@@ -11,7 +11,7 @@ $aid = $_GET['aid'];
 //form handling
 
 if (isset($_POST['vidid'])) {
-	$_POST = stripslashes_deep($_POST); 
+	//DB $_POST = stripslashes_deep($_POST);
 	$vidid = $_POST['vidid'];
 	$data = array();
 	$i = 0;
@@ -25,16 +25,16 @@ if (isset($_POST['vidid'])) {
 		}
 		if (isset($_POST['hasfollowup'.$i])) {
 			$n[3] = timetosec($_POST['followupend'.$i]);
-			
+
 			if (isset($_POST['showlink'.$i])) {
 				$n[4] = true;
-			} else { 
+			} else {
 				$n[4] = false;
 			}
 			$n[5] = trim(htmlentities($_POST['followuptitle'.$i]));
 		}
 		$data[$thistime] = $n;
-		$i++;	
+		$i++;
 	}
 	ksort($data);
 	$data = array_values($data);
@@ -42,12 +42,15 @@ if (isset($_POST['vidid'])) {
 	if (trim($_POST['finalseg'])!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
-	$data = addslashes(serialize($data));
-	$query = "UPDATE imas_assessments SET viddata='$data' WHERE id='$aid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	
+	//DB 	$data = addslashes(serialize($data));
+	$data = serialize($data);
+	//DB $query = "UPDATE imas_assessments SET viddata='$data' WHERE id='$aid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
+	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
+
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
-	exit;			
+	exit;
 }
 
 
@@ -58,9 +61,12 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$cou
 echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Video Navigation</div>\n";
 
 
-$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
+$stm->execute(array(':id'=>$aid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 $qorder = explode(',',$row[0]);
 $viddata = $row[1];
 $qidbynum = array();
@@ -79,10 +85,15 @@ for ($i=0;$i<count($qorder);$i++) {
 
 //Get question titles
 $qtitlebyid = array();
+//DB $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
+//DB $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
 $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
-$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid=:assessmentid";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':assessmentid'=>$aid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if (strlen($row[1])<30) {
 		$qtitle[$row[0]] = $row[1];
 	} else {
@@ -160,14 +171,14 @@ if ($viddata != '') {
 	$showlink = array_fill(0, $n, true);
 	$finalsegtitle = '';
 	$vidid = '';
-	
+
 }
 ?>
 <script type="text/javascript">
 var tag = document.createElement('script');
 tag.src = "//www.youtube.com/player_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag); 
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 var player;
 var vidid = "<?php echo $vidid;?>";
@@ -234,7 +245,7 @@ function validatevidform(el) {
 			}
 			lastsegtime = v;
 		}
-			
+
 	}
 	return true;
 }
@@ -243,7 +254,7 @@ function onYouTubePlayerAPIReady() {
 	if (vidid!="") {
 		loadPlayer();
 	}
-} 
+}
 
 function loadPlayer() {
 	player = new YT.Player('player', {
@@ -251,7 +262,7 @@ function loadPlayer() {
 		width: 443,
 		videoId: vidid,
 		playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0}
-	});	
+	});
 }
 
 function loadnewvideo() {
@@ -288,23 +299,23 @@ function updatefollowup(n,el) {
 }
 function addsegat(n) {
 	var insat = document.getElementById("insat"+n);
-	
+
 	var newins = document.createElement("div");
 	newins.className = "insblock";
 	newins.id = "insat"+(curnumseg+1);
 	newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;">Add video segment break</a>';
 	insat.parentNode.insertBefore(newins, insat);
-	
+
 	var html = 'Segment title: <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
 	html += 'Ends at: <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
 	html += '<input type="button" value="grab" onclick="grabcurvidtime('+curnumseg+',0);"/>';
 	html += ' <a href="#" onclick="return deleteseg(this);">[Delete]</a>';
-	
+
 	var newseg = document.createElement("div");
 	newseg.className = "vidsegblock";
 	newseg.innerHTML = html;
 	insat.parentNode.insertBefore(newseg, insat);
-	
+
 	curnumseg++;
 }
 
@@ -345,10 +356,10 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
 <p>This page allows you to setup your assessment to be cued to a video.  For each
 question, give a title to the video segment that leads up to that question, and select
 the time when that segment ends and the question should show.  You can grab this
-from the playing video, type the time in min:sec form.  Make sure all times are at least 
+from the playing video, type the time in min:sec form.  Make sure all times are at least
 one second before the end of the video.</p>
 
-<p>If your video contains a followup segment to a question (such as a solution), 
+<p>If your video contains a followup segment to a question (such as a solution),
 you can indicate this and specify when the followup ends.  The next segment will
 then start from the end of this followup.</p>
 
@@ -363,7 +374,7 @@ then start from the end of this followup.</p>
 for ($i=0;$i<$n;$i++) {
 	echo '<div class="insblock" id="insat'.$i.'">';
 	echo '<a href="#" onclick="addsegat('.$i.'); return false;">Add video segment break</a></div>';
-	
+
 	if (isset($qn[$i])) {
 		echo '<div class="vidsegblock">';
 		echo 'Segment title: <input type="text" size="20" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
@@ -373,7 +384,7 @@ for ($i=0;$i<$n;$i++) {
 		echo '<input type="hidden" name="qn'.$i.'" value="'.$qn[$i].'"/>';
 		echo '<br/>';
 		echo 'Has followup? <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
-		if ($hasfollowup[$i]) { 
+		if ($hasfollowup[$i]) {
 			echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'">';
 		} else {
 			echo ' onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'" style="display:none;">';
@@ -393,7 +404,7 @@ for ($i=0;$i<$n;$i++) {
 		echo 'Ends at: <input type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endtime[$i].'"/> ';
 		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
 	}
-}	
+}
 echo '<div class="insblock" id="insat'.$n.'">';
 echo '<a href="#" onclick="addsegat('.$n.'); return false;">Add video segment break</a></div>';
 

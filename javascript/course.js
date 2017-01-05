@@ -1,21 +1,21 @@
-function ahah(url, target) { 
+function ahah(url, target) {
   document.getElementById(target).innerHTML = ' Fetching data... ';
-  if (window.XMLHttpRequest) { 
-    req = new XMLHttpRequest(); 
-  } else if (window.ActiveXObject) { 
-    req = new ActiveXObject("Microsoft.XMLHTTP"); 
-  } 
-  if (typeof req != 'undefined') { 
-    req.onreadystatechange = function() {ahahDone(url, target);}; 
-    req.open("GET", url, true); 
-    req.send(""); 
-  } 
-}  
+  if (window.XMLHttpRequest) {
+    req = new XMLHttpRequest();
+  } else if (window.ActiveXObject) {
+    req = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  if (typeof req != 'undefined') {
+    req.onreadystatechange = function() {ahahDone(url, target);};
+    req.open("GET", url, true);
+    req.send("");
+  }
+}
 
-function ahahDone(url, target) { 
-  if (req.readyState == 4) { // only if req is "loaded" 
-    if (req.status == 200) { // only if "OK" 
-      document.getElementById(target).innerHTML = req.responseText; 
+function ahahDone(url, target) {
+  if (req.readyState == 4) { // only if req is "loaded"
+    if (req.status == 200) { // only if "OK"
+      document.getElementById(target).innerHTML = req.responseText;
       if (usingASCIIMath) {
 	      rendermathnode(document.getElementById(target));
       }
@@ -25,8 +25,8 @@ function ahahDone(url, target) {
       $('#'+target+' a').each(setuptracklinks);
       $('#'+target+' a[href*="youtu"]').each(setupvideoembeds);
       $('#'+target+' a[href*="vimeo"]').each(setupvideoembeds);
-      
-      var x = document.getElementById(target).getElementsByTagName("script"); 
+
+      var x = document.getElementById(target).getElementsByTagName("script");
       for(var i=0;i<x.length;i++) {
 	      if (x[i].src) {
 		      var script = document.createElement("script");
@@ -38,15 +38,15 @@ function ahahDone(url, target) {
 	      }
       }
 
-   
-    } else { 
-      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText; 
-    } 
-  } 
+
+    } else {
+      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText;
+    }
+  }
 }
 
 
-   
+
 var loadedblocks = new Array();
 
 function toggleblock(event,bnum,folder) {
@@ -61,51 +61,53 @@ function toggleblock(event,bnum,folder) {
 	  	loadedblocks.push(bnum);
 	  }
           node.className = 'hidden';
+          node.setAttribute('aria-hidden', true);
+          node.setAttribute('aria-expanded', false);
+          $("#blockhead"+bnum+" *[aria-expanded=true]").attr("aria-expanded",false);
           //butn.value = 'Expand';
 	  if (img != null) {
 		  img.src = imasroot+'/img/expand.gif';
 	  }
           if (loc>-1) {oblist.splice(loc,1);}
-      } else { 
+      } else {
           if (arraysearch(bnum,loadedblocks)==-1) {
 	  	ahah(getbiaddr+folder,'block'+bnum);
 		if (arraysearch(folder,plblist)==-1) {
-			plblist.push(folder);	
+			plblist.push(folder);
 		}
 	  }
           node.className = 'blockitems';
+          node.setAttribute('aria-hidden', false);
+          node.setAttribute('aria-expanded', true);
+          $("#blockhead"+bnum+" *[aria-expanded=false]").attr("aria-expanded",true);
           //butn.value = 'Collapse';
 	  if (img != null) {
 		  img.src = imasroot+'/img/collapse.gif';
 	  }
-          if (loc==-1) {oblist.push(bnum);} 
+          if (loc==-1) {oblist.push(bnum);}
       }
       oblist = oblist.join(',');
       plblist = plblist.join(',');
       document.cookie = 'openblocks-' +cid+'='+ oblist;
       document.cookie = 'prevloadedblocks-'+cid+'='+plblist;
       if (event.shiftKey && node.className == 'hidden') {
-          $("a[id^=blockh]").each(function(i,el) { 
-          	var id=$(el).attr("id").substr(6); 
+          $("a[id^=blockh]").each(function(i,el) {
+          	var id=$(el).attr("id").substr(6);
           	if ($("#block"+id).hasClass("blockitems")) { toggleblock({},id,null);}
-          });  
+          });
       }
    }
-   
+
 function showcalcontents(el) {
 	var html = '';
 	if (typeof el == 'number') {
-		var calwalk = new Date();
-		calwalk.setTime(el);
-		for (var j=0; j<28; j++) {
-			moday = (calwalk.getMonth()+1) + '-' + (calwalk.getDate());
+		for (moday in caleventsarr) {
 			if (caleventsarr[moday].data!=null) {
 				html += '<div style="background-color:#ddf;">'+caleventsarr[moday].date + '</div>';
 				html += showcalcontentsid(moday);
 			}
-			calwalk.setDate(calwalk.getDate()+1);
 		}
-		
+
 	} else if (caleventsarr[el.id]!=null) {
 		html += '<div style="background-color:#ddf;">'+caleventsarr[el.id].date + '</div>';
 		html += showcalcontentsid(el.id);
@@ -115,15 +117,12 @@ function showcalcontents(el) {
 			href = href.replace(/^(.*?cid=\d+).*$/,"$1");
 			mlink.href = href+"&addto="+(Date.parse(caleventsarr[el.id].date)/1000);
 		}
-	} 
-	
-	document.getElementById('caleventslist').innerHTML = html;	
-	var alltd = document.getElementsByTagName("td");
-	for (var i=0;i<alltd.length;i++) {
-		alltd[i].style.backgroundColor = '#fff';
 	}
+
+	document.getElementById('caleventslist').innerHTML = html;
+	$("table.cal td").removeClass("today");
 	if (typeof el != 'number') {
-		el.style.backgroundColor = '#fdd';
+		$(el).addClass("today");
 	}
 }
 
@@ -132,15 +131,24 @@ function showcalcontentsid(elid) {
 	if (caleventsarr[elid].data!=null) {
 		html += '<ul class=qview style="margin-top: 2px;">';
 		for (var i=0; i<caleventsarr[elid].data.length; i++) {
-			if (caleventsarr[elid].data[i].type=='A') { 
-				html += '<li><span class="calitem" style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null && !caleventsarr[elid].data[i].hasOwnProperty('inactive')) { 
+			if (!caleventsarr[elid].data[i].hasOwnProperty("time")) {
+				//minimal listing for editing purposes
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
+				html += caleventsarr[elid].data[i].name;
+				if (caleventsarr[elid].data[i].type.charAt(1)=='S') {
+					html += ". " + _("Available After Date");
+				} else if (caleventsarr[elid].data[i].type.charAt(1)=='E') {
+					html += ". " + _("Available Until Date");
+				}
+			} else if (caleventsarr[elid].data[i].type=='AE') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
+				if (caleventsarr[elid].data[i].id!=null && !caleventsarr[elid].data[i].hasOwnProperty('inactive')) {
 					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
 					if (caleventsarr[elid].data[i].timelimit!=null) {
 						html += 'onclick="return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
 						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
 					} else {
-						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';	
+						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';
 					}
 					html += '>';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -161,10 +169,10 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='AR') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+';padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
-					//html += '<a onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';	
-					html += 'href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
+				if (caleventsarr[elid].data[i].id!=null) {
+					//html += '<a onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';
+					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
 				} else {
 					html += caleventsarr[elid].data[i].name;
@@ -175,8 +183,8 @@ function showcalcontentsid(elid) {
 					html += ' <a href="isolateassessgrade.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='I') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+			} else if (caleventsarr[elid].data[i].type.charAt(0)=='I') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].folder != null) {
 					html += '<a href="../course/course.php?cid='+cid+'&folder='+caleventsarr[elid].data[i].folder+'#inline'+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -187,10 +195,10 @@ function showcalcontentsid(elid) {
 					html += ' <a href="addinlinetext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='L') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
-					
+			} else if (caleventsarr[elid].data[i].type.charAt(0)=='L') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
+				if (caleventsarr[elid].data[i].id!=null) {
+
 					if (caleventsarr[elid].data[i].link=='') {
 						html += '<a onclick="recclick(\'linkedviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';
 						if (caleventsarr[elid].data[i].target==1) { html += 'target="_blank" ';}
@@ -201,20 +209,20 @@ function showcalcontentsid(elid) {
 						html += 'href="'+caleventsarr[elid].data[i].link+'">';
 					}
 					html += caleventsarr[elid].data[i].name;
-					if (caleventsarr[elid].data[i].target==1) {html += ' <img src="'+imasroot+'/img/extlink.png"/>';}
+					if (caleventsarr[elid].data[i].target==1) {html += ' <img src="'+imasroot+'/img/extlink.png" alt="External link"/>';}
 					html += '</a>';
-					
+
 				} else {
 					html += caleventsarr[elid].data[i].name;
 				}
-				
+
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FP') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
+				if (caleventsarr[elid].data[i].id!=null) {
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
 				} else {
@@ -232,8 +240,8 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FR') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
+				if (caleventsarr[elid].data[i].id!=null) {
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
 				} else {
@@ -250,8 +258,8 @@ function showcalcontentsid(elid) {
 					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='D') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+			} else if (caleventsarr[elid].data[i].type=='DE') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id != null) {
 					html += '<a href="../course/drillassess.php?cid='+cid+'&daid='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -263,18 +271,18 @@ function showcalcontentsid(elid) {
 					html += ' <a href="gb-viewdrill.php?cid='+cid+'&daid='+caleventsarr[elid].data[i].id+'">Scores</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='C') {
-				html += '<li><span class="calitem" style="background-color: #0ff; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+			} else if (caleventsarr[elid].data[i].type=='CD') {
+				html += '<li><span class="calitem">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				html += caleventsarr[elid].data[i].name;
 				html += '</li>';
-			} 
+			}
 		}
 		html += '</ul>';
 	}
 	return html;
 }
 jQuery(document).ready(function($) {
-	$(".caldl").attr("title",_("Bring this day to top"));		
+	$(".caldl").attr("title",_("Bring this day to top"));
 });
 
 function changecallength(el) {
@@ -307,7 +315,7 @@ function playlisttogglelist() {
 	var wrap = $('#playlistwrap'+id);
 	var bar = $('#playlistbar'+id);
 	if (wrap.find('.playlisttext').css('display')=='none') {
-		//show list	
+		//show list
 		wrap.find('.playlisttext').show();
 		wrap.find('.playlistvid').hide();
 		bar.find('.vidtracks').removeClass("vidtracks").addClass("vidtracksA");
@@ -317,7 +325,7 @@ function playlisttogglelist() {
 		wrap.find('.playlistvid').show();
 		bar.find('.vidtracksA').removeClass("vidtracksA").addClass("vidtracks");
 	}
-	
+
 }
 function playliststart(id,vidk,el) {
 	if (el!==null) {
@@ -371,12 +379,12 @@ function playliststart(id,vidk,el) {
 		bar.find('.vidtracksA').removeClass('vidtracksA').addClass('vidtracks').css('cursor','pointer')
 			.bind('click',playlisttogglelist).next().css('cursor','pointer').bind('click', playlisttogglelist);
 	} else {
-		wrap.find('iframe').attr('src',url);	
+		wrap.find('iframe').attr('src',url);
 	}
 	if (playlist[id][vidk].isGdrive) {
-		bar.find('.playlisttitle').html(playlist[id][vidk].name+' <a target="_blank" href="https://drive.google.com/file/d/'+playlist[id][vidk].vidid+'/view"><img src="'+imasroot+'/img/extlink.png"/></a>');
+		bar.find('.playlisttitle').html(playlist[id][vidk].name+' <a target="_blank" href="https://drive.google.com/file/d/'+playlist[id][vidk].vidid+'/view"><img src="'+imasroot+'/img/extlink.png" alt="External link"/></a>');
 	} else {
-		bar.find('.playlisttitle').html(playlist[id][vidk].name+' <a target="_blank" href="http://www.youtube.com/watch?v='+playlist[id][vidk].vidid+'"><img src="'+imasroot+'/img/extlink.png"/></a>');
+		bar.find('.playlisttitle').html(playlist[id][vidk].name+' <a target="_blank" href="http://www.youtube.com/watch?v='+playlist[id][vidk].vidid+'"><img src="'+imasroot+'/img/extlink.png" alt="External link"/></a>');
 	}
 	if (vidk==0) {
 		bar.find('.vidrew,.vidrewI').removeClass("vidrew").addClass("vidrewI");
@@ -392,7 +400,7 @@ function playliststart(id,vidk,el) {
 
 /*
 function VidlistonPlayerReady(event) {
-	
+
 }
 function VidlistonPlayerStateChange(event) {
 	if (event.data==0) {//end of video

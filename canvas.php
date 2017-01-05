@@ -39,4 +39,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
       </lticm:options>
       <lticm:property name="session_setup_url"><?php echo $urlmode.$host . $imasroot . '/ltisessionsetup.php';?></lticm:property>
     </blti:extensions>
+    <blti:custom>
+    	<lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>
+    </blti:custom>
   </cartridge_basiclti_link>

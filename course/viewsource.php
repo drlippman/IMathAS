@@ -13,7 +13,7 @@
 	if (isset($_GET['aid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; View Source</div>";
-	
+
 	} else if (isset($_GET['daid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; View Source</div>";
@@ -26,14 +26,17 @@
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
 			echo "&gt; <a href=\"manageqset.php?cid={$_GET['cid']}\">Manage Question Set</a> &gt; View Source</div>\n";
 		}
-		
-	} 
-	
+
+	}
+
 	$qsetid = $_GET['id'];
-	$query = "SELECT * FROM imas_questionset WHERE id='$qsetid'";
-	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
-	
+	//DB $query = "SELECT * FROM imas_questionset WHERE id='$qsetid'";
+	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
+	$stm->execute(array(':id'=>$qsetid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
+
 	echo '<div id="headerviewsource" class="pagetitle"><h2>Question Source</h2></div>';
 	echo "<h4>Descr'ption</h4>\n";
 	echo "<pre>".$line['description']."</pre>\n";
@@ -49,8 +52,8 @@
 	echo "<pre>".$line['qtext']."</pre>\n";
 	echo "<h4>Answer</h4>\n";
 	echo "<pre>".$line['answer']."</pre>\n";
-	
-	
+
+
 	if (!isset($_GET['aid'])) {
 		echo "<a href=\"manageqset.php?cid={$_GET['cid']}\">Return to Question Set Management</a>\n";
 	} else {

@@ -9,22 +9,22 @@ ini_set("max_execution_time", "900");
 ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
-                                        
+
 /*** master php includes *******/
 require("../validate.php");
 require("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
- 
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Library Export";
 
- 
+
 //data manipulation here
 $isadmin = false;
-$isgrpadmin = false; 
+$isgrpadmin = false;
 
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid)) && $myrights<20) {
@@ -35,9 +35,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 	$body = "You need to log in as an admin to access this page";
 } elseif (!(isset($_GET['cid'])) && $myrights < 75) {
  	$overwriteBody = 1;
-	$body = "Please access this page from the menu links only.";		
+	$body = "Please access this page from the menu links only.";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-	
+
 	$cid = (isset($_GET['cid'])) ? $_GET['cid'] : "admin" ;
 
 	if ($myrights < 100) {
@@ -45,9 +45,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 	} else if ($myrights == 100) {
 		$isadmin = true;
 	} else if (!isset($teacherid)) {
-		$isadminpage = true;	
+		$isadminpage = true;
 	}
-		
+
 	if (isset($_POST['submit']) && $_POST['submit']=='Export') { //STEP 2 DATA MANIPULATION
 		if (count($_POST['libs'])==0) {
 			echo "No libraries selected";
@@ -58,13 +58,14 @@ if (!(isset($teacherid)) && $myrights<20) {
 		echo "PACKAGE DESCRIPTION\n";
 		echo $_POST['packdescription'];
 		echo "\n";
-		
+
 		$rootlibs = $_POST['libs'];  //root libs
 		if (isset($_POST['rootlib'])) {
 			array_unshift($rootlibs,$_POST['rootlib']);
 		}
-		$rootlist = "'".implode("','",$rootlibs)."'";
-		
+		//DB $rootlist = "'".implode("','",$rootlibs)."'";
+		$rootlist = implode(',', array_map('intval', $rootlibs));
+
 		$libcnt = 1;
 		$libs = Array();
 		$parents = Array();
@@ -73,15 +74,17 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$noncopyright = isset($_POST['noncopyright']);
 		//$libs is systemid=>newid
 		//$parents is childnewid=>parentnewid
-		
+
 		//get root lib names
 		$query = "SELECT id,name,parent,uniqueid,lastmoddate FROM imas_libraries WHERE id IN ($rootlist)";
 		if ($nonpriv) {
 			$query .= " AND userights>0";
 		}
 		$query .= " ORDER BY uniqueid";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+    $stm = $DBH->query($query);
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if (!in_array($row[2],$rootlibs)) { //don't export children here
 				$libs[$row[0]] = $libcnt;
 				$parents[$libcnt] = 0;
@@ -99,18 +102,28 @@ if (!(isset($teacherid)) && $myrights<20) {
 				$libcnt++;
 			}
 		}
-		
+
 		//lists child libraries
 		function getchildlibs($lib) {
-			global $libs,$libcnt,$nonpriv;
-			$query = "SELECT id,name,uniqueid,lastmoddate FROM imas_libraries WHERE parent='$lib'";
+			global $DBH,$libs,$libcnt,$nonpriv;
+			//DB $query = "SELECT id,name,uniqueid,lastmoddate FROM imas_libraries WHERE parent='$lib'";
+			//DB if ($nonpriv) {
+				//DB $query .= " AND userights>0";
+			//DB }
+			//DB $query .= " ORDER BY uniqueid";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+				//DB while ($row = mysql_fetch_row($result)) {
+			$query = "SELECT id,name,uniqueid,lastmoddate FROM imas_libraries WHERE parent=:parent";
 			if ($nonpriv) {
-				$query .= " AND userights>0";
-			}
+        $query .= " AND userights>0";
+      }
 			$query .= " ORDER BY uniqueid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':parent'=>$lib));
+
+			if ($stm->rowCount()>0) {
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if (!isset($libs[$row[0]])) { //in case someone clicked a parent and it's child
 						$libs[$row[0]] = $libcnt;
 						$parents[$libcnt] = $libs[$lib];
@@ -131,16 +144,14 @@ if (!(isset($teacherid)) && $myrights<20) {
 				}
 			}
 		}
-		
+
 		foreach ($rootlibs as $k=>$rootlib) {
 			getchildlibs($rootlib);
 		}
-		
+
 		$libarray = array_keys($libs);
-		foreach($libarray as $k=>$v) {
-			$libarray[$k] = "'".$v."'";
-		}
-		$liblist = implode(',',$libarray);
+
+		$liblist = implode(',', array_map('intval', $libarray));
 		//set question id array
 		//$qassoc is systemqsetid=>newqsetid
 		//$libitems is newlibid=>newqsetid
@@ -149,19 +160,21 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$query .= "WHERE imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
-		} 
+		}
 		if ($noncopyright) {
 			$query .= " AND imas_questionset.license>0";
 		}
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+    $stm = $DBH->query($query);
 		$qassoc = Array();
 		$libitems = Array();
 		$qcnt = 0;
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if (!isset($qassoc[$row[0]])) {$qassoc[$row[0]] = $qcnt; $qcnt++;}
 			$libitems[$libs[$row[1]]][] = $qassoc[$row[0]];
 		}
-		
+
 		foreach ($libs as $newid) {
 			if (isset($libitems[$newid])) {
 				echo "\nSTART LIBRARY ITEMS\n";
@@ -171,9 +184,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 				echo rtrim(implode(',',$libitems[$newid])) . "\n";
 			}
 		}
-		
+
 		$imgfiles = array();
-		$qlist = implode(',',array_unique(array_keys($qassoc)));
+		$qlist = implode(',', array_map('intval', array_unique(array_keys($qassoc))));
 		//first, lets pull any questions that have include__from so we can lookup backrefs
 		$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
 		//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
@@ -182,9 +195,11 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND userights>0";
 		}
 		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+    $stm = $DBH->query($query);
 		$includedqs = array();
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
 			}
@@ -194,14 +209,16 @@ if (!(isset($teacherid)) && $myrights<20) {
 		}
 		$includedbackref = array();
 		if (count($includedqs)>0) {
-			$includedlist = implode(',',$includedqs);
-			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
-			$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$includedbackref[$row[0]] = $row[1];		
+			$includedlist = implode(',', array_map('intval', $includedqs));
+			//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
+			//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->query("SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)");
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$includedbackref[$row[0]] = $row[1];
 			}
 		}
-		
+
 		//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
 		//$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
 		$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
@@ -209,10 +226,18 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND userights>0";
 		}
 		$query .= " ORDER BY uniqueid";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
-			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+    $stm = $DBH->query($query);
+		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+			//DB $line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
+			//DB $line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
+      $line['control'] = preg_replace_callback('/includecodefrom\((\d+)\)/', function($matches) use ($includedbackref) {
+          return "includecodefrom(UID".$includedbackref[$matches[1]].")";
+        }, $line['control']);
+      $line['qtext'] = preg_replace_callback('/includeqtextfrom\((\d+)\)/', function($matches) use ($includedbackref) {
+          return "includeqtextfrom(UID".$includedbackref[$matches[1]].")";
+        }, $line['qtext']);
 			echo "\nSTART QUESTION\n";
 			echo "QID\n";
 			echo rtrim($qassoc[$line['id']]) . "\n";
@@ -248,9 +273,12 @@ if (!(isset($teacherid)) && $myrights<20) {
 			echo rtrim($line['otherattribution']) . "\n";
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
-				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($row = mysql_fetch_row($r2)) {
+				//DB $query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
+				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB while ($row = mysql_fetch_row($r2)) {
+				$stm2 = $DBH->prepare("SELECT var,filename FROM imas_qimages WHERE qsetid=:qsetid");
+				$stm2->execute(array(':qsetid'=>$line['id']));
+				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 					$row[1] = trim($row[1]);
 					echo $row[0].','.$row[1]. "\n";
 					if ($GLOBALS['filehandertypecfiles'] == 's3') {
@@ -268,10 +296,10 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$tar = new tar();
 		$tar->addFiles($imgfiles);
 		$tar->toTar("../course/files/qimages.tar.gz",TRUE);
-		
+
 		exit;
 	} else {  //STEP 1 DATA MANIPULATION
-		
+
 		if ($isadmin || $isgrpadmin || $isadminpage) {
 			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Export libraries</div>\n";
 		} else {
@@ -279,24 +307,24 @@ if (!(isset($teacherid)) && $myrights<20) {
 		}
 	}
 }
-	
+
 /******* begin html output ********/
 require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
-} else {	
+} else {
 
 	echo $curBreadcrumb
 ?>
 	<form method=post action="exportlib.php?cid=<?php echo $cid ?>">
-		
+
 		<div id="headerexportlib" class="pagetitle"><h2>Library Export</h2></div>
-		<p>Note:  If a parent library is selected, it's children libraries are included in the export, 
-		and heirarchy will be maintained.  If libraries from different trees are selected, the topmost 
+		<p>Note:  If a parent library is selected, it's children libraries are included in the export,
+		and heirarchy will be maintained.  If libraries from different trees are selected, the topmost
 		libraries in each branch selected will be exported at the same level.</p>
-	
-<?php	
+
+<?php
 	$select = "all";
 	include("../course/libtree.php");
 ?>
@@ -312,13 +340,13 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<textarea name="packdescription" rows=4 cols=60></textarea>
 		</span><br class=form>
-			
+
 		<input type=submit name="submit" value="Export"><br/>
 		Once exported, <a href="../course/files/qimages.tar.gz">download image files</a> to be put in assessment/qimages
 	</form>
-	
+
 
 <?php
-}	
+}
 require("../footer.php");
 ?>

@@ -6,17 +6,17 @@
 global $allowedmacros;
 array_push($allowedmacros,"chem_disp","chem_mathdisp","chem_isotopedisp","chem_getsymbol","chem_getnumber","chem_getname","chem_getweight","chem_getmeltingpoint","chem_getboilingpoint","chem_getfamily","chem_randelementbyfamily"," chem_diffrandelementsbyfamily", "chem_getrandcompound", "chem_getdiffrandcompounds","chem_decomposecompound","chem_getcompoundmolmass","chem_randanion","chem_randcation","chem_makeioniccompound");
 
-//chem_disp(compound) 
+//chem_disp(compound)
 //formats a compound for display in as HTML
 function chem_disp($c) {
 	$c = preg_replace('/_(\d+)/','<sub>$1</sub>',$c);
-	return str_replace(' ','',$c);	
+	return str_replace(' ','',$c);
 }
 
-//chem_mathdisp(compound) 
+//chem_mathdisp(compound)
 //formats a compound for better display in math mode
 function chem_mathdisp($c) {
-	return preg_replace('/([a-zA-Z]+)/','"$1"',$c);	
+	return preg_replace('/([a-zA-Z]+)/','"$1"',$c);
 }
 
 //chem_isotopedisp(element,super,sub,[noitalic])
@@ -56,7 +56,7 @@ function chem_getsymbol($n) {
 }
 
 //chem_getnumber(symbol)
-//returns the atomic number given the chemical symbol 
+//returns the atomic number given the chemical symbol
 function chem_getnumber($s) {
 	global $chem_numberbyatom;
 	return $chem_numberbyatom[$s];
@@ -94,7 +94,7 @@ function chem_getboilingpoint($n) {
 
 //chem_getfamily(atomic number)
 //returns the family given the atomic number
-//Values may be:  "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen", 
+//Values may be:  "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen",
 //    "Transition Metal", "Lanthanide",  or "Actinide"
 function chem_getfamily($n) {
 	global $chem_periodic_table;
@@ -103,22 +103,22 @@ function chem_getfamily($n) {
 
 //chem_randelementbyfamily(family)
 //returns the atomic number of a random element from a family
-//Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+//Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth",
 //    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
 function chem_randelementbyfamily($f) {
-	global $chem_families;
+	global $chem_families, $RND;
 	$f = strtolower($f);
 	if (!isset($chem_families[$f])) {
 		echo 'Family not valid';
 		return 0;
 	}
 	$c = count($chem_families[$f]);
-	return $chem_families[$f][rand(0,$c-1)];
+	return $chem_families[$f][$RND->rand(0,$c-1)];
 }
 
 //chem_diffrandelementsbyfamily(family, n)
 //returns an array of n atomic numbers for random elements from a family
-//Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+//Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth",
 //    "Halogen", "Transition Metal", "Lanthanide", or "Actinide"
 function chem_diffrandelementsbyfamily($f, $n) {
 	global $chem_families;
@@ -141,20 +141,20 @@ function chem_diffrandelementsbyfamily($f, $n) {
 //valid types are: twobasic, twosub, threeplus, parens
 //if type is not supplied, compound is chosen randomly from all
 function chem_getrandcompound($type="twobasic,twosub,threeplus,parens") {
-	global $chem_compounds;
+	global $chem_compounds, $RND;
 	$types = explode(',',$type);
 	$n = array();
 	foreach ($types as $v) {
 		$n[] = count($chem_compounds[$v]);
 	}
-	$r = rand(0,array_sum($n)-1);
+	$r = $RND->rand(0,array_sum($n)-1);
 	foreach ($types as $i=>$v) {
 		if ($r<$n[$i]) {
-			return $chem_compounds[$v][$r];	
+			return $chem_compounds[$v][$r];
 		} else {
 			$r -= $n[$i];
-		} 
-	}		
+		}
+	}
 }
 
 //chem_getdiffrandcompounds(n,type)
@@ -177,7 +177,7 @@ function chem_getdiffrandcompounds($c, $type="twobasic,twosub,threeplus,parens")
 				unset($r[$k]);
 			} else {
 				$r[$k] -= $n[$i];
-			} 
+			}
 		}
 	}
 	return $out;
@@ -219,7 +219,7 @@ function chem_decomposecompound($c) {
 //gets the molecular mass of the given compound
 // round: decimals to round the individual atoms' molecular mass to during calculuations
 //        default: no additional rounding (4 decimal place accuracy)
-//        special value: .5.  Rounds all values to whole numbers, except Cl and Cu to nearest .5 
+//        special value: .5.  Rounds all values to whole numbers, except Cl and Cu to nearest .5
 function chem_getcompoundmolmass($c,$round=4) {
 	global $chem_periodic_table, $chem_numberbyatom;
 	list($els,$cnt) = chem_decomposecompound($c);
@@ -232,7 +232,7 @@ function chem_getcompoundmolmass($c,$round=4) {
 				$molmass += round($chem_periodic_table[$chem_numberbyatom[$el]][3])*$cnt[$k];
 			}
 		} else if ($round<4) {
-			$molmass += round($chem_periodic_table[$chem_numberbyatom[$el]][3],$round)*$cnt[$k];	
+			$molmass += round($chem_periodic_table[$chem_numberbyatom[$el]][3],$round)*$cnt[$k];
 		} else {
 			$molmass += $chem_periodic_table[$chem_numberbyatom[$el]][3]*$cnt[$k];
 		}
@@ -328,7 +328,7 @@ function chem_makeioniccompound($cation,$anion) {
 			echo "Anion not found.";
 		}
 	}
-		
+
 	$lcm = lcm($cation[1],$anion[1]);
 	$catsub = $lcm/$cation[1];
 	if ($catsub==1) {
@@ -345,7 +345,7 @@ function chem_makeioniccompound($cation,$anion) {
 			$formula = $cation[0];
 			$formula .= '_'.$catsub;
 		}
-		
+
 	}
 	$ansub = $lcm/$anion[1];
 	if ($ansub==1) {
@@ -355,19 +355,19 @@ function chem_makeioniccompound($cation,$anion) {
 			$formula .= ' ('.$anion[0].')';
 			$formula .= '_'.$ansub;
 		} else if (strpos($anion[0],'_')!==false) {
-			$pts = explode('_',$anion[0]);	
+			$pts = explode('_',$anion[0]);
 			$formula .= ' '.$pts[0].'_'.($ansub*$pts[1]);
 		} else {
 			$formula .= ' '.$anion[0];
 			$formula .= '_'.$ansub;
 		}
-		
+
 	}
 	$name = $cation[2].' '.$anion[2];
 	return array($formula,$name);
 }
-	
-	
+
+
 $GLOBALS['chem_periodic_table'] = array(
 	1=>array("H", "Hydrogen", 1,1.0079, "-255.34", "-252.87", ""),
         2=>array("He", "Helium", 2,4.00260, "< -272.2", "-268.934", "Noble gas"),
@@ -844,4 +844,3 @@ $GLOBALS['chem_compounds'] = array(
 		array('Zinc cyanide','Zn (C N)_2')
 	)
 );
-	

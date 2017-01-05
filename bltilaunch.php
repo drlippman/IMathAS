@@ -9,9 +9,9 @@
 //   cid_###      : launches course with given id.  secret is course's ltisecret
 //   placein_###  : launches a content linkage selector. In Canvas, uses resource selection return.
 //		    in others, links to resource id (which is lost on LMS course copy)
-//   sso_username : launches single signon to home page using given userid w/ rights 11 or 76. 
+//   sso_username : launches single signon to home page using given userid w/ rights 11 or 76.
 //                  secret value stored in DB password field.  Currently must be manually editted in DB
-//   username	  : like sso_username, but triggers course/item connection  
+//   username	  : like sso_username, but triggers course/item connection
 //   aid_, cid_, and sso_ types accept additional _0 or _1  :  0 is default, and links LMS account with a local account
 //                                      1 using LMS for validation, does not ask for local account info
 //
@@ -20,7 +20,7 @@
 //
 //  LMS MUST provide, in addition to key and secret:
 //    user_id
-//    
+//
 //  LMS MAY provide:
 //    lis_person_name_given
 //    lis_person_name_family
@@ -28,9 +28,9 @@
 
 header('P3P: CP="ALL CUR ADM OUR"');
 include("config.php");
-if (!get_magic_quotes_gpc()) {
-	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
-}
+//DB if (!get_magic_quotes_gpc()) {
+//DB 	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
+//DB }
 
 
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -75,59 +75,71 @@ if (
 
 //check to see if accessiblity page is posting back
 if (isset($_GET['launch'])) {
-	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	//DB $query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
+	$stm = $DBH->prepare('SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid');
+	$stm->execute(array(':sessionid'=>$sessionid));
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
+	if ($stm->rowCount()==0) {
 		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
 	}
-	list($enc,$userid) = mysql_fetch_row($result);
+	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
 	if ($_POST['access']==1) { //text-based
 		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 		 $sessiondata['graphdisp'] = 0;
-		 $sessiondata['useed'] = 0; 
+		 $sessiondata['useed'] = 0;
 	 } else if ($_POST['access']==2) { //img graphs
 		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 } else if ($_POST['access']==4) { //img math
 		 $sessiondata['mathdisp'] = 2;
 		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 } else if ($_POST['access']==3) { //img all
-		 $sessiondata['mathdisp'] = 2;  
+		 $sessiondata['mathdisp'] = 2;
 		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 } else {
-		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp']; 
+		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 }
-	
+
 	$enc = base64_encode(serialize($sessiondata));
-	
+
 	$now = time();
-	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	                                                               
+	//DB $query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare('UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id');
+	$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
+
 	if (isset($_POST['tzname'])) {
 		$tzname = $_POST['tzname'];
 	} else {
 		$tzname = '';
 	}
-	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}',tzname='$tzname' WHERE sessionid='$sessionid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	
+	//DB $query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}',tzname='$tzname' WHERE sessionid='$sessionid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare('UPDATE imas_sessions SET sessiondata=:sessiondata,tzoffset=:tzoffset,tzname=:tzname WHERE sessionid=:sessionid');
+	$stm->execute(array(':sessiondata'=>$enc, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessionid'=>$sessionid));
+
 	$keyparts = explode('_',$_SESSION['ltikey']);
 	if ($sessiondata['ltiitemtype']==0) { //is aid
 		$aid = $sessiondata['ltiitemid'];
-		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$cid = mysql_result($result,0,0);
+		//DB $query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $cid = mysql_result($result,0,0);
+		$stm = $DBH->prepare('SELECT courseid FROM imas_assessments WHERE id=:aid');
+		$stm->execute(array(':aid'=>$aid));
+		$cid = $stm->fetchColumn(0);
 		if ($sessiondata['ltirole'] == 'learner') {
-			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
-			$query .= "('$userid','$cid','assesslti','$aid',$now,'')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+			//DB $query .= "('$userid','$cid','assesslti','$aid',$now,'')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare('INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES (:userid,:courseid,\'assesslti\',:typeid,:viewtime,\'\')');
+			$stm->execute(array(':userid'=>$userid,':courseid'=>$cid,':typeid'=>$aid,':viewtime'=>$now));
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
@@ -142,14 +154,17 @@ if (isset($_GET['launch'])) {
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
-	exit;	
+	exit;
 } else if (isset($_GET['accessibility'])) {
-	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	//DB $query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare('SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid');
+	$stm->execute(array(':sessionid'=>$sessionid));
+	//DB if (mysql_num_rows($result)==0) {
+	if ($stm->rowCount()==0) {
 		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
 	}
-	list($enc,$userid) = mysql_fetch_row($result);
+	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
 	//time to output a postback to capture tzoffset and math/graph settings
 	$pref = 0;
@@ -161,25 +176,25 @@ if (isset($_GET['launch'])) {
 	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
-		echo "<p style=\"color:red;\">This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
 	} else {
 		echo ">";
 	}
 	?>
-	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  
+	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>
 	<input type="hidden" id="tzoffset" name="tzoffset" value="" />
-	<input type="hidden" id="tzname" name="tzname" value=""> 
-	<script type="text/javascript"> 
+	<input type="hidden" id="tzname" name="tzname" value="">
+	<script type="text/javascript">
 		 function updateloginarea() {
-			setnode = document.getElementById("settings"); 
-			var html = ""; 
+			setnode = document.getElementById("settings");
+			var html = "";
 			html += 'Accessibility: ';
 			html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help<\/a>";
 			html += '<div style="margin-top: 0px;margin-right:0px;text-align:right;padding:0px"><select name="access"><option value="0">Use defaults</option>';
 			html += '<option value="3">Force image-based display</option>';
 			html += '<option value="1">Use text-based display</option></select></div>';
-		
+
 			if (!MathJaxCompatible) {
 				html += '<input type="hidden" name="mathdisp" value="0" />';
 			} else {
@@ -191,10 +206,10 @@ if (isset($_GET['launch'])) {
 				html += '<input type="hidden" name="graphdisp" value="1" />';
 			}
 			html += '<div class="textright"><input type="submit" value="Continue" /><\/div>';
-			setnode.innerHTML = html; 
-			var thedate = new Date();  
+			setnode.innerHTML = html;
+			var thedate = new Date();
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
-			var tz = jstz.determine(); 
+			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
 		}
 		var existingonload = window.onload;
@@ -207,8 +222,8 @@ if (isset($_GET['launch'])) {
 	</form>
 	<?php
 	require("footer.php");
-	exit;	
-	
+	exit;
+
 } else if (isset($_GET['userinfo']) && isset($_SESSION['ltiuserid'])) {
 	//check to see if new LTI user is posting back user info
 	$ltiuserid = $_SESSION['ltiuserid'];
@@ -226,7 +241,7 @@ if (isset($_GET['launch'])) {
 	} else {
 		$allow_acctcreation = false;
 	}
-	if ($_GET['userinfo']=='set') {	
+	if ($_GET['userinfo']=='set') {
 		if (isset($CFG['GEN']['newpasswords'])) {
 			require_once("includes/password.php");
 		}
@@ -242,17 +257,21 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$query = "SELECT password,id FROM imas_users WHERE SID='{$_POST['curSID']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)==0) {
+				//DB $query = "SELECT password,id FROM imas_users WHERE SID='{$_POST['curSID']}'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare('SELECT password,id FROM imas_users WHERE SID=:sid');
+				$stm->execute(array(':sid'=>$_POST['curSID']));
+				//if (mysql_num_rows($result)==0) {
+				if ($stm->rowCount()==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					$realpw = mysql_result($result,0,0);
+					list($realpw,$tmpuserid) = $stm->fetch(PDO::FETCH_NUM); //DB mysql_result($result,0,0);
 					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
 					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
-						$userid=mysql_result($result,0,1);
+						$userid= $tmpuserid; //DB mysql_result($result,0,1);
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
+						unset($tmpuserid);
 					}
 				}
 			} else {
@@ -269,9 +288,12 @@ if (isset($_GET['launch'])) {
 				} else if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
 					$infoerr = 'Invalid email address';
 				} else {
-					$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($result)>0) {
+					//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare('SELECT id FROM imas_users WHERE SID=:sid');
+					$stm->execute(array(':sid'=>$_POST['SID']));
+					//DB if (mysql_num_rows($result)>0) {
+					if ($stm->rowCount()>0) {
 						$infoerr = "$loginprompt '{$_POST['SID']}' already used.  Please select another.";
 					}
 				}
@@ -288,10 +310,13 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
-			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$localltiuser = mysql_insert_id();	
-			if (!isset($userid) && $allow_acctcreation) {	
+			//DB $query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $localltiuser = mysql_insert_id();
+			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
+			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
+			$localltiuser = $DBH->lastInsertId();
+			if (!isset($userid) && $allow_acctcreation) {
 				if ($name_only) {
 					//make up a username/password for them
 					$_POST['SID'] = 'lti-'.$localltiuser;
@@ -305,18 +330,30 @@ if (isset($_GET['launch'])) {
 					}
 					$newgroupid = intval($_SESSION['lti_keygroupid']);
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,$newgroupid)";
+					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify,:groupid)';
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+						':FirstName'=>$_POST['firstname'],':LastName'=>$_POST['lastname'],':email'=>$_POST['email'],
+						':msgnotify'=>$msgnot,':groupid'=>$newgroupid));
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,$newgroupid)";
 				} else {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
+					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify)';
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+						':FirstName'=>$_POST['firstname'],':LastName'=>$_POST['lastname'],':email'=>$_POST['email'],
+						':msgnotify'=>$msgnot));
 				}
-				
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$userid = mysql_insert_id();	
+
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$userid = $DBH->lastInsertId(); //DB mysql_insert_id();
 			}
-			$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
-			mysql_query($query) or die("Query failed : " . mysql_error());	
+			//DB $query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
+			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -327,18 +364,18 @@ if (isset($_GET['launch'])) {
 		$nologo = true;
 		require("header.php");
 		if (isset($infoerr)) {
-			echo '<p style="color:red">'.$infoerr.'</p>';
+			echo '<p class=noticetext>'.$infoerr.'</p>';
 		}
-		
-		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";	
-		if ($name_only) { 
+
+		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";
+		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
 			echo "<p>Please provide a little information about yourself:</p>";
 			echo "<span class=form><label for=\"firstname\">Enter First Name (given name):</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>\n";
 			echo "<span class=form><label for=\"lastname\">Enter Last Name (surname):</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
-			
+
 		} else {
 			$deffirst = '';
 			$deflast = '';
@@ -352,13 +389,13 @@ if (isset($_GET['launch'])) {
 			if (isset($_SESSION['LMSemail'])) {
 				$defemail = $_SESSION['LMSemail'];
 			}
-			
+
 			if (isset($_SESSION['ltiorgname'])) {
 				$ltiorgname = $_SESSION['ltiorgname'];
 			} else {
 				$ltiorgname = $ltiorg;
 			}
-			
+
 			//strip off prepended org info before display
 			$ltiorgparts = explode(':',$ltiorgname);
 			if (count($ltiorgparts)>2) {
@@ -367,7 +404,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$ltiorgname = $ltiorgparts[1];
 			}
-			
+
 			//tying LTI to IMAthAS account
 			//give option to provide existing account info, or provide full new student info
 			if ($allow_acctcreation) {
@@ -397,10 +434,10 @@ if (isset($_GET['launch'])) {
 		}
 		echo "</form>\n";
 		require("footer.php");
-		exit;	
-			
+		exit;
+
 	}
-	
+
 } else if (isset($_SESSION['ltiuserid']) && !isset($_REQUEST['oauth_consumer_key'])) {
 	//refreshed this page from accessibility options page so session already exists
 	// (if user_id is set, then is new LTI request, so want to pass down to OAuth)
@@ -408,27 +445,33 @@ if (isset($_GET['launch'])) {
 	if (isset($_SESSION['userid'])) {
 		$userid = $_SESSION['userid'];
 	} else {
-		$query = "SELECT userid FROM imas_sessions WHERE sessionid='$sessionid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)==0) {
+		//DB $query = "SELECT userid FROM imas_sessions WHERE sessionid='$sessionid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare('SELECT userid FROM imas_sessions WHERE sessionid=:sessionid');
+		$stm->execute(array(':sessionid'=>$sessionid));
+		//DB if (mysql_num_rows($result)==0) {
+		if ($stm->rowCount()==0) {
 			reporterror("No session recorded");
 		} else {
-			$userid = mysql_result($result,0,0);
+			$userid = $stm->fetchColumn(0); //DB mysql_result($result,0,0);
 		}
 	}
-	
+
 	$keyparts = explode('_',$_SESSION['ltikey']);
 } else if(isset($_REQUEST['custom_view_folder'])) {
-	//temporary branch for handling this deprecated feature, until it can be removed.	
+	//temporary branch for handling this deprecated feature, until it can be removed.
 	$linkparts = explode("-",$_REQUEST['custom_view_folder']);
-	$query = "SELECT itemorder FROM imas_courses WHERE id='".intval($linkparts[0])."'";
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result2)==0) {
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='".intval($linkparts[0])."'";
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare('SELECT itemorder FROM imas_courses WHERE id=:cid');
+	$stm->execute(array(':cid'=>$linkparts[0]));
+	//DB if (mysql_num_rows($result2)==0) {
+	if ($stm->rowCount()==0) {
 		reporterror("invalid course identifier in folder view launch");
 	} else {
 		$cid = intval($linkparts[0]);
-		$row = mysql_fetch_row($result2);
-		$items = unserialize($row[0]);
+		$row = $stm->fetch(PDO::FETCH_ASSOC); //DB mysql_fetch_row($result2);
+		$items = unserialize($row['itemorder']);
 		function findfolder($items,$n,$loc) {
 			foreach ($items as $k=>$b) {
 				if (is_array($b)) {
@@ -451,21 +494,21 @@ if (isset($_GET['launch'])) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/public.php?cid=".$linkparts[0]."&folder=".$loc);
 	}
 	exit;
-	
+
 } else {
 	//not postback of new LTI user info, so must be fresh request
-	
+
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
 	if (empty($_REQUEST['user_id'])) {
 		reporterror("Unable to launch - User information not provided (user_id is required)");
 	} else {
 		$ltiuserid = $_REQUEST['user_id'];
 	}
-	
+
 	if (empty($_REQUEST['context_id'])) {
 		reporterror("Unable to launch - Course information not provided (context_id is required)");
 	}
-	
+
 	if (isset($_SESSION['ltiuserid']) && $_SESSION['ltiuserid']!=$ltiuserid) {
 		//new user - need to clear out session
 		session_destroy();
@@ -475,7 +518,7 @@ if (isset($_GET['launch'])) {
 		$_SESSION = array();
 		setcookie(session_name(),session_id());
 	}
-	
+
 	/*if (empty($_REQUEST['roles'])) {
 		reporterror("roles is required");
 	} else {
@@ -491,11 +534,11 @@ if (isset($_GET['launch'])) {
 	} else {
 		$ltikey = $_REQUEST['oauth_consumer_key'];
 	}
-	
+
 	//check OAuth Signature!
 	require_once 'includes/OAuth.php';
 	require_once 'includes/ltioauthstore.php';
-	
+
 	//set up OAuth
 	$store = new IMathASLTIOAuthDataStore();
 	$server = new OAuthServer($store);
@@ -506,14 +549,14 @@ if (isset($_GET['launch'])) {
 	try {
 		$requestinfo = $server->verify_request($request);
 	} catch (Exception $e) {
-		reporterror($e->getMessage());	
+		reporterror($e->getMessage());
 	}
 	$store->mark_nonce_used($request);
-	
+
 	$keyparts = explode('_',$ltikey);
 	$_SESSION['ltiorigkey'] = $ltikey;
-	
-	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
+
+	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='LTIkey') {  //cid:org
 		$_SESSION['ltilookup'] = 'c';
 		$ltiorg = $keyparts[1].':'.$ltiorg;
@@ -532,14 +575,14 @@ if (isset($_GET['launch'])) {
 		$parts = explode('-',$_REQUEST['custom_open_folder']);
 		$sourcecid = $parts[0];
 		$_SESSION['open_folder'] = array($sourcecid,$parts[1]);
-	} 
-	
-	
+	}
+
+
 	//Store all LTI request data in session variable for reuse on submit
 	//if we got this far, secret has already been verified
 	$_SESSION['ltiuserid'] = $ltiuserid;
 	$_SESSION['ltiorg'] = $ltiorg;
-	$ltirole = strtolower($_REQUEST['roles']);          
+	$ltirole = strtolower($_REQUEST['roles']);
 	if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false || strpos($ltirole,'contentdeveloper')!== false) {
 		$ltirole = 'instructor';
 	} else {
@@ -559,12 +602,13 @@ if (isset($_GET['launch'])) {
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
 	}
-	
+
 	//look if we know this user
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when LMS GUID change, while still storing it
 	$shortorg = $orgparts[0];	   //we'll only use the part from the lti key
 	$query = "SELECT lti.userid FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
-	$query .= "WHERE lti.org LIKE '$shortorg:%' AND lti.ltiuserid='$ltiuserid' ";
+	//DB $query .= "WHERE lti.org LIKE '$shortorg:%' AND lti.ltiuserid='$ltiuserid' ";
+	$query .= "WHERE lti.org LIKE :org AND lti.ltiuserid=:ltiuserid ";
 	if ($ltirole!='learner') {
 		//if they're a teacher, make sure their imathas account is too. If not, we'll act like we don't know them
 		//and require a new connection
@@ -574,17 +618,21 @@ if (isset($_GET['launch'])) {
 	//if there was a mixup and multiple records were created, use the first one
 	$query .= "ORDER BY iu.rights, lti.id";
 
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result) > 0) { //yup, we know them
-		$userid = mysql_result($result,0,0);
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':org'=>"$shortorg:%", ':ltiuserid'=>$ltiuserid));
+	//DB if (mysql_num_rows($result) > 0) { //yup, we know them
+	if ($stm->rowCount()>0) { //yup, we know them
+		//DB $userid = mysql_result($result,0,0);
+		$userid = $stm->fetchColumn(0);
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
-		
+
 		//go ahead and create the account if:
 		//has name information (should we skip?)
 		//domain level placement and (student or instructor with acceptable key rights)
 		//a _1 type placement and (student or instructor with acceptable key rights)
-	
+
 		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
 		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner') )) {
 			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
@@ -599,11 +647,14 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
-			
-			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$localltiuser = mysql_insert_id();	
-			if (!isset($userid)) {	
+
+			//DB $query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $localltiuser = mysql_insert_id();
+			$stm = $DBH->prepare('INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org,:ltiuserid)');
+			$stm->execute(array(':org'=>$ltiorg,':ltiuserid'=>$ltiuserid));
+			$localltiuser = $DBH->lastInsertId();
+			if (!isset($userid)) {
 				//make up a username/password for them
 				$_POST['SID'] = 'lti-'.$localltiuser;
 				$md5pw = 'pass'; //totally unusable since not md5'ed
@@ -615,18 +666,29 @@ if (isset($_GET['launch'])) {
 					}
 					$newgroupid = intval($_SESSION['lti_keygroupid']);
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0,'$newgroupid')";
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0,'$newgroupid')";
+					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0,:groupid)';
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+						':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email,':groupid'=>$newgroupid));
+
 				} else {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
+					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0)';
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
+						':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email));
 				}
-				
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$userid = mysql_insert_id();	
+
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$userid = $DBH->lastInsertId(); //DB $userid = mysql_insert_id();
 			}
-			$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
+			$stm->execute(array(':userid'=>$userid, ':localltiuser'=>$localltiuser));
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
@@ -634,7 +696,7 @@ if (isset($_GET['launch'])) {
 			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'];
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
-			} 
+			}
 		}
 	}
 	$_SESSION['ltikey'] = $ltikey;
@@ -647,10 +709,10 @@ if (isset($_GET['launch'])) {
 if ($askforuserinfo == true) {
 	if (!empty($_REQUEST['tool_consumer_instance_description'])) {
 		$_SESSION['ltiorgname'] = $_REQUEST['tool_consumer_instance_description'];
-	} 	
+	}
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?userinfo=ask");
-	exit;	
-	
+	exit;
+
 }
 
 //if here, we know the local userid.
@@ -674,28 +736,42 @@ $now = time();
 $orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
 $shortorg = $orgparts[0];
 
+//DB $query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
+//DB $query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
+//DB $query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB if (mysql_num_rows($result)==0) {
 $query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
-$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
-$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)==0) {
+$query .= "contextid=:contextid AND linkid=:linkid AND org LIKE :org";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>"$shortorg:%"));
+if ($stm->rowCount()==0) {
 	if (isset($_SESSION['place_aid'])) {
-		$query = "SELECT courseid FROM imas_assessments WHERE id='{$_SESSION['place_aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$aidsourcecid = mysql_result($result,0,0);
-			
+		//DB $query = "SELECT courseid FROM imas_assessments WHERE id='{$_SESSION['place_aid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $aidsourcecid = mysql_result($result,0,0);
+		$stm = $DBH->prepare('SELECT courseid FROM imas_assessments WHERE id=:aid');
+		$stm->execute(array(':aid'=>$_SESSION['place_aid']));
+		$aidsourcecid = $stm->fetchColumn(0);
+
 		//look to see if we've already linked this context_id with a course
-		$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
-		$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)==0) {
+		//DB $query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
+		//DB $query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result)==0) {
+		$stm = $DBH->prepare('SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org');
+		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+		if ($stm->rowCount()==0) {
 			//if instructor, see if the source course is ours
 			/***TODO:  check rights to see if they have course creation rights or not */
 			if ($_SESSION['ltirole']=='instructor') {
 				$copycourse = "notify";
-				$query = "SELECT id FROM imas_teachers WHERE courseid='$aidsourcecid' AND userid='$userid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) {
+				//DB $query = "SELECT id FROM imas_teachers WHERE courseid='$aidsourcecid' AND userid='$userid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)>0) {
+				$stm = $DBH->prepare('SELECT id FROM imas_teachers WHERE courseid=:aidsourcecid AND userid=:userid');
+				$stm->execute(array(':aidsourcecid'=>$aidsourcecid, ':userid'=>$userid));
+				if ($stm->rowCount()>0) {
 					$copycourse="ask";
 					if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useexisting") {
 						$destcid = $aidsourcecid;
@@ -710,13 +786,13 @@ if (mysql_num_rows($result)==0) {
 					$nologo = true;
 					$flexwidth = true;
 					require("header.php");
-					
+
 					echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}\">";
 					if ($copycourse=="ask") {
-						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this 
+						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this
 							link is located in a $installname course you are already a teacher of (course ID $aidsourcecid).
 							Would you like to associate this LMS course with that $installname course?  This means
-							that your students in your LMS course will show up in the Roster and Gradebook in that 
+							that your students in your LMS course will show up in the Roster and Gradebook in that
 							$installname course.  If you don't want to use your existing $installname course,
 							a copy of the $installname assignments can be made for you automatically and associated with
 							this LMS course.</p>
@@ -729,7 +805,7 @@ if (mysql_num_rows($result)==0) {
 							show in a separate $installname course.</p>
 							<p><input type=\"submit\" value=\"Continue\"/> (this may take a few moments - please be patient)</p>";
 					} else {
-						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this 
+						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this
 							link is located in a $installname course you are not a teacher of (course ID $aidsourcecid).
 							To use this content, a copy of the assignments will be made for you automatically,
 							and this LMS course will be associated with that copy in $installname.  This will allow you to make changes to the assignments
@@ -741,16 +817,16 @@ if (mysql_num_rows($result)==0) {
 					}
 					echo "</form>";
 					require("footer.php");
-					exit;	
+					exit;
 				}
 			} else {
 				reporterror("Course link not established yet.  Notify your instructor they need to click this assignment to set it up.");
 			}
 			if ($copycourse == "yes") {
-				//create a course  
+				//create a course
 				//creating a copy of a template course
 				$blockcnt = 1;
-				$itemorder = addslashes(serialize(array()));
+				$itemorder = serialize(array());
 				$randkey = uniqid();
 				$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
 				$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
@@ -758,49 +834,90 @@ if (mysql_num_rows($result)==0) {
 				$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 				$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 				$msgmonitor = (floor($msgset/5))&1;
-				$msgQtoInstr = (floor($msgset/5))&2;
 				$msgset = $msgset%5;
 				$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
 				$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
 				$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
-				$chatset = isset($CFG['CPS']['chatset'])?$CFG['CPS']['chatset'][0]:0;
 				$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
-				
+
 				$avail = 0;
 				$lockaid = 0;
-				mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
-				
-				$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-				$query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$destcid  = mysql_insert_id();
-				$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				
-				
+				//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+				$DBH->beginTransaction();
+
+				//DB $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+				//DB $query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $destcid  = mysql_insert_id();
+				$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+				$query .= "(:name,:ownerid,:enrollkey,:hideicons,:picicons,:allowunenroll,:copyrights,:msgset,:showlatepass,:itemorder,:topbar,:cploc,:available,:theme,:ltisecret,:blockcnt)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
+					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
+					':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
+				$destcid = $DBH->lastInsertId();
+
+				//DB $query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare('INSERT INTO imas_teachers (userid,courseid) VALUES (:userid,:destcid)');
+				$stm->execute(array(':userid'=>$userid, ':destcid'=>$destcid));
+
 				//DO full course copy
 				$sourcecid = $aidsourcecid;
-				$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='$sourcecid'";
-				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$row = mysql_fetch_row($result);
-				$query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$destcid'";
-				mysql_query($query) or die("Query failed :$query " . mysql_error());
-				
+				//DB $query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='$sourcecid'";
+				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				//DB $row = mysql_fetch_row($result);
+				$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,usersort FROM imas_gbscheme WHERE courseid=:courseid";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':courseid'=>$sourcecid));
+				$row = $stm->fetch(PDO::FETCH_NUM);
+
+				//DB $query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$destcid'";
+				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+				//$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode WHERE courseid=:courseid");
+				//$stm->execute(array(':useweights'=>$row[0], ':orderby'=>$row[1], ':defaultcat'=>$row[2], ':defgbmode'=>$row[3], ':stugbmode'=>$row[4], ':courseid'=>$destcid));
+				//bug fix: need to insert, not update
+				$stm = $DBH->prepare("INSERT INTO imas_gbscheme (courseid,useweights,orderby,defaultcat,defgbmode,stugbmode,usersort) VALUES (:courseid, :useweights, :orderby, :defaultcat, :defgbmode, :stugbmode, :usersort)");
+				$stm->execute(array(':courseid'=>$destcid, ':useweights'=>$row[0], ':orderby'=>$row[1], ':defaultcat'=>$row[2], ':defgbmode'=>$row[3], ':stugbmode'=>$row[4], ':usersort'=>$row[5]));
+
+
 				$gbcats = array();
-				$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$sourcecid'";
-				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
-					$frid = array_shift($row);
-					$irow = "'".implode("','",addslashes_deep($row))."'";
-					$query .= "('$destcid',$irow)";
-					mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$gbcats[$frid] = mysql_insert_id();
+				//DB $query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$sourcecid'";
+				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				//DB while ($row = mysql_fetch_row($result)) {
+				$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid");
+				$stm->execute(array(':courseid'=>$sourcecid));
+
+				$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden,calctype) VALUES ";
+				$query .= "(:courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden,:calctype)";
+				$cols = explode(',', ':courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden,:calctype');
+				$stm2 = $DBH->prepare($query);
+
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					//DB $query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
+					//DB $frid = array_shift($row);
+					//DB $irow = "'".implode("','",addslashes_deep($row))."'";
+					//DB $query .= "('$destcid',$irow)";
+					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+					//DB $gbcats[$frid] = mysql_insert_id();
+					$frid = $row[0];
+					$row[0] = $destcid; //change course id
+
+					$varmap = array();
+					foreach ($cols as $i=>$col) {
+						$varmap[$col] = $row[$i];
+					}
+					$stm2->execute($varmap);
+					$gbcats[$frid] = $DBH->lastInsertId();
 				}
 				$copystickyposts = true;
-				$query = "SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id='$sourcecid'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$r = mysql_fetch_row($result);
+				//DB $query = "SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id='$sourcecid'";
+				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				//DB $r = mysql_fetch_row($result);
+				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$sourcecid));
+				$r = $stm->fetch(PDO::FETCH_NUM);
+
 				$items = unserialize($r[0]);
 				$ancestors = $r[1];
 				$outcomesarr = $r[2];
@@ -810,32 +927,47 @@ if (mysql_num_rows($result)==0) {
 				} else {
 					$ancestors = intval($sourcecid).','.$ancestors;
 				}
-				$ancestors = addslashes($ancestors);
+				$ancestors = $ancestors;
 				$outcomes = array();
-				
+
+				//DB $query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
+				//DB $query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
+				//DB $query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
+				//DB $query .= "imas_assessments.courseid='$sourcecid' AND imas_questionset.replaceby>0";
+				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+				//DB while ($row = mysql_fetch_row($result)) {
 				$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
 				$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
 				$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
-				$query .= "imas_assessments.courseid='$sourcecid' AND imas_questionset.replaceby>0";
-				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$replacebyarr[$row[0]] = $row[1];  
+				$query .= "imas_assessments.courseid=:courseid AND imas_questionset.replaceby>0";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':courseid'=>$sourcecid));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$replacebyarr[$row[0]] = $row[1];
 				}
-				
+
 				if ($outcomesarr!='') {
-					$query = "SELECT id,name,ancestors FROM imas_outcomes WHERE courseid='$sourcecid'";
-					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-					while ($row = mysql_fetch_row($result)) {
+					//DB $query = "SELECT id,name,ancestors FROM imas_outcomes WHERE courseid='$sourcecid'";
+					//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					//DB while ($row = mysql_fetch_row($result)) {
+					$stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
+					$stm->execute(array(':courseid'=>$sourcecid));
+
+					$stm2 = $DBH->prepare("INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES (:destcid,:name,:ancestors)");
+
+					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						if ($row[2]=='') {
 							$row[2] = $row[0];
 						} else {
 							$row[2] = $row[0].','.$row[2];
 						}
-						$row[1] = addslashes($row[1]);
-						$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
-						$query .= "('$destcid','{$row[1]}','{$row[2]}')";
-						mysql_query($query) or die("Query failed :$query " . mysql_error());
-						$outcomes[$row[0]] = mysql_insert_id();
+						//DB $row[1] = addslashes($row[1]);
+						//DB $query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
+						//DB $query .= "('$destcid','{$row[1]}','{$row[2]}')";
+						//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+						//DB $outcomes[$row[0]] = mysql_insert_id();
+						$stm2->execute(array(':destcid'=>$destcid, ':name'=>$row[1], ':ancestors'=>$row[2]));
+						$outcomes[$row[0]] = $DBH->lastInsertId();
 					}
 					function updateoutcomes(&$arr) {
 						global $outcomes;
@@ -849,7 +981,7 @@ if (mysql_num_rows($result)==0) {
 					}
 					$outcomesarr = unserialize($outcomesarr);
 					updateoutcomes($outcomesarr);
-					$newoutcomearr = addslashes(serialize($outcomesarr));
+					$newoutcomearr = serialize($outcomesarr);
 				} else {
 					$newoutcomearr = '';
 				}
@@ -860,9 +992,12 @@ if (mysql_num_rows($result)==0) {
 				require_once("includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($sourcecid);
-				$itemorder = addslashes(serialize($newitems));
-				$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr',latepasshrs='$latepasshrs' WHERE id='$destcid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				$itemorder = serialize($newitems);
+				//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr',latepasshrs='$latepasshrs' WHERE id='$destcid'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':id'=>$destcid));
+
 				$offlinerubrics = array();
 				/*
 				//copy offline
@@ -884,63 +1019,99 @@ if (mysql_num_rows($result)==0) {
 					}
 				}*/
 				copyrubrics();
-				mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
-				
+				//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+				$DBH->commit();
+
 			}
+			//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+			//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$destcid)";
 			$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-			$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$destcid)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
+			$query .= "(:org, :contextid, :courseid)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$destcid));
 		} else {
-			$destcid = mysql_result($result,0,0);
+			//DB $destcid = mysql_result($result,0,0);
+			$destcid = $stm->fetchColumn(0);
 		}
 		if ($destcid==$aidsourcecid) {
 			//aid is in destination course - just make placement
 			$aid = $_SESSION['place_aid'];
 		} else {
 			//aid is in source course.  Let's see if we already copied it.
-			$query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '^".intval($_SESSION['place_aid'])."[[:>:]]' AND courseid=".intval($destcid);
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$aid = mysql_result($result,0,0);
+			//DB $query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '^".intval($_SESSION['place_aid'])."[[:>:]]' AND courseid=".intval($destcid);
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+			//DB 	$aid = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
+			$stm->execute(array(':ancestors'=>'^'.intval($_SESSION['place_aid']).'[[:>:]]', ':destcid'=>$destcid));
+			if ($stm->rowCount()>0) {
+				$aid = $stm->fetchColumn(0);
 			} else {
 				//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
 				//THIS SHOULD BE REMOVED - only included to accomodate people doing things the wrong way.
-				$query = "SELECT name FROM imas_assessments WHERE id=".intval($_SESSION['place_aid']);
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$sourceassessname = addslashes(mysql_result($result,0,0));
-				$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) {
-					$aid = mysql_result($result,0,0);
+				//DB $query = "SELECT name FROM imas_assessments WHERE id=".intval($_SESSION['place_aid']);
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $sourceassessname = addslashes(mysql_result($result,0,0));
+				$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
+				$stm->execute(array(':id'=>$_SESSION['place_aid']));
+				$sourceassessname = $stm->fetchColumn(0);
+
+				//DB $query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)>0) {
+				//DB $aid = mysql_result($result,0,0);
+				$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE name=:name AND courseid=:courseid");
+				$stm->execute(array(':name'=>$sourceassessname, ':courseid'=>$destcid));
+				if ($stm->rowCount()>0) {
+					$aid = $stm->fetchColumn(0);
 				} else {
 					// no assessment with same title - need to copy assessment from destination to source course
 					require("includes/copyiteminc.php");
-					$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid']}'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($result)==0) {
+					//DB $query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid']}'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($result)==0) {
+					$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid=:typeid");
+					$stm->execute(array(':typeid'=>$_SESSION['place_aid']));
+					if ($stm->rowCount()==0) {
 						reporterror("Error.  Assessment ID '{$_SESSION['place_aid']}' not found.");
 					}
 					$cid = $destcid;
-					$newitem = copyitem(mysql_result($result,0,0),array());
-					$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$aid = mysql_result($result,0,0);
-					$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$items = unserialize(mysql_result($result,0,0));
+					//DB $newitem = copyitem(mysql_result($result,0,0),array());
+					$newitem = copyitem($stm->fetchColumn(0),array());
+
+					//DB $query = "SELECT typeid FROM imas_items WHERE id=$newitem";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $aid = mysql_result($result,0,0);
+					$stm = $DBH->prepare("SELECT typeid FROM imas_items WHERE id=:id");
+					$stm->execute(array(':id'=>$newitem));
+					$aid = $stm->fetchColumn(0);
+
+					//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $items = unserialize(mysql_result($result,0,0));
+					$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+					$stm->execute(array(':id'=>$cid));
+					$items = unserialize($stm->fetchColumn(0));
+
 					$items[] = $newitem;
-					$items = addslashes(serialize($items));
-					$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					$items = serialize($items);
+					//DB $query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+					$stm->execute(array(':itemorder'=>$items, ':id'=>$cid));
+
 				}
 			}
-		}	
+		}
+		//DB $query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
+		//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
 		$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
-		$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		$query .= "(:org, :contextid, :linkid, :placementtype, :typeid)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':placementtype'=>'assess', ':typeid'=>$aid));
+
 		$linkparts = array('aid',$aid);
-		
+
 	} else if ($_SESSION['ltirole']=='instructor') {
 		//don't need to do anything - will prompt for linking
 	} else if ($_SESSION['lti_keytype']=='cc-of') {
@@ -949,7 +1120,8 @@ if (mysql_num_rows($result)==0) {
 		reporterror("This placement is not yet set up");
 	}
 } else {
-	$row = mysql_fetch_row($result);
+	//DB $row = mysql_fetch_row($result);
+	$row = $stm->fetch(PDO::FETCH_NUM);
 	if ($row[0]=='course') {
 		$linkparts = array('cid',$row[1]);
 	} else if ($row[0]=='assess') {
@@ -959,32 +1131,39 @@ if (mysql_num_rows($result)==0) {
 	   //don't have a way to track copies yet
 	   else if ($row[0]=='folder') {
 		$pts = explode('-', $row[1]);
-		$linkparts = array('folder',$row[1]); 
+		$linkparts = array('folder',$row[1]);
 	}*/ else {
 		reporterror("Invalid placement type");
 	}
-	
+
 }
 //** move inside of no placement?
 if ($_SESSION['lti_keytype']=='cc-of') {
 	$linkparts = array('folder',$_SESSION['open_folder'][0],$_SESSION['open_folder'][1]);
-	
+
 	//do checks to make sure it's OK to link into this course.
 	$linkcid = intval($_SESSION['open_folder'][0]);
-	
+
 	//look to see if we've already linked this context_id with a course
-	$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
-	$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	//DB $query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
+	//DB $query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
+	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+	if ($stm->rowCount()==0) {
 		//if instructor, see if the source course is ours
 		if ($_SESSION['ltirole']=='instructor') {
-			$query = "SELECT id FROM imas_teachers WHERE courseid='$linkcid' AND userid='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-				$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$linkcid)";
-				mysql_query($query) or die("Query failed : " . mysql_error());	
+			//DB $query = "SELECT id FROM imas_teachers WHERE courseid='$linkcid' AND userid='$userid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
+			$stm->execute(array(':courseid'=>$linkcid, ':userid'=>$userid));
+			if ($stm->rowCount()>0) {
+				//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+				//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$linkcid)";
+				$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
+				$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$linkcid));
 			} else {
 				reporterror("You are not an instructor on the course and folder this link is pointing to. Auto-copying is not currently supported for folder-level links.");
 			}
@@ -992,9 +1171,10 @@ if ($_SESSION['lti_keytype']=='cc-of') {
 			reporterror("Course connection not established yet.  Notify your instructor they need to click this link to set it up.");
 		}
 	} else {
-		$courselinkcid = mysql_result($result,0,0);
+		//DB $courselinkcid = mysql_result($result,0,0);
+		$courselinkcid = $stm->fetchColumn(0);
 		if ($courselinkcid != $linkcid) {
-			reporterror("This course in the LMS is not associated with the course this link is pointing to.");	
+			reporterror("This course in the LMS is not associated with the course this link is pointing to.");
 		}
 	}
 }
@@ -1002,19 +1182,25 @@ if ($_SESSION['lti_keytype']=='cc-of') {
 //is course level placement
 if ($linkparts[0]=='cid') {
 	$cid = intval($linkparts[1]);
-	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	//DB $query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT available,ltisecret FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($_SESSION['ltirole']!='instructor') {
 		if (!($line['avail']==0 || $line['avail']==2)) {
 			reporterror("This course is not available");
 		}
-	} 
+	}
 } else if ($linkparts[0]=='aid') {   //is assessment level placement
 	$aid = intval($linkparts[1]);
-	$query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	//DB $query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	$cid = $line['courseid'];
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
@@ -1023,10 +1209,18 @@ if ($linkparts[0]=='cid') {
 		if ($line['avail']==0) {
 			//reporterror("This assessment is closed");
 		}
-		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result2);
+		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result2);
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
+		$row = $stm->fetch(PDO::FETCH_NUM);
+		$useexception = false;
 		if ($row!=null) {
+			require_once("./includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($row, $line, true);	
+		}
+		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
@@ -1048,16 +1242,20 @@ if ($linkparts[0]=='cid') {
 				}
 			}
 		}
-		
+
 	}
 } else if ($linkparts[0]=='folder') {
-	$query = "SELECT itemorder FROM imas_courses WHERE id='".intval($linkparts[1])."'";
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result2)==0) {
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='".intval($linkparts[1])."'";
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result2)==0) {
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$linkparts[1]));
+	if ($stm->rowCount()==0) {
 		reporterror("invalid course identifier in folder view launch");
 	} else {
 		$cid = intval($linkparts[1]);
-		$row = mysql_fetch_row($result2);
+		//DB $row = mysql_fetch_row($result2);
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		$items = unserialize($row[0]);
 		function findfolder($items,$n,$loc) {
 			foreach ($items as $k=>$b) {
@@ -1082,37 +1280,58 @@ if ($linkparts[0]=='cid') {
 	}
 } else if ($_SESSION['ltirole']!='instructor') {
 	reporterror("invalid key. unknown action type");
-} 
+}
 
 //see if student is enrolled, if appropriate to action type
 if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || $linkparts[0]=='folder') {
 	if ($_SESSION['ltirole']=='instructor') {
-		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result) == 0) { //nope, not a teacher. 
+		//DB $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result) == 0) {
+		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+		if ($stm->rowCount() == 0) {
 			//see if they're a tutor - that's just as good.
-			$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result) == 0) {
+			//DB $query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result) == 0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+			if ($stm->rowCount() == 0) {
 				reporterror("error - you are not an instructor or tutor on the $installname course this link is associated with.  If you are team-teaching this course, have the other instructor add you as a teacher or tutor on $installname then try again.");
 			}
 		}
 		$timelimitmult = 1;
 	} else {
-		$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result) == 0) { //nope, not enrolled
-			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result) == 0) { //nope, not a teacher either in stuview.  
-				$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result) == 0) { //nope, not a tutor either.  Add new student
-					$query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$deflatepass = mysql_result($result,0,0);
-					$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}','$deflatepass')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result) == 0) {
+		$stm = $DBH->prepare("SELECT id,timelimitmult FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+		if ($stm->rowCount() == 0) {
+			//DB $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result) == 0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+			if ($stm->rowCount() == 0) {
+				//DB $query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result) == 0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+				if ($stm->rowCount() == 0) {
+					//DB $query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $deflatepass = mysql_result($result,0,0);
+					$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
+					$stm->execute(array(':id'=>$cid));
+					$deflatepass = $stm->fetchColumn(0);
+
+					//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}','$deflatepass')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
+					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
 				}
 			} else {
 				$_SESSION['ltirole']='instructor';
@@ -1120,21 +1339,26 @@ if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || 
 			}
 			$timelimitmult = 1;
 		} else {
-			$timelimitmult = mysql_result($result,0,1);
+			//DB $timelimitmult = mysql_result($result,0,1);
+			$timelimitmult = $stm->fetchColumn(1);
 		}
 	}
 }
-	
+
 //check if db session entry exists for session
 $promptforsettings = false;
-$query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
 $SESS = $_SESSION;
-if (mysql_num_rows($result)>0) {
-	//check that same userid, and that we're not jumping on someone else's 
+//DB $query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB if (mysql_num_rows($result)>0) {
+$stm = $DBH->prepare("SELECT userid,sessiondata FROM imas_sessions WHERE sessionid=:sessionid");
+$stm->execute(array(':sessionid'=>$sessionid));
+if ($stm->rowCount()>0) {	//check that same userid, and that we're not jumping on someone else's
 	//existing session.  If so, then we need to create a new session.
 	//also, if session did not have ltiuserid already, must be jumping non-LTI to LTI
-	if (mysql_result($result,0,0)!=$userid || !$atstarthasltiuserid) {
+	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	//DB if (mysql_result($result,0,0)!=$userid || !$atstarthasltiuserid) {
+	if ($row['userid']!=$userid || !$atstarthasltiuserid) {
 		session_destroy();
 		session_start();
 		session_regenerate_id();
@@ -1144,7 +1368,8 @@ if (mysql_num_rows($result)>0) {
 		$createnewsession = true;
 	} else {
 		//already have session.  Don't need to create one
-		$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
+		//DB $sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
+		$sessiondata = unserialize(base64_decode($row['sessiondata']));
 		if (!isset($sessiondata['mathdisp'])) {
 			//for some reason settings are not set, so going to prompt
 			$promptforsettings = true;
@@ -1158,9 +1383,12 @@ if (mysql_num_rows($result)>0) {
 
 //if assessment, going to check for timelimit
 if ($linkparts[0]=='aid') {
-	$query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$timelimit = abs(mysql_result($result,0,0)*$timelimitmult);
+	//DB $query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $timelimit = abs(mysql_result($result,0,0)*$timelimitmult);
+	$stm = $DBH->prepare("SELECT timelimit FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	$timelimit = abs($stm->fetchColumn(0)*$timelimitmult);
 	if ($timelimit>0) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);
@@ -1201,9 +1429,9 @@ if ($linkparts[0]=='aid') {
 }
 $sessiondata['ltiorg'] = $SESS['ltiorg'];
 $sessiondata['ltirole'] = $SESS['ltirole'];
-$sessiondata['lti_context_id']  = $SESS['lti_context_id']; 
-$sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id']; 
-$sessiondata['lti_lis_result_sourcedid']  = stripslashes($SESS['lti_lis_result_sourcedid']);
+$sessiondata['lti_context_id']  = $SESS['lti_context_id'];
+$sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
+$sessiondata['lti_lis_result_sourcedid']  = $SESS['lti_lis_result_sourcedid'];
 $sessiondata['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $sessiondata['lti_context_label'] = $SESS['lti_context_label'];
 $sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];
@@ -1225,23 +1453,33 @@ if ($_SESSION['lti_keytype']=='gc') {
 
 $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {
-	$query = "INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES ('$sessionid','$userid','$enc',$now)";
+	//DB $query = "INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES ('$sessionid','$userid','$enc',$now)";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES (:sessionid, :userid, :sessiondata, :time)");
+	$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':sessiondata'=>$enc, ':time'=>$now));
 } else {
-	$query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
+	//DB $query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_sessions SET sessiondata=:sessiondata,userid=:userid WHERE sessionid=:sessionid");
+	$stm->execute(array(':sessiondata'=>$enc, ':userid'=>$userid, ':sessionid'=>$sessionid));
 }
-mysql_query($query) or die("Query failed : " . mysql_error());
-if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwrds != '')) { 
+
+if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwrds != '')) {
 
 	//redirect now if already have session and no timelimit
 	$now = time();
-	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	
+	//DB $query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
+	$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
+
 	if ($linkparts[0]=='aid') { //is aid
 		if ($sessiondata['ltirole'] == 'learner') {
-			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
-			$query .= "('$userid','$cid','assesslti','$aid',$now,'')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+			//DB $query .= "('$userid','$cid','assesslti','$aid',$now,'')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES (:userid, :courseid, :type, :typeid, :viewtime, :info)");
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 	} else if ($linkparts[0]=='cid') { //is cid
@@ -1251,17 +1489,17 @@ if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwr
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
-	exit;	
+	exit;
 } else {
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?accessibility=ask");
-	exit;	
+	exit;
 }
 
 
-	
-	
-	
-/*end new behavior */	
+
+
+
+/*end new behavior */
 } else {
 /*use old behavior for any other request*/
 
@@ -1269,59 +1507,72 @@ if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwr
 
 //check to see if accessiblity page is posting back
 if (isset($_GET['launch'])) {
-	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	//DB $query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare("SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid");
+	$stm->execute(array(':sessionid'=>$sessionid));
+	if ($stm->rowCount()==0) {
 		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
 	}
-	list($enc,$userid) = mysql_fetch_row($result);
+	//DB list($enc,$userid) = mysql_fetch_row($result);
+	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
 	if ($_POST['access']==1) { //text-based
 		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
 		 $sessiondata['graphdisp'] = 0;
-		 $sessiondata['useed'] = 0; 
+		 $sessiondata['useed'] = 0;
 	 } else if ($_POST['access']==2) { //img graphs
 		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 } else if ($_POST['access']==4) { //img math
 		 $sessiondata['mathdisp'] = 2;
 		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 } else if ($_POST['access']==3) { //img all
-		 $sessiondata['mathdisp'] = 2;  
+		 $sessiondata['mathdisp'] = 2;
 		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 } else {
-		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp']; 
+		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1; 
+		 $sessiondata['useed'] = 1;
 	 }
-	
+
 	$enc = base64_encode(serialize($sessiondata));
-	
+
 	$now = time();
-	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	
+	//DB $query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
+	$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
+
 	if (isset($_POST['tzname'])) {
 		$tzname = $_POST['tzname'];
 	} else {
 		$tzname = '';
 	}
-	$query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}',tzname='$tzname' WHERE sessionid='$sessionid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	
+	//DB $query = "UPDATE imas_sessions SET sessiondata='$enc',tzoffset='{$_POST['tzoffset']}',tzname='$tzname' WHERE sessionid='$sessionid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_sessions SET sessiondata=:sessiondata,tzoffset=:tzoffset,tzname=:tzname WHERE sessionid=:sessionid");
+	$stm->execute(array(':sessiondata'=>$enc, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessionid'=>$sessionid));
+
 	$keyparts = explode('_',$_SESSION['ltikey']);
 	if ($sessiondata['ltiitemtype']==0) { //is aid
 		$aid = $sessiondata['ltiitemid'];
-		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$cid = mysql_result($result,0,0);
+		//DB $query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $cid = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
+		$stm->execute(array(':id'=>$aid));
+		$cid = $stm->fetchColumn(0);
 		if ($sessiondata['ltirole'] == 'learner') {
-			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
-			$query .= "('$userid','$cid','assesslti','$aid',$now,'')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+			//DB $query .= "('$userid','$cid','assesslti','$aid',$now,'')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES (:userid, :courseid, :type, :typeid, :viewtime, :info)");
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
@@ -1336,26 +1587,30 @@ if (isset($_GET['launch'])) {
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
-	exit;	
+	exit;
 } else if (isset($_GET['accessibility'])) {
-	$query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	//DB $query = "SELECT sessiondata,userid FROM imas_sessions WHERE sessionid='$sessionid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare("SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid");
+	$stm->execute(array(':sessionid'=>$sessionid));
+	if ($stm->rowCount()==0) {
 		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
 	}
-	list($enc,$userid) = mysql_fetch_row($result);
+	//DB list($enc,$userid) = mysql_fetch_row($result);
+	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
 	//time to output a postback to capture tzoffset and math/graph settings
 	$pref = 0;
 	/*if (isset($_COOKIE['mathgraphprefs'])) {
 		 $prefparts = explode('-',$_COOKIE['mathgraphprefs']);
 		 if ($prefparts[0]==2 && $prefparts[1]==2) { //img all
-			$pref = 3;	 
+			$pref = 3;
 		 } else if ($prefparts[0]==2) { //img math
 			 $pref = 4;
 		 } else if ($prefparts[1]==2) { //img graph
 			 $pref = 2;
-		 }	 
+		 }
 	}*/
 	$flexwidth = true;
 	$nologo = true;
@@ -1365,25 +1620,25 @@ if (isset($_GET['launch'])) {
 	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
-		echo "<p style=\"color:red;\">This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
 	} else {
 		echo ">";
 	}
 	?>
-	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  
+	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>
 	<input type="hidden" id="tzoffset" name="tzoffset" value="" />
-	<input type="hidden" id="tzname" name="tzname" value=""> 
-	<script type="text/javascript"> 
+	<input type="hidden" id="tzname" name="tzname" value="">
+	<script type="text/javascript">
 		 function updateloginarea() {
-			setnode = document.getElementById("settings"); 
-			var html = ""; 
+			setnode = document.getElementById("settings");
+			var html = "";
 			html += 'Accessibility: ';
 			html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help<\/a>";
 			html += '<div style="margin-top: 0px;margin-right:0px;text-align:right;padding:0px"><select name="access"><option value="0">Use defaults</option>';
 			html += '<option value="3">Force image-based display</option>';
 			html += '<option value="1">Use text-based display</option></select></div>';
-		
+
 			if (!MathJaxCompatible) {
 				html += '<input type="hidden" name="mathdisp" value="0" />';
 			} else {
@@ -1395,10 +1650,10 @@ if (isset($_GET['launch'])) {
 				html += '<input type="hidden" name="graphdisp" value="1" />';
 			}
 			html += '<div class="textright"><input type="submit" value="Continue" /><\/div>';
-			setnode.innerHTML = html; 
-			var thedate = new Date();  
+			setnode.innerHTML = html;
+			var thedate = new Date();
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
-			var tz = jstz.determine(); 
+			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
 		}
 		var existingonload = window.onload;
@@ -1411,8 +1666,8 @@ if (isset($_GET['launch'])) {
 	</form>
 	<?php
 	require("footer.php");
-	exit;	
-	
+	exit;
+
 } else if (isset($_GET['userinfo']) && isset($_SESSION['ltiuserid'])) {
 	//check to see if new LTI user is posting back user info
 	$ltiuserid = $_SESSION['ltiuserid'];
@@ -1430,7 +1685,7 @@ if (isset($_GET['launch'])) {
 	} else {
 		$allow_acctcreation = false;
 	}
-	if ($_GET['userinfo']=='set') {	
+	if ($_GET['userinfo']=='set') {
 		if (isset($CFG['GEN']['newpasswords'])) {
 			require_once("includes/password.php");
 		}
@@ -1446,15 +1701,20 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$query = "SELECT password,id FROM imas_users WHERE SID='{$_POST['curSID']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)==0) {
+				//DB $query = "SELECT password,id FROM imas_users WHERE SID='{$_POST['curSID']}'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)==0) {
+				$stm = $DBH->prepare("SELECT password,id FROM imas_users WHERE SID=:SID");
+				$stm->execute(array(':SID'=>$_POST['curSID']));
+				if ($stm->rowCount()==0) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					$realpw = mysql_result($result,0,0);
+					//DB $realpw = mysql_result($result,0,0);
+					list($realpw,$queryuserid) = $stm->fetch(PDO::FETCH_NUM);
 					if (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ($realpw == md5($_POST['curPW'])))
 					  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['curPW'],$realpw)) ) {
-						$userid=mysql_result($result,0,1);
+						//DB $userid=mysql_result($result,0,1);
+						$userid = $queryuserid;
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 					}
@@ -1473,9 +1733,12 @@ if (isset($_GET['launch'])) {
 				} else if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
 					$infoerr = 'Invalid email address';
 				} else {
-					$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($result)>0) {
+					//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($result)>0) {
+					$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+					$stm->execute(array(':SID'=>$_POST['SID']));
+					if ($stm->rowCount()>0) {
 						$infoerr = "$loginprompt '{$_POST['SID']}' already used.  Please select another.";
 					}
 				}
@@ -1492,10 +1755,13 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		if ($infoerr=='') { // no error, so create!
-			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$localltiuser = mysql_insert_id();	
-			if (!isset($userid) && $allow_acctcreation) {	
+			//DB $query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $localltiuser = mysql_insert_id();
+			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
+			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
+			$localltiuser = $DBH->lastInsertId();
+			if (!isset($userid) && $allow_acctcreation) {
 				if ($name_only) {
 					//make up a username/password for them
 					$_POST['SID'] = 'lti-'.$localltiuser;
@@ -1508,19 +1774,31 @@ if (isset($_GET['launch'])) {
 						$rights = 40;
 					}
 					$newgroupid = intval($_SESSION['lti_keygroupid']);
+					//DB $query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,$newgroupid)";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,$newgroupid)";
+					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
+					//DB $query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
+					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot));
 				}
-				
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$userid = mysql_insert_id();	
+
+				//DB $userid = mysql_insert_id();
+				$userid = $DBH->lastInsertId();
 			}
-			$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
-			mysql_query($query) or die("Query failed : " . mysql_error());	
+			//DB $query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
+			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
 		} else {
 			//uh-oh, had an error.  Better ask for user info again
 			$askforuserinfo = true;
@@ -1531,18 +1809,18 @@ if (isset($_GET['launch'])) {
 		$flexwidth = true;
 		require("header.php");
 		if (isset($infoerr)) {
-			echo '<p style="color:red">'.$infoerr.'</p>';
+			echo '<p class=noticetext>'.$infoerr.'</p>';
 		}
-		
-		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";	
-		if ($name_only) { 
+
+		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";
+		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
 			echo "<p>Please provide a little information about yourself:</p>";
 			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>\n";
 			echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
-			
+
 		} else {
 			$deffirst = '';
 			$deflast = '';
@@ -1556,13 +1834,13 @@ if (isset($_GET['launch'])) {
 			if (isset($_SESSION['LMSemail'])) {
 				$defemail = $_SESSION['LMSemail'];
 			}
-			
+
 			if (isset($_SESSION['ltiorgname'])) {
 				$ltiorgname = $_SESSION['ltiorgname'];
 			} else {
 				$ltiorgname = $ltiorg;
 			}
-			
+
 			//strip off prepended org info before display
 			$ltiorgparts = explode(':',$ltiorgname);
 			if (count($ltiorgparts)>2) {
@@ -1571,7 +1849,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				$ltiorgname = $ltiorgparts[1];
 			}
-			
+
 			//tying LTI to IMAthAS account
 			//give option to provide existing account info, or provide full new student info
 			if ($allow_acctcreation) {
@@ -1601,37 +1879,41 @@ if (isset($_GET['launch'])) {
 		}
 		echo "</form>\n";
 		require("footer.php");
-		exit;	
-			
+		exit;
+
 	}
-	
+
 } else if (isset($_SESSION['ltiuserid']) && !isset($_REQUEST['oauth_consumer_key'])) {
 	//refreshed this page from accessibility options page so session already exists
 	// (if user_id is set, then is new LTI request, so want to pass down to OAuth)
 	//pull necessary info and continue
-	$query = "SELECT userid FROM imas_sessions WHERE sessionid='$sessionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	//DB $query = "SELECT userid FROM imas_sessions WHERE sessionid='$sessionid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare("SELECT userid FROM imas_sessions WHERE sessionid=:sessionid");
+	$stm->execute(array(':sessionid'=>$sessionid));
+	if ($stm->rowCount()==0) {
 		reporterror("No session recorded");
 	} else {
-		$userid = mysql_result($result,0,0);
+		//DB $userid = mysql_result($result,0,0);
+		$userid = $stm->fetchColumn(0);
 	}
-	
+
 	$keyparts = explode('_',$_SESSION['ltikey']);
 } else {
 	//not postback of new LTI user info, so must be fresh request
-	
+
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
 	if (empty($_REQUEST['user_id'])) {
 		reporterror("Unable to launch - User information not provided (user_id is required)");
 	} else {
 		$ltiuserid = $_REQUEST['user_id'];
 	}
-	
+
 	if (empty($_REQUEST['context_id'])) {
 		reporterror("Unable to launch - Course information not provided (context_id is required)");
 	}
-	
+
 	if (isset($_SESSION['ltiuserid']) && $_SESSION['ltiuserid']!=$ltiuserid) {
 		//new user - need to clear out session
 		session_destroy();
@@ -1641,7 +1923,7 @@ if (isset($_GET['launch'])) {
 		$_SESSION = array();
 		setcookie(session_name(),session_id());
 	}
-	
+
 	/*if (empty($_REQUEST['roles'])) {
 		reporterror("roles is required");
 	} else {
@@ -1657,11 +1939,11 @@ if (isset($_GET['launch'])) {
 	} else {
 		$ltikey = $_REQUEST['oauth_consumer_key'];
 	}
-	
+
 	//check OAuth Signature!
 	require_once 'includes/OAuth.php';
 	require_once 'includes/ltioauthstore.php';
-	
+
 	//set up OAuth
 	$store = new IMathASLTIOAuthDataStore();
 	$server = new OAuthServer($store);
@@ -1672,14 +1954,14 @@ if (isset($_GET['launch'])) {
 	try {
 		$requestinfo = $server->verify_request($request);
 	} catch (Exception $e) {
-		reporterror($e->getMessage());	
+		reporterror($e->getMessage());
 	}
 	$store->mark_nonce_used($request);
-	
+
 	$keyparts = explode('_',$ltikey);
 	$_SESSION['ltiorigkey'] = $ltikey;
-	
-	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
+
+	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {  //cid:org
 		$_SESSION['ltilookup'] = 'c';
 		$ltiorg = $keyparts[1].':'.$ltiorg;
@@ -1690,9 +1972,12 @@ if (isset($_GET['launch'])) {
 		}
 		if (isset($_REQUEST['custom_place_aid'])) { //common catridge blti placement using cid_### or placein_### key type
 			$placeaid = intval($_REQUEST['custom_place_aid']);
-			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$sourcecid = mysql_result($result,0,0);
+			//DB $query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $sourcecid = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$placeaid));
+			$sourcecid = $stm->fetchColumn(0);
 			if ($keyparts[1]==$sourcecid) { //is key is for source course; treat like aid_### placement
 				$keyparts[0] = 'aid';
 				$keyparts[1] = $placeaid;
@@ -1707,13 +1992,16 @@ if (isset($_GET['launch'])) {
 			$parts = explode('-',$_REQUEST['custom_open_folder']);
 			$sourcecid = $parts[0];
 			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
-		}	
+		}
 	} else if ($keyparts[0]=='aid') {   //also cid:org
 		$_SESSION['ltilookup'] = 'a';
 		$aid = intval($keyparts[1]);
-		$query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$ltiorg = mysql_result($result,0,0) . ':' . $ltiorg;
+		//DB $query = "SELECT courseid FROM imas_assessments WHERE id='$aid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $ltiorg = mysql_result($result,0,0) . ':' . $ltiorg;
+		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
+		$stm->execute(array(':id'=>$aid));
+		$ltiorg = $stm->fetchColumn(0) . ':' . $ltiorg;
 		$keytype = 'a';
 	} else if ($keyparts[0]=='sso') {  //ssouserid:org
 		$_SESSION['ltilookup'] = 'u';
@@ -1726,9 +2014,12 @@ if (isset($_GET['launch'])) {
 		if (isset($_REQUEST['custom_place_aid'])) {
 			$placeaid = intval($_REQUEST['custom_place_aid']);
 			$keytype = 'cc-g';
-			$query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$sourcecid = mysql_result($result,0,0);
+			//DB $query = "SELECT courseid FROM imas_assessments WHERE id='$placeaid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $sourcecid = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$placeaid));
+			$sourcecid = $stm->fetchColumn(0);
 			$_SESSION['place_aid'] = array($sourcecid,$_REQUEST['custom_place_aid']);
 		} else if (isset($_REQUEST['custom_view_folder'])) {
 			$keytype = 'cc-vf';
@@ -1742,13 +2033,13 @@ if (isset($_GET['launch'])) {
 			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
 		}
 	}
-	
-	
+
+
 	//Store all LTI request data in session variable for reuse on submit
 	//if we got this far, secret has already been verified
 	$_SESSION['ltiuserid'] = $ltiuserid;
 	$_SESSION['ltiorg'] = $ltiorg;
-	$ltirole = strtolower($_REQUEST['roles']);          
+	$ltirole = strtolower($_REQUEST['roles']);
 	if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false || strpos($ltirole,'contentdeveloper')!== false) {
 		$ltirole = 'instructor';
 	} else {
@@ -1768,22 +2059,26 @@ if (isset($_GET['launch'])) {
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
 	}
-	
+
 	//look if we know this student
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when GUID change, while still storing it
 	$shortorg = $orgparts[0];
-	$query = "SELECT userid FROM imas_ltiusers WHERE org LIKE '$shortorg:%' AND ltiuserid='$ltiuserid' ORDER BY id";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result) > 0) { //yup, we know them
-		$userid = mysql_result($result,0,0);
+	//DB $query = "SELECT userid FROM imas_ltiusers WHERE org LIKE '$shortorg:%' AND ltiuserid='$ltiuserid' ORDER BY id";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result) > 0) {
+	$stm = $DBH->prepare("SELECT userid FROM imas_ltiusers WHERE org LIKE :org AND ltiuserid=:ltiuserid ORDER BY id");
+	$stm->execute(array(':ltiuserid'=>$ltiuserid, ':org'=>"$shortorg:%"));
+	if ($stm->rowCount() > 0) {
+		//DB $userid = mysql_result($result,0,0);
+		$userid = $stm->fetchColumn(0);
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
-		
+
 		//go ahead and create the account if:
 		//has name information (should we skip?)
 		//domain level placement and (student or instructor with acceptable key rights)
 		//a _1 type placement and (student or instructor with acceptable key rights)
-	
+
 		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
 		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)==1 && $keytype=='cc-vf' && $_SESSION['lti_keyrights']>75) ||
 		   (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner'))) {
@@ -1799,11 +2094,14 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
-			
-			$query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$localltiuser = mysql_insert_id();	
-			if (!isset($userid)) {	
+
+			//DB $query = "INSERT INTO imas_ltiusers (org,ltiuserid) VALUES ('$ltiorg','$ltiuserid')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $localltiuser = mysql_insert_id();
+			$stm = $DBH->prepare("INSERT INTO imas_ltiusers (org,ltiuserid) VALUES (:org, :ltiuserid)");
+			$stm->execute(array(':org'=>$ltiorg, ':ltiuserid'=>$ltiuserid));
+			$localltiuser = $DBH->lastInsertId();
+			if (!isset($userid)) {
 				//make up a username/password for them
 				$_POST['SID'] = 'lti-'.$localltiuser;
 				$md5pw = 'pass'; //totally unusable since not md5'ed
@@ -1814,19 +2112,31 @@ if (isset($_GET['launch'])) {
 						$rights = 40;
 					}
 					$newgroupid = intval($_SESSION['lti_keygroupid']);
+					//DB $query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0,'$newgroupid')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0,'$newgroupid')";
+					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email, ':msgnotify'=>0, ':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
+					//DB $query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
-					$query .= "('{$_POST['SID']}','$md5pw',$rights,'$firstname','$lastname','$email',0)";
+					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email, ':msgnotify'=>0));
 				}
-				
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$userid = mysql_insert_id();	
+
+				//DB $userid = mysql_insert_id();
+				$userid = $DBH->lastInsertId();
 			}
-			$query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_ltiusers SET userid=:userid WHERE id=:id");
+			$stm->execute(array(':userid'=>$userid, ':id'=>$localltiuser));
 		} else {
 			////create form asking them for user info
 			$askforuserinfo = true;
@@ -1834,7 +2144,7 @@ if (isset($_GET['launch'])) {
 			$_SESSION['LMSlastname'] = $_REQUEST['lis_person_name_family'];
 			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
 				$_SESSION['LMSemail'] = $_REQUEST['lis_person_contact_email_primary'];
-			} 
+			}
 		}
 	}
 	$_SESSION['ltikey'] = $ltikey;
@@ -1847,10 +2157,10 @@ if (isset($_GET['launch'])) {
 if ($askforuserinfo == true) {
 	if (!empty($_REQUEST['tool_consumer_instance_description'])) {
 		$_SESSION['ltiorgname'] = $_REQUEST['tool_consumer_instance_description'];
-	} 	
+	}
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?userinfo=ask");
-	exit;	
-	
+	exit;
+
 }
 
 //if here, we know the local userid.
@@ -1873,36 +2183,47 @@ $now = time();
 //general placement or common catridge placement - look for placement, or create if know info
 $orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
 $shortorg = $orgparts[0];
-if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf' && $_SESSION['lti_keytype']!='cc-of') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') { 
+if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf' && $_SESSION['lti_keytype']!='cc-of') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') {
+	//DB $query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
+	//DB $query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
+	//DB $query .= "AND org LIKE '$shortorg:%'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
-	$query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
-	$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	$query .= "contextid=:contextid AND linkid=:linkid AND org LIKE :org";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>"$shortorg:%"));
+	if ($stm->rowCount()==0) {
 		if (isset($_SESSION['place_aid'])) {
 			//look to see if we've already linked this context_id with a course
-			$query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
-			$query .= "AND org LIKE '$shortorg:%'"; //='{$_SESSION['ltiorg']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)==0) {
+			//DB $query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
+			//DB $query .= "AND org LIKE '$shortorg:%'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)==0) {
+			$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
+			$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+			if ($stm->rowCount()==0) {
 				if ($_SESSION['lti_keytype']=='cc-g') {
 					//if instructor, see if the source course is ours
 					$copycourse = true;
 					if ($_SESSION['ltirole']=='instructor') {
-						$query = "SELECT id FROM imas_teachers WHERE courseid='{$_SESSION['place_aid'][0]}' AND userid='$userid'";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						if (mysql_num_rows($result)>0) {
+						//DB $query = "SELECT id FROM imas_teachers WHERE courseid='{$_SESSION['place_aid'][0]}' AND userid='$userid'";
+						//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB if (mysql_num_rows($result)>0) {
+						$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
+						$stm->execute(array(':courseid'=>$_SESSION['place_aid'][0], ':userid'=>$userid));
+						if ($stm->rowCount()>0) {
 							$copycourse=false;
-							$destcid = $_SESSION['place_aid'][0];
+							$destcid = intval($_SESSION['place_aid'][0]);
 						}
 					} else {
 						reporterror("Course link not established yet");
 					}
 					if ($copycourse) {
-						//create a course  
+						//create a course
 						//creating a copy of a template course
 						$blockcnt = 1;
-						$itemorder = addslashes(serialize(array()));
+						$itemorder = serialize(array());
 						$randkey = uniqid();
 						$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
 						$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
@@ -1910,91 +2231,131 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 						$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 						$msgmonitor = (floor($msgset/5))&1;
-						$msgQtoInstr = (floor($msgset/5))&2;
 						$msgset = $msgset%5;
 						$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
 						$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
 						$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
-						$chatset = isset($CFG['CPS']['chatset'])?$CFG['CPS']['chatset'][0]:0;
 						$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
-						
+
 						$avail = 0;
 						$lockaid = 0;
-						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-						$query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
-						mysql_query($query) or die("Query failed : " . mysql_error());
-						$destcid  = mysql_insert_id();
-						$query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
-						mysql_query($query) or die("Query failed : " . mysql_error());
-						
+						//DB $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+						//DB $query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
+						//DB mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB $destcid  = mysql_insert_id();
+						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
+						$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :showlatepass, :itemorder, :topbar, :cploc, :available, :theme, :ltisecret, :blockcnt);";
+						$stm = $DBH->prepare($query);
+						$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
+							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
+							':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
+						$destcid  = $DBH->lastInsertId();
+						//DB $query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
+						//DB mysql_query($query) or die("Query failed : " . mysql_error());
+						$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
+						$stm->execute(array(':userid'=>$userid, ':courseid'=>$destcid));
+
 					}
-					$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-					$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$destcid)";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+					//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$destcid)";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
+					$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$destcid));
 				} else if ($_SESSION['lti_keytype']=='cc-c') {
 					$copyaid = true;
 					//link up key/secret course
-					$query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-					$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$keyparts[1]}')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
+					//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$keyparts[1]}')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
+					$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$keyparts[1]));
 					$destcid = $keyparts[1];
 				}
 			} else {
-				$destcid = mysql_result($result,0,0);
+				//DB $destcid = mysql_result($result,0,0);
+				$destcid = $stm->fetchColumn(0);
 			}
 			if ($destcid==$_SESSION['place_aid'][0]) {
 				//aid is in destination course - just make placement
 				$aid = $_SESSION['place_aid'][1];
 			} else {
 				//aid is in source course.  Let's see if we already copied it.
-				$query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP '^".intval($_SESSION['place_aid'][1])."[[:>:]]' AND courseid=".intval($destcid);
-				
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) {
-					$aid = mysql_result($result,0,0);
+				//DB $query = "SELECT id FROM imas_assessments WHERE ancestors REGEXP $ancreg AND courseid=".intval($destcid);
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)>0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE ancestors REGEXP :ancregex AND courseid=:destcid");
+				$stm->execute(array(':ancregex'=>'^'.intval($_SESSION['place_aid'][1]).'[[:>:]]', ':destcid'=>$destcid));
+				if ($stm->rowCount()>0) {
+					//DB $aid = mysql_result($result,0,0);
+					$aid = $stm->fetchColumn(0);
 				} else {
 					//aid is in source course.  Let's look and see if there's an assessment in destination with the same title.
 					//THIS SHOULD BE REMOVED - only included to accomodate people doing things the wrong way.
-					$query = "SELECT name FROM imas_assessments WHERE id=".intval($_SESSION['place_aid'][1]);
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$sourceassessname = addslashes(mysql_result($result,0,0));
-					$query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($result)>0) {
-						$aid = mysql_result($result,0,0);
+					//DB $query = "SELECT name FROM imas_assessments WHERE id=".intval($_SESSION['place_aid'][1]);
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $sourceassessname = addslashes(mysql_result($result,0,0));
+					$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
+					$stm->execute(array(':id'=>$_SESSION['place_aid'][1]));
+					$sourceassessname = $stm->fetchColumn(0);
+					//DB $query = "SELECT id FROM imas_assessments WHERE name='$sourceassessname' AND courseid='$destcid'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($result)>0) {
+						//DB $aid = mysql_result($result,0,0);
+					$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE name=:name AND courseid=:courseid");
+					$stm->execute(array(':name'=>$sourceassessname, ':courseid'=>$destcid));
+					if ($stm->rowCount()>0) {
+						$aid = $stm->fetchColumn(0);
 					} else {
 						// no assessment with same title - need to copy assessment from destination to source course
 						require("includes/copyiteminc.php");
-						$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						if (mysql_num_rows($result)==0) {
+						//DB $query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
+						//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB if (mysql_num_rows($result)==0) {
+						$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid=:typeid");
+						$stm->execute(array(':typeid'=>$_SESSION['place_aid'][1]));
+						if ($stm->rowCount()==0) {
 							reporterror("Error.  Assessment ID '{$_SESSION['place_aid'][1]}' not found.");
 						}
 						$cid = $destcid;
-						$newitem = copyitem(mysql_result($result,0,0),array());
-						$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						$aid = mysql_result($result,0,0);
-						$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						$items = unserialize(mysql_result($result,0,0));
+						//DB $newitem = copyitem(mysql_result($result,0,0),array());
+						$newitem = copyitem($stm->fetchColumn(0),array());
+						//DB $query = "SELECT typeid FROM imas_items WHERE id=$newitem";
+						//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB $aid = mysql_result($result,0,0);
+						$stm = $DBH->prepare("SELECT typeid FROM imas_items WHERE id=:id");
+						$stm->execute(array(':id'=>$newitem));
+						$aid = $stm->fetchColumn(0);
+						//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+						//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB $items = unserialize(mysql_result($result,0,0));
+						$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+						$stm->execute(array(':id'=>$cid));
+						$items = unserialize($stm->fetchColumn(0));
 						$items[] = $newitem;
-						$items = addslashes(serialize($items));
-						$query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
-						mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB $items = addslashes(serialize($items));
+						//DB $query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
+						//DB mysql_query($query) or die("Query failed : " . mysql_error());
+						$items = serialize($items);
+						$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+						$stm->execute(array(':itemorder'=>$items, ':id'=>$cid));
 					}
 				}
-			}	
+			}
+			//DB $query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
+			//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
-			$query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$_SESSION['lti_resource_link_id']}','assess','$aid')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query .= "(:org, :contextid, :linkid, :placementtype, :typeid)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':placementtype'=>'assess', ':typeid'=>$aid));
 			$keyparts = array('aid',$aid);
-			
+
 		} else {
 			reporterror("This placement is not yet set up");
 		}
 	} else {
-		$row = mysql_fetch_row($result);
+		//DB $row = mysql_fetch_row($result);
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row[0]=='course') {
 			$keyparts = array('cid',$row[1]);
 		} else if ($row[0]=='assess') {
@@ -2002,7 +2363,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 		} else {
 			reporterror("Invalid placement type");
 		}
-		
+
 	}
 }
 if ($_SESSION['lti_keytype']=='cc-vf' || $_SESSION['lti_keytype']=='cc-of') {
@@ -2011,19 +2372,25 @@ if ($_SESSION['lti_keytype']=='cc-vf' || $_SESSION['lti_keytype']=='cc-of') {
 //is course level placement
 if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	$cid = intval($keyparts[1]);
-	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	//DB $query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT available,ltisecret FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($_SESSION['ltirole']!='instructor') {
 		if (!($line['avail']==0 || $line['avail']==2)) {
 			reporterror("This course is not available");
 		}
-	} 
+	}
 } else if ($keyparts[0]=='aid') {   //is assessment level placement
 	$aid = intval($keyparts[1]);
-	$query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	//DB $query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	$cid = $line['courseid'];
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
@@ -2032,10 +2399,18 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		if ($line['avail']==0) {
 			//reporterror("This assessment is closed");
 		}
-		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result2);
+		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result2);
+		$stm2 = $DBH->prepare("SELECT startdate,enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
+		$row = $stm2->fetch(PDO::FETCH_NUM);
+		$useexception = false;
 		if ($row!=null) {
+			require_once("./includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($row, $line, true);	
+		}
+		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
@@ -2057,25 +2432,34 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 				}
 			}
 		}
-		
+
 	}
 } else if ($keyparts[0]=='folder') {
-	$query = "SELECT itemorder FROM imas_courses WHERE id='".intval($keyparts[1])."'";
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result2)==0) {
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='".intval($keyparts[1])."'";
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result2)==0) {
+	$stm2 = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm2->execute(array(':id'=>$keyparts[1]));
+	if ($stm2->rowCount()==0) {
 		reporterror("invalid course identifier in folder view launch");
 	} else {
 		$cid = intval($keyparts[1]);
 		if ($_SESSION['lti_keytype']=='cc-vf') {
 			$usid = explode('_',$_SESSION['ltiorigkey']);
+			//DB $query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
+			//DB $query .= "imas_tutors.courseid='$cid' AND imas_users.SID='".addslashes($usid[0])."'";
+			//DB $r3 = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($r3)==0) {
 			$query = "SELECT imas_tutors.id FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE ";
-			$query .= "imas_tutors.courseid='$cid' AND imas_users.SID='".addslashes($usid[0])."'";
-			$r3 = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($r3)==0) {
+			$query .= "imas_tutors.courseid=:courseid AND imas_users.SID=:SID";
+			$stm3 = $DBH->prepare($query);
+			$stm3->execute(array(':courseid'=>$cid, ':SID'=>$usid[0]));
+			if ($stm3->rowCount()==0) {
 				reporterror("not authorized to view folders in this course");
 			}
 		}
-		$row = mysql_fetch_row($result2);
+		//DB $row = mysql_fetch_row($result2);
+		$row = $stm2->fetch(PDO::FETCH_NUM);
 		$items = unserialize($row[0]);
 		function findfolder($items,$n,$loc) {
 			foreach ($items as $k=>$b) {
@@ -2104,37 +2488,59 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	}
 } else if ($keyparts[0]!='sso' && $_SESSION['ltirole']!='instructor') {
 	reporterror("invalid key. unknown action type");
-} 
+}
 
 //see if student is enrolled, if appropriate to action type
 if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $keyparts[0]=='folder' || $keyparts[0]=='LTIkey') {
 	if ($_SESSION['ltirole']=='instructor') {
-		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result) == 0) { //nope, not a teacher.  Set as tutor for this context_id
-			$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result) == 0) { //nope, not a tutor already.  Set as tutor for this context_id
-				$query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result) == 0) {
+		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+		if ($stm->rowCount() == 0) {
+			//DB $query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result) == 0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+			if ($stm->rowCount() == 0) {
+				//DB $query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}')";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("INSERT INTO imas_tutors (userid,courseid,section) VALUES (:userid, :courseid, :section)");
+				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label']));
 			}
 		}
 		$timelimitmult = 1;
 	} else {
-		$query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result) == 0) { //nope, not enrolled
-			$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result) == 0) { //nope, not a teacher either in stuview.  
-				$query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result) == 0) { //nope, not a tutor either.  Add new student
-					$query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$deflatepass = mysql_result($result,0,0);
-					$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}','$deflatepass')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result) == 0) {
+		$stm = $DBH->prepare("SELECT id,timelimitmult FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+		if ($stm->rowCount() == 0) {
+			//DB $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result) == 0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+			if ($stm->rowCount() == 0) {
+				//DB $query = "SELECT id FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result) == 0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+				if ($stm->rowCount() == 0) {
+					//DB $query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $deflatepass = mysql_result($result,0,0);
+					$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
+					$stm->execute(array(':id'=>$cid));
+					$deflatepass = $stm->fetchColumn(0);
+					//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','$cid','{$_SESSION['lti_context_label']}','$deflatepass')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
+					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
 				}
 			} else {
 				$_SESSION['ltirole']='instructor';
@@ -2142,21 +2548,27 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 			}
 			$timelimitmult = 1;
 		} else {
-			$timelimitmult = mysql_result($result,0,1);
+			//DB $timelimitmult = mysql_result($result,0,1);
+			$timelimitmult = $stm->fetchColumn(1);
 		}
 	}
 }
-	
+
 //check if db session entry exists for session
 $promptforsettings = false;
-$query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
 $SESS = $_SESSION;
-if (mysql_num_rows($result)>0) {
-	//check that same userid, and that we're not jumping on someone else's 
+//DB $query = "SELECT userid,sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB if (mysql_num_rows($result)>0) {
+$stm = $DBH->prepare("SELECT userid,sessiondata FROM imas_sessions WHERE sessionid=:sessionid");
+$stm->execute(array(':sessionid'=>$sessionid));
+if ($stm->rowCount()>0) {
+	//check that same userid, and that we're not jumping on someone else's
 	//existing session.  If so, then we need to create a new session.
 	//also, if session did not have ltiuserid already, must be jumping non-LTI to LTI
-	if (mysql_result($result,0,0)!=$userid || !$atstarthasltiuserid) {
+	list($sessionuserid, $sessiondata) = $stm->fetch(PDO::FETCH_NUM);
+	//DB if (mysql_result($result,0,0)!=$userid || !$atstarthasltiuserid) {
+	if ($sessionuserid!=$userid || !$atstarthasltiuserid) {
 		session_destroy();
 		session_start();
 		session_regenerate_id();
@@ -2166,7 +2578,7 @@ if (mysql_num_rows($result)>0) {
 		$createnewsession = true;
 	} else {
 		//already have session.  Don't need to create one
-		$sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
+		$sessiondata = unserialize(base64_decode($sessiondata));
 		if (!isset($sessiondata['mathdisp'])) {
 			//for some reason settings are not set, so going to prompt
 			$promptforsettings = true;
@@ -2180,9 +2592,12 @@ if (mysql_num_rows($result)>0) {
 
 //if assessment, going to check for timelimit
 if ($keyparts[0]=='aid') {
-	$query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$timelimit = abs(mysql_result($result,0,0)*$timelimitmult);
+	//DB $query = "SELECT timelimit FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $timelimit = abs(mysql_result($result,0,0)*$timelimitmult);
+	$stm = $DBH->prepare("SELECT timelimit FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	$timelimit = abs($stm->fetchColumn(0)*$timelimitmult);
 	if ($timelimit>0) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);
@@ -2225,9 +2640,9 @@ if ($keyparts[0]=='aid') {
 }
 $sessiondata['ltiorg'] = $SESS['ltiorg'];
 $sessiondata['ltirole'] = $SESS['ltirole'];
-$sessiondata['lti_context_id']  = $SESS['lti_context_id']; 
-$sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id']; 
-$sessiondata['lti_lis_result_sourcedid']  = stripslashes($SESS['lti_lis_result_sourcedid']);
+$sessiondata['lti_context_id']  = $SESS['lti_context_id'];
+$sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
+$sessiondata['lti_lis_result_sourcedid']  = $SESS['lti_lis_result_sourcedid'];
 $sessiondata['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $sessiondata['lti_context_label'] = $SESS['lti_context_label'];
 $sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];
@@ -2254,22 +2669,34 @@ if ($_SESSION['lti_keytype']=='cc-vf') {
 
 $enc = base64_encode(serialize($sessiondata));
 if ($createnewsession) {
-	$query = "INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES ('$sessionid','$userid','$enc',$now)";
+	//DB $query = "INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES ('$sessionid','$userid','$enc',$now)";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,sessiondata,time) VALUES (:sessionid, :userid, :sessiondata, :time)");
+	$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':sessiondata'=>$enc, ':time'=>$now));
 } else {
-	$query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
+	//DB $query = "UPDATE imas_sessions SET sessiondata='$enc',userid='$userid' WHERE sessionid='$sessionid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_sessions SET sessiondata=:sessiondata,userid=:userid WHERE sessionid=:sessionid");
+	$stm->execute(array(':sessiondata'=>$enc, ':userid'=>$userid, ':sessionid'=>$sessionid));
 }
-mysql_query($query) or die("Query failed : " . mysql_error());
-if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrds != ''))) { 
+
+if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrds != ''))) {
 	//redirect now if already have session and no timelimit
 	$now = time();
-	$query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
-	mysql_query($query) or die("Query failed : " . mysql_error());
-	
+	//DB $query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
+	$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
+
 	if ($keyparts[0]=='aid') { //is aid
 		if ($sessiondata['ltirole'] == 'learner') {
+			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
+			//DB $query .= "('$userid','$cid','assesslti','$aid',$now,'')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
-			$query .= "('$userid','$cid','assesslti','$aid',$now,'')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query .= "(:userid, :courseid, :type, :typeid, :viewtime, :info)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 	} else if ($keyparts[0]=='cid') { //is cid
@@ -2281,10 +2708,10 @@ if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsess
 	} else { //will only be instructors hitting this option
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php");
 	}
-	exit;	
+	exit;
 } else {
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . "?accessibility=ask");
-	exit;	
+	exit;
 }
 
 /*end using old behavior for other requests */

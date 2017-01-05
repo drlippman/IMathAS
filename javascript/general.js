@@ -4,13 +4,13 @@ var ddmenuitem	= 0;
 var homemenuloaded = 0;
 
 // open hidden layer
-function mopen(id,cid) {	
+function mopen(id,cid) {
 	if (id=='homemenu' && homemenuloaded==0) {
 		basicahah(imasroot+'/gethomemenu.php?cid='+cid,'homemenu');
 		homemenuloaded = 1;
 	}
 	mcancelclosetime();
-	if(ddmenuitem) { 
+	if(ddmenuitem) {
 		ddmenuitem.style.visibility = 'hidden';
 		ddmenuitem = null;
 	}else {
@@ -42,28 +42,28 @@ function basicahah(url, target, def) {
   if (def==null) { def =  ' Fetching data... ';}
   document.getElementById(target).innerHTML = def;
   var hasreq = false;
-  if (window.XMLHttpRequest) { 
+  if (window.XMLHttpRequest) {
     req = new XMLHttpRequest();
     hasreq = true;
-  } else if (window.ActiveXObject) { 
+  } else if (window.ActiveXObject) {
     req = new ActiveXObject("Microsoft.XMLHTTP");
     hasreq = true;
-  } 
-  if (hasreq) { 
-    req.onreadystatechange = function() {basicahahDone(url, target);}; 
-    req.open("GET", url, true); 
-    req.send(""); 
-  } 
-}  
+  }
+  if (hasreq) {
+    req.onreadystatechange = function() {basicahahDone(url, target);};
+    req.open("GET", url, true);
+    req.send("");
+  }
+}
 
-function basicahahDone(url, target) { 
-  if (req.readyState == 4) { // only if req is "loaded" 
-    if (req.status == 200) { // only if "OK" 
-      document.getElementById(target).innerHTML = req.responseText; 
-    } else { 
-      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText; 
-    } 
-  } 
+function basicahahDone(url, target) {
+  if (req.readyState == 4) { // only if req is "loaded"
+    if (req.status == 200) { // only if "OK"
+      document.getElementById(target).innerHTML = req.responseText;
+    } else {
+      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText;
+    }
+  }
 }
 
 function arraysearch(needle,hay) {
@@ -74,17 +74,26 @@ function arraysearch(needle,hay) {
       }
       return -1;
    }
-   
-var tipobj = 0;
+
+var tipobj = 0; var curtipel = null;
 function tipshow(el,tip) {
 	if (typeof tipobj!= 'object') {
 		tipobj = document.createElement("div");
 		tipobj.className = "tips";
+		tipobj.setAttribute("role","tooltip");
+		tipobj.id = "hovertipsholder";
 		document.getElementsByTagName("body")[0].appendChild(tipobj);
-	} 
-	tipobj.innerHTML = tip;
+	}
+	curtipel = el;
+	if (el.hasAttribute("data-tip")) {
+		tipobj.innerHTML = el.getAttribute("data-tip");
+	} else {
+		tipobj.innerHTML = tip;
+	}
 	tipobj.style.left = "5px";
 	tipobj.style.display = "block";
+	tipobj.setAttribute("aria-hidden","false");
+	el.setAttribute("aria-describedby", "hovertipsholder");
 	
 	if (typeof usingASCIIMath!='undefined' && typeof noMathRender != 'undefined') {
 		if (usingASCIIMath && !noMathRender) {
@@ -110,10 +119,10 @@ function tipshow(el,tip) {
 	  }
 
         x += scrOfX;
-        if ((p[0] + tipobj.offsetWidth)>x) {
+        if ((p[0] + tipobj.offsetWidth)>x-10) {
         	p[0] = x - tipobj.offsetWidth - 30;
         }
-        
+
 	tipobj.style.left = (p[0]+20) + "px";
 	if (p[1] < 30) {
 		tipobj.style.top = (p[1]+20) + "px";
@@ -145,7 +154,12 @@ function popupwindow(id,content,width,height,scroll) {
 	}
 }
 function tipout(el) {
-	tipobj.style.display = "none";	
+	tipobj.style.display = "none";
+	tipobj.setAttribute("aria-hidden","true");
+	if (curtipel) {
+		curtipel.removeAttribute("aria-describedby");
+	}
+	curtipel = null;
 }
 
 function findPos(obj) { //from quirksmode.org
@@ -177,19 +191,19 @@ function togglepic(el) {
 
 
 //from http://www.webreference.com/programming/javascript/onloads/
-function addLoadEvent(func) { 
-	  var oldonload = window.onload; 
-	  if (typeof window.onload != 'function') { 
-	    window.onload = func; 
-	  } else { 
-	    window.onload = function() { 
-	      if (oldonload) { 
-	        oldonload(); 
-	      } 
-	      func(); 
-	    } 
-	  } 
-} 
+function addLoadEvent(func) {
+	  var oldonload = window.onload;
+	  if (typeof window.onload != 'function') {
+	    window.onload = func;
+	  } else {
+	    window.onload = function() {
+	      if (oldonload) {
+	        oldonload();
+	      }
+	      func();
+	    }
+	  }
+}
 
 function submitlimiter(e) {
 	var target = e.target;
@@ -247,10 +261,10 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_window").style.display = "block";
 	document.getElementById("GB_overlay").style.display = "block";
 	document.getElementById("GB_loading").style.display = "block";
-	
+
 	var de = document.documentElement;
 	var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
-	
+
 	document.getElementById("GB_window").style.width = width + "px";
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
@@ -272,32 +286,39 @@ function chkAllNone(frmid, arr, mark, skip) {
        if (skip && frm.elements[i].className==skip) {
        	 frm.elements[i].checked = !mark;
        } else {
-       	 frm.elements[i].checked = mark;      
+       	 frm.elements[i].checked = mark;
        }
-      
+
      }
    } catch(er) {}
   }
   return false;
 }
 
-function initeditor(edmode,edids,css){
+var tinyMCEPreInit = {base: imasroot+"/tinymce4"};
+function initeditor(edmode,edids,css,inline,setupfunction){
 	var cssmode = css || 0;
+	var inlinemode = inline || 0;
 	var selectorstr = '';
 	if (edmode=="exact") { //list of IDs
 		selectorstr = '#'+edids.split(/,/).join(",#");
 	} else if (edmode=="textareas") { //class-based selection
 		selectorstr = "textarea."+edids;
+	} else if (edmode=="divs") { //class-based selection
+		selectorstr = "div."+edids;
+	} else if (edmode=="selector") { //flexible selector
+		selectorstr = edids;
 	}
 	var edsetup = {
 		selector: selectorstr,
+		inline: inlinemode,
 		plugins: [
-			"advlist attach image charmap anchor",
+			"advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor",
 			"media table paste asciimath asciisvg rollups"
 		],
 		menubar: false,//"edit insert format table tools ",
-		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code",
+		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
 		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
@@ -347,20 +368,23 @@ function initeditor(edmode,edids,css){
                 }]
         }
 	if (document.documentElement.clientWidth<385) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline";
+		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline | saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent  | link image | asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<465) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline forecolor";
+		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline forecolor | saveclose";
 		edsetup.toolbar2 = "bullist numlist outdent indent  | link unlink image | asciimath asciisvg";
 	} else if (document.documentElement.clientWidth<575) {
-		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor";
+		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor | saveclose";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
-	} 
+	}
+	if (setupfunction) {
+		edsetup.setup = setupfunction;
+	}
 	for (var i in tinymce.editors) {
 		tinymce.editors[i].remove();
 	}
 	tinymce.init(edsetup);
-	
+
 };
 
 function filePickerCallBack(callback, value, meta) {
@@ -377,10 +401,10 @@ function filePickerCallBack(callback, value, meta) {
 	tinyMCE.activeEditor.windowManager.open({
 		file : connector,
 		title : 'File Manager',
-		width : 350,  
+		width : 350,
 		height : 450,
 		resizable : "yes",
-		inline : "yes",  
+		inline : "yes",
 		close_previous : "no"
 	    }, {
 		oninsert: function(url, objVal) {
@@ -429,7 +453,7 @@ function selectByDivID(el) {
 	document.cookie = c+"store"+"="+escape(v) + ";expires="+exdate.toGMTString();
 }
 function setselectbycookie() {
-	var els = document.getElementsByTagName("select");	
+	var els = document.getElementsByTagName("select");
 	for (var i=0;i<els.length;i++) {
 		if (els[i].className.match("alts")) {
 			var cl = els[i].className.replace(/alts/,'').replace(/\s/g,'');
@@ -456,7 +480,7 @@ function recclick(type,typeid,info,txt) {
 			url: imasroot+'/course/rectrack.php?cid='+cid,
 			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
 		});
-	}			
+	}
 }
 function setuptracklinks(i,el) {
 	if (jQuery(el).attr("data-base")) {
@@ -543,10 +567,10 @@ function togglevideoembed() {
 			var inf = jQuery(this).prev().attr('data-base').split('-');
 			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
 		}
-	}	
+	}
 }
 function setupvideoembeds(i,el) {
-	
+
 	jQuery('<span/>', {
 		text: " [+]",
 		title: _("Watch video here"),
@@ -555,6 +579,12 @@ function setupvideoembeds(i,el) {
 		"class": "videoembedbtn"
 	}).insertAfter(el);
 	videoembedcounter++;
+}
+
+function addNoopener(i,el) {
+	if (!el.rel && el.target && el.host !== window.location.host) {
+		el.setAttribute("rel", "noopener noreferrer");
+	}
 }
 
 function addmultiselect(el,n) {
@@ -620,13 +650,13 @@ jQuery(document).ready(function($) {
 });
 
 jQuery(document).ready(function($) {
-	$('a').each(setuptracklinks);	
+	$('a').each(setuptracklinks).each(addNoopener);
 	$('a[href*="youtu"]').each(setupvideoembeds);
-	$('a[href*="vimeo"]').each(setupvideoembeds);	
+	$('a[href*="vimeo"]').each(setupvideoembeds);
 	$('body').fitVids();
 	$('a[target="_blank"]').each(function() {
 		if (!this.href.match(/youtu/) && !this.href.match(/vimeo/)) {
-		   $(this).append(' <img src="'+imasroot+'/img/extlink.png"/>')
+		   $(this).append(' <img src="'+imasroot+'/img/extlink.png" alt="External link"/>')
 		}
 	});
 });
@@ -688,7 +718,7 @@ function _(txt) {
   "use strict";
 
   $.fn.fitVids = function( ) {
-  
+
     return this.each(function(){
       var selectors = [
         "iframe[src*='player.vimeo.com']",
@@ -697,16 +727,17 @@ function _(txt) {
       ];
 
       var $allVideos = $(this).find(selectors.join(','));
-      
+
       $allVideos.each(function(){
         var $this = $(this);
+        if ($this.closest(".textsegment").length>0) {return true;}
         $this.parentsUntil(".intro","table").each(function() {
         	$(this).css('width','100%');
         });
         var height = ($this.attr('height') && !isNaN(parseInt($this.attr('height'), 10))) ? parseInt($this.attr('height'), 10) : $this.height(),
             width = !isNaN(parseInt($this.attr('width'), 10)) ? parseInt($this.attr('width'), 10) : $this.width(),
             aspectRatio = height / width;
-       
+
         if(!$this.attr('id')){
           var videoID = 'fitvid' + Math.floor(Math.random()*999999);
           $this.attr('id', videoID);
@@ -724,9 +755,9 @@ function _(txt) {
 function setAltSelectors(group,val) {
 	console.log("looking for "+group);
 	$(".alts."+group).parents(".altWrap").find(".altContentOn").removeClass("altContentOn").addClass("altContentOff");
-	$(".alts."+group).parents(".altWrap").find("."+val).addClass("altContentOn").removeClass("altContentOff");	
+	$(".alts."+group).parents(".altWrap").find("."+val).addClass("altContentOn").removeClass("altContentOff");
 	$("select.alts."+group).val(group+":"+val);
-	
+
 	var exdate=new Date();
 	exdate.setDate(exdate.getDate() + 365);
 	document.cookie = 'alt_store_'+group+"="+escape(val) + ";expires="+exdate.toGMTString()+ ";path=/";
@@ -740,17 +771,22 @@ jQuery(document).ready(function($) {
 	}).each(function (i,el) {
 		var groupValue = el.value.split(':');
 		if ((co = readCookie('alt_store_'+groupValue[0]))!=null) { //has cookie
-			setAltSelectors(groupValue[0], co);	
+			setAltSelectors(groupValue[0], co);
 		} else if ($(el).hasClass("setDefault")) {
 			setAltSelectors(groupValue[0], groupValue[1]);
 		}
 	});
 	$(document).on("keydown", function (e) {
-	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]), textarea")) {
+	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]), textarea, [contenteditable='true']")) {
 		e.preventDefault();
 	    }
 	});
-	
+	$("div.breadcrumb").attr("role","navigation").attr("aria-label",_("Navigation breadcrumbs"));
+	$("div.cpmid,div.cp").attr("role","group").attr("aria-label",_("Control link group"));
+	if ($("#centercontent").length) {
+		$("#centercontent").attr("role","main");
+		$(".midwrapper").removeAttr("role");
+	}
 });
 
 /* ========================================================================
@@ -918,4 +954,3 @@ jQuery(document).ready(function($) {
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
 
 }(jQuery);
-

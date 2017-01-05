@@ -14,15 +14,15 @@
 //    want to force the result to be connected.  If false for a tree, this
 //    forces a disconnected graph
 //  options['randweights'] = max or array(min,max).  Randomizes weights of edges
-//  options['randedges'] = probability (0-1).  Randomly keeps edges of original 
+//  options['randedges'] = probability (0-1).  Randomly keeps edges of original
 //    graph with given probability.
 //  options['tree'] = true.  Creates a minimum cost spanning tree from the original graph
 //  options['labelposition'] = "above","below","right","left","aboveright",etc.
-//    position of vertex labels.  
+//    position of vertex labels.
 
 global $allowedmacros;
 array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable","graphgetcriticalpath");
-	
+
 ///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
 //n vertices around a circle
@@ -90,7 +90,7 @@ function graphnestedpolygons($n,$m,$op=array()) {
 							$g[$v-$n-1][$v] = 1;
 						}
 					}
-					
+
 				} else {
 					$g[$v-$n][$v] = 1;
 					if ($i%2==1) {
@@ -107,7 +107,7 @@ function graphnestedpolygons($n,$m,$op=array()) {
 				}
 			}
 			$v++;
-			
+
 		}
 	}
 	//print_r($g);
@@ -144,7 +144,7 @@ function graphcircledstar($n,$op=array()) {
 	$g = graphemptygraph($n);
 	for ($i = 1; $i<=$n; $i++) {
 		$g[0][$i] = 1;
-		if ($i==1) { 
+		if ($i==1) {
 			$g[1][$n] = 1;
 		} else {
 			$g[$i-1][$i] = 1;
@@ -155,7 +155,7 @@ function graphcircledstar($n,$op=array()) {
 }
 
 //graphbipartite(n,[options])
-//draws a complete bipartite graph (every vertex on left is 
+//draws a complete bipartite graph (every vertex on left is
 //connected to every vertex on the right)
 //with n vertices in the first column, m in the second
 //returns array(pic,g)
@@ -177,7 +177,7 @@ function graphbipartite($n,$m,$op=array()) {
 			$g[$i][$j] = 1;
 		}
 	}
-		
+
 	$g = graphprocessoptions($g,$op);
 	return array(graphdrawit($pos,$g,$op),$g);
 }
@@ -198,12 +198,12 @@ function graphgrid($n,$m,$op=array()) {
 	}
 	$op['gridv'] = $n;
 	$g = graphprocessoptions($g,$op);
-	return array(graphgridlayout($g,$op),$g);	
+	return array(graphgridlayout($g,$op),$g);
 }
 
 
 //graphrandom(n,[options])
-//draws a randomly spring laid out graph with n vertices. 
+//draws a randomly spring laid out graph with n vertices.
 function graphrandom($n,$op=array()) {
 	$g = graphemptygraph($n);
 	for ($i = 0; $i<$n; $i++) {
@@ -212,8 +212,8 @@ function graphrandom($n,$op=array()) {
 		}
 	}
 	$g = graphprocessoptions($g,$op);
-	
-	return array(graphspringlayout($g,$op),$g);	
+
+	return array(graphspringlayout($g,$op),$g);
 }
 
 //graphemptygraph(n)
@@ -226,7 +226,7 @@ function graphemptygraph($n) {
 	return $g;
 }
 
-//graphdijkstra(g,[dest]) 
+//graphdijkstra(g,[dest])
 //computes dijkstras algorithm on the graph g
 //g is a 2-dimensional matrix
 //g[i][j]  &gt; 0 if vertexes i and j are connected
@@ -252,7 +252,7 @@ function graphdijkstra($g,$dest=-1) {
 	while (count($eaten)<$n) {
 		$cur = -1;
 		//find starting vertex, if any
-		for ($i=0; $i<$n; $i++) {	
+		for ($i=0; $i<$n; $i++) {
 			if (!isset($eaten[$i])) {
 				$cur = $i;
 				break;
@@ -283,7 +283,7 @@ function graphdijkstra($g,$dest=-1) {
 }
 
 
-//graphkruskal(g) 
+//graphkruskal(g)
 //return a minimum cost spanning tree graph from graph g
 function graphkruskal($g) {
 	$n = count($g[0]);
@@ -320,12 +320,12 @@ function graphkruskal($g) {
 				}
 			}
 			$clusters[$edges[$c][1]] = $clusters[$edges[$c][0]];
-			
+
 		}
 	}
 	$g = graphemptygraph($n);
 	foreach ($addededges as $c) {
-		$g[$edges[$c][0]][$edges[$c][1]] = $edgelist[$c];	
+		$g[$edges[$c][0]][$edges[$c][1]] = $edgelist[$c];
 	}
 	return $g;
 }
@@ -358,7 +358,7 @@ function graphnearestneighbor($g,$start,$returnweight=false) {
 	$totalweight = 0;
 	while (count($visited)<$n-1) {
 		$visited[$cur] = 1;
-		$minat = -1;  
+		$minat = -1;
 		$minval = 1e16;
 		for ($i=0; $i<$n; $i++) {
 			if (isset($visited[$i])) {continue;}
@@ -377,7 +377,7 @@ function graphnearestneighbor($g,$start,$returnweight=false) {
 	$ng[$cur][$start] = max($g[$cur][$start],$g[$start][$cur]);
 	$ng[$start][$cur] = $ng[$cur][$start];
 	$totalweight += $ng[$cur][$start];
-	
+
 	if ($returnweight) {
 		return array($ng,$totalweight);
 	} else {
@@ -385,7 +385,7 @@ function graphnearestneighbor($g,$start,$returnweight=false) {
 	}
 }
 
-//graphsortededges(g) 
+//graphsortededges(g)
 //returns a hamiltonian circuit graph using sorted edges
 function graphsortededges($g) {
 	$n = count($g[0]);
@@ -430,7 +430,7 @@ function graphsortededges($g) {
 	}
 	$g = graphemptygraph($n);
 	foreach ($addededges as $c) {
-		$g[$edges[$c][0]][$edges[$c][1]] = $edgelist[$c];	
+		$g[$edges[$c][0]][$edges[$c][1]] = $edgelist[$c];
 	}
 	return $g;
 }
@@ -457,19 +457,19 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
 		return -1; //doesn't return to start
-	} 
+	}
 	$dup = 0;
 	for ($i=1; $i<$len; $i++) {
 		if ($g[$vseq[$i]][$vseq[$i-1]]>0 || $g[$vseq[$i-1]][$vseq[$i]]>0) {
 			//edge exists
 			$g[$vseq[$i]][$vseq[$i-1]] = -1;
-			$g[$vseq[$i-1]][$vseq[$i]] = -1;	
+			$g[$vseq[$i-1]][$vseq[$i]] = -1;
 		} else if ($g[$vseq[$i]][$vseq[$i-1]]<0) {
 			//used this edge before.  naughty naughty
 			$g[$vseq[$i]][$vseq[$i-1]]--;
 			$g[$vseq[$i-1]][$vseq[$i]]--;
 			$dup++;
-		} else { 
+		} else {
 			//no edge exists
 			return -1;
 		}
@@ -482,7 +482,7 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 			}
 		}
 	}
-	return $dup;	
+	return $dup;
 }
 
 //function graphsequencishamiltonian(g,op,seq)
@@ -504,11 +504,11 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 		$vseq[$i] = $lblrev[$seq{$i}];
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
-		return false;	
+		return false;
 	}
 	if ($len != $n+1) {
 		return false; //doesn't return to start or not long enough
-	} 
+	}
 	$notvis = array_fill(0,$n,1);
 	for ($i=1; $i<$len; $i++) {
 		if ($g[$vseq[$i]][$vseq[$i-1]]>0 || $g[$vseq[$i-1]][$vseq[$i]]>0) {
@@ -517,10 +517,10 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 				$notvis[$vseq[$i]] = 0;
 			} else {
 				//second visit to vertex;
-				
+
 				return false;
 			}
-		} 
+		}
 	}
 	if (array_sum($notvis)>0) {
 		//some vertex not visisted.  Should have already been caught
@@ -585,7 +585,7 @@ function graphshortestpath($g,$op,$start,$end,$type=0) {
 			$path .= $lbl[$vert];
 		}
 		return array($path,$dist[$start]);
-	}	
+	}
 }
 
 //graphcircuittoarray(g,[start])
@@ -612,7 +612,7 @@ function graphcircuittoarray($g,$start=0) {
 	return $order;
 }
 
-//graphgetedges(g,op) 
+//graphgetedges(g,op)
 //gets list of edges in and not in graph
 //need op['labels'] set
 //return (goodedges,badedges)
@@ -650,7 +650,7 @@ function graphgetedges($g,$op) {
 	return array($good,$bad);
 }
 
-//graphgetedgesarray(g) 
+//graphgetedgesarray(g)
 //gets array of edges in a graph
 //returns array of edges; each edge is array(startvert,endvert)
 function graphgetedgesarray($g) {
@@ -664,7 +664,7 @@ function graphgetedgesarray($g) {
 				}
 				if($g[$j][$i]>0) {
 					$good[] = array($j,$i);
-				} 
+				}
 			} else {
 				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
 					$good[] = array($i,$j);
@@ -675,7 +675,7 @@ function graphgetedgesarray($g) {
 	return $good;
 }
 
-//graphgettotalcost(g) 
+//graphgettotalcost(g)
 //gets total cost of all edges in a graph
 function graphgettotalcost($g) {
 	$n = count($g[0]);
@@ -712,7 +712,7 @@ function graphadjacencytoprereqs($g,$op) {
 	return $list;
 }
 
-//graphprereqtable(g,w,[op]) 
+//graphprereqtable(g,w,[op])
 //creates an HTML table showing the tasks in g, the task times in w, and
 //the tasks that must be completed first.
 //use $op['labels'] to provide array of labels, or ='letters' to use letters
@@ -734,9 +734,9 @@ function graphprereqtable($g,$w,$op=array()) {
 	}
 	$out .= '</tbody></table>';
 	return $out;
-		
+
 }
-	
+
 //graphadjacencytoincidence(g,[options])
 //create incidence lists from adjacency matrix g
 //g[i][j] &gt; 0 if edge from i to j
@@ -798,13 +798,13 @@ function graphgetvalence($g,$vert,$dir=2) {
 			$cnt++;
 		} else if ($dir==1 && $g[$vert][$i]>0) {
 			$cnt++;
-		} 
+		}
 	}
 	return $cnt;
 }
 
 //graphmakesymmetric(g)
-//ensures that all edges are bidirectional.  
+//ensures that all edges are bidirectional.
 function graphmakesymmetric($g) {
 	$n = count($g[0]);
 	for ($i=0; $i<$n; $i++) {
@@ -830,7 +830,7 @@ function graphisconnected($g) {
 		if ($dist[$i]==$inf) {
 			return false;
 		}
-	} 
+	}
 	return true;
 }
 
@@ -841,7 +841,7 @@ function graphmaketable($g,$o=array()) {
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 	if (!is_array($op['labels'])) {
 		$op['labels'] = array_slice($lettersarray,0,$n);
-	}	
+	}
 	$table = '<table class="stats"><thead>';
 	$table .= '<tr><th></th>';
 	for ($i=0; $i<$n; $i++) {
@@ -872,6 +872,7 @@ function graphmaketable($g,$o=array()) {
 //g[i][j] &gt; 0 if vertices i and j are connected
 //not a digraph
 function graphspringlayout($g,$op=array()) {
+	global $RND;
 	$iterations = 40;
 	$t = 2;
 	$dim = 2;
@@ -879,15 +880,15 @@ function graphspringlayout($g,$op=array()) {
 	$k = sqrt(1/$n);
 	$dt = $t/$iterations;
 	$pos = array();
-	
-	
+
+
 	for ($i=0; $i<$n; $i++) {
 		$pos[$i] = array();
 		for ($x = 0; $x<$dim; $x++) {
-			$pos[$i][$x] = rand(0,32000)/32000;
+			$pos[$i][$x] = $RND->rand(0,32000)/32000;
 		}
 	}
-	
+
 	for ($it = 0; $it<$iterations; $it++) {
 		for ($i = 0; $i<$n; $i++) {
 			for ($x = 0; $x<$dim; $x++) {
@@ -913,7 +914,7 @@ function graphspringlayout($g,$op=array()) {
 				for ($x = 0; $x<$dim; $x++) {
 					$disp[$i][$x] += $delta[$x]*$force;
 					$disp[$j][$x] -= $delta[$x]*$force;
-				}	
+				}
 			}
 		}
 		for ($i = 0; $i<$n; $i++) {
@@ -925,11 +926,11 @@ function graphspringlayout($g,$op=array()) {
 			for ($x = 0; $x<$dim; $x++) {
 				$pos[$i][$x] += $disp[$i][$x]*$scale;
 			}
-			
+
 		}
 		$t -= $dt;
 	}
-	
+
 	return graphdrawit($pos,$g,$op);
 }
 
@@ -991,7 +992,7 @@ function graphgridlayout($g,$op=array()) {
 	for ($i=0; $i<$n; $i++) {
 		$pos[$i][0] = floor($i/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
 		$pos[$i][1] = ($i%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
-	}	
+	}
 	return graphdrawit($pos,$g,$op);
 }
 
@@ -1011,8 +1012,8 @@ function graphpathlayout($g,$op=array()) {
 	$dh = 10/$maxh;
 	$dv = 10/$maxv;
 	$odv = $dv/$maxh;
-	
-	
+
+
 	for ($i=0; $i<$n; $i++) {
 		if ($dist[$i]<0) { $dist[$i] = 0;}
 		$pos[$i][0] = 1-$dh*$dist[$i];
@@ -1026,8 +1027,9 @@ function graphpathlayout($g,$op=array()) {
 
 //internal function, not to be used directly
 function graphprocessoptions($g,$op) {
+	global $RND;
 	$n = count($g[0]);
-	
+
 	if (!isset($op['connected'])) {
 		if ($op['tree']) {
 			$op['connected'] = true;
@@ -1048,7 +1050,7 @@ function graphprocessoptions($g,$op) {
 			for ($j=$i+1; $j<$n; $j++) {
 				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
 					$nedg++;
-				} 
+				}
 				if ($op['digraph'] && $g[$i][$j]>0 && $g[$j][$i]>0) {
 					$nedg++;
 				}
@@ -1062,7 +1064,7 @@ function graphprocessoptions($g,$op) {
 					if ($g[$i][$j]>0) {
 						$g[$i][$j] = $rweights[$c];
 						$c++;
-					} 
+					}
 					if ($g[$j][$i]>0) {
 						$g[$j][$i] = $rweights[$c];
 						$c++;
@@ -1088,7 +1090,7 @@ function graphprocessoptions($g,$op) {
 		$rnd = $op['randedges'];
 		for ($i=0; $i<$n; $i++) {
 			for ($j=$i+1; $j<$n; $j++) {
-				$p = rand(0,99);
+				$p = $RND->rand(0,99);
 				if ($p < $rnd*100) {
 					if ($origg[$i][$j]>0) {
 						$g[$i][$j] = $origg[$i][$j];
@@ -1096,7 +1098,7 @@ function graphprocessoptions($g,$op) {
 					if ($origg[$j][$i]>0) {
 						$g[$j][$i] = $origg[$j][$i];
 					}
-				}		
+				}
 			}
 		}
 	}
@@ -1114,7 +1116,7 @@ function graphprocessoptions($g,$op) {
 			}
 		}
 	}
-	return $g;	
+	return $g;
 }
 
 //internal function, not usually used directly
@@ -1138,12 +1140,12 @@ function graphdrawit($pos,$g,$op) {
 		$op['ymin'] = $pymin;
 		$op['ymax'] = $pymax;
 	}
-	
+
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 	$com = "setBorder(60,30,60,30);initPicture({$op['xmin']},{$op['xmax']},{$op['ymin']},{$op['ymax']}); fontsize=14;";
 	$cx = ($op['xmin'] + $op['xmax'])/2;
 	$cy = ($op['ymin'] + $op['ymax'])/2;
-	
+
 	$com .= "fontstyle='none';";
 	if ($op['digraph']) {
 		$com .= 'marker="arrow";';
@@ -1160,7 +1162,7 @@ function graphdrawit($pos,$g,$op) {
 				} else if ($g[$j][$i]>0 && $g[$i][$j]>0) {
 					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
 				}
-				
+
 			} else {
 				if ($g[$i][$j]>0 || $g[$j][$i]>0) {
 					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
@@ -1178,9 +1180,9 @@ function graphdrawit($pos,$g,$op) {
 				if ($pos[$i][0]>$cx) { $ps .= "right"; } else {$ps .= "left";}
 			}
 			if (is_array($op['labels'])) {
-				$com .= "fontfill='blue';text([".$pos[$i][0].",".$pos[$i][1]."],'".$op['labels'][$i]."','$ps');";	
+				$com .= "fontfill='blue';text([".$pos[$i][0].",".$pos[$i][1]."],'".$op['labels'][$i]."','$ps');";
 			} else {
-				$com .= "fontfill='blue';text([".$pos[$i][0].",".$pos[$i][1]."],'".$lettersarray[$i]."','$ps');";	
+				$com .= "fontfill='blue';text([".$pos[$i][0].",".$pos[$i][1]."],'".$lettersarray[$i]."','$ps');";
 			}
 		}
 		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
@@ -1194,18 +1196,18 @@ function graphdrawit($pos,$g,$op) {
 					$my = $pos[$j][1] + ($pos[$i][1] - $pos[$j][1])*(1-$op['weightoffset']);
 				}
 				$com .= "fontfill='red';text([$mx,$my],'".max($g[$i][$j],$g[$j][$i])."');";
-				
+
 			}
 		}
 	}
-	return showasciisvg($com,$op['width'],$op['height']);	
+	return showasciisvg($com,$op['width'],$op['height']);
 }
 
 //graphcomparecircuits(A,B)
 //returns true or false
 //compares two circuits to see if they are the same, regardless of starting
 //vertex.  So "ABCDA" would be considered equivalent to "DCBAD"
-//can be used with the conditional answer type to score circuits. 
+//can be used with the conditional answer type to score circuits.
 function graphcomparecircuits($a,$b) {
 	$lena = strlen($a);
 	$lenb = strlen($b);
@@ -1240,6 +1242,7 @@ function graphcomparecircuits($a,$b) {
 //  value
 //if options['labels'] are used, "start" and "end" will be added automatically
 function graphrandomgridschedule($n,$m,$p,$op=array()) {
+	global $RND;
 	$op['digraph'] = true;
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 	$tot = $n*$m+1;
@@ -1250,7 +1253,7 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 			$op['weights'] = diffrands(1,$op['weights'],$n*$m);
 		}
 	}
-			
+
 	$g = graphemptygraph($tot);
 	$sn = $n;
 	$gd = 1;//10/$sn;
@@ -1261,7 +1264,7 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 	for ($i=0; $i<$tot-1; $i++) {
 		$pos[$i][0] = floor(($i)/$sn)*$gd  + ($op['wiggle']?$gd/5*sin(3*$i):0);;
 		$pos[$i][1] = $sn-1-(($i)%$sn)*$gd + ($op['wiggle']?$gd/5*sin(4*$i):0);
-	}	
+	}
 	//connections to start and end
 	for ($i = 1; $i<$n+1; $i++) {
 		//$g[0][$i] = 1;
@@ -1270,28 +1273,28 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 	//connections between
 	for ($i = 0; $i<$tot; $i++) {
 		if ($i<$tot-$n) {
-			$r[0] = rand(0,99);
-			$r[1] = rand(0,99);
-			$r[2] = rand(0,99);
-			
+			$r[0] = $RND->rand(0,99);
+			$r[1] = $RND->rand(0,99);
+			$r[2] = $RND->rand(0,99);
+
 			$out = false;
 			if ($r[0]<$p*100) {
 				$g[$i][$i+$n] = 1;
 				$out = true;
 			}
-			
+
 			if ($r[1]<$p*100  && ($i+1)%$n!=0) {
 				$g[$i][$i+$n+1] = 1;
 				$out = true;
 			}
-			
+
 			if ($r[2]<$p*100 && ($i)%$n!=0) {
 				$g[$i][$i+$n-1] = 1;
 				$out = true;
 			}
 			//force one outgoing
 			if (!$out) {
-				$d = rand(0,2);
+				$d = $RND->rand(0,2);
 				if ($d<2) {
 					$g[$i][$i+$n] = 1;
 				} else {
@@ -1324,9 +1327,9 @@ function graphrandomgridschedule($n,$m,$p,$op=array()) {
 		if (!$connected) {
 			$g[$i-$n][$i] = 1;
 		}
-		
+
 	}
-	
+
 	if (isset($op['labels'])) {
 		if ($op['labels']=="letters") {
 			$op['labels'] = array_slice($lettersarray,0,$tot-1);
@@ -1356,7 +1359,7 @@ function graphdecreasingtimelist($g,$w) {
 	while ($w[$k[count($k)-1]]==0) {
 		array_pop($k);
 	}
-	return $k;	
+	return $k;
 }
 
 //graphcriticaltimelist(g,w)
@@ -1373,7 +1376,7 @@ function graphcriticaltimelist($g,$w) {
 }
 
 //graphgetcriticalpath(g,w)
-//returns array(path,time,isunique) where path is an array of task indexes corresonding to 
+//returns array(path,time,isunique) where path is an array of task indexes corresonding to
 // the critical path, and time is the length of the critical path (the critical time)
 // isunique is true if there is only one critical path
 //g is the graph
@@ -1403,13 +1406,13 @@ function graphgetkeysweights($w) {
 	return array_keys($w);
 }
 
-//graphbackflow(g,[w]) 
+//graphbackflow(g,[w])
 //computes longest-path algorithm on the graph g
 //g is a 2-dimensional matrix
 //g[i][j] &gt; 1 if vertexes i leads to j
 //This might give bad/weird results if graph has a circuit
 //the last vertex will be used as the destination vertex
-//w are weights for the vertices, if a scheduling digraph and 
+//w are weights for the vertices, if a scheduling digraph and
 //tasks rather than edges have weights
 //returns array(dist,next) where
 //dist[i] is the longest dist to end, and
@@ -1440,11 +1443,11 @@ function graphbackflow($g,$w=array()) {
 					if ($alt>$dist[$i]) {
 						$dist[$i] = $alt;
 						$next[$i] = $cur;
-						
+
 					}
 					if (!in_array($i,$newtoprocess)) {
 						$douse = true;
-						//don't use if not terminal 
+						//don't use if not terminal
 						for ($j=0; $j<$n; $j++) {
 							if ($g[$i][$j]>0 && !isset($eaten[$j]) && $j!=$cur) {
 								$douse = false; break;
@@ -1460,7 +1463,7 @@ function graphbackflow($g,$w=array()) {
 		}
 		$toprocess = $newtoprocess;
 	}
-	
+
 	return array($dist,$next);
 }
 
@@ -1485,12 +1488,12 @@ function graphlistprocessing($g,$t,$L,$p,$op=array()) {
 	$n = count($g[0]);
 	$done = array();
 	$started = array();
-	$curtime = 0; 
+	$curtime = 0;
 	$proc = array_fill(0,$p,0); //holds time when each processor is done w current task
 	$prereqs = graphadjacencytoprereqs($g,$op);
 	$cnt = 0;
 	while (count($done)<$n-1) { //we don't worry about the last task.
-		//mark done tasks 
+		//mark done tasks
 		if ($curtime > 0) {
 			for ($i=0;$i<$p;$i++) {
 				if ($proc[$i]<=$curtime) { //if processor is done
@@ -1596,7 +1599,7 @@ function graphscheduleproctasks($sc,$p,$oneindex=false) {
 	}
 	return $out;
 }
-		
+
 
 //graphdrawschedule(sc,[width,height,names])
 //draws the schedule generated by graphlistprocessing
@@ -1618,7 +1621,7 @@ function graphdrawschedule($sc,$w=600,$h=-1,$names=array()) {
 	}
 	$com .= "stroke='black';";
 	for ($i=0;$i<=$ct;$i+=$sp) {
-		$com .= "text([$i,$p],'$i','above');";	
+		$com .= "text([$i,$p],'$i','above');";
 		$com .= "line([$i,-.1],[$i,$p+.1]);";
 	}
 	$com .= "fill='gray';rect([0,0],[$ct,$p]);";
@@ -1639,12 +1642,12 @@ function graphdrawschedule($sc,$w=600,$h=-1,$names=array()) {
 			$com .= "text([".($ti[1]+.5*$ti[2]).",".($p-$n-.5)."],'$tn');";
 		}
 	}
-	
+
 	return showasciisvg($com,$w,$h);
 }
 
 //graphschedulelayout(g,w,pos,[op])
-//draws a schedule digraph 
+//draws a schedule digraph
 //g is the graph, w is an array of task times
 //pos is array where L[task number] = array(column,row (counting up from bottom))
 //use $options['labels'] to specify labels, or T1 - TN will be used
@@ -1667,7 +1670,7 @@ function graphschedulelayout($g,$w,$pos,$op=array()) {
 }
 
 //graphschedulemultchoice(g,t,L,p)
-//attempts to return 4 schedules which are different.  The first is the 
+//attempts to return 4 schedules which are different.  The first is the
 //correct schedule based on the provided priority list L
 function graphschedulemultchoice($g,$t,$L,$p) {
 	$sc = graphlistprocessing($g,$t,$L,$p);

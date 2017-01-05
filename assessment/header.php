@@ -38,7 +38,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=012614";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=110216";?>" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
@@ -101,16 +101,22 @@ if (!isset($sessiondata['mathdisp'])) {
 		}
 		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
+		MathJax.Hub.Register.StartupHook("Begin Config", setupKatexAutoRenderWhenReady);
+		</script>
+		<script type="text/javascript">
+		function setupKatexAutoRenderWhenReady() {
+			if (typeof setupKatexAutoRender == "function") {setupKatexAutoRender();} else { setTimeout(setupKatexAutoRenderWhenReady,50);}
+		}
 		</script>';
-	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	//echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
 	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>';
 	//echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
 	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css"/>';
-	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=070816"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex"; function rendermathnode(node) {renderMathInElement(node);}</script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=083116"></script>';
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
@@ -120,7 +126,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
 }
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=071516\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=102316\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
@@ -141,12 +147,26 @@ div { zoom: 1; }
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=082616";?>" type="text/javascript"></script>
+
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=120616";?>" type="text/javascript"></script>
+
 <?php
+/*
+
+
+<script src="<?php echo $imasroot . "/javascript/general.js?v=082616";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/mathjs.js?v=082616";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=082616";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=082616";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/drawing.js?v=111916b";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/eqntips.js?v=082616";?>" type="text/javascript"></script>
+
+*/
 //assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=082716"></script>';
+	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var usingTinymceEditor = true;';
@@ -225,8 +245,8 @@ if (!isset($coursetopbar)) {
 	$coursetoolset = $sessiondata['coursetoolset'];
 }
 
-if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
-	echo '<div id="navlistcont">';
+if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
+	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
@@ -260,8 +280,8 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	echo '</ul>';
 	echo '<br class="clear" />';
 	echo '</div>';
-} else if (isset($cid) && !isset($flexwidth)  && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && !$sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
-	echo '<div id="navlistcont">';
+} else if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && !$sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
+	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
 	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
@@ -286,7 +306,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 if (!isset($flexwidth)) {
 	echo '</div>';
 }
-echo '<div class="midwrapper">';
+echo '<div class="midwrapper" role="main">'; 
 
 
 ?>

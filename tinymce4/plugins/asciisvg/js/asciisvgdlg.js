@@ -5,25 +5,25 @@ var AsciisvgDialog = {
 	sscr: "",
 	isnew: null,
 	AScgiloc: null,
-	
+
 	init : function() {
 		var f = document.forms[0];
 
 		// Get the selected contents as text and place it in the input
-		this.width = top.tinymce.activeEditor.windowManager.getParams().width; 
-		this.height = top.tinymce.activeEditor.windowManager.getParams().height; 
+		this.width = top.tinymce.activeEditor.windowManager.getParams().width;
+		this.height = top.tinymce.activeEditor.windowManager.getParams().height;
 		this.isnew = top.tinymce.activeEditor.windowManager.getParams().isnew;
 		this.sscr = top.tinymce.activeEditor.windowManager.getParams().sscr;
 		this.AScgiloc = top.tinymce.activeEditor.windowManager.getParams().AScgiloc;
 		this.alignm = top.tinymce.activeEditor.windowManager.getParams().alignm;
 		if (ASnoSVG) {
-			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " />';
+			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " alt="Graph"/>';
 		} else {
 			document.getElementById("previewsvg").setAttribute("sscr",this.sscr);
 		}
 		this.getsscr(this.sscr);
-		
-		
+
+
 	},
 
 	insert : function() {
@@ -35,7 +35,7 @@ var AsciisvgDialog = {
 			} else {
 				aligntxt = "vertical-align: "+this.alignm+"; float: none;";
 			}
-			top.tinymce.activeEditor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" data-sscr="'+this.sscr+'" data-asciisvg="1" data-mce-placeholder="1" script=" " />');
+			top.tinymce.activeEditor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" data-sscr="'+this.sscr+'" data-asciisvg="1" data-mce-placeholder="1" script=" " alt="Graph" />');
 		} else {
 			el = top.tinymce.activeEditor.selection.getNode();
 			ed.dom.setAttrib(el,"sscr",this.sscr);
@@ -52,20 +52,20 @@ var AsciisvgDialog = {
 				ed.dom.setStyle(el,"float","none");
 				ed.dom.setStyle(el,"vertical-align",this.alignm);
 			}
-			
+
 		}
 		top.tinymce.activeEditor.windowManager.close();
 	},
-	
+
 	addgraph : function() {
-		
+
 		var graphs = document.getElementById("graphs");
 		var newopt = document.createElement('option');
-	
+
 		var type = document.getElementById("eqntype").value;
 		var eq1 = document.getElementById("equation").value;
 		var eq2 = null;
-	
+
 		if (type == "func") {
 			newopt.text = 'y=' + eq1;
 		} else if (type == "polar") {
@@ -79,8 +79,8 @@ var AsciisvgDialog = {
 		} else if (type == "label") {
 			newopt.text = 'label='+eq1;
 		}
-	
-		
+
+
 		 m_gstart = document.getElementById("gstart").selectedIndex;
 		 m_gend = document.getElementById("gend").selectedIndex;
 		 m_color = document.getElementById("gcolor").value;
@@ -93,13 +93,13 @@ var AsciisvgDialog = {
 			//newopt.value = 'myplot(' + eqn + ',"' +m_gstart+  '","' + m_gend+'");';
 			newopt.value = type + ',' + eq1 + ',' + eq2 + ',' + m_gstart + ',' + m_gend + ',,' + ',' + m_color + ',' + m_strokewidth + ',' + m_strokedash;
 		 }
-		
+
 		graphs.options[graphs.options.length] = newopt;
 		graphs.selectedIndex = graphs.options.length - 1;
 		this.graphit();
 		document.getElementById("equation").focus();
 	},
-	
+
 	replacegraph : function() {
 		var graphs = document.getElementById("graphs");
 		if (graphs.selectedIndex >= 0) {
@@ -107,7 +107,7 @@ var AsciisvgDialog = {
 		}
 		this.addgraph();
 	},
-	
+
 	removegraph : function() {
 		var graphs = document.getElementById("graphs");
 		if (graphs.selectedIndex >= 0) {
@@ -117,16 +117,16 @@ var AsciisvgDialog = {
 		this.graphit();
 		document.getElementById("equation").focus();
 	},
-	
+
 	graphit : function() {
 		ed = top.tinymce.activeEditor;
 		var commands;
 		commands = "";
-	     
+
 		initialized = false;
-		
+
 		//commands = 'setBorder(5);';
-	
+
 		m_xmin = document.getElementById("xmin").value;
 		m_xmax = document.getElementById("xmax").value;
 		m_ymin = document.getElementById("ymin").value;
@@ -134,7 +134,7 @@ var AsciisvgDialog = {
 		if (m_ymin == "") m_ymin = null
 		if (m_ymax == "") m_ymax = null
 		commands += m_xmin + ',' + m_xmax + ','+ m_ymin + ',' + m_ymax + ',';
-	
+
 		m_xscl = document.getElementById("xscl").value;
 		m_yscl = document.getElementById("yscl").value;
 		if (m_xscl<0) {
@@ -152,17 +152,17 @@ var AsciisvgDialog = {
 		} else {
 			m_labels = 'null';
 		}
-	
+
 		if (document.getElementById("grid").checked) {
 			m_grid = ',' + m_xscl + ',' + m_yscl;
 		} else {
 			m_grid = ',null,null';
 		}
 		commands += m_xscl + ',' + m_yscl + ',' + m_labels + m_grid;
-	      
+
 		commands += ',' + document.getElementById("gwidth").value + ',' + document.getElementById("gheight").value;
-		
-	
+
+
 		graphs = document.getElementById("graphs");
 		for (i=0; i < graphs.length; i++) {
 			commands += ',' + graphs.options[i].value;
@@ -173,32 +173,32 @@ var AsciisvgDialog = {
 		this.sscr = commands;
 		this.alignm = document.getElementById("alignment").value;
 		if (ASnoSVG) {
-			pvimg = document.getElementById("previewimg");
+			var pvimg = document.getElementById("previewimg");
 			pvimg.src = this.AScgiloc + '?sscr='+encodeURIComponent(commands);
 			ed.dom.setStyle(pvimg,"width",this.width + 'px');
 			ed.dom.setStyle(pvimg,"height",this.height + 'px');
 		} else {
-			pvsvg = document.getElementById("previewsvg");
+			var pvsvg = document.getElementById("previewsvg");
 			parseShortScript(commands,this.width,this.height);
 		}
-	
+
 	},
-	
+
 	changetype : function() {
 		var type = document.getElementById("eqntype").value;
-		
+
 		if (type == "func") {
 			this.chgtext("eq1lbl","f(x)=");
 			document.getElementById("equation").value = "sin(x)";
 			this.chgtext("eq2lbl","");
 			this.chgtext("eq2","");
-			
+
 		} else if (type == "polar") {
 			this.chgtext("eq1lbl", "r(t)=");
 			document.getElementById("equation").value = "t";
 			this.chgtext("eq2lbl","");
 			this.chgtext("eq2","");
-			
+
 		} else if (type == "param") {
 			this.chgtext("eq1lbl", "f(t)=");
 			this.chgtext("eq2lbl","g(t)= ");
@@ -211,7 +211,7 @@ var AsciisvgDialog = {
 			var cnode = document.getElementById("eq2");
 			cnode.replaceChild(newinput,cnode.lastChild);
 			document.getElementById("equation").value = "sin(t)";
-	
+
 		} else if (type == "slope") {
 			this.chgtext("eq1lbl", "dy/dx (x,y) = ");
 			document.getElementById("equation").value = "x*y";
@@ -230,7 +230,7 @@ var AsciisvgDialog = {
 			this.chgtext("eq2lbl","");
 			this.chgtext("eq2","");
 		}
-		
+
 		if (type == "label") {
 			this.chgtext("xblbl1", "at x=");
 			this.chgtext("xblbl2", ", y=");
@@ -247,14 +247,14 @@ var AsciisvgDialog = {
 		document.getElementById("gcolor").selectedIndex = 0;
 		document.getElementById("strokewidth").selectedIndex = 0;
 		document.getElementById("strokedash").selectedIndex = 0;
-	
+
 	},
-	
+
 	loadeqn : function() {
-		graphs = document.getElementById("graphs");	
-		
+		graphs = document.getElementById("graphs");
+
 		var sa = graphs.options[graphs.selectedIndex].value.split(",");
-		
+
 		if (sa[0] == "func") {
 			document.getElementById("eqntype").selectedIndex = 0;
 		} else if (sa[0] == "polar") {
@@ -271,7 +271,7 @@ var AsciisvgDialog = {
 		if ((sa[0] == "param")||(sa[0] == "slope")) {
 			document.getElementById("eqn2").value = sa[2];
 		}
-	
+
 		document.getElementById("gstart").selectedIndex = sa[3];
 		document.getElementById("gend").selectedIndex = sa[4];
 		document.getElementById("xstart").value = sa[5];
@@ -294,7 +294,7 @@ var AsciisvgDialog = {
 			default: document.getElementById("strokedash").selectedIndex = 0;
 		}
 	},
-			
+
 	getsscr : function(text, alignment) {
 		alignment = "middle";
 		sa = text.split(",");
@@ -304,7 +304,7 @@ var AsciisvgDialog = {
 		document.getElementById("ymax").value = sa[3];
 		document.getElementById("xscl").value = sa[4];
 		document.getElementById("yscl").value = sa[5];
-	
+
 		if (sa[6] != "null") {
 			document.getElementById("labels").checked = true;
 		} else {
@@ -315,16 +315,16 @@ var AsciisvgDialog = {
 		} else {
 			document.getElementById("grid").checked = false;
 		}
-		
+
 		document.getElementById("gwidth").value = sa[9];
 		document.getElementById("gheight").value = sa[10];
-		
+
 		document.getElementById("graphs").length = 0;
-		
+
 		var inx = 11;
 		while (sa.length > inx+9) {
 			var newopt = document.createElement('option');
-			
+
 			if (sa[inx]== "func") {
 				newopt.text = 'y=' + sa[inx+1];
 			} else if (sa[inx] == "polar") {
@@ -345,7 +345,7 @@ var AsciisvgDialog = {
 		if (inx > 11) {
 			this.loadeqn();
 		}
-		
+
 		switch (alignment.toLowerCase()) {
 			case "text-top": document.getElementById("alignment").selectedIndex = 0; break;
 			case "middle": document.getElementById("alignment").selectedIndex = 1; break;
@@ -354,10 +354,10 @@ var AsciisvgDialog = {
 			case "right": document.getElementById("alignment").selectedIndex = 4; break;
 			default: document.getElementById("alignment").selectedIndex = 0; break;
 		}
-		
+
 		this.graphit();
 	},
-	
+
 	chgtext : function(tag,text)
 	{
 		var cnode = document.getElementById(tag);
@@ -365,4 +365,3 @@ var AsciisvgDialog = {
 	}
 
 };
-

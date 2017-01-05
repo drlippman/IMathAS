@@ -12,22 +12,25 @@
 	if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmode = mysql_result($result,0,0);
+		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $gbmode = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$gbmode = $stm->fetchColumn(0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];
 	} else {
 		$stu = 0;
 	}
-	
+
 	if (!isset($_POST['commentloc'])) {
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
 		echo '<div id="headergb-export" class="pagetitle"><h2>Export Gradebook</h2></div>';
-		
+
 		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=$stu&gbmode=$gbmode";
 		if (isset($_GET['export'])) {
 			echo "&export={$_GET['export']}";
@@ -38,16 +41,16 @@
 		if ($_GET['emailgb']=="ask") {
 			echo "<span class=\"form\">Email Gradebook To:</span><span class=\"formright\"> <input type=text name=\"email\" size=\"30\"/></span> <br class=\"form\" />";
 		}
-		
+
 		echo '<span class="form">Locked students?</span><span class="formright"><input type="radio" name="locked" value="hide" checked="checked"> Hide <input type="radio" name="locked" value="show" > Show </span><br class="form" />';
 		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
 		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include comments <br/>  <input type="radio" name="commentloc" value="1"> Separate set of columns at the end <br/><input type="radio" name="commentloc" value="0"> After each score column</span><br class="form" />';
 		echo '<span class="form">Assessment times:</span><span class="formright"> <input type="radio" name="timestype" value="0" checked="checked"> Don\'t include assessment times <br/>  <input type="radio" name="timestype" value="1"> Include total assessment time <br/><input type="radio" name="timestype" value="2"> Include time in questions</span><br class="form" />';
-		
+
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
 		echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
-		
-		
+
+
 		if (isset($_GET['export'])) {
 			echo '<p><input type=submit name="submit" value="Download Gradebook as CSV" /> <input type=submit name="submit" value="Download Gradebook for Excel" /> <a href="gradebook.php?cid='.$cid.'">Return to gradebook</a></p>';
 			echo '<p>When you click the <b>Download Gradebook</b> button, your browser will probably ask if you want to save or ';
@@ -62,22 +65,22 @@
 		require("../footer.php");
 		exit;
 	}
-	
+
 	if (isset($_POST['email'])) {
 		$_GET['emailgb'] = $_POST['email'];
 	}
-	
-	
+
+
 	$commentloc = $_POST['commentloc'];  //0: interleve, 1: at end
 	$pointsln = $_POST['pointsln']; //0: on main, 1: separate line
 	$lastlogin = $_POST['lastlogin']; //0: no, 1 yes
 	$logincnt = $_POST['logincnt']; //0: no, 1 yes
 	$hidelocked = ($_POST['locked']=='hide')?true:false;
 	$includetimes = intval($_POST['timestype']); //1 total time, 2 time on task
-	
+
 	$catfilter = -1;
 	$secfilter = -1;
-	
+
 	//Gbmode : Links NC Dates
 	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
@@ -109,46 +112,46 @@
 			foreach ($gb as $gbline) {
 				$line = '';
 				foreach ($gbline as $val) {
-					 # remove any windows new lines, as they interfere with the parsing at the other end 
-					  $val = str_replace("\r\n", "\n", $val); 
+					 # remove any windows new lines, as they interfere with the parsing at the other end
+					  $val = str_replace("\r\n", "\n", $val);
 					  $val = str_replace("\n", " ", $val);
 					  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
 					  $val = str_replace("&nbsp;"," ",$val);
-				
-					  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-					  if(preg_match("/[\,\"\n\r]/", $val)) { 
-						  $val = '"'.str_replace('"', '""', $val).'"'; 
+
+					  # if a deliminator char, a double quote char or a newline are in the field, add quotes
+					  if(preg_match("/[\,\"\n\r]/", $val)) {
+						  $val = '"'.str_replace('"', '""', $val).'"';
 					  }
 					  $line .= $val.',';
 				}
-				# strip the last deliminator 
-				$line = substr($line, 0, -1); 
+				# strip the last deliminator
+				$line = substr($line, 0, -1);
 				$line .= "\n";
 				echo $line;
 			}
 			exit;
-		} 
+		}
 		if (isset($_GET['emailgb'])) {
-			
+
 			$line = '';
 			foreach ($gb as $gbline) {
-				
+
 				foreach ($gbline as $val) {
-					 # remove any windows new lines, as they interfere with the parsing at the other end 
-					  $val = str_replace("\r\n", "\n", $val); 
+					 # remove any windows new lines, as they interfere with the parsing at the other end
+					  $val = str_replace("\r\n", "\n", $val);
 					  $val = str_replace("\n", " ", $val);
 					  $val = str_replace("<BR>", " ",$val);
 					  $val = str_replace("<br/>", " ",$val);
 					  $val = str_replace("&nbsp;"," ",$val);
-				
-					  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-					   if(preg_match("/[\,\"\n\r]/", $val)) {  
-						  $val = '"'.str_replace('"', '""', $val).'"'; 
+
+					  # if a deliminator char, a double quote char or a newline are in the field, add quotes
+					   if(preg_match("/[\,\"\n\r]/", $val)) {
+						  $val = '"'.str_replace('"', '""', $val).'"';
 					  }
 					  $line .= $val.',';
 				}
-				# strip the last deliminator 
-				$line = substr($line, 0, -1); 
+				# strip the last deliminator
+				$line = substr($line, 0, -1);
 				$line .= "\n";
 			}
 			$boundary = '-----=' . md5( uniqid ( rand() ) );
@@ -163,9 +166,12 @@
 			$headers .= "MIME-Version: 1.0\n";
 			$headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"";
 			if ($_GET['emailgb']=="me") {
-				$query = "SELECT email FROM imas_users WHERE id='$userid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$_GET['emailgb'] = mysql_result($result,0,0);
+				//DB $query = "SELECT email FROM imas_users WHERE id='$userid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $_GET['emailgb'] = mysql_result($result,0,0);
+				$stm = $DBH->prepare("SELECT email FROM imas_users WHERE id=:id");
+				$stm->execute(array(':id'=>$userid));
+				$_GET['emailgb'] = $stm->fetchColumn(0);
 			}
 			if ($_GET['emailgb']!='') {
 				mail($_GET['emailgb'], "Gradebook for $coursename", $message, $headers);
@@ -174,15 +180,15 @@
 				require("../footer.php");
 				exit;
 			}
-			
+
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 function gbinstrexport() {
-	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin,$logincnt,$includetimes;
+	global $DBH,$hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin,$logincnt,$includetimes;
 	$gbt = gbtable();
 	$gbo = array();
 	//print_r($gbt);
@@ -205,7 +211,7 @@ function gbinstrexport() {
 			}
 		}
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
@@ -223,11 +229,11 @@ function gbinstrexport() {
 				$n++;
 			}
 		}
-		
+
 	}
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-			if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+			if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -269,7 +275,7 @@ function gbinstrexport() {
 	if (!$totonleft) {
 		//total totals
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
@@ -301,7 +307,7 @@ function gbinstrexport() {
 	if ($commentloc == 1) {
 		if ($catfilter>-2) {
 			for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment comment headers
-				if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+				if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
 					continue;
 				}
 				if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -318,18 +324,21 @@ function gbinstrexport() {
 			}
 		}
 	}
-	
+
 	//get gb comments;
 	$gbcomments = array();
-	$query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$gbcomments[$row[0]] = array($row[1],$row[2]);
 	}
 	//create student rows
 	for ($i=1;$i<count($gbt);$i++) {
 		$n=0;
-		
+
 		for ($j=0;$j<count($gbt[0][0]);$j++) {
 			$gbo[$i][$n] = $gbt[$i][0][$j];
 			$n++;
@@ -361,7 +370,7 @@ function gbinstrexport() {
 			}
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
 					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
@@ -375,7 +384,7 @@ function gbinstrexport() {
 		//assessment values
 		if ($catfilter>-2) {
 			for ($j=0;$j<count($gbt[0][1]);$j++) {
-				if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden 
+				if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden
 					continue;
 				}
 				if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
@@ -397,8 +406,8 @@ function gbinstrexport() {
 							$gbo[$i][$n] .= ' (OT)';
 						} else if ($gbt[$i][1][$j][3]==4) {
 							$gbo[$i][$n] .=  ' {PT)';
-						} 
-						
+						}
+
 					} else { //no score
 						$gbo[$i][$n]  = '-';
 					}
@@ -411,7 +420,7 @@ function gbinstrexport() {
 					} else {
 						$gbo[$i][$n] = '-';
 					}
-					
+
 				} else if ($gbt[0][1][$j][6]==2) { //discuss
 					if (isset($gbt[$i][1][$j][0])) {
 						$gbo[$i][$n] = $gbt[$i][1][$j][0];
@@ -441,7 +450,7 @@ function gbinstrexport() {
 		if (!$totonleft) {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
 					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
@@ -475,7 +484,7 @@ function gbinstrexport() {
 					}
 				}
 			}
-			
+
 		}
 		if (isset($gbcomments[$gbt[$i][4][0]])) {
 			$gbo[$i][$n] = $gbcomments[$gbt[$i][4][0]][0];
@@ -488,7 +497,7 @@ function gbinstrexport() {
 		if ($commentloc == 1) {
 			if ($catfilter>-2) {
 				for ($j=0;$j<count($gbt[0][1]);$j++) {
-					if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden 
+					if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden
 						continue;
 					}
 					if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
@@ -511,10 +520,10 @@ function gbinstrexport() {
 	}
 	if ($pointsln==1) {
 		$ins = array();
-		
+
 		for ($i=0; $i<count($gbo[0]);$i++) {
 			if (preg_match('/(-?[\d\.]+)(\s*|&nbsp;)pts.*/',$gbo[0][$i],$matches)) {
-				$ins[$i] = $matches[1];	
+				$ins[$i] = $matches[1];
 			} else {
 				$ins[$i] = '';
 			}
@@ -528,8 +537,8 @@ function gbinstrexport() {
 
 //HTML formatted, for Excel import?
 function gbinstrdisp() {
-	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
-	
+	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
+
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -549,7 +558,7 @@ function gbinstrdisp() {
 			echo '<span class="small">N='.(count($gbt)-2).'</span>';
 		}
 		echo '</th>';
-		
+
 		$n++;
 	}
 	if ($totonleft && !$hidepast) {
@@ -571,7 +580,7 @@ function gbinstrdisp() {
 			}
 		}
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
@@ -599,11 +608,11 @@ function gbinstrdisp() {
 				$n++;
 			}
 		}
-		
+
 	}
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden 
+			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -635,7 +644,7 @@ function gbinstrdisp() {
 			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
 				echo ' (PT)';
 			}
-						
+
 			echo '</th>';
 			$n++;
 			if ($commentloc==0) {
@@ -654,7 +663,7 @@ function gbinstrdisp() {
 	}
 	if (!$totonleft && !$hidepast) {
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
@@ -702,12 +711,12 @@ function gbinstrdisp() {
 	}
 	echo '<th>Comment</th>';
 	echo '<th>Instructor Note</th>';
-	
+
 	$n+=2;
 	if ($commentloc == 1) {
 		if ($catfilter>-2) {
 			for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment comment headers
-				if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+				if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
 					continue;
 				}
 				if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -727,22 +736,25 @@ function gbinstrdisp() {
 	echo '</tr></thead><tbody>';
 	//get gb comments;
 	$gbcomments = array();
-	$query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$gbcomments[$row[0]] = array($row[1],$row[2]);
 	}
 	//create student rows
 	for ($i=1;$i<count($gbt);$i++) {
 		if ($i%2!=0) {
-			echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+			echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 		} else {
-			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 		}
 		echo '<td class="locked" scope="row">';
 		echo $gbt[$i][0][0];
 		for ($j=1;$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
+			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';
 		}
 		if ($totonleft && !$hidepast) {
 			//total totals
@@ -751,7 +763,7 @@ function gbinstrdisp() {
 					if (isset($gbt[$i][3][8])) { //using points based
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
-						
+
 					} else {
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 					}
@@ -766,7 +778,7 @@ function gbinstrdisp() {
 			}
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
 					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
@@ -797,7 +809,7 @@ function gbinstrdisp() {
 		//assessment values
 		if ($catfilter>-2) {
 			for ($j=0;$j<count($gbt[0][1]);$j++) {
-				if (!$isteacher && !$istutor && $gbt[0][1][$j][4]==0) { //skip if hidden 
+				if (!$isteacher && !$istutor && $gbt[0][1][$j][4]==0) { //skip if hidden
 					continue;
 				}
 				if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
@@ -817,7 +829,7 @@ function gbinstrdisp() {
 				}
 				if ($gbt[0][1][$j][6]==0) {//online
 					if (isset($gbt[$i][1][$j][0])) {
-						
+
 						echo $gbt[$i][1][$j][0];
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
@@ -827,8 +839,8 @@ function gbinstrdisp() {
 							echo ' (OT)';
 						} else if ($gbt[$i][1][$j][3]==4) {
 							echo ' (PT)';
-						} 
-						
+						}
+
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
@@ -848,7 +860,7 @@ function gbinstrdisp() {
 						}
 					}
 				} else if ($gbt[0][1][$j][6]==1) { //offline
-					
+
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
 						if ($gbt[$i][1][$j][3]==1) {
@@ -857,7 +869,7 @@ function gbinstrdisp() {
 					} else {
 						echo '-';
 					}
-					
+
 					if ($gbt[$i][1][$j][1]==1) {
 						echo '<sup>*</sup>';
 					}
@@ -893,7 +905,7 @@ function gbinstrdisp() {
 		if (!$totonleft && !$hidepast) {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
 					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
@@ -920,14 +932,14 @@ function gbinstrdisp() {
 					}
 				}
 			}
-			
+
 			//total totals
 			if ($catfilter<0) {
 				if ($availshow==3) {
 					if (isset($gbt[$i][3][8])) { //using points based
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
-						
+
 					} else {
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 					}
@@ -952,7 +964,7 @@ function gbinstrdisp() {
 		if ($commentloc == 1) {
 			if ($catfilter>-2) {
 				for ($j=0;$j<count($gbt[0][1]);$j++) {
-					if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden 
+					if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden
 						continue;
 					}
 					if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC

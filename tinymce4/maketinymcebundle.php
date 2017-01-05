@@ -55,7 +55,7 @@ $tinyMCECompressor->bundle();
 class TinyMCE_Compressor {
 	private $files, $settings;
 	private static $defaultSettings = array(
-		"plugins"    => "advlist,attach,image,charmap,anchor,searchreplace,code,link,textcolor,media,table,paste,asciimath,asciisvg,rollups",
+		"plugins"    => "advlist,attach,autolink,image,charmap,anchor,searchreplace,code,link,textcolor,media,table,paste,asciimath,asciisvg,rollups",
 		"themes"     => "modern",
 		"languages"  => "",
 		"disk_cache" => false,
@@ -95,7 +95,7 @@ class TinyMCE_Compressor {
 	 */
 	public function bundle() {
 		$files = array();
-		
+
 		$tinymceDir = dirname(__FILE__);
 
 		$plugins = preg_split('/,/', $this->settings["plugins"], -1, PREG_SPLIT_NO_EMPTY);
@@ -166,7 +166,7 @@ class TinyMCE_Compressor {
 		// Stream contents to client
 		file_put_contents("tinymce_bundled.js", $buffer);
 	}
-	
+
 	/**
 	 * Returns the contents of the script file if it exists and removes the UTF-8 BOM header if it exists.
 	 *

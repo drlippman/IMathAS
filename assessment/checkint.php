@@ -1,7 +1,7 @@
 <html>
 <body>
 <form action="checkint.php" method=post>
-<textarea name=txt cols=80 rows=10><?php $cleaned = stripslashes($_POST['txt']); echo $cleaned;?></textarea>
+<textarea name=txt cols=80 rows=10><?php $cleaned = $_POST['txt']; echo $cleaned;?></textarea>
 <BR>
 <input type=submit value=submit>
 </form>

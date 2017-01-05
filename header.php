@@ -10,14 +10,14 @@
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=071416";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=123016";?>" type="text/css" />
 <?php if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 	}
 	?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=121713";?>" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=071416" media="only screen and (max-width:480px)"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=111016";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=111016" media="only screen and (max-width:480px)"/>
 
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -40,7 +40,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=070816"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=120416"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();
@@ -93,16 +93,22 @@ if (!isset($sessiondata['mathdisp'])) {
 		}
 		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
+		MathJax.Hub.Register.StartupHook("Begin Config", setupKatexAutoRenderWhenReady);
+		</script>
+		<script type="text/javascript">
+		function setupKatexAutoRenderWhenReady() {
+			if (typeof setupKatexAutoRender == "function") {setupKatexAutoRender();} else { setTimeout(setupKatexAutoRenderWhenReady,50);}
+		}
 		</script>';
-	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	//echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
 	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>';
 	//echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
 	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css"/>';
-	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=070616"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) {renderMathInElement(node);}</script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=083116"></script>';
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
 	//these scripts are used by the editor to make image-based math work in the editor
@@ -118,7 +124,7 @@ if (!isset($sessiondata['mathdisp'])) {
 }
 echo "<script src=\"$imasroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=070516\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=102316\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($sessiondata['graphdisp'])) {
@@ -130,7 +136,8 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($useeditor) && $sessiondata['useed']==1) {
-	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=082716"></script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=100516"></script>';
+	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var coursetheme = "'.$coursetheme.'";';
@@ -139,7 +146,9 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	} else {
 		echo 'var filePickerCallBackFunc = null;';
 	}
-	echo 'initeditor("exact","'.$useeditor.'");';
+	if ($useeditor!="noinit") {
+		echo 'initeditor("exact","'.$useeditor.'");';
+	}
 	echo '</script>';
 }
 
@@ -192,7 +201,7 @@ function getactivetab() {
 	return array($t,$s);
 }
 if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[1])>0 && !isset($flexwidth)) {
-	echo '<div id="navlistcont">';
+	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 	$a = array_fill(0,11,"");
 	$c = getactivetab();
@@ -239,7 +248,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	echo '</div>';
 	$didnavlist = true;
 } else if (isset($cid) && !isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[0])>0 && !isset($flexwidth)) {
-	echo '<div id="navlistcont">';
+	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 	$a = array_fill(0,11,"");
 	$c = getactivetab();
@@ -273,7 +282,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 if (!isset($flexwidth)) {
 	echo '</div>';
 }
-echo '<div class="midwrapper">';
+echo '<div class="midwrapper" role="main">';
 
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');

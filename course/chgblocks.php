@@ -15,7 +15,7 @@ function buildExistBlocksArray($items,$parent) {
 	global $existblockids;
 	global $existBlocksVals;
 	global $existBlocksLabels;
-	
+
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			$existblocks[$parent.'-'.($k+1)] = $item['name'];
@@ -25,11 +25,12 @@ function buildExistBlocksArray($items,$parent) {
 			}
 		}
 	}
-	
+
 	$i=0;
 	foreach ($existblocks as $k=>$name) {
 		$existBlocksVals[$i]=$k;
-		$existBlocksLabels[$i]=stripslashes($name);
+		//DB $existBlocksLabels[$i]=stripslashes($name);
+		$existBlocksLabels[$i]=$name;
 		$i++;
 	}
 }
@@ -39,7 +40,7 @@ function updateBlocksArray(&$items,$tochg,$sets) {
 		if (is_array($item)) {
 			if (in_array($item['id'], $tochg)) {
 				foreach ($sets as $k=>$v) {
-					$items[$n][$k] = $v;	
+					$items[$n][$k] = $v;
 				}
 			}
 			if (count($item['items'])>0) {
@@ -55,9 +56,12 @@ $body = "";
 $pagetitle = "Mass Change Block Settings";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Mass Change Block Settings";
 
-$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$items = unserialize(mysql_result($result,0,0));
+//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $items = unserialize(mysql_result($result,0,0));
+$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+$stm->execute(array(':id'=>$_GET['cid']));
+$items = unserialize($stm->fetchColumn(0));
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -70,7 +74,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$checked[] = $id;
 		}
 	}
-	
+
 	$sets = array();
 	if (isset($_POST['chgavail'])) {
 		$sets['avail'] = intval($_POST['avail']);
@@ -102,12 +106,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	updateBlocksArray($items,$checked,$sets);
-	
-	$itemorder = addslashes(serialize($items));
-	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+	//DB $itemorder = addslashes(serialize($items));
+	$itemorder = serialize($items);
+	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
-		
+
 	exit;
 
 } else { //it is a teacher but the form has not been posted
@@ -116,23 +123,26 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existBlocksVals = array();
 	$existBlocksLabels = array();
 	buildExistBlocksArray($items,'0');
-	
+
 	$page_sectionlistval = array("none");
 	$page_sectionlistlabel = array(_("No restriction"));
-	$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_sectionlistval[] = 's-'.$row[0];
 		$page_sectionlistlabel[] = 'Section '.$row[0];
 	}
-	
+
 	$titlebg = "#DDDDFF";
 	$titletxt = "#000000";
 	$bi = "#EEEEFF";
 	$usedef = 1;
 	$fixedheight = 0;
 	$grouplimit = array();
-	
+
 }
 
 //anything in the placeinhead variable is inserted in the html doc between the HEAD tags
@@ -150,7 +160,7 @@ $(document).ready(init);
 $(function() {
 	$('.chgbox').change(function() {
 			$(this).parents('tr').toggleClass('odd');
-	});	
+	});
 })
 </script>";
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");} table td {border-bottom: 1px solid #ccf;}</style>";
@@ -167,10 +177,10 @@ if ($overwriteBody==1) {
 
 <div class=breadcrumb>
 	<?php echo $curBreadcrumb; ?>
-</div>	
+</div>
 <form id="qform" method="post" action="chgblocks.php?cid=<?php echo $cid;?>">
 <h3><?php echo _('Blocks to Change');?></h3>
-Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All');?></a> 
+Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All');?></a>
 <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None');?></a>
 <ul class="nomark">
 <?php
@@ -227,12 +237,12 @@ foreach ($existblocks as $pos=>$name) {
 		<td class="r">Block colors:</td>
 		<td>
 			<input type=radio name="colors" value="def" checked="checked"/>Use defaults<br/>
-			<input type=radio name="colors" value="copy"/>Copy colors from block: 
-			
+			<input type=radio name="colors" value="copy"/>Copy colors from block:
+
 			<?php
 			writeHtmlSelect("copycolors",$existBlocksVals,$existBlocksLabels);
 			?>
-		
+
 			<br />&nbsp;<br/>
 			<input type=radio name="colors" id="colorcustom" value="custom"/>Use custom:
 			<table style="display: inline; border-collapse: collapse; margin-left: 15px;">
@@ -259,9 +269,9 @@ foreach ($existblocks as $pos=>$name) {
 					<td>Items Background: </td>
 					<td><input type=text id="bi" name="bi" value="#EEEEFF" />
 					</td>
-				</tr> 
+				</tr>
 			</table>
-		
+
 		</td>
 	</tr>
 </tbody>

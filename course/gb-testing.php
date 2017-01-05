@@ -6,7 +6,7 @@ require("../validate.php");
 $cid = $_GET['cid'];
 if (isset($teacherid)) {
 	$isteacher = true;
-} 
+}
 if (isset($tutorid)) {
 	$istutor = true;
 }
@@ -16,7 +16,7 @@ if ($isteacher || $istutor) {
 	$canviewall = false;
 }
 if ($isteacher || $istutor) {
-	
+
 	if (isset($_GET['timefilter'])) {
 		$timefilter = $_GET['timefilter'];
 		$sessiondata[$cid.'timefilter'] = $timefilter;
@@ -49,10 +49,10 @@ if ($isteacher || $istutor) {
 		}
 	}
 	//Gbmode : Links NC Dates
-	$totonleft = 0 ; 
-	$links = 0; 
-	$hidenc = 2; 
-	$availshow = 1; 
+	$totonleft = 0 ;
+	$links = 0;
+	$hidenc = 2;
+	$availshow = 1;
 	$catfilter = -1;
 
 } else {
@@ -91,6 +91,14 @@ $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";
+$placeinhead .= 'function showendmsgs() {
+	$(".endmsg").each(function() {
+		var short = $(this).find(".short").text();
+		if (short!="") {
+			$(this).html("<br/>"+short);
+		}
+	});
+	$(".endmsg").show();}';
 $placeinhead .= "</script>";
 
 
@@ -108,7 +116,7 @@ $placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; docum
 $placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
 $placeinhead .= "} ";
 $placeinhead .= "</script>\n";
-$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
+$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .endmsg {display:none;}</style>";
 
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -127,11 +135,12 @@ echo "<option value=24 "; writeHtmlSelected($timefilter,24); echo ">last day</op
 echo "<option value=168 "; writeHtmlSelected($timefilter,168); echo ">last week</option>";
 echo "<option value=720 "; writeHtmlSelected($timefilter,720); echo ">last month</option>";
 echo "<option value=8760 "; writeHtmlSelected($timefilter,8760); echo ">last year</option>";
+echo "<option value=0 "; writeHtmlSelected($timefilter,0); echo ">all time</option>";
 echo "</select>";
 
 echo " Last name: <input type=text id=\"lnfilter\" value=\"$lnfilter\" />";
 echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
-
+echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="display:none;">Show End Messages</button>';
 echo "</div>";
 
 $gbt = gbinstrdisp();
@@ -153,16 +162,18 @@ echo "Meanings:   NC-no credit";
 
 
 function gbinstrdisp() {
-	global $isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection;
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection,$includeendmsg;
 	$hidenc = 1;
-	$gbt = gbtable();     
+	$includeendmsg = true;
+	$hasendmsg = false;
+	$gbt = gbtable();
 	//print_r($gbt);
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<div id=\"tbl-container\">";
 	echo "<table class=gb id=myTable><thead><tr>";
 	$n=0;
-	
-	
+
+
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
@@ -170,9 +181,12 @@ function gbinstrdisp() {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';
-			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
@@ -180,19 +194,19 @@ function gbinstrdisp() {
 				}
 				echo  ">{$row[0]}</option>";
 			}
-			echo  "</select>";	
-			
+			echo  "</select>";
+
 		} else if ($gbt[0][0][$i]=='Name') {
 			echo '<br/><span class="small">N='.(count($gbt)-2).'</span>';
 		}
 		echo '</th>';
-		
+
 		$n++;
 	}
-	
-	
+
+
 	for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-		if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+		if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
 			continue;
 		}
 		if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -200,8 +214,8 @@ function gbinstrdisp() {
 		} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
 			continue;
 		}
-		
-		
+
+
 		//name and points
 		echo '<th class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'<br/>';
 		if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
@@ -227,33 +241,33 @@ function gbinstrdisp() {
 				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 			}
 		}
-		
+
 		echo '</th>';
 		$n++;
 	}
-	
+
 	echo '</tr></thead><tbody>';
 	//create student rows
 	for ($i=1;$i<count($gbt)-1;$i++) {
 		if ($i%2!=0) {
-			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">"; 
+			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">";
 		} else {
-			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
+			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
 		}
 		echo '<td class="locked" scope="row">';
-		
+
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';
-		
+
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
+			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';
 		}
-		
+
 		//assessment values
-		
+
 		for ($j=0;$j<count($gbt[0][1]);$j++) {
-			if ($gbt[0][1][$j][4]==0) { //skip if hidden 
+			if ($gbt[0][1][$j][4]==0) { //skip if hidden
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
@@ -261,8 +275,8 @@ function gbinstrdisp() {
 			} else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
 				continue;
 			}
-			
-			
+
+
 			echo '<td class="c">';
 			if (isset($gbt[$i][1][$j][5])) {
 				echo '<span style="font-style:italic">';
@@ -272,12 +286,12 @@ function gbinstrdisp() {
 					if ($gbt[$i][1][$j][4]=='average') {
 						echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
 					} else {
-						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
+						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}&from=gbtesting\">";
 					}
 					echo $gbt[$i][1][$j][0];
 					if ($gbt[$i][1][$j][3]==1) {
 						echo ' (NC)';
-					} 
+					}
 					/*else if ($gbt[$i][1][$j][3]==2) {
 						echo ' (IP)';
 					} else if ($gbt[$i][1][$j][3]==3) {
@@ -288,6 +302,10 @@ function gbinstrdisp() {
 					echo '</a>';
 					if ($gbt[$i][1][$j][1]==1) {
 						echo '<sup>*</sup>';
+					}
+					if (isset($gbt[$i][1][$j][11])) {
+						echo '<span class="endmsg"><br/>'.$gbt[$i][1][$j][11].'</span>';
+						$hasendmsg = true;
 					}
 				} else { //no score
 					if ($gbt[$i][0][0]=='Averages') {
@@ -330,7 +348,7 @@ function gbinstrdisp() {
 			}
 			echo '</td>';
 		}
-		
+
 	}
 	echo "</tbody></table>";
 	if ($n>0) {
@@ -339,13 +357,16 @@ function gbinstrdisp() {
 		$sarr = array();
 	}
 	array_unshift($sarr,"'S'");
-	
+
 	$sarr = implode(",",$sarr);
 	if (count($gbt)<500) {
 		echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 	}
-		
-	
+	if ($hasendmsg) {
+		echo '<script type="text/javascript">$(function(){ $("#endmsgbtn").show(); });</script>';
+	}
+
+
 }
 
 ?>

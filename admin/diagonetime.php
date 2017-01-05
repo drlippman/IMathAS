@@ -27,6 +27,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$now = time();
 		$n = intval($_POST['n']);
 		$goodfor = intval($_POST['multi']);
+		$insval = array();
 		$query = 'INSERT IGNORE INTO imas_diag_onetime (diag,time,code,goodfor) VALUES';
 		for ($i=0; $i<$n; $i++) {
 			$code = '';
@@ -40,14 +41,21 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 			//	$code .= substr($lets,rand(0,23),1);
 			//}
 			if ($i>0) { $query .= ','; }
-			$query .= "('$diag',$now,'$code',$goodfor)";
-			$code_list[] = $code;	
+			//DB $query .= "('$diag',$now,'$code',$goodfor)";
+			$query .= "(?,?,?,?)";
+			array_push($insval, $diag,$now,$code,$goodfor);
+			$code_list[] = $code;
 		}
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare($query);
+		$stm->execute($insval);
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$code_list = array();
-		$query = "SELECT code,goodfor FROM imas_diag_onetime WHERE time=$now";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT code,goodfor FROM imas_diag_onetime WHERE time=$now";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT code,goodfor FROM imas_diag_onetime WHERE time=:time");
+		$stm->execute(array(':time'=>$now));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($row[1]==0) {
 				$row[1] = "One-time";
 			} else if ($row[1]>1000000000) {
@@ -59,25 +67,32 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 			} else {
 				$row[1] = intval($row[1]) . " minutes";
 			}
-			$code_list[] = $row;	
+			$code_list[] = $row;
 		}
 	}
 } else if (isset($_GET['delete'])) {
 	if ($_GET['delete']=='true') {
-		$query = "DELETE FROM imas_diag_onetime WHERE diag='$diag'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "DELETE FROM imas_diag_onetime WHERE diag='$diag'";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("DELETE FROM imas_diag_onetime WHERE diag=:diag");
+		$stm->execute(array(':diag'=>$diag));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
 		exit;
 	}
 } else {
 	$old = time() - 365*24*60*60; //one year ago
 	$now = time();
-	$query = "DELETE FROM imas_diag_onetime WHERE time<$old OR (goodfor>1000000000 AND goodfor<$now)";
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $query = "DELETE FROM imas_diag_onetime WHERE time<$old OR (goodfor>1000000000 AND goodfor<$now)";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("DELETE FROM imas_diag_onetime WHERE time<:old OR (goodfor>1000000000 AND goodfor<:now)");
+	$stm->execute(array(':old'=>$old, ':now'=>$now));
 	$code_list = array();
-	$query = "SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag='$diag' ORDER BY time";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag='$diag' ORDER BY time";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag=:diag ORDER BY time");
+	$stm->execute(array(':diag'=>$diag));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$row[0] = tzdate("F j, Y",$row[0]);
 		if ($row[2]==0) {
 			$row[2] = "One-time";
@@ -86,7 +101,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		} else {
 			$row[2] = intval($row[2]) . " minutes";
 		}
-		$code_list[] = $row;	
+		$code_list[] = $row;
 	}
 }
 
@@ -98,9 +113,12 @@ if ($overwriteBody==1) { //NO AUTHORITY
 } else {
 	echo $curBreadcrumb;
 	echo '<div id="headerdiagonetime" class="pagetitle"><h2>Diagnostic One-time Passwords</h2></div>';
-	$query = "SELECT name FROM imas_diags WHERE id='$diag'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	echo '<h4>'.mysql_result($result,0,0).'</h4>';
+	//DB $query = "SELECT name FROM imas_diags WHERE id='$diag'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB echo '<h4>'.mysql_result($result,0,0).'</h4>';
+	$stm = $DBH->prepare("SELECT name FROM imas_diags WHERE id=:id");
+	$stm->execute(array(':id'=>$diag));
+	echo '<h4>'.$stm->fetchColumn(0).'</h4>';
 	if (isset($_GET['generate'])) {
 		if (isset($_POST['n'])) {
 			echo "<b>Newly generated passwords</b> <a href=\"diagonetime.php?id=$diag&view=true\">View all</a>";

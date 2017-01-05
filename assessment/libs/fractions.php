@@ -4,12 +4,13 @@
 global $allowedmacros;
 array_push($allowedmacros, "fractionrand", "fractiondiffdrands", "fractiondiffdrandsfrom", "fractionparse", "fractiontomixed", "fractiontodecimal", "fractionadd","fractionsubtract","fractionmultiply","fractiondivide","fractionreduce","fractionneg","fractionpower", "fractionroot");
 
-//fractionrand(denom) 
+//fractionrand(denom)
 //returns a proper reduced fraction with the given denominator
 function fractionrand($d) {
+	global $RND;
 	$goodnum = array('4'=>array(1,3), '6'=>array(1,5), '8'=>array(1,3,5,7), '10'=>array(1,3,7,9), '12'=>array(1,5,7,11));
 	$d = round($d);
-	if ($d<1) { 
+	if ($d<1) {
 		echo "denominator must be larger than 1";
 		return "";
 	}
@@ -17,7 +18,7 @@ function fractionrand($d) {
 		$n = randfrom($goodnum[$d]);
 	} else {
 		do {
-			$n = rand(1,$d-1);
+			$n = $RND->rand(1,$d-1);
 		} while (gcd($d,$n)!=1);
 	}
 	return "$n/$d";
@@ -85,7 +86,7 @@ function fractiontomixed($fp) {
 		return $w.' '.abs($fp[0]).'/'.$fp[1];
 	} else {
 		return $fp[0].'/'.$fp[1];
-	} 
+	}
 }
 
 //fractiontodecimal(f)
@@ -120,7 +121,7 @@ function fractionreduce() {
 	$g = gcd($f[0],$f[1]);
 	$f[0] /= $g;
 	$f[1] /= $g;
-	if ($f[1]<0) {	
+	if ($f[1]<0) {
 		$f[0] *= -1;
 		$f[1] *= -1;
 	}
@@ -150,14 +151,14 @@ function fractionadd() {
 	$commondenom = 1;
 	foreach($args as $f) {
 		if (!is_array($f)) {
-			$f = fractionparse($f);	
+			$f = fractionparse($f);
 		}
-		$fracs[] = $f;	
+		$fracs[] = $f;
 		$commondenom *= $f[1];
 	}
 	$num = 0;
 	foreach ($fracs as $f) {
-		$num += round($commondenom/$f[1],0)*$f[0];	
+		$num += round($commondenom/$f[1],0)*$f[0];
 	}
 	return fractionreduce($num,$commondenom,$fracarr);
 }
@@ -287,6 +288,6 @@ function fractionroot($f,$root=2) {
 	include_once("radicals.php");
 	return reduceradicalfrac(1, $f[0]*$f[1], $f[1]);
 }
-	
-	
+
+
 ?>

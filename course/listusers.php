@@ -36,7 +36,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	
+
 	if (isset($_POST['submit']) && $_POST['submit']=="Unenroll") {
 		$_GET['action'] = "unenroll";
 	}
@@ -47,101 +47,139 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$_GET['action'] = "lock";
 		$_POST['tolock'] = $_POST['tounenroll'];
 	}
-	
+
 	if (isset($_GET['assigncode'])) {
-		
+
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
 		$pagetitle = "Assign Section/Code Numbers";
-		
+
 		if (isset($_POST['submit'])) {
 			$keys = array_keys($_POST['sec']);
 			foreach ($keys as $stuid) {
 				if ($_POST['sec'][$stuid]=='') {
-					$_POST['sec'][$stuid] = "NULL";
-				} else {
-					$_POST['sec'][$stuid] = "'".$_POST['sec'][$stuid]."'";
-				}
+					//DB $_POST['sec'][$stuid] = "NULL";
+					$_POST['sec'][$stuid] = null;
+				//DB } else {
+				//DB 	$_POST['sec'][$stuid] = "'".$_POST['sec'][$stuid]."'";
+			  }
 				if ($_POST['code'][$stuid]=='') {
-					$_POST['code'][$stuid] = "NULL";
-				} else {
-					$_POST['code'][$stuid] = intval($_POST['code'][$stuid]);
+					//DB $_POST['code'][$stuid] = "NULL";
+					$_POST['code'][$stuid] = null;
+				//DB } else {
+				//DB 	$_POST['code'][$stuid] = intval($_POST['code'][$stuid]);
 				}
 			}
 			foreach ($keys as $stuid) {
-				$query = "UPDATE imas_students SET section={$_POST['sec'][$stuid]},code={$_POST['code'][$stuid]} WHERE id='$stuid' AND courseid='$cid' ";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_students SET section={$_POST['sec'][$stuid]},code={$_POST['code'][$stuid]} WHERE id='$stuid' AND courseid='$cid' ";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_students SET section=:section,code=:code WHERE id=:id AND courseid=:courseid ");
+				$stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
 			}
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
-	
+
 		} else {
+			//DB $query = "SELECT imas_students.id,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
+			//DB $query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
+			//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+			//DB $resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "SELECT imas_students.id,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
-			$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
+			$query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseid AND imas_students.userid=imas_users.id ";
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-			$resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
+			$resultStudentList = $DBH->prepare($query);
+			$resultStudentList->execute(array(':courseid'=>$cid));
 		}
 	} elseif (isset($_GET['enroll'])) {
 
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
-		
+
 		if (isset($_POST['username'])) {
-			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['username']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)==0) {
+			//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['username']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)==0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+			$stm->execute(array(':SID'=>$_POST['username']));
+			if ($stm->rowCount()==0) {
 				$overwriteBody = 1;
 				$body = "Error, username doesn't exist. <a href=\"listusers.php?cid=$cid&enroll=student\">Try again</a>\n";
-				$body .= "or <a href=\"listusers.php?cid=$cid&newstu=new\">create and enroll a new student</a>";
+				if ($CFG['GEN']['allowinstraddstus']) {
+					$body .= "or <a href=\"listusers.php?cid=$cid&newstu=new\">create and enroll a new student</a>";
+				}
 			} else {
-				$id = mysql_result($result,0,0);
-				$query = "SELECT id FROM imas_teachers WHERE userid='$id' AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) {
+				//DB $id = mysql_result($result,0,0);
+				$id = $stm->fetchColumn(0);
+				//DB $query = "SELECT id FROM imas_teachers WHERE userid='$id' AND courseid='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)>0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':userid'=>$id, ':courseid'=>$cid));
+				if ($stm->rowCount()>0) {
 					echo "Teachers can't be enrolled as students - use Student View, or create a separate student account.";
 					exit;
 				}
-				$query = "SELECT id FROM imas_tutors WHERE userid='$id' AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) {
+				//DB $query = "SELECT id FROM imas_tutors WHERE userid='$id' AND courseid='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)>0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':userid'=>$id, ':courseid'=>$cid));
+				if ($stm->rowCount()>0) {
 					echo "Tutors can't be enrolled as students.";
 					exit;
 				}
-				$query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)>0) {
+				//DB $query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)>0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':userid'=>$id, ':courseid'=>$cid));
+				if ($stm->rowCount()>0) {
 					echo "This username is already enrolled in the class.";
 					exit;
 				}
-				$query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$row = mysql_fetch_row($result);
+				//DB $query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $row = mysql_fetch_row($result);
+				$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$cid));
+				$row = $stm->fetch(PDO::FETCH_NUM);
 				$deflatepass = $row[0];
-				
-				$vals = "$id,'$cid','$deflatepass'";
-				$query = "INSERT INTO imas_students (userid,courseid,latepass";
-				if (trim($_POST['section'])!='') {
-					$query .= ",section";
-					$vals .= ",'".$_POST['section']."'";
-				}
-				if (trim($_POST['code'])!='') {
-					$query .= ",code";
-					$vals .= ",'".$_POST['code']."'";
-				}
-				$query .= ") VALUES ($vals)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+
+				//DB $vals = "$id,'$cid','$deflatepass'";
+				//DB $query = "INSERT INTO imas_students (userid,courseid,latepass";
+				$query = "INSERT INTO imas_students (userid,courseid,latepass,section,code) ";
+				$query .= "VALUES (:userid,:courseid,:latepass,:section,:code)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(":userid"=>$id,":courseid"=>$cid,":latepass"=>$deflatepass,
+					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
+					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
+					));
+				//DB if (trim($_POST['section'])!='') {
+				//DB 	$query .= ",section";
+					//DB $vals .= ",'".$_POST['section']."'";
+				//DB }
+				//DB if (trim($_POST['code'])!='') {
+				//DB 	$query .= ",code";
+					//DB $vals .= ",'".$_POST['code']."'";
+				//DB }
+				//DB $query .= ") VALUES ($vals)";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 				exit;
 			}
-			
-		} 
+
+		}
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
-		$pagetitle = "Enroll a New Student";	
-	
+		$pagetitle = "Enroll a New Student";
+
 		if (isset($_POST['SID'])) {
-			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
+			//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+			$stm->execute(array(':SID'=>$_POST['SID']));
+			if ($stm->rowCount()>0) {
 				$overwriteBody = 1;
 				$body = "$loginprompt '{$_POST['SID']}' is used.  <a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
@@ -151,63 +189,95 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				} else {
 					$md5pw = md5($_POST['pw1']);
 				}
+				//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
+				//DB $query .= "VALUES ('{$_POST['SID']}','$md5pw',10,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',0);";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $newuserid = mysql_insert_id();
 				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
-				$query .= "VALUES ('{$_POST['SID']}','$md5pw',10,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',0);";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$newuserid = mysql_insert_id();
+				$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify);";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>10,
+					':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>0));
+				$newuserid = $DBH->lastInsertId();
 				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ($newuserid,'$cid')";
-				$query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$row = mysql_fetch_row($result);
+				//DB $query = "SELECT deflatepass FROM imas_courses WHERE id='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $row = mysql_fetch_row($result);
+				$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$cid));
+				$row = $stm->fetch(PDO::FETCH_NUM);
 				$deflatepass = $row[0];
-				
-				$vals = "$newuserid,'$cid','$deflatepass'";
-				$query = "INSERT INTO imas_students (userid,courseid,latepass";
-				if (trim($_POST['section'])!='') {
-					$query .= ",section";
-					$vals .= ",'".$_POST['section']."'";
-				}
-				if (trim($_POST['code'])!='') {
-					$query .= ",code";
-					$vals .= ",'".$_POST['code']."'";
-				}
-				$query .= ") VALUES ($vals)";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+
+				//DB $vals = "$newuserid,'$cid','$deflatepass'";
+				//DB $query = "INSERT INTO imas_students (userid,courseid,latepass";
+				//DB if (trim($_POST['section'])!='') {
+				//DB 	$query .= ",section";
+				//DB 	$vals .= ",'".$_POST['section']."'";
+				//DB }
+				//DB if (trim($_POST['code'])!='') {
+				//DB 	$query .= ",code";
+				//DB 	$vals .= ",'".$_POST['code']."'";
+				//DB }
+				//DB $query .= ") VALUES ($vals)";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "INSERT INTO imas_students (userid,courseid,latepass,section,code) ";
+				$query .= "VALUES (:userid,:courseid,:latepass,:section,:code)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(":userid"=>$newuserid,":courseid"=>$cid,":latepass"=>$deflatepass,
+					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
+					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
+					));
+
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 				exit;
 			}
-		} 
+		}
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
 		$pagetitle = "Copy Student Emails";
 		if (count($_POST['checked'])>0) {
-			$ulist = "'".implode("','",$_POST['checked'])."'";
+			//DB $ulist = "'".implode("','",$_POST['checked'])."'";$ulist = "'".implode("','",$_POST['checked'])."'";
+			$ulist = implode(',', array_map('intval', $_POST['checked']));
+			//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
+			//DB $query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid='$cid' AND imas_users.id IN ($ulist)";
+			//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
-			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid='$cid' AND imas_users.id IN ($ulist)";
+			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid AND imas_users.id IN ($ulist) ";
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid));
 			$stuemails = array();
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$stuemails[] = $row[0].' '.$row[1]. ' &lt;'.$row[2].'&gt;';
 			}
 			$stuemails = implode('; ',$stuemails);
 		}
-		
+
 	} elseif (isset($_GET['chgstuinfo'])) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";	
+		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
-		
+
 		if (isset($_POST['firstname'])) {
 			$un = preg_replace('/[^\w\.@]*/','',$_POST['username']);
 			$updateusername = true;
-			$query = "SELECT id FROM imas_users WHERE SID='$un'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
+			//DB $query = "SELECT id FROM imas_users WHERE SID='$un'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+			$stm->execute(array(':SID'=>$un));
+			if ($stm->rowCount()>0) {
 				$updateusername = false;
 			}
-			$query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}'";
+			//DB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}'";
+			$query = "UPDATE imas_users SET FirstName=:FirstName,LastName=:LastName,email=:email";
+
+			$qarr = array(':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email']);
 			if ($updateusername) {
-				$query .= ",SID='$un'";
+				//DB $query .= ",SID='$un'";
+				$query .= ",SID=:SID";
+				$qarr[':SID'] = $un;
 			}
 			if (isset($_POST['doresetpw'])) {
 				if (isset($CFG['GEN']['newpasswords'])) {
@@ -216,20 +286,29 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				} else {
 					$newpw = md5($_POST['password']);
 				}
-				$query .= ",password='$newpw'";
+				//DB $query .= ",password='$newpw'";
+				$query .= ",password=:password";
+				$qarr[':password'] = $newpw;
 			}
-			
-			$query .= " WHERE id='{$_GET['uid']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			
-			$code = "'{$_POST['code']}'";
-			$section = "'{$_POST['section']}'";
+
+			//DB $query .= " WHERE id='{$_GET['uid']}'";
+			$query .= " WHERE id=:id";
+			$qarr[':id'] = $_GET['uid'];
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare($query);
+			$stm->execute($qarr);
+
+			//DB $code = "'{$_POST['code']}'";
+			//DB $section = "'{$_POST['section']}'";
+			$code = $_POST['code'];
+			$section = $_POST['section'];
 			if (trim($_POST['section'])==='') {
-				$section = "NULL";
+				//DB $section = "NULL";
+				$section = null;
 			}
 			if (trim($_POST['code'])==='') {
-				$code = "NULL";
+				//DB $code = "NULL";
+				$code = null;
 			}
 			if (isset($_POST['locked'])) {
 				$locked = time();
@@ -245,19 +324,25 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//echo $timelimitmult;
 			if ($timelimitmult <= 0) {
 				$timelimitmult = '1.0';
-			} 
+			}
 			//echo $timelimitmult;
-			
+
 			if ($locked==0) {
-				$query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,locked=:locked,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':code'=>$code, ':section'=>$section, ':locked'=>$locked, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
 			} else {
-				$query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			}	
-		
+				//DB $query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':code'=>$code, ':section'=>$section, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
+				//DB $query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE userid=:userid AND courseid=:courseid AND locked=0");
+				$stm->execute(array(':locked'=>$locked, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
+			}
+
 			require('../includes/userpics.php');
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
 				processImage($_FILES['stupic'],$_GET['uid'],200,200);
@@ -271,11 +356,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$chguserimg = '';
 			}
 			if ($chguserimg != '') {
-				$query = "UPDATE imas_users SET $chguserimg WHERE id='{$_GET['uid']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_users SET $chguserimg WHERE id='{$_GET['uid']}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_users SET :chguserimg WHERE id=:id");
+				$stm->execute(array(':id'=>$_GET['uid'], ':chguserimg'=>$chguserimg));
 			}
-			
-			
+
+
 			require("../header.php");
 			echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 			echo '<div id="headerlistusers" class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
@@ -290,17 +377,22 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
 			require("../footer.php");
-			
+
 			//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 			exit;
 		} else {
+			//DB $query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult,imas_students.hidefromcourselist FROM imas_users,imas_students ";
+			//DB $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $lineStudent = mysql_fetch_array($result, MYSQL_ASSOC);
 			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult,imas_students.hidefromcourselist FROM imas_users,imas_students ";
-			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$lineStudent = mysql_fetch_array($result, MYSQL_ASSOC);
-			
+			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id=:id AND imas_students.courseid=:courseid";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':id'=>$_GET['uid'], ':courseid'=>$cid));
+			$lineStudent = $stm->fetch(PDO::FETCH_ASSOC);
+
 		}
-		
+
 	} elseif ((isset($_POST['submit']) && ($_POST['submit']=="E-mail" || $_POST['submit']=="Message"))|| isset($_GET['masssend']))  {
 		$calledfrom='lu';
 		$overwriteBody = 1;
@@ -312,56 +404,66 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['action']) && $_GET['action']=="resetpw") {
 		if (isset($_GET['confirmed'])) {
 			$newpw = "5f4dcc3b5aa765d61d8327deb882cf99";  //md5("password")
-			$query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['uid']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['uid']}'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_users SET password=:password WHERE id=:id");
+			$stm->execute(array(':password'=>$newpw, ':id'=>$_GET['uid']));
 		} else {
-			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
+			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 			$pagetitle = "Confirm Change";
 		}
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" && !isset($CFG['GEN']['noInstrUnenroll'])){
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
-		$pagetitle = "Unenroll Students";		
+		$pagetitle = "Unenroll Students";
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "unenroll.php";
-		
+
 	} elseif (isset($_GET['action']) && $_GET['action']=="lock") {
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n"; 
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
-		$pagetitle = "LockStudents";		
+		$pagetitle = "LockStudents";
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "lockstu.php";
-		
+
 	} elseif (isset($_GET['action']) && $_GET['action']=="lockone" && is_numeric($_GET['uid'])) {
 		$now = time();
-		$query = "UPDATE imas_students SET locked='$now' WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
-		mysql_query($query) or die("Query failed : " . mysql_error());
-	
+		//DB $query = "UPDATE imas_students SET locked='$now' WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE courseid=:courseid AND userid=:userid");
+		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid, ':userid'=>$_GET['uid']));
+
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 		exit;
 	} elseif (isset($_GET['action']) && $_GET['action']=="unlockone" && is_numeric($_GET['uid'])) {
 		$now = time();
-		$query = "UPDATE imas_students SET locked=0 WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
-		mysql_query($query) or die("Query failed : " . mysql_error());
-	
+		//DB $query = "UPDATE imas_students SET locked=0 WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_students SET locked=0 WHERE courseid=:courseid AND userid=:userid");
+		$stm->execute(array(':courseid'=>$cid, ':userid'=>$_GET['uid']));
+
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
 		exit;
 	} else { //DEFAULT DATA MANIPULATION HERE
-	 
+
 		$curBreadcrumb .= " &gt; Roster\n";
 		$pagetitle = "Student Roster";
-		
-		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)>0) {
+
+		//DB $query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result)>0) {
+		$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL ORDER BY section");
+		$stm->execute(array(':courseid'=>$cid));
+		if ($stm->rowCount()>0) {
 			$hassection = true;
 			$sectionselect = "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {$sectionselect .= 'selected=1';}
 			$sectionselect .=  '>All</option>';
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$sectionselect .=  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
 					$sectionselect .=  'selected=1';
@@ -372,42 +474,65 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		} else {
 			$hassection = false;
 		}
-		$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_result($result,0,0)>0) {
+		//DB $query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_result($result,0,0)>0) {
+		$stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.code IS NOT NULL");
+		$stm->execute(array(':courseid'=>$cid));
+		if ($stm->fetchColumn(0)>0) {
 			$hascode = true;
 		} else {
 			$hascode = false;
-		}	
-		
+		}
+
 		if ($hassection) {
-			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
+			//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
+			$stm->execute(array(':courseid'=>$cid));
+			$row = $stm->fetch(PDO::FETCH_NUM);
 			$sectionsort = ($row[0]==0);
 		} else {
 			$sectionsort = false;
 		}
+		//DB $query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult ";
+		//DB $query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
+		//DB if ($secfilter>-1) {
+			//DB $query .= "AND imas_students.section='$secfilter' ";
+		//DB }
+		//DB if ($sectionsort) {
+			//DB $query .= "ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
+		//DB } else {
+			//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		//DB }
+		//DB $resultDefaultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult ";
-		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id ";
+		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseid AND imas_students.userid=imas_users.id ";
 		if ($secfilter>-1) {
-			$query .= "AND imas_students.section='$secfilter' ";			
+			$query .= "AND imas_students.section=:section ";
 		}
 		if ($sectionsort) {
 			$query .= "ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
 		} else {
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		}
-		$resultDefaultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
+		$resultDefaultUserList = $DBH->prepare($query);
+		if ($secfilter>-1) {
+			$resultDefaultUserList->execute(array(':courseid'=>$cid, ':section'=>$secfilter));
+		} else {
+			$resultDefaultUserList->execute(array(':courseid'=>$cid));
+		}
+
 		$hasSectionRowHeader = ($hassection)? "<th>Section$sectionselect</th>" : "";
 		$hasCodeRowHeader = ($hascode) ? "<th>Code</th>" : "";
 		$hasSectionSortTable = ($hassection) ? "'S'," : "";
 		$hasCodeSortTable = ($hascode) ? "'N'," : "";
-	
+
 	}
 } //END DATA MANIPULATION
-	
-//$pagetitle = "Student List";	
+
+//$pagetitle = "Student List";
 
 /******* begin html output ********/
 if ($fileToInclude==null || $fileToInclude=="") {
@@ -419,7 +544,7 @@ $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";
-$placeinhead .= '$(function() { $(".lal").attr("title","View login log"); 
+$placeinhead .= '$(function() { $(".lal").attr("title","View login log");
 	$(".gl").attr("title","View student grades");
 	$(".ex").attr("title","Set due date exceptions");
 	$(".ui").attr("title","Change student profile info");
@@ -441,7 +566,7 @@ if ($overwriteBody==1) {
 	} else {
 		echo $body;
 	}
-} else {	
+} else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerlistusers" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
@@ -457,8 +582,9 @@ if ($overwriteBody==1) {
 			</tr>
 			</thead>
 			<tbody>
-<?php	
-		while ($line=mysql_fetch_array($resultStudentList, MYSQL_ASSOC)) {
+<?php
+		//DB while ($line=mysql_fetch_array($resultStudentList, MYSQL_ASSOC)) {
+		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 ?>
 			<tr>
 				<td><?php echo $line['LastName'] . ", " . $line['FirstName'] ?></td>
@@ -472,7 +598,7 @@ if ($overwriteBody==1) {
 		</table>
 		<input type=submit name=submit value="Submit"/>
 	</form>
-<?php			
+<?php
 	} elseif (isset($_GET['enroll'])) {
 ?>
 	<form method=post action="listusers.php?enroll=student&cid=<?php echo $cid ?>">
@@ -487,7 +613,7 @@ if ($overwriteBody==1) {
 <?php
 	} elseif (isset($_GET['newstu'])) {
 ?>
-	
+
 	<form method=post action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
 		<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>
 	<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>
@@ -501,7 +627,7 @@ if ($overwriteBody==1) {
 	<div class=submit><input type=submit value="Create and Enroll"></div>
 	</form>
 
-<?php 
+<?php
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
 		if (count($_POST['checked'])==0) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
@@ -509,7 +635,7 @@ if ($overwriteBody==1) {
 			echo '<textarea id="emails" rows="30" cols="60">'.$stuemails.'</textarea>';
 			echo '<script type="text/javascript">addLoadEvent(function(){var el=document.getElementById("emails");el.focus();el.select();})</script>';
 		}
-		
+
 	}elseif (isset($_GET['chgstuinfo'])) {
 ?>
 		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
@@ -526,11 +652,11 @@ if ($overwriteBody==1) {
 			<?php
 		if ($lineStudent['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_{$_GET['uid']}.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			} else {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				$galleryPath = "$curdir/course/files/";
-				echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			}
 		} else {
 			echo "No Pic ";
@@ -549,29 +675,29 @@ if ($overwriteBody==1) {
 			<span class="formright"><input type="checkbox" name="hidefromcourselist" value="1" <?php if ($lineStudent['hidefromcourselist']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class=form>Reset password?</span>
 			<span class=formright>
-				<input type=checkbox name="doresetpw" value="1" /> Reset to: 
+				<input type=checkbox name="doresetpw" value="1" /> Reset to:
 				<input type=text size=20 name="password" />
 			</span><br class=form />
 			<div class=submit><input type=submit value="Update Info"></div>
 		</form>
 
-<?php		
+<?php
 	} elseif (isset($_GET['action']) && $_GET['action']=="resetpw") {
 ?>
 		<form method=post action="listusers.php?cid=<?php echo $cid ?>&action=<?php echo $_GET['action'] ?>&uid=<?php echo $_GET['uid'] ?>&confirmed=true">
 
-		Are you sure you want to reset this student's password	
-		
+		Are you sure you want to reset this student's password
+
 		<p>
 			<input type=submit value="Yes, I'm Sure">
 			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='listusers.php?cid=<?php echo $cid ?>'">
 		</p>
 	</form>
 
-<?php		
+<?php
 	} else {
-?>	
-	
+?>
+
 	<script type="text/javascript">
 	var picsize = 0;
 	function rotatepics() {
@@ -615,7 +741,7 @@ if ($overwriteBody==1) {
 	echo '<span class="column" style="width:auto;">';
 	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
 	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
-	if ($CFG['GEN']['allowinstraddstus']) { 
+	if ($CFG['GEN']['allowinstraddstus']) {
 		echo '</span><span class="column" style="width:auto;">';
 		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
 		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
@@ -626,10 +752,10 @@ if ($overwriteBody==1) {
 	</div>
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-		With Selected:  
+		With Selected:
 		<input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">
-		<input type=submit name=submit value="Message" title="Send a message to the selected students"> 
-		<?php 
+		<input type=submit name=submit value="Message" title="Send a message to the selected students">
+		<?php
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
 			echo '<input type=submit name=submit value="Unenroll" title="Unenroll the selected students">';
 		}
@@ -638,7 +764,7 @@ if ($overwriteBody==1) {
 		<input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students">
 		<input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
 		<input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
-		
+
 	<table class=gb id=myTable>
 		<thead>
 		<tr>
@@ -657,11 +783,12 @@ if ($overwriteBody==1) {
 			<th>Lock Out</th>
 		</tr>
 		</thead>
-		<tbody>	
-<?php		
+		<tbody>
+<?php
 		$alt = 0;
 		$numstu = 0;
-		while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
+		//DB while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
+		while ($line=$resultDefaultUserList->fetch(PDO::FETCH_ASSOC)) {
 			if ($line['section']==null) {
 				$line['section'] = '';
 			}
@@ -674,22 +801,22 @@ if ($overwriteBody==1) {
 			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
 			if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
-?>			
+?>
 				<td><input type=checkbox name="checked[]" value="<?php echo $line['userid'] ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
 				<td>
 <?php
-	
+
 	if ($line['hasuserimg']==1) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+			echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		} else {
-			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		}
 	}
 ?>
 				</td>
-				<?php 
-				echo $hasSectionData; 
+				<?php
+				echo $hasSectionData;
 				echo $hasCodeData;
 				if ($line['locked']>0) {
 					echo '<td><span class="greystrike">'.$line['LastName'].'</span></td>';
@@ -705,13 +832,13 @@ if ($overwriteBody==1) {
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1" class="ex">Exception</a></td>
 				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>" class="ui">Chg</a>
 				<?php if ($line['timelimitmult']!=1) {
-					echo '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';	
+					echo '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
 				}
 				?>
 				</td>
 				<?php
 				if ($line['locked']>0) {
-					echo '<td><img src="../img/lock.png"/> <a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
+					echo '<td><img src="../img/lock.png" alt="Locked"/> <a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
 				} else {
 					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student ('.str_replace("'","\\'",$line['LastName'].', '.$line['FirstName']).') out of the course?\');" class="ll">Lock</a></td>';
 				}
@@ -722,7 +849,7 @@ if ($overwriteBody==1) {
 			</tr>
 <?php
 		}
-?>		
+?>
 
 			</tbody>
 		</table>
@@ -733,13 +860,13 @@ if ($overwriteBody==1) {
 			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S','S','S','S','D',false,false,false),true);
 		</script>
 	</form>
-		
 
-	
+
+
 	<p></p>
 <?php
 	}
-}	
-	
+}
+
 require("../footer.php");
 ?>

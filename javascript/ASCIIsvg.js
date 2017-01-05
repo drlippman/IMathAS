@@ -11,7 +11,7 @@ Latest version at http://www.chapman.edu/~jipsen/svg/ASCIIsvg.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
 A few modifications were made for use with IMathAS, especially removal
-of plot and drawPictures functions, and changes to mathjs.  
+of plot and drawPictures functions, and changes to mathjs.
 
 Merged ASCIIsvgAddon for tinyMCE use (c) 9/19/2008
 
@@ -20,12 +20,18 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or (at
 your option) any later version.
 
-This program is distributed in the hope that it will be useful, 
+This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License (at http://www.gnu.org/copyleft/gpl.html) 
+General Public License (at http://www.gnu.org/copyleft/gpl.html)
 for more details.*/
 
+//reserved:
+//minify using something that will preserve these variables:
+//like uglify on http://refresh-sf.com/
+//origin,border,strokewidth,strokedasharray,stroke,fill,fontstyle,fontfamily,fontsize,fontweight,fontstroke,fontfill,fontbackground,fillopacity,markerstrokewidth,markerstroke,markerfill,marker,arrowfill,dotradius,ticklength,axesstroke,gridstroke,xmin,xmax,ymin,ymax,xscl,yscl,xgrid,ygrid,xtick,ytick,width,height
+
+(function() {
 var ASnoSVG = false;
 var checkIfSVGavailable = true;
 var notifyIfNoSVG = false;
@@ -57,7 +63,7 @@ var aboveleft = "aboveleft";
 var aboveright = "aboveright";
 var belowleft = "belowleft";
 var belowright = "belowright";
-var xmin, xmax, ymin, ymax, xscl, yscl, 
+var xmin, xmax, ymin, ymax, xscl, yscl,
     xgrid, ygrid, xtick, ytick, initialized;
 var isOldIE = document.createElementNS==null;
 var picture, svgpicture, doc, width, height, a, b, c, d, i, n, p, t, x, y;
@@ -107,7 +113,7 @@ function isSVGavailable() {
 	      var oSVG=eval("new ActiveXObject('Adobe.SVGCtl.3');");
 		return null;
 	    } catch (e) {
-		    
+
 		return 1;
 	    }
     }
@@ -119,7 +125,7 @@ function isSVGavailable() {
 
 function less(x,y) { return x < y }  // used for scripts in XML files
                                      // since IE does not handle CDATA well
-function setText(st,id) { 
+function setText(st,id) {
   var node = document.getElementById(id);
   if (node!=null)
     if (node.childNodes.length!=0) node.childNodes[0].nodeValue = st;
@@ -156,7 +162,7 @@ function top_listener(evt) {
 }
 
 
-function bottom_listener(evt) { 
+function bottom_listener(evt) {
   svgpicture.setAttribute("ybase",evt.clientY-height+1);
 }
 
@@ -220,12 +226,12 @@ function updatePicture(obj) {
 
 function showHideCode(obj) {
   var node = obj.nextSibling;
-  while (node != null && node.nodeName != "BUTTON" && 
+  while (node != null && node.nodeName != "BUTTON" &&
 
     node.nodeName != "button") node = node.nextSibling;
   if (node.style.display == "none") node.style.display = "";
   else node.style.display = "none";
-  while (node != null && node.nodeName != "TEXTAREA" && 
+  while (node != null && node.nodeName != "TEXTAREA" &&
     node.nodeName != "textarea") node = node.previousSibling;
   if (node.style.display == "none") node.style.display = "";
   else node.style.display = "none";
@@ -245,7 +251,7 @@ function nobutton() { //do nothing
 }
 
 
-function setBorder(l,b,r,t) { 
+function setBorder(l,b,r,t) {
 	if (t==null) {
 		border = new Array(l,l,l,l);
 	} else {
@@ -253,8 +259,44 @@ function setBorder(l,b,r,t) {
 	}
 }
 
-
 function initPicture(x_min,x_max,y_min,y_max) {
+ if (x_min!=null) xmin = x_min;
+ if (x_max!=null) xmax = x_max;
+ if (y_min!=null) ymin = y_min;
+ if (y_max!=null) ymax = y_max;
+ if (xmin==null) xmin = -5;
+ if (xmax==null) xmax = 5;
+ if (typeof xmin != "number" || typeof xmax != "number" || xmin >= xmax)
+   alert("Picture requires at least two numbers: xmin < xmax");
+ else if (y_max != null && (typeof y_min != "number" ||
+  				typeof y_max != "number" || y_min >= y_max))
+   alert("initPicture(xmin,xmax,ymin,ymax) requires numbers ymin < ymax");
+ else {
+  //if (width==null)
+  width = picture.getAttribute("width");
+  //else picture.setAttribute("width",width);
+  if (width==null || width=="") width=defaultwidth;
+  //if (height==null)
+  height = picture.getAttribute("height");
+  //else picture.setAttribute("height",height);
+  if (height==null || height=="") height=defaultheight;
+  xunitlength = (width-border[0]-border[2])/(xmax-xmin);
+  yunitlength = xunitlength;
+  //alert(xmin+" "+xmax+" "+ymin+" "+ymax)
+  if (ymin==null) {
+  	origin = [-xmin*xunitlength+border[0],height/2];
+  	ymin = -(height-border[1]-border[3])/(2*yunitlength);
+  	ymax = -ymin;
+  } else {
+  	if (ymax!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
+  	else ymax = (height-border[1]-border[3])/yunitlength + ymin;
+  	origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
+  }
+  winxmin = Math.max(border[0]-5,0);
+  winxmax = Math.min(width-border[2]+5,width);
+  winymin = Math.max(border[3]-5,0);
+  winymax = Math.min(height-border[1]+5,height);
+ }
  if (!initialized) {
   strokewidth = "1"; // pixel
   strokedasharray = null;
@@ -269,61 +311,33 @@ function initPicture(x_min,x_max,y_min,y_max) {
   fontbackground = "none";
   marker = "none";
   initialized = true;
-  if (x_min!=null) xmin = x_min;
-  if (x_max!=null) xmax = x_max;
-  if (y_min!=null) ymin = y_min;
-  if (y_max!=null) ymax = y_max;
-  if (xmin==null) xmin = -5;
-  if (xmax==null) xmax = 5;
- if (typeof xmin != "number" || typeof xmax != "number" || xmin >= xmax) 
-   alert("Picture requires at least two numbers: xmin < xmax");
- else if (y_max != null && (typeof y_min != "number" || 
-          typeof y_max != "number" || y_min >= y_max))
-   alert("initPicture(xmin,xmax,ymin,ymax) requires numbers ymin < ymax");
- else {
-  //if (width==null) 
-  width = picture.getAttribute("width");
-  //else picture.setAttribute("width",width);
-  if (width==null || width=="") width=defaultwidth;
-  //if (height==null) 
-  height = picture.getAttribute("height");
-  //else picture.setAttribute("height",height);
-  if (height==null || height=="") height=defaultheight;
-  xunitlength = (width-border[0]-border[2])/(xmax-xmin);
-  yunitlength = xunitlength;
-//alert(xmin+" "+xmax+" "+ymin+" "+ymax)
-  if (ymin==null) {
-    origin = [-xmin*xunitlength+border[0],height/2];
-    ymin = -(height-border[1]-border[3])/(2*yunitlength);
-    ymax = -ymin;
-  } else {
-    if (ymax!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
-    else ymax = (height-border[1]-border[3])/yunitlength + ymin;
-    origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
-  }
-  winxmin = Math.max(border[0]-5,0);
-  winxmax = Math.min(width-border[2]+5,width);
-  winymin = Math.max(border[3]-5,0);
-  winymax = Math.min(height-border[1]+5,height);
 //  if (true ||picture.nodeName == "EMBED" || picture.nodeName == "embed") {
     if (isOldIE) {
       svgpicture = picture.getSVGDocument().getElementById("root");
-      while (svgpicture.childNodes.length()>5) 
-        svgpicture.removeChild(svgpicture.lastChild); 
+      while (svgpicture.childNodes.length()>5)
+        svgpicture.removeChild(svgpicture.lastChild);
       svgpicture.setAttribute("width",width);
       svgpicture.setAttribute("height",height);
       doc = picture.getSVGDocument();
     } else {
       var qnode = document.createElementNS("http://www.w3.org/2000/svg","svg");
-      qnode.setAttribute("id",picture.getAttribute("id"));
+	var picid = picture.getAttribute("id");
+	picture.setAttribute("id",picid+'-embed');
+      qnode.setAttribute("id", picid);
       qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
       qnode.setAttribute("width",picture.getAttribute("width"));
       qnode.setAttribute("height",picture.getAttribute("height"));
       qnode.setAttribute("alt",picture.getAttribute("alt"));
-      if (picture.parentNode!=null)
-        picture.parentNode.replaceChild(qnode,picture);
-      else
+      if (picture.parentNode!=null) {
+        //picture.parentNode.replaceChild(qnode,picture);
+				picture.parentNode.insertBefore(qnode,picture);
+				picture.style.display="none";
+				picture.removeAttribute("sscr");
+				picture.removeAttribute("script");
+      } else {
         svgpicture.parentNode.replaceChild(qnode,svgpicture);
+      }
+
       svgpicture = qnode;
       doc = document;
       pointerpos = doc.getElementById("pointerpos");
@@ -341,21 +355,7 @@ function initPicture(x_min,x_max,y_min,y_max) {
 //    svgpicture = picture;
 //    doc = document;
 //  }
-  svgpicture.setAttribute("xunitlength",xunitlength);
-  svgpicture.setAttribute("yunitlength",yunitlength);
-  svgpicture.setAttribute("xmin",xmin);
-  svgpicture.setAttribute("xmax",xmax);
-  svgpicture.setAttribute("ymin",ymin);
-  svgpicture.setAttribute("ymax",ymax);
-  svgpicture.setAttribute("ox",origin[0]);
-  svgpicture.setAttribute("oy",origin[1]);
-  var node = myCreateElementSVG("rect");
-  node.setAttribute("x","0");
-  node.setAttribute("y","0");
-  node.setAttribute("width",width);
-  node.setAttribute("height",height);
-  node.setAttribute("style","stroke-width:1;fill:white");
-  svgpicture.appendChild(node);
+
   if (!isOldIE && picture.getAttribute("onmousemove")!=null) {
     svgpicture.addEventListener("mousemove", mousemove_listener, true);
     var st = picture.getAttribute("onmousemove");
@@ -382,8 +382,31 @@ function initPicture(x_min,x_max,y_min,y_max) {
     svgpicture.appendChild(node);
   }
   border = defaultborder;
+ } else {
+ 	 //clear out svg
+	 while (svgpicture.lastChild) {
+		 svgpicture.removeChild(svgpicture.lastChild);
+	 }
  }
- }
+ svgpicture.setAttribute("height", height);
+ svgpicture.style.height = height+"px";
+ svgpicture.setAttribute("width", width);
+ svgpicture.style.width = width+"px";
+ svgpicture.setAttribute("xunitlength",xunitlength);
+ svgpicture.setAttribute("yunitlength",yunitlength);
+ svgpicture.setAttribute("xmin",xmin);
+ svgpicture.setAttribute("xmax",xmax);
+ svgpicture.setAttribute("ymin",ymin);
+ svgpicture.setAttribute("ymax",ymax);
+ svgpicture.setAttribute("ox",origin[0]);
+ svgpicture.setAttribute("oy",origin[1]);
+ var node = myCreateElementSVG("rect");
+ node.setAttribute("x","0");
+ node.setAttribute("y","0");
+ node.setAttribute("width",width);
+ node.setAttribute("height",height);
+ node.setAttribute("style","stroke-width:1;fill:white");
+ svgpicture.appendChild(node);
 }
 
 
@@ -399,7 +422,7 @@ function line(p,q,id) { // segment connecting points p,q (coordinates in units)
     (height-p[1]*yunitlength-origin[1])+" "+
     (q[0]*xunitlength+origin[0])+","+(height-q[1]*yunitlength-origin[1]));
   node.setAttribute("stroke-width", strokewidth);
-  if (strokedasharray!=null) 
+  if (strokedasharray!=null)
     node.setAttribute("stroke-dasharray", strokedasharray);
   node.setAttribute("stroke", stroke);
   if (fill.substr(0,5)=='trans') {
@@ -436,7 +459,7 @@ function path(plist,id,c) {
   }
   node.setAttribute("d", st);
   node.setAttribute("stroke-width", strokewidth);
-  if (strokedasharray!=null) 
+  if (strokedasharray!=null)
     node.setAttribute("stroke-dasharray", strokedasharray);
   node.setAttribute("stroke", stroke);
   if (fill.substr(0,5)=='trans') {
@@ -480,11 +503,11 @@ function circle(center,radius,id) { // coordinates in units
 }
 
 
-function loop(p,d,id) { 
+function loop(p,d,id) {
 // d is a direction vector e.g. [1,0] means loop starts in that direction
   if (d==null) d=[1,0];
   path([p,[p[0]+d[0],p[1]+d[1]],[p[0]-d[1],p[1]+d[0]],p],id,"C");
-  if (marker=="arrow" || marker=="arrowdot") 
+  if (marker=="arrow" || marker=="arrowdot")
     arrowhead([p[0]+Math.cos(1.4)*d[0]-Math.sin(1.4)*d[1],
                p[1]+Math.sin(1.4)*d[0]+Math.cos(1.4)*d[1]],p);
 }
@@ -507,13 +530,13 @@ function sector(center,radius,startang,endang,id) {
 	}
 	var start = [center[0] + radius*Math.cos(startang), center[1] + radius*Math.sin(startang)];
 	var end = [center[0] + radius*Math.cos(endang), center[1] + radius*Math.sin(endang)];
-	
+
 	var pathstr = "M"+(center[0]*xunitlength+origin[0])+","+
 		(height-center[1]*yunitlength-origin[1])+
 		" L"+(start[0]*xunitlength+origin[0])+","+
 		(height-start[1]*yunitlength-origin[1])+ " A"+radius*xunitlength+","+
 		radius*yunitlength+" 0 "+arctype+","+angdir+" "+(end[0]*xunitlength+origin[0])+","+
-		(height-end[1]*yunitlength-origin[1]) + 
+		(height-end[1]*yunitlength-origin[1]) +
 		" z";
 	node.setAttribute("d",pathstr);
 	node.setAttribute("stroke-width", strokewidth);
@@ -642,7 +665,7 @@ function textabs(p,st,pos,angle,id,fontsty) {
 	      dy = fontsize/2+2;
 	    }
 	  }
-  } 
+  }
   if (angle==90) {
 	  var dy = 0; var dx = -fontsize/3;
 	  if (pos!=null) {
@@ -673,7 +696,7 @@ function textabs(p,st,pos,angle,id,fontsty) {
 	    }
 	  }
   }
- 
+
   var node;
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
@@ -698,9 +721,9 @@ function textabs(p,st,pos,angle,id,fontsty) {
   node.setAttribute("stroke-width","0px");
   if (fontbackground!="none") {
 	  try {
-		 var bb = node.getBBox();  
+		 var bb = node.getBBox();
 		  var bgnode = myCreateElementSVG("rect");
-		 
+
 		  bgnode.setAttribute("fill",fontbackground);
 		  bgnode.setAttribute("stroke-width","0px");
 		  bgnode.setAttribute("x",bb.x-2);
@@ -712,9 +735,9 @@ function textabs(p,st,pos,angle,id,fontsty) {
 		  }
 		  svgpicture.insertBefore(bgnode,node);
 	  } catch (e) {
-		  
+
 	  }
-		  
+
   }
   return p;
 }
@@ -771,7 +794,7 @@ function dot(center, typ, label, pos, id) {
     node.setAttribute("stroke", stroke);
     node.setAttribute("fill", (typ=="open"?"white":stroke));
   }
-  if (label!=null) 
+  if (label!=null)
     text(center,label,(pos==null?"below":pos),(id==null?id:id+"label"))
 }
 
@@ -792,7 +815,7 @@ function arrowhead(p,q) { // draw arrowhead at q (in units)
     node.setAttribute("stroke-width", markerstrokewidth);
     node.setAttribute("stroke", stroke); /*was markerstroke*/
     node.setAttribute("fill", stroke); /*was arrowfill*/
-    svgpicture.appendChild(node);    
+    svgpicture.appendChild(node);
   }
 }
 
@@ -833,7 +856,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (doy=="fq") {fqonlyy = true;}
   if (dox=="off" || dox==0) { dox = false;} else {dox = true;}
   if (doy=="off" || doy==0) { doy = false;} else {doy = true;}
- 
+
 //alert(null)
     if (gdx!=null && gdx>0 && (xmax-xmin)/gdx > width) {
     	    gdx = xmax-xmin;
@@ -879,7 +902,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	    	    	    if (x<=winxmax) st += " M"+x+","+gridymin+" "+x+","+(fqonlyy?height-origin[1]:gridymax);
 	    }
     }
-   
+
     if (doy && gdy>0) {
 	    if (!fqonlyy) {
 	      for (y = height-origin[1]; y<=winymax; y = y+gdy)
@@ -893,7 +916,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     pnode.setAttribute("stroke", gridstroke);
     pnode.setAttribute("fill", fill);
     svgpicture.appendChild(pnode);
-  } 
+  }
   pnode = myCreateElementSVG("path");
   if (dox) {
 	  st="M"+(fqonlyx?origin[0]:winxmin)+","+(height-origin[1])+" "+winxmax+","+
@@ -902,7 +925,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (doy) {
 	  st += " M"+origin[0]+","+winymin+" "+origin[0]+","+(fqonlyy?height-origin[1]:winymax);
   }
-  
+
   if (dox && dx>0) {
 	  for (x = origin[0]; x<winxmax; x = x+dx)
 	    if (x>=winymin) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
@@ -918,10 +941,10 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	     for (y = height-origin[1]; y<winymax; y = y+dy)
 	      if (y>=winymin) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
 	   }
-	 
+
 	  for (y = height-origin[1]-dy; y>winymin; y = y-dy)
 	      if (y<=winymax) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
-	  
+
   }
   if (labels!=null) with (Math) {
     ldx = dx/xunitlength;
@@ -961,7 +984,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 
 function slopefield(fun,dx,dy) {
   var g = fun;
-  if (typeof fun=="string") 
+  if (typeof fun=="string")
     eval("g = function(x,y){ with(Math) return "+mathjs(fun)+" }");
   var gxy,x,y,u,v,dz;
   if (dx==null) dx=1;
@@ -989,13 +1012,13 @@ function drawPictures() {
 //xmin,xmax,ymin,ymax,xscl,yscl,labels,xgscl,ygscl,width,height plotcommands(see blow)
 //plotcommands: type,eq1,eq2,startmaker,endmarker,xmin,xmax,color,strokewidth,strokedash
 function parseShortScript(sscript,gw,gh) {
-	if (sscript == null) {
-		initialized = false;
+	if (sscript==null) {
 		sscript = picture.sscr;
+		initialized = false;
 	}
-	
+
 	var sa= sscript.split(",");
-	
+
 	if (gw && gh) {
 		sa[9] = gw;
 		sa[10] = gh;
@@ -1012,16 +1035,16 @@ function parseShortScript(sscript,gw,gh) {
 		commands += 'width=' +sa[9] + '; height=' +sa[10] + ';';
 		commands += 'initPicture(' + sa[0] +','+ sa[1] +','+ sa[2] +','+ sa[3] + ');';
 		commands += 'axes(' + sa[4] +','+ sa[5] +','+ sa[6] +','+ sa[7] +','+ sa[8]+ ');';
-				
+
 		var inx = 11;
 		var varlet = '';
 		var eqnlist = 'Graphs on the window x='+sa[0]+' to '+sa[1]+' and y='+sa[2]+' to '+sa[3]+': ';
-		
+
 		while (sa.length > inx+9) {
 		   commands += 'stroke="' + sa[inx+7] + '";';
 		   eqnlist += sa[inx+7] + " ";
 		   commands += 'strokewidth="' + sa[inx+8] + '";'
-		   //commands += 'strokedasharray="' + sa[inx+9] + '";'	
+		   //commands += 'strokedasharray="' + sa[inx+9] + '";'
 		   if (sa[inx+9] != "") {
 			   commands += 'strokedasharray="' + sa[inx+9].replace(/\s+/g,',') + '";';
 			   if (sa[inx+9]=='2') {
@@ -1032,11 +1055,11 @@ function parseShortScript(sscript,gw,gh) {
 			   	   eqnlist += "tight dashed ";
 			   } else if (sa[inx+9]=='7 3 2 3') {
 			   	   eqnlist += "dash-dot ";
-			   } 
+			   }
 		   }
 		   if (sa[inx]=="slope") {
 			   eqnlist += "slopefield where dy/dx="+sa[inx+1] + ". ";
-			commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');'; 
+			commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');';
 		   } else if (sa[inx]=="label") {
 			   eqnlist += "label with text "+sa[inx+1] + ' at the point ('+sa[inx+5]+','+sa[inx+6]+'). ';
 			   commands += 'text(['+sa[inx+5]+','+sa[inx+6]+'],"'+sa[inx+1]+'");';
@@ -1054,14 +1077,14 @@ function parseShortScript(sscript,gw,gh) {
 				eqn = '["' + sa[inx+1] + '","'+ sa[inx+2] + '"]';
 				varlet = 't';
 			}
-			
-			
+
+
 			if (typeof eval(sa[inx+5]) == "number") {
 		//	if ((sa[inx+5]!='null')&&(sa[inx+5].length>0)) {
 				//commands += 'myplot(' + eqn +',"' + sa[inx+3] +  '","' + sa[inx+4]+'",' + sa[inx+5] + ',' + sa[inx+6]  +');';
 				commands += 'plot(' + eqn +',' + sa[inx+5] + ',' + sa[inx+6] +',null,null,' + sa[inx+3] +  ',' + sa[inx+4] +');';
 				eqnlist += " from " + varlet + '='+sa[inx+5]+ ' ';
-				if (sa[inx+3]==1) { 
+				if (sa[inx+3]==1) {
 					eqnlist += 'with an arrow ';
 				} else if (sa[inx+3]==2) {
 					eqnlist += 'with an open dot ';
@@ -1069,7 +1092,7 @@ function parseShortScript(sscript,gw,gh) {
 					eqnlist += 'with a closed dot ';
 				}
 				eqnlist += "to "+varlet+'='+sa[inx+6]+' ';
-				if (sa[inx+4]==1) { 
+				if (sa[inx+4]==1) {
 					eqnlist += 'with an arrow ';
 				} else if (sa[inx+4]==2) {
 					eqnlist += 'with an open dot ';
@@ -1083,20 +1106,21 @@ function parseShortScript(sscript,gw,gh) {
 		   }
 		   inx += 10;
 		}
-	
+
 		picture.setAttribute("alt",eqnlist);
-		
+
 		try {
 			eval(commands);
 		} catch (e) {
 			setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
+			//console.log("Graph not ready");
 			//alert("Graph not ready");
 		}
-		
-		
+
+
 		//picture.setAttribute("width", sa[9]);
 		//picture.setAttribute("height", sa[9]);
-		
+
 		return commands;
 	}
 }
@@ -1108,8 +1132,8 @@ function drawPics() {
   var index, nd;
   pictures = document.getElementsByTagName("embed");
  // might be needed if setTimeout on parseShortScript isn't working
- 
- if (!ASnoSVG && isOldIE) {
+
+ 	if (!ASnoSVG && isOldIE) {
 	   try {
 		  for (var i = 0; i < pictures.length; i++) {
 		  	  if (pictures[i].getAttribute("sscr")!='' || pictures[i].getAttribute("script")!='') {
@@ -1123,24 +1147,24 @@ function drawPics() {
 		  setTimeout(drawPics,100);
 		  return;
 	  }
- }
- 
-  var len = pictures.length;
-  
-  
-  for (index = 0; index < len; index++) {
-	  picture = ((!ASnoSVG && isOldIE) ? pictures[index] : pictures[0]);
-  ///  for (index = len-1; index >=0; index--) {
-//	  picture = pictures[index];
+ 	}
+	var len = pictures.length;
+
+
+  //for (index = 0; index < len; index++) {
+	  //picture = ((!ASnoSVG && isOldIE) ? pictures[index] : pictures[0]);
+	var sscr, src;
+  for (index = len-1; index >=0; index--) {
+	  picture = pictures[index];
 	  if (!ASnoSVG) {
 		  initialized = false;
-		  var sscr = picture.getAttribute("sscr");
+		  sscr = picture.hasAttribute("data-sscr")?picture.getAttribute("data-sscr"):picture.getAttribute("sscr");
 		  if ((sscr != null) && (sscr != "")) { //sscr from editor
 			  try {
 				  parseShortScript(sscr);
 			  } catch (e) {}
 		  } else {
-			  src = picture.getAttribute("script"); //script from showplot
+			  src = picture.hasAttribute("data-script")?picture.getAttribute("data-script"):picture.getAttribute("script"); //script from showplot
 			  if ((src!=null) && (src != "")) {
 				  try {
 					  with (Math) eval(src);
@@ -1148,17 +1172,16 @@ function drawPics() {
 			  }
 		  }
 	  } else {
-		  if (picture.getAttribute("sscr")!='') {
+		sscr = picture.hasAttribute("data-sscr")?picture.getAttribute("data-sscr"):picture.getAttribute("sscr");
+		if ((sscr != null) && (sscr != "")) {
 			  n = document.createElement('img');
 			  n.setAttribute("style",picture.getAttribute("style"));
-			  n.setAttribute("src",AScgiloc+'?sscr='+encodeURIComponent(picture.getAttribute("sscr")));
+			  n.setAttribute("src",AScgiloc+'?sscr='+encodeURIComponent(sscr));
 			  pn = picture.parentNode;
 			  pn.replaceChild(n,picture);
-		  }
-		  
+		}
 	  }
-	  
-  }
+	}
 }
 
 //modified by David Lippman from original in AsciiSVG.js by Peter Jipsen
@@ -1167,7 +1190,7 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
   var pth = [];
   var f = function(x) { return x }, g = fun;
   var name = null;
-  if (typeof fun=="string") 
+  if (typeof fun=="string")
     eval("g = function(x){ with(Math) return "+mathjs(fun)+" }");
   else if (typeof fun=="object") {
     eval("f = function(t){ with(Math) return "+mathjs(fun[0])+" }");
@@ -1188,7 +1211,7 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
     if (!(isNaN(gt)||Math.abs(gt)=="Infinity")) {
 	    if ((pth.length > 0) && (Math.abs(gt-pth[pth.length-1][1]) > (ymax-ymin))) {
 		    if (pth.length > 1)  path(pth,name);
-		    pth.length=0; 
+		    pth.length=0;
 	    } else {
 		    pth[pth.length] = [f(t), gt];
 	    }
@@ -1260,53 +1283,9 @@ ASupdateCoords = [function() {updateCoords(0)},
   function() {updateCoords(9)}];
 
 
-// GO1.1 Generic onload by Brothercake 
-// http://www.brothercake.com/
-//onload function
-function generic()
-{
-  drawPictures();
-};
-//setup onload function
-if(typeof window.addEventListener != 'undefined')
-{
-  //.. gecko, safari, konqueror and standard
-  window.addEventListener('load', generic, false);
-}
-else if(typeof document.addEventListener != 'undefined')
-{
-  //.. opera 7
-  document.addEventListener('load', generic, false);
-}
-else if(typeof window.attachEvent != 'undefined')
-{
-  //.. win/ie
-  window.attachEvent('onload', generic);
-}
-//** remove this condition to degrade older browsers
-else
-{
-  //.. mac/ie5 and anything else that gets this far
-  //if there's an existing onload function
-  if(typeof window.onload == 'function')
-  {
-    //store it
-    var existing = onload;
-    //add new onload handler
-    window.onload = function()
-    {
-      //call existing onload function
-      existing();
-      //call generic onload function
-      generic();
-    };
-  }
-  else
-  {
-    //setup onload function
-    window.onload = generic;
-  }
-}
+$(function() {
+	drawPics();
+});
 
 
 if (checkIfSVGavailable) {
@@ -1314,3 +1293,9 @@ if (checkIfSVGavailable) {
   nd = isSVGavailable();
   ASnoSVG = nd!=null;
 }
+
+window.drawPictures = drawPictures;
+window.drawPics = drawPics;
+window.ASnoSVG = ASnoSVG;
+window.parseShortScript = parseShortScript;
+})();

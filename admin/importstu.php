@@ -21,7 +21,7 @@ function parsecsv($data) {
 	$ln = $data[$_POST['lncol']-1];
 	if ($_POST['lncol']!=$_POST['fncol'] && $_POST['lnloc']!=0) {
 		$fncol = explode(' ',$ln);
-	} 
+	}
 	if ($_POST['lnloc']!=0) {
 		if ($_POST['lnloc']<3) {
 			$ln = $fncol[$_POST['lnloc']-1];
@@ -48,7 +48,7 @@ function parsecsv($data) {
 		$email = 'none@none.com';
 	}
 	if ($_POST['codetype']==1) {
-		$code = $data[$_POST['code']-1];	
+		$code = $data[$_POST['code']-1];
 	} else {
 		$code = 0;
 	}
@@ -66,25 +66,25 @@ function parsecsv($data) {
 	}
 	return array($un,$fn,$ln,$email,$code,$sec,$pw);
 }
-		
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Import Students";
-$isadmin = false; 
+$isadmin = false;
 
 //data manipulation here
 
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid)) && $myrights<100) {
  	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";	
+	$body = "You need to log in as a teacher to access this page";
 } elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <100) {
  	$overwriteBody = 1;
-	$body = "You need to log in as an admin to access this page this way";	
+	$body = "You need to log in as an admin to access this page this way";
 } elseif (!(isset($_GET['cid']))) {
  	$overwriteBody = 1;
-	$body = "You need to access this page from a menu link";	
+	$body = "You need to access this page from a menu link";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
 	$cid = $_GET['cid'];
@@ -94,7 +94,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 	} else {
 		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Students</div>\n";
 	}
-	
+
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
 		if (isset($CFG['GEN']['newpasswords'])) {
@@ -105,20 +105,24 @@ if (!(isset($teacherid)) && $myrights<100) {
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
 		}
-		
+
 		while (($data = fgetcsv($handle,2096))!==false) {
 			$arr = parsecsv($data);
 			for ($i=0;$i<count($arr);$i++) {
 				$arr[$i] = trim($arr[$i]);
 			}
-			addslashes_deep($arr);
+			//DB addslashes_deep($arr);
 			if (trim($arr[0])=='' || trim($arr[0])=='_') {
 				continue;
 			}
-			$query = "SELECT id FROM imas_users WHERE SID='$arr[0]'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$id = mysql_result($result,0,0);
+			//DB $query = "SELECT id FROM imas_users WHERE SID='$arr[0]'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+				//DB $id = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+			$stm->execute(array(':SID'=>$arr[0]));
+			if ($stm->rowCount()>0) {
+				$id = $stm->fetchColumn(0);
 				echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
 			} else {
 				if (($_POST['pwtype']==0 || $_POST['pwtype']==1) && strlen($arr[0])<4) {
@@ -158,9 +162,12 @@ if (!(isset($teacherid)) && $myrights<100) {
 						}
 					}
 				}
-				$query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$id = mysql_insert_id();
+				//DB $query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $id = mysql_insert_id();
+				$stm = $DBH->prepare("INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES (:SID, :FirstName, :LastName, :email, :rights, :password)");
+				$stm->execute(array(':SID'=>$arr[0], ':FirstName'=>$arr[1], ':LastName'=>$arr[2], ':email'=>$arr[3], ':rights'=>10, ':password'=>$pw));
+				$id = $DBH->lastInsertId();
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
 				if ($isadmin) {
@@ -168,30 +175,36 @@ if (!(isset($teacherid)) && $myrights<100) {
 				} else {
 					$ncid = $cid;
 				}
-				$vals = "'$id','$ncid'";
-				$query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$ncid'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				if (mysql_num_rows($result)>0) {
+				//DB $vals = "'$id','$ncid'";
+				//DB $query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$ncid'";
+				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				//DB if (mysql_num_rows($result)>0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid));
+				if ($stm->rowCount()>0) {
 					echo "Username {$arr[0]} already enrolled in course.  Skipping<br/>";
 					continue;
 				}
-				
-				$query = "INSERT INTO imas_students (userid,courseid";
-				if ($_POST['codetype']==1) {
-					$query .= ",code";
-					$vals .= ",'$arr[4]'";
-				}
-				if ($_POST['sectype']>0) {
-					$query .= ",section";
-					$vals .= ",'$arr[5]'";
-				}
-				$query .= ") VALUES ($vals)";
-				
-				mysql_query($query) or die("Query failed : $query" . mysql_error());
+
+				//DB $query = "INSERT INTO imas_students (userid,courseid";
+				//DB if ($_POST['codetype']==1) {
+				//DB 	$query .= ",code";
+				//DB 	$vals .= ",'$arr[4]'";
+				//DB }
+				//DB if ($_POST['sectype']>0) {
+				//DB 	$query .= ",section";
+				//DB 	$vals .= ",'$arr[5]'";
+				//DB }
+				//DB $query .= ") VALUES ($vals)";
+
+				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,code,section) VALUES (:userid, :courseid, :code, :section)");
+				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid,
+					':code'=>($_POST['codetype']==1)?$arr[4]:null,
+					':section'=>($_POST['sectype']>0)?$arr[5]:null));
 			}
-			
+
 		}
-		
+
 		fclose($handle);
 		unlink($filename);
 		$overwriteBody = 1;
@@ -243,14 +256,17 @@ if (!(isset($teacherid)) && $myrights<100) {
 			}
 		}
 	} else { //STEP 1 DATA MANIPULATION
-	
+
 		if ($isadmin) {
+			//DB $query = "SELECT imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName FROM imas_courses,imas_users ";
+			//DB $query .= "WHERE imas_users.id=imas_courses.ownerid ";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "SELECT imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName FROM imas_courses,imas_users ";
 			$query .= "WHERE imas_users.id=imas_courses.ownerid ";
-			
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->query($query);
 			$i=0;
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_adminUserSelectVals[$i] = $row[0];
 				$page_adminUserSelectLabels[$i] = "$row[1] ($row[2], $row[3])";
 				$i++;
@@ -258,7 +274,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 		}
 	}
 //END OF DATA MANIPULATION
-}	
+}
 
 
 /******* begin html output ********/
@@ -272,7 +288,7 @@ if ($overwriteBody==1) {
 
 	<form enctype="multipart/form-data" method=post action="importstu.php?cid=<?php echo $cid ?>">
 
-<?php	
+<?php
 	if (isset($_FILES['userfile'])) {  //STEP 2 DISPLAY
 		echo $page_fileHiddenInput;
 ?>
@@ -288,9 +304,9 @@ if ($overwriteBody==1) {
 			</thead>
 			<tbody>
 
-<?php		
+<?php
 		for ($i=0; $i<count($page_sampleImport); $i++) {
-?>		
+?>
 				<tr>
 					<td><?php echo $page_sampleImport[$i]['col1'] ?></td>
 					<td><?php echo $page_sampleImport[$i]['col2'] ?></td>
@@ -301,7 +317,7 @@ if ($overwriteBody==1) {
 
 <?php
 		}
-?>		
+?>
 			</tbody>
 			</table>
 
@@ -314,21 +330,21 @@ if ($overwriteBody==1) {
 ?>
 		<div id="headerimportstu" class="pagetitle"><h2>Import Students from File</h2></div>
 		<p>Register and enroll students from a CSV (comma separated values) file</p>
-		
+
 		<span class=form>Import File: </span>
 		<span class=formright>
 			<input type="hidden" name="MAX_FILE_SIZE" value="300000" />
 			<input name="userfile" type="file" />
-		</span><br class=form>		
+		</span><br class=form>
 		<span class=form>File contains a header row:</span>
 		<span class=formright>
 			<input type=radio name=hdr value="1">Yes<br/>
 			<input type=radio name=hdr value="0" CHECKED>No<br/>
 		</span><br class=form>
-		
+
 		<span class=form>First name is in column:</span>
 		<span class=formright><input type=text name=fncol size=4 value="3"></span><br class=form>
-		
+
 		<span class=form>In that column, first name is:</span>
 		<span class=formright>
 			<select name=fnloc>
@@ -338,10 +354,10 @@ if ($overwriteBody==1) {
 				<option value="3">Last word in entry</option>
 			</select>
 		</span><br class=form>
-				
+
 		<span class=form>Last name is in column:</span>
 		<span class=formright><input type=text name=lncol size=4 value="3"></span><br class=form>
-		
+
 		<span class=form>In that column, Last name is:</span>
 		<span class=formright>
 			<select name=lnloc>
@@ -351,7 +367,7 @@ if ($overwriteBody==1) {
 				<option value="3">Last word in entry</option>
 			</select>
 		</span><br class=form>
-		
+
 		<span class=form>Email address is in column:<br/>Enter 0 if no email column</span>
 		<span class=formright><input type=text name=emailloc size=4 value="7"></span><br class=form>
 <?php
@@ -365,10 +381,10 @@ if (isset($CFG['GEN']['allowInstrImportStuByName']) && $CFG['GEN']['allowInstrIm
 <?php
 } else {
 	?>
-	
+
 		<span class=form>Does a column contain a desired username:</span>
 		<span class=formright>
-			<input type=radio name=unusecol value="1" CHECKED>Yes, Column 
+			<input type=radio name=unusecol value="1" CHECKED>Yes, Column
 			<input type=text name=unloc size=4 value="2"/><br/>
 			<input type=radio name=unusecol value="0">No, Use as username: firstname_lastname
 		</span><br class=form>
@@ -379,28 +395,28 @@ if (isset($CFG['GEN']['allowInstrImportStuByName']) && $CFG['GEN']['allowInstrIm
 		<span class=formright>
 			<input type=radio name=pwtype value="0">First 4 characters of username<br/>
 			<input type=radio name=pwtype value="1" CHECKED>Last 4 characters of username<br/>
-			<input type=radio name=pwtype value="3">Use value in column 
+			<input type=radio name=pwtype value="3">Use value in column
 			<input type=text name="pwcol" size=4 value="1"/><br/>
-			<input type=radio name=pwtype value="2">Set to: 
+			<input type=radio name=pwtype value="2">Set to:
 			<input type=text name="defpw" value="password"/>
 		</span><br class=form>
-		
+
 		<span class=form>Assign code number?</span>
 		<span class=formright>
 			<input type=radio name=codetype value="0" CHECKED>No<br/>
-			<input type=radio name=codetype value="1">Yes, use value in column: 
+			<input type=radio name=codetype value="1">Yes, use value in column:
 			<input type=text name="code" size=4 value="1"/>
 		</span><br class=form>
-			
+
 		<span class=form>Assign section value?</span>
 		<span class=formright>
 			<input type=radio name=sectype value="0" CHECKED>No<br/>
-			<input type=radio name=sectype value="1">Yes, use: 
+			<input type=radio name=sectype value="1">Yes, use:
 			<input type=text name="secval" size=6 value=""/><br/>
-			<input type=radio name=sectype value="2">Yes, use value in column: 
+			<input type=radio name=sectype value="2">Yes, use value in column:
 			<input type=text name="seccol" size=4 value="4"/>
 		</span><br class=form>
-		
+
 		<span class=form>Enroll students in:</span><span class=formright>
 <?php
 		if ($isadmin) {
@@ -410,7 +426,7 @@ if (isset($CFG['GEN']['allowInstrImportStuByName']) && $CFG['GEN']['allowInstrIm
 		}
 ?>
 		</span><br class=form>
-		
+
 		<div class=submit><input type=submit value="Submit and Review"></div>
 
 <?php
@@ -420,5 +436,3 @@ if (isset($CFG['GEN']['allowInstrImportStuByName']) && $CFG['GEN']['allowInstrIm
 
 require("../footer.php");
 ?>
-			
-

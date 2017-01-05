@@ -178,8 +178,8 @@ if (isset($_REQUEST['showfiles'])) {
 	echo '<div class="td_main">';
 	foreach ($files as $k=>$v) {
 		echo "<div><a href='#' onClick='delete_file(\"" . basename($v['name']) . "\", this)'>";
-		echo "<img border=0 src='" . $delete_image . "'></a> ";
-		echo "<img src='" . $file_small_image . "'> ";
+		echo "<img border=0 src='" . $delete_image . "' alt=\"Delete\"></a> ";
+		echo "<img src='" . $file_small_image . "' alt=\"File\"> ";
 		echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl($v['name']) . "\");'>" . basename($v['name']) . "</a><br></div>\n";
 	
 	}
