@@ -58,7 +58,7 @@ if (isset($ispublic) && $ispublic && !isset($sessiondata['mathdisp'])) {
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
-	echo '<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	echo '<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML-full"></script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
 	//merged, eliminating original AsciiMath display; MathJax only now
@@ -66,16 +66,17 @@ if (!isset($sessiondata['mathdisp'])) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=071116\" type=\"text/javascript\"></script>\n";
 	}
+	//MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+	//MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, "messageStyle": "none"});
 		} else {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none"});
 		}
-		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
-		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
+		MathJax.Hub.config.extensions.push("[Contrib]/InputToDataAttr/InputToDataAttr.js");
 		</script>';
-	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML-full"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>';
@@ -91,8 +92,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		} else {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none", skipStartupTypeset: true});
 		}
-		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
-		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
+		MathJax.Hub.config.extensions.push("[Contrib]/InputToDataAttr/InputToDataAttr.js");
 		MathJax.Hub.Register.StartupHook("Begin Config", setupKatexAutoRenderWhenReady);
 		</script>
 		<script type="text/javascript">
@@ -107,7 +107,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
 	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css"/>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=083116"></script>';
-	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML-full"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
