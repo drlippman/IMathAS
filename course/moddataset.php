@@ -1157,10 +1157,8 @@ Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsi
 <input type=button id="solveropenbutton" value="Solver">
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question">
-<?php if (isset($_GET['id'])): ?>
 <button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
 <span class="noticetext quickSaveNotice"></span>
-<?php endif; ?>
 <BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
 </div>
@@ -1171,10 +1169,8 @@ Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize(
 <input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question">
-<?php if (isset($_GET['id'])): ?>
 <button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
 <span class="noticetext quickSaveNotice"></span>
-<?php endif; ?>
 <BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+3));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
 </div>
@@ -1259,16 +1255,28 @@ if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
 <p>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question">
-<?php if (isset($_GET['id'])): ?>
 <button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
 <span class="noticetext quickSaveNotice"></span>
-<?php endif; ?>
 </p>
 </form>
 
-<?php if (isset($_GET['id'])): ?>
 <script type="text/javascript">
 var quickSaveQuestion = function(){
+	/* Reasons to trigger a full Save and Test Question:
+			* Image uploaded
+			* Image deleted
+			* No question id in query string
+	*/
+	var imgUploaded = $("input[name='imgfile']")[0].files.length > 0 ? true : false; // Image uploaded
+	var imgDeleted = $("input[name^='delimg-']:checked").length > 0 ? true : false; // Image deleted
+	var url = $("form")[0].action;
+	var noId = (url.indexOf("?id=") < 0 && url.indexOf("&id=") < 0) ? true : false;
+	// Trigger full Save and Test
+	if (imgUploaded || imgDeleted || noId){
+		$("input[value='Save and Test Question']").first().trigger("click")
+		return false;
+	}
+
 	// Add text to notice areas
 	$(".quickSaveNotice").html("Saving...");
 	// Save codemirror and tinyMCE data
@@ -1280,11 +1288,15 @@ var quickSaveQuestion = function(){
 		quickSaveQuestion.errorFunc();
 	}
 	// Get form data
-	var data = $("form").serializeArray();
+	// var data = $("form").serializeArray();
+	var data = new FormData($("form")[0]);
+
 	$.ajax({
 		url: $("form")[0].action,
 		type: 'POST',
 		data: data,
+		contentType: false,
+    processData: false,
 		success: function(res){
 			// Empty notices
 			$(".quickSaveNotice").empty();
@@ -1316,7 +1328,6 @@ $(document).on("keydown", quickSaveQuestion.keyBind);
 // STILL NEED TO BIND THIS TO TINYMCE KEYDOWN. I thought it should be something like:
 // tinymce.on('keydown', quickSaveButton.keyBind);
 </script>
-<?php endif; ?>
 
 <?php
 $placeinfooter='
