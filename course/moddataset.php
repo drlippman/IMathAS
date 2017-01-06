@@ -1116,6 +1116,8 @@ function decboxsize(box) {
 }
 
 var quickSaveQuestion = function(){
+	// Add text to notice areas
+	$(".quickSaveNotice").html("Saving...");
 	// Save codemirror and tinyMCE data
 	try {
 		if (qEditor) qEditor.save();
@@ -1131,27 +1133,35 @@ var quickSaveQuestion = function(){
 		type: 'POST',
 		data: data,
 		success: function(res){
+			// Empty notices
+			$(".quickSaveNotice").empty();
 			// On success, load preview page
 			var addr = '<?= "$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}" ?>';
 			var previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
 		},
 		error: function(res){
-			// Need to handle errors
 			quickSaveQuestion.errorFunc();
 		}
 	});
 }
 // Method to handle errors...
 quickSaveQuestion.errorFunc = function(){
-
+	$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");
 }
-// Bind key event: Ctrl + Shift + s will trigger quick save
-$(document).on("keypress", function(e){
+// Key-binding method
+quickSaveQuestion.keyBind = function(e){
 	var key = e.which || e.keyCode;
-	if (key == 19 && e.ctrlKey == true && e.shiftKey == true){
+	if (key == 83 && e.ctrlKey == true){
+		e.preventDefault();
+		e.stopPropagation();
 		quickSaveQuestion();
+		return false;
 	}
-});
+}
+// Bind key event
+$(document).on("keydown", quickSaveQuestion.keyBind);
+// STILL NEED TO BIND THIS TO TINYMCE KEYDOWN. I thought it should be something like:
+// tinymce.on('keydown', quickSaveButton.keyBind);
 
 </script>
 <p>
@@ -1196,6 +1206,7 @@ Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsi
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question">
 <button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<span class="noticetext quickSaveNotice"></span>
 <BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
 </div>
@@ -1207,6 +1218,7 @@ Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize(
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question">
 <button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<span class="noticetext quickSaveNotice"></span>
 <BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+3));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
 </div>
@@ -1292,6 +1304,7 @@ if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question">
 <button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<span class="noticetext quickSaveNotice"></span>
 </p>
 </form>
 
