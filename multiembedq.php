@@ -117,7 +117,7 @@ foreach ($seeds as $i=>$v) {
 	$seeds[$i] = intval($v);
 }
 require("./assessment/displayq2.php");
-$GLOBALS['assessver'] = 1;
+$GLOBALS['assessver'] = 2;
 
 if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	//load filter

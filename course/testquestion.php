@@ -6,7 +6,7 @@
 require("../validate.php");
 require("../assessment/displayq2.php");
 require("../assessment/testutil.php");
-$assessver = 1;
+$assessver = 2;
 
  //set some page specific variables and counters
 $overwriteBody = 0;
