@@ -784,6 +784,10 @@
 	}
 	$lnames = implode(", ",$lnames);
 
+	// If in quick-save mode, exit here
+	if (isset($_GET['quicksave'])) {
+		exit;
+	}
 
 	/// Start display ///
 	$pagetitle = "Question Editor";
@@ -1110,6 +1114,45 @@ function decboxsize(box) {
 	if (document.getElementById(box).rows > 2)
 		document.getElementById(box).rows -= 2;
 }
+
+var quickSaveQuestion = function(){
+	// Save codemirror and tinyMCE data
+	try {
+		if (qEditor) qEditor.save();
+		tinyMCE.triggerSave();
+		if (controlEditor) controlEditor.save();
+	} catch (err){
+		quickSaveQuestion.errorFunc();
+	}
+	// Get form data
+	var data = $("form").serializeArray();
+	$.ajax({
+		url: window.location.href + "&quicksave=1",
+		type: 'POST',
+		data: data,
+		success: function(res){
+			// On success, load preview page
+			var addr = '<?= "$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}" ?>';
+			var previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+		},
+		error: function(res){
+			// Need to handle errors
+			quickSaveQuestion.errorFunc();
+		}
+	});
+}
+// Method to handle errors...
+quickSaveQuestion.errorFunc = function(){
+
+}
+// Bind key event: Ctrl + Shift + s will trigger quick save
+$(document).on("keypress", function(e){
+	var key = e.which || e.keyCode;
+	if (key == 19 && e.ctrlKey == true && e.shiftKey == true){
+		quickSaveQuestion();
+	}
+});
+
 </script>
 <p>
 My library assignments: <span id="libnames"><?php echo $lnames;?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
@@ -1151,7 +1194,9 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
 <input type=button id="solveropenbutton" value="Solver">
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question"><BR>
+<input type=submit name=test value="Save and Test Question">
+<button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
 </div>
 
@@ -1160,7 +1205,9 @@ Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsi
 Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
 <input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question"><BR>
+<input type=submit name=test value="Save and Test Question">
+<button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+3));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
 </div>
 
@@ -1244,6 +1291,7 @@ if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
 <p>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question">
+<button type="button" onclick="quickSaveQuestion()">Quick Save and Preview</button>
 </p>
 </form>
 
