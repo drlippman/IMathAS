@@ -3452,10 +3452,18 @@ class Rand {
 			$min = (int)$min;
 			$max = (int)$max;
 			if ($min < $max) {
-				$this->seed ^= ($this->seed << 13);
-				$this->seed ^= ($this->seed >> 17);
-				$this->seed ^= ($this->seed << 5);
-				$this->seed &= 0x7fffffff;
+				if ($GLOBALS['assessver']>1) {
+					$this->seed = ($this->seed^($this->seed << 13)) & 0xffffffff;
+					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
+					$this->seed = ($this->seed^($this->seed >> 17)) & 0xffffffff;
+					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
+					$this->seed = ($this->seed^($this->seed << 5)) & 0x7fffffff;
+				} else { //broken; assessver=1 only
+					$this->seed ^= ($this->seed << 13);
+					$this->seed ^= ($this->seed >> 17);
+					$this->seed ^= ($this->seed << 5);
+					$this->seed &= 0x7fffffff;
+				}
 				return ($this->seed % ($max + 1 - $min)) + $min;
 			} else if($min > $max){
 				return $this->rand($max,$min);
@@ -3474,10 +3482,18 @@ class Rand {
 	public function shuffle(&$arr) {
 		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
 			for ($i=count($arr)-1;$i>0;$i--) {
-				$this->seed ^= ($this->seed << 13);
-				$this->seed ^= ($this->seed >> 17);
-				$this->seed ^= ($this->seed << 5);
-				$this->seed &= 0x7fffffff;
+				if ($GLOBALS['assessver']>1) {
+					$this->seed = ($this->seed^($this->seed << 13)) & 0xffffffff;
+					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
+					$this->seed = ($this->seed^($this->seed >> 17)) & 0xffffffff;
+					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
+					$this->seed = ($this->seed^($this->seed << 5)) & 0x7fffffff;
+				} else { //broken; assessver=1 only
+					$this->seed ^= ($this->seed << 13);
+					$this->seed ^= ($this->seed >> 17);
+					$this->seed ^= ($this->seed << 5);
+					$this->seed &= 0x7fffffff;
+				}
 				$j = $this->seed % ($i+1); //$this->rand(0,$i);
 				if ($i!=$j) {
 					$tmp = $arr[$j];
