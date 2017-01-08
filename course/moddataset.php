@@ -1305,7 +1305,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 						var idStart = formAction.indexOf("&id=") + 4;
 						var idEnd = formAction.indexOf("&", idStart);
 						var id = formAction.substring(idStart, idEnd);
-						quickSaveQuestion.testAddr = '<?= "$imasroot/course/testquestion.php?cid=$cid&qsetid=" ?>' + id;
+						quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid="; ?>' + id;
 					}
 				} else {
 					quickSaveQuestion.errorFunc();
@@ -1355,7 +1355,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		});
 	}
 	quickSaveQuestion.url = "<?php echo $formAction;?>&quicksave=1";
-	quickSaveQuestion.testAddr = '<?= "$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}" ?>';
+	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}"; ?>';
 	// Method to handle errors...
 	quickSaveQuestion.errorFunc = function(){
 		$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");
