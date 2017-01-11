@@ -116,7 +116,14 @@
 			$sentto = implode('<br/>',$fullnames);
 			//DB $message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
 			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n";
-
+			if (isset($_POST['tutorcopy'])) {
+				$message .= '<p>A copy was sent to all tutors.</p>';
+				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_tutors,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ");
+				$stm->execute(array(':courseid'=>$cid));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$tolist[] = $row[0];
+				}
+			}
 			foreach ($tolist as $msgto) {
 				//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 				//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,0,'$cid')";
@@ -186,6 +193,9 @@
 
 
 			$message .= "<p>Instructor note: Email sent to these students from course $coursename: <br/> $sentto </p>\n";
+			if (isset($_POST['tutorcopy'])) {
+				$message .= '<p>A copy was sent to all tutors.</p>';
+			}
 			if ($_POST['self']=="allt") {
 				//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 				//DB $query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
@@ -201,6 +211,15 @@
 					$teacheraddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";
 				}
 				$message .= "<p>A copy was also emailed to all instructors for this course</p>\n";
+			}
+			if (isset($_POST['tutorcopy'])) {
+				$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
+				$query .= "FROM imas_teachers,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':courseid'=>$cid));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$teacheraddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";
+				}
 			}
 			//$headers  = 'MIME-Version: 1.0' . "\r\n";
 			//$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
@@ -219,6 +238,10 @@
 		}
 		exit;
 	} else {
+		$stm = $DBH->prepare("SELECT count(id) FROM imas_tutors WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$_GET['cid']));
+		$hastutors = ($stm->fetchColumn(0)>0);
+		
 		$sendtype = (isset($_POST['posted']))?$_POST['posted']:$_POST['submit']; //E-mail or Message
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
@@ -259,7 +282,11 @@
 		echo "<span class=form><label for=\"self\">Send copy to:</label></span>";
 		echo "<span class=formright><input type=radio name=self id=self value=\"none\">Only Students<br/> ";
 		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Students and you<br/> ";
-		echo "<input type=radio name=self id=self value=\"allt\">Students and all instructors of this course</span><br class=form>\n";
+		echo "<input type=radio name=self id=self value=\"allt\">Students and all instructors of this course";
+		if ($hastutors) {
+			echo '<br/><input type="checkbox" name="tutorcopy" id="tutorcopy" value="tutorcopy">Also send a copy to tutors';
+		}
+		echo '</span><br class=form>';
 		if ($sendtype=='Message') {
 			echo '<span class="form"><label for="savesent">Save in sent messages?</label></span>';
 			echo '<span class="formright"><input type="checkbox" name="savesent" checked="checked" /></span><br class="form" />';
