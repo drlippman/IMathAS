@@ -759,7 +759,7 @@
 		}
 		//check for past time limit, with some leniency for javascript timing.
 		//want to reject if javascript was bypassed
-		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],5)) {
+		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],10)) {
 			echo _('Time limit has expired.  Submission rejected. ');
 			leavetestmsg();
 			exit;
@@ -1446,7 +1446,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		$now = time();
 		$totremaining = $testsettings['timelimit']-($now - $starttime);
 		if ($timebeforedue < $totremaining) {
-			$totremaining = $timebeforedue - 5;
+			$totremaining = $timebeforedue - 10;
 			$restrictedtimelimit = true;
 		}
 		$remaining = $totremaining;
