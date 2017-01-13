@@ -3582,7 +3582,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	}
 	function leavetestmsg() {
 		global $isdiag, $diagid, $sessiondata, $testsettings;
-		$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
+		$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
 		if ($isdiag) {
 			echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a></p>\n";
 		} else if ($isltilimited || $sessiondata['intreereader']) {
