@@ -1073,6 +1073,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
+
 	if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
 		if (isset($sessiondata['actas'])) {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
@@ -1090,7 +1091,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			}
 		}
 	} else if ($isltilimited) {
-		echo "<span style=\"float:right;\">";
+		echo '<div class="floatright">';
+		if ($userfullname != ' ') {
+			echo '<p><b>'.$userfullname.'</b></p>';
+		}
+		$out = '';
 		if ($testsettings['msgtoinstr']==1) {
 			//DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1098,11 +1103,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
 			$stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 			$msgcnt = $stm->fetchColumn(0);
-			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Messages'), " ";
+			$out .= "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Messages'). " ";
 			if ($msgcnt>0) {
-				echo '<span class="noticetext">('.$msgcnt.' new)</span>';
+				$out .= '<span class="noticetext">('.$msgcnt.' new)</span>';
 			}
-			echo '</a> ';
+			$out .= '</a> ';
 		}
 		$latepasscnt = 0;
 		if ($testsettings['allowlate']%10>1 && isset($exceptionduedate) && $exceptionduedate>0) {
@@ -1115,7 +1120,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$latepasscnt = round(($exceptionduedate - $testsettings['enddate'])/(3600*$latepasshrs));
 		}
 		if (($testsettings['allowlate']%10==1 || $testsettings['allowlate']%10-1>$latepasscnt) && $sessiondata['latepasses']>0 && !$isreview) {
-			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
+			$out .= "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Redeem LatePass'). "</a> ";
 		}
 		if ($isreview && !(isset($exceptionduedate) && $exceptionduedate>0) && $testsettings['allowlate']>10 && $sessiondata['latepasses']>0 && !isset($sessiondata['stuview']) && !$actas) {
 			//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='".$testsettings['courseid']."'";
@@ -1134,10 +1139,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$viewedassess[] = $r[0];
 			}
 			if ((time() - $testsettings['enddate'])<$latepasshrs*3600 && !in_array($testsettings['id'],$viewedassess)) {
-				echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
+				$out .= "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Redeem LatePass'). "</a> ";
 			}
 		}
-
+		if ($out != '') {
+			echo '<p>'.$out.'</p>';
+		}
 
 		if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
 			if ($testsettings['showans']!='N') {
@@ -1148,7 +1155,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo '>', _('View your scored assessment'), '</a></p>';
 			}
 		}
-		echo '</span>';
+		echo '</div>';
 	}
 
 	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
@@ -1378,7 +1385,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 		echo $row[1].' '.$row[0];
 		echo '<p>';
 	}
-
+	echo '<div class="clear"></div>';
+	
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
 		echo "<div class=right><span style=\"color:#f00\">" . _("Practice Assessment") . ".</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
 	}
