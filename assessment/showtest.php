@@ -1760,8 +1760,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 						echo  _(", or select another question");
 					}
 					echo '</p>';
-				} else if ($lefttodo > 0) {
-					echo "<p>"._('Select another question').'</p>';
+				} else {
+					if ($reattemptsremain && $immediatereattempt && $reattemptduring) {
+						echo "<p>"._('Reattempt last question below, or select another question').'</p>';
+					} else {
+						echo "<p>"._('Select another question').'</p>';
+					}
 				}
 
 				if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
