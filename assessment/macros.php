@@ -2711,6 +2711,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	$cntnanb = 0;
 	$correct = true;
 	$ratios = array();
+	$evalerr = false;
 	for ($i = 0; $i < 20; $i++) {
 		for($j=0; $j < count($variables); $j++) {
 			$tp[$j] = $tps[$i][$j];
@@ -2718,6 +2719,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		$ansa = @eval("return ($a);");
 		$ansb = @eval("return ($b);");
 		if ($ansa===false || $ansb===false) {
+			$evalerr = true;
 			break;
 		}
 		//echo "real: $ansa, my: $ansb <br/>";
@@ -2748,13 +2750,16 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 			echo "<p>Funcs: $a and $b</p>";
 		}
 		return false;
-	} else if ($i<20) {
+	} else if ($evalerr) {
 		if (isset($GLOBALS['teacherid'])) {
 			echo "<p>Debug info: one function was invalid.</p>";
 			echo "<p>Funcs: $a and $b</p>";
 		}
 		return false;
+	} else if ($i<20) { //broke out early
+		return false;
 	}
+	
 	if (abs($cntnana - $cntnanb)>1) {
 		return false;
 	}
