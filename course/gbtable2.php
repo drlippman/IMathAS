@@ -2045,19 +2045,25 @@ function gbtable() {
 				if (count($catavgs[$j][$i])>0) {
 					sort($catavgs[$j][$i], SORT_NUMERIC);
 					$fivenum = array();
+					$fivenumsum = '';
 					for ($k=0; $k<5; $k++) {
 						$fivenum[] = gbpercentile($catavgs[$j][$i],$k*25);
 					}
-					if ($i==3) {
-						$fivenumsum = implode('%,&nbsp;',$fivenum).'%';
-					} else {
-						$fivenumsum = implode(',&nbsp;',$fivenum);
+					if ($useweights==0) {
+						if ($i==3) {
+							$fivenumsum = implode('%,&nbsp;',$fivenum).'%';
+						} else {
+							$fivenumsum = implode(',&nbsp;',$fivenum);
+						}
+						if ($i<3 && $gb[0][2][$j][3+$i]>0) {
+							$fivenumsum .= '<br/>';
+						}
 					}
 					if ($i<3 && $gb[0][2][$j][3+$i]>0) {
 						for ($k=0; $k<5; $k++) {
 							$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][2][$j][3+$i],1);
 						}
-						$fivenumsum .= '<br/>'.implode('%,&nbsp;',$fivenum).'%';
+						$fivenumsum .= implode('%,&nbsp;',$fivenum).'%';
 					}
 				} else {
 					$fivenumsum = '';
@@ -2075,6 +2081,24 @@ function gbtable() {
 					$totavgs[$j][] = $gb[$i][3][$j];
 				}
 			}
+		}
+		for ($i=0; $i<4; $i++) {
+			if ($useweights==1 || $i==3) {
+				$c2 = ($i==3)?6:$i; //column that has percent total
+			} else {
+				$c2 = 3+$i;
+			}
+			$fivenumsum = '';
+			if (count($totavgs[$c2])>0) {
+				sort($totavgs[$c2], SORT_NUMERIC);
+				$fivenum = array();
+			
+				for ($k=0; $k<5; $k++) {
+					$fivenum[] = gbpercentile($totavgs[$c2],$k*25);
+				}
+				$fivenumsum .= implode('%,&nbsp;',$fivenum).'%';
+			} 
+			$gb[0][3][3+$i] = $fivenumsum;
 		}
 
 		foreach ($catavgs as $j=>$avg) {
