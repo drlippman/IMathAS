@@ -1503,7 +1503,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		echo "</script>\n";
 		}
 	} else if ($isreview) {
-		echo "<div class=right style=\"color:#f00;clear:right;\">" . _("In Review Mode - no scores will be saved") . "<br/><a href=\"showtest.php?regenall=all\">", _('Create new versions of all questions.'), "</a></div>\n";
+		echo "<div class=\"right noticetext\" style=\"clear:right;\">" . _("In Review Mode - no scores will be saved") . "<br/><a href=\"showtest.php?regenall=all\">", _('Create new versions of all questions.'), "</a></div>\n";
 	} else if ($superdone) {
 		echo "<div class=right>", _('Time limit expired'), "</div>";
 	} else {
@@ -2487,7 +2487,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			echo '});</script>';
 		}
 		if ($testsettings['displaymethod'] != "Embed") {
-			$testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
+			if ($isreview) {
+				$testsettings['intro'] .= '<p class="noticetext"><b>' . _("In Review Mode - no scores will be saved") . "</b></p>";
+			} else {
+				$testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
+			}
 		}
 		if ($testsettings['isgroup']>0) {
 			$testsettings['intro'] .= "<p><span class=noticetext >" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
