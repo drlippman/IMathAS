@@ -224,6 +224,9 @@ if ($overwriteBody==1) {
 	} else {
 		$colors = array();
 	}
+	if ($_GET['cid']=="admin") { //trigger debug messages
+		$teacherid = "admin";
+	}
 	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
 	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
