@@ -108,12 +108,14 @@ if (isset($_GET['markallread'])) {
 
 
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; New Forum Topics</div>\n";
 echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
 echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?from=$from&cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
 
 if (count($lastpost)>0) {
+  echo '<table class="gb" id="newthreads"><thead><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
   $threadids = implode(',', array_map('intval', array_keys($lastpost)));
   //DB $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   //DB $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
@@ -124,22 +126,20 @@ if (count($lastpost)>0) {
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
   $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_posts.forumid, imas_forum_threads.lastposttime DESC";
   $stm = $DBH->query($query);
+  $alt = 0;
   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-    if ($forumname[$line['threadid']]!=$lastforum) {
-      if ($lastforum!='') { echo '</tbody></table>';}
-      echo "<h4>Forum: <a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></h4><table class="gb"><thead><th>Topic</th><th>Started By</th><th>Last Post Date</th></thead><tbody>';
-      $lastforum = $forumname[$line['threadid']];
-    }
     if ($line['isanon']==1) {
       $name = "Anonymous";
     } else {
       $name = "{$line['LastName']}, {$line['FirstName']}";
     }
-    echo "<tr><td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">{$line['subject']}</a></b></td><td>$name</td>";
+    if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+    echo "<td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">{$line['subject']}</a></td><td>$name</td>";
+    echo "<td><a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></td>';
     echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
   }
-  if ($lastforum!='') { echo '</tbody></table>';}
-  echo '</ul>';
+  echo '</tbody></table>';
+  echo '<script type="text/javascript">	initSortTable("newthreads",Array("S","S","S","D"),true);</script>';
 } else {
   echo "No new posts";
 }
