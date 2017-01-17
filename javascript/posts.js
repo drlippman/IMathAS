@@ -86,11 +86,11 @@ function savelike(el) {
 	});
 }
 function toggletagged(id) {
-	var cursrc = $("#flag").attr("src");
+	var cursrc = $("#tag"+id).attr("src");
 	var settag = cursrc.match(/filled/)?0:1;
 	$.ajax({url: "savetagged.php?cid="+cid+"&threadid="+id+"&tagged="+settag})
 	   .done(function(msg) { if (msg=="OK") {
-	   	if (settag==0) { $("#flag").attr("src",cursrc.replace(/filled/,"empty"));}
-	   	else {$("#flag").attr("src",cursrc.replace(/empty/,"filled"));}
+	   	if (settag==0) { $("#tag"+id).attr("src",cursrc.replace(/filled/,"empty"));}
+	   	else {$("#tag"+id).attr("src",cursrc.replace(/empty/,"filled"));}
 	   }});
 }

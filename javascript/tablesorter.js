@@ -63,7 +63,7 @@
 	}
 	function sortDate(a,b) {
 		var months = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
-		if (ar = a.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)(am|pm)/)) {
+		if (ar = a.match(/(\d+)\/(\d+)\/(\d+),?\s+(\d+):(\d+)\s*(am|pm)/)) {
 			a = ar[3]*10000 + ar[1]*100 + 1*ar[2] + .01*(ar[4]/1-(ar[4]/1==12?12:0)+(ar[6]=='pm'?12:0))+.0001*ar[5]/1;
 		} else if (ar = a.match(/(\d+)\/(\d+)\/(\d+)/)) {
 			a = ar[3]*10000 + ar[1]*100 + 1*ar[2];
@@ -72,7 +72,7 @@
 		} else {
 			return -1;
 		}
-		if (ar = b.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)(am|pm)/)) {
+		if (ar = b.match(/(\d+)\/(\d+)\/(\d+),?\s+(\d+):(\d+)\s*(am|pm)/)) {
 			b = ar[3]*10000 + ar[1]*100 + 1*ar[2] + .01*(ar[4]/1-(ar[4]/1==12?12:0)+(ar[6]=='pm'?12:0))+.0001*ar[5]/1;
 		} else if (ar = b.match(/(\d+)\/(\d+)\/(\d+)/)) {
 			b = ar[3]*10000 + ar[1]*100 + 1*ar[2];

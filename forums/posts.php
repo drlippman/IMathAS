@@ -24,19 +24,23 @@ $page = $_GET['page'];
 //-2 tagged posts from forum page
 //-3 new posts from newthreads page
 //-4 forum search
+//-5 tagged posts page
 
+if ($page==-4) {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid";
+} else if ($page==-3) {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid";
+} else if ($page==-5) {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/flaggedthreads.php?cid=$cid";
+} else {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page";
+} 
 if (isset($_GET['markunread'])) {
 	//DB $query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	if ($page==-4) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
-	} else if ($page==-3) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
-	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
-	}
+	header('Location: ' . $redirecturl);
 	exit;
 }
 if (isset($_GET['marktagged'])) {
@@ -44,26 +48,14 @@ if (isset($_GET['marktagged'])) {
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=1 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	if ($page==-4) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
-	} else if ($page==-3) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
-	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
-	}
+	header('Location: ' . $redirecturl);
 	exit;
 } else if (isset($_GET['markuntagged'])) {
 	//DB $query = "UPDATE imas_forum_views SET tagged=0 WHERE userid='$userid' AND threadid='$threadid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=0 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	if ($page==-4) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
-	} else if ($page==-3) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
-	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
-	}
+	header('Location: ' . $redirecturl);
 	exit;
 }
 //DB $query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate FROM imas_forums WHERE id='$forumid'";
@@ -363,6 +355,8 @@ if ($page==-4) {
 	echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";
 } else if ($page==-3) {
 	echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
+} else if ($page==-5) {
+	echo "<a href=\"flaggedthreads.php?cid=$cid\">Flagged Threads</a> ";
 } else {
 	echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";
 }
@@ -421,9 +415,9 @@ if (!$oktoshow) {
 	}
 	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a>";
 	if ($tagged) {
-		echo "| <img class=\"pointer\" id=\"flag\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
+		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
 	} else {
-		echo "| <img class=\"pointer\" id=\"flag\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
+		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
 	}
 	/*if ($tagged) {
 		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markuntagged=true\">Unflag</a>";

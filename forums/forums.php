@@ -166,6 +166,11 @@
 		}
 		$tagfilterselect .= '</select>';
 	}
+	echo '<div class="cpmid">';
+	echo '<a href="newthreads.php?cid='.$cid.'">'._('New Forum Posts').'</a> | ';
+	echo '<a href="flaggedthreads.php?cid='.$cid.'">'._('Flagged Forum Posts').'</a>';
+	echo '</div>';
+	
 	if ($searchtype=='none') {
 		echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
 	} else {
