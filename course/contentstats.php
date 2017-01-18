@@ -19,6 +19,7 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 } else {
 	$data = array();
 	$descrips = array();
+	$qarr = array(':courseid'=>$cid, ':typeid'=>$typeid);
 	if ($stype=='I') {
 		//DB $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type='inlinetext' AND typeid='$typeid'";
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type='inlinetext' AND typeid=:typeid");
@@ -41,12 +42,13 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 		$stm2 = $DBH->prepare("SELECT name FROM imas_wikis WHERE id=:id");
 	} else if ($stype=='F') {
 		//DB $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('forumpost','forumreply') AND info='$typeid'";
-		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type IN ('forumpost','forumreply') AND info=:typeid");
+		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND ((type='forumpost' AND info=:typeid) OR (type='forumreply' AND info LIKE :likeid))");
+		$qarr[':likeid'] = "$typeid;%";
 		//DB $q2 = "SELECT name FROM imas_forums WHERE id='$typeid'";
 		$stm2 = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
 	}
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$stm->execute(array(':courseid'=>$cid, ':typeid'=>$typeid));
+	$stm->execute($qarr);
 	//DB while ($row = mysql_fetch_assoc($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$type = $row['type'];
@@ -54,7 +56,12 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 			$type = 'linkedlink';
 		}
 		if ($stype=='F' ||in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext'))) {
-			$ident = $type.'::'.$row['info'];
+			if ($type=='forumreply') {
+				$parts = explode(';',$row['info']);
+				$ident = $type.'::'.$parts[0];
+			} else {
+				$ident = $type.'::'.$row['info'];
+			}
 		} else {
 			$ident = $type;
 		}
@@ -69,9 +76,9 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 			} else if (in_array($type,array('linkedlink','linkedviacal','wiki','assess'))) {
 				$desc = 'Link to item';
 			} else if ($type=='forumpost') {
-				$desc = 'Forum post';
+				$desc = 'Forum posts';
 			} else if ($type=='forumreply') {
-				$desc = 'Forum reply';
+				$desc = 'Forum replies';
 			}
 			$descrips[$ident] = $desc;
 		}
@@ -125,17 +132,30 @@ if ($overwritebody) {
 		if ($stype=='I') {
 			echo '<p>'._('No clicks on links in this item yet').'</p>';
 		} else if ($stype=='F') {
-			echo '<p>'._('No posts or replies in this forum yet').'</p>';
+			echo '<p>'._('No student posts or replies in this forum yet').'</p>';
 		} else {
 			echo '<p>No views on this item yet</p>';
 		}
+	}
+	if ($stype=='F') {
+		echo '<p>'._('This page only shows who has made posts and replies. For forum viewing data, look in the forum thread list and click the number in the Views column').'</p>';
 	}
 
 	foreach ($idents as $ident) {
 		echo '<h4>'.$descrips[$ident].'</h4>';
 		echo '<table class="gb"><thead>';
-		echo '<tr><th colspan="2">Viewed</th><th>Not Viewed</th></tr>';
-		echo '<tr><th>Name</th><th style="padding-right:1em">Views</th>';
+		if ($stype=='F') {
+			if ($descrips[$ident] == 'Forum posts') {
+				echo '<tr><th colspan="2">Posted</th><th>Not Posted</th></tr>';
+				echo '<tr><th>Name</th><th style="padding-right:1em">Posts</th>';
+			} else if ($descrips[$ident] == 'Forum replies') {
+				echo '<tr><th colspan="2">Replied</th><th>Not Replied</th></tr>';
+				echo '<tr><th>Name</th><th style="padding-right:1em">Replies</th>';
+			}
+		} else {
+			echo '<tr><th colspan="2">Viewed</th><th>Not Viewed</th></tr>';
+			echo '<tr><th>Name</th><th style="padding-right:1em">Views</th>';
+		}
 		echo '<th>Name</th></tr></thead><tbody>';
 
 		$didview = array();
