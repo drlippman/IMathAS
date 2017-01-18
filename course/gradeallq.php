@@ -324,13 +324,7 @@
 		$("span[id^=\'ans\']").removeClass("hidden");
 		$(".sabtn").replaceWith("<span>Answer: </span>");
 	}
-	var formaltered=false;
-	$(function() {
-		$("input:text,textarea").on('keyup', function() { if (!formaltered) {enableQuicksave();} formaltered=true;});	
-	});
-	function enableQuicksave() {
-		$("#quicksavebtn").prop("disabled",false);
-	}
+
 	function quicksave() {
 		var url = $("#mainform").attr("action")+"&quick=true";
 		$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
@@ -340,9 +334,7 @@
 			data: $("#mainform").serialize()
 		}).done(function(msg) {
 			if (msg=="saved") {
-				$("#quicksavebtn").prop("disabled",true);
-				formaltered=false;
-				$("#quicksavenotice").html(_("Saved"))
+				$("#quicksavenotice").html(_("Saved"));
 				setTimeout(function() {$("#quicksavenotice").html("&nbsp;");}, 2000);
 			} else {
 				$("#quicksavenotice").html(msg);
@@ -378,7 +370,7 @@
 	}
 	if ($page==-1) {
 		echo '<div class="fixedbottomright">';
-		echo '<button type="button" id="quicksavebtn" onclick="quicksave()" disabled>'._('Quick Save').'</button><br/>';
+		echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
 		echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
 		echo '</div>';
 	}
