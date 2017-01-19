@@ -2914,9 +2914,9 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		}
 		if ($match>-1) {
 			if ($partial[$i+1]<1) {
-				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$i/2].'</div>';
+				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
 			} else {
-				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$i/2].'</div>';
+				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
 			}
 		} else {
 			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
@@ -2938,9 +2938,10 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 		$match = -1;
 		if (!is_array($partial)) { $partial = explode(',',$partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
+			$idx = $i/2;
 			if (is_array($requiretimes)) {
-				if ($requiretimes[$i]!='') {
-					if (checkreqtimes(str_replace(',','',$stu),$requiretimes[$i])==0) {
+				if ($requiretimes[$idx]!='') {
+					if (checkreqtimes(str_replace(',','',$stu),$requiretimes[$idx])==0) {
 						$rightanswrongformat = $i;
 						continue;
 					}
@@ -2952,8 +2953,8 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 				}
 			}
 			if (is_array($answerformat)) {
-				if ($answerformat[$i]!='') {
-					if (checkanswerformat($stu,$answerformat[$i])==0) {
+				if ($answerformat[$idx]!='') {
+					if (checkanswerformat($stu,$answerformat[$idx])==0) {
 						$rightanswrongformat = $i;
 						continue;
 					}
@@ -2975,9 +2976,9 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 		}
 		if ($match>-1) {
 			if ($partial[$i+1]<1) {
-				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$i/2].'</div>';
+				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
 			} else {
-				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$i/2].'</div>';
+				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
 			}
 		} else {
 			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
@@ -3122,8 +3123,8 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			}
 			if ($correct) {
 				if (is_array($requiretimes)) {
-					if ($requiretimes[$k]!='') {
-						if (checkreqtimes(str_replace(',','',$stuorig),$requiretimes[$k])==0) {
+					if ($requiretimes[$k/2]!='') {
+						if (checkreqtimes(str_replace(',','',$stuorig),$requiretimes[$k/2])==0) {
 							$rightanswrongformat = $k;
 							continue;
 						}
