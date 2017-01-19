@@ -146,7 +146,7 @@ div { zoom: 1; }
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=120616";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=011817";?>" type="text/javascript"></script>
 
 <?php
 /*

@@ -6862,6 +6862,7 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
 	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
 	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅'), array('(',')','oo','U','<=','>=','*'), $str);
+	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;
 }
