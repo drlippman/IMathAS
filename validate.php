@@ -113,8 +113,8 @@
 		// $now = time();
 		//DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
 		//DB //mysql_query($query) or die("Query failed : " . mysql_error());
-		//$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:now,:log)");
-		//$stm->execute(array(':now'=>$now, ':log'=>"$userid from IP: {$_SERVER['REMOTE_ADDR']}"));
+		$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:now,:log)");
+		$stm->execute(array(':now'=>$now, ':log'=>"$userid login from IP:{$_SERVER['REMOTE_ADDR']}"));
 
 
 		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
