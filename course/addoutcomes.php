@@ -131,7 +131,7 @@ if (isset($_POST['order'])) {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$DBH->query("UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)");
 	}
-	echo 'OK';
+	echo '1,h:';
 }
 
 
@@ -197,7 +197,7 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; var j=jQuery.noConflict();</script>";
 $placeinhead .= "<script src=\"$imasroot/javascript/mootools.js\"></script>";
-$placeinhead .= "<script src=\"$imasroot/javascript/nested1.js?v=0122102\"></script>";
+$placeinhead .= "<script src=\"$imasroot/javascript/nested1.js?v=011917\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var ocnt = 0;
@@ -259,7 +259,7 @@ $placeinhead .= '<script type="text/javascript">
 			}
 		}
 	}
-
+	var itemorderhash="h";
 	</script>';
 require("../header.php");
 
