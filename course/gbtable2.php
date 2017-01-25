@@ -141,7 +141,16 @@ row[1][4][3] = has gradebook comment
 cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidden, 7: calctype
 
 ****/
-
+function flattenitems($items,&$addto) {
+	foreach ($items as $item) {
+		if (is_array($item)) {
+			flattenitems($item['items'],$addto);
+		} else {
+			$addto[] = $item;
+		}
+	}
+}
+		
 function gbtable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
 	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs,$includeendmsg;
@@ -229,15 +238,7 @@ function gbtable() {
 		$stm->execute(array(':id'=>$cid));
 		$courseitemorder = unserialize($stm->fetchColumn(0));
 		$courseitemsimporder = array();
-		function flattenitems($items,&$addto) {
-			foreach ($items as $item) {
-				if (is_array($item)) {
-					flattenitems($item['items'],$addto);
-				} else {
-					$addto[] = $item;
-				}
-			}
-		}
+		
 		flattenitems($courseitemorder,$courseitemsimporder);
 		$courseitemsimporder = array_flip($courseitemsimporder);
 		$courseitemsassoc = array();
