@@ -1727,9 +1727,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
 					$tp[$j] = $RND->rand($fromto[0],$fromto[1]);
 				} else if (isset($fromto[2*$j+1])) {
-					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
+					if ($fromto[2*$j+1]==$fromto[2*$j]) {
+						$tp[$j] = $fromto[2*$j];
+					} else {
+						$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
+					}
 				} else {
-					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
+					if ($fromto[1]==$fromto[0]) {
+						$tp[$j] = $fromto[0];
+					} else {
+						$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
+					}
 				}
 			}
 			$pts[$i] = implode("~",$tp);
