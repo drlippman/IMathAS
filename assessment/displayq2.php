@@ -355,6 +355,14 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		foreach($entryTips as $iidx=>$entryTip) {
 			$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
+				if (strpos($shanspt[$iidx],'[AB')!==false) {
+					foreach($shanspt as $subiidx=>$sarep) {
+						if (strpos($shanspt[$iidx],'[AB'.$subiidx.']')!==false) {
+							$shanspt[$iidx] = str_replace('[AB'.$subiidx.']', $sarep, $shanspt[$iidx]);
+							$shanspt[$subiidx]='';
+						}
+					}
+				}
 				if ($nosabutton) {
 					$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$shanspt[$iidx]}</span>\n");
 				} else {
