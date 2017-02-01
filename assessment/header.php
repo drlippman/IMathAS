@@ -144,14 +144,13 @@ div { zoom: 1; }
 <![endif]-->
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
+<![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=011817";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=013117";?>" type="text/javascript"></script>
 
 <?php
 /*
-
-
 <script src="<?php echo $imasroot . "/javascript/general.js?v=082616";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/mathjs.js?v=082616";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=082616";?>" type="text/javascript"></script>

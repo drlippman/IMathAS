@@ -1336,80 +1336,96 @@ function toggleinlinebtn(n,p){
 		s.innerHTML = k.match(/\+/)?k.replace(/\+/,'-'):k.replace(/\-/,'+');
 	}
 }
-
 function assessbackgsubmit(qn,noticetgt) {
-	if (noticetgt != null && document.getElementById(noticetgt).innerHTML == _("Submitting...")) {return false;}
-	if (window.XMLHttpRequest) {
-		req = new XMLHttpRequest();
-	} else if (window.ActiveXObject) {
-		req = new ActiveXObject("Microsoft.XMLHTTP");
+	if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
+	doonsubmit();
+	var params = {};
+	var useFormData = !! window.FormData;
+	if (useFormData) {
+		var tosubFormData = new FormData();
 	}
-	if (typeof req != 'undefined') {
-		if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
-		doonsubmit();
-		params = "embedpostback=true";
-		if (qn != null) {
-			var els = new Array();
-			var tags = document.getElementsByTagName("input");
-			for (var i=0;i<tags.length;i++) {
-				els.push(tags[i]);
-			}
-			var tags = document.getElementsByTagName("select");
-			for (var i=0;i<tags.length;i++) {
-				els.push(tags[i]);
-			}
-			var tags = document.getElementsByTagName("textarea");
-			for (var i=0;i<tags.length;i++) {
-				els.push(tags[i]);
-			}
-			var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
-			for (var i=0;i<els.length;i++) {
-				if (els[i].name.match(regex)) {
-					if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {
-						params += ('&'+els[i].name+'='+encodeURIComponent(els[i].value));
-					}
-				}
-			}
-			params += '&toscore='+qn;
-			params += '&verattempts='+document.getElementById("verattempts"+qn).value;
-		} else {
-			var els = document.getElementsByTagName("input");
-			for (var i=0;i<els.length;i++) {
-				if (els[i].name.match(/^(qn|tc)/)) {
-					if (els[i].type!='radio' || els[i].type!='checkbox' || els[i].checked) {
-						params += ('&'+els[i].name+'='+encodeURIComponent(els[i].value));
-					}
-				}
-			}
-			params += '&verattempts='+document.getElementById("verattempts").value;
-		}
-		params += '&asidverify='+document.getElementById("asidverify").value;
-		params += '&disptime='+document.getElementById("disptime").value;
-		params += '&isreview='+document.getElementById("isreview").value;
-
-		if (noticetgt != null) {
-			document.getElementById(noticetgt).innerHTML = _("Submitting...");
-		}
-		req.open("POST", assesspostbackurl, true);
-		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		req.onreadystatechange = function() {assessbackgsubmitCallback(qn,noticetgt);};
-		req.send(params);
+	
+	var els = new Array();
+	var tags = document.getElementsByTagName("input");
+	for (var i=0;i<tags.length;i++) {
+		els.push(tags[i]);
+	}
+	var tags = document.getElementsByTagName("select");
+	for (var i=0;i<tags.length;i++) {
+		els.push(tags[i]);
+	}
+	var tags = document.getElementsByTagName("textarea");
+	for (var i=0;i<tags.length;i++) {
+		els.push(tags[i]);
+	}
+	if (qn != null) {
+		var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
 	} else {
-		if (noticetgt != null) {
-			document.getElementById(noticetgt).innerHTML = _("Error Submitting.");
+		var regex = new RegExp("^(qn|tc|qs)");
+	}
+	for (var i=0;i<els.length;i++) {
+		if (els[i].name.match(regex)) {
+			if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {
+				if (useFormData) {
+					if (els[i].type=='file') {
+						tosubFormData.append(els[i].name, els[i].files[0]);
+					} else {
+						tosubFormData.append(els[i].name, els[i].value);
+					}
+				} else {
+					if (els[i].type=='file') {
+						alert("File upload submissions are not supported by this browser");
+					} else {
+						params[els[i].name] = els[i].value;
+					}
+				}
+			}
 		}
 	}
-}
-
-function assessbackgsubmitCallback(qn,noticetgt) {
-  if (req.readyState == 4) { // only if req is "loaded"
-    if (req.status == 200) { // only if "OK"
-	    if (noticetgt != null) {
-		    document.getElementById(noticetgt).innerHTML = "";
-	    }
-	    if (qn != null) {
+	if (qn !== null) {
+		if (useFormData) { 
+			tosubFormData.append('toscore', qn);
+			tosubFormData.append('verattempts', document.getElementById("verattempts"+qn).value);
+		} else {
+			params['toscore'] = qn;
+			params['verattempts'] = document.getElementById("verattempts"+qn).value;
+		}
+	} else {
+		if (useFormData) { 
+			tosubFormData.append('verattempts', document.getElementById("verattempts").value);
+		} else {
+			params['verattempts'] = document.getElementById("verattempts").value;
+		}
+	}
+	if (useFormData) {
+		tosubFormData.append('asidverify', document.getElementById("asidverify").value);
+		tosubFormData.append('disptime', document.getElementById("disptime").value);
+		tosubFormData.append('isreview', document.getElementById("isreview").value);
+	} else {
+		params['asidverify'] = document.getElementById("asidverify").value;
+		params['disptime'] = document.getElementById("disptime").value;
+		params['isreview'] = document.getElementById("isreview").value;
+	}
+	var options = {
+		type: "POST",
+		url: assesspostbackurl,
+		data: useFormData?tosubFormData:params,
+		dataType: "text",
+		qn: qn,
+		noticetgt: noticetgt
+	};
+	if (useFormData) {
+		options.contentType = false;
+		options.processData = false;
+	}
+	$.ajax(options).done(function(msg) {
+		if (this.noticetgt != null) {
+		    document.getElementById(this.noticetgt).innerHTML = "";
+		}
+		if (this.qn !== null) {
+		    var qn = this.qn;
 		    var scripts = new Array();         // Array which will store the script's code
-		    var resptxt = req.responseText;
+		    var resptxt = msg;
 		    // Strip out tags
 		    while(resptxt.indexOf("<script") > -1 || resptxt.indexOf("</script") > -1) {
 			    var s = resptxt.indexOf("<script");
@@ -1482,16 +1498,16 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 		    if (pagescroll > elpos) {
 		    	    setTimeout(function () {window.scroll(0,elpos);}, 150);
 		    }
-	    }
-	    //var todo = eval('('+req.responseText+')');
-
-    } else {
-	    if (noticetgt != null) {
-		    document.getElementById(noticetgt).innerHTML = _("Submission Error")+":\n"+ req.status + "\n" +req.statusText;
-	    }
-    }
-  }
+		}
+	}).fail(function(msg) {
+		if (this.noticetgt != null) {
+		    document.getElementById(this.noticetgt).innerHTML = _("Submission Error");
+		}
+	});
+		
+	
 }
+
 
 /*******************************************************
 

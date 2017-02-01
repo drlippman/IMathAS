@@ -712,11 +712,13 @@ class S3 {
 			
 			} 
 		}
+		/*  
+		Seems to have errors
 		if ($type === false && function_exists('mime_content_type')) {  
 			// If anyone is still using mime_content_type()
 			$type = trim(mime_content_type($file));
 		}
-		
+		*/
 		if ($type !== false && strlen($type) > 0) return $type;
 		
 		// Otherwise do it the old fashioned way
