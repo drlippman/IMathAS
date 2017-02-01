@@ -2874,7 +2874,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$k++;
 						$saarr[$k] = "[$function[1]+$function[3]*t,$function[2]-$function[4]*t],green,,,,,,dash";
 					} else if (substr($function[0],0,2)=='x=') {
-						$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+						if (count($function)==3) {
+							if ($function[1] == '-oo') { $function[1] = $settings[2]-.1*($settings[3]-$settings[2]);}
+							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}	
+							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.$function[1].','.$function[2];
+						} else {
+							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+						}
 					} else { //is function
 						$saarr[$k] = $function[0].',blue';
 						if (count($function)>2) {
@@ -4941,8 +4947,26 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							//use vertex and x value at y of vertex + 20 pixels
 							$anshparabs[$key] = array('x', $xv, $yv, $xatyt);
 						}
-					} else {
-						$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
+					} else { //vertical line
+						$xp = $xtopix(substr($function[0],2));
+						if (count($function)==3) { //line segment or ray
+							if ($function[1]=='-oo') { //ray down
+								$y1p = $ytopix(floatval($function[2])-1);
+								$y2p = $ytopix(floatval($function[2]));
+								$ansvecs[$key] = array('r', $xp, $y2p, $xp, $y1p);
+							} else if ($function[2]=='oo') { //ray up
+								$y1p = $ytopix(floatval($function[1]));
+								$y2p = $ytopix(floatval($function[1])+1);
+								$ansvecs[$key] = array('r', $xp, $y1p, $xp, $y2p);
+							} else { //line seg
+								$y1p = $ytopix(floatval($function[1]));
+								$y2p = $ytopix(floatval($function[2]));
+								$ansvecs[$key] = array('ls', $xp, $y1p, $xp, $y2p);
+							}
+						} else {
+							//$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
+							$anslines[$key] = array('x',10000, $xp);
+						}
 					}
 				} else if (count($function)==3) { //line segment or ray
 					$func = makepretty($function[0]);
