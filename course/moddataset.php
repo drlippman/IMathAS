@@ -19,7 +19,7 @@
 	}
 
 	// Determine if this is an AJAX quicksave call
-	$quicksave = isset($_GET['quicksave']) ? true : false;
+	$quicksave = isset($_GET['quick']) ? true : false;
 
 	function stripsmartquotes($text) {
 		$text = str_replace(
@@ -1288,7 +1288,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		var data = new FormData($("form")[0]);
 
 		$.ajax({
-			url: quickSaveQuestion.url + "&quicksave=1",
+			url: quickSaveQuestion.url + "&quick=1",
 			type: 'POST',
 			data: data,
 			contentType: false,
@@ -1354,7 +1354,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 			}
 		});
 	}
-	quickSaveQuestion.url = "<?php echo $formAction;?>&quicksave=1";
+	quickSaveQuestion.url = "<?php echo $formAction;?>&quick=1";
 	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}"; ?>';
 	// Method to handle errors...
 	quickSaveQuestion.errorFunc = function(){
