@@ -1,6 +1,11 @@
 <?php if (!isset($imasroot)) {exit;} ?>
 <!DOCTYPE html>
-<html>
+<?php if (isset($CFG['locale'])) {
+	echo '<html lang="'.$CFG['locale'].'">';
+} else {
+	echo '<html lang="en">';	
+}
+?>
 <head>
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" />
