@@ -5454,29 +5454,22 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else if ($ansvec[0]=='ls') { //line segment
 					for ($i=0; $i<count($vecs); $i++) {
 						if ($vecs[$i][4]!='ls') {continue;}
-						if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance && abs($ansvec[1]-$vecs[$i][2])>$defpttol*$reltolerance) {
-							continue; //ans x1 doesn't match either vec x
-						}
-						if (abs($ansvec[1]-$vecs[$i][0])<=$defpttol*$reltolerance) { //x1 of ans matched first vec x
-							if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
-								continue;
-							}
+						if (abs($ansvec[1]-$vecs[$i][0])<=$defpttol*$reltolerance && abs($ansvec[2]-$vecs[$i][1])<=$defpttol*$reltolerance) { //x1 of ans matched first vec x
 							if (abs($ansvec[3]-$vecs[$i][2])>$defpttol*$reltolerance) {
 								continue;
 							}
 							if (abs($ansvec[4]-$vecs[$i][3])>$defpttol*$reltolerance) {
 								continue;
 							}
-						} else {
-							if (abs($ansvec[2]-$vecs[$i][3])>$defpttol*$reltolerance) {
-								continue;
-							}
+						} else if (abs($ansvec[1]-$vecs[$i][2])<=$defpttol*$reltolerance && abs($ansvec[2]-$vecs[$i][3])<=$defpttol*$reltolerance) { //x1 of ans matched second vec x
 							if (abs($ansvec[3]-$vecs[$i][0])>$defpttol*$reltolerance) {
 								continue;
 							}
 							if (abs($ansvec[4]-$vecs[$i][1])>$defpttol*$reltolerance) {
 								continue;
 							}
+						} else {
+							continue;
 						}
 						$scores[$key] = 1;
 						break;
