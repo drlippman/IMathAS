@@ -196,7 +196,15 @@ if (isset($_REQUEST['showfiles'])) {
 		<?php echo $strings["upload_file"]; ?>
 		<input type="hidden" name="action" value="upload_file">
 		<input type="hidden" name="MAX_FILE_SIZE" value="10485760" /> <!-- ~10mb -->
-		<input type="file" name="uploaded_file" id="uploaded_file">
+		<?php
+		if ($type=="img") {
+			echo '<input type="file" name="uploaded_file" id="uploaded_file" accept=".gif,.png,.jpg,.jpeg"><br/>';
+			echo $strings["imagetypes"].'<br/>';
+			
+		} else {
+			echo '<input type="file" name="uploaded_file" id="uploaded_file">';
+		}
+		?>
 		<input type="hidden" name="uploaded_file_name" id="uploaded_file_name" />
 		<input type="submit" value="<?php echo $strings["upload_file_submit"]; ?>"><br/>
 		<input type="checkbox" name="overwrite"/> <?php echo $strings["upload_overwrite"]; ?>
