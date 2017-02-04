@@ -108,7 +108,14 @@ function ineqbetweenplot($funcs) {
 			$xfunc = create_function('$x','return ('.$func.');');
 			for ($i = 0; $i<$stopat;$i++) {
 				$x = $xmin + $dx*$i;
-				$y = round($xfunc($x),3);
+				$y = $xfunc($x);
+				if (is_nan($y)) {
+					if (!isset($skipi[$i])) {
+						$skipi[$i] = $i;
+					}
+					continue;
+				}
+				$y = round($y,3);
 				if ($filltype=='above') {
 					$mins[$i][$k] = $y;
 				} else {
