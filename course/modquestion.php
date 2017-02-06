@@ -126,7 +126,7 @@ if (!(isset($teacherid))) {
 			//DB $query = "SELECT points,attempts,penalty,regen,showans,rubric,showhints FROM imas_questions WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints FROM imas_questions WHERE id=:id");
+			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($line['penalty']{0}==='L') {
@@ -142,6 +142,7 @@ if (!(isset($teacherid))) {
 			if ($line['points']==9999) {$line['points']='';}
 			if ($line['attempts']==9999) {$line['attempts']='';}
 			if ($line['penalty']==9999) {$line['penalty']='';}
+			$qsetid = $line['questionsetid'];
 		} else {
 			//set defaults
 			$line['points']="";
@@ -152,8 +153,16 @@ if (!(isset($teacherid))) {
 			$line['showans']='0';
 			$line['rubric']=0;
 			$line['showhints']=0;
+			$qsetid = $_GET['qsetid'];
 		}
-
+		
+		$stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
+		$stm->execute(array(':id'=>$qsetid));
+		$qdescrip = $stm->fetchColumn(0);
+		if (isset($_GET['loc'])) {
+			$qdescrip = $_GET['loc'].': '.$qdescrip;
+		}
+		
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		//DB $query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
@@ -188,6 +197,12 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
+$placeinhead = '<script type="text/javascript">
+function previewq(qn) {
+  previewpop = window.open(imasroot+"/course/testquestion.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
+  previewpop.focus();
+}
+</script>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -199,6 +214,11 @@ if ($overwriteBody==1) {
 
 
 <div id="headermodquestion" class="pagetitle"><h2>Modify Question Settings</h2></div>
+<p><?php 
+	echo '<b>'.$qdescrip.'</b> ';
+	echo '<button type="button" onclick="previewq('.$qsetid.')">'._('Preview').'</button>';
+?>
+</p>
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=$aid"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
 Leave items blank to use the assessment's default values<br/>
 

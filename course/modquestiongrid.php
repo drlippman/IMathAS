@@ -154,6 +154,12 @@
 
 	} else {
 		$pagetitle = "Question Settings";
+		$placeinhead = '<script type="text/javascript">
+			function previewq(qn) {
+			  previewpop = window.open(imasroot+"/course/testquestion.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
+			  previewpop.focus();
+			}
+			</script>';
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
@@ -177,9 +183,16 @@ Leave items blank to use the assessment's default values<br/>
 		if (isset($_POST['checked'])) { //modifying existing questions
 
 			$qids = array();
+			$qns = array();
 			foreach ($_POST['checked'] as $k=>$v) {
 				$v = explode(':',$v);
 				$qids[] = $v[1];
+				$qnpts = explode('-',$v[0]);
+				if (count($qnpts)==1) {
+					$qns[$v[1]] = $qnpts[0]+1;
+				} else {
+					$qns[$v[1]] = ($qnpts[0]+1).'-'.($qnpts[1]+1);     
+				}
 			}
 			$qrows = array();
 			//DB $query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
@@ -188,7 +201,7 @@ Leave items blank to use the assessment's default values<br/>
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
 			$qidlist = implode(',', array_map('intval', $qids));
-			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
+			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref,imas_questionset.id ";
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
 			$query .= "imas_questions.id IN ($qidlist)";
 			$stm = $DBH->query($query);
@@ -200,7 +213,7 @@ Leave items blank to use the assessment's default values<br/>
 					$row[3] = '';
 				}
 
-				$qrows[$row[0]] = '<tr><td>'.$row[1].'</td>';
+				$qrows[$row[0]] = '<tr><td>'.$qns[$row[0]].'</td><td>'.$row[1].'</td>';
 				$qrows[$row[0]] .= '<td>';
 				if ($row[5]!='') {
 					$extref = explode('~~',$row[5]);
@@ -221,6 +234,7 @@ Leave items blank to use the assessment's default values<br/>
 					}
 				}
 				$qrows[$row[0]] .= '</td>';
+				$qrows[$row[0]] .= '<td><button type="button" onclick="previewq('.$row[6].')">'._('Preview').'</button></td>';
 				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
 				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
 				$qrows[$row[0]] .= "<td><select name=\"showhints{$row[0]}\">";
@@ -230,7 +244,7 @@ Leave items blank to use the assessment's default values<br/>
 				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
 				$qrows[$row[0]] .= '</tr>';
 			}
-			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
+			echo "<th>Q#</th><th>Description</th><th></th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
 			//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
@@ -262,7 +276,7 @@ Leave items blank to use the assessment's default values<br/>
 			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 
 		} else { //adding new questions
-			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
+			echo "<th>Description</th><th></th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
 			//DB $query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
@@ -298,6 +312,7 @@ Leave items blank to use the assessment's default values<br/>
 				} else {
 					echo '<td></td>';
 				}
+				echo '<td><button type="button" onclick="previewq('.$row[0].')">'._('Preview').'</button></td>';
 				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"\" />";
 				echo '<input type="hidden" name="qparts'.$row[0].'" value="'.$n.'"/></td>';
 				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"\" /></td>";
