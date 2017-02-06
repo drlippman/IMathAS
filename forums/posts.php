@@ -24,19 +24,23 @@ $page = $_GET['page'];
 //-2 tagged posts from forum page
 //-3 new posts from newthreads page
 //-4 forum search
+//-5 tagged posts page
 
+if ($page==-4) {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid";
+} else if ($page==-3) {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid";
+} else if ($page==-5) {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/flaggedthreads.php?cid=$cid";
+} else {
+	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page";
+} 
 if (isset($_GET['markunread'])) {
 	//DB $query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	if ($page==-4) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
-	} else if ($page==-3) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
-	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
-	}
+	header('Location: ' . $redirecturl);
 	exit;
 }
 if (isset($_GET['marktagged'])) {
@@ -44,26 +48,14 @@ if (isset($_GET['marktagged'])) {
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=1 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	if ($page==-4) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
-	} else if ($page==-3) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
-	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
-	}
+	header('Location: ' . $redirecturl);
 	exit;
 } else if (isset($_GET['markuntagged'])) {
 	//DB $query = "UPDATE imas_forum_views SET tagged=0 WHERE userid='$userid' AND threadid='$threadid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=0 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	if ($page==-4) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
-	} else if ($page==-3) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
-	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
-	}
+	header('Location: ' . $redirecturl);
 	exit;
 }
 //DB $query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate FROM imas_forums WHERE id='$forumid'";
@@ -164,6 +156,7 @@ include("posthandler.php");
 
 $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=022410" type="text/css" />';
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/posts.js?v=011517"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 require("../header.php");
 
@@ -362,6 +355,8 @@ if ($page==-4) {
 	echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";
 } else if ($page==-3) {
 	echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
+} else if ($page==-5) {
+	echo "<a href=\"flaggedthreads.php?cid=$cid\">Flagged Threads</a> ";
 } else {
 	echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";
 }
@@ -420,10 +415,15 @@ if (!$oktoshow) {
 	}
 	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a>";
 	if ($tagged) {
+		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
+	} else {
+		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
+	}
+	/*if ($tagged) {
 		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markuntagged=true\">Unflag</a>";
 	} else {
 		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&marktagged=true\">Flag</a>";
-	}
+	}*/
 	//echo "<br/><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
 	//echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
 
@@ -438,98 +438,6 @@ if (!$oktoshow) {
 } else {
 echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=2\">View Condensed</a>";
 }*/
-
-?>
-<script type="text/javascript">
-var haschanges = false;
-$(function() {
-	$(".scorebox").on('keypress', function() {haschanges = true;});
-});
-function checkchgstatus(type,id) {
-	//type: 0 reply, 1 modify
-	if (haschanges) {
-		if (type==0) {
-			action = 'reply';
-		} else if (type==1) {
-			action = 'modify';
-		}
-		if (confirm("You have unsaved changes. Click OK to save changes before continuing, or Cancel to discard changes")) {
-			$("form").append('<input type="hidden" name="actionrequest" value="'+action+':'+id+'"/>').submit();
-			return false;
-		} else {
-			return true;
-		}
-	}
-}
-function toggleshow(butn) {
-	var forumgrp = $(butn).closest(".block").nextAll(".forumgrp").first();
-	if (forumgrp.hasClass("hidden")) {
-		forumgrp.removeClass("hidden");
-		butn.src = imasroot+'/img/collapse.gif';
-	} else {
-		forumgrp.addClass("hidden");
-		butn.src = imasroot+'/img/expand.gif';
-	}
-}
-function toggleitem(butn) {
-	var blockitems = $(butn).closest(".block").nextAll(".blockitems").first();
-	if (blockitems.hasClass("hidden")) {
-		blockitems.removeClass("hidden");
-		butn.value = _('Hide');
-	} else {
-		blockitems.addClass("hidden");
-		butn.value = _('Show');
-	}
-}
-function expandall() {
-	$(".expcol").each(function(i) {
-		var forumgrp = $(this).closest(".block").nextAll(".forumgrp").first().removeClass("hidden");
-		this.src = imasroot+'/img/collapse.gif';
-	});
-}
-function collapseall() {
-	$(".expcol").each(function(i) {
-		var forumgrp = $(this).closest(".block").nextAll(".forumgrp").first().addClass("hidden");
-		this.src = imasroot+'/img/expand.gif';
-	});
-}
-function showall() {
-	$(".shbtn").each(function(i) {
-		var blockitems = $(this).closest(".block").nextAll(".blockitems").first().removeClass("hidden");
-		this.value = _('Hide');
-	});
-}
-function hideall() {
-	$(".shbtn").each(function(i) {
-		var blockitems = $(this).closest(".block").nextAll(".blockitems").first().addClass("hidden");
-		this.value = _('Show');
-	});
-}
-
-function savelike(el) {
-	var like = (el.src.match(/gray/))?1:0;
-	var postid = el.id.substring(8);
-	$(el).parent().append('<img style="vertical-align: middle" src="../img/updating.gif" id="updating" alt="Updating"/>');
-	$.ajax({
-		url: "recordlikes.php",
-		data: {cid:<?php echo $cid;?>, postid: postid, like: like},
-		dataType: "json"
-	}).done(function(msg) {
-		if (msg.aff==1) {
-			el.title = msg.msg;
-			$('#likecnt'+postid).text(msg.cnt>0?msg.cnt:'');
-			el.className = "likeicon"+msg.classn;
-			if (like==0) {
-				el.src = el.src.replace("liked","likedgray");
-			} else {
-				el.src = el.src.replace("likedgray","liked");
-			}
-		}
-		$('#updating').remove();
-	});
-}
-</script>
-<?php
 
 function printchildren($base,$restricttoowner=false) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');

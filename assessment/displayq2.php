@@ -355,6 +355,14 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		foreach($entryTips as $iidx=>$entryTip) {
 			$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
+				if (strpos($shanspt[$iidx],'[AB')!==false) {
+					foreach($shanspt as $subiidx=>$sarep) {
+						if (strpos($shanspt[$iidx],'[AB'.$subiidx.']')!==false) {
+							$shanspt[$iidx] = str_replace('[AB'.$subiidx.']', $sarep, $shanspt[$iidx]);
+							$shanspt[$subiidx]='';
+						}
+					}
+				}
 				if ($nosabutton) {
 					$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$shanspt[$iidx]}</span>\n");
 				} else {
@@ -945,13 +953,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$rightb = '';
 		}
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
-			$tip = _('Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5') . "<br/>";
+			$tip = _('Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5172') . "<br/>";
 			$shorttip = _('Enter a list of whole or decimal numbers');
 		} else if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
-			$tip = _('Enter your answer as a set of whole or decimal numbers separated with commas: Example: {-4, 3, 2.5}') . "<br/>";
+			$tip = _('Enter your answer as a set of whole or decimal numbers separated with commas: Example: {-4, 3, 2.5172}') . "<br/>";
 			$shorttip = _('Enter a set of whole or decimal numbers');
 		} else {
-			$tip = _('Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5') . "<br/>";
+			$tip = _('Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5172') . "<br/>";
 			$shorttip = _('Enter a whole or decimal number');
 		}
 		$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
@@ -1727,9 +1735,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
 					$tp[$j] = $RND->rand($fromto[0],$fromto[1]);
 				} else if (isset($fromto[2*$j+1])) {
-					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
+					if ($fromto[2*$j+1]==$fromto[2*$j]) {
+						$tp[$j] = $fromto[2*$j];
+					} else {
+						$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
+					}
 				} else {
-					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
+					if ($fromto[1]==$fromto[0]) {
+						$tp[$j] = $fromto[0];
+					} else {
+						$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
+					}
 				}
 			}
 			$pts[$i] = implode("~",$tp);
@@ -1784,25 +1800,25 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
 		if ($displayformat == 'point') {
-			$tip = _('Enter your answer as a point.  Example: (2,5.5)') . "<br/>";
+			$tip = _('Enter your answer as a point.  Example: (2,5.5172)') . "<br/>";
 			$shorttip = _('Enter a point');
 		} else if ($displayformat == 'pointlist') {
-			$tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)') . "<br/>";
+			$tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5172,5)') . "<br/>";
 			$shorttip = _('Enter a list of points');
 		} else if ($displayformat == 'vector') {
 			$tip = _('Enter your answer as a vector.  Example: <2,5.5>') . "<br/>";
 			$shorttip = _('Enter a vector');
 		} else if ($displayformat == 'vectorlist') {
-			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5>') . "<br/>";
+			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5172,5>') . "<br/>";
 			$shorttip = _('Enter a list of vectors');
 		} else if ($displayformat == 'set') {
 			$tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
 			$shorttip = _('Enter a set');
 		} else if ($displayformat == 'list') {
-			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)') . "<br/>";
+			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5172,4)') . "<br/>";
 			$shorttip = _('Enter a list of n-tuples');
 		} else {
-			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5)') . "<br/>";
+			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
 			$shorttip = _('Enter an n-tuple');
 		}
 		$tip .= _('Enter DNE for Does Not Exist');
@@ -1844,25 +1860,25 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
 		if ($displayformat == 'point') {
-			$tip = _('Enter your answer as a point.  Example: (2,5.5)') . "<br/>";
+			$tip = _('Enter your answer as a point.  Example: (2,5.5172)') . "<br/>";
 			$shorttip = _('Enter a point');
 		} else if ($displayformat == 'pointlist') {
-			$tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5,5)') . "<br/>";
+			$tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5172,5)') . "<br/>";
 			$shorttip = _('Enter a list of points');
 		} else if ($displayformat == 'vector') {
-			$tip = _('Enter your answer as a vector.  Example: <2,5.5>') . "<br/>";
+			$tip = _('Enter your answer as a vector.  Example: <2,5.5172>') . "<br/>";
 			$shorttip = _('Enter a vector');
 		} else if ($displayformat == 'vectorlist') {
-			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5,5>') . "<br/>";
+			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5172,5>') . "<br/>";
 			$shorttip = _('Enter a list of vectors');
 		} else if ($displayformat == 'set') {
 			$tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
 			$shorttip = _('Enter a set');
 		} else if ($displayformat == 'list') {
-			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5,4)') . "<br/>";
+			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5172,4)') . "<br/>";
 			$shorttip = _('Enter a list of n-tuples');
 		} else {
-			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5)') . "<br/>";
+			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
 			$shorttip = _('Enter an n-tuple');
 		}
 		$tip .= formathint('each value',$ansformats,'calcntuple');
@@ -1915,10 +1931,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 
 		if (in_array('list',$ansformats)) {
-			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i') . "<br/>";
+			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5172i,-3-4i') . "<br/>";
 			$shorttip = _('Enter a list of complex numbers');
 		} else {
-			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5i') . "<br/>";
+			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i') . "<br/>";
 			$shorttip = _('Enter a complex number');
 		}
 
@@ -2249,7 +2265,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$shorttip = _('Adjust the sliders');
 		} else {
 
-			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6)') . " <br/>";
+			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6172)') . " <br/>";
 			$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
 			$tip .= _('Enter DNE for an empty set, oo for Infinity');
 			if (isset($reqdecimals)) {
@@ -2353,7 +2369,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip .= _('Enter <i>all real numbers</i> for solutions of that type') . "<br/>";
 			$shorttip = _('Enter an interval using inequalities');
 		} else {
-			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6)') . " <br/>";
+			$tip = _('Enter your answer using interval notation.  Example: [2,5)') . " <br/>";
 			if (in_array('list',$ansformats)) {
 				$tip .= _('Separate intervals by a comma.  Example: (-oo,2],[4,oo)') . "<br/>";
 				$shorttip = _('Enter a list of intervals using interval notation');
@@ -2858,7 +2874,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$k++;
 						$saarr[$k] = "[$function[1]+$function[3]*t,$function[2]-$function[4]*t],green,,,,,,dash";
 					} else if (substr($function[0],0,2)=='x=') {
-						$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+						if (count($function)==3) {
+							if ($function[1] == '-oo') { $function[1] = $settings[2]-.1*($settings[3]-$settings[2]);}
+							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}	
+							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.$function[1].','.$function[2];
+						} else {
+							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+						}
 					} else { //is function
 						$saarr[$k] = $function[0].',blue';
 						if (count($function)>2) {
@@ -4925,8 +4947,26 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							//use vertex and x value at y of vertex + 20 pixels
 							$anshparabs[$key] = array('x', $xv, $yv, $xatyt);
 						}
-					} else {
-						$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
+					} else { //vertical line
+						$xp = $xtopix(substr($function[0],2));
+						if (count($function)==3) { //line segment or ray
+							if ($function[1]=='-oo') { //ray down
+								$y1p = $ytopix(floatval($function[2])-1);
+								$y2p = $ytopix(floatval($function[2]));
+								$ansvecs[$key] = array('r', $xp, $y2p, $xp, $y1p);
+							} else if ($function[2]=='oo') { //ray up
+								$y1p = $ytopix(floatval($function[1]));
+								$y2p = $ytopix(floatval($function[1])+1);
+								$ansvecs[$key] = array('r', $xp, $y1p, $xp, $y2p);
+							} else { //line seg
+								$y1p = $ytopix(floatval($function[1]));
+								$y2p = $ytopix(floatval($function[2]));
+								$ansvecs[$key] = array('ls', $xp, $y1p, $xp, $y2p);
+							}
+						} else {
+							//$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
+							$anslines[$key] = array('x',10000, $xp);
+						}
 					}
 				} else if (count($function)==3) { //line segment or ray
 					$func = makepretty($function[0]);
@@ -6708,7 +6748,7 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= sprintf(_('Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of numbers using scientific notation'), $listtype):_('Enter a number using scientific notation');
 	} else {
-		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
+		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of mathematical expressions'), $listtype):_('Enter a mathematical expression');
 	}
 	if ($calledfrom != 'calcmatrix') {
@@ -6862,6 +6902,7 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
 	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
 	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅'), array('(',')','oo','U','<=','>=','*'), $str);
+	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;
 }

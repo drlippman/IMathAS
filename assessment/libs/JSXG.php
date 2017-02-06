@@ -100,7 +100,7 @@ function JSXG_createAxes($label, $ops=array()){
    //$out .= "JXG.Options.text.useMathJax = true;";
    // Create the board
    $defaultAxis = $ops['tickDistance'] ? "false" : "true";
-   $out .= "var board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
+   $out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
              boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
              axis: false,
              showCopyright: false,
@@ -614,7 +614,7 @@ function JSXG_createPolarAxes($label, $ops=array()){
    // Create the board
    $defaultAxis = $ops['tickDistance'] ? "false" : "true";
    $out .= "
-   var board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
+   window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
      boundingbox: [-{$rMaxBoard}, {$yMax}, {$rMaxBoard}, -{$rMaxBoard}],
      axis: false,
      showCopyright: false,
@@ -903,7 +903,7 @@ function JSXG_createBlankBoard($label, $ops){
   $centered = $ops['centered']!==null ? false : true;
 
   // Create the board
-  $out .= "var board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
+  $out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
            boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
            axis: false,
            showCopyright: false,
