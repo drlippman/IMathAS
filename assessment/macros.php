@@ -2232,15 +2232,19 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 	}
 }
 
-function forminlinebutton($label,$content,$style='button',$outstyle='block') {
-	if (isset($GLOBALS['inlinebuttoncnt'])) {
-		$r = $GLOBALS['inlinebuttoncnt'];
-		$GLOBALS['inlinebuttoncnt']++;
-		//$out = '';
+function forminlinebutton($label,$content,$style='button',$outstyle='block',$id=null) {
+	if ($id == null){
+		if (isset($GLOBALS['inlinebuttoncnt'])) {
+			$r = $GLOBALS['inlinebuttoncnt'];
+			$GLOBALS['inlinebuttoncnt']++;
+			//$out = '';
+		} else {
+			$r = 1;
+			$GLOBALS['inlinebuttoncnt'] = 2;
+			//$out = '<script type="text/javascript">function toggleinlinebtn(n){var el=document.getElementById(n);el.style.display=="none"?el.style.display="":el.style.display="none";}</script>';
+		}
 	} else {
-		$r = 1;
-		$GLOBALS['inlinebuttoncnt'] = 2;
-		//$out = '<script type="text/javascript">function toggleinlinebtn(n){var el=document.getElementById(n);el.style.display=="none"?el.style.display="":el.style.display="none";}</script>';
+		$r = $id;
 	}
 	$label = str_replace('"','',$label);
 	if ($style=='classic') {
@@ -2759,7 +2763,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	} else if ($i<20) { //broke out early
 		return false;
 	}
-	
+
 	if (abs($cntnana - $cntnanb)>1) {
 		return false;
 	}
