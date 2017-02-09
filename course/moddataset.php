@@ -804,6 +804,9 @@
 		$qsPacket = array();
 		$qsPacket['formAction'] = $formAction; // Form action
 		$qsPacket['images'] = $images; //  Images array
+		$qsPacket['outputmsg'] = $outputmsg; // output message
+		$qsPacket['errmsg'] = $errmsg;
+		$qsPacket['id'] = isset($_GET['id']) ? $_GET['id'] : 0;
 		// Build img base url
 		if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true){
 			$qsPacket['imgUrlBase'] = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/";
@@ -999,8 +1002,8 @@
 		}
 
 	}
-	echo $errmsg;
-	echo $outputmsg;
+	echo "<div id='errmsgContainer'>$errmsg</div>";
+	echo "<div id='outputmsgContainer'>$outputmsg</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
 	echo "<h2>$addmod QuestionSet Question</h2>\n";
@@ -1301,12 +1304,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				// Change form action url and testing address
 				if (formAction.indexOf("moddataset.php") > -1) {
 					quickSaveQuestion.url = formAction;
-					if (formAction.indexOf("&id=") > -1) {
-						var idStart = formAction.indexOf("&id=") + 4;
-						var idEnd = formAction.indexOf("&", idStart);
-						var id = formAction.substring(idStart, idEnd);
-						quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid="; ?>' + id;
-					}
+					quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid="; ?>' + res.id
 				} else {
 					quickSaveQuestion.errorFunc();
 				}
