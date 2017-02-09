@@ -6,7 +6,7 @@
 require("../validate.php");
 require("../assessment/displayq2.php");
 require("../assessment/testutil.php");
-$assessver = 1;
+$assessver = 2;
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -223,6 +223,9 @@ if ($overwriteBody==1) {
 		}
 	} else {
 		$colors = array();
+	}
+	if ($_GET['cid']=="admin") { //trigger debug messages
+		$teacherid = "admin";
 	}
 	displayq(0,$_GET['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
 	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";

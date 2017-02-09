@@ -14,7 +14,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
  }
 
 require("./assessment/displayq2.php");
-$GLOBALS['assessver'] = 1;
+$GLOBALS['assessver'] = 2;
 
 $sessiondata = array();
 if (isset($_GET['graphdisp'])) {

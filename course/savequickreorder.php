@@ -13,9 +13,24 @@
  }
  $cid = $_GET['cid'];
  $order = $_POST['order'];
+ 
+ //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+ //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+ //DB $items = unserialize(mysql_result($result,0,0));
+ $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+ $stm->execute(array(':id'=>$cid));
+ $itemorder = $stm->fetchColumn(0);
+ $items = unserialize($itemorder);
+ if (md5($itemorder)!=$_POST['checkhash']) {
+ 	 echo '0:'._('Error: Items have changed in the course, perhaps in another window, since this page was loaded. Refresh the page to load changes and try again.');
+ 	 exit;
+ } else if (countitems($items) != countitems(additems($order))) {
+ 	 echo '0:'._('Error: Some item data was not sent correctly. Please try again.');
+ 	 exit;
+ }
 
   foreach ($_POST as $id=>$val) {
-	 if ($id=="order") { continue;}
+	 if ($id=="order" || trim($val)=='') { continue;}
 	 $type = $id{0};
 	 $typeid = substr($id,1);
 	 if ($type=="I") {
@@ -43,15 +58,9 @@
 		 $stm = $DBH->prepare("UPDATE imas_drillassess SET name=:name WHERE id=:id");
 		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="B") {
-		 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		 //DB $itemsforblock = unserialize(mysql_result($result,0,0));
-		 $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		 $stm->execute(array(':id'=>$cid));
-		 $itemsforblock = unserialize($stm->fetchColumn(0));
 		$blocktree = explode('-',$typeid);
 		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
-		$sub =& $itemsforblock;
+		$sub =& $items;
 		if (count($blocktree)>1) {
 			for ($i=1;$i<count($blocktree);$i++) {
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
@@ -59,21 +68,8 @@
 		}
 		//DB $sub[$existingid]['name'] = stripslashes($val);
 		$sub[$existingid]['name'] = $val;
-		//DB $itemorder = addslashes(serialize($itemsforblock));
-		$itemorder = serialize($itemsforblock);
-		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 	 }
-	 //DB mysql_query($query) or die("Query failed : " . mysql_error());
  }
-
- //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
- //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
- //DB $items = unserialize(mysql_result($result,0,0));
- $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
- $stm->execute(array(':id'=>$cid));
- $items = unserialize($stm->fetchColumn(0));
 
  $newitems = array();
 
@@ -86,7 +82,18 @@
  $stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 
 
-
+ function countitems($arr) {
+ 	$n = 0;
+ 	foreach ($arr as $v) {
+ 		if (is_array($v)) {
+ 			$n++;
+ 			$n += countitems($v['items']);
+ 		} else {
+ 			$n++;
+ 		}
+ 	}
+ 	return $n;
+ }
  function additems($list) {
 	 global $items;
 	 $outarr = array();
@@ -135,7 +142,8 @@
 	 }
 	 return $outarr;
  }
- echo "OK";
+ echo '1,'.md5($itemlist).':';
+ 
  require("courseshowitems.php");
  $openblocks = Array(0);
  $prevloadedblocks = array(0);
@@ -145,4 +153,5 @@
  $oblist = implode(',',$openblocks);
 
  quickview($newitems,0);
+ 
 ?>

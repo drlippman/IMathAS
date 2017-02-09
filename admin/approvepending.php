@@ -79,10 +79,12 @@ if ($stm->rowCount()==0) {
 	//DB $res = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB if (mysql_num_rows($res)>0) {
 		//DB $log = explode('::', mysql_result($res,0,0));
-	$stm = $DBH->prepare("SELECT log FROM imas_log WHERE log LIKE :log");
+	$stm = $DBH->prepare("SELECT time,log FROM imas_log WHERE log LIKE :log");
 	$stm->execute(array(':log'=>"New Instructor Request: {$row[0]}::%"));
 	if ($stm->rowCount()>0) {
-		$log = explode('::', $stm->fetchColumn(0));
+		$reqdata = $stm->fetch(PDO::FETCH_NUM);
+		$reqdate = tzdate("D n/j/y, g:i a", $reqdata[0]); 
+		$log = explode('::', $reqdata[1]);
 		$details = $log[1];
 	} else {
 		$details = '';
@@ -93,6 +95,7 @@ if ($stm->rowCount()==0) {
 	echo '<input type="hidden" name="id" value="'.$row[0].'"/>';
 	echo '<input type="hidden" name="email" value="'.$row[4].'"/>';
 	echo '<p>Username: '.$row[1].'<br/>Name: '.$row[2].', '.$row[3].' ('.$row[4].')</p>';
+	echo '<p>Request made: '.$reqdate.'</p>';
 	if ($details != '') {
 		echo "<p>$details</p>";
 		if (preg_match('/School:(.*?)<br/',$details,$matches)) {

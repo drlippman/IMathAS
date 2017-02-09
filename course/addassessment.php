@@ -1128,6 +1128,7 @@ if ($overwriteBody==1) {
 			<span class=form>All items same random seed: </span>
 			<span class=formright>
 				<input type="checkbox" name="sameseed" <?php writeHtmlChecked($line['shuffle']&2,2); ?>>
+				<i>Don't use "Homework" mode or "Reattempts different versions" if you use this setting</i>
 			</span><BR class=form>
 			<span class=form>All students same version of questions: </span>
 			<span class=formright>

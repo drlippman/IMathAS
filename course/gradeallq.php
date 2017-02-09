@@ -139,7 +139,9 @@
 				}
 			}
 		}
-		if ($page == -1) {
+		if (isset($_GET['quick'])) {
+			echo "saved";
+		} else if ($page == -1) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");
 		} else {
 			$page++;
@@ -213,6 +215,7 @@
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
 	$placeinhead .= '</script>';
+	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px;}</style>';
 	require("../includes/rubric.php");
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
@@ -321,6 +324,25 @@
 		$("span[id^=\'ans\']").removeClass("hidden");
 		$(".sabtn").replaceWith("<span>Answer: </span>");
 	}
+
+	function quicksave() {
+		var url = $("#mainform").attr("action")+"&quick=true";
+		$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
+		$.ajax({
+			url: url,
+			type: "POST",
+			data: $("#mainform").serialize()
+		}).done(function(msg) {
+			if (msg=="saved") {
+				$("#quicksavenotice").html(_("Saved"));
+				setTimeout(function() {$("#quicksavenotice").html("&nbsp;");}, 2000);
+			} else {
+				$("#quicksavenotice").html(msg);
+			}
+		}).fail(function(jqXHR, textStatus) {
+			$("#quicksavenotice").html(textStatus);
+		});	
+	}
 	</script>
 <?php
 	//DB $query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
@@ -345,6 +367,12 @@
 	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
 	if ($deffbtext != '') {
 		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
+	}
+	if ($page==-1) {
+		echo '<div class="fixedbottomright">';
+		echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
+		echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
+		echo '</div>';
 	}
 	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=$page&update=true\">\n";
 	if ($isgroup>0) {

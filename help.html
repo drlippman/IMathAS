@@ -2158,7 +2158,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = a number or calculation resulting in a number, like $answer = 5 (In Common Control)</dt>
+<dt>$answer = a number or calculation resulting in a number, like $answer = 5 </dt>
 	<dd>Defines the answer.  Define multiple acceptable answers in a string separated by or:  $answer = "3 or 5 or 7".  
 	Alternatively, you can provide an interval notation range of 
 	acceptable answers, like $answer = "(2,5]".  Providing a range will override any tolerances set.  If $answerformat is set
@@ -2167,16 +2167,16 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
-<dt>$reqdecimals = a number (In Common Control)</dt>
+<dt>$reqdecimals = a number </dt>
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$reqsigfigs = a number (In Common Control)</dt>
+<dt>$reqsigfigs = a number </dt>
 	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also 
@@ -2186,22 +2186,22 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.
 	<br/>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
 	$ansprompt = "One value, x=;No values;Many values"</dd>
-<dt>$partialcredit = array(number,score,[number,score,...]) (In Common Control)</dt>
+<dt>$partialcredit = array(number,score,[number,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
 	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
 	currently only works for single number answers; "or" and list answers are not supported.</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
-<dt>$displayformat = "alignright" (In Common Control)</dt>
+<dt>$displayformat = "alignright" </dt>
 	<dd>Aligns the text in the answer box to the right side</dd>
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  Use this to give a detailed answer,
 	or a rounded off answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2217,7 +2217,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = a number or calculation resulting in a number (In Common Control)</dt>
+<dt>$answer = a number or calculation resulting in a number </dt>
 	<dd>Defines the answer.  Define multiple acceptable answers in a string separated by or:  $answer = "3 or 5 or 7".
 	Alternatively, you can provide an interval notation range of 
 	acceptable answers, like $answer = "(2,5]".  Providing a range will override any tolerances set</dd>
@@ -2225,7 +2225,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "sloppymixednumber", "mixednumberorimproper", "scinot", "fracordec", "nodecimal", "notrig", "allowmixed", "noval", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "sloppymixednumber", "mixednumberorimproper", "scinot", "fracordec", "nodecimal", "notrig", "allowmixed", "noval", "list", "exactlist", or "orderedlist" </dt>
 	<dd>Specifies answer format options.  Some can be combined, like this: $answerformat="nodecimal,notrig".
 	<ul>
 	<li>fraction: requires the answer to be a single fraction (like 10/6, 1/3, or 5)</li>
@@ -2247,39 +2247,39 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	$ansprompt = "One value, x=;No values;Many values"</li>
 	</ul>
 	</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
-<dt>$reqdecimals = a number (In Common Control)</dt>
+<dt>$reqdecimals = a number </dt>
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" (In Common Control)</dt>
+<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" </dt>
 	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
 	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times. <br/> 
 	You can	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"</dd>
-<dt>$requiretimeslistpart = a list, in the same format as $requiretimes (In Common Control)</dt>
+<dt>$requiretimeslistpart = a list, in the same format as $requiretimes </dt>
 	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used, 
 	where $requiretimes would be applied to the entire list of answers.</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
-<dt>$hidepreview = true (In Common Control)</dt>
+<dt>$hidepreview = true </dt>
 	<dd>Hides the Preview button.  Could be useful in multipart questions, or if you're only asking for a simple
 	response, like a fraction</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  Use this to give a detailed answer,
 	or a rounded off answer.</dd>
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2294,31 +2294,31 @@ A student is asked to select the correct answer from those given.  The order
 of choices is automatically randomized.
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$questions (or $choices) = an array of choices (In Common Control)</dt>
+<dt>$questions (or $choices) = an array of choices </dt>
 	<dd>Defines the choices.  If you use $choices, don't define $questions</dd>
-<dt>$answer = the <i>index</i> into $questions that contains the correct answer (In Common Control)</dt>
+<dt>$answer = the <i>index</i> into $questions that contains the correct answer </dt>
 	<dd>Defines the answer.  Remember that arrays are zero-indexed, so if $questions = array("correct","wrong","wrong"),
 	then $answer=0.  Define multiple acceptable answer indices in a string separated by or:  $answer = "0 or 1". </dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$displayformat = "horiz", "select", "2column, "3column", or "inline" (In Common Control)</dt>
+<dt>$displayformat = "horiz", "select", "2column, "3column", or "inline" </dt>
 	<dd>Will lay out the choices horizontally, as a select box, in multiple columns, or inline with text rather than using the default vertical layout</dd>
-<dt>$noshuffle = "all" or "last" (In Common Control)</dt>
+<dt>$noshuffle = "all" or "last" </dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled).  If $noshuffle = "last", then the $questions
 	array will be randomized, except for the last element.  This is for options like "None of the above"</dd>
-<dt>$partialcredit = array(index,score,[index,score,...]) (In Common Control)</dt>
+<dt>$partialcredit = array(index,score,[index,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(index,score,index,score,...), where
 	index is the index in $questions, and score is a proportion between 0 and 1 to award as partial credit.  For example, if $answer = 0 
 	and $partialcredit = array(2,.3), then the student would get full credit for selecting the item corresponding with $questions[0], and 30% credit
 	for selecting the item corresponding with $questions[2].  All other answers would receive 0 credit.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2333,30 +2333,30 @@ A student is asked to select all the choices given that are correct.  The order
 of choices is automatically randomized.
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$questions (or $choices)= an array of questions (In Common Control)</dt>
+<dt>$questions (or $choices)= an array of questions </dt>
 	<dd>Defines the choices.  If you use $choices, don't define $questions</dd>
-<dt>$answers = a list of the <i>indexes</i> into $questions that contain the correct answer (In Common Control)</dt>
+<dt>$answers = a list of the <i>indexes</i> into $questions that contain the correct answer </dt>
 	<dd>Defines the answers.  Remember that arrays are zero-indexed, if $questions = array("correct","correct","wrong"),
 	then $answers="0,1"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$scoremethod = "answers" or "allornothing" (In Common Control)</dt>
+<dt>$scoremethod = "answers" or "allornothing" </dt>
 	<dd>By default, the total points possible are divided by the number of questions, and partial credit is lost for each
 	correct answer missed and each wrong answer selected.  If $scoremethod="answers" is set, then the total points
 	possible are divided by the number of answers (tougher grading scheme).  If $scoremethod="allornothing", then the
 	student will only get credit if every piece is correct (no partial credit).</dd>
-<dt>$displayformat = "horiz", "2column, "3column", or "inline" (In Common Control)</dt>
+<dt>$displayformat = "horiz", "2column, "3column", or "inline" </dt>
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
-<dt>$noshuffle = "all" (In Common Control)</dt>
+<dt>$noshuffle = "all" </dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answers.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2370,23 +2370,23 @@ or if the question type gives away critical info to the student.</dd>
 A student is asked to match answers with questions
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$questions = an array of questions (In Common Control)</dt>
+<dt>$questions = an array of questions </dt>
 	<dd>Defines the questions - these will be on the left with entry boxes</dd>
-<dt>$answers = an array of answers (In Common Control)</dt>
+<dt>$answers = an array of answers </dt>
 	<dd>Defines the answers - these will be on the right and lettered</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$matchlist = a list of the <i>indexes</i> into $answers that contain the match to each question. (In Common Control)</dt>
+<dt>$matchlist = a list of the <i>indexes</i> into $answers that contain the match to each question. </dt>
 	<dd>Defines correct matches.  By default, it is assumed that each element of $questions is matched one-to-one with the 
 	    corresponding element of $answers (in other words, that $answers[0] is the answer to $questions[0]).<br/>  $matchlist allows
 	    you to define one-to-many matches.  Example:  if $questions=array("cat","dog","quartz") and 
 	    $answers=array("animal","mineral"), then $matchlist = "0,0,1"</dd> 
-<dt>$questiontitle = string (In Common Control)</dt>
+<dt>$questiontitle = string </dt>
 	<dd>Displays a title above the list of questions.  For example, if $questions was a list of
 	states, then $questiontitle="States" would be appropriate</dd>
-<dt>$answertitle = string (In Common Control)</dt>
+<dt>$answertitle = string </dt>
 	<dd>Displays a title above the list of answers</dd>
 <dt>$noshuffle = "questions" or "answers"</dt>
 	<dd>Retains original order of questions or answers, and only shuffles the other.  By default, both lists are shuffled</dd>
@@ -2395,10 +2395,10 @@ A student is asked to match answers with questions
 	pure text $questions.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place matching questions and answers in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the list of correct matches.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2412,26 +2412,26 @@ or if the question type gives away critical info to the student.</dd>
 A student is asked to enter a function
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = string (In Common Control)</dt>
+<dt>$answer = string </dt>
 	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$variables = string (In Common Control)</dt>
+<dt>$variables = string </dt>
 	<dd>A list of all variables in the function (including letters representing constants).  Defaults to "x".  Can use 
 	"f()" to indicate a symbol represents a function.</dd>
-<dt>$domain = "inputmin,inputmax" (In Common Control)</dt>
+<dt>$domain = "inputmin,inputmax" </dt>
 	<dd>Defines the domain on which to compare the given answer and correct answer functions.  The same domain
 	applies to all variables.  An option third list element "integers" can be given, which limits the domain to integer
 	values.  The domain defaults to real numbers from -10 to 10.  If using multiple variables, can extend domain to 
 	define domain for each variable separately.  Example: $variables = "x,y"; $domain = "0,5,20,25"</dd>	
-<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" (In Common Control)</dt>
+<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" </dt>
 	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
 	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times.  You can
 	use "#" in the symbol location to match any number (including decimal values); 3.2x+42y would match twice.</dd>
-<dt>$answerformat = "equation" or "toconst" (In Common Control)</dt>
+<dt>$answerformat = "equation" or "toconst" </dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -2440,24 +2440,24 @@ A student is asked to enter a function
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
 	values or raise numbers to very large powers.</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>	
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
-<dt>$hidepreview = true (In Common Control)</dt>
+<dt>$hidepreview = true </dt>
 	<dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to makeprettydisp($answer).  </dd>
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2472,13 +2472,13 @@ A student is asked to enter a string (a word or list of letters).
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = a string (In Common Control)</dt>
+<dt>$answer = a string </dt>
 	<dd>Defines the answer.  Multiple acceptable answers can be entered using "or".  Example: $answer = "dog or cat"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$strflags = string of flags, like "ignore_case=1,trim_whitespace=0" (In Common Control)</dt>
+<dt>$strflags = string of flags, like "ignore_case=1,trim_whitespace=0" </dt>
 	<dd>Determines how the string will be compared.  Set to 1 to turn on, 0 for off.  Flags are:
 		<ul>
 		<li>ignore_case: ignores capitol/lowercase differences</li>
@@ -2497,26 +2497,26 @@ A student is asked to enter a string (a word or list of letters).
 		</ul>
 		By default, compress_whitespace and ignore_case are On.  Only one of
 		partial_credit, allow_diff, in_answer or regex may be used at a time.</dd>
-<dt>$scoremethod = "takeanything" (In Common Control)</dt>
+<dt>$scoremethod = "takeanything" </dt>
 	<dd>Sets the problem to give full credit for any answer.</dd>
-<dt>$answerformat = "list" (In Common Control)</dt>
+<dt>$answerformat = "list" </dt>
 	<dd>Specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with 
 	partial_credit flag.  Duplicates are not ignored.</dd>
-<dt>$displayformat = "usepreview" or "typeahead"(In Common Control)</dt>
+<dt>$displayformat = "usepreview" or "typeahead"</dt>
 	<dd>"usepreview" adds a preview button for previewing mathematical answers.<br/>
 	"typeahead" will enable an auto-suggest list of options once the student has typed at least
 	two letters of the word.  Provide the auto-suggest list in the variable $questions.
 	</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the answer entry box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2534,18 +2534,18 @@ None - the essay type is not computer graded.
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerboxsize = "rows" or $answerboxsize = "rows,columns" (In Common Control)</dt>
+<dt>$answerboxsize = "rows" or $answerboxsize = "rows,columns" </dt>
 	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
-<dt>$displayformat = "editor" (In Common Control)</dt>
+<dt>$displayformat = "editor" </dt>
 	<dd>Use the rich text editor for the essay answer box.</dd>
-<dt>$scoremethod = "takeanything" (In Common Control)</dt>
+<dt>$scoremethod = "takeanything" </dt>
 	<dd>Sets the problem to give full credit for any answer.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the essay box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2562,21 +2562,40 @@ drawn line from the correct line.
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answers = a string or array of strings describing the points or curves to be drawn (In Common Control)</dt>
-	<dd>Curves:  "f(x)" or "f(x),xmin,xmax", like "x^2+3" or "x,-3,2"<br/>
+<dt>$answers = a string or array of strings describing the points or curves to be drawn </dt>
+	<dd>Curves:  "f(x)" like "x^2+3".<br/>
+	    Line segments or rays: "f(x),xmin,xmax", like "x+1,-3,2" or "x+1,-oo,3"<br/>
 	    Dots:  "x,y" for closed dots, "x,y,open" for open dots, like "2,3"</dd>
 </dl>
 </p>
-<p><b>Optional Variables</b><BR>
+<div><b>Recommended Variables</b><BR>
 <dl>
-<dt>$answerformat = "line,lineseg,dot,opendot" or "polygon" or "twopoint" or "inequality" or "numberline" (In Common Control)</dt>
-	<dd>Limits the drawing tools available to students.  Defaults to the older drawing tools "line,dot,opendot".  <br/>
-	    $answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
-	    control points to define the shape. 
+<dt>$answerformat = "twopoint", "polygon", "inequality", "numberline", or (for the older tools), "line,lineseg,dot,opendot" </dt>
+	<dd>Limits the drawing tools available to students.  Defaults to the older drawing tools "line,dot,opendot".
+	    <p>$answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
+	    control points to define the shape. It is strongly recommended you use these instead of the older tools. 
 	      <ul>
 	        <li>$answerformat="twopoint" will use a default tool set of line, parabola, absolute value, circle, and dot tools</li>
-	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector,exp,ellipse,hyperbola,horizparab</li>
-	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, exponentials, give $answers in the normal way (as a function of x)</li>
+	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: 
+	        	<ul>
+	        	<li>line (lines)</li>
+	        	<li>lineseg (line segment)</li>
+	        	<li>ray (rays)</li>
+	        	<li>parab (vertical parabolas)</li>
+	        	<li>horizparab (horizontal parabolas)</li>
+	        	<li>abs (absolute value)</li>
+	        	<li>circle (circles)</li>
+	        	<li>dot (open and closed dots)</li>
+	        	<li>sqrt (square root)</li>
+	        	<li>trig (sin and cos)</li>
+	        	<li>vector (position or displacement vectors)</li>
+	        	<li>exp (exponential with horizontal asymptote at y=0)</li>
+	        	<li>rational (linear/linear rational)</li>
+	        	<li>ellipse (ellipses)</li>
+	        	<li>hyperbola (vertical or horizontal hyperbolas)</li>
+	        	</ul>
+	        <li>For lines, vertical parabolas, absolute values, square roots, sines, cosines, exponentials, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
+	        <li>For line segments and rays, given $answers as a function with domain, like "2x+4,-oo,3", or for vertical line segments use x= and give the range, like "x=4,-2,3"</li>
 	        <li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
 	        <li>For circles, give $answers as "circle,x,y,radius", like "circle,2,-1,3"</li>
 	        <li>For ellipses, give $answers as "ellipse,x,y,x_radius,y_radius", like "ellipse,1,2,4,2"</li>
@@ -2585,17 +2604,29 @@ drawn line from the correct line.
 	        <li>For horizontal parabolas give $answers as "x=equation", like "x=2(y-1)^2-3".</li>
 	        <li>For vertical lines give $answers as "x=number", like "x=3".</li>
 	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
-	      </ul><br/>
-	    $answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.<br/>
-	    $answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
-	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.<br/>
-	    $answerformat="inequality,parab" will use a set of drawing tools for graphing quadratic inequalities in two variables.  Give $answers in form
-	       like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.<br/>
-	    $answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
-	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.<br/>
-	    Can also be used to limit the older tools: $answerformat = "line", or $answerformat = "line,dot"<br/>
+	      </ul></p>
+	    <p>$answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.</p>
+	    <p> $answerformat = "closedpolygon" can be used for drawing a single polygon that is closed; the enclosed area will be shaded and the drawing terminate when the shape is
+	       closed. The format is the same as "polygon", except make sure the first and last entry of your $answers array are identical.</p>
+	    <p>$answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
+	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.</p>
+	    <p>$answerformat="inequality,parab" will use a set of drawing tools for graphing quadratic inequalities in two variables.  Give $answers in form
+	       like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.</p>
+	    <p>$answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
+	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.</p>
+	    <p>$answerformat can also be used to limit the older tools: $answerformat = "line", or $answerformat = "line,dot"</p>
 	     </dd>
-<dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
+ <dt>$snaptogrid = spacing </dt>
+	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
+	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest
+	2 in the x and 4 in the y.  Does not have to match the actual grid line spacing.  Be aware that due to pixelation, the snapping
+	may not land on exact values correctly.  This is usually corrected for automatically, but it sometimes fails if the correction would be 
+	too large.  In that case, use the getsnapwidthheight macro to compute an imagewidth and imageheight that will be pixel accurate.</dd>
+</dl>
+</p>
+<div><b>Optional Variables</b><BR>
+<dl>
+<dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" </dt>
 	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
 	    values.  For example, to just set the window, you could use "0,10,0,10"<br/>
 	    If using $answerformat="numberline", set ymin and ymax to 0.<br/>If desired, you can set separate label and grid
@@ -2603,15 +2634,9 @@ drawn line from the correct line.
 	    "xmin,xmax,ymin,ymax,xlabel:xgrid:xaxislabel,ylabel:ygrid:yaxislabel,imagewidth,imageheight".  
 	    To create first quadrant graphs, use "0:-n" (for some value of n) for xmin and/or ymin to only have gridlines and labels 
 	    after 0, while still using -n to adjust spacing. </dd>
-<dt>$snaptogrid = spacing (In Common Control)</dt>
-	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
-	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest
-	2 in the x and 4 in the y.  Does not have to match the actual grid line spacing.  Be aware that due to pixelation, the snapping
-	may not land on exact values correctly.  This is usually corrected for automatically, but it sometimes fails if the correction would be 
-	too large.  In that case, use the getsnapwidthheight macro to compute an imagewidth and imageheight that will be pixel accurate.</dd>
-<dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
+<dt>$background = equation or array of equations, using the showplot macro format </dt>
 	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
-<dt>$partweights = array or list of weights (In Common Control)</dt>
+<dt>$partweights = array or list of weights </dt>
 	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
 	    to equal weights on each line or dot.</dd>
 <dt>$reltolerance = tolerance scaling factor</dt>
@@ -2623,15 +2648,15 @@ drawn line from the correct line.
 	the student will receive full credit.  Not set by default.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
 </dl>
-</p>
+</div>
 
 </div>
 <div class=h3>
@@ -2642,7 +2667,7 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = a string containing an n-tuple or list of n-tuples (In Common Control)</dt>
+<dt>$answer = a string containing an n-tuple or list of n-tuples </dt>
 	<dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
 	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1,2)",
 	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;".</dd>
@@ -2650,20 +2675,20 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Common Control)</dt>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" </dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2682,7 +2707,7 @@ rather than just numbers, such as (5/3, 2/3).
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = a string containing an n-tuple or list of n-tuples (In Common Control)</dt>
+<dt>$answer = a string containing an n-tuple or list of n-tuples </dt>
 	<dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
 	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1/3,2)",
 	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;". </dd>
@@ -2690,27 +2715,27 @@ rather than just numbers, such as (5/3, 2/3).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Common Control)</dt>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" </dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf" </dt>
 	<dd>Requires each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
 	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2726,25 +2751,25 @@ Complex questions require the student to enter a complex number in a+bi form.
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answers = a string containing a complex number or list of complex numbers (In Common Control)</dt>
+<dt>$answers = a string containing a complex number or list of complex numbers </dt>
   <dd>Defines the answer.  Example: $answer="3+2i"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "list" (In Common Control)</dt>
+<dt>$answerformat = "list" </dt>
 	<dd>Specifies that the answer will be a list of complex numbers.</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2761,14 +2786,14 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answers = a string containing a complex number or list of complex numbers (In Common Control)</dt>
+<dt>$answers = a string containing a complex number or list of complex numbers </dt>
   <dd>Defines the answer.  Example: $answer="3+2i", $answer="2/3+1/3i".  The answer <i>must</i> be given in 
   a + bi format (so 2+3isqrt(2) or 5/2+i/3 will not work)</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
 	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
 	must still only contain one i.  <br/>
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
@@ -2778,17 +2803,17 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
 	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2805,32 +2830,32 @@ The entries are compared to a given tolerance.
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = string descripting a matrix of numbers, or calculations leading to numbers (In Common Control)</dt>
+<dt>$answer = string descripting a matrix of numbers, or calculations leading to numbers </dt>
 	<dd>Defines the answer.  Example: $answer = "[(1,2,3),(8/2,5,6)]" is a 2x3 matrix with first row: 1,2,3</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answersize = "rows,cols" (In Common Control)</dt>
+<dt>$answersize = "rows,cols" </dt>
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
 	used if $answersize is not supplied.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2846,41 +2871,41 @@ The entries are compared to a given tolerance.
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = string descripting a matrix of numbers, or calculations leading to numbers (In Common Control)</dt>
+<dt>$answer = string descripting a matrix of numbers, or calculations leading to numbers </dt>
 	<dd>Defines the answer.  Example: $answer = "[(1,2,3),(8/2,5,6)]" is a 2x3 matrix with first row: 1,2,3</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answersize = "rows,cols" (In Common Control)</dt>
+<dt>$answersize = "rows,cols" </dt>
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
 	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
 	used if $answersize is not supplied.</dd>
-<dt>$hidepreview = true (In Common Control)</dt>
+<dt>$hidepreview = true </dt>
 	<dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to $answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2895,35 +2920,35 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = a string with the answer in interval notation (In Common Control)</dt>
+<dt>$answer = a string with the answer in interval notation </dt>
 	<dd>Defines the answer.  Join multiple intervals with U for union.  Example: $answer = "(-oo,4]U(3,oo)".  Use
 	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]"</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
-<dt>$reqdecimals = a number (In Common Control)</dt>
+<dt>$reqdecimals = a number </dt>
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$answerformat = "normalcurve" (In Common Control)</dt>
+<dt>$answerformat = "normalcurve" </dt>
 	<dd>Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
 	shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2940,41 +2965,41 @@ invertal notation.
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$answer = a string with the answer in interval notation (In Common Control)</dt>
+<dt>$answer = a string with the answer in interval notation </dt>
 	<dd>Defines the answer.  Join multiple intervals with U for union, and oo for infinity.  Example: $answer = "(-oo,4]U(9/2,oo)".  Use
 	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]".</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "inequality" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "inequality" </dt>
 	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	$answerformat = "inequality" will require the student to enter an inequality rather than an interval.  The instructor answer must still be given in
 	interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
 	</dd>
-<dt>$reltolerance = a decimal value (In Common Control)</dt>
+<dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
-<dt>$abstolerance = a number (In Common Control)</dt>
+<dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
-<dt>$reqdecimals = a number (In Common Control)</dt>
+<dt>$reqdecimals = a number </dt>
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$ansprompt = string (In Common Control)</dt>
+<dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
-<dt>$answerboxsize = number (In Common Control)</dt>
+<dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
 	Use this to substitute a detailed answer.</dd>
 <dt>$previewloc (In Question Text)</dt>
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -2992,13 +3017,13 @@ None - the file upload type is not computer graded.
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$scoremethod = "takeanything" (In Common Control)</dt>
+<dt>$scoremethod = "takeanything" </dt>
 	<dd>Sets the problem to give full credit for any answer.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>The answer to show to students (if option if available).</dd>
-<dt>$hidetips = true (In Common Control)</dt>
+<dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
@@ -3012,7 +3037,7 @@ This type of question can contain multiple parts, where each part is one of the 
 
 <p><b>Required Variables</b><BR>
 <dl>
-<dt>$anstypes = an array or list of answer types (In Common Control)</dt>
+<dt>$anstypes = an array or list of answer types </dt>
 	<dd>Defines the answer type for each part.  Example: 
 	$anstypes = array("number","number","choices")<br/>
 	Refer to this list for the short names of each question type:
@@ -3050,17 +3075,17 @@ This type of question can contain multiple parts, where each part is one of the 
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answeights = an array or list of weights for each question (In Common Control)</dt>
+<dt>$answeights = an array or list of weights for each question </dt>
 	<dd>By default the points for a problem are divided evenly over the parts.  Use this option if you wish to weight parts
 	differently.  Example: $answeights = array(.2,.3,.5).  Best practice is to use percents, but if other values are used, they will
 	be converted to percents.</dd>
-<dt>$scoremethod = "singlescore" or "allornothing" (In Common Control)</dt>
+<dt>$scoremethod = "singlescore" or "allornothing" </dt>
 	<dd>Instead of recording individual scores for each question part, these will cause a single score to be
 	recorded for the question.  "singlescore" totals the individual part scores, while "allornothing"
 	will only give full credit or no credit.</dd>
 <dt>Question part options</dt>
 	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
-<dt>$showanswer (In Common Control)</dt>
+<dt>$showanswer </dt>
 	<dd>You can either define $showanswer for individual question parts (ie, $showanswer[1]="`x^2`"), or you can set one 
 	$showanswer, which will be the only answer shown for the problem (ie, $showanswer = "x=$answer[0], y=$answer[1]")</dd>
 <dt>$showanswerloc (In Question Text)</dt>

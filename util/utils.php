@@ -195,6 +195,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="'.$imasroot.'/admin/approvepending.php">Approve Pending Instructor Accounts</a><br/>';
 	echo '<a href="utils.php?debug=true">Enable Debug Mode</a><br/>';
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';
+	echo '<a href="replaceurls.php">Replace URLS</a><br/>';
 	echo '<a href="utils.php?form=rescue">Recover lost items</a><br/>';
 	echo '<a href="utils.php?form=emu">Emulate User</a><br/>';
 	echo '<a href="listextref.php">List ExtRefs</a><br/>';

@@ -49,7 +49,7 @@ function getnextprev(formn,loc,onlychk) {
 	var looking = true;
 	for (var e = 0; e < form.elements.length; e++) {
 		var el = form.elements[e];
-		if (typeof el.type == "undefined") {
+		if (typeof el.type == "undefined" || el.value.match(/text/)) {
 			continue;
 		}
 		if (((el.type == 'checkbox' && el.name=='nchecked[]') || ((el.type=='checkbox' || el.type=='hidden') && el.name=='checked[]')) && (!onlychk || el.checked)) {

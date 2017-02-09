@@ -315,7 +315,7 @@ function toSimpleJSON(a) {
 }
 
 function submitChanges() { 
-  var params = 'order='+toSimpleJSON(sortIt.serialize());
+  var params = 'checkhash='+itemorderhash+'&order='+toSimpleJSON(sortIt.serialize());
   var url = AHAHsaveurl;
   var els = document.getElementsByTagName("input");
   for (var i=0; i<els.length; i++) {
@@ -354,16 +354,17 @@ function quickviewcollapseAll() {
 function NestedahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
-	    if (req.responseText.substring(0,2)=='OK') {
+	    if (req.responseText.charAt(0)=='1') {
+	    	    var p = req.responseText.indexOf(':');
+	    	    itemorderhash = req.responseText.substring(2,p);
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
 		    window.onbeforeunload = null;
 		    setlinksdisp("");
-		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(2);
-		    sortIt.haschanged = false;
-		      
+		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(p+1);
+		    sortIt.haschanged = false;      
 	    } else {
-		    document.getElementById(target).innerHTML=req.responseText;
+		    document.getElementById(target).innerHTML=req.responseText.substring(2);
 	    }
     } else { 
 	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText; 

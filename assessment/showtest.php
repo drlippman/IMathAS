@@ -303,7 +303,7 @@
 			//DB $query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext','$ltisourcedid');";
 			//DB $result = mysql_query($query);
 			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid,ver) ";
-			$query .= "VALUES (:userid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, :agroupid, :feedback, :lti_sourcedid,1);";
+			$query .= "VALUES (:userid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, :agroupid, :feedback, :lti_sourcedid,2);";
 			$stm = $DBH->prepare($query);
 			$result = $stm->execute(array(':userid'=>$userid, ':assessmentid'=>$_GET['id'], ':questions'=>$qlist, ':seeds'=>$seedlist, ':scores'=>$scorelist,
 				':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':starttime'=>$starttime, ':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist,
@@ -332,7 +332,7 @@
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						if ($cnt>0) {$query .= ',';}
 						//DB $query .= "('{$row[0]}','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext')";
-						$query .= "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)";
+						$query .= "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,2)";
 						array_push($insval, $row[0], $_GET['id'], $qlist, $seedlist, $scorelist, $attemptslist, $lalist, $starttime, $bestscorelist, $bestattemptslist, $bestseedslist, $bestlalist, $scorelist, $attemptslist, $reviewseedlist, $lalist, $stugroupid, $deffeedbacktext);
 						$cnt++;
 					}
@@ -759,7 +759,7 @@
 		}
 		//check for past time limit, with some leniency for javascript timing.
 		//want to reject if javascript was bypassed
-		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],5)) {
+		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],10)) {
 			echo _('Time limit has expired.  Submission rejected. ');
 			leavetestmsg();
 			exit;
@@ -1073,6 +1073,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['noprint'] == 1) {
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
+
 	if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
 		if (isset($sessiondata['actas'])) {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
@@ -1090,7 +1091,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			}
 		}
 	} else if ($isltilimited) {
-		echo "<span style=\"float:right;\">";
+		echo '<div class="floatright">';
+		if ($userfullname != ' ') {
+			echo '<p><b>'.$userfullname.'</b></p>';
+		}
+		$out = '';
 		if ($testsettings['msgtoinstr']==1) {
 			//DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1098,11 +1103,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
 			$stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 			$msgcnt = $stm->fetchColumn(0);
-			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Messages'), " ";
+			$out .= "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Messages'). " ";
 			if ($msgcnt>0) {
-				echo '<span class="noticetext">('.$msgcnt.' new)</span>';
+				$out .= '<span class="noticetext">('.$msgcnt.' new)</span>';
 			}
-			echo '</a> ';
+			$out .= '</a> ';
 		}
 		$latepasscnt = 0;
 		if ($testsettings['allowlate']%10>1 && isset($exceptionduedate) && $exceptionduedate>0) {
@@ -1115,7 +1120,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$latepasscnt = round(($exceptionduedate - $testsettings['enddate'])/(3600*$latepasshrs));
 		}
 		if (($testsettings['allowlate']%10==1 || $testsettings['allowlate']%10-1>$latepasscnt) && $sessiondata['latepasses']>0 && !$isreview) {
-			echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
+			$out .= "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Redeem LatePass'). "</a> ";
 		}
 		if ($isreview && !(isset($exceptionduedate) && $exceptionduedate>0) && $testsettings['allowlate']>10 && $sessiondata['latepasses']>0 && !isset($sessiondata['stuview']) && !$actas) {
 			//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='".$testsettings['courseid']."'";
@@ -1134,10 +1139,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$viewedassess[] = $r[0];
 			}
 			if ((time() - $testsettings['enddate'])<$latepasshrs*3600 && !in_array($testsettings['id'],$viewedassess)) {
-				echo "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Redeem LatePass'), "</a> ";
+				$out .= "<a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Redeem LatePass'). "</a> ";
 			}
 		}
-
+		if ($out != '') {
+			echo '<p>'.$out.'</p>';
+		}
 
 		if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
 			if ($testsettings['showans']!='N') {
@@ -1148,7 +1155,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo '>', _('View your scored assessment'), '</a></p>';
 			}
 		}
-		echo '</span>';
+		echo '</div>';
 	}
 
 	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
@@ -1378,7 +1385,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 		echo $row[1].' '.$row[0];
 		echo '<p>';
 	}
-
+	echo '<div class="clear"></div>';
+	
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
 		echo "<div class=right><span style=\"color:#f00\">" . _("Practice Assessment") . ".</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
 	}
@@ -1438,7 +1446,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		$now = time();
 		$totremaining = $testsettings['timelimit']-($now - $starttime);
 		if ($timebeforedue < $totremaining) {
-			$totremaining = $timebeforedue - 5;
+			$totremaining = $timebeforedue - 10;
 			$restrictedtimelimit = true;
 		}
 		$remaining = $totremaining;
@@ -1495,7 +1503,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		echo "</script>\n";
 		}
 	} else if ($isreview) {
-		echo "<div class=right style=\"color:#f00;clear:right;\">" . _("In Review Mode - no scores will be saved") . "<br/><a href=\"showtest.php?regenall=all\">", _('Create new versions of all questions.'), "</a></div>\n";
+		echo "<div class=\"right noticetext\" style=\"clear:right;\">" . _("In Review Mode - no scores will be saved") . "<br/><a href=\"showtest.php?regenall=all\">", _('Create new versions of all questions.'), "</a></div>\n";
 	} else if ($superdone) {
 		echo "<div class=right>", _('Time limit expired'), "</div>";
 	} else {
@@ -1760,8 +1768,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 						echo  _(", or select another question");
 					}
 					echo '</p>';
-				} else if ($lefttodo > 0) {
-					echo "<p>"._('Select another question').'</p>';
+				} else {
+					if ($reattemptsremain && $immediatereattempt && $reattemptduring) {
+						echo "<p>"._('Reattempt last question below, or select another question').'</p>';
+					} else {
+						echo "<p>"._('Select another question').'</p>';
+					}
 				}
 
 				if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
@@ -2475,7 +2487,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			echo '});</script>';
 		}
 		if ($testsettings['displaymethod'] != "Embed") {
-			$testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
+			if ($isreview) {
+				$testsettings['intro'] .= '<p class="noticetext"><b>' . _("In Review Mode - no scores will be saved") . "</b></p>";
+			} else {
+				$testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
+			}
 		}
 		if ($testsettings['isgroup']>0) {
 			$testsettings['intro'] .= "<p><span class=noticetext >" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
@@ -3566,7 +3582,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	}
 	function leavetestmsg() {
 		global $isdiag, $diagid, $sessiondata, $testsettings;
-		$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
+		$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
 		if ($isdiag) {
 			echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a></p>\n";
 		} else if ($isltilimited || $sessiondata['intreereader']) {
