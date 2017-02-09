@@ -804,6 +804,8 @@
 		$qsPacket = array();
 		$qsPacket['formAction'] = $formAction; // Form action
 		$qsPacket['images'] = $images; //  Images array
+		$qsPacket['outputmsg'] = $outputmsg; // output message
+		$qsPacket['errmsg'] = $errmsg;
 		// Build img base url
 		if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true){
 			$qsPacket['imgUrlBase'] = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/";
@@ -999,8 +1001,8 @@
 		}
 
 	}
-	echo $errmsg;
-	echo $outputmsg;
+	echo "<div id='errmsgContainer'>$errmsg</div>";
+	echo "<div id='outputmsgContainer'>$outputmsg</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
 	echo "<h2>$addmod QuestionSet Question</h2>\n";
@@ -1310,11 +1312,12 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				} else {
 					quickSaveQuestion.errorFunc();
 				}
-
 				// Change form action and url in address bar
 				$("form")[0].action = quickSaveQuestion.url;
 				if (window.history.replaceState) window.history.replaceState({}, "qs", quickSaveQuestion.url);
-
+				// Load output and error messages
+				$("#outputmsgContainer").html(res.outputmsg);
+				$("#errmsgContainer").html(res.errmsg);
 				// HANDLE IMAGES
 				var imgUploaded = $("input[name='imgfile']")[0].files.length > 0 ? true : false; // Image uploaded
 				var imgDeleted = $("input[name^='delimg-']:checked").length > 0 ? true : false; // Image deleted
