@@ -1308,11 +1308,12 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				} else {
 					quickSaveQuestion.errorFunc();
 				}
-
 				// Change form action and url in address bar
 				$("form")[0].action = quickSaveQuestion.url;
 				if (window.history.replaceState) window.history.replaceState({}, "qs", quickSaveQuestion.url);
-
+				// Change outputmsg and errmsg
+				$("#outputmsgContainer").html(res.outputmsg);
+				$("#errmsgContainer").html(res.errmsg);
 				// HANDLE IMAGES
 				var imgUploaded = $("input[name='imgfile']")[0].files.length > 0 ? true : false; // Image uploaded
 				var imgDeleted = $("input[name^='delimg-']:checked").length > 0 ? true : false; // Image deleted
