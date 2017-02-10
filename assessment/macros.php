@@ -2233,27 +2233,20 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 }
 
 function forminlinebutton($label,$content,$style='button',$outstyle='block') {
-	if (isset($GLOBALS['inlinebuttoncnt'])) {
-		$r = $GLOBALS['inlinebuttoncnt'];
-		$GLOBALS['inlinebuttoncnt']++;
-		//$out = '';
-	} else {
-		$r = 1;
-		$GLOBALS['inlinebuttoncnt'] = 2;
-		//$out = '<script type="text/javascript">function toggleinlinebtn(n){var el=document.getElementById(n);el.style.display=="none"?el.style.display="":el.style.display="none";}</script>';
-	}
+	$r = uniqid();
 	$label = str_replace('"','',$label);
+	$common = 'id="inlinebtn'.$r.'" aria-controls="inlinebtnc'.$r.'" aria-expanded="false" value="'.$label.'" onClick="toggleinlinebtn(\''.$r.'\');"';
 	if ($style=='classic') {
-		$out = '<input type="button" value="'.$label.'" onClick="toggleinlinebtn(\'inlinebtn'.$r.'\');" />';
+		$out = '<input type="button" '.$common.'/>';
 	} else if ($style=='link') {
-		$out = '<span class="link" onClick="toggleinlinebtn(\'inlinebtn'.$r.'\');">'.$label.'</span>';
+		$out = '<span class="link" '.$common.'>'.$label.'</span>';
 	} else {
-		$out = '<span class="spanbutton" onClick="toggleinlinebtn(\'inlinebtn'.$r.'\');">'.$label.'</span>';
+		$out = '<span class="spanbutton" '.$common.'>'.$label.'</span>';
 	}
 	if ($outstyle=='inline') {
-		$out .= ' <span id="inlinebtn'.$r.'" style="display:none;">'.$content.'</span>';
+		$out .= ' <span id="inlinebtnc'.$r.'" style="display:none;">'.$content.'</span>';
 	} else {
-		$out .= '<div id="inlinebtn'.$r.'" style="display:none;">'.$content.'</div>';
+		$out .= '<div id="inlinebtnc'.$r.'" style="display:none;">'.$content.'</div>';
 	}
 	return $out;
 }

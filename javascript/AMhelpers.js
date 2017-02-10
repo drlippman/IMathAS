@@ -1328,8 +1328,15 @@ function arraysearch(needle,hay) {
    }
 
 function toggleinlinebtn(n,p){
-	var el=document.getElementById(n);
-	el.style.display=="none"?el.style.display="":el.style.display="none";
+	var btn=document.getElementById('inlinebtn'+n);
+	var el=document.getElementById('inlinebtnc'+n);
+	if (el.style.display=="none") {
+		el.style.display="";
+		btn.setAttribute("aria-expanded",true);
+	} else {
+		el.style.display="none";
+		btn.setAttribute("aria-expanded",false);
+	}
 	if (p!=null) {
 		var s=document.getElementById(p);
 		var k=s.innerHTML;
