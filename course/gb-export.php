@@ -212,7 +212,7 @@ function gbinstrexport() {
 		}
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
+				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
@@ -224,7 +224,9 @@ function gbinstrexport() {
 						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][11].'%';
 					}
 				} else if ($availshow==3) {
-					$gbo[0][$n] = $gbt[0][2][$i][0];
+					if (isset($gbt[0][2][$i][11])) {
+						$gbo[0][$n] = $gbt[0][2][$i][11].'%';
+					}
 				}
 				$n++;
 			}
@@ -276,15 +278,21 @@ function gbinstrexport() {
 		//total totals
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
+				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
 				}
 				if ($availshow<3) {
-					$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+					if (isset($gbt[0][3][0])) { //using points based
+						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
+					} else {
+						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][11].'%';
+					}
 				} else if ($availshow==3) {
-					$gbo[0][$n] = $gbt[0][2][$i][0];
+					if (isset($gbt[0][2][$i][11])) {
+						$gbo[0][$n] = $gbt[0][2][$i][11].'%';
+					}
 				}
 				$n++;
 			}
@@ -371,12 +379,29 @@ function gbinstrexport() {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
+					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
-					$gbo[$i][$n] = $gbt[$i][2][$j][$availshow];
+					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
+						$gbo[$i][$n] = $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
+					} else {
+						if ($availshow==3) {
+							$gbo[$i][$n] = $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
+						} else {
+							if (isset($gbt[$i][3][8])) { //using points based
+								$gbo[$i][$n] = $gbt[$i][2][$j][$availshow];
+							} else {
+								if ($gbt[0][2][$j][3+$availshow]>0) {
+									$gbo[$i][$n] = round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
+								} else {
+									$gbo[$i][$n] = '0%';
+								}
+							}
+						}
+						
+					}
 					$n++;
 				}
 			}
@@ -451,12 +476,29 @@ function gbinstrexport() {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if ($availshow<2 && $gbt[0][2][$j][2]>1) {
+					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
-					$gbo[$i][$n] = $gbt[$i][2][$j][$availshow];
+					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
+						$gbo[$i][$n] = $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
+					} else {
+						if ($availshow==3) {
+							$gbo[$i][$n] = $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
+						} else {
+							if (isset($gbt[$i][3][8])) { //using points based
+								$gbo[$i][$n] = $gbt[$i][2][$j][$availshow];
+							} else {
+								if ($gbt[0][2][$j][3+$availshow]>0) {
+									$gbo[$i][$n] = round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
+								} else {
+									$gbo[$i][$n] = '0%';
+								}
+							}
+						}
+						
+					}
 					$n++;
 				}
 			}
