@@ -699,7 +699,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 	if ($isteacher) {
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
 		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report" title="',_("Generate printable grade reports"),'">',_('Print Report'),'</button> ';
-		echo '<button type="submit" name="posted" value="E-mail" title="',_("Send e-mail to the selected students"),'">',_('E-mail'),'</button> ';
+		if (!isset($CFG['GEN']['noEmailButton'])) {
+			echo '<button type="submit" name="posted" value="E-mail" title="',_("Send e-mail to the selected students"),'">',_('E-mail'),'</button> ';
+		}
 		echo '<button type="button" name="posted" value="Copy E-mails" title="',_("Copy e-mail addresses of the selected students"),'" onclick="copyemails()">',_('Copy E-mails'),'</button> ';
 		echo '<button type="submit" name="posted" value="Message" title="',_("Send a message to the selected students"),'">',_('Message'),'</button> ';
 

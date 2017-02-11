@@ -187,6 +187,27 @@ Date.prototype.getWeekDays = function(d) {
 	  }
 	  el.selectedIndex= 0;
   }
+  function senddownaction(ln,val) {
+  	  if ($("input[id^='cb']:checked").length==0) {
+  	  	  if (!confirm(_("No items have been selected. This action will apply to ALL items below this item"))) {
+  	  	  	  return false;
+  	  	  }
+  	  }
+	  if (val==1) {
+		  senddown(ln);
+	  } else if (val==2) {
+		  copydown(ln,0);
+	  } else if (val==3) {
+		  copydown(ln,1);
+	  } else if (val==4) {
+		  copydown(ln,1,'s');
+	  } else if (val==5) {
+		  copydown(ln,1,'e');
+	  } else if (val==6) {
+		  copydown(ln,1,'r');
+	  }
+	  return false;
+  }
   function copydownsub(type,basearr,st,usecb,ctype) {  //type: s,e,r
 	  if (document.getElementById(type+"datetype"+st).value==1) {
 		   var newstartdate = document.getElementById(type+"date"+st).value;

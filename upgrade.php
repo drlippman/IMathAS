@@ -1,7 +1,7 @@
 <?php
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 116;
+$latest = 117;
 
 
 @set_time_limit(0);
@@ -1903,6 +1903,26 @@ span.instronly {
   visibility: hidden;
 }
 			</code></p>';
+		}
+		if ($last<117) {
+			//rewrite way imas_courses.available works
+			$query = "ALTER TABLE `imas_teachers` ADD `hidefromcourselist` TINYINT(1) NOT NULL DEFAULT '0';";
+			$res = $DBH->query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			}
+			$query = "ALTER TABLE `imas_tutors` ADD `hidefromcourselist` TINYINT(1) NOT NULL DEFAULT '0';";
+			$res = $DBH->query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			}
+			$query = "UPDATE imas_teachers SET hidefromcourselist=1 WHERE courseid IN ";
+			$query .= "(SELECT id FROM imas_courses WHERE available>1)";
+			$res = $DBH->query($query);
+			
+			$query = "UPDATE imas_courses SET available=available-2 WHERE available>1";
+			$res = $DBH->query($query);
+			
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

@@ -596,7 +596,7 @@ function writeCourseInfo($line, $skipcopyright=2) {
 	if ($line['copyrights']<$skipcopyright) {
 		echo "&copy;\n";
 	} else {
-		echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+		echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\" class=\"small\">Preview</a>";
 	}
 }
 

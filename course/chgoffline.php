@@ -120,6 +120,13 @@ $line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
 
 //HTML output
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= '<script type="text/javascript">
+ $(function() {
+   $("#options td:first-child input[type=checkbox").on("change", function() {
+	$(this).parents("tr").toggleClass("odd");
+   });
+ });
+ </script>';
 require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -154,14 +161,14 @@ Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All<
 <?php
 
 foreach($gbitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.'</li>';
+	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.' <a class="small" href="addgrades.php?cid=264&grades=all&gbitem='.$id.'" target="_blank">Edit</a></li>';
 }
 ?>
 </ul>
 <p>With selected, <input type="submit" name="submit" value="Delete"/> or make changes below
 <fieldset>
 <legend>Offline Grade Options</legend>
-<table class=gb>
+<table class=gb id=options>
 <thead>
 <tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
 </thead>

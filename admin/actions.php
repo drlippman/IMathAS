@@ -4,6 +4,16 @@
 require("../validate.php");
 require_once("../includes/password.php");
 
+$from = 'admin';
+if (isset($_GET['from'])) {
+	if ($_GET['from']=='home') {
+		$from = 'home';
+	}
+}
+if ($from=='admin') {
+	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
+}
+
 switch($_GET['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
@@ -373,7 +383,7 @@ switch($_GET['action']) {
 			$cploc = $_POST['cploc'] + $_POST['cplocstu'] + $_POST['cplocview'];
 		}
 
-		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
+		$avail = 1 - $_POST['stuavail'];
 
 		$istemplate = 0;
 		if (($myspecialrights&1)==1 || $myrights==100) {
@@ -614,7 +624,7 @@ switch($_GET['action']) {
 			$DBH->commit();
 
 			require("../header.php");
-			echo '<div class="breadcrumb">'.$breadcrumbbase.'<a href="admin.php">Admin</a> &gt; Course Creation Confirmation</div>';
+			echo '<div class="breadcrumb">'.$breadcrumbbase.' Course Creation Confirmation</div>';
 			echo '<h2>Your course has been created!</h2>';
 			echo '<p>For students to enroll in this course, you will need to provide them two things:<ol>';
 			echo '<li>The course ID: <b>'.$cid.'</b></li>';
@@ -1368,6 +1378,8 @@ switch($_GET['action']) {
 session_write_close();
 if (isset($_GET['cid'])) {
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
+} else if ($from=='home') {
+	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
 } else {
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
 }

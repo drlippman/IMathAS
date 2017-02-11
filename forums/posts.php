@@ -487,20 +487,29 @@ function printchildren($base,$restricttoowner=false) {
 		} else {
 			echo "<input type=button class=\"shbtn\" value=\"Hide\" onClick=\"toggleitem(this)\">\n";
 		}
-
-		if ($isteacher) {
-			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a> \n";
-		}
-		if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
-			if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isteacher) {
-				echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\" onclick=\"return checkchgstatus(1,$child)\">Modify</a> \n";
-			}
-		}
-		if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
-			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";
-		}
 		if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\" onclick=\"return checkchgstatus(0,$child)\">Reply</a>";
+			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\" onclick=\"return checkchgstatus(0,$child)\">Reply</a> ";
+		}
+		if ($isteacher || ($ownerid[$child]==$userid && $allowmod && (($base==0 && time()<$postby) || ($base>0 && time()<$replyby))) || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
+			echo '<span class="dropdown">';
+			echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$child.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+			echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
+			echo '</a>';
+			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';	
+					
+			if ($isteacher) {
+				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a></li>\n";
+			}
+			if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
+				if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isteacher) {
+					echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\" onclick=\"return checkchgstatus(1,$child)\">Modify</a></li>\n";
+				}
+			}
+			if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
+				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a></li>\n";
+			}
+			
+			echo '</ul></span>';
 		}
 
 		echo "</span>\n";

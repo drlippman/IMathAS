@@ -317,12 +317,12 @@ if ($overwriteBody==1) {
 	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option><option value="a">Show</option></select>';
 	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
-	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
+	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';                                            
 
 	if ($picicons) {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
 	} else {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
 	}
 	$prefix = array();
 	if ($orderby==3) {  //course page order
@@ -780,7 +780,20 @@ if ($overwriteBody==1) {
 		echo '</td>';
 
 		//echo "<td>Send Down: <a href=\"#\" <input type=button value=\"Change\" onclick=\"senddown($cnt)\"/> <input type=button value=\"Copy\" onclick=\"copydown($cnt)\"/></td>";
-		echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
+		echo '<td class="c"><div class="dropdown">';
+		echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$cnt.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+		echo ' Action <img src="../img/collapse.gif" width="10" class="mida" alt="" />';
+		echo '</a>';
+		echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$cnt.'">';	
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',1)">Send down date &amp; time changes</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',2)">Copy down times only</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',3)">Copy down dates &amp; times</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',4)">Copy down start date &amp; time</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',5)">Copy down end date &amp; time</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',6)">Copy down review date &amp; time</a></li>';
+		echo '</ul></div></td>';
+		
+		/*echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
 		echo '<option value="1">Send down date &amp; time changes</option>';
 		echo '<option value="2">Copy down times only</option>';
 		echo '<option value="3">Copy down dates &amp; times</option>';
@@ -788,6 +801,7 @@ if ($overwriteBody==1) {
 		echo '<option value="5">Copy down end date &amp; time</option>';
 		echo '<option value="6">Copy down review date &amp; time</option>';
 		echo '</select></td>';
+		*/
 		echo "</tr>";
 		$cnt++;
 	}

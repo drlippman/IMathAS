@@ -49,9 +49,27 @@ $placeinhead = '
    div.pagetitle h2 {
   	margin-top: 0px;
   	}
+   #homefullwidth { clear: both;}
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-
+$placeinhead .= '<script type="text/javascript">$(function() {
+  var html = \'<div class="floatright dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
+  html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
+  $(".courselist-teach li").css("clear","both").each(function (i,el) {
+  	if ($(el).attr("data-isowner")=="true") {
+  		var cid = $(el).attr("data-cid");
+  		var thishtml = html + \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');">'._('Hide from course list').'</a></li>\';
+  		thishtml += \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
+  		thishtml += \' <li><a href="admin/forms.php?from=home&action=chgteachers&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
+  		thishtml += \' <li><a href="admin/forms.php?from=home&action=transfer&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
+  		thishtml += \' <li><a href="admin/forms.php?from=home&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
+  		thishtml += \'</ul></div>\';
+  		$(el).prepend(thishtml);
+  	} 
+  });
+  $(".dropdown-toggle").dropdown();
+  });
+  </script>';
 $nologo = true;
 
 
@@ -138,23 +156,26 @@ if ($myrights>10) {
 	//DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB if (mysql_num_rows($result)==0) {
-	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
+	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid,imas_courses.ownerid,imas_teachers.hidefromcourselist FROM imas_teachers,imas_courses ";
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid=:userid ";
 	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':userid'=>$userid));
+	$teachhashiddencourses = false;
 	if ($stm->rowCount()==0) {
 		$noclass = true;
 	} else {
-		$noclass = false;
-		$tchcids = array();
-
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$page_teacherCourseData[] = $line;
-			$page_coursenames[$line['id']] = $line['name'];
-			if (!in_array($line['id'],$hideonpostswidget)) {
-				$postcheckcids[] = $line['id'];
+			if ($line['hidefromcourselist']==1) {
+				$teachhashiddencourses = true;
+			} else {
+				$noclass = false;
+				$page_teacherCourseData[] = $line;
+				$page_coursenames[$line['id']] = $line['name'];
+				if (!in_array($line['id'],$hideonpostswidget)) {
+					$postcheckcids[] = $line['id'];
+				}
 			}
 		}
 	}
@@ -172,17 +193,21 @@ $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid=:us
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid));
+$tutorhashiddencourses = false;
 if ($stm->rowCount()==0) {
 	$noclass = true;
 } else {
-	$noclass = false;
-	$tchcids = array();
 	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$page_tutorCourseData[] = $line;
-		$page_coursenames[$line['id']] = $line['name'];
-		if (!in_array($line['id'],$hideonpostswidget)) {
-			$postcheckstucids[] = $line['id'];
+		if ($line['hidefromcourselist']==1) {
+			$tutorhashiddencourses = true;
+		} else {
+			$noclass = false;
+			$page_tutorCourseData[] = $line;
+			$page_coursenames[$line['id']] = $line['name'];
+			if (!in_array($line['id'],$hideonpostswidget)) {
+				$postcheckstucids[] = $line['id'];
+			}
 		}
 	}
 }
@@ -364,6 +389,9 @@ if ($myrights > 10) {
 } else if ($myrights > 9) {
 	echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
 }
+if ($myrights >=75) {
+	echo '<br/><a href="admin/admin.php">'._('Admin Page').'</a>';
+}
 
 echo '</div>';
 echo '<div class="pagetitle" id="headerhome" role="banner"><h2>';
@@ -394,14 +422,14 @@ for ($i=0; $i<3; $i++) {
 		switch ($pagelayout[$i][$j]) {
 			case 0:
 				if ($myrights>10) {
-					printCourses($page_teacherCourseData,_('Courses you\'re teaching'),'teach');
+					printCourses($page_teacherCourseData,_('Courses you\'re teaching'),'teach',$teachhashiddencourses);
 				}
 				break;
 			case 1:
-				printCourses($page_tutorCourseData,_('Courses you\'re tutoring'),'tutor');
+				printCourses($page_tutorCourseData,_('Courses you\'re tutoring'),'tutor',$tutorhashiddencourses);
 				break;
 			case 2:
-				printCourses($page_studentCourseData,_('Courses you\'re taking'),'take');
+				printCourses($page_studentCourseData,_('Courses you\'re taking'),'take',$stuhashiddencourses);
 				break;
 			case 10:
 				printMessagesGadget();
@@ -419,25 +447,23 @@ for ($i=0; $i<3; $i++) {
 require('./footer.php');
 
 
-function printCourses($data,$title,$type=null) {
-	global $shownewmsgnote, $shownewpostnote, $stuhashiddencourses,$imasroot;
+function printCourses($data,$title,$type=null,$hashiddencourses=false) {
+	global $shownewmsgnote, $shownewpostnote, $imasroot,$userid;
 	if (count($data)==0 && $type=='tutor') {return;}
 	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
 	echo '<div role="navigation" aria-label="'.$title.'">';
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
-	echo '<div class="blockitems"><ul class="nomark courselist">';
+	echo '<div class="blockitems"><ul class="nomark courselist courselist-'.$type.'">';
 	for ($i=0; $i<count($data); $i++) {
-		echo '<li>';
-		if ($type=='take') {
-			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
-		} /*else if ($type=='teach') {
-			echo '<div class="floatright clear dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$imasroot.'/img/gears.png" alt="Settings"/></a>';
-			echo '<ul class="dropdown-menu dropdown-menu-right">';
-			echo '<li><a>Do something one</a></li>';
-			echo '<li><a>Add/Remove Teachers</a></li>';
-			echo '<li><a>Something else</a></li>';
-			echo '</ul></div>';
-		}*/
+		echo '<li';
+		if ($type=='teach' && $myrights>39) {
+			echo ' data-isowner="'.($data[$i]['ownerid']==$userid?'true':'false').'"';
+			echo ' data-cid="'.$data[$i]['id'].'"';
+		}
+		echo '>';
+		if ($type != 'teach' || $data[$i]['ownerid']!=$userid || $myrights<40) {
+			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</span>';
+		} 
 		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
@@ -456,16 +482,21 @@ function printCourses($data,$title,$type=null) {
 		echo '</li>';
 	}
 	if ($type=='teach' && $myrights>39 && count($data)==0) {
-		echo '<li>', _('To add a course, head to the Admin Page'), '</li>';
+		echo '<li>', _('To add a course, click the button below'), '</li>';
 	} else if ($type=='teach' && $myrights<13 && $myrights>10 && count($data)==0) {
 		echo '<li>', _('Your instructor account has not been approved yet. Please be patient.'), '</li>';
 	}
 	echo '</ul>';
 	if ($type=='take') {
-		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a>';
-		echo '<br><a id="unhidelink" '.($stuhashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php">Unhide hidden courses</a>';
-		echo '</div>';
+		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
 	} else if ($type=='teach' && $myrights>39) {
+		echo '<div class="center"><a class="abutton" href="admin/forms.php?from=home&action=addcourse">', _('Add New Course'), '</a></div>';
+	}
+	
+	echo '<div class="center">';
+	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">Unhide hidden courses</a>';
+	echo '</div>';
+	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
 		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';
 	}
 	echo '</div>';

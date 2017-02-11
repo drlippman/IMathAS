@@ -547,9 +547,11 @@ $placeinhead .= "}\n";
 $placeinhead .= '$(function() { $(".lal").attr("title","View login log");
 	$(".gl").attr("title","View student grades");
 	$(".ex").attr("title","Set due date exceptions");
-	$(".ui").attr("title","Change student profile info");
+	$(".ui").attr("title","Edit student profile and options");
 	$(".ll").attr("title","Lock student out of the course");
-	$(".ull").attr("title","Allow student access to the course");});';
+	$(".ull").attr("title","Allow student access to the course");
+	$("input[type=checkbox]").on("change",function() {$(this).parents("tr").toggleClass("highlight");});
+	});';
 $placeinhead .= "</script>";
 
 require("../header.php");
@@ -704,6 +706,10 @@ if ($overwriteBody==1) {
 		picsize = (picsize+1)%3;
 		picshow(picsize);
 	}
+	function chgpicsize() {
+		var size = document.getElementById("picsize").value;
+		picshow(size);
+	}
 	function picshow(size) {
 		if (size==0) {
 			els = document.getElementById("myTable").getElementsByTagName("img");
@@ -731,6 +737,10 @@ if ($overwriteBody==1) {
 	echo '<span class="column" style="width:auto;">';
 	echo "<a href=\"logingrid.php?cid=$cid\">View Login Grid</a><br/>";
 	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
+	echo 'Pictures: <select id="picsize" onchange="chgpicsize()">';
+	echo "<option value=0 selected>", _('None'), "</option>";
+	echo "<option value=1>", _('Small'), "</option>";
+	echo "<option value=2>", _('Big'), "</option></select>";
 	echo '</span>';
 	echo '<span class="column" style="width:auto;">';
 	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
@@ -753,17 +763,21 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 		With Selected:
-		<input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">
+		<?php 
+		  if (!isset($CFG['GEN']['noEmailButton'])) {
+		  	  echo '<input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">';
+		  }
+		?>
 		<input type=submit name=submit value="Message" title="Send a message to the selected students">
+		<input type=submit name=submit value="Lock" title="Lock selected students out of the course">
+		<input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students">
+		<input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
 		<?php
 		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
 			echo '<input type=submit name=submit value="Unenroll" title="Unenroll the selected students">';
 		}
 		?>
-		<input type=submit name=submit value="Lock" title="Lock selected students out of the course">
-		<input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students">
-		<input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
-		<input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
+		</p>
 
 	<table class=gb id=myTable>
 		<thead>
@@ -772,15 +786,10 @@ if ($overwriteBody==1) {
 			<th></th>
 			<?php echo $hasSectionRowHeader; ?>
 			<?php echo $hasCodeRowHeader; ?>
-			<th>Last</th>
-			<th>First</th>
-			<th>Email</th>
-			<th><?php echo $loginprompt ?></th>
+			<th>Name</th>
+			<th></th>
 			<th>Last Access</th>
 			<th>Grades</th>
-			<th>Due Dates</th>
-			<th>Chg Info</th>
-			<th>Lock Out</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -792,15 +801,19 @@ if ($overwriteBody==1) {
 			if ($line['section']==null) {
 				$line['section'] = '';
 			}
+			$icons = '';
 			$numstu++;
 			if ($line['locked']>0) {
-				$lastaccess = "Is locked out";
-			} else {
-				$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
+				$icons .= '<img src="../img/lock.png" alt="Locked" title="Locked"/> ';
 			}
+			if ($line['timelimitmult']!=1) {
+				$icons .= '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
+			}
+			$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
+			
 			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
-			if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
+			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td><input type=checkbox name="checked[]" value="<?php echo $line['userid'] ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
 				<td>
@@ -818,34 +831,20 @@ if ($overwriteBody==1) {
 				<?php
 				echo $hasSectionData;
 				echo $hasCodeData;
+				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.$line['userid'].'" class="ui">';
+				$nameline .= $line['LastName'].', '.$line['FirstName'] . '</a>';
 				if ($line['locked']>0) {
-					echo '<td><span class="greystrike">'.$line['LastName'].'</span></td>';
-					echo '<td><span class="greystrike">'.$line['FirstName'].'</span></td>';
+					echo '<td><span class="greystrike">'.$nameline.'</span></td>';
+					echo '<td>'.$icons.'</td>';
+					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.$line['userid'].'" class="lal">'.$lastaccess.'</a></span></td>';
 				} else {
-					echo '<td>'.$line['LastName'].'</td><td>'.$line['FirstName'].'</td>';
+					echo '<td>'.$nameline.'</td>';
+					echo '<td>'.$icons.'</td>';
+					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.$line['userid'].'" class="lal">'.$lastaccess.'</a></td>';
 				}
 				?>
-				<td><a href="mailto:<?php echo $line['email'] ?>"><?php echo $line['email'] ?></a></td>
-				<td><?php echo $line['SID'] ?></td>
-				<td><a href="viewloginlog.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>" class="lal"><?php echo $lastaccess ?></a></td>
+				
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers" class="gl">Grades</a></td>
-				<td><a href="listusers.php?cid=<?php echo $cid ?>&uid=<?php echo $line['userid'] ?>&massexception=1" class="ex">Exception</a></td>
-				<td><a href="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $line['userid'] ?>" class="ui">Chg</a>
-				<?php if ($line['timelimitmult']!=1) {
-					echo '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
-				}
-				?>
-				</td>
-				<?php
-				if ($line['locked']>0) {
-					echo '<td><img src="../img/lock.png" alt="Locked"/> <a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
-				} else {
-					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student ('.str_replace("'","\\'",$line['LastName'].', '.$line['FirstName']).') out of the course?\');" class="ll">Lock</a></td>';
-				}
-				/*if (!isset($CFG['GEN']['noInstrUnenroll'])) {
-					echo '<td><a href="listusers.php?cid='.$cid.'&action=unenroll&uid='.$line['userid'].'">Unenroll</a></td>';
-				}*/
-				?>
 			</tr>
 <?php
 		}
@@ -857,7 +856,7 @@ if ($overwriteBody==1) {
 		echo "Number of students: $numstu<br/>";
 ?>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S','S','S','S','D',false,false,false),true);
+			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S',false,'D',false),true);
 		</script>
 	</form>
 

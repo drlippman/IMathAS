@@ -3,11 +3,26 @@
 //(c) 2006 David Lippman
 require("../validate.php");
 require("../header.php");
-if (!isset($_GET['cid'])) {
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Form</div>\n";
+
+$from = 'admin';
+$backloc = 'admin.php';
+if (isset($_GET['from'])) {
+	if ($_GET['from']=='home') {
+		$from = 'home';
+		$backloc = '../index.php';
+	}
 }
+if (!isset($_GET['cid'])) {
+	echo "<div class=breadcrumb>$breadcrumbbase ";
+	if ($from != 'home') {
+		echo "<a href=\"admin.php\">Admin</a> &gt; ";
+	}
+	echo "Form</div>\n";
+}
+
 switch($_GET['action']) {
 	case "delete":
+		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
 		//DB $query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $name = mysql_result($result,0,0);
@@ -16,17 +31,17 @@ switch($_GET['action']) {
 		$name = $stm->fetchColumn(0);
 		echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
 		echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=delete&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=delete&id={$_GET['id']}'\">\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
 		break;
 	case "deladmin":
 		echo "<p>Are you sure you want to delete this user?</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=deladmin&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=deladmin&id={$_GET['id']}'\">\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
 		break;
 	case "chgpwd":
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
-		echo "<form method=post action=\"actions.php?action=chgpwd\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=chgpwd\">\n";
 		echo "<span class=form>Enter old password:</span>  <input class=form type=password name=oldpw size=40> <BR class=form>\n";
 		echo "<span class=form>Enter new password:</span> <input class=form type=password name=newpw1 size=40> <BR class=form>\n";
 		echo "<span class=form>Verify new password:</span>  <input class=form type=password name=newpw2 size=40> <BR class=form>\n";
@@ -35,7 +50,7 @@ switch($_GET['action']) {
 
 	case "chgrights":
 	case "newadmin":
-		echo "<form method=post action=\"actions.php?action={$_GET['action']}";
+		echo "<form method=post action=\"actions.php?from=$from&action={$_GET['action']}";
 		if ($_GET['action']=="chgrights") { echo "&id={$_GET['id']}"; }
 		echo "\">\n";
 		if ($_GET['action'] == "newadmin") {
@@ -244,8 +259,14 @@ switch($_GET['action']) {
 			$cid = $_GET['cid'];
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Course Settings</h2></div>';
-		echo "<form method=post action=\"actions.php?action={$_GET['action']}";
+		echo '<div id="headerforms" class="pagetitle"><h2>';
+		if ($_GET['action']=='modify') {
+			echo _('Course Settings');
+		} else {
+			echo _('Add New Course');
+		}
+		echo '</h2></div>';
+		echo "<form method=post action=\"actions.php?from=$from&action={$_GET['action']}";
 		if (isset($_GET['cid'])) {
 			echo "&cid=$cid";
 		}
@@ -261,9 +282,7 @@ switch($_GET['action']) {
 		echo '<span class=form>Available?</span><span class=formright>';
 		echo '<input type="checkbox" name="stuavail" value="1" ';
 		if (($avail&1)==0) { echo 'checked="checked"';}
-		echo '/>Available to students<br/><input type="checkbox" name="teachavail" value="2" ';
-		if (($avail&2)==0) { echo 'checked="checked"';}
-		echo '/>Show on instructors\' home page</span><br class="form" />';
+		echo '/>Available to students</span><br class="form" />';
 		if ($_GET['action']=="modify") {
 			echo '<span class=form>Lock for assessment:</span><span class=formright><select name="lockaid">';
 			echo '<option value="0" ';
@@ -647,7 +666,7 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$_GET['id']));
 		$num = $stm->rowCount();
-		echo '<form method="post" action="actions.php?action=remteacher&cid='.$_GET['id'].'&tot='.$num.'">';
+		echo '<form method="post" action="actions.php?from='.$from.'&action=remteacher&cid='.$_GET['id'].'&tot='.$num.'">';
 		echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		$onlyone = ($num==1);
@@ -664,7 +683,7 @@ switch($_GET['action']) {
 			if ($onlyone) {
 				echo "<td></td></tr>";
 			} else {
-				echo "<td><A href=\"actions.php?action=remteacher&cid={$_GET['id']}&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
+				echo "<td><A href=\"actions.php?from=$from&action=remteacher&cid={$_GET['id']}&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
 			}
 			$used[$line['userid']] = true;
 		}
@@ -680,7 +699,7 @@ switch($_GET['action']) {
 			$stm = $DBH->query("SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;");
 		}
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		echo '<form method="post" action="actions.php?action=addteacher&cid='.$_GET['id'].'">';
+		echo '<form method="post" action="actions.php?from='.$from.'&action=addteacher&cid='.$_GET['id'].'">';
 		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -690,17 +709,17 @@ switch($_GET['action']) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
 				echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
 				echo "<td>{$line['LastName']}, {$line['FirstName']} </td> ";
-				echo "<td><a href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
+				echo "<td><a href=\"actions.php?from=$from&action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
 			}
 		}
 		echo "</table></form>\n";
-		echo "<p><input type=button value=\"Done\" onclick=\"window.location='admin.php'\" /></p>\n";
+		echo "<p><input type=button value=\"Done\" onclick=\"window.location='$backloc'\" /></p>\n";
 		break;
 	case "importmacros":
 		echo "<h3>Install Macro File</h3>\n";
 		echo "<p><b>Warning:</b> Macro Files have a large security risk.  <b>Only install macro files from a trusted source</b></p>\n";
 		echo "<p><b>Warning:</b> Install will overwrite any existing macro file of the same name</p>\n";
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=importmacros\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=$from&action=importmacros\">\n";
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n";
 		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
 		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
@@ -711,7 +730,7 @@ switch($_GET['action']) {
 		echo "<h3>Install Question Images</h3>\n";
 		echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install question images from a trusted source</b>, and where you've verified the archive only contains images.</p>\n";
 		echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n";
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=importqimages\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=$from&action=importqimages\">\n";
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"5000000\" />\n";
 		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
 		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
@@ -721,7 +740,7 @@ switch($_GET['action']) {
 		echo "<h3>Install Course files</h3>\n";
 		echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install course files from a trusted source</b>, and where you've verified the archive only contains regular files (no PHP files).</p>\n";
 		echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n";
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=importcoursefiles\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=$from&action=importcoursefiles\">\n";
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\" />\n";
 		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
 		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
@@ -731,7 +750,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Transfer Course Ownership</h3>\n";
 		echo '</div>';
-		echo "<form method=post action=\"actions.php?action=transfer&id={$_GET['id']}\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=transfer&id={$_GET['id']}\">\n";
 		echo "Transfer course ownership to: <select name=newowner>\n";
 		if ($myrights < 100) {
 			//DB $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND groupid='$groupid' ORDER BY LastName";
@@ -748,12 +767,12 @@ switch($_GET['action']) {
 		}
 		echo "</select>\n";
 		echo "<p><input type=submit value=\"Transfer\">\n";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
 		echo "</form>\n";
 		break;
 	case "deloldusers":
 		echo "<h3>Delete Old Users</h3>\n";
-		echo "<form method=post action=\"actions.php?action=deloldusers\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=deloldusers\">\n";
 		echo "<span class=form>Delete Users older than:</span>";
 		echo "<span class=formright><input type=text name=months size=4 value=\"6\"/> Months</span><br class=form>\n";
 		echo "<span class=form>Delete Who:</span>";
@@ -783,12 +802,12 @@ switch($_GET['action']) {
 			if ($row[0]==0) {
 				echo "<td></td>";
 			} else {
-				echo "<td><a href=\"actions.php?action=delltidomaincred&id={$row[0]}\" onclick=\"return confirm('Are you sure?');\">Delete</a></td>\n";
+				echo "<td><a href=\"actions.php?from=$from&action=delltidomaincred&id={$row[0]}\" onclick=\"return confirm('Are you sure?');\">Delete</a></td>\n";
 			}
 			echo "</tr>\n";
 		}
 		echo "</table>\n";
-		echo "<form method=post action=\"actions.php?action=modltidomaincred&id=new\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=modltidomaincred&id=new\">\n";
 		echo "<p>Add new LTI key/secret: <br/>";
 		echo "Domain: <input type=text name=\"ltidomain\" size=20><br/>\n";
 		echo "Key: <input type=text name=\"ltikey\" size=20><br/>\n";
@@ -820,7 +839,7 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<form method=post action=\"actions.php?action=modltidomaincred&id={$row[0]}\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=modltidomaincred&id={$row[0]}\">\n";
 		echo "Modify LTI key/secret: <br/>";
 		echo "Domain: <input type=text name=\"ltidomain\" value=\"{$row[1]}\" size=20><br/>\n";
 		echo "Key: <input type=text name=\"ltikey\" value=\"{$row[2]}\" size=20><br/>\n";
@@ -860,12 +879,12 @@ switch($_GET['action']) {
 			if ($row[0]==0) {
 				echo "<td></td>";
 			} else {
-				echo "<td><a href=\"actions.php?action=delgroup&id={$row[0]}\" onclick=\"return confirm('Are you SURE you want to delete this group?');\">Delete</a></td>\n";
+				echo "<td><a href=\"actions.php?from=$from&action=delgroup&id={$row[0]}\" onclick=\"return confirm('Are you SURE you want to delete this group?');\">Delete</a></td>\n";
 			}
 			echo "</tr>\n";
 		}
 		echo "</table>\n";
-		echo "<form method=post action=\"actions.php?action=addgroup\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=addgroup\">\n";
 		echo "Add new group: <input type=text name=gpname id=gpname size=50><br/>\n";
 		echo "<input type=submit value=\"Add Group\">\n";
 		echo "</form>\n";
@@ -879,7 +898,7 @@ switch($_GET['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($gpname,$parent) = $stm->fetch(PDO::FETCH_NUM);
 
-		echo "<form method=post action=\"actions.php?action=modgroup&id={$_GET['id']}\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=modgroup&id={$_GET['id']}\">\n";
 		echo "Group name: <input type=text size=50 name=gpname id=gpname value=\"$gpname\"><br/>\n";
 		echo 'Parent: <select name="parentid"><option value="0" ';
 		if ($parent==0) { echo ' selected="selected"';}
@@ -899,8 +918,8 @@ switch($_GET['action']) {
 		break;
 	case "removediag":
 		echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=removediag&id={$_GET['id']}'\">\n";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=removediag&id={$_GET['id']}'\">\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
 		break;
 }
 

@@ -246,11 +246,11 @@ function GB_show(caption,url,width,height) {
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
-		btnhtml += '<span class="pointer" onclick="GB_hide()">[X]</span>&nbsp;</span>Select Libraries<div class="clear"></div>';
+		btnhtml += '<span class="pointer" onclick="GB_hide()" aria-label="Close">[X]</span>&nbsp;</span>Select Libraries<div class="clear"></div>';
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()">[X]</span></span>'+caption;
+		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()" aria-label="Close">[X]</span></span>'+caption;
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
 			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
@@ -262,12 +262,15 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_overlay").style.display = "block";
 	document.getElementById("GB_loading").style.display = "block";
 
-	var de = document.documentElement;
-	var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
-
+	//var de = document.documentElement;
+	//var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
+	var w = $(document).width();
+	if (width > w-20) {
+		width = w-20;
+	}
 	document.getElementById("GB_window").style.width = width + "px";
 	document.getElementById("GB_window").style.height = (h-30) + "px";
-	document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
+	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
 }
 function GB_doneload() {
@@ -603,18 +606,19 @@ function removemultiselect(el) {
 	p.remove();
 }
 
-function hidefromcourselist(el,cid) {
+function hidefromcourselist(el,cid,type) {
 	if (confirm("Are you SURE you want to hide this course from your course list?")) {
 		jQuery.ajax({
 				type: "GET",
-				url: imasroot+'/admin/hidefromcourselist.php?cid='+cid
+				url: imasroot+'/admin/hidefromcourselist.php?cid='+cid+'&type='+type
 		}).done(function(msg) {
 			if (msg=='OK') {
-				jQuery(el).parent().slideUp();
-				jQuery('#unhidelink').show();
+				jQuery(el).closest("ul.courselist > li").slideUp();
+				jQuery('#unhidelink'+type).show();
 			}
 		});
 	}
+	return false;
 }
 
 function rotateimg(el) {

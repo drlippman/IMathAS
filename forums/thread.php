@@ -636,7 +636,7 @@ echo "</p>";
 ?>
 <table class="forum gb">
 	<thead>
-		<tr><th>Topic</th>
+		<tr><th>Topic</th><th>Started By</th>
 			<?php
 			if ($isteacher && $groupsetid>0 && !$dofilter) {
 				echo '<th>Group</th>';
@@ -743,6 +743,7 @@ echo "</p>";
 				if ($line['tag']!='') { //category tags
 					echo '<span class="forumcattag">'.$line['tag'].'</span> ';
 				}
+							   	
 				if ($line['posttype']==0) {
 					if (isset($flags[$line['id']])) {
 						echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Flagged\" />";
@@ -751,19 +752,28 @@ echo "</p>";
 					}
 				} else if ($isteacher) {
 					if ($line['posttype']==2) {
-						echo "<img src=\"$imasroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
+						echo "<img class=mida src=\"$imasroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
 					} else if ($line['posttype']==3) {
-						echo "<img src=\"$imasroot/img/noview.png\" alt=\"No View\" title=\"Students can only see their own replies\" /> ";
+						echo "<img class=mida src=\"$imasroot/img/noview.png\" alt=\"No View\" title=\"Students can only see their own replies\" /> ";
 					}
 				}
-				if ($isteacher) {
-					echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
-				}
-				if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
-					echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
-				}
-				if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
-					echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a>";
+				if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby) || ($allowdel && $line['userid']==$userid && $posts==0)) {
+					echo '<span class="dropdown">';
+					echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$line['id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+					echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
+					echo '</a>';
+					echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.$line['id'].'">';	
+					
+					if ($isteacher) {
+						echo "<li><a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a></li> ";
+					}
+					if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
+						echo "<li><a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a></li> ";
+					}
+					if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
+						echo "<li><a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a></li>";
+					}
+					echo '</ul></span>';
 				}
 				echo "</span>\n";
 				if ($line['isanon']==1) {
@@ -771,9 +781,10 @@ echo "</p>";
 				} else {
 					$name = "{$line['LastName']}, {$line['FirstName']}";
 				}
-				echo "<b><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page$grpqs\">{$line['subject']}</a></b>: $name";
-
-				echo "</td>\n";
+				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page$grpqs\">{$line['subject']}</a></td>";
+				
+				echo "<td>$name</td>\n";
+				
 				if ($isteacher && $groupsetid>0 && !$dofilter) {
 					echo '<td class=c>'.$groupnames[$line['stugroupid']].'</td>';
 				}
@@ -787,7 +798,7 @@ echo "</p>";
 				}
 				echo "{$line['tviews']} ({$uniqviews[$line['id']]})</td><td class=c>$lastpost ";
 				if ($lastpost=='' || $maxdate[$line['id']]>$lastview[$line['id']]) {
-					echo "<span style=\"color: red;\">New</span>";
+					echo "<span class=\"noticetext\">New</span>";
 				}
 				echo "</td></tr>\n";
 			}
