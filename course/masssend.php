@@ -32,8 +32,6 @@
 				}
 			}
 		}
-		print_r($toignore);
-		exit;
 		require_once("../includes/htmLawed.php");
 		//DB $_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
 		//DB $_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
