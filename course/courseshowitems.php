@@ -205,6 +205,7 @@ function enditem($canedit) {
 						echo ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
 						echo '</a>';
 						echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
+						echo " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">", _('Edit Contents'), "</a></li>";
 						echo " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a></li>";
 						echo " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$items[$i]['id']}');\">", _('Move'), '</a></li>';
 						echo " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">", _('Delete'), "</a></li>";
@@ -451,6 +452,7 @@ function enditem($canedit) {
 						echo ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
 						echo '</a>';
 						echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
+						echo " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">", _('Edit Contents'), "</a></li>";
 						echo " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a></li>";
 						echo " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$items[$i]['id']}');\">", _('Move'), '</a></li>';
 						echo " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">", _('Delete'), "</a></li>";
