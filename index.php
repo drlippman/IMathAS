@@ -188,7 +188,7 @@ $page_tutorCourseData = array();
 //DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB if (mysql_num_rows($result)==0) {
-$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
+$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid,imas_tutors.hidefromcourselist FROM imas_tutors,imas_courses ";
 $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid=:userid ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 $stm = $DBH->prepare($query);
