@@ -683,7 +683,7 @@ function JSXG_createPolarAxes($label, $ops=array()){
             fixed: true,
             highlight: false,
             strokeColor: '#b6b6b6',
-            strokeWidth: (t==0 ? 3 : 1)
+            strokeWidth: (i==0 ? 3 : 1)
           });
           if (i!=0){
             board_{$label}.create('text', [{$rMaxLabel}*Math.cos(i*Math.PI/inc), {$rMaxLabel}*Math.sin(i*Math.PI/inc), formatPiFrac(i,inc)], {
