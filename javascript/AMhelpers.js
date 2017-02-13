@@ -1327,21 +1327,21 @@ function arraysearch(needle,hay) {
       return -1;
    }
 
-function toggleinlinebtn(n,p){
-	var btn=document.getElementById('inlinebtn'+n);
-	var el=document.getElementById('inlinebtnc'+n);
+function toggleinlinebtn(n,p){ //n: target, p: click el
+	var btn = document.getElementById(p);
+	var el=document.getElementById(n);
 	if (el.style.display=="none") {
 		el.style.display="";
+		el.setAttribute("aria-hidden",false);
 		btn.setAttribute("aria-expanded",true);
 	} else {
 		el.style.display="none";
+		el.setAttribute("aria-hidden",true);
 		btn.setAttribute("aria-expanded",false);
 	}
-	if (p!=null) {
-		var s=document.getElementById(p);
-		var k=s.innerHTML;
-		s.innerHTML = k.match(/\+/)?k.replace(/\+/,'-'):k.replace(/\-/,'+');
-	}
+	var k=btn.innerHTML;
+	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
+	
 }
 function assessbackgsubmit(qn,noticetgt) {
 	if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
