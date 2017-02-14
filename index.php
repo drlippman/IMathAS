@@ -58,8 +58,8 @@ $placeinhead .= '<script type="text/javascript">$(function() {
   $(".courselist-teach li").css("clear","both").each(function (i,el) {
   	if ($(el).attr("data-isowner")=="true") {
   		var cid = $(el).attr("data-cid");
-  		var thishtml = html + \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');">'._('Hide from course list').'</a></li>\';
-  		thishtml += \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
+  		var thishtml = html + \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
+  		thishtml += \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');">'._('Hide from course list').'</a></li>\';
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=chgteachers&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=transfer&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';

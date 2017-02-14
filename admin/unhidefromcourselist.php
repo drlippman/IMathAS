@@ -15,6 +15,7 @@ if ($type=='teach') {
 } else {
 	$typename = "Taking";
 	$table = 'imas_students';
+	$type = 'take';
 }
 
 $pagetitle = "Unhide Courses You're $typename from Course List";
@@ -37,7 +38,13 @@ if (isset($_GET['cid'])) {
 //DB $query .= "WHERE istu.userid='$userid' AND istu.hidefromcourselist=1";
 //DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 $query = 'SELECT ic.name,ic.id FROM imas_courses AS ic JOIN '.$table.' AS istu ON ic.id=istu.courseid ';
-$query .= "WHERE istu.userid=:userid AND istu.hidefromcourselist=1 ORDER BY ic.name";
+$query .= "WHERE istu.userid=:userid AND istu.hidefromcourselist=1 ";
+if ($type=='take') {
+	$query .= "AND ic.available=0 ";
+} else {
+	$query .= "AND ic.available<4 ";
+}
+$query .= "ORDER BY ic.name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid));
 echo '<ul class="nomark">';
@@ -47,7 +54,9 @@ if ($stm->rowCount()==0) {
 } else {
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo '<li>'.$row[0].' <a href="unhidefromcourselist.php?type='.$type.'&cid='.$row[1].'">Unhide</a></li>';
+		echo '<li>';
+		echo '<a href="../course/course.php?cid='.$row[1].'" target="_blank">'.$row[0].'</a>:';
+		echo ' <a href="unhidefromcourselist.php?type='.$type.'&cid='.$row[1].'">Unhide</a></li>';
 	}
 }
 echo '</ul>';
