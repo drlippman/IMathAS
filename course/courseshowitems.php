@@ -2,11 +2,11 @@
 //IMathAS:  show items function for main course page
 //(c) 2007 David Lippman
 
-function beginitem($canedit,$aname=0) {
+function beginitem($canedit,$aname='') {
 	//if ($canedit) {
 	//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
 	// }
-	 if ($aname != 0) {
+	 if ($aname != '') {
 		 echo "<div class=\"item\" id=\"$aname\">\n";
 	 } else {
 	 	 echo "<div class=\"item\">\n";
@@ -1141,7 +1141,7 @@ function enditem($canedit) {
 				   } else {
 					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
 				   }
-				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   beginitem($canedit,'inline'.$typeid); //echo "<div class=item>\n";
 				   if ($canedit) {
 				   	echo '<div class="floatright dropdown">';
 				   	echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
