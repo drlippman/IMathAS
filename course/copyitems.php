@@ -637,8 +637,16 @@ $placeinhead .= '<script type="text/javascript">
 			$("#selectitemstocopy").hide();$("#allitemsnote").show();
 		} else {
 			$("#selectitemstocopy").show();$("#allitemsnote").hide();
-		} }
-
+		} 
+	}
+	function copyitemsonsubmit() {
+		if (!document.getElementById("whattocopy1").checked && !document.getElementById("whattocopy2").checked) {
+			alert(_("Select an option for what to copy"));
+			return false;
+		} else {
+			return true;
+		}
+	}
 	$(function() {
 		$("input:radio").change(function() {
 			if ($(this).hasClass("copyr")) {
@@ -723,21 +731,22 @@ if ($overwriteBody==1) {
 	}
 	</script>
 
-	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy">
+	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
 	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
-	What to copy: <select name="whattocopy" onchange="updatetocopy(this)">
-		<option value="all">Copy whole course</option>
-		<option value="select">Select items to copy</option>
-	</select>
+	<p>What to copy: 
 	<?php
-		if ($_POST['ekey']=='') { echo '&nbsp;<a class="small" target="_blank" href="course.php?cid='.$_POST['ctc'].'">Preview source course</a>';}
+		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.$_POST['ctc'].'">Preview source course</a>';}
 	?>
+	<br/>
+	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>
+	<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"> <label for=whattocopy2>Select items to copy</label></p>
+	
 	<div id="allitemsnote">
 	<p><input type=checkbox name="copyofflinewhole"  value="1"/> Copy offline grade items </p>
 	<p>Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.
 	   To change these options, choose "Select items to copy" instead.</p>
-
+	<p class="noticetext">You are about to copy ALL items in this course.</p>
 	</div>
 	<div id="selectitemstocopy" style="display:none;">
 	<h4>Select Items to Copy</h4>
