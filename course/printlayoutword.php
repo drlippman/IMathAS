@@ -27,6 +27,7 @@ if (!(isset($teacherid))) {
 $aid = intval($_GET['aid']);
 $sessiondata['texdisp'] = true;
 $sessiondata['texdoubleescape'] = true;
+$sessiondata['texalignformatrix'] = true;
 
 $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 2;
