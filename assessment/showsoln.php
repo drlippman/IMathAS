@@ -6,6 +6,8 @@ if ($_GET['cid']==="embedq") {
 	require("../i18n/i18n.php");
 	$cid = "embedq";
 	$sessiondata['secsalt'] = "12345";
+	$sessiondata['graphdisp'] = 1;
+	$sessiondata['mathdisp'] = 1;
 } else {
 	require("../validate.php");
 }
