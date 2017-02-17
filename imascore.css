@@ -527,6 +527,19 @@ ul.courselist > li:last-child {
 	border: 0;
 	margin-bottom: 15px;
 }
+ul.courselist > li > a {
+	display:inline-block;
+	margin-right:10px;
+}
+ul.courselist li { 
+	position: relative; 
+}
+div.coursedd { 
+	position: absolute; 
+	right: 0px; 
+	top: 2px;
+}
+   
 div.block h3 {
 	margin: 2px;
 }
@@ -690,15 +703,22 @@ div.multiselitem {
 }
 .ind3 {
 	margin-left: 2.25em;
-}
+} 
 .ind4 {
 	margin-left: 3em;
 }
 .delx {
+	position: absolute;
+	right: 0px;
+	width: 16px;
+	text-align: center;
+	top: 0px;
+	cursor: pointer;
+}
+.delx a:hover, .delx a, .delx a:focus {
 	font-family: sans-serif;
 	color: #6d6d6d;
-	float: right;
-	cursor: pointer;
+	text-decoration: none;
 }
 
 pre {
