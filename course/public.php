@@ -25,8 +25,6 @@
 	}
 	$coursename = $line['name'];
 	$coursetheme = $line['theme'];
-	$hideicons = $line['hideicons'];
-	$graphicalicons = ($line['picicons']==1);
 	$pagetitle = $line['name'];
 	$items = unserialize($line['itemorder']);
 

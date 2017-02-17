@@ -278,16 +278,9 @@ switch($_GET['action']) {
 			$theme = $_POST['theme'];
 		}
 
-		if (isset($CFG['CPS']['picicons']) && $CFG['CPS']['picicons'][1]==0) {
-			$picicons = $CFG['CPS']['picicons'][0];
-		} else {
-			$picicons = $_POST['picicons'];
-		}
-		if (isset($CFG['CPS']['hideicons']) && $CFG['CPS']['hideicons'][1]==0) {
-			$hideicons = $CFG['CPS']['hideicons'][0];
-		} else {
-			$hideicons = $_POST['HIassess'] + $_POST['HIinline'] + $_POST['HIlinked'] + $_POST['HIforum'] + $_POST['HIblock'];
-		}
+		//legacy values - remove eventually
+		$picicons = 1;
+		$hideicons = 0;
 
 		if (isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==0) {
 			$unenroll = $CFG['CPS']['unenroll'][0];

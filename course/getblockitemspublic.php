@@ -17,8 +17,6 @@
 	   echo "Course does not exist. \n";
 	   exit;
    }
-   $hideicons = $line['hideicons'];
-   $graphicalicons = ($line['picicons']==1);
    $pagetitle = $line['name'];
    $items = unserialize($line['itemorder']);
 

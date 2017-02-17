@@ -340,50 +340,7 @@ switch($_GET['action']) {
 
 			echo " </select></span><br class=\"form\" />";
 		}
-		if (!isset($CFG['CPS']['picicons']) || $CFG['CPS']['picicons'][1]==1) {
-
-			echo "<span class=form>Icons:</span><span class=formright>\n";
-			echo 'Icon Style: <input type=radio name="picicons" value="0" ';
-			if ($picicons==0) { echo "checked=1";}
-			echo '/> Text-based <input type=radio name="picicons" value="1" ';
-			if ($picicons==1) { echo "checked=1";}
-			echo '/> Images</span><br class="form" />';
-		}
-
-		if (!isset($CFG['CPS']['hideicons']) || $CFG['CPS']['hideicons'][1]==1) {
-
-			echo "<span class=form>Show Icons:</span><span class=formright>\n";
-
-			echo 'Assessments: <input type=radio name="HIassess" value="0" ';
-			if (($hideicons&1)==0) { echo "checked=1";}
-			echo '/> Show <input type=radio name="HIassess" value="1" ';
-			if (($hideicons&1)==1) { echo "checked=1";}
-			echo '/> Hide<br/>';
-
-			echo 'Inline Text: <input type=radio name="HIinline" value="0" ';
-			if (($hideicons&2)==0) { echo "checked=1";}
-			echo '/> Show <input type=radio name="HIinline" value="2" ';
-			if (($hideicons&2)==2) { echo "checked=1";}
-			echo '/> Hide<br/>';
-
-			echo 'Linked Text: <input type=radio name="HIlinked" value="0" ';
-			if (($hideicons&4)==0) { echo "checked=1";}
-			echo '/> Show <input type=radio name="HIlinked" value="4" ';
-			if (($hideicons&4)==4) { echo "checked=1";}
-			echo '/> Hide<br/>';
-
-			echo 'Forums: <input type=radio name="HIforum" value="0" ';
-			if (($hideicons&8)==0) { echo "checked=1";}
-			echo '/> Show <input type=radio name="HIforum" value="8" ';
-			if (($hideicons&8)==8) { echo "checked=1";}
-			echo '/> Hide<br/>';
-
-			echo 'Blocks: <input type=radio name="HIblock" value="0" ';
-			if (($hideicons&16)==0) { echo "checked=1";}
-			echo '/> Show <input type=radio name="HIblock" value="16" ';
-			if (($hideicons&16)==16) { echo "checked=1";}
-			echo '/> Hide</span><br class=form />';
-		}
+		
 		if (!isset($CFG['CPS']['unenroll']) || $CFG['CPS']['unenroll'][1]==1) {
 			echo "<span class=form>Allow students to self-<u>un</u>enroll</span><span class=formright>";
 			echo '<input type=radio name="allowunenroll" value="0" ';

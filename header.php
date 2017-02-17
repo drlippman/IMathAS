@@ -15,7 +15,7 @@
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=010417";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=021617";?>" type="text/css" />
 <?php if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
@@ -176,7 +176,11 @@ echo "<body>\n";
 
 
 $insertinheaderwrapper = ' '; //"<h1>$coursename</h1>";
-echo '<div class=mainbody>';
+if (isset($coursetheme) && strpos($coursetheme, '_fw')!==false) {
+	echo '<div class="mainbody isfw">';
+} else {
+	echo '<div class="mainbody notfw">';
+}
 if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }

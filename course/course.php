@@ -103,8 +103,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 
 	$allowunenroll = $line['allowunenroll'];
-	$hideicons = $line['hideicons'];
-	$graphicalicons = ($line['picicons']==1);
 	$pagetitle = $line['name'];
 	$items = unserialize($line['itemorder']);
 	$msgset = $line['msgset']%5;
