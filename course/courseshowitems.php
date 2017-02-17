@@ -197,7 +197,11 @@ function showitems($items,$parent,$inpublic=false) {
 				
 				while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 					if (!isset($typelookups[$line['itemtype']])) {$typelookups[$line['itemtype']] = array();}
-					$typelookups[$line['itemtype']][$line['typeid']] = $line['id'];  //store so we can map typeid back to item id below
+					if ($line['itemtype']=='Calendar') {
+						$itemshowdata[$line['id']] = $line;
+					} else {
+						$typelookups[$line['itemtype']][$line['typeid']] = $line['id'];  //store so we can map typeid back to item id below
+					}
 				}
 			}
 			if (isset($typelookups['Assessment'])) {
