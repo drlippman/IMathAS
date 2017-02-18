@@ -325,18 +325,19 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			if ($timelimitmult <= 0) {
 				$timelimitmult = '1.0';
 			}
+			$latepasses = intval($_POST['latepasses']);
 			//echo $timelimitmult;
 
 			if ($locked==0) {
 				//DB $query = "UPDATE imas_students SET code=$code,section=$section,locked=$locked,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,locked=:locked,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist WHERE userid=:userid AND courseid=:courseid");
-				$stm->execute(array(':code'=>$code, ':section'=>$section, ':locked'=>$locked, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
+				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,locked=:locked,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist,latepass=:latepass WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':code'=>$code, ':section'=>$section, ':locked'=>$locked, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
 			} else {
 				//DB $query = "UPDATE imas_students SET code=$code,section=$section,timelimitmult='$timelimitmult',hidefromcourselist=$hide WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist WHERE userid=:userid AND courseid=:courseid");
-				$stm->execute(array(':code'=>$code, ':section'=>$section, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
+				$stm = $DBH->prepare("UPDATE imas_students SET code=:code,section=:section,timelimitmult=:timelimitmult,hidefromcourselist=:hidefromcourselist,latepass=:latepass WHERE userid=:userid AND courseid=:courseid");
+				$stm->execute(array(':code'=>$code, ':section'=>$section, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
 				//DB $query = "UPDATE imas_students SET locked=$locked WHERE userid='{$_GET['uid']}' AND courseid='$cid' AND locked=0";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE userid=:userid AND courseid=:courseid AND locked=0");
@@ -385,7 +386,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//DB $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $lineStudent = mysql_fetch_array($result, MYSQL_ASSOC);
-			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult,imas_students.hidefromcourselist FROM imas_users,imas_students ";
+			$query = "SELECT imas_users.*,imas_students.code,imas_students.section,imas_students.locked,imas_students.timelimitmult,imas_students.hidefromcourselist,imas_students.latepass FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id=:id AND imas_students.courseid=:courseid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$_GET['uid'], ':courseid'=>$cid));
@@ -507,7 +508,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		//DB }
 		//DB $resultDefaultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult ";
+		$haslatepasses = false;
+		
+		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,";
+		$query .= "imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult,imas_students.latepass ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseid AND imas_students.userid=imas_users.id ";
 		if ($secfilter>-1) {
 			$query .= "AND imas_students.section=:section ";
@@ -523,11 +527,19 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		} else {
 			$resultDefaultUserList->execute(array(':courseid'=>$cid));
 		}
-
+		$defaultUserList = array();
+		while ($line=$resultDefaultUserList->fetch(PDO::FETCH_ASSOC)) {
+			$defaultUserList[] = $line;
+			if ($line['latepass']>0) {
+				$haslatepasses=true;
+			}
+		}
 		$hasSectionRowHeader = ($hassection)? "<th>Section$sectionselect</th>" : "";
 		$hasCodeRowHeader = ($hascode) ? "<th>Code</th>" : "";
+		$hasLatePassHeader = ($haslatepasses) ? "<th>LatePasses</th>" : "";
 		$hasSectionSortTable = ($hassection) ? "'S'," : "";
 		$hasCodeSortTable = ($hascode) ? "'N'," : "";
+		$hasLatePassSortTable = ($haslatepasses) ? ",'N'" : "";
 
 	}
 } //END DATA MANIPULATION
@@ -671,6 +683,8 @@ if ($overwriteBody==1) {
 			<span class=formright><input type="text" name="code" value="<?php echo $lineStudent['code'] ?>"/></span><br class=form>
 			<span class=form>Time Limit Multiplier:</span>
 			<span class=formright><input type="text" name="timelimitmult" value="<?php echo $lineStudent['timelimitmult'] ?>"/></span><br class=form>
+			<span class=form>LatePasses:</span>
+			<span class=formright><input type="text" name="latepasses" value="<?php echo $lineStudent['latepass'] ?>"/></span><br class=form>
 			<span class=form>Lock out of course?:</span>
 			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class="form">Student has course hidden from course list?:</span>
@@ -736,11 +750,7 @@ if ($overwriteBody==1) {
 	<?php
 	echo '<span class="column" style="width:auto;">';
 	echo "<a href=\"logingrid.php?cid=$cid\">View Login Grid</a><br/>";
-	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a><br/>";
-	echo 'Pictures: <select id="picsize" onchange="chgpicsize()">';
-	echo "<option value=0 selected>", _('None'), "</option>";
-	echo "<option value=1>", _('Small'), "</option>";
-	echo "<option value=2>", _('Big'), "</option></select>";
+	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a>";
 	echo '</span>';
 	echo '<span class="column" style="width:auto;">';
 	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
@@ -758,8 +768,12 @@ if ($overwriteBody==1) {
 	}
 	echo '</span>';
 	echo '<br class="clear"/>';
+	echo '</div>';
+	echo '<p>Show pictures: <select id="picsize" onchange="chgpicsize()">';
+	echo "<option value=0 selected>", _('None'), "</option>";
+	echo "<option value=1>", _('Small'), "</option>";
+	echo "<option value=2>", _('Big'), "</option></select></p>";
 	?>
-	</div>
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 		With Selected:
@@ -790,25 +804,32 @@ if ($overwriteBody==1) {
 			<th></th>
 			<th>Last Access</th>
 			<th>Grades</th>
+			<?php echo $hasLatePassHeader; ?>
 		</tr>
 		</thead>
 		<tbody>
 <?php
 		$alt = 0;
-		$numstu = 0;
+		$numstu = 0;  $numunlocked = 0;
 		//DB while ($line=mysql_fetch_array($resultDefaultUserList, MYSQL_ASSOC)) {
-		while ($line=$resultDefaultUserList->fetch(PDO::FETCH_ASSOC)) {
+		foreach ($defaultUserList as $line) {
 			if ($line['section']==null) {
 				$line['section'] = '';
 			}
 			$icons = '';
 			$numstu++;
 			if ($line['locked']>0) {
-				$icons .= '<img src="../img/lock.png" alt="Locked" title="Locked"/> ';
+				$icons .= '<img src="../img/lock.png" alt="Locked" title="Locked"/>';
+			} else {
+				$numunlocked++;
 			}
 			if ($line['timelimitmult']!=1) {
 				$icons .= '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
 			}
+			if ($icons != '') {
+				$icons = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.$line['userid'].'">'.$icons.'</a>';
+			}
+				
 			$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
 			
 			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
@@ -845,6 +866,11 @@ if ($overwriteBody==1) {
 				?>
 				
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers" class="gl">Grades</a></td>
+				<?php
+				if ($haslatepasses) {
+					echo '<td>'.$line['latepass'].'</td>';
+				}
+				?>
 			</tr>
 <?php
 		}
@@ -853,10 +879,14 @@ if ($overwriteBody==1) {
 			</tbody>
 		</table>
 <?php
-		echo "Number of students: $numstu<br/>";
+		echo "<p>Number of students: <b>$numunlocked</b>";
+		if ($numstu != $numunlocked) {
+			echo " ($numstu including locked students)";
+		}
+		echo '</p>';
 ?>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S',false,'D',false),true);
+			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S',false,'D',false<?php echo $hasLatePassSortTable ?>),true);
 		</script>
 	</form>
 
