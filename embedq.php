@@ -38,6 +38,9 @@ if (isset($_GET['noscores'])) {
 if (isset($_GET['noregen'])) {
 	$page_formAction .= '&noregen=true';
 }
+if (isset($_GET['resizer'])) {
+	$page_formAction .= '&resizer=true';
+}
 
 $showans = false;
 if (isset($_POST['seed'])) {
