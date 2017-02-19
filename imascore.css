@@ -766,7 +766,7 @@ pre {
 .playlistbar { background-color: #ccc; padding: 3px;}
 .playlistbar > * {vertical-align: top;}
 .playlistwrap { border: 1px solid #ccc; padding: 10px; position:relative;}
-.playlistbar, .playlistwrap {margin-left: -15px;}
+.playlistbar, .playlistwrap {margin-left: 0px;}
 
 .clearfix:before,
 .clearfix:after {

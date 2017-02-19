@@ -85,6 +85,9 @@ if (isset($_POST['seed'])) {
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $useeditor = 1;
+if (isset($_GET['resizer'])) {
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/iframeSizer_contentWindow_min.js"></script>';
+}
 require("./assessment/header.php");
 
 if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
