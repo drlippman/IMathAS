@@ -742,7 +742,7 @@ if ($overwriteBody==1) {
 	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>
 	<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"> <label for=whattocopy2>Select items to copy</label></p>
 	
-	<div id="allitemsnote">
+	<div id="allitemsnote" style="display:none;">
 	<p><input type=checkbox name="copyofflinewhole"  value="1"/> Copy offline grade items </p>
 	<p>Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.
 	   To change these options, choose "Select items to copy" instead.</p>

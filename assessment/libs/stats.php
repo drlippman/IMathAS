@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.9, March 30, 2008
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","percentile","quartile","TIquartile","Excelquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","quartile","TIquartile","Excelquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -54,6 +54,17 @@ function variance($a) {
 //the (sample) standard deviation of an array of numbers
 function stdev($a) {
 	return sqrt(variance($a));
+}
+
+//absmeandev(array)
+//the absolute mean deviation of an array of numbers
+function absmeandev($a) {
+	$v = 0;
+	$mean = mean($a);
+	foreach ($a as $x) {
+		$v += abs($x-$mean);
+	}
+	return ($v/(count($a)));
 }
 
 //percentile(array,percentile)
