@@ -2537,7 +2537,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$settings[2] = substr($settings[2],2);
 			}
 			if (strpos($grid[4],'pi')!==false) {
-				$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings[4];
+				if (strpos($settings[4],':')!==false) {
+					$settings4pts = explode(':',$settings[4]);
+					$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings4pts[1];
+				} else {
+					$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings[4];
+				}
 			}
 		} else {
 			$origxmin = $settings[0];
