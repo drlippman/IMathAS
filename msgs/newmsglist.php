@@ -63,7 +63,7 @@
 
 ?>
 
-	<form id="qform" method="post" action="newmsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
+	<form id="qform" method="post" action="newmsglist.php?cid=<?php echo $cid;?>">
 
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: <input type=submit name="read" value="Mark as Read">
@@ -76,7 +76,7 @@
 	//DB $query .= "ORDER BY imas_courses.name, senddate DESC ";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	//DB if (mysql_num_rows($result)==0) {
-	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
+	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_courses.id AS cid ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
 	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread&3)=0 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
@@ -110,7 +110,7 @@
 				$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 			}
 			echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-			echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&type=new&msgid={$line['id']}\">";
+			echo "<a href=\"viewmsg.php?cid={$line['cid']}&type=new&msgid={$line['id']}\">";
 			if (($line['isread']&1)==0) {
 				echo "<b>{$line['title']}</b>";
 			} else {
