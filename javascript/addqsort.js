@@ -954,7 +954,6 @@ function generateTable() {
 				if (displaymethod=="Embed") {
 					html += "<td colspan=8 id=\"textsegdescr"+i+"\" class=\"description-cell\">";
 					if (curitems[j][3]==1) {
-						text_segment_count++;
 						var header_contents= curitems[j][4];
 						html += "<div style=\"position: relative\"><h4 id=\"textsegheader"+i+"\" class=\"textsegment collapsedheader\">"+header_contents+"</h4>";
 						html += "<div class=\"text-segment-icon\"><button id=\"edit-buttonheader"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-spanheader"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div>";
