@@ -39,7 +39,7 @@
  if (isset($CFG['CPS']['theme'])) {
  	 $defaultcoursetheme = $CFG['CPS']['theme'][0];
  } else if (!isset($defaultcoursetheme)) {
-	 $defaultcoursetheme = "default.css";
+	 $defaultcoursetheme = "modern.css";
  }
  $coursetheme = $defaultcoursetheme; //will be overwritten later if set
  if (!isset($CFG['CPS']['miniicons'])) {
@@ -567,6 +567,10 @@
 			$coursetheme = $crow[5]; //mysql_result($result,0,5);
 			if (isset($usertheme) && $usertheme!='') {
 				$coursetheme = $usertheme;
+			} else if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
+				$coursetheme = $defaultcoursetheme;
+			} else if (isset($CFG['CPS']['themelist']) && strpos($CFG['CPS']['themelist'], $coursetheme)===false) {
+				$coursetheme = $defaultcoursetheme;
 			}
 			$coursenewflag = $crow[6]; //mysql_result($result,0,6);
 			$coursemsgset = $crow[7]%5;

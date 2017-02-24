@@ -157,6 +157,11 @@ if (!(isset($teacherid))) {
 				} else {
 					$row['ancestors'] = intval($_POST['ctc']).','.$row['ancestors'];
 				}
+				if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
+					$row['theme'] = $defaultcoursetheme;
+				} else if (isset($CFG['CPS']['themelist']) && strpos($CFG['CPS']['themelist'], $coursetheme)===false) {
+					$row['theme'] = $defaultcoursetheme;
+				}
 				$sets = '';
 				for ($i=0; $i<count($tocopyarr); $i++) {
 					if ($i>0) {$sets .= ',';}
