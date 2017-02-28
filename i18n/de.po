@@ -1,15 +1,15 @@
 # German translations for IMathAS.
-# Copyright (C) 2014-2017
+# Copyright (C) 2014-2016
 # This file is distributed under the same license as the IMathAS package.
 # Richard Schütz <rschuetz@uni-koblenz.de>, 2014.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.2\n"
+"Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-06-04 16:36+0200\n"
-"PO-Revision-Date: 2017-02-28 15:35+0200\n"
+"PO-Revision-Date: 2017-02-28 15:45+0200\n"
 "Last-Translator: Stefan Bäcker <baecker@uni-koblenz.de>\n"
 "Language: Deutsch\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 2.91.6\n"
+
 
 #: course/courseshowitems.php:321 course/courseshowitems.php:322
 msgid " Collapsed. "
@@ -3912,7 +3913,7 @@ msgstr "Trennen Sie Intervalle mit Kommata. Beispiel: (-oo,2],84,oo)"
 
 #: assessment/displayq2.php:2316 assessment/displayq2.php:2391
 msgid "Enter a list of intervals using interval notation"
-msgstr "Geben Sie eine Liste von Intervallen in Intervallnotation ein"
+msgstr "Geben Sie eine Liste von Intervallen in Intervallschreibweise ein"
 
 #: assessment/displayq2.php:2658 assessment/displayq2.php:2776
 msgid "Freehand Draw"
@@ -4067,77 +4068,67 @@ msgstr ""
 msgid ""
 "Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5172"
 msgstr ""
-"Geben Sie Ihre Antwort als Ganz- oder "
-"Dezimalzahl ein: Beispiele: 3, -4, 5.5172"
+"Geben Sie Ihre Antwort als Ganz- oder Dezimalzahl ein: Beispiele: 3, -4, "
+"5.5172"
 
 #: assessment/displayq2.php:1819 assessment/displayq2.php:1879
 msgid "Enter your answer as a point.  Example: (2,5.5172)"
-msgstr ""
-"Geben Sie Ihre Antwort als Punkt ein. "
-"Beispiel: (2, 5.5172)"
+msgstr "Geben Sie Ihre Antwort als Punkt ein. Beispiel: (2, 5.5172)"
 
 #: assessment/displayq2.php:1822 assessment/displayq2.php:1882
 msgid ""
 "Enter your answer a list of points separated with commas.  Example: (1,2), "
 "(3.5172,5)"
 msgstr ""
-"Geben Sie Ihre Antwort als Komma getrennte Liste von Punkten ein. "
-"Beispiel: (1, 2), (3.5172, 5)"
+"Geben Sie Ihre Antwort als Komma getrennte Liste von Punkten ein. Beispiel: "
+"(1, 2), (3.5172, 5)"
 
 #: assessment/displayq2.php:1828 assessment/displayq2.php:1888
 msgid ""
 "Enter your answer a list of vectors separated with commas.  Example: <1,2>, "
 "<3.5172,5>"
 msgstr ""
-"Geben Sie Ihre Antwort als Komma getrennte Liste von Vektoren ein. "
-"Beispiel: <1, 2>, <3.5172, 5>"
+"Geben Sie Ihre Antwort als Komma getrennte Liste von Vektoren ein. Beispiel: "
+"<1, 2>, <3.5172, 5>"
 
 #: assessment/displayq2.php:1834 assessment/displayq2.php:1894
 msgid ""
 "Enter your answer as a list of n-tuples of numbers separated with commas: "
 "Example: (1,2),(3.5172,4)"
 msgstr ""
-"Geben Sie Ihre Antwort als Komma getrennte Liste von n-Tupeln ein. "
-"Beispiel: (1, 2), (3.5172, 4)"
+"Geben Sie Ihre Antwort als Komma getrennte Liste von n-Tupeln ein. Beispiel: "
+"(1, 2), (3.5172, 4)"
 
 #: assessment/displayq2.php:1837 assessment/displayq2.php:1897
 msgid "Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)"
-msgstr ""
-"Geben Sie Ihre Antwort als n-Tupel ein. "
-"Beispiel: (2, 5.5172)"
+msgstr "Geben Sie Ihre Antwort als n-Tupel ein. Beispiel: (2, 5.5172)"
 
 #: assessment/displayq2.php:1885
 msgid "Enter your answer as a vector.  Example: <2,5.5172>"
-msgstr ""
-"Geben Sie Ihre Antwort als Vektor ein. "
-"Beispiel: <2, 5.5172>"
+msgstr "Geben Sie Ihre Antwort als Vektor ein. Beispiel: <2, 5.5172>"
 
 #: assessment/displayq2.php:1950
 msgid ""
 "Enter your answer as a list of complex numbers in a+bi form separated with "
 "commas.  Example: 2+5.5172i,-3-4i"
 msgstr ""
-"Geben Sie Ihre Antwort als Komma getrennte Liste von komplexen Zahlen "
-"in a+bi Form ein. Beispiel: 2+5.5172i, -3-4i"
+"Geben Sie Ihre Antwort als Komma getrennte Liste von komplexen Zahlen in a"
+"+bi Form ein. Beispiel: 2+5.5172i, -3-4i"
 
 #: assessment/displayq2.php:1953
 msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i"
 msgstr ""
-"Geben Sie Ihre Antwort als komplexe Zahl in a+bi Form ein. "
-"Beispiel: 2+5.5172i"
-
+"Geben Sie Ihre Antwort als komplexe Zahl in a+bi Form ein. Beispiel: "
+"2+5.5172i"
 
 #: assessment/displayq2.php:2284
 msgid "Enter your answer using interval notation.  Example: [2.1,5.6172)"
 msgstr ""
-"Geben Sie Ihre Antwort in Intervallnotation ein. "
-"Beispiel: [2.1, 5.6172)"
+"Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2.1, 5.6172)"
 
 #: assessment/displayq2.php:2388
 msgid "Enter your answer using interval notation.  Example: [2,5)"
-msgstr ""
-"Geben Sie Ihre Antwort in Intervallnotation ein. "
-"Beispiel: [2, 5)"
+msgstr "Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2, 5)"
 
 #: assessment/displayq2.php:2635
 msgid "Graph to add drawings to:"
@@ -4157,8 +4148,8 @@ msgid ""
 "Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, "
 "2^3, 5+4)"
 msgstr ""
-"Geben Sie %s als Zahl (wie etwa 5, -3, 2.2172) oder als Berechnung "
-"(wie etwa 5/3, 2^3, 5+4) ein."
+"Geben Sie %s als Zahl (wie etwa 5, -3, 2.2172) oder als Berechnung (wie etwa "
+"5/3, 2^3, 5+4) ein."
 
 #: assessment/displayq2.php:6813
 msgid "Incorrect"
@@ -4178,8 +4169,12 @@ msgstr "Teilweise richtig"
 
 #: assessment/displayq2.php:6832
 msgid "Interval notation solution: "
-msgstr "Lösung in Intervallnotation: "
+msgstr "Lösung in Intervallschreibweise: "
 
 #: assessment/displayq2.php:6834
 msgid "Inequality notation solution: "
 msgstr "Lösung als Ungleichung: "
+
+#: footer.php:32
+msgid "[more..]"
+msgstr "[mehr..]"
