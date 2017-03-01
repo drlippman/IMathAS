@@ -711,7 +711,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   if (isset($studentinfo['timelimitmult'])) {
 				$line['timelimit'] *= $studentinfo['timelimitmult'];
 	    		   }
-	    		   if (strpos($line['summary'],'<p ')!==0 && strpos($line['summary'],'<ul')!==0 && strpos($line['summary'],'<ol')!==0) {
+	    		   if (strpos($line['summary'],'<p')!==0 && strpos($line['summary'],'<ul')!==0 && strpos($line['summary'],'<ol')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
 				   	   $line['summary'] = '';
@@ -1005,7 +1005,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   	   $playlist .= '<script type="text/javascript">playlist['.$typeid.'] = ['.implode(',',$json).'];</script>';
 			   	   $line['text'] = $playlist;
 
-			   } else if (strpos($line['text'],'<p ')!==0 && strpos($line['text'],'<ul ')!==0 && strpos($line['text'],'<ol ')!==0) {
+			   } else if (strpos($line['text'],'<p')!==0 && strpos($line['text'],'<ul')!==0 && strpos($line['text'],'<ol')!==0) {
 				   $line['text'] = '<p>'.$line['text'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['text'])) {
 				   	   $line['text'] = '';
@@ -1034,25 +1034,29 @@ function showitems($items,$parent,$inpublic=false) {
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   beginitem($canedit,'inline'.$typeid);// echo "<div class=item>\n";
-				   echo '<div class="itemhdr">';
+				   if ($line['title']!='##hidden##' || $viewall) {
+				   	   echo '<div class="itemhdr">';
+				   }
 				   
 				   if ($line['title']!='##hidden##') {
 					   echo getItemIcon('inline', 'text item', false);
 					   
-					   echo "<div class=title> <b>{$line['title']}</b>\n";
+					   echo "<div class=title> <b>{$line['title']}</b><br/>\n";
 				   } else { 
 				   	   echo '<div class=title>';
 				   }
 				   if ($viewall) {
 					  echo '<span class="instrdates">';
-					   echo "<br/>$show ";
-					   echo '</span>';
+					  echo "$show ";
+					  echo '</span>';
 				   }
 				   echo "</div>"; //title
 				   if ($canedit) {
 				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false);
 				   }
-				   echo '</div>'; //itemhdr
+				   if ($line['title']!='##hidden##' || $viewall) {
+				   	   echo '</div>'; //itemhdr
+				   }
 				   
 				   echo filter("<div class=itemsum>{$line['text']}\n");
 				   //DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
@@ -1085,7 +1089,9 @@ function showitems($items,$parent,$inpublic=false) {
 					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
 				   }
 				   beginitem($canedit,'inline'.$typeid); //echo "<div class=item>\n";
-				   echo '<div class="itemhdr">';
+				   if ($line['title']!='##hidden##' || $viewall) {
+				   	   echo '<div class="itemhdr">';
+				   }
 				  
 				   if ($line['title']!='##hidden##') {
 				   	   echo getItemIcon('inline', 'text item', true);
@@ -1101,7 +1107,9 @@ function showitems($items,$parent,$inpublic=false) {
 				   if ($canedit) {
 				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false);
 				   }
-				   echo '</div>'; //itemhdr
+				   if ($line['title']!='##hidden##' || $viewall) {
+				   	   echo '</div>'; //itemhdr
+				   }
 				   
 				   echo filter("<div class=itemsum>{$line['text']}\n");
 				   //DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
@@ -1131,7 +1139,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 		   } else if ($line['itemtype']=="Drill") {
 
-			   if (strpos($line['summary'],'<p ')!==0) {
+			   if (strpos($line['summary'],'<p')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
 				   	   $line['summary'] = '';
@@ -1207,7 +1215,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 		   } else if ($line['itemtype']=="LinkedText") {
 
-			   if (strpos($line['summary'],'<p ')!==0 && strpos($line['summary'],'<ul ')!==0 && strpos($line['summary'],'<ol ')!==0) {
+			   if (strpos($line['summary'],'<p')!==0 && strpos($line['summary'],'<ul')!==0 && strpos($line['summary'],'<ol')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
 				   	   $line['summary'] = '';
@@ -1341,7 +1349,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   require_once("../includes/exceptionfuncs.php");
 			   list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']) = getCanUseLatePassForums(isset($exceptions[$items[$i]])?$exceptions[$items[$i]]:null, $line);
 
-			   if (strpos($line['description'],'<p ')!==0) {
+			   if (strpos($line['description'],'<p')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
 				   	   $line['description'] = '';
@@ -1460,7 +1468,7 @@ function showitems($items,$parent,$inpublic=false) {
 		   } else if ($line['itemtype']=="Wiki") {
 		   	  // if ($ispublic) { continue;}
 			   if ($ispublic && $line['groupsetid']>0) { continue;}
-			   if (strpos($line['description'],'<p ')!==0) {
+			   if (strpos($line['description'],'<p')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
 				   if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
 				   	   $line['description'] = '';
