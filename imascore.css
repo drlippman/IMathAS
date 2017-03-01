@@ -32,9 +32,13 @@ div.signup {
 	margin-top: 10px;
 	padding: 5px;
 }
+div#headerhome, div#homelinkbox {
+	padding-top: 8px;
+}
 div.itemsum {
 	margin-left: 45px;
 	overflow: auto;
+	padding: 5px 0px;
 	/*margin-top: -.5em;
 	margin-bottom: -.5em;*/
 }
@@ -945,3 +949,14 @@ a.dropdown-toggle:hover {
     left: 0;
   }
 }
+
+.fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper, .fw1000 .midwrapper {
+	max-width: 1000px;
+	margin: auto;
+}
+
+.fw1920 div#headercontent, .fw1920 div#navlistcont,.fw1920 .footerwrapper, .fw1920 .midwrapper {
+	max-width: 1920px;
+	margin: auto;
+}
+

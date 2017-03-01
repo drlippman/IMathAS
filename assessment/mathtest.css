@@ -793,3 +793,22 @@ span.inlinebtn:hover {
 .altContentOff {
 	display:none;
 }
+
+.fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper {
+	max-width: 1000px;
+	margin: auto;
+}
+.fw1000 .midwrapper {
+	margin:auto;
+	padding: 0px 10px;
+	max-width:980px;
+}
+.fw1920 div#headercontent, .fw1920 div#navlistcont,.fw1920 .footerwrapper {
+	max-width: 1920px;
+	margin: auto;
+}
+.fw1920 .midwrapper {
+	margin:auto;
+	padding: 0px 10px;
+	max-width:1900px;
+}

@@ -57,9 +57,17 @@ if (isset($CFG['locale'])) {
 }
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
-		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
+		$coursetheme = str_replace(array('_fw1920','_fw1000','_fw'),'',$sessiondata['coursetheme']);
 	} else {
 		$coursetheme = $sessiondata['coursetheme'];
+		$isfw = false;
+		if (strpos($coursetheme,'_fw1920')!==false) {
+			$isfw = 1920;
+			$coursetheme = str_replace('_fw1920','',$coursetheme);
+		} else if (strpos($coursetheme,'_fw')!==false) {
+			$isfw = 1000;
+			$coursetheme = str_replace(array('_fw1000','_fw'),'',$coursetheme);
+		}
 	}
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/$coursetheme\"/>\n";
 }
@@ -223,7 +231,12 @@ if (isset($sessiondata['ltiitemtype'])) {
 	$(function(){parent.postMessage(JSON.stringify({subject:\'lti.frameResize\', height: $(document).height()+"px"}), \'*\');});
 	</script>';
 }
-echo '</head><body>';
+echo '</head>';
+if ($isfw!==false) {
+	echo "<body class=\"fw$isfw\">\n";
+} else {
+	echo "<body>\n";
+}
 
 $insertinheaderwrapper = ' ';
 echo '<div class=mainbody>';
