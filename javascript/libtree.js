@@ -56,3 +56,9 @@ function libchkAll(frm, arr, mark) {
 	 } 
  }
 }
+$(function() {
+	$("input[type=checkbox]:not(:disabled)").on('dblclick', function(evt) {
+		var state = $(evt.target).prop("checked");
+		$(evt.target).parent().find("input:checkbox:not(:disabled)").prop("checked",!state);
+	});
+});
