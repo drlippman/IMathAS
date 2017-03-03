@@ -735,13 +735,20 @@ function gbstudisp($stu) {
 		$availshow=1;
 		$hidepast = true;
 	}
+	$hasoutcomes = false;
 	if ($stu>0) {
 		//DB $query = "SELECT showlatepass,latepasshrs FROM imas_courses WHERE id='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB list($showlatepass,$latepasshrs) = mysql_fetch_row($result);
-		$stm = $DBH->prepare("SELECT showlatepass,latepasshrs FROM imas_courses WHERE id=:id");
+		$stm = $DBH->prepare("SELECT showlatepass,latepasshrs,outcomes FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
-		list($showlatepass,$latepasshrs) = $stm->fetch(PDO::FETCH_NUM);
+		list($showlatepass,$latepasshrs,$outcomedata) = $stm->fetch(PDO::FETCH_NUM);
+		if ($outcomedata!='') {
+			$outcomes = unserialize($outcomedata);
+			if (is_array($outcomes) && count($outcomes)>0) {
+				$hasoutcomes = true;
+			}
+		}
 		
 		//DB $query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
 		//DB $query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
@@ -1327,11 +1334,13 @@ function gbstudisp($stu) {
 		}
 		echo '</tbody></table><br/>';
 		echo '<p>';
+		$outcometype = 0;
 		if (($show&1)==1) {
 			echo _('<b>Past Due</b> total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '<br/>';
 		}
 		if (($show&2)==2) {
 			echo _('<b>Past Due and Attempted</b> total includes items whose due date has passed, as well as currently available items you have started working on.'), '<br/>';
+			$outcometype = 1;
 		}
 		if (($show&4)==4) {
 			echo _('<b>Past Due and Available</b> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
@@ -1340,6 +1349,13 @@ function gbstudisp($stu) {
 			echo _('<b>All</b> total includes all items: past, current, and future to-be-done items.');
 		}
 		echo '</p>';
+		if ($hasoutcomes) {
+			echo '<p>';
+			echo '<a href="outcomereport.php?stu='.$stu.'&report=outstu&cid='.$cid.'&type='.$outcometype.'">';
+			echo _('View Outcome Report');
+			echo '</a>';
+			echo '</p>';
+		}
 	}
 
 	if ($hidepast && $isteacher && $stu>0) {

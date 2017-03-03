@@ -3,7 +3,9 @@
 //(c) 2013 David Lippman for Lumen Learning
 
 require("../validate.php");
-if (!isset($teacherid)) {echo "You're not validated to view this page."; exit;}
+if (!isset($teacherid) && !isset($studentid)) {
+	echo "You're not validated to view this page."; exit;
+}
 
 require("outcometable.php");
 $canviewall = true;
@@ -66,7 +68,11 @@ function flattenout($arr,$level) {
 }
 flattenout($outcomes,'0');
 
-if (isset($_GET['stu'])) {
+if (isset($studentid)) {
+	$stu = intval($studentid);
+	$report = 'onestu';
+	$qs = '&stu='.$stu;
+} else if (isset($_GET['stu'])) {
 	$stu = intval($_GET['stu']);
 	$report = 'onestu';
 	$qs = '&stu='.$stu;
@@ -132,7 +138,11 @@ if ($report != 'export') {
 	require("../header.php");
 
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
-	$curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
+	if (isset($teacherid)) {
+		$curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
+	} else if (isset($studentid)) {
+		$curBreadcrumb .= "<a href=\"gradebook.php?cid=$cid\">"._("Gradebook")."</a>\n";
+	}
 }
 
 
@@ -302,7 +312,11 @@ if ($report=='overview') {
 
 	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 } else if ($report=='onestu') {
-	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'&amp;type='.$type.'">'._("Outcomes Report").'</a> &gt; '._("Student Detail").'</div>';
+	if (isset($teacherid)) {
+		echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'&amp;type='.$type.'">'._("Outcomes Report").'</a> &gt; '._("Student Detail").'</div>';
+	} else {
+		echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Detail").'</div>';
+	}
 
 	$ot = outcometable($stu);
 
