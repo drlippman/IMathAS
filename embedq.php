@@ -29,9 +29,17 @@ if (empty($_GET['id'])) {
 	exit;
 }
 $qsetid=$_GET['id'];
-$sessiondata['coursetheme'] = $coursetheme;
 
 $page_formAction = "embedq.php?id=$qsetid";
+
+if (isset($_GET['theme'])) {
+	$theme = preg_replace('/\W/','',$_GET['theme']);
+	$sessiondata['coursetheme'] = $theme . '.css';
+	$page_formAction .= "&theme=$theme";	
+} else {
+	$sessiondata['coursetheme'] = $coursetheme;
+}
+
 if (isset($_GET['noscores'])) {
 	$page_formAction .= '&noscores=true';
 }
