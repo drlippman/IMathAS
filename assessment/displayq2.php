@@ -4945,7 +4945,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$ansvecs[$key] = array('d', $function[1]*$pixelsperx, -1*$function[2]*$pixelspery);
 					}
 				} else if ($function[0]=='circle') {  // form "circle,x_center,y_center,radius"
-					$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
+					//$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
+					$ansellipses[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx,$function[3]*$pixelsperx);
 				} else if ($function[0]=='ellipse') {  //form ellipse,x_center,y_center,x_radius,y_radius
 					$ansellipses[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,abs($function[3]*$pixelsperx),abs($function[4]*$pixelspery));
 				} else if ($function[0]=='verthyperbola') {  //form verthyperbola,x_center,y_center,horiz "radius",vert "radius"
@@ -5249,7 +5250,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$sqrts[] = array($pts[1],$pts[2],$secyp);
 					} else if ($pts[0]==7) {
 						//circle
-						$circs[] = array($pts[1],$pts[2],sqrt(($pts[3]-$pts[1])*($pts[3]-$pts[1]) + ($pts[4]-$pts[2])*($pts[4]-$pts[2])));
+						$rad = sqrt(($pts[3]-$pts[1])*($pts[3]-$pts[1]) + ($pts[4]-$pts[2])*($pts[4]-$pts[2]));
+						//$circs[] = array($pts[1],$pts[2],$rad);
+						$ellipses[] = array($pts[1],$pts[2],$rad,$rad);
 					} else if ($pts[0]==7.2) {
 						//ellipse
 						$ellipses[] = array($pts[1],$pts[2],abs($pts[3]-$pts[1]),abs($pts[4]-$pts[2]));
