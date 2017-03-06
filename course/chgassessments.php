@@ -364,7 +364,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['removeperq'])) {
 			//DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)");
+			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0,fixedseeds=NULL WHERE assessmentid IN ($checkedlist)");
 		}
 
 		if (isset($_POST['chgendmsg'])) {

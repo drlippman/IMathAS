@@ -811,7 +811,16 @@
 							$lastanswers[$i] = '';
 							$scores[$i] = -1;
 						}
-						$seeds[$i] = rand(1,9999);
+						if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+							$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+							if (count($fs)>1) {
+								//find existing seed and use next one
+								$k = array_search($seeds[$i], $fs);
+								$seeds[$i] = $fs[($k+1)%count($fs)];
+							}
+						} else {
+							$seeds[$i] = rand(1,9999);
+						}
 						if (!$isreview) {
 							if (newqfromgroup($i)) {
 								$reloadqi = true;
@@ -833,7 +842,16 @@
 							$reattempting[] = $i;
 						}
 						if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
-							$seeds[$i] = rand(1,9999);
+							if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+								$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+								if (count($fs)>1) {
+									//find existing seed and use next one
+									$k = array_search($seeds[$i], $fs);
+									$seeds[$i] = $fs[($k+1)%count($fs)];
+								}
+							} else {
+								$seeds[$i] = rand(1,9999);
+							}
 							if (!$isreview) {
 								if (newqfromgroup($i)) {
 									$reloadqi = true;
@@ -854,7 +872,16 @@
 					$reattempting[] = $toclear;
 				}
 				if (($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1) {
-					$seeds[$toclear] = rand(1,9999);
+					if ($qi[$questions[$toclear]]['fixedseeds'] !== null && $qi[$questions[$toclear]]['fixedseeds'] != '') {
+						$fs = explode(',',$qi[$questions[$toclear]]['fixedseeds']);
+						if (count($fs)>1) {
+							//find existing seed and use next one
+							$k = array_search($seeds[$toclear], $fs);
+							$seeds[$toclear] = $fs[($k+1)%count($fs)];
+						}
+					} else {
+						$seeds[$toclear] = rand(1,9999);
+					}
 					if (!$isreview) {
 						if (newqfromgroup($toclear)) {
 							$reloadqi = true;
@@ -903,7 +930,18 @@
 		if ($doexit) { exit;}
 		srand();
 		$toregen = $_GET['regen'];
-		$seeds[$toregen] = rand(1,9999);
+		
+		if ($qi[$questions[$toregen]]['fixedseeds'] !== null && $qi[$questions[$toregen]]['fixedseeds'] != '') {
+			$fs = explode(',',$qi[$questions[$toregen]]['fixedseeds']);
+			if (count($fs)>1) {
+				//find existing seed and use next one
+				$k = array_search($seeds[$toregen], $fs);
+				$seeds[$toregen] = $fs[($k+1)%count($fs)];
+			}
+		} else {
+			$seeds[$toregen] = rand(1,9999);
+		}
+		
 		$scores[$toregen] = -1;
 		$rawscores[$toregen] = -1;
 		$attempts[$toregen] = 0;
@@ -939,7 +977,16 @@
 					$scores[$i] = -1;
 					$rawscores[$i] = -1;
 					$attempts[$i] = 0;
-					$seeds[$i] = rand(1,9999);
+					if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+						$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+						if (count($fs)>1) {
+							//find existing seed and use next one
+							$k = array_search($seeds[$i], $fs);
+							$seeds[$i] = $fs[($k+1)%count($fs)];
+						}
+					} else {
+						$seeds[$i] = rand(1,9999);
+					}
 					$newla = array();
 					deletefilesifnotused($lastanswers[$i],$bestlastanswers[$i]);
 					$laarr = explode('##',$lastanswers[$i]);
@@ -967,7 +1014,16 @@
 				$scores[$i] = -1;
 				$rawscores[$i] = -1;
 				$attempts[$i] = 0;
-				$seeds[$i] = rand(1,9999);
+				if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+					$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+					if (count($fs)>1) {
+						//find existing seed and use next one
+						$k = array_search($seeds[$i], $fs);
+						$seeds[$i] = $fs[($k+1)%count($fs)];
+					}
+				} else {
+					$seeds[$i] = rand(1,9999);
+				}
 				$newla = array();
 				deletefilesifnotused($lastanswers[$i],$bestlastanswers[$i]);
 				$laarr = explode('##',$lastanswers[$i]);

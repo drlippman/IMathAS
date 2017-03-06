@@ -1,7 +1,7 @@
 <?php
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 118;
+$latest = 119;
 
 
 @set_time_limit(0);
@@ -1924,6 +1924,13 @@ span.instronly {
 			
 			$query = "UPDATE imas_courses SET available=available-2 WHERE available>1";
 			$res = $DBH->query($query);	
+		}
+		if ($last<119) {
+			$query = "ALTER TABLE  `imas_questions` ADD `fixedseeds` TEXT NULL DEFAULT NULL;";
+			$res = $DBH->query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

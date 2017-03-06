@@ -44,7 +44,7 @@ if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
 }
 
 $sessiondata['graphdisp'] = 2;
-
+$assessver = 2;
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -124,12 +124,13 @@ if ($overwriteBody==1) {
 
 	$points = array();
 	$qn = array();
+	$fixedseeds = array();
 	//DB $qlist = "'".implode("','",$questions)."'";
 	$qlist = implode(',', array_map('intval', $questions));
 	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)");
+	$stm = $DBH->query("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($qlist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
@@ -137,6 +138,9 @@ if ($overwriteBody==1) {
 			$points[$row[0]] = $row[1];
 		}
 		$qn[$row[0]] = $row[2];
+		if ($row[3]!==null && $row[3]!='') {
+			$fixedseeds[$row[0]] = explode(',',$row[3]);	
+		}
 	}
 
 
@@ -194,11 +198,26 @@ if ($overwriteBody==1) {
 		} else {
 			if ($shuffle&4) { //all students same seed
 				for ($i = 0; $i<count($questions);$i++) {
-					$seeds[$j][] = $aid + $i + $j;
+					if (isset($fixedseeds[$questions[$i]])) {
+						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
+					} else {
+						$seeds[$j][] = $aid + $i + $j;	
+					}
 				}
 			} else {
 				for ($i = 0; $i<count($questions);$i++) {
-					$seeds[$j][] = rand(1,9999);
+					if (isset($fixedseeds[$questions[$i]])) {
+						$n = count($fixedseeds[$questions[$i]]);
+						if (isset($fixedn[$i])) {
+							$x = $fixedn[$i];
+						} else {
+							$x = rand(0,$n-1);
+							$fixedn[$i] = $x;
+						}
+						$seeds[$j][] = $fixedseeds[$questions[$i]][($x+$j)%$n];
+					} else {
+						$seeds[$j][] = rand(1,9999);
+					}
 				}
 			}
 		}
@@ -311,9 +330,9 @@ if ($overwriteBody==1) {
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
-	global $DBH,$isfinal,$imasroot,$urlmode;
+	global $DBH,$RND,$isfinal,$imasroot,$urlmode;
 	$isbareprint = true;
-	srand($seed);
+	$RND->srand($seed);
 
 	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -341,9 +360,9 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
 	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
 	$toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
-	srand($seed+1);
+	$RND->srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
-	srand($seed+2);
+	$RND->srand($seed+2);
 	$la = '';
 
 	if (isset($choices) && !isset($questions)) {
