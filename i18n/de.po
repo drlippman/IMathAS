@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.2\n"
+"Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-06-04 16:36+0200\n"
-"PO-Revision-Date: 2016-08-18 11:41+0200\n"
+"PO-Revision-Date: 2017-02-28 15:45+0200\n"
 "Last-Translator: Stefan Bäcker <baecker@uni-koblenz.de>\n"
 "Language: Deutsch\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 2.91.6\n"
+
 
 #: course/courseshowitems.php:321 course/courseshowitems.php:322
 msgid " Collapsed. "
@@ -99,6 +100,7 @@ msgid ", Review until %s"
 msgstr ", überprüfen bis %s"
 
 #: assessment/displayq2.php:682 assessment/displayq2.php:935
+#: assessment/displayq2.php:968
 #, php-format
 msgid ", accurate to %d decimal places"
 msgstr ", auf %d Nachkommastellen genau"
@@ -109,11 +111,13 @@ msgid ", review until %s"
 msgstr ", Überprüfung bis %s"
 
 #: assessment/displayq2.php:698 assessment/displayq2.php:955
+#: assessment/displayq2.php:988
 #, php-format
 msgid ", with at least %d significant figures"
 msgstr ", mit mindestens %d signifikanten Figuren"
 
 #: assessment/displayq2.php:689 assessment/displayq2.php:942
+#: assessment/displayq2.php:975
 #, php-format
 msgid ", with exactly %d significant figures"
 msgstr ", mit genau %d signifikanten Figuren"
@@ -143,6 +147,7 @@ msgid "1 week from now"
 msgstr "in 1 Woche"
 
 #: assessment/displayq2.php:1650 assessment/displayq2.php:2225
+#: assessment/displayq2.php:2295
 msgid "2 regions"
 msgstr "2 Bereiche"
 
@@ -321,6 +326,7 @@ msgid "Add here:"
 msgstr "Füge hier hinzu:"
 
 #: assessment/displayq2.php:1636 assessment/displayq2.php:2211
+#: assessment/displayq2.php:2281
 msgid "Adjust the sliders"
 msgstr "Passen Sie die Schieberegler an"
 
@@ -375,10 +381,13 @@ msgstr "Anonym"
 #: assessment/displayq2.php:330 assessment/displayq2.php:338
 #: assessment/displayq2.php:350 assessment/displayq2.php:340
 #: assessment/displayq2.php:352 assessment/displayq2.php:360
+#: assessment/displayq2.php:347 assessment/displayq2.php:367
+#: assessment/displayq2.php:375
 msgid "Answer:"
 msgstr "Antwort:"
 
 #: assessment/displayq2.php:176 assessment/displayq2.php:240
+#: assessment/displayq2.php:247
 msgid "Answers may vary"
 msgstr "Antworten können variieren"
 
@@ -475,11 +484,13 @@ msgstr "Zurück zur regulären Ansicht"
 
 #: assessment/displayq2.php:1319 assessment/displayq2.php:1321
 #: assessment/displayq2.php:1710 assessment/displayq2.php:1712
+#: assessment/displayq2.php:1773 assessment/displayq2.php:1775
 msgid "Be sure your variables match those in the question"
 msgstr ""
 "Stellen Sie sicher, dass Ihre Variablen mit denen in der Frage übereinstimmen"
 
 #: assessment/displayq2.php:1650 assessment/displayq2.php:2225
+#: assessment/displayq2.php:2295
 msgid "Between two values"
 msgstr "Zwischen zwei Werten"
 
@@ -492,6 +503,7 @@ msgid "Block"
 msgstr "Block"
 
 #: assessment/displayq2.php:326 assessment/displayq2.php:495
+#: assessment/displayq2.php:510
 msgid "Box"
 msgstr "Antwort"
 
@@ -547,10 +559,12 @@ msgid "Check:"
 msgstr "Überprüfen:"
 
 #: assessment/displayq2.php:1878 assessment/displayq2.php:2553
+#: assessment/displayq2.php:2652
 msgid "Clear All"
 msgstr "Alles leeren"
 
 #: assessment/displayq2.php:1650 assessment/displayq2.php:2225
+#: assessment/displayq2.php:2295
 msgid "Click and drag and arrows to adjust the values."
 msgstr "Klicken und Ziehen Sie die Pfeile, um die Werte anzupassen."
 
@@ -680,6 +694,7 @@ msgid "Dates"
 msgstr "Daten"
 
 #: assessment/displayq2.php:2878 assessment/displayq2.php:3802
+#: assessment/displayq2.php:3949
 msgid "Debug info: empty, missing, or invalid $answer"
 msgstr "Debuginfo: leere, fehlende oder ungültiges $answer"
 
@@ -688,12 +703,14 @@ msgid "Debug info: empty, missingor invalid $answer"
 msgstr "Debuginfo: leere, fehlende oder ungültiges $answer"
 
 #: assessment/displayq2.php:3146 assessment/displayq2.php:4132
+#: assessment/displayq2.php:4299
 msgid ""
 "Debug info: function evaled to Not-a-number at all test points.  Check "
 "$domain"
 msgstr "Debuginfo: Funktion ergibt keine Zahl an allen Testpunkten. "
 
 #: assessment/displayq2.php:4917 assessment/displayq2.php:6449
+#: assessment/displayq2.php:6789
 msgid "Decimal values are not allowed"
 msgstr "Dezimalwerte sind nicht erlaubt"
 
@@ -740,10 +757,12 @@ msgid "Documentation"
 msgstr "Dokumentation"
 
 #: assessment/displayq2.php:1954 assessment/displayq2.php:2660
+#: assessment/displayq2.php:2778
 msgid "Dot"
 msgstr "Punkt"
 
 #: assessment/displayq2.php:1878 assessment/displayq2.php:2553
+#: assessment/displayq2.php:2652
 msgid "Draw:"
 msgstr "Zeichnen:"
 
@@ -791,12 +810,14 @@ msgstr "Veränderungen fällig bis %s. "
 
 #: assessment/displayq2.php:727 assessment/displayq2.php:863
 #: assessment/displayq2.php:1011 assessment/displayq2.php:1162
-#: assessment/displayq2.php:2069
+#: assessment/displayq2.php:2069 assessment/displayq2.php:1045
+#: assessment/displayq2.php:1196 assessment/displayq2.php:2137
 msgid "Eeek!  $questions is not defined or needs to be an array"
 msgstr "Eeek!  $questions ist nicht definiert oder muss ein Feld sein"
 
 #: assessment/displayq2.php:2345 assessment/displayq2.php:2388
 #: assessment/displayq2.php:3203 assessment/displayq2.php:3247
+#: assessment/displayq2.php:3352 assessment/displayq2.php:3396
 msgid ""
 "Eeek!  $questions is not defined or needs to be an array.  Make sure "
 "$questions is defined in the Common Control section."
@@ -805,11 +826,13 @@ msgstr ""
 "sicher, dass $question in der Common Control Sektion definiert wird"
 
 #: assessment/displayq2.php:973 assessment/displayq2.php:1285
+#: assessment/displayq2.php:1319
 msgid "Eeek!  $questions or $answers is not defined or needs to be an array"
 msgstr ""
 "Eeek! $questions oder $answers ist nicht definiert oder muss ein Array sein"
 
 #: assessment/displayq2.php:2444 assessment/displayq2.php:3304
+#: assessment/displayq2.php:3453
 msgid ""
 "Eeek!  $questions or $answers is not defined or needs to be an array.  Make "
 "sure both are defined in the Common Control section."
@@ -837,6 +860,7 @@ msgid "Enroll in a New Class"
 msgstr "In einen neuen Kurs einschreiben"
 
 #: assessment/displayq2.php:4892 assessment/displayq2.php:6419
+#: assessment/displayq2.php:6759
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)"
@@ -845,6 +869,7 @@ msgstr ""
 "-2) ein"
 
 #: assessment/displayq2.php:4904 assessment/displayq2.php:6436
+#: assessment/displayq2.php:6776
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or "
@@ -863,6 +888,7 @@ msgstr ""
 "5+4) ein"
 
 #: assessment/displayq2.php:4895 assessment/displayq2.php:6426
+#: assessment/displayq2.php:6766
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6) or as a whole number "
@@ -872,6 +898,7 @@ msgstr ""
 "(z.B. 4 oder -2) ein"
 
 #: assessment/displayq2.php:4898 assessment/displayq2.php:6430
+#: assessment/displayq2.php:6770
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 "
@@ -890,6 +917,7 @@ msgstr ""
 "unechten Bruch oder als ganze Zahl ein.  Beispiel: 2 1/2 = 2 &frac12;"
 
 #: assessment/displayq2.php:4907 assessment/displayq2.php:6439
+#: assessment/displayq2.php:6779
 #, php-format
 msgid ""
 "Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</"
@@ -899,40 +927,48 @@ msgstr ""
 "&middot; 10<sup>2</sup>"
 
 #: assessment/displayq2.php:1717 assessment/displayq2.php:2310
+#: assessment/displayq2.php:2385
 msgid "Enter <i>all real numbers</i> for solutions of that type"
 msgstr "Geben Sie <i>alle realen Zahlen</i> für Lösungen dieses Typs ein"
 
 #: assessment/displayq2.php:1354 assessment/displayq2.php:1448
 #: assessment/displayq2.php:1777 assessment/displayq2.php:1892
+#: assessment/displayq2.php:1840 assessment/displayq2.php:1957
 msgid "Enter DNE for Does Not Exist"
 msgstr "Geben Sie DNE (Does Not Exist) ein, wenn keine Antwort existiert"
 
 #: assessment/displayq2.php:679 assessment/displayq2.php:4914
 #: assessment/displayq2.php:932 assessment/displayq2.php:6446
+#: assessment/displayq2.php:965 assessment/displayq2.php:6786
 msgid "Enter DNE for Does Not Exist, oo for Infinity"
 msgstr ""
 "Geben Sie DNE (Does Not Exist) ein, wenn keine Antwort existiert, oder oo "
 "für Unendlich"
 
 #: assessment/displayq2.php:1641 assessment/displayq2.php:2216
+#: assessment/displayq2.php:2286
 msgid "Enter DNE for an empty set, oo for Infinity"
 msgstr "Geben Sie DNE für eine leere Menge oder oo für Unendlich ein"
 
 #: assessment/displayq2.php:1445 assessment/displayq2.php:1482
 #: assessment/displayq2.php:1889 assessment/displayq2.php:1932
+#: assessment/displayq2.php:1954 assessment/displayq2.php:1998
 msgid "Enter a complex number"
 msgstr "Geben Sie eine komplexe Zahl ein"
 
 #: assessment/displayq2.php:4905 assessment/displayq2.php:6437
+#: assessment/displayq2.php:6777
 msgid "Enter a fraction or exact decimal"
 msgstr "Geben Sie einen Bruch oder eine genaue Dezimalzahl ein"
 
 #: assessment/displayq2.php:4893 assessment/displayq2.php:6420
+#: assessment/displayq2.php:6760
 msgid "Enter a fraction or whole number"
 msgstr "Geben Sie einen Bruch oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:1442 assessment/displayq2.php:1479
 #: assessment/displayq2.php:1886 assessment/displayq2.php:1929
+#: assessment/displayq2.php:1951 assessment/displayq2.php:1995
 msgid "Enter a list of complex numbers"
 msgstr "Geben Sie eine Liste von komplexen Zahlen ein"
 
@@ -954,6 +990,7 @@ msgstr "Geben Sie eine Liste von gemischten Zahlen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:1349 assessment/displayq2.php:1396
 #: assessment/displayq2.php:1772 assessment/displayq2.php:1831
+#: assessment/displayq2.php:1835 assessment/displayq2.php:1895
 msgid "Enter a list of n-tuples"
 msgstr "Geben Sie eine Liste von n-Tupeln ein"
 
@@ -963,6 +1000,7 @@ msgstr "Geben Sie eine Liste von Zahlen in wissenschaftlicher Schreibweise ein"
 
 #: assessment/displayq2.php:1340 assessment/displayq2.php:1387
 #: assessment/displayq2.php:1760 assessment/displayq2.php:1819
+#: assessment/displayq2.php:1823 assessment/displayq2.php:1883
 msgid "Enter a list of points"
 msgstr "Geben Sie eine Liste von Punkten ein"
 
@@ -971,23 +1009,28 @@ msgid "Enter a list of reduced fractions or whole numbers"
 msgstr "Geben Sie eine Liste von gekürzten Brüchen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:1528 assessment/displayq2.php:1987
+#: assessment/displayq2.php:2054
 msgid "Enter a list of text"
 msgstr "Geben Sie eine Liste von Texten ein"
 
 #: assessment/displayq2.php:1346 assessment/displayq2.php:1393
 #: assessment/displayq2.php:1766 assessment/displayq2.php:1825
+#: assessment/displayq2.php:1829 assessment/displayq2.php:1889
 msgid "Enter a list of vectors"
 msgstr "Geben Sie eine Liste von Vektoren ein"
 
 #: assessment/displayq2.php:674 assessment/displayq2.php:924
+#: assessment/displayq2.php:957
 msgid "Enter a list of whole or decimal numbers"
 msgstr "Geben Sie eine Liste von ganzen Zahlen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:4911 assessment/displayq2.php:6443
+#: assessment/displayq2.php:6783
 msgid "Enter a mathematical expression"
 msgstr "Geben Sie einen mathematischen Ausdruck ein"
 
 #: assessment/displayq2.php:4899 assessment/displayq2.php:6431
+#: assessment/displayq2.php:6771
 msgid "Enter a mixed number or whole number"
 msgstr "Geben Sie eine gemischte oder eine ganze Zahl ein"
 
@@ -997,59 +1040,72 @@ msgstr ""
 "Geben Sie eine gemischte Zahl, einen unechten Bruch oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:4908 assessment/displayq2.php:6440
+#: assessment/displayq2.php:6780
 msgid "Enter a number using scientific notation"
 msgstr "Geben Sie eine Zahl in wissenschaftlicher Schreibweise ein"
 
 #: assessment/displayq2.php:1337 assessment/displayq2.php:1384
 #: assessment/displayq2.php:1757 assessment/displayq2.php:1816
+#: assessment/displayq2.php:1820 assessment/displayq2.php:1880
 msgid "Enter a point"
 msgstr "Geben Sie einen Punkt ein"
 
 #: assessment/displayq2.php:4896 assessment/displayq2.php:6427
+#: assessment/displayq2.php:6767
 msgid "Enter a reduced fraction or whole number"
 msgstr "Geben Sie einen verkürzten Bruch oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:1343 assessment/displayq2.php:1390
 #: assessment/displayq2.php:1763 assessment/displayq2.php:1822
+#: assessment/displayq2.php:1826 assessment/displayq2.php:1886
 msgid "Enter a vector"
 msgstr "Geben Sie einen Vektor ein"
 
 #: assessment/displayq2.php:677 assessment/displayq2.php:930
+#: assessment/displayq2.php:963
 msgid "Enter a whole or decimal number"
 msgstr "Geben Sie eine ganze Zahl oder eine Dezimalzahl ein"
 
 #: assessment/displayq2.php:1254 assessment/displayq2.php:1638
+#: assessment/displayq2.php:1673
 msgid "Enter an algebraic equation"
 msgstr "Geben Sie eine algebraische Gleichung ein"
 
 #: assessment/displayq2.php:1256 assessment/displayq2.php:1640
+#: assessment/displayq2.php:1675
 msgid "Enter an algebraic expression"
 msgstr "Geben Sie einen algebraischen Ausdruck ein"
 
 #: assessment/displayq2.php:1663 assessment/displayq2.php:2242
+#: assessment/displayq2.php:2312
 msgid "Enter an interval corresponding to the region to be shaded"
 msgstr ""
 "Geben Sie ein Intervall für den Bereich ein, der schattiert werden soll"
 
 #: assessment/displayq2.php:1718 assessment/displayq2.php:2311
+#: assessment/displayq2.php:2386
 msgid "Enter an interval using inequalities"
 msgstr "Geben Sie ein Intervall mit Ungleichungen an"
 
 #: assessment/displayq2.php:1645 assessment/displayq2.php:1722
 #: assessment/displayq2.php:2220 assessment/displayq2.php:2319
+#: assessment/displayq2.php:2290 assessment/displayq2.php:2394
 msgid "Enter an interval using interval notation"
 msgstr "Geben Sie ein Intervall in Intervallschreibweise ein"
 
 #: assessment/displayq2.php:1352 assessment/displayq2.php:1399
 #: assessment/displayq2.php:1775 assessment/displayq2.php:1834
+#: assessment/displayq2.php:1838 assessment/displayq2.php:1898
 msgid "Enter an n-tuple"
 msgstr "Geben Sie ein n-Tupel ein"
 
 #: assessment/displayq2.php:1174 assessment/displayq2.php:1541
+#: assessment/displayq2.php:1576
 msgid "Enter each element of the matrix as  number (like 5, -3, 2.2)"
 msgstr "Geben Sie jedes Element der Matrix als Zahl (z.B. 5, -2, 2.2) ein"
 
 #: assessment/displayq2.php:1531 assessment/displayq2.php:1990
+#: assessment/displayq2.php:2057
 msgid "Enter text"
 msgstr "Geben Sie Text ein"
 
@@ -1077,6 +1133,7 @@ msgstr ""
 "Geben Sie Ihre Antwort als komplexe Zahl der Form a+bi ein. Beispiel: 2+5.5i"
 
 #: assessment/displayq2.php:1481 assessment/displayq2.php:1931
+#: assessment/displayq2.php:1997
 msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5i"
 msgstr ""
 "Geben Sie Ihre Antwort als komplexe Zahl der Form a+bi ein. Beispiel: 2+5i"
@@ -1090,6 +1147,7 @@ msgstr ""
 "+bi ein.  Beispiel: 2+5.5i,-3-4i"
 
 #: assessment/displayq2.php:1478 assessment/displayq2.php:1928
+#: assessment/displayq2.php:1994
 msgid ""
 "Enter your answer as a list of complex numbers in a+bi form separated with "
 "commas.  Example: 2+5i,-3-4i"
@@ -1107,6 +1165,7 @@ msgstr ""
 "(1,2),(3.5,4)"
 
 #: assessment/displayq2.php:1527 assessment/displayq2.php:1986
+#: assessment/displayq2.php:2053
 msgid ""
 "Enter your answer as a list of text separated by commas.  Example:  dog, "
 "cat, rabbit."
@@ -1115,6 +1174,7 @@ msgstr ""
 "Hund, Katze, Hase"
 
 #: assessment/displayq2.php:1101 assessment/displayq2.php:1444
+#: assessment/displayq2.php:1478
 msgid ""
 "Enter your answer as a list of values separated by commas: Example: -4, 3, 2"
 msgstr ""
@@ -1130,6 +1190,7 @@ msgstr ""
 "Dezimalzahlen ein.  Beispiel: -4, 3, 2.5"
 
 #: assessment/displayq2.php:1179 assessment/displayq2.php:1548
+#: assessment/displayq2.php:1583
 msgid ""
 "Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))"
 msgstr ""
@@ -1137,6 +1198,7 @@ msgstr ""
 "ein."
 
 #: assessment/displayq2.php:1233 assessment/displayq2.php:1606
+#: assessment/displayq2.php:1641
 msgid "Enter your answer as a matrix, like ((2,3,4),(1,4,5))"
 msgstr "Geben Sie Ihre Antwort als Matrix wie ((2,3,4),(3,4,5)) ein."
 
@@ -1147,6 +1209,7 @@ msgstr "Geben Sie Ihre Antwort als Punkt ein.  Beispiel: (2,5.5)"
 
 #: assessment/displayq2.php:1342 assessment/displayq2.php:1389
 #: assessment/displayq2.php:1762 assessment/displayq2.php:1821
+#: assessment/displayq2.php:1825
 msgid "Enter your answer as a vector.  Example: <2,5.5>"
 msgstr "Geben Sie Ihre Antwort als Vektor ein.  Beispiel: <2,5.5>"
 
@@ -1157,10 +1220,12 @@ msgstr ""
 "3, -4, 5.5"
 
 #: assessment/displayq2.php:1319 assessment/displayq2.php:1710
+#: assessment/displayq2.php:1773
 msgid "Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3"
 msgstr "Geben Sie Ihre Antwort als Gleichung ein.  Beispiel: y=3x^2+1, 2+x+y=3"
 
 #: assessment/displayq2.php:1321 assessment/displayq2.php:1712
+#: assessment/displayq2.php:1775
 msgid "Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c"
 msgstr ""
 "Geben Sie Ihre Antwort als Ausdruck ein.  Beispiel: 3x^2+1, x/5, (a+b)/c"
@@ -1171,22 +1236,26 @@ msgid "Enter your answer as an n-tuple of numbers.  Example: (2,5.5)"
 msgstr "Geben Sie Ihre Antwort als n-Tupel von Zahlen ein.  Beispiel: (2,5.5)"
 
 #: assessment/displayq2.php:1530 assessment/displayq2.php:1989
+#: assessment/displayq2.php:2056
 msgid "Enter your answer as letters.  Examples: A B C, linear, a cat"
 msgstr ""
 "Geben Sie Ihre Antwort als Wort oder Wortfolge ein.  Beispiele: A B C, "
 "linear, eine Katze"
 
 #: assessment/displayq2.php:1621 assessment/displayq2.php:2196
+#: assessment/displayq2.php:2264
 msgid "Enter your answer as text.  This question is not automatically graded."
 msgstr ""
 "Geben Sie Ihre Antwort als Text ein.  Diese Frage wird nicht automatisch "
 "bewertet."
 
 #: assessment/displayq2.php:1992 assessment/displayq2.php:2710
+#: assessment/displayq2.php:2833
 msgid "Enter your answer by drawing on the graph."
 msgstr "Geben Sie Ihre Antwort ein, indem Sie zeichnen."
 
 #: assessment/displayq2.php:1635 assessment/displayq2.php:2210
+#: assessment/displayq2.php:2280
 msgid ""
 "Enter your answer by selecting the shade type, and by clicking and dragging "
 "the sliders on the normal curve"
@@ -1209,16 +1278,19 @@ msgstr ""
 
 #: assessment/displayq2.php:4521 assessment/displayq2.php:4522
 #: assessment/displayq2.php:5945 assessment/displayq2.php:5946
+#: assessment/displayq2.php:6271 assessment/displayq2.php:6272
 msgid "Error - File not uploaded in preview"
 msgstr "Fehler - Datei nicht in Vorschau hochgeladen"
 
 #: assessment/displayq2.php:4501 assessment/displayq2.php:4502
 #: assessment/displayq2.php:5914 assessment/displayq2.php:5915
+#: assessment/displayq2.php:6224 assessment/displayq2.php:6225
 msgid "Error - Invalid file type"
 msgstr "Fehler - Ungültiger Dateityp"
 
 #: assessment/displayq2.php:4516 assessment/displayq2.php:4517
 #: assessment/displayq2.php:5940 assessment/displayq2.php:5941
+#: assessment/displayq2.php:6266 assessment/displayq2.php:6267
 msgid "Error - no asid"
 msgstr "Fehler - keine asid"
 
@@ -1229,16 +1301,19 @@ msgstr "Fehler beim Laden der Bibliothek %s\n"
 
 #: assessment/displayq2.php:4542 assessment/displayq2.php:4543
 #: assessment/displayq2.php:5974 assessment/displayq2.php:5975
+#: assessment/displayq2.php:6300 assessment/displayq2.php:6301
 msgid "Error storing file"
 msgstr "Fehler beim Speichern der Datei"
 
 #: assessment/displayq2.php:4552 assessment/displayq2.php:4553
 #: assessment/displayq2.php:5985 assessment/displayq2.php:5986
+#: assessment/displayq2.php:6311 assessment/displayq2.php:6312
 msgid "Error uploading file"
 msgstr "Fehler beim Hochladen der Datei"
 
 #: assessment/displayq2.php:4549 assessment/displayq2.php:4550
 #: assessment/displayq2.php:5982 assessment/displayq2.php:5983
+#: assessment/displayq2.php:6308 assessment/displayq2.php:6309
 msgid "Error uploading file - file too big"
 msgstr "Fehler beim Hochladen der Datei - Datei zu groß"
 
@@ -1344,6 +1419,7 @@ msgid "GB Settings"
 msgstr "Punkteübersichtseinstellungen"
 
 #: assessment/displayq2.php:305 assessment/displayq2.php:459
+#: assessment/displayq2.php:474
 msgid "Get help: "
 msgstr "Hilfe erhalten:"
 
@@ -1461,6 +1537,7 @@ msgstr "Alle verbergen"
 
 #: assessment/displayq2.php:204 assessment/displayq2.php:222
 #: assessment/displayq2.php:272 assessment/displayq2.php:293
+#: assessment/displayq2.php:279 assessment/displayq2.php:300
 msgid "Hint:"
 msgstr "Hinweis:"
 
@@ -1525,6 +1602,7 @@ msgid "Import Question Set"
 msgstr "Fragensatz importieren"
 
 #: assessment/displayq2.php:1055 assessment/displayq2.php:1385
+#: assessment/displayq2.php:1419
 msgid ""
 "In each pull-down on the left, select the letter (a, b, c, etc.) of the "
 "matching answer in the right-hand column"
@@ -1533,6 +1611,7 @@ msgstr ""
 "Spalte auf der rechten Seite aus jedem Ausklappmenü links aus."
 
 #: assessment/displayq2.php:1053 assessment/displayq2.php:1383
+#: assessment/displayq2.php:1417
 msgid "In each pull-down, select the item that matches with the displayed item"
 msgstr ""
 "Wählen Sie den Eintrag aus dem Ausklappmenü aus, der zum angezeigten Eintrag "
@@ -1601,6 +1680,7 @@ msgid "Last attempt: "
 msgstr "Letzter Versuch: "
 
 #: assessment/displayq2.php:2111 assessment/displayq2.php:2884
+#: assessment/displayq2.php:3033
 msgid "Last file uploaded:"
 msgstr "Zuletzt hochgeladene Datei:"
 
@@ -1611,6 +1691,7 @@ msgid "LatePasses Allowed"
 msgstr "Verspätetes Einreichen erlaubt"
 
 #: assessment/displayq2.php:1649 assessment/displayq2.php:2224
+#: assessment/displayq2.php:2294
 #, fuzzy
 msgid "Left of a value"
 msgstr "Links von einem Wert"
@@ -1620,10 +1701,12 @@ msgid "Libraries"
 msgstr "Bibliotheken"
 
 #: assessment/displayq2.php:1950 assessment/displayq2.php:2654
+#: assessment/displayq2.php:2772
 msgid "Line"
 msgstr "Linie"
 
 #: assessment/displayq2.php:1952 assessment/displayq2.php:2656
+#: assessment/displayq2.php:2774
 msgid "Line Segment"
 msgstr "Liniensegment"
 
@@ -1909,6 +1992,7 @@ msgstr ""
 "erneut und versuchen Sie es ein weiteres Mal."
 
 #: assessment/displayq2.php:1956 assessment/displayq2.php:2662
+#: assessment/displayq2.php:2780
 #, fuzzy
 msgid "Open Dot"
 msgstr "Punkt öffnen"
@@ -2003,6 +2087,7 @@ msgstr "Punkte: %1$d von %2$d möglich"
 
 #: assessment/displayq2.php:1958 assessment/displayq2.php:1961
 #: assessment/displayq2.php:2664 assessment/displayq2.php:2667
+#: assessment/displayq2.php:2782 assessment/displayq2.php:2785
 msgid "Polygon"
 msgstr "Vieleck"
 
@@ -2027,6 +2112,11 @@ msgstr "Beiträge (%d)"
 #: assessment/displayq2.php:1602 assessment/displayq2.php:1667
 #: assessment/displayq2.php:1860 assessment/displayq2.php:1958
 #: assessment/displayq2.php:2065 assessment/displayq2.php:2352
+#: assessment/displayq2.php:1521 assessment/displayq2.php:1581
+#: assessment/displayq2.php:1627 assessment/displayq2.php:1637
+#: assessment/displayq2.php:1703 assessment/displayq2.php:1925
+#: assessment/displayq2.php:2025 assessment/displayq2.php:2133
+#: assessment/displayq2.php:2428
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -2178,6 +2268,7 @@ msgid "Review: "
 msgstr "Kontrollansicht:"
 
 #: assessment/displayq2.php:1649 assessment/displayq2.php:2224
+#: assessment/displayq2.php:2294
 #, fuzzy
 msgid "Right of a value"
 msgstr "Rechts von einem Wert"
@@ -2261,6 +2352,7 @@ msgid "Scores:"
 msgstr "Punktzahlen:"
 
 #: assessment/displayq2.php:2126 assessment/displayq2.php:2899
+#: assessment/displayq2.php:3048
 msgid "Select a file to upload"
 msgstr "Wählen Sie eine Datei zum Hochladen aus"
 
@@ -2270,10 +2362,12 @@ msgid "Select a name.."
 msgstr "Wählen Sie einen Namen aus.."
 
 #: assessment/displayq2.php:950 assessment/displayq2.php:1261
+#: assessment/displayq2.php:1295
 msgid "Select all correct answers"
 msgstr "Wählen Sie alle korrekten Antworten aus"
 
 #: assessment/displayq2.php:786 assessment/displayq2.php:1081
+#: assessment/displayq2.php:1115
 msgid "Select an answer"
 msgstr "Wählen Sie eine Antwort aus"
 
@@ -2288,6 +2382,7 @@ msgid "Select group members"
 msgstr "Wählen Sie Gruppenmitglieder aus"
 
 #: assessment/displayq2.php:847 assessment/displayq2.php:1145
+#: assessment/displayq2.php:1179
 msgid "Select the best answer"
 msgstr "Wählen Sie die beste Antwort aus"
 
@@ -2308,6 +2403,8 @@ msgstr "Alle Kursdaten verschieben"
 
 #: assessment/displayq2.php:332 assessment/displayq2.php:342
 #: assessment/displayq2.php:354 assessment/displayq2.php:362
+#: assessment/displayq2.php:349 assessment/displayq2.php:369
+#: assessment/displayq2.php:377
 msgid "Show Answer"
 msgstr "Antwort anzeigen"
 
@@ -2650,6 +2747,7 @@ msgid "Totals"
 msgstr "Gesamtpunktzahlen"
 
 #: assessment/displayq2.php:4926 assessment/displayq2.php:6458
+#: assessment/displayq2.php:6798
 msgid "Trig functions (sin,cos,etc.) are not allowed"
 msgstr "Trigonometrische Funktionen (sin, cos, etc.) sind nicht erlaubt"
 
@@ -2713,6 +2811,7 @@ msgid "Update Comment"
 msgstr "Kommentar aktualisieren"
 
 #: assessment/displayq2.php:4499 assessment/displayq2.php:5912
+#: assessment/displayq2.php:6222
 #, php-format
 msgid "Upload of %s: "
 msgstr "Hochladen von %s: "
@@ -2724,6 +2823,7 @@ msgstr "Verspätet einreichen"
 
 #: assessment/displayq2.php:1640 assessment/displayq2.php:1721
 #: assessment/displayq2.php:2215 assessment/displayq2.php:2318
+#: assessment/displayq2.php:2285 assessment/displayq2.php:2393
 msgid "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)"
 msgstr ""
 "Benutzen Sie U (union) um Intervalle zu kombinieren.  Beispiel: (-oo,2] U [4,"
@@ -2841,26 +2941,31 @@ msgstr "Sie haben dieses Problem bereits behandelt."
 
 #: assessment/displayq2.php:681 assessment/displayq2.php:4922
 #: assessment/displayq2.php:934 assessment/displayq2.php:6454
+#: assessment/displayq2.php:967 assessment/displayq2.php:6794
 #, php-format
 msgid "Your answer should be accurate to %d decimal places."
 msgstr "Ihre Antwort sollte auf %d Nachkommastellen genau sein."
 
 #: assessment/displayq2.php:4920 assessment/displayq2.php:6452
+#: assessment/displayq2.php:6792
 msgid "Your answer should be accurate to the nearest whole number."
 msgstr "Ihre Antwort sollte akurat zur nächsten ganzen Zahl sein."
 
 #: assessment/displayq2.php:697 assessment/displayq2.php:954
+#: assessment/displayq2.php:987
 #, php-format
 msgid "Your answer should have at least %d significant figures."
 msgstr "Ihre Antwort sollte mindestens %d signifikante Figuren haben."
 
 #: assessment/displayq2.php:688 assessment/displayq2.php:941
+#: assessment/displayq2.php:974
 #, php-format
 msgid "Your answer should have exactly %d significant figures."
 msgstr "Ihre Antwort sollte genau %d signifikante Figuren haben."
 
 #: assessment/displayq2.php:1643 assessment/displayq2.php:1728
 #: assessment/displayq2.php:2218 assessment/displayq2.php:2327
+#: assessment/displayq2.php:2288 assessment/displayq2.php:2402
 #, php-format
 msgid "Your numbers should be accurate to %d decimal places."
 msgstr "Ihre Zahlen sollten auf %d Nachkommastellen genau sein."
@@ -2930,12 +3035,14 @@ msgstr "einklappen"
 
 #: assessment/displayq2.php:1226 assessment/displayq2.php:1234
 #: assessment/displayq2.php:1595 assessment/displayq2.php:1607
+#: assessment/displayq2.php:1630 assessment/displayq2.php:1642
 msgid "each element of the matrix"
 msgstr "jedes Element der Matrix"
 
 #: assessment/displayq2.php:1102 assessment/displayq2.php:1726
 #: assessment/displayq2.php:1445 assessment/displayq2.php:1448
-#: assessment/displayq2.php:2325
+#: assessment/displayq2.php:2325 assessment/displayq2.php:1479
+#: assessment/displayq2.php:1482 assessment/displayq2.php:2400
 msgid "each value"
 msgstr "jeder Wert"
 
@@ -2945,10 +3052,12 @@ msgstr "else wird ohne vorangehende if Anweisung verwendet"
 
 #: assessment/displayq2.php:4756 assessment/displayq2.php:4763
 #: assessment/displayq2.php:6274 assessment/displayq2.php:6284
+#: assessment/displayq2.php:6613 assessment/displayq2.php:6623
 msgid "error - invalid form"
 msgstr "Fehler - ungültige Form"
 
 #: assessment/displayq2.php:4721 assessment/displayq2.php:6229
+#: assessment/displayq2.php:6567
 msgid "error - more than 1 i in expression"
 msgstr "Fehler - mehr als ein i im Ausdruck"
 
@@ -3061,6 +3170,7 @@ msgid "until"
 msgstr "bis"
 
 #: assessment/displayq2.php:1105 assessment/displayq2.php:1451
+#: assessment/displayq2.php:1485
 msgid "your answer"
 msgstr "Ihre Antwort"
 
@@ -3722,20 +3832,21 @@ msgstr "teilweise korrekt - keine weiteren Versuche"
 msgid "Hide Settings"
 msgstr "Verstecke Einstellungen"
 
-#: assessment/displayq2.php:383
+#: assessment/displayq2.php:383 assessment/displayq2.php:398
 msgid "This solution is for a similar problem, not your specific version"
 msgstr ""
 "Diese Lösung ist für ein ähnliches Problem, nicht für diese spezielle Version"
 
 #: assessment/displayq2.php:484 assessment/showsoln.php:19
+#: assessment/displayq2.php:499
 msgid "Written Example"
 msgstr "Musterlösung"
 
-#: assessment/displayq2.php:532
+#: assessment/displayq2.php:532 assessment/displayq2.php:547
 msgid "Detailed Solution"
 msgstr "Detaillierte Lösung"
 
-#: assessment/displayq2.php:534
+#: assessment/displayq2.php:534 assessment/displayq2.php:549
 msgid "Show Detailed Solution"
 msgstr "Zeige detaillierte Lösung an"
 
@@ -3747,21 +3858,21 @@ msgstr ""
 "Geben Sie Ihre Antwort als kommagetrennte Menge von ganzen Zahlen oder "
 "Dezimalzahlen ein: Beispiel: {-4, 3, 2.5}"
 
-#: assessment/displayq2.php:927
+#: assessment/displayq2.php:927 assessment/displayq2.php:960
 msgid "Enter a set of whole or decimal numbers"
 msgstr "Geben Sie eine Menge von ganzen Zahlen oder Dezimalzahlen ein"
 
-#: assessment/displayq2.php:945
+#: assessment/displayq2.php:945 assessment/displayq2.php:978
 #, php-format
 msgid "Your answer should have between %d and %d significant figures."
 msgstr "Ihre Antwort sollte zwischen %d und &d signifikante Stellen haben."
 
-#: assessment/displayq2.php:946
+#: assessment/displayq2.php:946 assessment/displayq2.php:979
 #, php-format
 msgid ", with %d - %d significant figures"
 msgstr ", mit %d - %d signifikanten Stellen"
 
-#: assessment/displayq2.php:1447
+#: assessment/displayq2.php:1447 assessment/displayq2.php:1481
 msgid ""
 "Enter your answer as a set of values separated with commas: Example: {-4, 3, "
 "2}"
@@ -3770,60 +3881,63 @@ msgstr ""
 "{-4, 3, 2}"
 
 #: assessment/displayq2.php:1768 assessment/displayq2.php:1827
+#: assessment/displayq2.php:1831 assessment/displayq2.php:1891
 msgid "Enter your answer as a set of numbers.  Example: {1,2,3}"
 msgstr "Geben Sie Ihre ANtwort als Menge von Zahlen ein, Beispiel: {1,2,3}"
 
 #: assessment/displayq2.php:1769 assessment/displayq2.php:1828
+#: assessment/displayq2.php:1832 assessment/displayq2.php:1892
 msgid "Enter a set"
 msgstr "Geben Sie eine Menge ein"
 
-#: assessment/displayq2.php:2093
+#: assessment/displayq2.php:2093 assessment/displayq2.php:2161
 msgid "The answer must match a specified pattern"
 msgstr "Die Antwort muss zu einem vorgegebenen Muster passen"
 
-#: assessment/displayq2.php:2308
+#: assessment/displayq2.php:2308 assessment/displayq2.php:2383
 #, php-format
 msgid ""
 "Enter your answer using inequality notation.  Example: 3 &lt;= %s &lt; 4"
 msgstr ""
 "Geben Sie Ihre Antwort als Ungleichung ein. Beispiel: 3 &lt;= %s &lt; 4"
 
-#: assessment/displayq2.php:2309
+#: assessment/displayq2.php:2309 assessment/displayq2.php:2384
 #, php-format
 msgid "Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3"
 msgstr ""
 "Benutzen Sie or um Intervalle zu vereinen. Beispiel:  %s &lt; 2 or %s &gt;= 3"
 
-#: assessment/displayq2.php:2315
+#: assessment/displayq2.php:2315 assessment/displayq2.php:2390
 msgid "Separate intervals by a comma.  Example: (-oo,2],[4,oo)"
 msgstr "Trennen Sie Intervalle mit Kommata. Beispiel: (-oo,2],84,oo)"
 
-#: assessment/displayq2.php:2316
+#: assessment/displayq2.php:2316 assessment/displayq2.php:2391
 msgid "Enter a list of intervals using interval notation"
-msgstr "Geben Sie eine Liste von Intervallen in Intervallnotation ein"
+msgstr "Geben Sie eine Liste von Intervallen in Intervallschreibweise ein"
 
-#: assessment/displayq2.php:2658
+#: assessment/displayq2.php:2658 assessment/displayq2.php:2776
 msgid "Freehand Draw"
 msgstr "Freihandzeichnen"
 
-#: assessment/displayq2.php:3781
+#: assessment/displayq2.php:3781 assessment/displayq2.php:3928
 msgid "Debug info: empty, missing or invalid $answer"
 msgstr "Debuginfo: leeres, fehlendes oder ungültiges $answer"
 
 #: assessment/displayq2.php:5896 assessment/displayq2.php:5962
+#: assessment/displayq2.php:6206 assessment/displayq2.php:6288
 msgid " Unable to open Excel file"
 msgstr " Kann Excel Datei nicht öffnen"
 
-#: assessment/displayq2.php:5970
+#: assessment/displayq2.php:5970 assessment/displayq2.php:6296
 msgid "Successful"
 msgstr "Erfolgreich"
 
-#: assessment/displayq2.php:6420
+#: assessment/displayq2.php:6420 assessment/displayq2.php:6760
 #, php-format
 msgid "Enter a %s of fractions or whole numbers"
 msgstr "Geben Sie %s als Bruch oder ganze Zahl ein"
 
-#: assessment/displayq2.php:6423
+#: assessment/displayq2.php:6423 assessment/displayq2.php:6763
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6), as a whole number (like "
@@ -3832,26 +3946,27 @@ msgstr ""
 "Geben Sie %s als einen gekürzten Bruch (wie 5/3 anstatt 10/6), als ganze "
 "Zahl (wie 4 oder -2), oder als Dezimalzahl (wie 0.5 oder 1.25) ein"
 
-#: assessment/displayq2.php:6424
+#: assessment/displayq2.php:6424 assessment/displayq2.php:6764
 #, php-format
 msgid "Enter a %s of reduced fractions, whole numbers, or exact decimals"
 msgstr "Geben Sie %s als gekürzten Bruch, ganze Zahl oder Dezimalzahl ein"
 
-#: assessment/displayq2.php:6424
+#: assessment/displayq2.php:6424 assessment/displayq2.php:6764
 msgid "Enter a reduced fraction, whole number, or exact decimal"
 msgstr "Geben Sie einen gekürzten Bruch, ganze Zahl oder Dezimalzahl ein"
 
-#: assessment/displayq2.php:6427
+#: assessment/displayq2.php:6427 assessment/displayq2.php:6767
 #, php-format
 msgid "Enter a %s of reduced fractions or whole numbers"
 msgstr "Geben Sie %s als gekürzten Bruch oder ganze Zahl ein"
 
 #: assessment/displayq2.php:6431 assessment/displayq2.php:6434
+#: assessment/displayq2.php:6771 assessment/displayq2.php:6774
 #, php-format
 msgid "Enter a %s of mixed numbers or whole numbers"
 msgstr "Geben Sie %s als gemischte oder ganze Zahl ein"
 
-#: assessment/displayq2.php:6433
+#: assessment/displayq2.php:6433 assessment/displayq2.php:6773
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number, reduced proper or improper fraction, or "
@@ -3860,41 +3975,43 @@ msgstr ""
 "Geben Sie %s als echten, unechten oder als gemischten Bruch oder als ganze "
 "Zahl ein. Kürzen Sie soweit wie möglich. Beispiel: 2 1/2 = 2 &frac12;"
 
-#: assessment/displayq2.php:6434
+#: assessment/displayq2.php:6434 assessment/displayq2.php:6774
 msgid ""
 "Enter a reduced mixed number, proper or improper fraction, or whole number"
 msgstr ""
 "Geben Sie eine gekürzte gemischte Zahl, einen echten oder unechten Bruch "
 "oder eine ganze Zahl ein"
 
-#: assessment/displayq2.php:6437
+#: assessment/displayq2.php:6437 assessment/displayq2.php:6777
 #, php-format
 msgid "Enter a %s of fractions or exact decimals"
 msgstr "Geben Sie ein %s von Brüchen oder Ganzzahlen ein"
 
-#: assessment/displayq2.php:6440
+#: assessment/displayq2.php:6440 assessment/displayq2.php:6780
 #, php-format
 msgid "Enter a %s of numbers using scientific notation"
 msgstr "Geben Sie ein %s von Zahlen in wissenschaftlicher Notation ein"
 
-#: assessment/displayq2.php:6443
+#: assessment/displayq2.php:6443 assessment/displayq2.php:6783
 #, php-format
 msgid "Enter a %s of mathematical expressions"
 msgstr "Geben sie ein %s von mathematischen Ausdrücken ein"
 
 #: assessment/displayq2.php:6487 assessment/displayq2.php:6539
+#: assessment/displayq2.php:6827 assessment/displayq2.php:6884
 msgid "No solution"
 msgstr "Keine Lösung"
 
 #: assessment/displayq2.php:6488 assessment/displayq2.php:6540
+#: assessment/displayq2.php:6828 assessment/displayq2.php:6885
 msgid "Infinite number of solutions"
 msgstr "Unendlich viele Lösungen"
 
-#: assessment/displayq2.php:6490
+#: assessment/displayq2.php:6490 assessment/displayq2.php:6830
 msgid "One or more solutions: "
 msgstr "Eine oder mehrere Lösungen: "
 
-#: assessment/displayq2.php:6492
+#: assessment/displayq2.php:6492 assessment/displayq2.php:6836
 msgid "One solution: "
 msgstr "Eine Lösung: "
 
@@ -3930,3 +4047,134 @@ msgstr "Keine Antwort ausgewählt. Bitte erneut versuchen."
 #: assessment/macros.php:2876
 msgid "This answer does not appear to be a valid number."
 msgstr "Diese Antwort scheint keine gültige Zahl zu sein."
+
+#: assessment/displayq2.php:956
+msgid ""
+"Enter your answer as a list of whole or decimal numbers separated with "
+"commas: Examples: -4, 3, 2.5172"
+msgstr ""
+"Geben Sie Ihre Antwort als Komma getrennte Liste von Ganz- oder "
+"Dezimalzahlen ein: Beispiel: -4, 3, 2.5172"
+
+#: assessment/displayq2.php:959
+msgid ""
+"Enter your answer as a set of whole or decimal numbers separated with "
+"commas: Example: {-4, 3, 2.5172}"
+msgstr ""
+"Geben Sie Ihre Antwort als Komma getrennte Menge von Ganz- oder "
+"Dezimalzahlen ein: Beispiel: {-4, 3, 2.5172}"
+
+#: assessment/displayq2.php:962
+msgid ""
+"Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5172"
+msgstr ""
+"Geben Sie Ihre Antwort als Ganz- oder Dezimalzahl ein: Beispiele: 3, -4, "
+"5.5172"
+
+#: assessment/displayq2.php:1819 assessment/displayq2.php:1879
+msgid "Enter your answer as a point.  Example: (2,5.5172)"
+msgstr "Geben Sie Ihre Antwort als Punkt ein. Beispiel: (2, 5.5172)"
+
+#: assessment/displayq2.php:1822 assessment/displayq2.php:1882
+msgid ""
+"Enter your answer a list of points separated with commas.  Example: (1,2), "
+"(3.5172,5)"
+msgstr ""
+"Geben Sie Ihre Antwort als Komma getrennte Liste von Punkten ein. Beispiel: "
+"(1, 2), (3.5172, 5)"
+
+#: assessment/displayq2.php:1828 assessment/displayq2.php:1888
+msgid ""
+"Enter your answer a list of vectors separated with commas.  Example: <1,2>, "
+"<3.5172,5>"
+msgstr ""
+"Geben Sie Ihre Antwort als Komma getrennte Liste von Vektoren ein. Beispiel: "
+"<1, 2>, <3.5172, 5>"
+
+#: assessment/displayq2.php:1834 assessment/displayq2.php:1894
+msgid ""
+"Enter your answer as a list of n-tuples of numbers separated with commas: "
+"Example: (1,2),(3.5172,4)"
+msgstr ""
+"Geben Sie Ihre Antwort als Komma getrennte Liste von n-Tupeln ein. Beispiel: "
+"(1, 2), (3.5172, 4)"
+
+#: assessment/displayq2.php:1837 assessment/displayq2.php:1897
+msgid "Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)"
+msgstr "Geben Sie Ihre Antwort als n-Tupel ein. Beispiel: (2, 5.5172)"
+
+#: assessment/displayq2.php:1885
+msgid "Enter your answer as a vector.  Example: <2,5.5172>"
+msgstr "Geben Sie Ihre Antwort als Vektor ein. Beispiel: <2, 5.5172>"
+
+#: assessment/displayq2.php:1950
+msgid ""
+"Enter your answer as a list of complex numbers in a+bi form separated with "
+"commas.  Example: 2+5.5172i,-3-4i"
+msgstr ""
+"Geben Sie Ihre Antwort als Komma getrennte Liste von komplexen Zahlen in a"
+"+bi Form ein. Beispiel: 2+5.5172i, -3-4i"
+
+#: assessment/displayq2.php:1953
+msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i"
+msgstr ""
+"Geben Sie Ihre Antwort als komplexe Zahl in a+bi Form ein. Beispiel: "
+"2+5.5172i"
+
+#: assessment/displayq2.php:2284
+msgid "Enter your answer using interval notation.  Example: [2.1,5.6172)"
+msgstr ""
+"Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2.1, 5.6172)"
+
+#: assessment/displayq2.php:2388
+msgid "Enter your answer using interval notation.  Example: [2,5)"
+msgstr "Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2, 5)"
+
+#: assessment/displayq2.php:2635
+msgid "Graph to add drawings to:"
+msgstr "Graph, zu dem Zeichnungen hinzugefügt werden:"
+
+#: assessment/displayq2.php:2637
+msgid "Elements to draw:"
+msgstr "Zu zeichnende Elemente"
+
+#: assessment/displayq2.php:2639
+msgid "Add new drawing element"
+msgstr "Neues Zeichenelement hinzufügen"
+
+#: assessment/displayq2.php:6782
+#, php-format
+msgid ""
+"Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, "
+"2^3, 5+4)"
+msgstr ""
+"Geben Sie %s als Zahl (wie etwa 5, -3, 2.2172) oder als Berechnung (wie etwa "
+"5/3, 2^3, 5+4) ein."
+
+#: assessment/displayq2.php:6813
+msgid "Incorrect"
+msgstr "Falsch"
+
+#: assessment/displayq2.php:6815
+msgid "Correct"
+msgstr "Richtig"
+
+#: assessment/displayq2.php:6817
+msgid "Correct answer, but wrong format"
+msgstr "Richtige Antwort, aber falsches Format"
+
+#: assessment/displayq2.php:6819
+msgid "Partially correct"
+msgstr "Teilweise richtig"
+
+#: assessment/displayq2.php:6832
+msgid "Interval notation solution: "
+msgstr "Lösung in Intervallschreibweise: "
+
+#: assessment/displayq2.php:6834
+msgid "Inequality notation solution: "
+msgstr "Lösung als Ungleichung: "
+
+#: footer.php:32
+msgid "[more..]"
+msgstr "[mehr..]"
