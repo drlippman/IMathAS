@@ -291,7 +291,9 @@ Leave items blank to use the assessment's default values<br/>
 	} else if (!$beentaken) {
 		echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
 	}
-	echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
+	if ($line['fixedseeds']=='') {
+		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
+	}
 	echo '<div class="advanced" id="fixedseedwrap" ';
 	if ($line['fixedseeds']=='') {
 		echo 'style="display:none;"';
@@ -300,8 +302,11 @@ Leave items blank to use the assessment's default values<br/>
 	echo '<span class="form">Restricted question seed list:</span>';
 	echo '<span class="formright"><input size=30 name="fixedseeds" id="fixedseeds" value="'.$line['fixedseeds'].'"/></span><br class="form"/>';
 	echo '</div>';
+	if ($line['fixedseeds']!='' && $beentaken) {
+		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
+	}
 	if ($beentaken) {
-		echo '<div class="advanced">'; 
+		echo '<div class="advanced" style="display:none">'; 
 		echo '<span class="form">Replace this question with question ID: <br/>';
 		echo '<span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
 		echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
