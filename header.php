@@ -16,7 +16,8 @@
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=022817b";?>" type="text/css" />
-<?php if (isset($coursetheme)) {
+<?php 
+if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace(array('_fw1920','_fw1000','_fw'),'',$coursetheme);
 	}
@@ -32,8 +33,15 @@
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=022817";?>" type="text/css" />
 <link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=022817" media="only screen and (max-width:480px)"/>
 
-<?php } ?>
-<link rel="shortcut icon" href="/favicon.ico" />
+<?php 
+} 
+if (isset($CFG['GEN']['favicon'])) {
+	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
+} else {
+	echo '<link rel="shortcut icon" href="/favicon.ico" />';
+}
+?>
+
 <!--[if lte IE 6]>
 <style>
 div { zoom: 1; }

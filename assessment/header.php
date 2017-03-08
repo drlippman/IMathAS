@@ -77,6 +77,11 @@ if ($isdiag) {
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
+if (isset($CFG['GEN']['favicon'])) {
+	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
+} else {
+	echo '<link rel="shortcut icon" href="/favicon.ico" />';
+}
 //$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; var mathRenderer = "none"; function rendermathnode(el) {AMprocessNode(el);};</script>';
