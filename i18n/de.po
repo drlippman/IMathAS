@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.3\n"
+"Project-Id-Version: 0.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-06-04 16:36+0200\n"
-"PO-Revision-Date: 2017-02-28 15:45+0200\n"
+"PO-Revision-Date: 2017-03-08 11:57+0200\n"
 "Last-Translator: Stefan Bäcker <baecker@uni-koblenz.de>\n"
 "Language: Deutsch\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 2.91.6\n"
-
 
 #: course/courseshowitems.php:321 course/courseshowitems.php:322
 msgid " Collapsed. "
@@ -2531,7 +2530,7 @@ msgstr "Studentenansicht"
 #: assessment/showtest.php:191 assessment/showtest.php:1809
 #: assessment/showtest.php:1850 assessment/showtest.php:2173
 #: assessment/showtest.php:2528 assessment/showtest.php:2602
-#: assessment/showtest.php:2791
+#: assessment/showtest.php:2791 multiembedq.php:146 multiembedq.php:186
 msgid "Submit"
 msgstr "Absenden"
 
@@ -4178,3 +4177,15 @@ msgstr "Lösung als Ungleichung: "
 #: footer.php:32
 msgid "[more..]"
 msgstr "[mehr..]"
+
+#: multiembedq.php:165
+msgid "Enable text based alternatives for graph display and drawing entry"
+msgstr "Schalte textbasierte Alternativen für Graphenanzeige und Zeichnungseingabe an"
+
+#: multiembedq.php:174
+msgid "Try Another Version of These Questions</a></p>"
+msgstr "Versuche andere Versionen dieser Fragen"
+
+#: multiembedq.php:176
+msgid "Try Another Version of This Question</a></p>"
+msgstr "Versuche eine andere Version dieser Frage"
