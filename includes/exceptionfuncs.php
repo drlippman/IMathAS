@@ -31,7 +31,6 @@ function getCanUseAssessException($exception, $adata, $limit=false) {
 			//regardless of whether exception is manual or latepass
 			//prevents using latepasses on top of a manual extension
 			$latepasscnt = max(0,round(($exception[1] - $adata['enddate'])/($latepasshrs*3600)));
-			
 			//use exception due date for determining canuselatepass
 			$adata['enddate'] = $exception[1];
 		} else {
@@ -43,10 +42,12 @@ function getCanUseAssessException($exception, $adata, $limit=false) {
 			}
 		}
 		
-		if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
-			$canuselatepass = true;
-		} else if ($now<$adata['enddate'] && ($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !$actas) {
-			$canuselatepass = true;
+		if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
+			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600) {
+				$canuselatepass = true;
+			} else if ($now<$adata['enddate']) {
+				$canuselatepass = true;
+			}
 		}
 		return array($useexception, $canundolatepass, $canuselatepass);
 	} else {
@@ -62,11 +63,13 @@ function getCanUseAssessLatePass($adata) {
 	$now = time();
 	$canuselatepass = false;
 	$latepasscnt = 0; 
-	if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
-		$canuselatepass = true;
-	} else if ($now<$adata['enddate'] && ($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !$actas) {
-		$canuselatepass = true;
-	} 
+	if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
+		if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600) {
+			$canuselatepass = true;
+		} else if ($now<$adata['enddate']) {
+			$canuselatepass = true;
+		}
+	}
 	return $canuselatepass;
 }
 
