@@ -5025,6 +5025,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$y2p = $ytopix($func(floatval($function[1])+1));
 						$ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
 					} else { //line seg
+						if ($function[1]>$function[2]) {  //if xmin>xmax, swap
+							$tmp = $function[2];
+							$function[2] = $function[1];
+							$function[1] = $tmp;
+						}
 						$y1p = $ytopix($func(floatval($function[1])));
 						$y2p = $ytopix($func(floatval($function[2])));
 						$ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
@@ -5963,14 +5968,21 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$func = mathphp($func,'x');
 				$func = str_replace("(x)",'($x)',$func);
 				$func = create_function('$x', 'return ('.$func.');');
+
 				if (!isset($function[1])) {
 					$function[1] = $settings[0];
 				}
 				if (!isset($function[2])) {
 					$function[2] = $settings[1];
 				}
+				if ($function[1]>$function[2]) {  //if xmin>xmax, swap
+					$tmp = $function[2];
+					$function[2] = $function[1];
+					$function[1] = $tmp;
+				}
 				$xminpix = round(max(2*$imgborder,($function[1] - $settings[0])*$pixelsperx + $imgborder));
 				$xmaxpix = round(min($settings[6]-2*$imgborder,($function[2] - $settings[0])*$pixelsperx + $imgborder));
+				
 				for ($k=ceil($xminpix/$step); $k*$step <= $xmaxpix; $k++) {
 					$x = $k*$step;
 					$coordx = ($x - $imgborder)/$pixelsperx + $settings[0]+1E-10;
@@ -5989,6 +6001,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			//break apart student entry
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
+
 			if ($lines=='') {
 				$lines = array();
 			} else {
