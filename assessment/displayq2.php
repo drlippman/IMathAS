@@ -1531,6 +1531,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
 		}
+		
 		if (isset($answer)) {
 			if (!is_numeric($answer)) {
 				$sa = '`'.$answer.'`';
@@ -1670,10 +1671,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		$la = $lap[0];
+		
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = array_map('trim',explode(',',$answerformat));
 
-		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
-
-		if ($answerformat=="equation") {
+		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$out .= "<label for=\"tn$qn\">$ansprompt</label>";
+		}
+		if (in_array('equation',$ansformats)) {
 			$shorttip = _('Enter an algebraic equation');
 		} else {
 			$shorttip = _('Enter an algebraic expression');
@@ -1772,11 +1777,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$points = implode(",",$pts);
 		$out .= "<script type=\"text/javascript\">pts[$qn]=\"$points\";</script>\n";
-		if ($answerformat=="equation") {
+		if (in_array('equation',$ansformats)) {
 			$out .= "<script type=\"text/javascript\">iseqn[$qn] = 1;</script>\n";
 			$tip = _('Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
 		} else {
 			$tip = _('Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c') . "\n<br/>" . _('Be sure your variables match those in the question');
+		}
+		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
 		}
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
@@ -4114,7 +4122,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}
-
+		
 		if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$qn];} else {$domain= $options['domain'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 
@@ -4131,11 +4139,30 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = array_map('trim',explode(',',$answerformat));		
+		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
+
 		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		
+		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, '', $answer, $ansprompt);
+		}
 
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+		
+		//handle nosolninf case
+		if ($_POST["tc$qn"]=='oo' || $_POST["tc$qn"]=='DNE') {
+			if ($answer==$_POST["tc$qn"]) {
+				return 1;
+			} else { 
+				return 0;
+			}
+		} else if ($answer=='DNE' || $answer=='oo') {
+			return 0;
+		}
 		$correct = true;
 
 		if (!isset($variables)) { $variables = "x";}
@@ -4193,7 +4220,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 
-		if ($answerformat!="equation" && strpos($answer,'=')!==false) {
+		if (!in_array('equation',$ansformats) && strpos($answer,'=')!==false) {
 			echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
 		}
 
@@ -4224,13 +4251,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$correct = true;
 			$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s]+/','',$answer);
 
-			if ($answerformat=="equation") {
+			if (in_array('equation',$ansformats)) {
 				if (substr_count($_POST["tc$qn"], '=')!=1) {
 					return 0;
 				}
 				$answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
 				unset($ratios);
-			} else if ($answerformat=="toconst") {
+			} else if (in_array('toconst',$ansformats)) {
 				unset($diffs);
 				unset($realanss);
 			}
@@ -4272,7 +4299,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
-				if ($answerformat=="equation") {  //if equation, store ratios
+				if (in_array('equation',$ansformats)) {  //if equation, store ratios
 					if (abs($realans)>.000001 && is_numeric($myans[$i])) {
 						$ratios[] = $myans[$i]/$realans;
 						if (abs($myans[$i])<=.00000001 && $realans!=0) {
@@ -4281,7 +4308,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else if (abs($realans)<=.000001 && is_numeric($myans[$i]) && abs($myans[$i])<=.00000001) {
 						$cntbothzero++;
 					}
-				} else if ($answerformat=="toconst") {
+				} else if (in_array('toconst',$ansformats)) {
 					$diffs[] = $myans[$i] - $realans;
 					$realanss[] = $realans;
 					$ysqr = $realans*$realans;
@@ -4305,7 +4332,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if ($stunan>1) { //if more than 1 student NaN response
 				$correct = false; continue;
 			}
-			if ($answerformat=="equation") {
+			if (in_array('equation',$ansformats)) {
 				if ($cntbothzero>18) {
 					$correct = true;
 				} else if (count($ratios)>1) {
@@ -4324,7 +4351,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else {
 					$correct = false;
 				}
-			} else if ($answerformat=="toconst") {
+			} else if (in_array('toconst',$ansformats)) {
 				if (isset($abstolerance)) {
 					//if abs, use mean diff - will minimize error in abs diffs
 					$meandiff = array_sum($diffs)/count($diffs);
@@ -6846,6 +6873,8 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$answerbox = preg_replace('/<label.*?<\/label>/','',$answerbox);  //remove existing ansprompt
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
+	$partnum = $qn%1000;
+	
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
 	} else if ($format=='interval') {
@@ -6869,7 +6898,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	}
 	$out .= '<div class="'.$colorbox.'">';
 	$out .= '<ul class="likelines">';
-	$out .= '<li><label><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'>'.$specsoln;
+	$out .= '<li><label><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'>'.$specsoln.'</label>';
 	if ($la=='DNE' || $la=='oo') {
 		$laqs = $la;
 		$answerbox = str_replace('value="'.$la.'"','value=""',$answerbox);
@@ -6879,8 +6908,8 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 
 	$out .= str_replace(getcolormark($colorbox),'',$answerbox);
 
-	$out .= '<span id="previewloctemp'.$qn.'"></span>';
-	$out .= '</label></li>';
+	$out .= '<span id="previewloctemp'.$partnum.'"></span>';
+	$out .= '</li>';
 
 	$out .= '<li><label><input type="radio" id="qs'.$qn.'-d" name="qs'.$qn.'" value="DNE" '.($laqs=='DNE'?'checked':'').'>'.$nosoln.'</label></li>';
 	if (in_array('nosolninf',$ansformats)) {
