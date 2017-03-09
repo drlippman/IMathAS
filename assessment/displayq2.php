@@ -3917,6 +3917,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//return 0;
 			$formatok = "nowhole";
 		}
+		
+		if (isset($requiretimeslistpart) && strpos($requiretimeslistpart,';')!==false) {
+			$requiretimeslistpart = explode(';', $requiretimeslistpart);
+		}
 
 
 
@@ -4026,6 +4030,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		$correct = 0;
+
 		foreach($anarr as $i=>$anss) {
 			$foundloc = -1;
 			if (in_array('orderedlist',$ansformats)) {
@@ -4037,7 +4042,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$formatok = "nopart";  $partformatok = false;
 					//continue;
 				}
-				if (isset($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart)==0) {
+				if (isset($requiretimeslistpart) && !is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart)==0) {
 					$formatok = "nopart";  $partformatok = false;
 					//continue;
 				}
@@ -4078,12 +4083,27 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}*/
 					} else if (is_numeric($givenans)) {
 						if (isset($abstolerance)) {
-							if (abs($anans-$givenans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
+							if (abs($anans-$givenans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
+								if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
+									$formatok = "nopart";  $partformatok = false;
+								}
+								if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+							}
 						} else {
 							if ($anans==0) {
-								if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
+								if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {
+									if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
+										$formatok = "nopart";  $partformatok = false;
+									}
+									if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+								}
 							} else {
-								if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
+								if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {
+									if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
+										$formatok = "nopart";  $partformatok = false;
+									}
+									if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+								}
 							}
 						}
 					}
@@ -6535,6 +6555,7 @@ function isNaN( $var ) {
 
 function checkreqtimes($tocheck,$rtimes) {
 	global $mathfuncs;
+	if ($rtimes=='') {return 1;}
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
 	}

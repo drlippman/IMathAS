@@ -2264,7 +2264,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	You can use a regular expression by putting in the symbol location "regex:expression"</dd>
 <dt>$requiretimeslistpart = a list, in the same format as $requiretimes </dt>
 	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used, 
-	where $requiretimes would be applied to the entire list of answers.</dd>
+	where $requiretimes would be applied to the entire list of answers.  To apply different $requiretimes to each element of the $answer list, separate
+	them with semicolons, like "pi,=1;/,=1;;"</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$answerboxsize = number </dt>
