@@ -4175,6 +4175,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		
+		
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, '', $answer, $ansprompt);
 		}
@@ -4182,13 +4183,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 		
 		//handle nosolninf case
-		if ($_POST["tc$qn"]=='oo' || $_POST["tc$qn"]=='DNE') {
+		if ($_POST["tc$qn"]==='oo' || $_POST["tc$qn"]==='DNE') {
 			if ($answer==$_POST["tc$qn"]) {
 				return 1;
 			} else { 
 				return 0;
 			}
-		} else if ($answer=='DNE' || $answer=='oo') {
+		} else if ($answer==='DNE' || $answer==='oo') {
 			return 0;
 		}
 		$correct = true;
