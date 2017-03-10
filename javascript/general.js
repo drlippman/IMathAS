@@ -237,6 +237,9 @@ function GB_show(caption,url,width,height) {
 		gb_overlay.onclick = GB_hide;
 		document.getElementsByTagName("body")[0].appendChild(gb_overlay);
 		var gb_window = document.createElement("div");
+		gb_window.setAttribute("aria-role","dialog");
+		gb_window.setAttribute("aria-labelledby","GB_caption");
+		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
 		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div>';
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
@@ -246,7 +249,7 @@ function GB_show(caption,url,width,height) {
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
-		btnhtml += '<span class="pointer" onclick="GB_hide()" aria-label="Close">[X]</span>&nbsp;</span>Select Libraries<div class="clear"></div>';
+		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span>Select Libraries<div class="clear"></div>';
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
@@ -272,6 +275,13 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
+	
+	document.getElementById("GB_window").focus();
+	$(document).on('keydown.GB', function(evt) {
+		if (evt.keyCode == 27) {
+			GB_hide();
+		}
+	});
 }
 function GB_doneload() {
 	document.getElementById("GB_loading").style.display = "none";
@@ -279,6 +289,7 @@ function GB_doneload() {
 function GB_hide() {
 	document.getElementById("GB_window").style.display = "none";
 	document.getElementById("GB_overlay").style.display = "none";
+	$(document).off('keydown.GB');
 }
 
 function chkAllNone(frmid, arr, mark, skip) {

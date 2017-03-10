@@ -640,7 +640,10 @@ input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus
   margin: 0;
   text-align: left;
 }
-
+#GB_caption a {
+	color: #fff;
+	text-decoration: none;
+}
 ol li ol {
 	list-style-type: lower-alpha;
 }
