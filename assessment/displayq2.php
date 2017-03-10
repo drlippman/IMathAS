@@ -3922,8 +3922,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$requiretimeslistpart = explode(';', $requiretimeslistpart);
 		}
 
-
-
 		if (in_array("scinot",$ansformats)) {
 			$answer = str_replace('xx','*',$answer);
 		}
@@ -4006,12 +4004,22 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$lastval = $v;
 			}
 
-			$tmp = $anarr;
-			sort($tmp);
+			if (isset($requiretimeslistpart) && is_array($requiretimeslistpart)) {
+				list($tmp,$tmprtlp) = jointsort($anarr,$requiretimeslistpart);
+			} else {
+				$tmp = $anarr;
+				sort($tmp);
+			}
 			$anarr = array($tmp[0]);
+			if (isset($requiretimeslistpart) && is_array($requiretimeslistpart)) {
+				$requiretimeslistpart = array($tmprtlp[0]);
+			}
 			for ($i=1;$i<count($tmp);$i++) {
-				if (!is_numeric($tmp[$i]) || !is_numeric($tmp[$i-1]) || $tmp[$i]-$tmp[$i-1]>1E-12) {
+				if (!is_numeric($tmp[$i][0]) || !is_numeric($tmp[$i-1][0]) || count($tmp[$i])>1 || count($tmp[$i-1])>1 || abs($tmp[$i][0]-$tmp[$i-1][0])>1E-12) {
 					$anarr[] = $tmp[$i];
+					if (isset($requiretimeslistpart) && is_array($requiretimeslistpart)) {
+						$requiretimeslistpart[] = $tmprtlp[$i];
+					}
 				}
 			}
 
