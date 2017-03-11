@@ -727,6 +727,7 @@
 		$testsettings['testtype']="Practice";
 		$testsettings['defattempts'] = 0;
 		$testsettings['defpenalty'] = 0;
+		$testsettings['origshowans'] = $testsettings['showans'];
 		$testsettings['showans'] = '0';
 
 		$seeds = explode(",",$line['reviewseeds']);
@@ -1203,7 +1204,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		}
 
 		if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
-			if ($testsettings['showans']!='N') {
+			if ($testsettings['origshowans']!='N') {
 				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'" ';
 				if ($isreview && !(isset($exceptionduedate) && $exceptionduedate>0) && $testsettings['allowlate']>10 && $sessiondata['latepasses']>0 && !isset($sessiondata['stuview']) && !$actas && (time() - $testsettings['enddate'])<$latepasshrs*3600 && !in_array($testsettings['id'],$viewedassess)) {
 					echo ' onclick="return confirm(\''._('If you view this scored assignment, you will not be able to use a LatePass on it').'\');"';
