@@ -69,7 +69,7 @@ function flattenout($arr,$level) {
 flattenout($outcomes,'0');
 
 if (isset($studentid)) {
-	$stu = intval($studentid);
+	$stu = intval($userid);
 	$report = 'onestu';
 	$qs = '&stu='.$stu;
 } else if (isset($_GET['stu'])) {
