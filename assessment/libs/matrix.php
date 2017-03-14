@@ -278,27 +278,37 @@ function matrixgetentry($m,$r,$c) {
 	}
 }
 
-//matrixgetrow(matrix,row)
+//matrixgetrow(matrix,row,[asArray])
 //get row of a matrix as a new 1xm matrix
+//  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
-function matrixgetrow($m,$r) {
+function matrixgetrow($m,$r, $asArray=false) {
 	if ($r<0 || $r>=count($m)) {
 		echo 'invalid row';
 	} else {
-		return array($m[$r]);
+		if ($asArray) {
+			return $m[$r];
+		} else {
+			return array($m[$r]);
+		}
 	}
 }
 
-//matrixgetcol(matrix,col)
+//matrixgetcol(matrix,col,[asArray])
 //get col of a matrix as a new nx1 matrix
+//  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
-function matrixgetcol($m,$c) {
+function matrixgetcol($m,$c, $asArray=false) {
 	if ($c<0 || $c>=count($m[0])) {
 		echo 'invalid col';
 	} else {
 		$o = array();
 		foreach ($m as $r=>$row) {
-			$o[$r] = array($row[$c]);
+			if ($asArray) {
+				$o[$r] = $row[$c];
+			} else {
+				$o[$r] = array($row[$c]);
+			}
 		}
 		return $o;
 	}

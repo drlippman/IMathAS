@@ -70,12 +70,14 @@ matrixgetentry(matrix,row,col)
 <BR>get entry from a matrix at given row and col
 <BR>rows and cols are 0 indexed (first row is row 0)
 <BR><h3><a name="matrixgetrow">matrixgetrow</a></h3>
-matrixgetrow(matrix,row)
+matrixgetrow(matrix,row,[asArray])
 <BR>get row of a matrix as a new 1xm matrix
+<br>&nbsp;&nbsp;or array if asArray is set to true
 <BR>rows and cols are 0 indexed (first row is row 0)
 <BR><h3><a name="matrixgetcol">matrixgetcol</a></h3>
-matrixgetcol(matrix,col)
+matrixgetcol(matrix,col,[asArray])
 <BR>get col of a matrix as a new nx1 matrix
+<br>&nbsp;&nbsp;or array if asArray is set to true
 <BR>rows and cols are 0 indexed (first row is row 0)
 <BR><h3><a name="matrixgetsubmatrix">matrixgetsubmatrix</a></h3>
 matrixgetsubmatrix(matrix,rowselector,colselector)
