@@ -13,6 +13,7 @@ function imasrubric_getpttot(rubricid) {
 			pttot = Math.max(pttot, imasrubrics[rubricid].data[i][2]);
 		}
 	}
+	pttot = Math.round(10*pttot)/10;
 	return pttot;
 }
 function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
@@ -75,7 +76,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot;
+			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
 			html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</td>';
 			//if (totpts==2) {
 			//	html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
@@ -93,7 +94,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot;
+			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
 			html += '</td><td width="10%"><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</td></tr>';
 		}
 	}
