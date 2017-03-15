@@ -491,7 +491,7 @@ if ($overwriteBody==1) {
 		<?php 
 		
 		if ((!$useviewbuttons && isset($teacherid) && $useleftbar) || ($useleftstubar && (isset($studentid) || isset($tutorid)))) {
-			if ($didnavlist) {
+			if ($didnavlist && !isset($teacherid)) {
 				$incclass = 'class="hideifnavlist"';
 			}
 			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
