@@ -31,7 +31,7 @@ if (isset($coursetheme)) {
 	}
 	?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=022817";?>" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=022817" media="only screen and (max-width:480px)"/>
+<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=031417" media="only screen and (max-width:480px)"/>
 
 <?php 
 } 

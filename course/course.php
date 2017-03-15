@@ -488,7 +488,16 @@ if ($overwriteBody==1) {
 		} else { echo '&nbsp;';}
 		?>
 		</span>
-		<?php echo $curBreadcrumb ?>
+		<?php 
+		
+		if ((!$useviewbuttons && isset($teacherid) && $useleftbar) || ($useleftstubar && (isset($studentid) || isset($tutorid)))) {
+			if ($didnavlist) {
+				$incclass = 'class="hideifnavlist"';
+			}
+			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
+		}
+		echo $curBreadcrumb 
+		?>
 		<div class=clear></div>
 	</div>
 

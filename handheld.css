@@ -7,6 +7,10 @@ div#leftcolumn, div#rightcolumn  {
 	width: auto;
 }
 
+span#leftcontenttoggle.hideifnavlist, .hideifnavlist {
+	display: none;
+}
+
 span#leftcontenttoggle {
 	display: inline-block;
 	vertical-align:middle;
