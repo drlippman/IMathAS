@@ -13,15 +13,8 @@ span#leftcontenttoggle.hideifnavlist, .hideifnavlist {
 
 span#leftcontenttoggle {
 	display: inline-block;
-	vertical-align:middle;
-	padding: 0px 5px;
 }
-span#leftcontenttoggle:hover {
-	background-color: #eee;
-}
-span#leftcontenttoggle.leftcontentactive {
-	background-color: #eee;
-}
+
 div#viewbuttoncont {
 	float:none;
 }
