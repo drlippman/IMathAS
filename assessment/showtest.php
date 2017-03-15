@@ -369,10 +369,11 @@
 			//DB $sessiondata['coursename'] = mysql_result($result,0,0);
 			//DB $sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursename'] = $courseinfo['name'];
-			$sessiondata['coursetheme'] = $courseinfo['theme'];
-			if (isset($usertheme) && $usertheme!='') {
-				$sessiondata['coursetheme'] = $usertheme;
+			if (!isset($coursetheme)) { //should already be set from validate.php
+				$coursetheme = $courseinfo['theme'];
 			}
+			$sessiondata['coursetheme'] = $coursetheme;
+
 			//DB $sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			//DB $sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
 			//DB $sessiondata['coursetoolset'] = mysql_result($result,0,4);
