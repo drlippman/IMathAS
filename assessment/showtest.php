@@ -1139,7 +1139,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			echo "&gt; ", _('View as student'), "</div>";
 		} else {
 			echo "<div class=breadcrumb>";
-			echo "<span style=\"float:right;\">$userfullname</span>";
+			echo "<span style=\"float:right;\" class=\"hideinmobile\">$userfullname</span>";
 			if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
 				echo "$breadcrumbbase ", _('Assessment'), "</div>";
 			} else {
