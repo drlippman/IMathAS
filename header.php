@@ -15,7 +15,7 @@
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=031417";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=031517";?>" type="text/css" />
 <?php 
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
@@ -31,7 +31,7 @@ if (isset($coursetheme)) {
 	}
 	?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=022817";?>" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=031417" media="only screen and (max-width:480px)"/>
+<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=031517" media="only screen and (max-width:480px)"/>
 
 <?php 
 } 
