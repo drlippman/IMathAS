@@ -104,6 +104,9 @@ div.blockitems, div.blockitems div.blockitems div.blockitems {
 div.hidden {
 	display:none;
 }
+.showinmobile {
+	display:none;
+}
 div.icon {
 	float: left;
 	padding-left: 5px;

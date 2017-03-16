@@ -197,8 +197,6 @@ switch($_GET['action']) {
 			$msgmonitor = (floor($line['msgset']/5))&1;
 			$msgOnEnroll = (floor($line['msgset']/5))&2;
 			$toolset = $line['toolset'];
-			$cploc = $line['cploc'];
-			$theme = $line['theme'];
 			$topbar = explode('|',$line['topbar']);
 			$topbar[0] = explode(',',$topbar[0]);
 			$topbar[1] = explode(',',$topbar[1]);
@@ -227,10 +225,6 @@ switch($_GET['action']) {
 			$msgmonitor = (floor($msgset/5))&1;
 			$msgOnEnroll = (floor($msgset/5))&2;
 			$msgset = $msgset%5;
-
-			$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
-
-			$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
 			$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
 			$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
 			$istemplate = 0;
@@ -408,75 +402,11 @@ switch($_GET['action']) {
 			echo '/> '._('Send').'</span><br class="form" />';
 		}
 
-
 		if (!isset($CFG['CPS']['showlatepass']) || $CFG['CPS']['showlatepass'][1]==1) {
 			echo '<span class="form">Show remaining LatePasses on student gradebook page:</span><span class="formright">';
 			echo '<input type=checkbox name="showlatepass" value="1" ';
 			if ($showlatepass==1) {echo 'checked="checked"';};
 			echo ' /></span><br class="form" />';
-		}
-
-		if (!isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1) {
-			echo "<span class=form>Student Quick Pick Top Bar items:</span><span class=formright>";
-			echo '<input type=checkbox name="stutopbar[]" value="0" ';
-			if (in_array(0,$topbar[0])) { echo 'checked=1'; }
-			echo ' /> Messages <br /><input type=checkbox name="stutopbar[]" value="3" ';
-			if (in_array(3,$topbar[0])) { echo 'checked=1'; }
-			echo ' /> Forums <br /><input type=checkbox name="stutopbar[]" value="1" ';
-			if (in_array(1,$topbar[0])) { echo 'checked=1'; }
-			echo ' /> Gradebook <br /><input type=checkbox name="stutopbar[]" value="2" ';
-			if (in_array(2,$topbar[0])) { echo 'checked=1'; }
-			echo ' /> Calendar <br /><input type=checkbox name="stutopbar[]" value="9" ';
-			if (in_array(9,$topbar[0])) { echo 'checked=1'; }
-			echo ' /> Log Out</span><br class=form />';
-
-			echo "<span class=form>Instructor Quick Pick Top Bar items:</span><span class=formright>";
-			echo '<input type=checkbox name="insttopbar[]" value="0" ';
-			if (in_array(0,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Messages<br /><input type=checkbox name="insttopbar[]" value="6" ';
-			if (in_array(6,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Forums<br /><input type=checkbox name="insttopbar[]" value="1" ';
-			if (in_array(1,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Student View<br /><input type=checkbox name="insttopbar[]" value="2" ';
-			if (in_array(2,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Gradebook<br /><input type=checkbox name="insttopbar[]" value="3" ';
-			if (in_array(3,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Roster<br /><input type=checkbox name="insttopbar[]" value="7" ';
-			if (in_array(7,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Groups<br/><input type=checkbox name="insttopbar[]" value="4" ';
-			if (in_array(4,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Calendar<br/><input type=checkbox name="insttopbar[]" value="5" ';
-			if (in_array(5,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Quick View<br /><input type=checkbox name="insttopbar[]" value="9" ';
-			if (in_array(9,$topbar[1])) { echo 'checked=1'; }
-			echo ' /> Log Out</span><br class=form />';
-
-			echo '<span class="form">Quick Pick Bar location:</span><span class="formright">';
-			echo '<input type="radio" name="topbarloc" value="0" '. ($topbar[2]==0?'checked="checked"':'').'>Top of course page<br/>';
-			echo '<input type="radio" name="topbarloc" value="1" '. ($topbar[2]==1?'checked="checked"':'').'>Top of all pages';
-			echo '</span><br class="form" />';
-		}
-		if (!isset($CFG['CPS']['cploc']) || $CFG['CPS']['cploc'][1]==1) {
-			echo '<span class=form>Instructor course management links location:</span><span class=formright>';
-			echo '<input type=radio name="cploc" value="0" ';
-			if (($cploc&1)==0) {echo "checked=1";}
-			echo ' /> Bottom of page<br /><input type=radio name="cploc" value="1" ';
-			if (($cploc&1)==1) {echo "checked=1";}
-			echo ' /> Left side bar</span><br class=form />';
-
-			echo '<span class=form>View Control links:</span><span class=formright>';
-			echo '<input type=radio name="cplocview" value="0" ';
-			if (($cploc&4)==0) {echo "checked=1";}
-			echo ' /> With other course management links<br /><input type=radio name="cplocview" value="4" ';
-			if (($cploc&4)==4) {echo "checked=1";}
-			echo ' /> Buttons at top right</span><br class=form />';
-
-			echo '<span class=form>Student links location:</span><span class=formright>';
-			echo '<input type=radio name="cplocstu" value="0" ';
-			if (($cploc&2)==0) {echo "checked=1";}
-			echo ' /> Bottom of page<br /><input type=radio name="cplocstu" value="2" ';
-			if (($cploc&2)==2) {echo "checked=1";}
-			echo ' /> Left side bar</span><br class=form />';
 		}
 
 		if (isset($enablebasiclti) && $enablebasiclti==true && isset($_GET['id'])) {

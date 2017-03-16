@@ -167,10 +167,7 @@
 		$latepasses = 0;
 	}
 
-	 //DB $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
-	 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	 //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	 $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,topbar,cploc,latepasshrs FROM imas_courses WHERE id=:id");
+	 $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
 	 $stm->execute(array(':id'=>$cid));
 	 $line = $stm->fetch(PDO::FETCH_ASSOC);
 	 $latepasshrs = $line['latepasshrs'];

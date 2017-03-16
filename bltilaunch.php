@@ -835,8 +835,6 @@ if ($stm->rowCount()==0) {
 				$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 				$msgmonitor = (floor($msgset/5))&1;
 				$msgset = $msgset%5;
-				$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
-				$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
 				$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
 				$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
 
@@ -845,16 +843,12 @@ if ($stm->rowCount()==0) {
 				//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 				$DBH->beginTransaction();
 
-				//DB $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-				//DB $query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $destcid  = mysql_insert_id();
-				$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-				$query .= "(:name,:ownerid,:enrollkey,:hideicons,:picicons,:allowunenroll,:copyrights,:msgset,:showlatepass,:itemorder,:topbar,:cploc,:available,:theme,:ltisecret,:blockcnt)";
+				$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
+				$query .= "(:name,:ownerid,:enrollkey,:hideicons,:picicons,:allowunenroll,:copyrights,:msgset,:showlatepass,:itemorder,:available,:theme,:ltisecret,:blockcnt)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
 					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
-					':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
+					':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 				$destcid = $DBH->lastInsertId();
 
 				//DB $query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
@@ -2232,23 +2226,17 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 						$msgmonitor = (floor($msgset/5))&1;
 						$msgset = $msgset%5;
-						$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
-						$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
 						$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
 						$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
 
 						$avail = 0;
 						$lockaid = 0;
-						//DB $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-						//DB $query .= "('{$_SESSION['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
-						//DB $destcid  = mysql_insert_id();
-						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
-						$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :showlatepass, :itemorder, :topbar, :cploc, :available, :theme, :ltisecret, :blockcnt);";
+						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
+						$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :showlatepass, :itemorder, :available, :theme, :ltisecret, :blockcnt);";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
 							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
-							':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
+							':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 						$destcid  = $DBH->lastInsertId();
 						//DB $query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
 						//DB mysql_query($query) or die("Query failed : " . mysql_error());

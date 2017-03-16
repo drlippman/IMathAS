@@ -91,10 +91,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	}
 
-	//DB $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,topbar,cploc,latepasshrs FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line == null) {
@@ -108,15 +105,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$msgset = $line['msgset']%5;
 	$toolset = $line['toolset'];
 	$latepasshrs = $line['latepasshrs'];
-	$useleftbar = (($line['cploc']&1)==1);
-	$useleftstubar = (($line['cploc']&2)==2);
-	$useviewbuttons = (($line['cploc']&4)==4);
-	$topbar = explode('|',$line['topbar']);
-	$topbar[0] = explode(',',$topbar[0]);
-	$topbar[1] = explode(',',$topbar[1]);
-	if (!isset($topbar[2])) {$topbar[2] = 0;}
-	if ($topbar[0][0] == null) {unset($topbar[0][0]);}
-	if ($topbar[1][0] == null) {unset($topbar[1][0]);}
+	$useleftnav = true;
 
 	if (isset($teacherid) && isset($_GET['togglenewflag'])) { //handle toggle of NewFlag
 		$sub =& $items;
@@ -166,11 +155,11 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 	if ($quickview=="on") {
 		$_GET['folder'] = '0';
+		//$useleftnav = false;
 	}
-	if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+	if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) { //folder view
 		if ($sessiondata['lti_keytype']!='cc-of') {
-			$useleftbar = false;
-			$useleftstubar = false;
+			$useleftnav = false;
 		}
 		$nocoursenav = true;
 		$usernameinheader = false;
@@ -490,9 +479,11 @@ if ($overwriteBody==1) {
 		</span>
 		<?php 
 		
-		if ((!$useviewbuttons && isset($teacherid) && $useleftbar) || ($useleftstubar && (isset($studentid) || isset($tutorid)))) {
-			if ($didnavlist && !isset($teacherid)) {
+		if ($useleftnav) {
+			if ($didnavlist && !isset($teacherid) && $previewshift==-1) {
 				$incclass = 'class="hideifnavlist"';
+			} else {
+				$incclass = '';
 			}
 			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
 		}
@@ -502,9 +493,14 @@ if ($overwriteBody==1) {
 	</div>
 
 <?php
-	if ($useleftbar && isset($teacherid)) {
+	if ($useleftnav && isset($teacherid)) {
 ?>
 	<div id="leftcontent" class="hiddenmobile" role="navigation" aria-label="<?php echo _('Instructor tool navigation');?>">
+		<p class="showinmobile"><b><?php echo _('Views'); ?></b><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick Rearrange'); ?></a>
+		</p>
+		
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
@@ -532,15 +528,8 @@ if ($overwriteBody==1) {
 		</p>
 	<?php
 	}
-	if (!$useviewbuttons) {
 	?>
-		<p><b><?php echo _('Views'); ?></b><br/>
-		<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick View'); ?></a>
-		</p>
-	<?php
-	}
-	?>
+
 		<p><b><?php echo _('Questions'); ?></b><br/>
 			<a href="manageqset.php?cid=<?php echo $cid ?>"><?php echo _('Manage'); ?></a><br/>
 			<a href="managelibs.php?cid=<?php echo $cid ?>"><?php echo _('Libraries'); ?></a>
@@ -580,16 +569,19 @@ if ($overwriteBody==1) {
 	</div>
 	<div id="centercontent">
 <?php
-	} else if ($useleftstubar && !isset($teacherid)) {
-		$neededtools = 0;
-		if ($msgset<4) {$neededtools++;}
-		if (($toolset&2)==0) {$neededtools++;}
-		if (($toolset&1)==0) {$neededtools++;}
-
+	} else if ($useleftnav && !isset($teacherid)) {
 ?>
-		<div id="leftcontent" class="hiddenmobile<?php if ($essentialsnavcnt<$neededtools+1) {echo ' needed';}?>"  role="navigation" aria-label="<?php echo _('Tools navigation');?>">
+		<div id="leftcontent" class="hiddenmobile"  role="navigation" aria-label="<?php echo _('Tools navigation');?>">
 
 <?php
+		if ($previewshift>-1) { //instructor in student view
+?>
+		  <p class="showinmobile"><b><?php echo _('Views'); ?></b><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=off&teachview=1"><?php echo _('Instructor View'); ?></a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick Rearrange'); ?></a>
+		  </p>
+<?php
+		}
 		if ($msgset<4 || ($toolset&2)==0 || ($toolset&1)==0) {
 			echo '<p>';
 			if ($msgset<4) {
@@ -627,19 +619,6 @@ if ($overwriteBody==1) {
 		<div id="centercontent">
 <?php
 	}
-
-   if ($previewshift>-1) {
-?>
-	<script type="text/javascript">
-		function changeshift() {
-			var shift = document.getElementById("pshift").value;
-			var toopen = '<?php echo $jsAddress1 ?>&stuview='+shift;
-			window.location = toopen;
-		}
-	</script>
-
-<?php
-   }
    makeTopMenu();
    echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>$curname</h2></div>\n";
 
@@ -679,138 +658,29 @@ if ($overwriteBody==1) {
 	   echo $backlink;
    }
 
-   if (($useleftbar && isset($teacherid)) || ($useleftstubar && !isset($teacherid))) {
-	   echo "</div>";
-   } else if (!isset($nocoursenav)) {
-
-?>
-	<div class=cp>
-		<span class=column>
-<?php		if ($msgset<4) {
-			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
-			echo _('Messages').'</a> '.$newmsgs .' <br/>';
-		}
-		if (($toolset&2)==0) {
-			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
-			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
-		}
-	?>
-		</span>
-		<div class=clear></div>
-	</div>
-<?php
-
-
-	   if (isset($teacherid)) {
-?>
-	<div class=cp>
-		<span class=column>
-			<?php echo generateadditem($_GET['folder'], 'BB') ?>
-			<a href="listusers.php?cid=<?php echo $cid ?>"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Show Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick View'); ?></a></span>
-			<span class=column>
-				<a href="manageqset.php?cid=<?php echo $cid ?>"><?php echo _('Manage Question Set'); ?><br></a>
-<?php
-			if ($allowcourseimport) {
-?>
-				<a href="../admin/export.php?cid=<?php echo $cid ?>"><?php echo _('Export Question Set'); ?><br></a>
-				<a href="../admin/import.php?cid=<?php echo $cid ?>"><?php echo _('Import Question Set'); ?></a>
-			</span>
-			<span class=column>
-				<a href="managelibs.php?cid=<?php echo $cid ?>"><?php echo _('Manage Libraries'); ?></a><br>
-				<a href="../admin/exportlib.php?cid=<?php echo $cid ?>"><?php echo _('Export Libraries'); ?></a><br/>
-				<a href="../admin/importlib.php?cid=<?php echo $cid ?>"><?php echo _('Import Libraries'); ?></a>
-			</span>
-			<span class=column>
-				<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy Course Items'); ?></a><br/>
-				<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Student Groups'); ?></a><br/>
-				<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
-			</span>
-<?php
-			} else {
-?>
-			<a href="managelibs.php?cid=<?php echo $cid ?>"><?php echo _('Manage Libraries'); ?></a><br>
-			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy Course Items'); ?></a><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
-		</span>
-		<span class=column>
-			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Student Groups'); ?></a><br/>
-			<a href="../admin/forms.php?action=modify&id=<?php echo $cid ?>&cid=<?php echo $cid ?>"><?php echo _('Course Settings'); ?></a>
-		</span>
-<?php
-			}
-
-			echo "<div class=clear></div></div>\n";
-		}
-		echo "<div class=cp>\n";
-
-	   if (!isset($teacherid)) {
-	   	if (($toolset&1)==0) {
-			echo '<a href="showcalendar.php?cid='.$cid.'">Calendar</a><br/>';
-		}
-?>
-	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/>
-	<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
-	<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>
-	<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a><br/>
-<?php
-			if ($myrights > 5 && $allowunenroll==1) {
-				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">", _('Unenroll From Course'), "</a></p>\n";
-			}
-	   } else {
-?>
-	<span class=column>
-		<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><BR>
-<?php
-			if ($allowcourseimport) {
-				echo "<a href=\"copyitems.php?cid=$cid\">", _('Copy Course Items'), "</a><br/>\n";
-			}
-?>
-		<a href="../admin/exportitems.php?cid=<?php echo $cid ?>"><?php echo _('Export Course Items'); ?></a><br/>
-		<a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import Course Items'); ?></a><br/>
-	</span>
-	<span class=column>
-		<a href="<?php echo $imasroot ?>/help.php?section=coursemanagement"><?php echo _('Help'); ?></a><br/>
-		<a href="timeshift.php?cid=<?php echo $cid ?>"><?php echo _('Shift all Course Dates'); ?></a><br/>
-		<a href="chgassessments.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Assessments'); ?></a>
-	</span>
-	<span class=column>
-		<a href="chgforums.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Forums'); ?></a>
-		<a href="masschgdates.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Dates'); ?></a>
-	</span>
-<?php
-		}
-		echo "<div class=clear></div></div>\n";
-	}
-	if ($firstload) {
+   echo "</div>"; //centercontent
+   
+   if ($firstload) {
 		echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 		echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
-	}
+   }
 }
 
 require("../footer.php");
 
 function makeTopMenu() {
 	global $teacherid;
-	global $topbar;
 	global $msgset;
-	global $previewshift;
 	global $imasroot;
 	global $cid;
-	global $newmsgs;
 	global $quickview;
-	global $newpostscnt;
-	global $coursenewflag;
 	global $CFG;
-	global $useviewbuttons, $useleftbar;
+	global $previewshift;
+	global $useleftnav;
 
-	if ($useviewbuttons && (isset($teacherid) || $previewshift>-1)) {
-		echo '<div id="viewbuttoncont">';
-		if ($useleftbar && isset($teacherid)) {
-			echo '<span id="leftcontenttoggle" aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
-		}
+	if (isset($teacherid) || $previewshift>-1) {
+		echo '<div id="viewbuttoncont" class="hideinmobile">';
+
 		echo 'View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
 		if ($previewshift==-1 && $quickview != 'on') {
@@ -837,18 +707,15 @@ function makeTopMenu() {
 		//echo '<br class="clear"/>';
 
 
-	} else {
-		$useviewbuttons = false;
-	}
+	} 
 
 	if (isset($teacherid) && $quickview=='on') {
-		if ($useviewbuttons) {
-			echo '<br class="clear"/>';
-		}
+		echo '<div class="clear"></div>';
+		
 		echo '<div class="cpmid">';
-		if (!$useviewbuttons) {
-			echo _('Quick View.'), " <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>. ";
-		}
+		
+		echo '<span class="showinmobile"><b>'._('Quick Rearrange.'), "</b> <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>.</span> ";
+		
 		if (isset($CFG['CPS']['miniicons'])) {
 			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 
@@ -860,84 +727,7 @@ function makeTopMenu() {
 		 echo '</div>';
 
 	}
-	if (($coursenewflag&1)==1) {
-		$gbnewflag = ' <span class="noticetext">' . _('New') . '</span>';
-	} else {
-		$gbnewflag = '';
-	}
-	if (isset($teacherid) && count($topbar[1])>0 && $topbar[2]==0) {
-		echo '<div class=breadcrumb>';
-		if (in_array(0,$topbar[1]) && $msgset<4) { //messages
-			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">", _('Messages'), "</a>$newmsgs &nbsp; ";
-		}
-		if (in_array(6,$topbar[1])) { //Calendar
-			echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">", _('Forums'), "</a>$newpostscnt &nbsp; ";
-		}
-		if (in_array(1,$topbar[1])) { //Stu view
-			echo "<a href=\"course.php?cid=$cid&stuview=0\">", _('Student View'), "</a> &nbsp; ";
-		}
-		if (in_array(3,$topbar[1])) { //List stu
-			echo "<a href=\"listusers.php?cid=$cid\">", _('Roster'), "</a> &nbsp; \n";
-		}
-		if (in_array(2,$topbar[1])) { //Gradebook
-			echo "<a href=\"gradebook.php?cid=$cid\">", _('Gradebook'), "</a>$gbnewflag &nbsp; ";
-		}
-		if (in_array(7,$topbar[1])) { //List stu
-			echo "<a href=\"managestugrps.php?cid=$cid\">", _('Groups'), "</a> &nbsp; \n";
-		}
-		if (in_array(4,$topbar[1])) { //Calendar
-			echo "<a href=\"showcalendar.php?cid=$cid\">", _('Calendar'), "</a> &nbsp; \n";
-		}
-		if (in_array(5,$topbar[1])) { //Calendar
-			echo "<a href=\"course.php?cid=$cid&quickview=on\">", _('Quick View'), "</a> &nbsp; \n";
-		}
 
-		if (in_array(9,$topbar[1])) { //Log out
-			echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
-		}
-		echo '<div class=clear></div></div>';
-	} else if (!isset($teacherid) && ((count($topbar[0])>0 && $topbar[2]==0) || ($previewshift>-1 && !$useviewbuttons))) {
-		echo '<div class=breadcrumb>';
-		if ($topbar[2]==0) {
-			if (in_array(0,$topbar[0]) && $msgset<4) { //messages
-				echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\">", _('Messages'), "</a>$newmsgs &nbsp; ";
-			}
-			if (in_array(3,$topbar[0])) { //forums
-				echo "<a href=\"$imasroot/forums/forums.php?cid=$cid\">", _('Forums'), "</a>$newpostscnt &nbsp; ";
-			}
-			if (in_array(1,$topbar[0])) { //Gradebook
-				echo "<a href=\"gradebook.php?cid=$cid\">", _('Show Gradebook'), "</a>$gbnewflag &nbsp; ";
-			}
-			if (in_array(2,$topbar[0])) { //Calendar
-				echo "<a href=\"showcalendar.php?cid=$cid\">", _('Calendar'), "</a> &nbsp; \n";
-			}
-			if (in_array(9,$topbar[0])) { //Log out
-				echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
-			}
-			if ($previewshift>-1 && count($topbar[0])>0) { echo '<br />';}
-		}
-		if ($previewshift>-1 && !$useviewbuttons) {
-			echo _('Showing student view. Show view:'), ' <select id="pshift" onchange="changeshift()">';
-			echo '<option value="0" ';
-			if ($previewshift==0) {echo "selected=1";}
-			echo '>', _('Now'), '</option>';
-			echo '<option value="3600" ';
-			if ($previewshift==3600) {echo "selected=1";}
-			echo '>', _('1 hour from now'), '</option>';
-			echo '<option value="14400" ';
-			if ($previewshift==14400) {echo "selected=1";}
-			echo '>', _('4 hours from now'), '</option>';
-			echo '<option value="86400" ';
-			if ($previewshift==86400) {echo "selected=1";}
-			echo '>', _('1 day from now'), '</option>';
-			echo '<option value="604800" ';
-			if ($previewshift==604800) {echo "selected=1";}
-			echo '>', _('1 week from now'), '</option>';
-			echo '</select>';
-			echo " <a href=\"course.php?cid=$cid&teachview=1\">", _('Back to instructor view'), "</a>";
-		}
-		echo '<div class=clear></div></div>';
-	}
 }
 
 

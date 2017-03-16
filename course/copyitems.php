@@ -144,7 +144,7 @@ if (!(isset($teacherid))) {
 			//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 			$DBH->beginTransaction();
 			if (isset($_POST['copycourseopt'])) {
-				$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,showlatepass,theme,latepasshrs';
+				$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,picicons,showlatepass,theme,latepasshrs';
 				//DB $query = "SELECT $tocopy FROM imas_courses WHERE id='{$_POST['ctc']}'";
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB $row = mysql_fetch_row($result);

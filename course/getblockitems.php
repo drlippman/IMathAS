@@ -15,10 +15,8 @@
    }
    $cid = $_GET['cid'];
    require("../filter/filter.php");
-   //DB $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs,toolset FROM imas_courses WHERE id='$cid'";
-   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-   $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs,toolset FROM imas_courses WHERE id=:id");
+
+   $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,latepasshrs FROM imas_courses WHERE id=:id");
    $stm->execute(array(':id'=>$cid));
    $line = $stm->fetch(PDO::FETCH_ASSOC);
    if ($line == null) {
@@ -30,13 +28,6 @@
    $items = unserialize($line['itemorder']);
    $msgset = $line['msgset']%5;
    $latepasshrs = $line['latepasshrs'];
-   $useleftbar = ($line['cploc']==1);
-   $topbar = explode('|',$line['topbar']);
-   $toolset = $line['toolset'];
-   $topbar[0] = explode(',',$topbar[0]);
-   $topbar[1] = explode(',',$topbar[1]);
-   if ($topbar[0][0] == null) {unset($topbar[0][0]);}
-   if ($topbar[1][0] == null) {unset($topbar[1][0]);}
 
     //get exceptions
    $now = time() + $previewshift;
