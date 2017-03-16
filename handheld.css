@@ -24,7 +24,7 @@ div.hiddenmobile {
 div.hiddenmobile {
 	display:none;
 }
-div#leftcontent {
+div#leftcontent:not(.treeleftcontent) {
 	box-shadow: 0px 5px 10px rgba(0,0,0,.175);
 	width: auto;
 	padding: 10px;
