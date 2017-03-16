@@ -138,7 +138,7 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false) {
-	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
+	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
 	   global $itemshowdata;
 	   
@@ -254,7 +254,7 @@ function showitems($items,$parent,$inpublic=false) {
 			}
 	   }
 
-	   $now = time() + $previewshift;
+	   $now = time();
 	   $blocklist = array();
 	   for ($i=0;$i<count($items);$i++) {
 		   if (is_array($items[$i])) { //if is a block
@@ -1833,7 +1833,7 @@ function showitems($items,$parent,$inpublic=false) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$hideicons,$exceptions,$latepasses,$CFG;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   $itemtypes = array();  $iteminfo = array();
 	   //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
@@ -1899,7 +1899,7 @@ function showitems($items,$parent,$inpublic=false) {
 		   $id = array_shift($row);
 		   $iteminfo['Drill'][$id] = $row;
 	   }
-	   $now = time() + $previewshift;
+	   $now = time();
 	   for ($i=0;$i<count($items); $i++) {
 		   if (is_array($items[$i])) { //is a block
 			//DB $items[$i]['name'] = stripslashes($items[$i]['name']);

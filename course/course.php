@@ -165,7 +165,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$usernameinheader = false;
 	}
 	//get exceptions
-	$now = time() + $previewshift;
+	$now = time();
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
 		//DB $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
@@ -196,7 +196,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 
 	if ($_GET['folder']!='0') {
-		$now = time() + $previewshift;
+		$now = time();
 		$blocktree = explode('-',$_GET['folder']);
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
@@ -388,7 +388,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 
 	//get latepasses
-	if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1 && isset($studentinfo)) {
+	if (!isset($teacherid) && !isset($tutorid) && !$inInstrStuView && isset($studentinfo)) {
 	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   //$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   //$latepasses = mysql_result($result,0,0);
@@ -480,7 +480,7 @@ if ($overwriteBody==1) {
 		<?php 
 		
 		if ($useleftnav) {
-			if ($didnavlist && !isset($teacherid) && $previewshift==-1) {
+			if ($didnavlist && !isset($teacherid) && !$inInstrStuView) {
 				$incclass = 'class="hideifnavlist"';
 			} else {
 				$incclass = '';
@@ -574,7 +574,7 @@ if ($overwriteBody==1) {
 		<div id="leftcontent" class="hiddenmobile"  role="navigation" aria-label="<?php echo _('Tools navigation');?>">
 
 <?php
-		if ($previewshift>-1) { //instructor in student view
+		if ($inInstrStuView) { //instructor in student view
 ?>
 		  <p class="showinmobile"><b><?php echo _('Views'); ?></b><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=off&teachview=1"><?php echo _('Instructor View'); ?></a><br/>
@@ -675,29 +675,29 @@ function makeTopMenu() {
 	global $cid;
 	global $quickview;
 	global $CFG;
-	global $previewshift;
+	global $inInstrStuView;
 	global $useleftnav;
 
-	if (isset($teacherid) || $previewshift>-1) {
+	if (isset($teacherid) || $inInstrStuView) {
 		echo '<div id="viewbuttoncont" class="hideinmobile">';
 
 		echo 'View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
-		if ($previewshift==-1 && $quickview != 'on') {
+		if (!$inInstrStuView && $quickview != 'on') {
 			echo 'class="buttonactive buttoncurveleft"';
 		} else {
 			echo 'class="buttoninactive buttoncurveleft"';
 		}
 		echo '>', _('Instructor'), '</a>';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&stuview=0\" ";
-		if ($previewshift>-1 && $quickview != 'on') {
+		if ($inInstrStuView && $quickview != 'on') {
 			echo 'class="buttonactive"';
 		} else {
 			echo 'class="buttoninactive"';
 		}
 		echo '>', _('Student'), '</a>';
 		echo "<a href=\"course.php?cid=$cid&quickview=on&teachview=1\" ";
-		if ($previewshift==-1 && $quickview == 'on') {
+		if (!$inInstrStuView && $quickview == 'on') {
 			echo 'class="buttonactive buttoncurveright"';
 		} else {
 			echo 'class="buttoninactive buttoncurveright"';

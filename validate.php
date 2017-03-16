@@ -380,7 +380,7 @@
 	//DB $query .= " FROM imas_users WHERE id='$userid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-  $query .= " FROM imas_users WHERE id=:id";
+	$query .= " FROM imas_users WHERE id=:id";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$userid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -397,7 +397,7 @@
 		$coursetheme = $usertheme;
 	}
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
-	$previewshift = -1;
+	$inInstrStuView = false;
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
 	if ($myrights==100 && (isset($_GET['debug']) || isset($sessiondata['debugmode']))) {
 		ini_set('display_errors',1);
@@ -530,7 +530,7 @@
 						writesessiondata();
 					}
 					if (isset($sessiondata['stuview'])) {
-						$previewshift = $sessiondata['stuview'];
+						$inInstrStuView = true;
 						unset($teacherid);
 						$studentid = $line['id'];
 					}
@@ -583,7 +583,7 @@
 			$picicons = $crow['picicons'];
 			$latepasshrs = $crow['latepasshrs'];
 			
-			if (isset($studentid) && $previewshift==-1 && (($crow['available'])&1)==1) {
+			if (isset($studentid) && !$inInstrStuView && (($crow['available'])&1)==1) {
 				echo "This course is not available at this time";
 				exit;
 			}
@@ -603,7 +603,7 @@
 				//group admin access
 				$teacherid = $userid;
 				$adminasteacher = true;
-			} else if ($myrights>19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && $previewshift==-1) {
+			} else if ($myrights>19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && !$inInstrStuView) {
 				if ($crow['copyrights']==2) {
 					$guestid = $userid;
 				} else if ($crow['copyrights']==1 && $crow['groupid']==$groupid) {

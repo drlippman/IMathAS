@@ -46,7 +46,7 @@ $line = $stm->fetch(PDO::FETCH_ASSOC);
 $items = unserialize($line['itemorder']);
 
 if ($_GET['folder']!='0') {
-	$now = time() + $previewshift;
+	$now = time();
 	$blocktree = explode('-',$_GET['folder']);
 	$backtrack = array();
 	for ($i=1;$i<count($blocktree);$i++) {

@@ -197,12 +197,6 @@ switch($_GET['action']) {
 			$msgmonitor = (floor($line['msgset']/5))&1;
 			$msgOnEnroll = (floor($line['msgset']/5))&2;
 			$toolset = $line['toolset'];
-			$topbar = explode('|',$line['topbar']);
-			$topbar[0] = explode(',',$topbar[0]);
-			$topbar[1] = explode(',',$topbar[1]);
-			if ($topbar[0][0] == null) {unset($topbar[0][0]);}
-			if ($topbar[1][0] == null) {unset($topbar[1][0]);}
-			if (!isset($topbar[2])) {$topbar[2] = 0;}
 			$avail = $line['available'];
 			$lockaid = $line['lockaid'];
 			$ltisecret = $line['ltisecret'];

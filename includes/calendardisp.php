@@ -16,12 +16,10 @@ $viewedassess = array();
 
 function showcalendar($refpage) {
 global $DBH;
-global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess, $editingon;
+global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess, $editingon;
 
 $now= time();
-if ($previewshift!=-1) {
-	$now = $now + $previewshift;
-}
+
 if (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid] == 0) {
 	$today = $now;
 } else {
