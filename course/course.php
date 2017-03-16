@@ -497,7 +497,7 @@ if ($overwriteBody==1) {
 ?>
 	<div id="leftcontent" class="hiddenmobile" role="navigation" aria-label="<?php echo _('Instructor tool navigation');?>">
 		<p class="showinmobile"><b><?php echo _('Views'); ?></b><br/>
-			<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
+			<a href="course.php?cid=<?php echo $cid ?>&stuview=on"><?php echo _('Student View'); ?></a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick Rearrange'); ?></a>
 		</p>
 		
@@ -689,7 +689,7 @@ function makeTopMenu() {
 			echo 'class="buttoninactive buttoncurveleft"';
 		}
 		echo '>', _('Instructor'), '</a>';
-		echo "<a href=\"course.php?cid=$cid&quickview=off&stuview=0\" ";
+		echo "<a href=\"course.php?cid=$cid&quickview=off&stuview=on\" ";
 		if ($inInstrStuView && $quickview != 'on') {
 			echo 'class="buttonactive"';
 		} else {

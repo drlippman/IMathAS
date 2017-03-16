@@ -30,7 +30,7 @@
    $latepasshrs = $line['latepasshrs'];
 
     //get exceptions
-   $now = time() + $previewshift;
+   $now = time();
    $exceptions = array();
    if (!isset($teacherid) && !isset($tutorid)) {
 	//DB $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
@@ -61,7 +61,7 @@
 
    //if ($_GET['folder']!='0') {
    if (strpos($_GET['folder'],'-')!==false) {
-	   $now = time() + $previewshift;
+	   $now = time();
 	   $blocktree = explode('-',$_GET['folder']);
 	   $backtrack = array();
 	   for ($i=1;$i<count($blocktree);$i++) {
@@ -89,7 +89,7 @@
 
 
    //get latepasses
-   if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1 && isset($studentinfo)) {
+   if (!isset($teacherid) && !isset($tutorid) && !$inInstrStuView && isset($studentinfo)) {
 	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   //$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   //$latepasses = mysql_result($result,0,0);
