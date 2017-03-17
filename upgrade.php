@@ -1,8 +1,12 @@
 <?php
-//change counter; increase by 1 each time a change is made
-//TODO:  change linked text tex to mediumtext
-$latest = 119;
+//Database and data storage upgrade script
+//Call this script via the web as an admin each time you update the code
 
+require('migrator.php');
+
+//old approach: change counter; increase by 1 each time a change is made
+//don't use this anymore:  create files in the /migrations/ directory
+$latest_oldstyle = 119;
 
 @set_time_limit(0);
 ini_set("max_input_time", "6000");
@@ -12,6 +16,11 @@ ini_set("memory_limit", "104857600");
 if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	//DB $query = "INSERT INTO imas_dbschema (id,ver) VALUES (1,$latest)";
 	//DB mysql_query($query);
+	require("config.php");
+	$migrator = new Migrator($DBH);
+	$latest_newstyle = $migrator->getLatestVersion();
+	$latest = max($latest_oldstyle, $latest_newstyle);
+	
 	$stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver)");
 	$stm->execute(array(':id'=>1, ':ver'=>$latest));
 	//$handle = fopen("upgradecounter.txt",'w');
@@ -77,7 +86,7 @@ unset($dbpassword);
 
 	$DBH->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 
-	if ($last==$latest) {
+	if ($last==$latest_oldstyle) {
 		echo "No changes to make.";
 	} else {
 		if ($last < 1) {
@@ -1162,7 +1171,7 @@ unset($dbpassword);
 			 	 //DB $query = "INSERT INTO imas_dbschema (id,ver) VALUES (1,$latest)";
 			 	 //DB mysql_query($query) or die ("can't run $query");
 			 	 $stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver)");
-			 	 $stm->execute(array(':id'=>1, ':ver'=>$latest));
+			 	 $stm->execute(array(':id'=>1, ':ver'=>65));
 			 }
 			echo "Moved upgrade counter to database<br/>";
 		}
@@ -1932,21 +1941,17 @@ span.instronly {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			 }
 		}
-		/*$handle = fopen("upgradecounter.txt",'w');
-		if ($handle===false) {
-			echo '<p>Error: unable open upgradecounter.txt for writing</p>';
-		} else {
-			$fwrite = fwrite($handle,$latest);
-			if ($fwrite === false) {
-				echo '<p>Error: unable to write to upgradecounter.txt</p>';
-			}
-			fclose($handle);
+		
+		if ($last<119) { 
+			//if we just ran any of those changes, update DB, otherwise
+			//let Migrator handle updating the ver
+			$stm = $DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=1");
+			$stm->execute(array(':ver'=>$latest_oldstyle));
 		}
-		*/
-		//DB $query = "UPDATE imas_dbschema SET ver=$latest WHERE id=1";
-		//DB mysql_query($query);
-		$stm = $DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=1");
-		$stm->execute(array(':ver'=>$latest));
+		
+		$migrator = new Migrator($DBH);
+		$migrator->migrateAll();
+
 		echo "Upgrades complete";
 	}
 }
