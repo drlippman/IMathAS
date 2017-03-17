@@ -196,7 +196,42 @@ if (!(isset($teacherid))) {
 		} else {
 			$beentaken = false;
 		}
-
+		
+		//get defaults
+		$query = "SELECT defpoints,defattempts,defpenalty,deffeedback,showhints,shuffle FROM imas_assessments ";
+		$query .= "WHERE id=:id";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':id'=>$aid));
+		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+		list($deffeedback,$defshowans) = explode('-',$defaults['deffeedback']);
+		if ($defaults['defpenalty']{0}==='L') {
+			$defaults['defpenalty'] = substr($defaults['defpenalty'],1);
+			$skippenalty=_('on last possible attempt only');
+		} else if ($defaults['defpenalty']{0}==='S') {
+			$skippenalty = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty']{1});
+			$defaults['defpenalty'] = substr($defaults['defpenalty'],2);
+		} else {
+			$skippenalty = _('per missed attempt');
+		}
+		$defaults['penalty'] = $defaults['defpenalty'].'% '.$skippenalty;
+		if ($deffeedback=="Practice" || $deffeedback=="Homework") {
+			$defaults['allowregen'] = _('Yes');
+		} else {
+			$defaults['allowregen'] = _('No');
+		}
+		if (($defaults['shuffle']&8)==8) {
+			$defaults['reattemptnewver'] = _('Yes');
+		} else {
+			$defaults['reattemptnewver'] = _('No');
+		}
+		if ($defshowans=='F') {
+			$defaults['showans'] = _('After last attempt');
+		} else if (is_numeric($defshowans)) {
+			$defaults['showans'] = sprintf(_('After %d attempts'), $defshowans);	
+		} else {
+			$defaults['showans'] = _('Never during assessment');
+		}
+		$defaults['showhints'] = ($defaults['showhints']==1)?_('Yes'):_('No');
 	}
 }
 
@@ -224,13 +259,16 @@ if ($overwriteBody==1) {
 ?>
 </p>
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=$aid"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
-Leave items blank to use the assessment's default values<br/>
+<p>Leave items blank to use the assessment's default values.</p>
 
-<span class=form>Points for this problem:</span><span class=formright> <input type=text size=4 name=points value="<?php echo $line['points'];?>"></span><BR class=form>
+<span class=form>Points for this problem:</span>
+<span class=formright> <input type=text size=4 name=points value="<?php echo $line['points'];?>"><br/><i class="grey">Default: <?php echo $defaults['defpoints'];?></i></span><BR class=form>
 
-<span class=form>Attempts allowed for this problem (0 for unlimited):</span><span class=formright> <input type=text size=4 name=attempts value="<?php echo $line['attempts'];?>"></span><BR class=form>
+<span class=form>Attempts allowed for this problem (0 for unlimited):</span>
+<span class=formright> <input type=text size=4 name=attempts value="<?php echo $line['attempts'];?>"><br/><i class="grey">Default: <?php echo $defaults['defattempts'];?></i></span><BR class=form>
 
-<span class=form>Default penalty:</span><span class=formright><input type=text size=4 name=penalty value="<?php echo $line['penalty'];?>">%
+<span class=form>Penalty for missed attempts:</span>
+<span class=formright><input type=text size=4 name=penalty value="<?php echo $line['penalty'];?>">%
    <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
      <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
      <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -240,21 +278,22 @@ Leave items blank to use the assessment's default values<br/>
      <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
      <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
      <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
-     </select></span><BR class=form>
+     </select><br/><i class="grey">Default: <?php echo $defaults['penalty'];?></i></span><BR class=form>
 
-<span class=form>New version on reattempt?</span><span class=formright>
+<span class=form>New version on reattempt?</span>
+<span class=formright>
     <select name="regen">
      <option value="0" <?php if (($line['regen']%3)==0) { echo 'selected="1"';}?>>Use Default</option>
      <option value="1" <?php if (($line['regen']%3)==1) { echo 'selected="1"';}?>>Yes, new version on reattempt</option>
      <option value="2" <?php if (($line['regen']%3)==2) { echo 'selected="1"';}?>>No, same version on reattempt</option>
-    </select></span><br class="form"/>
+    </select><br/><i class="grey">Default: <?php echo $defaults['reattemptnewver'];?></i></span><br class="form"/>
 
 <span class="form">Allow &quot;Try similar problem&quot;?</span>
 <span class=formright>
     <select name="allowregen">
      <option value="0" <?php if ($line['regen']<3) { echo 'selected="1"';}?>>Use Default</option>
      <option value="1" <?php if ($line['regen']>=3) { echo 'selected="1"';}?>>No</option>
-</select></span><br class="form"/>
+</select><br/><i class="grey">Default: <?php echo $defaults['allowregen'];?></i></span><br class="form"/>
 
 <span class=form>Show Answers</span><span class=formright>
     <select name="showans">
@@ -269,14 +308,14 @@ Leave items blank to use the assessment's default values<br/>
      <option value="6" <?php if ($line['showans']=="6") {echo "SELECTED";} ?>>After 6 attempts</option>
      <option value="7" <?php if ($line['showans']=="7") {echo "SELECTED";} ?>>After 7 attempts</option>
 
-    </select></span><br class="form"/>
+    </select><br/><i class="grey">Default: <?php echo $defaults['showans'];?></i></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>
     <select name="showhints">
      <option value="0" <?php if ($line['showhints']==0) { echo 'selected="1"';}?>>Use Default</option>
      <option value="1" <?php if ($line['showhints']==1) { echo 'selected="1"';}?>>No</option>
      <option value="2" <?php if ($line['showhints']==2) { echo 'selected="1"';}?>>Yes</option>
-    </select></span><br class="form"/>
+    </select><br/><i class="grey">Default: <?php echo $defaults['showhints'];?></i></span><br class="form"/>
 
 <span class=form>Use Scoring Rubric</span><span class=formright>
 <?php

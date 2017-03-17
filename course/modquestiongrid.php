@@ -153,6 +153,14 @@
 		}
 
 	} else {
+		//get defaults
+		$query = "SELECT defpoints,defattempts,showhints FROM imas_assessments ";
+		$query .= "WHERE id=:id";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':id'=>$aid));
+		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+		$defaults['showhints'] = ($defaults['showhints']==1)?_('Yes'):_('No');
+		
 		$pagetitle = "Question Settings";
 		$placeinhead = '<script type="text/javascript">
 			function previewq(qn) {
@@ -168,7 +176,7 @@
 
 ?>
 <div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
-<p>For more advanced settings, modify the settings for individual questions after adding.
+<p>For more advanced settings, modify the settings for individual questions after adding.</p>
 <?php
 if (isset($_POST['checked'])) { //modifying existing
 	echo "<form method=post action=\"addquestions.php?modqs=true&process=true&cid=$cid&aid=$aid\">";
@@ -176,7 +184,7 @@ if (isset($_POST['checked'])) { //modifying existing
 	echo "<form method=post action=\"addquestions.php?addset=true&process=true&cid=$cid&aid=$aid\">";
 }
 ?>
-Leave items blank to use the assessment's default values<br/>
+<p>Leave items blank to use the assessment's default values</p>
 <table class=gb>
 <thead><tr>
 <?php
@@ -187,7 +195,7 @@ Leave items blank to use the assessment's default values<br/>
 			foreach ($_POST['checked'] as $k=>$v) {
 				$v = explode(':',$v);
 				$qids[] = $v[1];
-				$qnpts = explode('-',$v[0]);
+				$qnpts = explode('-',$v[2]);
 				if (count($qnpts)==1) {
 					$qns[$v[1]] = $qnpts[0]+1;
 				} else {
@@ -244,7 +252,11 @@ Leave items blank to use the assessment's default values<br/>
 				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
 				$qrows[$row[0]] .= '</tr>';
 			}
-			echo "<th>Q#</th><th>Description</th><th></th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
+			echo "<th>Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
+			echo '<th>Points<br/><i class="grey">Default: '.$defaults['defpoints'].'</i></th>';
+			echo '<th>Attempts (0 for unlimited)<br/><i class="grey">Default: '.$defaults['defattempts'].'</i></th>';
+			echo '<th>Show hints &amp; video buttons?<br/><i class="grey">Default: '.$defaults['showhints'].'</i></th>';
+			echo "<th>Additional Copies to Add<br/>&nbsp;</th></tr></thead>";
 			echo "<tbody>";
 
 			//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
@@ -276,7 +288,11 @@ Leave items blank to use the assessment's default values<br/>
 			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 
 		} else { //adding new questions
-			echo "<th>Description</th><th></th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
+			echo "<th>Description</th><th></th><th></th>";
+			echo '<th>Points<br/><i class="grey">Default: '.$defaults['defpoints'].'</i></th>';
+			echo '<th>Attempts (0 for unlimited)<br/><i class="grey">Default: '.$defaults['defattempts'].'</i></th>';
+			echo '<th>Show hints &amp; video buttons?<br/><i class="grey">Default: '.$defaults['showhints'].'</i></th>';
+			echo "<th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
 			//DB $query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";

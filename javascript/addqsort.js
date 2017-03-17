@@ -891,7 +891,7 @@ function generateTable() {
 						} else if (itemarray[i][1]==1) {
 							html += " with";
 						}
-						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
+						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
 					}
 					html += "<td>&nbsp;Q"+(curqnum+1)+'-'+(j+1);
 				} else if (curistext) {
@@ -906,7 +906,7 @@ function generateTable() {
 				html += "<td>";
 				if (j==0) {
 					if (!curisgroup) {
-						html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
+						html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+i+":"+curitems[j][0]+":"+curqnum+"\"/></td><td>";
 					} else {
 						if (itemarray[i][3]==1) {
 							html += "<img src=\""+imasroot+"/img/collapse.gif\" onclick=\"collapseqgrp("+i+")\" alt=\"Collapse\"/>";
@@ -942,7 +942,7 @@ function generateTable() {
 					}
 				}
 				if (curisgroup) {
-					html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
+					html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(i+'-'+j)+":"+curitems[j][0]+":"+(curqnum+"-"+j)+"\"/></td><td>";
 					html += "<a href=\"#\" onclick=\"return ungroupitem('"+i+"-"+j+"');\">Ungroup</a>"; //FIX
 				}
 				html += "</td>";
@@ -1018,7 +1018,7 @@ function generateTable() {
 					html += "<td>"+curitems[j][4]+"</td>";
 					curpt = curitems[j][4];
 				}
-				html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(i+1)+'-'+(j+1):i+1)+"\">Change</a></td>"; //settings
+				html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change</a></td>"; //settings
 				if (curitems[j][5]) {
 					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
 				} else {
