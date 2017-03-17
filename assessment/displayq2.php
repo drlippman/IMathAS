@@ -6749,6 +6749,12 @@ function checkanswerformat($tocheck,$ansformats) {
 	if (strtoupper($tocheck)=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return true;
 	}
+	if (in_array("allowmixed",$ansformats) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches)) {
+		//rewrite mixed number as an improper fraction
+		$num = str_replace(' ','',$mnmatches[1])*$mnmatches[4] + $mnmatches[3]*1;
+		$tocheck = $num.'/'.$mnmatches[4];
+	}
+		
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
 		$tocheck = preg_replace('/\s/','',$tocheck);
 		if (!preg_match('/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
