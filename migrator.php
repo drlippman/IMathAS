@@ -119,11 +119,11 @@ class Migrator
     }
     
     /**
-     * Get the last migration version in the migration directory
+     * Get the last available migration version in the migration directory
      *
-     * @return float The last migration version.
+     * @return float The last available migration version.
      */
-    public function getLatestVersion()
+    public function getLatestVersionAvailable()
     {
         $migrationFilenames = glob(__DIR__ . '/migrations/*.php');
         if (count($migrationFilenames)==0) {

@@ -18,7 +18,7 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 	//DB mysql_query($query);
 	require("config.php");
 	$migrator = new Migrator($DBH);
-	$latest_newstyle = $migrator->getLatestVersion();
+	$latest_newstyle = $migrator->getLatestVersionAvailable();
 	$latest = max($latest_oldstyle, $latest_newstyle);
 	
 	$stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver)");
