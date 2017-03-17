@@ -158,7 +158,7 @@
 		 echo ', <span class="icon-forumreply"></span>'. _('Forum reply-by date');
 		 echo '</p>';
 	 }
-	 if (!isset($teacherid) && !isset($tutorid) !$inInstrStuView && isset($studentinfo)) {
+	 if (!isset($teacherid) && !isset($tutorid) && !$inInstrStuView && isset($studentinfo)) {
 	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   //$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   //$latepasses = mysql_result($result,0,0);
