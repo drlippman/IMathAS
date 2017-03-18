@@ -1,30 +1,36 @@
 <?php
-//change counter; increase by 1 each time a change is made
-//TODO:  change linked text tex to mediumtext
-$latest = 119;
+//Database and data storage upgrade script
+//Call this script via the web as an admin each time you update the code
 
+require('migrator.php');
+
+//don't use this anymore:  create files in the /migrations/ directory
+//old approach: change counter; increase by 1 each time a change is made
+$latest_oldstyle = 119;
 
 @set_time_limit(0);
 ini_set("max_input_time", "6000");
 ini_set("max_execution_time", "6000");
 ini_set("memory_limit", "104857600");
 
-if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
-	//DB $query = "INSERT INTO imas_dbschema (id,ver) VALUES (1,$latest)";
-	//DB mysql_query($query);
+if (isset($dbsetup) && $dbsetup==true) {  //initial setup run from dbsetup.php
+
+	//create dbscheme entry for DB ver
+	//store in the $latest_oldstyle, which matches the version in dbsetup
 	$stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver)");
-	$stm->execute(array(':id'=>1, ':ver'=>$latest));
-	//$handle = fopen("upgradecounter.txt",'w');
-	//fwrite($handle,$latest);
-	//fclose($handle);
-} else { //doing upgrade
+	$stm->execute(array(':id'=>1, ':ver'=>$latest_oldstyle));
+	
+	$last = $latest_oldstyle;
+	
+	//now we'll run the new-style migration stuff
+} else {  //called from web or cli - doing upgrade
 	$c = file_get_contents("config.php");
 	if (strpos($c, '$DBH')===false) {
 		echo '<p>The database connection mechanism has been updated to PDO. You will
-					need to revise your config.php before continuing to use the system.
-					In your existing config.php, remove everything below the line
-					<code>//no need to change anything from here on</code> and replace it
-					with the following code</p>
+			need to revise your config.php before continuing to use the system.
+			In your existing config.php, remove everything below the line
+			<code>//no need to change anything from here on</code> and replace it
+			with the following code</p>
 <pre>
 /* Connecting, selecting database */
 // MySQL with PDO_MYSQL
@@ -41,9 +47,9 @@ unset($dbserver);
 unset($dbusername);
 unset($dbpassword);
 </pre>
-					<p>On a production server, you may wish to set the PDO::ATTR_ERRMODE to PDO::ERRMODE_SILENT to hide database errors from users.</p>
-					<p>Run upgrade.php again after making those changes</p>';
-					exit;
+			<p>On a production server, you may wish to set the PDO::ATTR_ERRMODE to PDO::ERRMODE_SILENT to hide database errors from users.</p>
+			<p>Run upgrade.php again after making those changes</p>';
+			exit;
 	}
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
 		require("config.php");
@@ -74,12 +80,13 @@ unset($dbpassword);
 		//DB $last = mysql_result($result,0,0);
 		$last = $stm->fetchColumn(0);
 	}
+}
 
 	$DBH->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+/***
+  start older DB update stuff
+***/
 
-	if ($last==$latest) {
-		echo "No changes to make.";
-	} else {
 		if ($last < 1) {
 			$query = "ALTER TABLE `imas_forums` CHANGE `settings` `settings` TINYINT( 2 ) UNSIGNED NOT NULL DEFAULT '0';";
 			$DBH->query($query);
@@ -1162,7 +1169,7 @@ unset($dbpassword);
 			 	 //DB $query = "INSERT INTO imas_dbschema (id,ver) VALUES (1,$latest)";
 			 	 //DB mysql_query($query) or die ("can't run $query");
 			 	 $stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver)");
-			 	 $stm->execute(array(':id'=>1, ':ver'=>$latest));
+			 	 $stm->execute(array(':id'=>1, ':ver'=>65));
 			 }
 			echo "Moved upgrade counter to database<br/>";
 		}
@@ -1932,23 +1939,21 @@ span.instronly {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			 }
 		}
-		/*$handle = fopen("upgradecounter.txt",'w');
-		if ($handle===false) {
-			echo '<p>Error: unable open upgradecounter.txt for writing</p>';
-		} else {
-			$fwrite = fwrite($handle,$latest);
-			if ($fwrite === false) {
-				echo '<p>Error: unable to write to upgradecounter.txt</p>';
-			}
-			fclose($handle);
-		}
-		*/
-		//DB $query = "UPDATE imas_dbschema SET ver=$latest WHERE id=1";
-		//DB mysql_query($query);
+	
+/***
+  end older DB update stuff
+***/
+	if ($last<119) { 
+		//if we just ran any of those changes, update DB, otherwise
+		//let Migrator handle updating the ver
 		$stm = $DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=1");
-		$stm->execute(array(':ver'=>$latest));
-		echo "Upgrades complete";
+		$stm->execute(array(':ver'=>$latest_oldstyle));
 	}
-}
+		
+	$migrator = new Migrator($DBH, (isset($dbsetup) && $dbsetup==true));
+	$migrator->migrateAll();
+
+	echo "Migrations complete";
+	
 
 ?>

@@ -4,14 +4,17 @@
 </head>
 <body>
 <?php
-/*
-if (file_exists("upgradecounter.txt")) {
-	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
-	echo "rerun the setup, delete upgradecounter.txt";
-	echo "</body></html>";
-	exit;
-}
-*/
+
+/*************
+
+Don't edit this file.  This houses the initial database setup as of 3/17/17.
+Starting at that date, all future database changes should be made by creating
+a file in the /migrations/ directory, per the readme.md there.
+
+Because of this, this file does NOT contain the full up-to-date database schema.
+
+***************/
+
 $dbsetup = true;
 include("config.php");
 
