@@ -163,18 +163,18 @@ if ($theme != '') {
 }
 require("./assessment/header.php");
 if ($sessiondata['graphdisp'] == 1) {
-	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';  
+	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';  
 }
 echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
 
 echo '<input type="hidden" id="asidverify" value="'.$jwtstring.'"/>';
 echo '<input type="hidden" id="disptime" value="'.time().'"/>';
 echo '<input type="hidden" id="isreview" value="0"/>';
-echo '<p><a href="multiembedq.php?id='.$_GET['id'].'&amp;regen=1&amp;sameseed='.$sameseed.'&amp;theme='.$theme.'&amp;iframe_resize_id='.$targetid.'">Try Another Version of ';
+echo '<p><a href="multiembedq.php?id='.$_GET['id'].'&amp;regen=1&amp;sameseed='.$sameseed.'&amp;theme='.$theme.'&amp;iframe_resize_id='.$targetid.'">';
 if (count($qids)>1) {
-	echo 'These Questions</a></p>';
+	echo _('Try Another Version of These Questions</a></p>');
 } else {
-	echo 'This Question</a></p>';
+	echo _('Try Another Version of This Question</a></p>');
 }
 $showhints = true;
 
