@@ -36,6 +36,7 @@ $sessiondata['mathdisp'] = 3;
 $showtips = 2;
 $useeqnhelper = 4;
 $useeditor = 1;
+$sessiondata['secsalt'] = "12345";
 $cid = "embedq";
 
 if (isset($CFG['GEN']['JWTsecret'])) {
