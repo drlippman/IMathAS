@@ -4183,9 +4183,9 @@ msgid "Enable text based alternatives for graph display and drawing entry"
 msgstr "Schalte textbasierte Alternativen für Graphenanzeige und Zeichnungseingabe an"
 
 #: multiembedq.php:174
-msgid "Try Another Version of These Questions</a></p>"
+msgid "Try Another Version of These Questions"
 msgstr "Versuche andere Versionen dieser Fragen"
 
 #: multiembedq.php:176
-msgid "Try Another Version of This Question</a></p>"
+msgid "Try Another Version of This Question"
 msgstr "Versuche eine andere Version dieser Frage"
