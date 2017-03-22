@@ -605,9 +605,9 @@
 				$adminasteacher = true;
 			} else if ($myrights>19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && !$inInstrStuView) {
 				if ($crow['copyrights']==2) {
-					$guestid = $userid;
+					$instrPreviewId = $userid;
 				} else if ($crow['copyrights']==1 && $crow['groupid']==$groupid) {
-					$guestid = $userid;
+					$instrPreviewId = $userid;
 				}
 			}
 		}

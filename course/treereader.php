@@ -3,7 +3,7 @@
 //(c) 2011 David Lippman
 
 require("../validate.php");
-if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($guestid)) { // loaded by a NON-teacher
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
 	echo "You are not enrolled in this course. Please return to the <a href=\"../index.php\">Home Page</a> and enroll";
 	exit;
 }
@@ -495,7 +495,7 @@ function upsendexceptions(&$items) {
 ?>
 <div class="breadcrumb">
 	<span class="padright">
-	<?php if (isset($guestid)) {
+	<?php if (isset($instrPreviewId)) {
 		echo '<span class="noticetext">Instructor Preview</span> ';
 	}?>
 	<?php echo $userfullname ?>

@@ -4,8 +4,8 @@
    require("../validate.php");
    require("courseshowitems.php");
    require("../includes/calendardisp.php");
-   if (isset($guestid)) {
-	   $teacherid = $guestid;
+   if (isset($instrPreviewId)) {
+	   $tutorid = $instrPreviewId;
    }
    if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");

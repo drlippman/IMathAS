@@ -14,7 +14,7 @@ require("../includes/calendardisp.php");
 $overwriteBody = 0;
 $body = "";
 
-if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($guestid)) { // loaded by a NON-teacher
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
@@ -130,8 +130,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 
 	//enable teacher guest access
-	if (isset($guestid)) {
-		$teacherid = $guestid;
+	if (isset($instrPreviewId)) {
+		$tutorid = $instrPreviewId;
 	}
 
 	if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['folder'.$cid])) {
@@ -469,7 +469,7 @@ if ($overwriteBody==1) {
 		} else {
 			echo '<span class="padright hideinmobile">';
 		}
-		if (isset($guestid)) {
+		if (isset($instrPreviewId)) {
 			echo '<span class="noticetext">', _('Instructor Preview'), '</span> ';
 		}
 		if (!isset($usernameinheader)) {

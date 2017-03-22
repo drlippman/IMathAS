@@ -14,8 +14,8 @@
 			 'partial'=>'te_yellow_check.png');
 
 	}
-	if (isset($guestid)) {
-		$teacherid=$guestid;
+	if (isset($instrPreviewId)) {
+		$teacherid=$instrPreviewId;
 	}
 	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 		echo "<html><body>";
