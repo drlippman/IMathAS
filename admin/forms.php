@@ -200,6 +200,7 @@ switch($_GET['action']) {
 			$avail = $line['available'];
 			$lockaid = $line['lockaid'];
 			$ltisecret = $line['ltisecret'];
+			$theme = $line['theme'];
 			$showlatepass = $line['showlatepass'];
 			$istemplate = $line['istemplate'];
 			$deflatepass = $line['deflatepass'];
