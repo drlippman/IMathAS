@@ -29,6 +29,7 @@ Matrix functions.  Version 1.5, Oct 8, 2014
 <li><a href="#matrixsolvefrac">matrixsolvefrac</a></li>
 <li><a href="#matrixreduce">matrixreduce</a></li>
 <li><a href="#matrixnumsolutions">matrixnumsolutions</a></li>
+<li><a href="#matrixround">matrixround</a></li>
 <li><a href="#polyregression">polyregression</a></li>
 </ul>
 <h3><a name="matrix">matrix</a></h3>
@@ -72,12 +73,12 @@ matrixgetentry(matrix,row,col)
 <BR><h3><a name="matrixgetrow">matrixgetrow</a></h3>
 matrixgetrow(matrix,row,[asArray])
 <BR>get row of a matrix as a new 1xm matrix
-<br>&nbsp;&nbsp;or array if asArray is set to true
+<BR>&nbsp;&nbsp;or array if asArray is set to true
 <BR>rows and cols are 0 indexed (first row is row 0)
 <BR><h3><a name="matrixgetcol">matrixgetcol</a></h3>
 matrixgetcol(matrix,col,[asArray])
 <BR>get col of a matrix as a new nx1 matrix
-<br>&nbsp;&nbsp;or array if asArray is set to true
+<BR>&nbsp;&nbsp;or array if asArray is set to true
 <BR>rows and cols are 0 indexed (first row is row 0)
 <BR><h3><a name="matrixgetsubmatrix">matrixgetsubmatrix</a></h3>
 matrixgetsubmatrix(matrix,rowselector,colselector)
@@ -163,6 +164,9 @@ matrixnumsolutions(A,n)
 <BR>A is an arbitrary coefficient matrix augmented with n columns, after
 <BR>&nbsp;being row reduced to reduced echelon form (see matrixreduce)
 <BR>Returns the number of Ax=b equations that have at least one solution
+<BR><h3><a name="matrixround">matrixround</a></h3>
+matrixround(matrix, decimal places)
+<BR>rounds each entry of the matrix the specified decimal places
 <BR><h3><a name="polyregression">polyregression</a></h3>
 polyregression(x,y,n)
 <BR>find a nth degree polynomial that best fits the data 
