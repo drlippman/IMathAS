@@ -1929,7 +1929,7 @@ span.instronly {
 			$query .= "(SELECT id FROM imas_courses WHERE available>1)";
 			$res = $DBH->query($query);
 			
-			$query = "UPDATE imas_courses SET available=available-2 WHERE available>1";
+			$query = "UPDATE imas_courses SET available=available-2 WHERE available>1 AND available<4";
 			$res = $DBH->query($query);	
 		}
 		if ($last<119) {
