@@ -1753,7 +1753,8 @@ The following macros help with formatting values for display:
     produce lowercase</li>
 <li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
    can only be used for display, not in calculations</li>
-<li><b>prettyreal(number,decimals,[comma])</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
+<li><b>prettyreal(number,decimals,[comma])</b>:  Adds commas in thousands spaces of number, and displays the value to a fixed number of decimals places (rounding if needed).  
+   Example: prettyreal(1234.567,2) will return "1,234.57", and prettyreal(1.8,3) will return "1.800".  The result is a string, which
    can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li> 
 <li><b>prettysigfig(number,sigfigs,[comma,choptrailingzeros])</b>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" override.
    Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.</li> 
