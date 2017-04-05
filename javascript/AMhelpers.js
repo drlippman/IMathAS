@@ -302,6 +302,11 @@ function ineqtointerval(strw) {
 //preview for calcinterval type
 function intcalculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
+  if (format.indexOf('mixed')!=-1) {
+	  fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+  } else {
+	  fullstr = fullstr.replace(/\s+/g,'');
+  }
   fullstr = normalizemathunicode(fullstr);
   if (fullstr.match(/DNE/i)) {
 	  fullstr = fullstr.toUpperCase();
@@ -319,7 +324,6 @@ function intcalculate(inputId,outputId,format) {
 		var ineqvar = (pats != null)?pats[1]:((pat != null)?pat[1]:'');
 	  } else {
 	  	  var origstr = fullstr;
-		  fullstr = fullstr.replace(/\s+/g,'');
 	  }
 	  if (format.indexOf('list')!=-1) {
 	  	var lastpos = 0; var strarr = [];
@@ -369,9 +373,13 @@ function intcalculate(inputId,outputId,format) {
 
 				  if (err=='') {
 					  try {
-					    with (Math) var res = eval(mathjs(vals[j]));
+					  	toeval = vals[j];
+					  	if (format.indexOf('mixed')!=-1) {
+					  		toeval = toeval.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+					  	}
+					  	with (Math) var res = eval(mathjs(toeval));
 					  } catch(e) {
-					    err = _("syntax incomplete")+". ";
+					  	err = _("syntax incomplete")+". ";
 					  }
 				  }
 				  if (!isNaN(res) && res!="Infinity") {
@@ -459,7 +467,11 @@ function intcalculate(inputId,outputId,format) {
 function ntuplecalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = normalizemathunicode(fullstr);
-	fullstr = fullstr.replace(/\s+/g,'');
+	if (format.indexOf('mixed')!=-1) {
+		fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+	} else {
+		fullstr = fullstr.replace(/\s+/g,'');
+	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
 		outcalced = 'DNE';
@@ -494,18 +506,16 @@ function ntuplecalc(inputId,outputId,format) {
 			if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
 				sub = fullstr.substring(lastcut,i);
 				res = NaN;
-				try {
-				    with (Math) var res = eval(mathjs(sub));
-				} catch(e) {
-				    err += _("syntax incomplete")+". ";
-				}
 				err += singlevalsyntaxcheck(sub, format);
-				if (format.indexOf('mixed')!=-1) {
-					  sub = sub.replace(/_/,' ');
-				  } else {
-					  sub = sub.replace(/\s/g,'');
-				  }
 				err += syntaxcheckexpr(sub, format);
+				try {
+					if (format.indexOf('mixed')!=-1) {
+						sub = sub.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+					}
+					with (Math) var res = eval(mathjs(sub));
+				} catch(e) {
+					err += _("syntax incomplete")+". ";
+				}
 				if (!isNaN(res) && res!="Infinity") {
 					outcalced += res;
 				} else {
@@ -550,7 +560,11 @@ function complexcalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
 	var outcalced, outstr, err;
 	fullstr = normalizemathunicode(fullstr);
-	fullstr = fullstr.replace(/\s+/g,'');
+	if (format.indexOf('mixed')!=-1) {
+		fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+	} else {
+		fullstr = fullstr.replace(/\s+/g,'');
+	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
 		outcalced = 'DNE';
@@ -559,7 +573,11 @@ function complexcalc(inputId,outputId,format) {
 		outcalced = ''; err='';
 		var arr = fullstr.split(',');
 		for (var cnt=0; cnt<arr.length; cnt++) {
-			var prep = mathjs(arr[cnt],'i');
+			var prep = arr[cnt];
+			if (format.indexOf('mixed')!=-1) {
+				prep = prep.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+			}
+			var prep = mathjs(prep,'i');
 			if (format.indexOf("sloppycomplex")==-1) {
 				var cparts = parsecomplex(arr[cnt]);
 				err += singlevalsyntaxcheck(cparts[0], format);
@@ -1007,16 +1025,16 @@ function singlevalsyntaxcheck(str,format) {
 		 return '';
 	} else if (str.match(/oo$/) || str.match(/oo\W/)) {
 		 return '';
+	} else if (format.indexOf('fracordec')!=-1) {
+		  str = str.replace(/\s/g,'');
+		  if (!str.match(/^\-?\(?\d+\s*\/\s*\-?\d+\)?$/) && !str.match(/^\-?\d+$/) && !str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+			return (_(" invalid entry format")+". ");
+		  }
 	} else if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
 		  str = str.replace(/\s/g,'');
 		 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 		  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 			return (_("not a valid fraction")+". ");
-		  }
-	} else if (format.indexOf('fracordec')!=-1) {
-		  str = str.replace(/\s/g,'');
-		  if (!str.match(/^\-?\(?\d+\s*\/\s*\-?\d+\)?$/) && !str.match(/^\-?\d+$/) && !str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
-			return (_(" invalid entry format")+". ");
 		  }
 	} else if (format.indexOf('mixednumber')!=-1) {
 		  if (!str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/)) {
@@ -1126,7 +1144,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		qn = parseInt(qn);
 		if (document.getElementById("tc"+qn)==null) {continue;}
 		fullstr = document.getElementById("tc"+qn).value;
-		fullstr = fullstr.replace(/\s+/g,'');
+		fullstr = fullstr.replace(/^\s+/g,'').replace(/\s+$/,'');
 		fullstr = normalizemathunicode(fullstr);
 		if (fullstr.match(/DNE/i)) {
 			  fullstr = fullstr.toUpperCase();
@@ -1161,12 +1179,15 @@ function doonsubmit(form,type2,skipconfirm) {
 							  var err = "";
 
 							  try {
-							    with (Math) var res = eval(mathjs(vals[j]));
+							  	  if (calcformat[qn].indexOf('mixed')!=-1) {
+							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+							  	  }
+							  	  with (Math) var res = eval(mathjs(vals[j]));
 							  } catch(e) {
-							    err = "syntax incomplete";
+							  	  err = "syntax incomplete";
 							  }
 							  if (!isNaN(res) && res!="Infinity") {
-									  vals[j] = (Math.abs(res)<1e-15?0:res)+err;
+								  vals[j] = (Math.abs(res)<1e-15?0:res)+err;
 							  }
 						  }
 					  }
@@ -1247,13 +1268,13 @@ function doonsubmit(form,type2,skipconfirm) {
 	for (var qn in ntupletoproc) {//i=0; i<ntupletoproc.length; i++) {
 		qn = parseInt(qn);
 		if (document.getElementById("tc"+qn)==null) {continue;}
-		str = ntuplecalc("tc"+qn,null,'');
+		str = ntuplecalc("tc"+qn,null,calcformat[qn]);
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in complextoproc) { //i=0; i<complextoproc.length; i++) {
 		qn = parseInt(qn);
 		if (document.getElementById("tc"+qn)==null) {continue;}
-		str = complexcalc("tc"+qn,null,'');
+		str = complexcalc("tc"+qn,null,calcformat[qn]);
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in functoproc) { //fcnt=0; fcnt<functoproc.length; fcnt++) {
