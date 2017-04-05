@@ -430,7 +430,7 @@ function showitems($items,$parent,$inpublic=false) {
 					
 					echo '<div class="itemhdricon">';
 					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
-					if ($isopen) {echo _('collapse');} else {echo _('expand');}
+					if ($isopen) {echo 'collapse';} else {echo 'expand';}
 					echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"/>';
 					echo '</div>';
@@ -604,7 +604,7 @@ function showitems($items,$parent,$inpublic=false) {
 					
 					echo '<div class="itemhdricon">';
 					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
-					if ($isopen) {echo _('collapse');} else {echo _('expand');}
+					if ($isopen) {echo 'collapse';} else {echo 'expand';}
 					echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"/>';
 					echo '</div>';
