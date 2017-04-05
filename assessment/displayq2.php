@@ -670,6 +670,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				} else if (substr($_POST["qn$partnum"],0,2)=='[(') { //calcmatrix
 					$stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]);
 					$stuanswersval[$thisq][$kidx] = str_replace(',','|',$stuav);
+				} else {
+					$stuanswersval[$thisq][$kidx] = $_POST["qn$partnum"];
 				}
 			} else if (isset($_POST["qn$partnum"])) {
 				if (isset($_POST["qn$partnum-0"])) { //calcmatrix with matrixsize
@@ -725,6 +727,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			} else if (substr($_POST["qn$qnidx"],0,2)=='[(') { //calcmatrix
 				$stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$qnidx"]);
 				$stuanswersval[$thisq] = str_replace(',','|',$stuav);
+			} else {
+				$stuanswersval[$thisq] = $_POST["qn$qnidx"];
 			}
 		} else if (isset($_POST["qn$qnidx"])) {
 			if (isset($_POST["qn$qnidx-0"])) { //calcmatrix with matrixsize
