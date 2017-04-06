@@ -100,7 +100,7 @@ if ($pageshift==0 && (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$
 }
 echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a> ';
 echo '</div> ';
-echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
+
 
 $exlowertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek,$curyr)+$serveroffset;
 $lowertime = max($now,$exlowertime);
@@ -593,17 +593,22 @@ $jsarr .= '}';
 echo '<script type="text/javascript">';
 echo "cid = $cid;";
 echo "caleventsarr = $jsarr;";
+echo '$(function() {
+	$(".cal td").off("click.cal").on("click.cal", function() { showcalcontents(this); })
+	 .off("keyup.cal").on("keyup.cal", function(e) { if(e.which==13) {showcalcontents(this);} });
+	 });';
 echo '</script>';
+echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
 echo "<thead><tr><th>Sunday</th> <th>Monday</th> <th>Tuesday</th> <th>Wednesday</th> <th>Thursday</th> <th>Friday</th> <th>Saturday</th></tr></thead>";
 echo "<tbody>";
 for ($i=0;$i<count($hdrs);$i++) {
 	echo "<tr>";
 	for ($j=0; $j<count($hdrs[$i]);$j++) {
 		if ($i==0 && $j==$dayofweek && $pageshift==0) { //onmouseover="makebig(this)"
-			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
+			echo '<td tabindex=0 id="'.$ids[$i][$j].'" class="today"><div class="td"><span class=day>'.$hdrs[$i][$j]."</span><div class=center>";
 		} else {
 			$addr = $refpage.".php?cid=$cid&calstart=". ($midtoday + $i*7*24*60*60 + ($j - $dayofweek)*24*60*60);
-			echo '<td id="'.$ids[$i][$j].'" onclick="showcalcontents(this)" ><div class="td"><span class=day><a href="'.$addr.'" class="caldl">'.$hdrs[$i][$j]."</a></span><div class=center>";
+			echo '<td tabindex=0 id="'.$ids[$i][$j].'"><div class="td"><span class=day><a href="'.$addr.'" class="caldl">'.$hdrs[$i][$j]."</a></span><div class=center>";
 		}
 		if (isset($assess[$ids[$i][$j]])) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {
