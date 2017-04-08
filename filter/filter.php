@@ -17,7 +17,7 @@
 		include("$filterdir/graph/asciisvgimg.php");
 		$AS = new AStoIMG;
 	}
-	if ((isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==0)) {
+	if ((!isset($sessiondata['graphdisp']) || $sessiondata['graphdisp']==0)) {
 		include_once("$filterdir/graph/sscrtotext.php");
 	}
 	function mathfiltercallback($arr) {
