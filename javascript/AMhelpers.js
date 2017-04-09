@@ -2020,7 +2020,7 @@ function assessmentTimer(duration, timelimitkickout) {
 				document.getElementById('timelimitholder').innerHTML = _('Time limit expired - submitting now');
 				document.getElementById('timelimitholder').style.fontSize="300%";
 				if (document.getElementById("qform") == null) {
-					setTimeout("window.location.pathname='"+imasroot+"/assessment/showtest.php?action=skip&superdone=true'",2000);
+					setTimeout("window.location.href='"+imasroot+"/assessment/showtest.php?action=skip&superdone=true'",2000);
 					return;
 				} else {
 					var theform = document.getElementById("qform");
