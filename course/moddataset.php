@@ -18,6 +18,9 @@
 		exit;
 	}
 
+	// Determine if this is an AJAX quicksave call
+	$quicksave = isset($_GET['quick']) ? true : false;
+
 	function stripsmartquotes($text) {
 		$text = str_replace(
 			array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
@@ -516,6 +519,8 @@
 			$outputmsg .= "</script>";
 			//echo "}";
 			//echo "window.onload = previewit;";
+		} else if ($quicksave){
+			// Don't echo or die if in quicksave mode.
 		} else {
 			if ($errmsg == '' && !isset($_GET['aid'])) {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/manageqset.php?cid='.$cid);
@@ -784,6 +789,43 @@
 	}
 	$lnames = implode(", ",$lnames);
 
+	// Build form action
+	$formAction = "moddataset.php?process=true"
+		. (isset($_GET['cid']) ? "&cid=$cid" : "")
+		. (isset($_GET['aid']) ? "&aid={$_GET['aid']}" : "")
+		. ((isset($_GET['id']) && !isset($_GET['template'])) ? "&id={$_GET['id']}" : "")
+		. (isset($_GET['template']) ? "&templateid={$_GET['id']}" : "")
+		. (isset($_GET['makelocal']) ? "&makelocal={$_GET['makelocal']}" : "")
+		. ($frompot==1 ? "&frompot=1" : "");
+
+	// If in quick-save mode, build return packet and exit here
+	if ($quicksave) {
+		// Build return packet
+		$qsPacket = array();
+		$qsPacket['formAction'] = $formAction; // Form action
+		$qsPacket['images'] = $images; //  Images array
+		$qsPacket['outputmsg'] = $outputmsg; // output message
+		$qsPacket['errmsg'] = $errmsg;
+		$extrefqs = array();
+		for ($i=0;$i<count($extref);$i++) {
+			$extrefpt = explode('!!',$extref[$i]);
+			$type = ucfirst($extrefpt[0]);
+			if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
+				$type .= ' (cc)';
+			}
+			$extrefqs[$i] = array($type,$extrefpt[1]);
+		}
+		$qsPacket['extref'] = $extrefqs;
+		$qsPacket['id'] = isset($_GET['id']) ? $_GET['id'] : 0;
+		// Build img base url
+		if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true){
+			$qsPacket['imgUrlBase'] = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/";
+		} else {
+			$qsPacket['imgUrlBase'] = "$imasroot/assessment/qimages/";
+		}
+		// Return the packet
+		exit(json_encode($qsPacket));
+	}
 
 	/// Start display ///
 	$pagetitle = "Question Editor";
@@ -945,6 +987,7 @@
 		.CodeMirror-selected {background: #666666;}
 		</style>';
 	$placeinhead .= "<link href=\"$imasroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
+	$placeinhead .= "<style>.quickSaveButton {display:none;}</style>";
 
 	require("../header.php");
 
@@ -969,8 +1012,8 @@
 		}
 
 	}
-	echo $errmsg;
-	echo $outputmsg;
+	echo "<div id='errmsgContainer'>$errmsg</div>";
+	echo "<div id='outputmsgContainer'>$outputmsg</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
 	echo "<h2>$addmod QuestionSet Question</h2>\n";
@@ -1003,26 +1046,7 @@
 		echo "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
 	}
 ?>
-<form enctype="multipart/form-data" method=post action="moddataset.php?process=true<?php
-	if (isset($_GET['cid'])) {
-		echo "&cid=$cid";
-	}
-	if (isset($_GET['aid'])) {
-		echo "&aid={$_GET['aid']}";
-	}
-	if (isset($_GET['id']) && !isset($_GET['template'])) {
-		echo "&id={$_GET['id']}";
-	}
-	if (isset($_GET['template'])) {
-		echo "&templateid={$_GET['id']}";
-	}
-	if (isset($_GET['makelocal'])) {
-		echo "&makelocal={$_GET['makelocal']}";
-	}
-	if ($frompot==1) {
-		echo "&frompot=1";
-	}
-?>">
+<form enctype="multipart/form-data" method=post action="<?php echo $formAction; ?>">
 <input type="hidden" name="hasimg" value="<?php echo $line['hasimg'];?>"/>
 <p>
 Description:<BR>
@@ -1110,6 +1134,7 @@ function decboxsize(box) {
 	if (document.getElementById(box).rows > 2)
 		document.getElementById(box).rows -= 2;
 }
+
 </script>
 <p>
 My library assignments: <span id="libnames"><?php echo $lnames;?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
@@ -1151,7 +1176,10 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
 <input type=button id="solveropenbutton" value="Solver">
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question"><BR>
+<input type=submit name=test value="Save and Test Question" class="saveandtest" />
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<span class="noticetext quickSaveNotice"></span>
+<BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
 </div>
 
@@ -1160,7 +1188,10 @@ Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsi
 Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
 <input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question"><BR>
+<input type=submit name=test value="Save and Test Question" class="saveandtest" />
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<span class="noticetext quickSaveNotice"></span>
+<BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+3));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
 </div>
 
@@ -1176,7 +1207,7 @@ Detailed Solution:
 <span class="noselect"><span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span></span>
 <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question"><br/>
+<input type=submit name=test value="Save and Test Question" class="saveandtest" /><br/>
 <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
 Uses random variables from the question.
@@ -1192,39 +1223,50 @@ Display with the "Show Answer"<br/>
 <div id=imgbox>
 <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
 Image file: <input type="file" name="imgfile"/> assign to variable: <input type="text" name="newimgvar" size="6"/> Description: <input type="text" size="20" name="newimgalt" value=""/><br/>
+<div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
+	Images:
+	<ul id='imgList'>
 <?php
 if (isset($images['vars']) && count($images['vars'])>0) {
-	echo "Images:<br/>\n";
 	foreach ($images['vars'] as $id=>$var) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 			$urlimg = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$images['files'][$id]}";
 		} else {
 			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
 		}
-
+		echo "<li>";
 		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$urlimg\" target=\"_blank\">View</a> ";
-		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/> Delete? <input type=checkbox name=\"delimg-$id\"/><br/>";
+		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/> Delete? <input type=checkbox name=\"delimg-$id\"/>";
+		echo "</li>";
 	}
-
 }
 ?>
+	</ul>
+</div>
 Help button: Type: <select name="helptype">
  <option value="video">Video</option>
  <option value="read">Read</option>
  </select>
  URL: <input type="text" name="helpurl" size="30" /><br/>
 <?php
+echo '<div id="helpbtnwrap" ';
+if (count($extref)==0) {
+	echo 'class="hidden"';
+}
+echo ">Help buttons:<br/>";
+echo '<ul id="helpbtnlist">';
 if (count($extref)>0) {
-	echo "Help buttons:<br/>";
 	for ($i=0;$i<count($extref);$i++) {
 		$extrefpt = explode('!!',$extref[$i]);
-		echo 'Type: '.ucfirst($extrefpt[0]);
+		echo '<li>Type: '.ucfirst($extrefpt[0]);
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-		echo ', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/><br/>";
+		echo ', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/></li>";
 	}
 }
+echo '</ul></div>'; //helpbtnlist, helpbtnwrap
+
 if ($myrights==100) {
 	echo '<p>Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
 	if ($line['replaceby']!=0) {
@@ -1243,9 +1285,143 @@ if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
 </div>
 <p>
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question">
+<input type=submit name=test value="Save and Test Question" class="saveandtest" />
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<span class="noticetext quickSaveNotice"></span>
 </p>
 </form>
+
+<script type="text/javascript">
+if (FormData){ // Only allow quicksave if FormData object exists
+	var quickSaveQuestion = function(){
+		// Add text to notice areas
+		$(".quickSaveNotice").html("Saving...");
+		// Save codemirror and tinyMCE data
+		try {
+			if (qEditor) qEditor.save();
+			tinyMCE.triggerSave();
+			if (controlEditor) controlEditor.save();
+		} catch (err){
+			quickSaveQuestion.errorFunc();
+		}
+		// Get form data
+		var data = new FormData($("form")[0]);
+
+		$.ajax({
+			url: quickSaveQuestion.url + "&quick=1",
+			type: 'POST',
+			data: data,
+			contentType: false,
+			processData: false,
+			success: function(res){
+				// Parse out response string
+				var res = JSON.parse(res);
+				var formAction = res.formAction;
+				var images = res.images;
+				// Change form action url and testing address
+				if (formAction.indexOf("moddataset.php") > -1) {
+					quickSaveQuestion.url = formAction;
+					quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid="; ?>' + res.id
+				} else {
+					quickSaveQuestion.errorFunc();
+				}
+				// Change form action and url in address bar
+				$("form")[0].action = quickSaveQuestion.url;
+				if (window.history.replaceState) window.history.replaceState({}, "qs", quickSaveQuestion.url);
+				// Change outputmsg and errmsg
+				$("#outputmsgContainer").html(res.outputmsg);
+				$("#errmsgContainer").html(res.errmsg);
+				// HANDLE IMAGES
+				var imgUploaded = $("input[name='imgfile']")[0].files.length > 0 ? true : false; // Image uploaded
+				var imgDeleted = $("input[name^='delimg-']:checked").length > 0 ? true : false; // Image deleted
+				if (imgUploaded || imgDeleted) {
+					// Clear image inputs
+					var imgFile = $("input[name='imgfile']");
+					imgFile.replaceWith( imgFile = imgFile.val('').clone(true));
+					$("input[name='newimgvar'], input[name='newimgalt']").val('');
+
+					// Update image list
+					$("#imgList").empty();
+					var imgCount = 0;
+					for (id in images.vars){
+						imgCount++;
+						$("#imgList").append(
+							"<li> Variable: <input type='text' name='imgvar-" + id + "' value='$" + images.vars[id] + "' size='10' />" +
+							" <a href='" + res.imgUrlBase + images.files[id] + "' target='_blank'>View</a>" +
+							" Description: <input type='text' size='20' name='imgalt-" + id + "' value='" + images.alttext[id] + "'/>" +
+							" Delete? <input type='checkbox' name='delimg-" + id + "'/>" +
+							"</li>"
+						);
+					}
+				} else { // No uploads/deletes: still count number of images
+					var imgCount = 0;
+					for (i in images.vars) imgCount++;
+				}
+				// Hide image list if no images in question
+				$("#imgListContainer").css("display", imgCount > 0 ? "block" : "none");
+
+				//handle extref help buttons
+				if (res.extref.length>0) {
+					$("#helpbtnlist").html('');
+					for (var i=0;i<res.extref.length;i++) {
+						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] + 
+							", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
+							"Delete? <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
+					}
+					$("#helpbtnwrap").removeClass("hidden");
+				} else {
+					$("#helpbtnwrap").addClass("hidden");
+				}
+				$("input[name=helpurl]").val('');
+				
+				// Empty notices
+				$(".quickSaveNotice").empty();
+				// Load preview page
+				var previewpop = window.open(quickSaveQuestion.testAddr, 'Testing', 'width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+				previewpop.focus();
+			},
+			error: function(res){
+				quickSaveQuestion.errorFunc();
+			}
+		});
+	}
+	quickSaveQuestion.url = "<?php echo $formAction;?>&quick=1";
+	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}"; ?>';
+	// Method to handle errors...
+	quickSaveQuestion.errorFunc = function(){
+		$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");
+	}
+	// Key-binding method
+	quickSaveQuestion.keyBind = function(e){
+		var key = e.which || e.keyCode;
+		if (key == 83 && e.ctrlKey == true){
+			e.preventDefault();
+			e.stopPropagation();
+			quickSaveQuestion();
+			return false;
+		}
+	}
+	// Bind key event
+	$(document).on("keydown", quickSaveQuestion.keyBind);
+	// A little trickier for tinyMCE due to race conditions
+	var mceTry = setInterval(function(){
+		try {
+			tinymce.get('qtext').on('keydown', quickSaveQuestion.keyBind);
+			clearInterval(mceTry);
+		} catch (e) {}
+	}, 1000);
+
+	// Show Quick Save and Preview buttons
+	$(function() {
+		$(".quickSaveButton").css("display", "inline");
+		//$(".saveandtest").remove();
+	});
+} else { // No FormData object
+	$(function() {
+		$(".quickSaveButton, .quickSaveNotice").remove();
+	});
+}
+</script>
 
 <?php
 $placeinfooter='
