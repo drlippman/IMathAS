@@ -548,17 +548,17 @@ if ($myrights<20) {
 			if ($_GET['modify']!="new") {
 				$pagetitle = "Modify Library\n";
 				if ($isgrpadmin) {
-					$stm = $DBH->prepare("SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id=:id AND groupid=:groupid");
+					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id AND il.groupid=:groupid");
 					$stm->execute(array(':id'=>$_GET['modify'], ':groupid'=>$groupid));
 				} else if ($isadmin) {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}'";
-          $stm = $DBH->prepare("SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id=:id");
-          $stm->execute(array(':id'=>$_GET['modify']));
+					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id");
+					$stm->execute(array(':id'=>$_GET['modify']));
 				} else {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}' AND ownerid='$userid'";
 					$stm = $DBH->prepare("SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id=:id AND ownerid=:ownerid");
 					$stm->execute(array(':id'=>$_GET['modify'], ':ownerid'=>$userid));
-        }
+				}
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if ($row = mysql_fetch_row($result)) {
 				if ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -566,6 +566,9 @@ if ($myrights<20) {
 					$rights = $row[1];
 					$parent = $row[2];
 					$sortorder = $row[3];
+					if ($isgrpadmin || $isadmin) {
+						$ownername = $row[5].', '.$row[4];
+					}
 				}
 			} else {
 				$pagetitle = "Add Library\n";
@@ -817,6 +820,11 @@ if ($overwriteBody==1) {
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo $_GET['modify'] ?>">
 		<span class=form>Library Name:</span>
 		<span class=formright><input type=text name="name" value="<?php echo $name ?>" size=20></span><br class=form>
+		<?php
+		if (($isgrpadmin || $isadmin) && isset($ownername)) {
+			echo '<span class=form>Owner:</span><span class=formright>'.$ownername.'</span><br class=form />';
+		}
+		?>
 		<span class=form>Rights: </span>
 		<span class=formright>
 			<?php writeHtmlSelect ("rights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
