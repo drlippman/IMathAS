@@ -48,6 +48,15 @@ span.iteminfo {
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
 }
+label.error {
+	color: #db0000;
+	font-style: italic;
+	float: left;
+	margin-left: 10px;
+}
+input[type=checkbox] + label.error {
+	float:none;
+}
 div.title {
 	/*display: inline;*/
 	margin-left: 30px;

@@ -82,10 +82,8 @@ ini_set("post_max_size", "10485760");
 			$_POST['ekey'] = '';
 		}
 		if (!isset($_GET['confirmed'])) {
-			//DB $query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-			$stm = $DBH->prepare('SELECT SID FROM imas_users WHERE email=:email');
+			//look for existing account. ignore any LTI accounts
+			$stm = $DBH->prepare("SELECT SID FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'");
 			$stm->execute(array(':email'=>$_POST['email']));
 			if ($stm->rowCount()>0) {
 				$nologo = true;
@@ -416,6 +414,17 @@ ini_set("post_max_size", "10485760");
 			}
 			exit;
 		}
+	} else if ($_GET['action']=="checkusername") {
+		require_once("config.php");
+		
+		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+		$stm->execute(array(':SID'=>$_GET['SID']));
+		if ($stm->rowCount()>0) {
+			echo "false";
+		} else {
+			echo "true";
+		}
+		exit;
 	}
 
 	require("validate.php");
@@ -799,7 +808,7 @@ ini_set("post_max_size", "10485760");
 			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess='' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 		}
-	}
+	} 
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';
 	} else {

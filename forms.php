@@ -19,16 +19,19 @@ if (isset($_GET['greybox'])) {
 } else {
 	$gb = '';
 }
+$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+if (isset($CFG['locale'])) {
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.$CFG['locale'].'.min.js"></script>';
+}
 require("header.php");
 
 switch($_GET['action']) {
 	case "newuser":
 		if ($gb == '') {
-			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New Student Signup</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
-		//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/validateform.js\"></script>\n";
-		echo "<form method=post action=\"actions.php?action=newuser$gb\" onsubmit=\"return validateForm(this)\">\n";
+		echo '<div id="headerforms" class="pagetitle"><h2>New Student Signup</h2></div>';
+		echo "<form id=\"newuserform\" method=post action=\"actions.php?action=newuser$gb\">\n";
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">Choose a password:</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">Confirm password:</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
@@ -41,7 +44,36 @@ switch($_GET['action']) {
 		} else if (isset($CFG['GEN']['TOSpage'])) {
 			echo "<span class=form><label for=\"agree\">I have read and agree to the <a href=\"#\" onclick=\"GB_show('Terms of Use','".$CFG['GEN']['TOSpage']."',700,500);return false;\">Terms of Use</a></label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
 		}
-
+		echo '<script type="text/javascript">
+		$("#newuserform").validate({
+			rules: {
+				SID: {
+					required: true,
+					pattern: '.$loginformat.',
+					remote: imasroot+"/actions.php?action=checkusername"
+				},
+				pw1: { required: true, minlength: 6},
+				pw2: {
+					required: true,
+					equalTo: "#pw1"
+				},
+				firstname: { required: true},
+				lastname: {required: true},
+				email: {
+					required: true,
+					email: true
+				},
+				agree: { required: true}
+			},
+			messages: {
+				SID: {
+					remote: _("That username is already taken. Try another.")
+				}
+			},
+			invalidHandler: function() {
+				setTimeout(function(){$("#newuserform").removeClass("submitted").removeClass("submitted2");}, 100)}
+		});
+		</script>';
 		if (!$emailconfirmation) {
 			$doselfenroll = false;
 			//DB $query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
@@ -87,10 +119,23 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Change Password</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
-		echo "<form method=post action=\"actions.php?action=chgpwd$gb\">\n";
+		echo "<form id=\"pageform\" method=post action=\"actions.php?action=chgpwd$gb\">\n";
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
 		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
-		echo "<span class=form><label for=\"newpw1\">Verify new password:</label></span>  <input class=form type=password id=newpw2 name=newpw2 size=40> <BR class=form>\n";
+		echo "<span class=form><label for=\"newpw2\">Verify new password:</label></span>  <input class=form type=password id=newpw2 name=newpw2 size=40> <BR class=form>\n";
+		echo '<script type="text/javascript">
+		$("#pageform").validate({
+			rules: {
+				oldpw: { required: true},
+				newpw1: { required: true, minlength: 6},
+				newpw2: {
+					required: true,
+					equalTo: "#newpw1"
+				}
+			},
+			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+		);
+		</script>';
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
 		break;
 	case "chguserinfo":
@@ -105,7 +150,7 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>User Profile</h2></div>';
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
+		echo "<form id=\"pageform\" enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
@@ -118,7 +163,7 @@ switch($_GET['action']) {
 			$r = $stm->fetch(PDO::FETCH_NUM);
 			echo '<span class="form">'._('Group').':</span><span class="formright">'.$r[0].'</span><br class="form"/>';
 		}
-		echo '<span class="form"><label for="dochgpw">Change Password?</label></span> <span class="formright"><input type="checkbox" name="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
+		echo '<span class="form"><label for="dochgpw">Change Password?</label></span> <span class="formright"><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
 		echo '<div style="display:none" id="pwinfo">';
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
 		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
@@ -268,6 +313,30 @@ switch($_GET['action']) {
 
 
 		}
+		echo '<script type="text/javascript">
+		$("#pageform").validate({
+			rules: {
+				oldpw: { 
+					required: {depends: function(element) {return $("#dochgpw").is(":checked")}}
+				},
+				newpw1: { 
+					required: {depends: function(element) {return $("#dochgpw").is(":checked")}},
+					minlength: 6
+				},
+				newpw2: {
+					required: {depends: function(element) {return $("#dochgpw").is(":checked")}},
+					equalTo: "#newpw1"
+				},
+				firstname: { required: true},
+				lastname: {required: true},
+				email: {
+					required: true,
+					email: true
+				},
+			},
+			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+		);
+		</script>';
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
 
 		//echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
@@ -278,7 +347,7 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
-		echo "<form method=post action=\"actions.php?action=enroll$gb\">";
+		echo "<form id=\"pageform\" method=post action=\"actions.php?action=enroll$gb\">";
 		$doselfenroll = false;
 		//DB $query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -300,7 +369,8 @@ switch($_GET['action']) {
 			echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); var c2 = document.getElementById("selfenrollwarn"); ';
 			echo 'if (el.value==0) {c.style.display="";c2.style.display="none";} else {c.style.display="none";c2.style.display="";}}</script>';
 		} else {
-			echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
+			echo '<p>Enter the course ID provided by your teacher.</p>';
+			echo '<input type="hidden" name="courseselect" id="courseselect" value="0"/>';
 		}
 		echo '<span class="form"><label for="cid">Course ID:</label></span><input class="form" type="text" size="20" name="cid" id="cid"/><br class="form"/>';
 		echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey" id="ekey"/><br class="form"/>';
@@ -311,6 +381,16 @@ switch($_GET['action']) {
 			echo 'course will be viewable by your instructor or count towards your course.  For an instructor-led ';
 			echo 'course, you need to enter the course ID and key provided by your instructor.</div>';
 		}
+		echo '<script type="text/javascript">
+		$("#pageform").validate({
+			rules: {
+				cid: { 
+					required: {depends: function(element) {return $("#courseselect").val()==0}}
+				}
+			},
+			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+		);
+		</script>';
 		echo '<div class=submit><input type=submit value="Sign Up"></div></form>';
 		break;
 	case "unenroll":
@@ -329,10 +409,18 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Password Reset</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
-		echo "<form method=post action=\"actions.php?action=resetpw$gb\">\n";
+		echo "<form id=\"pageform\" method=post action=\"actions.php?action=resetpw$gb\">\n";
 		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
 		echo "reset your password.</p>";
 		echo "<p><label for=username>User Name</label>: <input type=text name=\"username\" id=username /></p>";
+		echo '<script type="text/javascript">
+		$("#pageform").validate({
+			rules: {
+				username: { required: true}
+			},
+			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+		);
+		</script>';   
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "lookupusername":
@@ -340,9 +428,17 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Username Lookup</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Lookup Username</h2></div>';
-		echo "<form method=post action=\"actions.php?action=lookupusername$gb\">\n";
+		echo "<form id=\"pageform\" method=post action=\"actions.php?action=lookupusername$gb\">\n";
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
 		echo "<p><label for=email>Email</label>: <input type=text name=\"email\" id=email /></p>";
+		echo '<script type="text/javascript">
+		$("#pageform").validate({
+			rules: {
+				email: { required: true, email: true}
+			},
+			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+		);
+		</script>';
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "forumwidgetsettings":
