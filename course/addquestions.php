@@ -505,6 +505,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$subs[$j]));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($line===false) { continue; } //this should never happen, but avoid issues if it does
 			$existingq[] = $line['questionsetid'];
 			if ($j>0) {
 				$jsarr .= ',';
