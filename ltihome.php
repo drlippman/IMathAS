@@ -250,7 +250,7 @@ if (isset($_POST['createcourse'])) {
 			$atitle = $stm->fetchColumn(0);
 
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_place_aid=$typeid";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($atitle).'&text='.urlencode($atitle));
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeStringForUrl($url).'&title='.Sanitize::encodeStringForUrl($atitle).'&text='.Sanitize::encodeStringForUrl($atitle));
 			exit;
 
 		} else {
@@ -262,7 +262,7 @@ if (isset($_POST['createcourse'])) {
 			$cname = $stm->fetchColumn(0);
 
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_open_folder=$typeid-0";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($cname).'&text='.urlencode($cname));
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeStringForUrl($url).'&title='.Sanitize::encodeStringForUrl($cname).'&text='.Sanitize::encodeStringForUrl($cname));
 			exit;
 		}
 	}

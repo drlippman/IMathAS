@@ -5,6 +5,7 @@
 	require("../validate.php");
 	require("../includes/exceptionfuncs.php");
 	
+
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
 
@@ -15,7 +16,7 @@
 	$stm->execute(array(':id'=>$cid));
 	$latepasshrs = $stm->fetchColumn(0);
 	$now = time();
-	
+
 	//DB $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $latepasses = mysql_result($result,0,0);
@@ -37,7 +38,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Un-use LatePass</div>";
 		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
@@ -151,7 +152,7 @@
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+1 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 					$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid, ':enddate'=>$enddate));
 				} else {
-					
+
 					//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES ('$userid','$aid','$startdate','$enddate',1,'A')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES (:userid, :assessmentid, :startdate, :enddate, :islatepass, :itemtype)");
@@ -168,7 +169,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Redeem LatePass</div>\n";
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";

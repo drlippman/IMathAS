@@ -3,6 +3,7 @@
 //(c) 2014 David Lippman for Lumen Learning
 
 require("../validate.php");
+
 $flexwidth = true;
 $nologo = true;
 
@@ -37,13 +38,13 @@ if (isset($_POST['message'])) {
 			$addy = "{$row[0]} {$row[1]} <{$row[2]}>";
 			//DB $subject = stripslashes($_POST['subject']);
 			//DB $message = stripslashes($_POST['message']);
-			$subject = $_POST['subject'];
-			$message = $_POST['message'];
+			$subject = $_POST['subject']; // Sanitized by strip_tags near line 14.
+			$message = $_POST['message']; // Sanitized by myhtmLawed near line 14.
 			$sessiondata['mathdisp']=2;
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
 			$message = filter($message);
-			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode  . $_SERVER['HTTP_HOST'].'/',$message);
+			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . '/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
 			//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";

@@ -136,7 +136,7 @@
 	</script>
 	<?php
 	} //end $editingon block
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Calendar</div>";
 	echo '<div id="headercalendar" class="pagetitle"><h2>Calendar</h2></div>';
 

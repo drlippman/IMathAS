@@ -1,6 +1,8 @@
 <?php
 //IMathAS:  Displays a wiki, public view
 //(c) 2010 David Lippman
+
+
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";
 		exit;
@@ -67,9 +69,9 @@
 		//DB $coursename = mysql_result($result,0,1);
 		//DB $coursetheme = mysql_result($result,0,2);
 		list($coursename, $coursetheme) = $stm->fetch(PDO::FETCH_NUM);
-		$breadcrumbbase = "<a href=\"$imasroot/course/public.php?cid=$cid\">$coursename</a> &gt; ";
+		$breadcrumbbase = "<a href=\"$imasroot/course/public.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	} else {
-		$breadcrumbbase = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$fcid\">$coursename</a> &gt; ";
+		$breadcrumbbase = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$fcid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 
 	if (!findinpublic($items,$itemid)) {

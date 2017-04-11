@@ -2,6 +2,7 @@
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
 	require("../validate.php");
+	
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -174,11 +175,13 @@
 			$groupnames[$row[0]] = $row[1];
 		}
 		if (count($groupnames)>0) {
-			$grplist = implode(',',array_keys($groupnames));
+			$grplist = array_keys($groupnames);
 			//DB $query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
-			$stm = $DBH->query("SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName");
+			$query_placeholders = Sanitize::generateQueryPlaceholders($grplist);
+			$stm = $DBH->prepare("SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($query_placeholders) ORDER BY iu.LastName,iu.FirstName");
+			$stm->execute($grplist);
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
 				$groupmembers[$row[0]][] = $row[2].' '.$row[1];
@@ -220,7 +223,7 @@
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
@@ -341,7 +344,7 @@
 			}
 		}).fail(function(jqXHR, textStatus) {
 			$("#quicksavenotice").html(textStatus);
-		});	
+		});
 	}
 	</script>
 <?php
@@ -490,22 +493,22 @@
 				echo 'class="iswrong"';
 			}
 			echo '>';
-			
+
 			echo "<p><span class=\"person\"><b>".$line['LastName'].', '.$line['FirstName'].'</b></span>';
 			if ($page != -1) {
 				echo '.  Jump to <select id="stusel" onchange="jumptostu()">';
 				foreach ($stulist as $i=>$st) {
 					echo '<option value="'.$i.'" ';
 					if ($i==$page) {echo 'selected="selected"';}
-					echo '>'.$st.'</option>';
+					echo '>'.Sanitize::encodeStringForDisplay($st).'</option>';
 				}
 				echo '</select>';
 			}
 			echo '</p>';
 			if (!$groupdup) {
-				echo '<h4 class="group" style="display:none">'.$groupnames[$line['agroupid']];
+				echo '<h4 class="group" style="display:none">'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
-					echo ' ('.implode(', ',$groupmembers[$line['agroupid']]).')</h4>';
+					echo ' ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</h4>';
 				} else {
 					echo ' (empty)</h4>';
 				}

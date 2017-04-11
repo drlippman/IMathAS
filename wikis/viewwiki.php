@@ -9,6 +9,7 @@ require("../includes/htmlutil.php");
 require("../includes/diff.php");
 
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -18,7 +19,7 @@ $body = "";
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
 $groupid = intval($_GET['grp']);
-$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">$coursename</a>";
+$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 
 if (isset($_GET['framed'])) {
 	$flexwidth = true;

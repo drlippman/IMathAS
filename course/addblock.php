@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //buildExistBlocksArray constructs $existblocks for use in generating
@@ -37,7 +38,7 @@ function buildExistBlocksArray($items,$parent) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Block Settings";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 $curBreadcrumb .= (isset($_GET['id'])) ? "&gt; Modify Block\n" : "&gt; Add Block\n";
 
 if (isset($_GET['id'])) {
@@ -52,7 +53,7 @@ if (isset($_GET['tb'])) {
 }
 
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 
 /* page load loop, runs only one set of code based on how the page was loaded,
 current options are (in order of code blocks below):
@@ -176,7 +177,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 	exit;
 } else { //it is a teacher but the form has not been posted
@@ -448,7 +449,7 @@ if ($overwriteBody==1) {
 	<div class=submit><input type=submit value="<?php echo $savetitle?>"></div>
 </form>
 <p class="small"><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>
-Items from publicly accessible blocks can viewed without logging in at <?php echo $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/public.php?cid=<?php echo $_GET['cid'];?>. </p>
+Items from publicly accessible blocks can viewed without logging in at <?php echo $urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/public.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>. </p>
 
 
 

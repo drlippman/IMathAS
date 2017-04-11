@@ -3,8 +3,10 @@
 //(c) 2006 David Lippman
 
 	require("../validate.php");
-	$aid = $_GET['aid'];
-	$cid = $_GET['cid'];
+	
+
+	$aid = Sanitize::onlyInt($_GET['aid']);
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['record'])) {
 
@@ -22,7 +24,7 @@
 				$upd_stm->execute(array(':category'=>$_POST[$row[0]], ':id'=>$row[0]));
 			}
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 
 		exit;
 	}
@@ -89,7 +91,7 @@ function getnextprev(formn,loc) {
 }
 </script>
 END;
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Categorize Questions</div>\n";
 
 	//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";

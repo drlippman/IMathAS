@@ -18,8 +18,8 @@ $curBreadcrumb = "$breadcrumbbase Admin\n";
 
  if ($myrights>=75) {
 	 if (isset($_GET['showcourses'])) {
-		 setcookie('showcourses',$_GET['showcourses']);
-		 $showcourses = $_GET['showcourses'];
+     $showcourses = Sanitize::onlyInt($_GET['showcourses']);
+		 setcookie('showcourses', $showcourses);
 	 } else if (isset($_COOKIE['showcourses'])) {
 		 $showcourses = $_COOKIE['showcourses'];
 	 } else {
@@ -30,10 +30,10 @@ $curBreadcrumb = "$breadcrumbbase Admin\n";
  }
  if ($myrights==100) {
 	 if (isset($_GET['showusers'])) {
-		 setcookie('showusers',$_GET['showusers']);
-		 $showusers = $_GET['showusers'];
+     $showusers = Sanitize::onlyInt($_GET['showusers']);
+		 setcookie('showusers', $showusers);
 	 } else if (isset($_COOKIE['showusers'])) {
-		 $showusers = $_COOKIE['showusers'];
+		 $showusers = Sanitize::onlyInt($_COOKIE['showusers']);
 	 } else {
 		 $showusers = $groupid;
 	 }
@@ -270,7 +270,7 @@ $placeinhead .= '</script>';
 					echo '<span style="color:#faa;text-decoration: line-through;">';
 				}
 
-				echo $page_courseList[$i]['name'];
+				echo Sanitize::encodeStringForDisplay($page_courseList[$i]['name']);
 
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '</i>';
@@ -283,7 +283,7 @@ $placeinhead .= '</script>';
 				</a>
 				</td>
 				<td class=c><?php echo $page_courseList[$i]['id'] ?></td>
-				<td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['LastName']) ?>, <?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['FirstName']) ?></td>
 				<td class=c><a href="forms.php?action=modify&id=<?php echo $page_courseList[$i]['id'] ?>" class="sl">Settings</a></td>
 				<td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td>
 				<td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
@@ -384,7 +384,7 @@ $placeinhead .= '</script>';
 ?>
 
 				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo $page_diagnosticsId[$i] ?>">
-				<?php echo $page_diagnosticsName[$i] ?></a></td>
+				<?php echo Sanitize::encodeStringForDisplay($page_diagnosticsName[$i]) ?></a></td>
 				<td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
 				<td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
 				<td><a href="diagsetup.php?id=<?php echo $page_diagnosticsId[$i] ?>">Modify</a></td>
@@ -417,9 +417,9 @@ $placeinhead .= '</script>';
 		for ($i=0;$i<count($page_userDataId);$i++) {
 			if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
-				<td><?php echo $page_userDataLastName[$i] . ", " . $page_userDataFirstName[$i] ?></td>
-				<td><?php echo $page_userDataSid[$i] ?></td>
-				<td><?php echo $page_userDataEmail[$i] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastName[$i]) . ", " . Sanitize::encodeStringForDisplay($page_userDataFirstName[$i]) ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataSid[$i]) ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataEmail[$i]) ?></td>
 				<td><?php echo $page_userDataType[$i] ?></td>
 				<td><?php echo $page_userDataLastAccess[$i] ?></td>
 				<td class=c><a href="forms.php?action=chgrights&id=<?php echo $page_userDataId[$i] ?>">Change</a></td>

@@ -2,6 +2,7 @@
 //IMathAS:  Display grade list for one online assessment
 //(c) 2007 David Lippman
 	require("../validate.php");
+	
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 
@@ -44,7 +45,7 @@
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
 
 	echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
@@ -227,7 +228,7 @@
 		}
 		$timeused = $line['endtime']-$line['starttime'];
 		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
-		$useexception = false; 
+		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
 			$useexception = getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate), true);
 			if ($useexception) {

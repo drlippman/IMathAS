@@ -3,6 +3,8 @@
 //(c) 2013 David Lippman
 
 require("../validate.php");
+
+
 $cid = intval($_GET['cid']);
 if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = $userid;
@@ -10,7 +12,7 @@ if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = intval($_GET['uid']);
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 if (isset($teacherid)) {
 	if (isset($_GET['from']) && $_GET['from']=='gb') {
 		$curBreadcrumb .= " &gt; <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> ";
@@ -35,7 +37,7 @@ echo '<div class="cpmid"><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">Vi
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);
-echo '<h3>Activity Log for '.$row[0].', '.$row[1].'</h3>';
+echo '<h3>Activity Log for '.Sanitize::encodeStringForDisplay($row[0]).', '.Sanitize::encodeStringForDisplay($row[1]).'</h3>';
 
 
 $actions = array();
@@ -60,74 +62,88 @@ if (count($lookups['as'])>0) {
 	//DB $query = 'SELECT id,name FROM imas_assessments WHERE id IN ('..')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$lookuplist = implode(',', array_map('intval', array_unique($lookups['as'])));
-	$stm = $DBH->query("SELECT id,name FROM imas_assessments WHERE id IN ($lookuplist)");
+	$lookuplist = array_map('intval', array_unique($lookups['as']));
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE id IN ($query_placeholders)");
+	$stm->execute($lookuplist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$asnames[$row[0]] = $row[1];
 	}
 }
 $innames = array();
 if (count($lookups['in'])>0) {
-	$lookuplist = implode(',', array_map('intval', array_unique($lookups['in'])));
+	$lookuplist = array_map('intval', array_unique($lookups['in']));
 	//DB $query = 'SELECT id,title FROM imas_inlinetext WHERE id IN ('.implode(',',array_unique($lookups['in'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,title FROM imas_inlinetext WHERE id IN ($lookuplist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,title FROM imas_inlinetext WHERE id IN ($query_placeholders)");
+    $stm->execute($lookuplist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$innames[$row[0]] = $row[1];
 	}
 }
 $linames = array();
 if (count($lookups['li'])>0) {
-	$lookuplist = implode(',', array_map('intval', array_unique($lookups['li'])));
+	$lookuplist = array_map('intval', array_unique($lookups['li']));
 	//DB $query = 'SELECT id,title FROM imas_linkedtext WHERE id IN ('.implode(',',array_unique($lookups['li'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,title FROM imas_linkedtext WHERE id IN ($lookuplist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,title FROM imas_linkedtext WHERE id IN ($query_placeholders)");
+    $stm->execute($lookuplist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$linames[$row[0]] = $row[1];
 	}
 }
 $winames = array();
 if (count($lookups['wi'])>0) {
-	$lookuplist = implode(',', array_map('intval', array_unique($lookups['wi'])));
+	$lookuplist = array_map('intval', array_unique($lookups['wi']));
 	//DB $query = 'SELECT id,name FROM imas_wikis WHERE id IN ('.implode(',',array_unique($lookups['wi'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,name FROM imas_wikis WHERE id IN ($lookuplist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,name FROM imas_wikis WHERE id IN ($query_placeholders)");
+    $stm->execute($lookuplist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$winames[$row[0]] = $row[1];
 	}
 }
 $exnames = array();
 if (count($lookups['ex'])>0) {
-	$lookuplist = implode(',', array_map('intval', array_unique($lookups['ex'])));
+	$lookuplist = array_map('intval', array_unique($lookups['ex']));
 	//DB $query = 'SELECT id,assessmentid FROM imas_questions WHERE id IN ('.implode(',',array_unique($lookups['ex'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,assessmentid FROM imas_questions WHERE id IN ($lookuplist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,assessmentid FROM imas_questions WHERE id IN ($query_placeholders)");
+    $stm->execute($lookuplist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$exnames[$row[0]] = $asnames[$row[1]];
 	}
 }
 $fpnames = array();
 if (count($lookups['fo'])>0) {
-	$lookuplist = implode(',', array_map('intval', array_unique($lookups['fo'])));
+	$lookuplist = array_map('intval', array_unique($lookups['fo']));
 	//DB $query = 'SELECT id,subject FROM imas_forum_posts WHERE id IN ('.implode(',',array_unique($lookups['fo'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,subject FROM imas_forum_posts WHERE id IN ($lookuplist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,subject FROM imas_forum_posts WHERE id IN ($query_placeholders)");
+    $stm->execute($lookuplist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$fpnames[$row[0]] = $row[1];
 	}
 }
 $forumnames = array();
 if (count($lookups['forums'])>0) {
-	$lookuplist = implode(',', array_map('intval', array_unique($lookups['forums'])));
+	$lookuplist = array_map('intval', array_unique($lookups['forums']));
 	//DB $query = 'SELECT id,name FROM imas_forums WHERE id IN ('.implode(',',array_unique($lookups['forums'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,name FROM imas_forums WHERE id IN ($lookuplist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE id IN ($query_placeholders)");
+	$stm->execute($lookuplist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$forumnames[$row[0]] = $row[1];
 	}
@@ -138,11 +154,11 @@ foreach ($actions as $r) {
 	if (isset($r[3])) {
 		$r3pts = explode('::',$r[3]);
 		if (count($r3pts)==2) {
-			$thelink = '<a href="'.$r3pts[0].'" target="_blank">'.$r3pts[1].'</a>';
-			$href = $r3pts[0];
+			$thelink = '<a href="'.Sanitize::fullUrl($r3pts[0]).'" target="_blank">'.Sanitize::encodeStringForDisplay($r3pts[1]).'</a>';
+			$href = Sanitize::fullUrl($r3pts[0]);
 		} else {
-			$thelink = $r[3];
-			$href = $r[3];
+			$thelink = Sanitize::fullUrl($r[3]);
+			$href = Sanitize::fullUrl($r[3]);
 		}
 	}
 	echo '<tr>';
@@ -150,64 +166,64 @@ foreach ($actions as $r) {
 	echo '<td>';
 	switch ($r[0]) {
 	case 'inlinetext':
-		echo 'In inline text item '.$innames[$r[1]].', clicked link to '.$thelink;
+		echo 'In inline text item '.Sanitize::encodeStringForDisplay($innames[$r[1]]).', clicked link to '.$thelink;
 		break;
 	case 'linkedsum':
-		echo 'From linked item '.$linames[$r[1]].' summary, clicked link to '.$thelink;
+		echo 'From linked item '.Sanitize::encodeStringForDisplay($linames[$r[1]]).' summary, clicked link to '.$thelink;
 		break;
 	case 'linkedlink':
 		if ($r[3]==$r[1] || (strpos($href,'showlinkedtext')!==false && strpos($href,'id='.$r[1])!==false)) {
-			echo 'Opened linked text item '.$linames[$r[1]];
+			echo 'Opened linked text item '.Sanitize::encodeStringForDisplay($linames[$r[1]]);
 		} else {
-			echo 'Clicked linked item <a target="_blank" href="'.$href.'">'.$linames[$r[1]].'</a>';
+			echo 'Clicked linked item <a target="_blank" href="'.$href.'">'.Sanitize::encodeStringForDisplay($linames[$r[1]]).'</a>';
 		}
 		break;
 	case 'linkedintext':
-		echo 'In linked text '.$linames[$r[1]].', clicked link to '.$thelink;
+		echo 'In linked text '.Sanitize::encodeStringForDisplay($linames[$r[1]]).', clicked link to '.$thelink;
 		break;
 	case 'linkedviacal':
 		if ($r[3]==$r[1] || (strpos($href,'showlinkedtext')!==false && strpos($href,'id='.$r[1])!==false)) {
-			echo 'Via calendar, opened linked text item '.$linames[$r[1]];
+			echo 'Via calendar, opened linked text item '.Sanitize::encodeStringForDisplay($linames[$r[1]]);
 		} else {
-			echo 'Via calendar, clicked linked item <a target="_blank" href="'.$href.'">'.$linames[$r[1]].'</a>';
+			echo 'Via calendar, clicked linked item <a target="_blank" href="'.$href.'">'.Sanitize::encodeStringForDisplay($linames[$r[1]]).'</a>';
 		}
 		break;
 	case 'extref':
 		$p = explode(': ',$r[3]);
-		echo 'In assessment '.$exnames[$r[1]].', clicked help for <a target="_blank" href="'.$p[1].'">'.$p[0].'</a>';
+		echo 'In assessment '.Sanitize::encodeStringForDisplay($exnames[$r[1]]).', clicked help for <a target="_blank" href="'.Sanitize::encodeStringForUrl($p[1]).'">'.Sanitize::encodeStringForDisplay($p[0]).'</a>';
 		break;
 	case 'assessintro':
-		echo 'In assessment '.$asnames[$r[1]].' intro, clicked link to '.$thelink;
+		echo 'In assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]).' intro, clicked link to '.$thelink;
 		break;
 	case 'assesssum':
-		echo 'In assessment '.$asnames[$r[1]].' summary, clicked link to '.$thelink;
+		echo 'In assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]).' summary, clicked link to '.$thelink;
 		break;
 	case 'assess':
-		echo 'Opened assessment '.$asnames[$r[1]];
+		echo 'Opened assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]);
 		break;
 	case 'assesslti':
-		echo 'Opened assessment '.$asnames[$r[1]].' via LTI';
+		echo 'Opened assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]).' via LTI';
 		break;
 	case 'assessviacal':
-		echo 'Via calendar, opened assessment '.$asnames[$r[1]];
+		echo 'Via calendar, opened assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]);
 		break;
 	case 'wiki':
-		echo 'Opened wiki '.$winames[$r[1]];
+		echo 'Opened wiki '.Sanitize::encodeStringForDisplay($winames[$r[1]]);
 		break;
 	case 'wikiintext':
-		echo 'In wiki '.$winames[$r[1]].', clicked link to '.$thelink;
+		echo 'In wiki '.Sanitize::encodeStringForDisplay($winames[$r[1]]).', clicked link to '.$thelink;
 		break;
 	case 'forumpost':
 		$fp = explode(';',$r[3]);
-		echo 'New post <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.$fp[0].'&thread='.$r[1].'">'.$fpnames[$r[1]].'</a> in forum '.$forumnames[$fp[0]];
+		echo 'New post <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeStringForUrl($fp[0]).'&thread='.Sanitize::encodeStringForUrl($r[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
 		break;
 	case 'forumreply':
 		$fp = explode(';',$r[3]);
-		echo 'New reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.$fp[0].'&thread='.$fp[1].'">'.$fpnames[$r[1]].'</a> in forum '.$forumnames[$fp[0]];
+		echo 'New reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeStringForUrl($fp[0]).'&thread='.Sanitize::encodeStringForUrl($fp[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
 		break;
 	case 'forummod':
 		$fp = explode(';',$r[3]);
-		echo 'Modified post/reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.$fp[0].'&thread='.$fp[1].'">'.$fpnames[$r[1]].'</a> in forum '.$forumnames[$fp[0]];
+		echo 'Modified post/reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeStringForUrl($fp[0]).'&thread='.Sanitize::encodeStringForUrl($fp[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
 		break;
 	}
 

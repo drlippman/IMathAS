@@ -3,6 +3,8 @@
 //(c) 2007 David Lippman
 
 	require("../validate.php");
+	
+
 	$cid = $_GET['cid'];
 	$fid = $_GET['fid'];
 	$from = $_GET['from'];
@@ -19,7 +21,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Un-use LatePass</div>";
 		//DB $query = "SELECT startdate,enddate,islatepass,itemtype FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$fid' AND (itemtype='F' OR itemtype='R' OR itemtype='P')";
@@ -186,7 +188,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Redeem LatePass</div>\n";
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";

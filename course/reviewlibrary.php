@@ -41,7 +41,7 @@ if ($myrights<20) {
 		$curBreadcrumb = "<a href=\"../index.php\">Home</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Review Library";
 	} else {
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a>";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 		$curBreadcrumb .= "&gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Review Library";
 	}
 

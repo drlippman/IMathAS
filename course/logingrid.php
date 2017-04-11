@@ -4,6 +4,7 @@
 
 require("../validate.php");
 
+
 $cid = $_GET['cid'];
 if (isset($_GET['secfilter'])) {
 	$secfilter = $_GET['secfilter'];
@@ -15,7 +16,7 @@ if (isset($_GET['secfilter'])) {
 	$secfilter = -1;
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= "&gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Login Grid";
 
 $overwriteBody = 0;

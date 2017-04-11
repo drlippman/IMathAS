@@ -3,10 +3,12 @@
 // (c) 2012 David Lippman
 
 require("../validate.php");
+
+
 if (!isset($teacherid)) {
 	exit;
 }
-$aid = $_GET['aid'];
+$aid = Sanitize::onlyInt($_GET['aid']);
 
 //form handling
 
@@ -49,7 +51,7 @@ if (isset($_POST['vidid'])) {
 	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
 	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
 
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 	exit;
 }
 
@@ -57,7 +59,7 @@ if (isset($_POST['vidid'])) {
 //start display
 require("../header.php");
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Video Navigation</div>\n";
 
 

@@ -245,8 +245,8 @@ switch($_GET['action']) {
 		}
 
 		if (isset($_GET['cid'])) {
-			$cid = $_GET['cid'];
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
+			$cid = Sanitize::courseId($_GET['cid']);
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Course Settings</div>";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>';
 		if ($_GET['action']=='modify') {
@@ -410,7 +410,7 @@ switch($_GET['action']) {
 			echo '<button type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">'._('Show LTI key and URL').'</button>';
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
-				echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
+				echo '<br/>URL: '.$urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).$imasroot.'/bltilaunch.php<br/>';
 				echo 'Key: LTIkey_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
 				echo 'Key: LTIkey_'.$_GET['id'].'_1 (to only allow access through the LMS )';
 			} else {
@@ -543,7 +543,7 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$_GET['id']));
 		$num = $stm->rowCount();
-		echo '<form method="post" action="actions.php?from='.$from.'&action=remteacher&cid='.$_GET['id'].'&tot='.$num.'">';
+		echo '<form method="post" action="actions.php?from='.$from.'&action=remteacher&cid='.Sanitize::onlyInt($_GET['id']).'&tot='.$num.'">';
 		echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		$onlyone = ($num==1);
@@ -556,11 +556,12 @@ switch($_GET['action']) {
 				echo '<tr><td><input type="checkbox" name="tid[]" value="'.$line['id'].'"/></td>';
 			}
 
-			echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+				Sanitize::encodeStringForDisplay($line['FirstName']));
 			if ($onlyone) {
 				echo "<td></td></tr>";
 			} else {
-				echo "<td><A href=\"actions.php?from=$from&action=remteacher&cid={$_GET['id']}&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
+				echo "<td><A href=\"actions.php?from=$from&action=remteacher&cid=".Sanitize::onlyInt($_GET['id'])."&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
 			}
 			$used[$line['userid']] = true;
 		}
@@ -576,7 +577,7 @@ switch($_GET['action']) {
 			$stm = $DBH->query("SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;");
 		}
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		echo '<form method="post" action="actions.php?from='.$from.'&action=addteacher&cid='.$_GET['id'].'">';
+		echo '<form method="post" action="actions.php?from='.$from.'&action=addteacher&cid='.Sanitize::onlyInt($_GET['id']).'">';
 		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
 		echo "<table cellpadding=5>\n";
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -585,8 +586,9 @@ switch($_GET['action']) {
 			if ($used[$line['id']]!=true) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
 				echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
-				echo "<td>{$line['LastName']}, {$line['FirstName']} </td> ";
-				echo "<td><a href=\"actions.php?from=$from&action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
+				printf("<td>%s, %s </td> ", Sanitize::encodeStringForDisplay($line['LastName']),
+					Sanitize::encodeStringForDisplay($line['FirstName']));
+				echo "<td><a href=\"actions.php?from=$from&action=addteacher&cid=".Sanitize::onlyInt($_GET['id'])."&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
 			}
 		}
 		echo "</table></form>\n";

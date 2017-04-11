@@ -3,6 +3,8 @@
 	//(c) 2006 David Lippman
 
 	require("../validate.php");
+	
+
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -68,7 +70,7 @@
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	if ($type=='sent') {
 		echo " <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> &gt; Message</div>";
@@ -142,11 +144,11 @@
 			$stm->execute(array(':name'=>$aname, ':courseid'=>$line['courseid']));
 			//DB if (mysql_num_rows($res)>0) {
 			if ($stm->rowCount()>0) {
-				
+
 				//DB list($aid,$due) = mysql_fetch_row($res);
 				$adata = $stm->fetch(PDO::FETCH_ASSOC);
 				$due = $adata['enddate'];
-				
+
 				//list($aid,$due) = $stm->fetch(PDO::FETCH_NUM);
 				//DB $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['msgfrom']}' AND assessmentid='$aid' AND itemtype='A'";
 				//DB $res = mysql_query($query) or die("Query failed : $query " . mysql_error());

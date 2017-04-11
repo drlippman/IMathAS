@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -13,7 +14,7 @@ $overwriteBody = 0;
 $body = "";
 $useeditor = "description";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
@@ -28,17 +29,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
 	if (isset($_GET['clearattempts'])) {
 		if ($_GET['clearattempts']=='true') {
-			$id = $_GET['id'];
+			$id = Sanitize::onlyInt($_GET['id']);
 			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
 			$stm->execute(array(':wikiid'=>$id));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addwiki.php?cid=$cid&id=$id");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addwiki.php?cid=$cid&id=$id");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"addwiki.php?cid=$cid&id=$id\">Modify Wiki</a>";
@@ -143,7 +144,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS

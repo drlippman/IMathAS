@@ -4,7 +4,15 @@
 
 require("../validate.php");
 
-$cid = intval($_GET['cid']);
+
+
+
+if (!is_numeric($_GET['cid'])) {
+	echo 'Invalid course ID.';
+	exit;
+}
+
+$cid = Sanitize::courseId($_GET['cid']);
 if (!isset($teacherid)) {
 	echo 'You must be a teacher to access this page';
 	exit;
@@ -24,7 +32,8 @@ $placeinhead = '<script type="text/javascript">
  </script>';
 
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Common Cartridge Export</div>\n";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">"
+	. Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; Common Cartridge Export</div>\n";
 
 echo '<div class="cpmid">';
 if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
@@ -107,7 +116,7 @@ if (isset($_GET['delete'])) {
 			$str = str_replace($imasroot.'/filter/graph/imgs/','',$str);
 		}
 		if ($addmathabs) {
-			$str = str_replace($mathimgurl,'http://'. $_SERVER['HTTP_HOST']. $mathimgurl, $str);
+			$str = str_replace($mathimgurl,'http://'. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']). $mathimgurl, $str);
 		}
 		return $str;
 	}
@@ -406,7 +415,7 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,'<grading_type>points</grading_type>');
 						fwrite($fp,'<assignment_group_identifierref>assngroup</assignment_group_identifierref>');
 						fwrite($fp,'<submission_types>external_tool</submission_types>');
-						fwrite($fp,'<external_tool_url>'. $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
+						fwrite($fp,'<external_tool_url>'. $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
 						fwrite($fp,'</assignment>');
 						fclose($fp);
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');
@@ -428,8 +437,8 @@ if (isset($_GET['delete'])) {
 							fwrite($fp,'<blti:custom><lticm:property name="place_aid">'.$iteminfo[$item][1].'</lticm:property></blti:custom>');
 							$urladd = '';
 						}
-						fwrite($fp,'<blti:launch_url>http://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php'.$urladd.'</blti:launch_url>');
-						if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php'.$urladd.'</blti:secure_launch_url>');}
+						fwrite($fp,'<blti:launch_url>http://' . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php'.$urladd.'</blti:launch_url>');
+						if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php'.$urladd.'</blti:secure_launch_url>');}
 						fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 						fwrite($fp,'</cartridge_basiclti_link>');
 						fclose($fp);
@@ -524,9 +533,9 @@ if (isset($_GET['delete'])) {
 		fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
 		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
-		fwrite($fp,' <lticm:property name="domain">'.$_SERVER['HTTP_HOST'].'</lticm:property>');
+		fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
 		fwrite($fp,' <lticm:options name="resource_selection">
-			<lticm:property name="url">'.$urlmode.$_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</lticm:property>
+			<lticm:property name="url">'.$urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php</lticm:property>
 			<lticm:property name="text">Pick an Assessment</lticm:property>
 			<lticm:property name="selection_width">500</lticm:property>
 			<lticm:property name="selection_height">300</lticm:property>

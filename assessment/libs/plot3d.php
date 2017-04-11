@@ -2,6 +2,8 @@
 //Basic 3D display, using Java applet.  Version 1.1, April 24, 2006
 //requires copying Viewer.class into assessment/libs directory
 
+require_once("../../includes/sanitize.php");
+
 global $allowedmacros;
 array_push($allowedmacros,"plot3d","spacecurve");
 
@@ -136,7 +138,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 		  } else {
 		  	  $bndtxt='';
 		  }
-	  	  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');		 
+	  	  $url = $GLOBALS['urlmode']  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
 		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>";
 	  	  $html .= "</canvas>";
 	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');});</script>";
@@ -316,7 +318,7 @@ function spacecurve($func,$tmin,$tmax) {
 		 } 
 	  	 $GLOBALS['3dplotcnt'] = $r;
 	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
-	  	 $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+	  	 $url = $GLOBALS['urlmode']  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
 		 $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a>";
 	  	 $html .= "</canvas>";
 	  	 $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');});</script>";

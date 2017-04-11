@@ -2,6 +2,7 @@
 
 require("../config.php");
 
+
 if (empty($_GET['badgeid'])) {
 	exit;
 }
@@ -130,7 +131,7 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 	if ($bs=='http://' || $bs=='https:/') {
 		$img = $badgetext;
 	} else {
-		$img = "$imasroot/img/badge.php?text=".urlencode($badgetext);
+		$img = "$imasroot/img/badge.php?text=".Sanitize::encodeStringForUrl($badgetext);
 	}
 
 	/*$query = "SELECT imas_courses.name AS cname, imas_users.LastName, imas_users.FirstName, imas_users.email, imas_groups.name FROM imas_courses JOIN imas_teachers ON imas_courses.id=imas_teachers.courseid ";

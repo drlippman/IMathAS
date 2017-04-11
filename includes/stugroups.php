@@ -30,7 +30,7 @@ function deletegroupset($grpsetid) {
 
 function deletegroup($grpid,$delposts=true) {
 	global $DBH;
-	$grpid = intval($grpid);
+	$grpid = Sanitize::onlyInt($grpid);
 	removeallgroupmembers($grpid);
 
 	if ($delposts) {

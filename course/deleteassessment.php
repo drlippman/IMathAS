@@ -5,13 +5,14 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Assessment";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Delete Assessment";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Assessment";
 
 if (!(isset($teacherid))) {
 	$overwriteBody = 1;
@@ -20,11 +21,11 @@ if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
 	if ($_GET['remove']=="really") {
-		$aid = $_GET['id'];
+		$aid = Sanitize::onlyInt($_GET['id']);
 		$DBH->beginTransaction();
 		//DB $query = "DELETE FROM imas_assessments WHERE id='$aid' AND courseid=$cid";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -87,7 +88,7 @@ if (!(isset($teacherid))) {
 			}
 		}
 		$DBH->commit();
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 		exit;
 	} else {
@@ -117,8 +118,8 @@ if ($overwriteBody==1) {
 	<h3><?php echo $itemname; ?></h3>
 	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
 	<p>
-	<input type=button value="Yes, Delete" onClick="window.location='deleteassessment.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
+	<input type=button value="Yes, Delete" onClick="window.location='deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
 	</p>
 
 <?php

@@ -18,7 +18,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> &gt; Copy Course Items";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Copy Course Items";
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
@@ -26,7 +26,7 @@ if (!(isset($teacherid))) {
 	$body = "You need to log in as a teacher to access this page";
 } else {
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$oktocopy = 1;
 
 	if (isset($_GET['action'])) {

@@ -3,6 +3,7 @@
   require("../validate.php");
   require("../includes/filehandler.php");
   
+  
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
@@ -13,6 +14,7 @@ ini_set("post_max_size", "10485760");
   reset ($_FILES);
   $tempkey = key($_FILES);
   $temp = current($_FILES);
+  $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist($temp['name']);
   if (is_uploaded_file($temp['tmp_name'])){
     
     if (isset($_SERVER['HTTP_ORIGIN']) && isset($CFG['GEN']['accepted_origins'])) {

@@ -168,7 +168,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Unenroll Students');
 		include("unenroll.php");
@@ -177,7 +177,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Lock Students');
 		include("lockstu.php");
@@ -489,13 +489,13 @@ if (isset($studentid) || $stu!=0) { //show student view
 	require("../header.php");
 
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt ", _('Student Grade Detail'), "</div>\n";
 	} else if ($isteacher || $istutor) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
 	} else {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; ", _('Gradebook'), "</div>";
 	}
 	if ($stu==-1) {
@@ -589,7 +589,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } table.gb tr.highlight { border-bottom:1px solid #333;} table.gb tr {border-bottom:1px solid #fff; } td.trld {display:table-cell;vertical-align:middle;} </style>";
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; ", _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 
@@ -826,7 +826,7 @@ function gbstudisp($stu) {
 				if ($row[0]==$stu) {
 					echo ' selected="selected"';
 				}
-				echo '>'.$row[2].', '.$row[1].'</option>';
+				echo '>'.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 			}
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
@@ -1634,7 +1634,7 @@ function gbinstrdisp() {
 		if ($gbt[$i][4][1]>0) {
 			echo '<span class="greystrike">'.$gbt[$i][0][0].'</span>';
 		} else {
-			echo $gbt[$i][0][0];
+			echo Sanitize::encodeStringForDisplay($gbt[$i][0][0]);
 		}
 		echo '</a>';
 		if ($gbt[$i][4][3]==1) {

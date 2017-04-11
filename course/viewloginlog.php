@@ -3,6 +3,8 @@
 //(c) 2011 David Lippman
 
 require("../validate.php");
+
+
 $cid = intval($_GET['cid']);
 if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = $userid;
@@ -10,7 +12,7 @@ if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = intval($_GET['uid']);
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 if (isset($teacherid)) {
 	if (isset($_GET['from']) && $_GET['from']=='gb') {
 		$curBreadcrumb .= " &gt; <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> ";

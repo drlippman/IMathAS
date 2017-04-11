@@ -248,7 +248,7 @@ if ($overwriteBody==1) {
 	}
 	require("../header.php");
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Mass Change Dates</div>\n";
 	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
 

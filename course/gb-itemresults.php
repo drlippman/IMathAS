@@ -8,6 +8,7 @@
 // does NOT work for randomized questions or matching.
 
 require("../validate.php");
+
 if (!isset($teacherid) && !isset($tutorid)) {
 	require("../header.php");
 	echo "You need to log in as a teacher or tutor to access this page";
@@ -37,7 +38,9 @@ $qsdata = array();
 //DB $query = "SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB while ($row = mysql_fetch_row($result)) {
-$stm = $DBH->query("SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")"); //INT from DB
+$query_placeholders = Sanitize::generateQueryPlaceholders($qsids);
+$stm = $DBH->prepare("SELECT id,qtype,control,description FROM imas_questionset WHERE id IN ($query_placeholders)");
+$stm->execute(array_values($qsids)); //INT from DB
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$qsdata[$row[0]] = array($row[1],$row[2],$row[3]);
 }
@@ -128,7 +131,7 @@ $placeinhead = ' <style type="text/css">
 }
 </style>';
 require("../assessment/header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
 echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Results: ';
@@ -165,7 +168,7 @@ require("../assessment/displayq2.php");
 $questions = array_keys($qdata);
 foreach ($itemarr as $k=>$q) {
 	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
-	echo '<p><span style="float:right">(Question ID '.$qsids[$q].')</span><b>'.$qsdata[$qsids[$q]][2].'</b></p>';
+	echo '<p><span style="float:right">(Question ID '.Sanitize::onlyInt($qsids[$q]).')</span><b>'.Sanitize::encodeStringForDisplay($qsdata[$qsids[$q]][2]).'</b></p>';
 	echo '<br class="clear"/>';
 	echo '<div style="float:left;width:35%;">';
 	showresults($q,$qsdata[$qsids[$q]][0]);

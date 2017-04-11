@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
@@ -42,7 +43,7 @@ if ($overwriteBody==1) {
 } if (!isset($_REQUEST['versions'])) {
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
@@ -83,7 +84,7 @@ if ($overwriteBody==1) {
 	if (($introjson=json_decode($line['intro']))!==null) { //is json intro
 		$line['intro'] = $introjson[0];
 	}
-	
+
 	$ioquestions = explode(",",$line['itemorder']);
 	$aname = $line['name'];
 	$questions = array();
@@ -122,11 +123,13 @@ if ($overwriteBody==1) {
 	$qn = array();
 	$fixedseeds = array();
 	//DB $qlist = "'".implode("','",$questions)."'";
-	$qlist = implode(',', array_map('intval', $questions));
+	$qlist = array_map('Sanitize::onlyInt', $questions);
 	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($qlist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
+	$stm = $DBH->prepare("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($query_placeholders)");
+	$stm->execute($qlist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
@@ -135,7 +138,7 @@ if ($overwriteBody==1) {
 		}
 		$qn[$row[0]] = $row[2];
 		if ($row[3]!==null && $row[3]!='') {
-			$fixedseeds[$row[0]] = explode(',',$row[3]);	
+			$fixedseeds[$row[0]] = explode(',',$row[3]);
 		}
 	}
 
@@ -168,7 +171,7 @@ if ($overwriteBody==1) {
 					if (isset($fixedseeds[$questions[$i]])) {
 						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
 					} else {
-						$seeds[$j][] = $aid + $i + $j;	
+						$seeds[$j][] = $aid + $i + $j;
 					}
 				}
 			} else {
@@ -287,7 +290,7 @@ if ($overwriteBody==1) {
 	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.$_SERVER['HTTP_HOST'].'/', $out);
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
@@ -304,7 +307,7 @@ if ($overwriteBody==1) {
 
 	/*
 
-	$data = 'html='.urlencode($out);
+	$data = 'html='.Sanitize::encodeStringForUrl($out);
 
 	$params = array (
             'http' => array (

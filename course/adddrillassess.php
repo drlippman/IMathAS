@@ -6,14 +6,15 @@ require("../validate.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 
+
 if (!isset($teacherid)) {
 	echo 'You are not authorized to view this page';
 	exit;
 }
 
 $pagetitle = "Add/Modify Drill Assessment";
-$cid = intval($_GET['cid']);
-$daid = intval($_GET['daid']);
+$cid = Sanitize::courseId($_GET['cid']);
+$daid = Sanitize::onlyInt($_GET['daid']);
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
 } else {
@@ -73,7 +74,7 @@ if (isset($_GET['clearatt'])) {
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
 	$stm->execute(array(':drillassessid'=>$daid));
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
 	exit;
 }
 if (isset($_GET['record'])) {
@@ -134,14 +135,16 @@ if (isset($_GET['record'])) {
 		$toadd = $_POST['nchecked'];
 		//$toadd = explode(',',$_POST['idstoadd']);
 		foreach ($toadd as $k=>$v) {
-			$toadd[$k] = intval($v);
+			$toadd[$k] = Sanitize::onlyInt($v);
 			if ($toadd[$k]==0) {
 				unset($toadd[$k]);
 			}
 		}
 		$toaddlist = implode(',',$toadd);
 		//DB $query = "SELECT id,description FROM imas_questionset WHERE id IN ($toaddlist)";
-		$stm = $DBH->query("SELECT id,description FROM imas_questionset WHERE id IN ($toaddlist)"); //pre-sanitized INTs
+		$query = "SELECT id,description FROM imas_questionset WHERE id IN ($toaddlist)";
+		$stm = $DBH->prepare($query); //pre-sanitized INTs
+		$stm->execute();
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$descr = array();
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -300,9 +303,9 @@ if (isset($_GET['record'])) {
 		writesessiondata();
 	}
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
 	}
 	exit;
 }
@@ -639,7 +642,7 @@ function updateorder(el) {
 </script>
 <?php
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Add/Modify Drill Assessment</div>";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Add/Modify Drill Assessment</div>";
 echo "<h2>Add/Modify Drill Assessment</h2>";
 
 echo "<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=$cid&daid=$daid&block=$block&tb=$totb&record=true\">";

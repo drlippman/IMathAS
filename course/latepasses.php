@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 
 	require("../validate.php");
+	
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -30,7 +31,7 @@
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> ";
 	echo "&gt; Manage LatePasses</div>";
 

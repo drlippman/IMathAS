@@ -8,7 +8,7 @@ if (!isset($_GET['cid'])) {
 	echo "No course identified";
 	exit;
 }
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if (!isset($_POST['libs']) || $_POST['libs']=='') {
 	require("../header.php");
 	if (isset($_POST['libs'])) {

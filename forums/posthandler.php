@@ -1,6 +1,9 @@
 <?php
 //IMathAS:  include with posts.php and postsbyname.php for handling deletes, replies, etc.
 //(c) 2006 David Lippman
+
+
+
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
@@ -15,7 +18,7 @@ if ($caller=="posts") {
 	$returnurl = "posts.php?view=$view&cid=$cid&page=$page&forum=$forumid&thread=$threadid";
 	$returnname = "Posts";
 } else if ($caller=="byname") {
-	$threadid = $_GET['thread'];
+	$threadid = Sanitize::onlyInt($_GET['thread']);
 	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid&thread=$threadid";
 	$returnname = "Posts by Name";
 
@@ -275,11 +278,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
 				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-				$message .= "<p>A new post has been made in forum $forumname in course $coursename</p>\r\n";
+				$message .= "<p>A new post has been made in forum $forumname in course ".Sanitize::encodeStringForDisplay($coursename)."</p>\r\n";
 				//DB $message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
-				$message .= "<p>Subject:".$_POST['subject']."</p>";
+				$message .= "<p>Subject:".Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
 				$message .= "<p>Poster: $userfullname</p>";
-				$message .= "<a href=\"" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl\">";
+				$message .= "<a href=\"" . $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/$returnurl\">";
 				$message .= "View Posting</a>\r\n";
 			}
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -297,7 +300,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			for ($i=count($files)/2-1;$i>=0;$i--) {
 				if (isset($_POST['filedel'][$i])) {
-					if (deleteforumfile($_GET['modify'],$files[2*$i+1])) {
+					if (deleteforumfile($_GET['modify'],Sanitize::sanitizeFilenameAndCheckBlacklist($files[2*$i+1]))) {
 						array_splice($files,2*$i,2);
 					}
 				}
@@ -308,13 +311,14 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$i = 0;
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
-				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['newfile-'.$i]['name']));
+				$userfilename = preg_replace('/[^\w\.]/','',Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['newfile-'.$i]['name']));
 				if (trim($_POST['newfiledesc-'.$i])=='') {
 					$_POST['newfiledesc-'.$i] = $userfilename;
 				}
 				$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);
 				$extension = strtolower(strrchr($userfilename,"."));
-				if (!in_array($extension,$badextensions) && storeuploadedfile('newfile-'.$i,'ffiles/'.$_GET['modify'].'/'.$userfilename,"public")) {
+				if (!in_array($extension,$badextensions) && storeuploadedfile('newfile-'.$i,'ffiles/'
+						.Sanitize::sanitizeFilenameAndCheckBlacklist($_GET['modify']).'/'.$userfilename,"public")) {
 					//DB $files[] = stripslashes($_POST['newfiledesc-'.$i]);
 					$files[] = $_POST['newfiledesc-'.$i];
 					$files[] = $userfilename;
@@ -329,7 +333,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
 		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
 		exit;
 	} else { //display mod
 		if ($caller=='thread') {
@@ -342,7 +346,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if ($caller != 'thread') {
 			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";
 		}
@@ -790,7 +794,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$lastpost = false;
 
 				if ($files!= '') {
-					deleteallpostfiles($_GET['remove']);
+					deleteallpostfiles(Sanitize::onlyInt($_GET['remove']));
 				}
 			}
 			//DB $query = "DELETE FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['remove']}'";
@@ -800,9 +804,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		}
 		if ($caller == "posts" && $lastpost) {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
 		}
 		exit;
 	} else {
@@ -827,7 +831,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				exit;
 			}
 		}
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if ($caller!='thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
 		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
 
@@ -912,7 +916,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$stm = $DBH->prepare("UPDATE imas_grades SET gradetypeid=:gradetypeid WHERE gradetype='forum' AND refid IN ($list)");
 			$stm->execute(array(':gradetypeid'=>$_POST['movetof']));
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
 			if ($_POST['movetot'] != $threadid) {
@@ -941,7 +945,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				}
 			}
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 
 		}
@@ -956,7 +960,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$pagetitle = "Move Thread";
 
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if ($caller != 'thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
 		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
 		//DB $query = "SELECT parent FROM imas_forum_posts WHERE id='{$_GET['move']}'";

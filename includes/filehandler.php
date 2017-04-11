@@ -32,7 +32,7 @@ function storecontenttofile($content,$key,$sec="private") {
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
 		$dir = $base.dirname($key);
-		$fn = basename($key);
+		$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
 		if (!is_dir($dir)) {
 			mkdir_recursive($dir);
 		}
@@ -92,6 +92,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 		}
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],$key,$sec)) {
 				return true;
 			} else {
@@ -104,7 +105,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
 			$dir = $base.dirname($key);
-			$fn = basename($key);
+			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist('',$key);
 			if (!is_dir($dir)) {
 				mkdir_recursive($dir);
 			}
@@ -134,6 +135,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 				$key = substr($fn,0,strpos($fn,"."))."_$t".strstr($fn,".");
 				$t++;
 			}
+			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
 				return $key;
 			} else {
@@ -147,7 +149,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
 			$keydir = dirname($key);
 			$dir = $base.dirname($key);
-			$fn = basename($key);
+			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
 			if (!is_dir($dir)) {
 				mkdir_recursive($dir);
 			}
@@ -181,6 +183,7 @@ function storeuploadedqimage($id,$key,$sec="public-read") {
 				$key = substr($fn,0,strpos($fn,"."))."_$t".strstr($fn,".");
 				$t++;
 			}
+			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'qimages/'.$key,$sec)) {
 				return $key;
 			} else {
@@ -193,7 +196,7 @@ function storeuploadedqimage($id,$key,$sec="public-read") {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages/';
 			$dir = $base.dirname($key);
-			$fn = basename($key);
+			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
 			if (!is_dir($dir)) {
 				mkdir_recursive($dir);
 			}
@@ -520,9 +523,10 @@ function getuserfiles($uid,$img=false) {
 	}
 }
 function deleteuserfile($uid,$file) {
+    $safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-		$s3object = "ufiles/$uid/$file";
+		$s3object = "ufiles/$uid/$safeFilename";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
 		}else {
@@ -530,7 +534,7 @@ function deleteuserfile($uid,$file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/ufiles/$uid/$file")) {
+		if (unlink($base."/ufiles/$uid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -539,9 +543,10 @@ function deleteuserfile($uid,$file) {
 }
 
 function deleteforumfile($postid,$file) {
+	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-		$s3object = "ffiles/$postid/$file";
+		$s3object = "ffiles/$postid/$safeFilename";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
 		}else {
@@ -549,7 +554,7 @@ function deleteforumfile($postid,$file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/ffiles/$postid/$file")) {
+		if (unlink($base."/ffiles/$postid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -558,9 +563,10 @@ function deleteforumfile($postid,$file) {
 }
 
 function deletecoursefile($file) {
+	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-		$s3object = "cfiles/$file";
+		$s3object = "cfiles/$safeFilename";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
 		}else {
@@ -568,7 +574,7 @@ function deletecoursefile($file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files';
-		if (unlink($base."/$file")) {
+		if (unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;

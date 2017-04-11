@@ -2,6 +2,7 @@
 //IMathAS:  Export or email Gradebook
 //(c) 2007 David Lippman
 	require("../validate.php");
+	
 	$isteacher = isset($teacherid);
 	$cid = $_GET['cid'];
 	if (!$isteacher) {
@@ -27,7 +28,7 @@
 
 	if (!isset($_POST['commentloc'])) {
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
 		echo '<div id="headergb-export" class="pagetitle"><h2>Export Gradebook</h2></div>';
 
@@ -174,7 +175,7 @@
 				$_GET['emailgb'] = $stm->fetchColumn(0);
 			}
 			if ($_GET['emailgb']!='') {
-				mail($_GET['emailgb'], "Gradebook for $coursename", $message, $headers);
+				mail(Sanitize::emailAddress($_GET['emailgb']), "Gradebook for $coursename", $message, $headers);
 				require("../header.php");
 				echo "Gradebook Emailed.  <a href=\"gradebook.php?cid=$cid\">Return to Gradebook</a>";
 				require("../footer.php");
@@ -400,7 +401,7 @@ function gbinstrexport() {
 								}
 							}
 						}
-						
+
 					}
 					$n++;
 				}
@@ -497,7 +498,7 @@ function gbinstrexport() {
 								}
 							}
 						}
-						
+
 					}
 					$n++;
 				}

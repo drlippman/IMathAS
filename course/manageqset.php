@@ -42,7 +42,7 @@ if ($myrights<20) {
 	} else if ($cid==0) {
 		$curBreadcrumb = "<a href=\"../index.php\">Home</a> ";
 	} else {
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 
 
@@ -1091,7 +1091,7 @@ if ($myrights<20) {
 			$page_questionTable[$i]['times'] = 0;
 
 			if ($isadmin || $isgrpadmin) {
-				$page_questionTable[$i]['mine'] = $line['lastName'] . ',' . substr($line['firstName'],0,1);
+				$page_questionTable[$i]['mine'] = Sanitize::encodeStringForDisplay($line['lastName']) . ',' . Sanitize::encodeStringForDisplay(substr($line['firstName'],0,1));
 				if ($line['userights']==0) {
 					$page_questionTable[$i]['mine'] .= ' <i>Priv</i>';
 				}
