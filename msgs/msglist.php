@@ -26,6 +26,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 
 	*/
 	require("../validate.php");
+	
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -211,23 +212,23 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>You've received a new message</p><p>From: $userfullname<br />Course: $cname.</p>\r\n";
 				//DB $message .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
-        $message .= "<p>Subject: ".$_POST['subject']."</p>";
-				$message .= "<a href=\"$urlmode" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid={$_POST['courseid']}&msgid=$msgid\">";
+        $message .= "<p>Subject: ". Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
+				$message .= "<a href=\"$urlmode" . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/viewmsg.php?cid=" . Sanitize::courseId($_POST['courseid']) . "&msgid=$msgid\">";
 				$message .= "View Message</a></p>\r\n";
 				$message .= "<p>If you do not wish to receive email notification of new messages, please ";
-				$message .= "<a href=\"$urlmode" . $_SERVER['HTTP_HOST'] . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
+				$message .= "<a href=\"$urlmode" . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
 				$message .= "user preferences</a></p>\r\n";
 				mail($email,'New message notification',$message,$headers);
 			}
 			if ($FCMtokenTo != '') {
 				require_once("../includes/FCM.php");
-				$url = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid={$_POST['courseid']}&msgid=$msgid";
+				$url = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/viewmsg.php?cid=".Sanitize::courseId($_POST['courseid'])."&msgid=$msgid";
 				sendFCM($FCMtokenTo,"Msg from: $userfullname",$_POST['subject'],$url);
 			}
 			if ($type=='new') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/newmsglist.php?cid=$cid");
 			} else {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
 			}
 			exit;
 		} else {
@@ -267,7 +268,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-				echo "<a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+				echo "<a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 			}
 			if ($type=='sent') {
 				echo " <a href=\"sentlist.php?page=$page&cid=$cid&filtercid=$filtercid\">Sent Message List</a> ";
@@ -616,7 +617,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Message List</div>";
 	echo '<div id="headermsglist" class="pagetitle"><h2>Messages</h2></div>';
@@ -945,7 +946,7 @@ function chgfilter() {
 		if ($line['name']==null) {
 			$line['name'] = "[Deleted]";
 		}
-		echo "<td>{$line['name']}</td>";
+		echo "<td>".Sanitize::encodeStringForDisplay($line['name'])."</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
 	}

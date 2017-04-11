@@ -1,4 +1,5 @@
 <?php
+require_once("../includes/sanitize.php");
 
 if ($_GET['cid']==="embedq") {
 	$sessiondata = array();
@@ -12,9 +13,9 @@ if ($_GET['cid']==="embedq") {
 	require("../validate.php");
 }
 
-$id = intval($_GET['id']);
+$id = Sanitize::onlyInt($_GET['id']);
 $sig = $_GET['sig'];
-$t = intval($_GET['t']);
+$t = Sanitize::onlyInt($_GET['t']);
 $sessiondata['coursetheme'] = $coursetheme;
 
 $flexwidth = true;

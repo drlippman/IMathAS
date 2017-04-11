@@ -14,6 +14,7 @@ ini_set("post_max_size", "10485760");
 require("../validate.php");
 require("../includes/filehandler.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
  //set some page specific variables and counters
@@ -38,7 +39,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 	$body = "Please access this page from the menu links only.";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = (isset($_GET['cid'])) ? $_GET['cid'] : "admin" ;
+	$cid = (isset($_GET['cid'])) ? Sanitize::courseId($_GET['cid']) : "admin" ;
 
 	if ($myrights < 100) {
 		$isgrpadmin = true;
@@ -303,7 +304,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if ($isadmin || $isgrpadmin || $isadminpage) {
 			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Export libraries</div>\n";
 		} else {
-			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Export Libraries</div>\n";
+			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Export Libraries</div>\n";
 		}
 	}
 }

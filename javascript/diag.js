@@ -1,7 +1,16 @@
 var cnt = new Array();
 
+function escapeHtml(unsafe) {
+	return unsafe
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
+
 function additem(inloc,outloc) {
-	var text = document.getElementById(inloc).value;
+	var text = escapeHtml(document.getElementById(inloc).value);
 	document.getElementById(inloc).value = '';
 	var outn = document.getElementById(outloc);
 	var newn = document.createElement("tr");
@@ -12,7 +21,7 @@ function additem(inloc,outloc) {
 	var html = "<input type=hidden name="+newid+" id="+newid+" value='"+text+"'>" + text;
 	newtd.innerHTML = html;
 	newn.appendChild(newtd);
-	
+
 	html = "  <a href='#' onclick=\"return removeitem('"+newid+"','"+outloc+"')\">Remove</a>";
 	html += " <a href='#' onclick=\"return moveitemup('"+newid+"','"+outloc+"')\">Move up</a>";
 	html += " <a href='#' onclick=\"return moveitemdown('"+newid+"','"+outloc+"')\">Move down</a>";

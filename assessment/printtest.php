@@ -126,7 +126,7 @@
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
 			require("../includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($row, $testsettings, true);	
+			$useexception = getCanUseAssessException($row, $testsettings, true);
 		}
 		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -159,7 +159,7 @@
 		$lastanswers = explode("~",$line['reviewlastanswers']);
 	}
 
-	echo "<h4 style=\"float:right;\">Name: $userfullname </h4>\n";
+	echo "<h4 style=\"float:right;\">Name: " . Sanitize::encodeStringForDisplay($userfullname) . " </h4>\n";
 	echo "<h3>".$testsettings['name']."</h3>\n";
 
 

@@ -2,7 +2,8 @@
 // localhost/imathas/course/claimbadge.php?cid=3942&badgid=4&userid=108534
 require("../validate.php");
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 $placeinhead = '<script src="http://beta.openbadges.org/issuer.js"></script>';
 require("../header.php");
@@ -31,7 +32,7 @@ if (isset($teacherid)) {
 //} else if (!isset($studentid)) {
 //	echo 'You are not authorized to view this page.';
 } else {
-	$badgeid = intval($_GET['badgeid']);
+	$badgeid = Sanitize::onlyInt($_GET['badgeid']);
 	//DB $query = "SELECT name, requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB if (mysql_num_rows($result)==0) {
@@ -126,7 +127,7 @@ if (isset($teacherid)) {
 
 		if ($reqmet) {
 			echo '<h3>Badge Requirements have been met!</h3>';
-			$verify = urlencode(hash('sha256', $username . $userid));
+			$verify = Sanitize::encodeStringForUrl(hash('sha256', $username . $userid));
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/verifybadge.php?format=json&userid='.$userid.'&badgeid='.$badgeid.'&v='.$verify;
 
 			echo '<p><input type="button" value="Claim Badge" onclick="OpenBadges.issue([\''.$url.'\'], function(errors,successes) { })"/><br/>FireFox, Chrome, Safari, or IE 9+ is needed to claim badge.</p>';

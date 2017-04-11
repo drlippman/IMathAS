@@ -5,9 +5,10 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 $cid = $_GET['cid'];
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; <a href=\"listusers.php?cid=$cid\">List Students</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"listusers.php?cid=$cid\">List Students</a>\n";
 
 if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;

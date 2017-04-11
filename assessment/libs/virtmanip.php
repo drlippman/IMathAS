@@ -1,13 +1,13 @@
 <?php
 //Virtual Manipulatives
-//Functions for displaying and scoring virtual manipulatives.  
+//Functions for displaying and scoring virtual manipulatives.
 //
 //Some of these can be used an exploration/calculation aid in a question without
 //being scored.  Most have the ability to score the interaction with the manipulative.
 //
 //When being scored, use the String question type.  For most of these, you must
 //manually implement the scoring, usually by defining a wrong $answer, then changing
-//it to match the value from $stuanswers if the values are correct.  
+//it to match the value from $stuanswers if the values are correct.
 //A typical pattern would look like:
 //
 //loadlibrary("virtmanip")
@@ -27,7 +27,6 @@
 //
 //Ver 1.0 by David Lippman and Bill Meacham, May 2014
 
-
 global $allowedmacros;
 array_push($allowedmacros,"vmgetlistener","vmsetupchipmodel","vmchipmodelgetcount","vmsetupnumbertiles","vmnumbertilesgetcount","vmsetupitemsort","vmitemsortgetcontainers","vmsetupnumberlineaddition","vmnumberlineadditiongetvals","vmsetupnumberline","vmnumberlinegetvals","vmsetupnumberlineinterval","vmnumberlineintervalgetvals","vmsetupfractionline","vmgetfractionlinevals","vmsetupfractionmult","vmgetfractionmultvals","vmsetupfractioncompare","vmgetfractioncompareval");
 
@@ -38,7 +37,7 @@ array_push($allowedmacros,"vmgetlistener","vmsetupchipmodel","vmchipmodelgetcoun
 function vmgetlistener($qn,$part=null) {
 	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
 	$out .= '<script type="text/javascript">';
-	$out .= '$(function() { $(window).on("message", function(e) { 
+	$out .= '$(function() { $(window).on("message", function(e) {
 		var data = e.originalEvent.data.split("::");
 		if (data[0] == '.$qn.') {
 			$("#qn'.$qn.'").val(data[1]);
@@ -68,9 +67,9 @@ function vmsetupchipmodel($state,$qn,$part=null) {
 	return $out;
 }
 
-//vmchipmodelgetcount(stuans) 
-//return an array array(poscount,negcount) of the count of positive and 
-//negative chips in the drop region.  
+//vmchipmodelgetcount(stuans)
+//return an array array(poscount,negcount) of the count of positive and
+//negative chips in the drop region.
 function vmchipmodelgetcount($state) {
 	list($initbasestr,$initobjstr,$cont) = explode('|',$state);
 	$pos = substr_count($cont,"pos");
@@ -99,8 +98,8 @@ function vmsetupnumbertiles($state,$qn,$part=null) {
 	return $out;
 }
 
-//vmnumbertilesgetcount(stuans) 
-//return an array array(hundredcount,tencount,onecount) of the count of 
+//vmnumbertilesgetcount(stuans)
+//return an array array(hundredcount,tencount,onecount) of the count of
 //hundred blocks, ten blocks, and ones blocks in the drop area
 function vmnumbertilesgetcount($state) {
 	list($initbasestr,$initobjstr,$cont) = explode('|',$state);
@@ -116,8 +115,8 @@ function vmnumbertilesgetcount($state) {
 //cats = array of titles for the two drop areas
 function vmsetupitemsort($numbers,$cats,$state,$qn,$part=null) {
 	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
-	$numbers = urlencode(implode(';;',$numbers));
-	$cats = urlencode(implode(';;',$cats));
+	$numbers = Sanitize::encodeStringForUrl(implode(';;',$numbers));
+	$cats = Sanitize::encodeStringForUrl(implode(';;',$cats));
 	$initbase = "[]";
 	$initobj = "[]";
 	if ($state!="") {
@@ -145,16 +144,16 @@ function vmitemsortgetcontainers($state, $n) {
 	//this is a very inelegant parsing of the container info
 	//the format is
 	//contname:el,el,el;contname2:el,el
-	//where the el's are object names 
+	//where the el's are object names
 	//In this case, we don't care about the container names, just that
-	//they are in order.  The el's in this case are just 
+	//they are in order.  The el's in this case are just
 	// the index into the numbers array
 	$contparts = explode(';',$cont);
 	$out = array();
 	for ($i=0;$i<count($n);$i++) {
 		$out[$i] = -1;
 	}
-	
+
 	for ($i=0;$i<count($contparts);$i++) {
 		$p = explode(":",$contparts[$i]);
 		if ($p[1]!='') {
@@ -244,7 +243,7 @@ function vmsetupfractionline($state="",$qn=null,$part=null) {
 		}
 		$querystr = '?qn='.$qn.'&N='.$N.'&D='.$D;
 	}
-	return '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/fractions/equivfrac.html'.$querystr.'" width="420" height="225" frameborder="0"></iframe>';	
+	return '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/fractions/equivfrac.html'.$querystr.'" width="420" height="225" frameborder="0"></iframe>';
 }
 
 //vmgetfractionlineval(stuans)
@@ -268,7 +267,7 @@ function vmsetupfractioncompare($state="",$qn=null,$part=null) {
 		}
 		$querystr = '?qn='.$qn.'&Na='.$Na.'&Da='.$Da.'&Nb='.$Nb.'&Db='.$Db;
 	}
-	return '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/fractions/fraccompare.html'.$querystr.'" width="620" height="225" frameborder="0"></iframe>';	
+	return '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/fractions/fraccompare.html'.$querystr.'" width="620" height="225" frameborder="0"></iframe>';
 }
 
 //vmgetfractioncompareval(stuans)
@@ -292,7 +291,7 @@ function vmsetupfractionmult($state="",$qn=null,$part=null) {
 		}
 		$querystr = '?qn='.$qn.'&Nh='.$Nh.'&Dh='.$Dh.'&Nv='.$Nv.'&Dv='.$Dv;
 	}
-	return '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/fractions/fracmult.html'.$querystr.'" width="620" height="605" frameborder="0"></iframe>';	
+	return '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/fractions/fracmult.html'.$querystr.'" width="620" height="605" frameborder="0"></iframe>';
 }
 
 //vmgetfractionmultvals(stuans)

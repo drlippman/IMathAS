@@ -330,7 +330,7 @@ function tokenize($str,$anstype,$countcnt) {
 			}
 			//check if allowed var
 			if (in_array($out,$disallowedvar)) {
-				echo sprintf(_('Eeek.. unallowed var %s!'), $out);
+				echo sprintf(_('Eeek.. unallowed var %s!'), Sanitize::encodeStringForDisplay($out));
 				return array(array('',9));
 			}
 
@@ -400,7 +400,7 @@ function tokenize($str,$anstype,$countcnt) {
 					} else {
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
-							echo sprintf(_('Eeek.. unallowed macro %s'), $out);
+							echo sprintf(_('Eeek.. unallowed macro %s'), Sanitize::encodeStringForDisplay($out));
 							return array(array('',9));
 						}
 					}
@@ -417,7 +417,7 @@ function tokenize($str,$anstype,$countcnt) {
 						//an unquoted string!  give a warning to instructor,
 						//but treat as a quoted string.
 						if (isset($GLOBALS['teacherid'])) {
-							echo sprintf(_('Warning... unquoted string %s.. treating as string'), $out);
+							echo sprintf(_('Warning... unquoted string %s.. treating as string'), Sanitize::encodeStringForDisplay($out));
 						}
 						$out = "'$out'";
 						$intype = 6;
@@ -644,7 +644,7 @@ function loadlibrary($str) {
 		if (is_file($libdir . $lib.".php")) {
 			include_once($libdir.$lib.".php");
 		} else {
-			echo sprintf(_("Error loading library %s\n"), $lib);
+			echo sprintf(_("Error loading library %s\n"), Sanitize::encodeStringForDisplay($lib));
 		}
 	}
 }

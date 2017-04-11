@@ -2,12 +2,13 @@
 
 require("../validate.php");
 
+
 if (!isset($teacherid)) {
 	echo "You are not authorized to view this page";
 	exit;
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (empty($_GET['badgeid'])) {
 	require("../header.php");
@@ -39,7 +40,7 @@ if (empty($_GET['badgeid'])) {
 
 } else {
 	if (!empty($_GET['delete'])) {
-		$badgeid = intval($_GET['badgeid']);
+		$badgeid = Sanitize::onlyInt($_GET['badgeid']);
 		if ($badgeid==0) { echo 'Can not delete - invalid badgeid'; exit;}
 		//DB $query = "SELECT courseid FROM imas_badgesettings WHERE id=$badgeid";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -82,7 +83,7 @@ if (empty($_GET['badgeid'])) {
 			$stm = $DBH->prepare("INSERT INTO imas_badgesettings (name, badgetext, description, longdescription, courseid, requirements) VALUES (:name, :badgetext, :description, :longdescription, :courseid, :requirements)");
 			$stm->execute(array(':name'=>$badgename, ':badgetext'=>$badgetext, ':description'=>$descr, ':longdescription'=>$longdescr, ':courseid'=>$cid, ':requirements'=>$req));
 		} else {
-			$badgeid = intval($_GET['badgeid']);
+			$badgeid = Sanitize::onlyInt($_GET['badgeid']);
 			//DB $query = "UPDATE imas_badgesettings SET name='$badgename',badgetext='$badgetext',description='$descr', longdescription='$longdescr', requirements='$req' WHERE id='$badgeid' AND courseid='$cid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_badgesettings SET name=:name,badgetext=:badgetext,description=:description, longdescription=:longdescription, requirements=:requirements WHERE id=:id AND courseid=:courseid");
@@ -101,7 +102,7 @@ if (empty($_GET['badgeid'])) {
 			$badgeid = 'new';
 			$req = array('data'=>array());
 		} else {
-			$badgeid = intval($_GET['badgeid']);
+			$badgeid = Sanitize::onlyInt($_GET['badgeid']);
 			//DB $query = "SELECT name,badgetext,description,longdescription,requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)==0) { echo 'Invalid badge id for this course'; exit;}

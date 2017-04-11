@@ -48,29 +48,36 @@ $lastforum = '';
 if (isset($_GET['markallread'])) {
   $now = time();
   if (count($forumids)>0) {
-    $forumidlist = implode(',', array_map('intval', $forumids));
+    $forumidlist = array_map('Sanitize::onlyInt', $forumids);
+    $forumidlist_query_placeholders = Sanitize::generateQueryPlaceholders($forumidlist);
     //DB $query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
     //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-    $stm = $DBH->query("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)");
+    $stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist_query_placeholders)");
+	  $stm->execute($forumidlist);
 
     $threadids = array();
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {
       $threadids[] = $row[0];
     }
     if (count($threadids)>0) {
-      $threadlist = implode(',', $threadids);  //INT vals from DB - safe
+      // $threadlist = implode(',', $threadids);  //INT vals from DB - safe
+      $threadidsSanitize = array_map('Sanitize::onlyInt', $threadids);//INT vals from DB - safe
+      $threadlist = implode(',', $threadidsSanitize);  //INT vals from DB - safe
+
+      // $threadlist_query_placeholders = Sanitize::generateQueryPlaceholders($threadlist);
       $toupdate = array();
       //DB $query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
       //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
       //DB while ($row = mysql_fetch_row($result)) {
       //DB $to
-      $stm = $DBH->prepare("SELECT threadid FROM imas_forum_views WHERE userid=:userid AND threadid IN ($threadlist)");
-      $stm->execute(array(':userid'=>$userid));
+      $stm = $DBH->prepare("SELECT threadid FROM imas_forum_views WHERE userid=:userid AND threadid IN (:threadlist)");
+      $stm->execute(array(':userid'=>$userid, ':threadlist'=>$threadlist));
       while ($row = $stm->fetch(PDO::FETCH_NUM)) {
         $toupdate[] = $row[0];
       }
       if (count($toupdate)>0) {
-        $toupdatelist= implode(',', $toupdate); //INT vals from DB - safe
+        $toupdatelistSanitize = array_map('Sanitize::onlyInt', $toupdate);//INT vals from DB - safe
+        $toupdatelist= implode(',', $toupdatelistSanitize); //INT vals from DB - safe
         //DB $query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
         //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
   			$stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE userid=:userid AND threadid IN ($toupdatelist)");
@@ -114,7 +121,7 @@ $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
 $pagetitle = _('New Forum Posts');
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; New Forum Posts</div>\n";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; New Forum Posts</div>\n";
 echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
 echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?from=$from&cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
 

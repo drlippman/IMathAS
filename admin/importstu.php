@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 function parsecsv($data) {
@@ -87,12 +88,12 @@ if (!(isset($teacherid)) && $myrights<100) {
 	$body = "You need to access this page from a menu link";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$isadmin = ($myrights==100 && $cid=="admin") ? true : false ;
 	if ($isadmin) {
 		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Students</div>\n";
 	} else {
-		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Students</div>\n";
+		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Import Students</div>\n";
 	}
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
@@ -100,7 +101,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 		if (isset($CFG['GEN']['newpasswords'])) {
 			require_once("../includes/password.php");
 		}
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
+		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
 		$handle = fopen($filename,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
@@ -171,7 +172,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
 				if ($isadmin) {
-					$ncid = $_POST['enrollcid'];
+					$ncid = Sanitize::onlyInt($_POST['enrollcid']);
 				} else {
 					$ncid = $cid;
 				}
@@ -211,17 +212,18 @@ if (!(isset($teacherid)) && $myrights<100) {
 		$body = "Import Successful<br/>\n";
 		$body .= "<p>";
 		if ($isadmin) {
-			$body .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Back to Admin Page";
+			$body .= "<a href=\"". $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Back to Admin Page";
 		} else {
-			$body .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Back to Course Page";
+			$body .= "<a href=\"". $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])  . $imasroot . "/course/course.php?cid=$cid\">Back to Course Page";
 		}
 		$body .= "</a></p>\n";
 
 	} elseif (isset($_FILES['userfile'])) {  //STEP 2 DATA MANIPULATION
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
+			$$uploadfilename = basename($uploadfile);
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::sanitizeFilenameAndCheckBlacklist($$uploadfilename)."\" />\n";
 		} else {
 			$overwriteBody = 1;
 			$body = "<p>Error uploading file!</p>\n";

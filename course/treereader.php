@@ -3,6 +3,8 @@
 //(c) 2011 David Lippman
 
 require("../validate.php");
+
+
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
 	echo "You are not enrolled in this course. Please return to the <a href=\"../index.php\">Home Page</a> and enroll";
 	exit;
@@ -69,7 +71,7 @@ if ($_GET['folder']!='0') {
 }
 $curBreadcrumb = $breadcrumbbase;
 if (isset($backtrack) && count($backtrack)>0) {
-	$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
+	$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	for ($i=0;$i<count($backtrack);$i++) {
 		$curBreadcrumb .= "&gt; ";
 		if ($i!=count($backtrack)-1) {
@@ -121,7 +123,7 @@ function recordlasttreeview(id) {
 var treereadernavstate = 1;
 function toggletreereadernav() {
 	var lc = document.getElementById("leftcontent");
-	
+
 	if (treereadernavstate==1) {
 		$("#leftcontenttext").slideUp(200,function() {
 			$(this).attr("aria-expanded",false).attr("aria-hidden",true);
@@ -139,7 +141,7 @@ function toggletreereadernav() {
 		document.getElementById("navtoggle").src= document.getElementById("navtoggle").src.replace(/expand/,"collapse");
 		resizeiframe();
 	}
-	
+
 	treereadernavstate = (treereadernavstate+1)%2;
 }
 function updateTRunans(aid, status) {
@@ -186,7 +188,7 @@ height: auto;
 }
 ul[role="tree"]:focus {
     outline:1px dotted #0000ff;
-} 
+}
 ul[role="tree"] li[aria-selected="true"]  {
       outline: none;
 }
@@ -195,7 +197,7 @@ ul[role="tree"] li[aria-selected="true"] > span.hdr .blocklbl {
 }
 ul[role="tree"] li > span.hdr .blocklbl {
 	border: 1px transparent;
-	
+
 }
 ul[role="tree"] li[aria-selected="true"] > a {
 	border:dotted 1px;
@@ -347,7 +349,7 @@ function printlist($items) {
 				 $stm->execute(array(':id'=>$typeid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if (isset($exceptions[$item])) {
-				 	 $useexception = getCanUseAssessException($exceptions[$item], $line, true); 
+				 	 $useexception = getCanUseAssessException($exceptions[$item], $line, true);
 				 	 if ($useexception) {
 				 	 	 $line['startdate'] = $exceptions[$item][0];
 				 	 	 $line['enddate'] = $exceptions[$item][1];

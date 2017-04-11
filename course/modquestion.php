@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
@@ -20,7 +21,7 @@ if (!(isset($teacherid))) {
 
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
-	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
 	$curBreadcrumb .= "Modify Question Settings";
 
@@ -159,14 +160,14 @@ if (!(isset($teacherid))) {
 			$line['showhints']=0;
 			$qsetid = $_GET['qsetid'];
 		}
-		
+
 		$stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
 		$stm->execute(array(':id'=>$qsetid));
 		$qdescrip = $stm->fetchColumn(0);
 		if (isset($_GET['loc'])) {
 			$qdescrip = $_GET['loc'].': '.$qdescrip;
 		}
-		
+
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		//DB $query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
@@ -196,7 +197,7 @@ if (!(isset($teacherid))) {
 		} else {
 			$beentaken = false;
 		}
-		
+
 		//get defaults
 		$query = "SELECT defpoints,defattempts,defpenalty,deffeedback,showhints,shuffle FROM imas_assessments ";
 		$query .= "WHERE id=:id";
@@ -227,7 +228,7 @@ if (!(isset($teacherid))) {
 		if ($defshowans=='F') {
 			$defaults['showans'] = _('After last attempt');
 		} else if (is_numeric($defshowans)) {
-			$defaults['showans'] = sprintf(_('After %d attempts'), $defshowans);	
+			$defaults['showans'] = sprintf(_('After %d attempts'), $defshowans);
 		} else {
 			$defaults['showans'] = _('Never during assessment');
 		}
@@ -253,7 +254,7 @@ if ($overwriteBody==1) {
 
 
 <div id="headermodquestion" class="pagetitle"><h2>Modify Question Settings</h2></div>
-<p><?php 
+<p><?php
 	echo '<b>'.$qdescrip.'</b> ';
 	echo '<button type="button" onclick="previewq('.$qsetid.')">'._('Preview').'</button>';
 ?>
@@ -345,7 +346,7 @@ if ($overwriteBody==1) {
 		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
 	}
 	if ($beentaken) {
-		echo '<div class="advanced" style="display:none">'; 
+		echo '<div class="advanced" style="display:none">';
 		echo '<span class="form">Replace this question with question ID: <br/>';
 		echo '<span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
 		echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';

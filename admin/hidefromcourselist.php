@@ -1,6 +1,6 @@
 <?php
 require("../validate.php");
-$cid = intval($_GET['cid']);
+$cid = Sanitize::courseId($_GET['cid']);
 if (!isset($_GET['type'])) {
 	$type = 'take';
 } else {

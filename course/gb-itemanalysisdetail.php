@@ -7,6 +7,7 @@ $flexwidth = true;
 $nologo = true;
 require("../header.php");
 
+
 $isteacher = isset($teacherid);
 $cid = $_GET['cid'];
 $aid = $_GET['aid'];
@@ -34,10 +35,12 @@ if (isset($tutorsection) && $tutorsection!='') {
 function getstunames($a) {
 	global $DBH;
 	if (count($a)==0) { return array();}
-	$a = implode(',', array_map('intval', $a));
+	$a = array_map('Sanitize::onlyInt', $a);
 	//DB $query = "SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($a)";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$stm = $DBH->query("SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($a)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($a);
+	$stm = $DBH->prepare("SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($query_placeholders)");
+	$stm->execute($a);
 	$names = array();
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -73,7 +76,7 @@ if ($type=='notstart') {
 	natsort($stunames);
 	echo '<h3>Students who have not started this assessment</h3><ul>';
 	foreach ($stunames as $name) {
-		echo '<li>'.$name.'</li>';
+		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
 	}
 	echo '</ul>';
 } else if ($type=='help') {
@@ -100,7 +103,7 @@ if ($type=='notstart') {
 	natsort($stunames);
 	echo '<h3>Students who clicked on help for this question</h3><ul>';
 	foreach ($stunames as $name) {
-		echo '<li>'.$name.'</li>';
+		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
 	}
 	echo '</ul>';
 } else {
@@ -158,7 +161,7 @@ if ($type=='notstart') {
 		natsort($stunames);
 		echo '<h3>Students who have started the assignment, but have not completed this question</h3><ul>';
 		foreach ($stunames as $name) {
-			echo '<li>'.$name.'</li>';
+			echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
 		}
 		echo '</ul>';
 	} else if ($type=='score') {
@@ -166,7 +169,8 @@ if ($type=='notstart') {
 		asort($stuscores);
 		echo '<h3>Students with lowest scores</h3><table class="gb"><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody>';
 		foreach ($stuscores as $uid=>$sc) {
-			echo '<tr><td>'.$stunames[$uid].'</td><td>'.$sc.'</td></tr>';
+			echo sprintf('<tr><td>%s</td><td>%s</td></tr>', Sanitize::encodeStringForDisplay($stunames[$uid]),
+				Sanitize::encodeStringForDisplay($sc));
 		}
 		echo '</tbody></table>';
 	} else if ($type=='att') {
@@ -177,11 +181,13 @@ if ($type=='notstart') {
 
 		$rows = array();
 		foreach ($stuatt as $uid=>$sc) {
-			$rows[] = '<tr><td>'.$stunames[$uid].'</td><td>'.$sc.'</td><td style="border-right:1px solid">&nbsp;</td>';
+			$rows[] = sprintf('<tr><td>%s</td><td>%s</td><td style="border-right:1px solid">&nbsp;</td>',
+				Sanitize::encodeStringForDisplay($stunames[$uid]), Sanitize::encodeStringForDisplay($sc));
 		}
 		$rrc = 0;
 		foreach ($sturegens as $uid=>$sc) {
-			$rows[$rrc] .= '<td>'.$stunames[$uid].'</td><td>'.$sc.'</td></tr>';
+			$rows[$rrc] .= sprintf('<td>%s</td><td>%s</td></tr>', Sanitize::encodeStringForDisplay($stunames[$uid]),
+				Sanitize::encodeStringForDisplay($sc));
 			$rrc++;
 		}
 		foreach ($rows as $r) {
@@ -195,7 +201,7 @@ if ($type=='notstart') {
 		arsort($stutimes);
 		echo '<h3>Students with most time spent on this question</h3><table class="gb"><thead><tr><th>Name</th><th>Time</th></tr></thead><tbody>';
 		foreach ($stutimes as $uid=>$sc) {
-			echo '<tr><td>'.$stunames[$uid].'</td><td>';
+			echo sprintf('<tr><td>%s</td><td>', Sanitize::encodeStringForDisplay($stunames[$uid]));
 			if ($sc<60) {
 				$sc .= ' sec';
 			} else {

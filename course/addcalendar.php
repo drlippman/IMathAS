@@ -23,10 +23,10 @@ if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
-	$itemid = $_GET['id'];
+	$itemid = Sanitize::onlyInt($_GET['id']);
 
 	//DB $query = "DELETE FROM imas_items WHERE id='$itemid'";
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -55,7 +55,7 @@ if (!(isset($teacherid))) {
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 } else {
 	$block = $_GET['block'];
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	//DB $query = "INSERT INTO imas_items (courseid,itemtype) VALUES ";
 	//DB $query .= "('$cid','Calendar');";
@@ -94,7 +94,7 @@ if (!(isset($teacherid))) {
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 
 }
-header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 exit;
 
 ?>

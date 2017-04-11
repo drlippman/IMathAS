@@ -18,7 +18,7 @@ if ( isset($_GET['grpsetid'])) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Manage Student Groups";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -300,13 +300,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require("../header.php");
 				echo '<p>Some students joined a group already and were skipped:</p><p>';
 				//DB $stulist = "'".implode("','",$alreadygroupedstu)."'";
-				$stulist = implode(',', array_map('intval', $alreadygroupedstu));
+				$stulist = array_map('Sanitize::onlyInt', $alreadygroupedstu);
 				//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id IN ($stulist) ORDER BY LastName, FirstName";
 				//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->query("SELECT FirstName,LastName FROM imas_users WHERE id IN ($stulist) ORDER BY LastName, FirstName");
+				$query_placeholders = Sanitize::generateQueryPlaceholders($stulist);
+				$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id IN ($query_placeholders) ORDER BY LastName, FirstName");
+				$stm->execute($stulist);
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					echo $row[1].', '.$row[0].'<br/>';
+					echo Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[0]).'<br/>';
 					$loginfo .= $row[1].', '.$row[0].' already in group.';
 				}
 				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}\">Continue</a></p>";

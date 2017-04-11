@@ -82,9 +82,9 @@ if (isset($_GET['form'])) {
 
 				//DB while ($row = mysql_fetch_assoc($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					echo '<p><b>'.$row['LastName'].', '.$row['FirstName'].'</b></p>';
+					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
 					echo '<form method="post" action="../admin/actions.php?action=resetpwd&id='.$row['id'].'">';
-					echo '<ul><li>Username: <a href="../admin/admin.php?showcourses='.$row['id'].'">'.$row['SID'].'</a></li>';
+					echo '<ul><li>Username: <a href="../admin/admin.php?showcourses='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
 					echo '<li>ID: '.$row['id'].'</li>';
 					if ($row['name']!=null) {
 						echo '<li>Group: '.$row['name'].'</li>';
@@ -97,7 +97,7 @@ if (isset($_GET['form'])) {
 							echo '<li>Parent Group: '.$r[0].'</li>';
 						}
 					}
-					echo '<li>Email: '.$row['email'].'</li>';
+					echo '<li>Email: '.Sanitize::encodeStringForDisplay($row['email']).'</li>';
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
 					echo '<li>Rights: '.$row['rights'].' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.$row['id'].'">[edit]</a></li>';
 					echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
@@ -109,7 +109,7 @@ if (isset($_GET['form'])) {
 						echo '<li>Enrolled as student in: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $stu_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
+							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.$r[0].')</a></li>';
 						}
 						echo '</ul></li>';
 					}
@@ -121,7 +121,7 @@ if (isset($_GET['form'])) {
 						echo '<li>Tutor in: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $tutor_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
+							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.$r[0].')</a></li>';
 						}
 						echo '</ul></li>';
 					}
@@ -134,7 +134,7 @@ if (isset($_GET['form'])) {
 						echo '<li>Teacher in: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $teach_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
+							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.$r[0].')</a></li>';
 							$teachercourses[] = $r[0];
 						}
 						echo '</ul></li>';

@@ -2,8 +2,9 @@
 
 require("../validate.php");
 require("../includes/htmLawed.php");
-$cid = $_GET['cid'];
-$aid = $_GET['aid'];
+
+$cid = Sanitize::courseId($_GET['cid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 
 if (!isset($teacherid)) {
 	echo "You are not authorized for this action";
@@ -156,7 +157,7 @@ if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?id=$aid&cid=$cid");
 	} else {
 		$qcnt = substr_count($qitemorder, ',')+1;
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> &gt; ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		$curBreadcrumb .= "<a href=\"addassessment.php?cid=$cid&id=$aid\">"._("Modify Assessment")."</a>";
 		require("../header.php");
 		echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt '._('Convert Intro').'</div>';

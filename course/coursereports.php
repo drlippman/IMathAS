@@ -1,4 +1,4 @@
-<?php 
+<?php
 //IMathAS:  Course Recent Report
 //(c) 2016 David Cooper, David Lippman
 
@@ -12,7 +12,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Course Reports";
-$cid = intval($_GET['cid']);
+$cid = Sanitize::courseId($_GET['cid']);
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -33,8 +33,8 @@ if ($overwriteBody==1) {
 	echo $body;
 } else {
 
-	$curBreadcrumb .= "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
-	$curname = $coursename;
+	$curBreadcrumb .= "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	$curname = Sanitize::encodeStringForDisplay($coursename);
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Course Reports</div>';
 	echo '<div class="pagetitle"><h2>Course Reports</h2></div>';
 	echo '<ul class="nomark">';
@@ -42,7 +42,7 @@ if ($overwriteBody==1) {
 	echo '<li><a href="outcomereport.php?cid='.$cid.'">Outcome Report</a></li>';
 	echo '<li><a href="logingrid.php?cid='.$cid.'">Login Grid</a></li>';
 	echo '</ul>';
-	
+
 	echo '<p>&nbsp;</p>';
 	echo '<p>Individual student login logs and detailed activity logs can be accessed ';
 	echo 'from the Gradebook report for an individual student.</p>';

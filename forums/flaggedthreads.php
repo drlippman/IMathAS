@@ -2,6 +2,8 @@
 //IMathAS:  Flagged threads list for a course
 //(c) 2017 David Lippman
 require("../validate.php");
+
+
 $cid = $_GET['cid'];
 $from = $_GET['from'];
 
@@ -45,9 +47,9 @@ if (isset($_GET['unflagall'])) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
 	} else {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../course/course.php?cid=$cid");
-	}	
+	}
 	exit;
-}	
+}
 
 
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
@@ -56,7 +58,7 @@ $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmod
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js?v=011517"></script>';
 $pagetitle = _('Flagged Forum Posts');
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
 echo '<div id="headerflaggedthreads" class="pagetitle"><h2>'._('Flagged Forum Posts').'</h2></div>';
 echo "<p><button type=\"button\" onclick=\"window.location.href='flaggedthreads.php?from=$from&cid=$cid&unflagall=true'\">"._('Unflag All')."</button></p>";
 

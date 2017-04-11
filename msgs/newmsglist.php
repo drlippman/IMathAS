@@ -7,6 +7,8 @@
 	//Read   Deleted   Deleted by Sender   Tagged
 
 	require("../validate.php");
+	
+
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -56,7 +58,7 @@
 
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
-		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "&gt; <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 	echo "&gt; New Message List</div>";
 	echo '<div id="headernewmsglist" class="pagetitle"><h2>New Messages</h2></div>';

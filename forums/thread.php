@@ -168,6 +168,7 @@ if ($groupsetid>0) {
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		    // This will always be a row ID (an integer). No need to sanitize.
 			$limthreads[] = $row[0];
 		}
 		if (count($limthreads)==0) {
@@ -213,7 +214,7 @@ if ($tagfilter != '') {
 
 if (isset($_GET['search']) && trim($_GET['search'])!='') {
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; Search Results</div>\n";
 
 	echo "<h2>Forum Search Results</h2>";
@@ -395,8 +396,8 @@ $placeinhead .= "var tagfilterurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtri
 require("../header.php");
 
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
-echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Forum Topics</div>\n";
+echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h2></div>';
 
 if ($duedates!='') {
 	echo '<p id="forumduedates">'.$duedates.'</p>';

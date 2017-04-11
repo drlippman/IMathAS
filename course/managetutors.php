@@ -3,6 +3,7 @@
 //(c) 2009 David Lippman
 	require("../validate.php");
 	require("../includes/htmlutil.php");
+	
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -70,8 +71,8 @@
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if (mysql_num_rows($result)>0) {
 					//DB while ($row = mysql_fetch_row($result)) {
-				$in  = str_repeat('?,', count($sidstouse) - 1) . '?';
-				$stm = $DBH->prepare("SELECT id,SID FROM imas_users WHERE SID IN ($in)");
+				$query_placeholders = Sanitize::generateQueryPlaceholders($sidstouse);
+				$stm = $DBH->prepare("SELECT id,SID FROM imas_users WHERE SID IN ($query_placeholders)");
 				$stm->execute($sidstouse);
 				$insvals = array();
 				if ($stm->rowCount()>0) {
@@ -158,7 +159,7 @@
 	//*** DISPLAY ***
 	$pagetitle = "Manage Tutors";
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Users</a> &gt; Manage Tutors</div>";
 
 ?>

@@ -5,6 +5,8 @@ ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
+require_once("includes/sanitize.php");
+
 	if (isset($_GET['greybox'])) {
 		$isgb = true;
 		$gb = '&greybox=true';
@@ -27,7 +29,13 @@ ini_set("post_max_size", "10485760");
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
 			$error = "<p>You must agree to the Terms and Conditions to set up an account</p>";
 		}
-		$_POST['SID'] = trim($_POST['SID']);
+
+		// Sanitize form data
+		$_POST['SID'] = Sanitize::stripHtmlTags(trim($_POST['SID']));
+		$_POST['email'] = Sanitize::emailAddress(trim($_POST['email']));
+		$_POST['firstname'] = Sanitize::stripHtmlTags(trim($_POST['firstname']));
+		$_POST['lastname'] = Sanitize::stripHtmlTags(trim($_POST['lastname']));
+
 		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
 			$error .= "<p>$loginprompt is invalid.</p>";
 		}
@@ -37,7 +45,7 @@ ini_set("post_max_size", "10485760");
 		$stm = $DBH->prepare('SELECT id FROM imas_users WHERE SID=:sid');
 		$stm->execute(array(':sid'=>$_POST['SID']));
 		if ($stm->rowCount()>0) {
-			$error .= "<p>$loginprompt '{$_POST['SID']}' is used. </p>";
+			$error .= "<p>$loginprompt '" . Sanitize::encodeStringForDisplay($_POST['SID']) . "' is used. </p>";
 		}
 		//
 		if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
@@ -91,22 +99,14 @@ ini_set("post_max_size", "10485760");
 				$nologo = true;
 				require("header.php");
 				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true'.$gb.'">';
-				//DB echo '<input type="hidden" name="SID" value="'.stripslashes($_POST['SID']).'" />';
-				//DB echo '<input type="hidden" name="firstname" value="'.stripslashes($_POST['firstname']).'" />';
-				//DB echo '<input type="hidden" name="lastname" value="'.stripslashes($_POST['lastname']).'" />';
-				//DB echo '<input type="hidden" name="email" value="'.stripslashes($_POST['email']).'" />';
-				//DB echo '<input type="hidden" name="pw1" value="'.stripslashes($_POST['pw1']).'" />';
-				//DB echo '<input type="hidden" name="pw2" value="'.stripslashes($_POST['pw2']).'" />';
-				//DB echo '<input type="hidden" name="courseid" value="'.stripslashes($_POST['courseid']).'" />';
-				//DB echo '<input type="hidden" name="ekey" value="'.stripslashes($_POST['ekey']).'" />';
-				echo '<input type="hidden" name="SID" value="'.$_POST['SID'].'" />';
-				echo '<input type="hidden" name="firstname" value="'.$_POST['firstname'].'" />';
-				echo '<input type="hidden" name="lastname" value="'.$_POST['lastname'].'" />';
-				echo '<input type="hidden" name="email" value="'.$_POST['email'].'" />';
-				echo '<input type="hidden" name="pw1" value="'.$_POST['pw1'].'" />';
-				echo '<input type="hidden" name="pw2" value="'.$_POST['pw2'].'" />';
-				echo '<input type="hidden" name="courseid" value="'.$_POST['courseid'].'" />';
-				echo '<input type="hidden" name="ekey" value="'.$_POST['ekey'].'" />';
+				echo '<input type="hidden" name="SID" value="'.Sanitize::encodeStringForDisplay($_POST['SID']).'" />';
+				echo '<input type="hidden" name="firstname" value="'.Sanitize::encodeStringForDisplay($_POST['firstname']).'" />';
+				echo '<input type="hidden" name="lastname" value="'.Sanitize::encodeStringForDisplay($_POST['lastname']).'" />';
+				echo '<input type="hidden" name="email" value="'.Sanitize::encodeStringForDisplay($_POST['email']).'" />';
+				echo '<input type="hidden" name="pw1" value="'.Sanitize::encodeStringForDisplay($_POST['pw1']).'" />';
+				echo '<input type="hidden" name="pw2" value="'.Sanitize::encodeStringForDisplay($_POST['pw2']).'" />';
+				echo '<input type="hidden" name="courseid" value="'.Sanitize::encodeStringForDisplay($_POST['courseid']).'" />';
+				echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_POST['ekey']).'" />';
 				if (isset($_POST['agree'])) {
 					echo '<input type="hidden" name="agree" value="1" />';
 				}
@@ -129,8 +129,15 @@ ini_set("post_max_size", "10485760");
 		$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
 
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'],
-			':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
+		$stm->execute(array(
+			':SID'=>$_POST['SID'],
+			':password'=>$md5pw,
+			':rights'=>$initialrights,
+			':FirstName'=>$_POST['firstname'],
+			':LastName'=>$_POST['lastname'],
+			':email'=>$_POST['email'],
+			':msgnotify'=>$msgnot,
+			':homelayout'=>$homelayout));
 		$newuserid = $DBH->lastInsertId();
 
 		if ($emailconfirmation) {
@@ -141,9 +148,9 @@ ini_set("post_max_size", "10485760");
 			$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 			$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 			$message .= "and paste it into your webbrowser:</p>\r\n";
-			$message .= "<a href=\"" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
-			$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
-			mail($_POST['email'],'IMathAS Confirmation',$message,$headers);
+			$message .= "<a href=\"" . $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/actions.php?action=confirm&id=$id\">";
+			$message .= $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/actions.php?action=confirm&id=$id</a>\r\n";
+			mail(Sanitize::emailAddress($_POST['email']),'IMathAS Confirmation',$message,$headers);
 			require("header.php");
 			if ($gb == '') {
 				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
@@ -159,7 +166,7 @@ ini_set("post_max_size", "10485760");
 			require("header.php");
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
 			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
-			echo "<p>Your account with username <b>{$_POST['SID']}</b> has been created.  If you forget your password, you can ask your ";
+			echo "<p>Your account with username <b>" . Sanitize::encodeStringForDisplay($_POST['SID']) . "</b> has been created.  If you forget your password, you can ask your ";
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
 			if (trim($_POST['courseid'])!='') {
 				$error = '';
@@ -191,7 +198,12 @@ ini_set("post_max_size", "10485760");
 							if (count($keylist)>1) {
 								//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 								$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
-								$array = array(':uid'=>$newuserid, ':cid'=>$_POST['courseid'], ':section'=>$_POST['ekey'],':latepass'=>$line['deflatepass']);
+								$array = array(
+									':uid'=>$newuserid,
+									':cid'=>$_POST['courseid'],
+									':section'=>$_POST['ekey'],
+									':latepass'=>$line['deflatepass']
+								);
 							} else {
 								//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$line['deflatepass']}');";
 								$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES (:uid,:cid,:latepass);";
@@ -200,7 +212,7 @@ ini_set("post_max_size", "10485760");
 							$stm = $DBH->prepare($query);
 							$stm->execute($array);
 							//DB mysql_query($query) or die("Query failed : " . mysql_error());
-							echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+							echo '<p>You have been enrolled in course ID '.Sanitize::encodeStringForDisplay($_POST['courseid']).'</p>';
 
 							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 							if ($msgOnEnroll) {
@@ -224,7 +236,7 @@ ini_set("post_max_size", "10485760");
 
 
 			echo "You can now <a href=\"";
-			echo $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php";
+			echo $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php";
 			echo "\">return to the login page</a> and login with your new username and password</p>";
 			require("footer.php");
 		}
@@ -283,8 +295,8 @@ ini_set("post_max_size", "10485760");
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
 				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
 				$message .= "will then be prompted to choose a new password.</p>";
-				$message .= "<a href=\"" .$urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
-				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
+				$message .= "<a href=\"" .$urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/actions.php?action=resetpw&id=$id&code=$code\">";
+				$message .= $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
 				if (isset($CFG['GEN']['useSESmail'])) {
 					SESmail($email, $sendfrom, 'Password Reset Request',$message);
 				} else {
@@ -302,10 +314,11 @@ ini_set("post_max_size", "10485760");
 				echo "Invalid Username.  <a href=\"index.php$gb\">Try again</a>";
 				exit;
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 		} else if (isset($_POST['pw1'])) {
 			if ($_POST['pw1']!=$_POST['pw2']) {
-				echo 'Passwords do not match.  <a href="actions.php?action=resetpw&code='.$_POST['code'].'&id='.$_POST['id'].'">Try again</a>';
+				echo 'Passwords do not match.  <a href="actions.php?action=resetpw&code='.Sanitize::encodeStringForUrl($_POST['code'])
+					.'&id='.Sanitize::encodeStringForUrl($_POST['id']).'">Try again</a>';
 				exit;
 			}
 			//DB $query = "SELECT remoteaccess FROM imas_users WHERE id='{$_POST['id']}'";
@@ -350,8 +363,8 @@ ini_set("post_max_size", "10485760");
 			$row = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($row !== false && $row['remoteaccess']!='' && $row['remoteaccess']===$_GET['code']) {
 				echo '<html><body><form method="post" action="actions.php?action=resetpw">';
-				echo '<input type="hidden" name="code" value="'.$_GET['code'].'"/>';
-				echo '<input type="hidden" name="id" value="'.$_GET['id'].'"/>';
+				echo '<input type="hidden" name="code" value="'.Sanitize::encodeStringForDisplay($_GET['code']).'"/>';
+				echo '<input type="hidden" name="id" value="'.Sanitize::encodeStringForDisplay($_GET['id']).'"/>';
 				echo '<p>Please select a new password:</p>';
 				echo '<p>Enter new password:  <input type="password" size="25" name="pw1"/><br/>';
 				echo '<p>Verify new password:  <input type="password" size="25" name="pw2"/></p>';
@@ -395,9 +408,9 @@ ini_set("post_max_size", "10485760");
 			}
 			$message .= "</p><p>If you forgot your password, use the Lost Password link at the login page.</p>";
 			if (isset($CFG['GEN']['useSESmail'])) {
-				SESmail($_POST['email'], $sendfrom, "$installname Username Request",$message);
+				SESmail(Sanitize::emailAddress($_POST['email']), $sendfrom, "$installname Username Request",$message);
 			} else {
-				mail($_POST['email'],"$installname Username Request",$message,$headers);
+				mail(Sanitize::emailAddress($_POST['email']),"$installname Username Request",$message,$headers);
 			}
 
 			exit;
@@ -575,7 +588,7 @@ ini_set("post_max_size", "10485760");
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					require("header.php");
 					echo $pagetopper;
-					echo '<p>You have been enrolled in course ID '.$_POST['cid'].'</p>';
+					echo '<p>You have been enrolled in course ID '.Sanitize::courseId($_POST['cid']).'</p>';
 					echo "<p>Return to the <a href=\"index.php\">main page</a> and click on the course name to access the course</p>";
 					require("footer.php");
 					exit;
@@ -597,7 +610,7 @@ ini_set("post_max_size", "10485760");
 			require("footer.php");
 			exit;
 		}
-		$cid = $_GET['cid'];
+		$cid = Sanitize::courseId($_GET['cid']);
 		//DB $query = "SELECT allowunenroll FROM imas_courses WHERE id='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_result($result,0,0)==1) {
@@ -803,7 +816,7 @@ ini_set("post_max_size", "10485760");
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';
 	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	}
 
 

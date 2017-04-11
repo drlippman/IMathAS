@@ -4,6 +4,7 @@
 
 /*** master php includes *******/
 require("../validate.php");
+
 if (!isset($teacherid)) {
 	echo "You must be a teacher to access this page";
 	exit;
@@ -66,7 +67,7 @@ if (isset($_POST['submit'])) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=="cal") {
 	echo "&gt; <a href=\"showcalendar.php?cid=$cid\">Calendar</a> ";
 }

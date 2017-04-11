@@ -13,6 +13,7 @@ ini_set("post_max_size", "10485760");
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 function printlist($parent) {
 	global $parents,$names;
@@ -359,7 +360,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 	$body = "Please access this page from the menu links only.";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = (isset($_GET['cid'])) ? $_GET['cid'] : "admin" ;
+	$cid = (isset($_GET['cid'])) ? Sanitize::courseId($_GET['cid']) : "admin" ;
 
 	if ($myrights < 100) {
 		$isgrpadmin = true;
@@ -370,12 +371,12 @@ if (!(isset($teacherid)) && $myrights<75) {
 	if ($isadmin || $isgrpadmin) {
 		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Libraries</div>\n";
 	} else {
-		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Libraries</div>\n";
+		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Import Libraries</div>\n";
 	}
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
+		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
 
 		$libstoadd = $_POST['libs'];
 
@@ -396,9 +397,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$unique[$k] = preg_replace('/[^0-9\.]/','',$v);
 		}
 		$lookup = implode(',', $unique);
-		// intval doesn't work on uniqueid since they're bigint 
+		// intval doesn't work on uniqueid since they're bigint
 		// $lookup = implode(',', array_map('intval', $unique));
-		
+
 		//DB $query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ($lookup)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -568,15 +569,15 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$page_uploadSuccessMsg .= "Updated Questions: $updateq.<br>";
 		$page_uploadSuccessMsg .= "New Library items: $newli.<br>";
 		if ($isadmin || $isgrpadmin) {
-			$page_uploadSuccessMsg .=  "<a href=\"".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";
+			$page_uploadSuccessMsg .=  "<a href=\"".$urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";
 		} else {
-			$page_uploadSuccessMsg .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Return to Course page</a>";
+			$page_uploadSuccessMsg .= "<a href=\"". $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])  . $imasroot . "/course/course.php?cid=$cid\">Return to Course page</a>";
 		}
 
 	} elseif ($_FILES['userfile']['name']!='') { // STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";

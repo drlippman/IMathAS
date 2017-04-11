@@ -3,6 +3,8 @@
 //(c) 2006 David Lippman
 
 require("../validate.php");
+
+
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	require("../header.php");
 	echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -34,7 +36,7 @@ if ($page==-4) {
 	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/flaggedthreads.php?cid=$cid";
 } else {
 	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page";
-} 
+}
 if (isset($_GET['markunread'])) {
 	//DB $query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -350,7 +352,7 @@ if ($oktoshow) {
 	}
 }
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 if ($page==-4) {
 	echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";
 } else if ($page==-3) {
@@ -495,8 +497,8 @@ function printchildren($base,$restricttoowner=false) {
 			echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$child.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 			echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
 			echo '</a>';
-			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';	
-					
+			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';
+
 			if ($isteacher) {
 				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a></li>\n";
 			}
@@ -508,7 +510,7 @@ function printchildren($base,$restricttoowner=false) {
 			if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a></li>\n";
 			}
-			
+
 			echo '</ul></span>';
 		}
 

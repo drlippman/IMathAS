@@ -3,6 +3,8 @@
 //(c) 2008 David Lippman
 
 require("../validate.php");
+
+
 $cid = $_GET['cid'];
 if (isset($teacherid)) {
 	$isteacher = true;
@@ -119,7 +121,7 @@ $placeinhead .= "</script>\n";
 $placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .endmsg {display:none;}</style>";
 
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Diagnostic Gradebook</div>";
 echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 
