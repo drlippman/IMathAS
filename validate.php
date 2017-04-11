@@ -51,6 +51,7 @@
 		 'forum'=>'forum_tiny.png',
 		 'wiki'=>'wiki_tiny.png',
 		 'folder'=>'folder_tiny.png',
+		 'tree'=>'folder_tree_tiny.png',
 		 'calendar'=>'1day.png');
  }
 

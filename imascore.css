@@ -153,9 +153,13 @@ ul.nomark li {
 
 ul.qview {
 	list-style-type: none;
-	margin-left: 20px;
+	margin-left: 12px;
 	padding-left: 0px;
 	margin-bottom: 6px;
+}
+ul.qview ul {
+	padding-left: 10px;
+	border-left: 1px dashed #ccc;
 }
 ul.qview li {
 	margin-left: 0px;

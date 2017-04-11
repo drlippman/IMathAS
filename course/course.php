@@ -168,27 +168,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$now = time();
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
-		//DB $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
-		//DB $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid='$cid') ";
-		//DB $query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid='$userid' AND ";
-		//DB $query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid='$cid') ";
-		$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=:userid AND ";
-		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid=:courseid) ";
-		$query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		$query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid=:userid2 AND ";
-		$query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid=:courseid2) ";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':userid2'=>$userid, ':courseid2'=>$cid));
-		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
-		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore'],$line['itemtype']);
-		}
+		$exceptions = loadExceptions($cid, $userid);
 	}
 	//update block start/end dates to show blocks containing items with exceptions
 	if (count($exceptions)>0) {
@@ -524,7 +504,8 @@ if ($overwriteBody==1) {
 	                <a href="coursereports.php?cid=<?php echo $cid ?>">Reports</a><br/>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
 			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a>
+			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a><br/>
+			<a href="coursemap.php?cid=<?php echo $cid ?>"><?php echo _('Course Map'); ?></a>
 		</p>
 	<?php
 	}
@@ -582,21 +563,22 @@ if ($overwriteBody==1) {
 		  </p>
 <?php
 		}
-		if ($msgset<4 || ($toolset&2)==0 || ($toolset&1)==0) {
-			echo '<p>';
-			if ($msgset<4) {
-				echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
-				echo _('Messages').'</a> '.$newmsgs .' <br/>';
-			}
-			if (($toolset&2)==0) {
-				echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
-				echo _('Forums').'</a> '.$newpostscnt.'<br/>';
-			}
-			if (($toolset&1)==0) {
-				echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a>';
-			}
-			echo '</p>';
+		
+		echo '<p>';
+		if ($msgset<4) {
+			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
+			echo _('Messages').'</a> '.$newmsgs .' <br/>';
 		}
+		if (($toolset&2)==0) {
+			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
+			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
+		}
+		if (($toolset&1)==0) {
+			echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a><br/>';
+		}
+		echo '<a href="coursemap.php?cid='.$cid.'">'._('Course Map').'</a>';
+		echo '</p>';
+		
 	?>
 
 			<p>
