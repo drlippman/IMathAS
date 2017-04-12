@@ -416,8 +416,8 @@
 		$usefullwidth = true;
 	}
 
-	if (isset($_GET['mathjax'])) {
-		$sessiondata['mathdisp'] = 1;
+	if (isset($_GET['mathdisp'])) {
+		$sessiondata['mathdisp'] = intval($_GET['mathdisp']);
 		writesessiondata();
 	}
 
