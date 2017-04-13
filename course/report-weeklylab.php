@@ -190,6 +190,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$st[$uid]['stuname']  = $line['lastName'].', '.$line['firstName'];
 		$st[$uid]['stuNocreditAssessList'] = array();
 		$st[$uid]['stuCreditAssessList'] = array();
+		$st[$uid]['totalTimeOnTask'] = 0;
 		$st[$uid]['totalPointsOnAttempted'] = 0;
 		$st[$uid]['totalPointsPossibleOnAttempted'] = 0;
 	}
@@ -202,7 +203,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	//DB $query .= " where (ia.courseid = '$cid' and endtime > $rangestart ) ";
 	//DB $query .= " order by ias.userid ";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ia.id, ia.defpoints, ia.itemorder ";
+	$query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ias.timeontask, ia.id, ia.defpoints, ia.itemorder ";
 	$query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
 	$query .= " where (ia.courseid=:courseid and endtime > :rangestart ) ";
 	$query .= " order by ias.userid ";
@@ -235,6 +236,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$sp = explode(';', $line['bestscores']);   //scores:rawscores
 		$pts = getpts($sp[0]);
 
+		$st[$uid]['totalTimeOnTask'] += array_sum(explode(',',str_replace('~',',',$line['timeontask'])));
 		$st[$uid]['totalPointsOnAttempted'] += $pts;
 		$st[$uid]['totalPointsPossibleOnAttempted'] += $assessmentInfo[$aid]['possible'];
 		$assessmentInfo[$aid]['totalPointsEarned'] += $pts;
@@ -358,6 +360,7 @@ if ($overwriteBody==1) {
 <thead><tr>
    <th> Student </th>
    <th> Number of Assessments Attempted </th>
+   <th> Total Time in Questions </th>
    <th> Cumulative Score </th>
    <th> Assessments with No Credit </th>
    <th> Assessments with Credit </th>
@@ -380,6 +383,14 @@ foreach ($st as $uid=>$stu) {
 
 	$stuattemptedCnt = count($stu['stuCreditAssessList'])+count($stu['stuNocreditAssessList']);
 	echo '<td class="c">'.$stuattemptedCnt.'</td>';
+	
+	echo '<td class="c">';
+	if ($stu['totalTimeOnTask']<180) {
+		echo round($stu['totalTimeOnTask']/60,1).' min';
+	} else {
+		echo round($stu['totalTimeOnTask']/3600,1).' hrs';
+	}
+	echo '</td>';
 
 	if ($stu['totalPointsPossibleOnAttempted']>0) {
 		echo '<td>'.$stu['totalPointsOnAttempted'].'/'.$stu['totalPointsPossibleOnAttempted'];

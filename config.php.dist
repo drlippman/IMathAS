@@ -147,11 +147,9 @@
 	 //and course settings.  All but themelist are in the form
 	 //array(defvalue, allowchange)
 	 $CFG['CPS']['hideicons'] = array(0,0);
-	 $CFG['CPS']['cploc'] = array(7,0);
 	 $CFG['CPS']['picicons'] =  array(1,0);
 	 $CFG['CPS']['unenroll'] = array(0,0);
 	 $CFG['CPS']['showlatepass'] = array(1,0);
-	 $CFG['CPS']['topbar'] = array(array("0,1,2,3,9","0,2,3,4,6,7,9",1),0);
 
 	 $CFG['CPS']['additemtype'] = array('links',0);   //instead of pull-down
 	 $CFG['CPS']['leftnavtools'] = false;      //hide roster, etc from left nav

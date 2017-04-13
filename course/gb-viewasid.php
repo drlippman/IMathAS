@@ -38,6 +38,9 @@
 		$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 		$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 		$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
+		if (isset($_GET['links'])) {
+			$links = intval($_GET['links']);
+		}
 	} else {
 		$links = 0;
 		$stu = 0;
@@ -485,7 +488,7 @@
 		$sessiondata['coursetheme'] = $coursetheme;
 		$sessiondata['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=031417"></script>';
 			require("../includes/rubric.php");
 		}
 		require("../assessment/header.php");
@@ -573,7 +576,15 @@
 			}
 		}
 		echo "Detail</div>";
+		if (($isteacher || $istutor) && isset($_GET['asid']) && $_GET['asid']!="new") {
+			echo '<div class="cpmid">';
+			echo '<a href="gb-viewasid.php?stu=$stu&asid='.$_GET['asid'].'&from='.$from.'&cid='.$cid.'&uid='.$_GET['uid'].'&links=1">';
+			echo _('Show Score Summary');
+			echo '</a>';
+			echo '</div>';
+		}
 		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
+	
 		//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
@@ -1240,6 +1251,13 @@
 		$stm->execute(array(':id'=>$_GET['uid']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 
+		if (($isteacher || $istutor) && isset($_GET['asid']) && $_GET['asid']!="new") {
+			echo '<div class="cpmid">';
+			echo '<a href="gb-viewasid.php?stu=$stu&asid='.$_GET['asid'].'&from='.$from.'&cid='.$cid.'&uid='.$_GET['uid'].'&links=0">';
+			echo _('Show Score Details');
+			echo '</a>';
+			echo '</div>';
+		}
 		if ($isdiag) {
 			$selparts = explode('~',$row[2]);
 			$ID = $selparts[0];
@@ -1247,7 +1265,7 @@
 			echo "<h2>Score Report</h2>\n";
 			echo "<h3>{$row[1]}, {$row[0]}<br/>($ID)</h3>\n";
 		} else {
-			echo "<h2>Grade Book Detail</h2>\n";
+			echo "<h2>Grade Book Summary</h2>\n";
 			echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		}
 

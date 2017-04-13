@@ -3,7 +3,9 @@ body {
 	font-family: "Trebuchet MS", "Arial", "Helvetica", sans-serif;
 	font-size: 90%;
 }
-
+div.mainbody {
+	height:auto;
+}
 /*Link styles*/
 a:link {
 	text-decoration: none;

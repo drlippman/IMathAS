@@ -2235,7 +2235,7 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 function forminlinebutton($label,$content,$style='button',$outstyle='block') {
 	$r = uniqid();
 	$label = str_replace('"','',$label);
-	$common = 'id="inlinebtn'.$r.'" aria-controls="inlinebtnc'.$r.'" aria-expanded="false" value="'.$label.'" onClick="toggleinlinebtn(\''.$r.'\');"';
+	$common = 'id="inlinebtn'.$r.'" aria-controls="inlinebtnc'.$r.'" aria-expanded="false" value="'.$label.'" onClick="toggleinlinebtn(\'inlinebtnc'.$r.'\', \'inlinebtn'.$r.'\');"';
 	if ($style=='classic') {
 		$out = '<input type="button" '.$common.'/>';
 	} else if ($style=='link') {
@@ -2244,9 +2244,9 @@ function forminlinebutton($label,$content,$style='button',$outstyle='block') {
 		$out = '<span class="spanbutton" '.$common.'>'.$label.'</span>';
 	}
 	if ($outstyle=='inline') {
-		$out .= ' <span id="inlinebtnc'.$r.'" style="display:none;">'.$content.'</span>';
+		$out .= ' <span id="inlinebtnc'.$r.'" style="display:none;" aria-hidden="true">'.$content.'</span>';
 	} else {
-		$out .= '<div id="inlinebtnc'.$r.'" style="display:none;">'.$content.'</div>';
+		$out .= '<div id="inlinebtnc'.$r.'" style="display:none;" aria-hidden="true">'.$content.'</div>';
 	}
 	return $out;
 }

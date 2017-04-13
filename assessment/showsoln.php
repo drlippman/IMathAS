@@ -6,6 +6,8 @@ if ($_GET['cid']==="embedq") {
 	require("../i18n/i18n.php");
 	$cid = "embedq";
 	$sessiondata['secsalt'] = "12345";
+	$sessiondata['graphdisp'] = 1;
+	$sessiondata['mathdisp'] = 1;
 } else {
 	require("../validate.php");
 }
@@ -20,6 +22,7 @@ require("header.php");
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';
 if ($sig != md5($id.$sessiondata['secsalt'])) {
 	echo "invalid signature - not authorized to view the solution for this problem";
+	exit;
 }
 
 require("displayq2.php");

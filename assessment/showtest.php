@@ -14,8 +14,8 @@
 			 'partial'=>'te_yellow_check.png');
 
 	}
-	if (isset($guestid)) {
-		$teacherid=$guestid;
+	if (isset($instrPreviewId)) {
+		$teacherid=$instrPreviewId;
 	}
 	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 		echo "<html><body>";
@@ -360,23 +360,18 @@
 				$sessiondata['intreereader'] = false;
 			}
 
-			//DB $query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			$stm = $DBH->prepare("SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id=:id");
+			$stm = $DBH->prepare("SELECT name,theme,msgset,toolset FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
 			$courseinfo = $stm->fetch(PDO::FETCH_ASSOC);
 			$sessiondata['courseid'] = intval($_GET['cid']);
 			//DB $sessiondata['coursename'] = mysql_result($result,0,0);
 			//DB $sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursename'] = $courseinfo['name'];
-			$sessiondata['coursetheme'] = $courseinfo['theme'];
-			if (isset($usertheme) && $usertheme!='') {
-				$sessiondata['coursetheme'] = $usertheme;
+			if (!isset($coursetheme)) { //should already be set from validate.php
+				$coursetheme = $courseinfo['theme'];
 			}
-			//DB $sessiondata['coursetopbar'] =  mysql_result($result,0,2);
-			//DB $sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
-			//DB $sessiondata['coursetoolset'] = mysql_result($result,0,4);
-			$sessiondata['coursetopbar'] =  $courseinfo['topbar'];
+			$sessiondata['coursetheme'] = $coursetheme;
+
 			$sessiondata['coursetoolset'] = $courseinfo['toolset'];
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
@@ -445,20 +440,12 @@
 				$stm->execute(array(':agroupid'=>$stugroupid, ':id'=>$line['id'], ':ver'=>$line['ver']));
 			}
 
-			//DB $query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			$stm = $DBH->prepare("SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id=:id");
+			$stm = $DBH->prepare("SELECT name,theme,msgset,toolset FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
 			$courseinfo = $stm->fetch(PDO::FETCH_ASSOC);
 			$sessiondata['courseid'] = intval($_GET['cid']);
-			//DB $sessiondata['coursename'] = mysql_result($result,0,0);
-			//DB $sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursename'] = $courseinfo['name'];
 			$sessiondata['coursetheme'] = $courseinfo['theme'];
-			//DB $sessiondata['coursetopbar'] =  mysql_result($result,0,2);
-			//DB $sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
-			//DB $sessiondata['coursetoolset'] = mysql_result($result,0,4);
-			$sessiondata['coursetopbar'] =  $courseinfo['topbar'];
 			$sessiondata['coursetoolset'] = $courseinfo['toolset'];
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
@@ -727,6 +714,7 @@
 		$testsettings['testtype']="Practice";
 		$testsettings['defattempts'] = 0;
 		$testsettings['defpenalty'] = 0;
+		$testsettings['origshowans'] = $testsettings['showans'];
 		$testsettings['showans'] = '0';
 
 		$seeds = explode(",",$line['reviewseeds']);
@@ -811,7 +799,16 @@
 							$lastanswers[$i] = '';
 							$scores[$i] = -1;
 						}
-						$seeds[$i] = rand(1,9999);
+						if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+							$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+							if (count($fs)>1) {
+								//find existing seed and use next one
+								$k = array_search($seeds[$i], $fs);
+								$seeds[$i] = $fs[($k+1)%count($fs)];
+							}
+						} else {
+							$seeds[$i] = rand(1,9999);
+						}
 						if (!$isreview) {
 							if (newqfromgroup($i)) {
 								$reloadqi = true;
@@ -833,7 +830,16 @@
 							$reattempting[] = $i;
 						}
 						if (($regenonreattempt && $qi[$questions[$i]]['regen']==0) || $qi[$questions[$i]]['regen']==1) {
-							$seeds[$i] = rand(1,9999);
+							if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+								$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+								if (count($fs)>1) {
+									//find existing seed and use next one
+									$k = array_search($seeds[$i], $fs);
+									$seeds[$i] = $fs[($k+1)%count($fs)];
+								}
+							} else {
+								$seeds[$i] = rand(1,9999);
+							}
 							if (!$isreview) {
 								if (newqfromgroup($i)) {
 									$reloadqi = true;
@@ -854,7 +860,16 @@
 					$reattempting[] = $toclear;
 				}
 				if (($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1) {
-					$seeds[$toclear] = rand(1,9999);
+					if ($qi[$questions[$toclear]]['fixedseeds'] !== null && $qi[$questions[$toclear]]['fixedseeds'] != '') {
+						$fs = explode(',',$qi[$questions[$toclear]]['fixedseeds']);
+						if (count($fs)>1) {
+							//find existing seed and use next one
+							$k = array_search($seeds[$toclear], $fs);
+							$seeds[$toclear] = $fs[($k+1)%count($fs)];
+						}
+					} else {
+						$seeds[$toclear] = rand(1,9999);
+					}
 					if (!$isreview) {
 						if (newqfromgroup($toclear)) {
 							$reloadqi = true;
@@ -903,7 +918,18 @@
 		if ($doexit) { exit;}
 		srand();
 		$toregen = $_GET['regen'];
-		$seeds[$toregen] = rand(1,9999);
+		
+		if ($qi[$questions[$toregen]]['fixedseeds'] !== null && $qi[$questions[$toregen]]['fixedseeds'] != '') {
+			$fs = explode(',',$qi[$questions[$toregen]]['fixedseeds']);
+			if (count($fs)>1) {
+				//find existing seed and use next one
+				$k = array_search($seeds[$toregen], $fs);
+				$seeds[$toregen] = $fs[($k+1)%count($fs)];
+			}
+		} else {
+			$seeds[$toregen] = rand(1,9999);
+		}
+		
 		$scores[$toregen] = -1;
 		$rawscores[$toregen] = -1;
 		$attempts[$toregen] = 0;
@@ -939,7 +965,16 @@
 					$scores[$i] = -1;
 					$rawscores[$i] = -1;
 					$attempts[$i] = 0;
-					$seeds[$i] = rand(1,9999);
+					if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+						$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+						if (count($fs)>1) {
+							//find existing seed and use next one
+							$k = array_search($seeds[$i], $fs);
+							$seeds[$i] = $fs[($k+1)%count($fs)];
+						}
+					} else {
+						$seeds[$i] = rand(1,9999);
+					}
 					$newla = array();
 					deletefilesifnotused($lastanswers[$i],$bestlastanswers[$i]);
 					$laarr = explode('##',$lastanswers[$i]);
@@ -967,7 +1002,16 @@
 				$scores[$i] = -1;
 				$rawscores[$i] = -1;
 				$attempts[$i] = 0;
-				$seeds[$i] = rand(1,9999);
+				if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+					$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
+					if (count($fs)>1) {
+						//find existing seed and use next one
+						$k = array_search($seeds[$i], $fs);
+						$seeds[$i] = $fs[($k+1)%count($fs)];
+					}
+				} else {
+					$seeds[$i] = rand(1,9999);
+				}
 				$newla = array();
 				deletefilesifnotused($lastanswers[$i],$bestlastanswers[$i]);
 				$laarr = explode('##',$lastanswers[$i]);
@@ -1081,7 +1125,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			echo "&gt; ", _('View as student'), "</div>";
 		} else {
 			echo "<div class=breadcrumb>";
-			echo "<span style=\"float:right;\">$userfullname</span>";
+			echo "<span style=\"float:right;\" class=\"hideinmobile\">$userfullname</span>";
 			if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
 				echo "$breadcrumbbase ", _('Assessment'), "</div>";
 			} else {
@@ -1147,7 +1191,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		}
 
 		if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
-			if ($testsettings['showans']!='N') {
+			if ($testsettings['origshowans']!='N') {
 				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'" ';
 				if ($isreview && !(isset($exceptionduedate) && $exceptionduedate>0) && $testsettings['allowlate']>10 && $sessiondata['latepasses']>0 && !isset($sessiondata['stuview']) && !$actas && (time() - $testsettings['enddate'])<$latepasshrs*3600 && !in_array($testsettings['id'],$viewedassess)) {
 					echo ' onclick="return confirm(\''._('If you view this scored assignment, you will not be able to use a LatePass on it').'\');"';

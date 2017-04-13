@@ -328,7 +328,7 @@ if (isset($_POST['text'])) {
 			//DB $query = "UPDATE imas_questions SET questionsetid='$qsetid' WHERE id='{$_GET['makelocal']}'";
 			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET questionsetid=:questionsetid WHERE id=:id");
-			$stm->execute(array(':questionsetid'=>$qsetid, ':id'=>$_GET['makelocal']));
+			$stm->execute(array(':questionsetid'=>$id, ':id'=>$_GET['makelocal']));
 			$editmsg .= " Local copy of Question Created ";
 			$frompot = 0;
 		} else {

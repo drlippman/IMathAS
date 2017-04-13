@@ -377,7 +377,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			//DB $query = "SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,withdrawn FROM imas_questions WHERE id IN ($flat)";
 			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			//$flat is santized above
-			$stm = $DBH->query("SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,withdrawn FROM imas_questions WHERE id IN ($flat)");
+			$stm = $DBH->query("SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,withdrawn,fixedseeds FROM imas_questions WHERE id IN ($flat)");
 			$inssph = array(); $inss = array();
 			$insorder = array();
 			//DB while ($row = mysql_fetch_assoc($result)) {
@@ -396,8 +396,8 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 						$row['category'] = 0;
 					}
 				}
-				$inssph[] = "(?,?,?,?,?,?,?,?,?)";
-				array_push($inss, $newtypeid, $row['questionsetid'],$row['points'],$row['attempts'],$row['penalty'],$row['category'],$row['regen'],$row['showans'],$row['showhints']);
+				$inssph[] = "(?,?,?,?,?,?,?,?,?,?)";
+				array_push($inss, $newtypeid, $row['questionsetid'],$row['points'],$row['attempts'],$row['penalty'],$row['category'],$row['regen'],$row['showans'],$row['showhints'],$row['fixedseeds']);
 				//DB $toins = array($row['questionsetid'],$row['points'],$row['attempts'],$row['penalty'],$row['category'],$row['regen'],$row['showans'],$row['showhints']);
 				$rubric[$row['id']] = $row['rubric'];
 				//check for a category that's set to an assessment e.g. AID-1234
@@ -411,7 +411,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$idtoorder = array_flip($insorder);
 
 			if (count($inss)>0) {
-				$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints) ";
+				$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints,fixedseeds) ";
 				//DB $query .= "VALUES ".implode(',',$inss);
 				$query .= "VALUES ".implode(',',$inssph);
 				$stm = $DBH->prepare($query);

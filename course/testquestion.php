@@ -78,7 +78,9 @@ if ($myrights<20) {
 	if (isset($_GET['onlychk'])) {
 		$page_formAction .=  "&onlychk=".$_GET['onlychk'];
 	}
-
+	if (isset($_GET['fixedseeds'])) {
+		$page_formAction .=  "&fixedseeds=1";
+	}
 
 	//DB $query = "SELECT imas_users.email,imas_questionset.* ";
 	//DB $query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
@@ -206,6 +208,38 @@ if ($overwriteBody==1) {
 			  }
 		  }
 		  </script>";
+	}
+	if (isset($_GET['fixedseeds'])) {
+		echo "<p id=\"fixedseedbox\" style=\"display:none\">";
+		echo "Seed: $seed. <input type=\"checkbox\" name=\"useinfixed\" id=\"useinfixed\" onclick=\"chguseinfixed(this.checked)\" ";
+		echo "/> Include in fixed seed list</p>";
+		echo '<script type="text/javascript">
+		$(function() {
+			var dofixed = opener.document.getElementById("fixedseedwrap").style.display;
+			if (dofixed!="none") {
+				var fixedseedlist = opener.document.getElementById("fixedseeds").value;
+				if (fixedseedlist.match(/\b'.$seed.'\b/)) {
+					$("#useinfixed").prop("checked",true);
+				}
+				$("#fixedseedbox").show();
+			}
+		});
+		function chguseinfixed(state) {
+			var fixedseedlist = opener.document.getElementById("fixedseeds").value;
+			if (state==true) {
+				if (!fixedseedlist.match(/\b'.$seed.'\b/)) {
+					if (fixedseedlist=="") {
+						fixedseedlist = "'.$seed.'";
+					} else {
+						fixedseedlist += ",'.$seed.'";
+					}
+				}
+			} else {
+				fixedseedlist = fixedseedlist.replace(/\b'.$seed.'(,|$)/,"").replace(/,$/,"");
+			}
+			opener.document.getElementById("fixedseeds").value = fixedseedlist;	
+		}
+		</script>';
 	}
 
 	echo $page_scoreMsg;

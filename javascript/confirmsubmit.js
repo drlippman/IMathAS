@@ -16,7 +16,9 @@ function checkComplete (form) {
     if (el.type == 'text' || el.type == 'textarea' ||
         el.type == 'password' || el.type == 'file' ) {
       if (el.value == '') {
-        return false;
+      	      if ($("#qs"+el.id.substr(2)+"-d:checked,#qs"+el.id.substr(2)+"-i:checked").length==0) {
+      	      	      return false;
+      	      }
       }
     }
     else if (el.type.indexOf('select') != -1) {

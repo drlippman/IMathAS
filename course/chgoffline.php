@@ -161,7 +161,7 @@ Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All<
 <?php
 
 foreach($gbitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.' <a class="small" href="addgrades.php?cid=264&grades=all&gbitem='.$id.'" target="_blank">Edit</a></li>';
+	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.' <a class="small" href="addgrades.php?cid='.$cid.'&grades=all&gbitem='.$id.'" target="_blank">Edit</a></li>';
 }
 ?>
 </ul>

@@ -29,14 +29,25 @@ if (empty($_GET['id'])) {
 	exit;
 }
 $qsetid=$_GET['id'];
-$sessiondata['coursetheme'] = $coursetheme;
 
 $page_formAction = "embedq.php?id=$qsetid";
+
+if (isset($_GET['theme'])) {
+	$theme = preg_replace('/\W/','',$_GET['theme']);
+	$sessiondata['coursetheme'] = $theme . '.css';
+	$page_formAction .= "&theme=$theme";	
+} else {
+	$sessiondata['coursetheme'] = $coursetheme;
+}
+
 if (isset($_GET['noscores'])) {
 	$page_formAction .= '&noscores=true';
 }
 if (isset($_GET['noregen'])) {
 	$page_formAction .= '&noregen=true';
+}
+if (isset($_GET['resizer'])) {
+	$page_formAction .= '&resizer=true';
 }
 
 $showans = false;
@@ -85,6 +96,9 @@ if (isset($_POST['seed'])) {
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $useeditor = 1;
+if (isset($_GET['resizer'])) {
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/iframeSizer_contentWindow_min.js"></script>';
+}
 require("./assessment/header.php");
 
 if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {

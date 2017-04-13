@@ -32,9 +32,13 @@ div.signup {
 	margin-top: 10px;
 	padding: 5px;
 }
+div#headerhome, div#homelinkbox {
+	padding-top: 8px;
+}
 div.itemsum {
 	margin-left: 45px;
 	overflow: auto;
+	padding: 5px 0px;
 	/*margin-top: -.5em;
 	margin-bottom: -.5em;*/
 }
@@ -44,10 +48,58 @@ span.iteminfo {
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
 }
+label.error {
+	color: #db0000;
+	font-style: italic;
+	float: left;
+	margin-left: 10px;
+}
+input[type=checkbox] + label.error {
+	float:none;
+}
 div.title {
 	/*display: inline;*/
 	margin-left: 30px;
 }
+div.itemhdr {
+	position: relative;
+	min-height: 26px;
+}
+.itemhdricon {
+	position: absolute; 
+}
+.itemhdricon div {
+	padding-left: 5px;
+	padding-right: 5px;
+	margin-right: 5px;
+}
+div.itemhdr div.title {
+	margin-right: 30px;
+}
+div.itemhdrdd, div.itemhdrright {
+	position: absolute;
+	right: 0px;
+	top:0px;
+}
+
+@media only screen and (min-width: 1005px) {
+	.notfw .itemhdricon {
+		display: inline-block;
+		position: static;
+		vertical-align: top;
+	}
+	.notfw .itemhdr .title {
+		display: inline-block;
+		margin-left: 6px;
+		margin-right: 10px;
+	}
+	.notfw div.itemhdrdd {
+		display: inline-block;
+		position: relative;
+		vertical-align: top;
+	}
+}
+
 div.block, div.blockitems div.blockitems div.block {
 	padding: 5px;
 	margin-bottom: 10px;
@@ -59,6 +111,9 @@ div.blockitems, div.blockitems div.blockitems div.blockitems {
 	margin-bottom: 10px;
 }
 div.hidden {
+	display:none;
+}
+.showinmobile {
 	display:none;
 }
 div.icon {
@@ -107,9 +162,13 @@ ul.nomark li {
 
 ul.qview {
 	list-style-type: none;
-	margin-left: 20px;
+	margin-left: 12px;
 	padding-left: 0px;
 	margin-bottom: 6px;
+}
+ul.qview ul {
+	padding-left: 10px;
+	border-left: 1px dashed #ccc;
 }
 ul.qview li {
 	margin-left: 0px;
@@ -187,6 +246,14 @@ div.submit {
 }
 span#leftcontenttoggle {
 	display:none;
+	vertical-align:middle;
+	padding: 0px 5px;
+}
+span#leftcontenttoggle:hover {
+	background-color: #eee;
+}
+span#leftcontenttoggle.leftcontentactive {
+	background-color: #eee;
 }
 
 @media only screen and (max-width: 760px) {
@@ -282,7 +349,6 @@ span.hdr1 {
 		margin-left:180px;
 		padding-left:10px;
 		margin-top:10px;
-		margin-right: 10px;
 }
 
 .midwrapper {
@@ -488,6 +554,19 @@ ul.courselist > li:last-child {
 	border: 0;
 	margin-bottom: 15px;
 }
+ul.courselist > li > a {
+	display:inline-block;
+	margin-right:10px;
+}
+ul.courselist li { 
+	position: relative; 
+}
+div.coursedd { 
+	position: absolute; 
+	right: 0px; 
+	top: 2px;
+}
+   
 div.block h3 {
 	margin: 2px;
 }
@@ -585,7 +664,10 @@ input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus
   margin: 0;
   text-align: left;
 }
-
+#GB_caption a {
+	color: #fff;
+	text-decoration: none;
+}
 ol li ol {
 	list-style-type: lower-alpha;
 }
@@ -651,15 +733,22 @@ div.multiselitem {
 }
 .ind3 {
 	margin-left: 2.25em;
-}
+} 
 .ind4 {
 	margin-left: 3em;
 }
 .delx {
+	position: absolute;
+	right: 0px;
+	width: 16px;
+	text-align: center;
+	top: 0px;
+	cursor: pointer;
+}
+.delx a:hover, .delx a, .delx a:focus {
 	font-family: sans-serif;
 	color: #6d6d6d;
-	float: right;
-	cursor: pointer;
+	text-decoration: none;
 }
 
 pre {
@@ -707,7 +796,7 @@ pre {
 .playlistbar { background-color: #ccc; padding: 3px;}
 .playlistbar > * {vertical-align: top;}
 .playlistwrap { border: 1px solid #ccc; padding: 10px; position:relative;}
-.playlistbar, .playlistwrap {margin-left: -15px;}
+.playlistbar, .playlistwrap {margin-left: 0px;}
 
 .clearfix:before,
 .clearfix:after {
@@ -886,3 +975,14 @@ a.dropdown-toggle:hover {
     left: 0;
   }
 }
+
+.fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper, .fw1000 .midwrapper {
+	max-width: 1000px;
+	margin: auto;
+}
+
+.fw1920 div#headercontent, .fw1920 div#navlistcont,.fw1920 .footerwrapper, .fw1920 .midwrapper {
+	max-width: 1920px;
+	margin: auto;
+}
+

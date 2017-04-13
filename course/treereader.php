@@ -3,7 +3,7 @@
 //(c) 2011 David Lippman
 
 require("../validate.php");
-if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($guestid)) { // loaded by a NON-teacher
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
 	echo "You are not enrolled in this course. Please return to the <a href=\"../index.php\">Home Page</a> and enroll";
 	exit;
 }
@@ -40,16 +40,13 @@ if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the studen
 }
 
 $cid = intval($_GET['cid']);
-//DB $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc FROM imas_courses WHERE id=$cid";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc FROM imas_courses WHERE id=:id");
+$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 $line = $stm->fetch(PDO::FETCH_ASSOC);
 $items = unserialize($line['itemorder']);
 
 if ($_GET['folder']!='0') {
-	$now = time() + $previewshift;
+	$now = time();
 	$blocktree = explode('-',$_GET['folder']);
 	$backtrack = array();
 	for ($i=1;$i<count($blocktree);$i++) {
@@ -128,17 +125,21 @@ function toggletreereadernav() {
 	if (treereadernavstate==1) {
 		$("#leftcontenttext").slideUp(200,function() {
 			$(this).attr("aria-expanded",false).attr("aria-hidden",true);
-			$("#leftcontent").width(20).attr("aria-expanded",false);
-			document.getElementById("centercontent").style.marginLeft = "30px";
+			$("#leftcontent").addClass("narrow").attr("aria-expanded",false);
+			//document.getElementById("centercontent").style.marginLeft = "30px";
+			$("#centercontent").addClass("wider");
+			resizeiframe();
 		});;
 		document.getElementById("navtoggle").src= document.getElementById("navtoggle").src.replace(/collapse/,"expand");
 	} else {
-		$("#leftcontent").width(250).attr("aria-expanded",true);
+		$("#leftcontent").removeClass("narrow").attr("aria-expanded",true);
 		$("#leftcontenttext").slideDown(200).attr("aria-expanded",true).attr("aria-hidden",false);
-		document.getElementById("centercontent").style.marginLeft = "260px";
+		//document.getElementById("centercontent").style.marginLeft = "260px";
+		$("#centercontent").removeClass("wider");
 		document.getElementById("navtoggle").src= document.getElementById("navtoggle").src.replace(/expand/,"collapse");
+		resizeiframe();
 	}
-	resizeiframe();
+	
 	treereadernavstate = (treereadernavstate+1)%2;
 }
 function updateTRunans(aid, status) {
@@ -162,8 +163,27 @@ height: auto;
 }
 #leftcontent {
 	margin-top: 0px;
+	width: 250px;
 }
-
+#leftcontent.narrow {
+	width: 20px;
+}
+#centercontent {
+	margin-left: 260px;
+	position:relative;
+}
+#centercontent.wider {
+	margin-left: 30px;
+}
+@media (max-width:480px) {
+	#centercontent, #centercontent.wider {
+		margin-left: 0px;
+	}
+	#leftcontent {
+		position: relative;
+		width: auto;
+	}
+}
 ul[role="tree"]:focus {
     outline:1px dotted #0000ff;
 } 
@@ -475,7 +495,7 @@ function upsendexceptions(&$items) {
 ?>
 <div class="breadcrumb">
 	<span class="padright">
-	<?php if (isset($guestid)) {
+	<?php if (isset($instrPreviewId)) {
 		echo '<span class="noticetext">Instructor Preview</span> ';
 	}?>
 	<?php echo $userfullname ?>
@@ -484,7 +504,7 @@ function upsendexceptions(&$items) {
 	<div class="clear"></div>
 </div>
 
-<div id="leftcontent" style="width: 250px;" role="navigation" aria-label="<?php echo _('Content navigation');?>">
+<div id="leftcontent" class="treeleftcontent" role="navigation" aria-label="<?php echo _('Content navigation');?>">
 <img id="navtoggle" src="<?php echo $imasroot;?>/img/collapse.gif"  onclick="toggletreereadernav()" alt="Expand/Collapse" aria-expanded="true" aria-controls="leftcontenttext"/>
 <ul id="leftcontenttext" class="nomark" style="margin-left:5px; font-size: 90%;">
 <?php
@@ -496,7 +516,7 @@ echo $ul[0];
 </ul>
 <div id="bmrecout" style="display:none;"></div>
 </div>
-<div id="centercontent" style="margin-left: 260px;position:relative;" role="main">
+<div id="centercontent" role="main">
 <iframe id="readerframe" name="readerframe" style="width:100%; border:1px solid #ccc;" src="<?php echo $imasroot . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
 </div>
 <?php

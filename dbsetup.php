@@ -4,14 +4,17 @@
 </head>
 <body>
 <?php
-/*
-if (file_exists("upgradecounter.txt")) {
-	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
-	echo "rerun the setup, delete upgradecounter.txt";
-	echo "</body></html>";
-	exit;
-}
-*/
+
+/*************
+
+Don't edit this file.  This houses the initial database setup as of 3/17/17.
+Starting at that date, all future database changes should be made by creating
+a file in the /migrations/ directory, per the readme.md there.
+
+Because of this, this file does NOT contain the full up-to-date database schema.
+
+***************/
+
 $dbsetup = true;
 include("config.php");
 
@@ -178,8 +181,6 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `msgset` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `toolset` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `showlatepass` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
-	. ' `topbar` VARCHAR(32) NOT NULL DEFAULT \'|\', '
-	. ' `cploc` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `available` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `lockaid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `theme` VARCHAR(32) NOT NULL DEFAULT \'default.css\', '
@@ -270,6 +271,7 @@ $sql = 'CREATE TABLE `imas_questions` ('
 	. ' `showhints` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `extracredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `withdrawn` CHAR(1) NOT NULL DEFAULT \'0\','
+	. ' `fixedseeds` TEXT NULL DEFAULT NULL,'
         . ' INDEX (`assessmentid`), INDEX(`questionsetid`), INDEX(`category`) '
         . ' )'
         . ' ENGINE = InnoDB'

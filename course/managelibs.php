@@ -224,6 +224,44 @@ if ($myrights<20) {
 
 
 
+	} else if (isset($_POST['chgsort'])) {
+		if (isset($_POST['sortorder'])) {
+			if ($_POST['sortorder']!='') {
+				//DB $llist = "'".implode("','",explode(',',$_POST['chgrights']))."'";
+				$llist = implode(',', array_map('intval', explode(',',$_POST['chgsort'])));
+				//DB $query = "UPDATE imas_libraries SET userights='{$_POST['newrights']}',lastmoddate=$now WHERE id IN ($llist)";
+				$query = "UPDATE imas_libraries SET sortorder=:sortorder,lastmoddate=:lastmoddate WHERE id IN ($llist)";
+				$qarr = array(':sortorder'=>$_POST['sortorder'], ':lastmoddate'=>$now);
+				if (!$isadmin) {
+					//DB $query .= " AND groupid='$groupid'";
+					$query .= " AND groupid=:groupid";
+					$qarr[':groupid']=$groupid;
+				}
+				if (!$isadmin && !$isgrpadmin) {
+					//DB $query .= " AND ownerid='$userid'";
+					$query .= " AND ownerid=:ownerid";
+					$qarr[':ownerid'] = $userid;
+				}
+				$stm = $DBH->prepare($query);
+				$stm->execute($qarr);
+				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+
+			}
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+
+			exit;
+
+		} else {
+			$pagetitle = "Change Library Sort Order";
+			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Change Library Sort Order ";
+			if (!isset($_POST['nchecked'])) {
+				$overwriteBody = 1;
+				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+			} else {
+				$tlist = implode(",",$_POST['nchecked']);
+			}
+		}
+
 	} else if (isset($_POST['transfer'])) {
 		if (isset($_POST['newowner'])) {
 			if ($_POST['transfer']!='') {
@@ -510,17 +548,17 @@ if ($myrights<20) {
 			if ($_GET['modify']!="new") {
 				$pagetitle = "Modify Library\n";
 				if ($isgrpadmin) {
-					$stm = $DBH->prepare("SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id=:id AND groupid=:groupid");
+					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id AND il.groupid=:groupid");
 					$stm->execute(array(':id'=>$_GET['modify'], ':groupid'=>$groupid));
 				} else if ($isadmin) {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}'";
-          $stm = $DBH->prepare("SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id=:id");
-          $stm->execute(array(':id'=>$_GET['modify']));
+					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id");
+					$stm->execute(array(':id'=>$_GET['modify']));
 				} else {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}' AND ownerid='$userid'";
 					$stm = $DBH->prepare("SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id=:id AND ownerid=:ownerid");
 					$stm->execute(array(':id'=>$_GET['modify'], ':ownerid'=>$userid));
-        }
+				}
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if ($row = mysql_fetch_row($result)) {
 				if ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -528,6 +566,9 @@ if ($myrights<20) {
 					$rights = $row[1];
 					$parent = $row[2];
 					$sortorder = $row[3];
+					if ($isgrpadmin || $isadmin) {
+						$ownername = $row[5].', '.$row[4];
+					}
 				}
 			} else {
 				$pagetitle = "Add Library\n";
@@ -705,6 +746,21 @@ if ($overwriteBody==1) {
 		</p>
 	</form>
 <?php
+	} else if (isset($_POST['chgsort'])) {
+?>
+	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+		<input type=hidden name=chgsort value="<?php echo $tlist ?>">
+		<span class=form>Sort order: </span>
+		<span class=formright>
+			<input type="radio" name="sortorder" value="0" checked/> Creation date<br/>
+			<input type="radio" name="sortorder" value="1"/> Alphabetical
+		</span><br class=form>
+		<p>
+			<input type=submit value="Change Sort Order">
+			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+		</p>
+	</form>
+<?php
 	}else if (isset($_POST['setparent'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
@@ -764,6 +820,11 @@ if ($overwriteBody==1) {
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo $_GET['modify'] ?>">
 		<span class=form>Library Name:</span>
 		<span class=formright><input type=text name="name" value="<?php echo $name ?>" size=20></span><br class=form>
+		<?php
+		if (($isgrpadmin || $isadmin) && isset($ownername)) {
+			echo '<span class=form>Owner:</span><span class=formright>'.$ownername.'</span><br class=form />';
+		}
+		?>
 		<span class=form>Rights: </span>
 		<span class=formright>
 			<?php writeHtmlSelect ("rights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
@@ -813,6 +874,7 @@ if ($overwriteBody==1) {
 			<input type=submit name="remove" value="Delete" title="Delete library">
 			<input type=submit name="setparent" value="Change Parent" title="Change the parent library">
 			<input type=submit name="chgrights" value="Change Rights" title="Change library use rights">
+			<input type=submit name="chgsort" value="Change Sort" title="Change library sort order">
 			<?php echo $page_appliesToMsg ?>
 
 		</div>
@@ -906,8 +968,8 @@ function printlist($parent) {
 					echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
 				}
 				echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
-				echo "<ul class=hide id=$child>\n";
 				echo "</span>";
+				echo "<ul class=hide id=$child>\n";
 				$count++;
 				printlist($child);
 				echo "</ul></li>\n";

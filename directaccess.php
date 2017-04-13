@@ -47,6 +47,8 @@
 		}
 		if ($_POST['pw1'] != $_POST['pw2']) {
 			$page_newaccounterror .= "Passwords don't match. ";
+			unset($_POST['pw1']);
+			unset($_POST['pw2']);
 		}
 
 		//DB $query = "SELECT enrollkey,deflatepass FROM imas_courses WHERE id = '{$_GET['cid']}'";
@@ -215,6 +217,10 @@
 			 $challenge = base64_encode(microtime() . rand(0,9999));
 			 $_SESSION['challenge'] = $challenge;
 		 }
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+		if (isset($CFG['locale'])) {
+			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.$CFG['locale'].'.min.js"></script>';
+		}
 		require("header.php");
 		//echo "<div class=\"breadcrumb\">$breadcrumbbase $coursename Access</div>";
 		echo "<div id=\"header\"><div class=\"vcenter\">$coursename</div></div>";
@@ -234,10 +240,23 @@
 		$enrollkey = $stm->fetchColumn(0);
 
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
+<form id="pageform" method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
 
-<h3 style="color:#036;">Already have an account?</h3>
-<p><b>Login</b>.  If you have an account on <?php echo $installname;?> but are not enrolled in this course, you will be able to enroll in this course.</p>
+<?php 
+if ($enrollkey!='closed') {
+?>
+<h3>Do you already have an account on <?php echo $installname;?>?</h3>
+<p>
+<input type=radio name="curornew" value="0" onclick="setlogintype(0)" <?php if ($page_newaccounterror=='') {echo 'checked';}?> /> I already have an account on <?php echo $installname;?><br/>
+<input type=radio name="curornew" value="1" onclick="setlogintype(1)" <?php if ($page_newaccounterror!='') {echo 'checked';}?> /> I need to create a new account
+</p>
+<?php
+} 
+?>
+
+<fieldset id="curuser" <?php if ($page_newaccounterror!='') {echo 'style="display:none"';}?>>
+<legend>Already have an account</legend>
+<p><b>Login</b>.  If you have an account on <?php echo $installname;?> but are not enrolled in this course, logging in below will enroll you in this course.</p>
 <?php
 	if ($haslogin) {echo '<p style="color: red;">Login Error.  Try Again</p>';}
 ?>
@@ -308,18 +327,22 @@ if (strlen($enrollkey)>0) {
 <?php
 	if ($enrollkey!='closed') {
 ?>
+</fieldset>
 <script type="text/javascript">
-function enablenewstu() {
-	document.getElementById("newstubutton").style.display = "none";
-	document.getElementById("newstu").style.display = "block";
+var logintype=<?php echo ($page_newaccounterror=='')?'0':'1';?>;
+function setlogintype(n) {
+	if (n==0) {
+		$("#curuser").show();
+		$("#newuser").hide();
+	} else {
+		$("#curuser").hide();
+		$("#newuser").show();
+	}
+	logintype=n;
 }
 </script>
-<h3 style="color:#036;">New to <?php echo $installname; ?>?</h3>
-
-<div id="newstubutton" style="display:<?php echo ($page_newaccounterror!=''?"none":"block");?>;" >
- <input type=button onclick="enablenewstu()" value="Create an account and Enroll">
-</div>
-<div id="newstu" style="display:<?php echo ($page_newaccounterror!=''?"block":"none");?>;">
+<fieldset id="newuser" <?php if ($page_newaccounterror=='') {echo 'style="display:none"';}?>>
+<legend>New to <?php echo $installname; ?></legend>
 
 <p><b>New Student Enrollment</b></p>
 <?php
@@ -327,10 +350,9 @@ if ($page_newaccounterror!='') {
 	echo '<p class=noticetext>'.$page_newaccounterror.'</p>';
 }
 ?>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/validateform.js"></script>
 <span class=form><label for="SID"><?php echo $longloginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID <?php if (isset($_POST['SID'])) {echo "value=\"{$_POST['SID']}\"";}?>><BR class=form>
-<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>
-<span class=form><label for="pw2">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>
+<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1 <?php if (isset($_POST['pw1'])) {echo "value=\"{$_POST['pw1']}\"";}?>><BR class=form>
+<span class=form><label for="pw2">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2 <?php if (isset($_POST['pw2'])) {echo "value=\"{$_POST['pw2']}\"";}?>><BR class=form>
 <span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname <?php if (isset($_POST['firstname'])) {echo "value=\"{$_POST['firstname']}\"";}?>><BR class=form>
 <span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname <?php if (isset($_POST['lastname'])) {echo "value=\"{$_POST['lastname']}\"";}?>><BR class=form>
 <span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email <?php if (isset($_POST['email'])) {echo "value=\"{$_POST['email']}\"";}?>><BR class=form>
@@ -348,13 +370,67 @@ if (isset($_GET['getsid'])) {
 	}
 ?>
 <div class=submit><input type="submit" name="submit" value="Sign Up"></div>
-</div>
+</fieldset>
 <?php
 	}
 ?>
 </form>
 
 <?php
+	echo '<script type="text/javascript">
+		$("#pageform").validate({
+			rules: {
+				username: {
+					required: {depends: function(element) {return logintype==0}}
+				},
+				password: {
+					required: {depends: function(element) {return logintype==0}}
+				},';
+	if (strlen($enrollkey)>0) {
+		echo '		ekey: {
+					required: {depends: function(element) {return logintype==0}}
+				},';
+	}
+	echo '
+				SID: {
+					required: {depends: function(element) {return logintype==1}},
+					pattern: '.$loginformat.',
+					remote: imasroot+"/actions.php?action=checkusername"
+				},
+				pw1: { 
+					required: {depends: function(element) {return logintype==1}},
+					minlength: 6},
+				pw2: {
+					required: {depends: function(element) {return logintype==1}},
+					equalTo: "#pw1"
+				},
+				firstname: { 
+					required: {depends: function(element) {return logintype==1}}
+				},
+				lastname: {
+					required: {depends: function(element) {return logintype==1}}
+				},';
+	if (strlen($enrollkey)>0) {
+		echo '		ekey2: {
+					required: {depends: function(element) {return logintype==1}}
+				},';
+	}
+	echo '
+				email: {
+					required: {depends: function(element) {return logintype==1}},
+					email: true
+				}
+				
+			},
+			messages: {
+				SID: {
+					remote: _("That username is already taken. Try another.")
+				}
+			},
+			invalidHandler: function() {
+				setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}
+		});
+		</script>';
 	require("footer.php");
 	}
 

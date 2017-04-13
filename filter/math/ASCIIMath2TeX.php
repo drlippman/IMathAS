@@ -34,6 +34,7 @@ var $AMpreviousSymbolinfix = false;
 var $AMcurrentSymbolinfix = false;
 var $AMnames = array();
 var $AMnestingDepth = 0;
+var $alignformatrix = false;
 
 var $AMsymbols = array(
 
@@ -721,7 +722,11 @@ function AMTparseExpr($str,$rightbracket) {
 			if ($right==')' || $right==']') {
 				$left = $newFrag{6};
 				if (($left=='(' && $right==')' && $symbol['input']!='}') || ($left=='[' && $right==']')) {
-					$mxout = '\\matrix{';
+					if ($this->alignformatrix) {
+						$mxout = '\\begin{align}';
+					} else {
+						$mxout = '\\matrix{';
+					}
 					$pos = array();
 					array_push($pos,0);
 					$matrix = true;
@@ -792,7 +797,11 @@ function AMTparseExpr($str,$rightbracket) {
 							$mxout .= implode('&',$subarr);
 						}
 					}
-					$mxout .= '}';
+					if ($this->alignformatrix) {
+						$mxout .= '\\end{align}';
+					} else {
+						$mxout .= '}';
+					}
 					if ($matrix) {
 						$newFrag = $mxout;
 					}
@@ -830,6 +839,10 @@ function AMtoTeX() { //constructor
 }
 function convert($str) {
 	return $this->AMTparseAMtoTeX($str);
+}
+
+function setAlignForMatrix($v) {
+	$this->alignformatrix = $v;
 }
 
 }

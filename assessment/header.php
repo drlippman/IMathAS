@@ -43,7 +43,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=110216";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=022817";?>" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
@@ -57,9 +57,17 @@ if (isset($CFG['locale'])) {
 }
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
-		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
+		$coursetheme = str_replace(array('_fw1920','_fw1000','_fw'),'',$sessiondata['coursetheme']);
 	} else {
 		$coursetheme = $sessiondata['coursetheme'];
+		$isfw = false;
+		if (strpos($coursetheme,'_fw1920')!==false) {
+			$isfw = 1920;
+			$coursetheme = str_replace('_fw1920','',$coursetheme);
+		} else if (strpos($coursetheme,'_fw')!==false) {
+			$isfw = 1000;
+			$coursetheme = str_replace(array('_fw1000','_fw'),'',$coursetheme);
+		}
 	}
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/$coursetheme\"/>\n";
 }
@@ -69,11 +77,16 @@ if ($isdiag) {
 } else {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
 }
+if (isset($CFG['GEN']['favicon'])) {
+	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
+} else {
+	echo '<link rel="shortcut icon" href="/favicon.ico" />';
+}
 //$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; var mathRenderer = "none"; function rendermathnode(el) {AMprocessNode(el);};</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
-	echo '<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML-full"></script>';
+	echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=AM_CHTML-full"></script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
@@ -84,10 +97,11 @@ if (!isset($sessiondata['mathdisp'])) {
 		} else {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none"});
 		}
-		MathJax.Hub.config.extensions.push("[Contrib]/InputToDataAttr/InputToDataAttr.js");
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
 		//webFont: "STIX-Web",
-	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML-full"></script>';
+	echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=AM_CHTML-full"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; var mathRenderer = "MathJax"; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>';
@@ -103,7 +117,8 @@ if (!isset($sessiondata['mathdisp'])) {
 		} else {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none", skipStartupTypeset: true});
 		}
-		MathJax.Hub.config.extensions.push("[Contrib]/InputToDataAttr/InputToDataAttr.js");
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		MathJax.Hub.Register.StartupHook("Begin Config", setupKatexAutoRenderWhenReady);
 		</script>
 		<script type="text/javascript">
@@ -114,11 +129,11 @@ if (!isset($sessiondata['mathdisp'])) {
 	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	//echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
-	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>';
+	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js" integrity="sha384-/y1Nn9+QQAipbNQWU65krzJralCnuOasHncUFXGkdwntGeSvQicrYkiUBwsgUqc1" crossorigin="anonymous"></script>';
 	//echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
-	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css"/>';
+	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" integrity="sha384-wITovz90syo1dJWVh32uuETPVEtGigN07tkttEqPv+uR2SE/mbQcG7ATL28aI9H0" crossorigin="anonymous">';
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=083116"></script>';
-	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML-full"></script>';
+	echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=AM_CHTML-full"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2) {
@@ -152,7 +167,7 @@ div { zoom: 1; }
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
 <![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=020917";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=040817";?>" type="text/javascript"></script>
 
 <?php
 /*
@@ -223,7 +238,12 @@ if (isset($sessiondata['ltiitemtype'])) {
 	$(function(){parent.postMessage(JSON.stringify({subject:\'lti.frameResize\', height: $(document).height()+"px"}), \'*\');});
 	</script>';
 }
-echo '</head><body>';
+echo '</head>';
+if ($isfw!==false) {
+	echo "<body class=\"fw$isfw\">\n";
+} else {
+	echo "<body>\n";
+}
 
 $insertinheaderwrapper = ' ';
 echo '<div class=mainbody>';
@@ -237,74 +257,40 @@ if (!isset($flexwidth)) {
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
 	require("$curdir/../{$CFG['GEN']['headerinclude']}");
 }
-if (!isset($coursetopbar)) {
-	$coursetopbar = explode('|',$sessiondata['coursetopbar']);
-	$coursetopbar[0] = explode(',',$coursetopbar[0]);
-	$coursetopbar[1] = explode(',',$coursetopbar[1]);
-	if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
-	if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
-	if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
-	$coursetoolset = $sessiondata['coursetoolset'];
-}
 
-if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
+if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false)) {
 	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
+
 	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
-	if (in_array(0,$coursetopbar[1]) && $msgset<4) { //messages
+	if ($coursemsgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}
-	if (in_array(6,$coursetopbar[1]) && (($coursetoolset&2)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Forums
+	
+	if (($coursetoolset&2)==0) { //forums
 		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
 	}
-	if (in_array(1,$coursetopbar[1])) { //Stu view
-		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&stuview=0\">Student View</a></li>";
+	
+	if (isset($teacherid)) { //Roster
+		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n"; 
 	}
-	if (in_array(3,$coursetopbar[1])) { //List stu
-		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
-	}
-	if (in_array(4,$coursetopbar[1])  && (($coursetoolset&1)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Calendar
+	
+	if (($coursetoolset&1)==0) { //Calendar
 		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
 	}
-	if (in_array(2,$coursetopbar[1])) { //Gradebook
-		echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a>$gbnewflag</li>";
-	}
-	if (in_array(7,$coursetopbar[1])) { //Groups
-		echo "<li><a href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
-	}
-	if (in_array(5,$coursetopbar[1])) { //Quickview
-		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
-	}
-
-	if (in_array(9,$coursetopbar[1]) && !isset($haslogout)) { //Log out
+	
+	echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li>"; //Gradebook
+	
+	if (!isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
-	echo '<br class="clear" />';
+	
+	echo '<div class="clear"></div>';
 	echo '</div>';
-} else if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && !$sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[0])>0) {
-	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
-	echo '<ul id="navlist">';
-	echo "<li><a href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
-	if (in_array(0,$coursetopbar[0]) && $msgset<4) { //messages
-		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
-	}
-	if (in_array(3,$coursetopbar[0]) && (($coursetoolset&2)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //forums
-		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li> ";
-	}
-	if (in_array(2,$coursetopbar[0]) && (($coursetoolset&1)==0 || !isset($CFG['CPS']['topbar']) || $CFG['CPS']['topbar'][1]==1)) { //Calendar
-		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
-	}
-	if (in_array(1,$coursetopbar[0])) { //Gradebook
-		echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li> ";
-	}
-	if (in_array(9,$coursetopbar[0]) && !isset($haslogout)) { //Log out
-		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
-	}
-	echo '</ul>';
-	echo '<br class="clear" />';
-	echo '</div>';
+	$didnavlist = true;
 }
+
 if (!isset($flexwidth)) {
 	echo '</div>';
 }

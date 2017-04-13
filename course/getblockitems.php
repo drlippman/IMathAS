@@ -4,8 +4,8 @@
    require("../validate.php");
    require("courseshowitems.php");
    require("../includes/calendardisp.php");
-   if (isset($guestid)) {
-	   $teacherid = $guestid;
+   if (isset($instrPreviewId)) {
+	   $tutorid = $instrPreviewId;
    }
    if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -15,10 +15,8 @@
    }
    $cid = $_GET['cid'];
    require("../filter/filter.php");
-   //DB $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs,toolset FROM imas_courses WHERE id='$cid'";
-   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-   $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc,latepasshrs,toolset FROM imas_courses WHERE id=:id");
+
+   $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,latepasshrs FROM imas_courses WHERE id=:id");
    $stm->execute(array(':id'=>$cid));
    $line = $stm->fetch(PDO::FETCH_ASSOC);
    if ($line == null) {
@@ -26,53 +24,24 @@
 	   exit;
    }
    $allowunenroll = $line['allowunenroll'];
-   $hideicons = $line['hideicons'];
-   $graphicalicons = ($line['picicons']==1);
    $pagetitle = $line['name'];
    $items = unserialize($line['itemorder']);
    $msgset = $line['msgset']%5;
    $latepasshrs = $line['latepasshrs'];
-   $useleftbar = ($line['cploc']==1);
-   $topbar = explode('|',$line['topbar']);
-   $toolset = $line['toolset'];
-   $topbar[0] = explode(',',$topbar[0]);
-   $topbar[1] = explode(',',$topbar[1]);
-   if ($topbar[0][0] == null) {unset($topbar[0][0]);}
-   if ($topbar[1][0] == null) {unset($topbar[1][0]);}
 
     //get exceptions
-   $now = time() + $previewshift;
+   $now = time();
    $exceptions = array();
    if (!isset($teacherid) && !isset($tutorid)) {
-	//DB $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-	//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
-	//DB $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid='$cid') ";
-	//DB $query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-	//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid='$userid' AND ";
-	//DB $query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid='$cid') ";
-  	$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-  	$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=:userid AND ";
-  	$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid=:courseid) ";
-  	$query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-  	$query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid=:userid2 AND ";
-  	$query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid=:courseid2) ";
-  	$stm = $DBH->prepare($query);
-  	$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':userid2'=>$userid, ':courseid2'=>$cid));
-	  // $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
-	   //$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
-	//DB    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-	   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-		   $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore'],$line['itemtype']);
-	   }
+	$exceptions = loadExceptions($cid, $userid);
    }
     if (count($exceptions)>0) {
-		   upsendexceptions($items);
-	   }
+	   upsendexceptions($items);
+    }
 
    //if ($_GET['folder']!='0') {
    if (strpos($_GET['folder'],'-')!==false) {
-	   $now = time() + $previewshift;
+	   $now = time();
 	   $blocktree = explode('-',$_GET['folder']);
 	   $backtrack = array();
 	   for ($i=1;$i<count($blocktree);$i++) {
@@ -100,7 +69,7 @@
 
 
    //get latepasses
-   if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1 && isset($studentinfo)) {
+   if (!isset($teacherid) && !isset($tutorid) && !$inInstrStuView && isset($studentinfo)) {
 	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	   //$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	   //$latepasses = mysql_result($result,0,0);

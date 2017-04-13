@@ -2,7 +2,7 @@
 //Matrix functions.  Version 1.5, Oct 8, 2014
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry","matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce","matrixnumsolutions");
+array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry","matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce","matrixnumsolutions","matrixround");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -278,27 +278,37 @@ function matrixgetentry($m,$r,$c) {
 	}
 }
 
-//matrixgetrow(matrix,row)
+//matrixgetrow(matrix,row,[asArray])
 //get row of a matrix as a new 1xm matrix
+//  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
-function matrixgetrow($m,$r) {
+function matrixgetrow($m,$r, $asArray=false) {
 	if ($r<0 || $r>=count($m)) {
 		echo 'invalid row';
 	} else {
-		return array($m[$r]);
+		if ($asArray) {
+			return $m[$r];
+		} else {
+			return array($m[$r]);
+		}
 	}
 }
 
-//matrixgetcol(matrix,col)
+//matrixgetcol(matrix,col,[asArray])
 //get col of a matrix as a new nx1 matrix
+//  or array if asArray is set to true
 //rows and cols are 0 indexed (first row is row 0)
-function matrixgetcol($m,$c) {
+function matrixgetcol($m,$c, $asArray=false) {
 	if ($c<0 || $c>=count($m[0])) {
 		echo 'invalid col';
 	} else {
 		$o = array();
 		foreach ($m as $r=>$row) {
-			$o[$r] = array($row[$c]);
+			if ($asArray) {
+				$o[$r] = $row[$c];
+			} else {
+				$o[$r] = array($row[$c]);
+			}
 		}
 		return $o;
 	}
@@ -829,6 +839,18 @@ function matrixnumsolutions($A,$n=0) {
 	return ($n - count($nosolution));
 }
 
+//matrixround(matrix, decimal places)
+//rounds each entry of the matrix the specified decimal places
+function matrixround($m,$d) {
+	$c = count($m[0]);
+	$r = count($m);
+	for ($i=0; $i<$r; $i++) {
+		for ($j=0; $j<$c; $j++) {
+			$m[$i][$j] = round($m[$i][$j], $d);		
+		}
+	}
+	return $m;
+}
 
 //polyregression(x,y,n)
 //find a nth degree polynomial that best fits the data 
@@ -846,6 +868,7 @@ function polyregression($x,$y,$n) {
 	$m = matrixtranspose($m);
 	return $m[0];
 }
+
 
 
 

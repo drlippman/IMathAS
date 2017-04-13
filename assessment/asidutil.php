@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 
 function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
+	global $DBH;
 	$ioquestions = explode(",",$itemorder);
 	$questions = array();
 	foreach($ioquestions as $k=>$q) {
@@ -35,6 +36,16 @@ function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 			$questions[] = $q;
 		}
 	}
+	
+	$qlist = implode(',',array_map('intval',$questions));
+	$stm = $DBH->query("SELECT id,fixedseeds FROM imas_questions WHERE id IN ($qlist)");
+	$fixedseeds = array();
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		if ($row[1]!==null && $row[1]!='') {
+			$fixedseeds[$row[0]] = explode(',',$row[1]);	
+		}
+	}
+	
 	if ($shuffle&1) {shuffle($questions);}
 	
 	if ($shuffle&2) { //all questions same random seed
@@ -48,13 +59,25 @@ function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 	} else {
 		if ($shuffle&4) { //all students same seed
 			for ($i = 0; $i<count($questions);$i++) {
-				$seeds[] = $aid + $i;
-				$reviewseeds[] = $aid + $i + 100;
+				if (isset($fixedseeds[$questions[$i]])) {
+					$seeds[] = $fixedseeds[$questions[$i]][0];
+					$reviewseeds[] = $fixedseeds[$questions[$i]][1%count($fixedseeds[$questions[$i]])];
+				} else {
+					$seeds[] = $aid + $i;
+					$reviewseeds[] = $aid + $i + 100;
+				}
 			}
 		} else {
 			for ($i = 0; $i<count($questions);$i++) {
-				$seeds[] = rand(1,9999);
-				$reviewseeds[] = rand(1,9999);
+				if (isset($fixedseeds[$questions[$i]])) {
+					$n = count($fixedseeds[$questions[$i]]);
+					$x = rand(0,$n-1);
+					$seeds[] = $fixedseeds[$questions[$i]][$x];
+					$reviewseeds[] = $fixedseeds[$questions[$i]][($x+1)%$n];
+				} else {
+					$seeds[] = rand(1,9999);
+					$reviewseeds[] = rand(1,9999);
+				}
 			}
 		}
 	}

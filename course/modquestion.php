@@ -33,11 +33,13 @@ if (!(isset($teacherid))) {
 			$showans = 0;
 			$rubric = 0;
 			$showhints = 0;
+			$fixedseeds = null;
 			$_POST['copies'] = 1;
 		} else {
 			if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
 			if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
 			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
+			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
 			if ($penalty!=9999) {
 				if ($_POST['skippenalty']==10) {
 					$penalty = 'L'.$penalty;
@@ -54,19 +56,19 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
 				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints";
 				//DB $query .= ',questionsetid='.intval($_POST['replacementid'])." WHERE id='{$_GET['id']}'";
-				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints";
+				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':rubric'=>$rubric,
-					':showhints'=>$showhints, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
+					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
 			} else {
 				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints";
 				//DB $query .= " WHERE id='{$_GET['id']}'";
-				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints";
+				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
-					':rubric'=>$rubric, ':showhints'=>$showhints, ':id'=>$_GET['id']));
+					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$_GET['id']));
 			}
 
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -91,11 +93,11 @@ if (!(isset($teacherid))) {
 				//DB $query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}',$rubric,$showhints)";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB $qid = mysql_insert_id();
-				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints) ";
-				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :questionsetid, :rubric, :showhints)";
+				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints,fixedseeds) ";
+				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :questionsetid, :rubric, :showhints, :fixedseeds)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$aid, ':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen,
-					':showans'=>$showans, ':questionsetid'=>$_GET['qsetid'], ':rubric'=>$rubric, ':showhints'=>$showhints));
+					':showans'=>$showans, ':questionsetid'=>$_GET['qsetid'], ':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds));
 				$qid = $DBH->lastInsertId();
 
 				//add to itemorder
@@ -126,7 +128,7 @@ if (!(isset($teacherid))) {
 			//DB $query = "SELECT points,attempts,penalty,regen,showans,rubric,showhints FROM imas_questions WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid FROM imas_questions WHERE id=:id");
+			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($line['penalty']{0}==='L') {
@@ -142,12 +144,14 @@ if (!(isset($teacherid))) {
 			if ($line['points']==9999) {$line['points']='';}
 			if ($line['attempts']==9999) {$line['attempts']='';}
 			if ($line['penalty']==9999) {$line['penalty']='';}
+			if ($line['fixedseeds']===null) {$line['fixedseeds'] = '';}
 			$qsetid = $line['questionsetid'];
 		} else {
 			//set defaults
 			$line['points']="";
 			$line['attempts']="";
 			$line['penalty']="";
+			$line['fixedseeds'] = '';
 			$skippenalty = 0;
 			$line['regen']=0;
 			$line['showans']='0';
@@ -192,14 +196,49 @@ if (!(isset($teacherid))) {
 		} else {
 			$beentaken = false;
 		}
-
+		
+		//get defaults
+		$query = "SELECT defpoints,defattempts,defpenalty,deffeedback,showhints,shuffle FROM imas_assessments ";
+		$query .= "WHERE id=:id";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':id'=>$aid));
+		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+		list($deffeedback,$defshowans) = explode('-',$defaults['deffeedback']);
+		if ($defaults['defpenalty']{0}==='L') {
+			$defaults['defpenalty'] = substr($defaults['defpenalty'],1);
+			$skippenalty=_('on last possible attempt only');
+		} else if ($defaults['defpenalty']{0}==='S') {
+			$skippenalty = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty']{1});
+			$defaults['defpenalty'] = substr($defaults['defpenalty'],2);
+		} else {
+			$skippenalty = _('per missed attempt');
+		}
+		$defaults['penalty'] = $defaults['defpenalty'].'% '.$skippenalty;
+		if ($deffeedback=="Practice" || $deffeedback=="Homework") {
+			$defaults['allowregen'] = _('Yes');
+		} else {
+			$defaults['allowregen'] = _('No');
+		}
+		if (($defaults['shuffle']&8)==8) {
+			$defaults['reattemptnewver'] = _('Yes');
+		} else {
+			$defaults['reattemptnewver'] = _('No');
+		}
+		if ($defshowans=='F') {
+			$defaults['showans'] = _('After last attempt');
+		} else if (is_numeric($defshowans)) {
+			$defaults['showans'] = sprintf(_('After %d attempts'), $defshowans);	
+		} else {
+			$defaults['showans'] = _('Never during assessment');
+		}
+		$defaults['showhints'] = ($defaults['showhints']==1)?_('Yes'):_('No');
 	}
 }
 
 /******* begin html output ********/
 $placeinhead = '<script type="text/javascript">
 function previewq(qn) {
-  previewpop = window.open(imasroot+"/course/testquestion.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
+  previewpop = window.open(imasroot+"/course/testquestion.php?fixedseeds=1&cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
   previewpop.focus();
 }
 </script>';
@@ -220,13 +259,16 @@ if ($overwriteBody==1) {
 ?>
 </p>
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=$aid"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
-Leave items blank to use the assessment's default values<br/>
+<p>Leave items blank to use the assessment's default values.</p>
 
-<span class=form>Points for this problem:</span><span class=formright> <input type=text size=4 name=points value="<?php echo $line['points'];?>"></span><BR class=form>
+<span class=form>Points for this problem:</span>
+<span class=formright> <input type=text size=4 name=points value="<?php echo $line['points'];?>"><br/><i class="grey">Default: <?php echo $defaults['defpoints'];?></i></span><BR class=form>
 
-<span class=form>Attempts allowed for this problem (0 for unlimited):</span><span class=formright> <input type=text size=4 name=attempts value="<?php echo $line['attempts'];?>"></span><BR class=form>
+<span class=form>Attempts allowed for this problem (0 for unlimited):</span>
+<span class=formright> <input type=text size=4 name=attempts value="<?php echo $line['attempts'];?>"><br/><i class="grey">Default: <?php echo $defaults['defattempts'];?></i></span><BR class=form>
 
-<span class=form>Default penalty:</span><span class=formright><input type=text size=4 name=penalty value="<?php echo $line['penalty'];?>">%
+<span class=form>Penalty for missed attempts:</span>
+<span class=formright><input type=text size=4 name=penalty value="<?php echo $line['penalty'];?>">%
    <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
      <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
      <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -236,21 +278,22 @@ Leave items blank to use the assessment's default values<br/>
      <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
      <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
      <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
-     </select></span><BR class=form>
+     </select><br/><i class="grey">Default: <?php echo $defaults['penalty'];?></i></span><BR class=form>
 
-<span class=form>New version on reattempt?</span><span class=formright>
+<span class=form>New version on reattempt?</span>
+<span class=formright>
     <select name="regen">
      <option value="0" <?php if (($line['regen']%3)==0) { echo 'selected="1"';}?>>Use Default</option>
      <option value="1" <?php if (($line['regen']%3)==1) { echo 'selected="1"';}?>>Yes, new version on reattempt</option>
      <option value="2" <?php if (($line['regen']%3)==2) { echo 'selected="1"';}?>>No, same version on reattempt</option>
-    </select></span><br class="form"/>
+    </select><br/><i class="grey">Default: <?php echo $defaults['reattemptnewver'];?></i></span><br class="form"/>
 
 <span class="form">Allow &quot;Try similar problem&quot;?</span>
 <span class=formright>
     <select name="allowregen">
      <option value="0" <?php if ($line['regen']<3) { echo 'selected="1"';}?>>Use Default</option>
      <option value="1" <?php if ($line['regen']>=3) { echo 'selected="1"';}?>>No</option>
-</select></span><br class="form"/>
+</select><br/><i class="grey">Default: <?php echo $defaults['allowregen'];?></i></span><br class="form"/>
 
 <span class=form>Show Answers</span><span class=formright>
     <select name="showans">
@@ -265,14 +308,14 @@ Leave items blank to use the assessment's default values<br/>
      <option value="6" <?php if ($line['showans']=="6") {echo "SELECTED";} ?>>After 6 attempts</option>
      <option value="7" <?php if ($line['showans']=="7") {echo "SELECTED";} ?>>After 7 attempts</option>
 
-    </select></span><br class="form"/>
+    </select><br/><i class="grey">Default: <?php echo $defaults['showans'];?></i></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>
     <select name="showhints">
      <option value="0" <?php if ($line['showhints']==0) { echo 'selected="1"';}?>>Use Default</option>
      <option value="1" <?php if ($line['showhints']==1) { echo 'selected="1"';}?>>No</option>
      <option value="2" <?php if ($line['showhints']==2) { echo 'selected="1"';}?>>Yes</option>
-    </select></span><br class="form"/>
+    </select><br/><i class="grey">Default: <?php echo $defaults['showhints'];?></i></span><br class="form"/>
 
 <span class=form>Use Scoring Rubric</span><span class=formright>
 <?php
@@ -287,16 +330,27 @@ Leave items blank to use the assessment's default values<br/>
 	} else if (!$beentaken) {
 		echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
 	}
-
+	if ($line['fixedseeds']=='') {
+		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
+	}
+	echo '<div class="advanced" id="fixedseedwrap" ';
+	if ($line['fixedseeds']=='') {
+		echo 'style="display:none;"';
+	}
+	echo '>';
+	echo '<span class="form">Restricted question seed list:</span>';
+	echo '<span class="formright"><input size=30 name="fixedseeds" id="fixedseeds" value="'.$line['fixedseeds'].'"/></span><br class="form"/>';
+	echo '</div>';
+	if ($line['fixedseeds']!='' && $beentaken) {
+		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
+	}
 	if ($beentaken) {
-		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'#advanced\').show();return false">Advanced</a></span><br class="form"/>';
-		echo '<div id="advanced" style="display:none;">';
+		echo '<div class="advanced" style="display:none">'; 
 		echo '<span class="form">Replace this question with question ID: <br/>';
 		echo '<span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
 		echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
 		echo '</div>';
 	}
-
 	echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 }
 

@@ -53,18 +53,18 @@ $placeinhead = '
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 $placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<div class="floatright dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
+  var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
   $(".courselist-teach li").css("clear","both").each(function (i,el) {
   	if ($(el).attr("data-isowner")=="true") {
   		var cid = $(el).attr("data-cid");
-  		var thishtml = html + \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');">'._('Hide from course list').'</a></li>\';
-  		thishtml += \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
+  		var thishtml = html + \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
+  		thishtml += \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');return false;">'._('Hide from course list').'</a></li>\';
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=chgteachers&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=transfer&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
   		thishtml += \'</ul></div>\';
-  		$(el).prepend(thishtml);
+  		$(el).append(thishtml);
   	} 
   });
   $(".dropdown-toggle").dropdown();
@@ -188,7 +188,7 @@ $page_tutorCourseData = array();
 //DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB if (mysql_num_rows($result)==0) {
-$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
+$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid,imas_tutors.hidefromcourselist FROM imas_tutors,imas_courses ";
 $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid=:userid ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 $stm = $DBH->prepare($query);
@@ -460,10 +460,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			echo ' data-isowner="'.($data[$i]['ownerid']==$userid?'true':'false').'"';
 			echo ' data-cid="'.$data[$i]['id'].'"';
 		}
-		echo '>';
-		if ($type != 'teach' || $data[$i]['ownerid']!=$userid || $myrights<40) {
-			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</span>';
-		} 
+		echo '>'; 
 		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
@@ -478,7 +475,9 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
 			echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
-
+		if ($type != 'teach' || $data[$i]['ownerid']!=$userid || $myrights<40) {
+			echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';
+		}
 		echo '</li>';
 	}
 	if ($type=='teach' && $myrights>39 && count($data)==0) {
@@ -494,7 +493,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	}
 	
 	echo '<div class="center">';
-	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">Unhide hidden courses</a>';
+	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
 	echo '</div>';
 	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
 		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';

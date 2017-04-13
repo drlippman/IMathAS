@@ -430,9 +430,10 @@ function onYouTubeIframeAPIReady() {
 	YouTubeApiLoaded = true;
 }
 */
+(function($) {
 $(function() {$("#leftcontenttoggle").on("click", function(e) {
 	var el = $("#leftcontenttoggle");
-	$("#leftcontent").toggleClass("hiddenmobile").css("top",el.position().top+el.outerHeight(true)-10);
+	$("#leftcontent").toggleClass("hiddenmobile").css("top",el.position().top+el.outerHeight(true)-parseInt($("#leftcontent").css("margin-top")));
 	el.toggleClass("leftcontentactive");
 	if (!$("#leftcontent").hasClass("hiddenmobile")) {
 		$(document).on("click.lefttoggle", function(e) {
@@ -447,4 +448,5 @@ $(function() {$("#leftcontenttoggle").on("click", function(e) {
 		$(document).off("click.lefttoggle");
 	}
 	e.preventDefault();});
-});
+})
+})(jQuery);
