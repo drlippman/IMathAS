@@ -1207,7 +1207,9 @@ Detailed Solution:
 <span class="noselect"><span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span></span>
 <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question" class="saveandtest" /><br/>
+<input type=submit name=test value="Save and Test Question" class="saveandtest" />
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<br/>
 <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
 Uses random variables from the question.
@@ -1364,7 +1366,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				if (res.extref.length>0) {
 					$("#helpbtnlist").html('');
 					for (var i=0;i<res.extref.length;i++) {
-						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] + 
+						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] +
 							", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
 							"Delete? <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
 					}
@@ -1373,7 +1375,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 					$("#helpbtnwrap").addClass("hidden");
 				}
 				$("input[name=helpurl]").val('');
-				
+
 				// Empty notices
 				$(".quickSaveNotice").empty();
 				// Load preview page
