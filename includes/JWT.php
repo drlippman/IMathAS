@@ -69,6 +69,14 @@ class JWT
             	$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
             	$stm->execute(array(':SID'=>$payload->auth));
 		          $key = $stm->fetchColumn(0);
+            } else if ($key===null && isset($payload->uid)) {
+            	//DB $query = "SELECT password FROM imas_users WHERE SID='".mysql_real_escape_string($payload->auth)."'";
+		          //DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		          //DB $row = mysql_fetch_row($result);
+							global $DBH;
+            	$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
+            	$stm->execute(array(':uid'=>$payload->uid));
+		          $key = $stm->fetchColumn(0);
             }
             if (!JWT::verify("$headb64.$bodyb64", $sig, $key, $header->alg)) {
                 throw new UnexpectedValueException('Signature verification failed');
