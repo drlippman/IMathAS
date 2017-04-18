@@ -3,10 +3,12 @@
 require("../validate.php");
 require("../includes/JWT.php");
 
+//grab user's hashed password to sign request with
 $stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
 $stm->execute(array(':uid'=>$userid));
 $key = $stm->fetchColumn(0);
 if (isset($_POST['textitemstype'])) {
+	//this is the AJAX callback to update the feed link
 	$payload = array('uid'=>$userid, 'cid'=>$cid);
 	if ($_POST['textitemstype']!='no') {
 		$payload['T'] = strtoupper($_POST['textitemstype']{0}).intval($_POST['textitems']);
@@ -20,12 +22,13 @@ if (isset($_POST['textitemstype'])) {
 	if ($_POST['caltype']!='no') {
 		$payload['C'] = strtoupper($_POST['caltype']{0}).intval($_POST['cal']);
 	}
-	$token = JWT::encode($payload, $key);
+	$token = JWT::encode($payload, $key); //token is URL safe from JWT
 	$url = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/admin/calendarfeed.php?t='.$token;
 	echo $url;
 	exit;
 } else {
-	$token = JWT::encode(array('uid'=>$userid, 'cid'=>$cid), $key);
+	//generate simple link on initial load
+	$token = JWT::encode(array('uid'=>$userid, 'cid'=>$cid), $key); //token is URL safe from JWT
 	$url = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/admin/calendarfeed.php?t='.$token;
 }
 unset($key);

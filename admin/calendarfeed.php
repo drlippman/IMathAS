@@ -8,14 +8,16 @@ if (!isset($_REQUEST['t'])) {
 	echo 'Token required';
 	exit;
 }
+//check token.  It was signed with user's password, so runs with their authority
 try {
 	$JWTsess = JWT::decode($_REQUEST['t']);
 } catch (Exception $e) {
 	echo "Error:", $e->getMessage();
 	exit;
 }
-$userid = $JWTsess->uid;
-$cid = $JWTsess->cid;
+
+$userid = intval($JWTsess->uid);
+$cid = intval($JWTsess->cid);
 $alarms = array('T'=>'', 'A'=>'', 'F'=>'', 'C'=>'');
 function toalarmformat($str) {
 	$type = $str{0};
