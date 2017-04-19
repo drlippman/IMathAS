@@ -253,7 +253,7 @@ function GB_show(caption,url,width,height) {
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()" aria-label="Close">[X]</span></span>'+caption;
+		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span>'+caption;
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
 			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
