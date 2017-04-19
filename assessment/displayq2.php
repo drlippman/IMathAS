@@ -2223,7 +2223,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" alt="Set score no credit" ';
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 
-				$la = preg_replace_callback('/<a[^>]*href="(.*)?"[^>]*>(.*?)<\/a>/', function ($m) {
+				$la = preg_replace_callback('/<a[^>]*href="(.*?)"[^>]*>(.*?)<\/a>/', function ($m) {
 					global $gradededessayexpandocnt;
 					if (!isset($gradededessayexpandocnt)) {
 						$gradededessayexpandocnt = 0;
