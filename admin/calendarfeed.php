@@ -115,9 +115,11 @@ function flattenitems($items,&$addto,$viewall) {
 	}
 }
 
-$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+$stm = $DBH->prepare("SELECT name,itemorder FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
-$itemorder = unserialize($stm->fetchColumn(0));
+$row = $stm->fetch(PDO::FETCH_NUM);
+$coursename = trim($row[0]);
+$itemorder = unserialize($row[1]);
 $itemsimporder = array();
 
 flattenitems($itemorder,$itemsimporder,(isset($teacherid)||isset($tutorid)));
