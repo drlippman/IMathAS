@@ -97,7 +97,7 @@ echo '</fieldset></form>';
 echo '<h3>'._('To load in the calendar feed').'</h3>';
 echo '<h4>'._('Google Calendar').'</h4>';
 echo '<p>';
-echo _('In the left column, under Other calendars, paste the feed link into box labeled "Add a friend\'s calendar"');
+echo _('In the left column, click the triangle after "Other calendars" and select "Add by URL". Paste in the feed link and Add Calendar.');
 echo '</p>';
 
 echo '<h4>'._('iOS').'</h4>';

@@ -280,7 +280,10 @@ $EOL = "\r\n";
 echo 'BEGIN:VCALENDAR'.$EOL;
 echo 'PRODID:-//IMathAS//'.$installname.'//EN'.$EOL;
 echo 'VERSION:2.0'.$EOL;
-echo 'X-WR-CALNAME:'.$installname.': '.$coursename.$EOL;
+echo 'NAME:'.$coursename.$EOL;
+echo 'DESCRIPTION:'.$installname.': '.$coursename.$EOL;
+echo 'X-WR-CALNAME:'.$coursename.$EOL;
+echo 'X-WR-CALDESC:'.$installname.': '.$coursename.$EOL;
 
 foreach ($calevents as $event) {
 	echo 'BEGIN:VEVENT'.$EOL;
