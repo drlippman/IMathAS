@@ -834,9 +834,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 
 	$score = 0;
 	if ($qdata['qtype']=="multipart") {
-		if (in_array('essay',$anstypes) || in_array('file',$anstypes)) {
-			$GLOBALS['questionmanualgrade'] = true;
-		}
 		$partla = array();
 		if (isset($answeights)) {
 			if (!is_array($answeights)) {
@@ -898,9 +895,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			return array(implode('~',$scores),implode('~',$raw));
 		}
 	} else {
-		if ($qdata['qtype']=='essay' || $qdata['qtype']=='file') {
-			$GLOBALS['questionmanualgrade'] = true;
-		}
 		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
 		if (isset($scoremethod) && $scoremethod == "allornothing") {
 			if ($score<.98) {$score=0;}
@@ -4587,6 +4581,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if (trim($givenans)=='') {
 			return 0;
 		} else {
+			$GLOBALS['questionmanualgrade'] = true;
 			return -2;
 		}
 	} else if ($anstype == 'interval' || $anstype == 'calcinterval') {
@@ -6423,6 +6418,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				return $pts/count($answer);
 			} else {
+				$GLOBALS['questionmanualgrade'] = true;
 				return -2;
 			}
 		}
