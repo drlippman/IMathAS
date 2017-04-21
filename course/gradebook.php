@@ -2002,10 +2002,10 @@ function gbinstrdisp() {
 		echo '</tr>';
 	}
 	echo "</tbody></table></div></div>";
-	if ($n>1) {
+	if ($n>0) {
 		$sarr = array_merge($sortarr, array_fill(0,$n,"'N'"));
 	} else {
-		$sarr = array();
+		$sarr = $sortarr;
 	}
 
 	$sarr = implode(",",$sarr);
