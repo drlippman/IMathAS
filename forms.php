@@ -2,13 +2,14 @@
 //IMathAS:  Basic forms
 //(c) 2006 David Lippman
 require("config.php");
+require("includes/htmlutil.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("validate.php");
 } else {
 	if (isset($CFG['CPS']['theme'])) {
 		$defaultcoursetheme = $CFG['CPS']['theme'][0];
 	} else if (!isset($defaultcoursetheme)) {
-		 $defaultcoursetheme = "default.css";
+		$defaultcoursetheme = "default.css";
 	}
 	$coursetheme = $defaultcoursetheme;
 }
@@ -23,8 +24,10 @@ $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jqu
 if (isset($CFG['locale'])) {
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.$CFG['locale'].'.min.js"></script>';
 }
+if ($_GET['action']=='chguserinfo') {
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+}
 require("header.php");
-
 switch($_GET['action']) {
 	case "newuser":
 		if ($gb == '') {
@@ -231,6 +234,7 @@ switch($_GET['action']) {
 			echo '</span><br class="form" />';
 
 		}
+		/*  moved to user prefs
 		echo '<span class="form"><label for="theme">'._('Overwrite default course theme on all pages:').'</label></span><span class="formright">';
 		echo '<select name="theme" id="theme">';
 		echo '<option value="" '.($line['theme']==''?'selected':'').'>'._('Use course default theme').'</option>';
@@ -243,6 +247,7 @@ switch($_GET['action']) {
 			echo '<option value="highcontrast_dark.css" '.($line['theme']=='highcontrast_dark.css'?'selected':'').'>'._('High contrast, light on dark').'</option>';
 		}
 		echo '</select><br class="form" />';
+		*/
 
 		if (isset($CFG['GEN']['translatewidgetID'])) {
 			echo '<span class="form">Attempt to translate pages into another language:</span>';
@@ -255,6 +260,11 @@ switch($_GET['action']) {
 			unset($CFG['GEN']['translatewidgetID']);
 		}
 		echo '</fieldset>';
+		
+		//show accessibilty and display prefs form
+		require("includes/userprefs.php");
+		showUserPrefsForm();
+		
 
 		if ($myrights>19) {
 			echo '<fieldset id="userinfoinstructor"><legend>Instructor Options</legend>';
@@ -299,20 +309,7 @@ switch($_GET['action']) {
 			echo '</fieldset>';
 
 		}
-		if ($tzname!='') {
-			echo '<fieldset><legend>Timezone</legend>';
-			echo '<p>Due Dates and other times are being shown to you correct for the <b>'.$tzname.'</b> timezone.</p>';
-			echo '<p>You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.</p>';
-			echo '<p>Set timezone to: <select name="settimezone" id="settimezone">';
-			$timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
-			foreach ($timezones as $tz) {
-				echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';
-			}
-			echo '</select></p>';
-			echo '</fieldset>';
 
-
-		}
 		echo '<script type="text/javascript">
 		$("#pageform").validate({
 			rules: {

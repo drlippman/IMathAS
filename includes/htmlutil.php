@@ -13,7 +13,7 @@ function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLa
 		echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
 	}
 	for ($i=0;$i<count($valList);$i++) {
-		if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
+		if ((isset($selectedVal)) && (strcmp($valList[$i],$selectedVal)==0)) {
 			echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
 		} else {
 			echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";

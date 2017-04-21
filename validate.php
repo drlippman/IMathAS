@@ -90,6 +90,7 @@
 			unset($userid);
 		 }
 	 } else {
+	 	 //no reason we should be here...
 		 if (isset($_SERVER['QUERY_STRING'])) {
 			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
 		 } else {
@@ -98,9 +99,10 @@
 
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
 		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
-		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
-		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = checkeditorok();
+		 
+		 require_once("$curdir/includes/userprefs.php");
+		 generateuserprefs();
+		
 		 $sessiondata['secsalt'] = generaterandstring();
 		 if (isset($_POST['savesettings'])) {
 			 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
@@ -247,68 +249,25 @@
 			exit;
 		 }
 
-		 //$sessiondata['mathdisp'] = $_POST['mathdisp'];
-		 //$sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 //$sessiondata['useed'] = $_POST['useed'];
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
 		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
 		 $sessiondata['secsalt'] = generaterandstring();
-		 if ($_POST['access']==1) { //text-based
-			 $sessiondata['mathdisp'] = $_POST['mathdisp']; //to allow for accessibility
-			 $sessiondata['graphdisp'] = 0;
-			 $sessiondata['useed'] = 0;
-			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['access']==2) { //img graphs
-		 	 //deprecated
-			 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
-			 $sessiondata['graphdisp'] = 2;
-			 $sessiondata['useed'] = checkeditorok();
-			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['access']==4) { //img math
-		 	 //deprecated
-			 $sessiondata['mathdisp'] = 2;
-			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = checkeditorok();
-			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['access']==3) { //img all
-			 $sessiondata['mathdisp'] = 2;
-			 $sessiondata['graphdisp'] = 2;
-			 $sessiondata['useed'] = checkeditorok();
-			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['access']==5) { //mathjax experimental
-		 	 //deprecated, as mathjax is now default
-		 	 $sessiondata['mathdisp'] = 1;
-			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = checkeditorok();
-			 $enc = base64_encode(serialize($sessiondata));
-		 } else if ($_POST['access']==6) { //katex experimental
-		 	 $sessiondata['mathdisp'] = 6;
-			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = checkeditorok();
-			 $enc = base64_encode(serialize($sessiondata));
-		 } else if (!empty($_POST['isok'])) {
-			 $sessiondata['mathdisp'] = 1;
-			 $sessiondata['graphdisp'] = 1;
-			 $sessiondata['useed'] = checkeditorok();
-			 $enc = base64_encode(serialize($sessiondata));
-		 } else {
-		 	 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
-		 	 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 	 $sessiondata['useed'] = checkeditorok();
-			 $enc = base64_encode(serialize($sessiondata));
-		 }
-
+		 
 		 if (!isset($_POST['tzoffset'])) {
 			 $_POST['tzoffset'] = 0;
 		 }
+		 if (isset($_POST['tzname'])) {
+		 	 $sessiondata['logintzname'] = $_POST['tzname'];
+		 }
+		 require_once("$curdir/includes/userprefs.php");
+		 generateuserprefs();
+		 
+		 $enc = base64_encode(serialize($sessiondata));
+
 		 if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-		 	 //DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
-       //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 	 $stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
 		 	 $stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$_POST['tzname'], ':sessiondata'=>$enc));
 		 } else {
-		 	 //DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
-       //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 	 $stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :sessiondata)");
 		 	 $stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':sessiondata'=>$enc));
 		 }
@@ -316,13 +275,9 @@
 
 		 if (isset($CFG['GEN']['newpasswords']) && strlen($line['password'])==32) { //old password - rehash it
 		 	 $hashpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
-		 	 //DB $query = "UPDATE imas_users SET lastaccess=$now,password='$hashpw' WHERE id=$userid";
-       //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 	 $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess,password=:password WHERE id=:id");
 		 	 $stm->execute(array(':lastaccess'=>$now, ':password'=>$hashpw, ':id'=>$userid));
 		 } else {
-		 	 //DB $query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
-       //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		 	 $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 		 	 $stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 		 }
@@ -392,13 +347,24 @@
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];
 	$selfhasuserimg = $line['hasuserimg'];
-	$usertheme = $line['theme'];
-	$FCMtoken = $line['FCMtoken'];
+	/*$usertheme = $line['theme'];
 	if (isset($usertheme) && $usertheme!='') {
 		$coursetheme = $usertheme;
 	}
+	*/
+	$FCMtoken = $line['FCMtoken'];
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$inInstrStuView = false;
+	if (!isset($sessiondata['userprefs']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+		//userprefs are missing!  They should be defined from initial session setup
+		//we should never be here. But in case we are, reload prefs
+		require_once("$curdir/includes/userprefs.php");
+		generateuserprefs(true);
+	}
+	if (isset($sessiondata['userprefs']['usertheme']) && strcmp($sessiondata['userprefs']['usertheme'],'0')!=0) {
+		$coursetheme = $sessiondata['userprefs']['usertheme'];
+	}
+	
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
 	if ($myrights==100 && (isset($_GET['debug']) || isset($sessiondata['debugmode']))) {
 		ini_set('display_errors',1);
@@ -436,6 +402,7 @@
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
 	}
+
 	if (isset($sessiondata['ltiitemtype'])) {
 		$flexwidth = true;
 		if ($sessiondata['ltiitemtype']==1) {
@@ -447,7 +414,7 @@
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
 			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid={$_GET['cid']}&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
-			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php'))) {
+			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php'))) {
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				//DB $query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -565,8 +532,12 @@
 			$crow = $stm->fetch(PDO::FETCH_ASSOC);
 			$coursename = $crow['name']; //mysql_result($result,0,0);
 			$coursetheme = $crow['theme']; //mysql_result($result,0,5);
-			if (isset($usertheme) && $usertheme!='') {
+			/*if (isset($usertheme) && $usertheme!='') {
 				$coursetheme = $usertheme;
+			} else 
+			*/
+			if (isset($sessiondata['userprefs']['usertheme']) && strcmp($sessiondata['userprefs']['usertheme'],'0')!=0) {
+				$coursetheme = $sessiondata['userprefs']['usertheme'];
 			} else if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
 				$coursetheme = $defaultcoursetheme;
 			} else if (isset($CFG['CPS']['themelist']) && strpos($CFG['CPS']['themelist'], $coursetheme)===false) {

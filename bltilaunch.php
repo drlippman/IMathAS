@@ -28,6 +28,7 @@
 
 header('P3P: CP="ALL CUR ADM OUR"');
 include("config.php");
+$curdir = rtrim(dirname(__FILE__), '/\\');
 //DB if (!get_magic_quotes_gpc()) {
 //DB 	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
 //DB }
@@ -85,27 +86,13 @@ if (isset($_GET['launch'])) {
 	}
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
-	if ($_POST['access']==1) { //text-based
-		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
-		 $sessiondata['graphdisp'] = 0;
-		 $sessiondata['useed'] = 0;
-	 } else if ($_POST['access']==2) { //img graphs
-		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
-		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1;
-	 } else if ($_POST['access']==4) { //img math
-		 $sessiondata['mathdisp'] = 2;
-		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1;
-	 } else if ($_POST['access']==3) { //img all
-		 $sessiondata['mathdisp'] = 2;
-		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1;
-	 } else {
-		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
-		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1;
-	 }
+	
+	if (isset($_POST['tzname'])) {
+		$sessiondata['logintzname'] = $_POST['tzname'];
+	}
+	
+	require_once("$curdir/includes/userprefs.php");
+	generateuserprefs();
 
 	$enc = base64_encode(serialize($sessiondata));
 
@@ -166,17 +153,18 @@ if (isset($_GET['launch'])) {
 	}
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
-	//time to output a postback to capture tzoffset and math/graph settings
+	//time to output a postback to capture tzname
 	$pref = 0;
 	$flexwidth = true;
 	$nologo = true;
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h4>Connecting to $installname</h4>";
-	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
+	echo "<form id=\"postbackform\" method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo '<div class="textright"><input type="submit" value="Continue" /></div>';
 	} else {
 		echo ">";
 	}
@@ -186,38 +174,18 @@ if (isset($_GET['launch'])) {
 	<input type="hidden" id="tzoffset" name="tzoffset" value="" />
 	<input type="hidden" id="tzname" name="tzname" value="">
 	<script type="text/javascript">
-		 function updateloginarea() {
-			setnode = document.getElementById("settings");
-			var html = "";
-			html += 'Accessibility: ';
-			html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help<\/a>";
-			html += '<div style="margin-top: 0px;margin-right:0px;text-align:right;padding:0px"><select name="access"><option value="0">Use defaults</option>';
-			html += '<option value="3">Force image-based display</option>';
-			html += '<option value="1">Use text-based display</option></select></div>';
-
-			if (!MathJaxCompatible) {
-				html += '<input type="hidden" name="mathdisp" value="0" />';
-			} else {
-				html += '<input type="hidden" name="mathdisp" value="1" />';
-			}
-			if (ASnoSVG) {
-				html += '<input type="hidden" name="graphdisp" value="2" />';
-			} else {
-				html += '<input type="hidden" name="graphdisp" value="1" />';
-			}
-			html += '<div class="textright"><input type="submit" value="Continue" /><\/div>';
-			setnode.innerHTML = html;
+		$(function() {
 			var thedate = new Date();
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
 			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
-		}
-		var existingonload = window.onload;
-		if (existingonload) {
-			window.onload = function() {existingonload(); updateloginarea();}
-		} else {
-			window.onload = updateloginarea;
-		}
+			<?php 
+			if ($sessiondata['ltiitemtype']!=0 || $sessiondata['ltitlwrds'] == '') {
+				//auto submit the form
+				echo 'document.getElementById("postbackform").submit();';
+			}
+			?>
+		});
 	</script>
 	</form>
 	<?php
@@ -1365,8 +1333,9 @@ if ($stm->rowCount()>0) {	//check that same userid, and that we're not jumping o
 		//DB $sessiondata = unserialize(base64_decode(mysql_result($result,0,1)));
 		$sessiondata = unserialize(base64_decode($row['sessiondata']));
 		if (!isset($sessiondata['mathdisp'])) {
-			//for some reason settings are not set, so going to prompt
-			$promptforsettings = true;
+			//for some reason settings are not set, so reload from user prefs
+			require_once("$curdir/includes/userprefs.php");
+			generateuserprefs(true);
 		}
 		$createnewsession = false;
 	}
@@ -1512,27 +1481,13 @@ if (isset($_GET['launch'])) {
 	//DB list($enc,$userid) = mysql_fetch_row($result);
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
-	if ($_POST['access']==1) { //text-based
-		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
-		 $sessiondata['graphdisp'] = 0;
-		 $sessiondata['useed'] = 0;
-	 } else if ($_POST['access']==2) { //img graphs
-		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
-		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1;
-	 } else if ($_POST['access']==4) { //img math
-		 $sessiondata['mathdisp'] = 2;
-		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1;
-	 } else if ($_POST['access']==3) { //img all
-		 $sessiondata['mathdisp'] = 2;
-		 $sessiondata['graphdisp'] = 2;
-		 $sessiondata['useed'] = 1;
-	 } else {
-		 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
-		 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 $sessiondata['useed'] = 1;
-	 }
+	
+	if (isset($_POST['tzname'])) {
+		$sessiondata['logintzname'] = $_POST['tzname'];
+	}
+	
+	require_once("$curdir/includes/userprefs.php");
+	generateuserprefs();
 
 	$enc = base64_encode(serialize($sessiondata));
 
@@ -1611,10 +1566,11 @@ if (isset($_GET['launch'])) {
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h4>Connecting to $installname</h4>";
-	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
+	echo "<form id=\"postbackform\" method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo '<div class="textright"><input type="submit" value="Continue" /></div>';
 	} else {
 		echo ">";
 	}
@@ -1624,38 +1580,18 @@ if (isset($_GET['launch'])) {
 	<input type="hidden" id="tzoffset" name="tzoffset" value="" />
 	<input type="hidden" id="tzname" name="tzname" value="">
 	<script type="text/javascript">
-		 function updateloginarea() {
-			setnode = document.getElementById("settings");
-			var html = "";
-			html += 'Accessibility: ';
-			html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help<\/a>";
-			html += '<div style="margin-top: 0px;margin-right:0px;text-align:right;padding:0px"><select name="access"><option value="0">Use defaults</option>';
-			html += '<option value="3">Force image-based display</option>';
-			html += '<option value="1">Use text-based display</option></select></div>';
-
-			if (!MathJaxCompatible) {
-				html += '<input type="hidden" name="mathdisp" value="0" />';
-			} else {
-				html += '<input type="hidden" name="mathdisp" value="1" />';
-			}
-			if (ASnoSVG) {
-				html += '<input type="hidden" name="graphdisp" value="2" />';
-			} else {
-				html += '<input type="hidden" name="graphdisp" value="1" />';
-			}
-			html += '<div class="textright"><input type="submit" value="Continue" /><\/div>';
-			setnode.innerHTML = html;
+		 $(function() {
 			var thedate = new Date();
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
 			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
-		}
-		var existingonload = window.onload;
-		if (existingonload) {
-			window.onload = function() {existingonload(); updateloginarea();}
-		} else {
-			window.onload = updateloginarea;
-		}
+			<?php 
+			if ($sessiondata['ltiitemtype']!=0 || $sessiondata['ltitlwrds'] == '') {
+				//auto submit the form
+				echo 'document.getElementById("postbackform").submit();';
+			}
+			?>
+		});
 	</script>
 	</form>
 	<?php
@@ -2568,8 +2504,9 @@ if ($stm->rowCount()>0) {
 		//already have session.  Don't need to create one
 		$sessiondata = unserialize(base64_decode($sessiondata));
 		if (!isset($sessiondata['mathdisp'])) {
-			//for some reason settings are not set, so going to prompt
-			$promptforsettings = true;
+			//for some reason settings are not set, so reload from user prefs
+			require_once("$curdir/includes/userprefs.php");
+			generateuserprefs(true);
 		}
 		$createnewsession = false;
 	}

@@ -162,7 +162,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			$useleftnav = false;
 		}
 		$nocoursenav = true;
-		$usernameinheader = false;
 	}
 	//get exceptions
 	$now = time();
@@ -452,9 +451,13 @@ if ($overwriteBody==1) {
 		if (isset($instrPreviewId)) {
 			echo '<span class="noticetext">', _('Instructor Preview'), '</span> ';
 		}
-		if (!isset($usernameinheader)) {
+		if (isset($sessiondata['ltiitemtype'])) {
+			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
+			echo "<span id=\"myname\">$userfullname</span>";
+			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
+		} else {
 			echo $userfullname;
-		} else { echo '&nbsp;';}
+		} 
 		?>
 		</span>
 		<?php 

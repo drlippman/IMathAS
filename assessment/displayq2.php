@@ -1504,7 +1504,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>$rightb";
@@ -1697,7 +1697,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>\n";
@@ -1925,7 +1925,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>";
@@ -2025,7 +2025,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>";
@@ -2128,7 +2128,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else if ($useeqnhelper && $displayformat == 'usepreview') {
 				$out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 			}
-			if ($displayformat == 'usepreview') {
+			if ($displayformat == 'usepreview' && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 				$out .= 'onKeyUp="updateLivePreview(this)" ';
 			}
 			$addlclass = '';
@@ -2429,7 +2429,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .")\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= '/>';
@@ -2611,6 +2611,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$settings[7] = $newheight;
 			}
 		}
+		if ($GLOBALS['sessiondata']['userprefs']['drawentry']==1 && $GLOBALS['sessiondata']['graphdisp']==0) {
+			//can't imagine why someone would pick this, but if they do, need to set graphdisp to 2 temporarily
+			$revertgraphdisp = true;		
+			$GLOBALS['sessiondata']['graphdisp']=2;
+		} else {
+			$revertgraphdisp = false;
+		}
 		if (!is_array($backg) && substr($backg,0,5)=="draw:") {
 			$plot = showplot("",$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
@@ -2641,7 +2648,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($GLOBALS['hidedrawcontrols'])) {
 			$out .= $plot;
 		} else {
-			if ($GLOBALS['sessiondata']['graphdisp']==0) { //accessible entry
+			if ($GLOBALS['sessiondata']['userprefs']['drawentry']==0) { //accessible entry
 				$bg = 'a11ydraw:'.implode(',', $answerformat);
 				$out .= '<p>'._('Graph to add drawings to:').'</p>';
 				$out .= '<p>'.$plot.'</p>';
@@ -2840,6 +2847,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$la = '[['.implode('],[',$la).']]';
 
 			$out .= "drawla[$qn] = $la;</script>";
+		}
+		if ($revertgraphdisp) {		
+			$GLOBALS['sessiondata']['graphdisp']=0;
 		}
 		$tip = _('Enter your answer by drawing on the graph.');
 		if (isset($answers)) {

@@ -49,6 +49,13 @@ $placeinhead = '
    div.pagetitle h2 {
   	margin-top: 0px;
   	}
+  div.sysnotice {
+   	border: 1px solid #faa;
+   	background-color: #fff3f3;
+   	padding: 5px;
+   	margin-bottom: 5px;
+   	clear: both;
+   }
    #homefullwidth { clear: both;}
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
@@ -405,6 +412,9 @@ if ($myrights==100 && count($brokencnt)>0) {
 	echo '<span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
 }
 echo '</div>';
+if (isset($tzname) && isset($sessiondata['logintzname']) && $tzname!=$sessiondata['logintzname']) {
+	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';
+}
 
 
 for ($i=0; $i<3; $i++) {

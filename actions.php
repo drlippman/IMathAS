@@ -780,6 +780,11 @@ ini_set("post_max_size", "10485760");
 			}
 		}
 
+		require("includes/userprefs.php");
+		storeUserPrefs();
+		
+		
+		/* moved above
 		if (isset($_POST['settimezone'])) {
 			if (date_default_timezone_set($_POST['settimezone'])) {
 				$tzname = $_POST['settimezone'];
@@ -788,7 +793,7 @@ ini_set("post_max_size", "10485760");
 				$stm = $DBH->prepare("UPDATE imas_sessions SET tzname=:tzname WHERE sessionid=:sessionid");
 				$stm->execute(array(':tzname'=>$tzname, ':sessionid'=>$sessionid));
 			}
-		}
+		}*/
 	} else if ($_GET['action']=="forumwidgetsettings") {
 		$checked = $_POST['checked'];
 		$all = explode(',',$_POST['allcourses']);
@@ -810,7 +815,7 @@ ini_set("post_max_size", "10485760");
 		}
 	} 
 	if ($isgb) {
-		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';
+		echo '<html><body>Changes Recorded.  <input type="button" onclick="parent.GB_hide()" value="Done" /></body></html>';
 	} else {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	}

@@ -84,9 +84,13 @@ switch($_GET['action']) {
 			$stm->execute(array(':id'=>$_GET['id']));
 		}
 		if ($stm->rowCount()==0) { break;}
+		$stm = $DBH->prepare("DELETE FROM imas_user_prefs WHERE userid=:userid");
+		$stm->execute(array(':userid'=>$_GET['id']));
 		$stm = $DBH->prepare("DELETE FROM imas_students WHERE userid=:userid");
 		$stm->execute(array(':userid'=>$_GET['id']));
 		$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE userid=:userid");
+		$stm->execute(array(':userid'=>$_GET['id']));
+		$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE userid=:userid");
 		$stm->execute(array(':userid'=>$_GET['id']));
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid");
 		$stm->execute(array(':userid'=>$_GET['id']));

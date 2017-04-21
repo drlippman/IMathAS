@@ -1,0 +1,35 @@
+<?php
+
+$DBH->beginTransaction();
+
+$query = 'CREATE TABLE `imas_user_prefs` (
+	  `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	  `item` VARCHAR(31) NOT NULL,
+	  `value` VARCHAR(31) NOT NULL,
+	  `userid` INT(10) unsigned NOT NULL,
+	  INDEX (`userid`)
+	) ENGINE=InnoDB;';
+$res = $DBH->query($query);
+if ($res===false) {
+	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+	 $DBH->rollBack();
+	 return false;
+}
+echo '<p>table imas_user_prefs created</p>';
+ 
+//move usertheme from imas_users to imas_user_prefs.
+if (!$isDBsetup) {
+	$query = "INSERT INTO imas_user_prefs (item,value,userid) SELECT 'usertheme',theme,id FROM imas_users WHERE theme<>''";
+	$res = $DBH->query($query);
+	if ($res===false) {
+		 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+		 $DBH->rollBack();
+		 return false;
+	}
+	echo '<p>Moved userthemes to user_prefs table</p>';
+}
+$DBH->commit();
+
+return true;
+
+?>
