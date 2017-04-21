@@ -27,6 +27,8 @@ if (!$isDBsetup) {
 		 return false;
 	}
 	echo '<p>Moved userthemes to user_prefs table</p>';
+	echo '<p>This update replaces the Accessibility pulldown on the login page with discrete settings under the user profile. ';
+	echo 'You will want to update your login page. See loginpage.php.dist for an example.</p>';
 }
 $DBH->commit();
 
