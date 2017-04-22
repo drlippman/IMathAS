@@ -8,26 +8,6 @@
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt','$myrights','$myspecialrights');
 
-function removeDisallowedVarsString($str) {
-	global $disallowedvar;
-	//remove variable variables as they're too hard to sanitize in qtext.  Allow \${$var} as it's not a var var.
-	$str = preg_replace_callback('/(^|[^\\\\]|\\\\\\\\)(\$\{.*)/', function($matches) {
-		$depth = 1;
-		for ($c=2; $c<strlen($matches[2]); $c++) {
-			if ($matches[2]{$c}=='{') {
-				$depth++;
-			} else if ($matches[2]{$c}=='}') {
-				$depth--;
-				if ($depth==0) {
-					return $matches[1]._('Invalid variable').substr($matches[2],$c+1);
-				}
-			}
-		}
-		return $matches[1]._('Invalid variable');
-	}, $str);
-	$str = str_replace($disallowedvar,_('Invalid variable'),$str);
-	return $str;
-}
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
 {
@@ -36,7 +16,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
-		$str = removeDisallowedVarsString($str);
+		$str = removeDisallowedVarsString($str,$anstype,$countcnt);
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -45,7 +25,6 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
 		$r =  interpretline($str.';',$anstype,$countcnt).';';
-		$r = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$r);
 		return $r;
 	}
 }
@@ -564,7 +543,7 @@ function tokenize($str,$anstype,$countcnt) {
 			if ($c=='`') {
 				$out = _('"invalid - unquoted backticks"');
 			} else {
-				$out .= removeDisallowedVarsString($strtext);
+				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt);
 			}
 			$i++;
 			$c = $str{$i};
@@ -659,7 +638,71 @@ function tokenize($str,$anstype,$countcnt) {
 	return $syms;
 }
 
-//check inside of a variable variable to make sure the
+//handle braces and variable variables in strings and qtext
+function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
+	global $disallowedvar;
+	
+	//remove any blatent disallowed var
+	$str = str_replace($disallowedvar,_('Invalid variable'),$str);
+	
+	$startmarker = 0; $lastend = 0;
+	$invarvar = false;
+	$inbraces = false;
+	$outstr = '';
+	$depth = 0;
+	for ($c=0;$c<strlen($str);$c++) {
+		if ($str{$c}=='{') {
+			if ($invarvar || $inbraces) {
+				$depth++;
+			} else { //may be starting new brace or varvar item
+				if ($c>0 && $str{$c-1}=='$') { //might be varvar
+					if ($c>1 && $str{$c-2}=='\\' && ($c<3 || $str{$c-3}!='\\')) {
+						//it's braces with escaped $ sign
+					} else {
+						$invarvar = true;
+					}
+				}
+				if (!$invarvar) {
+					if ($c<strlen($str)-1 && $str{$c+1}!=='$') {	
+						continue; //skip {b and { $a since won't parse as brace 
+					} else {
+						$inbraces = true;
+					}
+				}
+				$startmarker = $c;
+				$depth++;
+				if ($invarvar) {
+					$outstr .= substr($str,$lastend,$c-$lastend-1);
+				} else {
+					$outstr .= substr($str,$lastend,$c-$lastend);
+				}
+			}		
+		} else if ($str{$c}=='}' && ($invarvar || $inbraces)) {
+			$depth--;
+			if ($depth==0) {
+				if ($inbraces) {
+					//interpret stuff in braces as code
+					$insidebrace = interpretline(substr($str,$startmarker+1,$c-$startmarker-1),$anstype,$countcnt+1);
+					if ($insidebrace!='error') {
+						$outstr .= '{'.$insidebrace.'}';
+					}
+				} else if ($invarvar) {
+					$insidebrace = substr($str,$startmarker+1,$c-$startmarker-2);
+					$outstr .= ' '; //eliminate var var
+				}
+				$lastend = $c+1;
+				$inbraces = false;
+				$invarvar = false;
+			}
+		}
+	}
+	if ($depth==0) { //if we aren't in a brace, include any remaining string
+		$outstr .= substr($str,$lastend);
+	}
+	return $outstr;
+}
+
+//for code, check inside of a variable variable to make sure the
 //result is a simple string or variable that is allowed
 function checkvarvarisallowed($inside) {
 	global $disallowedvar;
