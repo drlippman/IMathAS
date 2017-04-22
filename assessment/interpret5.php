@@ -345,7 +345,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$c = $str{$i};
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//if [ then array ref - read and connect as part of variable token
-			if ($c=='[') {
+			if ($c=='[' || $c=='{') {
 				$connecttolast = 1;
 			}
 			//check if allowed var
@@ -636,6 +636,10 @@ function tokenize($str,$anstype,$countcnt) {
 					$syms[] = array('',7); //end of line;
 					$lastsym = array('',7);
 				}
+			} else if ($out{0}=='{' && $lastsym[0]=='$') { //var var
+				//conditional value based on if allowed
+				$syms[count($syms)-1][0] = '((checkvarvarisallowed('.substr($out,1,-1).'))?$'.$out.':0)';
+				$connecttolast = 0;
 			} else {
 				$syms[count($syms)-1][0] .= $out;
 				$connecttolast = 0;
@@ -654,11 +658,20 @@ function tokenize($str,$anstype,$countcnt) {
 	}
 	return $syms;
 }
-/*
-function checkvarvarisallowed($str) {
+
+//check inside of a variable variable to make sure the
+//result is a simple string or variable that is allowed
+function checkvarvarisallowed($inside) {
 	global $disallowedvar;
-	if (preg_match('/\$
-*/
+	if (preg_match('/^(\w+)$/',$inside,$matches)) {
+		if (!in_array('$'.$matches[1], $disallowedvar)) {
+			return true;
+		}
+	}
+	echo _('Invalid variable: ').$inside;
+	return false;
+}		
+	
 //loads a macro library
 function loadlibrary($str) {
 	$str = str_replace(array("/",".",'"'),"",$str);
