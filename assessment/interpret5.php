@@ -8,6 +8,26 @@
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt','$myrights','$myspecialrights');
 
+function removeDisallowedVarsString($str) {
+	global $disallowedvar;
+	//remove variable variables as they're too hard to sanitize in qtext.  Allow \${$var} as it's not a var var.
+	$str = preg_replace_callback('/(^|[^\\\\]|\\\\\\\\)(\$\{.*)/', function($matches) {
+		$depth = 1;
+		for ($c=2; $c<strlen($matches[2]); $c++) {
+			if ($matches[2]{$c}=='{') {
+				$depth++;
+			} else if ($matches[2]{$c}=='}') {
+				$depth--;
+				if ($depth==0) {
+					return $matches[1]._('Invalid variable').substr($matches[2],$c+1);
+				}
+			}
+		}
+		return $matches[1]._('Invalid variable');
+	}, $str);
+	$str = str_replace($disallowedvar,_('Invalid variable'),$str);
+	return $str;
+}
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
 {
@@ -16,7 +36,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
-		$str = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$str);  //block function eval or backticks as way of generating variable name
+		$str = removeDisallowedVarsString($str);
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -544,7 +564,7 @@ function tokenize($str,$anstype,$countcnt) {
 			if ($c=='`') {
 				$out = _('"invalid - unquoted backticks"');
 			} else {
-				$out .= $strtext;
+				$out .= removeDisallowedVarsString($strtext);
 			}
 			$i++;
 			$c = $str{$i};
@@ -634,7 +654,11 @@ function tokenize($str,$anstype,$countcnt) {
 	}
 	return $syms;
 }
-
+/*
+function checkvarvarisallowed($str) {
+	global $disallowedvar;
+	if (preg_match('/\$
+*/
 //loads a macro library
 function loadlibrary($str) {
 	$str = str_replace(array("/",".",'"'),"",$str);
