@@ -804,6 +804,35 @@ jQuery(document).ready(function($) {
 	}
 });
 
+//setup mobile nav menu, if exists
+jQuery(document).ready(function($) {
+	function toggleHeaderMobileMenuList(e) {
+		var list = $("#headermobilemenulist");
+		if (list.attr("aria-hidden")=="true") { //expand it
+			$("#headermobilemenulist").slideDown(50, function() {
+				$("#headermobilemenulist").addClass("menuexpanded").removeAttr("style");
+				list.attr("aria-hidden",false);
+				$("#topnavmenu").attr("aria-expanded",true);
+			});
+			$("#navlist").slideDown(100, function() {
+				$("#navlist").addClass("menuexpanded").removeAttr("style");	
+			});
+		} else { //collapse it
+			$("#navlist").slideUp(100, function() {
+				$("#navlist").removeClass("menuexpanded").removeAttr("style");
+			});
+			$("#headermobilemenulist").slideUp(50, function() {
+				$("#headermobilemenulist").removeClass("menuexpanded").removeAttr("style");
+				list.attr("aria-hidden",true);
+				$("#topnavmenu").attr("aria-expanded",false);
+			});
+		}
+		e.preventDefault();
+	}
+	$("#topnavmenu").on("click", toggleHeaderMobileMenuList)
+	   .on("keydown", function(e) { if (e.which===13 || e.which==32) { toggleHeaderMobileMenuList(e);}});
+});
+
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.5
  * http://getbootstrap.com/javascript/#dropdowns
