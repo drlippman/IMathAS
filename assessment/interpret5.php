@@ -328,6 +328,10 @@ function tokenize($str,$anstype,$countcnt) {
 				$connecttolast = 1;
 			}
 			//check if allowed var
+			if ($out==='$' && $connecttolast==0) {
+				echo _('Variable missing a name');
+				return array(array('',9));
+			}
 			if (in_array($out,$disallowedvar)) {
 				echo sprintf(_('Eeek.. unallowed var %s!'), $out);
 				return array(array('',9));
