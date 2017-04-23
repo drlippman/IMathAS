@@ -647,7 +647,8 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 	global $disallowedvar;
 	
 	//remove any blatent disallowed var
-	$str = str_replace($disallowedvar,_('Invalid variable'),$str);
+	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str); 
+	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
 	
 	$startmarker = 0; $lastend = 0;
 	$invarvar = false;
