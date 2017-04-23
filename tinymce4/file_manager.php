@@ -89,7 +89,7 @@ if (isset($_REQUEST["action"]))
 var FileBrowserDialogue = {
     args : null,
     init : function () {
-    	    args = top.tinymce.activeEditor.windowManager.getParams(); 
+    	    args = parent.tinymce.activeEditor.windowManager.getParams(); 
         // Here goes your code for setting your custom things onLoad.
 <?php
 if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
@@ -100,10 +100,10 @@ if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
     mySubmit : function (filename) {
 
         // insert information now
-        top.tinymce.activeEditor.windowManager.getParams().oninsert(filename);
+        parent.tinymce.activeEditor.windowManager.getParams().oninsert(filename);
     
         // close popup window
-        top.tinymce.activeEditor.windowManager.close();
+        parent.tinymce.activeEditor.windowManager.close();
     }
 }
 
