@@ -693,7 +693,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 					}
 				} else if ($invarvar) {
 					$insidebrace = substr($str,$startmarker+1,$c-$startmarker-2);
-					$outstr .= ' '; //eliminate var var
+					$outstr .= _('Invalid variable'); //eliminate var var
 				}
 				$lastend = $c+1;
 				$inbraces = false;
