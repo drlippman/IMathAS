@@ -16,8 +16,25 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 require("./assessment/displayq2.php");
 
 $sessiondata = array();
-$sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 1;
+$prefdefaults = array(
+	'mathdisp'=>1,
+	'graphdisp'=>1,
+	'drawentry'=>1,
+	'useed'=>1,
+	'livepreview'=>1);
+$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$sessiondata['userprefs'] = array();
+foreach($prefdefaults as $key=>$def) {
+	if ($prefcookie!==null && isset($prefcookie[$key])) {
+		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+	} else {
+		$sessiondata['userprefs'][$key] = $def;
+	}
+}
+foreach(array('graphdisp','mathdisp','useed') as $key) {
+	$sessiondata[$key] = $sessiondata['userprefs'][$key];
+}
+
 $showtips = 2;
 $useeqnhelper = 4;
 $sessiondata['drill']['cid'] = 0;
