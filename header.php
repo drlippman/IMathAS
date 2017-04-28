@@ -79,7 +79,7 @@ if (isset($ispublic) && $ispublic && !isset($sessiondata['mathdisp'])) {
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
-	echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=AM_CHTML-full"></script>';
+	echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=AM_CHTML-full"></script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
 	//merged, eliminating original AsciiMath display; MathJax only now
@@ -99,7 +99,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
-	echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=AM_CHTML-full"></script>';
+	echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=AM_CHTML-full"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.7.0"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>';
@@ -131,7 +131,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
 	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" integrity="sha384-wITovz90syo1dJWVh32uuETPVEtGigN07tkttEqPv+uR2SE/mbQcG7ATL28aI9H0" crossorigin="anonymous">';
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=083116"></script>';
-	echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=AM_CHTML-full"></script>';
+	echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=AM_CHTML-full"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
