@@ -41,11 +41,7 @@ $prefdefaults = array(
 	'drawentry'=>1,
 	'useed'=>1,
 	'livepreview'=>1);
-if (isset($_GET['graphdisp']))  //currently same is used for graphdisp and drawentry
-	$prefdefaults['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
-	$prefdefaults['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
-	setcookie("embedquserprefs", json_encode(array('graphdisp'=>$prefdefaults['graphdisp'], 'drawentry'=>$prefdefaults['drawentry']));
-}
+
 $prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
 $sessiondata['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
@@ -54,6 +50,14 @@ foreach($prefdefaults as $key=>$def) {
 	} else {
 		$sessiondata['userprefs'][$key] = $def;
 	}
+}
+if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
+	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	setcookie("embedquserprefs", json_encode(array(
+		'graphdisp'=>$sessiondata['userprefs']['graphdisp'], 
+		'drawentry'=>$sessiondata['userprefs']['drawentry']
+		)));
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
 	$sessiondata[$key] = $sessiondata['userprefs'][$key];
