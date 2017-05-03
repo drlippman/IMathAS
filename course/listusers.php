@@ -89,7 +89,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$resultStudentList = $DBH->prepare($query);
 			$resultStudentList->execute(array(':courseid'=>$cid));
 		}
-	} elseif (isset($_GET['enroll'])) {
+	} elseif (isset($_GET['enroll']) && ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true))) {
 
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
@@ -613,7 +613,7 @@ if ($overwriteBody==1) {
 		<input type=submit name=submit value="Submit"/>
 	</form>
 <?php
-	} elseif (isset($_GET['enroll'])) {
+	} elseif (isset($_GET['enroll']) && ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true))) {
 ?>
 	<form method=post action="listusers.php?enroll=student&cid=<?php echo $cid ?>">
 		<span class=form>Username to enroll:</span>
@@ -759,9 +759,11 @@ if ($overwriteBody==1) {
 	}
 	echo '</span>';
 	echo '<span class="column" style="width:auto;">';
-	echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+	if ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true)) {
+		echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+	}
 	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
-	if ($CFG['GEN']['allowinstraddstus']) {
+	if (isset($CFG['GEN']['allowinstraddstus']) && $CFG['GEN']['allowinstraddstus']==true) {
 		echo '</span><span class="column" style="width:auto;">';
 		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
 		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
