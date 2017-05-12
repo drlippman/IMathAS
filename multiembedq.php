@@ -24,6 +24,7 @@ require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $sessiondata = array();
+/*
 if (isset($_GET['graphdisp'])) {
 	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
 	setcookie("multiembedq-graphdisp", $sessiondata['graphdisp']);
@@ -33,6 +34,35 @@ if (isset($_GET['graphdisp'])) {
 	$sessiondata['graphdisp'] = 1;
 }
 $sessiondata['mathdisp'] = 3;
+*/
+$prefdefaults = array(
+	'mathdisp'=>1,
+	'graphdisp'=>1,
+	'drawentry'=>1,
+	'useed'=>1,
+	'livepreview'=>1);
+
+$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$sessiondata['userprefs'] = array();
+foreach($prefdefaults as $key=>$def) {
+	if ($prefcookie!==null && isset($prefcookie[$key])) {
+		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+	} else {
+		$sessiondata['userprefs'][$key] = $def;
+	}
+}
+if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
+	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	setcookie("embedquserprefs", json_encode(array(
+		'graphdisp'=>$sessiondata['userprefs']['graphdisp'], 
+		'drawentry'=>$sessiondata['userprefs']['drawentry']
+		)));
+}
+foreach(array('graphdisp','mathdisp','useed') as $key) {
+	$sessiondata[$key] = $sessiondata['userprefs'][$key];
+}
+
 $showtips = 2;
 $useeqnhelper = 4;
 $useeditor = 1;

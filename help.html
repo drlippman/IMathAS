@@ -191,15 +191,21 @@ dd {
 		</ul>
 	</ul>
 
-<li><a href="#usingimas">Using IMathAS</a></li>
+<li><a href="#usingimas">Using the System</a></li>
 	<ul>
 	<li><a href="#registering">Registering</a></li>
 	<li><a href="#loggingin">Logging In</a></li>
 	<li><a href="#homepage">Home Page</a></li>
 		<ul>
+		<li><a href="#userprofile">Changing Your User Profile</a></li>
+		<ul>
+			<li><a href="#accessibility">Accessibility and Display Preferences</a></li>
+		</ul>
 		<li><a href="#enrollinginacourse">Enrolling in a Course</a></li>
 		</ul>
 	<li><a href="#coursepage">Course Page</a></li>
+	<li><a href="#calendar">Calendar</a></li>
+	<li><a href="#coursemap">Course Map</a></li>
 	<li><a href="#takingassessments">Taking Assessments</a></li>
 		<ul>
 		<li><a href="#enteringmath">Entering Math</a></li>
@@ -3154,91 +3160,231 @@ own question type.
 </div>
 </div>
 </div>
-<h1><a name="usingimas">Using IMathAS</a></h1>
+<h1><a name="usingimas">Using the System</a></h1>
 <div class=h2>
 <h2><a name="registering">Registering</a></h2>
-
+<p>
 At the Login page, if you are not currently registered as a student, click the
-"Register as a New User" link.  You will be asked to provide:
+"Register as a New Student" link.  You will be asked to provide:
+</p>
 <ul>
 <li>A username.  Your school may require something specific, like your student ID number.</li>
 <li>A password.  You're asked to enter this twice. </li>
 <li>Your Firstname (Given name) and Lastname (Surname)</li>
 <li>Your email address</li>
+<li>You'll have the option to request an email notification when you recieve a new message in the system.</li>
+<li>If your teacher provided you a Course ID and Enrollment Key, you can enter them now to enroll in your course.
+    If you don't have this information yet, you can enter it later.</li>
 </ul>
+<p>
 When you click "Sign Up", you will be taken back to the Login page so you can log in
-
+</p>
 </div>
 <div class=h2>
 <h2><a name="loggingin">Logging In</a></h2>
-
-At the Login page, you will be asked to supply your login credidentials (username and password).  
-You will also be able to select Viewing/Accessibility options:
-<ul>
-<li>Most of the time, select Use defaults.  This will detect what your browser is capable of, and use the best option available.</li>
-<li>Force image-based display will force the use of images for math and graph display. This can be helpful if the default display is 
-    not working correctly for you, or if you want to be able to copy-and-paste math and graphs.</li>
-<li>MathJax display uses MathJax for math display, and detects the best settings for graphs.</li>
-<li>Use text-based display, for screen readers or older browsers.</li>
-</ul>
-<p><b>If you're not sure what to choose:</b> Pick "Use defaults"</p>
 <p>
-The options are set for your current session only, so you can set them differently depending on the support offered by the
-computer you're currently working at.
+At the Login page, you will be asked to supply your login credidentials (username and password).  
+</p>
+<p>
+If you forget your password, click the "Forgot Password" link and enter your username. 
+The system will send you an email with a link to click to reset your password.
+Check your email's spam filter if you don't receive the email in a few minutes.
+</p>
+<p>
+If you forget your username, click the "Forgot Username" link and enter your email address. 
+The system will send you an email with your username.
+Check your email's spam filter if you don't receive the email in a few minutes.
+</p>
+<p>
+If you still having trouble logging in, or never receive the "Forgot Password"
+or "Forgot Username" emails, contact your instructor.  They can help you check
+that your email address is correct, look up your username, and reset your password.
 </p>
 </div>
 <div class=h2>
 <h2><a name="homepage">Home Page</a></h2>
-
+<p>
 The home page lists the classes you're currently taking, and also has options for
-enrolling in a course, changing your password, changing your user info, or logging
+enrolling in a course, changing your password, changing your user profile, or logging
 out of the system.
+</p>
+<div class=h3>
+<h3><a name="userprofile">Changing Your User Profile</a></h3>
+<p>
+To modify your user profile, click the "Change User Info" link in the top right corner.
+</p>
+<p>
+Your profile allows you correct errors in your name, update your email address, and 
+change your password.  You can also upload a picture of yourself or an avatar that
+your instructor and other students will see with your forum posts and messages.
+</p>
+<p>You can also adjust settings for whether or not to show a list of new messages
+and forum posts on the home page.</p>
 
+<div class=h4>
+<h3><a name="accessibility">Accessibility and Display Preferences</a></h3>
+<p>
+The Accessibility and Display Preferences in the user profile allow you to personalize 
+how you interact with the system, and allow you to work around technical issues. 
+M
+</p>
+<ul>
+ <li><b>Math Display</b>: This option allows you to customize how math equations
+	are displayed in the system. 
+	<ul>
+	<li>MathJax: The recommended default is MathJax, which
+	generates high quality display of math and provides the best compatibility
+	with screenreaders and other assistive technology. </li>
+	<li>Katex: provides faster math display with good quality, but not quite
+	as nice as MathJax.</li>
+	<li>Image-based: this uses images to display math. The quality is not as
+	good, but this option can help workaround issue if the browser is having
+	trouble using MathJax.</li>
+	<li>Calculator-style: this uses an inline, text-based, calculator style
+	display, like <code>x^2+4sqrt(x)</code>.</li>
+	</ul></li>
+ <li><b>Graph Display</b>: This option allows you to customize how graphs are
+ 	displayed in the system.
+ 	<ul>
+	<li>SVG: The recommended default, this is the highest quality display, 
+	which will look clear and sharp even when zoomed in.</li>
+	<li>Image-based: this option uses images to display graphs. The quality
+	is not as high and will look fuzzy if zoomed in.</li>
+	<li>Text alternatives: this option will replace auto-generated graphs
+	with a text alternative, typically a table of values for the equations or
+	a text description of a chart.</li>
+	</ul></li>
+ <li><b>Drawing Entry</b>: This option controls how answers to drawing questions
+ 	are entered.
+ 	<ul>
+	<li>Mouse-based: The default, a mouse or touch device is used to plot 
+	points on a graph to create the drawing.</li>
+	<li>Keyboard and text alternative: this option provides a text-based
+	alternative for drawing entry, which can also be controlled entirely
+	using the keyboard.</li>
+	</ul></li>
+ <li><b>Text Editor</b>: This option controls how large text entry is done.
+ 	<ul>
+	<li>Rich text editor: The default, this option provides an editor
+	with formatting buttons and "what you see is what you get" editing.</li>
+	<li>Plain text entry: this option provides a basic text entry box with
+	no buttons or other clutter.</li>
+	</ul></li>
+ <li><b>Course styling and contrast</b>: This option allows you to customize
+ 	the contrast styling of the course.
+ 	<ul>
+	<li>Instructor chosen theme: The default, this option uses the instructor
+	chosen styles for the course.</li>
+	<li>High contrast, dark on light: this option overrides the course styles
+	with extra-high-contrast styles, featuring dark text on a light background.</li>
+	<li>High contrast, light on dark: this option overrides the course styles
+	with extra-high-contrast styles, featuring white text on a dark background.</li>
+	</ul></li>
+ <li><b>Live preview</b>: This option controls how the preview of your answers updates
+ 	as you type.
+ 	<ul>
+	<li>Show as I type: This default option will auto-update a preview of your
+	answer as you type it out.  This can help you catch entry mistakes early.</li>
+	<li>Only show a preview when I click: this option will stop the auto-update 
+	of a preview, and only display the preview when you request it. This option
+	can reduce the distraction and flicker of the auto-update.</li>
+	</ul></li>
+ <li><b>Time Zone</b>: This option allows you to control the time zone that due 
+ 	dates and other times are displayed based on.
+ 	<ul>
+	<li>Use timezone reported by browser: When you log in, the system asks
+	your computer what time zone you're in. By default, this timezone is the
+	one used when displaying dates. You can check the listed timezone to make
+	sure it's the correct one. If it is wrong, you can either adjust your
+	computer's timezone then log out and back in, or override the detected time zone.</li>
+	<li>Use a specific timezone for this session: this option allows you to override
+	the detected timezone for this one login session. The next time you log in, the system
+	will again detect your currect timezone. This option can be helpful if you don't
+	want to change your computer's clock, but want to adjust the timezone temorarily.</li>
+	<li>Always show times based on specific timezone: this option allows you to override
+	the detected timezone every time you log in. This can be helpful if you
+	travel a lot, but always want the times to display based on your home
+	timezone.</li>
+	</ul></li>
+</ul>
+</div>
+
+</div>
 <div class=h3>
 <h3><a name="enrollinginacourse">Enrolling in a Course</a></h3>
-
-At your home page, you can sign up for a course by entering the course ID number and
-enrollment key in the box provided.  If you do not know these, ask your instructor.
+<p>
+At your home page, click the "Enroll in a New Class" button to sign up for a
+new course.  You'll need to enter the Course ID number and
+Enrollment Key in the box provided.  If you do not know these, ask your instructor.
+</p>
 
 </div>
 </div>
 <div class=h2>
 <h2><a name="coursepage">Course Page</a></h2>
 
-The course page consists of a list of items.  There are five types of items:
+The course page consists of a list of items.  There are several types of items:
 <ul>
-<li><b>Blocks</b>: Groupings of items</li>
+<li><b>Blocks and Folders</b>: Groupings of items.  
+	If you see a folder icon, click the folder to open it and view the contents.
+	If you see a triangle icon, click the title to expand the contents.</li>
 <li><b>Text Items</b>:  Text that displays on the course page</li>
 <li><b>Links</b>:  A summary displays on the course page.  A link is provided
     that may display text, a file, or take you to a weblink</li>
 <li><b>Forums</b>:  Discussion forums</li>
-<li><b>Assessments</b>:  Tests or Practice questions</li>
+<li><b>Assessments</b>:  Homework, Quizzes, Tests, or Practice questions</li>
+<li><b>Drills</b>:  Repeated practice with a particular skill</li>
+<li><b>Wikis</b>:  Collaborative text editing</li>
 </ul>
-<p>Blocks have a colored header.  Some blocks may show collapsed.  Click the block
-name or the &quot;Expand&quot; button to view the block's contents.  Other blocks may display as
-folders (with a folder icon).  Click on the block name show the contents.</p>
-
-<p>Text items are preceded with an information <span class=icon>!</span> icon, forums are preceded with
-a <span class=icon>F</span> icon, and assessments are 
-preceded with a <span class=icon>?</span> icon.  Depending upon the setup, these may change color as a deadline approaches.  
-The color is green at two weeks before a due date, yellow at one week, and red on due date.</p>
-
-
 
 </div>
+
+<div class=h2>
+<h2><a name="calendar">Calendar</a></h2>
+
+<p>
+Many courses will have a Calendar link which will display a calendar showing
+upcoming due dates and other special events.  You can click on a specific day to
+view a more detailed listing of the events for that day.  You can use that 
+list to access assignments and other items.
+</p>
+<p>
+Keep in mind that not everything from the course will display on the calendar, 
+so be sure to actually look at the course page, not just rely on the calendar.
+</p>
+<p>
+The color of the items on the calendar will change based on how far away the due
+date is; items in green are futher away, items in yellow are closer, and items
+in red are approaching the due date.
+</p>
+
+</div>
+
+<div class=h2>
+<h2><a name="coursemap">Course Map</a></h2>
+
+<p>
+The course page will have a link to the Course Map, a condensed list view
+of everything in the course.  The Course Map can help you locate items in the
+course that are buried in folders.
+</p>
+
+</div>
+
+
 <div class=h2>
 <h2><a name="takingassessments">Taking Assessments</a></h2>
-When you take an assessment, it will be displayed to you in one of three ways:
+When you take an assessment, it will be displayed to you in one of several ways:
 <ul>
 <li><b>Full Test</b>:  You may see the entire test at once</li>
 <li><b>One at a time</b>:  You may have to answer one question before proceeding to the next</li>
-<li><b>Full test, submit one at a time</b>:  The full test is displayed, but only question is available for answer entry at a time</li>
-<li><b>Skip Around</b>:  You may see a green box on the left.  This will contain a list of questions.  You can
-    skip around between questions by clicking on these links, and answer the questions in any order.</li>
+<li><b>Full test, submit one at a time</b>:  The full test is displayed, but you only answer one question at a time</li>
+<li><b>Skip Around</b>:  You may see a list of questions.  You can skip around between questions by clicking on these links, 
+  and answer the questions in any order.</li>
 </ul>
 
-There are several question types.  At the bottom of the question or under the answer box when you click on it, it will tell you
-what kind of answer is expected.  Here are the types:
+There are several question types.  When you click on the answer box, a hint will typically display below it telling you 
+what kind of answer is expected.  Some of the types:
 <ul>
 <li><b>Number</b>:  You will be asked to enter a number, like 3, 5.5, or -6</li>
 <li><b>Calculated</b>:  You will be asked to enter a number, or a calculation, like 2/3, 5^2, or sin(2).  You can
@@ -3247,7 +3393,7 @@ what kind of answer is expected.  Here are the types:
 <li><b>Multiple-Answer</b>:  You will be given a set of choices, and asked to select all the correct choices</li>
 <li><b>Matching</b>:  You will be given a list of items with input boxes in front of them.  In each box, enter the letter
     of the item in the right-hand column that matches that item</li>
-<li><b>Function</b>:  You will be asked to enter a function, like "sin(x)" or "3x^2-5" or "x^2/5".  Make sure you use the
+<li><b>Expression</b>:  You will be asked to enter an algebraic expression, like "sin(x)" or "3x^2-5" or "x^2/5".  Make sure you use the
     same variables in your answer than were specified in the question.  You can press the
     "Preview" button to ensure the system is interpreting your answer the way you intended.  It will also check to 
     make sure that it understands your answer, and will tell if you if the syntax is ok.</li>
@@ -3259,9 +3405,14 @@ what kind of answer is expected.  Here are the types:
 </ul>
 <div class=h3>
 <h3><a name="enteringmath">Entering Math</a></h3>
+<p>
 For some types of questions, you need to enter a mathematical expression.  The system
 follows order of operations, so use grouping symbols as much as necessary.
-<p>Here is some help on how to enter expressions:</p>
+</p>
+<p>Many times, you can click a yellow arrow that displays next to the answer box when you click in it, which will
+open up the MathQuill equation editor, which you can use to help enter your answers.</p>
+
+<p>Alternatively, you can enter your answer using calculator-style notation. Here is some help on how to enter expressions:</p>
 <table>
 <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
 <tbody>
@@ -3277,6 +3428,7 @@ follows order of operations, so use grouping symbols as much as necessary.
 <tr><td>ln</td><td>Natural Logarithm base e</td></tr>
 <tr><td>log</td><td>Common Logarithm base 10</td></tr>
 <tr><td>!</td><td>Factorial</td></tr>
+<tr><td>DNE</td><td>Does Not Exist.  This is also often used for "no solutions".</td></tr>
 <tr><td>oo</td><td>Infinity.  Those are two lowercase o's, like the middle of the word "look"</td></tr>
 </tbody>
 </table>

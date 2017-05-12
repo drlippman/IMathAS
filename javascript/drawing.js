@@ -320,7 +320,7 @@ function encodea11ydraw() {
 				lines.push('('+outpts.join('),(')+')');
 			} else if (mode>=5 && mode<10 && outpts.length==2) {
 				tplines.push('('+mode+','+outpts.join(',')+')');
-			} else if (mode>10 && outpts.length==3) {
+			} else if (mode>=10 && outpts.length==3) {
 				tpineq.push('('+mode+','+outpts.join(',')+')');
 			}
 		});

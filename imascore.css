@@ -48,6 +48,15 @@ span.iteminfo {
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
 }
+label.error {
+	color: #db0000;
+	font-style: italic;
+	float: left;
+	margin-left: 10px;
+}
+input[type=checkbox] + label.error {
+	float:none;
+}
 div.title {
 	/*display: inline;*/
 	margin-left: 30px;
@@ -153,9 +162,13 @@ ul.nomark li {
 
 ul.qview {
 	list-style-type: none;
-	margin-left: 20px;
+	margin-left: 12px;
 	padding-left: 0px;
 	margin-bottom: 6px;
+}
+ul.qview ul {
+	padding-left: 10px;
+	border-left: 1px dashed #ccc;
 }
 ul.qview li {
 	margin-left: 0px;
@@ -651,7 +664,7 @@ input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus
   margin: 0;
   text-align: left;
 }
-#GB_caption a {
+#GB_caption a, #GB_caption a:hover, #GB_caption a:focus {
 	color: #fff;
 	text-decoration: none;
 }

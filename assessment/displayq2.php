@@ -837,9 +837,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 
 	$score = 0;
 	if ($qdata['qtype']=="multipart") {
-		if (in_array('essay',$anstypes) || in_array('file',$anstypes)) {
-			$GLOBALS['questionmanualgrade'] = true;
-		}
 		$partla = array();
 		if (isset($answeights)) {
 			if (!is_array($answeights)) {
@@ -901,9 +898,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			return array(implode('~',$scores),implode('~',$raw));
 		}
 	} else {
-		if ($qdata['qtype']=='essay' || $qdata['qtype']=='file') {
-			$GLOBALS['questionmanualgrade'] = true;
-		}
 		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
 		if (isset($scoremethod) && $scoremethod == "allornothing") {
 			if ($score<.98) {$score=0;}
@@ -1513,7 +1507,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>$rightb";
@@ -1706,7 +1700,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>\n";
@@ -1934,7 +1928,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>";
@@ -2034,7 +2028,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>";
@@ -2137,7 +2131,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else if ($useeqnhelper && $displayformat == 'usepreview') {
 				$out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 			}
-			if ($displayformat == 'usepreview') {
+			if ($displayformat == 'usepreview' && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 				$out .= 'onKeyUp="updateLivePreview(this)" ';
 			}
 			$addlclass = '';
@@ -2226,7 +2220,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" alt="Set score no credit" ';
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 
-				$la = preg_replace_callback('/<a[^>]*href="(.*)?"[^>]*>(.*?)<\/a>/', function ($m) {
+				$la = preg_replace_callback('/<a[^>]*href="(.*?)"[^>]*>(.*?)<\/a>/', function ($m) {
 					global $gradededessayexpandocnt;
 					if (!isset($gradededessayexpandocnt)) {
 						$gradededessayexpandocnt = 0;
@@ -2246,6 +2240,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$ret .= " <span aria-expanded=\"false\" aria-controls=\"essayfileprev$gradededessayexpandocnt\" class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayfileprev$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
 						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeStringForUrl($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
+					$gradededessayexpandocnt++;
 					return $ret;
 				   }, $la);
 			}
@@ -2437,7 +2432,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .")\" onblur=\"hideee();hideeedd();\" ";
 		}
-		if (!isset($hidepreview)) {
+		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= '/>';
@@ -2619,6 +2614,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$settings[7] = $newheight;
 			}
 		}
+		if ($GLOBALS['sessiondata']['userprefs']['drawentry']==1 && $GLOBALS['sessiondata']['graphdisp']==0) {
+			//can't imagine why someone would pick this, but if they do, need to set graphdisp to 2 temporarily
+			$revertgraphdisp = true;		
+			$GLOBALS['sessiondata']['graphdisp']=2;
+		} else {
+			$revertgraphdisp = false;
+		}
 		if (!is_array($backg) && substr($backg,0,5)=="draw:") {
 			$plot = showplot("",$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
@@ -2649,7 +2651,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($GLOBALS['hidedrawcontrols'])) {
 			$out .= $plot;
 		} else {
-			if ($GLOBALS['sessiondata']['graphdisp']==0) { //accessible entry
+			if ($GLOBALS['sessiondata']['userprefs']['drawentry']==0) { //accessible entry
 				$bg = 'a11ydraw:'.implode(',', $answerformat);
 				$out .= '<p>'._('Graph to add drawings to:').'</p>';
 				$out .= '<p>'.$plot.'</p>';
@@ -2848,6 +2850,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$la = '[['.implode('],[',$la).']]';
 
 			$out .= "drawla[$qn] = $la;</script>";
+		}
+		if ($revertgraphdisp) {		
+			$GLOBALS['sessiondata']['graphdisp']=0;
 		}
 		$tip = _('Enter your answer by drawing on the graph.');
 		if (isset($answers)) {
@@ -4589,6 +4594,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if (trim($givenans)=='') {
 			return 0;
 		} else {
+			$GLOBALS['questionmanualgrade'] = true;
 			return -2;
 		}
 	} else if ($anstype == 'interval' || $anstype == 'calcinterval') {
@@ -6425,6 +6431,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				return $pts/count($answer);
 			} else {
+				$GLOBALS['questionmanualgrade'] = true;
 				return -2;
 			}
 		}

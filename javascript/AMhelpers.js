@@ -338,7 +338,7 @@ function intcalculate(inputId,outputId,format) {
 		}
 		strarr.push(fullstr.substring(lastpos));
 	  } else {
-	  	  var strarr = fullstr.split(/U/i);
+	  	  var strarr = fullstr.split(/\s*U\s*/i);
 	  }
 	  var isok = true; var fullerr="";
 	  for (i=0; i<strarr.length; i++) {
@@ -1144,7 +1144,12 @@ function doonsubmit(form,type2,skipconfirm) {
 		qn = parseInt(qn);
 		if (document.getElementById("tc"+qn)==null) {continue;}
 		fullstr = document.getElementById("tc"+qn).value;
-		fullstr = fullstr.replace(/^\s+/g,'').replace(/\s+$/,'');
+		//fullstr = fullstr.replace(/^\s+/g,'').replace(/\s+$/,'');
+		if (calcformat[qn].indexOf('mixed')!=-1) {
+			fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+		} else {
+			fullstr = fullstr.replace(/\s+/g,'');
+		}
 		fullstr = normalizemathunicode(fullstr);
 		if (fullstr.match(/DNE/i)) {
 			  fullstr = fullstr.toUpperCase();
@@ -1165,7 +1170,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				}
 				strarr.push(fullstr.substring(lastpos));
 			  } else {
-				  var strarr = fullstr.split(/U/i);
+				  var strarr = fullstr.split(/\s*U\s*/i);
 			  }
 			  for (k=0; k<strarr.length; k++) {
 				  str = strarr[k];
@@ -2020,7 +2025,7 @@ function assessmentTimer(duration, timelimitkickout) {
 				document.getElementById('timelimitholder').innerHTML = _('Time limit expired - submitting now');
 				document.getElementById('timelimitholder').style.fontSize="300%";
 				if (document.getElementById("qform") == null) {
-					setTimeout("window.location.pathname='"+imasroot+"/assessment/showtest.php?action=skip&superdone=true'",2000);
+					setTimeout("window.location.href='"+imasroot+"/assessment/showtest.php?action=skip&superdone=true'",2000);
 					return;
 				} else {
 					var theform = document.getElementById("qform");

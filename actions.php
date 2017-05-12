@@ -90,10 +90,8 @@ require_once("includes/sanitize.php");
 			$_POST['ekey'] = '';
 		}
 		if (!isset($_GET['confirmed'])) {
-			//DB $query = "SELECT SID FROM imas_users WHERE email='{$_POST['email']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-			$stm = $DBH->prepare('SELECT SID FROM imas_users WHERE email=:email');
+			//look for existing account. ignore any LTI accounts
+			$stm = $DBH->prepare("SELECT SID FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'");
 			$stm->execute(array(':email'=>$_POST['email']));
 			if ($stm->rowCount()>0) {
 				$nologo = true;
@@ -429,6 +427,17 @@ require_once("includes/sanitize.php");
 			}
 			exit;
 		}
+	} else if ($_GET['action']=="checkusername") {
+		require_once("config.php");
+		
+		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+		$stm->execute(array(':SID'=>$_GET['SID']));
+		if ($stm->rowCount()>0) {
+			echo "false";
+		} else {
+			echo "true";
+		}
+		exit;
 	}
 
 	require("validate.php");
@@ -784,6 +793,11 @@ require_once("includes/sanitize.php");
 			}
 		}
 
+		require("includes/userprefs.php");
+		storeUserPrefs();
+		
+		
+		/* moved above
 		if (isset($_POST['settimezone'])) {
 			if (date_default_timezone_set($_POST['settimezone'])) {
 				$tzname = $_POST['settimezone'];
@@ -792,7 +806,7 @@ require_once("includes/sanitize.php");
 				$stm = $DBH->prepare("UPDATE imas_sessions SET tzname=:tzname WHERE sessionid=:sessionid");
 				$stm->execute(array(':tzname'=>$tzname, ':sessionid'=>$sessionid));
 			}
-		}
+		}*/
 	} else if ($_GET['action']=="forumwidgetsettings") {
 		$checked = $_POST['checked'];
 		$all = explode(',',$_POST['allcourses']);
@@ -812,9 +826,9 @@ require_once("includes/sanitize.php");
 			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess='' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 		}
-	}
+	} 
 	if ($isgb) {
-		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';
+		echo '<html><body>Changes Recorded.  <input type="button" onclick="parent.GB_hide()" value="Done" /></body></html>';
 	} else {
 		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	}
