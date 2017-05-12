@@ -56,7 +56,7 @@
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if ($searchtype != 'none') {
 		echo "<a href=\"forums.php?cid=$cid&amp;clearsearch=true\">Forum List</a> &gt; ";
 	}
@@ -545,7 +545,7 @@ if (!isset($teacherid)) {
 			echo "<a href=\"../course/addforum.php?cid=$cid&id={$line['id']}\">Modify</a> ";
 			echo '</span>';
 		}
-		echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> ";
+		echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> ";
 		if ($newcnt[$line['id']]>0) {
 			 echo "<a href=\"thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext >New Posts ({$newcnt[$line['id']]})</a>";
 		}

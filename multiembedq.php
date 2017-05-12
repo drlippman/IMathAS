@@ -157,7 +157,7 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	require_once("./filter/filter.php");
 
 	//need question ids, attempts, seeds.  Put in query string, or??
-	$qn = $_POST['toscore'];
+	$qn = Sanitize::onlyInt($_POST['toscore']);
 	$colors = array();
 	$GLOBALS['scoremessages'] = '';
 	$GLOBALS['questionmanualgrade'] = false;
@@ -194,7 +194,7 @@ if ($theme != '') {
 }
 require("./assessment/header.php");
 if ($sessiondata['graphdisp'] == 1) {
-	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';  
+	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';
 }
 echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
 

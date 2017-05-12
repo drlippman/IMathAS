@@ -737,7 +737,7 @@ switch($_GET['action']) {
 			}
 		}
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "addteacher":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
@@ -764,7 +764,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES ".implode(',',$ins));
 			$stm->execute($insval);
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
 		exit;
 	case "importmacros":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
@@ -1035,11 +1035,11 @@ switch($_GET['action']) {
 
 session_write_close();
 if (isset($_GET['cid'])) {
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 } else if ($from=='home') {
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/index.php");
 } else {
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
 }
 exit;
 ?>

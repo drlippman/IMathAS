@@ -5,7 +5,7 @@
 
 require("../validate.php");
 if (isset($_GET['cid'])) {
-  $cid = intval($_GET['cid']);
+  $cid = Sanitize::courseId($_GET['cid']);
 
   //get assessment items and associated data
   $assessinfo = array();

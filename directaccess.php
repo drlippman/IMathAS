@@ -2,9 +2,11 @@
 //IMathAS:  Course direct access - redirects to course page or presents
 //login / new student page specific for course
 //(c) 2007 David Lippman
+	
+
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	 if (!file_exists("$curdir/config.php")) {
-		 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
+		 header('Location: http://' . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
 	 }
  	require_once("$curdir/config.php");
 
@@ -121,9 +123,9 @@
 				$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 				$message .= "and paste it into your webbrowser:</p>\r\n";
-				$message .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
-				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
-				mail($_POST['email'],'IMathAS Confirmation',$message,$headers);
+				$message .= "<a href=\"". $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/actions.php?action=confirm&id=$id\">";
+				$message .= $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/actions.php?action=confirm&id=$id</a>\r\n";
+				mail(Sanitize::emailAddress($_POST['email']),'IMathAS Confirmation',$message,$headers);
 				echo "<html><body>\n";
 				echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
 				echo "<a href=\"$imasroot/directaccess.php?cid={$_GET['cid']}\">Back to login page</a>\n";
@@ -138,7 +140,7 @@
 	//check for session
 	$origquerys = $querys;
 	if ($_POST['ekey']!='') {
-		$addtoquerystring = "ekey=".urlencode($_POST['ekey']);
+		$addtoquerystring = "ekey=".Sanitize::encodeStringForUrl($_POST['ekey']);
 	}
 	require("validate.php");
 	$flexwidth = true;
@@ -164,11 +166,11 @@
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':latepass'=>$deflatepass));
 				}
 
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/course/course.php?cid='. $_GET['cid']);
 				exit;
 			} else {
 				require("header.php");
-				echo "<h2>$coursename</h2>";
+				echo "<h2>".Sanitize::encodeStringForDisplay($coursename)."</h2>";
 				echo '<form method="post" action="directaccess.php?cid='.$_GET['cid'].'">';
 				echo '<p>Incorrect enrollment key.  Try again.</p>';
 				echo "<p>Course Enrollment Key:  <input type=text name=\"ekey\"></p>";
@@ -178,7 +180,7 @@
 				exit;
 			}
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/course/course.php?cid='. $_GET['cid']);
 			exit;
 		}
 	} else { //not verified

@@ -34,10 +34,10 @@ if (isset($_REQUEST["action"]))
 	if ($_REQUEST["action"] == "upload_file")
 	{
 		//$filename = basename(stripslashes($_POST["uploaded_file_name"]));
-		$filename = basename($_FILES['uploaded_file']['name']);
+		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['uploaded_file']['name']);
 		$filename = str_replace(' ','_',$filename);
 		$filename = preg_replace('/[^\w\.\-_]/','',$filename);
-		//$filename = urlencode($filename);
+		//$filename = Sanitize::encodeStringForUrl($filename);
 		//echo $filename;
 		//exit;
 		$extension = strtolower(strrchr($filename,"."));
@@ -64,7 +64,7 @@ if (isset($_REQUEST["action"]))
 	}
 	else if ($_REQUEST["action"] == "delete_file")
 	{
-		if (deleteuserfile($userid,$_REQUEST["item_name"])) {
+		if (deleteuserfile($userid,Sanitize::sanitizeFilenameAndCheckBlacklist($_REQUEST["item_name"]))) {
 			echo 'OK';
 		} else {
 			echo 'FAIL';
@@ -89,7 +89,7 @@ if (isset($_REQUEST["action"]))
 var FileBrowserDialogue = {
     args : null,
     init : function () {
-    	    args = parent.tinymce.activeEditor.windowManager.getParams(); 
+    	    args = parent.tinymce.activeEditor.windowManager.getParams();
         // Here goes your code for setting your custom things onLoad.
 <?php
 if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
@@ -120,7 +120,7 @@ function switchDivs() {
 <?php
 if ($type=="img") {
 ?>
-	
+
 	extension = ['.png','.gif','.jpg','.jpeg'];
 	isok = false;
 	var thisext = fieldvalue.substr(fieldvalue.lastIndexOf('.')).toLowerCase();
@@ -178,14 +178,14 @@ if (isset($_REQUEST['showfiles'])) {
 		echo "<img border=0 src='" . $delete_image . "' alt=\"Delete\"></a> ";
 		echo "<img src='" . $file_small_image . "' alt=\"File\"> ";
 		echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl($v['name']) . "\");'>" . basename($v['name']) . "</a><br></div>\n";
-	
+
 	}
 	if (count($files)==0) {
 		echo '<div>No files to show</div>';
 	}
 } else {
 	echo '<div class="upload">';
-	echo '<p><a href="file_manager.php?showfiles=true&amp;type='.$type.'">Show previously uploaded files</a></p>';	
+	echo '<p><a href="file_manager.php?showfiles=true&amp;type='.$type.'">Show previously uploaded files</a></p>';
 }
 ?>
 </div>
@@ -200,7 +200,7 @@ if (isset($_REQUEST['showfiles'])) {
 		if ($type=="img") {
 			echo '<input type="file" name="uploaded_file" id="uploaded_file" accept=".gif,.png,.jpg,.jpeg"><br/>';
 			echo $strings["imagetypes"].'<br/>';
-			
+
 		} else {
 			echo '<input type="file" name="uploaded_file" id="uploaded_file">';
 		}

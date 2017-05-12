@@ -7,6 +7,7 @@ require("../validate.php");
 require("../includes/htmlutil.php");
 require_once("../includes/parsedatetime.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -30,7 +31,7 @@ if (isset($_GET['from'])) {
 
 $curBreadcrumb = $breadcrumbbase;
 if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-	$curBreadcrumb .= "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
+	$curBreadcrumb .= "<a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if ($stu>0) {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";

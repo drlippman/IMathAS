@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
 
 	require("../validate.php");
+	
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -20,7 +21,7 @@
 	if (isset($_GET['upload'])) {
 		require("../header.php");
 
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
 		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Gradebook Comments</a> &gt; Upload Comments</div>";
 
@@ -43,6 +44,7 @@
 				}
 				$scorecol = $_POST['gradecol']-1;
 
+				// $_FILES[]['tmp_name'] is not user provided. This is safe.
 				$handle = fopen($_FILES['userfile']['tmp_name'],'r');
 				if ($_POST['hashdr']==1) {
 					$data = fgetcsv($handle,4096,',');
@@ -175,7 +177,7 @@
 	echo '   }'."\n";
 	echo ' } </script>'."\n";
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 	if ($comtype=='stu') {
 		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";

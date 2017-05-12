@@ -58,8 +58,8 @@ require_once '../../includes/OAuth.php';
     $r = "<div id=\"ltiLaunchFormSubmitArea\">\n";
     $r .= "<form action=\"".$endpoint."\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n" ;
     foreach($newparms as $key => $value ) {
-      $key = htmlspecialchars($key);
-      $value = htmlspecialchars($value);
+      $key = Sanitize::encodeStringForDisplay($key);
+      $value = Sanitize::encodeStringForDisplay($value);
       if ( $key == "basiclti_submit" ) {
         $r .= "<input type=\"submit\" name=\"";
       } else {
@@ -76,8 +76,8 @@ require_once '../../includes/OAuth.php';
       $r .=  "<b>BasicLTI Endpoint</b>\n" . $endpoint . "\n\n";
       $r .=  "<b>BasicLTI Parameters:</b>\n";
       foreach($newparms as $key => $value ) {
-        $key = htmlspecialchars($key);
-        $value = htmlspecialchars($value);
+        $key = Sanitize::encodeStringForDisplay($key);
+        $value = Sanitize::encodeStringForDisplay($value);
         $r .= "$key = $value\n";
       }
       $r .= "</pre>\n";
@@ -110,13 +110,13 @@ require_once '../../includes/OAuth.php';
     if ( ! $launch_url ) $launch_url = $xml->launch_url[0];
     if ( $launch_url ) $launch_url = (string) $launch_url;
     $custom = array();
-    if ( $xml->custom[0]->parameter ) 
+    if ( $xml->custom[0]->parameter )
     foreach ( $xml->custom[0]->parameter as $resource) {
       $key = (string) $resource['key'];
       $key = strtolower($key);
       $nk = "";
-      for($i=0; $i < strlen($key); $i++) { 
-        $ch = substr($key,$i,1); 
+      for($i=0; $i < strlen($key); $i++) {
+        $ch = substr($key,$i,1);
         if ( $ch >= "a" && $ch <= "z" ) $nk .= $ch;
         else if ( $ch >= "0" && $ch <= "9" ) $nk .= $ch;
         else $nk .= "_";
@@ -126,7 +126,7 @@ require_once '../../includes/OAuth.php';
     }
     return array("launch_url" => $launch_url, "custom" => $custom ) ;
   }
-  
+
   function map_keyname($key) {
     $newkey = "";
     $key = strtolower(trim($key));

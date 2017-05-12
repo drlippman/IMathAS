@@ -7,6 +7,7 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -30,7 +31,7 @@ if (!isset($CFG['GEN']['allowinstraddstus'])) {
 if (!isset($CFG['GEN']['allowinstraddtutors'])) {
 	$CFG['GEN']['allowinstraddtutors'] = true;
 }
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 
 if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -345,13 +346,15 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 
 			require('../includes/userpics.php');
+
+			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
-				processImage($_FILES['stupic'],$_GET['uid'],200,200);
-				processImage($_FILES['stupic'],'sm'.$_GET['uid'],40,40);
+				processImage($_FILES['stupic'],Sanitize::onlyInt($_GET['uid']),200,200);
+				processImage($_FILES['stupic'],'sm'.Sanitize::onlyInt($_GET['uid']),40,40);
 				$chguserimg = "hasuserimg=1";
 			} else if (isset($_POST['removepic'])) {
-				deletecoursefile('userimg_'.$_GET['uid'].'.jpg');
-				deletecoursefile('userimg_sm'.$_GET['uid'].'.jpg');
+				deletecoursefile('userimg_'.Sanitize::onlyInt($_GET['uid']).'.jpg');
+				deletecoursefile('userimg_sm'.Sanitize::onlyInt($_GET['uid']).'.jpg');
 				$chguserimg = "hasuserimg=0";
 			} else {
 				$chguserimg = '';
@@ -410,12 +413,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:password WHERE id=:id");
 			$stm->execute(array(':password'=>$newpw, ':id'=>$_GET['uid']));
 		} else {
-			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 			$pagetitle = "Confirm Change";
 		}
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" && !isset($CFG['GEN']['noInstrUnenroll'])){
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "Unenroll Students";
 		$calledfrom='lu';
@@ -423,7 +426,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$fileToInclude = "unenroll.php";
 
 	} elseif (isset($_GET['action']) && $_GET['action']=="lock") {
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "LockStudents";
 		$calledfrom='lu';
@@ -509,7 +512,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		//DB }
 		//DB $resultDefaultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 		$haslatepasses = false;
-		
+
 		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,";
 		$query .= "imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult,imas_students.latepass ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseid AND imas_students.userid=imas_users.id ";
@@ -779,7 +782,7 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 		With Selected:
-		<?php 
+		<?php
 		  if (!isset($CFG['GEN']['noEmailButton'])) {
 		  	  echo '<input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">';
 		  }
@@ -831,9 +834,9 @@ if ($overwriteBody==1) {
 			if ($icons != '') {
 				$icons = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.$line['userid'].'">'.$icons.'</a>';
 			}
-				
+
 			$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
-			
+
 			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
@@ -855,7 +858,7 @@ if ($overwriteBody==1) {
 				echo $hasSectionData;
 				echo $hasCodeData;
 				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.$line['userid'].'" class="ui">';
-				$nameline .= $line['LastName'].', '.$line['FirstName'] . '</a>';
+				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
 				if ($line['locked']>0) {
 					echo '<td><span class="greystrike">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
@@ -866,7 +869,7 @@ if ($overwriteBody==1) {
 					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.$line['userid'].'" class="lal">'.$lastaccess.'</a></td>';
 				}
 				?>
-				
+
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers" class="gl">Grades</a></td>
 				<?php
 				if ($haslatepasses) {

@@ -3,6 +3,8 @@
 //(c) 2011 David Lippman
 
 	require("../validate.php");
+	
+
 	$cid = intval($_GET['cid']);
 
 	if (isset($teacherid)) {
@@ -91,7 +93,7 @@
 
 	$pagetitle = "View Forum Grade";
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Gradebook</a> ";
 	echo "&gt; View Forum Grade</div>";
 

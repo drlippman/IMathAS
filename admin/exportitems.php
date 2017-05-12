@@ -14,6 +14,7 @@ ini_set("post_max_size", "10485760");
 require("../validate.php");
 include("../includes/filehandler.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 function copysub($items,$parent,&$addtoarr) {
 	global $itemcnt,$toexport;
@@ -102,8 +103,9 @@ function getiteminfo($itemid) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Item Export";
-$cid = $_GET['cid'];
-$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Export Course Items</div>\n";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">"
+	. Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; Export Course Items</div>\n";
 
 
 if (!(isset($teacherid))) {   //NO PERMISSIONS
@@ -386,14 +388,17 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 	*/
 	if (count($qsettoexport)>0) {
-		$qstoexportlist = implode(',', array_map('intval', $qsettoexport));
+		$qstoexportlist = array_map('Sanitize::onlyInt', $qsettoexport);
+		$qstoexportlist_query_placeholders = Sanitize::generateQueryPlaceholders($qstoexportlist);
+
 		//first, lets pull any questions that have include__from so we can lookup backrefs
 		//DB $query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 		//DB $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
 		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
+		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist_query_placeholders)";
 		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		$stm = $DBH->query($query);
+		$stm = $DBH->prepare($query);
+		$stm->execute($qstoexportlist);
 		$includedqs = array();
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -418,7 +423,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$imgfiles = array();
 		//DB $query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$stm = $DBH->query("SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)");
+		$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist_query_placeholders)");
+		$stm->execute($qstoexportlist);
 		$qcnt = 0;
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -470,7 +476,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$stm2 = $DBH->prepare("SELECT var,filename FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo $row[0].','.$row[1]. "\n";
+					echo Sanitize::encodeStringForDisplay($row[0]).','.Sanitize::encodeStringForDisplay($row[1]). "\n";
 
 				}
 			}
@@ -482,7 +488,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		//DB $query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
 		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($r2)) {
-		$stm2 = $DBH->query("SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)");
+		$stm2 = $DBH->query("SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist_query_placeholders)");
+		$stm2->execute($qstoexportlist);
 		while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 			if ($GLOBALS['filehandertypecfiles'] == 's3') {
 				if (!file_exists("../assessment/qimages".DIRECTORY_SEPARATOR.trim($row[0]))) {

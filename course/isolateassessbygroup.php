@@ -2,6 +2,7 @@
 //IMathAS:  Display grade list for one online assessment by group
 //(c) 2007 David Lippman
 	require("../validate.php");
+	
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 
@@ -26,7 +27,7 @@
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; View Group Scores</div>";
 
 	//DB $query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id='$aid'";

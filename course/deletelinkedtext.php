@@ -5,13 +5,14 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= "&gt; Delete Link\n";
 $pagetitle = "Delete Link";
 

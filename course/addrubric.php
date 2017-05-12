@@ -6,15 +6,16 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'];
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=='modq') {
 	$fromstr = '&amp;from=modq&amp;aid='.$_GET['aid'].'&amp;qid='.$_GET['qid'];
 	$returnstr = 'modquestion.php?cid='.$cid.'&amp;aid='.$_GET['aid'].'&amp;id='.$_GET['qid'];
@@ -82,7 +83,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':ownerid'=>$userid, ':name'=>$_POST['rubname'], ':rubrictype'=>$_POST['rubtype'], ':groupid'=>$rubgrp, ':rubric'=>$rubricstring));
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addrubric.php?cid=$cid$fromstr");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addrubric.php?cid=$cid$fromstr");
 
 
 
@@ -164,15 +165,15 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	} else {
 		echo '<p style="display:none;" id="scoretotalinstr">';
 	}
-	echo 'With this type of rubric, one rubric item will be selected, and "portion of score" associated with that item will be the 
+	echo 'With this type of rubric, one rubric item will be selected, and "portion of score" associated with that item will be the
 		total final score for the question.  Make sure one item is 100(%) or the expected point total for the question.';
 	echo '</p>';
-	
+
 	echo '<p>Share with Group: <input type="checkbox" name="rubisgroup" '.getHtmlChecked($rubgrp,-1,1).' /></p>';
 	echo '<table><thead><tr><th>Rubric Item<br/>Shows in feedback</th><th>Instructor Note<br/>Not in feedback</th><th><span id="pointsheader" ';
 	if ($rubtype==2) {echo 'style="display:none;" ';}
 	echo '>Portion of Score</span>';
-	
+
 	echo '</th></tr></thead><tbody>';
 	for ($i=0;$i<15; $i++) {
 		echo '<tr><td><input type="text" size="40" name="rubitem'.$i.'" value="';

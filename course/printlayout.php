@@ -98,11 +98,13 @@ if ($overwriteBody==1) {
 	$qn = array();
 	$fixedseeds = array();
 	//DB $qlist = "'".implode("','",$questions)."'";
-	$qlist = implode(',', array_map('intval', $questions));
+	$qlist = array_map('Sanitize::onlyInt', $questions);
 	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($qlist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
+	$stm = $DBH->prepare("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($query_placeholders)");
+	$stm->execute($qlist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
@@ -412,7 +414,7 @@ if ($overwriteBody==1) {
 	}
 	if ($isfinal) {
 		$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
-		echo '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
+		echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::encodeStringForUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
 		echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 	}
 	echo "</form>\n";
@@ -503,7 +505,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	}
 	echo "<div class=qnum>".($qn+1).") ";
 	if (isset($_POST['points'])) {
-		echo '<br/>'.$pts.'pts';
+		echo '<br/>'.Sanitize::encodeStringForDisplay($pts).'pts';
 	}
 	echo "</div>\n";//end qnum div
 	echo "<div class=floatl><div>\n";

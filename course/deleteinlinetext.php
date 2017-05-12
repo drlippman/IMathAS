@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -12,7 +13,7 @@ $cid = $_GET['cid'];
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Inline Text";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= " &gt; Delete Inline Text\n";
 
 if (!(isset($teacherid))) {

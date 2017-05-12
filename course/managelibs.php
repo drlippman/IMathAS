@@ -44,7 +44,7 @@ if ($myrights<20) {
 		$curBreadcrumb .= " &gt; <a href=\"../admin/admin.php\">Admin</a> ";
 	}
 	if ($cid!=0) {
-		$curBreadcrumb .= " &gt; <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		$curBreadcrumb .= " &gt; <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 
 	if (isset($_POST['remove'])) {
@@ -96,10 +96,12 @@ if ($myrights<20) {
 				}
 
 				if (isset($qidstocheck)) {
-					$qids = implode(",",$qidstocheck);  //INTs from DB
+					$qids = array_map('Sanitize::onlyInt', $qidstocheck);//INTs from DB
+          $qids_query_placeholders = Sanitize::generateQueryPlaceholders($qids);
 					//DB $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->query("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)");
+					$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids_query_placeholders)");
+					$stm->execute($qids);
 					$okqids = array();
 					//DB while ($row = mysql_fetch_row($result)) {
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -107,11 +109,13 @@ if ($myrights<20) {
 					}
 					$qidstofix = array_diff($qidstocheck,$okqids);
 					if ($_POST['delq']=='yes' && count($qidstofix)>0) {
-						$qlist = implode(',',$qidstofix);
+            $qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
+            $qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
 						//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
 						//DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
 						//DB mysql_query($query) or die("Query failed : " . mysql_error());
-						$stm = $DBH->query("UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)");
+						$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist_query_placeholders)");
+            $stm->execute($qlist);
 						/*foreach ($qidstofix as $qid) {
 							delqimgs($qid);
 						}*/
@@ -124,7 +128,7 @@ if ($myrights<20) {
 						}
 					}
 				}
-				
+
 				if (!$isadmin && !$isgrpadmin) {
 					//DB $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
 					//DB $query .= " AND ownerid='$userid'";
@@ -393,10 +397,12 @@ if ($myrights<20) {
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_library_items WHERE libid=:libid");
 				$stm->execute(array(':libid'=>$_GET['remove']));
-				$qids = implode(",",$qidstocheck); //INT from DB
+        $qids = array_map('Sanitize::onlyInt', $qidstocheck);//INTs from DB
+        $qids_query_placeholders = Sanitize::generateQueryPlaceholders($qids);
 				//DB $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->query("SELECT DISTINCT qsetid FROM imas_library_items WHERE qsetid IN ($qids)");
+				$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM imas_library_items WHERE qsetid IN ($qids_query_placeholders)");
+        $stm->execute($qids);
 				$okqids = array();
 				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -404,11 +410,13 @@ if ($myrights<20) {
 				}
 				$qidstofix = array_diff($qidstocheck,$okqids);
 				if ($_POST['delq']=='yes' && count($qidstofix)>0) {
-					$qlist = implode(',',$qidstofix);
+          $qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
+          $qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
 					//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
 					//DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->query("UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)");
+					$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist_query_placeholders)");
+          $stm->execute($qlist);
 					/*foreach ($qidstofix as $qid) {
 						delqimgs($qid);
 					}*/

@@ -159,7 +159,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 			':ips'=>$_POST['iplist'], ':pws'=>$_POST['pwlist'], ':idprompt'=>$_POST['idprompt'], ':sel1name'=>$_POST['sel1name'],
 			':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>$_POST['sel2name'], ':sel2list'=>$sel2list,
 			':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime'], ':id'=>$_POST['id']));
-		$id = $_POST['id'];
+		$id = Sanitize::onlyInt($_POST['id']);
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
 	} else {
 		//DB $query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime) VALUES ";
@@ -176,8 +176,8 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$id = $DBH->lastInsertId();
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
 	}
-	$page_diagLink = "<p>Direct link to diagnostic:  <b>http://{$_SERVER['HTTP_HOST']}$imasroot/diag/index.php?id=$id</b></p>";
-	$page_publicLink = ($_POST['public']&2) ? "<p>Diagnostic is listed on the public listing at: <b>http://{$_SERVER['HTTP_HOST']}$imasroot/diag/</b></p>\n" : ""  ;
+	$page_diagLink = "<p>Direct link to diagnostic:  <b>http://".Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])."$imasroot/diag/index.php?id=$id</b></p>";
+	$page_publicLink = ($_POST['public']&2) ? "<p>Diagnostic is listed on the public listing at: <b>http://".Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])."$imasroot/diag/</b></p>\n" : ""  ;
 
 } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
 	if (isset($_GET['id'])) {
@@ -293,20 +293,20 @@ if ($overwriteBody==1) { //NO AUTHORITY
 		<h4>Second-level Selector - extra information</h4>
 		<form method=post action="diagsetup.php?step=3">
 
-			<input type=hidden name="sel1list" value="<?php echo $sel1list ?>"/>
-			<input type=hidden name="iplist" value="<?php echo $iplist ?>"/>
-			<input type=hidden name="pwlist" value="<?php echo $pwlist ?>"/>
-			<input type=hidden name="cid" value="<?php echo $_POST['cid'] ?>"/>
-			<input type=hidden name="term" value="<?php echo $_POST['term'] ?>"/>
-			<input type=hidden name="sel1name" value="<?php echo $_POST['sel'] ?>"/>
-			<input type=hidden name="diagname" value="<?php echo $_POST['diagname'] ?>"/>
-			<input type=hidden name="idprompt" value="<?php echo $_POST['idprompt'] ?>"/>
-			<input type=hidden name="entryformat" value="<?php echo $entryformat; ?>"/>
-			<input type=hidden name="public" value="<?php echo $public ?>"/>
-			<input type=hidden name="reentrytime" value="<?php echo $_POST['reentrytime'] ?>"/>
-			<input type=hidden name="id" value="<?php echo $page_updateId ?>" >
+			<input type=hidden name="sel1list" value="<?php echo Sanitize::encodeStringForDisplay($sel1list); ?>"/>
+			<input type=hidden name="iplist" value="<?php echo Sanitize::encodeStringForDisplay($iplist); ?>"/>
+			<input type=hidden name="pwlist" value="<?php echo Sanitize::encodeStringForDisplay($pwlist); ?>"/>
+			<input type=hidden name="cid" value="<?php echo Sanitize::courseId($_POST['cid']); ?>"/>
+			<input type=hidden name="term" value="<?php echo Sanitize::encodeStringForDisplay($_POST['term']); ?>"/>
+			<input type=hidden name="sel1name" value="<?php echo Sanitize::encodeStringForDisplay($_POST['sel']); ?>"/>
+			<input type=hidden name="diagname" value="<?php echo Sanitize::encodeStringForDisplay($_POST['diagname']); ?>"/>
+			<input type=hidden name="idprompt" value="<?php echo Sanitize::encodeStringForDisplay($_POST['idprompt']); ?>"/>
+			<input type=hidden name="entryformat" value="<?php echo Sanitize::encodeStringForDisplay($entryformat); ?>"/>
+			<input type=hidden name="public" value="<?php echo Sanitize::encodeStringForDisplay($public); ?>"/>
+			<input type=hidden name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($_POST['reentrytime']); ?>"/>
+			<input type=hidden name="id" value="<?php echo Sanitize::onlyInt($page_updateId); ?>" >
 			<p>Second-level selector name:
-			<input type=text name=sel2name value="<?php echo $sel2name ?>"/>
+			<input type=text name=sel2name value="<?php echo Sanitize::encodeStringForDisplay($sel2name); ?>"/>
 			'Select your ______'</p>
 			<p>For each of the first-level selectors, select which assessment should be delivered,
 			and provide options for the second-level selector</p>
@@ -315,7 +315,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 		foreach($sel1 as $k=>$s1) {
 ?>
 			<div>
-			<p><b><?php echo $s1 ?></b>.  Deliver assessment:
+			<p><b><?php echo Sanitize::encodeStringForDisplay($s1); ?></b>.  Deliver assessment:
 
 <?php
 			writeHtmlSelect ($page_selectName[$k],$page_selectValList[$k],$page_selectLabelList[$k],$page_selectedOption[$k]);
@@ -383,11 +383,11 @@ if ($overwriteBody==1) { //NO AUTHORITY
 <?php echo (isset($_GET['id'])) ? "	<input type=hidden name=id value=\"{$_GET['id']}\"/>" : ""; ?>
 
 	<p>Diagnostic Name:
-	<input type=text size=50 name="diagname" value="<?php echo $diagname; ?>"/></p>
+	<input type=text size=50 name="diagname" value="<?php echo Sanitize::encodeStringForDisplay($diagname); ?>"/></p>
 
 	<p>Term designator (e.g. F06):  <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>>Use Month
 				<input type=radio name="termtype" value="day" <?php if ($term=="*day*") {echo 'checked="checked"';}?>>Use Day
-				<input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>>Use: <input type=text size=7 name="term" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/></p>
+				<input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>>Use: <input type=text size=7 name="term" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo Sanitize::encodeStringForDisplay($term); }?>"/></p>
 
 	<p>Linked with course:
 	<?php writeHtmlSelect ("cid",$page_courseSelectList['val'],$page_courseSelectList['label'],$page_courseSelected); ?>
@@ -405,11 +405,11 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	<input type=radio name="reentry" value="0" <?php writeHtmlChecked(4,($public&4),1); ?> /> No
 
 	<input type=radio name="reentry" value="1" <?php writeHtmlChecked(4,($public&4),0); ?> /> Yes, within
-	  <input type="text" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /> minutes (0 for no limit)
+	  <input type="text" name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($reentrytime); ?>" size="4" /> minutes (0 for no limit)
 
 	</p>
 
-	<p>Unique ID prompt: <input type=text size=60 name="idprompt" value="<?php echo $idprompt; ?>" /></p>
+	<p>Unique ID prompt: <input type=text size=60 name="idprompt" value="<?php echo Sanitize::encodeStringForDisplay($idprompt); ?>" /></p>
 
 	<p>Attach first level selector to ID: <input type="checkbox" name="entrynotunique" value="1" <?php writeHtmlChecked($entrynotunique,true); ?> /></p>
 
@@ -436,8 +436,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			for ($i=0;$i<count($ips);$i++) {
 ?>
 		<tr id="tripout-<?php echo $i ?>">
-			<td><input type=hidden id="ipout-<?php echo $i ?>" name="ipout-<?php echo $i ?>" value="<?php echo $ips[$i] ?>">
-			<?php echo $ips[$i] ?></td>
+			<td><input type=hidden id="ipout-<?php echo $i ?>" name="ipout-<?php echo $i ?>" value="<?php echo Sanitize::encodeStringForDisplay($ips[$i]); ?>">
+			<?php echo Sanitize::encodeStringForDisplay($ips[$i]); ?></td>
 			<td>
 				<a href='#' onclick="return removeitem('ipout-<?php echo $i ?>','ipout')">Remove</a>
 				<a href='#' onclick="return moveitemup('ipout-<?php echo $i ?>','ipout')">Move up</a>
@@ -477,8 +477,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 ?>
 		<tr id="trpwout-<?php echo $i ?>">
 			<td>
-				<input type=hidden id="pwout-<?php echo $i ?>" name="pwout-<?php echo $i ?>" value="<?php echo $pwsb[$i] ?>">
-				<?php echo $pwsb[$i] ?>
+				<input type=hidden id="pwout-<?php echo $i ?>" name="pwout-<?php echo $i ?>" value="<?php echo Sanitize::encodeStringForDisplay($pwsb[$i]); ?>">
+				<?php echo Sanitize::encodeStringForDisplay($pwsb[$i]); ?>
 			</td>
 			<td>
 				<a href='#' onclick="return removeitem('pwout-<?php echo $i ?>','pwout')">Remove</a>
@@ -516,8 +516,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 ?>
 		<tr id="trpwsout-<?php echo $i ?>">
 			<td>
-				<input type=hidden id="pwsout-<?php echo $i ?>" name="pwsout-<?php echo $i ?>" value="<?php echo $pwss[$i] ?>">
-				<?php echo $pwss[$i] ?>
+				<input type=hidden id="pwsout-<?php echo $i ?>" name="pwsout-<?php echo $i ?>" value="<?php echo Sanitize::encodeStringForDisplay($pwss[$i]); ?>">
+				<?php echo Sanitize::encodeStringForDisplay($pwss[$i]); ?>
 			</td>
 			<td>
 				<a href='#' onclick="return removeitem('pwsout-<?php echo $i ?>','pwsout')">Remove</a>
@@ -542,7 +542,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	</p>
 
 	<h4>First-level selector - selects assessment to be delivered</h4>
-	<p>Selector name:  <input name="sel" type=text value="<?php echo $sel; ?>"/> "Please select your _______"</p>
+	<p>Selector name:  <input name="sel" type=text value="<?php echo Sanitize::encodeStringForDisplay($sel); ?>"/> "Please select your _______"</p>
 	<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
 	<p>Enter new selector option:
 		<input type=text id="sellist"  onkeypress="return onenter(event,'sellist','selout')">
@@ -558,8 +558,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 ?>
 				<tr id="trselout-<?php echo $i ?>">
 					<td>
-						<input type=hidden id="selout-<?php echo $i ?>" name="selout-<?php echo $i ?>" value="<?php echo $sl[$i]?>">
-						<?php echo $sl[$i]?>
+						<input type=hidden id="selout-<?php echo $i ?>" name="selout-<?php echo $i ?>" value="<?php echo Sanitize::encodeStringForDisplay($sl[$i]); ?>">
+						<?php echo Sanitize::encodeStringForDisplay($sl[$i]); ?>
 					</td>
 					<td>
 						<a href='#' onclick="return removeitem('selout-<?php echo $i ?>','selout')">Remove</a>

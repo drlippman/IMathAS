@@ -1,6 +1,7 @@
 <?php
 require("../validate.php");
 
+
 $isadmin = false;
 $isgrpadmin = false;
 $isteacher = false;
@@ -20,7 +21,7 @@ if ($err != '') {
 	require("../footer.php");
 }
 
-$cid = (isset($_GET['cid'])) ? $_GET['cid'] : "admin";
+$cid = (isset($_GET['cid'])) ? Sanitize::courseId($_GET['cid']) : "admin";
 if ($myrights == 75 && $cid=='admin') {
 	$isgrpadmin = true;
 } else if ($myrights == 100 && $cid == 'admin') {
@@ -91,10 +92,10 @@ if (isset($_POST['tname'])) {
 
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
 	exit;
 } else if (isset($_GET['delete']) && $_GET['delete']=='true') {
-	$id = intval($_GET['id']);
+	$id = Sanitize::onlyInt($_GET['id']);
 	if ($id>0) {
 		if ($isadmin) {
       //DB $query = "DELETE FROM imas_external_tools WHERE id=$id ";
@@ -112,12 +113,12 @@ if (isset($_POST['tname'])) {
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
+	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
 	exit;
 } else {
 	require("../header.php");
 	if ($isteacher) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if (isset($_GET['ltfrom'])) {
 			echo "&gt; <a href=\"../course/addlinkedtext.php?cid=$cid&amp;id={$_GET['ltfrom']}\">Modify Linked Text<a/> ";
 		}

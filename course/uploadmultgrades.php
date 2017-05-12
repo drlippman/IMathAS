@@ -6,6 +6,7 @@
 require("../validate.php");
 
 
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
@@ -16,11 +17,11 @@ if (!(isset($teacherid))) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$dir = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
 	if (isset($_POST['thefile'])) {
 		//already uploaded file, ready for official upload
-		$filename = basename($_POST['thefile']);
+		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['thefile']);
 		if (!file_exists($dir.$filename)) {
 			echo "File is missing!";
 			exit;
@@ -198,11 +199,11 @@ if (!(isset($teacherid))) {
 				//DB }
 				//DB $namelist = "'".implode("','",$names)."'";
 				if (count($names)>0) {
-					$in  = str_repeat('?,', count($names) - 1) . '?';
+					$query_placeholders = Sanitize::generateQueryPlaceholders($names);
 					//DB $query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {
-					$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($in) AND courseid=?");
+					$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($query_placeholders) AND courseid=?");
 					$stm->execute(array_merge($names, array($cid)));
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$loc = array_search($row[1],$names);
@@ -222,7 +223,7 @@ if (!(isset($teacherid))) {
 			$body = "File Upload error";
 		}
 	}
-	$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
 	$curBreadcrumb .=" &gt; <a href=\"chgoffline.php?stu=0&cid=$cid\">Manage Offline Grades</a> &gt; Upload Multiple Grades";
 

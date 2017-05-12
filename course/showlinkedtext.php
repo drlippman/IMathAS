@@ -2,6 +2,8 @@
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
 	require("../validate.php");
+	
+
 	$cid = $_GET['cid'];
 
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
@@ -96,7 +98,7 @@
 			echo '<div class="breadcrumb" '.$fixbc.'>'.$_SESSION['backtrack'][0];
 			echo " &gt; $titlesimp</div>";
 		} else {
-			echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+			echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			echo "&gt; $titlesimp</div>";
 			echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
 		}

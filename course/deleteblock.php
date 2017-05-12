@@ -5,13 +5,14 @@
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Course Block";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Delete Block";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Block";
 
 if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
@@ -64,7 +65,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
 
-		$obarr = explode(',',$_COOKIE['openblocks-'.$_GET['cid']]);
+		$obarr = explode(',',$_COOKIE['openblocks-'.Sanitize::courseId($_GET['cid'])]);
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
 		setcookie('openblocks-'.$_GET['cid'],implode(',',$obarr));

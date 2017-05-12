@@ -5,6 +5,7 @@
 require("../validate.php");
 require("../assessment/displayq2.php");
 
+
 if (!isset($teacherid) && !isset($studentid) && !isset($tutorid)) {
 	echo _("You don't have authority to access this item");
 	exit;
@@ -227,7 +228,7 @@ $showtips = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
 $useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 require("../assessment/header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; " . _("Drill Assessment") . "</div>";
 
 echo '<div id="headerdrillassess" class="pagetitle"><h2>' . _("Drill Assessment") . '</h2></div>';

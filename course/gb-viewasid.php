@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 	require("../validate.php");
 	require_once("../includes/filehandler.php");
+	
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -550,7 +551,7 @@
 
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-			echo "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
+			echo "<a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 
 			if ($stu>0) {
 				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -584,7 +585,7 @@
 			echo '</div>';
 		}
 		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
-	
+
 		//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
@@ -690,7 +691,7 @@
 				$saenddate = $exped;
 			}
 			require("../includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($exception, $line, true); 
+			$useexception = getCanUseAssessException($exception, $line, true);
 		}
 
 		if ($isteacher) {
@@ -1225,7 +1226,7 @@
 
 	} else if ($links==1) { //show grade detail question/category breakdown
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		if ($stu>0) {echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";}
 		echo "&gt; Detail</div>";

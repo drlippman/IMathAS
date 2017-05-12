@@ -10,6 +10,7 @@
 //4 - CC-BY-SA
 
 	require("../validate.php");
+	
 
 	if ($myrights<20) {
 		require("../header.php");
@@ -993,11 +994,11 @@
 
 
 	if (isset($_GET['aid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; Modify Questions</div>";
 
 	} else if (isset($_GET['daid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; Modify Questions</div>";
 	} else {
 		if ($_GET['cid']=="admin") {
@@ -1006,7 +1007,7 @@
 		} else {
 			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 			if ($cid>0) {
-				echo "&gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
+				echo "&gt; <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 			}
 			echo " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; Modify Question</div>\n";
 		}

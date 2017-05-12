@@ -11,6 +11,8 @@
 	require("../config.php");
 	require("../i18n/i18n.php");
 	require("courseshowitems.php");
+	
+
 	$ispublic = true;
 	$cid = $_GET['cid'];
 
@@ -70,7 +72,7 @@
 
 	$curBreadcrumb = $breadcrumbbase;
 	if (isset($backtrack) && count($backtrack)>0) {
-		$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder=0\">$coursename</a> ";
+		$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		for ($i=0;$i<count($backtrack);$i++) {
 			$curBreadcrumb .= "&gt; ";
 			if ($i!=count($backtrack)-1) {

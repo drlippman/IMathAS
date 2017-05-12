@@ -1,5 +1,6 @@
 <?php
 require("config.php");
+require_once("includes/sanitize.php");
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
  	 $urlmode = 'https://';
  } else {
@@ -20,11 +21,11 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <blti:title><?php echo htmlentities($installname) ?></blti:title>
     <blti:description>Math Assessment</blti:description>
     <blti:extensions platform="canvas.instructure.com">
-      <lticm:property name="domain"><?php echo $_SERVER['HTTP_HOST']; ?></lticm:property>
+      <lticm:property name="domain"><?php echo Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']); ?></lticm:property>
       <lticm:property name="tool_id">resource_selection</lticm:property>
       <lticm:property name="privacy_level">public</lticm:property>
       <lticm:options name="course_navigation">
-        <lticm:property name="url"><?php echo $urlmode.$_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php';?></lticm:property>
+        <lticm:property name="url"><?php echo $urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php';?></lticm:property>
         <lticm:property name="text"><?php echo htmlentities($installname) ?></lticm:property>
         <lticm:property name="enabled">true</lticm:property>
       </lticm:options>

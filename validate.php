@@ -9,6 +9,7 @@
  }
  require_once("$curdir/config.php");
  require("i18n/i18n.php");
+ require_once("includes/sanitize.php");
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);
  ini_set('auto_detect_line_endings',true);

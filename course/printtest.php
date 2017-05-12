@@ -6,17 +6,17 @@
 require("../validate.php");
 
 
-	
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Print Test";
-	
+
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
 }
@@ -26,9 +26,9 @@ require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
-} else {	
-	
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+} else {
+
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 	if (!isset($_POST['heights'])) {
 		echo '<div class="cpmid"><a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a>';
@@ -38,7 +38,7 @@ if ($overwriteBody==1) {
 		echo '</div>';
 	}
 	echo '<div id="headerprinttest" class="pagetitle"><h2>Print Test</h2></div>';
-	
+
 	if (!isset($_POST['heights'])) {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid\">\n";
 		echo "<h4>Header Setup</h4>\nPlease select the items you'd like in the test header:";
@@ -57,7 +57,7 @@ if ($overwriteBody==1) {
 		echo "Please check Page Setup under the File menu of your browser, and look up your print margin settings.<br/>\n";
 		echo "Left + Right:  <input type=text name=horiz size=5 value=\"1.0\"> inches<br/>\n";
 		echo "Top + Bottom:  <input type=text name=vert size=5 value=\"1.0\"> inches<br/>\n";
-		echo "<p>Browser: <input type=radio name=browser value=0 checked=1>Internet Explorer <input type=radio name=browser value=1>FireFox<sup>*</sup></p>\n"; 
+		echo "<p>Browser: <input type=radio name=browser value=0 checked=1>Internet Explorer <input type=radio name=browser value=1>FireFox<sup>*</sup></p>\n";
 		echo "<h4>Print Layout</h4>\n";
 		echo "<p>On the next page, you will see alternating blue and green rectangles indicating the size of pages.  Use the resizing ";
 		echo "buttons next to each question to increase or decrease the space after each question until the questions fall nicely onto ";
@@ -104,6 +104,6 @@ if ($overwriteBody==1) {
 		echo "<p><input type=submit value=\"Continue\"></p>\n";
 	}
 }
-	
+
 	require("../footer.php");
 ?>

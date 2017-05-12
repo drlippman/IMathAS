@@ -5,6 +5,7 @@
 // Lumen Learning's ImprovOER model
 
 require("../validate.php");
+
 if (!isset($teacherid) && !isset($adminid)) {
 	exit;
 }
@@ -173,7 +174,7 @@ arsort($assessbadness);
 
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 require("../header.php");
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> &gt; "._('Assessment Metric');
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._('Assessment Metric');
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 echo '<div id="headeraddlinkedtext" class="pagetitle"><h2>'._('Assessment Metric').'</h2></div>';
 

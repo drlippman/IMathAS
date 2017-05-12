@@ -3,6 +3,8 @@
 //(c) 2013 David Lippman for Lumen Learning
 
 require("../validate.php");
+
+
 if (!isset($teacherid) && !isset($studentid)) {
 	echo "You're not validated to view this page."; exit;
 }
@@ -137,7 +139,7 @@ $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 if ($report != 'export') {
 	require("../header.php");
 
-	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if (isset($teacherid)) {
 		$curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
 	} else if (isset($studentid)) {

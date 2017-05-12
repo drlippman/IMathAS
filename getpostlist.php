@@ -168,12 +168,12 @@
 			$url = $imasroot."/forums/posts.php?page=-2&amp;cid=$course&amp;forum={$line['forumid']}&amp;thread={$line['threadid']}";
 			/*$forumcontent[$line['forumid']] .= "<div style='font-size:100%;'>";
 			$forumcontent[$line['forumid']] .= "<a style='color: blue;' href='$url' target='_new'>{$line['subject']}</a>";
-			$forumcontent[$line['forumid']] .= " <span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span>";
-			$forumcontent[$line['forumid']] .= " <span style='color: gray;'>".htmlspecialchars($lastpost[$line['threadid']])."</span></div>";
+			$forumcontent[$line['forumid']] .= " <span style='color: black;'>".Sanitize::encodeStringForDisplay("{$line['LastName']}, {$line['FirstName']}")."</span>";
+			$forumcontent[$line['forumid']] .= " <span style='color: gray;'>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</span></div>";
 			*/
 			$forumcontent[$line['forumid']] .= "<tr><td><a style='color: blue;' href='$url' target='_new'>{$line['subject']}</a></td>";
-			$forumcontent[$line['forumid']] .= "<td><span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
-			$forumcontent[$line['forumid']] .= "<span style='color: gray;'>".htmlspecialchars($lastpost[$line['threadid']])."</span></td></tr>";
+			$forumcontent[$line['forumid']] .= "<td><span style='color: black;'>".Sanitize::encodeStringForDisplay("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
+			$forumcontent[$line['forumid']] .= "<span style='color: gray;'>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</span></td></tr>";
 		}
 
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-below:5px;'>New Posts</div>";
@@ -222,7 +222,7 @@
 			$line['title'] = substr($line['title'],4);
 			$n++;
 		}
-		$line['title'] = htmlspecialchars($line['title']);
+		$line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 		if ($n==1) {
 			$line['title'] = 'Re: '.$line['title'];
 		} else if ($n>1) {
@@ -231,8 +231,8 @@
 		$url = "/msgs/viewmsg.php?cid=0&amp;type=msg&amp;msgid=".$line['id'];
 		echo "<tr><td>";
 		echo "<a style='color: blue;' href='$url' target='_new'>".$line['title']."</a></td>";
-		echo "<td><span style='color: black;'>".htmlspecialchars("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
-		echo "<span style='color: gray;'>".htmlspecialchars(formatdate($line['senddate']))."</span></td></tr>";
+		echo "<td><span style='color: black;'>".Sanitize::encodeStringForDisplay("{$line['LastName']}, {$line['FirstName']}")."</span><br/>";
+		echo "<span style='color: gray;'>".Sanitize::encodeStringForDisplay(formatdate($line['senddate']))."</span></td></tr>";
 	}
 	if ($intable) {
 		echo '</table>';

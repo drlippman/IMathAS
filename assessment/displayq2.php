@@ -10,6 +10,8 @@ $allowedmacros = $mathfuncs;
 require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
+require_once("../includes/sanitize.php");
+
 
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
@@ -487,7 +489,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			for ($i=0;$i<count($extref);$i++) {
 				$extrefpt = explode('!!',$extref[$i]);
 				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
-					$extrefpt[1] = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
+					$extrefpt[1] = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".Sanitize::encodeStringForUrl($extrefpt[1]);
 					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
 					echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
 				} else if ($extrefpt[0]=='read') {
@@ -498,7 +500,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 		}
 		if (($qdata['solutionopts']&2)==2 && $qdata['solution']!='') {
-			$addr = $urlmode. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
+			$addr = $urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
 			$addr .= '&t='.($qdata['solutionopts']&1).'&cid='.$GLOBALS['cid'];
 			echo formpopup(_("Written Example"),$addr,730,500,"button",true,"soln",$qref);
 		}
@@ -567,6 +569,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 //inputs: Question number, Question id, rand seed, given answer
 function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
+	$qnidx = Sanitize::onlyInt($qnidx);
 	global $DBH, $RND;
 	unset($abstolerance);
 	$RND->srand($seed);
@@ -2235,7 +2238,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$ret .= " <br/><img id=\"essayimg$gradededessayexpandocnt\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" src=\"$url\" alt=\"Student uploaded image\" />";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$ret .= " <span aria-expanded=\"false\" aria-controls=\"essayfileprev$gradededessayexpandocnt\" class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayfileprev$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
-						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeStringForUrl($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
 					$gradededessayexpandocnt++;
 					return $ret;
@@ -3058,7 +3061,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$out .= " <span aria-expanded=\"false\" aria-controls=\"fileprev$qn\" class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
-						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeStringForUrl($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
 
 				}

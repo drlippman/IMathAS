@@ -7,7 +7,7 @@ require("../validate.php");
 require("../includes/copyiteminc.php");
 require("../includes/htmlutil.php");
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";

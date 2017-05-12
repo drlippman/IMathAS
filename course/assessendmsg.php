@@ -2,6 +2,7 @@
 //IMathAS:  Add end messages
 //(c) 2008 David Lippman
 
+
 if (!isset($imasroot)) {
 	require("../validate.php");
 	if (!(isset($teacherid))) { // loaded by a NON-teacher
@@ -9,7 +10,9 @@ if (!isset($imasroot)) {
 		exit;
 	}
 }
-	$cid = $_GET['cid'];
+require_once("../includes/sanitize.php");
+
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['record'])) {
 		$endmsg = array();
@@ -47,7 +50,7 @@ if (!isset($imasroot)) {
 			$stm->execute(array(':endmsg'=>$msgstr));
 
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 
 		exit;
 	}
@@ -56,7 +59,7 @@ if (!isset($imasroot)) {
 	$useeditor = "commonmsg";
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	if (!isset($_POST['checked'])) {
 		echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid={$_GET['aid']}\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
 	} else {
@@ -103,7 +106,7 @@ if (!isset($imasroot)) {
 	echo '<table class="gb"><thead><tr><th>If score is at least</th><th>Display this message</th></tr></thead><tbody>';
 	$i=1;
 	foreach($endmsg['msgs'] as $sc=>$msg) {
-		$msg = htmlspecialchars($msg);
+		$msg = Sanitize::encodeStringForDisplay($msg);
 		echo "<tr><td><input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"$sc\"/></td>";
 		echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
 		$i++;
@@ -114,7 +117,7 @@ if (!isset($imasroot)) {
 		$i++;
 	}
 	echo "<tr><td>Otherwise, show:</td>";
-	$endmsg['def'] = htmlspecialchars($endmsg['def']);
+	$endmsg['def'] = Sanitize::encodeStringForDisplay($endmsg['def']);
 	echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
 	echo '</tbody></table>';
 	echo '<p>After the score-specific message, display this text to everyone:</p>';

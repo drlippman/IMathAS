@@ -13,6 +13,7 @@ ini_set("post_max_size", "10485760");
 /*** master php includes *******/
 require("../validate.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 function getsubinfo($items,$parent,$pre) {
 	global $ids,$types,$names,$item,$parents;
@@ -553,11 +554,11 @@ function copysub($items,$parent,&$addtoarr) {
 
 
  //set some page specific variables and counters
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Import Course Items";
-$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Course Items</div>\n";
+$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Import Course Items</div>\n";
 
 //data manipulation here
 
@@ -575,7 +576,7 @@ if (!(isset($teacherid))) {
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
+		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
 		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($filename);
 
 		$userights = $_POST['userights'];
@@ -624,13 +625,13 @@ if (!(isset($teacherid))) {
 			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
 			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=$cid");
 		}
 		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
 		} else {

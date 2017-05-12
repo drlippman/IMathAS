@@ -6,6 +6,7 @@
 require("../validate.php");
 
 
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
@@ -42,6 +43,7 @@ if (!(isset($teacherid))) {
 			$scorecol = $_POST['gradecol']-1;
 			$feedbackcol = $_POST['feedbackcol']-1;
 
+			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			$handle = fopen($_FILES['userfile']['tmp_name'],'r');
 			if ($_POST['hashdr']==1) {
 				$data = fgetcsv($handle,4096,',');
@@ -126,7 +128,7 @@ if (!(isset($teacherid))) {
 			$body = "File Upload error";
 		}
 	} else { //DEFAULT DATA MANIPULATION
-		$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+		$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
 		$curBreadcrumb .=" &gt; <a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Offline Grades</a> &gt; Upload Grades";
 	}

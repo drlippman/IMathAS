@@ -6,6 +6,7 @@
 require("../validate.php");
 include("../includes/htmlutil.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -13,9 +14,9 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Add/Remove Questions";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid']) . "\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_GET['withdraw'])) {
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . $_GET['cid'] . "&aid=" . $_GET['aid'] . "\">Add/Remove Questions</a> &gt; Confirm\n";
+	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">Add/Remove Questions</a> &gt; Confirm\n";
 	//$pagetitle = "Modify Inline Text";
 } else {
 	$curBreadcrumb .= "&gt; Add/Remove Questions\n";
@@ -30,8 +31,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = $_GET['grp']; writesessiondata();}
 	if (isset($_GET['selfrom'])) {
 		$sessiondata['selfrom'.$aid] = $_GET['selfrom'];
@@ -50,7 +51,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if (isset($_POST['add'])) {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 				exit;
 			}
 		} else {
@@ -105,7 +106,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		}
 	}
@@ -116,7 +117,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 				exit;
 			}
 		}
@@ -137,7 +138,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -344,7 +345,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row[0]));
 			}
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 
 		} else {
@@ -375,7 +376,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	}
 
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid";
+	$address = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid";
 
 	$placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
@@ -384,7 +385,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=012317\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=031617\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=101016\" type=\"text/css\" />";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/iconfonts/style.css?v=081316\" type=\"text/css\" />";
 	$useeditor = "textsegmenteditor";
@@ -494,7 +495,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$qncnt++;
 		}
-		
+
 		for ($j=0;$j<count($subs);$j++) {
 			//DB $query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
 			//DB $query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
@@ -1150,7 +1151,7 @@ if ($overwriteBody==1) {
 		var curcid = <?php echo $cid ?>;
 		var curaid = <?php echo $aid ?>;
 		var defpoints = <?php echo $defpoints ?>;
-		var AHAHsaveurl = '<?php echo $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
+		var AHAHsaveurl = '<?php echo $urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo $searchlibs;?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>

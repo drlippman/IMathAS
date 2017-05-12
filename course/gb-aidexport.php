@@ -3,6 +3,7 @@
 //(c) 2009 David Lippman
 
 require("../validate.php");
+
 $isteacher = isset($teacherid);
 $cid = $_GET['cid'];
 $aid = $_GET['aid'];
@@ -132,7 +133,10 @@ if (isset($_POST['options'])) {
 		//DB $query = "SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
-		$stm = $DBH->query("SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)"); //INT vals from DB
+
+		$query_placeholders = Sanitize::generateQueryPlaceholders($qsetidlist);
+		$stm = $DBH->prepare("SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($query_placeholders)"); //INT vals from DB
+    $stm->execute($qsetidlist);
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$qcontrols[$row[0]] = interpret('control',$row[1],$row[2]);
 			$qanswers[$row[0]] = interpret('answer',$row[1],$row[3]);
@@ -387,7 +391,7 @@ if (isset($_POST['options'])) {
 	//ask for options
 	$pagetitle = "Assessment Export";
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; <a href=\"gb-itemanalysis.php?aid=$aid&cid=$cid\">Item Analysis</a> ";
 	echo '&gt; Assessment Export</div>';
 	echo '<div id="headergb-aidexport" class="pagetitle"><h2>Assessment Results Export</h2></div>';

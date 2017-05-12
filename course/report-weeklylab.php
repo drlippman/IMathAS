@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 // this gets points from the scores string
@@ -278,7 +279,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 
 
 	$curBreadcrumb = $breadcrumbbase;
-	$curBreadcrumb .= "<a href=\"course.php?cid=$cid\">$coursename</a> ";
+	$curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
 
 	$placeinhead = '<script type="text/javascript">function toggleList(el) { $(el).find("ul").toggle();}
@@ -383,7 +384,7 @@ foreach ($st as $uid=>$stu) {
 
 	$stuattemptedCnt = count($stu['stuCreditAssessList'])+count($stu['stuNocreditAssessList']);
 	echo '<td class="c">'.$stuattemptedCnt.'</td>';
-	
+
 	echo '<td class="c">';
 	if ($stu['totalTimeOnTask']<180) {
 		echo round($stu['totalTimeOnTask']/60,1).' min';

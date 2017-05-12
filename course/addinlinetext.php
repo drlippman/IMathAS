@@ -7,6 +7,7 @@ require("../validate.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 require("../includes/filehandler.php");
+
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
@@ -34,7 +35,7 @@ $body = "";
 $useeditor = "text";
 
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Inline Text\n";
 	$pagetitle = "Modify Inline Text";
@@ -55,7 +56,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 	$page_formActionTag = "addinlinetext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
 	$page_formActionTag .= "&tb=$totb";
@@ -213,10 +214,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if ($_FILES['userfile']['name']!='') {
 			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-			$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
+            $userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 			$filename = $userfilename;
 			$extension = strtolower(strrchr($userfilename,"."));
-			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".exe",".pl",".p");
 			if (in_array($extension,$badextensions)) {
 				$overwriteBody = 1;
 				$body = "<p>File type is not allowed</p>";
@@ -294,7 +295,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$_GET['id']));
 	}
 	if ($_POST['submitbtn']=='Submit') {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 		exit;
 	}
 
@@ -446,7 +447,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value;
-	var address = "<?php echo $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid=$cid&block=$block&id=" . $_GET['id'] ?>";
+	var address = "<?php echo $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid=$cid&block=$block&id=" . Sanitize::onlyInt($_GET['id']) ?>";
 
 	if (to != from) {
  	var toopen = address + '&movefile=' + from + '&movefileto=' + to;

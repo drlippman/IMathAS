@@ -3,6 +3,8 @@
 //Display outcome alignment table
 
 require("../validate.php");
+
+
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
 
 //load outcomes
@@ -196,7 +198,7 @@ if (count($cats)>0) {
 natsort($catnames);
 $placeinhead .= '<style type="text/css"> td { line-height: 150%;} .icon {background-color: #0f0;}</style>';
 require("../header.php");
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Map").'</div>';

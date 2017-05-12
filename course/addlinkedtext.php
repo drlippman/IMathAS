@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
+
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
@@ -21,7 +22,7 @@ $body = "";
 $useeditor = "text,summary";
 
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Link\n";
 	$pagetitle = "Modify Link";
@@ -42,10 +43,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 	$page_formActionTag = "addlinkedtext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
-	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::onlyInt($_GET['id']) : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
 	$caltag = $_POST['caltag'];
@@ -92,7 +93,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($_FILES['userfile']['name']!='') {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
-				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
+                $userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 				$filename = $userfilename;
 				$extension = strtolower(strrchr($userfilename,"."));
 				$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
@@ -295,7 +296,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$body = "<p>Error with your submission</p>";
 			}
-			$body .= "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
+			$body .= "<p><a href=\"addlinkedtext.php?cid=" . Sanitize::courseId($_GET['cid']);
 			if (isset($_GET['id'])) {
 				$body .= "&id={$_GET['id']}";
 			} else {
@@ -304,7 +305,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 		}
 		exit;
 	} else {

@@ -3,6 +3,8 @@
 	//(c) 2006 David Lippman
 
 	require("../validate.php");
+	
+
 	/*if (!isset($teacherid) && !isset($tutorid)) {
 	   require("../header.php");
 	   echo "You must be a teacher to access this page\n";
@@ -73,7 +75,7 @@
 		require("../includes/rubric.php");
 	}
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Forum Topics</a> &gt; Posts by Name</div>\n";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Forum Topics</a> &gt; Posts by Name</div>\n";
 
 	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h2>Posts by Name - $forumname</h2>\n";

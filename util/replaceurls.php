@@ -95,12 +95,12 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		echo '<table><tr><th>Current</th><th>Replacement</th></tr>';
 		$out = '';
 		foreach ($torep as $rep) {
-			echo '<tr><td>'.htmlspecialchars($rep[0]).'</td><td>'.htmlspecialchars($rep[1]).'</td></tr>';
+			echo '<tr><td>'.Sanitize::encodeStringForDisplay($rep[0]).'</td><td>'.Sanitize::encodeStringForDisplay($rep[1]).'</td></tr>';
 			$out .= $rep[0].','.$rep[1]."\n";
 		}
 		echo '</table>';
 		echo '<form method="post">';
-		echo '<input type="hidden" name="list" value="'.htmlspecialchars($out).'">';
+		echo '<input type="hidden" name="list" value="'.Sanitize::encodeStringForDisplay($out).'">';
 		echo '<input type="submit" name="confirm" value="Make Changes"/> (this will be slow)';
 		echo '</form>';
 	}

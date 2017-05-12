@@ -14,19 +14,19 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Assessment Settings";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Mass Change Assessment Settings";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Assessment Settings";
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } else {
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['checked'])) { //if the form has been submitted
 		$checked = array();
 		foreach ($_POST['checked'] as $id) {
-			$id = intval($id);
+			$id = Sanitize::onlyInt($id);
 			if ($id != 0) {
 				$checked[] = $id;
 			}
@@ -370,7 +370,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 		}
 		exit;
 

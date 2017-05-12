@@ -8,6 +8,7 @@ require("courseshowitems.php");
 require("../includes/htmlutil.php");
 require("../includes/calendardisp.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -18,7 +19,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$overwriteBody=1;
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas']) && $sessiondata['courseid']==$cid) {
 		//clean up coming out of an assessment
@@ -88,7 +89,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$_GET['cid']));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 	}
 
 	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
@@ -197,8 +198,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		}
 	}
 	//DEFAULT DISPLAY PROCESSING
-	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}";
-	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$jsAddress1 = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']);
+	$jsAddress2 = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);
@@ -222,7 +223,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 				}
 				//DB $sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
-				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".$backtrack[$i][0].'</a>';
+				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".Sanitize::encodeStringForDisplay($backtrack[$i][0]).'</a>';
 				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
 				$curBreadcrumb .= $backtrack[$i][0];
 				if ($i!=count($backtrack)-1) {
@@ -236,14 +237,14 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
 
 		} else {
-			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
+			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			for ($i=0;$i<count($backtrack);$i++) {
 				$curBreadcrumb .= " &gt; ";
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 				}
 				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-				$curBreadcrumb .= $backtrack[$i][0];
+				$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}
@@ -256,8 +257,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			}
 		}
 	} else {
-		$curBreadcrumb .= $coursename;
-		$curname = $coursename;
+		$curBreadcrumb .= Sanitize::encodeStringForDisplay($coursename);
+		$curname = Sanitize::encodeStringForDisplay($coursename);
 	}
 
 
@@ -413,7 +414,7 @@ if ($overwriteBody==1) {
 			var type = document.getElementById('addtype'+blk+'-'+tb).value;
 			if (tb=='BB' || tb=='LB') { tb = 'b';}
 			if (type!='') {
-				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $_GET['cid'] ?>';
+				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo Sanitize::courseId($_GET['cid']); ?>';
 				window.location = toopen;
 			}
 		}
@@ -453,15 +454,15 @@ if ($overwriteBody==1) {
 		}
 		if (isset($sessiondata['ltiitemtype'])) {
 			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
-			echo "<span id=\"myname\">$userfullname</span>";
+			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
 			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
 		} else {
-			echo $userfullname;
+			echo Sanitize::encodeStringForDisplay($userfullname);
 		} 
 		?>
 		</span>
-		<?php 
-		
+		<?php
+
 		if ($useleftnav) {
 			if ($didnavlist && !isset($teacherid) && !$inInstrStuView) {
 				$incclass = 'class="hideifnavlist"';
@@ -470,7 +471,7 @@ if ($overwriteBody==1) {
 			}
 			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
 		}
-		echo $curBreadcrumb 
+		echo $curBreadcrumb
 		?>
 		<div class=clear></div>
 	</div>
@@ -483,7 +484,7 @@ if ($overwriteBody==1) {
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=on"><?php echo _('Student View'); ?></a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick Rearrange'); ?></a>
 		</p>
-		
+
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
@@ -605,7 +606,7 @@ if ($overwriteBody==1) {
 <?php
 	}
    makeTopMenu();
-   echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>$curname</h2></div>\n";
+   echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>".Sanitize::encodeStringForDisplay($curname)."</h2></div>\n";
 
    if (count($items)>0) {
 
@@ -644,7 +645,7 @@ if ($overwriteBody==1) {
    }
 
    echo "</div>"; //centercontent
-   
+
    if ($firstload) {
 		echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 		echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
@@ -692,15 +693,15 @@ function makeTopMenu() {
 		//echo '<br class="clear"/>';
 
 
-	} 
+	}
 
 	if (isset($teacherid) && $quickview=='on') {
 		echo '<div class="clear"></div>';
-		
+
 		echo '<div class="cpmid">';
-		
+
 		echo '<span class="showinmobile"><b>'._('Quick Rearrange.'), "</b> <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>.</span> ";
-		
+
 		if (isset($CFG['CPS']['miniicons'])) {
 			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 

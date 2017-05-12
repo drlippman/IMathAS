@@ -1,12 +1,13 @@
 <?php
 require("config.php");
+require_once("includes/sanitize.php");
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https') || isset($CFG['GEN']['forcecanvashttps']))  {
 	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
  }
  
- $host = $_SERVER['HTTP_HOST'];
+ $host = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
  if (isset($CFG['GEN']['addwww']) && substr($host,0,4)!='www.') {
  	$host = 'www.'.$host;
  } 

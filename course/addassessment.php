@@ -6,6 +6,7 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
@@ -13,7 +14,7 @@ $overwriteBody = 0;
 $body = "";
 $useeditor = "summary,intro";
 $pagetitle = "Assessment Settings";
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_GET['from'])) {
 	$from = $_GET['from'];
@@ -26,7 +27,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=='gb') {
 	$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> ";
 } else if ($from=='mcd') {
@@ -47,13 +48,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
 	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
-			deleteallaidfiles($_GET['id']);
+			deleteallaidfiles(Sanitize::onlyInt($_GET['id']));
 			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -66,7 +67,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$_GET['id']));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\')
+                . "/addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id=".Sanitize::onlyInt($_GET['id']));
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -76,12 +78,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$assessmentname = $stm->fetchColumn(0);
-			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-			$body .= "&gt; <a href=\"addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
+			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			$body .= "&gt; <a href=\"addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
 			$body .= "<h3>$assessmentname</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}&clearattempts=confirmed'\">\n";
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}'\"></p>\n";
+			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}&clearattempts=confirmed'\">\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}'\"></p>\n";
 		}
 	} elseif ($_POST['name']!= null) { //if the form has been submitted
 
@@ -348,13 +350,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 			if ($from=='gb') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=".Sanitize::courseId($_GET['cid']));
 			} else if ($from=='mcd') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/masschgdates.php?cid={$_GET['cid']}");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/masschgdates.php?cid=".Sanitize::courseId($_GET['cid']));
 			} else if ($from=='lti') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/ltihome.php?showhome=true");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/ltihome.php?showhome=true");
 			} else {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
 			}
 			exit;
 		} else { //add new
@@ -432,7 +434,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid={$_GET['cid']}&aid=$newaid");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=".Sanitize::courseId($_GET['cid'])."&aid=$newaid");
 			exit;
 		}
 
@@ -604,7 +606,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($taken) {
 			$page_isTakenMsg = "<p>This assessment has already been taken.  Modifying some settings will mess up those assessment attempts, and those inputs ";
 			$page_isTakenMsg .=  "have been disabled.  If you want to change these settings, you should clear all existing assessment attempts</p>\n";
-			$page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}&clearattempts=ask'\"></p>\n";
+			$page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}&clearattempts=ask'\"></p>\n";
 		} else {
 			$page_isTakenMsg = "<p>&nbsp;</p>";
 		}

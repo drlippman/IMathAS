@@ -6,6 +6,7 @@
 	//single grade edit
 	require("../validate.php");
 	require("../includes/htmlutil.php");
+	
 
 	$istutor = false;
 	$isteacher = false;
@@ -37,7 +38,7 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 
 	if (isset($_GET['del']) && $isteacher) {
@@ -53,7 +54,7 @@
 				$stm->execute(array(':gradetypeid'=>$_GET['del']));
 			}
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid={$_GET['cid']}");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
 			exit;
 		} else {
 			require("../header.php");
@@ -212,9 +213,9 @@
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
 		if ($isnewitem && isset($_POST['doupload'])) {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/uploadgrades.php?gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/uploadgrades.php?gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid={$_GET['cid']}");
+			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
 		}
 		exit;
 	}
@@ -289,7 +290,7 @@
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	require("../includes/rubric.php");
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($_GET['stu']>0) {
 		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Student Detail</a> ";

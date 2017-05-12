@@ -13,6 +13,7 @@
 //		nc=#  do until nc questions are correct then stop
 //		t=#  do as many questions as possible in t seconds
 
+
 if (isset($_GET['public'])) {
 	require("../config.php");
 	if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
@@ -94,9 +95,9 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 		$headers .= "From: $sendfrom\r\n";
 		$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-		$message .= "<p>Quick Drill Results for $stuname</p>";
+		$message .= "<p>Quick Drill Results for ".Sanitize::encodeStringForDisplay($stuname)."</p>";
 		$message .= "<p>$out</p>";
-		mail($_GET['email'],'QuickDrill Results',$message,$headers);
+		mail(Sanitize::emailAddress($_GET['email']),'QuickDrill Results',$message,$headers);
 		echo "<p>Email Sent</p>";
 	}
 	exit;
@@ -218,7 +219,7 @@ $placeinhead = '<style type="text/css">div.question {width: auto;} div.review {w
 $useeditor = 1;
 require("../assessment/header.php");
 if ($cid!=0) {
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Drill</div>";
 }
 

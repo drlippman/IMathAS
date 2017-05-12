@@ -3,6 +3,8 @@
 	//(c) 2006 David Lippman
 
 	require("../validate.php");
+	
+
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -89,7 +91,7 @@ Read   Deleted   Deleted by Sender   Tagged
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Sent Message List</div>";
 	echo '<div id="headersentlist" class="pagetitle"><h2>Sent Messages</h2></div>';

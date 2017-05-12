@@ -1,6 +1,8 @@
 <?php
 //IMathAS:  Modify a question's settings in an assessment: grid for multiple.  Included in addquestions.php
 //(c) 2006 David Lippman
+
+
 	if (!(isset($teacherid))) {
 		echo "This page cannot be accessed directly";
 		exit;
@@ -160,7 +162,7 @@
 		$stm->execute(array(':id'=>$aid));
 		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
 		$defaults['showhints'] = ($defaults['showhints']==1)?_('Yes'):_('No');
-		
+
 		$pagetitle = "Question Settings";
 		$placeinhead = '<script type="text/javascript">
 			function previewq(qn) {
@@ -169,7 +171,7 @@
 			}
 			</script>';
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
 
 		echo "Question Settings</div>\n";
@@ -199,7 +201,7 @@ if (isset($_POST['checked'])) { //modifying existing
 				if (count($qnpts)==1) {
 					$qns[$v[1]] = $qnpts[0]+1;
 				} else {
-					$qns[$v[1]] = ($qnpts[0]+1).'-'.($qnpts[1]+1);     
+					$qns[$v[1]] = ($qnpts[0]+1).'-'.($qnpts[1]+1);
 				}
 			}
 			$qrows = array();

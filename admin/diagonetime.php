@@ -12,7 +12,7 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Diagnostic One-time Passwords";
-$diag = $_GET['id'];
+$diag = Sanitize::onlyInt($_GET['id']);
 
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a> &gt; Diagnostic One-time Passwords</div>\n";
 
@@ -76,7 +76,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_diag_onetime WHERE diag=:diag");
 		$stm->execute(array(':diag'=>$diag));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
 		exit;
 	}
 } else {
@@ -121,14 +121,14 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	echo '<h4>'.$stm->fetchColumn(0).'</h4>';
 	if (isset($_GET['generate'])) {
 		if (isset($_POST['n'])) {
-			echo "<b>Newly generated passwords</b> <a href=\"diagonetime.php?id=$diag&view=true\">View all</a>";
+			echo "<b>Newly generated passwords</b> <a href=\"diagonetime.php?id=" . Sanitize::encodeStringForUrl($diag) . "&view=true\">View all</a>";
 			echo '<table><thead><tr><th>Codes</th><th>Good For</th></tr></thead><tbody>';
 			foreach ($code_list as $code) {
 				echo "<tr><td>{$code[0]}</td><td>{$code[1]}</td></tr>";
 			}
 			echo '</tbody></table>';
 		} else {
-			echo "<form method=\"post\" action=\"diagonetime.php?id=$diag&generate=true\">";
+			echo "<form method=\"post\" action=\"diagonetime.php?id=" . Sanitize::encodeStringForUrl($diag) . "&generate=true\">";
 			echo '<p>Generate <input type="text" size="1" value="1" name="n" /> passwords <br/>';
 			echo 'Allow multi-use within <input type="text" size="1" value="0" name="multi" /> minutes (0 for one-time-only use)</p>';
 			echo '<input type="submit" value="Go" />';
@@ -136,10 +136,10 @@ if ($overwriteBody==1) { //NO AUTHORITY
 		}
 	} else if (isset($_GET['delete'])) {
 		echo "<p>Are you sure you want to delete all one-time passwords for this diagnostic?</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='diagonetime.php?id=$diag&delete=true'\">\n";
+		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='diagonetime.php?id=" . Sanitize::encodeStringForUrl($diag) . "&delete=true'\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
 	} else {
-		echo "<b>All one-time passwords</b> <a href=\"diagonetime.php?id=$diag&generate=true\">Generate</a> <a href=\"diagonetime.php?id=$diag&delete=check\">Delete all</a>";
+		echo "<b>All one-time passwords</b> <a href=\"diagonetime.php?id=" . Sanitize::encodeStringForUrl($diag) . "&generate=true\">Generate</a> <a href=\"diagonetime.php?id=" . Sanitize::encodeStringForUrl($diag) . "&delete=check\">Delete all</a>";
 		echo '<table><thead><tr><th>Codes</th><th>Good For</th><th>Created</th></tr></thead><tbody>';
 		foreach ($code_list as $row) {
 			echo "<tr><td>{$row[1]}</td><td>{$row[2]}</td><td>{$row[0]}</td></tr>";

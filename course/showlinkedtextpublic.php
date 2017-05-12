@@ -1,6 +1,8 @@
 <?php
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
+
+
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";
 		exit;
@@ -72,9 +74,9 @@
 		//DB $coursetheme = mysql_result($result,0,2);
 		$coursename = $itemcoursename;
 		$coursetheme = $itemcoursetheme;
-		$breadcrumbbase = "<a href=\"public.php?cid=$cid\">$coursename</a> &gt; ";
+		$breadcrumbbase = "<a href=\"public.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	} else {
-		$breadcrumbbase = "$breadcrumbbase <a href=\"course.php?cid=$fcid\">$coursename</a> &gt; ";
+		$breadcrumbbase = "$breadcrumbbase <a href=\"course.php?cid=$fcid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 
 	if (!findinpublic($items,$itemid)) {
