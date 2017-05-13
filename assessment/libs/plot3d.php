@@ -2,8 +2,6 @@
 //Basic 3D display, using Java applet.  Version 1.1, April 24, 2006
 //requires copying Viewer.class into assessment/libs directory
 
-require_once("../../includes/sanitize.php");
-
 global $allowedmacros;
 array_push($allowedmacros,"plot3d","spacecurve");
 
