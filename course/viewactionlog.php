@@ -65,7 +65,7 @@ if (count($lookups['as'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['as']));
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE id IN ($query_placeholders)");
-	$stm->execute($lookuplist);
+	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$asnames[$row[0]] = $row[1];
 	}
@@ -78,7 +78,7 @@ if (count($lookups['in'])>0) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,title FROM imas_inlinetext WHERE id IN ($query_placeholders)");
-    $stm->execute($lookuplist);
+	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$innames[$row[0]] = $row[1];
 	}
@@ -91,7 +91,7 @@ if (count($lookups['li'])>0) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,title FROM imas_linkedtext WHERE id IN ($query_placeholders)");
-    $stm->execute($lookuplist);
+	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$linames[$row[0]] = $row[1];
 	}
@@ -104,7 +104,7 @@ if (count($lookups['wi'])>0) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,name FROM imas_wikis WHERE id IN ($query_placeholders)");
-    $stm->execute($lookuplist);
+	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$winames[$row[0]] = $row[1];
 	}
@@ -117,7 +117,7 @@ if (count($lookups['ex'])>0) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,assessmentid FROM imas_questions WHERE id IN ($query_placeholders)");
-    $stm->execute($lookuplist);
+	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$exnames[$row[0]] = $asnames[$row[1]];
 	}
@@ -130,7 +130,7 @@ if (count($lookups['fo'])>0) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,subject FROM imas_forum_posts WHERE id IN ($query_placeholders)");
-    $stm->execute($lookuplist);
+	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$fpnames[$row[0]] = $row[1];
 	}
@@ -143,7 +143,7 @@ if (count($lookups['forums'])>0) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE id IN ($query_placeholders)");
-	$stm->execute($lookuplist);
+	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$forumnames[$row[0]] = $row[1];
 	}
