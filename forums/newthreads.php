@@ -48,7 +48,7 @@ $lastforum = '';
 if (isset($_GET['markallread'])) {
   $now = time();
   if (count($forumids)>0) {
-    $forumidlist = array_map('Sanitize::onlyInt', $forumids);
+    $forumidlist = array_map('Sanitize::onlyInt', array_values($forumids));
     $forumidlist_query_placeholders = Sanitize::generateQueryPlaceholders($forumidlist);
     //DB $query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
     //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
