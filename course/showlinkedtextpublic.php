@@ -2,6 +2,8 @@
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
 
+require_once(__DIR__ . "/../includes/sanitize.php");
+
 
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";

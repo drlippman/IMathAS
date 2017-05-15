@@ -53,7 +53,7 @@ if (isset($_GET['markallread'])) {
     //DB $query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
     //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
     $stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist_query_placeholders)");
-	  $stm->execute($forumidlist);
+	  $stm->execute(array_values($forumidlist));
 
     $threadids = array();
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {

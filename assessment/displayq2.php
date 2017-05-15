@@ -10,7 +10,7 @@ $allowedmacros = $mathfuncs;
 require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
-require_once("../includes/sanitize.php");
+require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
