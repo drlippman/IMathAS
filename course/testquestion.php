@@ -64,8 +64,9 @@ if ($myrights<20) {
 		$rawscores = array(-1);
 		$_SESSION['choicemap'] = array();
 	}
+  $cid = Sanitize::courseId($_GET['cid']);
+	$page_formAction = "testquestion.php?cid=$cid&qsetid={$_GET['qsetid']}";
 
-	$page_formAction = "testquestion.php?cid={$_GET['cid']}&qsetid={$_GET['qsetid']}";
 	if (isset($_POST['usecheck'])) {
 		$page_formAction .=  "&checked=".$_GET['usecheck'];
 	} else if (isset($_GET['checked'])) {
@@ -123,7 +124,7 @@ if ($overwriteBody==1) {
 	echo $body;
 } else { //DISPLAY BLOCK HERE
 	$useeditor = 1;
-	$brokenurl = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savebrokenqflag.php?qsetid=".$_GET['qsetid'].'&flag=';
+	$brokenurl = $GLOBALS['basesiteurl'] . "/course/savebrokenqflag.php?qsetid=".$_GET['qsetid'].'&flag=';
 	?>
 	<script type="text/javascript">
 		var BrokenFlagsaveurl = '<?php echo $brokenurl;?>';
@@ -168,13 +169,13 @@ if ($overwriteBody==1) {
 		echo "var numchked = -1;";
 		echo "if (window.opener && !window.opener.closed) {";
 		echo $page_onlyChkMsg;
-		echo "  if (prevnext[0][1]>0){
-				  document.write('<a href=\"testquestion.php?cid={$_GET['cid']}$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
+		echo " if (prevnext[0][1]>0){
+				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
 			  } else {
 				  document.write('Prev ');
 			  }
 			  if (prevnext[1][1]>0){
-				  document.write('<a href=\"testquestion.php?cid={$_GET['cid']}$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">Next</a> ');
+				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">Next</a> ');
 			  } else {
 				  document.write('Next ');
 			  }
@@ -237,7 +238,7 @@ if ($overwriteBody==1) {
 			} else {
 				fixedseedlist = fixedseedlist.replace(/\b'.$seed.'(,|$)/,"").replace(/,$/,"");
 			}
-			opener.document.getElementById("fixedseeds").value = fixedseedlist;	
+			opener.document.getElementById("fixedseeds").value = fixedseedlist;
 		}
 		</script>';
 	}

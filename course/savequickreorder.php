@@ -11,9 +11,9 @@
 	 echo "Cannot access this page directly";
 	 exit;
  }
- $cid = $_GET['cid'];
+ $cid = Sanitize::courseId($_GET['cid']);
  $order = $_POST['order'];
- 
+
  //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
  //DB $items = unserialize(mysql_result($result,0,0));
@@ -143,7 +143,7 @@
 	 return $outarr;
  }
  echo '1,'.md5($itemlist).':';
- 
+
  require("courseshowitems.php");
  $openblocks = Array(0);
  $prevloadedblocks = array(0);
@@ -153,5 +153,5 @@
  $oblist = implode(',',$openblocks);
 
  quickview($newitems,0);
- 
+
 ?>

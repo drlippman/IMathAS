@@ -181,8 +181,8 @@
 
 	require("../header.php");
 
-
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	$cid = Sanitize::courseId($_GET['cid']);
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	if ($calledfrom=='lu') {
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Manage Exceptions</div>\n";
 	} else if ($calledfrom=='gb') {
@@ -293,7 +293,9 @@
 					echo "<li>{$row['itemname']} <ul>";
 					$lasta = $row['itemid'];
 				}
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row['eid']}\" />{$row['LastName']}, {$row['FirstName']} ";
+				printf('<li><input type=checkbox name="clears[]" value="%s" />%s, %s ',
+					Sanitize::encodeStringForDisplay($row['eid']), Sanitize::encodeStringForDisplay($row['LastName']),
+					Sanitize::encodeStringForDisplay($row['FirstName']));
 				if ($row['itemtype']=='A') {
 					echo "($sdate - $edate)";
 				} else if ($row['itemtype']=='F') {
@@ -320,12 +322,13 @@
 					if ($lasts!=0) {
 						natsort($assessarr);
 						foreach ($assessarr as $id=>$val) {
-							echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />$val</li>";
+							echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />".Sanitize::encodeStringForDisplay($val)."</li>";
 						}
 						echo "</ul></li>";
 						$assessarr = array();
 					}
-					echo "<li>{$row['LastName']}, {$row['FirstName']} <ul>";
+					printf("<li>%s, %s <ul>", Sanitize::encodeStringForDisplay($row['LastName']),
+						Sanitize::encodeStringForDisplay($row['FirstName']));
 					$lasts = $row['userid'];
 				}
 				$assessarr[$row['eid']] = "{$row['itemname']} ";
@@ -345,7 +348,7 @@
 			}
 			natsort($assessarr);
 			foreach ($assessarr as $id=>$val) {
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />$val</li>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />".Sanitize::encodeStringForDisplay($val)."</li>";
 			}
 			echo "</ul></li>";
 		}
@@ -512,7 +515,8 @@
 		echo "<ul>";
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<li>{$row[0]}, {$row[1]}</li>";
+			printf("<li>%s, %s</li>", Sanitize::encodeStringForDisplay($row[0]),
+				Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</ul>';
 		echo '</fieldset>';

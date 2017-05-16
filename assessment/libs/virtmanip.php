@@ -115,8 +115,8 @@ function vmnumbertilesgetcount($state) {
 //cats = array of titles for the two drop areas
 function vmsetupitemsort($numbers,$cats,$state,$qn,$part=null) {
 	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
-	$numbers = Sanitize::encodeStringForUrl(implode(';;',$numbers));
-	$cats = Sanitize::encodeStringForUrl(implode(';;',$cats));
+	$numbers = Sanitize::encodeUrlParam(implode(';;',$numbers));
+	$cats = Sanitize::encodeUrlParam(implode(';;',$cats));
 	$initbase = "[]";
 	$initobj = "[]";
 	if ($state!="") {

@@ -108,13 +108,12 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';
-
-	if (isset($_GET['from'])) {
-		echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Back</a></div>\n";
+	if (!($_GET['from'])) {
+		echo "<div class=right><a href=\"course.php?cid=$cid\">Back</a></div>\n";
 	} else if ($fcid>0) {
 		echo "<div class=right><a href=\"{$_SERVER['HTTP_REFERER']}\">Back</a></div>\n";
 	} else {
-		echo "<div class=right><a href=\"public.php?cid={$_GET['cid']}\">Return to the Public Course Page</a></div>\n";
+		echo "<div class=right><a href=\"public.php?cid=$cid\">Return to the Public Course Page</a></div>\n";
 	}
 	require("../footer.php");
 

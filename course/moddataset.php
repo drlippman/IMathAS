@@ -10,7 +10,7 @@
 //4 - CC-BY-SA
 
 	require("../validate.php");
-	
+
 
 	if ($myrights<20) {
 		require("../header.php");
@@ -62,7 +62,7 @@
 		return $vidid;
  	}
 
- 	$cid = $_GET['cid'];
+ 	$cid = Sanitize::courseId($_GET['cid']);
 	$isadmin = false;
 	$isgrpadmin = false;
 	if ($_GET['cid']=='admin') {
@@ -507,10 +507,10 @@
 			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 		} else {
 			if ($frompot==1) {
-				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}\">Add Question to Assessment</a> | \n";
+				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
 			}
-			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid={$_GET['aid']}\">Return to Assessment</a>\n";
+			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 		}
 		if ($_POST['test']=="Save and Test Question") {
 			$outputmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}';";
@@ -524,9 +524,9 @@
 			// Don't echo or die if in quicksave mode.
 		} else {
 			if ($errmsg == '' && !isset($_GET['aid'])) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/manageqset.php?cid='.$cid);
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/manageqset.php?cid='.$cid);
 			} else if ($errmsg == '' && $frompot==0) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/addquestions.php?cid='.$cid.'&aid='.$_GET['aid']);
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/addquestions.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']));
 			} else {
 				require("../header.php");
 				echo $errmsg;
@@ -741,7 +741,7 @@
 			$line['deleted'] = 0;
 			$line['replaceby'] = 0;
 			if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
-				$inlibs = $sessiondata['lastsearchlibs'.$_GET['aid']];
+				$inlibs = $sessiondata['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
 			} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
 				//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
 				$inlibs = $sessiondata['lastsearchlibs'.$cid];
@@ -994,12 +994,12 @@
 
 
 	if (isset($_GET['aid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; Modify Questions</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
 
 	} else if (isset($_GET['daid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
 	} else {
 		if ($_GET['cid']=="admin") {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
@@ -1040,7 +1040,7 @@
 
 	}
 	if (isset($_GET['qid'])) {
-		echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid={$_GET['aid']}&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
+		echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
 		echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
 	}
 	if (!$myq) {

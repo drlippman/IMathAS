@@ -5,7 +5,7 @@
 require("../validate.php");
 
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if (isset($teacherid)) {
 	$isteacher = true;
 }
@@ -72,7 +72,7 @@ $placeinhead = '';
 $placeinhead .= "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgtimefilter() { ';
 $placeinhead .= '       var tm = document.getElementById("timetoggle").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=$cid";
 
 $placeinhead .= "       var toopen = '$address&timefilter=' + tm;\n";
 $placeinhead .= "  	window.location = toopen; \n";
@@ -80,7 +80,7 @@ $placeinhead .= "}\n";
 
 $placeinhead .= 'function chglnfilter() { ';
 $placeinhead .= '       var ln = document.getElementById("lnfilter").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=$cid";
 
 $placeinhead .= "       var toopen = '$address&lnfilter=' + ln;\n";
 $placeinhead .= "  	window.location = toopen; \n";
@@ -88,7 +88,7 @@ $placeinhead .= "}\n";
 
 $placeinhead .= 'function chgsecfilter() { ';
 $placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=$cid";
 
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
@@ -121,7 +121,7 @@ $placeinhead .= "</script>\n";
 $placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .endmsg {display:none;}</style>";
 
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Diagnostic Gradebook</div>";
 echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 

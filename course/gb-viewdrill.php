@@ -110,7 +110,7 @@ $placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("l
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
 
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Drill Assessment Results</div>";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Drill Assessment Results</div>";
 echo "<h2>Drill Assessment Results</h2>";
 
 echo '<table id="myTable" class="gb">';

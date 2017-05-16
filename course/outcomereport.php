@@ -127,7 +127,7 @@ if ($report == 'overview') {
 	$placeinhead .= '</script>';
 }
 
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/outcomereport.php?cid=$cid".$qs;
+$address = $GLOBALS['basesiteurl'] . "/course/outcomereport.php?cid=$cid".$qs;
 
 $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 	function chgtype() {

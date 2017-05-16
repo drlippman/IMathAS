@@ -3,7 +3,7 @@
 //(c) 2009 David Lippman
 	require("../validate.php");
 	require("../includes/htmlutil.php");
-	
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -15,7 +15,7 @@
 		echo "Adding tutors is not allowed";
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	//*** PROCESSING ***
 	$err = '';
@@ -102,7 +102,7 @@
 			}
 		} else {
 			//if not adding new, redirect back to listusers
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 			exit;
 		}
 	}
@@ -159,7 +159,8 @@
 	//*** DISPLAY ***
 	$pagetitle = "Manage Tutors";
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	$cid = Sanitize::courseId($_GET['cid']);
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Users</a> &gt; Manage Tutors</div>";
 
 ?>

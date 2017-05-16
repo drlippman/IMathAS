@@ -27,8 +27,8 @@ if (isset($_POST['versions'])) {
 }
 
 $nologo = true;
-$cid = $_GET['cid'];
-$aid = intval($_GET['aid']);
+$cid = Sanitize::courseId($_GET['cid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
 	$sessiondata['mathdisp'] = 0;
 } else {
@@ -320,8 +320,8 @@ if ($overwriteBody==1) {
 			}
 		}
 	}
-	$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
-	echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::encodeStringForUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
+	$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
+	echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::fullUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
 
 	echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 

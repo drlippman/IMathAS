@@ -26,7 +26,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 
 	*/
 	require("../validate.php");
-	
+
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -38,14 +38,16 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	} else {
 		$isteacher = false;
 	}
+  $to = ($_GET['to']) ? Sanitize::onlyInt($_GET['to']) : NULL;
+
 	$cansendmsgs = false;
 	$threadsperpage = intval($listperpage);
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
-		$page = $_GET['page'];
+		$page = Sanitize::onlyInt($_GET['page']);
 	}
 	if ($page==-2) {
 		$limittotagged = 1;
@@ -118,7 +120,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
          $stm->execute(array(':courseid'=>$cid));
       }
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$opts[] = "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+				$opts[] = sprintf('<option value="%d">%s, %s</option>', $row[0],
+                    Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
 
 
@@ -135,7 +138,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$opts[] = "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+				$opts[] = sprintf('<option value="%d">%s, %s</option>', $row[0],
+					Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
 		}
 		echo json_encode($opts);
@@ -213,22 +217,22 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message .= "<p>You've received a new message</p><p>From: $userfullname<br />Course: $cname.</p>\r\n";
 				//DB $message .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
         $message .= "<p>Subject: ". Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
-				$message .= "<a href=\"$urlmode" . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/viewmsg.php?cid=" . Sanitize::courseId($_POST['courseid']) . "&msgid=$msgid\">";
+				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=" . Sanitize::courseId($_POST['courseid']) . "&msgid=$msgid\">";
 				$message .= "View Message</a></p>\r\n";
 				$message .= "<p>If you do not wish to receive email notification of new messages, please ";
-				$message .= "<a href=\"$urlmode" . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
+				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=chguserinfo\">click here to change your ";
 				$message .= "user preferences</a></p>\r\n";
 				mail($email,'New message notification',$message,$headers);
 			}
 			if ($FCMtokenTo != '') {
 				require_once("../includes/FCM.php");
-				$url = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/viewmsg.php?cid=".Sanitize::courseId($_POST['courseid'])."&msgid=$msgid";
+				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($_POST['courseid'])."&msgid=$msgid";
 				sendFCM($FCMtokenTo,"Msg from: $userfullname",$_POST['subject'],$url);
 			}
 			if ($type=='new') {
-				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/newmsglist.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
 			} else {
-				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
 			}
 			exit;
 		} else {
@@ -289,7 +293,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			}
 
 			if ($replyto > 0) {
-				echo "&gt; <a href=\"viewmsg.php?page=$page&type=$type&cid=$cid&filtercid=$filtercid&msgid=$replyto\">Message</a> ";
+				echo "&gt; <a href=\"viewmsg.php?page=$page&type=".Sanitize::encodeUrlParam($type)."&cid=$cid&filtercid=$filtercid&msgid=".Sanitize::onlyInt($replyto)."\">Message</a> ";
 				echo "&gt; Reply</div>";
 				echo "<h2>Reply</h2>\n";
 			} else {
@@ -409,7 +413,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message = '';
 			}
 
-			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\"";
+			echo "<form method=post action=\"msglist.php?page=$page&type=".Sanitize::encodeUrlParam($type)."&cid=$cid&add={$_GET['add']}&replyto=".Sanitize::onlyInt($replyto);
 			if (!isset($_GET['to'])) {
 				echo " onsubmit=\"return checkrecipient();\"";
 			}
@@ -417,7 +421,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
 				//DB $query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg FROM imas_users AS iu ";
-				//DB $query .= "LEFT JOIN imas_students AS i_s ON iu.id=i_s.userid AND i_s.courseid='$courseid' WHERE iu.id='{$_GET['to']}'";
+				//DB $query .= "LEFT JOIN imas_students AS i_s ON iu.id=i_s.userid AND i_s.courseid='$courseid' WHERE iu.id='$to'";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB $row = mysql_fetch_row($result);
 				$query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg FROM imas_users AS iu ";
@@ -441,18 +445,18 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				}
 				if ($ismsgsrcteacher) {
 					echo " <a href=\"mailto:{$row[2]}\">email</a> | ";
-					echo " <a href=\"$imasroot/course/gradebook.php?cid=$courseid&stu={$_GET['to']}\" target=\"_popoutgradebook\">gradebook</a>";
+					echo " <a href=\"$imasroot/course/gradebook.php?cid=$courseid&stu=$to\" target=\"_popoutgradebook\">gradebook</a>";
 					if ($row[3]!=null) {
 						echo " | Last login ".tzdate("F j, Y, g:i a",$row[3]);
 					}
 				}
-				echo "<input type=hidden name=to value=\"{$_GET['to']}\"/>";
+				echo "<input type=hidden name=to value=\"$to\"/>";
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				if (isset($_GET['to']) && $row[4]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-						echo " <img style=\"vertical-align: middle;\" src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+						echo " <img style=\"vertical-align: middle;\" src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					} else {
-						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					}
 				}
 				echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
@@ -503,7 +507,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
             }
             //DB while ($row = mysql_fetch_row($result)) {
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+				            printf('<option value="%d">%s, %s</option>', $row[0],
+                                Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 						}
 
 
@@ -520,7 +525,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':courseid'=>$courseid));
 						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+							printf('<option value="%d">%s, %s</option>', $row[0],
+                                Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 						}
 					}
 					echo "</select>";
@@ -541,7 +547,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "</span><br class=form />";
 
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"$title\"></span><br class=form>\n";
+			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"></span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 			echo htmlentities($message);
@@ -590,9 +596,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
       //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
       $DBH->query($query);
   		if ($type=='new') {
-  			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
   		} else {
-  			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
   		}
   		exit;
   	}
@@ -610,7 +616,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 
 	$pagetitle = "Messages";
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $GLOBALS['basesiteurl'] . "/msgs/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -756,7 +762,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		}
 		echo "<div>$prevnext</div>\n";
 	}
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
+	$address = $GLOBALS['basesiteurl'] . "/msgs/msglist.php?cid=$cid&filtercid=";
 
 
 ?>

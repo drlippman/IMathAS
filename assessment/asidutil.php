@@ -2,6 +2,8 @@
 //IMathAS:  Assessment Session utility functions
 //(c) 2007 David Lippman
 
+require_once(__DIR__ . "/../includes/sanitize.php");
+
 function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 	global $DBH;
 	$ioquestions = explode(",",$itemorder);
@@ -37,8 +39,10 @@ function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 		}
 	}
 	
-	$qlist = implode(',',array_map('intval',$questions));
-	$stm = $DBH->query("SELECT id,fixedseeds FROM imas_questions WHERE id IN ($qlist)");
+	$qlist = array_map('intval',$questions);
+	$qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
+	$stm = $DBH->prepare("SELECT id,fixedseeds FROM imas_questions WHERE id IN ($qlist_query_placeholders)");
+	$stm->execute($qlist);
 	$fixedseeds = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]!==null && $row[1]!='') {

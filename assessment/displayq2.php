@@ -489,7 +489,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			for ($i=0;$i<count($extref);$i++) {
 				$extrefpt = explode('!!',$extref[$i]);
 				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
-					$extrefpt[1] = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".Sanitize::encodeStringForUrl($extrefpt[1]);
+					$extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
 					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
 					echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
 				} else if ($extrefpt[0]=='read') {
@@ -500,7 +500,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 		}
 		if (($qdata['solutionopts']&2)==2 && $qdata['solution']!='') {
-			$addr = $urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
+			$addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
 			$addr .= '&t='.($qdata['solutionopts']&1).'&cid='.$GLOBALS['cid'];
 			echo formpopup(_("Written Example"),$addr,730,500,"button",true,"soln",$qref);
 		}
@@ -1532,7 +1532,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
 		}
-		
+
 		if (isset($answer)) {
 			if (!is_numeric($answer)) {
 				$sa = '`'.$answer.'`';
@@ -1672,7 +1672,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		$la = $lap[0];
-		
+
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -2238,7 +2238,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$ret .= " <br/><img id=\"essayimg$gradededessayexpandocnt\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" src=\"$url\" alt=\"Student uploaded image\" />";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$ret .= " <span aria-expanded=\"false\" aria-controls=\"essayfileprev$gradededessayexpandocnt\" class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayfileprev$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
-						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeStringForUrl($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeUrlParam($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
 					$gradededessayexpandocnt++;
 					return $ret;
@@ -2616,7 +2616,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if ($GLOBALS['sessiondata']['userprefs']['drawentry']==1 && $GLOBALS['sessiondata']['graphdisp']==0) {
 			//can't imagine why someone would pick this, but if they do, need to set graphdisp to 2 temporarily
-			$revertgraphdisp = true;		
+			$revertgraphdisp = true;
 			$GLOBALS['sessiondata']['graphdisp']=2;
 		} else {
 			$revertgraphdisp = false;
@@ -2777,8 +2777,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
 						$out .= ' alt="Open dot"/>';
 					}
-					
-					
+
+
 				} else {
 					if ($answerformat[0]=='numberline') {
 						array_shift($answerformat);
@@ -2851,7 +2851,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 			$out .= "drawla[$qn] = $la;</script>";
 		}
-		if ($revertgraphdisp) {		
+		if ($revertgraphdisp) {
 			$GLOBALS['sessiondata']['graphdisp']=0;
 		}
 		$tip = _('Enter your answer by drawing on the graph.');
@@ -2898,9 +2898,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],blue,0,1,,arrow";
 					} else if ($function[0]=='circle') { //is circle
 						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
-					} else if ($function[0]=='ellipse') { 
+					} else if ($function[0]=='ellipse') {
 						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[4]}*sin(t)+{$function[2]}],blue,0,6.31";
-					} else if ($function[0]=='verthyperbola') { 
+					} else if ($function[0]=='verthyperbola') {
 						//(y-yc)^2/a^2 -  (x-xc)^2/b^2 = 1
 						$saarr[$k] = "sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2]";
 						$k++;
@@ -2909,7 +2909,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]+$function[3]*t],green,,,,,,dash";
 						$k++;
 						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]-$function[3]*t],green,,,,,,dash";
-					} else if ($function[0]=='horizhyperbola') { 
+					} else if ($function[0]=='horizhyperbola') {
 						//(x-xc)^2/a^2 - (y-yc)^2/b^2 = 1
 						$saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
 						$k++;
@@ -2921,7 +2921,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					} else if (substr($function[0],0,2)=='x=') {
 						if (count($function)==3) {
 							if ($function[1] == '-oo') { $function[1] = $settings[2]-.1*($settings[3]-$settings[2]);}
-							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}	
+							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}
 							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.$function[1].','.$function[2];
 						} else {
 							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
@@ -3061,7 +3061,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$out .= " <span aria-expanded=\"false\" aria-controls=\"fileprev$qn\" class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
-						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeStringForUrl($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeUrlParam($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
 
 				}
@@ -3929,7 +3929,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//return 0;
 			$formatok = "nowhole";
 		}
-		
+
 		if (isset($requiretimeslistpart) && strpos($requiretimeslistpart,';')!==false) {
 			$requiretimeslistpart = explode(';', $requiretimeslistpart);
 		}
@@ -4162,7 +4162,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}
-		
+
 		if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$qn];} else {$domain= $options['domain'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 
@@ -4180,25 +4180,25 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = array_map('trim',explode(',',$answerformat));		
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 
 		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		
-		
+
+
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, '', $answer, $ansprompt);
 		}
 
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
-		
+
 		//handle nosolninf case
 		if ($_POST["tc$qn"]==='oo' || $_POST["tc$qn"]==='DNE') {
 			if ($answer==$_POST["tc$qn"]) {
 				return 1;
-			} else { 
+			} else {
 				return 0;
 			}
 		} else if ($answer==='DNE' || $answer==='oo') {
@@ -4222,7 +4222,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = str_replace('E','varE',$answer);
 		}
 		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
-		
+
 		if (count($variables)>1 && count($fromto)>2) {
 			uasort($variables,'lensort');
 			$newdomain = array();
@@ -4248,7 +4248,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		$vlist = implode("|",$variables);
 
-		
+
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
@@ -5045,7 +5045,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$A = ($y3p * ($x2p - $x1p) + $y2p * ($x1p - $x3p) + $y1p * ($x3p - $x2p)) / $denom;
 						$B = ($y3p*$y3p * ($x1p - $x2p) + $y2p*$y2p * ($x3p - $x1p) + $y1p*$y1p * ($x2p - $x3p)) / $denom;
 						$C = ($y2p * $y3p * ($y2p - $y3p) * $x1p + $y3p * $y1p * ($y3p - $y1p) * $x2p + $y1p * $y2p * ($y1p - $y2p) * $x3p) / $denom;
-						
+
 						$yv = -$B/(2*$A);
 						$xv = $C-$B*$B/(4*$A);
 						//TODO:  adjust 20px to be based on drawing window and grid
@@ -6051,7 +6051,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				$xminpix = round(max(2*$imgborder,($function[1] - $settings[0])*$pixelsperx + $imgborder));
 				$xmaxpix = round(min($settings[6]-2*$imgborder,($function[2] - $settings[0])*$pixelsperx + $imgborder));
-				
+
 				for ($k=ceil($xminpix/$step); $k*$step <= $xmaxpix; $k++) {
 					$x = $k*$step;
 					$coordx = ($x - $imgborder)/$pixelsperx + $settings[0]+1E-10;
@@ -6549,7 +6549,8 @@ function getqsetid($questionid) {
 function getallqsetid($questions) {
 	global $DBH;
 	//DB $qids = "'".implode("','",$questions)."'";
-	$qids = implode(',', array_map('intval', $questions));
+	$qids = array_map('intval', $questions);
+	$qids_query_placeholders = Sanitize::generateQueryPlaceholders($qids);
 	$order = array_flip($questions);
 	$out = array();
 	//DB $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
@@ -6557,8 +6558,9 @@ function getallqsetid($questions) {
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
-	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
-	$stm = $DBH->query($query);
+	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids_query_placeholders)";
+	$stm = $DBH->prepare($query);
+	$stm->execute($qids);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$out[0][$order[$row[3]]] = $row[0];// = array($row[0],$row[1]);
 		if ($row[2]==null) {
@@ -6768,7 +6770,7 @@ function checkanswerformat($tocheck,$ansformats) {
 		$num = str_replace(' ','',$mnmatches[1])*$mnmatches[4] + $mnmatches[3]*1;
 		$tocheck = $num.'/'.$mnmatches[4];
 	}
-		
+
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
 		$tocheck = preg_replace('/\s/','',$tocheck);
 		if (!preg_match('/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
@@ -6924,7 +6926,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
 	$partnum = $qn%1000;
-	
+
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
 	} else if ($format=='interval') {

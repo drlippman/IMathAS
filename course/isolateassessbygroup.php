@@ -12,8 +12,8 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];

@@ -3,7 +3,7 @@
 	//(c) 2006 David Lippman
 
 	require("../validate.php");
-	
+
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -19,14 +19,14 @@
 
 	$threadsperpage = intval($listperpage);
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
-		$page = $_GET['page'];
+		$page = Sanitize::onlyInt($_GET['page']);
 	}
 	if (isset($_GET['filtercid'])) {
-		$filtercid = $_GET['filtercid'];
+		$filtercid = Sanitize::onlyInt($_GET['filtercid']);
 	} else if ($cid!='admin' && $cid>0) {
 		$filtercid = $cid;
 	} else {
@@ -184,7 +184,7 @@ Read   Deleted   Deleted by Sender   Tagged
 		}
 		echo "<div>$prevnext</div>\n";
 	}
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/sentlist.php?cid=$cid&filtercid=";
+	$address = $GLOBALS['basesiteurl'] . "/msgs/sentlist.php?cid=$cid&filtercid=";
 
 
 ?>
@@ -249,7 +249,8 @@ function chgfilter() {
 		if ($filteruid==$row[0]) {
 			echo 'selected=1';
 		}
-		echo " >{$row[1]}, {$row[2]}</option>";
+		printf(" >%s, %s</option>", Sanitize::encodeStringForDisplay($row[1]),
+            Sanitize::encodeStringForDisplay($row[2]));
 	}
 	echo "</select></p>";
 ?>
@@ -317,7 +318,8 @@ function chgfilter() {
 		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid={$line['id']}\">";
 		echo $line['title'];
 		echo "</a></td>";
-		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+		printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+            Sanitize::encodeStringForDisplay($line['FirstName']));
 		if (($line['isread']&1)==1) {
 			echo "<td>Yes</td>";
 		} else {

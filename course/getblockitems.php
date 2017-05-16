@@ -13,7 +13,7 @@
 	   require("../footer.php");
 	   exit;
    }
-   $cid = $_GET['cid'];
+   $cid = Sanitize::courseId($_GET['cid']);
    require("../filter/filter.php");
 
    $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,latepasshrs FROM imas_courses WHERE id=:id");

@@ -5,6 +5,8 @@
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 
+require_once(__DIR__ . "/../includes/sanitize.php");
+
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
@@ -48,10 +50,10 @@ ini_set("max_execution_time", "600");
 
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}");
 			exit;
 		}
 	} else { //get confirm

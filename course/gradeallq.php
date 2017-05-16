@@ -2,7 +2,7 @@
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
 	require("../validate.php");
-	
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -12,7 +12,7 @@
 	}
 
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$stu = $_GET['stu'];
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 	$gbmode = $_GET['gbmode'];
@@ -27,7 +27,7 @@
 		$gbmode = $stm->fetchColumn(0);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
-	$aid = $_GET['aid'];
+	$aid = Sanitize::onlyInt($_GET['aid']);
 	$qid = $_GET['qid'];
 	if (isset($_GET['ver'])) {
 		$ver = $_GET['ver'];
@@ -143,10 +143,10 @@
 		if (isset($_GET['quick'])) {
 			echo "saved";
 		} else if ($page == -1) {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");
 		} else {
 			$page++;
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradeallq.php?stu=$stu&cid=$cid&aid=$aid&qid=$qid&page=$page");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq.php?stu=$stu&cid=$cid&aid=$aid&qid=$qid&page=$page");
 
 		}
 		exit;
@@ -213,7 +213,7 @@
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradeallq.php?stu=$stu&cid=$cid&gbmode=$gbmode&aid=$aid&qid=$qid&ver=$ver";
+	$address = $GLOBALS['basesiteurl'] . "/course/gradeallq.php?stu=$stu&cid=$cid&gbmode=$gbmode&aid=$aid&qid=$qid&ver=$ver";
 	$placeinhead .= "       var toopen = '$address&page=' + stun;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
@@ -223,7 +223,7 @@
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
@@ -494,7 +494,7 @@
 			}
 			echo '>';
 
-			echo "<p><span class=\"person\"><b>".$line['LastName'].', '.$line['FirstName'].'</b></span>';
+			echo "<p><span class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).'</b></span>';
 			if ($page != -1) {
 				echo '.  Jump to <select id="stusel" onchange="jumptostu()">';
 				foreach ($stulist as $i=>$st) {
@@ -550,7 +550,7 @@
 
 
 			echo "<div class=review>";
-			echo '<span class="person">'.$line['LastName'].', '.$line['FirstName'].': </span>';
+			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
 			if (!$groupdup) {
 				echo '<span class="group" style="display:none">'.$groupnames[$line['agroupid']].': </span>';
 			}

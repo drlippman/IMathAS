@@ -3,7 +3,7 @@
 	//(c) 2006 David Lippman
 
 	require("../validate.php");
-	
+
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -17,19 +17,19 @@
 		$isteacher = false;
 	}
 	if (isset($_GET['filtercid'])) {
-		$filtercid = $_GET['filtercid'];
+		$filtercid = Sanitize::onlyInt($_GET['filtercid']);
 	} else {
 		$filtercid = 0;
 	}
 	if (isset($_GET['filterstu'])) {
-		$filterstu = $_GET['filterstu'];
+		$filterstu = Sanitize::onlyInt($_GET['filterstu']);
 	} else {
 		$filterstu = 0;
 	}
 
-	$cid = $_GET['cid'];
-	$page = $_GET['page'];
-	$type = $_GET['type'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$page = Sanitize::onlyInt($_GET['page']);
+	$type = Sanitize::encodeStringForDisplay($_GET['type']);
 
 	$teacherof = array();
 	//DB $query = "SELECT courseid FROM imas_teachers WHERE userid='$userid'";
@@ -42,15 +42,15 @@
 	}
 
 	if (isset($_GET['markunread'])) {
-		$msg = $_GET['msgid'];
+		$msg = Sanitize::onlyInt($_GET['msgid']);
 		//DB $query = "UPDATE imas_msgs SET isread=isread-1 WHERE id='$msg'";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread-1 WHERE id=:id");
 		$stm->execute(array(':id'=>$msg));
 		if ($type=='new') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
 		}
 		exit;
 	}
@@ -85,7 +85,7 @@
 
 
 
-	$msgid = $_GET['msgid'];
+	$msgid = Sanitize::onlyInt($_GET['msgid']);
 
 	//DB $query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg,imas_students.section ";
 	//DB $query .= "FROM imas_msgs JOIN imas_users ON imas_msgs.msgfrom=imas_users.id LEFT JOIN imas_students ON imas_students.userid=imas_users.id AND imas_students.courseid='$cid' ";
@@ -127,7 +127,8 @@
 		}
 	}
 	echo "<table class=gb ><tbody>";
-	echo "<tr><td><b>From:</b></td><td>{$line['LastName']}, {$line['FirstName']}";
+	printf("<tr><td><b>From:</b></td><td>%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),
+		Sanitize::encodeStringForDisplay($line['FirstName']));
 	if ($line['section']!='') {
 		echo ' <span class="small">(Section: '.$line['section'].')</span>';
 	}

@@ -18,7 +18,7 @@
 	}
 
 	$forumid = $_GET['forum'];
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['markallread'])) {
 		//DB $query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
@@ -295,7 +295,7 @@
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	function printuserposts($name, $uid, $content, $postcnt, $replycnt) {
-		echo "<b>$name</b> (";
+		printf("<b>%s</b> (", Sanitize::encodeStringForDisplay($name));
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {

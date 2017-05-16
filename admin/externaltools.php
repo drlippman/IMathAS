@@ -92,7 +92,7 @@ if (isset($_POST['tname'])) {
 
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom");
 	exit;
 } else if (isset($_GET['delete']) && $_GET['delete']=='true') {
 	$id = Sanitize::onlyInt($_GET['id']);
@@ -113,7 +113,7 @@ if (isset($_POST['tname'])) {
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom");
 	exit;
 } else {
 	require("../header.php");

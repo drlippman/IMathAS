@@ -4,7 +4,7 @@
 
 	require("../validate.php");
 	require("../includes/htmlutil.php");
-	
+
 
 	$istutor = false;
 	$isteacher = false;
@@ -56,7 +56,7 @@
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid=:gradetypeid");
 			$stm->execute(array(':gradetypeid'=>$lid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid={$_GET['cid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
 			exit;
 		} else {
 			require("../header.php");
@@ -135,7 +135,7 @@
 	}
 
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
 		exit;
 	}
 
@@ -143,7 +143,8 @@
 
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+    printf('<div class=breadcrumb>%s <a href="course.php?cid=%s">%s</a> ', $breadcrumbbase,
+        Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($_GET['stu']>0) {
 		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Student Detail</a> ";

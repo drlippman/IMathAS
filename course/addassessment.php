@@ -27,7 +27,7 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=='gb') {
 	$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> ";
 } else if ($from=='mcd') {
@@ -50,7 +50,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
-
 	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
@@ -67,8 +66,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$_GET['id']));
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\')
-                . "/addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id=".Sanitize::onlyInt($_GET['id']));
+			header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
+                    Sanitize::courseId($_GET['cid']), Sanitize::onlyInt($_GET['id'])));
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -78,12 +77,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$assessmentname = $stm->fetchColumn(0);
-			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			$body .= "&gt; <a href=\"addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
-			$body .= "<h3>$assessmentname</h3>";
+			$body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
+                $cid, Sanitize::encodeStringForDisplay($coursename));
+			$body .= sprintf("&gt; <a href=\"addassessment.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
+                $cid, Sanitize::onlyInt($_GET['id']));
+			$body .= sprintf("<h3>%s</h3>", $assessmentname);
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}&clearattempts=confirmed'\">\n";
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}'\"></p>\n";
+			$body .= sprintf("<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid=%s&id=%d&clearattempts=confirmed'\">\n",
+                $cid, Sanitize::onlyInt($_GET['id']));
+			$body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=%s&id=%d'\"></p>\n",
+                $cid, Sanitize::onlyInt($_GET['id']));
 		}
 	} elseif ($_POST['name']!= null) { //if the form has been submitted
 
@@ -350,13 +353,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 			if ($from=='gb') {
-				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=".Sanitize::courseId($_GET['cid']));
+				header(sprintf('Location: %s/course/gradebook.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
 			} else if ($from=='mcd') {
-				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/masschgdates.php?cid=".Sanitize::courseId($_GET['cid']));
+				header(sprintf('Location: %s/course/masschgdates.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
 			} else if ($from=='lti') {
-				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/ltihome.php?showhome=true");
+				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
 			} else {
-				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
+				header(sprintf('Location: %s/course/course.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
 			}
 			exit;
 		} else { //add new
@@ -434,7 +437,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=".Sanitize::courseId($_GET['cid'])."&aid=$newaid");
+			header(sprintf('Location: %s/course/addquestions.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'], $cid, $newaid));
 			exit;
 		}
 
@@ -540,7 +543,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['intro'] = $introjson[0];
 		} else {
 			if (strpos($line['intro'], '[Q ')!==false || strpos($line['intro'], '[QUESTION ')!==false) {
-				$introconvertmsg = sprintf(_('It appears this assessment is using an older [Q #] or [QUESTION #] tag. You can %sconvert that into a new format%s if you would like.'), '<a href="convertintro.php?cid='.$cid.'&aid='.$_GET['id'].'">','</a>').'<br/>';
+				$introconvertmsg = sprintf(_('It appears this assessment is using an older [Q #] or [QUESTION #] tag. You can %sconvert that into a new format%s if you would like.'), '<a href="convertintro.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['id']).'">','</a>').'<br/>';
 			}
 		}
 		if ($line['minscore']>10000) {
@@ -606,7 +609,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($taken) {
 			$page_isTakenMsg = "<p>This assessment has already been taken.  Modifying some settings will mess up those assessment attempts, and those inputs ";
 			$page_isTakenMsg .=  "have been disabled.  If you want to change these settings, you should clear all existing assessment attempts</p>\n";
-			$page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$_GET['id']}&clearattempts=ask'\"></p>\n";
+			$page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment.php?cid=$cid&id=".Sanitize::onlyInt($_GET['id'])."&clearattempts=ask'\"></p>\n";
 		} else {
 			$page_isTakenMsg = "<p>&nbsp;</p>";
 		}
@@ -617,12 +620,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 		}
 
-		$page_formActionTag = "addassessment.php?block=$block&cid=$cid";
+		$page_formActionTag = sprintf("addassessment.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);
 		if (isset($_GET['id'])) {
-			$page_formActionTag .= "&id=" . $_GET['id'];
+			$page_formActionTag .= "&id=" . Sanitize::onlyInt($_GET['id']);
 		}
-		$page_formActionTag .= "&folder=" . $_GET['folder'] . "&from=" . $_GET['from'];
-		$page_formActionTag .= "&tb=$totb";
+		$page_formActionTag .= sprintf("&folder=%s&from=%s", Sanitize::encodeUrlParam($_GET['folder']), Sanitize::encodeUrlParam($_GET['from']));
+		$page_formActionTag .= "&tb=" . Sanitize::encodeUrlParam($totb);
 
 		//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -818,23 +821,25 @@ if ($overwriteBody==1) {
 	<?php echo $formTitle ?>
 	<?php
 	if (isset($_GET['id'])) {
-		echo '<div class="cp"><a href="addquestions.php?aid='.$_GET['id'].'&amp;cid='.$cid.'" onclick="return confirm(\''._('This will discard any changes you have made on this page').'\');">'._('Add/Remove Questions').'</a></div>';
+		printf('<div class="cp"><a href="addquestions.php?aid=%d&amp;cid=%s" onclick="return confirm(\''
+            . _('This will discard any changes you have made on this page').'\');">'
+            . _('Add/Remove Questions').'</a></div>', Sanitize::onlyInt($_GET['id']), $cid);
 	}
 	?>
 	<?php echo $page_isTakenMsg ?>
 
 	<form method=post action="<?php echo $page_formActionTag ?>">
 		<span class=form>Assessment Name:</span>
-		<span class=formright><input type=text size=30 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span><BR class=form>
+        <span class=formright><input type=text size=30 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']); ?>"></span><BR class=form>
 
 		Summary:<BR>
 		<div class=editor>
-			<textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo htmlentities($line['summary']);?></textarea>
+			<textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary']); ?></textarea>
 		</div><BR>
 		Intro/Instructions:<BR>
 		<?php if (isset($introconvertmsg)) {echo $introconvertmsg;} ?>
 		<div class=editor>
-			<textarea cols=50 rows=20 id=intro name=intro style="width: 100%"><?php echo htmlentities($line['intro']);?></textarea>
+			<textarea cols=50 rows=20 id=intro name=intro style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['intro']); ?></textarea>
 		</div><BR>
 
 
@@ -882,7 +887,7 @@ if ($overwriteBody==1) {
 
 		<span class=form></span>
 		<span class=formright>
-			<input type=submit value="<?php echo $savetitle;?>"> now or continue below for Assessment Options
+			<input type=submit value="<?php echo Sanitize::encodeStringForDisplay($savetitle); ?>"> now or continue below for Assessment Options
 		</span><br class=form>
 
 		<fieldset><legend>Assessment Options</legend>
@@ -917,7 +922,7 @@ if ($overwriteBody==1) {
 		<div id="customoptions" class="show">
 			<fieldset><legend>Core Options</legend>
 			<span class=form>Require Password (blank for none):</span>
-			<span class=formright><input type="password" name="assmpassword" id="assmpassword" value="<?php echo $line['password'];?>" autocomplete="new-password"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
+			<span class=formright><input type="password" name="assmpassword" id="assmpassword" value="<?php echo Sanitize::encodeStringForDisplay($line['password']); ?>" autocomplete="new-password"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
 			<span class=form>Time Limit (minutes, 0 for no time limit): </span>
 			<span class=formright><input type=text size=4 name=timelimit value="<?php echo abs($timelimit);?>">
 				<input type="checkbox" name="timelimitkickout" <?php if ($timelimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
@@ -939,11 +944,11 @@ if ($overwriteBody==1) {
 			</span><BR class=form>
 
 			<span class=form>Default points per problem: </span>
-			<span class=formright><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>></span><BR class=form>
+			<span class=formright><input type=text size=4 name=defpoints value="<?php echo Sanitize::encodeStringForDisplay($line['defpoints']); ?>" <?php if ($taken) {echo 'disabled=disabled';}?>></span><BR class=form>
 
 			<span class=form>Default attempts per problem (0 for unlimited): </span>
 			<span class=formright>
-				<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
+				<input type=text size=4 name=defattempts value="<?php echo Sanitize::encodeStringForDisplay($line['defattempts']); ?>" >
 				<span id="showreattdiffver" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
 	 			<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($line['shuffle']&8,8); ?> />
 	 			Reattempts different versions</span>
@@ -951,7 +956,7 @@ if ($overwriteBody==1) {
 
 			<span class=form>Default penalty:</span>
 			<span class=formright>
-				<input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
+				<input type=text size=4 name=defpenalty value="<?php echo Sanitize::encodeStringForDisplay($line['defpenalty']); ?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
 			   	<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
 			    	<option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
 					<option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -1096,8 +1101,8 @@ if ($overwriteBody==1) {
 ?>
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
-				Active: <input name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>"/>,
-				Review: <input name="caltagrev" type=text size=8 value="<?php echo $line['calrtag'];?>"/>
+				Active: <input name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>,
+				Review: <input name="caltagrev" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['calrtag']); ?>"/>
 			</span><br class="form" />
 
 			</fieldset>
@@ -1105,7 +1110,7 @@ if ($overwriteBody==1) {
 			<fieldset><legend>Advanced Options</legend>
 			<span class=form>Minimum score to receive credit: </span>
 			<span class=formright>
-				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
+				<input type=text size=4 name=minscore value="<?php echo Sanitize::encodeStringForDisplay($line['minscore']); ?>">
 				<input type="radio" name="minscoretype" value="0" <?php writeHtmlChecked($minscoretype,0);?>> Points
 				<input type="radio" name="minscoretype" value="1" <?php writeHtmlChecked($minscoretype,1);?>> Percent
 			</span><BR class=form>
@@ -1125,7 +1130,7 @@ if ($overwriteBody==1) {
 			<span class="form">Default Feedback Text:</span>
 			<span class="formright">
 				Use? <input type="checkbox" name="usedeffb" <?php writeHtmlChecked($usedeffb,true); ?>><br/>
-				Text: <input type="text" size="60" name="deffb" value="<?php echo str_replace('"','&quot;',$deffb);?>" />
+				Text: <input type="text" size="60" name="deffb" value="<?php echo Sanitize::encodeStringForDisplay($deffb); ?>" />
 			</span><br class="form" />
 			<span class=form>All items same random seed: </span>
 			<span class=formright>
@@ -1139,7 +1144,7 @@ if ($overwriteBody==1) {
 
 			<span class=form>Penalty for questions done while in exception/LatePass: </span>
 			<span class=formright>
-				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
+				<input type=text size=4 name="exceptionpenalty" value="<?php echo Sanitize::encodeStringForDisplay($line['exceptionpenalty']); ?>">%
 			</span><BR class=form>
 
 			<span class=form>Group assessment: </span>
@@ -1151,7 +1156,7 @@ if ($overwriteBody==1) {
 			</span><br class="form" />
 			<span class=form>Max group members (if group assessment): </span>
 			<span class=formright>
-				<input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
+				<input type="text" name="groupmax" value="<?php echo Sanitize::encodeStringForDisplay($line['groupmax']); ?>" />
 			</span><br class="form" />
 			<span class="form">Use group set:<?php
 				if ($taken) {
@@ -1172,12 +1177,12 @@ if ($overwriteBody==1) {
 				foreach ($page_outcomeslist as $oc) {
 					if ($oc[1]==1) {//is group
 						if ($ingrp) { echo '</optgroup>';}
-						echo '<optgroup label="'.htmlentities($oc[0]).'">';
+						echo '<optgroup label="'.Sanitize::encodeStringForDisplay($oc[0]).'">';
 						$ingrp = true;
 					} else {
-						echo '<option value="'.$oc[0].'" ';
+						echo '<option value="'.Sanitize::encodeStringForDisplay($oc[0]).'" ';
 						if ($line['defoutcome'] == $oc[0]) { echo 'selected="selected"'; $issel = true;}
-						echo '>'.$page_outcomes[$oc[0]].'</option>';
+						echo '>'.Sanitize::encodeStringForDisplay($page_outcomes[$oc[0]]).'</option>';
 					}
 				}
 				if ($ingrp) { echo '</optgroup>';}

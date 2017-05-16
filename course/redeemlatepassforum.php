@@ -3,9 +3,9 @@
 //(c) 2007 David Lippman
 
 	require("../validate.php");
-	
 
-	$cid = $_GET['cid'];
+
+	$cid = Sanitize::courseId($_GET['cid']);
 	$fid = $_GET['fid'];
 	$from = $_GET['from'];
 
@@ -178,9 +178,9 @@
 			}
 		}
 		if ($from=='forum') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/forums/thread.php?cid=$cid&forum=$fid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=$cid&forum=$fid");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 		}
 
 	} else {

@@ -20,14 +20,14 @@
 
 	$threadsperpage = intval($listperpage);
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
-		$page = $_GET['page'];
+		$page = Sanitize::onlyInt($_GET['page']);
 	}
 	if (isset($_GET['filterstu'])) {
-		$filterstu = $_GET['filterstu'];
+		$filterstu = Sanitize::onlyInt($_GET['filterstu']);
 	} else {
 		$filterstu = 0;
 	}
@@ -121,7 +121,7 @@
 		echo $prevnext;
 		echo "</span>\n";
 	}
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/allstumsglist.php?cid=$cid&filterstu=";
+	$address = $GLOBALS['basesiteurl'] . "/msgs/allstumsglist.php?cid=$cid&filterstu=";
 
 ?>
 <script type="text/javascript">

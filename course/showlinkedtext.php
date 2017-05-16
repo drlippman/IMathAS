@@ -2,10 +2,9 @@
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
 	require("../validate.php");
-	
 
-	$cid = $_GET['cid'];
 
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
 		require("../header.php");
 		echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -13,7 +12,7 @@
 		exit;
 	}
 	if (!isset($_GET['id'])) {
-		echo "<html><body>No item specified. <a href=\"course.php?cid={$_GET['cid']}\">Try again</a></body></html>\n";
+		echo "<html><body>No item specified. <a href=\"course.php?cid=$cid\">Try again</a></body></html>\n";
 		exit;
 	}
 	if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
@@ -49,7 +48,7 @@
 		} else {
 			//redirect to post page
 			$param .= '&target=new';
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/filter/basiclti/post.php?'.$param);
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/filter/basiclti/post.php?'.$param);
 			exit;
 		}
 	} else if ((substr($text,0,4)=="http") && (strpos(trim($text)," ")===false)) { //is a web link
@@ -98,7 +97,7 @@
 			echo '<div class="breadcrumb" '.$fixbc.'>'.$_SESSION['backtrack'][0];
 			echo " &gt; $titlesimp</div>";
 		} else {
-			echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			echo "&gt; $titlesimp</div>";
 			echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
 		}
@@ -191,9 +190,9 @@
 	echo '</div>';
 	if ($shownav) {
 		if (isset($_SESSION['backtrack'])) {
-			echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}&folder=".$_SESSION['backtrack'][1]."\">Back</a></div>\n";
+			echo "<div class=right><a href=\"course.php?cid=$cid&folder=".$_SESSION['backtrack'][1]."\">Back</a></div>\n";
 		} else {
-			echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></div>\n";
+			echo "<div class=right><a href=\"course.php?cid=$cid\">Return to Course Page</a></div>\n";
 		}
 	}
 	require("../footer.php");

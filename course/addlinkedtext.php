@@ -21,8 +21,8 @@ $overwriteBody = 0;
 $body = "";
 $useeditor = "text,summary";
 
-
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Link\n";
 	$pagetitle = "Modify Link";
@@ -305,7 +305,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 		}
 		exit;
 	} else {

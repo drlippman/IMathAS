@@ -31,12 +31,12 @@ switch($_GET['action']) {
 		$name = $stm->fetchColumn(0);
 		echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
 		echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=delete&id={$_GET['id']}'\">\n";
+		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=delete&id=".Sanitize::encodeUrlParam($_GET['id'])."'\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
 		break;
 	case "deladmin":
 		echo "<p>Are you sure you want to delete this user?</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=deladmin&id={$_GET['id']}'\">\n";
+		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=deladmin&id=".Sanitize::encodeUrlParam($_GET['id'])."'\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
 		break;
 	case "chgpwd":
@@ -50,8 +50,8 @@ switch($_GET['action']) {
 
 	case "chgrights":
 	case "newadmin":
-		echo "<form method=post action=\"actions.php?from=$from&action={$_GET['action']}";
-		if ($_GET['action']=="chgrights") { echo "&id={$_GET['id']}"; }
+		echo "<form method=post action=\"actions.php?from=$from&action=".Sanitize::encodeUrlParam($_GET['action']);
+		if ($_GET['action']=="chgrights") { echo "&id=".Sanitize::encodeUrlParam($_GET['id']); }
 		echo "\">\n";
 		if ($_GET['action'] == "newadmin") {
 			echo "<span class=form>New User username:</span>  <input class=form type=text size=40 name=adminname><BR class=form>\n";
@@ -68,7 +68,8 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT FirstName,LastName,rights,groupid,specialrights FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			echo "<h2>{$line['FirstName']} {$line['LastName']}</h2>\n";
+			printf("<h2>%s %s</h2>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
+				Sanitize::encodeStringForDisplay($line['LastName']));
 			$oldgroup = $line['groupid'];
 			$oldrights = $line['rights'];
 			$oldspecialrights = $line['specialrights'];
@@ -255,16 +256,17 @@ switch($_GET['action']) {
 			echo _('Add New Course');
 		}
 		echo '</h2></div>';
-		echo "<form method=post action=\"actions.php?from=$from&action={$_GET['action']}";
+		echo "<form method=post action=\"actions.php?from=$from&action=".Sanitize::encodeUrlParam($_GET['action']);
 		if (isset($_GET['cid'])) {
 			echo "&cid=$cid";
 		}
-		if ($_GET['action']=="modify") { echo "&id={$_GET['id']}"; }
+		if ($_GET['action']=="modify") { echo "&id=".Sanitize::encodeUrlParam($_GET['id']); }
 		echo "\">\n";
 		echo "<span class=form>Course ID:</span><span class=formright>$courseid</span><br class=form>\n";
 		if ($isadminview) {
 			echo '<span class="form">Owner:</span><span class="formright">';
-			echo $udat['LastName'].', '.$udat['FirstName'].' ('.$udat['name'].')</span><br class="form"/>';
+			printf('%s, %s (%s)</span><br class="form"/>', Sanitize::encodeStringForDisplay($udat['LastName']),
+				Sanitize::encodeStringForDisplay($udat['FirstName']), Sanitize::encodeStringForDisplay($udat['name']));
 		}
 		echo "<span class=form>Enter Course name:</span><input class=form type=text size=80 name=\"coursename\" value=\"$name\"><BR class=form>\n";
 		echo "<span class=form>Enter Enrollment key:</span><input class=form type=text size=30 name=\"ekey\" value=\"$ekey\"><BR class=form>\n";
@@ -329,7 +331,7 @@ switch($_GET['action']) {
 
 			echo " </select></span><br class=\"form\" />";
 		}
-		
+
 		if (!isset($CFG['CPS']['unenroll']) || $CFG['CPS']['unenroll'][1]==1) {
 			echo "<span class=form>Allow students to self-<u>un</u>enroll</span><span class=formright>";
 			echo '<input type=radio name="allowunenroll" value="0" ';
@@ -410,9 +412,9 @@ switch($_GET['action']) {
 			echo '<button type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">'._('Show LTI key and URL').'</button>';
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
-				echo '<br/>URL: '.$urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).$imasroot.'/bltilaunch.php<br/>';
-				echo 'Key: LTIkey_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
-				echo 'Key: LTIkey_'.$_GET['id'].'_1 (to only allow access through the LMS )';
+				echo '<br/>URL: ' . $GLOBALS['basesiteurl'] . '/bltilaunch.php<br/>';
+				echo 'Key: LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.') or<br/>';
+				echo 'Key: LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS )';
 			} else {
 				echo 'Course ID not yet set.';
 			}
@@ -629,7 +631,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Transfer Course Ownership</h3>\n";
 		echo '</div>';
-		echo "<form method=post action=\"actions.php?from=$from&action=transfer&id={$_GET['id']}\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=transfer&id=".Sanitize::encodeUrlParam($_GET['id'])."\">\n";
 		echo "Transfer course ownership to: <select name=newowner>\n";
 		if ($myrights < 100) {
 			//DB $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND groupid='$groupid' ORDER BY LastName";
@@ -777,7 +779,7 @@ switch($_GET['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($gpname,$parent) = $stm->fetch(PDO::FETCH_NUM);
 
-		echo "<form method=post action=\"actions.php?from=$from&action=modgroup&id={$_GET['id']}\">\n";
+		echo "<form method=post action=\"actions.php?from=$from&action=modgroup&id=".Sanitize::encodeUrlParam($_GET['id'])."\">\n";
 		echo "Group name: <input type=text size=50 name=gpname id=gpname value=\"$gpname\"><br/>\n";
 		echo 'Parent: <select name="parentid"><option value="0" ';
 		if ($parent==0) { echo ' selected="selected"';}
@@ -797,7 +799,7 @@ switch($_GET['action']) {
 		break;
 	case "removediag":
 		echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=removediag&id={$_GET['id']}'\">\n";
+		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?from=$from&action=removediag&id=".Sanitize::encodeUrlParam($_GET['id'])."'\">\n";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
 		break;
 }

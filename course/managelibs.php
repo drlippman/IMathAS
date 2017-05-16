@@ -28,7 +28,7 @@ if ($myrights<20) {
 	$body = "Please access this page from the menu links only.";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if ($cid=='admin') {
 		if ($myrights >74 && $myrights<100) {
 			$isgrpadmin = true;
@@ -144,7 +144,7 @@ if ($myrights<20) {
 				}
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 
 			exit;
 		} else {
@@ -193,7 +193,7 @@ if ($myrights<20) {
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 
 			exit;
 
@@ -251,7 +251,7 @@ if ($myrights<20) {
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 
 			exit;
 
@@ -298,7 +298,7 @@ if ($myrights<20) {
         //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 
 			exit;
 		} else {
@@ -351,7 +351,7 @@ if ($myrights<20) {
           //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 
 			exit;
 		} else {
@@ -430,7 +430,7 @@ if ($myrights<20) {
 				}
 			}
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 
 			exit;
 		} else {
@@ -472,7 +472,7 @@ if ($myrights<20) {
       $stm = $DBH->prepare($query);
       $stm->execute($qarr);
       //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 			exit;
 		} else {
 			$pagetitle = "Transfer Library";
@@ -515,7 +515,7 @@ if ($myrights<20) {
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>$_POST['name'], ':ownerid'=>$userid,
             ':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':parent'=>$_POST['libs'], ':groupid'=>$groupid));
-					header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+					header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 					exit;
 				}
 			} else {
@@ -546,7 +546,7 @@ if ($myrights<20) {
         $stm->execute($qarr);
         //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 				exit;
 			}
 		} else {

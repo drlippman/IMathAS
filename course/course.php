@@ -89,7 +89,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$_GET['cid']));
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 	}
 
 	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
@@ -198,8 +198,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		}
 	}
 	//DEFAULT DISPLAY PROCESSING
-	$jsAddress1 = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']);
-	$jsAddress2 = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
+	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course";
 
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);
@@ -458,7 +458,7 @@ if ($overwriteBody==1) {
 			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
 		} else {
 			echo Sanitize::encodeStringForDisplay($userfullname);
-		} 
+		}
 		?>
 		</span>
 		<?php
@@ -567,7 +567,7 @@ if ($overwriteBody==1) {
 		  </p>
 <?php
 		}
-		
+
 		echo '<p>';
 		if ($msgset<4) {
 			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
@@ -582,7 +582,7 @@ if ($overwriteBody==1) {
 		}
 		echo '<a href="coursemap.php?cid='.$cid.'">'._('Course Map').'</a>';
 		echo '</p>';
-		
+
 	?>
 
 			<p>

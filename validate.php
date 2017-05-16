@@ -1,20 +1,25 @@
 <?php
 //IMathAS:  Checks user's login - prompts if none.
 //(c) 2006 David Lippman
+require_once(__DIR__ . "/includes/sanitize.php");
+
  header('P3P: CP="ALL CUR ADM OUR"');
 
  $curdir = rtrim(dirname(__FILE__), '/\\');
  if (!file_exists("$curdir/config.php")) {
-	 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
+ 	// Can't use $basesiteurl here, as it's defined in config.php.
+	$httpMode = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on')
+		|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https')
+		? 'https://' : 'http://';
+	header('Location: ' . $httpMode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF'])), '/\\') . "/install.php");
  }
  require_once("$curdir/config.php");
  require("i18n/i18n.php");
- require_once("includes/sanitize.php");
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);
  ini_set('auto_detect_line_endings',true);
 
- $hostparts = explode('.',$_SERVER['HTTP_HOST']);
+ $hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
  if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
  	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
  }
@@ -35,8 +40,6 @@
  $myrights = 0;
  $myspecialrights = 0;
  $ispublic = false;
- //domain checks for special themes, etc. if desired
- $requestaddress = $_SERVER['HTTP_HOST'] .$_SERVER['PHP_SELF'];
  if (isset($CFG['CPS']['theme'])) {
  	 $defaultcoursetheme = $CFG['CPS']['theme'][0];
  } else if (!isset($defaultcoursetheme)) {
@@ -100,10 +103,10 @@
 
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
 		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
-		 
+
 		 require_once("$curdir/includes/userprefs.php");
 		 generateuserprefs();
-		
+
 		 $sessiondata['secsalt'] = generaterandstring();
 		 if (isset($_POST['savesettings'])) {
 			 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
@@ -121,7 +124,7 @@
 		$stm->execute(array(':now'=>$now, ':log'=>"$userid login from IP:{$_SERVER['REMOTE_ADDR']}"));
 
 
-		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+		 header('Location: ' . $GLOBALS['basesiteurl'] . $querys);
 		 exit;
 	 }
 
@@ -253,7 +256,7 @@
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
 		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
 		 $sessiondata['secsalt'] = generaterandstring();
-		 
+
 		 if (!isset($_POST['tzoffset'])) {
 			 $_POST['tzoffset'] = 0;
 		 }
@@ -262,7 +265,7 @@
 		 }
 		 require_once("$curdir/includes/userprefs.php");
 		 generateuserprefs();
-		 
+
 		 $enc = base64_encode(serialize($sessiondata));
 
 		 if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
@@ -293,7 +296,7 @@
 		 //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
 		 //DB //mysql_query($query) or die("Query failed : " . mysql_error());
 
-		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+		 header('Location: ' . $GLOBALS['basesiteurl'] . $querys);
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;
@@ -325,7 +328,7 @@
 		/*
 		$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+		header('Location: ' . $GLOBALS['basesiteurl'] . $querys);
 		exit;
 		*/
 	}
@@ -365,7 +368,7 @@
 	if (isset($sessiondata['userprefs']['usertheme']) && strcmp($sessiondata['userprefs']['usertheme'],'0')!=0) {
 		$coursetheme = $sessiondata['userprefs']['usertheme'];
 	}
-	
+
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
 	if ($myrights==100 && (isset($_GET['debug']) || isset($sessiondata['debugmode']))) {
 		ini_set('display_errors',1);
@@ -401,7 +404,7 @@
 		writesessiondata();
 	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
 	}
 
 	if (isset($sessiondata['ltiitemtype'])) {
@@ -413,7 +416,7 @@
 				exit;
 			}
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
-			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid={$_GET['cid']}&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
+			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
 			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php'))) {
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
@@ -423,7 +426,7 @@
 				$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
 				$cid = $stm->fetchColumn(0);
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
 		} else if ($sessiondata['ltirole']=='instructor') {
@@ -437,7 +440,7 @@
 
 	if ((isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) || (isset($sessiondata['courseid']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')!==false)) {
 		if (isset($_GET['cid'])) {
-			$cid = $_GET['cid'];
+			$cid = Sanitize::courseId($_GET['cid']);
 		} else {
 			$cid = $sessiondata['courseid'];
 		}
@@ -535,7 +538,7 @@
 			$coursetheme = $crow['theme']; //mysql_result($result,0,5);
 			/*if (isset($usertheme) && $usertheme!='') {
 				$coursetheme = $usertheme;
-			} else 
+			} else
 			*/
 			if (isset($sessiondata['userprefs']['usertheme']) && strcmp($sessiondata['userprefs']['usertheme'],'0')!=0) {
 				$coursetheme = $sessiondata['userprefs']['usertheme'];
@@ -555,7 +558,7 @@
 			}
 			$picicons = $crow['picicons'];
 			$latepasshrs = $crow['latepasshrs'];
-			
+
 			if (isset($studentid) && !$inInstrStuView && (($crow['available'])&1)==1) {
 				echo "This course is not available at this time";
 				exit;
@@ -567,7 +570,7 @@
 					echo '<p>This course is currently locked for an assessment</p>';
 					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
 					require("footer.php");
-					//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$lockaid");
+					//header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
 					exit;
 				}
 			}

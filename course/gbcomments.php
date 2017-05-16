@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 	require("../validate.php");
-	
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -11,7 +11,7 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['comtype'])) {
 		$comtype = $_GET['comtype'];
 	} else {
@@ -21,7 +21,7 @@
 	if (isset($_GET['upload'])) {
 		require("../header.php");
 
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
 		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Gradebook Comments</a> &gt; Upload Comments</div>";
 
@@ -160,7 +160,7 @@
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid");
 		exit;
 	}
 
@@ -177,7 +177,7 @@
 	echo '   }'."\n";
 	echo ' } </script>'."\n";
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 	if ($comtype=='stu') {
 		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";

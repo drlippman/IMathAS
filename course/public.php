@@ -12,10 +12,10 @@
 	require("../i18n/i18n.php");
 	require("courseshowitems.php");
 	require_once("../includes/sanitize.php");
-	
+
 
 	$ispublic = true;
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	$stm = $DBH->prepare("SELECT name,theme,itemorder,hideicons,picicons,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
@@ -61,8 +61,8 @@
 		}
 	}
 
-	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/public.php?cid={$_GET['cid']}";
-	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/public.php?cid=".Sanitize::courseId($_GET['cid']);
+	$jsAddress2 = $GLOBALS['basesiteurl'] . '/course';
 
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);

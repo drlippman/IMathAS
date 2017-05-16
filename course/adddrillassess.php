@@ -74,7 +74,7 @@ if (isset($_GET['clearatt'])) {
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
 	$stm->execute(array(':drillassessid'=>$daid));
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+	header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d', $GLOBALS['basesiteurl'], $cid, $daid));
 	exit;
 }
 if (isset($_GET['record'])) {
@@ -140,11 +140,11 @@ if (isset($_GET['record'])) {
 				unset($toadd[$k]);
 			}
 		}
-		$toaddlist = implode(',',$toadd);
+		$toadd_query_placeholders = Sanitize::generateQueryPlaceholders($toadd);
 		//DB $query = "SELECT id,description FROM imas_questionset WHERE id IN ($toaddlist)";
-		$query = "SELECT id,description FROM imas_questionset WHERE id IN ($toaddlist)";
+		$query = "SELECT id,description FROM imas_questionset WHERE id IN ($toadd_query_placeholders)";
 		$stm = $DBH->prepare($query); //pre-sanitized INTs
-		$stm->execute();
+		$stm->execute(array_values($toadd));
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$descr = array();
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -303,9 +303,9 @@ if (isset($_GET['record'])) {
 		writesessiondata();
 	}
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header(sprintf('Location: %s/course/course.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
 	} else {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+		header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d', $GLOBALS['basesiteurl'], $cid, $daid));
 	}
 	exit;
 }
@@ -483,7 +483,7 @@ if (!$beentaken) {
 					$page_libqids[$line['libid']][] = $line['id'];
 				}
 				$i = $line['id'];
-				$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+				$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::encodeStringForDisplay($line['id']) . "' id='qo$ln'>";
 				if (in_array($i,$itemids)) {
 					$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
 				} else {
@@ -498,7 +498,8 @@ if (!$beentaken) {
 					$page_questionTable[$i]['avgtime'] = '';
 				}
 				if ($searchall==1) {
-					$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
+					$page_questionTable[$i]['lib'] = sprintf("<a href=\"addquestions.php?cid=%s&aid=%d&listlib=%s\">List lib</a>",
+                        $cid, $aid, Sanitize::encodeUrlParam($line['libid']));
 				} else {
 					$page_questionTable[$i]['junkflag'] = $line['junkflag'];
 					$page_questionTable[$i]['libitemid'] = $line['libitemid'];
@@ -542,12 +543,15 @@ if (!$beentaken) {
 
 
 				if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-					$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&daid=$daid&cid=$cid&frompot=1\">Edit</a>";
+					$page_questionTable[$i]['src'] = sprintf("<a href=\"moddataset.php?id=%d&daid=%d&cid=%s&frompot=1\">Edit</a>",
+                        Sanitize::onlyInt($line['id']), $daid, $cid);
 				} else {
-					$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&daid=$daid&cid=$cid\">View</a>";
+					$page_questionTable[$i]['src'] = sprintf("<a href=\"viewsource.php?id=%d&daid=%d&cid=%s\">View</a>",
+                        Sanitize::onlyInt($line['id']), $daid, $cid);
 				}
 
-				$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&daid=$daid&cid=$cid&template=true\">Template</a>";
+				$page_questionTable[$i]['templ'] = sprintf("<a href=\"moddataset.php?id=%d&daid=%d&cid=%s&template=true\">Template</a>",
+                        Sanitize::onlyInt($line['id']), $daid, $cid);
 				//$i++;
 				$ln++;
 
@@ -555,9 +559,11 @@ if (!$beentaken) {
 
 			//pull question useage data
 			if (count($page_questionTable)>0) {
-				$allusedqids = implode(',', array_keys($page_questionTable)); //INT vals from DB
+				$allusedqids = array_keys($page_questionTable); //INT vals from DB
+                $allusedqids_query_placeholders = Sanitize::generateQueryPlaceholders($allusedqids);
 				//DB $query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
-				$stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
+				$stm = $DBH->prepare("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids_query_placeholders) GROUP BY questionsetid");
+				$stm->execute($allusedqids);
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -642,18 +648,19 @@ function updateorder(el) {
 </script>
 <?php
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Add/Modify Drill Assessment</div>";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Add/Modify Drill Assessment</div>";
 echo "<h2>Add/Modify Drill Assessment</h2>";
 
-echo "<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=$cid&daid=$daid&block=$block&tb=$totb&record=true\">";
+printf("<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=%s&daid=%d&block=%s&tb=%s&record=true\">",
+    $cid, $daid, Sanitize::encodeUrlParam($block), Sanitize::encodeUrlParam($totb));
 ?>
 		<span class=form>Title: </span>
-		<span class=formright><input type=text size=60 name="title" value="<?php echo str_replace('"','&quot;',$drillname);?>">
+		<span class=formright><input type=text size=60 name="title" value="<?php echo Sanitize::encodeStringForDisplay($drillname);?>">
 		</span><BR class=form>
 
 		Summary<BR>
 		<div class=editor>
-			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo htmlentities($drillsummary);?></textarea>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($drillsummary);?></textarea>
 		</div>
 		<br/>
 		<span class=form>Show:</span>
@@ -707,7 +714,7 @@ echo '<p>Scoring type:';
 $vals = array('nat','nct','ncc','nst','nsc','t');
 $lbls = array('Do N questions then stop.  Record time.','Do N questions correct.  Record time.','Do N questions correct.  Record total attempts.','Do N questions correct in a row.  Record time','Do N questions correct in a row.  Record total attempts','Do as many correct as possible in N seconds');
 writeHtmlSelect('scoretype',$vals,$lbls,$scoretype,null,null,$beentaken?'disabled="disabled"':'');
-echo ' where N = <input type="text" size="4" name="n" value="'.$n.'" '. ($beentaken?'disabled="disabled"':''). '/></p>';
+echo ' where N = <input type="text" size="4" name="n" value="'.Sanitize::encodeStringForDisplay($n).'" '. ($beentaken?'disabled="disabled"':''). '/></p>';
 echo '<p>Feedback on individual questions:';
 $vals = array(0,1,4,2,3);
 $lbls = array('Show score, and display answer if wrong', 'Show score, don\'t show answers, give new question if wrong','Show score, don\'t show answers, give same question if wrong','Don\'t show score','Don\'t show score, but provide show answer buttons');
@@ -744,7 +751,7 @@ foreach ($itemids as $k=>$id) {
 		generateselect(count($itemids),$k);
 		echo '</td>';
 	}
-	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.htmlentities($itemdescr[$k]).'"/></td>';
+	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.Sanitize::encodeStringForDisplay($itemdescr[$k]).'"/></td>';
 	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k,{$itemids[$k]})\"/></td>";
 	if (!$beentaken) {
 		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1"/></td>';
@@ -759,12 +766,12 @@ if (!$beentaken) {
 	<h3>Potential Questions</h3>
 
 		In Libraries:
-		<span id="libnames"><?php echo $lnames ?></span>
-		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
+		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames) ?></span>
+		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs) ?>">
 		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
 		<br>
 		Search:
-		<input type=text size=15 name=search value="<?php echo $search ?>">
+		<input type=text size=15 name=search value="<?php echo Sanitize::encodeStringForDisplay($search) ?>">
 		<span tabindex="0" data-tip="Search all libraries, not just selected ones" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
 		Search all libs</span>
@@ -810,7 +817,7 @@ if (!$beentaken) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 						echo '<td></td>';
 						echo '<td>';
-						echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+						echo '<b>'.Sanitize::encodeStringForDisplay($lnamesarr[$page_libstouse[$j]]).'</b>';
 						echo '</td>';
 						for ($k=0;$k<9;$k++) {echo '<td></td>';}
 						echo '</tr>';

@@ -22,6 +22,7 @@
 require("./config.php");
 require("i18n/i18n.php");
 require("includes/JWT.php");
+require_once(__DIR__ . "/includes/sanitize.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $sessiondata = array();
 /*
@@ -196,7 +197,7 @@ require("./assessment/header.php");
 if ($sessiondata['graphdisp'] == 1) {
 	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';
 }
-echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
+echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
 
 echo '<input type="hidden" id="asidverify" value="'.$jwtstring.'"/>';
 echo '<input type="hidden" id="disptime" value="'.time().'"/>';

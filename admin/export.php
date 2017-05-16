@@ -30,7 +30,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 	$body = "Please access this page from the menu links only.";
 } else {
 
-	$cid = (isset($_GET['cid'])) ? $_GET['cid'] : "admin" ;
+	$cid = (isset($_GET['cid'])) ? Sanitize::courseId($_GET['cid']) : "admin" ;
 
 	if ($myrights < 100) {
 		$isgrpadmin = true;

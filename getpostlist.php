@@ -23,7 +23,7 @@
 	}
 	//DB $userid = mysql_result($result,0,0);
 	$userid = $stm->fetchColumn(0);
-	$tzoffset = $_GET['tzoffset'];
+  $tzoffset = Sanitize::onlyInt($_GET['tzoffset']);
 
 	function tzdate($string,$time) {
 		  global $tzoffset;

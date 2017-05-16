@@ -154,7 +154,7 @@ if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
 		$stm->execute(array(':id'=>$aid, ':intro'=>json_encode($introjson)));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?id=$aid&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?id=$aid&cid=$cid");
 	} else {
 		$qcnt = substr_count($qitemorder, ',')+1;
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";

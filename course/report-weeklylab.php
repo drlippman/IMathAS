@@ -125,7 +125,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
 		writesessiondata();
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/report-weeklylab.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/report-weeklylab.php?cid=$cid");
 		exit;
 	}
 
@@ -380,7 +380,7 @@ foreach ($st as $uid=>$stu) {
 		echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">";
 	}
 
-	echo '<td>'.$stu['stuname'].'</td>';
+	printf('<td>%s</td>', Sanitize::encodeStringForDisplay($stu['stuname']));
 
 	$stuattemptedCnt = count($stu['stuCreditAssessList'])+count($stu['stuNocreditAssessList']);
 	echo '<td class="c">'.$stuattemptedCnt.'</td>';
@@ -406,7 +406,7 @@ foreach ($st as $uid=>$stu) {
 		echo count($stu['stuNocreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuNocreditAssessList'] as $aid) {
-			echo '<li>'.$assessmentInfo[$aid]['name'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($assessmentInfo[$aid]['name']));
 		}
 		echo '</ul>';
 	} else {
@@ -421,7 +421,7 @@ foreach ($st as $uid=>$stu) {
 		echo count($stu['stuCreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuCreditAssessList'] as $aid) {
-			echo '<li>'.$assessmentInfo[$aid]['name'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($assessmentInfo[$aid]['name']));
 		}
 		echo '</ul>';
 	} else {
@@ -480,7 +480,7 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 		echo count($ainfo['nocreditstulist']);
 		echo '<ul class="nomark asul" style="display:none">';
 		foreach ($ainfo['nocreditstulist'] as $uid) {
-			echo '<li>'.$st[$uid]['stuname'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($st[$uid]['stuname']));
 		}
 		echo '</ul>';
 	} else {
@@ -494,7 +494,7 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 		echo count($ainfo['gotcreditstulist']);
 		echo '<ul class="nomark asul" style="display:none">';
 		foreach ($ainfo['gotcreditstulist'] as $uid) {
-			echo '<li>'.$st[$uid]['stuname'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($st[$uid]['stuname']));
 		}
 		echo '</ul>';
 	} else {

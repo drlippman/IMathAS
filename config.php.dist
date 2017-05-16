@@ -4,6 +4,8 @@
 	//created automatically by install.php
   //(c) 2006 David Lippman
 
+  require_once(__DIR__ . "/includes/security.php");
+
   //these settings must be editted before running dbsetup.php
   $dbserver = "localhost";  		//database server
   $dbname = "imas";			//database name
@@ -41,6 +43,12 @@
   //web root to imathas:  http://yoursite.com $imasroot
   //set = "" if installed in web root dir
   $imasroot = "/imathas";
+
+  //base site url - use when generating full URLs to site pages.
+  $httpmode = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on')
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https')
+    ? 'https://' : 'http://';
+  $GLOBALS['basesiteurl'] = $httpmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot;
 
   //absolute path or full url to Mimetex CGI, for math image fallback
   //if you do not have a local install, feel free to use:

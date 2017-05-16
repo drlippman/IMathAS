@@ -33,7 +33,7 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$checkedlist = implode(',', array_map('intval',$checked));
 			require("../header.php");
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 			echo "&gt; <a href=\"chgoffline.php?cid=$cid\">Manage Offline Grades</a> &gt; Confirm Delete</div>";
 			echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid&confirm=true\">";
@@ -94,7 +94,7 @@ if (isset($_POST['checked'])) { //form submitted
 		}
 	}
 
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid");
 	exit;
 }
 
@@ -130,7 +130,7 @@ $placeinhead .= '<script type="text/javascript">
  </script>';
 require("../header.php");
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Manage Offline Grades</div>";
 echo '<div id="headerchgoffline" class="pagetitle"><h2>Manage Offline Grades</h2></div>';

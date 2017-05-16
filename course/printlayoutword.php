@@ -25,7 +25,7 @@ if (!(isset($teacherid))) {
 
 /******* begin html output ********/
 
-$aid = intval($_GET['aid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 $sessiondata['texdisp'] = true;
 $sessiondata['texdoubleescape'] = true;
 $sessiondata['texalignformatrix'] = true;
@@ -283,11 +283,11 @@ if ($overwriteBody==1) {
 			$out .= "</ol>\n";
 		}
 	}
-	$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
+	$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
 	$out .= '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
 	$out .= '</body></html>';
 
-	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.$_SERVER['HTTP_HOST'].'/', $out);
+	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'/', $out);
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";

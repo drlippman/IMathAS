@@ -17,7 +17,7 @@ if (isset($teacherid)) {
 
 $threadsperpage = $listperpage;
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $forumid = $_GET['forum'];
 if (!isset($_GET['page']) || $_GET['page']=='') {
 	$page = 1;
@@ -90,16 +90,16 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 	if (isset($_POST['actionrequest'])) {
 		list($action,$actionid) = explode(':',$_POST['actionrequest']);
 		if ($action=='reply') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_GET['thread']}&modify=reply&replyto=$actionid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_GET['thread']}&modify=reply&replyto=$actionid");
 		} else if ($action=='modify') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_GET['thread']}&modify=$actionid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_GET['thread']}&modify=$actionid");
 		}
 	} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Previous') {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['prevth']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['prevth']}");
 	} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Next') {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['nextth']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['nextth']}");
 	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
 	}
 	exit;
 }
@@ -290,7 +290,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		} else {
 			$name = "{$row[4]} {$row[5]}";
 		}
-		echo "<br/>Posted by: $name, ";
+		printf("<br/>Posted by: %s, ", Sanitize::encodeStringForDisplay($name));
 		echo tzdate("F j, Y, g:i a",$row[6]);
 
 		echo "</div><div class=blockitems>";
@@ -390,9 +390,9 @@ if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
 $pagetitle = "Threads";
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';";
+$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
-$placeinhead .= "var tagfilterurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
+$placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
 require("../header.php");
 
 
@@ -744,7 +744,7 @@ echo "</p>";
 				if ($line['tag']!='') { //category tags
 					echo '<span class="forumcattag">'.$line['tag'].'</span> ';
 				}
-							   	
+
 				if ($line['posttype']==0) {
 					if (isset($flags[$line['id']])) {
 						echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Flagged\" />";
@@ -763,8 +763,8 @@ echo "</p>";
 					echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$line['id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 					echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
 					echo '</a>';
-					echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.$line['id'].'">';	
-					
+					echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.$line['id'].'">';
+
 					if ($isteacher) {
 						echo "<li><a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a></li> ";
 					}
@@ -783,9 +783,9 @@ echo "</p>";
 					$name = "{$line['LastName']}, {$line['FirstName']}";
 				}
 				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['id']}&page=$page$grpqs\">{$line['subject']}</a></td>";
-				
-				echo "<td>$name</td>\n";
-				
+
+				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
+
 				if ($isteacher && $groupsetid>0 && !$dofilter) {
 					echo '<td class=c>'.$groupnames[$line['stugroupid']].'</td>';
 				}

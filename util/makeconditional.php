@@ -61,7 +61,7 @@ if (isset($_POST['aidorder'])) {
 		$stm->execute(array(':reqscoreaid'=>$prereq, ':reqscore'=>$score, ':id'=>$tochgaid, ':courseid'=>$cid));
 	}
 
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	exit;
 
 } else {

@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
 require("config.php");
 require("includes/htmlutil.php");
+require_once("includes/sanitize.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("validate.php");
 } else {
@@ -155,8 +156,8 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>User Profile</h2></div>';
 		echo "<form id=\"pageform\" enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
-		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
-		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
+		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
+		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
 		if ($myrights>10 && $groupid>0) {
 			//DB $query = "SELECT name FROM imas_groups WHERE id=".intval($groupid);
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -260,11 +261,11 @@ switch($_GET['action']) {
 			unset($CFG['GEN']['translatewidgetID']);
 		}
 		echo '</fieldset>';
-		
+
 		//show accessibilty and display prefs form
 		require("includes/userprefs.php");
 		showUserPrefsForm();
-		
+
 
 		if ($myrights>19) {
 			echo '<fieldset id="userinfoinstructor"><legend>Instructor Options</legend>';
@@ -313,10 +314,10 @@ switch($_GET['action']) {
 		echo '<script type="text/javascript">
 		$("#pageform").validate({
 			rules: {
-				oldpw: { 
+				oldpw: {
 					required: {depends: function(element) {return $("#dochgpw").is(":checked")}}
 				},
-				newpw1: { 
+				newpw1: {
 					required: {depends: function(element) {return $("#dochgpw").is(":checked")}},
 					minlength: 6
 				},
@@ -381,7 +382,7 @@ switch($_GET['action']) {
 		echo '<script type="text/javascript">
 		$("#pageform").validate({
 			rules: {
-				cid: { 
+				cid: {
 					required: {depends: function(element) {return $("#courseselect").val()==0}}
 				}
 			},
@@ -398,8 +399,8 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
 
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
-		echo "<p><input type=button onclick=\"window.location='actions.php?action=unenroll&cid={$_GET['cid']}'\" value=\"Really Unenroll\">\n";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid={$_GET['cid']}'\"></p>\n";
+		echo "<p><input type=button onclick=\"window.location='actions.php?action=unenroll&cid=".Sanitize::courseId($_GET['cid'])."'\" value=\"Really Unenroll\">\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid=".Sanitize::courseId($_GET['cid'])."'\"></p>\n";
 		break;
 	case "resetpw":
 		if ($gb == '') {
@@ -417,7 +418,7 @@ switch($_GET['action']) {
 			},
 			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 		);
-		</script>';   
+		</script>';
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "lookupusername":
@@ -464,7 +465,7 @@ switch($_GET['action']) {
 				$allcourses[] = $row[0];
 				echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.$row[0].'" id="c'.$row[0].'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
+				echo '/> <label for="c'.$row[0].'">'.Sanitize::encodeStringForDisplay($row[1]).'</label>';
 			}
 			echo '</p>';
 		}
@@ -480,7 +481,7 @@ switch($_GET['action']) {
 				$allcourses[] = $row[0];
 				echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.$row[0].'" id="c'.$row[0].'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
+				echo '/> <label for="c'.$row[0].'">'.Sanitize::encodeStringForDisplay($row[1]).'</label>';
 			}
 			echo '</p>';
 		}
@@ -536,7 +537,7 @@ switch($_GET['action']) {
 		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";
 		echo "to gain access to your data</p>";
 
-		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=http%3A//'.$_SERVER['HTTP_HOST'].$imasroot.'/google-postreader.php"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
+		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=' . $GLOBALS['basesiteurl'] . '/google-postreader.php"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
 		echo "<p>Access Code: $code</p>";
 		echo "<p><a href=\"forms.php?action=googlegadget&regen=true$gb\">Generate a new Access code<a/><br/>";
 		echo "<p><a href=\"actions.php?action=googlegadget&clear=true$gb\">Clear Access code</a></p>";

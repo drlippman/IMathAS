@@ -22,7 +22,7 @@ if ($myrights<20) {
 	$isadmin = false;
 	$isgrpadmin = false;
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['source'])) {
 		$source = $_GET['source'];
 	} else {

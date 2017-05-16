@@ -114,5 +114,5 @@ $stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$ci
 //DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 $DBH->commit();
 
-header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 ?>

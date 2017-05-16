@@ -61,7 +61,7 @@ if (isset($_GET['go'])) {
 			mail($row[2],$installname . ' Account Approval',$message,$headers);
 		}
 	}
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/admin/approvepending.php?skipn=$offset");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/approvepending.php?skipn=$offset");
 	exit;
 }
 
@@ -100,7 +100,7 @@ if ($stm->rowCount()==0) {
 	if ($details != '') {
 		echo "<p>$details</p>";
 		if (preg_match('/School:(.*?)<br/',$details,$matches)) {
-			echo '<p><a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeStringForUrl($row[3].' '.$row[2].' '.$matches[1]).'">Search</a></p>';
+			echo '<p><a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row[3].' '.$row[2].' '.$matches[1]).'">Search</a></p>';
 		}
 	}
 	echo '<p>Group: <select name="group"><option value="-1">New Group</option>';

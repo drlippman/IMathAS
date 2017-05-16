@@ -10,8 +10,8 @@
 	$cid = intval($_GET['cid']);
 	if (isset($_GET['from'])) {
 		$pubcid = $cid;  //swap out cid's before calling validate
-		$cid = $_GET['from'];
-		$_GET['cid'] = $_GET['from'];
+	  $cid = Sanitize::courseId($_GET['from']);
+		$_GET['cid'] = Sanitize::courseId($_GET['from']);
 		require("../validate.php");
 		$fcid = $cid;
 		$cid = $pubcid;
@@ -125,7 +125,7 @@
 	echo filter($text);
 	echo '</div>';
 
-	echo "<div class=right><a href=\"../course/public.php?cid={$_GET['cid']}\">Return to Public Course Page</a></div>\n";
+	echo "<div class=right><a href=\"../course/public.php?cid=$cid\">Return to Public Course Page</a></div>\n";
 	require("../footer.php");
 
 ?>

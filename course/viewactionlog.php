@@ -190,7 +190,7 @@ foreach ($actions as $r) {
 		break;
 	case 'extref':
 		$p = explode(': ',$r[3]);
-		echo 'In assessment '.Sanitize::encodeStringForDisplay($exnames[$r[1]]).', clicked help for <a target="_blank" href="'.Sanitize::encodeStringForUrl($p[1]).'">'.Sanitize::encodeStringForDisplay($p[0]).'</a>';
+		echo 'In assessment '.Sanitize::encodeStringForDisplay($exnames[$r[1]]).', clicked help for <a target="_blank" href="'.Sanitize::fullUrl($p[1]).'">'.Sanitize::encodeStringForDisplay($p[0]).'</a>';
 		break;
 	case 'assessintro':
 		echo 'In assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]).' intro, clicked link to '.$thelink;
@@ -215,15 +215,15 @@ foreach ($actions as $r) {
 		break;
 	case 'forumpost':
 		$fp = explode(';',$r[3]);
-		echo 'New post <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeStringForUrl($fp[0]).'&thread='.Sanitize::encodeStringForUrl($r[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
+		echo 'New post <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeUrlParam($fp[0]).'&thread='.Sanitize::encodeUrlParam($r[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
 		break;
 	case 'forumreply':
 		$fp = explode(';',$r[3]);
-		echo 'New reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeStringForUrl($fp[0]).'&thread='.Sanitize::encodeStringForUrl($fp[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
+		echo 'New reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeUrlParam($fp[0]).'&thread='.Sanitize::encodeUrlParam($fp[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
 		break;
 	case 'forummod':
 		$fp = explode(';',$r[3]);
-		echo 'Modified post/reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeStringForUrl($fp[0]).'&thread='.Sanitize::encodeStringForUrl($fp[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
+		echo 'Modified post/reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeUrlParam($fp[0]).'&thread='.Sanitize::encodeUrlParam($fp[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
 		break;
 	}
 

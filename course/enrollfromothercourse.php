@@ -7,7 +7,7 @@ require("../validate.php");
 
 
 /*** pre-html data manipulation, including function code *******/
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"listusers.php?cid=$cid\">List Students</a>\n";
 
 if (!isset($teacherid)) { // loaded by a NON-teacher
@@ -52,7 +52,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section) VALUES '.implode(',', $vals));
 			$stm->execute($qarr);
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
 
 	} else if (isset($_POST['sourcecourse'])) {
@@ -76,6 +76,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 $pagetitle = "Enroll Students From Another Course";
 require("../header.php");
+require_once(__DIR__ . "/../includes/sanitize.php");
 $curBreadcrumb .= '&gt; Enroll From Another Course';
 
 /***** page body *****/
@@ -111,7 +112,8 @@ if ($overwriteBody==1) {
 		//DB while ($line=mysql_fetch_array($resultStudentList, MYSQL_ASSOC)) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 			echo '<input type=checkbox name="checked[]" value="'.$line['id'].'"/>';
-			echo $line['LastName'].', '.$line['FirstName'].'<br/>';
+			printf('%s, %s<br/>', Sanitize::encodeStringForDisplay($line['LastName']),
+                Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		echo '</p><p>Assign to section: <input type="text" name="section" />  (optional)</p>';
 		echo '</p><p><input type="submit" value="Enroll These Students" /></p>';

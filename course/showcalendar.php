@@ -9,7 +9,7 @@
 	   exit;
 	}
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['editing'])) {
 		$editingon = $_GET['editing']=='on';
 		$sessiondata[$cid.'caledit'] = $editingon;

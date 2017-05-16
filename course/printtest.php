@@ -17,8 +17,8 @@ if (!(isset($teacherid))) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 }
 
 /******* begin html output ********/

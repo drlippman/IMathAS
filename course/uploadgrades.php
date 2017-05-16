@@ -18,7 +18,7 @@ if (!(isset($teacherid))) {
 	$body = "You need to log in as a teacher to access this page";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
@@ -128,7 +128,7 @@ if (!(isset($teacherid))) {
 			$body = "File Upload error";
 		}
 	} else { //DEFAULT DATA MANIPULATION
-		$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
 		$curBreadcrumb .=" &gt; <a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Offline Grades</a> &gt; Upload Grades";
 	}

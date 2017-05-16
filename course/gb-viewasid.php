@@ -3,11 +3,11 @@
 //(c) 2007 David Lippman
 	require("../validate.php");
 	require_once("../includes/filehandler.php");
-	
+
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$asid = intval($_GET['asid']);
 	if (!isset($_GET['uid']) && !$isteacher && !$istutor) {
 		$_GET['uid'] = $userid;
@@ -52,7 +52,7 @@
 
 
 	if ($_GET['asid']=="new" && $isteacher) {
-		$aid = $_GET['aid'];
+		$aid = Sanitize::onlyInt($_GET['aid']);
 		//student could have started, so better check to make sure it still doesn't exist
 		//DB $query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$_GET['uid']}' AND assessmentid='$aid' ORDER BY id";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -115,7 +115,7 @@
 			}
 			$_GET['asid'] = $asid;
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 
 	}
 	//PROCESS ANY TODOS
@@ -154,15 +154,15 @@
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
 			}
 			if ($from=='isolate') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/isolateassessgrade.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='gisolate') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/isolateassessbygroup.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=".Sanitize::courseId($_GET['cid'])."&aid=$aid");
 			} else if ($from=='gbtesting') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&gbmode=$gbmode");
 			} else {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&gbmode=$gbmode");
 			}
 			exit;
 		} else {
@@ -190,7 +190,7 @@
 			$stm->execute(array(':id'=>$_GET['asid']));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			removegroupmember($row[1],$row[0]);
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
 			echo getconfirmheader();
 			echo "<p>Are you sure you want to separate this student from their current group?</p>";
@@ -253,7 +253,7 @@
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':scores'=>"$scorelist;$scorelist",
 					':bestattempts'=>$bestattemptslist, ':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':bestscores'=>"$bestscorelist;$bestscorelist;$bestscorelist"));
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
 			$isgroup = isasidgroup($_GET['asid']);
 			if ($isgroup) {
@@ -366,7 +366,7 @@
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
 				}
 
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
+				header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 			} else {
 				echo "$clearid";
 				print_r($scores);
@@ -473,15 +473,15 @@
 			}
 			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($from=='isolate') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/isolateassessgrade.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='gisolate') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/isolateassessbygroup.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=".Sanitize::courseId($_GET['cid'])."&aid=$aid");
 			} else if ($from=='gbtesting') {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&gbmode=$gbmode");
 			} else {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=".Sanitize::courseId($_GET['cid'])."&gbmode=$gbmode");
 			}
 			exit;
 		}
@@ -551,7 +551,7 @@
 
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-			echo "<a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+			echo "<a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 
 			if ($stu>0) {
 				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -1226,7 +1226,7 @@
 
 	} else if ($links==1) { //show grade detail question/category breakdown
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		if ($stu>0) {echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";}
 		echo "&gt; Detail</div>";

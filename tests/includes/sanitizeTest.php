@@ -17,7 +17,7 @@ final class SanitizeTest extends TestCase
 	public function testSanitizeFilenameAndCheckBlacklist()
 	{
 		$result = Sanitize::sanitizeFilenameAndCheckBlacklist('abe$er&%*#$');
-    $this->assertEquals("abeer",$result);
+		$this->assertEquals("abeer", $result);
 	}
 
 	/*
@@ -68,13 +68,32 @@ final class SanitizeTest extends TestCase
 	}
 
 	/*
-	 * encodeStringForUrl
+	 * encodeUrlParam
 	 */
 
-	public function testEncodeStringForUrl()
+	public function testEncodeUrlParam()
 	{
-		$result =  Sanitize::EncodeStringForUrl("https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertTrue");
-    $this->assertEquals("https%3A%2F%2Fphpunit.de%2Fmanual%2Fcurrent%2Fen%2Fappendixes.assertions.html%23appendixes.assertions.assertTrue", $result);
+		$result = Sanitize::encodeUrlParam("<h1>Hello, world!</h1>");
+		$this->assertEquals("%3Ch1%3EHello%2C+world%21%3C%2Fh1%3E", $result);
+	}
+
+	/*
+	 * fullUrl
+	 */
+
+	public function testFullUrlValid()
+	{
+		$testUrl = 'https://www.test.example.com/index.html?page-id=123&validchars=a-_~:;/?#[321]@!$(\'z\')*+,%b';
+		$result = Sanitize::fullUrl($testUrl);
+		$this->assertEquals($testUrl, $result);
+	}
+
+	public function testFullUrlWithInvalid()
+	{
+		$testUrl = "https://www.test.example.com/index.html?page-id=123&invalid=<h1>\"^Hello, world!\"</h1>";
+		$expectedUrl = "https://www.test.example.com/index.html?page-id=123&invalid=h1Hello,world!/h1";
+		$result = Sanitize::fullUrl($testUrl);
+		$this->assertEquals($expectedUrl, $result);
 	}
 
 	/*
@@ -83,8 +102,8 @@ final class SanitizeTest extends TestCase
 
 	public function testStripHtmlTags()
 	{
-		$resilt = Sanitize::stripHtmlTags("<h1>Yolo World!</h1>");
-		$this->assertEquals("Yolo World!",$resilt);
+		$result = Sanitize::stripHtmlTags("<h1>Yolo World!</h1>");
+		$this->assertEquals("Yolo World!", $result);
 	}
 
 	/*

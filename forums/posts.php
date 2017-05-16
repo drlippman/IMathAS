@@ -17,7 +17,7 @@ if (isset($teacherid)) {
 	$isteacher = false;
 }
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $forumid = $_GET['forum'];
 $threadid = $_GET['thread'];
 $page = $_GET['page'];
@@ -29,13 +29,13 @@ $page = $_GET['page'];
 //-5 tagged posts page
 
 if ($page==-4) {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid";
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/forums.php?cid=$cid";
 } else if ($page==-3) {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid";
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/newthreads.php?cid=$cid";
 } else if ($page==-5) {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/flaggedthreads.php?cid=$cid";
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/flaggedthreads.php?cid=$cid";
 } else {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page";
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=$cid&forum=$forumid&page=$page";
 }
 if (isset($_GET['markunread'])) {
 	//DB $query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
@@ -527,7 +527,7 @@ function printchildren($base,$restricttoowner=false) {
 			}
 			echo ">";
 		}
-		echo $poster[$child];
+		echo Sanitize::encodeStringForDisplay($poster[$child]); // This is the user's first and last name.
 		if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 			echo "</a>";
 		}

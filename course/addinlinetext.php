@@ -33,9 +33,10 @@ function generatemoveselect($count,$num) {
 $overwriteBody = 0;
 $body = "";
 $useeditor = "text";
+$cid = Sanitize::courseId($_GET['cid']);
 
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Inline Text\n";
 	$pagetitle = "Modify Inline Text";
@@ -295,7 +296,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$_GET['id']));
 	}
 	if ($_POST['submitbtn']=='Submit') {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 		exit;
 	}
 
@@ -447,7 +448,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value;
-	var address = "<?php echo $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid=$cid&block=$block&id=" . Sanitize::onlyInt($_GET['id']) ?>";
+	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . Sanitize::onlyInt($_GET['id']) ?>";
 
 	if (to != from) {
  	var toopen = address + '&movefile=' + from + '&movefileto=' + to;

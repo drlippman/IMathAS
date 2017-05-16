@@ -33,7 +33,7 @@ if (isset($_POST['search'])) {
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$thisperson = $row['LastName'].', '.$row['FirstName'];
 		if ($thisperson != $lastperson) {
-			echo '<br/><input type="checkbox" name="checked[]" value="'.$row['id'].'" checked="checked"> '.$thisperson .' ('.$row['groupname'].')';
+			echo '<br/><input type="checkbox" name="checked[]" value="'.$row['id'].'" checked="checked"> '.Sanitize::encodeStringForDisplay($thisperson) .' ('.Sanitize::encodeStringForDisplay($row['groupname']).')';
 			$lastperson= $thisperson;
 		}
 		echo ' <a href="../course/course.php?cid='.$row['cid'].'" target="_blank">'.$row['cid'].'</a>';

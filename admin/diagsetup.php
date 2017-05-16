@@ -176,8 +176,8 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$id = $DBH->lastInsertId();
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
 	}
-	$page_diagLink = "<p>Direct link to diagnostic:  <b>http://".Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])."$imasroot/diag/index.php?id=$id</b></p>";
-	$page_publicLink = ($_POST['public']&2) ? "<p>Diagnostic is listed on the public listing at: <b>http://".Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])."$imasroot/diag/</b></p>\n" : ""  ;
+	$page_diagLink = sprintf("<p>Direct link to diagnostic: <b>%s/diag/index.php?id=%d</b></p>", $GLOBALS['basesiteurl'], $id);
+	$page_publicLink = ($_POST['public']&2) ? sprintf("<p>Diagnostic is listed on the public listing at: <b>%s/diag/</b></p>\n", $GLOBALS['basesiteurl']) : ""  ;
 
 } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
 	if (isset($_GET['id'])) {
@@ -380,7 +380,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 <div id="headerdiagsetup" class="pagetitle"><h2>Diagnostic Setup</h2></div>
 <form method=post action=diagsetup.php?step=2>
 
-<?php echo (isset($_GET['id'])) ? "	<input type=hidden name=id value=\"{$_GET['id']}\"/>" : ""; ?>
+<?php echo (isset($_GET['id'])) ? "	<input type=hidden name=id value=\"".Sanitize::encodeUrlParam($_GET['id'])."\"/>" : ""; ?>
 
 	<p>Diagnostic Name:
 	<input type=text size=50 name="diagname" value="<?php echo Sanitize::encodeStringForDisplay($diagname); ?>"/></p>
