@@ -919,6 +919,8 @@
 			mode: "imathasqtext",
 			smartIndent: true,
 			lineWrapping: true,
+			lineNumbers: true,
+			autoCloseTags: true,
 			indentUnit: 2,
 			tabSize: 2,
 			styleSelectedText:true
