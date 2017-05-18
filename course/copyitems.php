@@ -316,7 +316,7 @@ if (!(isset($teacherid))) {
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					function updateoutcomes(&$arr) {
 						global $outcomes;
-						foreach ($arr as $k=>$v) {
+						foreach (is_array($arr)?$arr:array() as $k=>$v) {
 							if (is_array($v)) {
 								updateoutcomes($arr[$k]['outcomes']);
 							} else {

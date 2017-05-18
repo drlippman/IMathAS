@@ -165,7 +165,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 $cnt = 0;
 function printoutcome($arr) {
 	global $outcomeinfo,$cnt;
-	foreach ($arr as $item) {
+	foreach (is_array($arr)?$arr:array() as $item) {
 		if (is_array($item)) { //is outcome group
 			echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
 			echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';

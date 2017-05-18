@@ -122,7 +122,7 @@ END;
 	$outcomes = array();
 	function flattenarr($ar) {
 		global $outcomes;
-		foreach ($ar as $v) {
+		foreach (is_array($ar)?$ar:array() as $v) {
 			if (is_array($v)) { //outcome group
 				$outcomes[] = array($v['name'], 1);
 				flattenarr($v['outcomes']);
