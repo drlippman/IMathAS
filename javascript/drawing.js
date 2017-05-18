@@ -1216,9 +1216,10 @@ function drawMouseDown(ev) {
 	}
 	if (hasTouch) {
 		window.clearTimeout(hasTouchTimer);
-		$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
-		$(document).on("touchmove.imathasdraw", drawMouseMove);
+		$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+		$(".drawcanvas").on("touchmove.imathasdraw", drawMouseMove);
 		$(document).on("touchend.imathasdraw", drawMouseUp);
+		$(document).on("touchcancel.imathasdraw", drawMouseUp);
 	} else {
 		$(document).on("mousemove.imathasdraw", drawMouseMove);
 		$(document).on("mouseup.imathasdraw", drawMouseUp);
@@ -1243,9 +1244,11 @@ function drawMouseDown(ev) {
 
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
+			/*  not necessary
 			if( navigator.userAgent.match(/Android/i) ) {
-				//ev.preventDefault(); //prevent pinch-zoom too
+				ev.preventDefault(); //prevent pinch-zoom too
 			}
+			*/
 			if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 			if (drawlocky[curTarget]==1) {
 				mouseOff.y = targets[curTarget].imgheight/2;
@@ -1623,13 +1626,13 @@ function drawMouseUp(ev) {
 			hasTouch = false;
 			clearAllDrawListners();
 			$(document).on("mousemove.imathasdraw", drawMouseMove);
-			$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+			$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 			$(document).on("mousedown.imathasdraw", drawMouseDown);
 		}, 350);
 	} else {
 		clearAllDrawListners();
 		$(document).on("mousemove.imathasdraw", drawMouseMove);
-		$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+		$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 		$(document).on("mousedown.imathasdraw", drawMouseDown);
 	}
 }
@@ -1676,7 +1679,7 @@ function drawMouseMove(ev) {
 			return true;  //bypass when multitouching to prevent interference with pinch zoom
 		} else if (typeof ev != 'undefined') {
 			ev.preventDefault();
-		}
+		} 
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
@@ -1832,12 +1835,13 @@ function getPosition(e){
 
 function clearAllDrawListners() {
 	$(document).off("mousedown.imathasdraw").off("mousemove.imathasdraw").off("mouseup.imathasdraw");
-	$(document).off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw");
+	$(document).off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw").off("touchcancel.imathasdraw");
+	$(".drawcanvas").off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw").off("touchcancel.imathasdraw");
 }
 function initCanvases(k) {
 	clearAllDrawListners();
-	$(document).on("mousemove.imathasdraw", drawMouseMove);
-	$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+	$(".drawcanvas").on("mousemove.imathasdraw", drawMouseMove);
+	$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 	$(document).on("mousedown.imathasdraw", drawMouseDown);
 
 	try {
