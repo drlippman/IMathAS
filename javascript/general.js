@@ -372,12 +372,12 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			]
 			},
 			{title: "Font Size", items: [
-                                {title: '8pt', inline:'span', styles: { fontSize: '12px', 'font-size': '8px' } },
-                                {title: '10pt', inline:'span', styles: { fontSize: '12px', 'font-size': '10px' } },
-                                {title: '12pt', inline:'span', styles: { fontSize: '12px', 'font-size': '12px' } },
-                                {title: '14pt', inline:'span', styles: { fontSize: '12px', 'font-size': '14px' } },
-                                {title: '16pt', inline:'span', styles: { fontSize: '12px', 'font-size': '16px' } },
-                                {title: '20pt', inline:'span', styles: { fontSize: '12px', 'font-size': '20px' } }
+                                {title: 'x-small', inline:'span', styles: { fontSize: 'x-small', 'font-size': 'x-small' } },
+                                {title: 'small', inline:'span', styles: { fontSize: 'small', 'font-size': 'small' } },
+                                {title: 'medium', inline:'span', styles: { fontSize: 'medium', 'font-size': 'medium' } },
+                                {title: 'large', inline:'span', styles: { fontSize: 'large', 'font-size': 'large' } },
+                                {title: 'x-large', inline:'span', styles: { fontSize: 'x-large', 'font-size': 'x-large' } },
+                                {title: 'xx-large', inline:'span', styles: { fontSize: 'xx-large', 'font-size': 'xx-large' } }
                         ]
                 }]
         }
