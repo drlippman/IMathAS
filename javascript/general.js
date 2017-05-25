@@ -346,6 +346,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		paste_data_images: true,
 		default_link_target: "_blank",
 		browser_spellcheck: true,
+		branding: false,
 		resize: "both",
 		width: '100%',
 		content_style: "body {background-color: #ffffff !important;}",

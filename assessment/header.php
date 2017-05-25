@@ -187,11 +187,7 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var usingTinymceEditor = true;';
-	if (isset($sessiondata['coursetheme'])) {
-		echo 'var coursetheme = "'.$sessiondata['coursetheme'].'";';
-	} else {
-		echo 'var coursetheme = "'.$coursetheme.'";';
-	}
+	echo 'var coursetheme = "'.$coursetheme.'";';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		echo 'var filePickerCallBackFunc = filePickerCallBack;';
 	} else {
