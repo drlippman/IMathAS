@@ -55,7 +55,7 @@ $tinyMCECompressor->bundle();
 class TinyMCE_Compressor {
 	private $files, $settings;
 	private static $defaultSettings = array(
-		"plugins"    => "advlist,attach,autolink,image,charmap,anchor,searchreplace,code,link,textcolor,media,table,paste,asciimath,asciisvg,rollups",
+		"plugins"    => "lists,advlist,attach,autolink,image,charmap,anchor,searchreplace,code,link,textcolor,media,table,paste,asciimath,asciisvg,rollups",
 		"themes"     => "modern",
 		"languages"  => "",
 		"disk_cache" => false,
