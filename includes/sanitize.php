@@ -3,7 +3,7 @@
 class Sanitize
 {
 
-	const BLACKLISTED_FILENAMES = array(
+	private static $BLACKLISTED_FILENAMES = array(
 		'/^\./',
 		'/\.php$/',
 		'/\.php3$/',
@@ -44,7 +44,7 @@ class Sanitize
 	 */
 	public static function isFilenameBlacklisted($filenameToCheck)
 	{
-		foreach (self::BLACKLISTED_FILENAMES as $blacklistedFilename) {
+		foreach (self::$BLACKLISTED_FILENAMES as $blacklistedFilename) {
 			if (preg_match($blacklistedFilename, $filenameToCheck)) {
 				return true;
 			}
