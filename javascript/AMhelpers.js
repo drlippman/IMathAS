@@ -224,7 +224,7 @@ function calculate(inputId,outputId,format) {
 			  if (format.indexOf('scinot')!=-1) {
 			  	  evalstr = evalstr.replace("xx","*");
 			  }
-			  with (Math) var res = eval(mathjs(evalstr));
+			  var res = eval(prepWithMath(mathjs(evalstr)));
 		  } catch(e) {
 		  	  err = _("syntax incomplete")+'. '+err;
 		  	  res = NaN;
@@ -377,7 +377,7 @@ function intcalculate(inputId,outputId,format) {
 					  	if (format.indexOf('mixed')!=-1) {
 					  		toeval = toeval.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 					  	}
-					  	with (Math) var res = eval(mathjs(toeval));
+					  	var res = eval(prepWithMath(mathjs(toeval)));
 					  } catch(e) {
 					  	err = _("syntax incomplete")+". ";
 					  }
@@ -512,7 +512,7 @@ function ntuplecalc(inputId,outputId,format) {
 					if (format.indexOf('mixed')!=-1) {
 						sub = sub.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 					}
-					with (Math) var res = eval(mathjs(sub));
+					var res = eval(prepWithMath(mathjs(sub)));
 				} catch(e) {
 					err += _("syntax incomplete")+". ";
 				}
@@ -585,8 +585,8 @@ function complexcalc(inputId,outputId,format) {
 			}
 			err += syntaxcheckexpr(arr[cnt], format);
 			try {
-			    with (Math) var real = scopedeval('var i=0;'+prep);
-			    with (Math) var imag = scopedeval('var i=1;'+prep);
+			    var real = scopedeval('var i=0;'+prepWithMath(prep));
+			    var imag = scopedeval('var i=1;'+prepWithMath(prep));
 			} catch(e) {
 			    err += _("syntax incomplete");
 			}
@@ -743,7 +743,7 @@ function matrixcalc(inputId,outputId,rows,cols) {
 	function calced(estr) {
 		var err='';
 		try {
-			with (Math) var res = eval(mathjs(estr));
+			var res = eval(prepWithMath(mathjs(estr)));
 		} catch(e) {
 			err = _("syntax incomplete");
 		}
@@ -961,7 +961,7 @@ function AMpreview(inputId,outputId) {
   }
   vars = vl.split('|');
 
-  var totesteqn = mathjs(str,vl);
+  var totesteqn = prepWithMath(mathjs(str,vl));
 
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
@@ -973,7 +973,7 @@ function AMpreview(inputId,outputId) {
 	  totest += totesteqn;
 	  err =_("syntax ok");
 	  try {
-	    with (Math) var res = scopedeval(totest);
+	    var res = scopedeval(totest);
 	  } catch(e) {
 	    err = _("syntax error");
 	  }
@@ -1187,7 +1187,7 @@ function doonsubmit(form,type2,skipconfirm) {
 							  	  if (calcformat[qn].indexOf('mixed')!=-1) {
 							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 							  	  }
-							  	  with (Math) var res = eval(mathjs(vals[j]));
+							  	  var res = eval(prepWithMath(mathjs(vals[j])));
 							  } catch(e) {
 							  	  err = "syntax incomplete";
 							  }
@@ -1249,7 +1249,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				var res = str.toUpperCase();
 			} else {
 				try {
-					with (Math) var res = eval(mathjs(str));
+					var res = eval(prepWithMath(mathjs(str)));
 				} catch(e) {
 					var res = '';
 				}
@@ -1318,10 +1318,10 @@ function doonsubmit(form,type2,skipconfirm) {
 			if (nh.value=='') {
 				totest += Math.random()+";";
 			} else {
-				totest += nh.value+";";
+				totest += prepWithMath(nh.value)+";";
 			}
 			try {
-				with (Math) vals[fj] = scopedeval(totest);
+				vals[fj] = scopedeval(totest);
 			} catch (e) {
 				vals[fj] = NaN;
 			}
@@ -1337,7 +1337,7 @@ function doonsubmit(form,type2,skipconfirm) {
 function scopedeval(c) {
 	var res;
 	try {
-		with (Math) res = eval(c);
+		res = eval(c);
 		return res;
 	} catch(e) {
 		return "synerr";
@@ -2094,5 +2094,11 @@ function togglemainintroshow(el) {
 		$("#intro").addClass("hidden").attr("aria-hidden",true).attr("aria-expanded",false);
 		$(el).html(_("Show Intro/Instructions")).attr("aria-expanded",false);
 	}
+}
+
+function prepWithMath(str) {
+	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
+	str = str.replace(/\((E|PI)\)/,'(Math.$1)');
+	return str;
 }
 

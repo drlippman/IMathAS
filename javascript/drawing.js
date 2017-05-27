@@ -299,12 +299,12 @@ function encodea11ydraw() {
 			var outpts = [];
 			for (var i=1;i<input.length;i+=2) {
 				try {
-					with (Math) input[i-1] = eval(mathjs(input[i-1]));
+					input[i-1] = eval(prepWithMath(mathjs(input[i-1])));
 				} catch(e) {
 					input[i-1] = NaN;
 				}
 				try {
-					with (Math) input[i] = eval(mathjs(input[i]));
+					input[i] = eval(prepWithMath(mathjs(input[i])));
 				} catch(e) {
 					input[i] = NaN;
 				}
