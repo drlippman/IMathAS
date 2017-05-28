@@ -183,6 +183,9 @@ class TinyMCE_Compressor {
 		if (substr_count($content,"\n")>5) {
 			$content = minify($content);
 			echo "Minifying $file<br/>";
+			if (trim($content)=='') {
+				echo "Error with minification<br/>";
+			}
 		} else {
 			echo "Adding $file<br/>";
 		}
