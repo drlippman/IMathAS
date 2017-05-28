@@ -40,11 +40,14 @@ function mbxfilter($str) {
 	$str = preg_replace('#</?div[^>]*>#','',$str);
 	//strip scripts - don't want to see insides left behind
 	$str = preg_replace('#<script.*?</script>\s*#s','',$str);
+	//force p in li
+	$str = str_replace(array('<li>','</li>'),array('<li><p>','</p></li>'),$str);
+	//if not editor-generated, wrap in <p> and rewrite double line breaks.
 	if (substr($str,0,2)!='<p') {
 		$str = '<p>'.$str.'</p>';
-		$str = str_replace('<br><br>','</p><p>',$str);
-		$str = str_replace(array('<br>','<br/>','<br />','<BR>','<BR/>','<BR />'),'</p><p>',$str);
 	}
+	$str = str_replace('<br><br>','</p><p>',$str);
+	$str = str_replace(array('<br>','<br/>','<br />','<BR>','<BR/>','<BR />'),'</p><p>',$str);
 	//make a stab at unwrapping tables up front
 	$str = str_replace(array('<table','</table>'), array('</p><table>','</table><p>'), $str);
 	
