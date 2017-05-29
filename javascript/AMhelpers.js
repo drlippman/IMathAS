@@ -2098,7 +2098,7 @@ function togglemainintroshow(el) {
 
 function prepWithMath(str) {
 	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
-	str = str.replace(/\((E|PI)\)/,'(Math.$1)');
+	str = str.replace(/\((E|PI)\)/g,'(Math.$1)');
 	return str;
 }
 
