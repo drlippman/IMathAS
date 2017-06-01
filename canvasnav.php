@@ -25,7 +25,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
       <lticm:property name="tool_id">resource_selection</lticm:property>
       <lticm:property name="privacy_level">public</lticm:property>
       <lticm:options name="course_navigation">
-        <lticm:property name="url"><?php echo $urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php';?></lticm:property>
+        <lticm:property name="url"><?php echo $GLOBALS['basesiteurl'] . '/bltilaunch.php';?></lticm:property>
         <lticm:property name="text"><?php echo htmlentities($installname) ?></lticm:property>
         <lticm:property name="enabled">true</lticm:property>
       </lticm:options>

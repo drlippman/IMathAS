@@ -12,7 +12,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= "&gt; Delete Link\n";
 $pagetitle = "Delete Link";
 
@@ -25,7 +25,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
 	if ($_GET['remove']=="really") {
@@ -105,7 +105,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		}
 		$DBH->commit();
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 		exit;
 	} else {
@@ -132,8 +132,8 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h3><?php echo $itemname; ?></h3>
 	Are you SURE you want to delete this link item?
-	<p><input type=button value="Yes, Delete" onClick="window.location='deletelinkedtext.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'"></p>
+	<p><input type=button value="Yes, Delete" onClick="window.location='deletelinkedtext.php?cid=<?php echo Sanitize::courseId($_GET['cid']) ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']) ?>'"></p>
 
 <?php
 }

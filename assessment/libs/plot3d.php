@@ -37,7 +37,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 	if (func_num_args()>14) {
 		$bounds = array_slice(func_get_args(),9,6);
 	}
-	
+
 	if (strpos($func,',')!==FALSE) {
 		$isparam = true;
 		$func = str_replace('[','',$func);
@@ -49,7 +49,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			$func[$k] = str_replace('(v)','($v)',$func[$k]);
 			$usefunc[$k] = create_function('$u,$v','return('.$func[$k].');');
 		}
-		
+
 	} else {
 		$isparam = false;
 		$func = mathphp($func,'x|y');
@@ -90,11 +90,11 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			  $faces .= (($i+1)*$disc+$j) . ',';
 			  $faces .= (($i+1)*$disc+$j+1) . ',';
 			  $faces .= ($i*$disc+$j+1);
-			 
+
 			  $count++;
 		  }
 	  }
-	  
+
 	  $useragent = $_SERVER['HTTP_USER_AGENT'];
 	  $oldschool = false;
 	  if (isset($GLOBALS['sessiondata']['useflash'])) {
@@ -104,7 +104,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			$oldschool =true;
 		}
 	  }
-	  
+
 	  if ($oldschool || isset($GLOBALS['sessiondata']['useflash'])) {
 	  	  if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
@@ -128,7 +128,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 		  } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
-		  } 
+		  }
 	  	  $GLOBALS['3dplotcnt'] = $r;
 	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
 	  	  if (isset($bounds)) {
@@ -140,8 +140,8 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>";
 	  	  $html .= "</canvas>";
 	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');});</script>";
-	  } 
-	/*	  
+	  }
+	/*
 	  } else {
 		  $html .= "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
 		  $html .= "<param name=\"verts\" value=\"$verts\">\n";
@@ -155,12 +155,12 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
 		  }
 		  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
-				 
+
 		  $html .= "</applet><br/>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>\n";
 	  }
 	  */
 	  return $html;
-	
+
 }
 
 //spacecurve("[x(t),y(t),z(t)]",tmin,tmax,[disc,width,height,axes,bounds])
@@ -194,7 +194,7 @@ function spacecurve($func,$tmin,$tmax) {
 	if (func_num_args()>12) {
 		$bounds = array_slice(func_get_args(),7,6);
 	}
-	
+
 	$useragent = $_SERVER['HTTP_USER_AGENT'];
 	$oldschool = false;
 	if (isset($GLOBALS['sessiondata']['useflash'])) {
@@ -204,7 +204,7 @@ function spacecurve($func,$tmin,$tmax) {
 			$oldschool =true;
 		}
 	}
-	
+
 	if ($oldschool) {
 
 		$func = str_replace('[','',$func);
@@ -219,7 +219,7 @@ function spacecurve($func,$tmin,$tmax) {
 			$func[$k] = str_replace('(t)','($t)',$func[$k]);
 			$usefunc[$k] = create_function('$u,$t','return('.$func[$k].');');
 		}
-		
+
 		$count = 0;
 		$dt = ($tmax-$tmin)/($disc-1);
 		for ($i=0; $i<4;$i++) {
@@ -227,12 +227,12 @@ function spacecurve($func,$tmin,$tmax) {
 				  if ($count > 0) { $verts .= '~';}
 				  $u = 1.571*$i;
 				  $t = $vmin+$dt*$j;
-				  
+
 				  $x = $usefunc[0]($u,$t);
 				  $y = $usefunc[1]($u,$t);
 				  $z = $usefunc[2]($u,$t);
 				  $verts .= "$x,$y,$z";
-				  
+
 				  $count++;
 			  }
 		  }
@@ -244,7 +244,7 @@ function spacecurve($func,$tmin,$tmax) {
 				  $faces .= (($i+1)*$disc+$j) . ',';
 				  $faces .= (($i+1)*$disc+$j+1) . ',';
 				  $faces .= ($i*$disc+$j+1);
-				 
+
 				  $count++;
 			  }
 		  }
@@ -265,7 +265,7 @@ function spacecurve($func,$tmin,$tmax) {
 		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
 		  $html .= '</script>';
 		  /*if (isset($GLOBALS['sessiondata']['useflash'])) {
-			  
+
 		  } else {
 			  $html = "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
 			  $html .= "<param name=\"verts\" value=\"$verts\">\n";
@@ -280,7 +280,7 @@ function spacecurve($func,$tmin,$tmax) {
 				  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
 			  }
 			  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
-					 
+
 			  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></applet>\n";
 		  } */
 	} else {
@@ -293,36 +293,36 @@ function spacecurve($func,$tmin,$tmax) {
 			$func[$k] = str_replace('(t)','($t)',$func[$k]);
 			$usefunc[$k] = create_function('$t','return('.$func[$k].');');
 		}
-		
+
 		$count = 0;
 		$dt = ($tmax-$tmin)/($disc-1);
 		for ($j=0;$j<$disc;$j++) {
 			  if ($count > 0) { $verts .= '~';}
 			  $t = $vmin+$dt*$j;
-			  
+
 			  $x = $usefunc[0]($t);
 			  $y = $usefunc[1]($t);
 			  $z = $usefunc[2]($t);
 			  $verts .= "$x,$y,$z";
-			  
+
 			  $count++;
 		 }
-		  
+
 	  	 if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
 			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 		 } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
-		 } 
+		 }
 	  	 $GLOBALS['3dplotcnt'] = $r;
 	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
-	  	 $url = $GLOBALS['urlmode']  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+	  	 $url = $GLOBALS['basesiteurl'] . '/assessment/libs/plot3d.php' . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
 		 $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a>";
 	  	 $html .= "</canvas>";
 	  	 $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');});</script>";
 	}
-	  
+
 	  return $html;
-	
+
 }
 ?>

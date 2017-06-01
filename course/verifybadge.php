@@ -1,6 +1,7 @@
 <?php
 
 require("../config.php");
+require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 if (empty($_GET['badgeid'])) {
@@ -123,7 +124,7 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 	} else {
 		$urlmode = 'http://';
 	}
-	$urlbase = $urlmode . $_SERVER['HTTP_HOST'];
+	$urlbase = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 	$salt = generateSalt();
 	$hash = 'sha256$'.hash('sha256', $email . $salt);
 
@@ -131,7 +132,7 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 	if ($bs=='http://' || $bs=='https:/') {
 		$img = $badgetext;
 	} else {
-		$img = "$imasroot/img/badge.php?text=".Sanitize::encodeStringForUrl($badgetext);
+		$img = "$imasroot/img/badge.php?text=".Sanitize::encodeUrlParam($badgetext);
 	}
 
 	/*$query = "SELECT imas_courses.name AS cname, imas_users.LastName, imas_users.FirstName, imas_users.email, imas_groups.name FROM imas_courses JOIN imas_teachers ON imas_courses.id=imas_teachers.courseid ";

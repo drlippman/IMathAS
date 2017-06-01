@@ -17,16 +17,16 @@ $from = $_GET['from'];
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=='modq') {
-	$fromstr = '&amp;from=modq&amp;aid='.$_GET['aid'].'&amp;qid='.$_GET['qid'];
-	$returnstr = 'modquestion.php?cid='.$cid.'&amp;aid='.$_GET['aid'].'&amp;id='.$_GET['qid'];
+	$fromstr = '&amp;from=modq&amp;aid='.Sanitize::onlyInt($_GET['aid']).'&amp;qid='.Sanitize::onlyInt($_GET['qid']);
+	$returnstr = 'modquestion.php?cid='.$cid.'&amp;aid='.Sanitize::onlyInt($_GET['aid']).'&amp;id='.Sanitize::onlyInt($_GET['qid']);
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Question Settings</a> ";
 } else if ($from=='addg') {
 	$fromstr = '&amp;from=addg&amp;gbitem='.$_GET['gbitem'];
 	$returnstr = 'addgrades.php?cid='.$cid.'&amp;gbitem='.$_GET['gbitem'].'&amp;grades=all';
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Offline Grades</a> ";
 } else if ($from=='addf') {
-	$fromstr = '&amp;from=addf&amp;fid='.$_GET['fid'];
-	$returnstr = 'addforum.php?cid='.$cid.'&amp;id='.$_GET['fid'];
+	$fromstr = '&amp;from=addf&amp;fid='.Sanitize::onlyInt($_GET['fid']);
+	$returnstr = 'addforum.php?cid='.$cid.'&amp;id='.Sanitize::onlyInt($_GET['fid']);
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Forum</a> ";
 }
 
@@ -83,7 +83,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':ownerid'=>$userid, ':name'=>$_POST['rubname'], ':rubrictype'=>$_POST['rubtype'], ':groupid'=>$rubgrp, ':rubric'=>$rubricstring));
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addrubric.php?cid=$cid$fromstr");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr");
 
 
 

@@ -3,7 +3,7 @@
 class Sanitize
 {
 
-	private static $BLACKLISTED_FILENAMES = array(
+	private static $blacklistedFilenames = array(
 		'/^\./',
 		'/\.php$/',
 		'/\.php3$/',
@@ -44,7 +44,8 @@ class Sanitize
 	 */
 	public static function isFilenameBlacklisted($filenameToCheck)
 	{
-		foreach (self::$BLACKLISTED_FILENAMES as $blacklistedFilename) {
+
+		foreach (self::$blacklistedFilenames as $blacklistedFilename) {
 			if (preg_match($blacklistedFilename, $filenameToCheck)) {
 				return true;
 			}
@@ -68,14 +69,12 @@ class Sanitize
 	}
 
 	/**
-	 * Encode a string for use in a URL to be clicked on.
-	 *
-	 * If a URL is to be displayed and NOT clicked on, use encodeStringForDisplay().
+	 * Encode a string for use in a URL to be clicked on. Use for query parameters only!
 	 *
 	 * @param $string string The string to encode.
 	 * @return string The encoded string.
 	 */
-	public static function encodeStringForUrl($string)
+	public static function encodeUrlParam($string)
 	{
 		return urlencode($string);
 	}
@@ -89,7 +88,8 @@ class Sanitize
 	 */
 	public static function fullUrl($string)
 	{
-		return filter_var($string, FILTER_SANITIZE_URL);
+		// Valid characters: https://www.ietf.org/rfc/rfc3986.txt
+		return preg_replace('/[^\da-z\._~:\/?#\[\]%@!$&\'()*+,;=-]/i', '', $string);
 	}
 
 	/**

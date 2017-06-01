@@ -120,7 +120,7 @@ require("../header.php");
 if ($overwritebody) {
 	echo $body;
 } else {
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo " &gt; Content Stats</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';

@@ -9,6 +9,8 @@ if (isset($_POST['dbserver'])) {
 	$contents = "<?php
 //IMathAS Math Config File.  Adjust settings here!
 
+require_once(__DIR__ . \"/includes/security.php\");
+
 //database access settings
 \$dbserver = \"{$_POST['dbserver']}\";
 \$dbname = \"{$_POST['dbname']}\";
@@ -49,6 +51,10 @@ $contents .= "';
 //path settings
 //web path to install
 \$imasroot = \"{$_POST['imasroot']}\";
+
+//base site url - use when generating full URLs to site pages.
+\$httpmode = isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://';
+\$basesiteurl = \$httpmode . Sanitize::domainNameWithPort(\$_SERVER['HTTP_HOST']) . \$imasroot;
 
 //mimetex path
 \$mathimgurl = \"{$_POST['mathimgurl']}\";

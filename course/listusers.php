@@ -11,7 +11,7 @@ require("../validate.php");
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['secfilter'])) {
 	$secfilter = $_GET['secfilter'];
 	$sessiondata[$cid.'secfilter'] = $secfilter;
@@ -76,7 +76,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm = $DBH->prepare("UPDATE imas_students SET section=:section,code=:code WHERE id=:id AND courseid=:courseid ");
 				$stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 			exit;
 
 		} else {
@@ -165,7 +165,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				//DB $query .= ") VALUES ($vals)";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 				exit;
 			}
 
@@ -229,7 +229,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
 
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 				exit;
 			}
 		}
@@ -440,7 +440,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE courseid=:courseid AND userid=:userid");
 		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid, ':userid'=>$_GET['uid']));
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
 	} elseif (isset($_GET['action']) && $_GET['action']=="unlockone" && is_numeric($_GET['uid'])) {
 		$now = time();
@@ -449,7 +449,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=0 WHERE courseid=:courseid AND userid=:userid");
 		$stm->execute(array(':courseid'=>$cid, ':userid'=>$_GET['uid']));
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
 	} else { //DEFAULT DATA MANIPULATION HERE
 
@@ -555,7 +555,7 @@ if ($fileToInclude==null || $fileToInclude=="") {
 $placeinhead .= "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgsecfilter() { ';
 $placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid";
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";
@@ -604,9 +604,9 @@ if ($overwriteBody==1) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 ?>
 			<tr>
-				<td><?php echo $line['LastName'] . ", " . $line['FirstName'] ?></td>
-				<td><input type=text name="sec[<?php echo $line['id'] ?>]" value="<?php echo $line['section'] ?>"/></td>
-				<td><input type=text name="code[<?php echo $line['id'] ?>]" value="<?php echo $line['code'] ?>"/></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></td>
+				<td><input type=text name="sec[<?php echo $line['id'] ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
+				<td><input type=text name="code[<?php echo $line['id'] ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['code']); ?>"/></td>
 			</tr>
 <?php
 		}
@@ -659,11 +659,11 @@ if ($overwriteBody==1) {
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
 			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"/><br class=form>
 			<span class=form><label for="firstname">Enter First Name:</label></span>
-			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo $lineStudent['FirstName'] ?>"/><br class=form>
+			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
 			<span class=form><label for="lastname">Enter Last Name:</label></span>
-			<input class=form type=text size=20 id=lastname name=lastname value="<?php echo $lineStudent['LastName'] ?>"/><BR class=form>
+			<input class=form type=text size=20 id=lastname name=lastname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['LastName']); ?>"/><BR class=form>
 			<span class=form><label for="email">Enter E-mail address:</label></span>
-			<input class=form type=text size=60 id=email name=email value="<?php echo $lineStudent['email'] ?>"/><BR class=form>
+			<input class=form type=text size=60 id=email name=email value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['email']); ?>"/><BR class=form>
 			<span class=form><label for="stupic">Picture:</label></span>
 			<span class="formright">
 			<?php

@@ -56,7 +56,7 @@ if ($cid==0) {
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid");
 			$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">View Wiki</a>";
@@ -78,7 +78,7 @@ if ($cid==0) {
 				$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid AND id<:curid");
 				$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':curid'=>$curid));
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">View Wiki</a>";
@@ -116,7 +116,7 @@ if ($cid==0) {
 				$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid AND id>:id");
 				$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':id'=>$revision));
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id$framed");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id$framed");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">View Wiki</a>";
@@ -276,11 +276,11 @@ if ($cid==0) {
 
  /******* begin html output ********/
  $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/viewwiki.js?v=051710"></script>';
- $addr = $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/wikirev.php?cid='.$cid.'&id='.$id.$framed;
+ $addr = $GLOBALS['basesiteurl'] . '/wikis/wikirev.php?cid=' . $cid . '&id=' . $id . $framed;
  if ($isgroup) {
 	 $addr .= '&grp='.$groupid;
  }
- $addr2 = $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/viewwiki.php?revert=ask&cid='.$cid.'&id='.$id.$framed;
+ $addr2 = $GLOBALS['basesiteurl'] . '/wikis/viewwiki.php?revert=ask&cid=' . $cid . '&id=' . $id . $framed;
  if ($isgroup) {
 	 $addr2 .= '&grp='.$groupid;
  }
@@ -330,8 +330,8 @@ if ($overwriteBody==1) {
 		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=true$framed'\">Yes, I'm Sure</button> | ";
 		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
 	} else if (isset($_GET['revert'])) {
-		$torev = $_GET['torev'];
-		$disprev = $_GET['disprev'];
+		$torev = intval($_GET['torev']);
+        $disprev = Sanitize::onlyInt($_GET['disprev']);
 		echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
 
 		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&torev=$torev&revert=true$framed'\">Yes, I'm Sure</button> | ";

@@ -18,7 +18,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Copy Course Items";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Copy Course Items";
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
@@ -124,7 +124,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 			exit;
 		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 			if ($_POST['whattocopy']=='all') {
@@ -479,7 +479,7 @@ if (!(isset($teacherid))) {
 					$calitems[] = $row;
 				}
 			} else {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
 				exit;
 			}
@@ -642,7 +642,7 @@ $placeinhead .= '<script type="text/javascript">
 			$("#selectitemstocopy").hide();$("#allitemsnote").show();
 		} else {
 			$("#selectitemstocopy").show();$("#allitemsnote").hide();
-		} 
+		}
 	}
 	function copyitemsonsubmit() {
 		if (!document.getElementById("whattocopy1").checked && !document.getElementById("whattocopy2").checked) {
@@ -739,14 +739,14 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
 	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
-	<p>What to copy: 
+	<p>What to copy:
 	<?php
 		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.$_POST['ctc'].'">Preview source course</a>';}
 	?>
 	<br/>
 	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>
 	<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"> <label for=whattocopy2>Select items to copy</label></p>
-	
+
 	<div id="allitemsnote" style="display:none;">
 	<p><input type=checkbox name="copyofflinewhole"  value="1"/> Copy offline grade items </p>
 	<p>Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.
@@ -890,7 +890,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 						<span class=btn id="b<?php echo $line['userid'] ?>">+</span>
 					</span>
 					<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-						<span id="n<?php echo $line['userid'] ?>" ><?php echo $line['LastName'] . ", " . $line['FirstName'] . "\n" ?>
+						<span id="n<?php echo $line['userid'] ?>" ><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
 						</span>
 					</span>
 					<a href="mailto:<?php echo $line['email'] ?>">Email</a>
@@ -1010,7 +1010,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 							<span class=btn id="b<?php echo $line['userid'] ?>">+</span>
 						</span>
 						<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-							<span id="n<?php echo $line['userid'] ?>"><?php echo $line['LastName'] . ", " . $line['FirstName'] . "\n" ?>
+							<span id="n<?php echo $line['userid'] ?>"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
 							</span>
 						</span>
 						<a href="mailto:<?php echo $line['email'] ?>">Email</a>

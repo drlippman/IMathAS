@@ -2,7 +2,7 @@
 //IMathAS:  New threads list for a course
 //(c) 2006 David Lippman
 require("../validate.php");
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'];
 /*
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_posts.threadid,max(imas_forum_posts.postdate) as lastpost,mfv.lastview,count(imas_forum_posts.id) as pcount FROM imas_forum_posts ";
@@ -108,9 +108,9 @@ if (isset($_GET['markallread'])) {
     }
   }
   if ($from=='home') {
-    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
   } else {
-    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../course/course.php?cid=$cid");
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
   }
   exit;
 }
@@ -145,8 +145,8 @@ if (count($lastpost)>0) {
     }
     if ($alt==0) {$stripe = "even"; $alt=1;} else {$stripe = "odd"; $alt=0;}
     echo '<tr>';
-    echo "<td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">{$line['subject']}</a></td>";
-    echo "<td>$name</td>";
+    echo "<td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
+    printf("<td>%s</td>", Sanitize::encodeStringForDisplay($name));
     echo "<td><a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></td>';
     echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
   }

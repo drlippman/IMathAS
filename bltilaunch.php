@@ -88,11 +88,11 @@ if (isset($_GET['launch'])) {
 	}
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
-	
+
 	if (isset($_POST['tzname'])) {
 		$sessiondata['logintzname'] = $_POST['tzname'];
 	}
-	
+
 	require_once("$curdir/includes/userprefs.php");
 	generateuserprefs();
 
@@ -130,18 +130,18 @@ if (isset($_GET['launch'])) {
 			$stm = $DBH->prepare('INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES (:userid,:courseid,\'assesslti\',:typeid,:viewtime,\'\')');
 			$stm->execute(array(':userid'=>$userid,':courseid'=>$cid,':typeid'=>$aid,':viewtime'=>$now));
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
 		$cid = $sessiondata['ltiitemid'];
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	} else if ($sessiondata['ltiitemtype']==2) {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/index.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 	} else if ($sessiondata['ltiitemtype']==3) {
 		$cid = $sessiondata['ltiitemid'][2];
 		$folder = $sessiondata['ltiitemid'][1];
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=$cid&folder=".$folder);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&folder=".$folder);
 	} else { //will only be instructors hitting this option
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/ltihome.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
 	exit;
 } else if (isset($_GET['accessibility'])) {
@@ -181,7 +181,7 @@ if (isset($_GET['launch'])) {
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
 			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
-			<?php 
+			<?php
 			if ($sessiondata['ltiitemtype']!=0 || $sessiondata['ltitlwrds'] == '') {
 				//auto submit the form
 				echo 'document.getElementById("postbackform").submit();';
@@ -461,7 +461,7 @@ if (isset($_GET['launch'])) {
 		if ($loc=='') {
 			reporterror("invalid folder identifier in folder view launch");
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/public.php?cid=".$linkparts[0]."&folder=".$loc);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/public.php?cid=".$linkparts[0]."&folder=".$loc);
 	}
 	exit;
 
@@ -680,7 +680,7 @@ if ($askforuserinfo == true) {
 	if (!empty($_REQUEST['tool_consumer_instance_description'])) {
 		$_SESSION['ltiorgname'] = $_REQUEST['tool_consumer_instance_description'];
 	}
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . "?userinfo=ask");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?userinfo=ask");
 	exit;
 
 }
@@ -1182,7 +1182,7 @@ if ($linkparts[0]=='cid') {
 		$useexception = false;
 		if ($row!=null) {
 			require_once("./includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($row, $line, true);	
+			$useexception = getCanUseAssessException($row, $line, true);
 		}
 		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -1446,17 +1446,17 @@ if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwr
 			$stm = $DBH->prepare("INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES (:userid, :courseid, :type, :typeid, :viewtime, :info)");
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 	} else if ($linkparts[0]=='cid') { //is cid
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	} else if ($linkparts[0]=='folder') {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?checksess=true&cid=$cid&folder=".$linkparts[3]);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?checksess=true&cid=$cid&folder=".$linkparts[3]);
 	} else { //will only be instructors hitting this option
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/ltihome.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
 	exit;
 } else {
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . "?accessibility=ask");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask");
 	exit;
 }
 
@@ -1483,11 +1483,11 @@ if (isset($_GET['launch'])) {
 	//DB list($enc,$userid) = mysql_fetch_row($result);
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
-	
+
 	if (isset($_POST['tzname'])) {
 		$sessiondata['logintzname'] = $_POST['tzname'];
 	}
-	
+
 	require_once("$curdir/includes/userprefs.php");
 	generateuserprefs();
 
@@ -1525,18 +1525,18 @@ if (isset($_GET['launch'])) {
 			$stm = $DBH->prepare("INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES (:userid, :courseid, :type, :typeid, :viewtime, :info)");
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid");
 	} else if ($sessiondata['ltiitemtype']==1) { //is cid
 		$cid = $sessiondata['ltiitemid'];
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	} else if ($sessiondata['ltiitemtype']==2) {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/index.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 	} else if ($sessiondata['ltiitemtype']==3) {
 		$cid = $sessiondata['ltiitemid'][2];
 		$folder = $sessiondata['ltiitemid'][1];
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=$cid&folder=".$folder);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&folder=".$folder);
 	} else { //will only be instructors hitting this option
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/ltihome.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
 	exit;
 } else if (isset($_GET['accessibility'])) {
@@ -1587,7 +1587,7 @@ if (isset($_GET['launch'])) {
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
 			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
-			<?php 
+			<?php
 			if ($sessiondata['ltiitemtype']!=0 || $sessiondata['ltitlwrds'] == '') {
 				//auto submit the form
 				echo 'document.getElementById("postbackform").submit();';
@@ -1786,10 +1786,10 @@ if (isset($_GET['launch'])) {
 			//give option to provide existing account info, or provide full new student info
 			if ($allow_acctcreation) {
 				echo "<p>If you already have an account on $installname, enter your username and ";
-				echo "password below to enable automated signon from $ltiorgname</p>";
+				echo "password below to enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
 			} else {
 				echo "<p>Enter your username and ";
-				echo "password for $installname below to enable automated signon from $ltiorgname</p>";
+				echo "password for $installname below to enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
 			}
 			echo "<span class=form><label for=\"curSID\">$loginprompt:</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
 			echo "<span class=form><label for=\"curPW\">Password:</label></span><input class=form type=password size=20 id=\"curPW\" name=\"curPW\"><BR class=form>\n";
@@ -1800,9 +1800,9 @@ if (isset($_GET['launch'])) {
 				echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 				echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 				echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
-				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"$deffirst\" size=20 id=firstnam name=firstname><BR class=form>\n";
-				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text value=\"$deflast\" size=20 id=lastname name=lastname><BR class=form>\n";
-				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"$defemail\" size=60 id=email name=email><BR class=form>\n";
+				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deffirst)."\" size=20 id=firstnam name=firstname><BR class=form>\n";
+				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deflast)."\" size=20 id=lastname name=lastname><BR class=form>\n";
+				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
 				echo "<div class=submit><input type=submit value='Create Account'></div>\n";
 			} else {
@@ -2090,7 +2090,7 @@ if ($askforuserinfo == true) {
 	if (!empty($_REQUEST['tool_consumer_instance_description'])) {
 		$_SESSION['ltiorgname'] = $_REQUEST['tool_consumer_instance_description'];
 	}
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . "?userinfo=ask");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?userinfo=ask");
 	exit;
 
 }
@@ -2334,7 +2334,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		$useexception = false;
 		if ($row!=null) {
 			require_once("./includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($row, $line, true);	
+			$useexception = getCanUseAssessException($row, $line, true);
 		}
 		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -2625,19 +2625,19 @@ if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsess
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 	} else if ($keyparts[0]=='cid') { //is cid
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	} else if ($keyparts[0]=='sso') {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/index.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 	} else if ($keyparts[0]=='folder') {
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/course/course.php?checksess=true&cid=$cid&folder=".$keyparts[3]);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?checksess=true&cid=$cid&folder=".$keyparts[3]);
 	} else { //will only be instructors hitting this option
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/ltihome.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/ltihome.php");
 	}
 	exit;
 } else {
-	header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . "?accessibility=ask");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask");
 	exit;
 }
 

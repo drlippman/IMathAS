@@ -15,13 +15,16 @@ function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLa
 	echo (isset($actions)) ? $actions : "" ;
 	echo ">\n";
 	if (isset($defaultLabel) && isset($defaultVal)) {
-		echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
+		printf("		<option value=\"%s\" selected>%s</option>\n", Sanitize::encodeStringForDisplay($defaultVal),
+            Sanitize::encodeStringForDisplay($defaultLabel));
 	}
 	for ($i=0;$i<count($valList);$i++) {
 		if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
-			echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
+			printf("		<option value=\"%s\" selected>%s</option>\n",
+                Sanitize::encodeStringForDisplay($valList[$i]), Sanitize::encodeStringForDisplay($labelList[$i]));
 		} else {
-			echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
+			printf("		<option value=\"%s\">%s</option>\n",
+                Sanitize::encodeStringForDisplay($valList[$i]), Sanitize::encodeStringForDisplay($labelList[$i]));
 		}
 	}
 	echo "</select>\n";
@@ -64,7 +67,7 @@ if (!(isset($teacherid))) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $basedate = mysql_result($result,0,intval($_POST['base']));
 		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['aid']));
+		$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['aid'])));
 		$basedate = $stm->fetchColumn(intval($_POST['base']));
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$_POST['sdate'],$dmatches);
 		$newstamp = mktime(date('G',$basedate),date('i',$basedate),0,$dmatches[1],$dmatches[2],$dmatches[3]);
@@ -137,11 +140,12 @@ if (!(isset($teacherid))) {
 		$stm = $DBH->prepare("UPDATE imas_calitems SET date=date+:shift WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid, ':shift'=>$shift));
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
+		$curBreadcrumb = sprintf("%s <a href=\"course.php?cid=%s\">%s</a>", $breadcrumbbase, $cid,
+            Sanitize::encodeStringForDisplay($coursename));
 		$curBreadcrumb .= " &gt; Shift Course Dates ";
 
 		$sdate = tzdate("m/d/Y",time());

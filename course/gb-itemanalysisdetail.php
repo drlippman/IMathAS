@@ -9,8 +9,8 @@ require("../header.php");
 
 
 $isteacher = isset($teacherid);
-$cid = $_GET['cid'];
-$aid = $_GET['aid'];
+$cid = Sanitize::courseId($_GET['cid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 $qid = $_GET['qid'];
 $type = $_GET['type'];
 if (!$isteacher) {

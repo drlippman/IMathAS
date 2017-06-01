@@ -93,7 +93,7 @@ $parms['resource_link_id'] = $cid.'-'.$_GET['linkid'];
 if ($points>0 && isset($studentid) && !isset($sessiondata['stuview'])) {
 	$sig = sha1($gradesecret.'::'.$parms['resource_link_id'].'::'.$userid);
 	$parms['lis_result_sourcedid'] = $sig.'::'.$parms['resource_link_id'].'::'.$userid;
-	$parms['lis_outcome_service_url'] = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/admin/ltioutcomeservice.php';
+	$parms['lis_outcome_service_url'] = $GLOBALS['basesiteurl'] . '/admin/ltioutcomeservice.php';
 }
 
 $parms['resource_link_title'] = $title;
@@ -111,12 +111,12 @@ if ($_GET['target']=='new') {
 	$parms['launch_presentation_height'] = '500';
 	$parms['launch_presentation_width'] = '600';
 }
-$parms['launch_presentation_return_url'] = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid=' . $cid;
+$parms['launch_presentation_return_url'] = $GLOBALS['basesiteurl'] . '/course/course.php?cid=' . $cid;
 
 if (isset($CFG['GEN']['LTIorgid'])) {
 	$org_id = $CFG['GEN']['LTIorgid'];
 } else {
-	$org_id = $_SERVER['HTTP_HOST'];
+	$org_id = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 }
 
 $org_desc = $installname;

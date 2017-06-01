@@ -1,13 +1,14 @@
 <?php
 	$dbsetup = true; //to prevent database connection
 	require("../../config.php");
+	require_once(__DIR__ . "/../../includes/sanitize.php");
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
 	 } else {
 		 $urlmode = 'http://';
 	 }
 	$imgdir = 'imgs/'; //relative to current dir
-	$host  = $_SERVER['HTTP_HOST'];
+	$host  = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 	$uri  = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 	if (isset($_GET['script']) && trim($_GET['script']!='')) {
 		//DB $_GET['script'] = stripslashes($_GET['script']);

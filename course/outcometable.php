@@ -524,7 +524,8 @@ function outcometable() {
 		$catposscur[$ln] = array();
 
 		//Student ID info
-		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
+		$gb[$ln][0][0] = sprintf("%s,&nbsp;%s", Sanitize::encodeStringForDisplay($line['LastName']),
+			Sanitize::encodeStringForDisplay($line['FirstName']));
 		$gb[$ln][0][1] = $line['id'];
 		$gb[$ln][0][2] = $line['locked'];
 

@@ -28,7 +28,7 @@ if ($myrights<20) {
 	$body = "Please access this page from the menu links only.";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if ($cid=='admin') {
 		if ($myrights >74 && $myrights<100) {
 			$isgrpadmin = true;
@@ -123,7 +123,7 @@ if ($myrights<20) {
 				}
 
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
 			exit;
 		} else {
@@ -173,7 +173,7 @@ if ($myrights<20) {
 				}
 
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
 			exit;
 		} else {
@@ -436,7 +436,7 @@ if ($myrights<20) {
 */
 
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
 			exit;
 		} else {
@@ -563,7 +563,7 @@ if ($myrights<20) {
 				}
 
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
 			exit;
 		} else {
@@ -637,7 +637,7 @@ if ($myrights<20) {
 					}
 				}
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
 			exit;
 		} else {
@@ -689,7 +689,7 @@ if ($myrights<20) {
         }
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 			exit;
 		} else {
 			$pagetitle = "Change Question Rights";
@@ -722,7 +722,7 @@ if ($myrights<20) {
 					$stm->execute(array(':id'=>$_GET['remove']));
 					//$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
 				} else {
-					header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+					header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 					exit;
 				}
 
@@ -748,7 +748,7 @@ if ($myrights<20) {
 				//delqimgs($_GET['remove']);
 			}
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
 			exit;
 		} else {
@@ -786,7 +786,7 @@ if ($myrights<20) {
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 			exit;
 		} else {
 			$pagetitle = "Transfer Ownership";
@@ -1150,7 +1150,7 @@ if ($myrights<20) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".$urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';";
+$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '" . $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';";
 $placeinhead .= '$(function(){$(".wlf").attr("title","'.('Flag a question if it is in the wrong library').'");});</script>';
 if ($_POST['chglib']) {
 	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/course/libtree.css" type="text/css" />';
@@ -1158,7 +1158,7 @@ if ($_POST['chglib']) {
 }
 require("../header.php");
 
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+$address = $GLOBALS['basesiteurl'] . '/course';
 
 if ($overwriteBody==1) {
 	echo $body;

@@ -186,7 +186,7 @@ if ($cid==0) {
 
 			}
 			if (!$inconflict) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
 				exit;
 			}
 
@@ -253,7 +253,7 @@ if ($inconflict) {
 <?php
 }
 if (isset($lasteditedby)) {
-	echo "<p>Last Edited by $lasteditedby on $lastedittime</p>";
+	printf("<p>Last Edited by %s on %s</p>", Sanitize::encodeStringForDisplay($lasteditedby), $lastedittime);
 }
 ?>
 	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo $id;?>&grp=<?php echo $groupid.$framed;?>">

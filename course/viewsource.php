@@ -2,7 +2,7 @@
 //IMathAS:  Modify a question's code
 //(c) 2006 David Lippman
 	require("../validate.php");
-	
+
 
 	$pagetitle = "Question Source";
 	require("../header.php");
@@ -11,22 +11,23 @@
 		require("../footer.php");
 		exit;
 	}
+	$cid = Sanitize::courseId($_GET['cid']);
 	$isadmin = false;
 	if (isset($_GET['aid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; View Source</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">Add/Remove Questions</a> &gt; View Source</div>";
 
 	} else if (isset($_GET['daid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; View Source</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid=$cid\">Add Drill Assessment</a> &gt; View Source</div>";
 	} else {
 		if ($_GET['cid']=="admin") {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; View Source</div>\n";
 			$isadmin = true;
 		} else {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
-			echo "&gt; <a href=\"manageqset.php?cid={$_GET['cid']}\">Manage Question Set</a> &gt; View Source</div>\n";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
+			echo "&gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; View Source</div>\n";
 		}
 
 	}
@@ -57,9 +58,9 @@
 
 
 	if (!isset($_GET['aid'])) {
-		echo "<a href=\"manageqset.php?cid={$_GET['cid']}\">Return to Question Set Management</a>\n";
+		echo "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 	} else {
-		echo "<a href=\"addquestions.php?cid={$_GET['cid']}&aid={$_GET['aid']}\">Return to Assessment</a>\n";
+		echo "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 	}
 	require("../footer.php");
 ?>

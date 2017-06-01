@@ -13,8 +13,8 @@ $overwriteBody = 0;
 $body = "";
 $useeditor = "description,postinstr,replyinstr";
 
-
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Forum\n";
@@ -250,7 +250,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES (:forumid, :userid)");
 			$stm->execute(array(':forumid'=>$newforumid, ':userid'=>$userid));
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
@@ -340,9 +340,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		list($posttag,$replytag) = explode('--',$line['caltag']);
 
-		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
-		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
-		$page_formActionTag .= "&tb=$totb";
+		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
+		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::encodeUrlParam($_GET['id']) : "";
+		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
 		$hr = floor($coursedeftime/60)%12;
 		$min = $coursedeftime%60;
@@ -517,13 +517,13 @@ if ($overwriteBody==1) {
 
 	<form method=post action="addforum.php<?php echo $page_formActionTag ?>">
 		<span class=form>Name: </span>
-		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span>
+		<span class=formright><input type=text size=60 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']);?>"></span>
 		<BR class=form>
 
 		Description:<BR>
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
-		<?php echo htmlentities($line['description']);?></textarea>
+		<?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>
 		</div><br/>
 
 		<?php if ($line['postinstr']=='' && $line['replyinstr']=='') {
@@ -534,12 +534,12 @@ if ($overwriteBody==1) {
 		Posting Instructions: <em>Displays on Add New Thread</em><br/>
 		<div class=editor>
 		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%">
-		<?php echo htmlentities($line['postinstr']);?></textarea>
+		<?php echo Sanitize::encodeStringForDisplay($line['postinstr']);?></textarea>
 		</div><br/>
 		Reply Instructions: <em>Displays on Add Reply</em><br/>
 		<div class=editor>
 		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%">
-		<?php echo htmlentities($line['replyinstr']);?></textarea>
+		<?php echo Sanitize::encodeStringForDisplay($line['replyinstr']);?></textarea>
 		</div>
 		<?php if ($line['postinstr']=='' && $line['replyinstr']=='') {
 			echo '</div></div>';
@@ -644,10 +644,10 @@ if ($overwriteBody==1) {
 			<input type=radio name="replyby" value="Always" <?php if ($replyby==2000000000) { echo "checked=1";}?>/>Always<br/>
 			<input type=radio name="replyby" value="Never" <?php if ($replyby==0) { echo "checked=1";}?>/>Never<br/>
 			<input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before:
-			<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>">
+			<input type=text size=10 name="replybydate" value="<?php echo Sanitize::encodeStringForDisplay($replybydate);?>">
 			<a href="#" onClick="displayDatePicker('replybydate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
-			at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
+			at <input type=text size=10 name=replybytime value="<?php echo Sanitize::encodeStringForDisplay($replybytime);?>">
 		</span><br class="form" />
 
 		<span class=form>Allow use of LatePasses?: </span>
@@ -662,8 +662,8 @@ if ($overwriteBody==1) {
 
 		<span class="form">Calendar icon:</span>
 		<span class="formright">
-			New Threads: <input name="caltagpost" type=text size=8 value="<?php echo $posttag;?>"/>,
-			Replies: <input name="caltagreply" type=text size=8 value="<?php echo $replytag;?>"/>
+			New Threads: <input name="caltagpost" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($posttag);?>"/>,
+			Replies: <input name="caltagreply" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($replytag);?>"/>
 		</span><br class="form" />
 
 
@@ -677,7 +677,7 @@ if ($overwriteBody==1) {
 		<div id="gbdetail" <?php if ($cntingb==0 && $points==0) { echo 'style="display:none;"';}?>>
 		<span class="form">Points:</span>
 		<span class="formright">
-			<input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+			<input type=text size=4 name="points" value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/> points
 		</span><br class="form"/>
 		<span class=form>Gradebook Category:</span>
 			<span class=formright>
@@ -696,8 +696,8 @@ if ($overwriteBody==1) {
 		<span class=form>Use Scoring Rubric</span><span class=formright>
 <?php
     writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
-    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addf&amp;fid={$_GET['id']}\">Add new rubric</a> ";
-    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid={$_GET['id']}\">Edit rubrics</a> ";
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'])."\">Add new rubric</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid=".Sanitize::encodeUrlParam($_GET['id'])."\">Edit rubrics</a> ";
 ?>
     		</span><br class="form"/>
 <?php

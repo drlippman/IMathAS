@@ -9,7 +9,7 @@ require("../validate.php");
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Inline Text";
@@ -23,7 +23,7 @@ if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 	if ($_GET['remove']=="really") {
 		require("../includes/filehandler.php");
@@ -92,7 +92,7 @@ if (!(isset($teacherid))) {
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		}
 		$DBH->commit();
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 		exit;
 	} else {
 		//DB $query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";

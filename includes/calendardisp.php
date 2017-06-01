@@ -1,12 +1,13 @@
 <?php
+$cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_GET['calstart'])) {
-	setcookie("calstart".$_GET['cid'], $_GET['calstart']);
-	$_COOKIE["calstart".$_GET['cid']] = $_GET['calstart'];
+	setcookie("calstart".$cid, $_GET['calstart']);
+	$_COOKIE["calstart".$cid] = $_GET['calstart'];
 }
 if (isset($_GET['callength'])) {
-	setcookie("callength".$_GET['cid'], $_GET['callength']);
-	$_COOKIE["callength".$_GET['cid']] = $_GET['callength'];
+	setcookie("callength".$cid, $_GET['callength']);
+	$_COOKIE["callength".$cid] = $_GET['callength'];
 }
 
 require_once("filehandler.php");
@@ -80,7 +81,7 @@ for ($i=0;$i<7*$callength;$i++) {
 
 <?php
 //echo '<div class="floatleft">Jump to <a href="'.$refpage.'.php?calpageshift=0&cid='.$cid.'">Now</a></div>';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$refpage.php?cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/includes/$refpage.php?cid=$cid";
 
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
 echo '<div class="floatright"><span class="calupdatenotice red"></span> Show <select id="callength" onchange="changecallength(this)">';
@@ -132,7 +133,7 @@ $bestscores_stm = null;
 $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-	$canundolatepass = false; 
+	$canundolatepass = false;
 	$canuselatepass = false;
 	if (!$havecalcedviewedassess && $row['allowlate']>0) {
 		$havecalcedviewedassess = true;
@@ -148,7 +149,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	}
 	require_once("exceptionfuncs.php");
 	if (isset($exceptions[$row['id']])) {
-		list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptions[$row['id']], $row); 
+		list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptions[$row['id']], $row);
 		if ($useexception) {
 			$row['startdate'] = $exceptions[$row['id']][0];
 			$row['enddate'] = $exceptions[$row['id']][1];

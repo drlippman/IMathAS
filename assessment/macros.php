@@ -2224,7 +2224,7 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 			return '<span class="link" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		} else if ($type=='button') {
 			if (substr($content,0,31)=='http://www.youtube.com/watch?v=') {
-				$content = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".Sanitize::encodeStringForUrl($content);
+				$content = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=".Sanitize::encodeUrlParam($content);
 				$width = 660;
 				$height = 525;
 			}
@@ -2753,7 +2753,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	} else if ($i<20) { //broke out early
 		return false;
 	}
-	
+
 	if (abs($cntnana - $cntnanb)>1) {
 		return false;
 	}

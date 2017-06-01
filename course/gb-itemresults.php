@@ -17,7 +17,7 @@ if (!isset($teacherid) && !isset($tutorid)) {
 }
 
 $cid = intval($_GET['cid']);
-$aid = intval($_GET['aid']); //imas_assessments id
+$aid = Sanitize::onlyInt($_GET['aid']); //imas_assessments id
 $att = $_GET['att'];
 
 
@@ -131,7 +131,7 @@ $placeinhead = ' <style type="text/css">
 }
 </style>';
 require("../assessment/header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
 echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Results: ';

@@ -36,8 +36,8 @@ if ($overwriteBody==1) {
 	echo $body;
 } else {
 
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (isset($_POST['vert'])) {
 		$ph = 11 - $_POST['vert'];
 		$pw = 8.5 - $_POST['horiz'];
@@ -113,7 +113,7 @@ if ($overwriteBody==1) {
 		}
 		$qn[$row[0]] = $row[2];
 		if ($row[3]!==null && $row[3]!='') {
-			$fixedseeds[$row[0]] = explode(',',$row[3]);	
+			$fixedseeds[$row[0]] = explode(',',$row[3]);
 		}
 	}
 
@@ -413,8 +413,8 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($isfinal) {
-		$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
-		echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::encodeStringForUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
+		$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
+		echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::fullUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
 		echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 	}
 	echo "</form>\n";

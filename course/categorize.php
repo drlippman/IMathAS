@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 	require("../validate.php");
-	
+
 
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -24,7 +24,7 @@
 				$upd_stm->execute(array(':category'=>$_POST[$row[0]], ':id'=>$row[0]));
 			}
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 
 		exit;
 	}

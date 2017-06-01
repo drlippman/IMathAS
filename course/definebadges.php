@@ -8,7 +8,7 @@ if (!isset($teacherid)) {
 	exit;
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (empty($_GET['badgeid'])) {
 	require("../header.php");
@@ -57,7 +57,7 @@ if (empty($_GET['badgeid'])) {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_badgerecords WHERE badgeid=:badgeid");
 		$stm->execute(array(':badgeid'=>$badgeid));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/definebadges.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/definebadges.php?cid=$cid");
 		exit;
 	}
 	if (!empty($_POST['badgename'])) { //postback
@@ -89,7 +89,7 @@ if (empty($_GET['badgeid'])) {
 			$stm = $DBH->prepare("UPDATE imas_badgesettings SET name=:name,badgetext=:badgetext,description=:description, longdescription=:longdescription, requirements=:requirements WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':name'=>$badgename, ':badgetext'=>$badgetext, ':description'=>$descr, ':longdescription'=>$longdescr, ':requirements'=>$req, ':id'=>$badgeid, ':courseid'=>$cid));
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/definebadges.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/definebadges.php?cid=$cid");
 		exit;
 
 	} else {  // create form

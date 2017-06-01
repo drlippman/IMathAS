@@ -5,7 +5,7 @@
 require("../validate.php");
 
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['secfilter'])) {
 	$secfilter = $_GET['secfilter'];
 	$sessiondata[$cid.'secfilter'] = $secfilter;

@@ -1,6 +1,7 @@
 <?php
 	require("../config.php");
 	require("../i18n/i18n.php");
+	require_once(__DIR__ . "/../includes/sanitize.php");
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
 	 } else {
@@ -34,13 +35,13 @@
 		}
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<li><a href=\"$imasroot/diag/index.php?id={$row[0]}\">{$row[1]}</a></li>";
+			echo "<li><a href=\"$imasroot/diag/index.php?id={$row[0]}\">".Sanitize::encodeStringForDisplay($row[1])."</a></li>";
 		}
 		echo "</ul></div>";
 		require("../footer.php");
 		exit;
 	}
-	$diagid = $_GET['id'];
+	$diagid = Sanitize::onlyInt($_GET['id']);
 
 	//DB $query = "SELECT * from imas_diags WHERE id='$diagid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -99,7 +100,7 @@
 		   setcookie(session_name(), '', time()-42000, '/');
 	   }
 	   session_destroy();
-	   header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php?id=$diagid");
+	   header('Location: ' . $GLOBALS['basesiteurl'] . "/diag/index.php?id=$diagid");
 	   exit;
 	}
 
@@ -157,7 +158,7 @@ if (isset($_POST['SID'])) {
 	}
 
 	if ($_POST['course']==-1) {
-		echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
+		echo "<html><body>", Sanitize::encodeStringForDisplay(sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name'])), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
 			exit;
 	}
 	$pws = explode(';',$line['pws']);
@@ -305,7 +306,8 @@ if (isset($_POST['SID'])) {
 			$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 			$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
+		    header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
+                Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
 			exit;
 
 		//} else {
@@ -350,7 +352,8 @@ if (isset($_POST['SID'])) {
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
+	header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
+        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
 	exit;
 }
 
@@ -401,19 +404,19 @@ function getteach() {
 
 </script>
 
-<span class=form><?php printf(_('Select your %s'), $line['sel1name']); ?></span><span class=formright>
+<span class=form><?php Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel1name'])); ?></span><span class=formright>
 <select name="course" id="course" onchange="getteach()">
-<option value="-1"><?php printf(_('Select a %s'), $line['sel1name']); ?></option>
+<option value="-1"><?php Sanitize::encodeStringForDisplay(sprintf(_('Select a %s'), $line['sel1name'])); ?></option>
 <?php
 for ($i=0;$i<count($sel1);$i++) {
-	echo "<option value=\"$i\">{$sel1[$i]}</option>\n";
+	echo "<option value=\"$i\">".Sanitize::encodeStringForDisplay($sel1[$i])."</option>\n";
 }
 ?>
 </select></span><br class=form>
 
-<span class=form><?php printf(_('Select your %s'), $line['sel2name']); ?></span><span class=formright>
+<span class=form><?php Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel2name'])); ?></span><span class=formright>
 <select name="teachers" id="teachers">
-<option value="not selected"><?php printf(_('Select a %s first'), $line['sel1name']); ?></option>
+<option value="not selected"><?php Sanitize::encodeStringForDisplay(sprintf(_('Select a %s first'), $line['sel1name'])); ?></option>
 </select></span><br class=form>
 
 <?php

@@ -5,8 +5,8 @@
 require("../validate.php");
 
 $isteacher = isset($teacherid);
-$cid = $_GET['cid'];
-$aid = $_GET['aid'];
+$cid = Sanitize::courseId($_GET['cid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 if (!$isteacher) {
 	echo "This page not available to students";
 	exit;

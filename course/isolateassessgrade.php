@@ -13,8 +13,8 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
@@ -208,16 +208,18 @@
 		$lc++;
 		if ($line['locked']>0) {
 			echo '<td><span style="text-decoration: line-through;">';
-			echo "{$line['LastName']}, {$line['FirstName']}</span></td>";
+			printf("%s, %s</span></td>", Sanitize::encodeStringForDisplay($line['LastName']),
+				Sanitize::encodeStringForDisplay($line['FirstName']));
 		} else {
-			echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName'],
+				Sanitize::encodeStringForDisplay($line['FirstName'])));
 		}
 		if ($hassection) {
-			echo "<td>{$line['section']}</td>";
+			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['section']));
 		}
 		if ($hascodes) {
 			if ($line['code']==null) {$line['code']='';}
-			echo "<td>{$line['code']}</td>";
+			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['code']));
 		}
 		$total = 0;
 		$sp = explode(';',$line['bestscores']);

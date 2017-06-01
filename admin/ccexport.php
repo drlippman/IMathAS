@@ -415,7 +415,7 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,'<grading_type>points</grading_type>');
 						fwrite($fp,'<assignment_group_identifierref>assngroup</assignment_group_identifierref>');
 						fwrite($fp,'<submission_types>external_tool</submission_types>');
-						fwrite($fp,'<external_tool_url>'. $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
+						fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
 						fwrite($fp,'</assignment>');
 						fclose($fp);
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');
@@ -535,7 +535,7 @@ if (isset($_GET['delete'])) {
 		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
 		fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
 		fwrite($fp,' <lticm:options name="resource_selection">
-			<lticm:property name="url">'.$urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php</lticm:property>
+			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</lticm:property>
 			<lticm:property name="text">Pick an Assessment</lticm:property>
 			<lticm:property name="selection_width">500</lticm:property>
 			<lticm:property name="selection_height">300</lticm:property>

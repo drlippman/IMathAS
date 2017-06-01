@@ -10,7 +10,7 @@ if (!isset($teacherid)) {
 	exit;
 }
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['from']) && $_GET['from']=='cal') {
 	$from = 'cal';
 } else {
@@ -54,9 +54,9 @@ if (isset($_POST['submit'])) {
 	}
 	if ($_POST['submit']=='Save') {
 		if ($from=='cp') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showcalendar.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/showcalendar.php?cid=$cid");
 		}
 		exit;
 	}

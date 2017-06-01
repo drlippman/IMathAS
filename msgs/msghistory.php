@@ -16,7 +16,7 @@
 	}
 
 	if (isset($_GET['filtercid'])) {
-		$filtercid = $_GET['filtercid'];
+		$filtercid = Sanitize::onlyInt($_GET['filtercid']);
 	} else if ($cid!='admin' && $cid>0) {
 		$filtercid = $cid;
 	} else {
@@ -24,10 +24,10 @@
 	}
 	$view = 0;
 
-	$cid = $_GET['cid'];
-	$msgid = $_GET['msgid'];
-	$page = $_GET['page'];
-	$type = $_GET['type'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$msgid = Sanitize::onlyInt($_GET['msgid']);
+	$page = Sanitize::onlyInt($_GET['page']);
+	$type =  Sanitize::encodeStringForDisplay($_GET['type']);
 
 	$pagetitle = "Message Conversation";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
@@ -278,7 +278,7 @@
 			} else if ($allowmsg && $ownerid[$child]!=0) {
 				echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
 			}
-			echo $poster[$child];
+			echo Sanitize::encodeStringForDisplay($poster[$child]); // This is a user's first and last name.
 			if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 				echo "</a>";
 			}

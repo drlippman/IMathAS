@@ -117,7 +117,7 @@ function resizeiframe() {
 }
 
 function recordlasttreeview(id) {
-	var url = "'.$urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/course/treereader.php?cid='.$cid.'&folder='.$_GET['folder'].'&recordbookmark=" + id;
+	var url = "' . $GLOBALS['basesiteurl'] . '/course/treereader.php?cid='.$cid.'&folder='.$_GET['folder'].'&recordbookmark=" + id;
 	basicahah(url, "bmrecout");
 }
 var treereadernavstate = 1;
@@ -145,7 +145,7 @@ function toggletreereadernav() {
 	treereadernavstate = (treereadernavstate+1)%2;
 }
 function updateTRunans(aid, status) {
-	var urlbase = "'.$urlmode.$_SERVER['HTTP_HOST'] . $imasroot.'";
+	var urlbase = "' . $GLOBALS['basesiteurl'] . '";
 	if (status==0) {
 		document.getElementById("aimg"+aid).src = urlbase+"/img/q_fullbox.gif";
 	} else if (status==1) {

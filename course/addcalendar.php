@@ -94,7 +94,7 @@ if (!(isset($teacherid))) {
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 
 }
-header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 exit;
 
 ?>

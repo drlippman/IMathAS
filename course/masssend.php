@@ -2,7 +2,7 @@
 //IMathAS:  Mass send email or message to students; called from List Users or Gradebook
 //(c) 2006 David Lippman
 
-	
+
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
@@ -51,11 +51,11 @@
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!in_array($row[2],$toignore)) {
-					$fullnames[$row[2]] = $row[1]. ', '.$row[0];
+					$fullnames[$row[2]] = strip_tags($row[1]. ', '.$row[0]);
 					//DB $firstnames[$row[2]] = addslashes($row[0]);
 					//DB $lastnames[$row[2]] = addslashes($row[1]);
-					$firstnames[$row[2]] = $row[0];
-					$lastnames[$row[2]] = $row[1];
+					$firstnames[$row[2]] = strip_tags($row[0]);
+					$lastnames[$row[2]] = strip_tags($row[1]);
 
 					if ($row[3]==1) {
 						$emailaddys[$row[2]] = "{$row[0]} {$row[1]} <{$row[4]}>";
@@ -84,11 +84,11 @@
 			$messagep1 .= "<p>You've received a new message</p><p>From: $from<br />Course: $coursename.</p>\r\n";
 			//DB $messagep1 .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
 			$messagep1 .= "<p>Subject: ".$_POST['subject']."</p>";
-			$messagep1 .= "<a href=\"http://" . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/msgs/viewmsg.php?cid=$cid&msgid=";
+			$messagep1 .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=$cid&msgid=";
 			$messagep2 = "\">";
 			$messagep2 .= "View Message</a></p>\r\n";
 			$messagep2 .= "<p>If you do not wish to receive email notification of new messages, please ";
-			$messagep2 .= "<a href=\"http://" . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
+			$messagep2 .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=chguserinfo\">click here to change your ";
 			$messagep2 .= "user preferences</a></p>\r\n";
 
 			foreach ($tolist as $msgto) {
@@ -240,11 +240,11 @@
 			//mail(implode(', ',$emailaddys),$subject,$message,$headers);
 		}
 		if ($calledfrom=='lu') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		} else if ($calledfrom=='gb') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid");
 		} else if ($calledfrom=='itemsearch') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin.php");
 		}
 		exit;
 	} else {
@@ -256,7 +256,7 @@
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if ($calledfrom=='lu') {
 			echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass $sendtype</div>\n";
 		} else if ($calledfrom=='gb') {
@@ -334,7 +334,8 @@
 		echo '<p>Unless limited, message will be sent to:<ul>';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+			printf("<li>%s, %s (%s)</li>", Sanitize::encodeStringForDisplay($row[0]),
+				Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 		}
 		echo '</ul>';
 		require("../footer.php");

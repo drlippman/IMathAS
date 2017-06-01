@@ -155,7 +155,7 @@
 					if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
-						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".Sanitize::encodeStringForUrl($url);
+						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".Sanitize::encodeUrlParam($url);
 						$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 
 					} else {
@@ -195,7 +195,7 @@
 					} else {
 						list ($junk,$url,$w,$h) = $resval;
 					}
-					$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=cdf&amp;url=".Sanitize::encodeStringForUrl($url);
+					$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=cdf&amp;url=".Sanitize::encodeUrlParam($url);
 					$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 					$str = str_replace($resval[0], $tag, $str);
 				}

@@ -2,9 +2,9 @@
 //IMathAS:  Export or email Gradebook
 //(c) 2007 David Lippman
 	require("../validate.php");
-	
+
 	$isteacher = isset($teacherid);
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!$isteacher) {
 		echo "This page not available to students";
 		exit;

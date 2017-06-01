@@ -23,13 +23,13 @@ if (isset($_POST['textitemstype'])) {
 		$payload['C'] = strtoupper($_POST['caltype']{0}).intval($_POST['cal']);
 	}
 	$token = JWT::encode($payload, $key); //token is URL safe from JWT
-	$url = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/admin/calendarfeed.php?t='.$token;
+	$url = $GLOBALS['basesiteurl'] . '/admin/calendarfeed.php?t='.$token;
 	echo $url;
 	exit;
 } else {
 	//generate simple link on initial load
 	$token = JWT::encode(array('uid'=>$userid, 'cid'=>$cid), $key); //token is URL safe from JWT
-	$url = $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/admin/calendarfeed.php?t='.$token;
+	$url = $GLOBALS['basesiteurl'] . '/admin/calendarfeed.php?t='.$token;
 }
 unset($key);
 

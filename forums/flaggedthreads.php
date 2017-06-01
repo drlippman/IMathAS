@@ -4,7 +4,7 @@
 require("../validate.php");
 
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'];
 
 $now = time();
@@ -44,9 +44,9 @@ if (isset($_GET['unflagall'])) {
 		$DBH->query("UPDATE imas_forum_views SET tagged=0 WHERE threadid IN ($threadids)");
 	}
 	if ($from=='home') {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
 	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
 	}
 	exit;
 }
@@ -54,7 +54,7 @@ if (isset($_GET['unflagall'])) {
 
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
-$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/savetagged.php?cid=$cid';</script>";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js?v=011517"></script>';
 $pagetitle = _('Flagged Forum Posts');
 require("../header.php");
@@ -83,8 +83,8 @@ if (count($lastpost)>0) {
     }
     echo '<tr id="tr'.$line['threadid'].'" class="tagged">';
     echo "<td><span class=\"right\"><img class=\"pointer\" id=\"tag{$line['threadid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['threadid']});return false;\" alt=\"Flagged\" /></span>";
-    echo "<a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-5\">{$line['subject']}</a></td><td>$name</td>";
-    echo "<td><a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></td>';
+    echo "<a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-5\">{$line['subject']}</a></td><td>".Sanitize::encodeStringForDisplay($name)."</td>";
+    echo "<td><a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
     echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
   }
   echo '</tbody></table>';

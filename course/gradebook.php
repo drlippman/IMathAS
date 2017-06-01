@@ -19,9 +19,10 @@
 
 
 require("../validate.php");
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if (isset($teacherid)) {
 	$isteacher = true;
+
 }
 if (isset($tutorid)) {
 	$istutor = true;
@@ -168,7 +169,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Unenroll Students');
 		include("unenroll.php");
@@ -177,7 +178,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Lock Students');
 		include("lockstu.php");
@@ -252,7 +253,7 @@ if ($isteacher) {
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?{$_SERVER['QUERY_STRING']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?{$_SERVER['QUERY_STRING']}");
 		exit;
 	}
 }
@@ -268,7 +269,7 @@ if ($canviewall) {
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function chgfilter() { ';
 	$placeinhead .= '       var cat = document.getElementById("filtersel").value; ';
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
+	$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid";
 
 	$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -276,18 +277,18 @@ if ($canviewall) {
 	if ($isteacher) {
 		$placeinhead .= 'function chgsecfilter() { ';
 		$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
+		$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid";
 
 		$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 		$placeinhead .= "  	window.location = toopen; \n";
 		$placeinhead .= "}\n";
 		$placeinhead .= 'function chgnewflag() { ';
-		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&togglenewflag=true";
+		$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid&togglenewflag=true";
 
 		$placeinhead .= "       basicahah('$address','newflag','Recording...');\n";
 		$placeinhead .= "}\n";
 	}
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&stu=";
+	$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&stu=";
 	$placeinhead .= "function chgstu(el) { 	\$('#updatingicon').show(); window.location = '$address' + el.value;}\n";
 	$placeinhead .= 'function chgtoggle() { ';
 	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value*1+ document.getElementById(\"toggle5\").value*1) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
@@ -301,7 +302,7 @@ if ($canviewall) {
 		$placeinhead .= "     altgbmode += 400;\n";
 	}
 
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
+	$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
@@ -309,7 +310,7 @@ if ($canviewall) {
 	if ($isteacher) {
 		$placeinhead .= 'function chgexport() { ';
 		$placeinhead .= "	var type = document.getElementById(\"exportsel\").value; ";
-		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-export.php?stu=$stu&cid=$cid&";
+		$address = $GLOBALS['basesiteurl'] . "/course/gb-export.php?stu=$stu&cid=$cid&";
 		$placeinhead .= "	var toopen = '$address';";
 		$placeinhead .= "	if (type==1) { toopen = toopen+'export=true';}\n";
 		$placeinhead .= "	if (type==2) { toopen = toopen+'emailgb=me';}\n";
@@ -487,15 +488,14 @@ if (isset($studentid) || $stu!=0) { //show student view
 		}</script>';
 
 	require("../header.php");
-
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt ", _('Student Grade Detail'), "</div>\n";
 	} else if ($isteacher || $istutor) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
 	} else {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; ", _('Gradebook'), "</div>";
 	}
 	if ($stu==-1) {
@@ -589,7 +589,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } table.gb tr.highlight { border-bottom:1px solid #333;} table.gb tr {border-bottom:1px solid #fff; } td.trld {display:table-cell;vertical-align:middle;} </style>";
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; ", _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 
@@ -749,7 +749,7 @@ function gbstudisp($stu) {
 				$hasoutcomes = true;
 			}
 		}
-		
+
 		//DB $query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
 		//DB $query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -765,7 +765,7 @@ function gbstudisp($stu) {
 		}
 		//DB list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = mysql_fetch_row($result);
 		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
-		
+
 		$viewedassess = array();
 		if (!$isteacher && !$istutor) {
 			//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$stu' AND type='gbviewasid'";
@@ -837,7 +837,7 @@ function gbstudisp($stu) {
 
 			$now = time();
 		}
-		
+
 		if ($stusection!='') {
 			echo ' <span class="small">Section: '.$stusection.'.</span>';
 		}
@@ -852,15 +852,15 @@ function gbstudisp($stu) {
 			echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=msg&cid=$cid',800,'auto')\" title=\"Send Message\">", _('Message'), "</a> | ";
 			//remove since redundant with Make Exception button "with selected"
 			//echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
-			echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
-			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
+			echo "<a href=\"listusers.php?cid=$cid&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
+			echo "<a href=\"viewloginlog.php?cid=$cid&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
+			echo "<a href=\"viewactionlog.php?cid=$cid&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
 			echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
 			echo '</div>';
 		} else if ($istutor) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid">';
-			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
+			echo "<a href=\"viewloginlog.php?cid=$cid&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
+			echo "<a href=\"viewactionlog.php?cid=$cid&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
 			echo '</div>';
 		}
 
@@ -953,7 +953,7 @@ function gbstudisp($stu) {
 				//not started, so no canuselatepass record
 				require_once("../includes/exceptionfuncs.php");
 				$gbt[1][1][$i][10] = getCanUseAssessLatePass(array('enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12]));
-				
+
 			}
 			/*if (!$isteacher && !$istutor && $latepasses>0  &&	(
 				(isset($gbt[1][1][$i][10]) && $gbt[1][1][$i][10]>0 && !in_array($gbt[0][1][$i][7],$viewedassess)) ||  //started, and already figured it's ok

@@ -2,6 +2,7 @@
 //IMathAS:  include with posts.php and postsbyname.php for handling deletes, replies, etc.
 //(c) 2006 David Lippman
 
+require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 @set_time_limit(0);
@@ -139,7 +140,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$sendemail = false;
 				require("../header.php");
 				echo '<h2>Error:</h2><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
-				echo 'want to copy-and-paste it somewhere. <a href="'.$returnurl.'">Continue</a></p>';
+				echo 'want to copy-and-paste it somewhere. <a href="'.Sanitize::fullUrl($returnurl).'">Continue</a></p>';
 				echo '<hr>';
 				//DB echo '<p>Message:</p><div class="editor">'.filter(stripslashes($_POST['message'])).'</div>';
 				echo '<p>Message:</p><div class="editor">'.filter($_POST['message']).'</div>';
@@ -282,7 +283,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//DB $message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
 				$message .= "<p>Subject:".Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
 				$message .= "<p>Poster: $userfullname</p>";
-				$message .= "<a href=\"" . $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF']), '/\\')) . "/$returnurl\">";
+				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forums/$returnurl\">";
 				$message .= "View Posting</a>\r\n";
 			}
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -333,7 +334,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
 		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
 
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl");
 		exit;
 	} else { //display mod
 		if ($caller=='thread') {
@@ -704,7 +705,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					if ($line['isanon']==1) {
 						$poster[$line['id']] = "Anonymous";
 					} else {
-						$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
+						$poster[$line['id']] = Sanitize::encodeStringForDisplay($line['FirstName'] . ' ' . $line['LastName']);
 						if ($isteacher && $line['userid']!=$userid) {
 							$poster[$line['id']] .= " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$line['userid']}\" target=\"_popoutgradebook\">[GB]</a>";
 						}
@@ -804,9 +805,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		}
 		if ($caller == "posts" && $lastpost) {
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
 		} else {
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$returnurl");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl");
 		}
 		exit;
 	} else {
@@ -916,7 +917,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$stm = $DBH->prepare("UPDATE imas_grades SET gradetypeid=:gradetypeid WHERE gradetype='forum' AND refid IN ($list)");
 			$stm->execute(array(':gradetypeid'=>$_POST['movetof']));
 
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
 			if ($_POST['movetot'] != $threadid) {
@@ -945,7 +946,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				}
 			}
 
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 
 		}

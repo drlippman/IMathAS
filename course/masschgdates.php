@@ -19,7 +19,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
 } else {
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['chgcnt'])) {
 
@@ -174,7 +174,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		}
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
@@ -317,7 +317,7 @@ if ($overwriteBody==1) {
 	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option><option value="a">Show</option></select>';
 	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
-	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';                                            
+	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
 
 	if ($picicons) {
 		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
@@ -784,7 +784,7 @@ if ($overwriteBody==1) {
 		echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$cnt.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 		echo ' Action <img src="../img/collapse.gif" width="10" class="mida" alt="" />';
 		echo '</a>';
-		echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$cnt.'">';	
+		echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$cnt.'">';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',1)">Send down date &amp; time changes</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',2)">Copy down times only</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',3)">Copy down dates &amp; times</a></li>';
@@ -792,7 +792,7 @@ if ($overwriteBody==1) {
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',5)">Copy down end date &amp; time</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',6)">Copy down review date &amp; time</a></li>';
 		echo '</ul></div></td>';
-		
+
 		/*echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
 		echo '<option value="1">Send down date &amp; time changes</option>';
 		echo '<option value="2">Copy down times only</option>';

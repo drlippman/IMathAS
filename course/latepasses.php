@@ -3,7 +3,7 @@
 //(c) 2007 David Lippman
 
 	require("../validate.php");
-	
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -11,7 +11,7 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['hours'])) {
 		if (isset($_POST['latepass'])) {
@@ -26,12 +26,13 @@
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET latepasshrs=:latepasshrs WHERE id=:id");
 		$stm->execute(array(':latepasshrs'=>$_POST['hours'], ':id'=>$cid));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+    printf('<div class=breadcrumb>%s <a href="course.php?cid=%s">%s</a> ', $breadcrumbbase,
+        Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
 	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> ";
 	echo "&gt; Manage LatePasses</div>";
 

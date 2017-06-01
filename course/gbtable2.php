@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 
 require_once("../includes/exceptionfuncs.php");
+require_once("../includes/sanitize.php");
 
 //used by gbtable
 function getpts($sc) {
@@ -990,7 +991,8 @@ function gbtable() {
 		$cattotcurec[$ln] = array();
 		$cattotfutureec[$ln] = array();
 		//Student ID info
-		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
+		$gb[$ln][0][0] = sprintf("%s,&nbsp;%s", Sanitize::encodeStringForDisplay($line['LastName']),
+			Sanitize::encodeStringForDisplay($line['FirstName']));
 		$gb[$ln][4][0] = $line['id'];
 		$gb[$ln][4][1] = $line['locked'];
 		$gb[$ln][4][2] = $line['hasuserimg'];

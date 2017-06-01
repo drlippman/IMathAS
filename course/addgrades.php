@@ -6,7 +6,7 @@
 	//single grade edit
 	require("../validate.php");
 	require("../includes/htmlutil.php");
-	
+
 
 	$istutor = false;
 	$isteacher = false;
@@ -54,13 +54,17 @@
 				$stm->execute(array(':gradetypeid'=>$_GET['del']));
 			}
 
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
+			header(sprintf('Location: %s/course/gradebook.php?stu=%s&gbmode=%s&cid=%s', $GLOBALS['basesiteurl'],
+                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid));
 			exit;
 		} else {
 			require("../header.php");
 			echo "<p>Are you SURE you want to delete this item and all associated grades from the gradebook?</p>";
-			echo "<p><a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['del']}&confirm=true\">Delete Item</a>";
-			echo " <a href=\"gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid\">Nevermind</a>";
+			printf("<p><a href=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&del=%s&confirm=true\">Delete Item</a>",
+                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid,
+                Sanitize::encodeUrlParam($_GET['del']));
+			printf(" <a href=\"gradebook.php?stu=%s&gbmode=%s&cid=%s\">Nevermind</a>",
+                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid);
 			require("../footer.php");
 			exit;
 		}
@@ -213,9 +217,11 @@
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
 		if ($isnewitem && isset($_POST['doupload'])) {
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/uploadgrades.php?gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}");
+			header(sprintf('Location: %s/course/uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s', $GLOBALS['basesiteurl'],
+                Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($_GET['gbitem'])));
 		} else {
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
+			header(sprintf('Location: %s/course/gradebook.php?stu=%s&gbmode=%s&cid=%s', $GLOBALS['basesiteurl'],
+                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid));
 		}
 		exit;
 	}
@@ -290,12 +296,12 @@
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	require("../includes/rubric.php");
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($_GET['stu']>0) {
-		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Student Detail</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Student Detail</a> ";
 	} else if ($_GET['stu']==-1) {
-		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Averages</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Averages</a> ";
 	}
 	echo "&gt; Offline Grades</div>";
 
@@ -305,7 +311,9 @@
 		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h2>Modify Offline Grades</h2></div>";
 	}
 
-	echo "<form id=\"mainform\" method=post action=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}\">";
+    printf("<form id=\"mainform\" method=post action=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&gbitem=%s&grades=%s\">",
+        Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid,
+        Sanitize::encodeUrlParam($_GET['gbitem']), Sanitize::encodeUrlParam($_GET['grades']));
 
 	if ($_GET['grades']=='all') {
 	    if (!isset($_GET['isolate'])) {
@@ -390,14 +398,14 @@
 
 ?>
 
-<span class=form>Name:</span><span class=formright><input type=text name="name" value="<?php echo $name;?>"/></span><br class="form"/>
+<span class=form>Name:</span><span class=formright><input type=text name="name" value="<?php echo Sanitize::encodeStringForDisplay($name);?>"/></span><br class="form"/>
 
-<span class=form>Points:</span><span class=formright><input type=text name="points" size=3 value="<?php echo $points;?>"/></span><br class="form"/>
+<span class=form>Points:</span><span class=formright><input type=text name="points" size=3 value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/></span><br class="form"/>
 
 <span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
-<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo $sdate;?>">
+<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo Sanitize::encodeStringForDisplay($sdate);?>">
 <a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
-at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
+at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringForDisplay($stime);?>"></span><BR class=form>
 
 <?php
 		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
@@ -415,11 +423,11 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				echo "<option value=\"{$row[0]}\" ";
+				printf('<option value="%d" ', Sanitize::encodeStringForDisplay($row[0]));
 				if ($gbcat==$row[0]) {
 					echo "selected=1 ";
 				}
-				echo ">{$row[1]}</option>\n";
+				printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 			}
 
 		}
@@ -445,8 +453,8 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 
 		echo '<span class=form>Use Scoring Rubric</span><span class=formright>';
 		writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$rubric);
-		echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addg&amp;gbitem={$_GET['gbitem']}\">Add new rubric</a> ";
-		echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addg&amp;gbitem={$_GET['gbitem']}\">Edit rubrics</a> ";
+		echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addg&amp;gbitem=".Sanitize::encodeUrlParam($_GET['gbitem'])."\">Add new rubric</a> ";
+		echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addg&amp;gbitem=".Sanitize::encodeUrlParam($_GET['gbitem'])."\">Edit rubrics</a> ";
 		echo '</span><br class="form"/>';
 
 		if (count($outcomes)>0) {
@@ -456,7 +464,8 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		}
 
 		if ($_GET['gbitem']!='new') {
-			echo "<br class=form /><div class=\"submit\"><input type=submit value=\"Submit\"/> <a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a> </div><br class=form />";
+			printf("<br class=form /><div class=\"submit\"><input type=submit value=\"Submit\"/> <a href=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&del=%s\">Delete Item</a> </div><br class=form />",
+                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($_GET['gbitem']));
 		} else {
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
@@ -470,7 +479,8 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 			$stm->execute(array(':courseid'=>$cid));
 			while($row = $stm->fetch(PDO::FETCH_NUM)) {
-				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+				printf('<option value="%d">%s</option>', Sanitize::encodeStringForDisplay($row[0]),
+                    Sanitize::encodeStringForDisplay($row[1]));
 			}
 			echo '<select><br/>';
 			echo 'Grade type:<br/> <input type="radio" name="assesssnaptype" value="0" checked="checked">Current score ';
@@ -485,7 +495,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		$stm = $DBH->prepare("SELECT name,rubric,points FROM imas_gbitems WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['gbitem']));
 		list($rubname, $rubric, $points) = $stm->fetch(PDO::FETCH_NUM);
-		echo '<h3>'.$rubname.'</h3>';
+		echo '<h3>'.Sanitize::encodeStringForDisplay($rubname).'</h3>';
 		//DB $rubric = mysql_result($result,0,1);
 		//DB $points = mysql_result($result,0,2);
 	    }
@@ -495,7 +505,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		$stm = $DBH->prepare("SELECT name,rubric,points FROM imas_gbitems WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['gbitem']));
 		list($rubname, $rubric, $points) = $stm->fetch(PDO::FETCH_NUM);
-		echo '<h3>'.$rubname.'</h3>';
+		echo '<h3>'.Sanitize::encodeStringForDisplay($rubname).'</h3>';
 		//DB $rubric = mysql_result($result,0,1);
 		//DB $points = mysql_result($result,0,2);
 	}
@@ -549,7 +559,8 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		}
 
 		if ($_GET['grades']=='all' && $_GET['gbitem']!='new' && $isteacher) {
-			echo "<p><a href=\"uploadgrades.php?gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}\">Upload Grades</a></p>";
+			printf("<p><a href=\"uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s\">Upload Grades</a></p>",
+                Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($_GET['gbitem']));
 		}
 		/*
 		if ($hassection && ($_GET['gbitem']=='new' || $_GET['grades']=='all')) {
@@ -663,27 +674,31 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			} else {
 				echo '<tr><td>';
 			}
-			echo "{$row[1]}, {$row[2]}";
+			printf("%s, %s", Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 			echo '</td>';
 			if ($hassection) {
-				echo "<td>{$row[3]}</td>";
+				echo "<td>".Sanitize::encodeStringForDisplay($row[3])."</td>";
 			}
 			if ($hascodes) {
 				if ($row[5]==null) {$row[5] = '';}
-				echo "<td>{$row[5]}</td>";
+				echo "<td>".Sanitize::encodeStringForDisplay($row[5])."</td>";
 			}
 			if (isset($score[$row[0]])) {
-				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
-				echo $score[$row[0]];
+				printf('<td><input type="text" size="3" autocomplete="off" name="score[%d]" id="score%d" value="%s',
+                    Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]),
+                    Sanitize::encodeStringForDisplay($score[$row[0]]));
 			} else {
-				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
+				printf('<td><input type="text" size="3" autocomplete="off" name="newscore[%d]" id="score%d" value="',
+                    Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]));
 			}
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
 			if ($rubric != 0) {
 				echo printrubriclink($rubric,$points,"score{$row[0]}","feedback{$row[0]}");
 			}
 			echo "</td>";
-			echo "<td><textarea cols=60 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
+			printf('<td><textarea cols=60 rows=1 id="feedback%d" name="feedback[%d]">%s</textarea></td>',
+                Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]),
+                Sanitize::encodeStringForDisplay($feedback[$row[0]]));
 			echo "</tr>";
 		}
 

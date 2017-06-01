@@ -569,9 +569,9 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$page_uploadSuccessMsg .= "Updated Questions: $updateq.<br>";
 		$page_uploadSuccessMsg .= "New Library items: $newli.<br>";
 		if ($isadmin || $isgrpadmin) {
-			$page_uploadSuccessMsg .=  "<a href=\"".$urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Return to Admin page</a>";
+			$page_uploadSuccessMsg .=  "<a href=\"" . $GLOBALS['basesiteurl'] . "/admin/admin.php\">Return to Admin page</a>";
 		} else {
-			$page_uploadSuccessMsg .= "<a href=\"". $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])  . $imasroot . "/course/course.php?cid=$cid\">Return to Course page</a>";
+			$page_uploadSuccessMsg .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid\">Return to Course page</a>";
 		}
 
 	} elseif ($_FILES['userfile']['name']!='') { // STEP 2 DATA MANIPULATION

@@ -187,7 +187,7 @@
 			if ($pwfail) {
 				require("../header.php");
 				if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
-					echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+					echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 					echo '&gt; ', _('Assessment'), '</div>';
 				}
 				echo $out;
@@ -385,7 +385,7 @@
 
 			writesessiondata();
 			session_write_close();
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
 			exit;
 		} else { //returning to test
 
@@ -399,9 +399,7 @@
 				//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
 				$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-				header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])
-					. rtrim(dirname($_SERVER['PHP_SELF']), '/\\')
-					. "/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=" . Sanitize::courseId($_GET['cid']) . "&id=$aid");
 				exit;
 			}
 			//Return to test.
@@ -474,7 +472,7 @@
 
 			writesessiondata();
 			session_write_close();
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
 		}
 		exit;
 	}
@@ -1041,7 +1039,7 @@
 			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
 			$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$testsettings['id']));
-			header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
 			exit;
 		}
 
@@ -1379,7 +1377,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$curinagrp[] = $row[0];
 			}
-			$curids = implode(',', array_map('intval', $curinagrp));
+			$curids = array_map('intval', $curinagrp);
+			$curids_query_placeholders = Sanitize::generateQueryPlaceholders($curids);
 			$selops = '<option value="0">' . _('Select a name..') . '</option>';
 
 			//DB $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
@@ -1388,12 +1387,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 			//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
-			$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid ";
-			$query .= "AND imas_users.id NOT IN ($curids) ORDER BY imas_users.LastName,imas_users.FirstName";
+			$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid=? ";
+			$query .= "AND imas_users.id NOT IN ($curids_query_placeholders) ORDER BY imas_users.LastName,imas_users.FirstName";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$testsettings['courseid']));
+			$stm->execute(array_merge(array($testsettings['courseid']), $curids));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$selops .= sprintf('<option value="%s">%s, %s</option>', $row[0], Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
+				$selops .= sprintf('<option value="%d">%s, %s</option>', $row[0], Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
 			//TODO i18n
 			echo '<p>';
@@ -2363,10 +2362,10 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$tocheck = $aid.$qn.$userid.$rawscore.$arv;
 				$now = time();
 				if (isset($CFG['GEN']['livepollpassword'])) {
-					$livepollsig = Sanitize::encodeStringForUrl(base64_encode(sha1($tocheck . $CFG['GEN']['livepollpassword'] . $now,true)));
+					$livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($tocheck . $CFG['GEN']['livepollpassword'] . $now,true)));
 				}
 
-				$r = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/qscored?aid='.$aid.'&qn='.$qn.'&user='.$userid.'&score='.Sanitize::encodeStringForUrl($rawscore).'&now='.$now.'&la='.Sanitize::encodeStringForUrl($arv).'&sig='.$livepollsig);
+				$r = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/qscored?aid='.$aid.'&qn='.$qn.'&user='.$userid.'&score='.Sanitize::encodeUrlParam($rawscore).'&now='.$now.'&la='.Sanitize::encodeUrlParam($arv).'&sig='.$livepollsig);
 				echo '{success: true}';
 			//}
 			exit;
@@ -2386,7 +2385,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$stm->execute(array(':curquestion'=>$qn, ':seed'=>$seed, ':startt'=>$startt, ':assessmentid'=>$aid));
 
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = Sanitize::encodeStringForUrl(base64_encode(sha1($aid.$qn .$seed. $CFG['GEN']['livepollpassword'] . $now, true)));
+				$livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($aid.$qn .$seed. $CFG['GEN']['livepollpassword'] . $now, true)));
 			}
 			$regenstr = '';
 
@@ -2423,7 +2422,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$newstate=3;
 			}
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = Sanitize::encodeStringForUrl(base64_encode(sha1($aid.$qn . $newstate. $CFG['GEN']['livepollpassword'] . $now,true)));
+				$livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($aid.$qn . $newstate. $CFG['GEN']['livepollpassword'] . $now,true)));
 			}
 
 			//DB $query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate='$newstate' WHERE assessmentid='$aid'";
@@ -2780,7 +2779,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo '</div>';
 				$intro = '';
 			}
-			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.$_GET['page'].'";</script>';
+			echo '<script type="text/javascript">var assesspostbackurl="' . $GLOBALS['basesiteurl'] . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.Sanitize::encodeUrlParam($_GET['page']).'";</script>';
 			//using the full test scoreall action for timelimit auto-submits
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 			if (!$introhaspages && $testsettings['displaymethod'] != "VideoCue") {
@@ -2955,11 +2954,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if ($dopage==true) {
 				echo '<p>';
 				if ($_GET['page']>0) {
-					echo '<a href="showtest.php?page='.($_GET['page']-1).'">' . _("Previous Page") . '</a> ';
+					echo '<a href="showtest.php?page='.Sanitize::encodeUrlParam($_GET['page']-1).'">' . _("Previous Page") . '</a> ';
 				}
 				if ($_GET['page']<(count($intropages)-1)/2-1) {
 					if ($_GET['page']>0) { echo '| ';}
-					echo '<a href="showtest.php?page='.($_GET['page']+1).'">' . _("Next Page") . '</a>';
+					echo '<a href="showtest.php?page='.Sanitize::encodeUrlParam($_GET['page']+1).'">' . _("Next Page") . '</a>';
 				}
 				echo '</p>';
 			}
@@ -2980,7 +2979,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 
 		} else if ($testsettings['displaymethod']=='LivePoll') {
-			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/assessment/showtest.php?embedpostback=true";</script>';
+			echo '<script type="text/javascript">var assesspostbackurl="' . $GLOBALS['basesiteurl'] . '/assessment/showtest.php?embedpostback=true";</script>';
 			echo "<input type=\"hidden\" id=\"asidverify\" name=\"asidverify\" value=\"$testid\" />";
 			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";

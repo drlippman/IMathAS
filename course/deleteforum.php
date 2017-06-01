@@ -12,7 +12,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Forum";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Forum";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Forum";
 $useeditor = "description";
 
 if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missing go back to the index page
@@ -22,7 +22,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
 	if ($_GET['remove']=="really") {
@@ -107,7 +107,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 			$stm->execute(array(':forumid'=>$forumid));
 		}
 		$DBH->commit();
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 		exit;
 	} else {
@@ -135,8 +135,8 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 		<h3><?php echo $itemname; ?></h3>
 		Are you SURE you want to delete this forum and all associated postings?
-		<p><input type=button value="Yes, Delete" onClick="window.location='deleteforum.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-		<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
+		<p><input type=button value="Yes, Delete" onClick="window.location='deleteforum.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
+		<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
 		</p>
 
 <?php

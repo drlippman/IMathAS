@@ -42,7 +42,8 @@ if ($stm->rowCount()==0) {
 	echo '<ul class="nomark">';
 	//DB while ($row = mysql_fetch_assoc($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		echo '<li>'.$row['LastName'].', '.$row['FirstName'].'</li>';
+		printf('<li>%s, %s</li>', Sanitize::encodeStringForDisplay($row['LastName']),
+			Sanitize::encodeStringForDisplay($row['FirstName']));
 	}
 	echo '</ul>';
 }

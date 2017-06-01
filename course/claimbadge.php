@@ -3,7 +3,7 @@
 require("../validate.php");
 
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 $placeinhead = '<script src="http://beta.openbadges.org/issuer.js"></script>';
 require("../header.php");
@@ -127,8 +127,8 @@ if (isset($teacherid)) {
 
 		if ($reqmet) {
 			echo '<h3>Badge Requirements have been met!</h3>';
-			$verify = Sanitize::encodeStringForUrl(hash('sha256', $username . $userid));
-			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/verifybadge.php?format=json&userid='.$userid.'&badgeid='.$badgeid.'&v='.$verify;
+			$verify = Sanitize::encodeUrlParam(hash('sha256', $username . $userid));
+			$url = $GLOBALS['basesiteurl'] . '/course/verifybadge.php?format=json&userid='.$userid.'&badgeid='.$badgeid.'&v='.$verify;
 
 			echo '<p><input type="button" value="Claim Badge" onclick="OpenBadges.issue([\''.$url.'\'], function(errors,successes) { })"/><br/>FireFox, Chrome, Safari, or IE 9+ is needed to claim badge.</p>';
 		}

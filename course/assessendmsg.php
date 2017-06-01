@@ -40,7 +40,7 @@ require_once("../includes/sanitize.php");
 			//DB $query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id=:id");
-			$stm->execute(array(':endmsg'=>$msgstr, ':id'=>$_POST['aid']));
+			$stm->execute(array(':endmsg'=>$msgstr, ':id'=>Sanitize::onlyInt($_POST['aid'])));
 		} else if (isset($_POST['aidlist'])) {
 			//DB $aidlist = "'".implode("','",explode(',',$_POST['aidlist']))."'";
 			//DB $query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id IN ($aidlist)";
@@ -50,7 +50,7 @@ require_once("../includes/sanitize.php");
 			$stm->execute(array(':endmsg'=>$msgstr));
 
 		}
-		header('Location: ' . $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
 		exit;
 	}
@@ -61,7 +61,7 @@ require_once("../includes/sanitize.php");
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	if (!isset($_POST['checked'])) {
-		echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid={$_GET['aid']}\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
+		echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid=" . Sanitize::onlyInt($_GET['aid']) . "\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
 	} else {
 		echo "&gt; <a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a> &gt; End of Assessment Msg</div>\n";
 	}
@@ -70,7 +70,7 @@ require_once("../includes/sanitize.php");
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $endmsg = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['aid']));
+		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['aid'])));
 		$endmsg = $stm->fetchColumn(0);
 	} else {
 		$endmsg = '';
@@ -94,7 +94,7 @@ require_once("../includes/sanitize.php");
 	if (isset($_POST['checked'])) {
 		echo '<input type="hidden" name="aidlist" value="'.implode(',',$_POST['checked']).'" />';
 	} else {
-		echo '<input type="hidden" name="aid" value="'.$_GET['aid'].'" />';
+		echo '<input type="hidden" name="aid" value="'.Sanitize::onlyInt($_GET['aid']).'" />';
 	}
 	echo '<p>Base messages on: ';
 	echo '<input type="radio" name="type" value="0" ';

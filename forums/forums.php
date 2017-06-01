@@ -19,7 +19,7 @@
 		exit;
 	}
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['searchsubmit'])) {
 		if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
@@ -53,7 +53,7 @@
 	$pagetitle = "Forums";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
-	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -170,7 +170,7 @@
 	echo '<a href="newthreads.php?cid='.$cid.'">'._('New Forum Posts').'</a> | ';
 	echo '<a href="flaggedthreads.php?cid='.$cid.'">'._('Flagged Forum Posts').'</a>';
 	echo '</div>';
-	
+
 	if ($searchtype=='none') {
 		echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
 	} else {
@@ -298,9 +298,9 @@ if ($searchtype == 'thread') {
 			} else {
 				$name = "{$line['LastName']}, {$line['FirstName']}";
 			}
-			echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}&page=-4\">{$line['subject']}</a></b>: $name";
+			echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}&page=-4\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></b>: ".Sanitize::encodeStringForDisplay($name);
 			echo "</td>\n";
-			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">{$line['name']}</a></td>";
+			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></td>";
 			echo "<td class=c>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
 			echo "</td></tr>\n";
 		}

@@ -385,10 +385,10 @@ if (isset($_POST['text'])) {
 		$editmsg .=  "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 	} else {
 		if ($frompot==1) {
-			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid={$_GET['aid']}&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid={$_GET['aid']}\">Add Question to Assessment</a> | \n";
+			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+			$editmsg .=  "<a href=\"modquestion.php?qsetid=$id&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
 		}
-		$editmsg .=  "<a href=\"addquestions.php?cid=$cid&aid={$_GET['aid']}\">Return to Assessment</a>\n";
+		$editmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 	}
 	//update libraries
 	$newlibs = explode(",",$_POST['libs']);
@@ -970,7 +970,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$line['author'] = $myname;
 	$line['deleted'] = 0;
 	if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
-		$inlibs = $sessiondata['lastsearchlibs'.$_GET['aid']];
+		$inlibs = $sessiondata['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
 	} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
 		//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
 		$inlibs = $sessiondata['lastsearchlibs'.$cid];
@@ -1063,12 +1063,12 @@ $flexwidth = true;
 require("../header.php");
 
 if (isset($_GET['aid'])) {
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; Modify Questions</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
 
 } else if (isset($_GET['daid'])) {
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
 } else {
 	if ($_GET['cid']=="admin") {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
@@ -1112,7 +1112,7 @@ if (isset($inusecnt) && $inusecnt>0) {
 
 }
 if (isset($_GET['qid'])) {
-	echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid={$_GET['aid']}&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
+	echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
 	echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
 }
 if (!$myq) {
@@ -1292,7 +1292,7 @@ function setupKeepcodeEditor() {
 		echo "&cid=$cid";
 	}
 	if (isset($_GET['aid'])) {
-		echo "&aid={$_GET['aid']}";
+		echo "&aid=".Sanitize::onlyInt($_GET['aid']);
 	}
 	if (isset($_GET['id']) && !isset($_GET['template'])) {
 		echo "&id={$_GET['id']}";

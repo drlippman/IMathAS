@@ -2,9 +2,9 @@
 //IMathAS:  Student view grade on offline grade with feedback
 //(c) 2006 David Lippman
 	require("../validate.php");
-	
 
-	$cid = $_GET['cid'];
+
+	$cid = Sanitize::courseId($_GET['cid']);
 	$gid = $_GET['gid'];
 	$stu = $_GET['stu'];
 	$gbmode = $_GET['gbmode'];
@@ -21,7 +21,7 @@
 	$row = $stm->fetch(PDO::FETCH_NUM);
 	$pagetitle = "View Grade";
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=$gbmode&cid=$cid\">Gradebook</a> ";
 	echo "&gt; View Grade</div>";
 
