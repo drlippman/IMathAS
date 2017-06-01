@@ -55,17 +55,63 @@ class Sanitize
 	}
 
 	/**
-	 * Encode a string for display in a web browser.
+	 * Encode a string for display in a web browser. Use for page text and HTML attributes only!
 	 *
 	 * This method will not double-encode existing HTML entities.
-	 * This is safe to use for HTML tag attributes. (quotes are encoded)
+	 *
+	 * @see encodeStringForJavascript
+	 * @see encodeStringForCSS
 	 *
 	 * @param $string string The string to encode.
 	 * @return string the encoded string.
 	 */
 	public static function encodeStringForDisplay($string)
 	{
-		return htmlspecialchars($string, ENT_QUOTES, ini_get("default_charset"), false);
+		return htmlspecialchars($string, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), false);
+	}
+
+	/**
+	 * Encode a string for use in blocks of JavaScript, or in-line JavaScript.
+	 *
+	 * @see encodeStringForDisplay
+	 * @see encodeStringForCSS
+	 *
+	 * @param $string string The string to encode.
+	 * @return string the encoded string.
+	 */
+	public static function encodeStringForJavascript($string)
+	{
+		$safeString = '';
+
+		$stringLength = strlen($string);
+		for ($i = 0; $i < $stringLength; $i++) {
+			$char = substr($string, $i, 1);
+			$safeString .= preg_match("/[\da-z]/i", $char) ? $char : '\\x' . dechex(ord($char));
+		}
+
+		return $safeString;
+	}
+
+	/**
+	 * Encode a string for use in blocks of CSS, or in-line CSS.
+	 *
+	 * @see encodeStringForDisplay
+	 * @see encodeStringForJavascript
+	 *
+	 * @param $string string The string to encode.
+	 * @return string the encoded string.
+	 */
+	public static function encodeStringForCSS($string)
+	{
+		$safeString = '';
+
+		$stringLength = strlen($string);
+		for ($i = 0; $i < $stringLength; $i++) {
+			$char = substr($string, $i, 1);
+			$safeString .= preg_match("/[\da-z]/i", $char) ? $char : '\\' . dechex(ord($char));
+		}
+
+		return $safeString;
 	}
 
 	/**
