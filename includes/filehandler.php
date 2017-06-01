@@ -105,7 +105,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
 			$dir = $base.dirname($key);
-			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist('',$key);
+			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
 			if (!is_dir($dir)) {
 				mkdir_recursive($dir);
 			}

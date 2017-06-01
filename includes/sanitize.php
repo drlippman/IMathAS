@@ -44,6 +44,7 @@ class Sanitize
 	 */
 	public static function isFilenameBlacklisted($filenameToCheck)
 	{
+
 		foreach (self::$blacklistedFilenames as $blacklistedFilename) {
 			if (preg_match($blacklistedFilename, $filenameToCheck)) {
 				return true;

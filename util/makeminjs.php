@@ -36,20 +36,30 @@ function httpPost($url, $data)
 }
 
 //build assessment javascript min file
-$c = minify(file_get_contents("../javascript/general.js"))."\n";
-$c .= minify(file_get_contents("../javascript/mathjs.js"))."\n";
-$c .= minify(file_get_contents("../javascript/AMhelpers.js"))."\n";
-$c .= minify(file_get_contents("../javascript/confirmsubmit.js"))."\n";
-$c .= minify(file_get_contents("../javascript/drawing.js"))."\n";
-$c .= minify(file_get_contents("../javascript/eqntips.js"))."\n";
+$g = minify(file_get_contents("../javascript/general.js"));
+$m = minify(file_get_contents("../javascript/mathjs.js"));
+$a = minify(file_get_contents("../javascript/AMhelpers.js"));
+$c = minify(file_get_contents("../javascript/confirmsubmit.js"));
+$d = minify(file_get_contents("../javascript/drawing.js"));
+$e = minify(file_get_contents("../javascript/eqntips.js"));
 
+if (trim($g)=='' || trim($m)=='' || trim($a)=='' || trim($c)=='' || trim($d)=='' || trim($e)=='') {
+	echo "One or minimizations failed";
+	exit;	
+}
+$c = $g."\n".$m."\n".$a."\n".$c."\n".$d."\n".$e;
 file_put_contents("../javascript/assessment_min.js", $c);
 echo "Wrote assessment_min<br>";
 
-$c = file_get_contents("../javascript/mathquill.js")."\n";
-$c .= file_get_contents("../javascript/mathquilled.js")."\n";
-$c .= file_get_contents("../javascript/AMtoMQ.js")."\n";
+$mc = file_get_contents("../javascript/mathquill.js")."\n";
+$me = file_get_contents("../javascript/mathquilled.js")."\n";
+$ma = file_get_contents("../javascript/AMtoMQ.js")."\n";
 
+if (trim($mc)=='' || trim($me)=='' || trim($ma)=='') {
+	echo "One or minimizations failed";
+	exit;	
+}
+$c = $mc."\n".$me."\n".$ma;
 file_put_contents("../javascript/MQbundle_min.js", minify($c));
 echo "Wrote MQbundle_min<br>";
 ?>
