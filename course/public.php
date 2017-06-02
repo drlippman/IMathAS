@@ -11,7 +11,6 @@
 	require("../config.php");
 	require("../i18n/i18n.php");
 	require("courseshowitems.php");
-	require_once("../includes/sanitize.php");
 
 
 	$ispublic = true;

@@ -307,7 +307,7 @@ if ($overwriteBody==1) {
 
 	/*
 
-	$data = 'html='.Sanitize::encodeStringForUrl($out);
+	$data = 'html='.Sanitize::encodeUrlParam($out);
 
 	$params = array (
             'http' => array (

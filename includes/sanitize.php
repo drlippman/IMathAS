@@ -117,12 +117,15 @@ class Sanitize
 	/**
 	 * Encode a string for use in a URL to be clicked on. Use for query parameters only!
 	 *
+	 * This method will not double-encode a string.
+	 *
 	 * @param $string string The string to encode.
 	 * @return string The encoded string.
 	 */
 	public static function encodeUrlParam($string)
 	{
-		return urlencode($string);
+		$decoded = urldecode($string);
+		return urlencode($decoded);
 	}
 
 	/**
@@ -136,6 +139,19 @@ class Sanitize
 	{
 		// Valid characters: https://www.ietf.org/rfc/rfc3986.txt
 		return preg_replace('/[^\da-z\._~:\/?#\[\]%@!$&\'()*+,;=-]/i', '', $string);
+	}
+
+	/**
+	 * Sanitize a complete URL query string. (Everything after and without the '?' character in a URL)
+	 *
+	 * Example input: "name=MyName&cid=994&color=blue"
+	 *
+	 * @param $string string The entire query string.
+	 * @return string The encoded query string.
+	 */
+	public static function fullQueryString($string)
+	{
+		return self::fullUrl($string);
 	}
 
 	/**

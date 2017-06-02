@@ -54,7 +54,7 @@ $contents .= "';
 
 //base site url - use when generating full URLs to site pages.
 \$httpmode = isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://';
-\$basesiteurl = \$httpmode . Sanitize::domainNameWithPort(\$_SERVER['HTTP_HOST']) . \$imasroot;
+\$GLOBALS['basesiteurl'] = \$httpmode . Sanitize::domainNameWithPort(\$_SERVER['HTTP_HOST']) . \$imasroot;
 
 //mimetex path
 \$mathimgurl = \"{$_POST['mathimgurl']}\";

@@ -3,7 +3,6 @@
 //(c) 2006 David Lippman
 require("config.php");
 require("includes/htmlutil.php");
-require_once("includes/sanitize.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("validate.php");
 } else {

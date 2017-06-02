@@ -1,7 +1,6 @@
 <?php
 
 require("../config.php");
-require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 if (empty($_GET['badgeid'])) {
