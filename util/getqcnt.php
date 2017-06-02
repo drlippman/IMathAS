@@ -101,7 +101,7 @@
 
 	echo "<p>Questions on system created anytime:  public / nonprivate / total</p>";
 	foreach ($qs as $u=>$n) {
-		echo "{$info[$u]}: $u: {$qsp[$u]}/{$qsnp[$u]}/$n<br/>\n";
+		echo Sanitize::encodeStringForDisplay($info[$u]).": " . Sanitize::onlyInt($u).": " .Sanitize::onlyInt($qsp[$u])."/". Sanitize::onlyInt($qsnp[$u]) ."/" .Sanitize::onlyInt($n) ."<br/>\n";
 	}
 
 ?>
