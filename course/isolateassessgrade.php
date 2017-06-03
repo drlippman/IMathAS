@@ -211,8 +211,8 @@
 			printf("%s, %s</span></td>", Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		} else {
-			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName'],
-				Sanitize::encodeStringForDisplay($line['FirstName'])));
+			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+				Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		if ($hassection) {
 			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['section']));

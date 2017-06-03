@@ -413,7 +413,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message = '';
 			}
 
-			echo "<form method=post action=\"msglist.php?page=$page&type=".Sanitize::encodeUrlParam($type)."&cid=$cid&add={$_GET['add']}&replyto=".Sanitize::onlyInt($replyto);
+			echo "<form method=post action=\"msglist.php?page=$page&type=".Sanitize::encodeUrlParam($type)."&cid=$cid&add={$_GET['add']}&replyto=".Sanitize::onlyInt($replyto).'"';
 			if (!isset($_GET['to'])) {
 				echo " onsubmit=\"return checkrecipient();\"";
 			}
