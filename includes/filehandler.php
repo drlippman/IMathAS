@@ -707,7 +707,8 @@ function copyqimage($key,$dest) {
 function getuserfileurl($key) {
 	global $urlmode,$imasroot;
 	if ($GLOBALS['filehandertype'] == 's3') {
-		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
+		//return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
+		return 'https://'.$GLOBALS['AWSbucket'].".s3.amazonaws.com/$key";
 	} else {
 		return "$imasroot/filestore/$key";
 	}
@@ -715,7 +716,8 @@ function getuserfileurl($key) {
 function getcoursefileurl($key) {
 	global $urlmode,$imasroot;
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
-		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/$key";
+		//return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/$key";
+		return 'https://'.$GLOBALS['AWSbucket'].".s3.amazonaws.com/cfiles/$key";
 	} else {
 		return "$imasroot/course/files/$key";
 	}
