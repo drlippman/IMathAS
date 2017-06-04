@@ -54,7 +54,7 @@ function updateBlocksArray(&$items,$tochg,$sets) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Block Settings";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid']).">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Block Settings";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid']).'">'.Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Block Settings";
 
 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
