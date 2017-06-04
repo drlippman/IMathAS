@@ -24,6 +24,7 @@
 	var skipfirst = 0;
 	
 	function sortNumeric(a,b){
+		var p;
 		try {
 		//reRowText = /(\< *[^\>]*\>|\&nbsp\;|\,|[^\d\.\/])/g;
 		//a = a.replace(reRowText,"");
@@ -37,8 +38,20 @@
 		//if(b.indexOf('/')>=0) b = eval(b);
 		a = a.replace(/\<\s*[^\>]*\>/g,'');
 		b = b.replace(/\<\s*[^\>]*\>/g,'');
-		a = parseFloat(a.match(/[\d\.]+/));
-		b = parseFloat(b.match(/[\d\.]+/));
+		if (p = a.match(/[\d\.]+\s*%/)) {
+			a = parseFloat(p);
+		} else if (p = a.match(/[\d\.]+\s*min/)) {
+			a = 60*parseFloat(p);
+		} else {
+			a = parseFloat(a.match(/[\d\.]+/));
+		}
+		if (p = b.match(/[\d\.]+\s*%/)) {
+			b = parseFloat(p);
+		} else if (p = b.match(/[\d\.]+\s*min/)) {
+			b = 60*parseFloat(p);
+		} else {
+			b = parseFloat(b.match(/[\d\.]+/));
+		}
 		
 		if (isNaN(a)) { a=0; }
 		if (isNaN(b)) { b=0; }
