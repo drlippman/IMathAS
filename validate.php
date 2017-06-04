@@ -95,10 +95,10 @@ require_once(__DIR__ . "/includes/sanitize.php");
 		 }
 	 } else {
 	 	 //no reason we should be here...
-		 if (isset($_SERVER['QUERY_STRING'])) {
+		 if (!empty($_SERVER['QUERY_STRING'])) {
 			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
 		 } else {
-			 $querys = (isset($addtoquerystring)?'?'.$addtoquerystring:'');
+			 $querys = (!empty($addtoquerystring)?'?'.$addtoquerystring:'');
 		 }
 
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -287,10 +287,10 @@ require_once(__DIR__ . "/includes/sanitize.php");
 		 }
 
 
-		 if (isset($_SERVER['QUERY_STRING'])) {
+		 if (!empty($_SERVER['QUERY_STRING'])) {
 			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
 		 } else {
-			 $querys = (isset($addtoquerystring)?'?'.$addtoquerystring:'');
+			 $querys = (!empty($addtoquerystring)?'?'.$addtoquerystring:'');
 		 }
 		 //$now = time();
 		 //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
