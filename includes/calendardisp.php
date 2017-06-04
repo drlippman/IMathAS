@@ -81,7 +81,7 @@ for ($i=0;$i<7*$callength;$i++) {
 
 <?php
 //echo '<div class="floatleft">Jump to <a href="'.$refpage.'.php?calpageshift=0&cid='.$cid.'">Now</a></div>';
-$address = $GLOBALS['basesiteurl'] . "/includes/$refpage.php?cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/$refpage.php?cid=$cid";
 
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
 echo '<div class="floatright"><span class="calupdatenotice red"></span> Show <select id="callength" onchange="changecallength(this)">';
