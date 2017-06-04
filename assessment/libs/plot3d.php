@@ -136,29 +136,11 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 		  } else {
 		  	  $bndtxt='';
 		  }
-	  	  $url = $GLOBALS['urlmode']  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+	  	  $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
 		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>";
 	  	  $html .= "</canvas>";
 	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');});</script>";
 	  }
-	/*
-	  } else {
-		  $html .= "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
-		  $html .= "<param name=\"verts\" value=\"$verts\">\n";
-		  $html .= "<param name=\"faces\" value=\"$faces\">\n";
-		  if ($axes==1) {
-			  $html .= "<param name=\"axes\" value=\"show\">\n";
-		  } else {
-			  $html .= "<param name=\"axes\" value=\"hide\">\n";
-		  }
-		  if (isset($bounds)) {
-			  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
-		  }
-		  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
-
-		  $html .= "</applet><br/>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>\n";
-	  }
-	  */
 	  return $html;
 
 }
@@ -264,25 +246,6 @@ function spacecurve($func,$tmin,$tmax) {
 		  $html .= "  width: $width, height: $height };";
 		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
 		  $html .= '</script>';
-		  /*if (isset($GLOBALS['sessiondata']['useflash'])) {
-
-		  } else {
-			  $html = "<applet codebase=\"{$GLOBALS['imasroot']}/assessment/libs\" code=\"Viewer.class\" width=$width height=$height>\n";
-			  $html .= "<param name=\"verts\" value=\"$verts\">\n";
-			  $html .= "<param name=\"faces\" value=\"$faces\">\n";
-			  if ($axes==1) {
-				  $html .= "<param name=\"axes\" value=\"show\">\n";
-			  } else {
-				  $html .= "<param name=\"axes\" value=\"hide\">\n";
-			  }
-			  $html .= "<param name=\"edges\" value=\"hide\">\n";
-			  if (isset($bounds)) {
-				  $html .= "<param name=\"bounds\" value=\"" . implode(',',$bounds) . "\">\n";
-			  }
-			  $url = $GLOBALS['urlmode']  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
-
-			  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></applet>\n";
-		  } */
 	} else {
 		//new approach
 		$func = str_replace('[','',$func);
@@ -316,7 +279,8 @@ function spacecurve($func,$tmin,$tmax) {
 		 }
 	  	 $GLOBALS['3dplotcnt'] = $r;
 	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
-	  	 $url = $GLOBALS['basesiteurl'] . '/assessment/libs/plot3d.php' . (isset($_SERVER['QUERY_STRING'])?'?'.$_SERVER['QUERY_STRING'].'&useflash=true':'?useflash=true');
+	  	 $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
+		  
 		 $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a>";
 	  	 $html .= "</canvas>";
 	  	 $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');});</script>";

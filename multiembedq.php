@@ -195,7 +195,7 @@ if ($theme != '') {
 }
 require("./assessment/header.php");
 if ($sessiondata['graphdisp'] == 1) {
-	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';
+	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';
 }
 echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
 

@@ -13,6 +13,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 	 } else {
 		 $querys = '';
 	 }
+	 $loginFormAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
 	 if (!empty($_SESSION['challenge'])) {
 		 $challenge = $_SESSION['challenge'];
 	 } else {
@@ -28,7 +29,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 
 
 <div id="loginbox">
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
+<form method="post" action="<?php echo $loginFormAction;?>">
 <?php
 	if ($haslogin) {
 		if ($badsession) {

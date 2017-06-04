@@ -195,7 +195,7 @@ if ($isteacher) {
 		require("../header.php");
 
 		echo '<div class="noPrint"><a href="#" onclick="window.print(); return false;">Print Reports</a> ';
-		echo '<a href="gradebook.php?'.$_SERVER['QUERY_STRING'].'">', _('Back to Gradebook'), '</a></div>';
+		echo '<a href="gradebook.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">', _('Back to Gradebook'), '</a></div>';
 		if( isset($_POST['checked']) ) {
 			echo "<div id=\"tbl-container\">";
 			echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
@@ -253,7 +253,7 @@ if ($isteacher) {
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?{$_SERVER['QUERY_STRING']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullUrl($_SERVER['QUERY_STRING']));
 		exit;
 	}
 }
@@ -866,7 +866,7 @@ function gbstudisp($stu) {
 
 		if (trim($gbcomment)!='' || $isteacher) {
 			if ($isteacher) {
-				echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
+				echo "<form method=post action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."\">";
 				echo _('Gradebook Comment').': '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
 				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea>";
 				echo '</form>';
@@ -885,7 +885,7 @@ function gbstudisp($stu) {
 		}
 
 	}
-	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
+	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."&uid=$stu\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
 	if ($isteacher && $stu>0) {
 		echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';

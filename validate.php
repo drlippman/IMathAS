@@ -124,7 +124,7 @@ require_once(__DIR__ . "/includes/sanitize.php");
 		$stm->execute(array(':now'=>$now, ':log'=>"$userid login from IP:{$_SERVER['REMOTE_ADDR']}"));
 
 
-		 header('Location: ' . $GLOBALS['basesiteurl'] . $querys);
+		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::fullUrl($querys));
 		 exit;
 	 }
 
@@ -296,7 +296,7 @@ require_once(__DIR__ . "/includes/sanitize.php");
 		 //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
 		 //DB //mysql_query($query) or die("Query failed : " . mysql_error());
 
-		 header('Location: ' . $GLOBALS['basesiteurl'] . $querys);
+		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::fullUrl($querys));
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;
@@ -328,7 +328,7 @@ require_once(__DIR__ . "/includes/sanitize.php");
 		/*
 		$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		header('Location: ' . $GLOBALS['basesiteurl'] . $querys);
+		header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::fullUrl($querys));
 		exit;
 		*/
 	}

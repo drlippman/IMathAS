@@ -1021,7 +1021,7 @@
 	echo '</div>';
 
 	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {
-		echo '<p>This question appears to be a Tutorial Style question.  <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Open in the tutorial question editor</a></p>';
+		echo '<p>This question appears to be a Tutorial Style question.  <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">Open in the tutorial question editor</a></p>';
 	}
 
 	if ($line['deleted']==1) {
@@ -1170,7 +1170,7 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 <a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a> |
 <a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
 <?php if (!isset($_GET['id'])) {
-	echo ' | <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
+	echo ' | <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">Tutorial Style editor</a>';
 }?>
 </p>
 <div id=ccbox>

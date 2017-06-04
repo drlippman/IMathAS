@@ -141,7 +141,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 	//check for session
 	$origquerys = $querys;
 	if ($_POST['ekey']!='') {
-		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
+		$addtoquerystring = "ekey=".Sanitize::encodeStringForUrl($_POST['ekey']);
 	}
 	require("validate.php");
 	$flexwidth = true;
@@ -243,7 +243,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 		$enrollkey = $stm->fetchColumn(0);
 
 ?>
-<form id="pageform" method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
+<form id="pageform" method="post" action="directaccess.php<?php echo Sanitize::encodeStringForDisplay($querys);?>">
 
 <?php
 if ($enrollkey!='closed') {
@@ -267,7 +267,7 @@ if ($enrollkey!='closed') {
 <span class=form>Password:</span><input class="form" type="password" size="15" id="password" name="password"><br class="form">
 <?php
 if (strlen($enrollkey)>0) {
-	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="'.(isset($_POST['ekey'])?$_POST['ekey']:"").'"/><BR class=form>';
+	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="'.(isset($_REQUEST['ekey'])?$_REQUEST['ekey']:"").'"/><BR class=form>';
 }
 ?>
 <span class=form> </span><span class=formright><a href="<?php echo $imasroot; ?>/forms.php?action=resetpw">Forgot Password</a></span><br class="form">
