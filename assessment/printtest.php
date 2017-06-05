@@ -52,7 +52,7 @@
 			</script>';
 
 	if ($isteacher && isset($_GET['asid'])) {
-		$testid = $_GET['asid'];
+		$testid = Sanitize::onlyInt($_GET['asid']);
 	} else {
 		//DB $testid = addslashes($sessiondata['sessiontestid']);
 		$testid = $sessiondata['sessiontestid'];

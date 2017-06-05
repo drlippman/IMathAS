@@ -35,7 +35,6 @@ if ($stm->rowCount()==0) {
 	$showtype = '4';
 	$n = 30;
 	$showtostu = 7;
-	$itemdescr = array();
 	$daid = 0;
 	$drillname = "Enter title here";
 	$drillsummary = "<p>Enter summary here (displays on course page)</p>";
@@ -82,12 +81,12 @@ if (isset($_GET['record'])) {
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
 		} else {
-			$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+			$startdate = parsedatetime(Sanitize::cleanDate($_POST['sdate']), Sanitize::cleanTime($_POST['stime']));
 		}
 		if ($_POST['edatetype']=='2000000000') {
 			$enddate = 2000000000;
 		} else {
-			$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+			$enddate = parsedatetime(Sanitize::cleanDate($_POST['edate']), Sanitize::cleanTime($_POST['etime']));
 		}
 	} else {
 		$startdate = 0;
@@ -152,7 +151,7 @@ if (isset($_GET['record'])) {
 			$descr[$row[0]] = str_replace(',','',$row[1]);
 		}
 		foreach ($toadd as $k=>$v) {
-			$itemids[] = $v;
+			$itemids[] = Sanitize::onlyInt($v);
 			$itemdescr[] = $descr[$v];
 		}
 		$classbests = array_fill(0,count($itemids),-1);
@@ -287,7 +286,7 @@ if (isset($_GET['record'])) {
 		if ($_POST['libs']=='') {
 			$_POST['libs'] = $userdeflib;
 		}
-		$searchlibs = $_POST['libs'];
+		$searchlibs = Sanitize::encodeStringForDisplay($_POST['libs']);
 		//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
 		$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
 		writesessiondata();
@@ -330,6 +329,7 @@ $placeinhead = "<script type=\"text/javascript\">
 		</script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js"></script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 
 require("../header.php");
 
@@ -752,7 +752,7 @@ foreach ($itemids as $k=>$id) {
 		echo '</td>';
 	}
 	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.Sanitize::encodeStringForDisplay($itemdescr[$k]).'"/></td>';
-	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k,{$itemids[$k]})\"/></td>";
+	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k," . Sanitize::encodeStringForJavascript($itemids[$k]) . ")\"/></td>";
 	if (!$beentaken) {
 		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1"/></td>';
 	}
