@@ -2,7 +2,7 @@
 //IMathAS: Content view statistics for an item
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../validate.php");
+require("../init.php");
 
 
 $overwritebody = false;

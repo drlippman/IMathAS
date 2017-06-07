@@ -2,7 +2,7 @@
 //IMathAS:  Drill Assess creator (rough version)
 //(c) 2011 David Lippman
 
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 

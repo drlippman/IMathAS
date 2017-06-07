@@ -2,7 +2,7 @@
 // IMathAS: Add video cueing to assessments
 // (c) 2012 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 
 if (!isset($teacherid)) {

@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Main course page
 //(c) 2006 David Lippman
-   require("../validate.php");
+   require("../init.php");
    require("courseshowitems.php");
    require("../includes/calendardisp.php");
    if (isset($instrPreviewId)) {

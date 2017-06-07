@@ -2,7 +2,7 @@
 //Displays forums posts
 //(c) 2006 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {

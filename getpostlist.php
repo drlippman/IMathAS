@@ -2,7 +2,7 @@
 //IMathAS:  New threads and messages list for a course using remoteaccess code
 //for mobile access w/o logging in
 //(c) 2009 David Lippman
-   	require("config.php");
+   	require("init_without_validate.php");
 	if (!empty($_COOKIE['remoteaccess']) && strlen($_COOKIE['remoteaccess'])==10) {
 		$_GET['key'] = $_COOKIE['remoteaccess'];
 	} else if (empty($_GET['key']) || strlen(trim($_GET['key']))!=10) {

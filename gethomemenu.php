@@ -2,7 +2,7 @@
 //returns list of courses for switch-to menu
 //called via AJAX
 //IMathAS
-require("validate.php");
+require("init.php");
 
 echo '<b>Switch to:</b><ul class="nomark">';
 $query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";

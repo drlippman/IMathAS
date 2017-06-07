@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("courseshowitems.php");
 require("../includes/htmlutil.php");
 require("../includes/calendardisp.php");

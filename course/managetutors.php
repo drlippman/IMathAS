@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Add/remove class tutors
 //(c) 2009 David Lippman
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/htmlutil.php");
 
 

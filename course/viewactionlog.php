@@ -2,7 +2,7 @@
 //IMathAS:  View content tracking logs
 //(c) 2013 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 
 $cid = intval($_GET['cid']);

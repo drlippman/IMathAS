@@ -2,7 +2,7 @@
 //IMathAS 2014
 //list forum thread viewers
 
-require("../validate.php");
+require("../init.php");
 
 if (!isset($teacherid)) {
 	echo "Not authorized to view this page";

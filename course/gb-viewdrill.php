@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Drill Assess player (updated quickdrill)
 //(c) 2011 David Lippman
-require("../validate.php");
+require("../init.php");
 
 
 function stddev($array){

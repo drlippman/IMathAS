@@ -2,7 +2,7 @@
 //IMathAS:  Frontend of testing engine - manages administration of assessments
 //(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	
 	if (!isset($CFG['TE']['navicons'])) {
 		 $CFG['TE']['navicons'] = array(

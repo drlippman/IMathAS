@@ -4,7 +4,7 @@
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 
-require("../validate.php");
+require("../init.php");
 if ($myrights<100) { exit; }
 error_reporting(E_ALL);
 function minify($c) {

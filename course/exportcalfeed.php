@@ -1,6 +1,6 @@
 <?php
 
-require("../validate.php");
+require("../init.php");
 require("../includes/JWT.php");
 
 //grab user's hashed password to sign request with

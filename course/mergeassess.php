@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 
 
 if (!isset($teacherid)) {

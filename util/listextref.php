@@ -1,6 +1,6 @@
 <?php
 
-require("../validate.php");
+require("../init.php");
 
 //DB $query = "SELECT uniqueid,lastmoddate,extref FROM imas_questionset WHERE extref<>''";
 //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());

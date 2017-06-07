@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 require("../includes/filehandler.php");
 
 @set_time_limit(0);

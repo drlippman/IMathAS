@@ -3,7 +3,7 @@
 //(c) 2008 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 if (!isset($teacherid)) {
 	echo "You must be a teacher to access this page";

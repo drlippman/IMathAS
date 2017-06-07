@@ -2,7 +2,7 @@
 //IMathAS:  View login record
 //(c) 2011 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 
 $cid = intval($_GET['cid']);

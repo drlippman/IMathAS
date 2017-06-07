@@ -1,5 +1,5 @@
 <?php
-	require("../validate.php");
+	require("../init.php");
 	$isteacher = (isset($teacherid) || $sessiondata['isteacher']==true);
 	if (!isset($sessiondata['sessiontestid']) && !$isteacher) {
 		echo "<html><body>Error. </body></html>\n";

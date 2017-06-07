@@ -1,6 +1,6 @@
 <?php
 
-require("../validate.php");
+require("../init.php");
 require("../includes/htmLawed.php");
 
 $cid = Sanitize::courseId($_GET['cid']);

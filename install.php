@@ -9,8 +9,6 @@ if (isset($_POST['dbserver'])) {
 	$contents = "<?php
 //IMathAS Math Config File.  Adjust settings here!
 
-require_once(__DIR__ . \"/includes/security.php\");
-
 //database access settings
 \$dbserver = \"{$_POST['dbserver']}\";
 \$dbname = \"{$_POST['dbname']}\";

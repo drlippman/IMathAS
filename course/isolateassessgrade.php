@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Display grade list for one online assessment
 //(c) 2007 David Lippman
-	require("../validate.php");
+	require("../init.php");
 	
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);

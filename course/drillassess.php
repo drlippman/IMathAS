@@ -2,7 +2,7 @@
 //IMathAS:  Drill Assess player (updated quickdrill)
 //(c) 2011 David Lippman
 
-require("../validate.php");
+require("../init.php");
 require("../assessment/displayq2.php");
 
 

@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 
  //set some page specific variables and counters

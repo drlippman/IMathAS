@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Flagged threads list for a course
 //(c) 2017 David Lippman
-require("../validate.php");
+require("../init.php");
 
 
 $cid = Sanitize::courseId($_GET['cid']);

@@ -2,7 +2,7 @@
 //IMathAS:  Add/modify gradebook comments
 //(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 
 
 	if (!(isset($teacherid))) {

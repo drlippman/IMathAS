@@ -27,8 +27,7 @@
 //    lis_person_contact_email_primary
 
 header('P3P: CP="ALL CUR ADM OUR"');
-include("config.php");
-require_once("includes/sanitize.php");
+include("init_without_validate.php");
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
 //DB if (!get_magic_quotes_gpc()) {

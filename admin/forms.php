@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Admin forms
 //(c) 2006 David Lippman
-require("../validate.php");
+require("../init.php");
 require("../header.php");
 
 $from = 'admin';

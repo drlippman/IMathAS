@@ -4,7 +4,7 @@
 	//add/modify gbitem w/ grade edit
 	//grade edit
 	//single grade edit
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/htmlutil.php");
 
 

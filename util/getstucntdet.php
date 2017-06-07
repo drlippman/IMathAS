@@ -9,7 +9,7 @@ ul {
 </head>
 <body>
 <?php
-	require("../validate.php");
+	require("../init.php");
 	if ($myrights<40) {
 		exit;
 	}

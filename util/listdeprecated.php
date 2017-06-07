@@ -1,6 +1,6 @@
 <?php
 
-require("../validate.php");
+require("../init.php");
 
 //DB $query = "SELECT A.uniqueid,B.uniqueid,A.description,B.description FROM imas_questionset AS A JOIN imas_questionset AS B ON A.replaceby=B.id";
 //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());

@@ -1,11 +1,10 @@
 <?php
 //IMathAS:  Basic forms
 //(c) 2006 David Lippman
-require("config.php");
+require("init_without_validate.php");
 require("includes/htmlutil.php");
-require_once("includes/sanitize.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
-	require("validate.php");
+	require("init.php");
 } else {
 	if (isset($CFG['CPS']['theme'])) {
 		$defaultcoursetheme = $CFG['CPS']['theme'][0];

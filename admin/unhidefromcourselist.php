@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
 if (!isset($_GET['type'])) {
 	$type = 'take';

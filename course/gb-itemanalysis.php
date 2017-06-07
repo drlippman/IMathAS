@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Item Analysis (averages)
 //(c) 2007 David Lippman
-	require("../validate.php");
+	require("../init.php");
 
 	$isteacher = isset($teacherid);
 	$cid = Sanitize::courseId($_GET['cid']);

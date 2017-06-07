@@ -1,7 +1,7 @@
 <?php
  //IMathAS:  Save page reordering from Quick View
  //(c) 2008 David Lippman
- require("../validate.php");
+ require("../init.php");
 
  if (!isset($teacherid)) {
 	 echo "Must be a teacher to access this page";

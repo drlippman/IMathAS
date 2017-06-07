@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 if ($myrights<100) {exit;}
 if ((isset($_POST['submit']) && $_POST['submit']=="Message") || isset($_GET['masssend'])) {
 	$cid = $CFG['GEN']['sendquestionproblemsthroughcourse'];

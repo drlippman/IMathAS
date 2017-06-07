@@ -4,8 +4,6 @@
 	//created automatically by install.php
   //(c) 2006 David Lippman
 
-  require_once(__DIR__ . "/includes/security.php");
-
   //these settings must be editted before running dbsetup.php
   $dbserver = "localhost";  		//database server
   $dbname = "imas";			//database name

@@ -52,9 +52,9 @@ unset($dbpassword);
 			exit;
 	}
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
-		require("config.php");
+		require("init_without_validate.php");
 	} else {
-		require("validate.php");
+		require("init.php");
 		if ($myrights<100) {
 			echo "No rights, aborting";
 			exit;

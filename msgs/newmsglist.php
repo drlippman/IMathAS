@@ -6,7 +6,7 @@
 	//1      2         4                   8
 	//Read   Deleted   Deleted by Sender   Tagged
 
-	require("../validate.php");
+	require("../init.php");
 	
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {

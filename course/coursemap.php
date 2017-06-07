@@ -2,7 +2,7 @@
 //IMathAS:  Course Map view
 //(c) 2017 David Lippman
 
-require("../validate.php");
+require("../init.php");
 require('../includes/loaditemshowdata.php');
 
 $placeinhead = '<style type="text/css">

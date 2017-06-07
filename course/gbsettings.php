@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Add/modify gradebook categories
 //(c) 2006 David Lippman
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/htmlutil.php");
 
 

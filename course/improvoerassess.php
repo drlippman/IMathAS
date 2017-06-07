@@ -4,7 +4,7 @@
 // Assessment "badness" report, based on
 // Lumen Learning's ImprovOER model
 
-require("../validate.php");
+require("../init.php");
 
 if (!isset($teacherid) && !isset($adminid)) {
 	exit;

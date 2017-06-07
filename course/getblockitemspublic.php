@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Main course page
 //(c) 2006 David Lippman
-   require("../config.php");
+   require("../init_without_validate.php");
    require("courseshowitems.php");
    $ispublic = true;
 

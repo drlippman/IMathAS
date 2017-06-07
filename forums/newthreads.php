@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  New threads list for a course
 //(c) 2006 David Lippman
-require("../validate.php");
+require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'];
 /*
