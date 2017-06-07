@@ -77,7 +77,7 @@ function setupLivePreview(qn) {
 			  		if (!calcformat[qn].match(/inequality/)) {
 			  			text = text.replace(/U/g,"uu");
 			  		} else {
-			  			text = text.replace('<=','le').replace('>=','ge').replace('<','lt').replace('>','gt');
+			  			text = text.replace(/<=/g,' le ').replace(/>=/g,' ge ').replace(/</g,' lt ').replace(/>/g,' gt ');
 			  			if (text.match(/all\s*real/i)) {
 			  				text = "text("+text+")";
 			  			}

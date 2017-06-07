@@ -4627,12 +4627,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if (in_array('inequality',$ansformats)) {
 				$_POST["tc$qn"] = str_replace('or', ' or ', $_POST["tc$qn"]);
-
 				preg_match_all('/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/',$_POST["tc$qn"],$matches);
 				foreach ($matches[0] as $var) {
 					$var = str_replace(' ','',$var);
 					if (in_array($var,$mathfuncs)) { continue;}
-					if ($var!= 'or' && $var!='and' && $var!='DNE' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
+					if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
 						return 0;
 					}
 				}
@@ -4643,7 +4642,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$opts = preg_split('/(<=?|>=?)/',$opt);
 					foreach ($opts as $optp) {
 						$optp = trim($optp);
-						if ($optp==$variables) {continue;}
+						if ($optp==$variables || $optp=='oo' || $optp=='-oo') {continue;}
 						if (!checkanswerformat($optp,$ansformats)) {
 							return 0;
 						}
