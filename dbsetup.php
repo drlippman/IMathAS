@@ -1111,6 +1111,17 @@ $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest ac
 $DBH->query($sql);
 echo 'imas_dbschema created<br/>';
 
+$sql = 'CREATE TABLE `php_sessions` (
+	`id` VARCHAR(32) NOT NULL,
+	`access` INT(10) unsigned DEFAULT NULL,
+	`data` TEXT,
+	PRIMARY KEY (`id`),
+	INDEX (`access`)
+	) ENGINE=InnoDB';
+//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+$DBH->query($sql);
+echo 'php_sessions created<br/>';
+
 if (isset($CFG['GEN']['newpasswords'])) {
 	require_once("includes/password.php");
 	$md5pw = password_hash($password, PASSWORD_DEFAULT);

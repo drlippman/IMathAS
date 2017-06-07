@@ -122,6 +122,7 @@ $contents .= '
 	  unset($dbusername);
 	  unset($dbpassword);
 
+require_once(__DIR__ . "/includes/session.php");
 
 ?>';
 $file = fopen('config.php','w');
