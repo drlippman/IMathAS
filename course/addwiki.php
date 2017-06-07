@@ -14,7 +14,7 @@ $overwriteBody = 0;
 $body = "";
 $useeditor = "description";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid']).">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];

@@ -20,11 +20,11 @@ if (!(isset($teacherid))) {
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
-} elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
+} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = $_GET['block'];
+	$block = Sanitize::stripHtmlTags($_GET['block']);
 
-	if ($_GET['remove']=="really") {
+	if ($_POST['remove']=="really") {
 		$aid = Sanitize::onlyInt($_GET['id']);
 		$DBH->beginTransaction();
 		//DB $query = "DELETE FROM imas_assessments WHERE id='$aid' AND courseid=$cid";
@@ -117,10 +117,13 @@ if ($overwriteBody==1) {
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h3><?php echo $itemname; ?></h3>
 	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
+
+	<form method="POST" action="deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeStringForDisplay($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>
-	<input type=button value="Yes, Delete" onClick="window.location='deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
+	<button type=submit name="remove" value="really">Yes, Delete</button>		
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
 	</p>
+	</form>
 
 <?php
 }

@@ -20,8 +20,8 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	if ($_GET['remove']=="really") { // the request has been confirmed, delete the block
+} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
+	if ($_POST['remove']=="really") { // the request has been confirmed, delete the block
 		$blocktree = explode('-',$_GET['id']);
 		$blockid = array_pop($blocktree) - 1; //-1 adjust for 1-index
 
@@ -105,11 +105,11 @@ if ($overwriteBody==1) {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h3><?php echo $itemname; ?></h3>
-	<form method=post action="deleteblock.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&id=<?php echo $_GET['id'] ?>&remove=really">
+	<form method=post action="deleteblock.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&id=<?php echo Sanitize::encodeStringForDisplay($_GET['id']) ?>">
 	<p>Are you SURE you want to delete this Block?</p>
 	<p><input type=radio name="delcontents" value="0"/>Move all items out of block<br/>
 	<input type=radio name="delcontents" value="1" checked="checked"/>Also Delete all items in block</p>
-	<p><input type=submit value="Yes, Delete">
+	<p><button type=submit name="remove" value="really">Yes, Delete</button>		
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'"></p>
 <?php
 }
