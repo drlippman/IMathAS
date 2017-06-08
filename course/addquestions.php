@@ -122,8 +122,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 	}
-	if (isset($_GET['clearattempts'])) {
-		if ($_GET['clearattempts']=="confirmed") {
+	if (isset($_REQUEST['clearattempts'])) {
+		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
 			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
@@ -151,8 +151,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h3>$assessmentname</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=confirmed'\">\n";
+			$body .= '<form method="POST" action="'.sprintf('addquestions.php?cid=%s&aid=%d',$cid, $aid).'">';
+			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
 			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
+			$body .= '</form>';
 		}
 	}
 	/*
@@ -241,7 +243,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	*/
 	if (isset($_GET['withdraw'])) {
-		if (isset($_GET['confirmed'])) {
+		if (isset($_POST['withdrawtype']) && isset($_GET['confirmed'])) {
 			if (strpos($_GET['withdraw'],'-')!==false) {
 				$isingroup = true;
 				$loc = explode('-',$_GET['withdraw']);
@@ -357,7 +359,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h3>Withdraw Question</h3>";
-			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw={$_GET['withdraw']}&confirmed=true\">";
+			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw=".Sanitize::encodeStringForDisplay($_GET['withdraw'])."&confirmed=true\">";
 			if ($isingroup) {
 				$body .= '<p><b>This question is part of a group of questions</b>.  </p>';
 				$body .= '<input type=radio name="withdrawtype" value="groupzero" > Set points possible and all student scores to zero <b>for all questions in group</b><br/>';

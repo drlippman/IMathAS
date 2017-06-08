@@ -42,7 +42,7 @@
 
 
 	if (isset($_GET['del']) && $isteacher) {
-		if (isset($_GET['confirm'])) {
+		if (isset($_POST['confirm'])) {
 			//DB $query = "DELETE FROM imas_gbitems WHERE id='{$_GET['del']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id=:id AND courseid=:courseid");
@@ -54,17 +54,25 @@
 				$stm->execute(array(':gradetypeid'=>$_GET['del']));
 			}
 
-			header(sprintf('Location: %s/course/gradebook.php?stu=%s&gbmode=%s&cid=%s', $GLOBALS['basesiteurl'],
-                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid));
+			header(sprintf('Location: %s/course/gradebook.php?stu=%s&cid=%s', $GLOBALS['basesiteurl'],
+				Sanitize::encodeUrlParam($_GET['stu']), $cid));
 			exit;
 		} else {
 			require("../header.php");
-			echo "<p>Are you SURE you want to delete this item and all associated grades from the gradebook?</p>";
-			printf("<p><a href=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&del=%s&confirm=true\">Delete Item</a>",
-                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid,
-                Sanitize::encodeUrlParam($_GET['del']));
-			printf(" <a href=\"gradebook.php?stu=%s&gbmode=%s&cid=%s\">Nevermind</a>",
-                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid);
+			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['del']));
+			$itemname = $stm->fetchColumn(0);
+			
+			echo "<p>Are you SURE you want to delete <strong>".Sanitize::encodeStringForDisplay($itemname);
+			echo "</strong> and all associated grades from the gradebook?</p>";
+			echo '<form method="POST" action="'.sprintf("addgrades.php?stu=%s&cid=%s&del=%s",
+				Sanitize::encodeUrlParam($_GET['stu']), $cid, Sanitize::encodeUrlParam($_GET['del'])).'">';
+			echo '<p><button type=submit name=confirm value=true>'._('Delete Item').'</button>';
+
+			printf(" <input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addgrades.php?stu=%s&cid=%s&gbitem=%d&grades=all'\" />",
+				Sanitize::encodeUrlParam($_GET['stu']), $cid, $_GET['del']);
+			
+			echo '</p></form>';
 			require("../footer.php");
 			exit;
 		}

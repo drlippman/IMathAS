@@ -16,7 +16,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 if (isset($_POST['checked'])) { //form submitted
 	$checked = $_POST['checked'];
 	if ($_POST['submit']=="Delete") {
-		if (isset($_GET['confirm'])) {
+		if (isset($_POST['confirm'])) {
 			$checked = explode(',',$checked);
 			foreach ($checked as $k=>$gbi) {
 				$gbi = intval($gbi);
@@ -36,7 +36,7 @@ if (isset($_POST['checked'])) { //form submitted
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 			echo "&gt; <a href=\"chgoffline.php?cid=$cid\">Manage Offline Grades</a> &gt; Confirm Delete</div>";
-			echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid&confirm=true\">";
+			echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 			echo '<input type="hidden" name="submit" value="Delete" />';
 			echo '<input type="hidden" name="checked" value="'.$checkedlist.'"/>';
 			echo '<p>Are you <b>SURE</b> you want to delete these offline grade items ';
@@ -49,7 +49,8 @@ if (isset($_POST['checked'])) { //form submitted
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				echo $row[0].'<br/>';
 			}
-			echo '<p><p><input type="submit" value="Yes, Delete"/>';
+			//echo '</p><p><input type="submit" value="Yes, Delete"/>';
+			echo '</p><p><button type=submit name=confirm value=true>'._('Yes, Delete').'</button> ';
 			echo '<input type=button value="Nevermind" class="secondarybtn" onClick="window.location=\'gradebook.php?cid='.$cid.'\'"></p>';
 			echo '</form>';
 			require("../footer.php");

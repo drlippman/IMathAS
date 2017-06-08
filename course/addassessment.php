@@ -50,8 +50,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
-	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
-		if ($_GET['clearattempts']=="confirmed") {
+	if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
+		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles(Sanitize::onlyInt($_GET['id']));
 			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
@@ -78,15 +78,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$_GET['id']));
 			$assessmentname = $stm->fetchColumn(0);
 			$body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
-                $cid, Sanitize::encodeStringForDisplay($coursename));
+				$cid, Sanitize::encodeStringForDisplay($coursename));
 			$body .= sprintf("&gt; <a href=\"addassessment.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
-                $cid, Sanitize::onlyInt($_GET['id']));
+				$cid, Sanitize::onlyInt($_GET['id']));
 			$body .= sprintf("<h3>%s</h3>", $assessmentname);
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-			$body .= sprintf("<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addassessment.php?cid=%s&id=%d&clearattempts=confirmed'\">\n",
-                $cid, Sanitize::onlyInt($_GET['id']));
+			$body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, Sanitize::onlyInt($_GET['id'])).'">';
+			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
 			$body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=%s&id=%d'\"></p>\n",
-                $cid, Sanitize::onlyInt($_GET['id']));
+				$cid, Sanitize::onlyInt($_GET['id']));
+			$body .= '</form>';
 		}
 	} elseif ($_POST['name']!= null) { //if the form has been submitted
 

@@ -405,18 +405,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "massexception.php";
-	} elseif (isset($_GET['action']) && $_GET['action']=="resetpw") {
-		if (isset($_GET['confirmed'])) {
-			$newpw = "5f4dcc3b5aa765d61d8327deb882cf99";  //md5("password")
-			//DB $query = "UPDATE imas_users SET password='$newpw' WHERE id='{$_GET['uid']}'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("UPDATE imas_users SET password=:password WHERE id=:id");
-			$stm->execute(array(':password'=>$newpw, ':id'=>$_GET['uid']));
-		} else {
-			$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
-			$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
-			$pagetitle = "Confirm Change";
-		}
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" && !isset($CFG['GEN']['noInstrUnenroll'])){
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
@@ -433,7 +421,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "lockstu.php";
 
-	} elseif (isset($_GET['action']) && $_GET['action']=="lockone" && is_numeric($_GET['uid'])) {
+	} /*elseif (isset($_GET['action']) && $_GET['action']=="lockone" && is_numeric($_GET['uid'])) {
 		$now = time();
 		//DB $query = "UPDATE imas_students SET locked='$now' WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -451,7 +439,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
-	} else { //DEFAULT DATA MANIPULATION HERE
+	}*/ else { //DEFAULT DATA MANIPULATION HERE
 
 		$curBreadcrumb .= " &gt; Roster\n";
 		$pagetitle = "Student Roster";
@@ -699,19 +687,6 @@ if ($overwriteBody==1) {
 			</span><br class=form />
 			<div class=submit><input type=submit value="Update Info"></div>
 		</form>
-
-<?php
-	} elseif (isset($_GET['action']) && $_GET['action']=="resetpw") {
-?>
-		<form method=post action="listusers.php?cid=<?php echo $cid ?>&action=<?php echo $_GET['action'] ?>&uid=<?php echo $_GET['uid'] ?>&confirmed=true">
-
-		Are you sure you want to reset this student's password
-
-		<p>
-			<input type=submit value="Yes, I'm Sure">
-			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='listusers.php?cid=<?php echo $cid ?>'">
-		</p>
-	</form>
 
 <?php
 	} else {
