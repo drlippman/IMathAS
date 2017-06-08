@@ -14,7 +14,7 @@ if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
 }
 
-switch($_GET['action']) {
+switch($_POST['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
 		$be = $_REQUEST['uid'];
@@ -322,7 +322,7 @@ switch($_GET['action']) {
 
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 
-		if ($_GET['action']=='modify') {
+		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,hideicons=:hideicons,available=:available,lockaid=:lockaid,picicons=:picicons,showlatepass=:showlatepass,";
 			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass WHERE id=:id";
 			$qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],

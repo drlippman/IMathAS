@@ -29,7 +29,8 @@ if (isset($_GET['form'])) {
 	if ($_GET['form']=='emu') {
 		require("../header.php");
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Emulate User</div>';
-		echo '<form method="post" action="'.$imasroot.'/admin/actions.php?action=emulateuser">';
+		echo '<form method="post" action="'.$imasroot.'/admin/actions.php">';
+		echo '<input type=hidden name=action value="emulateuser" />';
 		echo 'Emulate user with userid: <input type="text" size="5" name="uid"/>';
 		echo '<input type="submit" value="Go"/>';
 		require("../footer.php");
@@ -83,7 +84,8 @@ if (isset($_GET['form'])) {
 				//DB while ($row = mysql_fetch_assoc($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
-					echo '<form method="post" action="../admin/actions.php?action=resetpwd&id='.$row['id'].'">';
+					echo '<form method="post" action="../admin/actions.php?id='.$row['id'].'">';
+					echo '<input type=hidden name=action value="resetpwd" />';
 					echo '<ul><li>Username: <a href="../admin/admin.php?showcourses='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
 					echo '<li>ID: '.$row['id'].'</li>';
 					if ($row['name']!=null) {
