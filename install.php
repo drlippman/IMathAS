@@ -52,7 +52,7 @@ $contents .= "';
 
 //base site url - use when generating full URLs to site pages.
 \$httpmode = (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on')
-|| (isset(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+    || (isset(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
 	? 'https://' : 'http://';
 \$GLOBALS['basesiteurl'] = \$httpmode . Sanitize::domainNameWithPort(\$_SERVER['HTTP_HOST']) . \$imasroot;
 
