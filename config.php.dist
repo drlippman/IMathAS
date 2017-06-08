@@ -215,6 +215,4 @@
   //DB  $_POST  = array_map('addslashes_deep', $_POST);
   //DB  $_COOKIE = array_map('addslashes_deep', $_COOKIE);
   //DB }
-
-  require_once(__DIR__ . "/includes/session.php");
 ?>
