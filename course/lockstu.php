@@ -13,7 +13,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../footer.php");
 		exit;
 	}
-	if (isset($_GET['confirmed'])) { //do unenroll
+	if (isset($_POST['dolockstu']) || isset($_POST['lockinstead'])) { //do lockout - postback
 		if ($_GET['uid']=="selected") {
 			$tolock = explode(",",$_POST['tolock']);
 		} else if ($_GET['uid']=="all") {
@@ -98,7 +98,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 					}
 ?>
 		</ul>
-		<input type=hidden name="tolock" value="<?php echo implode(",",$_POST['checked']) ?>">
+		<input type=hidden name="tolock" value="<?php echo Sanitize::encodeStringForDisplay(implode(",",$_POST['checked'])); ?>">
 <?php
 				}
 			} else {
@@ -107,7 +107,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 ?>
 
 		<p>
-			<input type=submit value="Yes, Lock Out Student">
+			<input type=submit name="dolockstu" value="Yes, Lock Out Student">
 <?php
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";

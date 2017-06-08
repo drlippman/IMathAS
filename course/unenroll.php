@@ -13,7 +13,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../footer.php");
 		exit;
 	}
-	if (isset($_GET['confirmed'])) { //do unenroll
+	if (isset($_POST['dounenroll'])) { //do unenroll - postback
 		if ($_GET['uid']=="selected") {
 			$tounenroll = explode(",",$_POST['tounenroll']);
 		} else if ($_GET['uid']=="all") {
@@ -127,9 +127,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action={$_GET['action']}&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"listusers.php?cid=$cid&action={$_GET['action']}&uid={$_GET['uid']}\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=unenroll&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&action=unenroll&uid={$_GET['uid']}\">";
 		}
 
 
@@ -188,7 +188,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		</ul>
 		<?php echo $delForumMsg; ?>
 		<?php echo $delWikiMsg; ?>
-		<input type=hidden name="tounenroll" value="<?php echo implode(",",$_POST['checked']) ?>">
+		<input type=hidden name="tounenroll" value="<?php echo Sanitize::encodeStringForDisplay(implode(",",$_POST['checked'])); ?>">
 <?php
 				}
 			} else {
@@ -197,7 +197,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 ?>
 
 		<p>
-			<input type=submit class="secondarybtn" value="Unenroll">
+			<input type=submit name="dounenroll" class="secondarybtn" value="Unenroll">
 			<input type=submit name="lockinstead" value="Lock Students Out Instead">
 <?php
 			if ($calledfrom=='lu') {

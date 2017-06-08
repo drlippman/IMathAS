@@ -25,7 +25,7 @@
 			$gbmode = $stm->fetchColumn(0);
 		}
 		if (isset($_GET['stu']) && $_GET['stu']!='') {
-			$stu = $_GET['stu'];
+			$stu = Sanitize::onlyInt($_GET['stu']);
 		} else {
 			$stu = 0;
 		}
@@ -48,7 +48,8 @@
 		$from = 'gb';
 		$now = time();
 	}
-
+	
+	$overwriteBody = false;
 
 
 	if ($_GET['asid']=="new" && $isteacher) {
@@ -119,8 +120,8 @@
 
 	}
 	//PROCESS ANY TODOS
-	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
-		if ($_GET['clearattempt']=="confirmed") {
+	if (isset($_REQUEST['clearattempt']) && isset($_GET['asid']) && $isteacher) {
+		if (isset($_POST['clearattempt']) && $_POST['clearattempt']=='confirmed') {
 			//DB $query = "SELECT ias.assessmentid,ias.lti_sourcedid FROM imas_assessment_sessions AS ias ";
 			//DB $query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -169,19 +170,22 @@
 			$isgroup = isasidgroup($_GET['asid']);
 			if ($isgroup) {
 				$pers = 'group';
-				echo getconfirmheader(true);
+				$body = getconfirmheader(true);
 			} else {
 				$pers = 'student';
-				echo getconfirmheader();
+				$body = getconfirmheader();
 			}
-			echo "<p>Are you sure you want to clear this $pers's assessment attempt?  This will make it appear the $pers never tried the assessment, and the $pers will receive a new version of the assessment.</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&clearattempt=confirmed'\" value=\"Really Clear\">\n";
-			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
-			exit;
+			$overwriteBody = true;
+			$body .= "<p>Are you sure you want to clear this $pers's assessment attempt?  This will make it appear the $pers never tried the assessment, and the $pers will receive a new version of the assessment.</p>";
+			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<p><button type=submit name="clearattempt" value="confirmed">'._('Really Clear').'</button> ';
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= '</form>';
+			//exit;
 		}
 	}
-	if (isset($_GET['breakfromgroup']) && isset($_GET['asid']) && $isteacher) {
-		if ($_GET['breakfromgroup']=="confirmed") {
+	if (isset($_REQUEST['breakfromgroup']) && isset($_GET['asid']) && $isteacher) {
+		if (isset($_POST['breakfromgroup']) && $_POST['breakfromgroup']=="confirmed") {
 			include("../includes/stugroups.php");
 			//DB $query = "SELECT userid,agroupid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -192,15 +196,18 @@
 			removegroupmember($row[1],$row[0]);
 			header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
-			echo getconfirmheader();
-			echo "<p>Are you sure you want to separate this student from their current group?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&breakfromgroup=confirmed'\" value=\"Really Separate\">\n";
-			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
-			exit;
+			$overwriteBody = true;
+			$body = getconfirmheader();
+			$body .= "<p>Are you sure you want to separate this student from their current group?</p>";
+			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<p><button type=submit name="breakfromgroup" value="confirmed">'._('Really Separate').'</button> ';
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= '</form>';
+			//exit;
 		}
 	}
-	if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
-		if ($_GET['clearscores']=="confirmed") {
+	if (isset($_REQUEST['clearscores']) && isset($_GET['asid']) && $isteacher) {
+		if (isset($_POST['clearscores']) && $_POST['clearscores']=="confirmed") {
 
 			//DB $query = "SELECT ias.assessmentid FROM imas_assessment_sessions AS ias ";
 			//DB $query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
@@ -256,21 +263,25 @@
 			header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
 			$isgroup = isasidgroup($_GET['asid']);
+			$overwriteBody = true;
+			
 			if ($isgroup) {
 				$pers = 'group';
-				echo getconfirmheader(true);
+				$body = getconfirmheader(true);
 			} else {
 				$pers = 'student';
-				echo getconfirmheader();
+				$body = getconfirmheader();
 			}
-			echo "<p>Are you sure you want to clear this $pers's scores for this assessment?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&from=$from&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}&clearscores=confirmed'\" value=\"Really Clear\">\n";
-			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
-			exit;
+			$body .= "<p>Are you sure you want to clear this $pers's scores for this assessment?</p>";
+			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<p><button type=submit name="clearscores" value="confirmed">'._('Really Clear').'</button> ';
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= '</form>';
+			//exit;
 		}
 	}
-	if (isset($_GET['clearq']) && isset($_GET['asid']) && $isteacher) {
-		if ($_GET['confirmed']=="true") {
+	if (isset($_REQUEST['clearq']) && isset($_GET['asid']) && $isteacher) {
+		if (isset($_POST['clearq'])) { //postback
 			$qp = getasidquery($_GET['asid']);
 			//DB $whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			//$whereqry = getasidquery($_GET['asid']);
@@ -309,7 +320,7 @@
 			$bestlastanswers = explode("~",$line['bestlastanswers']);
 			$bestseeds = explode(",",$line['bestseeds']);
 
-			$clearid = $_GET['clearq'];
+			$clearid = $_POST['clearq'];
 			if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
 				deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
 				$scores[$clearid] = -1;
@@ -323,7 +334,7 @@
 					$bestrawscores[$clearid] = -1;
 					$firstscores[$clearid] = -1;
 				}
-				if (isset($_GET['regen']) && $_GET['regen']==1) {
+				if (isset($_POST['regen'])) {
 					$seeds[$clearid] = rand(1,9999);
 					$bestseeds[$clearid] = $seeds[$clearid];
 				}
@@ -377,18 +388,26 @@
 
 		} else {
 			$isgroup = isasidgroup($_GET['asid']);
+			$overwriteBody = true;
 			if ($isgroup) {
 				$pers = 'group';
-				echo getconfirmheader(true);
+				$body = getconfirmheader(true);
 			} else {
 				$pers = 'student';
-				echo getconfirmheader();
+				$body = getconfirmheader();
 			}
-			echo "<p>Are you sure you want to clear this $pers's scores for this question?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\"> \n";
-			echo "<input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&regen=1&confirmed=true'\" value=\"Really Clear and Regen\"> \n";
-			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
-			exit;
+			$body .= "<p>Are you sure you want to clear this $pers's scores for this question?</p>";
+			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<p><button type=submit name="noregen" value="1">'._('Really Clear').'</button> ';
+			$body .= '<button type=submit name="regen" value="1">'._('Really Clear and Regen').'</button> ';
+			$body .= '<input type="hidden" name="clearq" value="'.Sanitize::encodeStringForDisplay($_GET['clearq']).'"/>';
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= '</form>';
+						
+			//echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\"> \n";
+			//echo "<input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&regen=1&confirmed=true'\" value=\"Really Clear and Regen\"> \n";
+			//echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
+			//exit;
 		}
 	}
 	if (isset($_GET['forcegraphimg'])) {
@@ -576,10 +595,18 @@
 				$backurl = "gradebook.php?stu=0&cid=$cid";
 			}
 		}
-		echo "Detail</div>";
+		if ($overwriteBody) { //doing a confirm action
+			echo '<a href="'.Sanitize::encodeStringForDisplay('gb-viewasid.php?stu='.$stu.'&asid='.$_GET['asid'].'&from='.$from.'&cid='.$cid.'&uid='.$_GET['uid']).'&from='.$_GET['from'].'">';
+			echo _('Assessment Detail').'</a> &gt; Confirm Action</div>';
+			echo $body;
+			require("../footer.php");
+			exit;
+		} else {
+			echo "Detail</div>";
+			}
 		if (($isteacher || $istutor) && isset($_GET['asid']) && $_GET['asid']!="new") {
 			echo '<div class="cpmid">';
-			echo '<a href="gb-viewasid.php?stu=$stu&asid='.$_GET['asid'].'&from='.$from.'&cid='.$cid.'&uid='.$_GET['uid'].'&links=1">';
+			echo '<a href="'.Sanitize::encodeStringForDisplay('gb-viewasid.php?stu='.$stu.'&asid='.$_GET['asid'].'&from='.$from.'&cid='.$cid.'&uid='.$_GET['uid'].'&links=1').'">';
 			echo _('Show Score Summary');
 			echo '</a>';
 			echo '</div>';
