@@ -310,4 +310,32 @@ class Sanitize
 
 		return $placeholders;
 	}
+
+	/**
+	 * Generate a string containing only numbers and forward slashes.
+	 *
+	 * Example return string: "03/12/2017"
+	 *
+	 * @param $date string A date to be sanitized.
+	 * @return string A string containing only numbers and forward slashes.
+	 */
+	public static function cleanDate($date)
+	{
+		return preg_replace("([^0-9/])", "", $date);
+	}
+
+	/**
+	 * Generate a string containing only numbers, colon, "a", "p", "m" and
+	 * whitespace.
+	 *
+	 * Example return string: "12:36 pm"
+	 *
+	 * @param $time string A time to be sanitized.
+	 * @return string A string containing only numbers, colon, "a", "p", "m" and
+	 *                whitespace.
+	 */
+	public static function cleanTime($time)
+	{
+		return preg_replace("[^0-9: AaPpMm]", "", $time);
+	}
 }

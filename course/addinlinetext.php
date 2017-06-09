@@ -45,7 +45,7 @@ if (isset($_GET['id'])) {
 	$pagetitle = "Add Inline Text";
 }
 if (isset($_GET['tb'])) {
-	$totb = $_GET['tb'];
+	$totb = Sanitize::encodeStringForDisplay($_GET['tb']);
 } else {
 	$totb = 'b';
 }
