@@ -583,10 +583,10 @@ if ($overwriteBody==1) {
 		if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
 ?>
 				<td>
-				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>' checked=checked>
+				<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($ids[$i]); ?>' checked=checked>
 				</td>
-				<td><?php echo $types[$i] ?></td>
-				<td><?php echo $names[$i] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($types[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></td>
 			</tr>
 <?php
 	}

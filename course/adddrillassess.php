@@ -385,7 +385,7 @@ if (isset($sessiondata['lastsearchlibs'.$aid])) {
 $llist = implode(',',array_map('intval', explode(',',$searchlibs)));
 
 echo '<script type="text/javascript">';
-echo "var curlibs = '$searchlibs';";
+echo "var curlibs = '".Sanitize::encodeStringForJavascript($searchlibs)."';";
 echo '</script>';
 
 if (!$beentaken) {
