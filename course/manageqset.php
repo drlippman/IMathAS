@@ -704,109 +704,30 @@ if ($myrights<20) {
 			}
 		}
 	} else if (isset($_GET['remove'])) {
-		if (isset($_GET['confirmed'])) {
-			if ($isgrpadmin) {
-				//DB $query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
-				//DB $query .= "imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ";
-				//DB $query .= "imas_questionset.id='{$_GET['remove']}'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
-				$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
-				$query .= "imas_questionset.ownerid=imas_users.id AND imas_users.groupid=:groupid AND ";
-				$query .= "imas_questionset.id=:id";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':groupid'=>$groupid, ':id'=>$_GET['remove']));
-				if ($stm->rowCount()>0) {
-					//DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$_GET['remove']}'";
-					$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id=:id");
-					$stm->execute(array(':id'=>$_GET['remove']));
-					//$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
-				} else {
-					header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
-					exit;
-				}
-
-			} else {
-				//$query = "DELETE FROM imas_questionset WHERE id='{$_GET['remove']}'";
-				if (!$isadmin) {
-          //DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$_GET['remove']}' AND ownerid='$userid'";
-          $stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id=:id AND ownerid=:ownerid");
-          $stm->execute(array(':id'=>$_GET['remove'], ':ownerid'=>$userid));
-				} else {
-          //DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$_GET['remove']}'";
-          $stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id=:id");
-          $stm->execute(array(':id'=>$_GET['remove']));
-        }
-			}
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_affected_rows($link)>0) {
-			if ($stm->rowCount()>0) {
-				//DB $query = "DELETE FROM imas_library_items WHERE qsetid='{$_GET['remove']}'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("DELETE FROM imas_library_items WHERE qsetid=:qsetid");
-				$stm->execute(array(':qsetid'=>$_GET['remove']));
-				//delqimgs($_GET['remove']);
-			}
-
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
-
-			exit;
-		} else {
-			$pagetitle = "Confirm Delete";
-			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
-			$curBreadcrumb .= " &gt; Confirm Delete";
-
-		}
+		//postback handled by $_POST['remove'] block
+		$pagetitle = "Confirm Delete";
+		$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
+		$curBreadcrumb .= " &gt; Confirm Delete";
+		
 	} else if (isset($_GET['transfer'])) {
-		if (isset($_POST['newowner'])) {
+		
+		//postback handled by $_POST['transfer'] block
+		$pagetitle = "Transfer Ownership";
+		$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
+		$curBreadcrumb .= " &gt; Transfer QSet";
 
-			if ($isgrpadmin) {
-				//DB $query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id='{$_GET['transfer']}' AND imas_users.groupid='$groupid'";
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
-				$stm = $DBH->prepare("SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id=:id AND imas_users.groupid=:groupid");
-				$stm->execute(array(':id'=>$_GET['transfer'], ':groupid'=>$groupid));
-				if ($stm->rowCount()>0) {
-					//DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id='{$_GET['transfer']}'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id=:id");
-					$stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$_GET['transfer']));
-				}
-
-			} else {
-				if (!$isadmin) {
-          //DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id='{$_GET['transfer']}' AND ownerid='$userid'";
-          $stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id=:id AND ownerid=:ownerid2");
-          $stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$_GET['transfer'], ':ownerid2'=>$userid));
-				} else {
-          //DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id='{$_GET['transfer']}'";
-          $stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id=:id");
-          $stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$_GET['transfer']));
-        }
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			}
-
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
-			exit;
-		} else {
-			$pagetitle = "Transfer Ownership";
-			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
-			$curBreadcrumb .= " &gt; Transfer QSet";
-
-			//DB $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
-			$i=0;
-			$page_transferUserList = array();
-			//DB while ($row = mysql_fetch_row($result)) {
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$page_transferUserList['val'][$i] = $row[0];
-				$page_transferUserList['label'][$i] = $row[2] . ", " . $row[1];
-				$i++;
-			}
-
-
+		//DB $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName");
+		$i=0;
+		$page_transferUserList = array();
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$page_transferUserList['val'][$i] = $row[0];
+			$page_transferUserList['label'][$i] = $row[2] . ", " . $row[1];
+			$i++;
 		}
+
 
 	} else { //DEFAULT DATA MANIPULATION
 		$curBreadcrumb .= " &gt; Manage Question Set";
@@ -1400,15 +1321,21 @@ function getnextprev(formn,loc) {
 ?>
 		Are you SURE you want to delete this question from the Question Set.  This will make it unavailable
 		to all users.  If it is currently being used in an assessment, it will mess up that assessment.
-		<p>
-			<input type=button onclick="window.location='manageqset.php?cid=<?php echo $cid ?>&remove=<?php echo $_GET['remove'] ?>&confirmed=true'" value="Really Delete">
-			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
-		</p>
+	
+		<form method=post action="manageqset.php?cid=<?php echo $cid ?>&confirmed=true">
+			<input type=hidden name=remove value="<?php echo Sanitize::onlyInt($_GET['remove']); ?>">
+			<p>
+				<input type=submit value="Really Delete">
+				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
+			</p>
+		</form>
 <?php
 	} else if (isset($_GET['transfer'])) {
 ?>
-		<form method=post action="manageqset.php?cid=<?php echo $cid ?>&transfer=<?php echo $_GET['transfer'] ?>">
-			Transfer to:
+		
+		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
+			<input type=hidden name=transfer value="<?php echo Sanitize::onlyInt($_GET['transfer']); ?>">
+			Transfer question ownership to:
 
 			<?php writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
 
@@ -1417,6 +1344,7 @@ function getnextprev(formn,loc) {
 				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
+		
 <?php
 	} else { //DEFAULT DISPLAY
 

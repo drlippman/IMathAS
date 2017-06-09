@@ -243,7 +243,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	*/
 	if (isset($_GET['withdraw'])) {
-		if (isset($_POST['withdrawtype']) && isset($_GET['confirmed'])) {
+		if (isset($_POST['withdrawtype'])) {
 			if (strpos($_GET['withdraw'],'-')!==false) {
 				$isingroup = true;
 				$loc = explode('-',$_GET['withdraw']);
@@ -359,7 +359,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h3>Withdraw Question</h3>";
-			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw=".Sanitize::encodeStringForDisplay($_GET['withdraw'])."&confirmed=true\">";
+			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw=".Sanitize::encodeStringForDisplay($_GET['withdraw'])."\">";
 			if ($isingroup) {
 				$body .= '<p><b>This question is part of a group of questions</b>.  </p>';
 				$body .= '<input type=radio name="withdrawtype" value="groupzero" > Set points possible and all student scores to zero <b>for all questions in group</b><br/>';

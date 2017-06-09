@@ -104,7 +104,7 @@
 		}
 		require("../footer.php");
 
-	} else if (isset($_GET['confirm'])) {
+	} else if (isset($_POST['confirm'])) {
 		$addtime = $latepasshrs*60*60;
 		//DB $query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -211,12 +211,13 @@
 			echo "<p>You have no late passes remaining.</p>";
 		} else if ($canuselatepass) {
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
-			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid&confirm=true\">";
+			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid\">";
 			if ($allowlate%10>1) {
 				echo '<p>You may use up to '.($allowlate%10-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
 			}
 			echo "<p>You have $latepasses LatePass(es) remaining.  You can redeem one LatePass for a $latepasshrs hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
+			echo '<input type="hidden" name="confirm" value="true" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
 			if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";

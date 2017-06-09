@@ -116,7 +116,7 @@
 
 		require("../footer.php");
 
-	} else if (isset($_GET['confirm'])) {
+	} else if (isset($_POST['confirm'])) {
 		$addtime = $hours*60*60;
 		//DB $query = "SELECT allowlate,postby,replyby FROM imas_forums WHERE id='$fid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -250,7 +250,7 @@
 			echo "<p>You have no late passes remaining.</p>";
 		} else if ($canuselatepasspost || $canuselatepassreply) {
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
-			echo "<form method=post action=\"redeemlatepassforum.php?cid=$cid&fid=$fid&from=$from&confirm=true\">";
+			echo "<form method=post action=\"redeemlatepassforum.php?cid=$cid&fid=$fid&from=$from\">";
 			if ($allowlaten>1) {
 				echo '<p>You may use up to '.($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>';
 			}
@@ -266,6 +266,7 @@
 				echo " the <b>Replies</b> due date ";
 			}
 			echo "for this forum assignment.</p><p>Are you sure you want to redeem a LatePass?</p>";
+			echo '<input type="hidden" name="confirm" value="true" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/> ";
 			if ($from=='forum') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../forums/thread.php?cid=$cid&forum=$fid'\"/>";

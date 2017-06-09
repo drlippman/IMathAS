@@ -70,8 +70,8 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 			$code_list[] = $row;
 		}
 	}
-} else if (isset($_GET['delete'])) {
-	if ($_GET['delete']=='true') {
+} else if (isset($_POST['delete'])) {
+	if ($_POST['delete']=='true') {
 		//DB $query = "DELETE FROM imas_diag_onetime WHERE diag='$diag'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_diag_onetime WHERE diag=:diag");
@@ -135,9 +135,11 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			echo '</form>';
 		}
 	} else if (isset($_GET['delete'])) {
-		echo "<p>Are you sure you want to delete all one-time passwords for this diagnostic?</p>\n";
-		echo "<p><input type=button value=\"Delete\" onclick=\"window.location='diagonetime.php?id=" . Sanitize::encodeUrlParam($diag) . "&delete=true'\">\n";
+		echo '<form method="POST" action="diagonetime.php?id=' . Sanitize::encodeUrlParam($diag).'">';
+		echo '<p><button type=submit name="delete" value="true">'._('Delete').'</button>';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+		echo '</form>';
+		
 	} else {
 		echo "<b>All one-time passwords</b> <a href=\"diagonetime.php?id=" . Sanitize::encodeUrlParam($diag) . "&generate=true\">Generate</a> <a href=\"diagonetime.php?id=" . Sanitize::encodeUrlParam($diag) . "&delete=check\">Delete all</a>";
 		echo '<table><thead><tr><th>Codes</th><th>Good For</th><th>Created</th></tr></thead><tbody>';

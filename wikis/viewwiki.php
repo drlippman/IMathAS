@@ -50,8 +50,8 @@ if ($cid==0) {
 	if (!isset($teacherid) && ($row['avail']==0 || ($row['avail']==1 && ($now<$row['startdate'] || $now>$row['enddate'])))) {
 		$overwriteBody=1;
 		$body = "This wiki is not currently available for viewing";
-	} else if (isset($_GET['delall']) && isset($teacherid)) {
-		if ($_GET['delall']=='true') {
+	} else if (isset($_REQUEST['delall']) && isset($teacherid)) {
+		if (isset($_POST['delall']) && $_POST['delall']=='true') {
 			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid");
@@ -63,8 +63,8 @@ if ($cid==0) {
 			$curBreadcrumb .= " &gt; Clear WikiPage Contents\n";
 			$pagetitle = "Confirm Page Contents Delete";
 		}
-	} else if (isset($_GET['delrev']) && isset($teacherid)) {
-		if ($_GET['delrev']=='true') {
+	} else if (isset($_REQUEST['delrev']) && isset($teacherid)) {
+		if (isset($_POST['delrev']) && $_POST['delrev']=='true') {
 			//DB $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
@@ -86,8 +86,8 @@ if ($cid==0) {
 			$pagetitle = "Confirm History Delete";
 		}
 
-	} else if (isset($_GET['revert']) && isset($teacherid)) {
-		if ($_GET['revert']=='true') {
+	} else if (isset($_REQUEST['revert']) && isset($teacherid)) {
+		if (isset($_POST['revert']) && $_POST['revert']=='true') {
 			$revision = intval($_GET['torev']);
 			//DB $query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ";
 			//DB $query .= "AND id>=$revision ORDER BY id DESC";
@@ -320,22 +320,32 @@ if ($overwriteBody==1) {
 	}
 	if (isset($_GET['delall']) && isset($teacherid)) {
 		echo '<p>Are you SURE you want to delete all contents and history for '.$grpnote.' Wiki page?</p>';
-
-		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=true$framed'\">Yes, I'm Sure</button> | ";
-		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+		
+		$querystring = http_build_query(array('cid'=>$cid,'id'=>$id,'grp'=>$groupid));
+		echo '<form method="post" action="viewwiki.php?'.$querystring.$framed.'">';
+		echo '<p><button type=submit name=delall value=true>'._("Yes, I'm Sure").'</button> ';
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
+		echo '</p>';
 
 	} else if (isset($_GET['delrev']) && isset($teacherid)) {
 		echo '<p>Are you SURE you want to delete all revision history for '.$grpnote.' Wiki page?  The current version will be retained.</p>';
 
-		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=true$framed'\">Yes, I'm Sure</button> | ";
-		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+		$querystring = http_build_query(array('cid'=>$cid,'id'=>$id,'grp'=>$groupid));
+		echo '<form method="post" action="viewwiki.php?'.$querystring.$framed.'">';
+		echo '<p><button type=submit name=delrev value=true>'._("Yes, I'm Sure").'</button> ';
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
+		echo '</p>';
+		
 	} else if (isset($_GET['revert'])) {
-		$torev = intval($_GET['torev']);
-        $disprev = Sanitize::onlyInt($_GET['disprev']);
+		$torev = Sanitize::onlyInt($_GET['torev']);
+		$disprev = Sanitize::onlyInt($_GET['disprev']);
 		echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
 
-		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&torev=$torev&revert=true$framed'\">Yes, I'm Sure</button> | ";
-		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+		$querystring = http_build_query(array('cid'=>$cid,'id'=>$id,'grp'=>$groupid,'torev'=>$torev));
+		echo '<form method="post" action="viewwiki.php?'.$querystring.$framed.'">';
+		echo '<p><button type=submit name=revert value=true>'._("Yes, I'm Sure").'</button> ';
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
+		echo '</p>';
 
 	} else if (isset($_GET['snapshot'])) {
 		echo "<p>Current Version Code.  <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">Back</a></p>";

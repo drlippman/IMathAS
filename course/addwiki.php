@@ -32,8 +32,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
-	if (isset($_GET['clearattempts'])) {
-		if ($_GET['clearattempts']=='true') {
+	if (isset($_REQUEST['clearattempts'])) {
+		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="true") {
 			$id = Sanitize::onlyInt($_GET['id']);
 			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -270,8 +270,11 @@ if (isset($_GET['clearattempts'])) {
 	$id = $_GET['id'];
 	echo '<p>Are you SURE you want to delete all contents and history for this Wiki page? ';
 	echo 'This will clear contents for all groups if you are using groups.</p>';
-	echo "<p><a href=\"addwiki.php?cid=$cid&id=$id&clearattempts=true\">Yes, I'm Sure</a> | ";
-	echo "<a href=\"addwiki.php?cid=$cid&id=$id\">Nevermind</a></p>";
+	
+	echo '<form method="POST" action="'.sprintf('addwiki.php?cid=%d&id=%d', $cid, $id) .'">';
+	echo '<p><button type=submit name="clearattempts" value="true">'._("Yes, I'm Sure").'</button>';
+	echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".sprintf('addwiki.php?cid=%d&id=%d', $cid, $id)."'\"></p>\n";
+	echo '</form>';
 
 } else { //default display
 

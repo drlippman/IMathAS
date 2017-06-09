@@ -94,7 +94,7 @@ if (isset($_POST['tname'])) {
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom");
 	exit;
-} else if (isset($_GET['delete']) && $_GET['delete']=='true') {
+} else if (isset($_POST['delete']) && $_POST['delete']=='true') {
 	$id = Sanitize::onlyInt($_GET['id']);
 	if ($id>0) {
 		if ($isadmin) {
@@ -136,7 +136,8 @@ if (isset($_POST['tname'])) {
 		$name = $stm->fetchColumn(0);
 
 		echo '<p>Are you SURE you want to delete the tool <b>'.$name.'</b>?  Doing so will break ALL placements of this tool.</p>';
-		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$_GET['id'].'&amp;delete=true">';
+		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$_GET['id'].'">';
+		echo '<input type=hidden name=delete value=true />';
 		echo '<input type=submit value="Yes, I\'m Sure">';
 		echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
 		echo '</form>';

@@ -733,7 +733,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		exit;
 	}
 } else if (isset($_GET['remove']) && $allowdel) {// $isteacher) { //removing post
-	if (isset($_GET['confirm'])) {
+	if (isset($_POST['confirm'])) {
 		$go = true;
 		if (!$isteacher) {
 			//DB $query = "SELECT id FROM imas_forum_posts WHERE parent='{$_GET['remove']}'";
@@ -842,9 +842,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		} else {
 			echo "<p>Are you SURE you want to remove this post?</p>\n";
 		}
-
-		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='$returnurl&remove={$_GET['remove']}&confirm=true'\">\n";
+		echo '<form method="post" action="'.$returnurl.'&remove='.Sanitize::onlyInt($_GET['remove']).'">';
+		echo '<p><button type=submit name=confirm value=true>'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
+		echo '</form>';
 		require("../footer.php");
 		exit;
 	}

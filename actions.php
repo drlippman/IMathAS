@@ -606,7 +606,7 @@ require_once("includes/sanitize.php");
 				//mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-	} else if ($_GET['action']=="unenroll") {
+	} else if ($_POST['action']=="unenroll") {
 		if ($myrights < 6) {
 			echo "<html><body>\nError: Guests can't unenroll from courses</body></html";
 			exit;

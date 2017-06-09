@@ -176,10 +176,11 @@
 				$body = getconfirmheader();
 			}
 			$overwriteBody = true;
+			$querystring = http_build_query(array('stu'=>$stu, 'cid'=>$cid, 'asid'=>$_GET['asid'], 'from'=>$from, 'uid'=>$_GET['uid']));
 			$body .= "<p>Are you sure you want to clear this $pers's assessment attempt?  This will make it appear the $pers never tried the assessment, and the $pers will receive a new version of the assessment.</p>";
-			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<form method="POST" action="gb-viewasid.php?'.$querystring.'">';
 			$body .= '<p><button type=submit name="clearattempt" value="confirmed">'._('Really Clear').'</button> ';
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?$querystring'\"></p>\n";
 			$body .= '</form>';
 			//exit;
 		}
@@ -198,10 +199,11 @@
 		} else {
 			$overwriteBody = true;
 			$body = getconfirmheader();
+			$querystring = http_build_query(array('stu'=>$stu, 'cid'=>$cid, 'asid'=>$_GET['asid'], 'from'=>$from, 'uid'=>$_GET['uid']));
 			$body .= "<p>Are you sure you want to separate this student from their current group?</p>";
-			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<form method="POST" action="gb-viewasid.php?'.$querystring.'">';
 			$body .= '<p><button type=submit name="breakfromgroup" value="confirmed">'._('Really Separate').'</button> ';
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?$querystring'\"></p>\n";
 			$body .= '</form>';
 			//exit;
 		}
@@ -272,10 +274,11 @@
 				$pers = 'student';
 				$body = getconfirmheader();
 			}
+			$querystring = http_build_query(array('stu'=>$stu, 'cid'=>$cid, 'asid'=>$_GET['asid'], 'from'=>$from, 'uid'=>$_GET['uid']));
 			$body .= "<p>Are you sure you want to clear this $pers's scores for this assessment?</p>";
-			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<form method="POST" action="gb-viewasid.php?'.$querystring.'">';
 			$body .= '<p><button type=submit name="clearscores" value="confirmed">'._('Really Clear').'</button> ';
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"gb-viewasid.php?$querystring'\"></p>\n";
 			$body .= '</form>';
 			//exit;
 		}
@@ -396,12 +399,13 @@
 				$pers = 'student';
 				$body = getconfirmheader();
 			}
+			$querystring = http_build_query(array('stu'=>$stu, 'cid'=>$cid, 'asid'=>$_GET['asid'], 'from'=>$from, 'uid'=>$_GET['uid']));
 			$body .= "<p>Are you sure you want to clear this $pers's scores for this question?</p>";
-			$body .= '<form method="POST" action="'.Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}").'">';
+			$body .= '<form method="POST" action="gb-viewasid.php?'.$querystring.'">';
 			$body .= '<p><button type=submit name="noregen" value="1">'._('Really Clear').'</button> ';
 			$body .= '<button type=submit name="regen" value="1">'._('Really Clear and Regen').'</button> ';
 			$body .= '<input type="hidden" name="clearq" value="'.Sanitize::encodeStringForDisplay($_GET['clearq']).'"/>';
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForDisplay("gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}")."'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?$querystring'\"></p>\n";
 			$body .= '</form>';
 						
 			//echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\"> \n";

@@ -50,8 +50,9 @@
 	}
 
 
-	if (isset($_GET['clear']) && $isteacher) {
-		if (isset($_GET['confirm'])) {
+	/*Not called from anywhere?
+	if (isset($_REQUEST['clear']) && $isteacher) {
+		if (isset($_POST['confirm'])) {
 			//DB $query = "DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid='$lid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid=:gradetypeid");
@@ -61,12 +62,20 @@
 		} else {
 			require("../header.php");
 			echo "<p>Are you SURE you want to clear all associated grades on this item from the gradebook?</p>";
-			echo "<p><a href=\"edittoolscores.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&lid=$lid&confirm=true\">Clear Scores</a>";
-			echo " <a href=\"gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid\">Nevermind</a>";
+			
+			$querystring = http_build_query(array('stu'=>$_GET['stu'], 'cid'=>$cid, 'lid'=> $lid));
+			echo '<form method="POST" action="edittoolscores.php?'.$querystring.'">';
+			echo '<p><button type=submit name="confirm" value="true">'._('Clear Scores').'</button>';
+			
+			$querystring2 = http_build_query(array('stu'=>$_GET['stu'], 'cid'=>$cid));
+			echo " <a href=\"gradebook.php?$querystring2\">Nevermind</a></p>";
+			echo '</form>';
+			
 			require("../footer.php");
 			exit;
 		}
 	}
+	*/
 
 	//check for grades marked as newscore that aren't really new
 	//shouldn't happen, but could happen if two browser windows open

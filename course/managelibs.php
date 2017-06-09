@@ -367,7 +367,7 @@ if ($myrights<20) {
 			}
 		}
 	} else if (isset($_GET['remove'])) {
-		if (isset($_GET['confirmed'])) {
+		if (isset($_POST['delq'])) {
 			//DB $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid='{$_GET['remove']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
