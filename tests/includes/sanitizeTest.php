@@ -343,44 +343,5 @@ final class SanitizeTest extends TestCase
 		$this->assertNull($result);
 	}
 
-	/*
-	 * cleanDate
-	 */
-
-	public function testCleanDateWithValidInput()
-	{
-		$date = "06/06/2017";
-
-		$result = Sanitize::cleanDate($date);
-		$this->assertEquals($date, $result);
-	}
-
-	/*
-	 * cleanTime
-	 */
-
-	public function testCleanTimeWithValidInput()
-	{
-		$time = "12:24 am";
-
-		$result = Sanitize::cleanTime($time);
-		$this->assertEquals($time, $result);
-	}
-
-	public function testCleanTimeWithValidInputWithSeconds()
-	{
-		$time = "12:24:48 am";
-
-		$result = Sanitize::cleanTime($time);
-		$this->assertEquals($time, $result);
-	}
-
-	public function testCleanTimeWithValidInputUppercased()
-	{
-		$time = "12:24 AM";
-
-		$result = Sanitize::cleanTime($time);
-		$this->assertEquals($time, $result);
-	}
 
 }

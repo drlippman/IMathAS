@@ -52,7 +52,7 @@ echo '<ul class="nomark">';
 if ($stm->rowCount()==0) {
 	echo '<li>No hidden courses</li>';
 } else {
-	//DB while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) { 
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		echo '<li>';
 		
@@ -70,7 +70,7 @@ if ($stm->rowCount()==0) {
 			echo '</ul></span> ';
 			echo '<a href="../course/course.php?cid='.$row[1].'">'.Sanitize::encodeStringForDisplay($row[0]).'</a> ';
 		} else {
-			echo '<a href="../course/course.php?cid='.$row[1].'">'.Sanitize::encodeUrlParam($row[0]).'</a> ';
+			echo '<a href="../course/course.php?cid='.$row[1].'">'.Sanitize::encodeStringForDisplay($row[0]).'</a> ';
 			echo ' <a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&cid='.$row[1].'" class="small">Unhide</a>';
 		}
 		

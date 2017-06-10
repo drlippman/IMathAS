@@ -15,7 +15,9 @@ require_once(__DIR__ . "/config.php");
 
 // Store PHP sessions in the database.
 require_once(__DIR__ . "/includes/session.php");
-session_set_save_handler(new SessionDBHandler(), true);
+if (!isset($use_local_sessions)) {
+	session_set_save_handler(new SessionDBHandler(), true);
+}
 
 // OWASP CSRF Protector
 require_once(__DIR__ . "/csrfp/libs/csrf/csrfprotector.php");

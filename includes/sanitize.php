@@ -143,8 +143,12 @@ class Sanitize
 
 	/**
 	 * Sanitize a complete URL query string. (Everything after and without the '?' character in a URL)
+	 *  
 	 *
 	 * Example input: "name=MyName&cid=994&color=blue"
+	 *
+	 *  Do NOT use this for a string like "name=$name&color=$color", as it
+	 *  does not encode query parameters
 	 *
 	 * @param $string string The entire query string.
 	 * @return string The encoded query string.
@@ -311,31 +315,4 @@ class Sanitize
 		return $placeholders;
 	}
 
-	/**
-	 * Generate a string containing only numbers and forward slashes.
-	 *
-	 * Example return string: "03/12/2017"
-	 *
-	 * @param $date string A date to be sanitized.
-	 * @return string A string containing only numbers and forward slashes.
-	 */
-	public static function cleanDate($date)
-	{
-		return preg_replace("([^0-9/])", "", $date);
-	}
-
-	/**
-	 * Generate a string containing only numbers, colon, "a", "p", "m" and
-	 * whitespace.
-	 *
-	 * Example return string: "12:36 pm"
-	 *
-	 * @param $time string A time to be sanitized.
-	 * @return string A string containing only numbers, colon, "a", "p", "m" and
-	 *                whitespace.
-	 */
-	public static function cleanTime($time)
-	{
-		return preg_replace("[^0-9: AaPpMm]", "", $time);
-	}
 }
