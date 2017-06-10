@@ -16,7 +16,7 @@ Because of this, this file does NOT contain the full up-to-date database schema.
 ***************/
 
 $dbsetup = true;
-include("config.php");
+include("init_without_validate.php");
 
 //DB $query = "SELECT ver FROM imas_dbschema WHERE id=1";
 //DB $result = mysql_query($query);
@@ -1110,6 +1110,17 @@ $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest ac
 //DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_dbschema created<br/>';
+
+$sql = 'CREATE TABLE `php_sessions` (
+	`id` VARCHAR(32) NOT NULL,
+	`access` INT(10) unsigned DEFAULT NULL,
+	`data` TEXT,
+	PRIMARY KEY (`id`),
+	INDEX (`access`)
+	) ENGINE=InnoDB';
+//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+$DBH->query($sql);
+echo 'php_sessions created<br/>';
 
 if (isset($CFG['GEN']['newpasswords'])) {
 	require_once("includes/password.php");

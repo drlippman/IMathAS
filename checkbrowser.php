@@ -1,5 +1,5 @@
 <?php
-	require("config.php");
+	require("init_without_validate.php");
 	$sessiondata['mathdisp']=1;
 	$sessiondata['graphdisp']=1;
 	$nologo = true;

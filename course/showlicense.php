@@ -1,6 +1,6 @@
 <?php
 
-require("../config.php");
+require("../init_without_validate.php");
 require("../header.php");
 echo '<h3>Question License</h3>';
 

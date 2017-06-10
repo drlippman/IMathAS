@@ -4,7 +4,7 @@
 //(c) 2010 David Lippman
 
 /*** master includes ***/
-require("./validate.php");
+require("./init.php");
 
 //0: classes you're teaching
 //1: classes you're tutoring

@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 if ($myrights<100) {exit;}
 
 function getstr($items,$str,$parent) {
@@ -32,7 +32,7 @@ if (isset($_POST['search'])) {
 		$items = unserialize($row[1]);
 		$det = getstr($items, $srch, '0');
 		if (count($det)>0) {
-			echo '<a target="_blank" href="'.$imasroot.'/course/course.php?cid='.$row[0].'&folder='.$det[0].'">'.$det[1].'</a> in'.$row[2].'<br/>';
+			echo '<a target="_blank" href="'.$imasroot.'/course/course.php?cid='.Sanitize::courseId($row[0]).'&folder='.Sanitize::encodeUrlParam($det[0]).'">'.Sanitize::encodeStringForDisplay($det[1]).'</a> in'.Sanitize::encodeStringForDisplay($row[2]).'<br/>';
 		}
 	}
 	echo '</p>';

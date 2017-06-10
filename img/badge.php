@@ -2,7 +2,7 @@
 $text = $_GET['text'];
 
 $dbsetup = true;
-require("../config.php");
+require("../init_without_validate.php");
 
 if (isset($CFG['GEN']['badgebase'])) {
 	$im = imagecreatefrompng($CFG['GEN']['badgebase']);

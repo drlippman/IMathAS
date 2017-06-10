@@ -1,5 +1,5 @@
 <?php
-	require("../validate.php");
+	require("../init.php");
 	$isteacher = (isset($teacherid) || $sessiondata['isteacher']==true);
 	if (!isset($sessiondata['sessiontestid']) && !$isteacher) {
 		echo "<html><body>Error. </body></html>\n";
@@ -52,7 +52,7 @@
 			</script>';
 
 	if ($isteacher && isset($_GET['asid'])) {
-		$testid = $_GET['asid'];
+		$testid = Sanitize::onlyInt($_GET['asid']);
 	} else {
 		//DB $testid = addslashes($sessiondata['sessiontestid']);
 		$testid = $sessiondata['sessiontestid'];

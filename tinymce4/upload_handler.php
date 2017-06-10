@@ -1,6 +1,6 @@
 <?php
   //check credentials
-  require("../validate.php");
+  require("../init.php");
   require("../includes/filehandler.php");
   
   

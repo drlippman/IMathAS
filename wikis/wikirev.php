@@ -4,7 +4,7 @@
 
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/diff.php");
 

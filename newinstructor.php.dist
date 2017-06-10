@@ -1,7 +1,6 @@
 <?php
 
-	require("config.php");
-	require("includes/sanitize.php");
+	require("init_without_validate.php");
 	$pagetitle = "New instructor account request";
 	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 	$nologo = true;

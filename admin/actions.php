@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Admin actions
 //(c) 2006 David Lippman
-require("../validate.php");
+require("../init.php");
 require_once("../includes/password.php");
 
 $from = 'admin';

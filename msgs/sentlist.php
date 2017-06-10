@@ -2,7 +2,7 @@
 	//Displays Message list
 	//(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {

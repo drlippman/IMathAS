@@ -2,7 +2,7 @@
 //IMathAS:  Outcomes report generator
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../validate.php");
+require("../init.php");
 
 
 if (!isset($teacherid) && !isset($studentid)) {

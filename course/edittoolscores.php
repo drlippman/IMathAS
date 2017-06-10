@@ -2,7 +2,7 @@
 //IMathAS:  Add/modify external tool scores
 //(c) 2014 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/htmlutil.php");
 
 

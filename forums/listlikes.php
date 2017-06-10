@@ -2,7 +2,7 @@
 //IMathAS 2014
 //list forum thread likes
 
-require("../validate.php");
+require("../init.php");
 
 if (!isset($_GET['post'])) {
 	echo "No post specified";

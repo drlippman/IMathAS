@@ -7,7 +7,7 @@
 ini_set("max_execution_time", "600");
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/copyiteminc.php");
 require("../includes/htmlutil.php");
 

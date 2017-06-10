@@ -2,7 +2,7 @@
 //IMathAS:  Tree-style framed content reading based on block structure
 //(c) 2011 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher

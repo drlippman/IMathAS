@@ -2,7 +2,7 @@
 //IMathAS:  A greybox modal for sending a single message or email
 //(c) 2014 David Lippman for Lumen Learning
 
-require("../validate.php");
+require("../init.php");
 
 $flexwidth = true;
 $nologo = true;

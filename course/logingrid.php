@@ -2,7 +2,7 @@
 //IMathAS:  Grid view of login log
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../validate.php");
+require("../init.php");
 
 
 $cid = Sanitize::courseId($_GET['cid']);

@@ -11,7 +11,7 @@ ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -20,11 +20,11 @@ function printlist($parent) {
 	$children = array_keys($parents,$parent);
 	foreach ($children as $child) {
 		if (!in_array($child,$parents)) { //if no children
-			echo "<li><span class=dd>-</span><input type=checkbox name=\"libs[]\" value=\"$child\" CHECKED>{$names[$child]}</li>";
+			echo "<li><span class=dd>-</span><input type=checkbox name=\"libs[]\" value=\"".Sanitize::encodeStringForDisplay($child)."\" CHECKED>".Sanitize::encodeStringForDisplay($names[$child])."</li>";
 		} else { // if children
-			echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle($child)\"><span class=btn id=\"b$child\">+</span> ";
-			echo "</span><input type=checkbox name=\"libs[]\" value=$child CHECKED>";
-			echo "<span class=hdr onClick=\"toggle($child)\">{$names[$child]}</span>";
+			echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle(".Sanitize::encodeStringForJavascript($child)."\"><span class=btn id=\"b$child\">+</span> ";
+			echo "</span><input type=checkbox name=\"libs[]\" value=\"".Sanitize::encodeStringForDisplay($child)."\" CHECKED>";
+			echo "<span class=hdr onClick=\"toggle(".Sanitize::encodeStringForJavascript($child)."\">".Sanitize::encodeStringForDisplay($names[$child])."</span>";
 			echo "<ul class=hide id=$child>\n";
 			printlist($child);
 			echo "</ul></li>\n";
@@ -580,7 +580,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay(basename($uploadfile))."\" />\n";
 		} else {
 			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
 		}
@@ -661,7 +661,7 @@ if ($overwriteBody==1) {
 			<a href="import.php?cid=<?php echo $cid ?>">Question Import</a> page
 			</p>
 
-<?php echo $packname; ?>
+<?php echo Sanitize::encodeStringForDisplay($packname); ?>
 
 			<h3>Select Libraries to import</h3>
 			<p>Note:  If a parent library is not selected, NONE of the children libraries will be added,

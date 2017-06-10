@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 
 

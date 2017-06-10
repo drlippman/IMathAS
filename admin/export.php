@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -124,7 +124,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			//DB $query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
 			$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
 			$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.description LIKE :safesearch ";
-			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist) LIMIT 500";
 			$qarr = array(':safesearch'=>"%$safesearch%");
 		} else if ($isgrpadmin) {
 			//DB $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
@@ -136,7 +136,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.description LIKE :safesearch ";
 			$query .= "AND imas_questionset.ownerid=imas_users.id ";
 			$query .= "AND (imas_users.groupid=:groupid OR imas_questionset.userights>0) ";
-			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist) LIMIT 500";
 			$qarr = array(':safesearch'=>"%$safesearch%", ':groupid'=>$groupid);
 		} else {
 			//DB $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
@@ -146,7 +146,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
 			$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.description LIKE :safesearch ";
 			$query .= "AND (imas_questionset.ownerid=:ownerid OR imas_questionset.userights>0) ";
-			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist) LIMIT 500";
 			$qarr = array(':safesearch'=>"%$safesearch%", ':ownerid'=>$userid);
 		}
 
@@ -286,7 +286,7 @@ if ($overwriteBody==1) {
 
 <script type="text/javascript">
 
-var curlibs = '<?php echo $searchlibs ?>';
+var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
 function libselect() {
 	window.open('../course/libtree.php?libtree=popup&cid=<?php echo $cid ?>&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }
@@ -326,10 +326,10 @@ function setlibnames(libn) {
 ?>
 
 				<td>
-				<input type=checkbox name='pchecked[]' value='<?php echo $page_pChecked[$i]['id'] ?>' checked=checked>
+				<input type=checkbox name='pchecked[]' value='<?php echo Sanitize::encodeStringForDisplay($page_pChecked[$i]['id']); ?>' checked=checked>
 				</td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_pChecked[$i]['description']) ?></td>
-				<td><?php echo $page_pChecked[$i]['qtype'] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_pChecked[$i]['description']); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_pChecked[$i]['qtype']); ?></td>
 			</tr>
 
 <?php
@@ -358,10 +358,10 @@ function setlibnames(libn) {
 ?>
 
 		<h3>Potential Questions</h3>
-		In Libraries: <span id="libnames"><?php echo $lnames ?></span>
-		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
+		In Libraries: <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames); ?></span>
+		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>">
 		<input type=button value="Select Libraries" onClick="libselect()"> <br>
-		Search: <input type=text size=15 name=search value="<?php echo $search ?>">
+		Search: <input type=text size=15 name=search value="<?php echo Sanitize::encodeStringForDisplay($search); ?>">
 		<input type=submit value="Update and Search">
 		<input type=submit name="finalize" value="Finalize"><BR>
 
@@ -386,10 +386,10 @@ function setlibnames(libn) {
 ?>
 
 				<td>
-				<input type=checkbox name='nchecked[]' value='<?php echo $page_nChecked[$i]['id'] ?>'>
+				<input type=checkbox name='nchecked[]' value='<?php echo Sanitize::encodeStringForDisplay($page_nChecked[$i]['id']); ?>'>
 				</td>
-				<td><?php echo $page_nChecked[$i]['description'] ?></td>
-				<td><?php echo $page_nChecked[$i]['qtype'] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_nChecked[$i]['description']); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_nChecked[$i]['qtype']); ?></td>
 			</tr>
 
 <?php

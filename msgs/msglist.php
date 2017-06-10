@@ -25,7 +25,7 @@ Read   Deleted   Deleted by Sender   Tagged
 If (isread&2)==2 && (isread&4)==4  then should be deleted
 
 	*/
-	require("../validate.php");
+	require("../init.php");
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");

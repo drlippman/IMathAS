@@ -9,7 +9,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 	 if (!file_exists("$curdir/config.php")) {
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php");
 	 }
- 	require_once("$curdir/config.php");
+ 	require_once(__DIR__ . "/init_without_validate.php");
 
  	if (!isset($_GET['cid'])) {
 		echo "Invalid address.  Address must be directaccess.php?cid=###, where ### is your courseid";
@@ -143,7 +143,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 	if ($_POST['ekey']!='') {
 		$addtoquerystring = "ekey=".Sanitize::encodeStringForUrl($_POST['ekey']);
 	}
-	require("validate.php");
+	require("init.php");
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student

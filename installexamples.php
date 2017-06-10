@@ -1,6 +1,6 @@
 <?php
 //IMathAS Install initial examples library
-require("validate.php");
+require("init.php");
 if ($myrights<100) {
 	echo "No rights";
 	exit;

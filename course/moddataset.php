@@ -9,7 +9,7 @@
 //3 - CC-BY-SA-NC
 //4 - CC-BY-SA
 
-	require("../validate.php");
+	require("../init.php");
 
 
 	if ($myrights<20) {

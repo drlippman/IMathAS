@@ -2,7 +2,7 @@
 //IMathAS:  Categorize questions used in an assessment
 //(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 
 
 	$aid = Sanitize::onlyInt($_GET['aid']);

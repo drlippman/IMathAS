@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
-	require("../validate.php");
+	require("../init.php");
 
 
 	if (!(isset($teacherid))) {

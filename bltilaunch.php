@@ -27,8 +27,7 @@
 //    lis_person_contact_email_primary
 
 header('P3P: CP="ALL CUR ADM OUR"');
-include("config.php");
-require_once("includes/sanitize.php");
+include("init_without_validate.php");
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
 //DB if (!get_magic_quotes_gpc()) {
@@ -49,7 +48,7 @@ if ($enablebasiclti!=true) {
 function reporterror($err) {
 	global $imasroot;
 	require("header.php");
-	echo "<p>$err</p>";
+	printf('<p>%s</p>', Sanitize::encodeStringForDisplay($err));
 	require("footer.php");
 	exit;
 }
@@ -162,10 +161,12 @@ if (isset($_GET['launch'])) {
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h4>Connecting to $installname</h4>";
-	echo "<form id=\"postbackform\" method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
+	echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
-		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
-		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo "onsubmit='return confirm(\"This assessment has a time limit of "
+            .Sanitize::encodeStringForJavascript($sessiondata['ltitlwrds'])
+            .".  Click OK to start or continue working on the assessment.\")' >";
+		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($sessiondata['ltitlwrds']).".</p>";
 		echo '<div class="textright"><input type="submit" value="Continue" /></div>';
 	} else {
 		echo ">";
@@ -334,10 +335,10 @@ if (isset($_GET['launch'])) {
 		$nologo = true;
 		require("header.php");
 		if (isset($infoerr)) {
-			echo '<p class=noticetext>'.$infoerr.'</p>';
+			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
 		}
 
-		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";
+		echo "<form method=\"post\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
 		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
@@ -379,23 +380,23 @@ if (isset($_GET['launch'])) {
 			//give option to provide existing account info, or provide full new student info
 			if ($allow_acctcreation) {
 				echo "<p>If you already have an account on $installname, enter your username and ";
-				echo "password below to enable automated signon from $ltiorgname</p>";
+				echo "password below to enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
 			} else {
 				echo "<p>Enter your username and ";
-				echo "password for $installname below to enable automated signon from $ltiorgname</p>";
+				echo "password for $installname below to enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
 			}
-			echo "<span class=form><label for=\"curSID\">$loginprompt:</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
+			echo "<span class=form><label for=\"curSID\">".Sanitize::encodeStringForDisplay($loginprompt).":</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
 			echo "<span class=form><label for=\"curPW\">Password:</label></span><input class=form type=password size=20 id=\"curPW\" name=\"curPW\"><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Sign In'></div>\n";
 			if ($allow_acctcreation) {
 				echo "<p>If you do not already have an account on $installname, provide the information below to create an account ";
-				echo "and enable automated signon from $ltiorgname</p>";
-				echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
+				echo "and enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
+				echo "<span class=form><label for=\"SID\">".Sanitize::encodeStringForDisplay($longloginprompt).":</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 				echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 				echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
-				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"$deffirst\" size=20 id=firstnam name=firstname><BR class=form>\n";
-				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text value=\"$deflast\" size=20 id=lastname name=lastname><BR class=form>\n";
-				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"$defemail\" size=60 id=email name=email><BR class=form>\n";
+				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deffirst)."\" size=20 id=firstnam name=firstname><BR class=form>\n";
+				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deflast)."\" size=20 id=lastname name=lastname><BR class=form>\n";
+				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
 				echo "<div class=submit><input type=submit value='Create Account'></div>\n";
 			} else {
@@ -757,7 +758,7 @@ if ($stm->rowCount()==0) {
 					$flexwidth = true;
 					require("header.php");
 
-					echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}\">";
+					echo "<form method=\"post\" action=\"".$imasroot."/bltilaunch.php\">";
 					if ($copycourse=="ask") {
 						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this
 							link is located in a $installname course you are already a teacher of (course ID $aidsourcecid).
@@ -1568,10 +1569,10 @@ if (isset($_GET['launch'])) {
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h4>Connecting to $installname</h4>";
-	echo "<form id=\"postbackform\" method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
+	echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
-		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
-		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo "onsubmit='return confirm(\"This assessment has a time limit of ".Sanitize::encodeStringForDisplay($sessiondata['ltitlwrds']).".  Click OK to start or continue working on the assessment.\")' >";
+		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($sessiondata['ltitlwrds']).".</p>";
 		echo '<div class="textright"><input type="submit" value="Continue" /></div>';
 	} else {
 		echo ">";
@@ -1741,10 +1742,10 @@ if (isset($_GET['launch'])) {
 		$flexwidth = true;
 		require("header.php");
 		if (isset($infoerr)) {
-			echo '<p class=noticetext>'.$infoerr.'</p>';
+			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
 		}
 
-		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";
+		echo "<form method=\"post\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
 		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
@@ -1791,13 +1792,13 @@ if (isset($_GET['launch'])) {
 				echo "<p>Enter your username and ";
 				echo "password for $installname below to enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
 			}
-			echo "<span class=form><label for=\"curSID\">$loginprompt:</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
+			echo "<span class=form><label for=\"curSID\">".Sanitize::encodeStringForDisplay($loginprompt).":</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
 			echo "<span class=form><label for=\"curPW\">Password:</label></span><input class=form type=password size=20 id=\"curPW\" name=\"curPW\"><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Sign In'></div>\n";
 			if ($allow_acctcreation) {
 				echo "<p>If you do not already have an account on $installname, provide the information below to create an account ";
-				echo "and enable automated signon from $ltiorgname</p>";
-				echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
+				echo "and enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
+				echo "<span class=form><label for=\"SID\">".Sanitize::encodeStringForDisplay($longloginprompt).":</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 				echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 				echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
 				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deffirst)."\" size=20 id=firstnam name=firstname><BR class=form>\n";

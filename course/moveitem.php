@@ -2,7 +2,7 @@
 //IMathAS: Move item dialog
 //(c) 2017 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 $cid = intval($_GET['cid']);
 if (!isset($teacherid)) {

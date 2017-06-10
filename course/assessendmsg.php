@@ -4,7 +4,7 @@
 
 
 if (!isset($imasroot)) {
-	require("../validate.php");
+	require("../init.php");
 	if (!(isset($teacherid))) { // loaded by a NON-teacher
 		echo "You must be a teacher to access this page";
 		exit;

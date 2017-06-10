@@ -10,7 +10,7 @@
  *
  * Tweaked to bundle as a util
  */
-require("../validate.php");
+require("../init.php");
 if ($myrights<100) {exit;}
 
 function minify($c) {

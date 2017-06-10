@@ -2,7 +2,7 @@
 //IMathAS.  Records library items junk tag
 //(c) 2010 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 if (!isset($_GET['libitemid']) || $myrights<20) {
 	exit;

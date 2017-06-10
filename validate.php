@@ -1,19 +1,10 @@
 <?php
 //IMathAS:  Checks user's login - prompts if none.
 //(c) 2006 David Lippman
-require_once(__DIR__ . "/includes/sanitize.php");
 
  header('P3P: CP="ALL CUR ADM OUR"');
 
  $curdir = rtrim(dirname(__FILE__), '/\\');
- if (!file_exists("$curdir/config.php")) {
- 	// Can't use $basesiteurl here, as it's defined in config.php.
-	$httpMode = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on')
-		|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https')
-		? 'https://' : 'http://';
-	header('Location: ' . $httpMode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . Sanitize::encodeStringForDisplay(rtrim(dirname($_SERVER['PHP_SELF'])), '/\\') . "/install.php");
- }
- require_once("$curdir/config.php");
  require("i18n/i18n.php");
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);

@@ -2,7 +2,7 @@
 //IMathAS:  GB view for testing center staff
 //(c) 2008 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 
 $cid = Sanitize::courseId($_GET['cid']);

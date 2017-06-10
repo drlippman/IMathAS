@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 require("../includes/filehandler.php");
@@ -45,7 +45,7 @@ if (isset($_GET['id'])) {
 	$pagetitle = "Add Inline Text";
 }
 if (isset($_GET['tb'])) {
-	$totb = $_GET['tb'];
+	$totb = Sanitize::encodeStringForDisplay($_GET['tb']);
 } else {
 	$totb = 'b';
 }

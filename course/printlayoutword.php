@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 
  //set some page specific variables and counters
@@ -307,7 +307,7 @@ if ($overwriteBody==1) {
 
 	/*
 
-	$data = 'html='.Sanitize::encodeStringForUrl($out);
+	$data = 'html='.Sanitize::encodeUrlParam($out);
 
 	$params = array (
             'http' => array (

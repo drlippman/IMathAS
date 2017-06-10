@@ -2,7 +2,7 @@
 //(c) 2013 David Lippman.  Part of IMathAS
 //Define course outcomes
 
-require("../validate.php");
+require("../init.php");
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
 
 if (isset($_POST['order'])) {

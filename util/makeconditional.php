@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 
 if (!isset($teacherid) || !isset($cid)) {
 	echo "You are not authorized to view this page";

@@ -2,7 +2,7 @@
 //IMathAS.  Records tags/untags
 //(c) 2007 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 if (!isset($_GET['threadid'])) {
 	exit;

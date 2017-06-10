@@ -55,28 +55,77 @@ class Sanitize
 	}
 
 	/**
-	 * Encode a string for display in a web browser.
+	 * Encode a string for display in a web browser. Use for page text and HTML attributes only!
 	 *
 	 * This method will not double-encode existing HTML entities.
-	 * This is safe to use for HTML tag attributes. (quotes are encoded)
+	 *
+	 * @see encodeStringForJavascript
+	 * @see encodeStringForCSS
 	 *
 	 * @param $string string The string to encode.
 	 * @return string the encoded string.
 	 */
 	public static function encodeStringForDisplay($string)
 	{
-		return htmlspecialchars($string, ENT_QUOTES, ini_get("default_charset"), false);
+		return htmlspecialchars($string, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), false);
+	}
+
+	/**
+	 * Encode a string for use in blocks of JavaScript, or in-line JavaScript.
+	 *
+	 * @see encodeStringForDisplay
+	 * @see encodeStringForCSS
+	 *
+	 * @param $string string The string to encode.
+	 * @return string the encoded string.
+	 */
+	public static function encodeStringForJavascript($string)
+	{
+		$safeString = '';
+
+		$stringLength = strlen($string);
+		for ($i = 0; $i < $stringLength; $i++) {
+			$char = substr($string, $i, 1);
+			$safeString .= preg_match("/[\da-z]/i", $char) ? $char : '\\x' . dechex(ord($char));
+		}
+
+		return $safeString;
+	}
+
+	/**
+	 * Encode a string for use in blocks of CSS, or in-line CSS.
+	 *
+	 * @see encodeStringForDisplay
+	 * @see encodeStringForJavascript
+	 *
+	 * @param $string string The string to encode.
+	 * @return string the encoded string.
+	 */
+	public static function encodeStringForCSS($string)
+	{
+		$safeString = '';
+
+		$stringLength = strlen($string);
+		for ($i = 0; $i < $stringLength; $i++) {
+			$char = substr($string, $i, 1);
+			$safeString .= preg_match("/[\da-z]/i", $char) ? $char : '\\' . dechex(ord($char));
+		}
+
+		return $safeString;
 	}
 
 	/**
 	 * Encode a string for use in a URL to be clicked on. Use for query parameters only!
+	 *
+	 * This method will not double-encode a string.
 	 *
 	 * @param $string string The string to encode.
 	 * @return string The encoded string.
 	 */
 	public static function encodeUrlParam($string)
 	{
-		return urlencode($string);
+		$decoded = urldecode($string);
+		return urlencode($decoded);
 	}
 
 	/**
@@ -90,6 +139,23 @@ class Sanitize
 	{
 		// Valid characters: https://www.ietf.org/rfc/rfc3986.txt
 		return preg_replace('/[^\da-z\._~:\/?#\[\]%@!$&\'()*+,;=-]/i', '', $string);
+	}
+
+	/**
+	 * Sanitize a complete URL query string. (Everything after and without the '?' character in a URL)
+	 *  
+	 *
+	 * Example input: "name=MyName&cid=994&color=blue"
+	 *
+	 *  Do NOT use this for a string like "name=$name&color=$color", as it
+	 *  does not encode query parameters
+	 *
+	 * @param $string string The entire query string.
+	 * @return string The encoded query string.
+	 */
+	public static function fullQueryString($string)
+	{
+		return self::fullUrl($string);
 	}
 
 	/**
@@ -248,4 +314,5 @@ class Sanitize
 
 		return $placeholders;
 	}
+
 }

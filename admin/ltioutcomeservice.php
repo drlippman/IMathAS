@@ -8,7 +8,7 @@
 //  where sig = sha1(gbitemid::cid-linkid::userid)
 
 
-require("../config.php");
+require("../init_without_validate.php");
 
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 	 $urlmode = 'https://';

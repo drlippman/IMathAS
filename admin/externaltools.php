@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 
 
 $isadmin = false;
@@ -30,7 +30,7 @@ if ($myrights == 75 && $cid=='admin') {
 	$isteacher = true;
 }
 if (isset($_GET['ltfrom'])) {
-	$ltfrom = '&amp;ltfrom='.$_GET['ltfrom'];
+	$ltfrom = '&amp;ltfrom='.Sanitize::encodeUrlParam($_GET['ltfrom']);
 } else {
 	$ltfrom = '';
 }
@@ -120,7 +120,7 @@ if (isset($_POST['tname'])) {
 	if ($isteacher) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if (isset($_GET['ltfrom'])) {
-			echo "&gt; <a href=\"../course/addlinkedtext.php?cid=$cid&amp;id={$_GET['ltfrom']}\">Modify Linked Text<a/> ";
+			echo "&gt; <a href=\"../course/addlinkedtext.php?cid=$cid&amp;id=".Sanitize::encodeUrlParam($_GET['ltfrom'])."\">Modify Linked Text<a/> ";
 		}
 	} else {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> \n";
@@ -173,7 +173,7 @@ if (isset($_POST['tname'])) {
 		foreach ($tochg as $v) {
 			${$v} = htmlentities(${$v});
 		}
-		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$_GET['id'].'">';
+		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.Sanitize::onlyInt($_GET['id']).'">';
 ?>
 		<span class="form">Tool Name:</span>
 		<span class="formright"><input type="text" size="40" name="tname" value="<?php echo $name;?>" /></span>

@@ -3,7 +3,7 @@
 //(c) 2016 David Cooper, David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 
 

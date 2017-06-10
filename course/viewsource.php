@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Modify a question's code
 //(c) 2006 David Lippman
-	require("../validate.php");
+	require("../init.php");
 
 
 	$pagetitle = "Question Source";

@@ -1,5 +1,5 @@
 <?php
-	require("../validate.php");
+	require("../init.php");
 	if ($myrights<40) {
 		exit;
 	}
@@ -12,7 +12,7 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
 	//DB echo "<p>Student count: ".mysql_result($result,0,0);
-	echo "<p>Student count: ".$stm->fetchColumn(0);
+	echo "<p>Student count: ".Sanitize::onlyInt($stm->fetchColumn(0));
 
 	if (isset($_GET['days'])) {
 		$days = intval($_GET['days']);
@@ -35,7 +35,7 @@
 	$skipcids = implode(',',$skipcid);
 
 	$date = $now - 60*60*24*$days;
-	echo "<p>Active enrollments in $days Days</p>";
+	echo "<p>Active enrollments in " . Sanitize::onlyInt($days) . " Days</p>";
 	$query = "SELECT count(imas_students.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	if (count($skipcid)>0) {
@@ -45,9 +45,9 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
 	//DB echo "<p>Student count: ".mysql_result($result,0,0);
-	echo "<p>Student count: ".$stm->fetchColumn(0);
+	echo "<p>Student count: ".Sanitize::onlyInt($stm->fetchColumn(0));
 
-	echo "<p>Active users in $days Days</p>";
+	echo "<p>Active users in " . Sanitize::onlyInt($days). "Days</p>";
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_students WHERE ";
 	$query .= "imas_users.id=imas_students.userid AND imas_users.lastaccess>$date";
 	if (count($skipcid)>0) {
@@ -57,7 +57,7 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
 	//DB echo "<p>Student count: ".mysql_result($result,0,0);
-	echo "<p>Student count: ".$stm->fetchColumn(0);
+	echo "<p>Student count: ".Sanitize::onlyInt($stm->fetchColumn(0));
 
 	$query = "SELECT count(DISTINCT imas_users.id) FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_users.id=imas_teachers.userid AND imas_users.lastaccess>$date";
@@ -67,7 +67,7 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
 	//DB echo "</p><p>Teacher count: ".mysql_result($result,0,0)."</p>";
-	echo "</p><p>Teacher count: ".$stm->fetchColumn(0)."</p>";
+	echo "</p><p>Teacher count: ".Sanitize::onlyInt($stm->fetchColumn(0))."</p>";
 
 	echo "<p>Active student association (by course owner)</p>";
 	$query = "SELECT g.name,u.LastName,COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_courses AS t ";
@@ -80,17 +80,18 @@
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[0] != $lastgroup) {
 			if ($lastgroup != '') {
-				echo "<b>$lastgroup</b>: $grpcnt<br/>";
-				echo $grpdata;
+				echo "<b>". Sanitize::encodeStringForDisplay($lastgroup)."</b>: ". Sanitize::onlyInt($grpcnt)."<br/>";
+				echo Sanitize::encodeStringForDisplay($grpdata);
 			}
 			$grpcnt = 0;  $grpdata = '';
 			$lastgroup = $row[0];
 		}
-		$grpdata .= "{$row[1]}:  {$row[2]}<br/>";
+
+		$grpdata .= Sanitize::encodeStringForDisplay($row[1]) .":  ".  Sanitize::encodeStringForDisplay($row[2]) ."<br/>";
 		$grpcnt += $row[2];
 	}
-	echo "<b>$lastgroup</b>: $grpcnt<br/>";
-	echo $grpdata;
+	echo "<b>".Sanitize::encodeStringForDisplay($lastgroup). "</b>: " .Sanitize::onlyInt($grpcnt) ."<br/>";
+	echo Sanitize::encodeStringForDisplay($grpdata);
 
 	echo "<p>Active students last hour: ";
 	$date = $now - 60*60;

@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../assessment/displayq2.php");
 require("../assessment/testutil.php");
 $assessver = 2;

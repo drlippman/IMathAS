@@ -2,7 +2,7 @@
 //IMathAS:  Redeem latepasses
 //(c) 2007 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 
 
 	$cid = Sanitize::courseId($_GET['cid']);

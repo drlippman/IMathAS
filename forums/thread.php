@@ -2,7 +2,7 @@
 //Displays forum threads
 //(c) 2006 David Lippman
 
-require("../validate.php");
+require("../init.php");
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	require("../header.php");
 	echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";

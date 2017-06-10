@@ -2,7 +2,7 @@
 //IMathAS:  Manage LatePasses
 //(c) 2007 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 
 
 	if (!(isset($teacherid))) {

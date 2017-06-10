@@ -7,7 +7,7 @@ ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
-require("../validate.php");
+require("../init.php");
 if ($myrights<100) {exit;}
 
 require("../header.php");

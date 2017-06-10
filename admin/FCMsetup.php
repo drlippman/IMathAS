@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 
 if (isset($_POST['token'])) {
 	$stm = $DBH->prepare("UPDATE imas_users SET FCMtoken=:token WHERE id=:id");

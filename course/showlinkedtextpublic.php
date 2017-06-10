@@ -2,9 +2,6 @@
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
 
-require_once(__DIR__ . "/../includes/sanitize.php");
-
-
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";
 		exit;
@@ -15,19 +12,19 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = intval($_GET['from']);
 		$_GET['cid'] = intval($_GET['from']);
-		require("../validate.php");
+		require("../init.php");
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else if (isset($_SERVER['HTTP_REFERER']) && preg_match('/cid=(\d+)/',$_SERVER['HTTP_REFERER'],$matches) && $matches[1]!=$cid) {
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = intval($matches[1]);
 		$_GET['cid'] = intval($matches[1]);
-		require("../validate.php");
+		require("../init.php");
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else {
 		$fcid = 0;
-		require("../config.php");
+		require("../init_without_validate.php");
 	}
 
 	function findinpublic($items,$id) {

@@ -17,7 +17,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 if (isset($_GET['public'])) {
-	require("../config.php");
+	require("../init_without_validate.php");
 	if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
 	ini_set('session.gc_maxlifetime',86400);
 	ini_set('auto_detect_line_endings',true);
@@ -43,7 +43,7 @@ if (isset($_GET['public'])) {
 	$sessiondata['graphdisp'] = 1;
 	$sessiondata['mathdisp'] = 2;
 } else {
-	require("../validate.php");
+	require("../init.php");
 	$public = '';
 	$publica = '';
 }

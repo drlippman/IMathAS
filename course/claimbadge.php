@@ -1,6 +1,6 @@
 <?php
 // localhost/imathas/course/claimbadge.php?cid=3942&badgid=4&userid=108534
-require("../validate.php");
+require("../init.php");
 
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";

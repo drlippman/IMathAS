@@ -1,5 +1,5 @@
 <?php
-	require("../validate.php");
+	require("../init.php");
 	if ($myrights<100) {exit;}
 	/*
 	echo "<p>Raw Non-WebWork Questions anywhere on system </p>\n";
@@ -101,7 +101,7 @@
 
 	echo "<p>Questions on system created anytime:  public / nonprivate / total</p>";
 	foreach ($qs as $u=>$n) {
-		echo "{$info[$u]}: $u: {$qsp[$u]}/{$qsnp[$u]}/$n<br/>\n";
+		echo Sanitize::encodeStringForDisplay($info[$u]).": " . Sanitize::onlyInt($u).": " .Sanitize::onlyInt($qsp[$u])."/". Sanitize::onlyInt($qsnp[$u]) ."/" .Sanitize::onlyInt($n) ."<br/>\n";
 	}
 
 ?>

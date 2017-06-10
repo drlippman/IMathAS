@@ -12,12 +12,12 @@
 		$pubcid = $cid;  //swap out cid's before calling validate
 	  $cid = Sanitize::courseId($_GET['from']);
 		$_GET['cid'] = Sanitize::courseId($_GET['from']);
-		require("../validate.php");
+		require("../init.php");
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else {
 		$fcid = 0;
-		require("../config.php");
+		require("../init_without_validate.php");
 	}
 	if (!isset($_GET['id'])) {
 		echo "<html><body>No item specified.</body></html>\n";

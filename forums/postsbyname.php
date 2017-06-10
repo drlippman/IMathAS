@@ -2,7 +2,7 @@
 	//Lists forum posts by Student name
 	//(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	
 
 	/*if (!isset($teacherid) && !isset($tutorid)) {

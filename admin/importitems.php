@@ -11,7 +11,7 @@ ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -633,10 +633,10 @@ if (!(isset($teacherid))) {
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
 		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay(basename($uploadfile))."\" />\n";
 		} else {
 			echo "<p>Error uploading file!</p>\n";
-			echo $_FILES["userfile"]['error'];
+			echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
 			exit;
 		}
 		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($uploadfile);
@@ -716,7 +716,7 @@ function chkgrp(frm, arr, mark) {
 			echo $page_fileHiddenInput;
 ?>
 		<h3>Package Description</h3>
-		<?php echo $desc; ?>
+		<?php echo Sanitize::encodeStringForDisplay($desc); ?>
 
 
 		<p>Some questions (possibly older or different versions) may already exist on the system.
@@ -761,17 +761,17 @@ function chkgrp(frm, arr, mark) {
 					if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
 			if (strpos($types[$i],'Block')!==false) {
-				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}' checked=checked ";
-				echo "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
+				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}' checked=checked ";
+				echo "onClick=\"chkgrp(this.form, '".Sanitize::encodeStringForJavascript($ids[$i])."', this.checked);\" ";
 				echo '/>';
 			} else {
-				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
 				echo '/>';
 			}
 ?>
 				</td>
-				<td><?php echo $types[$i] ?></td>
-				<td><?php echo $names[$i] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($types[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></td>
 			</tr>
 
 <?php

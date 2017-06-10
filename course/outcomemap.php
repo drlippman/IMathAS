@@ -2,7 +2,7 @@
 //(c) 2013 David Lippman.  Part of IMathAS
 //Display outcome alignment table
 
-require("../validate.php");
+require("../init.php");
 
 
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}

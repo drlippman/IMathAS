@@ -19,10 +19,9 @@
     - On submit, show scored, but no show answer
     */
 
-require("./config.php");
+require("./init_without_validate.php");
 require("i18n/i18n.php");
 require("includes/JWT.php");
-require_once(__DIR__ . "/includes/sanitize.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $sessiondata = array();
 /*

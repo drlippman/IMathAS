@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
-	require("../validate.php");
+	require("../init.php");
 
 
 	$cid = Sanitize::courseId($_GET['cid']);

@@ -1,7 +1,6 @@
 <?php
 	$dbsetup = true; //to prevent database connection
-	require("../../config.php");
-	require_once(__DIR__ . "/../../includes/sanitize.php");
+	require("../../init_without_validate.php");
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
 	 } else {

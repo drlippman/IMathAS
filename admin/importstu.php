@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 
 
@@ -124,7 +124,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			$stm->execute(array(':SID'=>$arr[0]));
 			if ($stm->rowCount()>0) {
 				$id = $stm->fetchColumn(0);
-				echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
+				echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." already existed in system; using existing<br/>\n";
 			} else {
 				if (($_POST['pwtype']==0 || $_POST['pwtype']==1) && strlen($arr[0])<4) {
 					if (isset($CFG['GEN']['newpasswords'])) {
@@ -153,7 +153,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 						}
 					} else if ($_POST['pwtype']==3) {
 						if (trim($arr[6])=='') {
-							echo "Password for {$arr[0]} is blank; skipping import<br/>";
+							echo "Password for ".Sanitize::encodeStringForDisplay($arr[0])." is blank; skipping import<br/>";
 							continue;
 						}
 						if (isset($CFG['GEN']['newpasswords'])) {
@@ -183,7 +183,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid));
 				if ($stm->rowCount()>0) {
-					echo "Username {$arr[0]} already enrolled in course.  Skipping<br/>";
+					echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." already enrolled in course.  Skipping<br/>";
 					continue;
 				}
 
@@ -301,7 +301,7 @@ if ($overwriteBody==1) {
 			<thead>
 				<tr>
 					<th>Username</th><th>Firstname</th><th>Lastname</th><th>e-mail</th>
-					<th><?php echo $page_columnFiveLabel ?></th>
+					<th><?php echo Sanitize::encodeStringForDisplay($page_columnFiveLabel); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -310,11 +310,11 @@ if ($overwriteBody==1) {
 		for ($i=0; $i<count($page_sampleImport); $i++) {
 ?>
 				<tr>
-					<td><?php echo $page_sampleImport[$i]['col1'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col2'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col3'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col4'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col5'] ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col1']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col2']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col3']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col4']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col5']); ?></td>
 				</tr>
 
 <?php
@@ -325,7 +325,7 @@ if ($overwriteBody==1) {
 
 <?php
 		foreach($_POST as $k=>$v) {
-			echo "<input type=hidden name=\"$k\" value=\"$v\">\n";
+			echo "<input type=hidden name=\"$k\" value=\"".Sanitize::encodeStringForDisplay($v)."\">\n";
 		}
 		echo "<p><input type=submit name=\"process\" value=\"Accept and Enroll\"></p>\n";
 	} else { //STEP 1 DISPLAY

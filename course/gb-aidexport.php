@@ -2,7 +2,7 @@
 //IMathAS: Pull Student responses on an assessment
 //(c) 2009 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 $isteacher = isset($teacherid);
 $cid = Sanitize::courseId($_GET['cid']);

@@ -17,7 +17,7 @@ forumreply	new forum reply			imas_forum_posts.id,  info has imas_forums.id ; ima
 forummod	modify form post/reply		imas_forum_posts.id,  info has imas_forums.id ; imas_forum_threads.id
 */
 
-require("../validate.php");
+require("../init.php");
 if (isset($studentid)) {
 	$now = time();
 	if (isset($_POST['unloadinglinked'])) {

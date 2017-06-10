@@ -2,7 +2,7 @@
 //IMathAS: Common Catridge v1.1 Export
 //(c) 2011 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 
 

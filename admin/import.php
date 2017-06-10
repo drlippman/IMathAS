@@ -10,7 +10,7 @@ ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 /*** pre-html data manipulation, including function code *******/
 function parsefile($file) {

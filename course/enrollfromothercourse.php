@@ -3,7 +3,7 @@
 //(c) 2009 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -76,7 +76,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 $pagetitle = "Enroll Students From Another Course";
 require("../header.php");
-require_once(__DIR__ . "/../includes/sanitize.php");
 $curBreadcrumb .= '&gt; Enroll From Another Course';
 
 /***** page body *****/

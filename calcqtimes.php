@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 //Is not currently part of the GUI
 
-require("validate.php");
+require("init.php");
 if ($myrights<100) {
 	exit;
 }

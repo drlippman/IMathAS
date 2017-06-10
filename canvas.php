@@ -1,6 +1,5 @@
 <?php
-require("config.php");
-require_once("includes/sanitize.php");
+require("init_without_validate.php");
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https') || isset($CFG['GEN']['forcecanvashttps']))  {
 	 $urlmode = 'https://';
  } else {

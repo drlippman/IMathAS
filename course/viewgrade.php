@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Student view grade on offline grade with feedback
 //(c) 2006 David Lippman
-	require("../validate.php");
+	require("../init.php");
 
 
 	$cid = Sanitize::courseId($_GET['cid']);

@@ -7,7 +7,7 @@
 
 // does NOT work for randomized questions or matching.
 
-require("../validate.php");
+require("../init.php");
 
 if (!isset($teacherid) && !isset($tutorid)) {
 	require("../header.php");

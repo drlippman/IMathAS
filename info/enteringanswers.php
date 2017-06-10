@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <?php
 	$dbsetup = true; //prevents connection to database
-	include("../config.php");
+	include("../init_without_validate.php");
 ?>
 <html>
 <head>

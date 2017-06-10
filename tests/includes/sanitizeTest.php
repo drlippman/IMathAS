@@ -68,6 +68,27 @@ final class SanitizeTest extends TestCase
 	}
 
 	/*
+	 * encodeStringForJavascript
+	 */
+
+	public function testEncodeStringForJavascript()
+	{
+		$result = Sanitize::encodeStringForJavascript("<h1 style='color: red;'>Hello, world!</h1>");
+		$this->assertEquals(
+			'\x3ch1\x20style\x3d\x27color\x3a\x20red\x3b\x27\x3eHello\x2c\x20world\x21\x3c\x2fh1\x3e', $result);
+	}
+
+	/*
+	 * encodeStringForCSS
+	 */
+
+	public function testEncodeStringForCSS()
+	{
+		$result = Sanitize::encodeStringForCSS("<h1 style='color: red;'>Hello, world!</h1>");
+		$this->assertEquals('\3ch1\20style\3d\27color\3a\20red\3b\27\3eHello\2c\20world\21\3c\2fh1\3e', $result);
+	}
+
+	/*
 	 * encodeUrlParam
 	 */
 
@@ -321,5 +342,6 @@ final class SanitizeTest extends TestCase
 		$result = Sanitize::generateQueryPlaceholdersGrouped($array, 4);
 		$this->assertNull($result);
 	}
+
 
 }

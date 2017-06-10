@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
 if (!isset($_GET['type'])) {
 	$type = 'take';
@@ -52,7 +52,7 @@ echo '<ul class="nomark">';
 if ($stm->rowCount()==0) {
 	echo '<li>No hidden courses</li>';
 } else {
-	//DB while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) { 
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		echo '<li>';
 		
@@ -60,7 +60,7 @@ if ($stm->rowCount()==0) {
 			echo ' <span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 			echo '<img src="../img/gears.png" alt="Options" class="mida"/></a>';
 			echo '<ul role="menu" class="dropdown-menu">';
-			echo ' <li><a href="unhidefromcourselist.php?type='.$type.'&cid='.$row[1].'">'._('Un-hide from course list').'</a></li>';
+			echo ' <li><a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&cid='.$row[1].'">'._('Un-hide from course list').'</a></li>';
 			if ($row[2]==$userid) {
 				echo ' <li><a href="forms.php?from=home&action=modify&id='.$row[1].'">'._('Settings').'</a></li>';
 				echo '<li><a href="forms.php?from=home&action=chgteachers&id='.$row[1].'">'._('Add/remove teachers').'</a></li>';
@@ -68,10 +68,10 @@ if ($stm->rowCount()==0) {
 				echo ' <li><a href="forms.php?from=home&action=delete&id='.$row[1].'">'._('Delete').'</a></li>';
 			}
 			echo '</ul></span> ';
-			echo '<a href="../course/course.php?cid='.$row[1].'">'.$row[0].'</a> ';
+			echo '<a href="../course/course.php?cid='.$row[1].'">'.Sanitize::encodeStringForDisplay($row[0]).'</a> ';
 		} else {
-			echo '<a href="../course/course.php?cid='.$row[1].'">'.$row[0].'</a> ';
-			echo ' <a href="unhidefromcourselist.php?type='.$type.'&cid='.$row[1].'" class="small">Unhide</a>';
+			echo '<a href="../course/course.php?cid='.$row[1].'">'.Sanitize::encodeStringForDisplay($row[0]).'</a> ';
+			echo ' <a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&cid='.$row[1].'" class="small">Unhide</a>';
 		}
 		
 		echo '</li>';

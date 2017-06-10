@@ -9,8 +9,6 @@ if (isset($_POST['dbserver'])) {
 	$contents = "<?php
 //IMathAS Math Config File.  Adjust settings here!
 
-require_once(__DIR__ . \"/includes/security.php\");
-
 //database access settings
 \$dbserver = \"{$_POST['dbserver']}\";
 \$dbname = \"{$_POST['dbname']}\";
@@ -53,8 +51,10 @@ $contents .= "';
 \$imasroot = \"{$_POST['imasroot']}\";
 
 //base site url - use when generating full URLs to site pages.
-\$httpmode = isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://';
-\$basesiteurl = \$httpmode . Sanitize::domainNameWithPort(\$_SERVER['HTTP_HOST']) . \$imasroot;
+\$httpmode = (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on')
+    || (isset(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+	? 'https://' : 'http://';
+\$GLOBALS['basesiteurl'] = \$httpmode . Sanitize::domainNameWithPort(\$_SERVER['HTTP_HOST']) . \$imasroot;
 
 //mimetex path
 \$mathimgurl = \"{$_POST['mathimgurl']}\";
@@ -121,7 +121,6 @@ $contents .= '
 	  unset($dbserver);
 	  unset($dbusername);
 	  unset($dbpassword);
-
 
 ?>';
 $file = fopen('config.php','w');
