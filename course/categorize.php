@@ -305,6 +305,6 @@ echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" o
 	echo '<p><input type=submit value="Record Categorizations"> and return to the Add/Remove Questions page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 
-
+	require("../footer.php");
 
 ?>

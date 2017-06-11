@@ -1,5 +1,6 @@
 <?php
 	$dbsetup = true; //prevents connection to database
+	$init_skip_csrfp = true;
 	include("init_without_validate.php");
 	if (!isset($_GET['bare'])) {
 ?>

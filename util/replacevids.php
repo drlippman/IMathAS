@@ -59,5 +59,5 @@ echo '<form method="post">';
 echo '<p>Replace video ID <input type="text" name="from" size="11"/> with video ID <input type="text" name="to" size="11"/></p>';
 echo '<p><input type="submit" value="Replace"/></p>';
 echo '</form>';
-
+require("../footer.php");
 ?>

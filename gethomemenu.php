@@ -2,6 +2,7 @@
 //returns list of courses for switch-to menu
 //called via AJAX
 //IMathAS
+$init_skip_csrfp = true;
 require("init.php");
 
 echo '<b>Switch to:</b><ul class="nomark">';

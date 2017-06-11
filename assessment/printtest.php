@@ -378,4 +378,6 @@
 	if ($endtext != '') {
 		echo '<div class="intro">'.filter($endtext).'</div>';
 	}
+	
+	require("../footer.php");
 ?>

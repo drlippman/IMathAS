@@ -14,6 +14,8 @@ ini_set("max_input_time", "3600");
 ini_set("max_execution_time", "3600");
 ini_set("memory_limit", "712857600");
 
+require("header.php");
+
 $start = microtime(true);
 //get last updated time
 //DB $query = "SELECT id,ver FROM imas_dbschema WHERE id=3 OR id=4";
@@ -218,4 +220,6 @@ if ($lastfirstupdate == 0) {
 echo "Done: updated $nq questions with a total of $totn new datapoints";
 echo '<br/>Max memory: '.memory_get_peak_usage().', '.memory_get_peak_usage(true);
 echo '<br/>Time: '.(microtime(true) - $start);
+
+require("footer.php");
 ?>

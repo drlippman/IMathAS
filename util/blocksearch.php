@@ -37,4 +37,5 @@ if (isset($_POST['search'])) {
 	}
 	echo '</p>';
 }
+require("../footer.php");
 ?>

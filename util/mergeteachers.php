@@ -21,6 +21,7 @@ if (empty($_POST['from']) || empty($_POST['to'])) {
 	echo 'to <select name="to">'.$ops.'</select><br/>';
 	echo '<input type="submit" value="Go"/>';
 	echo '</form>';
+	require("../footer.php");
 
 } else {
 	$from = intval($_POST['from']);

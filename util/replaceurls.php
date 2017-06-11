@@ -114,5 +114,5 @@ echo '<p>Replace URL: <input type="text" name="from" size="50"/><br/>with URL: <
 echo '<p>Or, paste from a spreadsheet (current URL in first column, replacement in second column)<br/><textarea cols=80 rows=6 name="list"></textarea></p>';
 echo '<p><input type="submit" value="Replace"/></p>';
 echo '</form>';
-
+require("../footer.php");
 ?>

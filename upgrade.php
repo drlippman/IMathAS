@@ -53,8 +53,10 @@ unset($dbpassword);
 	}
 	$use_local_sessions = true;
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
+		$init_skip_csrfp = true;
 		require("init_without_validate.php");
 	} else {
+		$init_skip_csrfp = true;
 		require("init.php");
 		if ($myrights<100) {
 			echo "No rights, aborting";

@@ -483,5 +483,5 @@
 		}
 
 	}
-
+	require("../footer.php");
 ?>
