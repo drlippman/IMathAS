@@ -20,8 +20,10 @@ if (!isset($use_local_sessions)) {
 }
 
 // OWASP CSRF Protector
-require_once(__DIR__ . "/csrfp/libs/csrf/csrfprotector.php");
-csrfProtector::init();
+if (!isset($init_skip_csrfp) || (isset($init_skip_csrfp) && false == $init_skip_csrfp)) {
+	require_once(__DIR__ . "/csrfp/libs/csrf/csrfprotector.php");
+	csrfProtector::init();
+}
 
 // Load validate.php?
 if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init_skip_validate)) {

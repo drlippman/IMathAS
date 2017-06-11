@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . "/includes/sanitize.php");
+require_once(__DIR__ . "/init_without_validate.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 ini_set('session.gc_maxlifetime',86400);
 if ($_SERVER['HTTP_HOST'] != 'localhost') {
