@@ -19,7 +19,9 @@
     - On submit, show scored, but no show answer
     */
 
+$init_skip_csrfp = true;
 require("./init_without_validate.php");
+unset($init_skip_csrfp);
 require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
