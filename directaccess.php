@@ -29,7 +29,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 	 if (isset($_POST['submit']) && $_POST['submit']=="Sign Up") {
 		unset($_POST['username']);
 		unset($_POST['password']);
-		require_once("config.php");
+		require_once("init_without_validate.php");
 		if ($_POST['SID']=="" || $_POST['firstname']=="" || $_POST['lastname']=="" || $_POST['email']=="" || $_POST['pw1']=="") {
 			$page_newaccounterror .= "Please include all information. ";
 		}
