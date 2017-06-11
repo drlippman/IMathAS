@@ -299,7 +299,7 @@
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm$uid.jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm$uid.jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			} else {
 				echo "<img src=\"$imasroot/course/files/userimg_sm$uid.jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			}

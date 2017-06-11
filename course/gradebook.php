@@ -797,7 +797,7 @@ function gbstudisp($stu) {
 
 			if ($gbt[1][4][2]==1) {
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/> ";
+					echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/> ";
 				} else {
 					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/>";
 				}
@@ -1615,7 +1615,7 @@ function gbinstrdisp() {
 	echo '</tr></thead><tbody>';
 	//create student rows
 	if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-		$userimgbase = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles";
+		$userimgbase = $urlmode."{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles";
 	} else {
 		$userimgbase = "$imasroot/course/files";
 	}

@@ -820,7 +820,7 @@
 		$qsPacket['id'] = isset($_GET['id']) ? $_GET['id'] : 0;
 		// Build img base url
 		if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true){
-			$qsPacket['imgUrlBase'] = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/";
+			$qsPacket['imgUrlBase'] = $urlmode."{$GLOBALS['AWSbucket']}.s3.amazonaws.com/qimages/";
 		} else {
 			$qsPacket['imgUrlBase'] = "$imasroot/assessment/qimages/";
 		}
@@ -1233,7 +1233,7 @@ Image file: <input type="file" name="imgfile"/> assign to variable: <input type=
 if (isset($images['vars']) && count($images['vars'])>0) {
 	foreach ($images['vars'] as $id=>$var) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			$urlimg = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$images['files'][$id]}";
+			$urlimg = $urlmode."{$GLOBALS['AWSbucket']}.s3.amazonaws.com/qimages/{$images['files'][$id]}";
 		} else {
 			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
 		}
