@@ -845,8 +845,9 @@ function AMnumfuncPrepVar(qn,str) {
   var vl = vlist[qn];
   var fl = flist[qn];
   var vars = vl.split("|");
+  vars.push("DNE");
 
-  str = str.replace(/,/g,"");
+  str = str.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
   str = normalizemathunicode(str);
   var foundaltcap = [];
   var dispstr = str;
@@ -997,6 +998,9 @@ function AMpreview(inputId,outputId) {
   else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression");}
   //outnode.appendChild(document.createTextNode(" " + err));
 
+  if (dispstr=='"DNE"' || dispstr=="oo") {
+  	  err = _("syntax ok");
+  }
   var qn = outputId.substr(1);
   setupLivePreview(qn);
   LivePreviews[qn].RenderNow('`'+dispstr+'` '+wrapAMnotice(err));
