@@ -101,10 +101,8 @@ function handleClickTextSegmentButton(e) {
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
 	if (usingASCIIMath) {
-		$("#curqtbl tr:not(.textsegmentrow)").each(function(i,el) {
-			rendermathnode(el);
-		});
-
+		rendermathnode(document.getElementById("curqtbl"));
+		
   }
   updateqgrpcookie();
 	initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
@@ -879,7 +877,7 @@ function generateTable() {
 				curclass = 'odd';
 			}
 			if (curistext==1) {
-				curclass += ' textsegmentrow';
+				curclass += ' textsegmentrow skipmathrender';
 			}
 			html += "<tr class='"+curclass+"'>";
 			if (beentaken) {
