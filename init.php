@@ -21,8 +21,8 @@ if (!isset($use_local_sessions)) {
 
 // OWASP CSRF Protector
 if (!isset($init_skip_csrfp) || (isset($init_skip_csrfp) && false == $init_skip_csrfp)) {
-	require_once(__DIR__ . "/csrfp/libs/csrf/csrfprotector.php");
-	csrfProtector::init();
+	//require_once(__DIR__ . "/csrfp/libs/csrf/csrfprotector.php");
+	//csrfProtector::init();
 }
 
 // Load validate.php?
