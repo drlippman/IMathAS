@@ -49,7 +49,7 @@ class SessionDBHandler implements SessionHandlerInterface
 		$stm = $this->db->prepare('DELETE * FROM php_sessions WHERE access < :oldTimestamp');
 		$stm->bindParam(':oldTimestamp', $oldTimestamp);
 
-		if ($this->db->execute()) {
+		if ($stm->execute()) {
 			return true;
 		}
 
