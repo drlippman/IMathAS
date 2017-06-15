@@ -58,8 +58,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = $_GET['block'];
-	$page_formActionTag = "addinlinetext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
+	$block = Sanitize::encodeStringForDisplay($_GET['block']);
+	$page_formActionTag = "addinlinetext.php?block=$block&cid=$cid&folder=" . Sanitize::encodeStringForDisplay($_GET['folder']);
 	$page_formActionTag .= "&tb=$totb";
 	$caltag = $_POST['caltag'];
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
