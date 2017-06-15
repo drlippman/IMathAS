@@ -301,7 +301,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			for ($i=count($files)/2-1;$i>=0;$i--) {
 				if (isset($_POST['filedel'][$i])) {
-					if (deleteforumfile($_GET['modify'],Sanitize::sanitizeFilenameAndCheckBlacklist($files[2*$i+1]))) {
+					if (deleteforumfile($_GET['modify'],$files[2*$i+1])) {
 						array_splice($files,2*$i,2);
 					}
 				}
@@ -312,7 +312,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$i = 0;
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
 			while (isset($_FILES['newfile-'.$i]) && is_uploaded_file($_FILES['newfile-'.$i]['tmp_name'])) {
-				$userfilename = preg_replace('/[^\w\.]/','',Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['newfile-'.$i]['name']));
+				$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['newfile-'.$i]['name']);
 				if (trim($_POST['newfiledesc-'.$i])=='') {
 					$_POST['newfiledesc-'.$i] = $userfilename;
 				}

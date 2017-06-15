@@ -222,8 +222,8 @@ if (!(isset($teacherid)) && $myrights<100) {
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
 		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$$uploadfilename = basename($uploadfile);
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::sanitizeFilenameAndCheckBlacklist($$uploadfilename)."\" />\n";
+			$uploadfilename = basename($uploadfile);
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay($uploadfilename)."\" />\n";
 		} else {
 			$overwriteBody = 1;
 			$body = "<p>Error uploading file!</p>\n";

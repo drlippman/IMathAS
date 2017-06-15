@@ -34,9 +34,9 @@ if (isset($_REQUEST["action"]))
 	if ($_REQUEST["action"] == "upload_file")
 	{
 		//$filename = basename(stripslashes($_POST["uploaded_file_name"]));
-		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['uploaded_file']['name']);
-		$filename = str_replace(' ','_',$filename);
-		$filename = preg_replace('/[^\w\.\-_]/','',$filename);
+		$filename = str_replace(' ','_',$_FILES['uploaded_file']['name']);
+		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist($filename);
+
 		//$filename = Sanitize::encodeStringForUrl($filename);
 		//echo $filename;
 		//exit;
@@ -64,7 +64,7 @@ if (isset($_REQUEST["action"]))
 	}
 	else if ($_REQUEST["action"] == "delete_file")
 	{
-		if (deleteuserfile($userid,Sanitize::sanitizeFilenameAndCheckBlacklist($_REQUEST["item_name"]))) {
+		if (deleteuserfile($userid,$_REQUEST["item_name"])) {
 			echo 'OK';
 		} else {
 			echo 'FAIL';

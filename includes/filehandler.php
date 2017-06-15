@@ -31,8 +31,9 @@ function storecontenttofile($content,$key,$sec="private") {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+		$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 		$dir = $base.dirname($key);
-		$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
+		$fn = basename($key);
 		if (!is_dir($dir)) {
 			mkdir_recursive($dir);
 		}
@@ -104,8 +105,9 @@ function storeuploadedfile($id,$key,$sec="private") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			$dir = $base.dirname($key);
-			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
+			$fn = basename($key);
 			if (!is_dir($dir)) {
 				mkdir_recursive($dir);
 			}
@@ -147,9 +149,10 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
-			$keydir = dirname($key);
+			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			$dir = $base.dirname($key);
-			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
+			$fn = basename($key);
+			$keydir = dirname($key);
 			if (!is_dir($dir)) {
 				mkdir_recursive($dir);
 			}
@@ -195,8 +198,9 @@ function storeuploadedqimage($id,$key,$sec="public-read") {
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages/';
+			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			$dir = $base.dirname($key);
-			$fn = Sanitize::sanitizeFilenameAndCheckBlacklist($key);
+			$fn = basename($key);
 			if (!is_dir($dir)) {
 				mkdir_recursive($dir);
 			}
@@ -523,7 +527,7 @@ function getuserfiles($uid,$img=false) {
 	}
 }
 function deleteuserfile($uid,$file) {
-    $safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
+	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "ufiles/$uid/$safeFilename";
@@ -563,7 +567,7 @@ function deleteforumfile($postid,$file) {
 }
 
 function deletecoursefile($file) {
-	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
+	$safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($file);
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "cfiles/$safeFilename";
@@ -582,9 +586,10 @@ function deletecoursefile($file) {
 	}
 }
 function deleteqimage($file) {
+	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-		$s3object = "qimages/$file";
+		$s3object = "qimages/$safeFilename";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
 		}else {
@@ -592,7 +597,7 @@ function deleteqimage($file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages';
-		if (unlink($base."/$file")) {
+		if (unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -601,9 +606,10 @@ function deleteqimage($file) {
 }
 
 function deletefilebykey($key) {
+	$safeFilename = Sanitize::sanitizeFilePathAndCheckBlacklist($file);
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-		$s3object = "$key";
+		$s3object = $safeFilename;
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
 		}else {
@@ -611,7 +617,7 @@ function deletefilebykey($key) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/$key")) {
+		if (unlink($base."/$safeFilename")) {
 			return true;
 		} else {
 			return false;

@@ -416,7 +416,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 
 			$uploadfilebasename = basename($uploadfile);
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::sanitizeFilenameAndCheckBlacklist($uploadfilebasename)."\" />\n";
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay($uploadfilebasename)."\" />\n";
 
 		} else {
 			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";

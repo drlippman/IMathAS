@@ -14,7 +14,7 @@ ini_set("post_max_size", "10485760");
   reset ($_FILES);
   $tempkey = key($_FILES);
   $temp = current($_FILES);
-  $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist($temp['name']);
+  $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist(str_replace(' ','_',$temp['name']));
   if (is_uploaded_file($temp['tmp_name'])){
     
     if (isset($_SERVER['HTTP_ORIGIN']) && isset($CFG['GEN']['accepted_origins'])) {
@@ -49,8 +49,6 @@ ini_set("post_max_size", "10485760");
 
     // Accept upload if there was no origin, or if it is an accepted origin
     $filename = basename($temp['name']);
-    $filename = str_replace(' ','_',$filename);
-    $filename = preg_replace('/[^\w\.\-_]/','',$filename);
     $ncnt = 1;
     $filenamepts = explode('.',$filename);
     $skipcheck = false;

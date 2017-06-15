@@ -25,7 +25,7 @@ class Sanitize
 	 */
 	public static function sanitizeFilenameAndCheckBlacklist($uncleanFilename)
 	{
-		$safeFilename = preg_replace('/[^\da-z\._-]/i', '', $uncleanFilename);
+		$safeFilename = preg_replace('/[^\da-z\._\-]/i', '', $uncleanFilename);
 
 		if (self::isFilenameBlacklisted($safeFilename)) {
 			print("Invalid filename used! Halting.\n");
@@ -34,6 +34,33 @@ class Sanitize
 		}
 
 		return $safeFilename;
+	}
+	
+	
+	/**
+	 * Sanitize a file path and and check  the filenameagainst a blacklist. 
+	 * Request processing is halted if the filename exists in the blacklist.
+	 *
+	 * @param $uncleanPath string The file path to sanitize and check.
+	 *   example:  ufiles/1/filename.doc
+	 * @return string A sanitized file path.
+	 */
+	public static function sanitizeFilePathAndCheckBlacklist($uncleanPath)
+	{
+		$saferFilePath = preg_replace('/[^\da-z\._\-\/]/i', '', $uncleanPath);
+		//prevent ../ paths
+		$cnt = 1;
+		while ($cnt>0) {  //repeat until there are no more
+			$saferFilePath = str_replace('../','',$saferFilePath,$cnt);
+		}
+
+		if (self::isFilenameBlacklisted(basename($saferFilePath)) || basename($saferFilePath)=='') {
+			print("Invalid filename used! Halting.\n");
+			// Normally, an exception would be thrown here, but we don't have exception handling. Yet! :)
+			exit;
+		}
+
+		return $saferFilePath;                 
 	}
 
 	/**
