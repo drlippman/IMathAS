@@ -87,9 +87,9 @@
 	 } else {
 	 	 //no reason we should be here...
 		 if (!empty($_SERVER['QUERY_STRING'])) {
-			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
+			 $querys = '?' . $_SERVER['QUERY_STRING'] . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 } else {
-			 $querys = (!empty($addtoquerystring)?'?'.$addtoquerystring:'');
+			 $querys = (!empty($addtoquerystring) ? '?' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 }
 
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -115,7 +115,7 @@
 		$stm->execute(array(':now'=>$now, ':log'=>"$userid login from IP:{$_SERVER['REMOTE_ADDR']}"));
 
 
-		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::fullUrl($querys));
+		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys);
 		 exit;
 	 }
 
@@ -279,15 +279,15 @@
 
 
 		 if (!empty($_SERVER['QUERY_STRING'])) {
-			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
+			 $querys = '?' . $_SERVER['QUERY_STRING'] . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 } else {
-			 $querys = (!empty($addtoquerystring)?'?'.$addtoquerystring:'');
+			 $querys = (!empty($addtoquerystring) ? '?' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 }
 		 //$now = time();
 		 //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
 		 //DB //mysql_query($query) or die("Query failed : " . mysql_error());
 
-		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::fullUrl($querys));
+		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys);
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;

@@ -102,19 +102,62 @@ final class SanitizeTest extends TestCase
 	 * fullUrl
 	 */
 
-	public function testFullUrlValid()
+	public function testFullUrl()
 	{
-		$testUrl = 'https://www.test.example.com/index.html?page-id=123&validchars=a-_~:;/?#[321]@!$(\'z\')*+,%b';
+		$testUrl = 'https://user:pass@www.test.example.com:8080/index.html?page-id=123&validchars=a-_~:;/?#<h1>Hi!</h1>[321]@!$(\'z\')*+,%b#fragmentName';
+		$expectedUrl = 'https://user:pass@www.test.example.com:8080/index.html?page-id=123&validchars=a-_%7E%3A%3B%2F%3F#%3Ch1%3EHi%21%3C%2Fh1%3E%5B321%5D%40%21%24%28%27z%27%29%2A%2B%2C%25b%23fragmentName';
+
 		$result = Sanitize::fullUrl($testUrl);
-		$this->assertEquals($testUrl, $result);
+
+		$this->assertEquals($expectedUrl, $result);
+	}
+
+	public function testFullUrl_MissingOptionalParts()
+	{
+		$testUrl = 'https://www.test.example.com/index.html?page-id=123&validchars=a-_~:;/?<h1>Hi!</h1>[321]@!$(\'z\')*,%b';
+		$expectedUrl = 'https://www.test.example.com/index.html?page-id=123&validchars=a-_%7E%3A%3B%2F%3F%3Ch1%3EHi%21%3C%2Fh1%3E%5B321%5D%40%21%24%28%27z%27%29%2A%2C%25b';
+
+		$result = Sanitize::fullUrl($testUrl);
+
+		$this->assertEquals($expectedUrl, $result);
 	}
 
 	public function testFullUrlWithInvalid()
 	{
-		$testUrl = "https://www.test.example.com/index.html?page-id=123&invalid=<h1>\"^Hello, world!\"</h1>";
-		$expectedUrl = "https://www.test.example.com/index.html?page-id=123&invalid=h1Hello,world!/h1";
+		$testUrl = "https://user:pass@www.test.example.com:8080/index.html?page-id=123&invalid=<h1>\"^Hello, world!\"</h1>#fragmentName";
+		$expectedUrl = "https://user:pass@www.test.example.com:8080/index.html?page-id=123&invalid=%3Ch1%3E%22%5EHello%2C+world%21%22%3C%2Fh1%3E#fragmentName";
+
 		$result = Sanitize::fullUrl($testUrl);
+
 		$this->assertEquals($expectedUrl, $result);
+	}
+
+	/*
+	 * fullQuery
+	 */
+
+	public function testGenerateQueryStringFromMap()
+	{
+		$testQuery = array( 'name' => 'MyName&inject=badStuff', 'cid' => 994 );
+		$expectedQuery = "name=MyName%26inject%3DbadStuff&cid=994";
+
+		$result = Sanitize::generateQueryStringFromMap($testQuery);
+
+		$this->assertEquals($expectedQuery, $result);
+	}
+
+	/*
+	 * fullQueryString
+	 */
+
+	public function testFullQueryString()
+	{
+		$testQuery = "name=My%Name&cid=994";
+		$expectedQuery = "name=My%25Name&cid=994";
+
+		$result = Sanitize::fullQueryString($testQuery);
+
+		$this->assertEquals($expectedQuery, $result);
 	}
 
 	/*

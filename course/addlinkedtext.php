@@ -45,7 +45,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
-	$page_formActionTag = "addlinkedtext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
+	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
+            'cid' => $cid, 'folder' => $_GET['folder']));
 	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::onlyInt($_GET['id']) : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
@@ -298,7 +299,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$body .= "<p><a href=\"addlinkedtext.php?cid=" . Sanitize::courseId($_GET['cid']);
 			if (isset($_GET['id'])) {
-				$body .= "&id={$_GET['id']}";
+				$body .= "&id=" . Sanitize::onlyInt($_GET['id']);
 			} else {
 				$body .= "&id=$newtextid";
 			}
@@ -587,7 +588,8 @@ if ($overwriteBody==1) {
 				echo 'No Tools defined yet<br/>';
 			}
 			if (!isset($CFG['GEN']['noInstrExternalTools'])) {
-				echo '<a href="../admin/externaltools.php?cid='.$cid.'&amp;ltfrom='.$_GET['id'].'">Add or edit an external tool</a>';
+				echo '<a href="../admin/externaltools.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
+                        'ltfrom' => $_GET['id'])) .'">Add or edit an external tool</a>';
 			}
 			?>
 			</span><br class="form"/>
