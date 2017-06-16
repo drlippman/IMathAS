@@ -4186,7 +4186,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		
+
 		$_POST["tc$qn"] = trim($_POST["tc$qn"]);
 
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
@@ -4251,7 +4251,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-		
+
 		//handle nosolninf case
 		if ($_POST["tc$qn"]==='oo' || $_POST["tc$qn"]==='DNE') {
 			if ($answer==$_POST["tc$qn"]) {
@@ -6267,7 +6267,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		$filename = basename($_FILES["qn$qn"]['name']);
+		$filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		$hasfile = false;
 		require_once(dirname(__FILE__)."/../includes/filehandler.php");

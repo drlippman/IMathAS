@@ -93,7 +93,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($_FILES['userfile']['name']!='') {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
-                $userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
+        $userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['userfile']['name'])));
 				$filename = $userfilename;
 				$extension = strtolower(strrchr($userfilename,"."));
 				$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");

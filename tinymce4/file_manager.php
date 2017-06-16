@@ -35,7 +35,7 @@ if (isset($_REQUEST["action"]))
 	{
 		//$filename = basename(stripslashes($_POST["uploaded_file_name"]));
 		$filename = str_replace(' ','_',$_FILES['uploaded_file']['name']);
-		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist($filename);
+		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$filename)));
 
 		//$filename = Sanitize::encodeStringForUrl($filename);
 		//echo $filename;
@@ -56,7 +56,7 @@ if (isset($_REQUEST["action"]))
 				}
 			}
 			if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public")) {
-			
+
 			} else {
 				unset($_REQUEST["action"]);
 			}
@@ -101,7 +101,7 @@ if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 
         // insert information now
         parent.tinymce.activeEditor.windowManager.getParams().oninsert(filename);
-    
+
         // close popup window
         parent.tinymce.activeEditor.windowManager.close();
     }

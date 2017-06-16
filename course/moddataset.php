@@ -386,7 +386,7 @@
 			} else {
 				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/';
 				//$filename = basename($_FILES['imgfile']['name']);
-				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['imgfile']['name']));
+				$userfilename = preg_replace('/[^\w\.]/','',basename(str_replace('\\','/',$_FILES['imgfile']['name'])));
 				$filename = $userfilename;
 
 				//$uploadfile = $uploaddir . $filename;
