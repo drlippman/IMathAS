@@ -526,30 +526,32 @@ if (isset($_GET['delete'])) {
 		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
 		'.$module_meta . '</items>  </module> </modules>';
 
-		$fp = fopen($newdir.'/bltiimathas.xml','w');
-		fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
-		fwrite($fp,'<blti:title>'.htmlentities($installname,ENT_XML1,'UTF-8',false).'</blti:title>');
-		fwrite($fp,'<blti:description>Math Assessment</blti:description>');
-		fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
-		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
-		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
-		fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
-		fwrite($fp,' <lticm:options name="resource_selection">
-			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</lticm:property>
-			<lticm:property name="text">Pick an Assessment</lticm:property>
-			<lticm:property name="selection_width">500</lticm:property>
-			<lticm:property name="selection_height">300</lticm:property>
-		      </lticm:options>');
-		fwrite($fp,'</blti:extensions>');
-		fwrite($fp,'<blti:custom>');
-		fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');
-		fwrite($fp,'</blti:custom>');
-		fwrite($fp,'</cartridge_basiclti_link>');
-		fclose($fp);
-		$resitem =  '<resource identifier="RESbltiimathas" type="imsbasiclti_xmlv1p0">'."\n";
-		$resitem .= '  <file href="bltiimathas.xml" />'."\n";
-		$resitem .= '</resource>';
-		$manifestres[] = $resitem;
+		if ($_POST['includeappconfig']==1) {
+			$fp = fopen($newdir.'/bltiimathas.xml','w');
+			fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
+			fwrite($fp,'<blti:title>'.htmlentities($installname,ENT_XML1,'UTF-8',false).'</blti:title>');
+			fwrite($fp,'<blti:description>Math Assessment</blti:description>');
+			fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
+			fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
+			fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
+			fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
+			fwrite($fp,' <lticm:options name="resource_selection">
+				<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</lticm:property>
+				<lticm:property name="text">Pick an Assessment</lticm:property>
+				<lticm:property name="selection_width">500</lticm:property>
+				<lticm:property name="selection_height">300</lticm:property>
+			      </lticm:options>');
+			fwrite($fp,'</blti:extensions>');
+			fwrite($fp,'<blti:custom>');
+			fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');
+			fwrite($fp,'</blti:custom>');
+			fwrite($fp,'</cartridge_basiclti_link>');
+			fclose($fp);
+			$resitem =  '<resource identifier="RESbltiimathas" type="imsbasiclti_xmlv1p0">'."\n";
+			$resitem .= '  <file href="bltiimathas.xml" />'."\n";
+			$resitem .= '</resource>';
+			$manifestres[] = $resitem;
+		}
 		mkdir($newdir.'/non_cc_assessments');
     		mkdir($newdir.'/course_settings');
     		$fp = fopen($newdir.'/course_settings/syllabus.html','w');
@@ -796,8 +798,12 @@ if (isset($_GET['delete'])) {
 		</table>
 	</div>
 	<?php
-	//echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>";
+	//echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>"; 
 	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in BlackBoard and Moodle)</button></p>";
+	echo '<p>If exporting for Canvas: <br/>';
+	echo '<input type=radio name=includeappconfig value=1 checked />Include App Configuration.<br/>';
+	echo '<input type=radio name=includeappconfig value=0 />Do not include App Configuration.  Select this option if you have site-wide credentials, ';
+	echo ' or if you are doing a second import into a course that already has a configuration</p>';
 	echo "<p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
 	echo '</form>';
 
