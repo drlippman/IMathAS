@@ -17,16 +17,35 @@ require("./assessment/displayq2.php");
 $GLOBALS['assessver'] = 2;
 
 $sessiondata = array();
-if (isset($_GET['graphdisp'])) {
-	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
-	setcookie("OEAembed-graphdisp", $sessiondata['graphdisp']);
-} else if (isset($_COOKIE['OEAembed-graphdisp'])) {
-	$sessiondata['graphdisp'] = intval($_COOKIE['OEAembed-graphdisp']);
-} else {
-	$sessiondata['graphdisp'] = 1;
+
+$prefdefaults = array(
+	'mathdisp'=>6,
+	'graphdisp'=>1,
+	'drawentry'=>1,
+	'useed'=>1,
+	'livepreview'=>1);
+
+$prefcookie = json_decode($_COOKIE["OEAembeduserprefs"], true);
+$sessiondata['userprefs'] = array();
+foreach($prefdefaults as $key=>$def) {
+	if ($prefcookie!==null && isset($prefcookie[$key])) {
+		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+	} else {
+		$sessiondata['userprefs'][$key] = $def;
+	}
+}
+if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
+	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	setcookie("OEAembeduserprefs", json_encode(array(
+		'graphdisp'=>$sessiondata['userprefs']['graphdisp'], 
+		'drawentry'=>$sessiondata['userprefs']['drawentry']
+		)));
+}
+foreach(array('graphdisp','mathdisp','useed') as $key) {
+	$sessiondata[$key] = $sessiondata['userprefs'][$key];
 }
 
-$sessiondata['mathdisp'] = 6;
 $sessiondata['secsalt'] = "12345";
 $cid = "embedq";
 $showtips = 2;
@@ -87,6 +106,8 @@ require("./assessment/header.php");
 
 if ($sessiondata['graphdisp'] == 1) {
 	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';  
+} else {
+	echo '<div style="float:right;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=1">Enable visual graph display and drawing entry</a></div>';  
 }
 
 //seeds 1-4999 are for summative requests that are signed
