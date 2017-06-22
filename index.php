@@ -474,10 +474,10 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo Sanitize::encodeStringForDisplay($data[$i]['name']).'</a>';
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
-			echo ' <span style="color:green;">', _('Hidden'), '</span>';
+			echo ' <em style="color:green;">', _('Unavailable'), '</em>';
 		}
 		if (isset($data[$i]['lockaid']) && $data[$i]['lockaid']>0) {
-			echo ' <span style="color:green;">', _('Lockdown'), '</span>';
+			echo ' <em style="color:green;">', _('Lockdown'), '</em>';
 		}
 		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
 			echo ' <a class="noticetext" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
