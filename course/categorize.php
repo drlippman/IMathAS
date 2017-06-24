@@ -139,7 +139,7 @@ END;
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT imas_questions.id,imas_libraries.id,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
 	$query .= "WHERE imas_questions.assessmentid=:assessmentid AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
-	$query .= "imas_library_items.libid=imas_libraries.id ORDER BY imas_questions.id";
+	$query .= "imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 AND imas_libraries.deleted=0 ORDER BY imas_questions.id";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':assessmentid'=>$aid));
 	$libnames = array();

@@ -163,12 +163,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					   //DB while ($frow = mysql_fetch_row($r2)) {
 					   while ($frow = $stm2->fetch(PDO::FETCH_NUM)) {
 						   $filedescr[$frow[0]] = $frow[1];
-						   if ($GLOBALS['filehandertypecfiles'] == 's3') {
-						   	   $filenames[$frow[0]] = getcoursefileurl($frow[2]);
-						   } else {
-						   	   $filenames[$frow[0]] = basename($frow[2]);
-						   	   $coursefiles[] = $frow[2];
-						   }
+						   $filenames[$frow[0]] = getcoursefileurl($frow[2],true);
 					   }
 				}
 				//DB $query = "SELECT * FROM imas_inlinetext WHERE id='{$row[1]}'";
@@ -180,13 +175,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
 				echo "TEXT\n";
-				if ($GLOBALS['filehandertypecfiles'] == 's3' && count($filenames)>0) {
-					$line['text'] .= '<ul>';
-					foreach (explode(',',$line['fileorder']) as $fid) {
-						$line['text'] .= '<li><a href="'.$filenames[$fid].'">'.$filedescr[$fid].'</a></li>';
-					}
-					$line['text'] .= '</ul>';
-				}
 				echo $line['text'] . "\n";
 				echo "AVAIL\n";
 				echo $line['avail'] . "\n";
@@ -198,13 +186,11 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['oncal'] . "\n";
 				echo "CALTAG\n";
 				echo $line['caltag'] . "\n";
-				if ((!isset($GLOBALS['filehandertypecfiles']) || $GLOBALS['filehandertypecfiles'] != 's3') && count($filenames)>0) {
-					   echo "INSTRFILES\n";
-					   foreach (explode(',',$line['fileorder']) as $fid) {
-						  echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
-					   }
+				echo "INSTRFILES\n";
+				foreach (explode(',',$line['fileorder']) as $fid) {
+					echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
 				}
-
+				
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="LinkedText"):
@@ -215,12 +201,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$stm2->execute(array(':id'=>$row[1]));
 				$line = $stm2->fetch(PDO::FETCH_ASSOC);
 				if (substr($line['text'],0,5)=='file:') {
-					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($line['text']),0,5)=="file:") {
-						$line['text'] = getcoursefileurl(trim(substr(strip_tags($line['text']),5)));
-					} else {
-						$coursefiles[] = substr($line['text'],5);
-						$line['text'] = 'file:'.basename(substr($line['text'],5));
-					}
+					$line['text'] = getcoursefileurl(trim(substr(strip_tags($line['text']),5)),true);
 				}
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
@@ -473,10 +454,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				//DB $query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
 				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB while ($row = mysql_fetch_row($r2)) {
-				$stm2 = $DBH->prepare("SELECT var,filename FROM imas_qimages WHERE qsetid=:qsetid");
+				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo Sanitize::encodeStringForDisplay($row[0]).','.Sanitize::encodeStringForDisplay($row[1]). "\n";
+					echo $row[0].','.getqimageurl($row[1],true).','.$row[2]. "\n";
 
 				}
 			}
@@ -484,56 +465,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		}
 
 
-
-		//DB $query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
-		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($r2)) {
-		$stm2 = $DBH->query("SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist_query_placeholders)");
-		$stm2->execute($qstoexportlist);
-		while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-			if ($GLOBALS['filehandertypecfiles'] == 's3') {
-				if (!file_exists("../assessment/qimages".DIRECTORY_SEPARATOR.trim($row[0]))) {
-					copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
-				}
-			}
-			$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]);
-		}
 	}
-	// need to work on
-	/*include("../includes/tar.class.php");
-	if (file_exists("../course/files/qimages.tar.gz")) {
-		unlink("../course/files/qimages.tar.gz");
-	}
-	$tar = new tar();
-	$tar->addFiles($imgfiles);
-	$tar->toTar("../course/files/qimages.tar.gz",TRUE);
-	*/
-	if (class_exists('ZipArchive')) {
-		$zip = new ZipArchive();
-		if ($zip->open("../course/files/qimages.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
-			foreach ($imgfiles as $file) {
-				$zip->addFile($file,basename($file));
-			}
-		}
-		$zip->close();
-	}
-
-	if (class_exists('ZipArchive')) {
-		$zip = new ZipArchive();
-		if ($zip->open("../course/files/coursefilepack$cid.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
-			foreach ($coursefiles as $file) {
-				if ($GLOBALS['filehandertypecfiles'] == 's3') {
-					copycoursefile($file, realpath("../course/files").DIRECTORY_SEPARATOR.basename($file));
-					$zip->addFile("../course/files/".basename($file),basename($file));
-				} else {
-					$zip->addFile("../course/files/$file",basename($file));
-				}
-			}
-		}
-		$zip->close();
-	}
-
-
+	
 	exit;
 
 } else { //STEP 1 DATA PROCESSING, INITIAL LOAD
@@ -595,12 +528,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p><input type=submit name="export" value="Export Items"></p>
 	</form>
-	<p>Once exported, <a href="../course/files/qimages.zip">download image files</a> to be put in assessment/qimages</p>
-	<?php
-	if (class_exists('ZipArchive')) {
-		echo '<p>Once exported, <a href="../course/files/coursefilepack'.$cid.'.zip">download course files</a> to be put in course/files/</p>';
-	}
-	?>
+	
 	<p>If you were wanting to export this course to a different Learning Management System, you can try the <a href="ccexport.php?cid=<?php echo $cid;?>">
 	Common Cartridge export</a></p>
 <?php

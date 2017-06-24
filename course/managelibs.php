@@ -50,102 +50,92 @@ if ($myrights<20) {
 	if (isset($_POST['remove'])) {
 		if (isset($_GET['confirmed'])) {
 			if ($_POST['remove']!='') {
-				//DB $remlist = "'".implode("','",explode(',',$_POST['remove']))."'";
 				$remlist = implode(',' , array_map('intval', explode(',',$_POST['remove'])));
-
-				//DB $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid IN ($remlist)";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->query("SELECT DISTINCT qsetid FROM imas_library_items WHERE libid IN ($remlist)");
+				if (!$isadmin) {
+					if ($isgrpadmin) {
+						$stm = $DBH->prepare("SELECT id FROM imas_libraries WHERE id IN ($remlist) AND groupid=:groupid");
+						$stm->execute(array(':groupid'=>$groupid));
+					} else {
+						$stm = $DBH->prepare("SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid=:ownerid");
+						$stm->execute(array(':ownerid'=>$userid));	
+					}
+					$oklib = array();
+					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+						$oklib[] = $row[0];
+					}
+					$remlist = implode(',', $oklib);
+				}
+				$DBH->beginTransaction();
+				// $remlist now only contains libraries that are OK to delete
+				//now actually delete the libraries
+				$now = time();
+				$stm = $DBH->prepare("UPDATE imas_libraries SET deleted=1,lastmoddate=:now WHERE id IN ($remlist)");
+				$stm->execute(array(':now'=>$now));
+				
+				// note the question IDs in the deleted libraries
+				$qidstocheck = array();
+				$stm = $DBH->query("SELECT DISTINCT qsetid FROM imas_library_items WHERE libid IN ($remlist) AND deleted=0");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$qidstocheck[] = $row[0];
 				}
+				
+				// delete the library items
+				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid IN ($remlist)");
+				$stm->execute(array(':now'=>$now));
 
-				if ($isadmin) {
-					//DB $query = "DELETE FROM imas_library_items WHERE libid IN ($remlist)";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->query("DELETE FROM imas_library_items WHERE libid IN ($remlist)");
-				} else if ($isgrpadmin) {
-					//DB $query = "SELECT id FROM imas_libraries WHERE id IN ($remlist) AND groupid='$groupid'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB while ($row = mysql_fetch_row($result)) {
-					$stm = $DBH->prepare("SELECT id FROM imas_libraries WHERE id IN ($remlist) AND groupid=:groupid");
-					$stm->execute(array(':groupid'=>$groupid));
-					$todel = array();
-					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$todel[] = $row[0];
-						//DB $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					}
-					$todellist = implode(',', $todel);
-					$stm = $DBH->query("DELETE FROM imas_library_items WHERE libid IN ($todellist)");
-				} else {
-					//DB $query = "SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid='$userid'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB while ($row = mysql_fetch_row($result)) {
-					$stm = $DBH->prepare("SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid=:ownerid");
-					$stm->execute(array(':ownerid'=>$userid));
-					$todel = array();
-					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$todel[] = $row[0];
-						//DB $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					}
-					$todellist = implode(',', $todel);
-					$stm = $DBH->query("DELETE FROM imas_library_items WHERE libid IN ($todellist)");
-				}
-
-				if (isset($qidstocheck)) {
+				if (count($qidstocheck)>0) {
 					$qids = array_map('Sanitize::onlyInt', $qidstocheck);//INTs from DB
-          $qids_query_placeholders = Sanitize::generateQueryPlaceholders($qids);
+					$qids_query_placeholders = Sanitize::generateQueryPlaceholders($qids);
 					//DB $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids_query_placeholders)");
+					$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids_query_placeholders) AND deleted=0");
 					$stm->execute($qids);
 					$okqids = array();
-					//DB while ($row = mysql_fetch_row($result)) {
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$okqids[] = $row[0];
 					}
-					$qidstofix = array_diff($qidstocheck,$okqids);
+					//get a list of questions with no more library items
+					$qidstofix = array_values(array_diff($qidstocheck,$okqids));
+					$qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
+					$qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
 					if ($_POST['delq']=='yes' && count($qidstofix)>0) {
-            $qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
-            $qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
 						//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
 						//DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
 						//DB mysql_query($query) or die("Query failed : " . mysql_error());
-						$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist_query_placeholders)");
-            $stm->execute($qlist);
-						/*foreach ($qidstofix as $qid) {
-							delqimgs($qid);
-						}*/
-					} else {
-						$stm = $DBH->prepare("INSERT INTO imas_library_items (qsetid,libid) VALUES (:qsetid, :libid)");
-						foreach($qidstofix as $qid) {
-							//DB $query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
-							//DB mysql_query($query) or die("Query failed : " . mysql_error());
-							$stm->execute(array(':qsetid'=>$qid, ':libid'=>0));
+						$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=? WHERE id IN ($qlist_query_placeholders)");
+						$stm->execute(array_merge(array($now),$qlist));
+							//echo "del: $qlist";
+							/*foreach ($qidstofix as $qid) {
+								delqimgs($qid);
+							}*/
+					} else if (count($qidstofix)>0) {
+						//see which questions with no active lib items already have an unassigned lib item we can undeleted 
+						$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qlist_query_placeholders) AND libid=0 AND deleted=1");
+						$stm->execute($qlist);
+						$toundelqids = array();
+						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+							$toundelqids[] = $row[0];
+						}
+						//undelete those lib items
+						if (count($toundelqids)>0) {
+							$toundel_query_placeholders = Sanitize::generateQueryPlaceholders($toundelqids);
+							//$undellist = implode(',', $toundelqids);
+							$stm = $DBH->prepare("UPDATE `imas_library_items` SET deleted=0,lastmoddate=? WHERE qsetid IN ($toundel_query_placeholders) AND libid=0");
+							$stm->execute(array_merge(array($now),$toundelqids));
+						}
+
+						//for questions with no active lib items or unassigned to undelete, add an unassigned lib item
+						$qidstoadd = array_values(array_diff($qidstofix, $toundelqids));
+						$stm = $DBH->prepare("INSERT INTO imas_library_items ( qsetid,libid,lastmoddate) VALUES (:qsetid, :libid, :lastmoddate)");
+						foreach($qidstoadd as $qid) {
+							$stm->execute(array(':qsetid'=>$qid, ':libid'=>0, ':lastmoddate'=>$now));
 						}
 					}
 				}
-
-				if (!$isadmin && !$isgrpadmin) {
-					//DB $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
-					//DB $query .= " AND ownerid='$userid'";
-					$stm = $DBH->prepare("DELETE FROM imas_libraries WHERE id IN ($remlist) AND ownerid=:ownerid");
-					$stm->execute(array(':ownerid'=>$userid));
-				} else if (!$isadmin) {
-					//DB $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
-					//DB $query .= " AND groupid='$groupid'";
-					$stm = $DBH->prepare("DELETE FROM imas_libraries WHERE id IN ($remlist) AND groupid=:groupid");
-					$stm->execute(array(':groupid'=>$groupid));
-				} else if ($isadmin) {
-					$stm = $DBH->query("DELETE FROM imas_libraries WHERE id IN ($remlist)");
-				}
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$DBH->commit();
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
-
+				
 			exit;
 		} else {
 			$pagetitle = "Confirm Removal";
@@ -155,11 +145,8 @@ if ($myrights<20) {
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
 				$oktorem = array();
-        $stm = $DBH->prepare("SELECT count(id) FROM imas_libraries WHERE parent=:parent");
-        for ($i=0; $i<count($_POST['nchecked']); $i++) {
-					//DB $query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_POST['nchecked'][$i]}'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB $libcnt= mysql_result($result,0,0);
+				$stm = $DBH->prepare("SELECT count(id) FROM imas_libraries WHERE parent=:parent AND deleted=0");
+				for ($i=0; $i<count($_POST['nchecked']); $i++) {
 					$stm->execute(array(':parent'=>$_POST['nchecked'][$i]));
 					$libcnt= $stm->fetchColumn(0);
 					if ($libcnt == 0) {
@@ -270,7 +257,7 @@ if ($myrights<20) {
 		if (isset($_POST['newowner'])) {
 			if ($_POST['transfer']!='') {
 				//DB $translist = "'".implode("','",explode(',',$_POST['transfer']))."'";
-        $translist = implode(',', array_map('intval', explode(',',$_POST['transfer'])));
+				$translist = implode(',', array_map('intval', explode(',',$_POST['transfer'])));
 
 				//added for mysql 3.23 compatibility
 				//DB $query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
@@ -281,21 +268,21 @@ if ($myrights<20) {
 				$newgpid = $stm->fetchColumn(0);
 				//DB $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
 				$query = "UPDATE imas_libraries SET ownerid=:ownerid,groupid=:groupid WHERE imas_libraries.id IN ($translist)";
-		    $qarr = array(':ownerid'=>$_POST['newowner'], ':groupid'=>$newgpid);
-
-        if (!$isadmin) {
-          //DB $query .= " AND groupid='$groupid'";
-          $query .= " AND groupid=:groupid";
-          $qarr[':groupid']=$groupid;
-        }
-        if (!$isadmin && !$isgrpadmin) {
-          //DB $query .= " AND ownerid='$userid'";
-          $query .= " AND ownerid=:ownerid";
-          $qarr[':ownerid'] = $userid;
-        }
-        $stm = $DBH->prepare($query);
-        $stm->execute($qarr);
-        //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$qarr = array(':ownerid'=>$_POST['newowner'], ':groupid'=>$newgpid);
+	
+				if (!$isadmin) {
+				  //DB $query .= " AND groupid='$groupid'";
+				  $query .= " AND groupid=:groupid";
+				  $qarr[':groupid']=$groupid;
+				}
+				if (!$isadmin && !$isgrpadmin) {
+				  //DB $query .= " AND ownerid='$userid'";
+				  $query .= " AND ownerid=:ownerid";
+				  $qarr[':ownerid'] = $userid;
+				}
+				$stm = $DBH->prepare($query);
+				$stm->execute($qarr);
+				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
@@ -333,22 +320,22 @@ if ($myrights<20) {
 				}
 				if (count($toset)>0) {
 					//DB $parlist = "'".implode("','",$toset)."'";
-          $parlist = implode(',', array_map('intval',$toset));
+					$parlist = implode(',', array_map('intval',$toset));
 					//DB $query = "UPDATE imas_libraries SET parent='{$_POST['libs']}',lastmoddate=$now WHERE id IN ($parlist)";
 					$query = "UPDATE imas_libraries SET parent=:parent,lastmoddate=:lastmoddate WHERE id IN ($parlist)";
 					$qarr = array(':parent'=>$_POST['libs'], ':lastmoddate'=>$now);
-          if ($isgrpadmin) {
-            //DB $query .= " AND groupid='$groupid'";
-            $query .= " AND groupid=:groupid";
-            $qarr[':groupid']=$groupid;
-          } else if (!$isadmin && !$isgrpadmin) {
-            //DB $query .= " AND ownerid='$userid'";
-            $query .= " AND ownerid=:ownerid";
-            $qarr[':ownerid'] = $userid;
-          }
-          $stm = $DBH->prepare($query);
-          $stm->execute($qarr);
-          //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+					  if ($isgrpadmin) {
+					    //DB $query .= " AND groupid='$groupid'";
+					    $query .= " AND groupid=:groupid";
+					    $qarr[':groupid']=$groupid;
+					  } else if (!$isadmin && !$isgrpadmin) {
+					    //DB $query .= " AND ownerid='$userid'";
+					    $query .= " AND ownerid=:ownerid";
+					    $qarr[':ownerid'] = $userid;
+					  }
+					  $stm = $DBH->prepare($query);
+					  $stm->execute($qarr);
+					  //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
@@ -365,83 +352,6 @@ if ($myrights<20) {
 			} else {
 				$tlist = implode(",",$_POST['nchecked']);
 			}
-		}
-	} else if (isset($_GET['remove'])) {
-		if (isset($_POST['delq'])) {
-			//DB $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid='{$_GET['remove']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
-			$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM imas_library_items WHERE libid=:libid");
-			$stm->execute(array(':libid'=>$_GET['remove']));
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$qidstocheck[] = $row[0];
-			}
-			//DB $query = "DELETE FROM imas_libraries WHERE id='{$_GET['remove']}'";
-      $query = "DELETE FROM imas_libraries WHERE id=:id";
-      $qarr = array(':id'=>$_GET['remove']);
-      if ($isgrpadmin) {
-        //DB $query .= " AND groupid='$groupid'";
-        $query .= " AND groupid=:groupid";
-        $qarr[':groupid']=$groupid;
-      } else if (!$isadmin && !$isgrpadmin) {
-        //DB $query .= " AND ownerid='$userid'";
-        $query .= " AND ownerid=:ownerid";
-        $qarr[':ownerid'] = $userid;
-      }
-      $stm = $DBH->prepare($query);
-      $stm->execute($qarr);
-      //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB if (mysql_affected_rows()>0 && count($qidstocheck)>0) {
-			if ($stm->rowCount()>0 && count($qidstocheck)>0) {
-				//DB $query = "DELETE FROM imas_library_items WHERE libid='{$_GET['remove']}'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("DELETE FROM imas_library_items WHERE libid=:libid");
-				$stm->execute(array(':libid'=>$_GET['remove']));
-        $qids = array_map('Sanitize::onlyInt', $qidstocheck);//INTs from DB
-        $qids_query_placeholders = Sanitize::generateQueryPlaceholders($qids);
-				//DB $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM imas_library_items WHERE qsetid IN ($qids_query_placeholders)");
-        $stm->execute($qids);
-				$okqids = array();
-				//DB while ($row = mysql_fetch_row($result)) {
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$okqids[] = $row[0];
-				}
-				$qidstofix = array_diff($qidstocheck,$okqids);
-				if ($_POST['delq']=='yes' && count($qidstofix)>0) {
-          $qlist = array_map('Sanitize::onlyInt', $qidstofix);//INTs from DB
-          $qlist_query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
-					//$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
-					//DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist_query_placeholders)");
-          $stm->execute($qlist);
-					/*foreach ($qidstofix as $qid) {
-						delqimgs($qid);
-					}*/
-				} else {
-          $stm = $DBH->prepare("INSERT INTO imas_library_items (qsetid,libid) VALUES (:qsetid, :libid)");
-          foreach($qidstofix as $qid) {
-						//DB $query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
-						$stm->execute(array(':qsetid'=>$qid, ':libid'=>0));
-					}
-				}
-			}
-
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
-
-			exit;
-		} else {
-			//DB $query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_GET['remove']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $libcnt= mysql_result($result,0,0);
-			$stm = $DBH->prepare("SELECT count(id) FROM imas_libraries WHERE parent=:parent");
-			$stm->execute(array(':parent'=>$_GET['remove']));
-			$libcnt= $stm->fetchColumn(0);
-			$pagetitle = ($libcnt>0) ? "Error" : "Remove Library";
-			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
 		}
 	} else if (isset($_GET['transfer'])) {
 		if (isset($_POST['newowner'])) {
@@ -460,18 +370,18 @@ if ($myrights<20) {
 			//DB $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='{$_GET['transfer']}'";
 			$query = "UPDATE imas_libraries SET ownerid=:ownerid,groupid=:groupid WHERE imas_libraries.id=:id";
 			$qarr = array(':ownerid'=>$_POST['newowner'], ':groupid'=>$newgpid, ':id'=>$_GET['transfer']);
-      if ($isgrpadmin) {
-        //DB $query .= " AND groupid='$groupid'";
-        $query .= " AND groupid=:groupid";
-        $qarr[':groupid']=$groupid;
-      } else if (!$isadmin && !$isgrpadmin) {
-        //DB $query .= " AND ownerid='$userid'";
-        $query .= " AND ownerid=:ownerid";
-        $qarr[':ownerid'] = $userid;
-      }
-      $stm = $DBH->prepare($query);
-      $stm->execute($qarr);
-      //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+		      if ($isgrpadmin) {
+			//DB $query .= " AND groupid='$groupid'";
+			$query .= " AND groupid=:groupid";
+			$qarr[':groupid']=$groupid;
+		      } else if (!$isadmin && !$isgrpadmin) {
+			//DB $query .= " AND ownerid='$userid'";
+			$query .= " AND ownerid=:ownerid";
+			$qarr[':ownerid'] = $userid;
+		      }
+		      $stm = $DBH->prepare($query);
+		      $stm->execute($qarr);
+		      //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 			exit;
 		} else {
@@ -514,7 +424,7 @@ if ($myrights<20) {
 					$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :sortorder, :parent, :groupid)";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>$_POST['name'], ':ownerid'=>$userid,
-            ':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':parent'=>$_POST['libs'], ':groupid'=>$groupid));
+						':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':parent'=>$_POST['libs'], ':groupid'=>$groupid));
 					header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 					exit;
 				}
@@ -526,25 +436,25 @@ if ($myrights<20) {
 				//DB }
 				//DB $query .= " WHERE id='{$_GET['modify']}'";
 				$query = "UPDATE imas_libraries SET name=:name,userights=:userights,sortorder=:sortorder,lastmoddate=:lastmoddate";
-        $qarr = array(':name'=>$_POST['name'], ':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':lastmoddate'=>$now, ':id'=>$_GET['modify']);
+				$qarr = array(':name'=>$_POST['name'], ':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':lastmoddate'=>$now, ':id'=>$_GET['modify']);
 				if ($_GET['modify'] != $_POST['libs']) {
-          $query .= ",parent=:parent";
-          $qarr[':parent']=$_POST['libs'];
-        }
+					$query .= ",parent=:parent";
+					$qarr[':parent']=$_POST['libs'];
+				}
 				$query .= " WHERE id=:id";
 
-        if ($isgrpadmin) {
-          //DB $query .= " AND groupid='$groupid'";
-          $query .= " AND groupid=:groupid";
-          $qarr[':groupid']=$groupid;
-        } else if (!$isadmin) {
-          //DB $query .= " AND ownerid='$userid'";
-          $query .= " AND ownerid=:ownerid";
-          $qarr[':ownerid'] = $userid;
-        }
-        $stm = $DBH->prepare($query);
-        $stm->execute($qarr);
-        //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+				if ($isgrpadmin) {
+				  //DB $query .= " AND groupid='$groupid'";
+				  $query .= " AND groupid=:groupid";
+				  $qarr[':groupid']=$groupid;
+				} else if (!$isadmin) {
+				  //DB $query .= " AND ownerid='$userid'";
+				  $query .= " AND ownerid=:ownerid";
+				  $qarr[':ownerid'] = $userid;
+				}
+				$stm = $DBH->prepare($query);
+				$stm->execute($qarr);
+				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 				exit;
@@ -576,7 +486,7 @@ if ($myrights<20) {
 					$sortorder = $row[3];
 					if ($isgrpadmin || $isadmin) {
 						$ownername = $row[5].', '.$row[4];
-					}
+				}
 				}
 			} else {
 				$pagetitle = "Add Library\n";
@@ -646,8 +556,8 @@ if ($myrights<20) {
 		//DB $query .= "GROUP BY imas_libraries.id";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
-		$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id ";
-		$query .= "GROUP BY imas_libraries.id";
+		$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id and imas_library_items.deleted=0 ";
+		$query .= "WHERE imas_libraries.deleted=0 GROUP BY imas_libraries.id";
 		$stm = $DBH->query($query);
 		$rights = array();
 		$sortorder = array();
@@ -786,43 +696,6 @@ if ($overwriteBody==1) {
 		</p>
 	</form>
 <?php
-	} else if (isset($_GET['remove'])) {
-		if ($libcnt>0) {
-?>
-	The library selected has children libraries.  A parent library cannot be removed until all
-	children libraries are removed.
-	<p><a href="managelibs.php?cid=<?php echo $cid ?>">Back to Library Manager</a>
-<?php
-		} else {
-?>
-
-	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&remove=<?php echo $_GET['remove'] ?>&confirmed=true">
-		Are you SURE you want to delete this Library?
-		<p>
-			<input type=radio name="delq" value="no" CHECKED>Move questions in library to Unassigned<br>
-			<input type=radio name="delq" value="yes" >Also delete questions in library
-		</p>
-		<p>
-			<input type=submit value="Really Delete">
-			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
-		</p>
-	</form>
-<?php
-		}
-
-	} else if (isset($_GET['transfer'])) {
-?>
-	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&transfer=<?php echo $_GET['transfer'] ?>">
-		Transfer library ownership to:
-		<?php
-		writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ;
-		?>
-		<p>
-			<input type=submit value="Transfer">
-			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
-		</p>
-	</form>
-<?php
 	} else if (isset($_GET['modify'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo $_GET['modify'] ?>">
@@ -920,6 +793,7 @@ require("../footer.php");
 
 function delqimgs($qsid) {
   global $DBH;
+
   $srch_stm = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
   $del_stm = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
 
@@ -932,9 +806,11 @@ function delqimgs($qsid) {
 		//DB $query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
 		//DB $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		//DB if (mysql_num_rows($r2)==1) {
-		$srch_stm->execute(array(':filename'=>$row[1]));
-		if ($srch_stm->rowCount()==1) {
-			unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+		if (substr($row[1],0,4)!='http') {
+			$srch_stm->execute(array(':filename'=>$row[1]));
+			if ($srch_stm->rowCount()==1) {
+				unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+			}
 		}
 		//DB $query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
 		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -972,8 +848,6 @@ function printlist($parent) {
 				echo "<span class=op>";
 				if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
 					echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
-					echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
-					echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
 				}
 				echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
 				echo "</span>";
@@ -990,8 +864,6 @@ function printlist($parent) {
 				//}
 				echo "<span class=op>";
 				if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
-					echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
-					echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
 					echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
 				}
 				if ($qcount[$child]==0) {

@@ -29,10 +29,12 @@ function delitembyid($itemid) {
 			//DB $query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 			//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($r2)==1) {
-			$file_src->execute(array(':filename'=>$row[0]));
-			if ($file_src->rowCount()==1) {
-				//unlink($uploaddir . $row[0]);
-				deletecoursefile($row[0]);
+			if (substr($row[0],0,4)!='http') {
+				$file_src->execute(array(':filename'=>$row[0]));
+				if ($file_src->rowCount()==1) {
+					//unlink($uploaddir . $row[0]);
+					deletecoursefile($row[0]);
+				}
 			}
 		}
 		//DB $query = "DELETE FROM imas_instr_files WHERE itemid='$typeid'";

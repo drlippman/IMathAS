@@ -142,18 +142,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemid'=>$_GET['id']));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (isset($_POST['delfile-'.$row[0]])) {
-					$filestoremove[] = $row[0];
 					//DB $query = "DELETE FROM imas_instr_files WHERE id='{$row[0]}'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$del_file_stm->execute(array(':id'=>$row[0]));
 					//DB $query = "SELECT id FROM imas_instr_files WHERE filename='{$row[2]}'";
 					//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB if (mysql_num_rows($r2)==0) {
-					$src_file_stm->execute(array(':filename'=>$row[2]));
-					if ($src_file_stm->rowCount()==0) {
-						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-						//unlink($uploaddir . $row[2]);
-						deletecoursefile($row[2]);
+					if (substr($row[2],0,4)!='http') {
+						$filestoremove[] = $row[0];
+						$src_file_stm->execute(array(':filename'=>$row[2]));
+						if ($src_file_stm->rowCount()==0) {
+							//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+							//unlink($uploaddir . $row[2]);
+							deletecoursefile($row[2]);
+						}
 					}
 				} else if ($_POST['filedescr-'.$row[0]]!=$row[1]) {
 					//DB $query = "UPDATE imas_instr_files SET description='{$_POST['filedescr-'.$row[0]]}' WHERE id='{$row[0]}'";

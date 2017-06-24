@@ -36,79 +36,36 @@ function parseqs($file,$touse,$rights) {
 	function writeq($qd,$rights,$qn) {
 		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin;
 		$now = time();
-		//DB $qd = array_map('addslashes_deep', $qd);
-		//DB $query = "SELECT id,adddate,lastmoddate FROM imas_questionset WHERE uniqueid='{$qd['uqid']}'";
-		//DB $result = mysql_query($query) or die("Error: $query: " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
-		$stm = $DBH->prepare("SELECT id,adddate,lastmoddate FROM imas_questionset WHERE uniqueid=:uniqueid");
+		$toundel = array();
+		$stm = $DBH->prepare("SELECT id,adddate,lastmoddate,deleted FROM imas_questionset WHERE uniqueid=:uniqueid");
 		$stm->execute(array(':uniqueid'=>$qd['uqid']));
 		if ($stm->rowCount()>0) {
-      list($qsetid, $adddate, $lastmoddate) = $stm->fetch(PDO::FETCH_NUM);
-			//DB $qsetid = mysql_result($result,0,0);
-			//DB $adddate = mysql_result($result,0,1);
-			//DB $lastmoddate = mysql_result($result,0,2);
+			list($qsetid, $adddate, $lastmoddate, $deleted) = $stm->fetch(PDO::FETCH_NUM);
 			$exists = true;
 		} else {
 			$exists = false;
 		}
 
-		if ($exists && ($_POST['merge']==1 || $_POST['merge']==2)) {
-			if ($qd['lastmod']>$adddate || $_POST['merge']==2) { //only update if changed
+		if ($exists && ($deleted==1 || $_POST['merge']==1 || $_POST['merge']==2)) {
+			if (($qd['lastmod']>$adddate && $lastmoddate<=$adddate) || $deleted==1 || $_POST['merge']==2) { //only update if changed unless forced
 				if (!empty($qd['qimgs'])) {
 					$hasimg = 1;
 				} else {
 					$hasimg = 0;
 				}
-				if ($isgrpadmin) {
-					//$query = "UPDATE imas_questionset,imas_users SET imas_questionset.description='{$qd['description']}',imas_questionset.author='{$qd['author']}',";
-					//$query .= "imas_questionset.qtype='{$qd['qtype']}',imas_questionset.control='{$qd['control']}',imas_questionset.qcontrol='{$qd['qcontrol']}',imas_questionset.qtext='{$qd['qtext']}',";
-					//$query .= "imas_questionset.answer='{$qd['answer']}',imas_questionset.lastmoddate=$now,imas_questionset.adddate=$now WHERE imas_questionset.id='$qsetid'";
-					//$query .= " AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
-					//DB $query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE WHERE imas_questionset.id='$qsetid' AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB if (mysql_num_rows($result)>0) {
-					$stm = $DBH->prepare("SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE WHERE imas_questionset.id=:id AND imas_questionset.ownerid=imas_users.id AND imas_users.groupid=:groupid");
-					$stm->execute(array(':id'=>$qsetid, ':groupid'=>$groupid));
-					if ($stm->rowCount()>0) {
-						//DB $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
-						//DB $query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-						//DB $query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
-						//DB $query .= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',";
-						//DB $query .= "adddate=$now,lastmoddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
-						$query = "UPDATE imas_questionset SET description=:description,author=:author,";
-						$query .= "qtype=:qtype,control=:control,qcontrol=:qcontrol,qtext=:qtext,";
-						$query .= "answer=:answer,extref=:extref,license=:license,ancestorauthors=:ancestorauthors,otherattribution=:otherattribution,";
-						$query .= "solution=:solution,solutionopts=:solutionopts,";
-						$query .= "adddate=:adddate,lastmoddate=:lastmoddate,hasimg=:hasimg WHERE id=:id";
-						$stm = $DBH->prepare($query);
-						$stm->execute(array(':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'], ':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'], ':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'], ':extref'=>$qd['extref'], ':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'], ':otherattribution'=>$qd['otherattribution'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'], ':adddate'=>$now, ':lastmoddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$qsetid));
-					} else {
-						return $qsetid;
-					}
-				} else {
-					//DB $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
-					//DB $query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-					//DB $query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
-					//DB $query .= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',adddate=$now,lastmoddate=$now,hasimg=$hasimg WHERE id='$qsetid'";
-					$query = "UPDATE imas_questionset SET description=:description,author=:author,";
-					$query .= "qtype=:qtype,control=:control,qcontrol=:qcontrol,qtext=:qtext,";
-					$query .= "answer=:answer,extref=:extref,license=:license,ancestorauthors=:ancestorauthors,otherattribution=:otherattribution,";
-					$query .= "solution=:solution,solutionopts=:solutionopts,adddate=:adddate,lastmoddate=:lastmoddate,hasimg=:hasimg WHERE id=:id";
-					$qarr = array(':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'],
-						':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'], ':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'],
-						':extref'=>$qd['extref'], ':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'],
-						':otherattribution'=>$qd['otherattribution'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'],
-						':adddate'=>$now, ':lastmoddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$qsetid);
-					if (!$isadmin) {
-						//DB $query .= " AND ownerid=$userid";
-						$query .= " AND ownerid=:ownerid";
-						$qarr[':ownerid'] = $userid;
-					}
-					$stm = $DBH->prepare($query);
-					$stm->execute($qarr);
-				}
-				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
-				//DB if (mysql_affected_rows()>0) {
+				
+				$query = "UPDATE imas_questionset SET description=:description,author=:author,";
+				$query .= "qtype=:qtype,control=:control,qcontrol=:qcontrol,qtext=:qtext,";
+				$query .= "answer=:answer,extref=:extref,license=:license,ancestorauthors=:ancestorauthors,otherattribution=:otherattribution,";
+				$query .= "solution=:solution,solutionopts=:solutionopts,adddate=:adddate,lastmoddate=:lastmoddate,hasimg=:hasimg,deleted=0 WHERE id=:id";
+				$qarr = array(':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'],
+					':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'], ':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'],
+					':extref'=>$qd['extref'], ':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'],
+					':otherattribution'=>$qd['otherattribution'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'],
+					':adddate'=>$now, ':lastmoddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$qsetid);
+				$stm = $DBH->prepare($query);
+				$stm->execute($qarr);
+				
 				if ($stm->rowCount()>0) {
 					$updateq++;
 					if (!empty($qd['qimgs'])) {
@@ -121,20 +78,29 @@ function parseqs($file,$touse,$rights) {
 						foreach($qimgs as $qimg) {
 							$p = explode(',',$qimg);
 							if (count($p)<2) {continue;}
+							if (count($p)<3) {
+								$alttext = '';
+							} else if (count($p)>3) {
+								$alttext = implode(',', array_slice($p, 2));
+							} else {
+								$alttext = $p[2];
+							}                               
+							//strip out any HTML-like stuff from 
+							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
 							//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
 							//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
-							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-							$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1]));
+							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
+							$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
 						}
 					}
 				}
 			}
 			return $qsetid;
-		} else if ($exists && $_POST['merge']==-1) {
+		} else if ($exists) {
 			return $qsetid;
 		} else {
 			$importuid = '';
-			if ($qd['uqid']=='0' || ($exists && $_POST['merge']==0)) {
+			if ($qd['uqid']=='0') {
 				$importuid = $qd['uqid'];
 				$mt = microtime();
 				$qd['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
@@ -151,9 +117,9 @@ function parseqs($file,$touse,$rights) {
 			$query .= "(:uniqueid, :adddate, :lastmoddate, :ownerid, :userights, :description, :author, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':uniqueid'=>$qd['uqid'], ':adddate'=>$now, ':lastmoddate'=>$now, ':ownerid'=>$userid, ':userights'=>$rights,
-        ':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'], ':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'],
-        ':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'], ':extref'=>$qd['extref'],
-        ':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'], ':otherattribution'=>$qd['otherattribution'], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
+				':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'], ':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'],
+				':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'], ':extref'=>$qd['extref'],
+				':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'], ':otherattribution'=>$qd['otherattribution'], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
 			$newq++;
 			//DB $qsetid = mysql_insert_id();
 			$qsetid = $DBH->lastInsertId();
@@ -343,36 +309,14 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Import Questions";
 
-
-//data manipulation here
-$isadmin = false;
-$isgrpadmin = false;
-
 	//CHECK PERMISSIONS AND SET FLAGS
-if (!(isset($teacherid)) && $myrights<75) {
+if ($myrights < 100) {
  	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";
-} elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <75) {
- 	$overwriteBody = 1;
-	$body = "You need to log in as an admin to access this page";
-} elseif (!(isset($_GET['cid'])) && $myrights < 75) {
- 	$overwriteBody = 1;
-	$body = "Please access this page from the menu links only.";
+	$body = "This page is only accessible to admins.";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-
 	$cid = (isset($_GET['cid'])) ? Sanitize::courseId($_GET['cid']) : "admin" ;
-
-	if ($myrights < 100) {
-		$isgrpadmin = true;
-	} else if ($myrights == 100) {
-		$isadmin = true;
-	}
-
-	if ($isadmin || $isgrpadmin) {
-		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Libraries</div>\n";
-	} else {
-		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Import Libraries</div>\n";
-	}
+	$isadmin = true;
+	$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Libraries</div>\n";
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
@@ -397,17 +341,18 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$unique[$k] = preg_replace('/[^0-9\.]/','',$v);
 		}
 		$lookup = implode(',', $unique);
-		// intval doesn't work on uniqueid since they're bigint
+		// intval doesn't work on uniqueid since they're bigint 
 		// $lookup = implode(',', array_map('intval', $unique));
-
+		
 		//DB $query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ($lookup)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
-		$stm = $DBH->query("SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ($lookup)");
+		$stm = $DBH->query("SELECT id,uniqueid,adddate,lastmoddate,deleted FROM imas_libraries WHERE uniqueid IN ($lookup)");
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$exists[$row[1]] = $row[0];
 			$adddate[$row[0]] = $row[2];
 			$lastmod[$row[0]] = $row[3];
+			$deleted[$row[0]] = $row[4];
 		}
 
 		$mt = microtime();
@@ -429,31 +374,30 @@ if (!(isset($teacherid)) && $myrights<75) {
 				continue;
 			}
 			$now = time();
-			if (isset($exists[$unique[$libid]]) && $_POST['merge']==1) {
+			
+			if (isset($exists[$unique[$libid]]) && $deleted[$exists[$unique[$libid]]]==1) {
+				//if lib is deleted, undelete it
+				$stm = $DBH->prepare("UPDATE imas_libraries SET deleted=0,name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id");
+				$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]]));
+				if ($stm->rowCount()>0) {
+					$newl++;
+				}
+			} else if (isset($exists[$unique[$libid]]) && $_POST['merge']==1) {
+				//lib exists and we're updating it (if possible)
 				if ($lastmoddate[$libid]>$adddate[$exists[$unique[$libid]]]) { //if library has changed
-					if ($isadmin) {
-						//DB $query = "UPDATE imas_libraries SET name='{$names[$libid]}',adddate=$now,lastmoddate=$now WHERE id={$exists[$unique[$libid]]}";
-						$stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id");
-						$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]]));
-					} else if ($isgrpadmin) {
-						//DB $query .= "UPDATE imas_libraries SET name='{$names[$libid]}',adddate=$now,lastmoddate=$now WHERE id={$exists[$unique[$libid]]} AND groupid='$groupid'";
-						$stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id AND groupid=:groupid");
-						$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]], ':groupid'=>$groupid));
-					} else  {
-						//DB $query .= "UPDATE imas_libraries SET name='{$names[$libid]}',adddate=$now,lastmoddate=$now WHERE id={$exists[$unique[$libid]]} AND (ownerid='$userid' or userights>1)";
-						$stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id AND (ownerid=:ownerid or userights>1)");
-						$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]], ':ownerid'=>$userid));
-					}
-					//DB mysql_query($query) or die("error on: $query: " . mysql_error());
-					//DB if (mysql_affected_rows()>0) {
+					$stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id");
+					$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]]));
+					
 					if ($stm->rowCount()>0) {
 						$updatel++;
 					}
 				}
 				$libs[$libid] = $exists[$unique[$libid]];
-			} else if (isset($exists[$unique[$libid]]) && $_POST['merge']==-1 ) {
+			} else if (isset($exists[$unique[$libid]])) {
+				//if lib exists, use it
 				$libs[$libid] = $exists[$unique[$libid]];
 			} else {
+				//if lib does not exist, add it
 				if ($unique[$libid]==0 || (isset($exists[$unique[$libid]]) && $_POST['merge']==0)) {
 					$unique[$libid] = substr($mt,11).substr($mt,2,2).$libid;
 				}
@@ -485,6 +429,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
 			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
 			$includedqs = array();
+			
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$qidstoupdate[] = $row[0];
@@ -498,16 +443,25 @@ if (!(isset($teacherid)) && $myrights<75) {
 			if (count($qidstoupdate)>0) {
 				//lookup backrefs
 				$includedbackref = array();
+				$toundel = array();
 				if (count($includedqs)>0) {
 					$includedlist = implode(',', $includedqs);  //known decimal values from above
 					//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 					//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {
-					$stm = $DBH->query("SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)");
+					$stm = $DBH->query("SELECT id,uniqueid,deleted FROM imas_questionset WHERE uniqueid IN ($includedlist)");
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$includedbackref[$row[1]] = $row[0];
+						if ($row[2]==1) {
+							$toundel[] = $row[0];
+						}
 					}
 				}
+				if (count($toundel)>0) {
+					$undellist = implode(',', $toundel);
+					$stm = $DBH->query("UPDATE imas_questionset SET deleted=0 WHERE id IN ($undellist)");
+				}
+				
 				$updatelist = implode(',', array_map('intval', $qidstoupdate));
 				//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
 				//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
@@ -519,7 +473,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 					$control = preg_replace_callback('/includecodefrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
   						return "includecodefrom(".$includedbackref[$matches[1]].")";
   					}, $row[1]);
-  				$qtext = preg_replace_callback('/includeqtextfrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
+  					$qtext = preg_replace_callback('/includeqtextfrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
   						return "includeqtextfrom(".$includedbackref[$matches[1]].")";
   					}, $row[2]);
 					//DB $query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
@@ -533,29 +487,35 @@ if (!(isset($teacherid)) && $myrights<75) {
 			//write imas library items, connecting libraries to items
 			foreach ($libstoadd as $libid) {
 				if (!isset($libs[$libid])) { $libs[$libid]=0;} //assign questions to unassigned if library is closed.  Shouldn't ever trigger
-				//DB $query = "SELECT qsetid FROM imas_library_items WHERE libid={$libs[$libid]}";
-				//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
-				$stm = $DBH->prepare("SELECT qsetid FROM imas_library_items WHERE libid=:libid");
+				$stm = $DBH->prepare("SELECT qsetid,deleted FROM imas_library_items WHERE libid=:libid");
 				$stm->execute(array(':libid'=>$libs[$libid]));
 				$existingli = array();
-				//DB while ($row = mysql_fetch_row($result)) {
+				$deletedli = array();
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$existingli[] = $row[0];
+					if ($row[1]==1) {
+						$deletedli[] = $row[0];
+					} else {
+						$existingli[] = $row[0];
+					}
 				}
+				
 				$qidlist = explode(',',$libitems[$libid]);
 				foreach ($qidlist as $qid) {
-					if (isset($qids[$qid]) && (array_search($qids[$qid],$existingli)===false)) {
-						//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('{$libs[$libid]}','{$qids[$qid]}','$userid')";
-						//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
-						$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
-						$stm->execute(array(':libid'=>$libs[$libid], ':qsetid'=>$qids[$qid], ':ownerid'=>$userid));
+					if (isset($qids[$qid]) && (array_search($qids[$qid],$deletedli)!==false)) {
+						$stm = $DBH->prepare("UPDATE imas_library_items SET ownerid=:ownerid,lastmoddate=:now,deleted=0 WHERE libid=:libid AND qsetid=:qsetid");
+						$stm->execute(array(':libid'=>$libs[$libid], ':qsetid'=>$qids[$qid], ':ownerid'=>$userid, ':now'=>$now));
+						$newli += count($deletedli);
+					} else if (isset($qids[$qid]) && (array_search($qids[$qid],$existingli)===false)) {
+						$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+						$stm->execute(array(':libid'=>$libs[$libid], ':qsetid'=>$qids[$qid], ':ownerid'=>$userid, ':now'=>$now));
 						$newli++;
 					}
 				}
 				unset($existingli);
 			}
 			//clean up any unassigned library items that are now assigned
-			$DBH->query("DELETE A FROM imas_library_items AS A JOIN imas_library_items as B on A.qsetid=B.qsetid WHERE A.libid=0 AND B.libid>0");
+			$stm = $DBH->prepare("UPDATE imas_library_items as A JOIN imas_library_items as B on A.qsetid=B.qsetid SET A.deleted=1,A.lastmoddate=:now WHERE A.libid=0 AND A.deleted=0 AND B.libid>0 AND B.deleted=0");
+			$stm->execute(array(':now'=>$now));
 		}
 
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
@@ -568,11 +528,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$page_uploadSuccessMsg .= "Updated Libraries: $updatel.<br>";
 		$page_uploadSuccessMsg .= "Updated Questions: $updateq.<br>";
 		$page_uploadSuccessMsg .= "New Library items: $newli.<br>";
-		if ($isadmin || $isgrpadmin) {
 			$page_uploadSuccessMsg .=  "<a href=\"" . $GLOBALS['basesiteurl'] . "/admin/admin.php\">Return to Admin page</a>";
-		} else {
-			$page_uploadSuccessMsg .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid\">Return to Course page</a>";
-		}
 
 	} elseif ($_FILES['userfile']['name']!='') { // STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
@@ -682,16 +638,9 @@ if ($overwriteBody==1) {
 				<option value="0">Private</option>
 				<option value="1">Closed to group, private to others</option>
 				<option value="2" SELECTED>Open to group, private to others</option>
-<?php
-			if ($isadmin || $isgrpadmin || $allownongrouplibs) {
-?>
 				<option value="4">Closed to all</option>
 				<option value="5">Open to group, closed to others</option>
 				<option value="8">Open to all</option>
-<?php
-			}
-?>
-
 			</select>
 			</p>
 
@@ -702,12 +651,9 @@ if ($overwriteBody==1) {
 			</p>
 
 			<p>If a library or question already exists on this system, do you want to:<br/>
-				<input type=radio name=merge value="1" CHECKED>Update existing,
-				<input type=radio name=merge value="0">import as new, or
-				<input type=radio name=merge value="-1">Keep existing
-				<?php if ($myrights==100) {
-					echo '<input type=radio name=merge value="2">Force update';
-				}?>
+				<input type=radio name=merge value="1" CHECKED>Update existing if not edited locally,<br/> 
+				<input type=radio name=merge value="-1">Keep existing, or <br/>
+				<input type=radio name=merge value="2">Force update
 				<br/>
 				Note that updating existing libraries will not place those imported libraries
 				in the parent selected above.

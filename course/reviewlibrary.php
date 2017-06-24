@@ -79,7 +79,7 @@ if ($myrights<20) {
 		//DB $query = "SELECT count(qsetid) FROM imas_library_items WHERE libid='$lib'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $cnt = mysql_result($result,0,0);
-		$stm = $DBH->prepare("SELECT count(qsetid) FROM imas_library_items WHERE libid=:libid");
+		$stm = $DBH->prepare("SELECT count(qsetid) FROM imas_library_items WHERE libid=:libid AND deleted=0");
 		$stm->execute(array(':libid'=>$lib));
 		$cnt = $stm->fetchColumn(0);
 		if ($cnt==0) {
@@ -91,7 +91,7 @@ if ($myrights<20) {
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $qsetid = mysql_result($result,0,0);
 		$offset = intval($offset);
-		$stm = $DBH->prepare("SELECT qsetid FROM imas_library_items WHERE libid=:libid LIMIT $offset,1");
+		$stm = $DBH->prepare("SELECT qsetid FROM imas_library_items WHERE libid=:libid AND deleted=0 LIMIT $offset,1");
 		$stm->execute(array(':libid'=>$lib));
 		$qsetid = $stm->fetchColumn(0);
 
@@ -174,7 +174,8 @@ if ($myrights<20) {
 						//DB if (mysql_num_rows($result)>0) {
 						$query = "SELECT imas_library_items FROM imas_library_items,imas_users WHERE ";
 						$query .= "imas_library_items.ownerid=imas_users.id AND imas_users.groupid=:groupid AND ";
-						$query .= "imas_library_items.qsetid=:qsetid AND imas_library_items.libid=:libid";
+						$query .= "imas_library_items.qsetid=:qsetid AND imas_library_items.libid=:libid ";
+						$query .= "AND imas_library_items.deleted=0";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$qsetid, ':libid'=>$lib));
 						if ($stm->rowCount()>0) {
@@ -209,7 +210,7 @@ if ($myrights<20) {
 						//DB $query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
 						//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						//DB if (mysql_num_rows($result)==0) {
-						$stm = $DBH->prepare("SELECT id FROM imas_library_items WHERE qsetid=:qsetid");
+						$stm = $DBH->prepare("SELECT id FROM imas_library_items WHERE qsetid=:qsetid AND deleted=0");
 						$stm->execute(array(':qsetid'=>$qsetid));
 						if ($stm->rowCount()==0) {
 							//DB $query = "INSERT INTO imas_library_items (qsetid,libid,ownerid) VALUES ('$qsetid',0,$userid)";
@@ -233,7 +234,7 @@ if ($myrights<20) {
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB $qsetid = mysql_result($result,0,0);
 				$offset = intval($offset);
-				$stm = $DBH->prepare("SELECT qsetid FROM imas_library_items WHERE libid=:libid LIMIT $offset,1");
+				$stm = $DBH->prepare("SELECT qsetid FROM imas_library_items WHERE libid=:libid AND deleted=0 LIMIT $offset,1");
 				$stm->execute(array(':libid'=>$lib));
 				$qsetid = $stm->fetchColumn(0);
 			}
@@ -315,7 +316,8 @@ if ($myrights<20) {
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$query = "SELECT imas_library_items.ownerid,imas_users.groupid FROM imas_library_items,imas_users WHERE ";
-		$query .= "imas_library_items.ownerid=imas_users.id AND imas_library_items.libid=:libid AND imas_library_items.qsetid=:qsetid";
+		$query .= "imas_library_items.ownerid=imas_users.id AND imas_library_items.libid=:libid AND imas_library_items.qsetid=:qsetid ";
+		$query .= "AND imas_library_items.deleted=0";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':libid'=>$lib, ':qsetid'=>$qsetid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -568,10 +570,12 @@ function delqimgs($qsid) {
 		//DB $query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
 		//DB $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		//DB if (mysql_num_rows($r2)==1) {
-		$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
-		$stm2->execute(array(':filename'=>$row[1]));
-		if ($stm2->rowCount()==1) {
-			unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+		if (substr($row[1],0,4)!='http') {
+			$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
+			$stm2->execute(array(':filename'=>$row[1]));
+			if ($stm2->rowCount()==1) {
+				unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+			}
 		}
 		//DB $query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
 		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());

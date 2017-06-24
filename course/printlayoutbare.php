@@ -142,7 +142,7 @@ if ($overwriteBody==1) {
 		$qn[$row[0]] = $row[2];
 		if ($row[3]!==null && $row[3]!='') {
 			$fixedseeds[$row[0]] = explode(',',$row[3]);
-		}
+	}
 	}
 
 
@@ -203,8 +203,8 @@ if ($overwriteBody==1) {
 					if (isset($fixedseeds[$questions[$i]])) {
 						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
 					} else {
-						$seeds[$j][] = $aid + $i + $j;
-					}
+					$seeds[$j][] = $aid + $i + $j;
+				}
 				}
 			} else {
 				for ($i = 0; $i<count($questions);$i++) {
@@ -218,11 +218,11 @@ if ($overwriteBody==1) {
 						}
 						$seeds[$j][] = $fixedseeds[$questions[$i]][($x+$j)%$n];
 					} else {
-						$seeds[$j][] = rand(1,9999);
-					}
+					$seeds[$j][] = rand(1,9999);
 				}
 			}
 		}
+	}
 	}
 
 	for ($pt=0;$pt<$printtwice;$pt++) {
@@ -350,7 +350,9 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 		$stm->execute(array(':qsetid'=>$qsetid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+			if (substr($row[1],0,4)=='http') {
+				${$row[0]} = "<img src=\"{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			} else if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				${$row[0]} = "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
 			} else {
 				${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";

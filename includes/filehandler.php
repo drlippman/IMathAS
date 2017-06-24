@@ -719,13 +719,40 @@ function getuserfileurl($key) {
 		return "$imasroot/filestore/$key";
 	}
 }
-function getcoursefileurl($key) {
+function getfopenloc($key) {
 	global $urlmode,$imasroot;
-	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+	if ($GLOBALS['filehandertype'] == 's3') {
+		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
+	} else {
+		return "../filestore/$key";
+	}
+}
+function getcoursefileurl($key,$abs=false) {
+	global $urlmode,$imasroot;
+	$st = substr($key,0,6);
+	if ($st == 'http:/' || $st=='https:') {
+		return $key;
+	} else if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		//return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/$key";
 		return 'https://'.$GLOBALS['AWSbucket'].".s3.amazonaws.com/cfiles/$key";
 	} else {
-		return "$imasroot/course/files/$key";
+		if ($abs==true) {
+			return $urlmode.$_SERVER['HTTP_HOST']."$imasroot/course/files/$key";
+		} else {
+			return "$imasroot/course/files/$key";
+		}
+	}
+}
+function getqimageurl($key,$abs=false) {
+	global $urlmode,$imasroot;
+	if ($GLOBALS['filehandertypecfiles'] == 's3') {
+		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/$key";
+	} else {
+		if ($abs==true) {
+			return $urlmode.$_SERVER['HTTP_HOST']."$imasroot/assessment/qimages/$key";
+		} else {
+			return "$imasroot/assessment/qimages/$key";
+		}
 	}
 }
 function mkdir_recursive($pathname, $mode=0777)

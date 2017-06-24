@@ -182,7 +182,9 @@ if (isset($_GET['delete'])) {
 						//DB while ($r = mysql_fetch_row($result)) {
 						while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 							//if s3 filehandler, do files as weblinks rather than including the file itself
-							if ($GLOBALS['filehandertypecfiles'] == 's3') {
+							if (substr($r[2],0,4)=='http') {
+								//do nothing
+							} else if ($GLOBALS['filehandertypecfiles'] == 's3') {
 								$r[2] = getcoursefileurl($r[2]);
 							} else {
 								//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);

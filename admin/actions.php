@@ -625,13 +625,17 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare("SELECT filename FROM imas_instr_files WHERE itemid=:itemid");
 				$stm->execute(array(':itemid'=>$ilid[0]));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
-					$stm2->execute(array(':filename'=>$row[0]));
-					if ($stm2->rowCount()==1) {
-						//unlink($uploaddir . $row[0]);
-						deletecoursefile($row[0]);
+					if (substr($row[0],0,4)!='http') {
+						$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
+						$stm2->execute(array(':filename'=>$row[0]));
+						if ($stm2->rowCount()==1) {
+							//unlink($uploaddir . $row[0]);
+							deletecoursefile($row[0]);
+						}
 					}
 				}
+				//DB $query = "DELETE FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_instr_files WHERE itemid=:itemid");
 				$stm->execute(array(':itemid'=>$ilid[0]));
 			}
@@ -1017,6 +1021,26 @@ switch($_POST['action']) {
 	case "delltidomaincred":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$stm = $DBH->prepare("DELETE FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		break;
+	case "modfedpeers":
+		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		if ($_GET['id']=='new') {
+			$query = "INSERT INTO imas_federation_peers (peername,peerdescription,secret,url,lastpull) VALUES ";
+			$query .= "(:peername, :peerdescription, :secret, :url, 0)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'], 
+				':secret'=>$_POST['secret'], ':url'=>$_POST['url']));
+		} else {
+			$query = "UPDATE imas_federation_peers SET peername=:peername,peerdescription=:peerdescription,secret=:secret,url=:url WHERE id=:id";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'], 
+				':secret'=>$_POST['secret'], ':url'=>$_POST['url'], ':id'=>$_GET['id']));
+		}
+		break;
+	case "delfedpeers":
+		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		$stm = $DBH->prepare("DELETE FROM imas_federation_peers WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		break;
 	case "removediag";

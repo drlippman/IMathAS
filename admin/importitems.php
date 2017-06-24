@@ -92,87 +92,95 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//DB $query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}' AND deleted=0";
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
 			//DB $questionexists = (mysql_num_rows($result)>0);
-			$stm = $DBH->prepare("SELECT id,adddate FROM imas_questionset WHERE uniqueid=:uniqueid AND deleted=0");
+			$stm = $DBH->prepare("SELECT id,adddate,lastmoddate,deleted FROM imas_questionset WHERE uniqueid=:uniqueid");
 			$stm->execute(array(':uniqueid'=>$questions[$qid]['uqid']));
 			$questionexists = ($stm->rowCount()>0);
+			echo "Question ID ".$questions[$qid]['uqid'].($questionexists?" exists":" not found");
 			if ($questionexists) {
-				list($thisqsetid, $qadddate) = $stm->fetch(PDO::FETCH_NUM);
+				list($thisqsetid, $qadddate, $qlastmoddate, $qdeleted) = $stm->fetch(PDO::FETCH_NUM);
 			}
-			if ($questionexists && ($_POST['merge']==1 || $_POST['merge']==2)) {
+			if ($questionexists && ($qdeleted==1 || $_POST['merge']==1 || $_POST['merge']==2)) {
 				//DB $questions[$qid]['qsetid'] = mysql_result($result,0,0);
 				$questions[$qid]['qsetid'] = $thisqsetid;
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
 				//DB if ($qset['lastmod'][$n]>mysql_result($result,0,1) || $_POST['merge']==2) {
-				if ($qset['lastmod'][$n]>$qadddate || $_POST['merge']==2) {
+				if (($qset['lastmod'][$n]>$qadddate && $qadddate>=$qlastmoddate) || $qdeleted==1 || $_POST['merge']==2) {
 					$now = time();
 					if (!empty($qset['qimgs'][$n])) {
 						$hasimg = 1;
 					} else {
 						$hasimg = 0;
 					}
-					//DB $query = "UPDATE imas_questionset SET description='{$qset['description'][$n]}',";
-					//DB $query .= "author='{$qset['author'][$n]}',qtype='{$qset['qtype'][$n]}',";
-					//DB $query .= "control='{$qset['control'][$n]}',qcontrol='{$qset['qcontrol'][$n]}',";
-					//DB $query .= "qtext='{$qset['qtext'][$n]}',answer='{$qset['answer'][$n]}',";
-					//DB $query .= "solution='{$qset['solution'][$n]}',solutionopts='{$qset['solutionopts'][$n]}',";
-					//DB $query .= "license='{$qset['license'][$n]}',ancestorauthors='{$qset['ancestorauthors'][$n]}',otherattribution='{$qset['otherattribution'][$n]}',";
-					//DB $query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now,hasimg=$hasimg ";
-					//DB $query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>3)";
-					//DB mysql_query($query) or die("error on: $query: " . mysql_error());
-					//DB if (mysql_affected_rows()>0 && $hasimg==1) {
+					$qarr = array(':description'=>$qset['description'][$n], ':author'=>$qset['author'][$n], ':qtype'=>$qset['qtype'][$n],
+						':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
+						':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':license'=>$qset['license'][$n],
+						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>$qset['extref'][$n],
+						':lastmoddate'=>$now, ':adddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$questions[$qid]['qsetid']);
+					
 					$query = "UPDATE imas_questionset SET description=:description,";
 					$query .= "author=:author,qtype=:qtype,";
 					$query .= "control=:control,qcontrol=:qcontrol,";
 					$query .= "qtext=:qtext,answer=:answer,";
 					$query .= "solution=:solution,solutionopts=:solutionopts,";
 					$query .= "license=:license,ancestorauthors=:ancestorauthors,otherattribution=:otherattribution,";
-					$query .= "extref=:extref,lastmoddate=:lastmoddate,adddate=:adddate,hasimg=:hasimg ";
-					$query .= " WHERE id=:id AND (ownerid=:ownerid OR userights>3)";
+					$query .= "extref=:extref,lastmoddate=:lastmoddate,adddate=:adddate,hasimg=:hasimg";
+					if ($qdeleted==1) {
+						$query .= ",ownerid=:ownerid,deleted=0";
+						$qarr[':ownerid'] = $userid;
+					}
+					$query .= " WHERE id=:id ";
+					if (($_POST['merge']!=2 || $myrights<100) && $qdeleted==0) {
+						$query .= "AND (ownerid=:ownerid OR userights>3)";
+						$qarr[':ownerid'] = $userid;
+					}
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':description'=>$qset['description'][$n], ':author'=>$qset['author'][$n], ':qtype'=>$qset['qtype'][$n],
-						':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
-						':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':license'=>$qset['license'][$n],
-						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>$qset['extref'][$n],
-						':lastmoddate'=>$now, ':adddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$questions[$qid]['qsetid'], ':ownerid'=>$userid));
+					$stm->execute($qarr);
 					if ($stm->rowCount()>0 && $hasimg==1) {
 						//not efficient, but sufficient :)
-						//DB $query = "DELETE FROM imas_qimages WHERE qsetid='{$questions[$qid]['qsetid']}'";
-						//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
 						$stm = $DBH->prepare("DELETE FROM imas_qimages WHERE qsetid=:qsetid");
 						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid']));
 						$qimgs = explode("\n",trim($qset['qimgs'][$n]));
 						foreach($qimgs as $qimg) {
 							$p = explode(',',$qimg);
 							if (count($p)<2) {continue;}
-							//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ('{$questions[$qid]['qsetid']}','{$p[0]}','{$p[1]}')";
-							//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
-							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-							$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1]));
+							if (count($p)<3) {
+								$alttext = '';
+							} else if (count($p)>3) {
+								$alttext = implode(',', array_slice($p, 2));
+							} else {
+								$alttext = $p[2];
+							}
+							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
+							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
+							$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+						}
+					}
+					if ($qdeleted==1) { //was deleted; need to add library items
+						//try to undelete first
+						$liblist = implode(',', array_map('intval', $newlibs));
+						$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now WHERE qsetid=:qsetid AND libid IN ($liblist)");
+						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':now'=>$now));
+						if ($stm->rowCount()==0) { //if none to undelete, add new
+							foreach ($newlibs as $lib) {
+								$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+								$stm->execute(array(':libid'=>$lib, ':qsetid'=>$questions[$qid]['qsetid'], ':ownerid'=>$userid, ':now'=>$now));
+							}
 						}
 					}
 					$updateqcnt++;
 				}
-			} else if ($questionexists && $_POST['merge']==-1) {
+			} else if ($questionexists) {
 				//DB $questions[$qid]['qsetid'] = mysql_result($result,0,0);
 				$questions[$qid]['qsetid'] = $thisqsetid;
 			} else { //add question, and assign to default library
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
 				$importuid = '';
-				if ($questionexists && $_POST['merge']==0) {
-					$importuid = $questions[$qid]['uqid'];
-					$questions[$qid]['uqid'] = substr($mt,11).substr($mt,2,2).$qid;
-					$qset['uniqueid'][$n] = $questions[$qid]['uqid'];
-				}
 				$now = time();
 				if (!empty($qset['qimgs'][$n])) {
 					$hasimg = 1;
 				} else {
 					$hasimg = 0;
 				}
-				//DB $query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuidstr) ";
-				//DB $query .= "VALUES ($now,'{$qset['lastmod'][$n]}','{$qset['uniqueid'][$n]}','$userid','{$qset['author'][$n]}','$userights','{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}','{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['solution'][$n]}','{$qset['solutionopts'][$n]}','{$qset['extref'][$n]}','{$qset['license'][$n]}','{$qset['ancestorauthors'][$n]}','{$qset['otherattribution'][$n]}',$hasimg,$importuid)";
-				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
-				//DB $questions[$qid]['qsetid'] = mysql_insert_id();
 				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) ";
 				$query .= "VALUES (:adddate, :lastmoddate, :uniqueid, :ownerid, :author, :userights, :description, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 				$stm = $DBH->prepare($query);
@@ -193,10 +201,8 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					}
 				}
 				foreach ($newlibs as $lib) {
-					//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','{$questions[$qid]['qsetid']}','$userid')";
-					//DB mysql_query($query) or die("error on: $query: " . mysql_error());
-					$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
-					$stm->execute(array(':libid'=>$lib, ':qsetid'=>$questions[$qid]['qsetid'], ':ownerid'=>$userid));
+					$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+					$stm->execute(array(':libid'=>$lib, ':qsetid'=>$questions[$qid]['qsetid'], ':ownerid'=>$userid, ':now'=>$now));
 				}
 				$newqcnt++;
 			}
@@ -268,6 +274,10 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			}
 		}
 
+		//clean up any unassigned library items that are now assigned
+		$stm = $DBH->prepare("UPDATE imas_library_items as A JOIN imas_library_items as B on A.qsetid=B.qsetid SET A.deleted=1,A.lastmoddate=:now WHERE A.libid=0 AND A.deleted=0 AND B.libid>0 AND B.deleted=0");
+		$stm->execute(array(':now'=>$now));
+
 		//recreate itemorder
 		//$item[$itemtoadd]['questions'] = preg_replace("/(\d+)/e",'$questions[\\1]["systemid"]',$item[$itemtoadd]['questions']);
 		$qs = explode(',',$item[$itemtoadd]['questions']);
@@ -329,11 +339,15 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$item[$itemtoadd]['instrfiles'] = explode("\n",$item[$itemtoadd]['instrfiles']);
 			$fileorder = array();
 			foreach ($item[$itemtoadd]['instrfiles'] as $fileinfo) {
-				if (!file_exists("../course/files/$filename")) {
-					$missingfiles[] = $filename;
-				}
+				
 				//DB list($filename,$filedescr) = explode(':::',addslashes($fileinfo));
 				list($filename,$filedescr) = explode(':::',$fileinfo);
+				if (substr($filename,0,4)=='http') {
+					$filename = filter_var($filename, FILTER_SANITIZE_URL);
+				} else if (!file_exists("../course/files/$filename")) {
+					$missingfiles[] = $filename;
+				}
+				
 				//DB $query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ";
 				//DB $query .= "('$filedescr','$filename',$typeid)";
 				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
@@ -721,8 +735,7 @@ function chkgrp(frm, arr, mark) {
 
 		<p>Some questions (possibly older or different versions) may already exist on the system.
 		With these questions, do you want to:<br/>
-			<input type=radio name=merge value="1" CHECKED>Update existing questions,
-			<input type=radio name=merge value="0">Add as new question,
+			<input type=radio name=merge value="1" CHECKED>Update existing questions (if allowed),
 			<input type=radio name=merge value="-1">Keep existing questions
 			<?php if ($myrights==100) {
 				echo '<input type=radio name=merge value="2">Force update';
