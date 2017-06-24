@@ -53,7 +53,7 @@ function parseqs($file,$touse,$rights) {
 				} else {
 					$hasimg = 0;
 				}
-				
+
 				$query = "UPDATE imas_questionset SET description=:description,author=:author,";
 				$query .= "qtype=:qtype,control=:control,qcontrol=:qcontrol,qtext=:qtext,";
 				$query .= "answer=:answer,extref=:extref,license=:license,ancestorauthors=:ancestorauthors,otherattribution=:otherattribution,";
@@ -65,7 +65,7 @@ function parseqs($file,$touse,$rights) {
 					':adddate'=>$now, ':lastmoddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$qsetid);
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
-				
+
 				if ($stm->rowCount()>0) {
 					$updateq++;
 					if (!empty($qd['qimgs'])) {
@@ -84,8 +84,13 @@ function parseqs($file,$touse,$rights) {
 								$alttext = implode(',', array_slice($p, 2));
 							} else {
 								$alttext = $p[2];
-							}                               
-							//strip out any HTML-like stuff from 
+							}
+
+							if (strpos($qd['qtext'],'$'.$p[0])===false && strpos($qd['qcontrol'],'$'.$p[0])===false) {
+								//skip if not actually used in question
+								continue;
+							}
+							//strip out any HTML-like stuff from
 							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
 							//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
 							//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
@@ -341,9 +346,9 @@ if ($myrights < 100) {
 			$unique[$k] = preg_replace('/[^0-9\.]/','',$v);
 		}
 		$lookup = implode(',', $unique);
-		// intval doesn't work on uniqueid since they're bigint 
+		// intval doesn't work on uniqueid since they're bigint
 		// $lookup = implode(',', array_map('intval', $unique));
-		
+
 		//DB $query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ($lookup)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -374,7 +379,7 @@ if ($myrights < 100) {
 				continue;
 			}
 			$now = time();
-			
+
 			if (isset($exists[$unique[$libid]]) && $deleted[$exists[$unique[$libid]]]==1) {
 				//if lib is deleted, undelete it
 				$stm = $DBH->prepare("UPDATE imas_libraries SET deleted=0,name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id");
@@ -387,7 +392,7 @@ if ($myrights < 100) {
 				if ($lastmoddate[$libid]>$adddate[$exists[$unique[$libid]]]) { //if library has changed
 					$stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id");
 					$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]]));
-					
+
 					if ($stm->rowCount()>0) {
 						$updatel++;
 					}
@@ -429,7 +434,7 @@ if ($myrights < 100) {
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
 			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
 			$includedqs = array();
-			
+
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$qidstoupdate[] = $row[0];
@@ -461,7 +466,7 @@ if ($myrights < 100) {
 					$undellist = implode(',', $toundel);
 					$stm = $DBH->query("UPDATE imas_questionset SET deleted=0 WHERE id IN ($undellist)");
 				}
-				
+
 				$updatelist = implode(',', array_map('intval', $qidstoupdate));
 				//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
 				//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
@@ -498,7 +503,7 @@ if ($myrights < 100) {
 						$existingli[] = $row[0];
 					}
 				}
-				
+
 				$qidlist = explode(',',$libitems[$libid]);
 				foreach ($qidlist as $qid) {
 					if (isset($qids[$qid]) && (array_search($qids[$qid],$deletedli)!==false)) {
@@ -651,7 +656,7 @@ if ($overwriteBody==1) {
 			</p>
 
 			<p>If a library or question already exists on this system, do you want to:<br/>
-				<input type=radio name=merge value="1" CHECKED>Update existing if not edited locally,<br/> 
+				<input type=radio name=merge value="1" CHECKED>Update existing if not edited locally,<br/>
 				<input type=radio name=merge value="-1">Keep existing, or <br/>
 				<input type=radio name=merge value="2">Force update
 				<br/>

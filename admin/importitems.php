@@ -116,7 +116,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 						':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':license'=>$qset['license'][$n],
 						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>$qset['extref'][$n],
 						':lastmoddate'=>$now, ':adddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$questions[$qid]['qsetid']);
-					
+
 					$query = "UPDATE imas_questionset SET description=:description,";
 					$query .= "author=:author,qtype=:qtype,";
 					$query .= "control=:control,qcontrol=:qcontrol,";
@@ -149,6 +149,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 								$alttext = implode(',', array_slice($p, 2));
 							} else {
 								$alttext = $p[2];
+							}
+
+							if (strpos($qset['qtext'][$n],'$'.$p[0])===false && strpos($qset['control'][$n],'$'.$p[0])===false) {
+								//skip if not actually used in question
+								continue;
 							}
 							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
 							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
@@ -339,7 +344,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$item[$itemtoadd]['instrfiles'] = explode("\n",$item[$itemtoadd]['instrfiles']);
 			$fileorder = array();
 			foreach ($item[$itemtoadd]['instrfiles'] as $fileinfo) {
-				
+
 				//DB list($filename,$filedescr) = explode(':::',addslashes($fileinfo));
 				list($filename,$filedescr) = explode(':::',$fileinfo);
 				if (substr($filename,0,4)=='http') {
@@ -347,7 +352,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				} else if (!file_exists("../course/files/$filename")) {
 					$missingfiles[] = $filename;
 				}
-				
+
 				//DB $query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ";
 				//DB $query .= "('$filedescr','$filename',$typeid)";
 				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
