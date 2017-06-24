@@ -356,7 +356,7 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,20,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
