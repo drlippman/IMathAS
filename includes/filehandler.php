@@ -736,6 +736,7 @@ function getcoursefileurl($key,$abs=false) {
 		//return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/$key";
 		return 'https://'.$GLOBALS['AWSbucket'].".s3.amazonaws.com/cfiles/$key";
 	} else {
+		$key = Sanitize::rawurlencodePath($key);  //shouldn't be needed since filenames sanitized, but better to be safe
 		if ($abs==true) {
 			return $urlmode.$_SERVER['HTTP_HOST']."$imasroot/course/files/$key";
 		} else {

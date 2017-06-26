@@ -380,7 +380,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$filedescr[$row[0]] = $row[1];
-				$filenames[$row[0]] = rawurlencode($row[2]);
+				$filenames[$row[0]] = $row[2];
 			}
 			foreach ($fileorder as $k=>$fid) {
 				$page_FileLinks[$k]['link'] = $filenames[$fid];
