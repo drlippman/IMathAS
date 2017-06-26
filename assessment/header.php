@@ -3,7 +3,7 @@
 <?php if (isset($CFG['locale'])) {
 	echo '<html lang="'.$CFG['locale'].'">';
 } else {
-	echo '<html lang="en">';	
+	echo '<html lang="en">';
 }
 ?>
 <head>
@@ -43,7 +43,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=042217";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=062617";?>" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
@@ -167,12 +167,12 @@ div { zoom: 1; }
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
 <![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=061217";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=062617";?>" type="text/javascript"></script>
 
 <?php
 /*
 
-<script src="<?php echo $imasroot . "/javascript/general.js?v=052617";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/general.js?v=062617";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/mathjs.js?v=082616";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=061217";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=082616";?>" type="text/javascript"></script>
@@ -262,26 +262,26 @@ if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intre
 	if ($coursemsgset<4) { //messages
 		echo "<li><a href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
 	}
-	
+
 	if (($coursetoolset&2)==0) { //forums
 		echo "<li><a href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
 	}
-	
+
 	if (isset($teacherid)) { //Roster
-		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n"; 
+		echo "<li><a href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
 	}
-	
+
 	if (($coursetoolset&1)==0) { //Calendar
 		echo "<li><a href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
 	}
-	
+
 	echo "<li><a href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li>"; //Gradebook
-	
+
 	if (!isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
 	echo '</ul>';
-	
+
 	echo '<div class="clear"></div>';
 	echo '</div>';
 	$didnavlist = true;
@@ -290,7 +290,7 @@ if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intre
 if (!isset($flexwidth)) {
 	echo '</div>';
 }
-echo '<div class="midwrapper" role="main">'; 
+echo '<div class="midwrapper" role="main">';
 
 
 ?>

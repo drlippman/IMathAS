@@ -94,7 +94,7 @@ function tipshow(el,tip) {
 	tipobj.style.display = "block";
 	tipobj.setAttribute("aria-hidden","false");
 	el.setAttribute("aria-describedby", "hovertipsholder");
-	
+
 	if (typeof usingASCIIMath!='undefined' && typeof noMathRender != 'undefined') {
 		if (usingASCIIMath && !noMathRender) {
 			rendermathnode(tipobj);
@@ -275,7 +275,7 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
-	
+
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {
@@ -670,11 +670,6 @@ jQuery(document).ready(function($) {
 	$('a[href*="youtu"]').each(setupvideoembeds);
 	$('a[href*="vimeo"]').each(setupvideoembeds);
 	$('body').fitVids();
-	$('a[target="_blank"]').each(function() {
-		if (!this.href.match(/youtu/) && !this.href.match(/vimeo/)) {
-		   $(this).append(' <img src="'+imasroot+'/img/extlink.png" alt="External link"/>')
-		}
-	});
 });
 
 jQuery.fn.isolatedScroll = function() {
@@ -816,7 +811,7 @@ jQuery(document).ready(function($) {
 				$("#topnavmenu").attr("aria-expanded",true);
 			});
 			$("#navlist").slideDown(100, function() {
-				$("#navlist").addClass("menuexpanded").removeAttr("style");	
+				$("#navlist").addClass("menuexpanded").removeAttr("style");
 			});
 		} else { //collapse it
 			$("#navlist").slideUp(100, function() {
