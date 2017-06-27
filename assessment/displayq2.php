@@ -1557,10 +1557,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
-
-
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		if (isset($ansprompt)) {$out .= $ansprompt;}
+		
+		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+		}
 		if (isset($answersize)) {
 			if (!isset($sz)) { $sz = 3;}
 			if ($colorbox=='') {
@@ -1626,7 +1627,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$la = $la[0];
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		if (isset($ansprompt)) {$out .= $ansprompt;}
+		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+		}
 		if (isset($answersize)) {
 			if (!isset($sz)) { $sz = 3;}
 			$answersize = explode(",",$answersize);
@@ -2811,8 +2814,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
 						$out .= ' alt="Open dot"/>';
 					}
-					
-					
+
+
 				} else {
 					if ($answerformat[0]=='numberline') {
 						array_shift($answerformat);
@@ -2932,9 +2935,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],blue,0,1,,arrow";
 					} else if ($function[0]=='circle') { //is circle
 						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
-					} else if ($function[0]=='ellipse') { 
+					} else if ($function[0]=='ellipse') {
 						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[4]}*sin(t)+{$function[2]}],blue,0,6.31";
-					} else if ($function[0]=='verthyperbola') { 
+					} else if ($function[0]=='verthyperbola') {
 						//(y-yc)^2/a^2 -  (x-xc)^2/b^2 = 1
 						$saarr[$k] = "sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2]";
 						$k++;
@@ -2943,7 +2946,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]+$function[3]*t],green,,,,,,dash";
 						$k++;
 						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]-$function[3]*t],green,,,,,,dash";
-					} else if ($function[0]=='horizhyperbola') { 
+					} else if ($function[0]=='horizhyperbola') {
 						//(x-xc)^2/a^2 - (y-yc)^2/b^2 = 1
 						$saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
 						$k++;
@@ -2955,7 +2958,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					} else if (substr($function[0],0,2)=='x=') {
 						if (count($function)==3) {
 							if ($function[1] == '-oo') { $function[1] = $settings[2]-.1*($settings[3]-$settings[2]);}
-							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}	
+							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}
 							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.$function[1].','.$function[2];
 						} else {
 							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
@@ -5124,7 +5127,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$A = ($y3p * ($x2p - $x1p) + $y2p * ($x1p - $x3p) + $y1p * ($x3p - $x2p)) / $denom;
 						$B = ($y3p*$y3p * ($x1p - $x2p) + $y2p*$y2p * ($x3p - $x1p) + $y1p*$y1p * ($x2p - $x3p)) / $denom;
 						$C = ($y2p * $y3p * ($y2p - $y3p) * $x1p + $y3p * $y1p * ($y3p - $y1p) * $x2p + $y1p * $y2p * ($y1p - $y2p) * $x3p) / $denom;
-						
+
 						$yv = -$B/(2*$A);
 						$xv = $C-$B*$B/(4*$A);
 						//TODO:  adjust 20px to be based on drawing window and grid
