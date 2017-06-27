@@ -38,19 +38,25 @@ if (isset($_POST['submit'])) {
 			//DB $query = "UPDATE imas_calitems SET date='$date',tag='$tag',title='{$_POST['txt'][$id]}' WHERE id='$id'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_calitems SET date=:date,tag=:tag,title=:title WHERE id=:id");
-			$stm->execute(array(':date'=>$date, ':tag'=>$tag, ':title'=>$_POST['txt'][$id], ':id'=>$id));
+			$stm->execute(array(':date'=>$date, ':tag'=>Sanitize::stripHtmlTags($tag),
+				':title'=>Sanitize::stripHtmlTags($_POST['txt'][$id]), ':id'=>$id));
 		}
 	}
 
 	//add new
-	if (trim($_POST['txtnew'])!='' || $_POST['tagnew'] != '!') {
-		$date = $_POST['datenew'];
-		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-		$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-		//DB $query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ('$cid','$datenew','{$_POST['tagnew']}','{$_POST['txtnew']}')";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		$stm = $DBH->prepare("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES (:courseid, :date, :tag, :title)");
-		$stm->execute(array(':courseid'=>$cid, ':date'=>$datenew, ':tag'=>$_POST['tagnew'], ':title'=>$_POST['txtnew']));
+	$newcnt = 0;
+	while (isset($_POST['datenew-'.$newcnt])) {
+		if (trim($_POST['txtnew-'.$newcnt])!='' || $_POST['tagnew-'.$newcnt] != '!') {
+			$date = $_POST['datenew-'.$newcnt];
+			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
+			$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+			//DB $query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ('$cid','$datenew','{$_POST['tagnew']}','{$_POST['txtnew']}')";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES (:courseid, :date, :tag, :title)");
+			$stm->execute(array(':courseid'=>$cid, ':date'=>$datenew, ':tag'=>Sanitize::stripHtmlTags($_POST['tagnew-'.$newcnt]),
+				':title'=>Sanitize::stripHtmlTags($_POST['txtnew-'.$newcnt])));
+		}
+		$newcnt++;
 	}
 	if ($_POST['submit']=='Save') {
 		if ($from=='cp') {
@@ -65,6 +71,36 @@ if (isset($_POST['submit'])) {
 
 //HTML output
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= '<script type="text/javascript">
+	$(document).on("submit","form",function() {
+		window.onbeforeunload = null;
+		return true;
+	});
+	var nextnewcnt = 1;
+	function addnewevent() {
+		var html = "<tr><td><input type=text size=10 id=\"datenew-"+nextnewcnt+"\" name=\"datenew-"+nextnewcnt+"\"> ";
+		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+		html += "<td><input name=\"tagnew-"+nextnewcnt+"\" id=\"tagnew-"+nextnewcnt+"\" type=text size=8 /></td>";
+		html += "<td><input name=\"txtnew-"+nextnewcnt+"\" id=\"txtnew-"+nextnewcnt+"\" type=text size=80 /></td></tr>";
+		$("#newEventsTable tbody").append(html);
+		$("#datenew-"+nextnewcnt).val($("#datenew-"+(nextnewcnt-1)).val());
+		$("#tagnew-"+nextnewcnt).val($("#tagnew-"+(nextnewcnt-1)).val());
+		$("#txtnew-"+nextnewcnt).val($("#txtnew-"+(nextnewcnt-1)).val());
+		nextnewcnt++;
+		if (!haschanged) {
+			haschanged = true;
+			window.onbeforeunload = function() {return unsavedmsg;}
+		}
+	}
+	var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";
+	var haschanged = false;
+	function txtchg() {
+		if (!haschanged) {
+			haschanged = true;
+			window.onbeforeunload = function() {return unsavedmsg;}
+		}
+	}
+	</script>';
 require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -95,17 +131,18 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	echo '<tr>';
 	echo '<td><input type=checkbox name="del['.$row[0].']" /></td>';
 	$date = tzdate("m/d/Y",$row[1]);
-	echo "<td><input type=text size=10 id=\"date{$row[0]}\" name=\"date{$row[0]}\" value=\"$date\"/> ";
+	echo "<td><input type=text size=10 id=\"date{$row[0]}\" name=\"date{$row[0]}\" value=\"";
+	echo Sanitize::encodeStringForDisplay($date) . "\" oninput=\"txtchg()\" /> ";
 	echo "<a href=\"#\" onClick=\"displayDatePicker('date{$row[0]}', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 	$cnt++;
-	echo '<td><input name="tag['.$row[0].']" type=text size=8 value="'.$row[3].'" /></td>';
-	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.str_replace('"','&quot;',$row[2]).'" /></td>';
+	echo '<td><input name="tag['.$row[0].']" type=text size=8 value="'.Sanitize::encodeStringForDisplay($row[3]).'" oninput="txtchg()" /></td>';
+	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.Sanitize::encodeStringForDisplay($row[2]).'" oninput="txtchg()" /></td>';
 	echo '<tr/>';
 }
 echo '</tbody></table>';
 echo '<p><button type="submit" name="submit" value="Save">'._('Save Changes').'</button></p>';
 echo '<h4>Add New Events</h4>';
-echo '<table class="gb">
+echo '<table class="gb" id="newEventsTable">
 <thead>
 <tr><th>Date</th><th>Tag</th><th>Event Details</th></tr>
 </thead>
@@ -116,23 +153,21 @@ echo '<tr>';
 if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$_GET['addto']);
 } else if (isset($datenew)) {
-	echo "datenew";
 	$date = tzdate("m/d/Y",$datenew);
 } else  {
 	$date = tzdate("m/d/Y",$now);
 }
-echo "<td><input type=text size=10 id=\"datenew\" name=\"datenew\" value=\"$date\"/> ";
-echo "<a href=\"#\" onClick=\"displayDatePicker('datenew', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+echo "<td><input type=text size=10 id=\"datenew-0\" name=\"datenew-0\" value=\"$date\" oninput=\"txtchg()\"/> ";
+echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
-echo '<td><input name="tagnew" type=text size=8 value="!" /></td>';
-echo '<td><input name="txtnew" type=text size=80 value="" /></td>';
+echo '<td><input name="tagnew-0" id="tagnew-0" type=text size=8 value="!" oninput="txtchg()" /></td>';
+echo '<td><input name="txtnew-0" id="txtnew-0" type=text size=80 value="" oninput="txtchg()" /></td>';
 echo '<tr/>';
 
 ?>
 </thead>
 </table>
-
-<button type="submit" name="submit" value="SaveAndAdd"><?php echo _('Save and Add another') ?></button>
+<button type="button" onclick="addnewevent()"><?php echo _('Add another') ?></button>
 <button type="submit" name="submit" value="Save"><?php echo _('Save Changes') ?></button>
 </form>
 

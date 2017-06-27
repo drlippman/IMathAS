@@ -206,7 +206,11 @@ class Sanitize
 	 */
 	public static function stripHtmlTags($string)
 	{
-		return filter_var($string, FILTER_SANITIZE_STRING);
+		//changed to strip_tags since FILTER_SANITIZE_STRING removes
+		//anything following a < symbol, which is overkill
+		
+		//return filter_var($string, FILTER_SANITIZE_STRING);
+		return strip_tags($string);
 	}
 
 	/**
