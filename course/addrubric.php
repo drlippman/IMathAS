@@ -21,8 +21,8 @@ if ($from=='modq') {
 	$returnstr = 'modquestion.php?cid='.$cid.'&amp;aid='.Sanitize::onlyInt($_GET['aid']).'&amp;id='.Sanitize::onlyInt($_GET['qid']);
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Question Settings</a> ";
 } else if ($from=='addg') {
-	$fromstr = '&amp;from=addg&amp;gbitem='.$_GET['gbitem'];
-	$returnstr = 'addgrades.php?cid='.$cid.'&amp;gbitem='.$_GET['gbitem'].'&amp;grades=all';
+	$fromstr = '&amp;from=addg&amp;gbitem='.Sanitize::encodeStringForDisplay($_GET['gbitem']);
+	$returnstr = 'addgrades.php?cid='.$cid.'&amp;gbitem='.Sanitize::encodeStringForDisplay($_GET['gbitem']).'&amp;grades=all';
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Offline Grades</a> ";
 } else if ($from=='addf') {
 	$fromstr = '&amp;from=addf&amp;fid='.Sanitize::onlyInt($_GET['fid']);
@@ -146,7 +146,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	*/
 	$rubtypeval = array(1,0,3,4,2);
 	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
-	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id={$_GET['id']}$fromstr\">";
+	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::onlyInt($_GET['id']) . $fromstr . "\">";
 	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></p>';
 
 	echo '<p>Rubric Type: ';
