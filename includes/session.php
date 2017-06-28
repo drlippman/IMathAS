@@ -46,7 +46,7 @@ class SessionDBHandler implements SessionHandlerInterface
 	{
 		$oldTimestamp = time() - $maxLifetime;
 
-		$stm = $this->db->prepare('DELETE * FROM php_sessions WHERE access < :oldTimestamp');
+		$stm = $this->db->prepare('DELETE FROM php_sessions WHERE access < :oldTimestamp');
 		$stm->bindParam(':oldTimestamp', $oldTimestamp);
 
 		if ($stm->execute()) {
@@ -102,4 +102,3 @@ class SessionDBHandler implements SessionHandlerInterface
 	}
 
 }
-
