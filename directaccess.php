@@ -3,13 +3,12 @@
 //login / new student page specific for course
 //(c) 2007 David Lippman
 
-require_once(__DIR__ . "/includes/sanitize.php");
-$cid = Sanitize::courseId($_GET['cid']);
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	 if (!file_exists("$curdir/config.php")) {
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php");
 	 }
  	require_once(__DIR__ . "/init_without_validate.php");
+	$cid = Sanitize::courseId($_GET['cid']);
 
  	if (!isset($_GET['cid'])) {
 		echo "Invalid address.  Address must be directaccess.php?cid=###, where ### is your courseid";
@@ -141,7 +140,7 @@ $cid = Sanitize::courseId($_GET['cid']);
 	//check for session
 	$origquerys = $querys;
 	if ($_POST['ekey']!='') {
-		$addtoquerystring = "ekey=".Sanitize::encodeStringForUrl($_POST['ekey']);
+		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
 	require("init.php");
 	$flexwidth = true;
@@ -186,18 +185,6 @@ $cid = Sanitize::courseId($_GET['cid']);
 		}
 	} else { //not verified
 		//$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\" />\n";
-		$pref = 0;
-		 if (isset($_COOKIE['mathgraphprefs'])) {
-			 $prefparts = explode('-',$_COOKIE['mathgraphprefs']);
-			 if ($prefparts[0]==2 && $prefparts[1]==2) { //img all
-				$pref = 3;
-			 } else if ($prefparts[0]==2) { //img math
-				 $pref = 4;
-			 } else if ($prefparts[1]==2) { //img graph
-				 $pref = 2;
-			 }
-
-		 }
 
 		//DB $query = "SELECT name FROM imas_courses WHERE id='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -270,63 +257,30 @@ if (strlen($enrollkey)>0) {
 	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="'.(isset($_REQUEST['ekey'])?$_REQUEST['ekey']:"").'"/><BR class=form>';
 }
 ?>
+<div class=submit><input type="submit" value="Login and Enroll"></div>
 <span class=form> </span><span class=formright><a href="<?php echo $imasroot; ?>/forms.php?action=resetpw">Forgot Password</a></span><br class="form">
 </table>
-<div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
+<div><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</noscript></div>
 
 <input type="hidden" id="tzoffset" name="tzoffset" value="">
 <input type="hidden" id="tzname" name="tzname" value="">
 <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
 <script type="text/javascript">
+$(function() {
         var thedate = new Date();
         document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
         var tz = jstz.determine();
         document.getElementById("tzname").value = tz.name();
+				<?php
+					if ($page_newaccounterror!='') {
+						echo 'document.getElementById("SID").focus();';
+					} else {
+						echo 'document.getElementById("username").focus();';
+					}
+				?>
+});
 </script>
 
-
-<script type="text/javascript">
-	function updateloginarea() {
-		setnode = document.getElementById("settings");
-		var html = "";
-		html += '<span class=form>Accessibility:</span><span class=formright> ';
-		//html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help</a>";
-		html += '<input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Use visual display<br/>';
-		html += '<input type="radio" name="access" value="2" <?php if ($pref==2) {echo "checked=1";} ?> />Force image-based graphs<br/>';
-		html += '<input type="radio" name="access" value="4" <?php if ($pref==4) {echo "checked=1";} ?> />Force image-based math<br/>';
-		html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
-		html += '<input type="radio" name="access" value="1">Use text-based display</span><br class=form>';
-
-		if (!MathJaxCompatible) {
-			html += '<input type=hidden name="mathdisp" value="0">';
-		} else {
-			html += '<input type=hidden name="mathdisp" value="1">';
-		}
-		if (ASnoSVG) {
-			html += '<input type=hidden name="graphdisp" value="2">';
-		} else {
-			html += '<input type=hidden name="graphdisp" value="1">';
-		}
-		if (MathJaxCompatible && !ASnoSVG) {
-			html += '<input type=hidden name="isok" value=1>';
-		}
-		html += '<div class=submit><input name="submit" type="submit" value="Login"></div>';
-		setnode.innerHTML = html;
-<?php
-	if ($page_newaccounterror!='') {
-		echo 'document.getElementById("SID").focus();';
-	} else {
-		echo 'document.getElementById("username").focus();';
-	}
-?>
-	}
-	var existingonload = window.onload;
-	if (existingonload) {
-		window.onload = function() {existingonload(); updateloginarea();}
-	} else {
-		window.onload = updateloginarea;
-	}
-</script>
 <?php
 	if ($enrollkey!='closed') {
 ?>
