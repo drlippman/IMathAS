@@ -244,7 +244,6 @@ var renderMathInElement = function(elem, options) {
     } else {
     	    options.ignoreClassRegex = null;
     }
-    console.log(options.ignoreClassRegex );
     usedMathJax = false;
     
     renderElem(elem, options.delimiters, options.ignoredTags, options.ignoreClassRegex);

@@ -15,6 +15,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	if (isset($_POST['process'])) {
+		//get deflatepass
+		$query = "SELECT deflatepass FROM imas_courses WHERE id=:cid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':cid'=>$cid));
+		$deflatepass = $stm->fetchColumn(0);
+
 		//know students.  Do work
 		$todo = array();
 		foreach ($_POST['checked'] as $stu) {
@@ -39,8 +45,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		foreach ($todo as $stu) {
 			if (in_array($stu,$dontdo)) {continue;}
 			//DB $vals[] = "($stu,'$cid'$section)";
-			$vals[] = "(?,?,?)";
-			array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null);
+			$vals[] = "(?,?,?,?)";
+			array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null, $deflatepass);
 		}
 		if (count($vals)>0) {
 			//DB $query = 'INSERT INTO imas_students (userid,courseid';
@@ -49,7 +55,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//DB }
 			//DB $query .= ') VALUES '.implode(',',$vals);
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section) VALUES '.implode(',', $vals));
+			$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section,latepass) VALUES '.implode(',', $vals));
 			$stm->execute($qarr);
 		}
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");

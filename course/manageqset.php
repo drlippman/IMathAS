@@ -46,102 +46,62 @@ if ($myrights<20) {
 	}
 
 
-	if (isset($_POST['remove'])) {
+	if (isset($_POST['remove']) || isset($_GET['remove'])) {
 		if (isset($_GET['confirmed'])) {
 			if ($_POST['remove']!='') {
-				//DB $remlist = "'".implode("','",explode(',',$_POST['remove']))."'";
-        $remlist = implode(',', array_map('intval', explode(',',$_POST['remove'])));
-
-				if ($isadmin) {
-					//DB $query = "DELETE FROM imas_library_items WHERE qsetid IN ($remlist)";
-					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$stm = $DBH->query("DELETE FROM imas_library_items WHERE qsetid IN ($remlist)");
-					/*foreach (explode(',',$_POST['remove']) as $qid) {
-						delqimgs($qid);
-					}*/
-				} else if ($isgrpadmin) {
-					//DB $query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
-					//DB $query .= "imas_questionset.id IN ($remlist) AND imas_questionset.ownerid=imas_users.id ";
-					//DB $query .= "AND imas_users.groupid='$groupid'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB while ($row = mysql_fetch_row($result)) {
-					$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
-					$query .= "imas_questionset.id IN ($remlist) AND imas_questionset.ownerid=imas_users.id ";
-					$query .= "AND imas_users.groupid=:groupid";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':groupid'=>$groupid));
-          $del_stm = $DBH->prepare("DELETE FROM imas_library_items WHERE qsetid=:qsetid");
-					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						//DB $query = "DELETE FROM imas_library_items WHERE qsetid='$row[0]'";
-						//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-						$del_stm->execute(array(':qsetid'=>$row[0]));
-						//delqimgs($row[0]);
-					}
-
-				} else {
-					//DB $query = "SELECT id FROM imas_questionset WHERE id IN ($remlist) AND ownerid='$userid'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB while ($row = mysql_fetch_row($result)) {
-					$stm = $DBH->prepare("SELECT id FROM imas_questionset WHERE id IN ($remlist) AND ownerid=:ownerid");
-					$stm->execute(array(':ownerid'=>$userid));
-          $del_stm = $DBH->prepare("DELETE FROM imas_library_items WHERE qsetid=:qsetid");
-					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						//DB $query = "DELETE FROM imas_library_items WHERE qsetid='$row[0]'";
-						//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-						$del_stm->execute(array(':qsetid'=>$row[0]));
-						//delqimgs($row[0]);
-					}
-				}
-
-				if ($isgrpadmin) {
-					//DB $query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($remlist) AND imas_users.groupid='$groupid'";
-					//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					//DB while ($row = mysql_fetch_row($result)) {
-					$stm = $DBH->prepare("SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($remlist) AND imas_users.groupid=:groupid");
-					$stm->execute(array(':groupid'=>$groupid));
-          $upd_stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1 WHERE id=:id");
-					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						//$query = "DELETE FROM imas_questionset WHERE id='{$row[0]}'";
-						//DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id='{$row[0]}'";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
-						$upd_stm->execute(array(':id'=>$row[0]));
-					}
-				} else {
-					//$query = "DELETE FROM imas_questionset WHERE id IN ($remlist)";
-					if (!$isadmin) {
-            //DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($remlist)";
-						//DB $query .= " AND ownerid='$userid'";
-            $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($remlist)";
-						$query .= " AND ownerid=:ownerid";
+				$remlist = implode(',', array_map('intval', explode(',',$_POST['remove'])));
+				if (!$isadmin) {
+					$oktorem = array();
+					if ($isgrpadmin) {
+						$query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE ";
+						$query .= "imas_questionset.id IN ($remlist) AND imas_questionset.ownerid=imas_users.id ";
+						$query .= "AND imas_users.groupid=:groupid";
 						$stm = $DBH->prepare($query);
-						$stm->execute(array(':ownerid'=>$userid));
+						$stm->execute(array(':groupid'=>$groupid));
 					} else {
-            //DB $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($remlist)";
-            $stm = $DBH->query("UPDATE imas_questionset SET deleted=1 WHERE id IN ($remlist)");
-          }
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+						$stm = $DBH->prepare("SELECT id FROM imas_questionset WHERE id IN ($remlist) AND ownerid=:ownerid");
+						$stm->execute(array(':ownerid'=>$userid));
+					}
+					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+						$oktorem[] = $row[0];
+					}
+					$remlist = implode(',',$oktorem);
 				}
+				//remlist now only contains questions ok to remove
+				$now = time();
+				
+				//delete all library items for that question, regardless of owner
+				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE qsetid IN ($remlist) AND deleted=0");
+				$stm->execute(array(':now'=>$now));
+				
+				//now delete the questions
+				$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=:now WHERE id IN ($remlist)");
+				$stm->execute(array(':now'=>$now));
 
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
 			exit;
 		} else {
-			if (!isset($_POST['nchecked'])) {
+			if (isset($_POST['remove']) && !isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
+			} else {
+				$pagetitle = "Confirm Delete";
+				$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
+				$curBreadcrumb .= " &gt; Confirm Delete";
+				if (isset($_POST['remove'])) {
+					$rlist = implode(",",$_POST['nchecked']);
+				} else {
+					$rlist = $_GET['remove'];
+				}
 			}
-			$pagetitle = "Confirm Delete";
-			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
-			$curBreadcrumb .= " &gt; Confirm Delete";
-
-			$rlist = implode(",",$_POST['nchecked']);
 		}
-	} else if (isset($_POST['transfer'])) {
+	} else if (isset($_POST['transfer']) || isset($_GET['transfer'])) {
 		if (isset($_POST['newowner'])) {
 			if ($_POST['transfer']!='') {
 				//DB $translist = "'".implode("','",explode(',',$_POST['transfer']))."'";
-        $translist = implode(',', array_map('intval', explode(',',$_POST['transfer'])));
+				$translist = implode(',', array_map('intval', explode(',',$_POST['transfer'])));
 
 				if ($isgrpadmin) {
 					//DB $query = "SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($translist) AND imas_users.groupid='$groupid'";
@@ -149,7 +109,7 @@ if ($myrights<20) {
 					//DB while ($row = mysql_fetch_row($result)) {
 					$stm = $DBH->prepare("SELECT imas_questionset.id FROM imas_questionset,imas_users WHERE imas_questionset.ownerid=imas_users.id AND imas_questionset.id IN ($translist) AND imas_users.groupid=:groupid");
 					$stm->execute(array(':groupid'=>$groupid));
-          $upd_stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id=:id");
+					$upd_stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id=:id");
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						//DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id='{$row[0]}'";
 						//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -158,17 +118,17 @@ if ($myrights<20) {
 
 				} else {
 					if (!$isadmin) {
-            //DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id IN ($translist)";
+						//DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id IN ($translist)";
 						//DB $query .= " AND ownerid='$userid'";
-            $query = "UPDATE imas_questionset SET ownerid=:ownerid WHERE id IN ($translist)";
+						$query = "UPDATE imas_questionset SET ownerid=:ownerid WHERE id IN ($translist)";
 						$query .= " AND ownerid=:ownerid2";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':ownerid'=>$_POST['newowner'], ':ownerid2'=>$userid));
 					} else {
-            //DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id IN ($translist)";
-            $stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id IN ($translist)");
-            $stm->execute(array(':ownerid'=>$_POST['newowner']));
-          }
+						//DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id IN ($translist)";
+						$stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id IN ($translist)");
+						$stm->execute(array(':ownerid'=>$_POST['newowner']));
+					}
 					//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 
@@ -181,11 +141,16 @@ if ($myrights<20) {
 			$pagetitle ="Transfer Ownership";
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; Transfer QSet";
-
-			$tlist = implode(",",$_POST['nchecked']);
-			if (!isset($_POST['nchecked'])) {
+		
+			if (isset($_POST['transfer']) && !isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
+			} else {
+				if (isset($_POST['transfer'])) {
+					$tlist = implode(",",$_POST['nchecked']);
+				} else {
+					$tlist = $_GET['transfer'];
+				}
 			}
 
 			//DB $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
@@ -208,84 +173,110 @@ if ($myrights<20) {
 				if ($_POST['libs']=='') {
 					$newlibs = array();
 				} else {
-					if ($newlibs[0]==0 && count($newlibs)>1) { //get rid of unassigned if checked and others are checked
+					$newlibs = array_map('intval', $newlibs);
+					if ($newlibs[0]==0) { //get rid of unassigned if checked
 						array_shift($newlibs);
 					}
+				}
+				//Verify we have rights to add to all of newlibs
+				$newliblist = implode(',', $newlibs);
+				if (!$isadmin && count($newlibs)>0) {
+					$oktoaddto = array();
+					$stm = $DBH->query("SELECT id,ownerid,userights,groupid FROM imas_libraries WHERE id IN ($newliblist)");
+					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+						if ($isgrpadmin) {
+							if ($row['groupid']==$groupid || $row['userights']==8) {
+								$oktoaddto[] = $row['id'];
+							}
+						} else {
+							if ($row['ownerid']==$userid || (($row['userights']%3)==2 && $row['groupid']==$groupid) || $row['userights']==8) {
+								$oktoaddto[] = $row['id'];
+							}
+						}
+					}
+					$newlibs = $oktoaddto;
 				}
 
 				$libarray = explode(',',$_POST['qtochg']); //qsetids to change
 				if ($_POST['qtochg']=='') {
 					$libarray = array();
 				}
-				//DB $chglist = "'".implode("','",$libarray)."'";
-        $chglist = implode(',', array_map('intval', $libarray));
+				//make a list of all the questions that we're changing libraries for
+				$chglist = implode(',', array_map('intval', $libarray));
 
+				//pull a list of all non-deleted library items for these questions
 				$alllibs = array();
-				//DB $query = "SELECT qsetid,libid FROM imas_library_items WHERE qsetid IN ($chglist)";
-				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->query("SELECT qsetid,libid FROM imas_library_items WHERE qsetid IN ($chglist)");
+				$dellibs = array();
+				$stm = $DBH->query("SELECT qsetid,libid,deleted FROM imas_library_items WHERE qsetid IN ($chglist) AND libid>0");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$alllibs[$row[0]][] = $row[1];
+					if ($row[2]==0) {
+						$alllibs[$row[0]][] = $row[1];
+					} else {
+						$dellibs[$row[0]][] = $row[1];
+					}
 				}
-				if ($isgrpadmin) {
-					//DB $query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items,imas_users WHERE ";
-					//DB $query .= "imas_library_items.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR imas_library_items.libid=0)";
-					//DB $query .= "AND imas_library_items.qsetid IN ($chglist)";
+				
+				//pull a list of non-deleted library items for these questions that user has the rights to modify
+				if ($isadmin) {
+					$query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
+					$query .= "ili.libid=il.id AND il.deleted=0 WHERE ili.qsetid IN ($chglist) AND ili.deleted=0";
+					$stm = $DBH->query($query);
+				} else if ($isgrpadmin) {
 					$query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items,imas_users WHERE ";
 					$query .= "imas_library_items.ownerid=imas_users.id AND (imas_users.groupid=:groupid OR imas_library_items.libid=0) ";
-					$query .= "AND imas_library_items.qsetid IN ($chglist)";
+					$query .= "AND imas_library_items.qsetid IN ($chglist) AND imas_library_items.deleted=0";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':groupid'=>$groupid));
 				} else {
-					if (!$isadmin) {
-						//unassigned, or owner and lib not closed or mine
-            //DB $query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
-  					//DB $query .= "ili.libid=il.id WHERE ili.qsetid IN ($chglist)";
-						//DB $query .= " AND ((ili.ownerid='$userid' AND (il.ownerid='$userid' OR il.userights%3<>1)) OR ili.libid=0)";
-            $query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
-  					$query .= "ili.libid=il.id WHERE ili.qsetid IN ($chglist) ";
-						$query .= "AND ((ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)) OR ili.libid=0)";
-						$stm = $DBH->prepare($query);
-						$stm->execute(array(':ownerid'=>$userid, ':ownerid2'=>$userid));
-					} else {
-            //DB $query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
-  					//DB $query .= "ili.libid=il.id WHERE ili.qsetid IN ($chglist)";
-            $query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
-  					$query .= "ili.libid=il.id WHERE ili.qsetid IN ($chglist)";
-  					$stm = $DBH->query($query);
-          }
+					$query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
+					$query .= "ili.libid=il.id AND il.deleted=0 WHERE ili.qsetid IN ($chglist) ";
+					$query .= "AND ((ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)) OR ili.libid=0) AND ili.deleted=0";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':ownerid'=>$userid, ':ownerid2'=>$userid));
 				}
 				$mylibs = array();
-				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$mylibs[$row[0]][] = $row[1];
 				}
 
+				$now = time();
 				if ($_POST['action']==0) {//add, keep existing
 					/*
 					get list of existing library assignments
 					remove any additions that already exist
 					add to new libraries
 					*/
-          $ins_stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
-          $del_stm = $DBH->prepare("DELETE FROM imas_library_items WHERE qsetid=:qsetid AND libid=0");
+					$ins_stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+					$undel_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now,ownerid=:ownerid WHERE qsetid=:qsetid AND libid=:libid");
+					$del_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE qsetid=:qsetid AND libid=0");
 
 					foreach ($libarray as $qsetid) { //for each question
 						//determine which checked libraries it's not already in
-						$toadd = array_values(array_diff($newlibs,$alllibs[$qsetid]));
-						//and add them
-						foreach($toadd as $libid) {
-							if ($libid==0) { continue;} //no need to add to unassigned using "keep existing"
-							//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-							//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid));
+						if (isset($alllibs[$qsetid])) {
+							$toadd = array_values(array_diff($newlibs,$alllibs[$qsetid]));
+						} else {
+							$toadd = $newlibs;
 						}
-						if (count($toadd)>1 || (count($toadd)>0 && $toadd[0]!=0)) {
-							//DB $query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid=0";
-							//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-							$del_stm->execute(array(':qsetid'=>$qsetid));
+						if (isset($dellibs[$qsetid])) {
+							$toundel = array_values(array_intersect($newlibs,$dellibs[$qsetid]));
+						} else {
+							$toundel = array();
+						}
+						$toaddnew = array_values(array_diff($toadd, $toundel));
+						
+						$alladded = array_merge($toaddnew,$toundel);				
+						
+						foreach ($toundel as $libid) {
+							if ($libid==0) { continue;} //no need to add to unassigned using "keep existing"
+							$undel_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
+						}
+						foreach($toaddnew as $libid) {
+							if ($libid==0) { continue;} //no need to add to unassigned using "keep existing"
+							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
+						}
+						//delete unassigned library item
+						if (count($alladded)>1 || (count($alladded)>0 && $alladded[0]!=0)) {
+							$del_stm->execute(array(':qsetid'=>$qsetid, ':now'=>$now));
 						}
 					}
 				} else if ($_POST['action']==1) { //add, remove existing
@@ -295,146 +286,90 @@ if ($myrights<20) {
 					remove any excess existing
 					add to any new
 					*/
-          $ins_stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
-          $del_stm = $DBH->prepare("DELETE FROM imas_library_items WHERE libid=:libid AND qsetid=:qsetid");
-          $sel_stm = $DBH->prepare("SELECT id FROM imas_library_items WHERE qsetid=:qsetid");
-
+					$ins_stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+					$undel_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now,ownerid=:ownerid WHERE qsetid=:qsetid AND libid=:libid");
+					$del_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid=:libid AND qsetid=:qsetid");
+					$sel_stm = $DBH->prepare("SELECT id,deleted FROM imas_library_items WHERE qsetid=:qsetid AND (deleted=0 OR (libid=0 AND deleted=1)) ORDER BY deleted");
+					$unassn_undel_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now WHERE libid=0 AND qsetid=:qsetid");
+					
 					foreach ($libarray as $qsetid) { //for each question
 						//determine which checked libraries it's not already in
-						$toadd = array_diff($newlibs,$alllibs[$qsetid]);
+						if (isset($alllibs[$qsetid])) {
+							$toadd = array_values(array_diff($newlibs,$alllibs[$qsetid]));
+						} else {
+							$toadd = $newlibs;
+						}
+						if (isset($dellibs[$qsetid])) {
+							$toundel = array_values(array_intersect($toadd,$dellibs[$qsetid]));
+						} else {
+							$toundel = array();
+						}
+						$toaddnew = array_values(array_diff($toadd,$toundel));
+						//print_r($toundel);
+						//print_r($toaddnew);
+						//exit;
+						
 						//and add them
-						foreach($toadd as $libid) {
-							//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-							//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid));
+						foreach ($toundel as $libid) {
+							if ($libid==0) { continue;} //we'll handle unassigned later
+							$undel_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
+						}
+						foreach($toaddnew as $libid) {
+							if ($libid==0) { continue;} //we'll handle unassigned later
+							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 						}
 						//determine which libraries to remove from; my lib assignments - newlibs
 						if (isset($mylibs[$qsetid])) {
 							$toremove = array_diff($mylibs[$qsetid],$newlibs);
 							foreach($toremove as $libid) {
-								//DB $query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
-								//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-								$del_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid));
+								$del_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now));
 							}
 
-							//check for unassigneds
-							//DB $query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
-							//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-							//DB if (mysql_num_rows($result)==0) {
-							$sel_stm->execute(array(':qsetid'=>$qsetid));
-							if ($sel_stm->rowCount()==0) {
-								//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
-								//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-								$ins_stm->execute(array(':libid'=>0, ':qsetid'=>$qsetid, ':ownerid'=>$userid));
+							//check for unassigneds if not adding to any new libs
+							if (count($newlibs)==0) {
+								$sel_stm->execute(array(':qsetid'=>$qsetid));
+								if ($sel_stm->rowCount()==0) { //no library items exist - add unassigned
+									$ins_stm->execute(array(':libid'=>0, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
+								} else { //we have active lib item or deleted unassigned
+									if ($sel_stm->fetchColumn(1)==1) { //has no active lib items, so must have unassigned to undelete
+										$unassn_undel_stm->execute(array(':qsetid'=>$qsetid, ':now'=>$now));
+									}
+								}
 							}
 						}
 					}
-
-
-
 				} else if ($_POST['action']==2) { //remove
 					/*
 					get list of exisiting assignments
 					if not in checked list, remove
 					*/
-          $del_stm = $DBH->prepare("DELETE FROM imas_library_items WHERE libid=:libid AND qsetid=:qsetid");
-          $sel_stm = $DBH->prepare("SELECT id FROM imas_library_items WHERE qsetid=:qsetid");
-          $ins_stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
+					$del_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid=:libid AND qsetid=:qsetid");
+					$ins_stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+					$sel_stm = $DBH->prepare("SELECT id,deleted FROM imas_library_items WHERE qsetid=:qsetid AND (deleted=0 OR (libid=0 AND deleted=1)) ORDER BY deleted");
+					$unassn_undel_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now WHERE libid=0 AND qsetid=:qsetid");
 
 					foreach ($libarray as $qsetid) { //for each question
 						//determine which libraries to remove from; my lib assignments - newlibs
 						if (isset($mylibs[$qsetid])) {
 							$toremove = array_diff($mylibs[$qsetid],$newlibs);
 							foreach($toremove as $libid) {
-								//DB $query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
-								//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-								$del_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid));
+								$del_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now));
 							}
 							//check for unassigneds
-							//DB $query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
-							//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-							//DB if (mysql_num_rows($result)==0) {
-							$sel_stm->execute(array(':qsetid'=>$qsetid));
-							if ($sel_stm->rowCount()==0) {
-								//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
-								//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-								$ins_stm->execute(array(':libid'=>0, ':qsetid'=>$qsetid, ':ownerid'=>$userid));
+							if (count($newlibs)==0) {
+								$sel_stm->execute(array(':qsetid'=>$qsetid));
+								if ($sel_stm->rowCount()==0) { //no library items exist - add unassigned
+									$ins_stm->execute(array(':libid'=>0, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
+								} else { //we have active lib item or deleted unassigned
+									if ($sel_stm->fetchColumn(1)==1) { //has no active lib items, so must have unassigned to undeleted
+										$unassn_undel_stm->execute(array(':qsetid'=>$qsetid, ':now'=>$now));
+									}
+								}
 							}
 						}
 					}
 
 				}
-/*
-				if ($_POST['onlyadd']==1) { //only adding to newly check libs
-					$query = "SELECT libid FROM imas_library_items WHERE qsetid IN ($chglist)";
-					$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-					while ($row = mysql_fetch_row($result)) {
-						$checked[] = $row[0];
-					}
-
-					$toadd = array_values(array_diff($newlibs,$checked));
-					if (count($toadd)>0) {
-						foreach ($libarray as $qsetid) {
-							foreach($toadd as $libid) {
-								$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-								mysql_query($query) or die("Query failed :$query " . mysql_error());
-							}
-						}
-					}
-
-				} //making changes
-				foreach ($libarray as $qsetid) {
-					if ($isgrpadmin) {
-						$query = "SELECT imas_library_items.libid FROM imas_library_items,imas_users WHERE ";
-						$query .= "imas_library_items.ownerid=imas_users.id AND imas_users.groupid='$groupid' ";
-						$query .= "AND imas_library_items.qsetid='$qsetid'";
-					} else {
-						$query = "SELECT libid FROM imas_library_items WHERE qsetid='$qsetid'";
-						if (!$isadmin) {
-							$query .= " AND (ownerid='$userid' OR libid=0)";
-						}
-					}
-					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-					$existing = array();
-					while($row = mysql_fetch_row($result)) {
-						$existing[] = $row[0];
-					}
-					if ($_POST['onlyadd']==1) { //don't do per question adding here; already did new check adds
-						$toadd = array();
-					} else {
-						$toadd = array_values(array_diff($newlibs,$existing));
-					}
-					$toremove = array_values(array_diff($existing,$newlibs));
-
-					while(count($toremove)>0 && count($toadd)>0) {
-						$tochange = array_shift($toremove);
-						$torep = array_shift($toadd);
-						$query = "UPDATE imas_library_items SET libid='$torep' WHERE qsetid='$qsetid' AND libid='$tochange'";
-						mysql_query($query) or die("Query failed :$query " . mysql_error());
-					}
-					if (count($toadd)>0) {
-						foreach($toadd as $libid) {
-							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());
-						}
-					} else if (count($toremove)>0) {
-						foreach($toremove as $libid) {
-							$query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());
-						}
-					}
-					//if (count($newlibs)==0) {
-						$query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
-						$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-						if (mysql_num_rows($result)==0) {
-							$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
-							mysql_query($query) or die("Query failed :$query " . mysql_error());
-						}
-					//}
-
-				}
-*/
-
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
 
@@ -454,45 +389,17 @@ if ($myrights<20) {
 				//DB $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist)";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->query("SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist)");
+				$stm = $DBH->query("SELECT DISTINCT ili.libid FROM imas_library_items AS ili WHERE ili.qsetid IN ($clist) AND deleted=0");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$checked[] = $row[0];
 				}
 				$_GET['selectrights'] = 1;
 			}
-			/*
-			if (!$isadmin && !$isgrpadmin) {
-				$query = "SELECT libid FROM imas_library_items WHERE qsetid IN ($clist) AND ownerid!='$userid'";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$locked[] = $row[0];
-				}
-			} else if ($isgrpadmin) {
-				$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ";
-				$query .= "ili.ownerid=imas_users.id AND imas_users.groupid!='$groupid' AND ili.qsetid IN ($clist)";
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$locked[] = $row[0];
-				}
-			}
-			*/
-
-			/*if ($isgrpadmin) {
-				$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ";
-				$query .= "ili.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ili.qsetid IN ($clist)";
-			} else {
-				$query = "SELECT libid FROM imas_library_items WHERE qsetid IN ($clist)";
-				if (!$isadmin) {
-					$query .= " AND ownerid='$userid'";
-				}
-			}
-			*/
-
-
 		}
 
 
-	} else if (isset($_POST['template'])) {
+	}
+	/* else if (isset($_POST['template'])) {
 		if (isset($_POST['qtochg'])) {
 			if (!isset($_POST['libs'])) {
 				$overwriteBody = 1;
@@ -580,7 +487,8 @@ if ($myrights<20) {
 			}
 		}
 
-	} else if (isset($_POST['license'])) {
+	}*/
+	else if (isset($_POST['license'])) {
 		if (isset($_POST['qtochg'])) {
 			$qtochg = implode(',', array_map('intval', explode(',',$_POST['qtochg'])));
 			if ($_POST['sellicense']!=-1) {
@@ -703,12 +611,6 @@ if ($myrights<20) {
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
 			}
 		}
-	} else if (isset($_GET['remove'])) {
-		//postback handled by $_POST['remove'] block
-		$pagetitle = "Confirm Delete";
-		$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
-		$curBreadcrumb .= " &gt; Confirm Delete";
-		
 	} else if (isset($_GET['transfer'])) {
 		
 		//postback handled by $_POST['transfer'] block
@@ -873,7 +775,7 @@ if ($myrights<20) {
 		}
 
 		//DB $llist = "'".implode("','",explode(',',$searchlibs))."'";
-    $llist = implode(',', array_map('intval', explode(',',$searchlibs)));
+		$llist = implode(',', array_map('intval', explode(',',$searchlibs)));
 
 		$libsortorder = array();
 		if (substr($searchlibs,0,1)=="0") {
@@ -906,7 +808,7 @@ if ($myrights<20) {
 		//DB $query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
 		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
-		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
+		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND imas_library_items.deleted=0 AND $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 
 		if ($isadmin) {
@@ -916,33 +818,33 @@ if ($myrights<20) {
 		} else if ($isgrpadmin) {
 			//DB $query .= "AND (imas_users.groupid='$groupid' OR imas_questionset.userights>0) ";
 			//DB $query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid='$groupid')";
-      $query .= "AND (imas_users.groupid=? OR imas_questionset.userights>0) ";
-      $qarr[] = $groupid;
-      $query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=?)";
-      $qarr[] = $groupid;
+			$query .= "AND (imas_users.groupid=? OR imas_questionset.userights>0) ";
+			$qarr[] = $groupid;
+			$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=?)";
+			$qarr[] = $groupid;
 		} else {
 			//DB $query .= "AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) ";
 			//DB $query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid')";
-      $query .= "AND (imas_questionset.ownerid=? OR imas_questionset.userights>0) ";
-      $qarr[] = $userid;
+			$query .= "AND (imas_questionset.ownerid=? OR imas_questionset.userights>0) ";
+			$qarr[] = $userid;
 			$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?)";
-      $qarr[] = $userid;
+			$qarr[] = $userid;
 		}
-    if ($searchall==0) {
-      $query .= " AND imas_library_items.libid IN ($llist)";
-    }
-    if ($searchmine==1) {
-      //DB $query .= " AND imas_questionset.ownerid='$userid'";
-      $query .= " AND imas_questionset.ownerid=?";
-      $qarr[] = $userid;
-    }
+		if ($searchall==0) {
+			$query .= " AND imas_library_items.libid IN ($llist)";
+		}
+		if ($searchmine==1) {
+			//DB $query .= " AND imas_questionset.ownerid='$userid'";
+			$query .= " AND imas_questionset.ownerid=?";
+			$qarr[] = $userid;
+		}
 		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id ";
 		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist{0}=='0')) {
 			$query .= " LIMIT 300";
 		}
 		//DB $resultLibs = mysql_query($query) or die("Query failed : " . mysql_error
-    $resultLibs = $DBH->prepare($query);
-    $resultLibs->execute($qarr);
+		$resultLibs = $DBH->prepare($query);
+		$resultLibs->execute($qarr);
 		//DB $searchlimited = (mysql_num_rows($resultLibs)==300);
 		$searchlimited = ($resultLibs->rowCount()==300);
 		$page_questionTable = array();
@@ -1152,7 +1054,7 @@ function getnextprev(formn,loc) {
 	<div id="headermanageqset" class="pagetitle"><h2><?php echo $pagetitle; echo $helpicon; ?></h2></div>
 
 <?php
-	if (isset($_POST['remove'])) {
+	if (isset($_POST['remove']) || isset($_GET['remove'])) {
 ?>
 		Are you SURE you want to delete these questions from the Question Set.  This will make them unavailable
 		to all users.  If any are currently being used in an assessment, it will mess up that assessment.
@@ -1164,7 +1066,7 @@ function getnextprev(formn,loc) {
 			</p>
 		</form>
 <?php
-	} else if (isset($_POST['transfer'])) {
+	} else if (isset($_POST['transfer']) || isset($_GET['transfer'])) {
 ?>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 			<input type=hidden name=transfer value="<?php echo $tlist ?>">
@@ -1388,7 +1290,7 @@ function getnextprev(formn,loc) {
 			echo "<br/>(Delete and Transfer only apply to group's questions)\n";
 		}
 		echo "<table id=myTable class=gb><thead>\n";
-		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>&nbsp;</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
+		echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
 		if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
 		if ($searchall==1) {
 			echo "<th>Library</th>";
@@ -1415,6 +1317,7 @@ function getnextprev(formn,loc) {
 				echo '<td class="nowrap"><div';
 				if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}
 				echo '>'.$page_questionTable[$qid]['extref'].'</div></td>';
+				echo '<td>'.$qid.'</td>';
 				echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
@@ -1438,9 +1341,7 @@ function getnextprev(formn,loc) {
 		}
 		echo "</tbody></table>\n";
 		echo "<script type=\"text/javascript\">\n";
-		echo "initSortTable('myTable',Array(false,'S',false,false,false,'S','N','D'";
-		echo ",'S',false";
-		echo "),true);\n";
+		echo "initSortTable('myTable',Array(false,'S',false,'N',false,false,'S','N','D','S',false),true);\n";
 		echo "</script>\n";
 		echo "</form>\n";
 		echo "<p></p>\n";
@@ -1455,8 +1356,8 @@ function delqimgs($qsid) {
 	//DB $query = "SELECT id,filename,var FROM imas_qimages WHERE qsetid='$qsid'";
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-  $del_stm = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
-  $stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
+	$del_stm = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
+	$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
 
 	$stm = $DBH->prepare("SELECT id,filename,var FROM imas_qimages WHERE qsetid=:qsetid");
 	$stm->execute(array(':qsetid'=>$qsid));
@@ -1464,9 +1365,11 @@ function delqimgs($qsid) {
 		//DB $query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
 		//DB $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		//DB if (mysql_num_rows($r2)==1) {
-		$stm2->execute(array(':filename'=>$row[1]));
-		if ($stm2->rowCount()==1) {
-			unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+		if (substr($row[1],0,4)!='http') {
+			$stm2->execute(array(':filename'=>$row[1]));
+			if ($stm2->rowCount()==1) {
+				unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+			}
 		}
 		//DB $query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
 		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());

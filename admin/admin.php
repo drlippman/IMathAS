@@ -328,19 +328,15 @@ $placeinhead .= '</script>';
 	<div class=cp>
 	<span class=column>
 	<a href="../course/manageqset.php?cid=admin">Manage Question Set</a><BR>
-	<a href="export.php?cid=admin">Export Question Set</a><BR>
-	<a href="import.php?cid=admin">Import Question Set</a><BR>
-	</span>
-	<span class=column>
-	<a href="../course/managelibs.php?cid=admin">Manage Libraries</a><br>
+	<a href="../course/managelibs.php?cid=admin">Manage Libraries</a><br/>
 	<a href="exportlib.php?cid=admin">Export Libraries</a><BR>
-	<a href="importlib.php?cid=admin">Import Libraries</a></span>
+	</span>
 <?php
-		if ($myrights == 100) {
+	if ($myrights == 100) {
 ?>
 	<span class=column>
 	<a href="forms.php?action=listgroups">Edit Groups</a><br/>
-	<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
+	<a href="importlib.php?cid=admin">Import Libraries</a><br/>
 	<a href="importstu.php?cid=admin">Import Students from File</a>
 	</span>
 	<?php if ($allowmacroinstall) {
@@ -354,7 +350,10 @@ $placeinhead .= '</script>';
 	if ($enablebasiclti) {
 		echo "<a href=\"forms.php?action=listltidomaincred\">LTI Provider Creds</a><br/>\n";
 	}
+	echo "<a href=\"forms.php?action=listfedpeers\">Federation Peers</a><br/>\n";
 	echo "<a href=\"externaltools.php?cid=admin\">External Tools</a><br/>\n";
+	echo '</span>';
+	echo '<span class="column">';
 	echo "<a href=\"../util/utils.php\">Admin Utilities</a><br/>\n";
 	echo '</span>';
 

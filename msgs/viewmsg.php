@@ -96,7 +96,12 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	//DB if (mysql_num_rows($result)==0) {
 	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg,imas_students.section ";
-	$query .= "FROM imas_msgs JOIN imas_users ON imas_msgs.msgfrom=imas_users.id LEFT JOIN imas_students ON imas_students.userid=imas_users.id AND imas_students.courseid=:courseid ";
+	if ($type=='sent') {
+		$query .= "FROM imas_msgs JOIN imas_users ON imas_msgs.msgto=imas_users.id ";
+	} else {
+		$query .= "FROM imas_msgs JOIN imas_users ON imas_msgs.msgfrom=imas_users.id ";
+	}
+	$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_users.id AND imas_students.courseid=:courseid ";
 	$query .= "WHERE imas_msgs.id=:id ";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= "AND (imas_msgs.msgto=:msgto OR imas_msgs.msgfrom=:msgfrom)";
@@ -127,7 +132,12 @@
 		}
 	}
 	echo "<table class=gb ><tbody>";
-	printf("<tr><td><b>From:</b></td><td>%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),
+	if ($type=='sent') {
+		echo '<tr><td><b>'._('To').':</b></td>';
+	} else {
+		echo '<tr><td><b>'._('From').':</b></td>';
+	}
+	printf("<td>%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),
 		Sanitize::encodeStringForDisplay($line['FirstName']));
 	if ($line['section']!='') {
 		echo ' <span class="small">(Section: '.$line['section'].')</span>';

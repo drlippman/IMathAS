@@ -157,6 +157,18 @@ class Sanitize
 	}
 
 	/**
+	 * Encodes all characters except -_.~/ with %hex
+	 * Equivalent to rawurlencode, except it doesn't encode /
+	 *
+	 * @param $string string The path to sanitize.
+	 * @return string The sanitized string.
+	 */
+	public static function rawurlencodePath($string)
+	{
+		return implode("/", array_map("rawurlencode", explode("/", $string)));
+	}
+
+	/**
 	 * Sanitize a full URL string. This should include the protocol (http/https), port, path,
 	 * and any query parameters.
 	 *
@@ -194,7 +206,11 @@ class Sanitize
 	 */
 	public static function stripHtmlTags($string)
 	{
-		return filter_var($string, FILTER_SANITIZE_STRING);
+		//changed to strip_tags since FILTER_SANITIZE_STRING removes
+		//anything following a < symbol, which is overkill
+		
+		//return filter_var($string, FILTER_SANITIZE_STRING);
+		return strip_tags($string);
 	}
 
 	/**

@@ -777,7 +777,56 @@ switch($_GET['action']) {
 		echo "<input type=submit value=\"Update LTI Credentials\">\n";
 		echo "</form>\n";
 		break;
+		
+	case "listfedpeers":
+		if ($myrights<100) { echo "not allowed"; exit;}
+		echo '<div id="headerforms" class="pagetitle">';
+		echo "<h3>View Federation Peers</h3>\n";
+		echo '</div>';
+		echo "<table><tr><th>Name</th><th>Description</th><th>Their Last Pull</th><th>Our Last Pull</th><th>Modify</th><th>Delete</th></tr>\n";
 
+		$query = "SELECT ifp.id,ifp.peername,ifp.peerdescription,ifp.lastpull,max(pulls.pulltime) as uspull FROM imas_federation_peers AS ifp ";
+		$query .= "LEFT JOIN imas_federation_pulls AS pulls ON ifp.id=pulls.peerid GROUP BY pulls.peerid";
+		$stm = $DBH->query($query);
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			echo "<tr><td>{$row['peername']}</td><td>{$row['peerdescription']}</td>";
+			echo '<td>'.($row['lastpull']>0?tzdate("n/j/y", $row['lastpull']):'Never').'</td>';
+			echo '<td>'.($row['uspull']===null?'Never':tzdate("n/j/y", $row['uspull'])).'</td>';
+			echo "<td><a href=\"forms.php?action=modfedpeers&id={$row['id']}\">Modify</a></td>\n";
+			echo "<td><a href=\"actions.php?action=delfedpeers&id={$row['id']}\" onclick=\"return confirm('Are you sure?');\">Delete</a></td>\n";
+			echo "</tr>\n";
+		}
+		echo "</table>\n";
+		echo "<form method=post action=\"actions.php?action=modfedpeers&id=new\">\n";
+		echo "<p>Add new federation peer: <br/>";
+		echo "Install Name: <input type=text name=\"peername\" size=20><br/>\n";
+		echo "Description: <input type=text name=\"peerdescription\" size=50><br/>\n";
+		echo "Root URL: <input type=text name=\"url\" size=50><br/>\n";
+		echo "Secret: <input type=text name=\"secret\" size=20><br/>\n";
+		echo "<input type=submit value=\"Add Federation Peer\"></p>\n";
+		echo "</form>\n";
+		break;
+	case "modfedpeers":
+		if ($myrights<100) { echo "not allowed"; exit;}
+		echo '<div id="headerforms" class="pagetitle">';
+		echo "<h3>Modify Federation Peer</h3>\n";
+		echo '</div>';
+		//DB $query = "SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT id,peername,peerdescription,url,secret,lastpull FROM imas_federation_peers WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$row = $stm->fetch(PDO::FETCH_ASSOC);
+		echo "<form method=post action=\"actions.php?action=modfedpeers&id={$row['id']}\">\n";
+		echo "Modify federation peer: <br/>";
+		echo "Install Name: <input type=text name=\"peername\" value=\"{$row['peername']}\" size=20><br/>\n";
+		echo "Description: <input type=text name=\"peerdescription\" value=\"{$row['peerdescription']}\" size=50><br/>\n";
+		echo "Root URL: <input type=text name=\"url\" value=\"{$row['url']}\" size=50><br/>\n";
+		echo "Secret: <input type=text name=\"secret\"  value=\"{$row['secret']}\" size=20><br/>\n";
+		echo "<input type=submit value=\"Update Federation Peer\">\n";
+		echo "</form>\n";
+		break;
+		
 	case "listgroups":
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Modify Groups</h3>\n";

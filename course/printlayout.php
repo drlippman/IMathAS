@@ -7,6 +7,7 @@ require("../init.php");
 
 
 
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
@@ -114,7 +115,7 @@ if ($overwriteBody==1) {
 		$qn[$row[0]] = $row[2];
 		if ($row[3]!==null && $row[3]!='') {
 			$fixedseeds[$row[0]] = explode(',',$row[3]);
-		}
+	}
 	}
 
 
@@ -278,9 +279,9 @@ if ($overwriteBody==1) {
 					}
 					$seeds[] = $fixedseeds[$questions[$i]][($x+$j)%$n];
 				} else {
-					$seeds[] = rand(1,9999);
-				}
+				$seeds[] = rand(1,9999);
 			}
+		}
 		}
 
 		$headerleft = '';
@@ -425,7 +426,7 @@ if ($overwriteBody==1) {
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts) {
-	global $DBH,$RND,$isfinal,$imasroot;
+	global $DBH,$RND,$isfinal,$imasroot,$urlmode;
 	$RND->srand($seed);
 
 	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
@@ -442,7 +443,13 @@ function printq($qn,$qsetid,$seed,$pts) {
 		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 		$stm->execute(array(':qsetid'=>$qsetid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";
+			if (substr($row[1],0,4)=='http') {
+				${$row[0]} = "<img src=\"{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			} else if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			} else {
+				${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			}
 		}
 	}
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
