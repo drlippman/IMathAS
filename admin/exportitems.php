@@ -296,29 +296,31 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					echo "$setting=".$line[$setting]."\n";
 				}
 				echo "QUESTIONS\n";
-				unset($newqorder);
-				$qs = explode(',',$line['itemorder']);
-				foreach ($qs as $q) {
-					if (strpos($q,'~')===FALSE) {
-						$qtoexport[$qcnt] = $q;
-						$newqorder[] = $qcnt;
-						$qcnt++;
-					} else {
-						unset($newsub);
-						$subs = explode('~',$q);
-						if (strpos($subs[0],'|')!==false) {
-							$newsub[] = $subs[0];
-							array_shift($subs);
-						}
-						foreach($subs as $subq) {
-							$qtoexport[$qcnt] = $subq;
-							$newsub[] = $qcnt;
+				if (trim($line['itemorder'])!='') {
+					unset($newqorder);
+					$qs = explode(',',$line['itemorder']);
+					foreach ($qs as $q) {
+						if (strpos($q,'~')===FALSE) {
+							$qtoexport[$qcnt] = $q;
+							$newqorder[] = $qcnt;
 							$qcnt++;
+						} else {
+							unset($newsub);
+							$subs = explode('~',$q);
+							if (strpos($subs[0],'|')!==false) {
+								$newsub[] = $subs[0];
+								array_shift($subs);
+							}
+							foreach($subs as $subq) {
+								$qtoexport[$qcnt] = $subq;
+								$newsub[] = $qcnt;
+								$qcnt++;
+							}
+							$newqorder[] = implode('~',$newsub);
 						}
-						$newqorder[] = implode('~',$newsub);
 					}
+					echo implode(',',$newqorder) . "\n";
 				}
-				echo implode(',',$newqorder) . "\n";
 				echo "END ITEM\n";
 				break;
 		} //end item switch
