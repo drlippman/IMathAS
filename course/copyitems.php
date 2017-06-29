@@ -538,7 +538,7 @@ if (!(isset($teacherid))) {
 			//DB $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
 			//DB $courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
+			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,it.userid,ic.name";
 			$courseGroupResults = $DBH->prepare($query);
 			$courseGroupResults->execute(array(':groupid'=>$groupid, ':userid'=>$userid));
 
@@ -561,7 +561,7 @@ if (!(isset($teacherid))) {
 			//DB $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
 			//DB $courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
-			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
+			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 			$courseTreeResult = $DBH->prepare($query);
 			$courseTreeResult->execute(array(':groupid'=>$groupid, ':userid'=>$userid));
 			$lastteacher = 0;
