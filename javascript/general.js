@@ -329,7 +329,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		plugins: [
 			"lists advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor",
-			"media table paste asciimath asciisvg rollups"
+			"media table paste asciimath asciisvg rollups colorpicker"
 		],
 		menubar: false,//"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code | saveclose",
