@@ -89,10 +89,16 @@ class SessionDBHandler implements SessionHandlerInterface
 	 */
 	public function write($sessionId, $sessionData)
 	{
-		$stm = $this->db->prepare('REPLACE INTO php_sessions VALUES (:sessionId, :lastAccessTime, :sessionData)');
+		//$stm = $this->db->prepare('REPLACE INTO php_sessions VALUES (:sessionId, :lastAccessTime, :sessionData)');
+		$query = 'INSERT INTO php_sessions (id,access,data) VALUES (:sessionId, :lastAccessTime, :sessionData) ';
+		$query .= 'ON DUPLICATE KEY UPDATE access=:lastAccessTime2,data=:sessionData2';
+		$stm = $this->db->prepare($query);
+
 		$stm->bindParam(':sessionId', $sessionId);
 		$stm->bindValue(':lastAccessTime', time());
 		$stm->bindParam(':sessionData', $sessionData);
+		$stm->bindValue(':lastAccessTime2', time());
+		$stm->bindParam(':sessionData2', $sessionData);
 
 		if ($stm->execute()) {
 			return true;
