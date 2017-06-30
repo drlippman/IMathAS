@@ -433,7 +433,7 @@
 		if ($_POST['libs']=='') {
 			$newlibs = array();
 		}
-		
+
 		$allcurrentlibs = array();
 		$alldeletedlibs = array();
 		//$query = "SELECT ili.libid,ili.deleted FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
@@ -458,9 +458,13 @@
 				$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$qsetid));
 			} else {
 				//unassigned, or owner and lib not closed or mine
-				$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
-				$query .= "(ili.libid=il.id OR ili.libid=0) AND il.deleted=0 WHERE ili.qsetid=:qsetid AND ili.deleted=0 ";
-				$query .= " AND ((ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)) OR ili.libid=0)";
+				$query = "SELECT ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
+				$query .= "ili.libid=il.id AND il.deleted=0 WHERE ili.qsetid=:qsetid AND ili.deleted=0 AND ";
+				$query .= "(ili.libid=0 OR (ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)))";
+
+				//$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
+				//$query .= "(ili.libid=il.id OR ili.libid=0) AND il.deleted=0 WHERE ili.qsetid=:qsetid AND ili.deleted=0 ";
+				//$query .= " AND ((ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)) OR ili.libid=0)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':qsetid'=>$qsetid, ':ownerid'=>$userid, ':ownerid2'=>$userid));
 			}
@@ -471,20 +475,22 @@
 				$haverightslibs[] = $row[0];
 			}
 		}
-		
+
 		//remove any that we have the rights to but are not in newlibs
 		$toremove = array_values(array_diff($haverightslibs,$newlibs));
 		//undelete any libs that are new and in deleted libs
 		$toundelete = array_values(array_intersect($newlibs,$alldeletedlibs));
 		//add any new librarys that are not current and aren't being undeleted
 		$toadd = array_values(array_diff($newlibs,$allcurrentlibs,$toundelete));
-		
+
 		//no selected libs, we're removing all current libs (or none of either)
-		// nothing to undelete, nothing to add.  
+		// nothing to undelete, nothing to add.
 		// Create unassigned
 		if (count($newlibs)==0 && count($toremove)==count($allcurrentlibs) && count($toundelete)==0 && count($toadd)==0) {
 			if (in_array(0, $alldeletedlibs)) {  //have unassigned to undelete
 				$toundelete[] = 0;
+			} else if (count($toremove)==1 && $toremove[0]==0) { //already have an unassigned - don't delete it
+				array_shift($toremove);
 			} else { //create new unassigned
 				$toadd[] = 0;
 			}
@@ -502,14 +508,14 @@
 				$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
 				$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 			}
-		} 
+		}
 		if (count($toremove)>0) {
 			foreach($toremove as $libid) {
 				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid=:libid AND qsetid=:qsetid");
 				$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now));
 			}
 		}
-		
+
 		if (!isset($_GET['aid'])) {
 			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 		} else {
