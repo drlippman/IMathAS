@@ -231,10 +231,11 @@ if (isset($_GET['form'])) {
 		echo '<p>Debug Mode Enabled - Error reporting is now turned on.</p>';
 	}
 	echo '<a href="utils.php?form=lookup">User lookup</a><br/>';
+	echo '<a href="'.$imasroot.'/admin/approvepending.php">Approve Pending Instructor Accounts</a><br/>';
 	echo '<a href="utils.php?form=jumptoitem">Jump to Item</a><br/>';
+	echo '<a href="batchcreateinstr.php">Batch create Instructor Accounts</a><br/>';
 	echo '<a href="getstucnt.php">Get Student Count</a><br/>';
 	echo '<a href="getstucntdet.php">Get Detailed Student Count</a><br/>';
-	echo '<a href="'.$imasroot.'/admin/approvepending.php">Approve Pending Instructor Accounts</a><br/>';
 	echo '<a href="utils.php?debug=true">Enable Debug Mode</a><br/>';
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';
 	echo '<a href="replaceurls.php">Replace URLS</a><br/>';
