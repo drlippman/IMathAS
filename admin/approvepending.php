@@ -105,7 +105,27 @@ if ($stm->rowCount()==0) {
 			echo '<p><a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row[3].' '.$row[2].' '.$matches[1]).'">Search</a></p>';
 		}
 	}
+	$havesuggestion = false;
 	$breakdist = min(5,.5*strlen($school));
+	if (strlen($school)<4) {$breakdist = .5;}
+	$emailparts = explode('@',$row[4]);
+	$emailgroupsuggestions = array();
+	if (preg_match('/(edu|us)$/', $emailparts[1])) {
+		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE rights>19 AND email LIKE :domain");
+		$stm->execute(array(':domain'=>'%@'.$emailparts[1]));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			if (isset($emailgroupsuggestions[$row[0]])) {
+				$emailgroupsuggestions[$row[0]]++;
+			} else {
+				$emailgroupsuggestions[$row[0]] = 1;
+			}
+		}
+		if (count($emailgroupsuggestions)>0) {
+			arsort($emailgroupsuggestions);
+			$havesuggestion = true;
+		}
+	}
+
 
 	echo '<p>Group: <select name="group"><option value="-1">New Group</option>';
 	//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
@@ -116,8 +136,11 @@ if ($stm->rowCount()==0) {
 	$groups = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$opts .= '<option value="'.$row[0].'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
-		if ($school!='') {
+		if ($school!='' && !$havesuggestion) {
 			$groups[] = array(levenshtein($school,normalizeGroup($row[1])), $row[0], $row[1]);
+		}
+		if (isset($emailgroupsuggestions[$row[0]])) {
+			$emailgroupsuggestions[$row[0]] = $row[1];
 		}
 	}
 	if ($school!='') {
@@ -129,11 +152,20 @@ if ($stm->rowCount()==0) {
 			}
 		});
 	}
-	if ($school != '' && $groups[0][0]<$breakdist) {
+	if (($school != '' && $groups[0][0]<$breakdist) || $havesuggestion) {
 		echo '<optgroup label="Suggestions">';
-		foreach ($groups as $group) {
-			if ($group[0]>=$breakdist) {break;}
-			echo '<option value="'.$group[1].'">'.Sanitize::encodeStringForDisplay($group[2]).'</option>';
+		$first = true;
+		if ($havesuggestion) {
+			foreach ($emailgroupsuggestions as $g=>$n) {
+				echo '<option value="'.$g.'"'.($first?' selected':'').'>'.Sanitize::encodeStringForDisplay($n).'</option>';
+				$first = false;
+			}
+		} else {
+			foreach ($groups as $group) {
+				if ($group[0]>=$breakdist) {break;}
+				echo '<option value="'.$group[1].'"'.($first&&$group[0]<3?' selected':'').'>'.Sanitize::encodeStringForDisplay($group[2]).'</option>';
+				$first = false;
+			}
 		}
 		echo '</optgroup>';
 		echo '<optgroup label="Others">';
