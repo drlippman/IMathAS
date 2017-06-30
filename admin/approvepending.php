@@ -97,23 +97,63 @@ if ($stm->rowCount()==0) {
 	echo '<input type="hidden" name="id" value="'.Sanitize::encodeStringForDisplay($row[0]).'"/>';
 	echo '<p>Username: '.Sanitize::encodeStringForDisplay($row[1]).'<br/>Name: '.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[3]).' ('.Sanitize::encodeStringForDisplay($row[4]).')</p>';
 	echo '<p>Request made: '.$reqdate.'</p>';
+	$school = '';
 	if ($details != '') {
 		echo "<p>$details</p>";
 		if (preg_match('/School:(.*?)<br/',$details,$matches)) {
+			$school = normalizeGroup($matches[1]);
 			echo '<p><a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row[3].' '.$row[2].' '.$matches[1]).'">Search</a></p>';
 		}
 	}
+	$breakdist = min(5,.5*strlen($school));
+
 	echo '<p>Group: <select name="group"><option value="-1">New Group</option>';
 	//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
+	$opts = '';
+	$groups = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo '<option value="'.$row[0].'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
+		$opts .= '<option value="'.$row[0].'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
+		if ($school!='') {
+			$groups[] = array(levenshtein($school,normalizeGroup($row[1])), $row[0], $row[1]);
+		}
 	}
+	if ($school!='') {
+		usort($groups, function($a,$b) {
+			if ($a[0]==$b[0]) {
+				return strcmp($a[2],$b[2]);
+			} else {
+				return ($a[0]<$b[0])?-1:1;
+			}
+		});
+	}
+	if ($school != '' && $groups[0][0]<$breakdist) {
+		echo '<optgroup label="Suggestions">';
+		foreach ($groups as $group) {
+			if ($group[0]>=$breakdist) {break;}
+			echo '<option value="'.$group[1].'">'.Sanitize::encodeStringForDisplay($group[2]).'</option>';
+		}
+		echo '</optgroup>';
+		echo '<optgroup label="Others">';
+		echo $opts;
+		echo '</optgroup>';
+	} else {
+		echo $opts;
+	}
+
 	echo '</select> New group: <input type="text" name="newgroup" size="20" /></p>';
 	echo '<p><input type="submit" name="approve" value="Approve" /> <input type="submit" name="deny" value="Deny" /> <input type="submit" name="skip" value="Skip" /></p>';
 	echo '</form>';
 }
 require("../footer.php");
+
+function normalizeGroup($g) {
+	$g = preg_replace("/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.)\b/","",strtolower($g));
+	$g = preg_replace('/\bmt(\.|\b)/','mount',$g);
+	$g = preg_replace('/\bst(\.|\b)/','saint',$g);
+	$g = trim($g);
+	return $g;
+}
 ?>
