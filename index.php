@@ -408,6 +408,9 @@ if (isset($CFG['GEN']['hometitle'])) {
 	echo _('Welcome to'), " $installname, " . Sanitize::encodeStringForDisplay($userfullname);
 }
 echo '</h2>';
+if (isset($sessiondata['emulateuseroriginaluser'])) {
+	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
+}
 if ($myrights==100 && count($brokencnt)>0) {
 	echo '<span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
 }

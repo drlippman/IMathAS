@@ -409,7 +409,7 @@ $placeinhead .= '</script>';
 	<div class=item>
 		<table class=gb width="90%" id="myTable">
 		<thead>
-			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Password</th><th>Delete</th></tr>
+			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Delete</th></tr>
 		</thead>
 		<tbody>
 <?php
@@ -422,7 +422,6 @@ $placeinhead .= '</script>';
 				<td><?php echo $page_userDataType[$i] ?></td>
 				<td><?php echo $page_userDataLastAccess[$i] ?></td>
 				<td class=c><a href="forms.php?action=chgrights&id=<?php echo $page_userDataId[$i] ?>">Change</a></td>
-				<td class=c><a href="actions.php?action=resetpwd&id=<?php echo $page_userDataId[$i] ?>">Reset</a></td>
 				<td class=c><a href="forms.php?action=deladmin&id=<?php echo $page_userDataId[$i] ?>">Delete</a></td>
 			</tr>
 <?php

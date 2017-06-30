@@ -25,6 +25,14 @@ switch($_POST['action']) {
 		if ($myrights < 100 && $_POST['newrights']>75) {echo "You don't have the authority for this action"; break;}
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 
+		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+		$stm->execute(array(':SID'=>$_POST['adminname']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
+		$chgSID = true;
+		if ($row != null) {
+			$chgSID = false;
+		}
+
 		$specialrights = 0;
 		if (isset($_POST['specialrights1'])) {
 			$specialrights += 1;
@@ -38,17 +46,51 @@ switch($_POST['action']) {
 		if (isset($_POST['specialrights8'])) {
 			$specialrights += 8;
 		}
+		if (isset($CFG['GEN']['newpasswords'])) {
+			$hashpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+		} else {
+			$hashpw = md5($_POST['password']);
+		}
+
+		$arr = array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'], ':groupid'=>$groupid,
+				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+				':email'=>Sanitize::stripHtmlTags($_POST['email']));
+		if ($chgSID) {
+			$arr[':SID'] = Sanitize::stripHtmlTags($_POST['SID']);
+		}
+		if (isset($_POST['doresetpw'])) {
+			$arr[':password'] = $hashpw;
+		}
 
 		if ($myrights == 100) { //update library groupids
-			$stm = $DBH->prepare("UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid WHERE id=:id");
-			$stm->execute(array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':groupid'=>$_POST['group'], ':id'=>$_GET['id']));
+			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid,FirstName=:FirstName,LastName=:LastName,email=:email";
+			if ($chgSID) {
+				$query .= ',SID=:SID';
+			}
+			if (isset($_POST['doresetpw'])) {
+				$query .= ',password=:password';
+			}
+			$query .= " WHERE id=:id";
+			$stm = $DBH->prepare($query);
+			$stm->execute($arr);
 			$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=:groupid WHERE ownerid=:ownerid");
 			$stm->execute(array(':groupid'=>$_POST['group'], ':ownerid'=>$_GET['id']));
 		} else {
-			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights";
+			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,FirstName=:FirstName,LastName=:LastName,email=:email";
+			if ($chgSID) {
+				$query .= ',SID=:SID';
+			}
+			if (isset($_POST['doresetpw'])) {
+				$query .= ',password=:password';
+			}
 			$query .= " WHERE id=:id AND groupid=:groupid AND rights<100";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'], ':groupid'=>$groupid));
+			$stm->execute($arr);
+		}
+		if ($chgSID==false && $row[0]!=$_GET['id']) {
+			echo "Username in use - left unchanged";
+			exit;
 		}
 		break;
 	case "resetpwd":
@@ -1029,12 +1071,12 @@ switch($_POST['action']) {
 			$query = "INSERT INTO imas_federation_peers (peername,peerdescription,secret,url,lastpull) VALUES ";
 			$query .= "(:peername, :peerdescription, :secret, :url, 0)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'], 
+			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'],
 				':secret'=>$_POST['secret'], ':url'=>$_POST['url']));
 		} else {
 			$query = "UPDATE imas_federation_peers SET peername=:peername,peerdescription=:peerdescription,secret=:secret,url=:url WHERE id=:id";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'], 
+			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'],
 				':secret'=>$_POST['secret'], ':url'=>$_POST['url'], ':id'=>$_GET['id']));
 		}
 		break;

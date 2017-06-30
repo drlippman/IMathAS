@@ -1,6 +1,14 @@
 <?php
 
 require("../init.php");
+if (isset($sessiondata['emulateuseroriginaluser']) && isset($_GET['unemulateuser'])) {
+	$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
+	$stm->execute(array(':userid'=>$sessiondata['emulateuseroriginaluser'], ':sessionid'=>$sessionid));
+	unset($sessiondata['emulateuseroriginaluser']);
+	writesessiondata();
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+	exit;
+}
 if ($myrights<100) {
 	echo "You are not authorized to view this page";
 	exit;
@@ -15,12 +23,30 @@ if (isset($_GET['removelti'])) {
 	$stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 }
+if (isset($_GET['emulateuser'])) {
+	$sessiondata['emulateuseroriginaluser'] = $userid;
+	writesessiondata();
+	$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
+	$stm->execute(array(':userid'=>$_GET['emulateuser'], ':sessionid'=>$sessionid));
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+	exit;
+}
 if (isset($_GET['removecourselti'])) {
 	$id = intval($_GET['removecourselti']);
 	//DB $query = "DELETE FROM imas_lti_courses WHERE id=$id";
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
+}
+if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
+	if (!empty($_POST['cid'])) {
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$_POST['cid']);
+	} else if (!empty($_POST['pqid'])) {
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".$_POST['pqid']);
+	} else if (!empty($_POST['eqid'])) {
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/moddataset.php?cid=admin&id=".$_POST['eqid']);
+	}
+	exit;
 }
 
 if (isset($_GET['form'])) {
@@ -34,6 +60,18 @@ if (isset($_GET['form'])) {
 		echo 'Emulate user with userid: <input type="text" size="5" name="uid"/>';
 		echo '<input type="submit" value="Go"/>';
 		require("../footer.php");
+	} else if ($_GET['form']=='jumptoitem') {
+		require("../header.php");
+		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Jump to Item</div>';
+		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
+		echo '<input type=hidden name=action value="jumptoitem" />';
+		echo '<p>Jump to:<br/>';
+		echo 'Course ID: <input type="text" size="8" name="cid"/><br/>';
+		echo 'Preview Question ID: <input type="text" size="8" name="pqid"/><br/>';
+		echo 'Edit Question ID: <input type="text" size="8" name="eqid"/><br/>';
+		echo '<input type="submit" value="Go"/>';
+		require("../footer.php");
+
 	} else if ($_GET['form']=='rescue') {
 		require("../header.php");
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Recover Items</div>';
@@ -56,17 +94,17 @@ if (isset($_GET['form'])) {
 			} else  {
 				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
 				if (!empty($_POST['LastName'])) {
-					$query .= "imas_users.LastName=:lastname ";
-					$qarr[':lastname']=$_POST['LastName'];
+					$query .= "imas_users.LastName LIKE :lastname ";
+					$qarr[':lastname']=$_POST['LastName'].'%';
 					if (!empty($_POST['FirstName'])) {
 						$query .= "AND ";
 					}
 				}
 				if (!empty($_POST['FirstName'])) {
-					$query .= "imas_users.FirstName=:firstname ";
-					$qarr[':firstname']=$_POST['FirstName'];
+					$query .= "imas_users.FirstName LIKE :firstname ";
+					$qarr[':firstname']=$_POST['FirstName'].'%';
 				}
-				$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+				$query .= "ORDER BY imas_users.LastName,imas_users.FirstName LIMIT 100";
 			}
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare($query);
@@ -99,6 +137,7 @@ if (isset($_GET['form'])) {
 							echo '<li>Parent Group: '.Sanitize::encodeStringForDisplay($r[0]).'</li>';
 						}
 					}
+					echo '<li><a href="utils.php?emulateuser='.$row['id'].'">Emulate User</li>';
 					echo '<li>Email: '.Sanitize::encodeStringForDisplay($row['email']).'</li>';
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
 					echo '<li>Rights: '.$row['rights'].' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.$row['id'].'">[edit]</a></li>';
@@ -192,6 +231,7 @@ if (isset($_GET['form'])) {
 		echo '<p>Debug Mode Enabled - Error reporting is now turned on.</p>';
 	}
 	echo '<a href="utils.php?form=lookup">User lookup</a><br/>';
+	echo '<a href="utils.php?form=jumptoitem">Jump to Item</a><br/>';
 	echo '<a href="getstucnt.php">Get Student Count</a><br/>';
 	echo '<a href="getstucntdet.php">Get Detailed Student Count</a><br/>';
 	echo '<a href="'.$imasroot.'/admin/approvepending.php">Approve Pending Instructor Accounts</a><br/>';

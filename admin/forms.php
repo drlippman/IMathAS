@@ -60,18 +60,13 @@ switch($_GET['action']) {
 		echo "\">\n";
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
 		if ($_GET['action'] == "newadmin") {
-			echo "<span class=form>New User username:</span>  <input class=form type=text size=40 name=adminname><BR class=form>\n";
-			echo "<span class=form>First Name:</span> <input class=form type=text size=40 name=firstname><BR class=form>\n";
-			echo "<span class=form>Last Name:</span> <input class=form type=text size=40 name=lastname><BR class=form>\n";
-			echo "<span class=form>Email:</span> <input class=form type=text size=40 name=email><BR class=form>\n";
-			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="password"/><br class="form"/>';
 			$oldgroup = 0;
 			$oldrights = 10;
 		} else {
 			//DB $query = "SELECT FirstName,LastName,rights,groupid,specialrights FROM imas_users WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$stm = $DBH->prepare("SELECT FirstName,LastName,rights,groupid,specialrights FROM imas_users WHERE id=:id");
+			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			printf("<h2>%s %s</h2>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
@@ -96,6 +91,33 @@ switch($_GET['action']) {
 				$("input[name=newrights]").on("change", onrightschg);
 				});
 			</script>';
+		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=adminname ";
+		if ($_GET['action'] != "newadmin") {
+			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
+		}
+		echo "><BR class=form>\n";
+		echo "<span class=form>First Name:</span> <input class=form type=text size=40 name=firstname ";
+		if ($_GET['action'] != "newadmin") {
+			echo 'value="'.Sanitize::encodeStringForDisplay($line['FirstName']).'"';
+		}
+		echo "><BR class=form>\n";
+		echo "<span class=form>Last Name:</span> <input class=form type=text size=40 name=lastname ";
+		if ($_GET['action'] != "newadmin") {
+			echo 'value="'.Sanitize::encodeStringForDisplay($line['LastName']).'"';
+		}
+		echo "><BR class=form>\n";
+		echo "<span class=form>Email:</span> <input class=form type=text size=40 name=email ";
+		if ($_GET['action'] != "newadmin") {
+			echo 'value="'.Sanitize::encodeStringForDisplay($line['email']).'"';
+		}
+		echo "><BR class=form>\n";
+		if ($_GET['action'] == "newadmin") {
+			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="password"/><br class="form"/>';
+		} else {
+			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" /> ';
+			echo 'Reset to: <input type=text size=20 name="password" /></span><br class=form />';
+		}
+
 		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
 		echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
@@ -777,7 +799,7 @@ switch($_GET['action']) {
 		echo "<input type=submit value=\"Update LTI Credentials\">\n";
 		echo "</form>\n";
 		break;
-		
+
 	case "listfedpeers":
 		if ($myrights<100) { echo "not allowed"; exit;}
 		echo '<div id="headerforms" class="pagetitle">';
@@ -826,7 +848,7 @@ switch($_GET['action']) {
 		echo "<input type=submit value=\"Update Federation Peer\">\n";
 		echo "</form>\n";
 		break;
-		
+
 	case "listgroups":
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Modify Groups</h3>\n";
