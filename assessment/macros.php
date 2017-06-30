@@ -3536,4 +3536,37 @@ class Rand {
 
 }
 $RND = new Rand();
+
+function evalMathPHP($str,$vl) {
+	return evalReturnValue('return ('.mathphp($str,$vl).');', $str);
+}
+function evalReturnValue($str,$errordispstr='',$vars=array()) {
+	global $myrights;
+	$preevalerror = error_get_last();
+	foreach ($vars as $v=>$val) {
+		${$v} = $val;
+	}
+	$res = @eval($str);
+	if ($res===false) {
+		if ($myrights>10) {
+			$error = error_get_last();
+			echo '<p>Caught error in evaluating a function in this question: ',$error['message'];
+			if ($errordispstr!='') {
+				echo ' while evaluating '.htmlspecialchars($errordispstr);
+			}
+			echo '</p>';
+		}
+	} else {
+		$error = error_get_last();
+		if ($error && $error!=$preevalerror && $myrights>10) {
+			echo '<p>Caught error in evaluating a function in this question: ',$error['message'];
+			if ($errordispstr!='') {
+				echo ' while evaluating '.htmlspecialchars($errordispstr);
+			}
+			echo '</p>';
+		}
+	}
+	return $res;
+}
+
 ?>

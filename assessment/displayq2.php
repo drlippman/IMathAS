@@ -137,9 +137,23 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['rawscores'])) {
 		$scoreiscorrect = getiscorrect();
 	}
+	$preevalerror = error_get_last();
+	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
+	$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	if ($res1===false || $res2===false) {
+		if ($myrights>10) {
+			$error = error_get_last();
+			echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+		} else {
+			echo '<p>Something went wrong with this question.  Tell your teacher.</p>';
+		}
+	} else {
+		$error = error_get_last();
+		if ($error && $error!=$preevalerror && $myrights>10) {
+			echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+		}
+	}
 
-	eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
 	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
 	$toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
@@ -152,8 +166,24 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//echo "toeval: $toevalqtxt";
 	if ($doshowans) {
 		$RND->srand($seed+1);
-		eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+		$preevalerror = error_get_last();
+		$res1 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+
+		if ($res1===false) {
+			if ($myrights>10) {
+				$error = error_get_last();
+				echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			} else {
+				echo '<p>Something went wrong with this question.  Tell your teacher.</p>';
+			}
+		} else {
+			$error = error_get_last();
+			if ($error && $error!=$preevalerror && $myrights>10) {
+				echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			}
+		}
 	}
+
 	$RND->srand($seed+2);
 	$laarr = explode('##',$GLOBALS['lastanswers'][$qnidx]);
 	$la = $laarr[count($laarr)-1];
@@ -572,7 +602,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 //inputs: Question number, Question id, rand seed, given answer
 function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	$qnidx = Sanitize::onlyInt($qnidx);
-	global $DBH, $RND;
+	global $DBH, $RND,$myrights;
 	unset($abstolerance);
 	$RND->srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;
@@ -774,10 +804,23 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$stuanswers[$thisq] = implode('|',$tmp);
 		}
 	}
-
-	eval(interpret('control',$qdata['qtype'],$qdata['control']));
+	$preevalerror = error_get_last();
+	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	$RND->srand($seed+1);
-	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	if ($res1===false || $res2===false) {
+		if ($myrights>10) {
+			$error = error_get_last();
+			echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+		} else {
+			echo '<p>Something went wrong with this question.  Tell your teacher.</p>';
+		}
+	} else {
+		$error = error_get_last();
+		if ($error && $error!=$preevalerror && $myrights>10) {
+			echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+		}
+	}
 
 	if (isset($choices) && !isset($questions)) {
 		$questions =& $choices;
@@ -1558,7 +1601,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		
+
 		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
 			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
 		}
@@ -3609,7 +3652,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answerlist = explode(',',$ansr);
 
 		foreach ($answerlist as $k=>$v) {
-			$v = eval('return ('.mathphp($v,null).');');
+			//$v = eval('return ('.mathphp($v,null).');');
+			$v = evalMathPHP($v,null);
 			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
 		}
 
@@ -3676,7 +3720,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
 		$answerlist = explode(',',$ansr);
 		foreach ($answerlist as $k=>$v) {
-			$v = eval('return ('.mathphp($v,null).');');
+			//$v = eval('return ('.mathphp($v,null).');');
+			$v = evalMathPHP($v,null);
 			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
 		}
 		//$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
@@ -3804,7 +3849,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ansparts = explode(',',$v[2]);
 			foreach ($ansparts as $j=>$v) {
 				if (!is_numeric($v)) {
-					$ansparts[$j] = eval('return('.mathphp($v,null).');');
+					$ansparts[$j] = evalMathPHP($v,null); //eval('return('.mathphp($v,null).');');
 				}
 			}
 			$anarr[$k][2] = $ansparts;
@@ -3938,8 +3983,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (!is_array($cparts)) {
 				$ansparts = parsesloppycomplex($answer);
 			} else {
-				$ansparts[0] = eval('return ('.mathphp($cparts[0],null).');');
-				$ansparts[1] = eval('return ('.mathphp($cparts[1],null).');');
+				$ansparts[0] = evalMathPHP($cparts[0],null);//eval('return ('.mathphp($cparts[0],null).');');
+				$ansparts[1] = evalMathPHP($cparts[1],null);//eval('return ('.mathphp($cparts[1],null).');');
 			}
 			$foundloc = -1;
 
@@ -4042,7 +4087,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
 							$aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
 						} else {
-							$aarr[$j] = eval('return('.mathphp($anans,null).');');
+							$aarr[$j] = evalMathPHP($anans,null);//eval('return('.mathphp($anans,null).');');
 						}
 					}
 				}
@@ -4063,7 +4108,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
 						$aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
 					} else {
-						$aarr[$j] = eval('return('.mathphp($anans,null).');');
+						$aarr[$j] = evalMathPHP($anans,null);//eval('return('.mathphp($anans,null).');');
 					}
 				}
 			}
@@ -4390,7 +4435,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if ($answer == '') {
 				return 0;
 			}
-
+			$origanswer = $answer;
 			$answer = mathphppre($answer);
 			$answer = makepretty($answer);
 			$answer = mathphp($answer,$vlist);
@@ -4419,7 +4464,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				*/
 					$tp[$j] = $tps[$i][$j];
 				}
-				$realans = eval("return ($answer);");
+				$realans = evalReturnValue("return ($answer);", $origanswer, array('tp'=>$tp));  //eval("return ($answer);");
 
 				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
@@ -4787,10 +4832,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$ansint = substr($ansint,1,strlen($ansint)-2);
 				list($anssn,$ansen) = explode(',',$ansint);
 				if (!is_numeric($anssn) && strpos($anssn,'oo')===false) {
-					$anssn = eval('return('.mathphp($anssn,null).');');
+					$anssn = evalMathPHP($anssn,null);//eval('return('.mathphp($anssn,null).');');
 				}
 				if (!is_numeric($ansen) && strpos($ansen,'oo')===false) {
-					$ansen = eval('return('.mathphp($ansen,null).');');
+					$ansen = evalMathPHP($ansen,null); //eval('return('.mathphp($ansen,null).');');
 				}
 				$foundloc = -1;
 				foreach ($gaarr as $k=>$gansint) {
@@ -6724,8 +6769,8 @@ function checkreqtimes($tocheck,$rtimes) {
 function parsesloppycomplex($v) {
 	$v = mathphp($v,'i');
 	$v = str_replace('(i)','($i)',$v);
-	$a = eval('$i=0;return ('.$v.');');
-	$apb = eval('$i=1;return ('.$v.');');
+	$a = evalReturnValue('$i=0;return ('.$v.');');
+	$apb = evalReturnValue('$i=1;return ('.$v.');');
 	return array($a,$apb-$a);
 }
 
