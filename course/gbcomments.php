@@ -17,6 +17,14 @@
 	} else {
 		$comtype = 'stu';
 	}
+	function fopen_utf8 ($filename, $mode) {
+	    $file = @fopen($filename, $mode);
+	    $bom = fread($file, 3);
+	    if ($bom != b"\xEF\xBB\xBF") {
+	        rewind($file, 0);
+	    }
+	    return $file;
+	}
 
 	if (isset($_GET['upload'])) {
 		require("../header.php");
@@ -45,7 +53,7 @@
 				$scorecol = $_POST['gradecol']-1;
 
 				// $_FILES[]['tmp_name'] is not user provided. This is safe.
-				$handle = fopen($_FILES['userfile']['tmp_name'],'r');
+				$handle = fopen_utf8($_FILES['userfile']['tmp_name'],'r');
 				if ($_POST['hashdr']==1) {
 					$data = fgetcsv($handle,4096,',');
 				} else if ($_POST['hashdr']==2) {

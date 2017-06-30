@@ -5,7 +5,14 @@
 /*** master php includes *******/
 require("../init.php");
 
-
+function fopen_utf8 ($filename, $mode) {
+    $file = @fopen($filename, $mode);
+    $bom = fread($file, 3);
+    if ($bom != b"\xEF\xBB\xBF") {
+        rewind($file, 0);
+    }
+    return $file;
+}
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -78,7 +85,7 @@ if (!(isset($teacherid))) {
 		$adds = array();
 		$addsvals = array();
 		if (count($gbitemid)>0) {
-			$handle = fopen($dir.$filename,'r');
+			$handle = fopen_utf8($dir.$filename,'r');
 			for ($i = 0; $i<$_POST['headerrows']; $i++) {
 				$line = fgetcsv($handle,4096);
 			}
@@ -153,7 +160,7 @@ if (!(isset($teacherid))) {
 			if (move_uploaded_file($_FILES['userfile']['tmp_name'], $dir.$uploadfile)) {
 				//parse out header info
 				$page_fileHiddenInput = '<input type="hidden" name="thefile" value="'.$uploadfile.'" />';
-				$handle = fopen($dir.$uploadfile,'r');
+				$handle = fopen_utf8($dir.$uploadfile,'r');
 				$hrow = fgetcsv($handle,4096);
 				$columndata = array();
 				$names = array();

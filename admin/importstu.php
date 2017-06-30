@@ -8,7 +8,15 @@ require("../includes/htmlutil.php");
 
 
 /*** pre-html data manipulation, including function code *******/
-
+// Reads past the UTF-8 bom if it is there.
+function fopen_utf8 ($filename, $mode) {
+    $file = @fopen($filename, $mode);
+    $bom = fread($file, 3);
+    if ($bom != b"\xEF\xBB\xBF") {
+        rewind($file, 0);
+    }
+    return $file;
+}
 function parsecsv($data) {
 	$fn = $data[$_POST['fncol']-1];
 	if ($_POST['fnloc']!=0) {
@@ -102,7 +110,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			require_once("../includes/password.php");
 		}
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
-		$handle = fopen($filename,'r');
+		$handle = fopen_utf8($filename,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
 		}
@@ -228,7 +236,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			$overwriteBody = 1;
 			$body = "<p>Error uploading file!</p>\n";
 		}
-		$handle = fopen($uploadfile,'r');
+		$handle = fopen_utf8($uploadfile,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
 		}
