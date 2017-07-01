@@ -150,7 +150,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	} else {
 		$error = error_get_last();
 		if ($error && $error!=$preevalerror && $myrights>10) {
-			echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			if ($error['type']==$_ERROR) {
+				echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			} else if ($error['type']==E_WARNING) {
+				echo '<p>Caught warning in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			}
 		}
 	}
 
@@ -179,7 +183,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		} else {
 			$error = error_get_last();
 			if ($error && $error!=$preevalerror && $myrights>10) {
-				echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+				if ($error['type']==$_ERROR) {
+					echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+				} else if ($error['type']==E_WARNING) {
+					echo '<p>Caught warning in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+				}
 			}
 		}
 	}
@@ -818,7 +826,11 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	} else {
 		$error = error_get_last();
 		if ($error && $error!=$preevalerror && $myrights>10) {
-			echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			if ($error['type']==$_ERROR) {
+				echo '<p>Caught error in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			} else if ($error['type']==E_WARNING) {
+				echo '<p>Caught warning in the question code: ',$error['message'], ' on line ', $error['line'] ,'</p>';
+			}
 		}
 	}
 

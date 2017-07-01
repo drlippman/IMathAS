@@ -3558,7 +3558,7 @@ function evalReturnValue($str,$errordispstr='',$vars=array()) {
 		}
 	} else {
 		$error = error_get_last();
-		if ($error && $error!=$preevalerror && $myrights>10) {
+		if ($error && $error!=$preevalerror && $error['type']==E_ERROR && $myrights>10) {
 			echo '<p>Caught error in evaluating a function in this question: ',$error['message'];
 			if ($errordispstr!='') {
 				echo ' while evaluating '.htmlspecialchars($errordispstr);
