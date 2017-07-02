@@ -25,7 +25,7 @@ array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeacct
 //$statement[#]['totaltotalops'] = array of options for totaltotal.  If not set, totaltotal title is fixed
 //$statement[#]['totalindent'] = number of indent for totaltotal entry.  0 if not set
 //$statement[#]['dblunder'] = true if double-underline under the totaltotal entry
-function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat,  &$answerformat,  &$answerboxsize) {
+function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer, &$showanswer, &$displayformat,  &$answerformat,  &$answerboxsize) {
 	$debug = false;
 	if ($anstypes === null) { $anstypes = array();}
 	if ($questions === null) { $questions = array();}
@@ -34,7 +34,7 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 	if ($displayformat === null) { $displayformat = array();}
 	if ($answerformat === null) { $answerformat = array();}
 
-	if ($ops[0] == 'pulldowns') {
+	if (isset($ops[0]) && $ops[0] == 'pulldowns') {
 		array_shift($ops);
 		$disptype = 'select';
 	} else {

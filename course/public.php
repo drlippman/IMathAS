@@ -56,7 +56,6 @@
 			$items = unserialize($line['itemorder']);
 			unset($backtrack);
 			unset($blocktree);
-			break;
 		}
 	}
 
