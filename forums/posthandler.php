@@ -753,8 +753,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			//DB $files = mysql_result($result,0,1);
 			$stm = $DBH->prepare("SELECT parent,files FROM imas_forum_posts WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['remove']));
-			$parent = $stm->fetchColumn(0);
-			$files = $stm->fetchColumn(1);
+			list($parent,$files) = $stm->fetch(PDO::FETCH_NUM);
 
 			if ($parent==0) {
 				//DB $query = "SELECT id FROM imas_forum_posts WHERE threadid='{$_GET['remove']}' AND files<>''";

@@ -38,6 +38,14 @@ if (isset($_GET['removecourselti'])) {
 	$stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 }
+if (isset($_GET['fixorphanqs'])) {
+	$query = "UPDATE imas_library_items AS ili, (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ";
+	$query .= "SET ili.deleted=0 WHERE ili.qsetid=tofix.qsetid AND ili.libid=0";
+	$stm = $DBH->query($query);
+	echo '<p>'.$stm->rowCount() . ' questions with no libraries fixed</p>';
+	echo '<p><a href="utils.php">Utils</a></p>';
+	exit;
+}
 if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$_POST['cid']);
@@ -240,6 +248,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';
 	echo '<a href="replaceurls.php">Replace URLS</a><br/>';
 	echo '<a href="utils.php?form=rescue">Recover lost items</a><br/>';
+	echo '<a href="utils.php?fixorphanqs=true">Fix orphaned questions</a><br/>';
 	echo '<a href="utils.php?form=emu">Emulate User</a><br/>';
 	echo '<a href="listextref.php">List ExtRefs</a><br/>';
 	echo '<a href="updateextref.php">Update ExtRefs</a><br/>';
