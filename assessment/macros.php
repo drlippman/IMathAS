@@ -957,9 +957,9 @@ function prettynegs($a) {
 }
 
 
-function rrand($min,$max,$p) {
-	if (func_num_args()!=3) { echo "rrand expects 3 arguments"; return $min;}
-	if ($max < $min) {echo "Need min&lt;max"; return $min;}
+function rrand($min,$max,$p=0) {
+	if (func_num_args()!=3) { echo "Error: rrand expects 3 arguments"; return $min;}
+	if ($max < $min) {echo "rrand: Need min&lt;max"; return $min;}
 	if ($p==0) {echo "Error with rrand: need to set step size"; return false;}
 	$rn = 0;
 	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
@@ -969,7 +969,7 @@ function rrand($min,$max,$p) {
 }
 
 
-function rands($min,$max,$n) {
+function rands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "rands expects 3 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	for ($i = 0; $i < $n; $i++) {
@@ -979,7 +979,7 @@ function rands($min,$max,$n) {
 }
 
 
-function rrands($min,$max,$p,$n) {
+function rrands($min,$max,$p=0,$n=0) {
 	if (func_num_args()!=4) { echo "rrands expects 4 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($p==0) {echo "Error with rrands: need to set step size"; return false;}
@@ -1053,7 +1053,7 @@ function nonzerorand($min,$max) {
 }
 
 
-function nonzerorrand($min,$max,$p) {
+function nonzerorrand($min,$max,$p=0) {
 	if (func_num_args()!=3) { echo "nonzerorrand expects 3 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($min==0 && $max==0) {
@@ -1071,7 +1071,7 @@ function nonzerorrand($min,$max,$p) {
 }
 
 
-function nonzerorands($min,$max,$n) {
+function nonzerorands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "nonzerorands expects 3 arguments"; return $min;}
 	$min = ceil($min);
 	$max = floor($max);
@@ -1088,7 +1088,7 @@ function nonzerorands($min,$max,$n) {
 }
 
 
-function nonzerorrands($min,$max,$p,$n) {
+function nonzerorrands($min,$max,$p=0,$n=0) {
 	if (func_num_args()!=4) { echo "nonzerorrands expects 4 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($min==0 && $max==0) {
@@ -1108,7 +1108,7 @@ function nonzerorrands($min,$max,$p,$n) {
 }
 
 
-function diffrands($min,$max,$n) {
+function diffrands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "diffrands expects 3 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($n<.1*($max-$min)) {
@@ -1131,7 +1131,7 @@ function diffrands($min,$max,$n) {
 }
 
 
-function diffrrands($min,$max,$p,$n, $nonzero=false) {
+function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 	if (func_num_args()<4) { echo "diffrrands expects 4 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($min==0 && $max==0) {
@@ -1175,7 +1175,7 @@ function diffrrands($min,$max,$p,$n, $nonzero=false) {
 }
 
 
-function nonzerodiffrands($min,$max,$n) {
+function nonzerodiffrands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "nonzerodiffrands expects 3 arguments"; return $min;}
 	$min = ceil($min);
 	$max = floor($max);
@@ -1203,7 +1203,7 @@ function nonzerodiffrands($min,$max,$n) {
 }
 
 
-function nonzerodiffrrands($min,$max,$p,$n) {
+function nonzerodiffrrands($min,$max,$p=0,$n=0) {
 	return diffrrands($min,$max,$p,$n, true);
 }
 

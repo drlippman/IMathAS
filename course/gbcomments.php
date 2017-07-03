@@ -21,7 +21,7 @@
 	    $file = @fopen($filename, $mode);
 	    $bom = fread($file, 3);
 	    if ($bom != b"\xEF\xBB\xBF") {
-	        rewind($file, 0);
+	        rewind($file);
 	    }
 	    return $file;
 	}

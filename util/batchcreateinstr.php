@@ -186,7 +186,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     }
   }
 
-  echo "<p>Done. <a href="$imasroot/admin/admin.php">Admin page</a></p>";
+  echo '<p>Done. <a href="../admin/admin.php">Admin page</a></p>';
 } else {
   require("../header.php");
   $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a>\n";
@@ -226,7 +226,7 @@ function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
     $bom = fread($file, 3);
     if ($bom != b"\xEF\xBB\xBF") {
-        rewind($file, 0);
+        rewind($file);
     }
     return $file;
 }

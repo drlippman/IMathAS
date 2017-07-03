@@ -42,6 +42,13 @@
 			if ($items[$blocktree[$i]-1]['public']==1) {
 				$blockispublic = true;
 			}
+			if (!is_array($items[$blocktree[$i]-1])) { //invalid blocktree
+				$_GET['folder'] = 0;
+				$items = unserialize($line['itemorder']);
+				unset($backtrack);
+				unset($blocktree);
+				break;
+			}
 			if (!isset($teacherid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);

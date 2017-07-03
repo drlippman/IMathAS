@@ -124,6 +124,9 @@ if (isset($_GET['launch'])) {
 		$stm = $DBH->prepare('SELECT courseid FROM imas_assessments WHERE id=:aid');
 		$stm->execute(array(':aid'=>$aid));
 		$cid = $stm->fetchColumn(0);
+    if ($cid===false) {
+      reporterror("This assignment does not appear to exist anymore");
+    }
 		if ($sessiondata['ltirole'] == 'learner') {
 			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
 			//DB $query .= "('$userid','$cid','assesslti','$aid',$now,'')";
@@ -726,6 +729,9 @@ if ($stm->rowCount()==0) {
 		$stm = $DBH->prepare('SELECT courseid FROM imas_assessments WHERE id=:aid');
 		$stm->execute(array(':aid'=>$_SESSION['place_aid']));
 		$aidsourcecid = $stm->fetchColumn(0);
+    if ($aidsourcecid===false) {
+      reporterror("This assignment does not appear to exist anymore");
+    }
 
 		//look to see if we've already linked this context_id with a course
 		//DB $query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
@@ -1168,6 +1174,9 @@ if ($linkparts[0]=='cid') {
 	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($line===false) {
+    reporterror("This assignment does not appear to exist anymore");
+  }
 	$cid = $line['courseid'];
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
@@ -1521,6 +1530,9 @@ if (isset($_GET['launch'])) {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$cid = $stm->fetchColumn(0);
+    if ($cid===false) {
+      reporterror("This assignment does not appear to exist anymore");
+    }
 		if ($sessiondata['ltirole'] == 'learner') {
 			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
 			//DB $query .= "('$userid','$cid','assesslti','$aid',$now,'')";
@@ -1913,6 +1925,9 @@ if (isset($_GET['launch'])) {
 			$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$placeaid));
 			$sourcecid = $stm->fetchColumn(0);
+      if ($sourcecid===false) {
+        reporterror("This assignment does not appear to exist anymore");
+      }
 			if ($keyparts[1]==$sourcecid) { //is key is for source course; treat like aid_### placement
 				$keyparts[0] = 'aid';
 				$keyparts[1] = $placeaid;
@@ -1955,6 +1970,9 @@ if (isset($_GET['launch'])) {
 			$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$placeaid));
 			$sourcecid = $stm->fetchColumn(0);
+      if ($sourcecid===false) {
+        reporterror("This assignment does not appear to exist anymore");
+      }
 			$_SESSION['place_aid'] = array($sourcecid,$_REQUEST['custom_place_aid']);
 		} else if (isset($_REQUEST['custom_view_folder'])) {
 			$keytype = 'cc-vf';
@@ -2320,6 +2338,9 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($line===false) {
+    reporterror("This assignment does not appear to exist anymore");
+  }
 	$cid = $line['courseid'];
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
