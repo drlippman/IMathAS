@@ -848,18 +848,25 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	}
 
 	if (isset($reqdecimals)) {
+		$hasGlobalAbstol = false;
+		if (is_array($anstypes) && !isset($abstolerance)  && !isset($reltolerance)) {
+			$abstolerance = array();
+		} else if (isset($anstypes) && isset($abstolerance) && !is_array($abstolerance)) {
+			$abstolerance = array_fill(0,count($anstypes),$abstolerance);
+			$hasGlobalAbstol = true;
+		}
 		if (is_array($reqdecimals)) {
 			foreach ($reqdecimals as $kidx=>$vval) {
-				if (!isset($abstolerance[$kidx]) && !isset($reltolerance[$kidx])) {
+				if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
 					$abstolerance[$kidx] = 0.5/(pow(10,$vval));
 				}
 			}
 		} else {
 			if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
 				$abstolerance = 0.5/(pow(10,$reqdecimals));
-			} else if (isset($anstypes)) {
+			} else if (isset($anstypes) && !isset($reltolerance)) {
 				foreach ($anstypes as $kidx=>$vval) {
-					if (!isset($abstolerance[$kidx]) && !isset($reltolerance[$kidx])) {
+					if (!isset($abstolerance[$kidx]) && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
 						$abstolerance[$kidx] = 0.5/(pow(10,$reqdecimals));
 					}
 				}
