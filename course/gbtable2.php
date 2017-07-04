@@ -151,7 +151,7 @@ function flattenitems($items,&$addto) {
 		}
 	}
 }
-		
+
 function gbtable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
 	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs,$includeendmsg;
@@ -239,7 +239,7 @@ function gbtable() {
 		$stm->execute(array(':id'=>$cid));
 		$courseitemorder = unserialize($stm->fetchColumn(0));
 		$courseitemsimporder = array();
-		
+
 		flattenitems($courseitemorder,$courseitemsimporder);
 		$courseitemsimporder = array_flip($courseitemsimporder);
 		$courseitemsassoc = array();
@@ -257,6 +257,30 @@ function gbtable() {
 		}
 
 	}
+
+	//pre-pull questions data
+	$questionpointdata = array();
+	$query = "SELECT iq.points,iq.id FROM imas_questions AS iq JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
+	$query .= "WHERE ia.courseid=:courseid AND iq.points<9999 AND ia.avail>0 ";
+	if (!$canviewall) {
+		$query .= "AND ia.cntingb>0 ";
+	}
+	if ($istutor) {
+		$query .= "AND ia.tutoredit<2 ";
+	}
+	if ($catfilter>-1) {
+		$query .= "AND ia.gbcategory=:gbcategory ";
+	}
+	$stm = $DBH->prepare($query);
+	if ($catfilter>-1) {
+		$stm->execute(array(':courseid'=>$cid, ':gbcategory'=>$catfilter));
+	} else {
+		$stm->execute(array(':courseid'=>$cid));
+	}
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		$questionpointdata[$line['id']] = $line['points'];
+	}
+
 
 	//Pull Assessment Info
 	$now = time();
@@ -346,58 +370,39 @@ function gbtable() {
 		}
 		$aitems = explode(',',$line['itemorder']);
 		$allowlate[$kcnt] = $line['allowlate'];
-		
+
 		if (isset($line['endmsg']) && $line['endmsg']!='') {
 			$endmsgs[$kcnt] = unserialize($line['endmsg']);
 		}
 		$k = 0;
 		$atofind = array();
+		$totalpossible = 0;
 		foreach ($aitems as $v) {
 			if (strpos($v,'~')!==FALSE) {
 				$sub = explode('~',$v);
 				if (strpos($sub[0],'|')===false) { //backwards compat
-					$atofind[$k] = $sub[0];
-					$aitemcnt[$k] = 1;
-					$k++;
+					$totalpossible += (isset($questionpointdata[$sub[0]]))?$questionpointdata[$sub[0]]:$line['defpoints'];
 				} else {
 					$grpparts = explode('|',$sub[0]);
 					if ($grpparts[0]==count($sub)-1) { //handle diff point values in group if n=count of group
 						for ($i=1;$i<count($sub);$i++) {
-							$atofind[$k] = $sub[$i];
-							$aitemcnt[$k] = 1;
-							$k++;
+							$totalpossible += (isset($questionpointdata[$sub[$i]]))?$questionpointdata[$sub[$i]]:$line['defpoints'];
 						}
 					} else {
-						$atofind[$k] = $sub[1];
-						$aitemcnt[$k] = $grpparts[0];
-						$k++;
+						$totalpossible += $grpparts[0]*((isset($questionpointdata[$sub[1]]))?$questionpointdata[$sub[1]]:$line['defpoints']);
 					}
 				}
 			} else {
-				$atofind[$k] = $v;
-				$aitemcnt[$k] = 1;
-				$k++;
+				$totalpossible += (isset($questionpointdata[$v]))?$questionpointdata[$v]:$line['defpoints'];
 			}
 		}
 
-		//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$line['id']}'";
-		//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		$stm2 = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
-		$stm2->execute(array(':assessmentid'=>$line['id']));
-		$totalpossible = 0;
-		//DB while ($r = mysql_fetch_row($result2)) {
-		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-			if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts
-				if ($r[0]==9999) {
-					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
-				} else {
-					$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
-				}
-			}
-		}
 		$possible[$kcnt] = $totalpossible;
 		$kcnt++;
 	}
+
+	unset($questionpointdata);
+
 
 	//Pull Offline Grade item info
 	//DB $query = "SELECT * from imas_gbitems WHERE courseid='$cid' ";
@@ -2095,12 +2100,12 @@ function gbtable() {
 			if (count($totavgs[$c2])>0) {
 				sort($totavgs[$c2], SORT_NUMERIC);
 				$fivenum = array();
-			
+
 				for ($k=0; $k<5; $k++) {
 					$fivenum[] = gbpercentile($totavgs[$c2],$k*25);
 				}
 				$fivenumsum .= implode('%,&nbsp;',$fivenum).'%';
-			} 
+			}
 			$gb[0][3][3+$i] = $fivenumsum;
 		}
 
