@@ -308,7 +308,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT * FROM imas_inlinetext WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($line['title']=='##hidden##') {
 			$hidetitle = true;
@@ -436,7 +436,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	flattenarr($outcomearr);
 
-$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::onlyInt($_GET['id']) : "";
 }
 
 
@@ -544,7 +544,7 @@ function movefile(from) {
 			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No<br/>
 			<input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> Yes, on Available after date (will only show after that date)<br/>
 			<input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> Yes, on Available until date<br/>
-			With tag: <input name="caltag" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+			With tag: <input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
 		</span><br class="form" />
 		</div>
 		<div id="altcaldiv" style="display:<?php echo ($line['avail']==2)?"block":"none"; ?>">
@@ -555,7 +555,7 @@ function movefile(from) {
 			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></a> <br/>
-			With tag: <input name="altcaltag" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+			With tag: <input name="altcaltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
 		</span><BR class=form>
 		</div>
 <?php

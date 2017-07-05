@@ -71,7 +71,7 @@ ul {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1].', '.$row[2]!=$lastuser) {
 			if ($lastuser != '') {
-				$grpdata .= '<li><b>'.$lastuser.'</b><ul>';
+				$grpdata .= '<li><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b><ul>';
 				$grpdata .= $userdata;
 				$grpdata .= '</ul></li>';
 			}
@@ -86,7 +86,7 @@ ul {
 			$grpcnt = 0;  $grpdata = '';
 			$lastgroup = $row[0];
 		}
-		$userdata .= "<li>".$row[4].' ('.$row[3].'): <b>'.$row[5].'</b>';
+		$userdata .= "<li>".Sanitize::encodeStringForDisplay($row[4]).' ('.$row[3].'): <b>'.$row[5].'</b>';
 		if (!in_array($row[3],$seencid)) {
 			$grpcnt += $row[5];
 			$seencid[] = $row[3];
@@ -95,7 +95,7 @@ ul {
 		}
 		$userdata .= "</li>";
 	}
-	$grpdata .= '<li><b>'.$lastuser.'</b><ul>';
+	$grpdata .= '<li><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b><ul>';
 	$grpdata .= $userdata;
 	$grpdata .= '</ul></li>';
 	$userdata = '';

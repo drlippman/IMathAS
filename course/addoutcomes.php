@@ -181,8 +181,8 @@ function printoutcome($arr) {
 			}
 			echo '</li>';
 		} else { //individual outcome
-			echo '<li id="'.$item.'"><span class=icon style="background-color:#0f0">O</span> ';
-			echo '<input class="outcome" type="text" size="60" id="o'.$item.'" value="'.htmlentities($outcomeinfo[$item]).'" onkeyup="txtchg()"> ';
+			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0">O</span> ';
+			echo '<input class="outcome" type="text" size="60" id="o' . Sanitize::encodeStringForDisplay($item) . '" value="' . Sanitize::encodeStringForDisplay($outcomeinfo[$item]).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
 		}
 	}

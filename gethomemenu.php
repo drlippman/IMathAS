@@ -19,7 +19,8 @@ $query .= "ORDER BY name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':useridC'=>$userid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	echo "<li><a href=\"$imasroot/course/course.php?cid={$row[1]}&folder=0\">{$row[0]}</a></li>";
+	echo "<li><a href=\"$imasroot/course/course.php?cid=" . Sanitize::courseId($row[1])
+		. "&folder=0\">" . Sanitize::encodeStringForDisplay($row[0]) . "</a></li>";
 }
 echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 echo '</ul>';

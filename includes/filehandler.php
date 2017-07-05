@@ -738,7 +738,7 @@ function getcoursefileurl($key,$abs=false) {
 	} else {
 		$key = Sanitize::rawurlencodePath($key);  //shouldn't be needed since filenames sanitized, but better to be safe
 		if ($abs==true) {
-			return $urlmode.$_SERVER['HTTP_HOST']."$imasroot/course/files/$key";
+			return $GLOBALS['basesiteurl'] . "/course/files/$key";
 		} else {
 			return "$imasroot/course/files/$key";
 		}

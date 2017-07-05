@@ -92,7 +92,7 @@ require_once("../includes/sanitize.php");
 	echo '<div id="headerassessendmsg" class="pagetitle"><h2>End of Assessment Messages</h2></div>';
 	echo "<form method=\"post\" action=\"assessendmsg.php?cid=$cid&amp;record=true\" />";
 	if (isset($_POST['checked'])) {
-		echo '<input type="hidden" name="aidlist" value="'.implode(',',$_POST['checked']).'" />';
+		echo '<input type="hidden" name="aidlist" value="' . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . '" />';
 	} else {
 		echo '<input type="hidden" name="aid" value="'.Sanitize::onlyInt($_GET['aid']).'" />';
 	}

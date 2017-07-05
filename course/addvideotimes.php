@@ -183,7 +183,7 @@ var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 var player;
-var vidid = "<?php echo $vidid;?>";
+var vidid = "<?php echo $vidid; ?>";
 
 function validatevidform(el) {
 	var els = el.getElementsByTagName("input");
@@ -367,7 +367,7 @@ then start from the end of this followup.</p>
 
 <form method="post" style="clear:both;" onsubmit="return validatevidform(this);">
 
-<p>YouTube video ID: <input type="text" name="vidid" id="vidid" value="<?php echo $vidid;?>"/>
+<p>YouTube video ID: <input type="text" name="vidid" id="vidid" value="<?php echo Sanitize::encodeStringForDisplay($vidid); ?>"/>
 <input type="button" value="Load Video" onclick="loadnewvideo()"/></p>
 
 
@@ -379,22 +379,22 @@ for ($i=0;$i<$n;$i++) {
 
 	if (isset($qn[$i])) {
 		echo '<div class="vidsegblock">';
-		echo 'Segment title: <input type="text" size="20" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
-		echo 'Ends at: <input type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endtime[$i].'"/> ';
-		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> ';
-		echo 'Question '.($qn[$i]+1).': '.$qtitle[$qidbynum[$qn[$i]]];
-		echo '<input type="hidden" name="qn'.$i.'" value="'.$qn[$i].'"/>';
+		echo 'Segment title: <input type="text" size="20" name="segtitle' . $i . '" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/> ';
+		echo 'Ends at: <input type="text" size="4" name="segend' . $i . '" id="segend' . Sanitize::encodeStringForDisplay($i) . '" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/> ';
+		echo '<input type="button" value="grab" onclick="grabcurvidtime(' . $i . ',0);"/> ';
+		echo 'Question ' . (Sanitize::onlyInt($qn[$i]) + 1) . ': ' . Sanitize::encodeStringForDisplay($qtitle[$qidbynum[$qn[$i]]]);
+		echo '<input type="hidden" name="qn' . $i . '" value="' . Sanitize::encodeStringForDisplay($qn[$i]) . '"/>';
 		echo '<br/>';
-		echo 'Has followup? <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
+		echo 'Has followup? <input type="checkbox" name="hasfollowup' . $i . '" value="1" ';
 		if ($hasfollowup[$i]) {
-			echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'">';
+			echo 'checked="checked" onclick="updatefollowup(' . $i . ',this);" /> <span id="followupspan' . Sanitize::encodeStringForDisplay($i) . '">';
 		} else {
-			echo ' onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'" style="display:none;">';
+			echo ' onclick="updatefollowup(' . $i . ',this);" /> <span id="followupspan' . Sanitize::encodeStringForDisplay($i) . '" style="display:none;">';
 		}
-		echo 'Followup title: <input type="text" size="20" name="followuptitle'.$i.'" value="'.$followuptitle[$i].'"/> ';
-		echo 'Ends at: <input type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="'.$followupendtime[$i].'"/> ';
-		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',1);"/> ';
-		echo 'Show link in navigation? <input type="checkbox" name="showlink'.$i.'" value="1" ';
+		echo 'Followup title: <input type="text" size="20" name="followuptitle' . $i . '" value="' . Sanitize::encodeStringForDisplay($followuptitle[$i]) . '"/> ';
+		echo 'Ends at: <input type="text" size="4" name="followupend' . $i . '" id="followupend' . Sanitize::encodeStringForDisplay($i) . '" value="' . Sanitize::encodeStringForDisplay($followupendtime[$i]) . '"/> ';
+		echo '<input type="button" value="grab" onclick="grabcurvidtime(' . $i . ',1);"/> ';
+		echo 'Show link in navigation? <input type="checkbox" name="showlink' . $i . '" value="1" ';
 		if ($showlink[$i]) {
 			echo 'checked="checked"';
 		}
@@ -402,16 +402,16 @@ for ($i=0;$i<$n;$i++) {
 		echo '</div>';
 	} else {
 		echo '<div class="vidsegblock">';
-		echo 'Segment title: <input type="text" size="20" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
-		echo 'Ends at: <input type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endtime[$i].'"/> ';
-		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
+		echo 'Segment title: <input type="text" size="20" name="segtitle' . $i . '" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/> ';
+		echo 'Ends at: <input type="text" size="4" name="segend' . $i . '" id="segend' . Sanitize::encodeStringForDisplay($i).'" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/> ';
+		echo '<input type="button" value="grab" onclick="grabcurvidtime(' . $i . ',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
 	}
 }
-echo '<div class="insblock" id="insat'.$n.'">';
-echo '<a href="#" onclick="addsegat('.$n.'); return false;">Add video segment break</a></div>';
+echo '<div class="insblock" id="insat' . $n . '">';
+echo '<a href="#" onclick="addsegat(' . $n . '); return false;">Add video segment break</a></div>';
 
 echo '<div class="vidsegblock">';
-echo 'Remainder of video segment title (if any): <input type="text" size="20" name="finalseg" value="'.$finalsegtitle.'"/></div>';
+echo 'Remainder of video segment title (if any): <input type="text" size="20" name="finalseg" value="' . Sanitize::encodeStringForDisplay($finalsegtitle) . '"/></div>';
 echo '<p><input type="submit" value="Submit"/></p>';
 echo '</form>';
 require("../footer.php");

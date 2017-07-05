@@ -150,11 +150,11 @@ function chgfilter() {
 	$stulist = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$stulist[$row[0]] = "{$row[1]}, {$row[2]}";
-		echo "<option value=\"{$row[0]}\" ";
+		echo "<option value=\"" . Sanitize::encodeStringForDisplay($row[0]) . "\" ";
 		if ($filterstu==$row[0]) {
 			echo 'selected=1';
 		}
-		echo " >{$row[1]}, {$row[2]}</option>";
+		echo " >" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</option>";
 	}
 	echo "</select></p>";
 
@@ -223,12 +223,12 @@ function chgfilter() {
 		} else if ($n>1) {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
-		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filterstu=$filterstu&type=msg&msgid={$line['id']}&type=allstu\">";
-		echo $line['title'];
+		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"" . Sanitize::onlyInt($line['id']) . "\"/></td><td>";
+		echo "<a href=\"viewmsg.php?page" . Sanitize::onlyInt($page) . "&cid=$cid&filterstu=" . Sanitize::encodeStringForDisplay($filterstu) . "&type=msg&msgid=" . Sanitize::onlyInt($line['id']) . "&type=allstu\">";
+		echo Sanitize::encodeStringForDisplay($line['title']);
 		echo "</a></td><td>";
-		echo $stulist[$line['msgfrom']];
-		echo "</td><td>{$stulist[$line['msgto']]}</td>";
+		echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
+		echo "</td><td>" . Sanitize::encodeStringForDisplay($stulist[$line['msgto']]) . "</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
 	}

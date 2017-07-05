@@ -31,7 +31,7 @@ if (isset($_GET['id'])) {
 	$pagetitle = "Add Link";
 }
 if (isset($_GET['tb'])) {
-	$totb = $_GET['tb'];
+	$totb = Sanitize::encodeStringForDisplay($_GET['tb']);
 } else {
 	$totb = 'b';
 }
@@ -568,7 +568,7 @@ if ($overwriteBody==1) {
 				require_once("../includes/filehandler.php");
 				echo '<input type="hidden" name="curfile" value="'.$filename.'"/>';
 				$alink = getcoursefileurl($filename);
-				echo 'Current file: <a href="'.$alink.'">'.basename($filename).'</a><br/>Replace ';
+				echo 'Current file: <a href="' . Sanitize::encodeStringForDisplay($alink) . '">'.basename($filename).'</a><br/>Replace ';
 			} else {
 				echo 'Attach ';
 			}
@@ -589,7 +589,7 @@ if ($overwriteBody==1) {
 			}
 			if (!isset($CFG['GEN']['noInstrExternalTools'])) {
 				echo '<a href="../admin/externaltools.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-                        'ltfrom' => $_GET['id'])) .'">Add or edit an external tool</a>';
+                        'ltfrom' => Sanitize::onlyInt($_GET['id']))) .'">Add or edit an external tool</a>';
 			}
 			?>
 			</span><br class="form"/>
@@ -601,7 +601,7 @@ if ($overwriteBody==1) {
 			<div id="gbdetail" <?php if ($points==0) { echo 'style="display:none;"';}?>>
 			<span class="form">Points:</span>
 			<span class="formright">
-				<input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+				<input type=text size=4 name="points" value="<?php echo Sanitize::encodeStringForDisplay($points); ?>"/> points
 			</span><br class="form"/>
 			<span class=form>Gradebook Category:</span>
 				<span class=formright>

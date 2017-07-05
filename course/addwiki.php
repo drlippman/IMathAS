@@ -196,9 +196,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$savetitle = _("Create Wiki");
 		}
 
-		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
-		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
-		$page_formActionTag .= "&tb=$totb";
+		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
+		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::encodeUrlParam($_GET['id']) : "";
+		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
 		$hr = floor($coursedeftime/60)%12;
 		$min = $coursedeftime%60;
@@ -267,7 +267,7 @@ if ($overwriteBody==1) {
 	<div id="headeraddwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 <?php
 if (isset($_GET['clearattempts'])) {
-	$id = $_GET['id'];
+	$id = Sanitize::onlyInt($_GET['id']);
 	echo '<p>Are you SURE you want to delete all contents and history for this Wiki page? ';
 	echo 'This will clear contents for all groups if you are using groups.</p>';
 
@@ -281,12 +281,12 @@ if (isset($_GET['clearattempts'])) {
 if ($started) {
 	echo '<p>Revisions have already been made on this wiki.  Changing group settings has been disabled.  If you want to change the ';
 	echo 'group settings, you should clear all existing wiki content.</p>';
-	echo '<p><input type="button" value="Clear All Wiki Content"  onclick="window.location=\'addwiki.php?cid='.$cid.'&id='.$_GET['id'].'&clearattempts=ask\'" /></p>';
+	echo '<p><input type="button" value="Clear All Wiki Content"  onclick="window.location=\'addwiki.php?cid='.$cid.'&id=' . Sanitize::onlyInt($_GET['id']) . '&clearattempts=ask\'" /></p>';
 }
 
 ?>
 
-	<form method=post action="addwiki.php<?php echo $page_formActionTag ?>">
+	<form method=post action="addwiki.php<?php echo $page_formActionTag; ?>">
 		<span class=form>Name: </span>
 		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span>
 		<BR class=form>
