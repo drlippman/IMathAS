@@ -197,26 +197,13 @@ function gbtable() {
 	} else {
 		$gb[0][0][1] = "Username";
 	}
-	//DB $query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_result($result,0,0)>0) {
-	$stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL");
+
+	$stm = $DBH->prepare("SELECT count(DISTINCT section),count(DISTINCT code) FROM imas_students WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
-	if ($stm->fetchColumn(0)>0) {
-		$hassection = true;
-	} else {
-		$hassection = false;
-	}
-	//DB $query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_result($result,0,0)>0) {
-	$stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.code IS NOT NULL");
-	$stm->execute(array(':courseid'=>$cid));
-	if ($stm->fetchColumn(0)>0) {
-		$hascode = true;
-	} else {
-		$hascode = false;
-	}
+	$row = $stm->fetch(PDO::FETCH_NUM);
+	$hassection = ($row[0]>0);
+	$hascode = ($row[1]>0);
+
 	if ($hassection && !$isdiag) {
 		$gb[0][0][] = "Section";
 	}
