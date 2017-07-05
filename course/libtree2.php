@@ -41,8 +41,29 @@ END;
 	//DB $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
 	//DB $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
 	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
-	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 WHERE imas_libraries.deleted=0 GROUP BY imas_libraries.id";
-	$stm = $DBH->query($query);
+	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 WHERE imas_libraries.deleted=0 ";
+	$qarr = array();
+	if ($isadmin) {
+		//no filter
+	} else if ($isgrpadmin) {
+		//any group owned library or visible to all
+		$query .= "AND (imas_libraries.groupid=:groupid OR imas_libraries.userights>2) ";
+		$qarr[':groupid'] = $groupid;
+	} else {
+		//owned, group
+		$query .= "AND (imas_libraries.ownerid=:userid OR imas_libraries.userights>2) ";
+		$query .= "OR (imas_libraries.userights>0 AND imas_libraries.userights<3 AND imas_libraries.groupid=:groupid) ";
+		$qarr[':groupid'] = $groupid;
+		$qarr[':userid'] = $userid;
+	}
+	$query .= " GROUP BY imas_libraries.id";
+	if (count($qarr)==0) {
+		$stm = $DBH->query($query);
+	} else {
+		$stm = $DBH->prepare($query);
+		$stm->execute($qarr);
+	}
+
 	//$query = "SELECT id,name,parent FROM imas_libraries ORDER BY parent";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 
