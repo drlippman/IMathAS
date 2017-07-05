@@ -28,28 +28,44 @@
 
 		if (!isset($_POST['addexc'])) { $_POST['addexc'] = array();}
 		if (!isset($_POST['addfexc'])) { $_POST['addfexc'] = array();}
-		foreach(explode(',',$_POST['tolist']) as $stu) {
-			foreach($_POST['addexc'] as $aid) {
-				//DB $query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$aid' and itemtype='A'";
-				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
-				$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid and itemtype='A'");
-				$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
-				if ($stm->rowCount()==0) {
-					//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,itemtype) VALUES ";
-					//DB $query .= "('$stu','$aid',$startdate,$enddate,$waivereqscore,$epenalty,'A')";
-					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,itemtype) VALUES ";
-					$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :itemtype)";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':itemtype'=>'A'));
-				} else {
-					//DB $eid = mysql_result($result,0,0);
-					$eid = $stm->fetchColumn(0);
-					//DB $query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore,exceptionpenalty=$epenalty WHERE id=$eid";
-					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty WHERE id=:id");
-					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':id'=>$eid));
+		$toarr = array_map('Sanitize::onlyInt', explode(',', $_POST['tolist']));
+		$addexcarr = array_map('Sanitize::onlyInt', $_POST['addexc']);
+		$addfexcarr = array_map('Sanitize::onlyInt', $_POST['addfexc']);
+		$existingExceptions = array();
+		if (count($addexcarr)>0 && count($toarr)>0) {
+			//prepull users with exceptions
+			$uidplaceholders = Sanitize::generateQueryPlaceholders($toarr);
+			$aidplaceholders = Sanitize::generateQueryPlaceholders($addexcarr);
+			$stm = $DBH->prepare("SELECT userid,assessmentid FROM imas_exceptions WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
+			$stm->execute(array_merge($toarr, $addexcarr));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$existingExceptions[$row[0].'-'.$row[1]] = 1;
+			}
+		}
+		//set up inserts
+		$insertExceptionHolders = array();
+		$insertExceptionVals = array();
+		foreach ($toarr as $stu) {
+			foreach ($addexcarr as $aid) {
+				if (!isset($existingExceptions[$stu.'-'.$aid])) {
+					$insertExceptionHolders[] = "(?,?,?,?,?,?,?)";
+					array_push($insertExceptionVals, $stu, $aid, $startdate, $enddate, $waivereqscore, $epenalty, 'A');
 				}
-				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+			}
+		}
+		//run update
+		$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
+		$stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty), $toarr, $addexcarr));
+
+		//run inserts
+		if (count($insertExceptionVals)>0) {
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,itemtype) VALUES ";
+			$query .= implode(',', $insertExceptionHolders);
+			$stm = $DBH->prepare($query);
+			$stm->execute($insertExceptionVals);
+		}
+		foreach($toarr as $stu) {
+			foreach($addexcarr as $aid) {
 				if (isset($_POST['forceregen'])) {
 					//this is not group-safe
 					//DB $query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
@@ -126,7 +142,20 @@
 				}
 
 			}
-			foreach($_POST['addfexc'] as $fid) {
+			/* work in progress
+			$existingForumExceptions = array();
+			if (count($addfexcarr)>0 && count($toarr)>0) {
+				//prepull users with forum exceptions
+				$uidplaceholders = Sanitize::generateQueryPlaceholders($toarr);
+				$fidplaceholders = Sanitize::generateQueryPlaceholders($addfexcarr);
+				$stm = $DBH->prepare("SELECT userid,assessmentid FROM imas_exceptions WHERE userid IN ($uidplaceholders) AND assessmentid IN ($fidplaceholders) and (itemtype='F' OR itemtype='P' OR itemtype='R')");
+				$stm->execute(array_merge($toarr, $addfexcarr));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$existingForumExceptions[$row[0].'-'.$row[1]] = 1;
+				}
+			}
+			*/
+			foreach($addfexcarr as $fid) {
 				//DB $query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$fid' and (itemtype='F' OR itemtype='P' OR itemtype='R')";
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB if (mysql_num_rows($result)==0) {
@@ -149,6 +178,7 @@
 				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 			}
 		}
+
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
 			//DB $tolist = implode("','",explode(',',$_POST['tolist']));
