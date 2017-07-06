@@ -51,8 +51,11 @@ switch($_POST['action']) {
 		} else {
 			$hashpw = md5($_POST['password']);
 		}
+		if ($_POST['newrights']>$myrights) { //checked above, but do it again
+			$_POST['newrights'] = $myrights;
+		}
 
-		$arr = array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'], ':groupid'=>$groupid,
+		$arr = array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'], ':groupid'=>$_POST['group'],
 				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 				':email'=>Sanitize::stripHtmlTags($_POST['email']));
