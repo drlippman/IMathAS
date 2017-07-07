@@ -17,7 +17,7 @@
 		$query = "INSERT INTO imas_gbcats (courseid) VALUES ('$cid')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}*/
-	if (isset($_GET['remove'])) {  //LEGACY
+	/*if (isset($_GET['remove'])) {  //LEGACY
 		//DB $query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory=:gbcategory");
@@ -31,6 +31,7 @@
 		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['remove']));
 	}
+	*/
 	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
 		if (isset($_POST['deletecatonsubmit'])) {
 			//DB foreach ($_POST['deletecatonsubmit'] as $i=>$cattodel) {
@@ -187,7 +188,7 @@
 		document.getElementById("cattbody").appendChild(tr);
 	}
 	function removeexistcat(id) {
-		if (confirm("Are you SURE you want to delete this category?")) {
+		if (confirm("Are you SURE you want to delete this category? After confirming, Save Changes to finalize deleting the category.")) {
 			$("#theform").append(\'<input type="hidden" name="deletecatonsubmit[]" value="\'+id+\'"/>\');
 			var torem = document.getElementById("catrow"+id);
 			document.getElementById("cattbody").removeChild(torem);
