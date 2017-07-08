@@ -46,7 +46,7 @@ if (isset($_POST['submit'])) {
 	//add new
 	$newcnt = 0;
 	while (isset($_POST['datenew-'.$newcnt])) {
-		if (trim($_POST['txtnew-'.$newcnt])!='' || $_POST['tagnew-'.$newcnt] != '!') {
+		if (trim($_POST['tagnew-'.$newcnt])!='' && (trim($_POST['txtnew-'.$newcnt])!='' || $_POST['tagnew-'.$newcnt] != '!')) {
 			$date = $_POST['datenew-'.$newcnt];
 			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
 			$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);

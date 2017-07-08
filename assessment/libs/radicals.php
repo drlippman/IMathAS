@@ -16,6 +16,14 @@ function reduceradical($in,$root=2,$format="string") {
 	if ($in<0 && ($root%2==0)) {
 		echo "even roots of negatives can't be handled";
 		return;
+	} if ($root==0) {
+		if (is_string($root)) {
+			echo "can't provide a string as the root value - check your parameters";
+			return;
+		} else {
+			echo "can't take the zero'th root";
+			return;
+		}
 	} else if ($in<0) {
 		$sign = '-';
 	} else {

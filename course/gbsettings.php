@@ -17,40 +17,29 @@
 		$query = "INSERT INTO imas_gbcats (courseid) VALUES ('$cid')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}*/
-	if (isset($_GET['remove'])) {  //LEGACY
+	if (isset($_POST['remove'])) {  //via ajax post
 		//DB $query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory=:gbcategory");
-		$stm->execute(array(':gbcategory'=>$_GET['remove']));
+		$stm->execute(array(':gbcategory'=>$_POST['remove']));
 		//DB $query = "UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory=:gbcategory");
-		$stm->execute(array(':gbcategory'=>$_GET['remove']));
+		$stm->execute(array(':gbcategory'=>$_POST['remove']));
 		//DB $query = "DELETE FROM imas_gbcats WHERE id='{$_GET['remove']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['remove']));
-	}
-	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
-		if (isset($_POST['deletecatonsubmit'])) {
-			//DB foreach ($_POST['deletecatonsubmit'] as $i=>$cattodel) {
-			//DB 	$_POST['deletecatonsubmit'][$i] = intval($cattodel);
-			//DB }
-			$catlist = implode(',', array_map('intval',$_POST['deletecatonsubmit']));
-
-			//DB $query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory IN ($catlist)");
-			//DB $query = "UPDATE imas_forums SET gbcategory=0 WHERE gbcategory IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("UPDATE imas_forums SET gbcategory=0 WHERE gbcategory IN ($catlist)");
-			//DB $query = "UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory IN ($catlist)");
-			//DB $query = "DELETE FROM imas_gbcats WHERE id IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("DELETE FROM imas_gbcats WHERE id IN ($catlist)");
+		$stm->execute(array(':id'=>$_POST['remove']));
+		if ($stm->rowCount()>0) {
+			echo "OK";
+		} else {
+			echo "ERROR";
 		}
+		exit;
+	}
+	
+	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
+		
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
@@ -188,9 +177,19 @@
 	}
 	function removeexistcat(id) {
 		if (confirm("Are you SURE you want to delete this category?")) {
-			$("#theform").append(\'<input type="hidden" name="deletecatonsubmit[]" value="\'+id+\'"/>\');
-			var torem = document.getElementById("catrow"+id);
-			document.getElementById("cattbody").removeChild(torem);
+			$.ajax({
+				type: "POST",
+				url: "gbsettings.php?cid='.$cid.'",
+				data: "remove="+id
+			}).done(function(msg) {
+				if (msg=="OK") {	
+					var torem = document.getElementById("catrow"+id);
+					document.getElementById("cattbody").removeChild(torem);
+				} else {
+					alert("Error removing category");
+				}
+			});
+			return false;
 		}
 	}
 	function removecat(n) {
