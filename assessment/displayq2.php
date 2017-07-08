@@ -6737,14 +6737,14 @@ function checkreqtimes($tocheck,$rtimes) {
 	if (is_numeric($cleanans) && $cleanans>0 && $cleanans<1) {
 		$cleanans = ltrim($cleanans,'0');
 	}
-	$ignore_case = false;
+	$ignore_case = true;
 	if ($rtimes != '') {
 		$list = array_map('trim',explode(",",$rtimes));
 		for ($i=0;$i < count($list);$i+=2) {
-			if ($list[$i]=='' || strlen($list[$i+1])<2) {continue;}
+			if ($list[$i]=='' || ($list[$i]!='ignore_case' && strlen($list[$i+1])<2)) {continue;}
 			$list[$i+1] = trim($list[$i+1]);
 			if ($list[$i]=='ignore_case') {
-				$ignore_case = ($list[$i+1]=='1' || $list[$i+1]=='true' || $list[$i+1]=='=1');
+				$ignore_case = ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1');
 				continue;
 			}
 			$comp = substr($list[$i+1],0,1);
