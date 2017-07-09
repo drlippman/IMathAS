@@ -186,6 +186,7 @@ if ($overwriteBody==1) {
       echo ' ('._('Subgroup of').': '.Sanitize::encodeStringForDisplay(trim($userinfo['parentgroup'])).')';
     }
   }
+  echo '<br/>'._('Email').': '.Sanitize::encodeStringForDisplay($userinfo['email']);
   echo '<br/>'._('Last Login').': '.Sanitize::encodeStringForDisplay($userinfo['lastaccess']).'</p>';
 
   if ((count($courses_teaching)>0 || count($courses_tutoring)>0) && count($courses_taking)>0) {

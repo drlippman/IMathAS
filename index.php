@@ -59,7 +59,8 @@ $placeinhead = '
    #homefullwidth { clear: both;}
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-$placeinhead .= '<script type="text/javascript">$(function() {
+if ($myrights>15) {
+  $placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
   $(".courselist-teach li").css("clear","both").each(function (i,el) {
@@ -77,6 +78,7 @@ $placeinhead .= '<script type="text/javascript">$(function() {
   $(".dropdown-toggle").dropdown();
   });
   </script>';
+}
 $nologo = true;
 
 
@@ -379,30 +381,32 @@ if ($myrights==100) {
 /*** done pulling stuff.  Time to display something ***/
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
-echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
-if (!isset($CFG['GEN']['hidedefindexmenu'])) {
-	if ($myrights>5) {
-		echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
-		echo "<a href=\"forms.php?action=chgpwd\">", _('Change Password'), "</a> | \n";
+if (!isset($CFG['GEN']['homelinkbox'])) {
+	echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
+	if (!isset($CFG['GEN']['hidedefindexmenu'])) {
+		if ($myrights>5) {
+			echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
+			echo "<a href=\"forms.php?action=chgpwd\">", _('Change Password'), "</a> | \n";
+		}
+		echo '<a href="actions.php?action=logout">', _('Log Out'), '</a><br/>';
 	}
-	echo '<a href="actions.php?action=logout">', _('Log Out'), '</a><br/>';
-}
-echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
-if ($msgtotal>0) {
-	echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), $msgtotal), '</a>';
-}
-if ($myrights > 10) {
-	echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
-} else if ($myrights > 9) {
-	echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
-}
-if ($myrights >=75) {
-	echo '<br/><a href="admin/admin.php">'._('Admin Page').'</a>';
-} else if (($myspecialrights&4)==4) {
-	echo '<br/><a href="admin/listdiag.php">'._('Diagnostics').'</a>';
+	echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
+	if ($msgtotal>0) {
+		echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), $msgtotal), '</a>';
+	}
+	if ($myrights > 10) {
+		echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
+	} else if ($myrights > 9) {
+		echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
+	}
+	if ($myrights >=75) {
+		echo '<br/><a href="admin/admin.php">'._('Admin Page').'</a>';
+	} else if (($myspecialrights&4)==4) {
+		echo '<br/><a href="admin/listdiag.php">'._('Diagnostics').'</a>';
+	}
+	echo '</div>';
 }
 
-echo '</div>';
 echo '<div class="pagetitle" id="headerhome" role="banner"><h2>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
