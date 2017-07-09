@@ -204,7 +204,7 @@ if ($overwriteBody==1) {
   	echo '<div id="headeradmin" class="pagetitle"><h2>',$pagetitle,'</h2></div>';
     if ($page=='groupadmin') {
       //group admin header top navigation
-      echo '<div class=cp>';
+      echo '<div class=cpmid>';
 
       echo '<span class="column">';
       echo '<a href="../course/manageqset.php?cid=admin">',_('Manage Question Set'), '</a> <br/>';
@@ -214,6 +214,10 @@ if ($overwriteBody==1) {
       echo '<span class="column">';
       echo '<a href="exportlib.php?cid=admin">',_('Export Libraries'),'</a><br/>';
       echo '<a href="listdiag.php">',_('Diagnostics'),'</a> ';
+      echo '</span>';
+
+      echo '<span class="column">';
+      echo '<a href="forms.php?from=admin2&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
       echo '</span>';
 
       echo '<div class=clear></div></div>';
@@ -255,13 +259,15 @@ if ($overwriteBody==1) {
       echo '</ul>';
 
     } else if ($page=='groupadmin' || $page=='groupdetails') {
-      $from = 'gd'.Sanitize::encodeUrlParam($showgroup);
-      if ($showgroup>-1) {
+      if ($page=='groupadmin') {
+        $from = 'admin2';
+      } else {
+        $from = 'gd'.Sanitize::encodeUrlParam($showgroup);
+      }
+      if ($showgroup>-1 && $page=='groupdetails') {
         echo '<div class="cpmid">';
         echo '<a href="forms.php?from='.$from.'&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
-        if ($myrights==100 || ($myspecialrights&4)==4) {
-          echo ' | <a href="listdiag.php?show=g'.Sanitize::encodeUrlParam($showgroup).'">'._('Diagnostics').'</a>';
-        }
+        echo ' | <a href="listdiag.php?show=g'.Sanitize::encodeUrlParam($showgroup).'">'._('Diagnostics').'</a>';
         echo '</div>';
       }
       echo '<table class=gb id="myTable">';
