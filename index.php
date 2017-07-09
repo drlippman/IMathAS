@@ -398,6 +398,8 @@ if ($myrights > 10) {
 }
 if ($myrights >=75) {
 	echo '<br/><a href="admin/admin.php">'._('Admin Page').'</a>';
+} else if (($myspecialrights&4)==4) {
+	echo '<br/><a href="admin/listdiag.php">'._('Diagnostics').'</a>';
 }
 
 echo '</div>';

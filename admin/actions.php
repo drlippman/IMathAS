@@ -8,10 +8,26 @@ $from = 'admin';
 if (isset($_GET['from'])) {
 	if ($_GET['from']=='home') {
 		$from = 'home';
+	} else if ($_GET['from']=='admin2') {
+		$from = 'admin2';
+	} else if (substr($_GET['from'],0,2)=='ud') {
+		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
+		$from = 'ud'.$userdetailsuid;
+		$backloc = 'userdetails.php?id='.$userdetailsuid;
+	} else if (substr($_GET['from'],0,2)=='gd') {
+		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
+		$from = 'gd'.$groupdetailsgid;
+		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
 	}
 }
 if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
+} else if ($from == 'admin2') {
+	$breadcrumbbase .= '<a href="admin2.php">Admin</a> &gt; ';
+} else if (substr($_GET['from'],0,2)=='ud') {
+	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
+} else if (substr($_GET['from'],0,2)=='gd') {
+	echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
 }
 
 switch($_POST['action']) {
@@ -1103,10 +1119,16 @@ switch($_POST['action']) {
 }
 
 session_write_close();
-if (isset($_GET['cid'])) {
+if (empty($from)) {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin.php");
+} else if (isset($_GET['cid'])) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 } else if ($from=='home') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+} else if ($from=='admin2') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
+} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin.php");
 }

@@ -18,6 +18,23 @@ if ($type=='teach') {
 	$type = 'take';
 }
 
+if (isset($_GET['cid'])) {
+	if ($cid>0) {
+		//DB $query = "UPDATE imas_students SET hidefromcourselist=0 WHERE courseid='$cid' AND userid='$userid'";
+		//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$stm = $DBH->prepare("UPDATE $table SET hidefromcourselist=0 WHERE courseid=:courseid AND userid=:userid");
+		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+		if (isset($_GET['ajax'])) {
+			if ($stm->rowCount()>0) {
+				echo "OK";
+			} else {
+				echo "ERROR";
+			}
+			exit;
+		}
+	}
+}
+
 $pagetitle = "View Hidden Courses You're $typename from Course List";
 $curBreadcrumb = "$breadcrumbbase Unhide Courses\n";
 require("../header.php");
@@ -25,14 +42,7 @@ require("../header.php");
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 echo '<h2>View Hidden Courses You\'re '.$typename.'</h2>';
 
-if (isset($_GET['cid'])) {
-	if ($cid>0) {
-		//DB $query = "UPDATE imas_students SET hidefromcourselist=0 WHERE courseid='$cid' AND userid='$userid'";
-		//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$stm = $DBH->prepare("UPDATE $table SET hidefromcourselist=0 WHERE courseid=:courseid AND userid=:userid");
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
-	}
-}
+
 
 //DB $query = 'SELECT ic.name,ic.id FROM imas_courses AS ic JOIN imas_students AS istu ON ic.id=istu.courseid ';
 //DB $query .= "WHERE istu.userid='$userid' AND istu.hidefromcourselist=1";

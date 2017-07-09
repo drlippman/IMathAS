@@ -6,16 +6,33 @@ require("../header.php");
 
 $from = 'admin';
 $backloc = 'admin.php';
-if (isset($_GET['from'])) {
+if (!empty($_GET['from'])) {
 	if ($_GET['from']=='home') {
 		$from = 'home';
 		$backloc = '../index.php';
+	} else if ($_GET['from']=='admin2') {
+		$from = 'admin2';
+		$backloc = 'admin2.php';
+	} else if (substr($_GET['from'],0,2)=='ud') {
+		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
+		$from = 'ud'.$userdetailsuid;
+		$backloc = 'userdetails.php?id='.Sanitize::encodeUrlParam($userdetailsuid);
+	} else if (substr($_GET['from'],0,2)=='gd') {
+		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
+		$from = 'gd'.$groupdetailsgid;
+		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
 	}
 }
 if (!isset($_GET['cid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase ";
-	if ($from != 'home') {
+	if ($from == 'admin') {
 		echo "<a href=\"admin.php\">Admin</a> &gt; ";
+	} else if ($from == 'admin2') {
+		echo '<a href="admin2.php">'._('Admin').'</a> &gt; ';
+	} else if (substr($_GET['from'],0,2)=='ud') {
+		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
+	} else if (substr($_GET['from'],0,2)=='gd') {
+		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
 	}
 	echo "Form</div>\n";
 }
@@ -60,7 +77,7 @@ switch($_GET['action']) {
 		echo "\">\n";
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
 		if ($_GET['action'] == "newadmin") {
-			$oldgroup = 0;
+			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):0);
 			$oldrights = 10;
 		} else {
 			//DB $query = "SELECT FirstName,LastName,rights,groupid,specialrights FROM imas_users WHERE id='{$_GET['id']}'";
@@ -859,7 +876,11 @@ switch($_GET['action']) {
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td>{$row[1]}</td>";
+			if ($from=='admin2') {
+				echo '<tr><td><a href="admin2.php?groupdetails='.$row[0].'">'.$row[1].'</a></td>';
+			} else {
+				echo "<tr><td>{$row[1]}</td>";
+			}
 			echo "<td><a href=\"forms.php?action=modgroup&id={$row[0]}\">Modify</a></td>\n";
 			if ($row[0]==0) {
 				echo "<td></td>";
