@@ -410,13 +410,14 @@ if (isset($CFG['GEN']['hometitle'])) {
 	echo _('Welcome to'), " $installname, " . Sanitize::encodeStringForDisplay($userfullname);
 }
 echo '</h2>';
+echo '</div>';
 if (isset($sessiondata['emulateuseroriginaluser'])) {
 	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
 }
 if ($myrights==100 && count($brokencnt)>0) {
-	echo '<span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
+	echo '<div><span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
 }
-echo '</div>';
+
 if (isset($tzname) && isset($sessiondata['logintzname']) && $tzname!=$sessiondata['logintzname']) {
 	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';
 }
