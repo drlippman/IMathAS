@@ -127,9 +127,12 @@ if (isset($_POST['order'])) {
 		$query = "UPDATE imas_gbitems SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		*/
-		//DB $query = "UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		$DBH->query("UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)");
+
+		//$DBH->query("UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)");
+		$query = "UPDATE imas_questions AS iq INNER JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
+		$query .= "SET iq.category='' WHERE ia.courseid=:courseid AND iq.category IN ($unusedlist)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$cid));
 	}
 	echo '1,h:';
 }
