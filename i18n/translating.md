@@ -1,12 +1,12 @@
-#Tranlating IMathAS system messages
+# Translating IMathAS system messages
 
 First, be aware that while most of the student-facing interface is set up for
 internationatlization, thanks to the work of Stefan Baecker and others from 
 Univ Koblenz, much of the instructor-facing interface is not yet.
 
-##Extracting Messages
+## Extracting Messages
 In the following, replace `es` with the desired [two-letter language code](https://www.w3schools.com/tags/ref_language_codes.asp). 
-Run the commands from the main imathas directory.
+Run the commands on the command line from the main imathas directory.
 
 Make a backup copy of the existing .po file, if one exists
 
@@ -20,11 +20,11 @@ Now, build the .po file. This will process the appropriate git versioned files.
 
 `git ls-tree -r master --name-only | grep -E '(php|js)$' | grep -v 'i18n/' | xargs xgettext -d es -p i18n -j --from-code=UTF-8`
 
-##Translate
+## Translate
 
 Translate i18n/es.po manually
 
-##Compile the translations
+## Compile the translations
 
 If needed, make the i18n/local/es/LC_MESSAGES
 
@@ -38,7 +38,7 @@ Build the javascript messages file
 
 `php i18n/extractjsfrompo.php es`
 
-##Using the tranlations
+## Using the tranlations
 
 Add to config.php:
 
