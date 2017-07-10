@@ -7,7 +7,8 @@ require("../init.php");
 function getRoleNameByRights($rights) {
   switch ($rights) {
     case 5: return _("Guest"); break;
-    case 10:return _("Student"); break;
+    case 10: return _("Student"); break;
+    case 12: return _("Pending"); break;
     case 15: return _("Tutor/TA/Proctor"); break;
     case 20: return _("Teacher"); break;
     case 40: return _("LimCourseCreator"); break;

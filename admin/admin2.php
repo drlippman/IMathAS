@@ -8,7 +8,8 @@ require("../init.php");
 function getRoleNameByRights($rights) {
   switch ($rights) {
     case 5: return _("Guest"); break;
-    case 10:return _("Student"); break;
+    case 10: return _("Student"); break;
+    case 12: return _("Pending"); break;
     case 15: return _("Tutor/TA/Proctor"); break;
     case 20: return _("Teacher"); break;
     case 40: return _("LimCourseCreator"); break;
@@ -55,6 +56,7 @@ if ($myrights < 75) {
     //search for a user (teacher or regular)
     $words = array();
     $possible_users = array();
+    $hasp1 = false;
     if (trim($_GET['findteacher'])!=='') {
       $limitToTeacher = true;
       $words = preg_split('/\s+/', trim($_GET['findteacher']));
@@ -65,44 +67,56 @@ if ($myrights < 75) {
       $pagetitle = _("Select User");
     }
     if (count($words)==1 && strpos($words[0],'@')!==false) {
-      $query = "SELECT id,LastName,FirstName,email,SID FROM imas_users WHERE (email=? OR SID=?)";
+      $query = "SELECT iu.id,LastName,iu.FirstName,iu.email,iu.SID,iu.rights,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id "; 
+      $query .= "WHERE (iu.email=? OR iu.SID=?)";
       if ($limitToTeacher) {
-        $query .= " AND rights>11";
+        $query .= " AND iu.rights>11";
       }
+      $query .= " LIMIT 200";
       $stm = $DBH->prepare($query);
       $stm->execute(array($words[0], $words[0]));
       while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        if ($row['rights']==11 || $row['rights']==76 || $row['rights']==77) {continue;} //skip LTI creds
         $possible_users[] = $row;
       }
     } else if (count($words)==1) {
-      $query = "SELECT id,LastName,FirstName,email,SID FROM imas_users WHERE (LastName LIKE ? OR FirstName Like ? OR SID LIKE ?)";
+      $query = "SELECT iu.id,LastName,iu.FirstName,iu.email,iu.SID,iu.rights,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id "; 
+      $query .= "WHERE (iu.LastName LIKE ? OR iu.FirstName Like ? OR iu.SID LIKE ?)";
       if ($limitToTeacher) {
-        $query .= " AND rights>11";
+        $query .= " AND iu.rights>11";
       }
+      $query .= " LIMIT 200";
       $stm = $DBH->prepare($query);
       $stm->execute(array($words[0].'%', $words[0].'%', '%'.$words[0].'%'));
       while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        if ($row['rights']==11 || $row['rights']==76 || $row['rights']==77) {continue;} //skip LTI creds
         if ($row['SID']==$words[0] || $row['LastName']==$words[0]) {
           $row['priority'] = 1;
+          $hasp1 = true;
         } else {
           $row['priority'] = 0;
         }
         $possible_users[] = $row;
       }
     } else if (count($words)==2) {
-      $query = "SELECT id,LastName,FirstName,email,SID FROM imas_users WHERE ((LastName LIKE ? AND FirstName Like ?) OR (LastName LIKE ? AND FirstName Like ?))";
+      $query = "SELECT iu.id,LastName,iu.FirstName,iu.email,iu.SID,iu.rights,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id "; 
+      $query .= "WHERE ((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
       if ($limitToTeacher) {
-        $query .= " AND rights>11";
+        $query .= " AND iu.rights>11";
       }
+      $query .= " LIMIT 200";
       $stm = $DBH->prepare($query);
       $stm->execute(array($words[0].'%', $words[1].'%', $words[1].'%', $words[0].'%' ));
       $possible_users = array();
       while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        if ($row['rights']==11 || $row['rights']==76 || $row['rights']==77) {continue;} //skip LTI creds
         $row['priority'] = 0;
         if ($row['LastName']==$words[0] || $row['LastName']==$words[1]) {
+          $hasp1 = true;
           $row['priority'] += 1;
         }
         if ($row['FirstName']==$words[0] || $row['FirstName']==$words[1]) {
+          $hasp1 = true;
           $row['priority'] += 1;
         }
         $possible_users[] = $row;
@@ -129,6 +143,7 @@ if ($myrights < 75) {
     $curBreadcrumb = $curBreadcrumb . ' <a href="admin2.php">' . _('Admin') . '</a> &gt; ' . $pagetitle;
 
   } else if (!empty($_GET['findgroup'])) {
+    $hasp1 = false;
     $words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$_GET['findgroup'])));
     $likearr = array();
     foreach ($words as $v) {
@@ -142,7 +157,8 @@ if ($myrights < 75) {
       $row['priority'] = 0;
       foreach ($words as $v) {
         if (preg_match('/\b'.$v.'\b/i', $row['name'])) {
-          $row['priority'] ++;
+          $hasp1 = true;
+          $row['priority']++;
         }
       }
       $possible_groups[] = $row;
@@ -178,9 +194,9 @@ if ($myrights < 75) {
     } else {
 
       if ($myrights==100) { //include pending users
-        $stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 11 AND rights<>76 AND groupid=:groupid ORDER BY LastName,FirstName");
+        $stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 11 AND rights<>76 AND rights<>77 AND groupid=:groupid ORDER BY LastName,FirstName");
       } else {
-        $stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 12 AND rights<>76 AND groupid=:groupid ORDER BY LastName,FirstName");
+        $stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 12 AND rights<>76 AND rights<>77 AND groupid=:groupid ORDER BY LastName,FirstName");
       }
       $stm->execute(array(':groupid'=>$showgroup));
     }
@@ -226,38 +242,80 @@ if ($overwriteBody==1) {
       if (count($possible_users)==0) {
         echo '<p>'._('No users found').'</p>';
       } else {
-        echo '<table class="gb">';
+      	if ($hasp1) {
+      		echo '<style type="text/css"> tr.p0 {color:#999;} tr.p2 {color:#060;}</style>';
+      	}
+        echo '<table class="gb" id="myTable">';
         echo '<thead><tr>';
         echo '<th>'._('Name').'</th>';
         echo '<th>'._('Username').'</th>';
         echo '<th>'._('Email').'</th>';
+        echo '<th>'._('Role').'</th>';
+        echo '<th>'._('Group').'</th>';
         echo '</tr></thead>';
         echo '<tbody>';
         $alt = 0;
         foreach ($possible_users as $user) {
-          if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+          $priorityclass = "p".$user['priority']; 
+          if ($alt==0) {echo "<tr class=\"even $priorityclass\">"; $alt=1;} else {echo "<tr class=\"odd $priorityclass\">"; $alt=0;}
           echo '<td><a href="userdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'">';
           echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']) . '</a></td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['SID']).'</td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['email']).'</td>';
+          echo '<td>'.Sanitize::encodeStringForDisplay(getRoleNameByRights($user['rights'])).'</td>';
+          if ($user['name']===null) {
+          	  echo '<td></td>';
+          } else {
+          	  echo '<td>'.Sanitize::encodeStringForDisplay($user['name']).'</td>';
+          }
           echo '</tr>';
         }
         echo '</tbody>';
         echo '</table>';
+        if (count($possible_users)==200) {
+        	echo '<p>'._('List cut off at 200 options.  Try narrowing the search').'</p>';
+        }
+        echo '<script type="text/javascript">
+          initSortTable("myTable",Array("S","S","S","S","S"),true);
+          </script>';
       }
 
     } else if ($page=='pickgroup') {
 
+      if ($hasp1) {
+      	echo '<style type="text/css"> .p0 {opacity:.5} .p2 a,.p3 a,.p4 a {color:#060;}</style>';
+      	//echo '<style type="text/css"> li.p0 {opacity:.5} li.p2 a,li.p3 a,li.p4 a {color:#060;}</style>';
+      }
+/*
       echo '<ul class="nomark">';
       if (count($possible_groups)==0) {
         echo '<li>'._('No group found').'</li>';
       }
       foreach ($possible_groups as $group) {
-        echo '<li><a href="admin2.php?groupdetails='.Sanitize::encodeUrlParam($group['id']).'">';
+        $priorityclass = "p".$group['priority']; 
+        echo '<li class="'.$priorityclass.'"><a href="admin2.php?groupdetails='.Sanitize::encodeUrlParam($group['id']).'">';
         echo Sanitize::encodeStringForDisplay($group['name']).'</a></li>';
       }
       echo '</ul>';
-
+*/
+	echo '<table class="gb" id="myTable">';
+        echo '<thead><tr>';
+        echo '<th>'._('Group').'</th>';
+        echo '</tr></thead>';
+        echo '<tbody>';
+        $alt = 0;
+        foreach ($possible_groups as $group) {
+          $priorityclass = "p".$group['priority']; 
+          if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+          echo '<td class="'.$priorityclass.'"><a href="admin2.php?groupdetails='.Sanitize::encodeUrlParam($group['id']).'">';
+          echo Sanitize::encodeStringForDisplay($group['name']).'</a></td></tr>';
+        }
+        echo '</tbody>';
+        echo '</table>';
+        echo '<script type="text/javascript">
+          initSortTable("myTable",Array("S"),true);
+          </script>';
+          
     } else if ($page=='groupadmin' || $page=='groupdetails') {
       if ($page=='groupadmin') {
         $from = 'admin2';
