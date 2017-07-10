@@ -1,4 +1,7 @@
 <?php
+
+echo "This script has been deprecated.  Using the extractjsfrompo.php instead.";
+exit;
 $dir = realpath('..');
 
 $strs = array();
