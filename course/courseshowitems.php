@@ -1688,70 +1688,73 @@ function showitems($items,$parent,$inpublic=false) {
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
 	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $itemtypes, $iteminfo;
 	   if (!is_array($openblocks)) {$openblocks = array();}
-	   $itemtypes = array();  $iteminfo = array();
-	   //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($row = mysql_fetch_row($result)) {
-	   $stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
-	   $stm->execute(array(':courseid'=>$cid));
-	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		   $itemtypes[$row[0]] = array($row[1],$row[2]);
-	   }
-	   //DB $query = "SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid='$cid'";
-	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($row = mysql_fetch_row($result)) {
-	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid=:courseid");
-	   $stm->execute(array(':courseid'=>$cid));
-	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		   $id = array_shift($row);
-		   $iteminfo['Assessment'][$id] = $row;
-	   }
-	   //DB $query = "SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
-	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($row = mysql_fetch_row($result)) {
-	   $stm = $DBH->prepare("SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid=:courseid");
-	   $stm->execute(array(':courseid'=>$cid));
-	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		   $id = array_shift($row);
-		   $iteminfo['InlineText'][$id] = $row;
-	   }
-	   //DB $query = "SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid='$cid'";
-	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($row = mysql_fetch_row($result)) {
-	   $stm = $DBH->prepare("SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid=:courseid");
-	   $stm->execute(array(':courseid'=>$cid));
-	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		   $id = array_shift($row);
-		   $iteminfo['LinkedText'][$id] = $row;
-	   }
-	   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid='$cid'";
-	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($row = mysql_fetch_row($result)) {
-	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid=:courseid");
-	   $stm->execute(array(':courseid'=>$cid));
-	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		   $id = array_shift($row);
-		   $iteminfo['Forum'][$id] = $row;
-	   }
-
-	   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
-	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($row = mysql_fetch_row($result)) {
-	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid=:courseid");
-	   $stm->execute(array(':courseid'=>$cid));
-	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		   $id = array_shift($row);
-		   $iteminfo['Wiki'][$id] = $row;
-	   }
-	   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid='$cid'";
-	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   //DB while ($row = mysql_fetch_row($result)) {
-	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid=:courseid");
-	   $stm->execute(array(':courseid'=>$cid));
-	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		   $id = array_shift($row);
-		   $iteminfo['Drill'][$id] = $row;
+	   if ($parent==0) {
+		   $itemtypes = array();  $iteminfo = array();
+		   //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB while ($row = mysql_fetch_row($result)) {
+		   $stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
+		   $stm->execute(array(':courseid'=>$cid));
+		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			   $itemtypes[$row[0]] = array($row[1],$row[2]);
+		   }
+		   //DB $query = "SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid='$cid'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB while ($row = mysql_fetch_row($result)) {
+		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid=:courseid");
+		   $stm->execute(array(':courseid'=>$cid));
+		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			   $id = array_shift($row);
+			   $iteminfo['Assessment'][$id] = $row;
+		   }
+		   //DB $query = "SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB while ($row = mysql_fetch_row($result)) {
+		   $stm = $DBH->prepare("SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid=:courseid");
+		   $stm->execute(array(':courseid'=>$cid));
+		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			   $id = array_shift($row);
+			   $iteminfo['InlineText'][$id] = $row;
+		   }
+		   //DB $query = "SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid='$cid'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB while ($row = mysql_fetch_row($result)) {
+		   $stm = $DBH->prepare("SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid=:courseid");
+		   $stm->execute(array(':courseid'=>$cid));
+		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			   $id = array_shift($row);
+			   $iteminfo['LinkedText'][$id] = $row;
+		   }
+		   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid='$cid'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB while ($row = mysql_fetch_row($result)) {
+		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid=:courseid");
+		   $stm->execute(array(':courseid'=>$cid));
+		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			   $id = array_shift($row);
+			   $iteminfo['Forum'][$id] = $row;
+		   }
+	
+		   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB while ($row = mysql_fetch_row($result)) {
+		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid=:courseid");
+		   $stm->execute(array(':courseid'=>$cid));
+		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			   $id = array_shift($row);
+			   $iteminfo['Wiki'][$id] = $row;
+		   }
+		   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid='$cid'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB while ($row = mysql_fetch_row($result)) {
+		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid=:courseid");
+		   $stm->execute(array(':courseid'=>$cid));
+		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			   $id = array_shift($row);
+			   $iteminfo['Drill'][$id] = $row;
+		   }
 	   }
 	   $now = time();
 	   for ($i=0;$i<count($items); $i++) {

@@ -498,6 +498,8 @@ if (!(isset($teacherid))) {
 			$names = array();
 			$sums = array();
 			$parents = array();
+			require_once("../includes/loaditemshowdata.php");
+			$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);	
 			getsubinfo($items,'0','',false,' ');
 
 			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";

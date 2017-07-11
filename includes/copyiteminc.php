@@ -747,7 +747,7 @@ function getiteminfo($itemid) {
 }
 
 function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nbsp;') {
-	global $ids,$types,$names,$sums,$parents,$gitypeids,$prespace,$CFG;
+	global $ids,$types,$names,$sums,$parents,$gitypeids,$prespace,$CFG,$itemshowdata;
 	if (!isset($gitypeids)) {
 		$gitypeids = array();
 	}
@@ -769,7 +769,24 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nb
 			if ($item==null || $item=='') {
 				continue;
 			}
-			$arr = getiteminfo($item);
+			if (!empty($itemshowdata)) {
+				array($itemtype,$name,$summary,$typeid);
+				if (isset($itemshowdata[$item]['name'])) {
+					$name = $itemshowdata[$item]['name'];
+				} else {
+					$name = $itemshowdata[$item]['title'];
+				}
+				if (isset($itemshowdata[$item]['summary'])) {
+					$summary = $itemshowdata[$item]['summary'];
+				} else if (isset($itemshowdata[$item]['text'])) {
+					$summary = $itemshowdata[$item]['text'];
+				} else {
+					$summary = $itemshowdata[$item]['description'];
+				}
+				$arr = array($itemshowdata[$item]['itemtype'], $name, $summary, $itemshowdata[$item]['id']);
+			} else {
+				$arr = getiteminfo($item);
+			}
 			if ($arr[0]===false || ($itemtypelimit!==false && $arr[0]!=$itemtypelimit)) {
 				continue;
 			}

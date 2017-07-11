@@ -6,6 +6,7 @@
 require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/copyiteminc.php");
+require("../includes/loaditemshowdata.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -418,6 +419,7 @@ if (!(isset($teacherid))) {
 		$parents = array();
 		$agbcats = array();
 		$prespace = array();
+		$itemshowdata = loadItemShowData($items,false,true,false,false,'Assessment',true);
 		getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
 
 		//DB $query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";

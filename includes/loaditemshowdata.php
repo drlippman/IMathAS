@@ -57,8 +57,10 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 *	$viewall:	Is this a teacher/tutor able to see all items?
 *	$inpublic:	Are we in a public block?
 *	$ispublic:	Are we loading this from public.php? 
+* 	$limittype: 	Limit item type loaded
+*	$limited:	True to only return ids and names/summaries
 ***/
-function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=false) {
+function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=false,$limittype=false,$limited=false) {
 	global $DBH;
 	$itemshowdata = array();
 	
@@ -67,7 +69,14 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	$typelookups = array();
 	if (count($itemstolookup)>0) {
 		$itemlist = implode(',', array_map('intval', $itemstolookup));
-		$stm = $DBH->query("SELECT itemtype,typeid,id FROM imas_items WHERE id IN ($itemlist)");
+		$query = "SELECT itemtype,typeid,id FROM imas_items WHERE id IN ($itemlist)";
+		if ($limittype!==false) {
+			$query .= " AND itemtype=:itemtype";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':itemtype'=>$limittype));
+		} else {
+			$stm = $DBH->query($query);
+		}
 		
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($typelookups[$line['itemtype']])) {$typelookups[$line['itemtype']] = array();}
@@ -80,7 +89,12 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	}
 	if (isset($typelookups['Assessment']) && !$ispublic) {
 		$typelist = implode(',', array_keys($typelookups['Assessment']));
-		$stm = $DBH->query("SELECT id,name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id IN ($typelist)");
+		if ($limited) {
+			$tosel = 'id,name,summary';
+		} else {
+			$tosel = 'id,name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit';
+		}
+		$stm = $DBH->query("SELECT $tosel FROM imas_assessments WHERE id IN ($typelist)");
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Assessment';
 			$itemshowdata[$typelookups['Assessment'][$line['id']]] = $line;
@@ -88,7 +102,12 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	}
 	if (isset($typelookups['InlineText'])) {
 		$typelist = implode(',', array_keys($typelookups['InlineText']));
-		$stm = $DBH->query("SELECT id,title,text,startdate,enddate,fileorder,avail,isplaylist FROM imas_inlinetext WHERE id IN ($typelist)");
+		if ($limited) {
+			$tosel = 'id,title,text';
+		} else {
+			$tosel = 'id,title,text,startdate,enddate,fileorder,avail,isplaylist';
+		}
+		$stm = $DBH->query("SELECT $tosel FROM imas_inlinetext WHERE id IN ($typelist)");
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'InlineText';
 			$itemshowdata[$typelookups['InlineText'][$line['id']]] = $line;
@@ -96,7 +115,12 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	}
 	if (isset($typelookups['Drill']) && !$ispublic) {
 		$typelist = implode(',', array_keys($typelookups['Drill']));
-		$stm = $DBH->query("SELECT id,name,summary,startdate,enddate,avail FROM imas_drillassess WHERE id IN ($typelist)");
+		if ($limited) {
+			$tosel = 'id,name,summary';
+		} else {
+			$tosel = 'id,name,summary,startdate,enddate,avail';
+		}
+		$stm = $DBH->query("SELECT $tosel FROM imas_drillassess WHERE id IN ($typelist)");
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Drill';
 			$itemshowdata[$typelookups['Drill'][$line['id']]] = $line;
@@ -104,7 +128,12 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	}
 	if (isset($typelookups['LinkedText'])) {
 		$typelist = implode(',', array_keys($typelookups['LinkedText']));
-		$stm = $DBH->query("SELECT id,title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id IN ($typelist)");
+		if ($limited) {
+			$tosel = 'id,title,summary';
+		} else {
+			$tosel = 'id,title,summary,text,startdate,enddate,avail,target';
+		}
+		$stm = $DBH->query("SELECT $tosel FROM imas_linkedtext WHERE id IN ($typelist)");
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'LinkedText';
 			$itemshowdata[$typelookups['LinkedText'][$line['id']]] = $line;
@@ -112,7 +141,12 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	}
 	if (isset($typelookups['Forum']) && !$ispublic) {
 		$typelist = implode(',', array_keys($typelookups['Forum']));
-		$stm = $DBH->query("SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby,allowlate FROM imas_forums WHERE id IN ($typelist)");
+		if ($limited) {
+			$tosel = 'id,name,description';
+		} else {
+			$tosel = 'id,name,description,startdate,enddate,groupsetid,avail,postby,replyby,allowlate';
+		}
+		$stm = $DBH->query("SELECT $tosel FROM imas_forums WHERE id IN ($typelist)");
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Forum';
 			$itemshowdata[$typelookups['Forum'][$line['id']]] = $line;
@@ -120,7 +154,12 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	}
 	if (isset($typelookups['Wiki'])) {
 		$typelist = implode(',', array_keys($typelookups['Wiki']));
-		$stm = $DBH->query("SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id IN ($typelist)");
+		if ($limited) {
+			$tosel = 'id,name,description';
+		} else {
+			$tosel = 'id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid';
+		}
+		$stm = $DBH->query("SELECT $tosel FROM imas_wikis WHERE id IN ($typelist)");
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Wiki';
 			$itemshowdata[$typelookups['Wiki'][$line['id']]] = $line;
