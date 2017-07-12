@@ -3,9 +3,8 @@
 //(c) 2011 David Lippman
 
 require("../init.php");
-
-
-
+require("../includes/copyiteminc.php");
+require("../includes/loaditemshowdata.php");
 
 if (!is_numeric($_GET['cid'])) {
 	echo 'Invalid course ID.';
@@ -685,68 +684,20 @@ if (isset($_GET['delete'])) {
 	echo "Once downloaded, keep things clean and <a href=\"ccexport.php?cid=$cid&delete=true\">Delete</a> the export file off the server.";
 } else {
 
-	function getsubinfo($items,$parent,$pre) {
-		global $ids,$types,$names;
-		foreach($items as $k=>$item) {
-			if (is_array($item)) {
-				$ids[] = $parent.'-'.($k+1);
-				$types[] = $pre."Block";
-				//DB $names[] = stripslashes($item['name']);
-				$names[] = $item['name'];
-				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
-			} else {
-				$ids[] = $item;
-				$arr = getiteminfo($item);
-				$types[] = $pre.$arr[0];
-				$names[] = $arr[1];
-			}
-		}
-	}
-	function getiteminfo($itemid) {
-		global $DBH;
-		//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
-		$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
-		$stm->execute(array(':id'=>$itemid));
-		//DB $itemtype = mysql_result($result,0,0);
-		//DB $typeid = mysql_result($result,0,1);
-		list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
-		switch($itemtype) {
-			case ($itemtype==="InlineText"):
-				//DB $query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
-				break;
-			case ($itemtype==="LinkedText"):
-				//DB $query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
-				break;
-			case ($itemtype==="Forum"):
-				//DB $query = "SELECT name FROM imas_forums WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
-				break;
-			case ($itemtype==="Assessment"):
-				//DB $query = "SELECT name FROM imas_assessments WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-				break;
-		}
-		$stm->execute(array(':id'=>$typeid));
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $name = mysql_result($result,0,0);
-		$name = $stm->fetchColumn(0);
-		return array($itemtype,$name);
-	}
 
-	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $items = unserialize(mysql_result($result,0,0));
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$items = unserialize($stm->fetchColumn(0));
+
 	$ids = array();
 	$types = array();
 	$names = array();
-
-	getsubinfo($items,'0','');
+	$sums = array();
+	$parents = array();
+	$agbcats = array();
+	$prespace = array();
+	$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
+	getsubinfo($items,'0','',false,'|- ');
 
 
 	echo '<h2>Common Cartridge Export</h2>';
@@ -788,10 +739,10 @@ if (isset($_GET['delete'])) {
 		if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
 ?>
 				<td>
-				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>'>
+				<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($ids[$i]); ?>'>
 				</td>
-				<td><?php echo $types[$i] ?></td>
-				<td><?php echo $names[$i] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($prespace[$i].$types[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></td>
 			</tr>
 <?php
 	}
