@@ -54,8 +54,10 @@
 			}
 		}
 		//run update
-		$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
-		$stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty), $toarr, $addexcarr));
+		if (count($addexcarr)>0 && count($toarr)>0) {
+			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
+			$stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty), $toarr, $addexcarr));
+		}
 
 		//run inserts
 		if (count($insertExceptionVals)>0) {
