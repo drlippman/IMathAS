@@ -793,7 +793,7 @@ function chgfilter() {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$msgcourses[$row[0]] = $row[1];
 	}
-	if (!isset($msgcourses[$cid])) {
+	if (!isset($msgcourses[$cid]) && $cid>0) {
 		$msgcourses[$cid] = $coursename;
 	}
 	natsort($msgcourses);
