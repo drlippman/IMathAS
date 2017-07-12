@@ -13,91 +13,10 @@ ini_set("post_max_size", "10485760");
 /*** master php includes *******/
 require("../init.php");
 include("../includes/filehandler.php");
-
+require("../includes/copyiteminc.php");
+require("../includes/loaditemshowdata.php");
 
 /*** pre-html data manipulation, including function code *******/
-function copysub($items,$parent,&$addtoarr) {
-	global $itemcnt,$toexport;
-	global $checked;
-	foreach ($items as $k=>$item) {
-		if (is_array($item)) {
-			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
-				$newblock = array();
-				$newblock['name'] = $item['name'];
-				$newblock['avail'] = $item['avail'];
-				$newblock['startdate'] = $item['startdate'];
-				$newblock['enddate'] = $item['enddate'];
-				$newblock['SH'] = $item['SH'];
-				$newblock['colors'] = $item['colors'];
-				$newblock['public'] = $item['public'];
-				$newblock['fixedheight'] = $item['fixedheight'];
-				$newblock['items'] = array();
-				copysub($item['items'],$parent.'-'.($k+1),$newblock['items']);
-				$addtoarr[] = $newblock;
-			} else {
-				copysub($item['items'],$parent.'-'.($k+1),$addtoarr);
-			}
-		} else {
-			if (array_search($item,$checked)!==FALSE) {
-				$toexport[$itemcnt] = $item;
-				$addtoarr[] = $itemcnt;
-				$itemcnt++;
-			}
-		}
-	}
-}
-
-function getsubinfo($items,$parent,$pre) {
-	global $ids,$types,$names;
-	foreach($items as $k=>$item) {
-		if (is_array($item)) {
-			$ids[] = $parent.'-'.($k+1);
-			$types[] = $pre."Block";
-			//DB $names[] = stripslashes($item['name']);
-			$names[] = $item['name'];
-			getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
-		} else {
-			$ids[] = $item;
-			$arr = getiteminfo($item);
-			$types[] = $pre.$arr[0];
-			$names[] = $arr[1];
-		}
-	}
-}
-
-function getiteminfo($itemid) {
-  global $DBH;
-	//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
-	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
-	$stm->execute(array(':id'=>$itemid));
-  //DB $itemtype = mysql_result($result,0,0);
-  //DB $typeid = mysql_result($result,0,1);
-  list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
-  switch($itemtype) {
-    case ($itemtype==="InlineText"):
-      //DB $query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
-      break;
-    case ($itemtype==="LinkedText"):
-      //DB $query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
-      break;
-    case ($itemtype==="Forum"):
-      //DB $query = "SELECT name FROM imas_forums WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
-      break;
-    case ($itemtype==="Assessment"):
-      //DB $query = "SELECT name FROM imas_assessments WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-      break;
-  }
-  $stm->execute(array(':id'=>$typeid));
-  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-  //DB $name = mysql_result($result,0,0);
-  $name = $stm->fetchColumn(0);
-	return array($itemtype,$name);
-}
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -481,8 +400,12 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$ids = array();
 	$types = array();
 	$names = array();
-
-	getsubinfo($items,'0','');
+	$sums = array();
+	$parents = array();
+	$agbcats = array();
+	$prespace = array();
+	$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
+	getsubinfo($items,'0','',false,'|- ');
 }
 
 require("../header.php");
@@ -520,7 +443,7 @@ if ($overwriteBody==1) {
 				<td>
 				<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($ids[$i]); ?>' checked=checked>
 				</td>
-				<td><?php echo Sanitize::encodeStringForDisplay($types[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($prespace[$i].$types[$i]); ?></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></td>
 			</tr>
 <?php
