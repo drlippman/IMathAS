@@ -458,127 +458,118 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$grp = 0;
 		$grp0Selected = " selected";
 	}
+	
+	$questionjsarr = array();
+	$existingq = array();
+	$query = "SELECT imas_questions.id,imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions ";
+	$query .= "JOIN imas_questionset ON imas_questionset.id=imas_questions.questionsetid JOIN imas_users ON imas_questionset.ownerid=imas_users.id ";
+	$query .= "WHERE imas_questions.assessmentid=:aid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':aid'=>$aid));
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($line===false) { continue; } //this should never happen, but avoid issues if it does
+		$existingq[] = $line['questionsetid'];
+		//output item array
+		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
+			$canedit = '1';
+		} else {
+			$canedit = '0';
+		}
+		$extrefval = 0;
+		if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
+			$extrefval += 1;
+		}
+		if ($line['extref']!='') {
+			$extref = explode('~~',$line['extref']);
+			$hasvid = false;  $hasother = false;  $hascap = false;
+			foreach ($extref as $v) {
+				if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
+					$hasvid = true;
+					if (strpos($v,'!!1')!==false) {
+						$hascap = true;
+					}
+				} else {
+					$hasother = true;
+				}
+			}
+			//$page_questionTable[$i]['extref'] = '';
+			if ($hasvid) {
+				$extrefval += 4;
+			}
+			if ($hasother) {
+				$extrefval += 2;
+			}
+			if ($hascap) {
+				$extrefval += 16;
+			}
+		}
+		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
+			$extrefval += 8;
+		}
+		$questionjsarr[$line['id']] = array($line['id'], $line['questionsetid'], 
+			Sanitize::encodeStringForDisplay($line['description']), 
+			Sanitize::encodeStringForDisplay($line['qtype']), 
+			Sanitize::onlyInt($line['points']), $canedit, 
+			Sanitize::onlyInt($line['withdrawn']), $extrefval);
 
-	$jsarr = '[';
+	}
+
+	$apointstot = 0;
+	$qncnt = 0;
+	
+	$jsarr = array();
 	if ($itemorder != '') {
 		$items = explode(",",$itemorder);
 	} else {
 		$items = array();
 	}
-	$existingq = array();
-	$apointstot = 0;
-	$qncnt = 0;
 	for ($i = 0; $i < count($items); $i++) {
-		if ($i>0) {
-			$jsarr .= ',';
-		}
 		if (isset($text_segments[$qncnt])) {
 			foreach ($text_segments[$qncnt] as $text_seg) {
 				//stupid hack: putting a couple extra unused entries in array so length>=5
-				$jsarr .= '["text", "'.str_replace(array("\\",'"'),array("\\\\",'\\"'),trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
+				$jsarr[] = array("text", $text_seg['text'],
+					Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
+					Sanitize::onlyInt($text_seg['ispage']),
+					$text_seg['pagetitle'], 1);
 			}
 		}
 		if (strpos($items[$i],'~')!==false) {
 			$subs = explode('~',$items[$i]);
-		} else {
-			$subs[] = $items[$i];
-		}
-
-		if (count($subs)>1) {
+			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid],true))) {
+				$closegrp = '0';
+			} else {
+				$closegrp = '1';
+			}
+			$qsdata = array();
+			for ($j=(strpos($subs[0],'|')===false)?0:1;$j<count($subs);$j++) {
+				$qsdata[] = $questionjsarr[$subs[$j]];
+			}
 			if (strpos($subs[0],'|')===false) { //for backwards compat
-				$jsarr .= '[1,0,[';
+				$jsarr[] = array(1,0,$qsdata,$closegrp);
 				$qncnt++;
 			} else {
 				$grpparts = explode('|',$subs[0]);
-				$jsarr .= '['.$grpparts[0].','.$grpparts[1].',[';
-				array_shift($subs);
+				$jsarr[] = array(Sanitize::onlyInt($grpparts[0]),Sanitize::onlyInt($grpparts[1]),$qsdata,$closegrp);
 				$qncnt += $grpparts[0];
 			}
 		} else {
+			$jsarr[] = $questionjsarr[$items[$i]];
 			$qncnt++;
 		}
 
-		for ($j=0;$j<count($subs);$j++) {
-			//DB $query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
-			//DB $query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
-			$query .= "WHERE imas_questions.id=:id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id";
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':id'=>$subs[$j]));
-			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($line===false) { continue; } //this should never happen, but avoid issues if it does
-			$existingq[] = $line['questionsetid'];
-			if ($j>0) {
-				$jsarr .= ',';
-			}
-			//output item array
-			$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
-			if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
-				$jsarr .= '1';
-			} else {
-				$jsarr .= '0';
-			}
-			$jsarr .= ','.$line['withdrawn'];
-			$extrefval = 0;
-			if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
-				$extrefval += 1;
-			}
-			if ($line['extref']!='') {
-				$extref = explode('~~',$line['extref']);
-				$hasvid = false;  $hasother = false;  $hascap = false;
-				foreach ($extref as $v) {
-					if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
-						$hasvid = true;
-						if (strpos($v,'!!1')!==false) {
-							$hascap = true;
-						}
-					} else {
-						$hasother = true;
-					}
-				}
-				$page_questionTable[$i]['extref'] = '';
-				if ($hasvid) {
-					$extrefval += 4;
-				}
-				if ($hasother) {
-					$extrefval += 2;
-				}
-				if ($hascap) {
-					$extrefval += 16;
-				}
-			}
-			if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
-				$extrefval += 8;
-			}
-			$jsarr .= ','.$extrefval;
-			$jsarr .= ']';
-		}
-		if (count($subs)>1) {
-			$jsarr .= '],';
-			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid],true))) {
-				$jsarr .= '0';
-			} else {
-				$jsarr .= '1';
-			}
-			$jsarr .= ']';
-		}
 		$alt = 1-$alt;
-		unset($subs);
 	}
 	if (isset($text_segments[$qncnt])) {
 		foreach ($text_segments[$qncnt] as $j=>$text_seg) {
 			//stupid hack: putting a couple extra unused entries in array so length>=5
-			if ($i>0 || $j>0) {
-				$jsarr .= ',';
-			}
-			$jsarr .= '["text", "'.str_replace('"','\\"',trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1]';
+			$jsarr[] = array("text", $text_seg['text'],
+				Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
+				Sanitize::onlyInt($text_seg['ispage']),
+				$text_seg['pagetitle'], 1);
 		}
 	}
 
-	$jsarr .= ']';
-	$jsarr = str_replace("\n",'',$jsarr);
+	unset($questionjsarr);
 
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
@@ -1242,7 +1233,7 @@ if ($overwriteBody==1) {
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
-		var itemarray = <?php echo $jsarr ?>;
+		var itemarray = <?php echo json_encode($jsarr) ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo $displaymethod;?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
