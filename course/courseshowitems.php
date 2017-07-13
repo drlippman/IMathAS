@@ -1690,7 +1690,7 @@ function showitems($items,$parent,$inpublic=false) {
 	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$hideicons,$exceptions,$latepasses,$CFG;
 	   global $itemtypes, $iteminfo;
 	   if (!is_array($openblocks)) {$openblocks = array();}
-	   if ($parent==0) {
+	   if ($parent=='0') {
 		   $itemtypes = array();  $iteminfo = array();
 		   //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
