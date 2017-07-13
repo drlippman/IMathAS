@@ -27,7 +27,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 
 
 
-function copyitem($itemid,$gbcats,$sethidden=false) {
+function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	global $DBH;
 	global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
 	global $posttoforumtrack, $forumtrack;
@@ -554,7 +554,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	return ($DBH->lastInsertId());
 }
 
-function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
+function copysub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 	global $checked,$blockcnt;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
@@ -657,7 +657,7 @@ function doaftercopy($sourcecid) {
 	}
 }
 
-function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
+function copyallsub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 	global $blockcnt,$reqscoretrack,$assessnewid;;
 	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];

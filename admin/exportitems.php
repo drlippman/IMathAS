@@ -17,6 +17,36 @@ require("../includes/copyiteminc.php");
 require("../includes/loaditemshowdata.php");
 
 /*** pre-html data manipulation, including function code *******/
+function exportcopysub($items,$parent,&$addtoarr) {
+	global $itemcnt,$toexport;
+	global $checked;
+	foreach ($items as $k=>$item) {
+		if (is_array($item)) {
+			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
+				$newblock = array();
+				$newblock['name'] = $item['name'];
+				$newblock['avail'] = $item['avail'];
+				$newblock['startdate'] = $item['startdate'];
+				$newblock['enddate'] = $item['enddate'];
+				$newblock['SH'] = $item['SH'];
+				$newblock['colors'] = $item['colors'];
+				$newblock['public'] = $item['public'];
+				$newblock['fixedheight'] = $item['fixedheight'];
+				$newblock['items'] = array();
+				exportcopysub($item['items'],$parent.'-'.($k+1),$newblock['items']);
+				$addtoarr[] = $newblock;
+			} else {
+				exportcopysub($item['items'],$parent.'-'.($k+1),$addtoarr);
+			}
+		} else {
+			if (array_search($item,$checked)!==FALSE) {
+				$toexport[$itemcnt] = $item;
+				$addtoarr[] = $itemcnt;
+				$itemcnt++;
+			}
+		}
+	}
+}
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -50,7 +80,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$qtoexport = array();
 	$qsettoexport = array();
 
-	copysub($items,'0',$newitems);
+	exportcopysub($items,'0',$newitems);
 	//print_r($newitems);
 	echo "EXPORT DESCRIPTION\n";
 	echo $_POST['description']."\n";
