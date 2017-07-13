@@ -485,14 +485,24 @@ if (!(isset($teacherid))) {
 			}
 
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
+			$items = false;
+			
+			$stm = $DBH->prepare("SELECT id,itemorder,picicons FROM imas_courses WHERE id IN (?,?)");
+			$stm->execute(array($_POST['ctc'], $cid));
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if ($row['id']==$_POST['ctc']) {
+					$items = unserialize($row['itemorder']);
+					$picicons = $row['picicons'];
+				} else if ($row['id']==$cid) {
+					$existblocks = array();
+					buildexistblocks(unserialize($row['itemorder']),'0');
+				}
+			}
+			if ($items===false) {
+				echo 'Error with course to copy';
+				exit;
+			}
 
-			//DB $query = "SELECT itemorder,picicons FROM imas_courses WHERE id='{$_POST['ctc']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB list($itemorder,$picicons) = mysql_fetch_row($result);
-			$stm = $DBH->prepare("SELECT itemorder,picicons FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_POST['ctc']));
-			list($itemorder,$picicons) = $stm->fetch(PDO::FETCH_NUM);
-			$items = unserialize($itemorder);
 			$ids = array();
 			$types = array();
 			$names = array();
@@ -501,16 +511,6 @@ if (!(isset($teacherid))) {
 			require_once("../includes/loaditemshowdata.php");
 			$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);	
 			getsubinfo($items,'0','',false,' ');
-
-			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $items = unserialize(mysql_result($result,0,0));
-			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$cid));
-			$items = unserialize($stm->fetchColumn(0));
-			$existblocks = array();
-
-			buildexistblocks($items,'0');
 
 			$i=0;
 			$page_blockSelect = array();
