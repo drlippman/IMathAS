@@ -835,58 +835,47 @@
 		//DB $query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
 		//DB $query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric,iq.showhints,iqs.extref,iqs.ownerid ";
+		$query = "SELECT iq.id AS qid,iq.points,iq.withdrawn,iq.rubric,iq.showhints,iqs.* ";
 		$query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
 		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid=:assessmentid";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
 		$totalpossible = 0;
 		$pts = array();
+		$qsetids = array();
 		$withdrawn = array();
 		$rubric = array();
 		$extref = array();
 		$owners = array();
+		$qsdata = array();
 		//DB while ($r = mysql_fetch_row($result)) {
-		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
-			if ($r[1]==9999) {
-				$pts[$r[0]] = $line['defpoints'];  //use defpoints
+		while ($r = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($r['points']==9999) {
+				$pts[$r['qid']] = $line['defpoints'];  //use defpoints
 			} else {
-				$pts[$r[0]] = $r[1]; //use points from question
+				$pts[$r['qid']] = $r['points']; //use points from question
 			}
-			//$totalpossible += $pts[$r[0]];  do later
-			$withdrawn[$r[0]] = $r[2];
-			$rubric[$r[0]] = $r[5];
-			if ($r[3]=='multipart') {
-				//if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
-				/*if (($p = strpos($r[4],'answeights'))!==false) {
-					$p = strpos($r[4],"\n",$p);
-					$answeights[$r[0]] = getansweights($r[0],$r[4]);
-				} else {
-					preg_match('/anstypes(.*)/',$r[4],$match);
-					$n = substr_count($match[1],',')+1;
-					if ($n>1) {
-						$answeights[$r[0]] = array_fill(0,$n-1,round(1/$n,3));
-						$answeights[$r[0]][] = 1-array_sum($answeights[$r[0]]);
-					} else {
-						$answeights[$r[0]] = array(1);
-					}
-				}
-				*/
-				$answeights[$r[0]] = getansweights($r[0],$r[4]);
-				for ($i=0; $i<count($answeights[$r[0]])-1; $i++) {
-					$answeights[$r[0]][$i] = round($answeights[$r[0]][$i]*$pts[$r[0]],2);
+			//$totalpossible += $pts[$r['qid']];  do later
+			$withdrawn[$r['qid']] = $r['withdrawn'];
+			$rubric[$r['qid']] = $r['rubric'];
+			$qsetids[$r['qid']] = $r['id'];
+			if ($r['qtype']=='multipart') {
+				$answeights[$r['qid']] = getansweights($r['qid'],$r['control']);
+				for ($i=0; $i<count($answeights[$r['qid']])-1; $i++) {
+					$answeights[$r['qid']][$i] = round($answeights[$r['qid']][$i]*$pts[$r['qid']],2);
 				}
 				//adjust for rounding
-				$diff = $pts[$r[0]] - array_sum($answeights[$r[0]]);
-				$answeights[$r[0]][count($answeights[$r[0]])-1] += $diff;
+				$diff = $pts[$r['qid']] - array_sum($answeights[$r['qid']]);
+				$answeights[$r['qid']][count($answeights[$r['qid']])-1] += $diff;
 
 			}
-			if (($line['showhints']==1 && $r[6]!=1) || $r[6]==2) {
+			if (($line['showhints']==1 && $r['showhints']!=1) || $r['showhints']==2) {
 				if ($r[7]!='') {
-					$extref[$r[0]] = explode('~~',$r[7]);
+					$extref[$r['qid']] = explode('~~',$r['extref']);
 				}
 			}
-			$owners[$r[0]] = $r[8];
+			$owners[$r['qid']] = $r['ownerid'];
+			$qsdata[$r['qid']] = $r;
 		}
 		echo '<script type="text/javascript">
 			function hidecorrect() {
@@ -1005,7 +994,8 @@
 			echo ' id="qwrap'.($i+1).'"';
 			$totalpossible += $pts[$questions[$i]];
 			echo '>';
-			list($qsetid,$cat) = getqsetid($questions[$i]);
+			
+			$qsetid = $qsetids[$questions[$i]];
 			if ($isteacher || $istutor || ($testtype=="Practice" && $showans!="V") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="V" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
 
 			if (isset($answeights[$questions[$i]])) {
@@ -1026,6 +1016,7 @@
 			}
 			$capturechoices = true;
 			$choicesdata = array();
+			$qdatafordisplayq = $qsdata[$questions[$i]];
 			$qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i],false,false,false,$colors);
 			echo '</div>';
 
