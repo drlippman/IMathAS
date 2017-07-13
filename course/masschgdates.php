@@ -32,6 +32,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$cnt = $_POST['chgcnt'];
 		$blockchg = 0;
+
+		$assesstoupdate = array();
+		$inlinetoupdate = array();
+		$wikitoupdate = array();
+		$linktoupdate = array();
+		$forumbasictoupdate = array();
+		$forumfulltoupdate = array();
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("../includes/parsedatetime.php");
 
@@ -110,44 +117,39 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$avail = intval($data[7]);
 			if ($type=='Assessment') {
 				if ($id>0) {
-					//DB $query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate',avail='$avail' WHERE id='$id'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate,avail=:avail WHERE id=:id");
-					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':avail'=>$avail, ':id'=>$id));
+					//$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate,avail=:avail WHERE id=:id");
+					//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':avail'=>$avail, ':id'=>$id));
+					array_push($assesstoupdate, $id, $startdate, $enddate, $reviewdate, $avail);
 				}
 			} else if ($type=='Forum') {
 				if ($id>0) {
 					if ($data[3] != 'NA' && $data[4] != 'NA') {
-						//DB $query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',postby='$fpdate',replyby='$frdate',avail='$avail' WHERE id='$id'";
-						$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,postby=:postby,replyby=:replyby,avail=:avail WHERE id=:id");
-						$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':postby'=>$fpdate, ':replyby'=>$frdate, ':avail'=>$avail, ':id'=>$id));
+						//$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,postby=:postby,replyby=:replyby,avail=:avail WHERE id=:id");
+						//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':postby'=>$fpdate, ':replyby'=>$frdate, ':avail'=>$avail, ':id'=>$id));
+						array_push($forumfulltoupdate, $id, $startdate, $enddate, $avail, $postby, $replyby);
 					} else {
-						//DB $query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
-						$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
-						$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+						//$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+						//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+						array_push($forumbasictoupdate, $id, $startdate, $enddate, $avail);
 					}
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='Wiki') {
 				if ($id>0) {
-					//DB $query = "UPDATE imas_wikis SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("UPDATE imas_wikis SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
-					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+					//$stm = $DBH->prepare("UPDATE imas_wikis SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+					//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+					array_push($wikitoupdate, $id, $startdate, $enddate, $avail);
 				}
 			} else if ($type=='InlineText') {
 				if ($id>0) {
-					//DB $query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("UPDATE imas_inlinetext SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
-					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+					//$stm = $DBH->prepare("UPDATE imas_inlinetext SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+					//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+					array_push($inlinetoupdate, $id, $startdate, $enddate, $avail);
 				}
 			} else if ($type=='Link') {
 				if ($id>0) {
-					//DB $query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("UPDATE imas_linkedtext SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
-					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+					//$stm = $DBH->prepare("UPDATE imas_linkedtext SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+					//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
+					array_push($linktoupdate, $id, $startdate, $enddate, $avail);
 				}
 			} else if ($type=='Block') {
 				$blocktree = explode('-',$id);
@@ -164,6 +166,48 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$blockchg++;
 			}
 
+		}
+		if (count($assesstoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($assesstoupdate, 5);
+			$query = "INSERT INTO imas_assessments (id,startdate,enddate,reviewdate,avail) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),reviewdate=VALUES(reviewdate),avail=VALUES(avail)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($assesstoupdate);
+		}
+		if (count($inlinetoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($inlinetoupdate, 4);
+			$query = "INSERT INTO imas_inlinetext (id,startdate,enddate,avail) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($inlinetoupdate);
+		}
+		if (count($linktoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($linktoupdate, 4);
+			$query = "INSERT INTO imas_linkedtext (id,startdate,enddate,avail) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($linktoupdate);
+		}
+		if (count($wikitoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($wikitoupdate, 4);
+			$query = "INSERT INTO imas_wikis (id,startdate,enddate,avail) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($wikitoupdate);
+		}
+		if (count($forumbasictoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($forumbasictoupdate, 4);
+			$query = "INSERT INTO imas_forums (id,startdate,enddate,avail) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($forumbasictoupdate);
+		}
+		if (count($forumfulltoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($forumfulltoupdate, 6);
+			$query = "INSERT INTO imas_forums (id,startdate,enddate,avail,postby,replyby) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail),postby=VALUES(postby),replyby=VALUES(replyby)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($forumfulltoupdate);
 		}
 		if ($blockchg>0) {
 			//DB $itemorder = addslashes(serialize($items));
