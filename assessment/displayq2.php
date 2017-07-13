@@ -47,9 +47,13 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id='$qidx'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id=:id");
-	$stm->execute(array(':id'=>$qidx));
-	$qdata = $stm->fetch(PDO::FETCH_ASSOC);
+	if (isset($GLOBALS['qdatafordisplayq'])) {
+		$qdata = $GLOBALS['qdatafordisplayq'];
+	} else {
+		$stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id=:id");
+		$stm->execute(array(':id'=>$qidx));
+		$qdata = $stm->fetch(PDO::FETCH_ASSOC);
+	}
 
 	if ($qdata['hasimg']>0) {
 		//DB $query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";

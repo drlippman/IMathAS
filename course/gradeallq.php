@@ -98,6 +98,7 @@
 		$cnt = 0;
 
 		//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$updatedata = array();
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			$GLOBALS['assessver'] = $line['ver'];
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
@@ -128,17 +129,23 @@
 					$scorelist .= ';'.$sp[1].';'.$sp[2];
 				}
 
-				//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
-				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id");
-				$stm2->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$line['id']));
-
+				//$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id");
+				//$stm2->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$line['id']));
+				array_push($updatedata, $line['id'], $scorelist, $feedback);
+				
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$scores);
 				}
 			}
+		}
+		if (count($updatedata)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($updatedata,3);
+			$query = "INSERT INTO imas_assessment_sessions (id,bestscores,feedback) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE bestscores=VALUES(bestscores),feedback=VALUES(feedback)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($updatedata);
 		}
 		if (isset($_GET['quick'])) {
 			echo "saved";
@@ -154,11 +161,8 @@
 
 
 	require("../assessment/displayq2.php");
-	list ($qsetid,$cat) = getqsetid($qid);
 
-	//DB $query = "SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	//DB list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysql_fetch_row($result);
+
 	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = $stm->fetch(PDO::FETCH_NUM);
@@ -166,9 +170,6 @@
 	if ($isgroup>0) {
 		$groupnames = array();
 		$groupmembers = array();
-		//DB $query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
-		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid");
 		$stm->execute(array(':groupsetid'=>$groupsetid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -176,9 +177,6 @@
 		}
 		if (count($groupnames)>0) {
 			$grplist = array_keys($groupnames);
-			//DB $query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$query_placeholders = Sanitize::generateQueryPlaceholders($grplist);
 			$stm = $DBH->prepare("SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($query_placeholders) ORDER BY iu.LastName,iu.FirstName");
 			$stm->execute($grplist);
@@ -192,18 +190,17 @@
 
 	}
 
-	//DB $query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
-	//DB $query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
+	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$qid));
-	list ($points, $qcontrol, $rubric, $qtype) = $stm->fetch(PDO::FETCH_NUM);
-	//DB $points = mysql_result($result,0,0);
-	//DB $qcontrol = mysql_result($result,0,1);
-	//DB $rubric = mysql_result($result,0,2);
-	//DB $qtype = mysql_result($result,0,3);
+	$qdatafordisplayq = $stm->fetch(PDO::FETCH_ASSOC);
+	$points = $qdatafordisplayq['points'];
+	$rubric = $qdatafordisplayq['rubric'];
+	$qsetid = $qdatafordisplayq['id'];
+	$qtype = $qdatafordisplayq['qtype'];
+	$qcontrol = $qdatafordisplayq['control'];
+	//list ($points, $qcontrol, $rubric, $qtype) = $stm->fetch(PDO::FETCH_NUM);
 	if ($points==9999) {
 		$points = $defpoints;
 	}
