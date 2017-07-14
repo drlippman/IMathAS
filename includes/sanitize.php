@@ -172,30 +172,89 @@ class Sanitize
 	 * Sanitize a full URL string. This should include the protocol (http/https), port, path,
 	 * and any query parameters.
 	 *
-	 * @param $string string The URL to sanitize.
-	 * @return string The sanitized URL string.
+	 * Warning: This method is NOT secure if any part of the URL was generated with data obtained from user input!
+	 *
+	 * For a more secure result, use generateQueryStringFromMap() with a combination of one of the following:
+	 *   - $GLOBALS['basesiteurl']
+	 *   - $imasroot
+	 *
+	 * This method may be used as a last resort, for example, if you have a fully formed URL instead of its parts.
+	 *
+	 * @param  string $url The full URL string.
+	 * @return string A sanitized URL.
+	 * @see generateQueryStringFromMap
 	 */
-	public static function fullUrl($string)
+	public static function fullUrl($url)
 	{
-		// Valid characters: https://www.ietf.org/rfc/rfc3986.txt
-		return preg_replace('/[^\da-z\._~:\/?#\[\]%@!$&\'()*+,;=-]/i', '', $string);
+		// Sanitize url parts
+		$parsed_url = parse_url($url);
+		$scheme = preg_replace('/[^a-z]/i', '', $parsed_url['scheme']);
+		$user = isset($parsed_url['user']) ? rawurlencode($parsed_url['user']) : '';
+		$pass = isset($parsed_url['pass']) ? rawurlencode($parsed_url['pass']) : '';
+		$host = preg_replace('/[^\da-z\.-]/i', '', $parsed_url['host']);
+		$port = isset($parsed_url['port']) ? preg_replace('/[^\d]/', '', $parsed_url['port']) : '';
+		$fragment = isset($parsed_url['fragment']) ? rawurlencode($parsed_url['fragment']) : '';
+
+		// Sanitize the path
+		$path = rawurlencode($parsed_url['path']);
+		$path = preg_replace("/%2F/", "/", $path);
+
+		// Sanitize query string
+		$query_map = array();
+		parse_str($parsed_url['query'], $query_map);
+		$encoded_query = http_build_query($query_map);
+
+		// Sanitize optional url parts
+		$auth = "";
+		if ('' != $user || '' != $pass) {
+			$auth = sprintf("%s:%s@", $user, $pass);
+		}
+
+		$port = '' != $port ? ':' . $port : '';
+		$fragment = '' != $fragment ? '#' . $fragment : '';
+		$encoded_query = '' != $encoded_query ? '?' . $encoded_query : '';
+
+		// Put it all together.
+		$safeUrl = sprintf("%s://%s%s%s%s%s%s", $scheme, $auth, $host, $port, $path, $encoded_query, $fragment);
+
+		return $safeUrl;
+	}
+
+	/**
+	 * Generate a safe query string from a map of query arguments.
+	 * It is not necessary to "pre-sanitize" data passed to this method. It will all be URL-encoded.
+	 *
+	 * Example input: array( 'name' => 'MyName', 'cid' => 994 );
+	 *
+	 * Note: Usage of this method is strongly preferred over fullQueryString().
+	 *
+	 * @param $args array The entire query map.
+	 * @return string The encoded query string.
+	 */
+	public static function generateQueryStringFromMap($args)
+	{
+		return http_build_query($args);
 	}
 
 	/**
 	 * Sanitize a complete URL query string. (Everything after and without the '?' character in a URL)
 	 *
-	 *
 	 * Example input: "name=MyName&cid=994&color=blue"
 	 *
-	 *  Do NOT use this for a string like "name=$name&color=$color", as it
-	 *  does not encode query parameters
+	 * Warning: This method is NOT secure if the query string was generated with data obtained from user input!
+	 * Example of insecure input: "name=${POST['name']}&color=${POST['color']}".
 	 *
 	 * @param $string string The entire query string.
 	 * @return string The encoded query string.
+	 * @see generateQueryStringFromMap
 	 */
 	public static function fullQueryString($string)
 	{
-		return self::fullUrl($string);
+		$query_map = array();
+		parse_str($string, $query_map);
+		$encoded_query = http_build_query($query_map);
+
+		return $encoded_query;
 	}
 
 	/**

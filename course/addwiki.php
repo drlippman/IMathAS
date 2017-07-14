@@ -17,7 +17,7 @@ $useeditor = "description";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (isset($_GET['tb'])) {
-	$totb = $_GET['tb'];
+	$totb = Sanitize::encodeStringForDisplay($_GET['tb']);
 } else {
 	$totb = 'b';
 }
@@ -270,7 +270,7 @@ if (isset($_GET['clearattempts'])) {
 	$id = $_GET['id'];
 	echo '<p>Are you SURE you want to delete all contents and history for this Wiki page? ';
 	echo 'This will clear contents for all groups if you are using groups.</p>';
-	
+
 	echo '<form method="POST" action="'.sprintf('addwiki.php?cid=%d&id=%d', $cid, $id) .'">';
 	echo '<p><button type=submit name="clearattempts" value="true">'._("Yes, I'm Sure").'</button>';
 	echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".sprintf('addwiki.php?cid=%d&id=%d', $cid, $id)."'\"></p>\n";
