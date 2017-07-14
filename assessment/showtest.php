@@ -759,7 +759,9 @@
 
 
 	}
-	$qi = getquestioninfo($questions,$testsettings);
+	$preloadqsetdata = ((!isset($_GET['action']) || $_GET['action']=='seq' || $_GET['action']=='scoreall') && !isset($_REQUEST['embedpostback']) && 
+		($testsettings['displaymethod']=='Embed' || $testsettings['displaymethod']=='VideoCue' || $testsettings['displaymethod'] == "AllAtOnce" || $testsettings['displaymethod'] == "Seq"));
+	$qi = getquestioninfo($questions,$testsettings,$preloadqsetdata);
 	srand();
 
 	//check for withdrawn
@@ -2293,7 +2295,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 							echo '</div>';
 							displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true,$colors);
 						} else {
-							echo $msg . -(', is displayed below') . '</p>';
+							echo $msg . _(', is displayed below') . '</p>';
 							echo '</div>';
 							displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
 						}

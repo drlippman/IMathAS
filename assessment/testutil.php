@@ -6,7 +6,7 @@
 //qns:  array of or single question ids
 //testsettings: assoc array of assessment settings
 //Returns:  id,questionsetid,category,points,penalty,attempts
-function getquestioninfo($qns,$testsettings) {
+function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 	global $DBH;
 	if (!is_array($qns)) {
 		$qns = array($qns);
@@ -26,14 +26,24 @@ function getquestioninfo($qns,$testsettings) {
 		}
 		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control ";
 		//DB $query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
-		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control,iq.fixedseeds ";
+		if ($preloadqsdata) {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iq.fixedseeds,";
+			$query .= "iqs.qtype,iqs.control,iqs.qcontrol,iqs.qtext,iqs.answer,iqs.hasimg,iqs.extref,iqs.solution,iqs.solutionopts ";
+		} else {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control,iq.fixedseeds ";
+		}
 		$query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
 		$stm = $DBH->query($query);
 	} else {
 		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
 		//DB $query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
 		//DB $query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
-		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control,iq.fixedseeds ";
+		if ($preloadqsdata) {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iq.fixedseeds,";
+			$query .= "iqs.qtype,iqs.control,iqs.qcontrol,iqs.qtext,iqs.answer,iqs.hasimg,iqs.extref,iqs.solution,iqs.solutionopts ";
+		} else {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control,iq.fixedseeds ";
+		}
 		$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
 		$query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
 		$stm = $DBH->query($query);
@@ -90,9 +100,11 @@ function getquestioninfo($qns,$testsettings) {
 		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
 		$line['regen'] = $line['regen']%3;
 		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] > 0);
-		unset($line['qtype']);
-		unset($line['control']);
-		$out[$line['id']] = $line;
+		if (!$preloadqsdata) {
+			unset($line['qtype']);
+			unset($line['control']);
+		}
+		$out[$line['qid']] = $line;
 	}
 	return $out;
 }

@@ -49,6 +49,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 	if (isset($GLOBALS['qdatafordisplayq'])) {
 		$qdata = $GLOBALS['qdatafordisplayq'];
+	} else if (isset($GLOBALS['qi']) && isset($GLOBALS['qi'][$GLOBALS['questions'][$qnidx]]['qtext'])) {
+		$qdata = $GLOBALS['qi'][$GLOBALS['questions'][$qnidx]];
 	} else {
 		$stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id=:id");
 		$stm->execute(array(':id'=>$qidx));
@@ -618,12 +620,16 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	unset($abstolerance);
 	$RND->srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;
-	//DB $query = "SELECT qtype,control,answer FROM imas_questionset WHERE id='$qidx'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT qtype,control,answer FROM imas_questionset WHERE id=:id");
-	$stm->execute(array(':id'=>$qidx));
-	$qdata = $stm->fetch(PDO::FETCH_ASSOC);
+	
+	if (isset($GLOBALS['qdatafordisplayq'])) {
+		$qdata = $GLOBALS['qdatafordisplayq'];
+	} else if (isset($GLOBALS['qi']) && isset($GLOBALS['qi'][$GLOBALS['questions'][$qnidx]]['qtext'])) {
+		$qdata = $GLOBALS['qi'][$GLOBALS['questions'][$qnidx]];
+	} else {
+		$stm = $DBH->prepare("SELECT qtype,control,answer FROM imas_questionset WHERE id=:id");
+		$stm->execute(array(':id'=>$qidx));
+		$qdata = $stm->fetch(PDO::FETCH_ASSOC);
+	}
 
 	if (isset($GLOBALS['lastanswers'])) {
 		foreach ($GLOBALS['lastanswers'] as $iidx=>$ar) {

@@ -144,12 +144,10 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	}
 	$jwtstring = saveAssessData();
 }
-foreach ($qids as $i=>$v) {
-	$qids[$i] = intval($v);
-}
-foreach ($seeds as $i=>$v) {
-	$seeds[$i] = intval($v);
-}
+
+$qids = array_map('Sanitize::onlyInt',$qids);
+$seeds = array_map('Sanitize::onlyInt',$seeds);
+
 require("./assessment/displayq2.php");
 $GLOBALS['assessver'] = 2;
 
@@ -211,10 +209,20 @@ if (count($qids)>1) {
 }
 $showhints = true;
 
+//preload qsdata
+$placeholders = Sanitize::generateQueryPlaceholders($qids);
+$stm = $DBH->prepare("SELECT id,qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id IN ($placeholders)");
+$stm->execute($qids);
+$qsdata = array();
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	$qsdata[$row['id']] = $row;
+}
+
 foreach ($qids as $i=>$qid) {
 	echo '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
 	$quesout = '';
 	ob_start();
+	$qdatafordisplayq = $qsdata[$qid];
 	displayq($i,$qid,$seeds[$i],false,$showhints,$attempts[$i]);
 	$quesout .= ob_get_clean();
 	$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';

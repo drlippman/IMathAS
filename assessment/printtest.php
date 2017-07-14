@@ -112,9 +112,6 @@
 	$testsettings = $stm->fetch(PDO::FETCH_ASSOC);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 
-	$qi = getquestioninfo($questions,$testsettings);
-
-
 	$now = time();
 	$isreview = false;
 	if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
@@ -158,6 +155,8 @@
 		$attempts = explode(",",$line['reviewattempts']);
 		$lastanswers = explode("~",$line['reviewlastanswers']);
 	}
+
+	$qi = getquestioninfo($questions,$testsettings,true);
 
 	echo "<h4 style=\"float:right;\">Name: " . Sanitize::encodeStringForDisplay($userfullname) . " </h4>\n";
 	echo "<h3>".$testsettings['name']."</h3>\n";
