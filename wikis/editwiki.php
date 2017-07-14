@@ -45,7 +45,7 @@ if ($cid==0) {
 	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
-	$wikiname = $row['id'];
+	$wikiname = $row['name'];
 	$now = time();
 	if (!isset($teacherid) && ($row['avail']==0 || ($row['avail']==1 && ($now<$row['startdate'] || $now>$row['enddate'])) || $now>$row['editbydate'])) {
 		$overwriteBody=1;
@@ -227,7 +227,7 @@ if ($cid==0) {
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $pagetitle = "Edit Wiki: $wikiname";
+ $pagetitle = _("Edit Wiki").': '.Sanitize::encodeStringForDisplay($wikiname);
  require("../header.php");
 
 if ($overwriteBody==1) {

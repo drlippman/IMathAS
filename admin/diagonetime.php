@@ -35,9 +35,10 @@ if (!empty($_GET['from'])) {
 		$curBreadcrumb .= '<a href="admin2.php?groupdetails='.$gid.'">'._('Group Details').'</a> &gt; ';
 		$curBreadcrumb .= '<a href="listdiag.php?show=g'.$gid.'">'._('Diagnostics').'</a> &gt; ';
 		$backtrack = '/admin/listdiag.php?show=g'.$gid;
-	}
+	} 
 } else {
 	$curBreadcrumb .= "<a href=\"$imasroot/admin/admin.php\">Admin</a> &gt; ";
+	$backtrack = '/admin/admin.php';
 }
 $curBreadcrumb .= _('Diagnostic One-time Passwords').'</div>';
 

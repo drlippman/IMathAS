@@ -37,6 +37,7 @@ if (!empty($_GET['from'])) {
 	}
 } else {
 	$curBreadcrumb .= "<a href=\"$imasroot/admin/admin.php\">Admin</a> &gt;";
+	$backtrack = 'admin.php';
 }
 $curBreadcrumb .= _("Diagnostic Setup").'</div>';
 
@@ -44,7 +45,7 @@ $curBreadcrumb .= _("Diagnostic Setup").'</div>';
 if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$overwriteBody = 1;
 	$body = "You don't have authority to access this page.";
-} elseif (isset($_GET['step']) && $_GET['step']==2) {  // STEP 2 DATA PROCESSING
+} elseif (isset($_GET['step']) && $_GET['step']==2 && isset($_POST['termtype'])) {  // STEP 2 DATA PROCESSING
 
 	$sel1 = array();
 	$ips = array();
@@ -132,7 +133,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$page_cntScript = (isset($sel2[$s1]) && count($sel2[$s1])>0) ? "<script> cnt['out$k'] = ".count($sel2[$s1]).";</script>\n"  : "<script> cnt['out$k'] = 0;</script>\n";
 
 
-} elseif (isset($_GET['step']) && $_GET['step']==3) {  //STEP 3 DATA PROCESSING
+} elseif (isset($_GET['step']) && $_GET['step']==3 && isset($_POST['sel1list'])) {  //STEP 3 DATA PROCESSING
 	$sel1 = explode(',',$_POST['sel1list']);
 	$aids = array();
 	$forceregen = 0;
