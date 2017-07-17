@@ -129,14 +129,14 @@ $cnt = 0;
 //DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	echo '<tr>';
-	echo '<td><input type=checkbox name="del['.$row[0].']" /></td>';
+	echo '<td><input type=checkbox name="del['.Sanitize::encodeStringForDisplay($row[0]).']" /></td>';
 	$date = tzdate("m/d/Y",$row[1]);
-	echo "<td><input type=text size=10 id=\"date{$row[0]}\" name=\"date{$row[0]}\" value=\"";
+	echo "<td><input type=text size=10 id=\"date" . Sanitize::encodeStringForDisplay($row[0]) . "\" name=\"date{$row[0]}\" value=\"";
 	echo Sanitize::encodeStringForDisplay($date) . "\" oninput=\"txtchg()\" /> ";
 	echo "<a href=\"#\" onClick=\"displayDatePicker('date{$row[0]}', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
 	$cnt++;
-	echo '<td><input name="tag['.$row[0].']" type=text size=8 value="'.Sanitize::encodeStringForDisplay($row[3]).'" oninput="txtchg()" /></td>';
-	echo '<td><input name="txt['.$row[0].']" type=text size=80 value="'.Sanitize::encodeStringForDisplay($row[2]).'" oninput="txtchg()" /></td>';
+	echo '<td><input name="tag['.Sanitize::encodeStringForDisplay($row[0]).']" type=text size=8 value="'.Sanitize::encodeStringForDisplay($row[3]).'" oninput="txtchg()" /></td>';
+	echo '<td><input name="txt['.Sanitize::encodeStringForDisplay($row[0]).']" type=text size=80 value="'.Sanitize::encodeStringForDisplay($row[2]).'" oninput="txtchg()" /></td>';
 	echo '<tr/>';
 }
 echo '</tbody></table>';

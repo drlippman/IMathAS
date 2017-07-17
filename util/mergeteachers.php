@@ -12,7 +12,7 @@ if (empty($_POST['from']) || empty($_POST['to'])) {
 	$ops = '';
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$ops .= '<option value="'.$row[0].'">'.$row[1].', '.$row[2].' ('.$row[3].') '.tzdate('n/j/y',$row[4]).'</option>';
+		$ops .= '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[2]).' ('.Sanitize::encodeStringForDisplay($row[3]).') '.Sanitize::encodeStringForDisplay(tzdate('n/j/y',$row[4])).'</option>';
 	}
 	require("../header.php");
 	echo "<h2>Merge Teacher Accounts</h2>";

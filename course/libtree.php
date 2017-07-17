@@ -136,7 +136,7 @@ END;
 		$base = $_GET['base'];
 	}
 	if (isset($base)) {
-		echo "<input type=hidden name=\"rootlib\" value=$base>{$names[$base]}</span>";
+		echo "<input type=hidden name=\"rootlib\" value=" . Sanitize::encodeStringForDisplay($base) . ">" . Sanitize::encodeStringForDisplay($names[$base]) . "</span>";
 	} else {
 		if ($select == "parent") {
 			echo "<input type=radio name=\"libs\" value=0 ";
@@ -206,29 +206,29 @@ END;
 				}
 				if (isset($ltlibs[$child])) { //library has children
 					//echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
-					echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle($child)\"><span class=btn id=\"b$child\">+</span> ";
+					echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child). ")\"><span class=btn id=\"b" . Sanitize::encodeStringForDisplay($child) . "\">+</span> ";
 					if ($select == "parent" || $select=="all") {
 						if ($_GET['type']=="radio") {
 							if (in_array($child,$locked) || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
 								echo "</span><input type=radio disabled=\"disabled\" ";
 							} else {
-								echo "</span><input type=radio name=\"libs\" value=$child ";
+								echo "</span><input type=radio name=\"libs\" value=" . Sanitize::encodeStringForDisplay($child) . " ";
 							}
 							if (in_array($child,$checked)) { echo "CHECKED";	}
-							echo "><span class=hdr onClick=\"toggle($child)\">";
+							echo "><span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\">";
 						} else {
 							if (in_array($child,$locked)) {
 								echo "</span><input type=checkbox disabled=\"disabled\" ";
 							} else {
-								echo "</span><input type=checkbox name=\"libs[]\" value=$child ";
+								echo "</span><input type=checkbox name=\"libs[]\" value=" . Sanitize::encodeStringForDisplay($child) . " ";
 							}
 
 							if (in_array($child,$checked)) { echo "CHECKED";	}
-							echo "><span class=hdr onClick=\"toggle($child)\">";
+							echo "><span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\">";
 						}
 					}
-					echo " <span id=\"n$child\" class=\"r{$rights[$child]}\">{$names[$child]}</span> </span>\n";
-					echo "<ul class=hide id=$child>\n";
+					echo " <span id=\"n" . Sanitize::encodeStringForDisplay($child) . "\" class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span> </span>\n";
+					echo "<ul class=hide id=" . Sanitize::encodeStringForDisplay($child) . ">\n";
 					printlist($child);
 					echo "</ul></li>\n";
 
@@ -239,26 +239,26 @@ END;
 								echo "<li><span class=dd>---</span> <input type=radio disabled=\"disabled\" ";
 							} else {
 								if ($select=="parent") {
-									echo "<li><span class=dd>---</span> <input type=radio name=\"libs\" value=$child ";
+									echo "<li><span class=dd>---</span> <input type=radio name=\"libs\" value=" . Sanitize::encodeStringForDisplay($child) . " ";
 								} else {
-									echo "<li><span class=dd>-</span> <input type=radio name=\"libs\" value=$child ";
+									echo "<li><span class=dd>-</span> <input type=radio name=\"libs\" value=" . Sanitize::encodeStringForDisplay($child) . " ";
 								}
 							}
 
 							if (in_array($child,$checked)) { echo "CHECKED";	}
-							echo "> <span id=\"n$child\" class=\"r{$rights[$child]}\">{$names[$child]}</span></li>\n";
+							echo "> <span id=\"n" . Sanitize::encodeStringForDisplay($child) . "\" class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span></li>\n";
 						} else {
 							if (in_array($child,$locked)) {
 								echo "<li><span class=dd>-</span><input type=checkbox disabled=\"disabled\" ";
 
 							} else {
-								echo "<li><span class=dd>-</span><input type=checkbox name=\"libs[]\" value=$child ";
+								echo "<li><span class=dd>-</span><input type=checkbox name=\"libs[]\" value=" . Sanitize::encodeStringForDisplay($child) . " ";
 							}
 							if (in_array($child,$checked)) { echo "CHECKED";	}
-							echo "> <span id=\"n$child\" class=\"r{$rights[$child]}\">{$names[$child]}</span></li>\n";
+							echo "> <span id=\"n" . Sanitize::encodeStringForDisplay($child) . "\" class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span></li>\n";
 						}
 					} else {
-						echo "<li><span class=dd>---</span> <span id=\"n$child\" class=\"r{$rights[$child]}\">{$names[$child]}</span></li>\n";
+						echo "<li><span class=dd>---</span> <span id=\"n" . Sanitize::encodeStringForDisplay($child) . "\" class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span></li>\n";
 					}
 
 				}

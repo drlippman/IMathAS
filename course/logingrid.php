@@ -127,7 +127,7 @@ if ($overwriteBody==1) {
 	$n = count($dates);
 	foreach ($stus as $stu) {
 		if ($alt==0) {echo '<tr class="even">'; $alt=1;} else {echo '<tr class="odd">'; $alt=0;}
-		echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.$stu[1].'">'.$stu[0].'</a></td>';
+		echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($stu[1]).'">'.Sanitize::encodeStringForDisplay($stu[0]).'</a></td>';
 		for ($i=0;$i<$n;$i++) {
 			echo '<td>';
 			if (isset($logins[$stu[1]][$i])) {

@@ -182,7 +182,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$stm->execute(array(':SID'=>$_POST['SID']));
 			if ($stm->rowCount()>0) {
 				$overwriteBody = 1;
-				$body = "$loginprompt '{$_POST['SID']}' is used.  <a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
+				$body = "$loginprompt '" . Sanitize::encodeStringForDisplay($_POST['SID']) . "' is used.  <a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
 				if (isset($CFG['GEN']['newpasswords'])) {
 					require_once("../includes/password.php");
@@ -251,7 +251,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$stuemails = array();
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$stuemails[] = $row[0].' '.$row[1]. ' &lt;'.$row[2].'&gt;';
+				$stuemails[] = Sanitize::encodeStringForDisplay($row[0]) . ' ' . Sanitize::encodeStringForDisplay($row[1]) .  ' &lt;' . Sanitize::encodeStringForDisplay($row[2]) . '&gt;';
 			}
 			$stuemails = implode('; ',$stuemails);
 		}
@@ -456,11 +456,11 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$sectionselect .=  '>All</option>';
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$sectionselect .=  "<option value=\"{$row[0]}\" ";
+				$sectionselect .=  "<option value=\"" . Sanitize::encodeStringForDisplay($row[0]) . "\" ";
 				if ($row[0]==$secfilter) {
 					$sectionselect .=  'selected=1';
 				}
-				$sectionselect .=  ">{$row[0]}</option>";
+				$sectionselect .=  ">". Sanitize::encodeStringForDisplay($row[0]) . "</option>";
 			}
 			$sectionselect .=  "</select>";
 		} else {
@@ -593,8 +593,8 @@ if ($overwriteBody==1) {
 ?>
 			<tr>
 				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></td>
-				<td><input type=text name="sec[<?php echo $line['id'] ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
-				<td><input type=text name="code[<?php echo $line['id'] ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['code']); ?>"/></td>
+				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
+				<td><input type=text name="code[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['code']); ?>"/></td>
 			</tr>
 <?php
 		}
@@ -643,9 +643,9 @@ if ($overwriteBody==1) {
 
 	}elseif (isset($_GET['chgstuinfo'])) {
 ?>
-		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo $_GET['uid'] ?>"/>
+		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo Sanitize::onlyInt($_GET['uid']) ?>"/>
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
-			<input class=form type=text size=20 id=username name=username value="<?php echo $lineStudent['SID'] ?>"/><br class=form>
+			<input class=form type=text size=20 id=username name=username value="<?php echo Sanitize::onlyInt($lineStudent['SID']); ?>"/><br class=form>
 			<span class=form><label for="firstname">Enter First Name:</label></span>
 			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
 			<span class=form><label for="lastname">Enter Last Name:</label></span>
@@ -657,11 +657,11 @@ if ($overwriteBody==1) {
 			<?php
 		if ($lineStudent['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_{$_GET['uid']}.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			} else {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				$galleryPath = "$curdir/course/files/";
-				echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"$imasroot/course/files/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			}
 		} else {
 			echo "No Pic ";
@@ -669,13 +669,13 @@ if ($overwriteBody==1) {
 		?>
 			<br/><input type="file" name="stupic"/></span><br class="form" />
 			<span class=form>Section (optional):</span>
-			<span class=formright><input type="text" name="section" value="<?php echo $lineStudent['section'] ?>"/></span><br class=form>
+			<span class=formright><input type="text" name="section" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['section']); ?>"/></span><br class=form>
 			<span class=form>Code (optional):</span>
-			<span class=formright><input type="text" name="code" value="<?php echo $lineStudent['code'] ?>"/></span><br class=form>
+			<span class=formright><input type="text" name="code" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['code']); ?>"/></span><br class=form>
 			<span class=form>Time Limit Multiplier:</span>
-			<span class=formright><input type="text" name="timelimitmult" value="<?php echo $lineStudent['timelimitmult'] ?>"/></span><br class=form>
+			<span class=formright><input type="text" name="timelimitmult" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['timelimitmult']); ?>"/></span><br class=form>
 			<span class=form>LatePasses:</span>
-			<span class=formright><input type="text" name="latepasses" value="<?php echo $lineStudent['latepass'] ?>"/></span><br class=form>
+			<span class=formright><input type="text" name="latepasses" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['latepass']); ?>"/></span><br class=form>
 			<span class=form>Lock out of course?:</span>
 			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class="form">Student has course hidden from course list?:</span>
@@ -807,7 +807,7 @@ if ($overwriteBody==1) {
 				$icons .= '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
 			}
 			if ($icons != '') {
-				$icons = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.$line['userid'].'">'.$icons.'</a>';
+				$icons = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.Sanitize::onlyInt($line['userid']).'">'.$icons.'</a>';
 			}
 
 			$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
@@ -816,15 +816,15 @@ if ($overwriteBody==1) {
 			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
-				<td><input type=checkbox name="checked[]" value="<?php echo $line['userid'] ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
+				<td><input type=checkbox name="checked[]" value="<?php echo Sanitize::onlyInt($line['userid']); ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
 				<td>
 <?php
 
 	if ($line['hasuserimg']==1) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
+			echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		} else {
-			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
+			echo "<img src=\"$imasroot/course/files/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		}
 	}
 ?>
@@ -832,20 +832,20 @@ if ($overwriteBody==1) {
 				<?php
 				echo $hasSectionData;
 				echo $hasCodeData;
-				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.$line['userid'].'" class="ui">';
+				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid=' . Sanitize::onlyInt($line['userid']) . '" class="ui">';
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
 				if ($line['locked']>0) {
 					echo '<td><span class="greystrike">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
-					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.$line['userid'].'" class="lal">'.$lastaccess.'</a></span></td>';
+					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></span></td>';
 				} else {
 					echo '<td>'.$nameline.'</td>';
 					echo '<td>'.$icons.'</td>';
-					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.$line['userid'].'" class="lal">'.$lastaccess.'</a></td>';
+					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></td>';
 				}
 				?>
 
-				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo $line['userid'] ?>&from=listusers" class="gl">Grades</a></td>
+				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo Sanitize::onlyInt($line['userid']); ?>&from=listusers" class="gl">Grades</a></td>
 				<?php
 				if ($haslatepasses) {
 					echo '<td>'.$line['latepass'].'</td>';

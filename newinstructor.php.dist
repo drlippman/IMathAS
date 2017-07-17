@@ -27,7 +27,7 @@
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 			$stm->execute(array(':SID'=>$_POST['username']));
 			if ($stm->rowCount()>0) {
-				echo "<p>Username <b>{$_POST['username']}</b> is already in use.  Please try another</p>\n";
+				echo "<p>Username <b>".Sanitize::encodeStringForDisplay($_POST['username'])."</b> is already in use.  Please try another</p>\n";
 			} else {
 				if (isset($CFG['GEN']['homelayout'])) {
 					$homelayout = $CFG['GEN']['homelayout'];

@@ -94,7 +94,7 @@
 	$pagetitle = "View Forum Grade";
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Gradebook</a> ";
+	echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($stu)."&cid=".Sanitize::encodeUrlParam($cid)."\">Gradebook</a> ";
 	echo "&gt; View Forum Grade</div>";
 
 	//DB $query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points,i_f.tutoredit,i_f.enddate FROM imas_users AS iu, imas_forums as i_f ";
@@ -112,7 +112,7 @@
 	$showlink = ($caneditscore || time()<$row[5]);
 
 	echo '<div id="headerviewforumgrade" class="pagetitle"><h2>View Forum Grade</h2></div>';
-	echo "<p>Grades on forum <b>{$row[2]}</b> for <b>{$row[1]} {$row[0]}</b></p>";
+	echo "<p>Grades on forum <b>".Sanitize::encodeStringForDisplay($row[2])."</b> for <b>".Sanitize::encodeStringForDisplay($row[1])." ".Sanitize::encodeStringForDisplay($row[0])."</b></p>";
 
 	if ($istutor && $tutoredit==2) {
 		echo '<p>No access to scores for this forum</p>';
@@ -135,7 +135,7 @@
 	if ($possiblepoints==0) {
 		echo '<p>This forum is not a graded forum</p>';
 	} else {
-		echo "<p>Total:  $totalpts out of $possiblepoints</p>";
+		echo "<p>Total: ". Sanitize::onlyInt($totalpts) ." out of ". Sanitize::onlyInt($possiblepoints)." </p>";
 	}
 
 	if ($caneditscore) {
@@ -151,29 +151,29 @@
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		echo "<tr><td>";
 		if ($showlink) {
-			echo "<a href=\"$imasroot/forums/posts.php?cid=$cid&forum=$forumid&thread={$row[1]}\">";
+			echo "<a href=\"$imasroot/forums/posts.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::encodeUrlParam($forumid)."&thread=".Sanitize::encodeUrlParam($row[1])."\">";
 		}
-		echo $row[2];
+		echo Sanitize::encodeStringForDisplay($row[2]);
 		if ($showlink) {
 			echo '</a>';
 		}
 		echo "</td>";
 		if ($caneditscore) {
 			if (isset($scores[$row[0]])) {
-				echo "<td><input type=text size=3 name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
-				echo $scores[$row[0]][0];
+				echo "<td><input type=text size=3 name=\"score[".Sanitize::encodeStringForDisplay($row[0])."]\" id=\"score".Sanitize::encodeStringForDisplay($row[0])."\" value=\"";
+				echo Sanitize::encodeStringForDisplay($scores[$row[0]][0]);
 			} else {
-				echo "<td><input type=text size=3 name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
+				echo "<td><input type=text size=3 name=\"newscore[".Sanitize::encodeStringForDisplay($row[0])."]\" id=\"score".Sanitize::encodeStringForDisplay($row[0])."\" value=\"";
 			}
 			echo "\" /> </td>";
-			echo "<td><textarea cols=40 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$scores[$row[0]][1]}</textarea></td>";
+			echo "<td><textarea cols=40 rows=1 id=\"feedback".Sanitize::encodeStringForDisplay($row[0])."\" name=\"feedback[".Sanitize::encodeStringForDisplay($row[0])."]\">".Sanitize::encodeStringForDisplay($scores[$row[0]][1])."</textarea></td>";
 		} else {
 			if (isset($scores[$row[0]])) {
-				echo '<td>'.$scores[$row[0]][0].'</td>';
+				echo '<td>'.Sanitize::encodeStringForDisplay($scores[$row[0]][0]).'</td>';
 			} else {
 				echo "<td>-</td>";
 			}
-			echo '<td>'.$scores[$row[0]][1].'</td>';
+			echo '<td>'.Sanitize::encodeStringForDisplay($scores[$row[0]][1]).'</td>';
 		}
 		echo "</tr>";
 	}
@@ -182,15 +182,15 @@
 		if ($caneditscore) {
 			if (isset($scores[0])) {
 				echo "<td><input type=text size=3 name=\"score[0]\" id=\"score0\" value=\"";
-				echo $scores[0][0];
+				echo Sanitize::encodeStringForDisplay($scores[0][0]);
 			} else {
 				echo "<td><input type=text size=3 name=\"newscore[0]\" id=\"score0\" value=\"";
 			}
 			echo "\" /> </td>";
-			echo "<td><textarea cols=40 rows=1 id=\"feedback0\" name=\"feedback[0]\">{$scores[0][1]}</textarea></td>";
+			echo "<td><textarea cols=40 rows=1 id=\"feedback0\" name=\"feedback[0]\">".Sanitize::encodeStringForDisplay($scores[0][1])."</textarea></td>";
 		} else {
-			echo '<td>'.$scores[0][0].'</td>';
-			echo '<td>'.$scores[0][1].'</td>';
+			echo '<td>'.Sanitize::encodeStringForDisplay($scores[0][0]).'</td>';
+			echo '<td>'.Sanitize::encodeStringForDisplay($scores[0][1]).'</td>';
 		}
 		echo "</tr>";
 	}

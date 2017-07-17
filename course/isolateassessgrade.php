@@ -45,8 +45,8 @@
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
 
 	echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
 
@@ -131,7 +131,7 @@
 
 
 	echo '<div id="headerisolateassessgrade" class="pagetitle"><h2>';
-	echo "Grades for $name</h2></div>";
+	echo "Grades for " . Sanitize::encodeStringForDisplay($name) . "</h2></div>";
 	echo "<p>$totalpossible points possible</p>";
 
 //	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
@@ -240,7 +240,16 @@
 			$thisenddate = $enddate;
 		}
 		if ($line['id']==null) {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a>";
+			$querymap = array(
+				'gbmode' => $gbmode,
+				'cid' => $cid,
+				'asid' => 'new',
+				'uid' => $line['userid'],
+				'from' => 'isolate',
+				'aid' => $aid
+			);
+
+			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
 			if ($useexception) {
 				if ($exceptions[$line['userid']][2]>0) {
 					echo '<sup>LP</sup>';
@@ -250,11 +259,20 @@
 			}
 			echo "</td><td>-</td><td></td><td></td><td></td>";
 		} else {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
+			$querymap = array(
+				'gbmode' => $gbmode,
+				'cid' => $cid,
+				'asid' => $line['id'],
+				'uid' => $line['userid'],
+				'from' => 'isolate',
+				'aid' => $aid
+			);
+
+			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
 			if ($thisenddate>$now) {
-				echo '<i>'.$total;
+				echo '<i>'.Sanitize::onlyFloat($total);
 			} else {
-				echo $total;
+				echo Sanitize::onlyFloat($total);
 			}
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {

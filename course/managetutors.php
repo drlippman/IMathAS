@@ -92,7 +92,7 @@
 					if (count($notfound)>0) {
 						$err .= "<p>Some usernames not found:<br/>";
 						foreach ($notfound as $nf) {
-							$err .= "$nf<br/>";
+							$err .= Sanitize::encodeStringForDisplay($nf) . "<br/>";
 						}
 						$err .= '</p>';
 					}
@@ -175,7 +175,7 @@
 	<thead>
 		<tr>
 			<th>Tutor name</th>
-			<th>Limit to <?php echo $limitname; ?></th>
+			<th>Limit to <?php echo Sanitize::encodeStringForDisplay($limitname); ?></th>
 
 			<th>Remove?
 			Check: <a href="#" onclick="return chkAllNone('curform','remove[]',true)">All</a> <a href="#" onclick="return chkAllNone('curform','remove[]',false)">None</a></th>
@@ -195,7 +195,7 @@ foreach ($tutorlist as $tutor) {
 	echo '<select name="section['.$tutor['id'].']">';
 	echo '<option value="" '.getHtmlSelected($tutor['section'],"").'>All</option>';
 	foreach ($sections as $sec) {
-		echo '<option value="'.$sec.'" '.getHtmlSelected($tutor['section'],$sec).'>'.$sec.'</option>';
+		echo '<option value="'.Sanitize::encodeStringForDisplay($sec).'" '.getHtmlSelected($tutor['section'],$sec).'>'.Sanitize::encodeStringForDisplay($sec).'</option>';
 	}
 	if (!in_array($tutor['section'],$sections) && $tutor['section']!='') {
 		echo '<option value="invalid" selected="selected">Invalid - reselect</option>';

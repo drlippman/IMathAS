@@ -220,7 +220,7 @@
 	} else if ($calledfrom=='gb') {
 		echo "&gt; <a href=\"gradebook.php?cid=$cid";
 		if (isset($_GET['uid'])) {
-			echo "&stu={$_GET['uid']}";
+			echo "&stu=" . Sanitize::onlyInt($_GET['uid']);
 		}
 		echo "\">Gradebook</a> &gt; Manage Exceptions</div>\n";
 	}
@@ -231,7 +231,7 @@
 	} else if ($calledfrom=='gb') {
 		echo "<form method=post action=\"gradebook.php?cid=$cid&massexception=1";
 		if (isset($_GET['uid'])) {
-			echo "&uid={$_GET['uid']}";
+			echo "&uid=" . Sanitize::onlyInt($_GET['uid']);
 		}
 		echo "\" id=\"qform\">\n";
 	}
@@ -242,7 +242,7 @@
 	if (isset($_GET['uid'])) {
 		//DB $tolist = "'{$_GET['uid']}'";
 		$tolist = intval($_GET['uid']);
-		echo "<input type=hidden name=\"tolist\" value=\"{$_GET['uid']}\">\n";
+		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::onlyInt($_GET['uid']) . "\">\n";
 	} else {
 		if (count($_POST['checked'])==0) {
 			echo "<p>No students selected.</p>";
@@ -254,7 +254,7 @@
 			require("../footer.php");
 			exit;
 		}
-		echo "<input type=hidden name=\"tolist\" value=\"" . implode(',',$_POST['checked']) . "\">\n";
+		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
 		//DB $tolist = "'".implode("','",$_POST['checked'])."'";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));
 	}
@@ -274,9 +274,9 @@
 		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=:id AND istu.courseid=:courseid");
 		$stm->execute(array(':id'=>$tolist, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<h2>{$row[0]}, {$row[1]}";
+		echo "<h2>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]);
 		if ($row[2]!='') {
-			echo ' <span class="small">(Section: '.$row[2].')</span>';
+			echo ' <span class="small">(Section: '.Sanitize::encodeStringForDisplay($row[2]).')</span>';
 		}
 		echo "</h2>";
 	}
@@ -322,7 +322,7 @@
 					if ($lasta!=0) {
 						echo "</ul></li>";
 					}
-					echo "<li>{$row['itemname']} <ul>";
+					echo "<li>" . Sanitize::encodeStringForDisplay($row['itemname']) ." <ul>";
 					$lasta = $row['itemid'];
 				}
 				printf('<li><input type=checkbox name="clears[]" value="%s" />%s, %s ',
@@ -354,7 +354,7 @@
 					if ($lasts!=0) {
 						natsort($assessarr);
 						foreach ($assessarr as $id=>$val) {
-							echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />".Sanitize::encodeStringForDisplay($val)."</li>";
+							echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val)."</li>";
 						}
 						echo "</ul></li>";
 						$assessarr = array();
@@ -380,7 +380,7 @@
 			}
 			natsort($assessarr);
 			foreach ($assessarr as $id=>$val) {
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />".Sanitize::encodeStringForDisplay($val)."</li>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val)."</li>";
 			}
 			echo "</ul></li>";
 		}
@@ -415,7 +415,7 @@
 	//echo "<h4>Make New Exception</h4>";
 	echo '<h3>'._("Make New Exception").'</h3>';
 	echo '<fieldset class="optionlist"><legend>'._("Exception Options").'</legend>';
-	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.$lpmsg.'</p>';
+	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
 	echo '<p class="list"><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
 	echo '<p>For assessments:</p>';
 	echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
@@ -485,7 +485,7 @@
 		foreach ($assessarr as $id=>$val) {
 			echo "<li><input type=checkbox name=\"addexc[]\" value=\"$id\" ";
 			if (isset($_POST['assesschk']) && in_array($id,$_POST['assesschk'])) { echo 'checked="checked" ';}
-			echo "/>$val</li>";
+			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</li>";
 		}
 		echo '</ul>';
 		echo "<input type=submit value=\"Record Changes\" />";
@@ -529,7 +529,7 @@
 		foreach ($forumarr as $id=>$val) {
 			echo "<li><input type=checkbox name=\"addfexc[]\" value=\"$id\" ";
 			if (isset($_POST['forumchk']) && in_array($id,$_POST['forumchk'])) { echo 'checked="checked" ';}
-			echo "/>$val</li>";
+			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</li>";
 		}
 		echo '</ul>';
 		echo "<input type=submit value=\"Record Changes\" />";

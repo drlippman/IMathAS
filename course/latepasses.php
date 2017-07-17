@@ -148,7 +148,7 @@ function sendtoall(type) {
 		$stm->execute(array(':id'=>$cid));
 		$hours = $stm->fetchColumn(0);
 		echo '<p>Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.  Students must redeem the LatePass before the Due Date, unless you opt in your assessment settings to allow use after the due date (but within 1 LatePass period, specified below).</p>';
-		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"$hours\"/> hours</p>";
+		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"" . Sanitize::encodeStringForDisplay($hours) . "\"/> hours</p>";
 		echo "<p>To all students:  <input type=\"text\" size=\"3\" value=\"1\" id=\"toall\"/> ";
 		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';
 		echo "<table id=myTable><thead><tr><th>Name</th>";
@@ -175,12 +175,12 @@ function sendtoall(type) {
 
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td>{$row[1]}, {$row[2]}</td>";
+			echo "<tr><td>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</td>";
 			if ($hassection) {
-				echo "<td>{$row[3]}</td>";
+				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}
 
-			echo "<td><input type=text size=3 name=\"latepass[{$row[0]}]\" value=\"{$row[4]}\"";
+			echo "<td><input type=text size=3 name=\"latepass[" . Sanitize::encodeStringForDisplay($row[0]) . "]\" value=\"" . Sanitize::encodeStringForDisplay($row[4]) . "\"";
 			echo " onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td>";
 			echo "</tr>";
 		}
