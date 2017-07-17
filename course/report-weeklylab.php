@@ -394,7 +394,8 @@ foreach ($st as $uid=>$stu) {
 	echo '</td>';
 
 	if ($stu['totalPointsPossibleOnAttempted']>0) {
-		echo '<td>'.$stu['totalPointsOnAttempted'].'/'.$stu['totalPointsPossibleOnAttempted'];
+		printf('<td>%s/%s', Sanitize::encodeStringForDisplay($stu['totalPointsOnAttempted']),
+            Sanitize::encodeStringForDisplay($stu['totalPointsPossibleOnAttempted']));
 		echo ' ('. round(100*$stu['totalPointsOnAttempted']/$stu['totalPointsPossibleOnAttempted'],1) .'%)</td>';
 	} else {
 		echo '<td>N/A</td>';

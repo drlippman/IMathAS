@@ -81,7 +81,7 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	}
 	echo $out;
 	if (isset($_GET['email']) && isset($_GET['public']) && !isset($_POST['stuname'])) {
-		$addy = 'quickdrill.php?public=true&showresults=true&email='.$_GET['email'];
+		$addy = 'quickdrill.php?public=true&showresults=true&email='.Sanitize::encodeUrlParam($_GET['email']);
 		echo '<p><b>Send results to instructor</b><br/>';
 		echo "<form action=\"$addy\" method=\"post\">";
 		echo 'Your name: <input type="text" name="stuname" /></p>';
@@ -396,7 +396,7 @@ if ($showans) {
 		$doshowans = 0;
 	}
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
-	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
+	echo "<input type=\"hidden\" name=\"seed\" value=\"".Sanitize::encodeStringForDisplay($seed)."\" />";
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
 	if ($sa==3) {
 		echo "<input type=submit name=\"next\" value=\"Next Question\">\n";

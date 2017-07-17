@@ -284,7 +284,7 @@ if (isset($_POST['checked'])) { //modifying existing
 			}
 
 			echo '</tbody></table>';
-			echo '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
+			echo '<input type=hidden name="qids" value="'.Sanitize::encodeStringForDisplay(implode(',',$qids)).'" />';
 			echo '<input type=hidden name="mod" value="true" />';
 
 			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
@@ -342,7 +342,7 @@ if (isset($_POST['checked'])) { //modifying existing
 				echo '</tr>';
 			}
 			echo '</tbody></table>';
-			echo '<input type=hidden name="qsetids" value="'.implode(',',$_POST['nchecked']).'" />';
+			echo '<input type=hidden name="qsetids" value="'.Sanitize::encodeStringForDisplay(implode(',',$_POST['nchecked'])).'" />';
 			echo '<input type=hidden name="add" value="true" />';
 
 			echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</p>';

@@ -1234,7 +1234,8 @@ function gbstudisp($stu) {
 		echo '</p>';
 		if ($hasoutcomes) {
 			echo '<p>';
-			echo '<a href="outcomereport.php?stu='.$stu.'&report=outstu&cid='.$cid.'&type='.$outcometype.'">';
+			echo '<a href="outcomereport.php?' . Sanitize::generateQueryStringFromMap(array('stu' => $stu,
+					'report' => 'outstu', 'cid' => $cid, 'type' => $outcometype)) . '">';
 			echo _('View Outcome Report');
 			echo '</a>';
 			echo '</p>';

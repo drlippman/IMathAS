@@ -106,8 +106,8 @@ require("../header.php");
 ?>
 <script>
 	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo $cid ?>&folder=';
-	var oblist = '<?php echo $oblist ?>';
-	var plblist = '<?php echo $plblist ?>';
+	var oblist = '<?php echo Sanitize::encodeStringForJavascript($oblist); ?>';
+	var plblist = '<?php echo Sanitize::encodeStringForJavascript($plblist); ?>';
 	var cid = '<?php echo $cid ?>';
 </script>
 <div class=breadcrumb>

@@ -88,7 +88,8 @@
 							$n = $row[1];
 						}
 					}
-					echo "<p>Returning $n LatePass".($n>1?"es":"")."</p>";
+					printf("<p>Returning %d LatePass", $n);
+					echo ($n>1?"es":"")."</p>";
 					//DB $query = "UPDATE imas_students SET latepass=latepass+$n WHERE userid='$userid' AND courseid='$cid'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass+:n WHERE userid=:userid AND courseid=:courseid");

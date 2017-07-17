@@ -127,7 +127,7 @@ if (!(isset($teacherid))) {
 				$body .= '</p>';
 			}
 			if ($successes>0) {
-				$body .= "<a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Return to grade list</a></p>";
+				$body .= "<a href=\"addgrades.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&gbitem=".Sanitize::encodeUrlParam($_GET['gbitem'])."&grades=all\">Return to grade list</a></p>";
 			}
 
 		} else {
@@ -136,8 +136,8 @@ if (!(isset($teacherid))) {
 		}
 	} else { //DEFAULT DATA MANIPULATION
 		$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .=" &gt; <a href=\"addgrades.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades=all\">Offline Grades</a> &gt; Upload Grades";
+		$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
+		$curBreadcrumb .=" &gt; <a href=\"addgrades.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&gbitem=".Sanitize::encodeUrlParam($_GET['gbitem'])."&grades=all\">Offline Grades</a> &gt; Upload Grades";
 	}
 }
 
@@ -154,7 +154,7 @@ if ($overwriteBody==1) {
 	<div id="headeruploadgrades" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 
 
-	<form enctype="multipart/form-data" method=post action="uploadgrades.php?cid=<?php echo $cid ?>&gbmode=<?php echo $_GET['gbmode'] ?>&gbitem=<?php echo $_GET['gbitem'] ?>">
+	<form enctype="multipart/form-data" method=post action="uploadgrades.php?cid=<?php echo $cid ?>&gbmode=<?php echo Sanitize::encodeUrlParam($_GET['gbmode']); ?>&gbitem=<?php echo Sanitize::encodeUrlParam($_GET['gbitem']); ?>">
 		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
 		<span class=form>Grade file (CSV): </span>
 		<span class=formright><input name="userfile" type="file" /></span><br class=form>

@@ -606,7 +606,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<script>
-	var curlibs = '<?php echo $parent1 ?>';
+	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1); ?>';
 	function libselect() {
 		window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&select=parent&selectrights=1&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 	}
@@ -658,7 +658,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['transfer'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<input type=hidden name=transfer value="<?php echo $tlist ?>">
+		<input type=hidden name=transfer value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
 		Transfer library ownership to:
 		<?php writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 
@@ -671,7 +671,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['chgrights'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<input type=hidden name=chgrights value="<?php echo $tlist ?>">
+		<input type=hidden name=chgrights value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
 		<span class=form>Library use rights: </span>
 		<span class=formright>
 			<?php writeHtmlSelect ("newrights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
@@ -693,7 +693,7 @@ if ($overwriteBody==1) {
 	} else if (isset($_POST['chgsort'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<input type=hidden name=chgsort value="<?php echo $tlist ?>">
+		<input type=hidden name=chgsort value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
 		<span class=form>Sort order: </span>
 		<span class=formright>
 			<input type="radio" name="sortorder" value="0" checked/> Creation date<br/>
@@ -708,7 +708,7 @@ if ($overwriteBody==1) {
 	}else if (isset($_POST['setparent'])) {
 ?>
 	<form method=post action="managelibs.php?cid=<?php echo $cid ?>">
-		<input type=hidden name=setparent value="<?php echo $tlist ?>">
+		<input type=hidden name=setparent value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
 		<span class=form>New Parent Library: </span>
 		<span class=formright>
 			<span id="libnames"></span>

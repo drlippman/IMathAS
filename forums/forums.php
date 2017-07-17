@@ -182,7 +182,7 @@
 	<div id="forumsearch">
 	<form method="post" action="forums.php?cid=<?php echo $cid;?>">
 		<p>
-		Search: <input type=text name="search" value="<?php echo $searchstr;?>" />
+		Search: <input type=text name="search" value="<?php echo Sanitize::encodeStringForDisplay($searchstr);?>" />
 		<input type="radio" name="searchtype" value="thread" <?php if ($searchtype!='posts') {echo 'checked="checked"';}?>/>All thread subjects
 		<input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts.
 		<?php

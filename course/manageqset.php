@@ -1089,7 +1089,7 @@ function getnextprev(formn,loc) {
 		Are you SURE you want to delete these questions from the Question Set.  This will make them unavailable
 		to all users.  If any are currently being used in an assessment, it will mess up that assessment.
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>&confirmed=true">
-			<input type=hidden name=remove value="<?php echo $rlist ?>">
+			<input type=hidden name=remove value="<?php echo Sanitize::encodeStringForDisplay($rlist); ?>">
 			<p>
 				<input type=submit value="Really Delete">
 				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
@@ -1099,7 +1099,7 @@ function getnextprev(formn,loc) {
 	} else if (isset($_POST['transfer']) || isset($_GET['transfer'])) {
 ?>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
-			<input type=hidden name=transfer value="<?php echo $tlist ?>">
+			<input type=hidden name=transfer value="<?php echo Sanitize::encodeStringForDisplay($tlist); ?>">
 			Transfer question ownership to:
 
 			<?php writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
@@ -1138,7 +1138,7 @@ function getnextprev(formn,loc) {
 		</script>
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 			<input type=hidden name=chglib value="true">
-			<input type=hidden name=qtochg value="<?php echo $clist ?>">
+			<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 			What do you want to do with these questions?<br/>
 			<input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments<br/>
 			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
@@ -1168,7 +1168,7 @@ function getnextprev(formn,loc) {
 			</p>
 			<p>Select the library into which to put the new copies:</p>
 
-			<input type=hidden name=qtochg value="<?php echo $clist ?>">
+			<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 
 			<?php include("libtree.php"); ?>
 
@@ -1184,7 +1184,7 @@ function getnextprev(formn,loc) {
 	<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 		<input type=hidden name="license" value="true">
 
-		<input type=hidden name=qtochg value="<?php echo $clist ?>">
+		<input type=hidden name=qtochg value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 
 		<p>This will allow you to change the license or attribution on questions, if you have the rights to change them</p>
 
@@ -1240,7 +1240,7 @@ function getnextprev(formn,loc) {
 				</select>
 			</p>
 
-			<input type="hidden" name="qtochg" value="<?php echo $clist ?>">
+			<input type="hidden" name="qtochg" value="<?php echo Sanitize::encodeStringForDisplay($clist); ?>">
 
 
 			<p>

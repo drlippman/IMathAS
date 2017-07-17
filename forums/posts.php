@@ -18,9 +18,9 @@ if (isset($teacherid)) {
 }
 
 $cid = Sanitize::courseId($_GET['cid']);
-$forumid = $_GET['forum'];
-$threadid = $_GET['thread'];
-$page = $_GET['page'];
+$forumid = Sanitize::onlyInt($_GET['forum']);
+$threadid = Sanitize::onlyInt($_GET['thread']);
+$page = Sanitize::onlyInt($_GET['page']);
 //special "page"s
 //-1 new posts from forum page
 //-2 tagged posts from forum page
@@ -171,6 +171,7 @@ if ($haspoints && $caneditscore && $rubric != 0) {
 	$stm->execute(array(':id'=>$rubric));
 	if ($stm->rowCount()>0) {
 		$row = $stm->fetch(PDO::FETCH_NUM);
+		// $row data is sanitized by printrubrics().
 		echo printrubrics(array($row));
 	}
 }
@@ -390,7 +391,7 @@ if (!$oktoshow) {
 	//DB $prevth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$prevth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$prevth&grp=$groupid\">Prev</a> ";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::encodeUrlParam($prevth)."&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
 	}
@@ -413,7 +414,7 @@ if (!$oktoshow) {
 	//DB $nextth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$nextth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=$groupid\">Next</a>";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
 	} else {
 		echo "Next";
 	}
@@ -669,11 +670,11 @@ printchildren(0);
 if ($caneditscore && $haspoints) {
 	echo '<div><input type=submit name="save" value="Save Grades" /></div>';
 	if ($prevth!='' && $page!=-3) {
-		echo '<input type="hidden" name="prevth" value="'.$prevth.'"/>';
+		echo '<input type="hidden" name="prevth" value="'.Sanitize::encodeStringForDisplay($prevth).'"/>';
 		echo '<input type="submit" name="save" value="Save Grades and View Previous"/>';
 	}
 	if ($nextth!='' && $page!=-3) {
-		echo '<input type="hidden" name="nextth" value="'.$nextth.'"/>';
+		echo '<input type="hidden" name="nextth" value="'.Sanitize::encodeStringForDisplay($nextth).'"/>';
 		echo '<input type="submit" name="save" value="Save Grades and View Next"/>';
 	}
 	echo "</form>";

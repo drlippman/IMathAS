@@ -2,6 +2,8 @@
 //IMathAS:  utility functions for rubrics
 //(c) 2011 David Lippman
 
+require_once(__DIR__ . "/sanitize.php");
+
 //printrubrics
 //returns javascript string for rubric data
 //input: array of rubrics
@@ -10,15 +12,15 @@ function printrubrics($rubricarray) {
 	$out = '<script type="text/javascript">';
 	$out .= 'var imasrubrics = new Array();';
 	foreach ($rubricarray as $info) {
-		$out .= "imasrubrics[{$info[0]}] = {'type':{$info[1]},'data':[";
+		$out .= "imasrubrics[".Sanitize::encodeStringForJavascript($info[0])."] = {'type':".Sanitize::encodeStringForJavascript($info[1]).",'data':[";
 		$data = unserialize($info[2]);
 		foreach ($data as $i=>$rubline) {
 			if ($i!=0) {
 				$out .= ',';
 			}
-			$out .= '["'.str_replace('"','\\"',$rubline[0]).'",';
-			$out .= '"'.str_replace('"','\\"',$rubline[1]).'"';
-			$out .= ','.$rubline[2];
+			$out .= '["'.Sanitize::encodeStringForJavascript($rubline[0]).'",';
+			$out .= '"'.Sanitize::encodeStringForJavascript($rubline[1]).'"';
+			$out .= ','.Sanitize::encodeStringForJavascript($rubline[2]);
 			$out .= ']';
 		}
 		$out .= ']};';

@@ -35,7 +35,7 @@
 	$titlesimp = strip_tags($title);
 
 	if (substr($text,0,8)=='exttool:') {
-		$param = "linkid={$_GET['id']}&cid=$cid";
+		$param = "linkid=".Sanitize::encodeUrlParam($_GET['id'])."&cid=$cid";
 
 		if ($target==0) {
 			$height = '500px';

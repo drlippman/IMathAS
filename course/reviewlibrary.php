@@ -24,7 +24,7 @@ if ($myrights<20) {
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['source'])) {
-		$source = $_GET['source'];
+		$source = Sanitize::onlyInt($_GET['source']);
 	} else {
 		$source = 0;
 	}
@@ -69,7 +69,7 @@ if ($myrights<20) {
 
 	} else {
 
-		$lib = $_REQUEST['lib'];
+		$lib = Sanitize::onlyInt($_REQUEST['lib']);
 		if (isset($_GET['offset'])) {
 			$offset = $_GET['offset'];
 		} else {

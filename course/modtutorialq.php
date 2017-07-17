@@ -1070,7 +1070,7 @@ if (isset($_GET['aid'])) {
 
 } else if (isset($_GET['daid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+	echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
 } else {
 	if ($_GET['cid']=="admin") {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
@@ -1114,7 +1114,7 @@ if (isset($inusecnt) && $inusecnt>0) {
 
 }
 if (isset($_GET['qid'])) {
-	echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
+	echo "<p><a href=\"moddataset.php?id=".Sanitize::encodeUrlParam($_GET['id'])."&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=".Sanitize::encodeUrlParam($_GET['qid'])."\">Template this question</a> for use in this assessment.  ";
 	echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
 }
 if (!$myq) {
@@ -1315,7 +1315,7 @@ Description:<BR>
 <textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea>
 </p>
 <p>
-Author: <?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>">
+Author: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input type="hidden" name="author" value="<?php echo Sanitize::encodeStringForDisplay($author); ?>">
 </p>
 <p>
 <?php
@@ -1454,7 +1454,7 @@ for ($n=0;$n<10;$n++) {
 	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
 	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?$qtold[$n]:0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?$answerboxsize[$n]:20).'"/>.';
-	echo ' Variables: <input autocomplete="off" name="variables'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?$variables[$n]:'x').'"/>.';
+	echo ' Variables: <input autocomplete="off" name="variables'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?Sanitize::encodeStringForDisplay($variables[$n]):'x').'"/>.';
 	echo '</span>';
 
 	echo '</span>'; // end question parts span

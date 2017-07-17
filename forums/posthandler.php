@@ -542,7 +542,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 								$notice .= 'Please read and participate in the existing discussion.';
 								//DB while ($row = mysql_fetch_row($result)) {
 								while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-									$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
+									$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">".Sanitize::encodeStringForDisplay($line['subject'])."</a>";
 								}
 							}
 						}
@@ -571,12 +571,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		if ($forumsettings['postinstr'] != '' && $_GET['modify']=="new") {
 			echo '<h4>'._('Posting Instructions').'</h4>';
-			echo '<div class="intro">'.$forumsettings['postinstr'].'</div><br/>';
+			echo '<div class="intro">'.Sanitize::encodeStringForDisplay($forumsettings['postinstr']).'</div><br/>';
 		} else if ($forumsettings['replyinstr'] != '' && $_GET['modify']=="reply") {
 			echo '<h4>'._('Reply Instructions').'</h4>';
-			echo '<div class="intro">'.$forumsettings['replyinstr'].'</div><br/>';
+			echo '<div class="intro">'.Sanitize::encodeStringForDisplay($forumsettings['replyinstr']).'</div><br/>';
 		}
-		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify={$_GET['modify']}&replyto={$_GET['replyto']}\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify=".Sanitize::encodeUrlParam($_GET['modify'])."&replyto=".Sanitize::encodeUrlParam($_GET['replyto'])."\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
 		if (isset($notice) && $notice!='') {
 			echo '<span class="form">&nbsp;</span><span class="formright">'.$notice.'</span><br class="form"/>';
@@ -599,6 +599,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$files = explode('@@',$line['files']);
 					for ($i=0;$i<count($files)/2;$i++) {
 						echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'" aria-label="'._('Description').'"/>';
+						// $_GET['modify'] will be sanitized by getuserfileurl().
 						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
 						echo '<label for="filedel['.$i.']">Delete?</label> <input type="checkbox" name="filedel['.$i.']" id="filedel['.$i.']" value="1"/><br/>';
 					}
@@ -660,11 +661,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<input type=radio name=replyby id=replyby3 value=\"Date\" ";
 				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1 ";}
 				echo "/> <label for=replyby3>Before:</label> ";
-				echo "<input type=text size=10 name=replybydate value=\"$replybydate\" aria-label=\"reply by date\"/>";
+				echo "<input type=text size=10 name=replybydate value=\"".Sanitize::encodeStringForDisplay($replybytime)."\" aria-label=\"reply by date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
 				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
 				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
-				echo "at <input type=text size=10 name=replybytime value=\"$replybytime\" aria-label=\"reply by time\"></span><br class=\"form\" />";
+				echo "at <input type=text size=10 name=replybytime value=\"".Sanitize::encodeStringForDisplay($replybytime)."\" aria-label=\"reply by time\"></span><br class=\"form\" />";
 				if ($groupsetid >0) {
 					echo '<span class="form"><label for="stugroup">Set thread to group</label>:</span><span class="formright">';
 					echo '<select name="stugroup" id="stugroup">';
@@ -682,9 +683,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 							$row[1] .= " $grpnums";
 							$grpnums++;
 						}
-						echo '<option value="'.$row[0].'" ';
+						echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'" ';
 						if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
-						echo '>'.$row[1].'</option>';
+						echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 					}
 					echo '</select></span><br class="form" />';
 				}
@@ -722,7 +723,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';
-				echo '<input type="text" size="4" name="points" id="points" value="'.$points.'" /></span><br class="form" />';
+				echo '<input type="text" size="4" name="points" id="points" value="'.Sanitize::onlyInt($points).'" /></span><br class="form" />';
 			}
 			if ($_GET['modify']=='reply') {
 				echo "<div class=submit><input type=submit value='Post Reply'></div>\n";
@@ -1027,8 +1028,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo "<h3>Move Post</h3>\n";
 		}
 
-		echo "<form method=post action=\"$returnurl&move={$_GET['move']}\">";
-		echo '<input type="hidden" name="thread" value="'.$threadid.'"/>';
+		echo "<form method=post action=\"$returnurl&move=".Sanitize::encodeUrlParam($_GET['move'])."\">";
+		echo '<input type="hidden" name="thread" value="'.Sanitize::encodeStringForDisplay($threadid).'"/>';
 		echo "<p>What do you want to do?<br/>";
 		if ($ishead) {
 			echo '<input type="radio" name="movetype" value="0" id=movetype0 checked="checked" onclick="toggleforumselect(0)"/> <label for="movetype0">Move thread to different forum</label><br/>';
@@ -1047,9 +1048,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<input type=\"radio\" name=\"movetof\" value=\"{$row[0]}\" id=\"moveto{$row[0]}\" ";
+		echo "<input type=\"radio\" name=\"movetof\" value=\"".Sanitize::onlyInt($row[0])."\" id=\"moveto".Sanitize::onlyInt($row[0])."\" ";
 			if ($row[0]==$forumid) {echo 'checked="checked"';}
-			echo "/> <label for=\"moveto{$row[0]}\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
+			echo "/> <label for=\"moveto".Sanitize::onlyInt($row[0])."\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
 		}
 		echo '</div>';
 
@@ -1063,9 +1064,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm->execute(array(':forumid'=>$forumid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($ishead && $row[0]==$threadid) {continue;}
-			echo "<input type=\"radio\" name=\"movetot\" value=\"{$row[0]}\" id=\"movetot{$row[0]}\" ";
+			echo "<input type=\"radio\" name=\"movetot\" value=\"".Sanitize::encodeStringForDisplay($row[0])."\" id=\"movetot".Sanitize::encodeStringForDisplay($row[0])."\" ";
 			if ($row[0]==$threadid) {echo 'checked="checked"';}
-			echo "/> <label for=\"movetot{$row[0]}\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
+			echo "/> <label for=\"movetot".Sanitize::encodeStringForDisplay($row[0])."\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
 		}
 		echo '</div>';
 

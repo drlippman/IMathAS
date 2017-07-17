@@ -81,7 +81,7 @@
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
 			$messagep1 = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-			$messagep1 .= "<p>You've received a new message</p><p>From: $from<br />Course: ".Sanitize::encodeStringForDisplay($coursename).".</p>\r\n";
+			$messagep1 .= "<p>You've received a new message</p><p>From: ".Sanitize::encodeStringForDisplay($from)."<br />Course: ".Sanitize::encodeStringForDisplay($coursename).".</p>\r\n";
 			//DB $messagep1 .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
 			$messagep1 .= "<p>Subject: ".$_POST['subject']."</p>"; // Sanitized by htmLawed near line 40.
 			$messagep1 .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=$cid&msgid=";
@@ -105,7 +105,7 @@
 						':senddate'=>$now, ':isread'=>$isread, ':courseid'=>$cid));
 					$msgid = $DBH->lastInsertId();
 					if (isset($emailaddys[$msgto])) {
-						mail($emailaddys[$msgto],'New message notification',$messagep1.$msgid.$messagep2,$headers);
+						mail(Sanitize::emailAddress($emailaddys[$msgto]),'New message notification',$messagep1.$msgid.$messagep2,$headers);
 					}
 				}
 			}
@@ -125,7 +125,7 @@
 			}
 			$sentto = implode('<br/>',$fullnames);
 			//DB $message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
-			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n";
+			$message = Sanitize::encodeStringForDisplay($_POST['message']) . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".Sanitize::emailAddress($sentto)." </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_tutors,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ");
@@ -188,7 +188,7 @@
 			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
 			//$headers .= "From: $self\r\n";
 			$headers .= "From: $sendfrom\r\n";
-			$headers .= "Reply-To: $self\r\n";
+			$headers .= "Reply-To: ".Sanitize::emailAddress($self)."\r\n";
 			$message = "<p><b>Note:</b>This email was sent by ".htmlentities($self)." from $installname. If you need to reply, make sure your reply goes to their email address.</p><p></p>".$message;
 			$teacheraddys = array();
 			if ($_POST['self']!="none") {
@@ -197,12 +197,12 @@
 			foreach ($emailaddys as $k=>$addy) {
 				$addy = trim($addy);
 				if ($addy!='' && $addy!='none@none.com') {
-					mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
+					mail(Sanitize::emailAddress($addy),$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
 				}
 			}
 
 
-			$message .= "<p>Instructor note: Email sent to these students from course $coursename: <br/> $sentto </p>\n";
+			$message .= "<p>Instructor note: Email sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".Sanitize::emailAddress($sentto)." </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 			}
@@ -235,7 +235,7 @@
 			//$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			//$headers .= "From: $sendfrom\r\n";
 			foreach ($teacheraddys as $addy) {
-				mail($addy,$subject,$message,$headers);
+				mail(Sanitize::emailAddress($addy),$subject,$message,$headers);
 			}
 			//mail(implode(', ',$emailaddys),$subject,$message,$headers);
 		}
@@ -280,12 +280,12 @@
 		if ($calledfrom=='lu') {
 			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
+			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='itemsearch') {
 			echo "<form method=post action=\"itemsearch.php?masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
+		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";
 		echo "<span class=form><label for=\"message\">Message:</label></span>";
 		echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70> </textarea></div></span><br class=form>\n";
 		echo "<p><i>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each students' first/last name</p>";
@@ -323,9 +323,9 @@
 		}
 		echo "</select>\n";
 		echo "<input type=hidden name=\"tolist\" value=\""
-			. Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
+	. Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
 		echo "</span><br class=form />\n";
-		echo "<div class=submit><input type=submit value=\"Send $sendtype\"></div>\n";
+		echo "<div class=submit><input type=submit value=\"Send".Sanitize::encodeStringForDisplay($sendtype)."\"></div>\n";
 		echo "</form>\n";
 		//DB $tolist = "'".implode("','",$_POST['checked'])."'";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));

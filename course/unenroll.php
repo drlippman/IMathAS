@@ -120,16 +120,18 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['uid']));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$unenrollConfirm =  "Are you SURE you want to unenroll {$row[0]} {$row[1]} ($row[2])?";
+			$unenrollConfirm =  sprintf("Are you SURE you want to unenroll %s %s (%s)?",
+                Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
+                Sanitize::encodeStringForDisplay($row[2]));
 		}
 
 		/**** confirmation page body *****/
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action={$_GET['action']}&uid={$_GET['uid']}\">";
+			echo "<form method=post action=\"listusers.php?cid=$cid&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=unenroll&uid={$_GET['uid']}\">";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&action=unenroll&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
 		}
 
 
@@ -142,7 +144,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 <?php
 					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
-						echo "			<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+						printf("			<li>%s %s (%s)</li>",
+                            Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
+                            Sanitize::encodeStringForDisplay($row[2]));
 					}
 ?>
 		</ul>
@@ -182,7 +186,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 <?php
 					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
-						echo "			<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+						printf("			<li>%s %s (%s)</li>",
+							Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
+							Sanitize::encodeStringForDisplay($row[2]));
 					}
 ?>
 		</ul>
@@ -203,7 +209,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."'\">";
 			}
 ?>
 		</p>

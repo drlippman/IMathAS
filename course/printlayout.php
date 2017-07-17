@@ -143,9 +143,9 @@ if ($overwriteBody==1) {
 	if ($isfinal) {
 		$heights = explode(',',$_POST['heights']);
 		for ($i=0;$i<count($heights);$i++) {
-			echo "div.trq$i {float: left; width: {$pw}in; height: {$heights[$i]}in; padding: 0px; overflow: hidden;}\n";
+			echo "div.trq$i {float: left; width: ".Sanitize::encodeStringForCSS($pw)."in; height: ".Sanitize::encodeStringForCSS($heights[$i])."in; padding: 0px; overflow: hidden;}\n";
 		}
-		echo "div.hdrm {width: {$pw}in; padding: 0px; overflow: hidden;}\n";
+		echo "div.hdrm {width: ".Sanitize::encodeStringForCSS($pw)."in; padding: 0px; overflow: hidden;}\n";
 	} else {
 		$pt = 0;
 		for ($i=0;$i<ceil($numq/3)+1;$i++) {
@@ -227,7 +227,7 @@ if ($overwriteBody==1) {
 			display: none;
 		}
 		div.m {
-			width: <?php echo $pw ?>in;
+			width: <?php echo Sanitize::encodeStringForCSS($pw); ?>in;
 			border: 0px;
 		}
 		div.cbutn {
@@ -328,8 +328,8 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<div class=m>\n";
 		}
-		echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-		echo "<div id=intro>{$line['intro']}</div>\n";
+		echo "<div id=headerleft>".Sanitize::encodeStringForDisplay($headerleft)."</div><div id=headerright>".Sanitize::encodeStringForDisplay($headerright)."</div>\n";
+		echo "<div id=intro>".Sanitize::encodeStringForDisplay($line['intro'])."</div>\n";
 		echo "</div>\n";
 		if (!$isfinal) {
 			echo "<div class=cbutn><a href=\"printtest.php?cid=$cid&aid=$aid\">Cancel</a></div>\n";
@@ -369,8 +369,8 @@ if ($overwriteBody==1) {
 
 <?php
 		echo "<input type=hidden id=heights name=heights value=\"\">\n";
-		echo "<input type=hidden name=pw value=\"$pw\">\n";
-		echo "<input type=hidden name=ph value=\"$ph\">\n";
+		echo "<input type=hidden name=pw value=\"".Sanitize::encodeStringForDisplay($pw)."\">\n";
+		echo "<input type=hidden name=ph value=\"".Sanitize::encodeStringForDisplay($ph)."\">\n";
 		if (isset($_POST['points'])) {
 			echo "<input type=hidden name=points value=1>\n";
 		}
@@ -391,7 +391,7 @@ if ($overwriteBody==1) {
 		}
 		if (isset($_POST['otherheader'])) {
 			echo "<input type=hidden name=otherheader value=1>\n";
-			echo "<input type=hidden name=otherheadertext value=\"{$_POST['otherheadertext']}\">\n";
+			echo "<input type=hidden name=otherheadertext value=\"".Sanitize::encodeStringForDisplay($_POST['otherheadertext'])."\">\n";
 		}
 		echo "<div class=q><div class=m>&nbsp;</div><div class=cbutn><input type=submit value=\"Continue\"></div></div>\n";
 	} else if ($_POST['keys']>0) { //print answer keys

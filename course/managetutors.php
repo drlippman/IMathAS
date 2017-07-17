@@ -189,10 +189,10 @@ if (count($tutorlist)==0) {
 }
 foreach ($tutorlist as $tutor) {
 	echo '<tr>';
-	echo '<td>'.$tutor['name'].'</td>';
+	echo '<td>'.Sanitize::encodeStringForDisplay($tutor['name']).'</td>';
 	echo '<td>';
 	//section
-	echo '<select name="section['.$tutor['id'].']">';
+	echo '<select name="section['.Sanitize::encodeStringForDisplay($tutor['id']).']">';
 	echo '<option value="" '.getHtmlSelected($tutor['section'],"").'>All</option>';
 	foreach ($sections as $sec) {
 		echo '<option value="'.Sanitize::encodeStringForDisplay($sec).'" '.getHtmlSelected($tutor['section'],$sec).'>'.Sanitize::encodeStringForDisplay($sec).'</option>';
@@ -203,7 +203,7 @@ foreach ($tutorlist as $tutor) {
 	echo '</select>';
 	echo '</td>';
 	echo '<td>';
-	echo '<input type="checkbox" name="remove[]" value="'.$tutor['id'].'" />';
+	echo '<input type="checkbox" name="remove[]" value="'.Sanitize::encodeStringForDisplay($tutor['id']).'" />';
 	echo '</td>';
 	echo '</tr>';
 }

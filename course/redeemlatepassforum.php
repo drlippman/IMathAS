@@ -6,7 +6,7 @@
 
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	$fid = $_GET['fid'];
+	$fid = Sanitize::onlyInt($_GET['fid']);
 	$from = $_GET['from'];
 
 	//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";

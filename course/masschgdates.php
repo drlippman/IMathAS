@@ -246,7 +246,7 @@ if ($overwriteBody==1) {
 	$availnames = array(_("Hidden"),_("By Dates"),_("Always"));
 
 	if (isset($_GET['orderby'])) {
-		$orderby = $_GET['orderby'];
+		$orderby = Sanitize::onlyInt($_GET['orderby']);
 		$sessiondata['mcdorderby'.$cid] = $orderby;
 		writesessiondata();
 	} else if (isset($sessiondata['mcdorderby'.$cid])) {
@@ -255,7 +255,7 @@ if ($overwriteBody==1) {
 		$orderby = 3;
 	}
 	if (isset($_GET['filter'])) {
-		$filter = $_GET['filter'];
+		$filter = preg_replace('/[^\da-z\._\-]/i', '', $_GET['filter']);
 		$sessiondata['mcdfilter'.$cid] = $filter;
 		writesessiondata();
 	} else if (isset($sessiondata['mcdfilter'.$cid])) {

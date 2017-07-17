@@ -125,9 +125,9 @@ if (isset($_POST['message'])) {
 
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
-	echo '<input type="hidden" name="sendtype" value="'.$_GET['sendtype'].'"/>';
+	echo '<input type="hidden" name="sendtype" value="'.Sanitize::encodeStringForDisplay($_GET['sendtype']).'"/>';
 	echo "To: $to<br/>\n";
-	echo "Subject: <input type=text size=50 name=subject id=subject value=\"$title\"><br/>\n";
+	echo "Subject: <input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"><br/>\n";
 	echo "Message: <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 	echo htmlentities($message);
 	echo "</textarea></div><br/>\n";

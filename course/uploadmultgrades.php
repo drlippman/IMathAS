@@ -251,7 +251,7 @@ if ($overwriteBody==1) {
 	if (isset($page_fileHiddenInput)) {
 		//file has been uploaded, need to know what to import
 		echo $page_fileHiddenInput;
-		echo '<input type="hidden" name="headerrows" value="'.$_POST['headerrows'].'" />';
+		echo '<input type="hidden" name="headerrows" value="'.Sanitize::encodeStringForDisplay($_POST['headerrows']).'" />';
 		$sdate = tzdate("m/d/Y",time());
 		$stime = tzdate("g:i a",time());
 	?>
@@ -280,7 +280,7 @@ if ($overwriteBody==1) {
 			//DB while ($row = mysql_fetch_row($result)) {
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$gbcatoptions .= "<option value=\"{$row[0]}\">{$row[1]}</option>\n";
+				$gbcatoptions .= "<option value=\"{$row[0]}\">".Sanitize::encodeStringForDisplay($row[1])."</option>\n";
 			}
 		}
 		foreach ($columndata as $col=>$data) {
@@ -294,7 +294,7 @@ if ($overwriteBody==1) {
 			}
 			echo '</select></td>';
 			echo '<td><input type="text" size="20" name="colname'.$col.'" value="'.htmlentities($data[0]).'" /></td>';
-			echo '<td><input type="text" size="3" name="colpts'.$col.'"  value="'.$data[1].'" /></td>';
+			echo '<td><input type="text" size="3" name="colpts'.$col.'"  value="'.Sanitize::encodeStringForDisplay($data[1]).'" /></td>';
 			echo '<td><select name="colcnt'.$col.'">';
 			echo '<option value="1" selected="selected">Count in gradebook</option>';
 			echo '<option value="0">Don\'t count and hide from students</option>';
