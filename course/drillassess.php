@@ -228,7 +228,7 @@ $showtips = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
 $useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 require("../assessment/header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">" . Sanitize::encodeStringForDisplay($coursename) . "</a> ";
 echo "&gt; " . _("Drill Assessment") . "</div>";
 
 echo '<div id="headerdrillassess" class="pagetitle"><h2>' . _("Drill Assessment") . '</h2></div>';
@@ -270,7 +270,7 @@ foreach ($itemdescr as $qn=>$descr) {
 	if ($qn==$curitem) {
 		echo '<span class="current">';
 	}
-	echo "<a href=\"drillassess.php?cid=$cid&daid=$daid&start=$qn\">$descr</a>";
+	echo "<a href=\"drillassess.php?cid=$cid&daid=$daid&start=$qn\">" . Sanitize::encodeStringForDisplay($descr) . "</a>";
 	if ($qn==$curitem) {
 		echo '</span>';
 	}
@@ -278,7 +278,7 @@ foreach ($itemdescr as $qn=>$descr) {
 		echo '<ul class="qlist">';
 		if (($showtostu&1)==1 && isset($scorerec[$qn])) {
 			//show last score
-			echo '<li>' . _('Last score') . ': ' . dispscore($scorerec[$qn][count($scorerec[$qn])-1]).'</li>';
+			echo '<li>' . _('Last score') . ': ' . Sanitize::encodeStringForDisplay(dispscore($scorerec[$qn][count($scorerec[$qn])-1])) . '</li>';
 		}
 		if (($showtostu&2)==2 && isset($scorerec[$qn])) {
 			//show best score
@@ -290,7 +290,7 @@ foreach ($itemdescr as $qn=>$descr) {
 		}
 		if (($showtostu&4)==4 && $classbests[$qn]!=-1 ) {
 			//show best score
-			echo '<li>'. _('Class best') . ': ' . dispscore($classbests[$qn]).'</li>';
+			echo '<li>'. _('Class best') . ': ' . Sanitize::encodeStringForDisplay(dispscore($classbests[$qn])) . '</li>';
 		}
 		echo '</ul>';
 	}
@@ -313,7 +313,7 @@ if ($curitem == -1) {
 	//are we done with this assessment?
 	if ($drillisdone) {
 		echo "<h4>" . _("Drill Complete") . "</h4>";
-		echo "<p>$scoremsg</p>";
+		echo "<p>" . Sanitize::encodeStringForDisplay($scoremsg) . "</p>";
 		if (($showtostu&2)==2 && $isnewpbest) {
 			echo '<p>' . _("Congrats! That's a new personal best!") . '</p>';
 		}

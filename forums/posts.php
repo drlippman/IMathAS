@@ -362,14 +362,14 @@ if ($page==-4) {
 } else if ($page==-5) {
 	echo "<a href=\"flaggedthreads.php?cid=$cid\">Flagged Threads</a> ";
 } else {
-	echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";
+	echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">".Sanitize::encodeStringForDisplay($forumname)."</a> ";
 }
 echo "&gt; Posts</div>\n";
 
 if (!$oktoshow) {
 	echo '<p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
 } else {
-	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
+	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h2></div>';
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
 
 	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";

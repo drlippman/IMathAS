@@ -1134,7 +1134,7 @@ $now = time();
 $stm = $DBH->prepare("INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES (:SID, :password, :rights, :FirstName, :LastName, :email)");
 $stm->execute(array(':SID'=>$username, ':password'=>$md5pw, ':rights'=>100, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email));
 
-echo "user $username created<br/>";
+echo "user " . Sanitize::encodeStringForDisplay($username) . " created<br/>";
 
 //write upgradecounter
 require("upgrade.php");

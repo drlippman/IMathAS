@@ -140,7 +140,7 @@ echo "<option value=8760 "; writeHtmlSelected($timefilter,8760); echo ">last yea
 echo "<option value=0 "; writeHtmlSelected($timefilter,0); echo ">all time</option>";
 echo "</select>";
 
-echo " Last name: <input type=text id=\"lnfilter\" value=\"$lnfilter\" />";
+echo " Last name: <input type=text id=\"lnfilter\" value=\"" . Sanitize::encodeStringForDisplay($lnfilter) . "\" />";
 echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
 echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="display:none;">Show End Messages</button>';
 echo "</div>";
@@ -190,11 +190,11 @@ function gbinstrdisp() {
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[0]=='') { continue;}
-				echo  "<option value=\"{$row[0]}\" ";
+				echo  "<option value=\"" . Sanitize::encodeStringForDisplay($row[0]) . "\" ";
 				if ($row[0]==$secfilter) {
 					echo  'selected=1';
 				}
-				echo  ">{$row[0]}</option>";
+				echo  ">" . Sanitize::encodeStringForDisplay($row[0]) . "</option>";
 			}
 			echo  "</select>";
 

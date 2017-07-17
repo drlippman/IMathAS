@@ -47,7 +47,7 @@ if (isset($_POST['checked'])) { //form submitted
 			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				echo $row[0].'<br/>';
+				echo Sanitize::encodeStringForDisplay($row[0]) . '<br/>';
 			}
 			//echo '</p><p><input type="submit" value="Yes, Delete"/>';
 			echo '</p><p><button type=submit name=confirm value=true>'._('Yes, Delete').'</button> ';
@@ -163,7 +163,7 @@ Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All<
 <?php
 
 foreach($gbitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.' <a class="small" href="addgrades.php?cid='.$cid.'&grades=all&gbitem='.$id.'" target="_blank">Edit</a></li>';
+	echo '<li><input type="checkbox" name="checked[]" value="' . Sanitize::encodeStringForDisplay($id) . '" /> ' . Sanitize::encodeStringForDisplay($name) . ' <a class="small" href="addgrades.php?cid=' . Sanitize::encodeUrlParam($cid) . '&grades=all&gbitem=' . Sanitize::encodeUrlParam($id) . '" target="_blank">Edit</a></li>';
 }
 ?>
 </ul>

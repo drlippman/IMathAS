@@ -624,7 +624,7 @@ $(function() {
 					$blockout = '';
 				}
 				echo '<li>';
-				echo "<input type=checkbox name='checked[]' value='{$gitypeids[$i]}' id='{$parents[$i]}.{$ids[$i]}:{$agbcats[$gitypeids[$i]]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='" . Sanitize::encodeStringForDisplay($gitypeids[$i]) . "' id='" . Sanitize::encodeStringForDisplay($parents[$i] . "." . $ids[$i] . ":" . $agbcats[$gitypeids[$i]]) . "' checked=checked ";
 				echo '/>';
 				$pos = strrpos($types[$i],'-');
 				if ($pos!==false) {

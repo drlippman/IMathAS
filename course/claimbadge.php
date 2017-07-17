@@ -63,19 +63,19 @@ if (isset($teacherid)) {
 		}
 
 		$reqmet = true;
-		echo '<h2>Badge: '.$name.'</h2>';
+		echo '<h2>Badge: ' . Sanitize::encodeStringForDisplay($name) . '</h2>';
 		echo '<p>Badge requirements:</p>';
 		echo '<table class="gb"><thead><tr><th>Category/Course Total</th><th>Score Required</th><th>Your Score</th><th>Requirement Met</th></tr></thead><tbody>';
 		foreach ($req['data'] as $r) {  //r = array(gbcat, gradetype, score)
 			$metthis = false;
 			echo '<tr><td>';
 			if ($r[0]>0) {//is a category total
-				echo $gbcats[$r[0]] . ' ('.$gtypes[$r[1]].')';
+				echo Sanitize::encodeStringForDisplay($gbcats[$r[0]]) . ' (' . Sanitize::encodeStringForDisplay($gtypes[$r[1]]) . ')';
 			} else {
 				echo 'Course Total ('.$gtypes[$r[1]].')';
 			}
 			echo '</td><td>';
-			echo $r[2].'%';
+			echo Sanitize::encodeStringForDisplay($r[2]) . '%';
 			echo '</td><td>';
 			if ($r[0]>0) {//is a category total
 				foreach ($gbt[0][2] as $i=>$catinfo) {

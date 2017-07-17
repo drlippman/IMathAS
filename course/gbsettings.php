@@ -410,9 +410,9 @@
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
-			echo "<input type=text name=\"name[$id]\" value=\"{$row['name']}\"/>";
+			echo "<input type=text name=\"name[$id]\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\"/>";
 		} else {
-			echo $row['name'];
+			echo Sanitize::encodeStringForDisplay($row['name']);
 		}
 		"</td>";
 
@@ -424,7 +424,7 @@
 		//echo "/></td>";
 		echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
 		if ($row['scale']>0) {
-			echo $row['scale'];
+			echo Sanitize::encodeStringForDisplay($row['scale']);
 		}
 		echo "\"/> (<input type=radio name=\"st[$id]\" value=0 ";
 		if ($row['scaletype']==0) {
@@ -469,10 +469,10 @@
 		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"$absr4\"/> scores</td>";
+		echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</td>";
 		echo "<td><input type=text size=3 name=\"weight[$id]\" value=\"";
 		if ($row['weight']>-1) {
-			echo $row['weight'];
+			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
 		echo "\"/></td>";
 		if ($id!=0) {

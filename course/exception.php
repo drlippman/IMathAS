@@ -34,20 +34,20 @@ if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
 	$curBreadcrumb .= "<a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if ($stu>0) {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
+		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid\">Student Detail</a> &gt; ";
 	} else if ($_GET['from']=="isolate") {
 		$curBreadcrumb .= " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> &gt; ";
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">View Scores</a> &gt; ";
 	} else if ($_GET['from']=="gisolate") {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> &gt; ";
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">View Group Scores</a> &gt; ";
 	}else if ($_GET['from']=='stugrp') {
-		$curBreadcrumb .= "<a href=\"managestugrps.php?cid=$cid&aid=$aid\">Student Groups</a> &gt; ";
+		$curBreadcrumb .= "<a href=\"managestugrps.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Student Groups</a> &gt; ";
 	} else {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
 	}
 }
-$curBreadcrumb .= "<a href=\"gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid\">Assessment Detail</a> &gt Make Exception\n";
+$curBreadcrumb .= "<a href=\"gb-viewasid.php?cid=$cid&asid=" . Sanitize::onlyInt($asid) . "&uid=" . Sanitize::onlyInt($uid) . "\">Assessment Detail</a> &gt Make Exception\n";
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -167,14 +167,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid&stu=$stu&from=$from");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?cid=$cid&asid=" . Sanitize::onlyInt($asid) . "&uid=" . Sanitize::onlyInt($uid) . "&stu=" . Sanitize::onlyInt($stu) . "&from=" . Sanitize::encodeUrlParam($from));
 
 	} else if (isset($_GET['clear'])) {
 		//DB $query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
 		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['clear']));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid&stu=$stu&from=$from");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?"
+			. Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'asid' => $asid, 'uid' => $uid,
+				'stu' => $stu, 'from' => $from,)));
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -205,7 +207,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$savetitle = _('Create Exception');
 		if ($erow != null) {
 			$savetitle = _('Save Changes');
-			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&uid={$_GET['uid']}&clear={$erow[0]}&asid=$asid&stu=$stu&from=$from'\">"._("Clear Exception").'</button> or modify below.</p>';
+			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=" . Sanitize::onlyInt($_GET['aid']) . "&uid=" . Sanitize::onlyInt($_GET['uid']) . "&clear=" . Sanitize::encodeUrlParam($erow[0]) . "&asid=" . Sanitize::onlyInt($asid) . "&stu=" . Sanitize::encodeUrlParam($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "'\">"._("Clear Exception").'</button> or modify below.</p>';
 			$sdate = tzdate("m/d/Y",$erow[1]);
 			$edate = tzdate("m/d/Y",$erow[2]);
 			$stime = tzdate("g:i a",$erow[1]);
@@ -215,7 +217,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 	//DEFAULT LOAD DATA MANIPULATION
-	$address = $GLOBALS['basesiteurl'] . "/course/exception.php?cid=" . Sanitize::courseId($_GET['cid']) . "&uid={$_GET['uid']}&asid=$asid&stu=$stu&from=$from";
+	$address = $GLOBALS['basesiteurl'] . "/course/exception.php?" . Sanitize::generateQueryStringFromMap(array(
+			'cid' => $_GET['cid'], 'uid' => $_GET['uid'], 'asid' => $asid, 'stu' => $stu, 'from' => $from));
 
 	//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -250,7 +253,7 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 	function nextpage() {
 	   var aid = document.getElementById('aidselect').value;
-	   var togo = '<?php echo $address; ?>&aid='+aid;
+	   var togo = '<?php echo Sanitize::fullUrl($address); ?>&aid=' + aid;
 	   window.location = togo;
 	}
 	</script>
@@ -267,8 +270,11 @@ if ($overwriteBody==1) {
 	echo '</span><br class="form"/></p>';
 
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
+		$exceptionUrl = "exception.php?" . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
+				'aid' => $_GET['aid'], 'uid' => $_GET['uid'], 'asid' => $asid, 'from' => $from,
+            ));
 ?>
-	<form method=post action="exception.php?cid=<?php echo $cid ?>&aid=<?php echo Sanitize::onlyInt($_GET['aid']) ?>&uid=<?php echo $_GET['uid'] ?>&asid=<?php echo $asid;?>&from=<?php echo $from;?>">
+	<form method=post action="<?php echo $exceptionUrl; ?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
 			<input type=text size=10 name=sdate value="<?php echo $sdate ?>">

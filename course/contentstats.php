@@ -96,7 +96,7 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 	$stm2->execute(array(':id'=>$typeid));
 	//DB $result = mysql_query($q2) or die("Query failed : " . mysql_error());
 	//DB $row = mysql_fetch_row($result);
-	$itemname = $stm2->fetchColumn(0);
+	$itemname = Sanitize::encodeStringForDisplay($stm2->fetchColumn(0));
 
 	$stus = array();
 	//DB $query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu ";

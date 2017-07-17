@@ -185,12 +185,12 @@ Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php e
 <ul class="nomark">
 <?php
 foreach ($existblocks as $pos=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$existblockids[$pos].'"/>';
+	echo '<li><input type="checkbox" name="checked[]" value="' . Sanitize::encodeStringForDisplay($existblockids[$pos]) . '"/>';
 	$n = substr_count($pos,"-")-1;
 	for ($i=0;$i<$n;$i++) {
 		echo '&nbsp;&nbsp;';
 	}
-	echo $name.'</li>';
+	echo Sanitize::encodeStringForDisplay($name) . '</li>';
 }
 ?>
 </ul>

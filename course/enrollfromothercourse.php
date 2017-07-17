@@ -102,9 +102,9 @@ if ($overwriteBody==1) {
 		$cnt = 0;
 		//DB while ($line=mysql_fetch_array($resultCourseList, MYSQL_ASSOC)) {
 		while ($line=$resultCourseList->fetch(PDO::FETCH_ASSOC)) {
-			echo '<input type="radio" name="sourcecourse" value="'.$line['id'].'" ';
+			echo '<input type="radio" name="sourcecourse" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ';
 			if ($cnt==0) {echo 'checked="checked"';}
-			echo '/> '.$line['name'].'<br/>';
+			echo '/> ' . Sanitize::encodeStringForDisplay($line['name']) . '<br/>';
 			$cnt++;
 		}
 		echo '<input type="submit" value="Choose Students" />';
@@ -116,7 +116,7 @@ if ($overwriteBody==1) {
 		echo '<p>';
 		//DB while ($line=mysql_fetch_array($resultStudentList, MYSQL_ASSOC)) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
-			echo '<input type=checkbox name="checked[]" value="'.$line['id'].'"/>';
+			echo '<input type=checkbox name="checked[]" value="' . Sanitize::encodeStringForDisplay($line['id']) . '"/>';
 			printf('%s, %s<br/>', Sanitize::encodeStringForDisplay($line['LastName']),
                 Sanitize::encodeStringForDisplay($line['FirstName']));
 		}

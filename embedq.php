@@ -125,14 +125,14 @@ if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
 }
 
 if ($showans) {
-	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
 	echo "<p>" . _('Displaying last question with solution') . " <input type=submit name=\"next\" value=\"" . _('New Question') . "\"/></p>\n";
 	displayq(0,$qsetid,$seed,2,true,0);
 	echo "</form>\n";
 } else {
 	$doshowans = 0;
-	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
-	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
+	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
+	echo "<input type=\"hidden\" name=\"seed\" value=\"" . Sanitize::encodeStringForDisplay($seed) . "\" />";
 	$lastanswers = array();
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
 	echo "<input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";

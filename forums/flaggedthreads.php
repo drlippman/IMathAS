@@ -60,7 +60,7 @@ $pagetitle = _('Flagged Forum Posts');
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
 echo '<div id="headerflaggedthreads" class="pagetitle"><h2>'._('Flagged Forum Posts').'</h2></div>';
-echo "<p><button type=\"button\" onclick=\"window.location.href='flaggedthreads.php?from=$from&cid=$cid&unflagall=true'\">"._('Unflag All')."</button></p>";
+echo "<p><button type=\"button\" onclick=\"window.location.href='flaggedthreads.php?from=" . Sanitize::encodeUrlParam($from) . "&cid=$cid&unflagall=true'\">" . _('Unflag All') . "</button></p>";
 
 if (count($lastpost)>0) {
   echo '<table class="gb forum" id="newthreads"><thead><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
@@ -83,8 +83,8 @@ if (count($lastpost)>0) {
     }
     echo '<tr id="tr'.$line['threadid'].'" class="tagged">';
     echo "<td><span class=\"right\"><img class=\"pointer\" id=\"tag{$line['threadid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['threadid']});return false;\" alt=\"Flagged\" /></span>";
-    echo "<a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-5\">{$line['subject']}</a></td><td>".Sanitize::encodeStringForDisplay($name)."</td>";
-    echo "<td><a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
+    echo "<a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "&thread=" . Sanitize::encodeUrlParam($line['threadid']) . "&page=-5\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></td><td>" . Sanitize::encodeStringForDisplay($name) . "</td>";
+    echo "<td><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "\">" . Sanitize::encodeStringForDisplay($forumname[$line['threadid']]) . '</a></td>';
     echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
   }
   echo '</tbody></table>';

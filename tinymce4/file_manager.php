@@ -185,7 +185,7 @@ if (isset($_REQUEST['showfiles'])) {
 	}
 } else {
 	echo '<div class="upload">';
-	echo '<p><a href="file_manager.php?showfiles=true&amp;type='.$type.'">Show previously uploaded files</a></p>';
+	echo '<p><a href="file_manager.php?showfiles=true&amp;type=' . Sanitize::encodeUrlParam($type) . '">Show previously uploaded files</a></p>';
 }
 ?>
 </div>

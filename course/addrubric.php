@@ -136,7 +136,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	$stm = $DBH->prepare("SELECT id, name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
 	$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$groupid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo Sanitize::encodeStringForDisplay($row[1]) . " <a href=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeStringForDisplay($row[0]) . Sanitize::encodeStringForDisplay($fromstr) . "\">Edit</a><br/>";
+		echo Sanitize::encodeStringForDisplay($row[1]) . " <a href=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::onlyInt($row[0]) . $fromstr . "\">Edit</a><br/>";
 	}
 	echo '</p>';
 } else {  //adding/editing a rubric
@@ -149,7 +149,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	*/
 	$rubtypeval = array(1,0,3,4,2);
 	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
-    echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::onlyInt($_GET['id']) . $fromstr . "\">";
+    echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
 	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></p>';
 
 	echo '<p>Rubric Type: ';

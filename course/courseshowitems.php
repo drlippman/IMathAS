@@ -301,7 +301,7 @@ function showitems($items,$parent,$inpublic=false) {
 					
 					if ($ispublic) {
 					} else {
-						echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+						echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span class=noticetext>", _('New'), "</span>";
@@ -347,7 +347,7 @@ function showitems($items,$parent,$inpublic=false) {
 					
 					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
-					echo "$astyle>{$items[$i]['name']}</a></b> ";
+					echo "$astyle>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</a></b> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span class=noticetext>", _('New'), "</span>";
 					}
@@ -478,7 +478,11 @@ function showitems($items,$parent,$inpublic=false) {
 					echo "<div class=title>";
 					
 					echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
-					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
+					if ($items[$i]['SH'][0]=='S') {
+						echo Sanitize::encodeStringForDisplay($items[$i]['name'])."</b></a> ";
+					} else {
+						echo "<i>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</i></b></a>";
+					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo " <span class=noticetext>", _('New'), "</span>";
 					}
@@ -524,9 +528,9 @@ function showitems($items,$parent,$inpublic=false) {
 					$control = "onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					$control .= 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					if ($items[$i]['SH'][0]=='S') {
-						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" $control $astyle>{$items[$i]['name']}</a>";
+						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" $control $astyle>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</a>";
 					} else {
-						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#\" $control  $astyle>{$items[$i]['name']}</a></i>";
+						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#\" $control  $astyle>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</a></i>";
 					}
 					echo "</b> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -741,7 +745,7 @@ function showitems($items,$parent,$inpublic=false) {
 							 echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
 						 }
 				   }
-				   echo ">{$line['name']}</a></b>";
+				   echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>";
 				   if ($line['enddate']!=2000000000) {
 					   echo "<BR> $endname $enddate \n";
 				   }
@@ -782,7 +786,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   				   
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\"";
 
-				   echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate).'.';
+				   echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate).'.';
 				   if ($line['reviewdate']!=2000000000) {
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
@@ -819,7 +823,7 @@ function showitems($items,$parent,$inpublic=false) {
 					   $endname = _('Due');
 				   }
 
-				   echo "<div class=\"title grey\"><b><i>{$line['name']}</i></b>";
+				   echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
 				   echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
 
 				   if ($line['enddate']!=2000000000) {
@@ -847,7 +851,7 @@ function showitems($items,$parent,$inpublic=false) {
 				  
 				   echo getItemIcon('assess', 'assessment', true);
 				   
-				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >{$line['name']}</a></i>";
+				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >".Sanitize::encodeStringForDisplay($line['name'])."</a></i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i>\n";
 				   echo '</span>';
@@ -950,7 +954,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   if ($line['title']!='##hidden##') {
 					   echo getItemIcon('inline', 'text item', false);
 					   
-					   echo "<div class=title> <b>{$line['title']}</b><br/>\n";
+					   echo "<div class=title> <b>".Sanitize::encodeStringForDisplay($line['title'])."</b><br/>\n";
 				   } else { 
 				   	   echo '<div class=title>';
 				   }
@@ -984,7 +988,7 @@ function showitems($items,$parent,$inpublic=false) {
 					   }
 					   foreach (explode(',',$line['fileorder']) as $fid) {
 						   //echo "<li><a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
-						   echo "<li><a href=\"".getcoursefileurl($filenames[$fid])."\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+						   echo "<li><a href=\"".getcoursefileurl($filenames[$fid])."\" target=\"_blank\">".Sanitize::encodeStringForDisplay($filedescr[$fid])."</a></li>";
 					   }
 
 					   echo "</ul>";
@@ -1005,7 +1009,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   if ($line['title']!='##hidden##') {
 				   	   echo getItemIcon('inline', 'text item', true);
 					   
-					   echo "<div class=title><i> <b>{$line['title']}</b> </i><br/>";
+					   echo "<div class=title><i> <b>".Sanitize::encodeStringForDisplay($line['title'])."</b> </i><br/>";
 				   } else {
 					   echo "<div class=title>";
 				   }
@@ -1037,7 +1041,7 @@ function showitems($items,$parent,$inpublic=false) {
 					   }
 					   foreach (explode(',',$line['fileorder']) as $fid) {
 						  // echo "<li><a href=\"$imasroot/course/files/{$filenames[$fid]}\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
-						    echo "<li><a href=\"".getcoursefileurl($filenames[$fid])."\" target=\"_blank\">{$filedescr[$fid]}</a></li>";
+						    echo "<li><a href=\"".getcoursefileurl($filenames[$fid])."\" target=\"_blank\">".Sanitize::encodeStringForDisplay($filedescr[$fid])."</a></li>";
 
 					   }
 
@@ -1081,7 +1085,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo getItemIcon('drill', 'Drill', false);
 				   
 				   echo "<div class=title>";
-				   echo "<b><a href=\"$alink\" $target>{$line['name']}</a></b>\n";
+				   echo "<b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1109,7 +1113,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo getItemIcon('drill', 'Drill', true);
 				   
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\" $target>{$line['name']}</a></b> </i>";
+				   echo "<i> <b><a href=\"$alink\" $target>".Sanitize::encodeStringForDisplay($line['name'])."</a></b> </i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i> ";
 				   echo '</span>';
@@ -1213,7 +1217,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   } else {
 				   	   echo '<b>';
 				   }
-				   echo "<a href=\"$alink\" $rec $target>{$line['title']}</a></b>\n";
+				   echo "<a href=\"$alink\" $rec $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1239,7 +1243,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo getItemIcon($icon, "link to $icon", true);
 				   
 				   echo "<div class=title>";
-				   echo "<i> <b><a href=\"$alink\" onclick=\"$rec\" $target>{$line['title']}</a></b> </i>";
+				   echo "<i> <b><a href=\"$alink\" onclick=\"$rec\" $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b> </i>";
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i> ";
 				   echo '</span>';
@@ -1303,7 +1307,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo getItemIcon('forum', 'forum', false);
 				   
 				   echo "<div class=title> ";
-				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
+				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
 					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext>", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
 				   }
@@ -1351,7 +1355,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   
 				   echo getItemIcon('forum', 'forum', true);
 				   
-				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b></i> ";
+				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b></i> ";
 				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
 					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext>", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
 				   }
@@ -1465,14 +1469,14 @@ function showitems($items,$parent,$inpublic=false) {
 				   
 				   echo "<div class=title> ";
 				   if ($ispublic) {
-				   	   echo "<b><a href=\"../wikis/viewwikipublic.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b>\n";
+				   	   echo "<b><a href=\"../wikis/viewwikipublic.php?cid=$cid&id={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   } else {
 				   	   if (isset($studentid) && !isset($sessiondata['stuview'])) {
 						   $rec = "data-base=\"wiki-$typeid\"";
 					   } else {
 						   $rec = '';
 					   }
-				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\" $rec>{$line['name']}</a></b>\n";
+				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\" $rec>".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   	   if ($hasnew) {
 				   	    	    echo " <span class=noticetext>", _('New Revisions'), "</span>";
 				   	   }
@@ -1502,7 +1506,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   
 				   echo getItemIcon('wiki', 'wiki', true);
 				   
-				   echo "<div class=title><i> <b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b></i> ";
+				   echo "<div class=title><i> <b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b></i> ";
 				   if ($hasnew) {
 				   	   echo " <span class=noticetext>", _('New Revisions'), "</span>";
 				   }
@@ -1807,12 +1811,12 @@ function showitems($items,$parent,$inpublic=false) {
 			} else {
 				$icon = '<img alt="folder" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
 			}
-			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'">'.$icon;
+			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.Sanitize::encodeStringForDisplay($items[$i]['id']).'">'.$icon;
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
-				echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b>";
+				echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($items[$i]['name']). "</span></b>";
 				//echo '<b>'.$items[$i]['name'].'</b>';
 			} else {
-				echo '<i><b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b></i>";
+				echo '<i><b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($items[$i]['name']). "</span></b></i>";
 				//echo '<i><b>'.$items[$i]['name'].'</b></i>';
 			}
 			if ($showdates) {
@@ -1872,19 +1876,19 @@ function showitems($items,$parent,$inpublic=false) {
 			echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   $show = sprintf(_('Available until %s'), $enddate);
-				   echo '<b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   echo '<b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   //echo '<b>'.$line['name'].'</b> ';
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
 				   $show = sprintf(_('Review until %s'), $reviewdate);
 				   //echo '<b>'.$line['name'].'</b> ';
-				   echo '<b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   echo '<b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 			   } else {
 				   $show = sprintf(_('Available %1$s to %2$s'), $startdate, $enddate);
 				   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
 					   $show .= sprintf(_(', review until %s'), $reviewdate);
 				   }
 				   //echo '<i><b>'.$line['name'].'</b></i> ';
-				   echo '<i><b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   echo '<i><b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b></i>";
 			   }
 			   if ($showdates) {
 				   echo Sanitize::encodeStringForDisplay($show);
@@ -1929,14 +1933,14 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
-				   echo '<b><span id="I' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   echo '<b><span id="I' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				  // echo '<b>'.$line['name']. "</b>";
 				   if ($showdates) {
 					   printf(_(' showing until %s'), Sanitize::encodeStringForDisplay($enddate));
 				   }
 			   } else {
 				   //echo '<i><b>'.$line['name']. "</b></i>";
-				   echo '<i><b><span id="I' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   echo '<i><b><span id="I' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b></i>";
 				   if ($showdates) {
 					   printf(_(' showing %1$s until %2$s'), Sanitize::encodeStringForDisplay($startdate), Sanitize::encodeStringForDisplay($enddate));
 				   }
@@ -1945,7 +1949,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '<span class="links">';
 				   echo " <a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 				  echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeStringForDisplay($items[$i]) . "\">", _('Copy'), "</a>";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
@@ -1977,13 +1981,13 @@ function showitems($items,$parent,$inpublic=false) {
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
-				   echo '<b><span id="L' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   echo '<b><span id="L' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {
 					   printf(_(' showing until %s'), Sanitize::encodeStringForDisplay($enddate));
 				   }
 			   } else {
 				   //echo '<i><b>'.$line['name']. "</b></i>";
-				   echo '<i><b><span id="L' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   echo '<i><b><span id="L' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b></i>";
 				   if ($showdates) {
 					   printf(_(' showing %1$s until %2$s'), Sanitize::encodeStringForDisplay($startdate), Sanitize::encodeStringForDisplay($enddate));
 				   }
@@ -1992,7 +1996,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '<span class="links">';
 				   echo " <a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 				  echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeStringForDisplay($items[$i]) . "\">", _('Copy'), "</a>";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
@@ -2024,12 +2028,12 @@ function showitems($items,$parent,$inpublic=false) {
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
-				   echo '<b><span id="F' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   echo '<b><span id="F' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {
 					   printf(_(' showing until %s'), Sanitize::encodeStringForDisplay($enddate));
 				   }
 			   } else {
-				   echo '<i><b><span id="F' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   echo '<i><b><span id="F' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b></i>";
 				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   if ($showdates) {
 					   printf(_(' showing %1$s until %2$s'), Sanitize::encodeStringForDisplay($startdate), Sanitize::encodeStringForDisplay($enddate));
@@ -2039,7 +2043,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '<span class="links">';
 				   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 				  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeStringForDisplay($items[$i]) . "\">", _('Copy'), "</a>";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
@@ -2071,12 +2075,12 @@ function showitems($items,$parent,$inpublic=false) {
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
-				   echo '<b><span id="W' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   echo '<b><span id="W' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {
 					   printf(_(' showing until %s'), Sanitize::encodeStringForDisplay($enddate));
 				   }
 			   } else {
-				   echo '<i><b><span id="W' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   echo '<i><b><span id="W' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b></i>";
 				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   if ($showdates) {
 					   printf(_(' showing %1$s until %2$s'), Sanitize::encodeStringForDisplay($startdate), Sanitize::encodeStringForDisplay($enddate));
@@ -2086,7 +2090,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '<span class="links">';
 				   echo " <a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 				  echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
-				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeStringForDisplay($items[$i]) . "\">", _('Copy'), "</a>";
+				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
@@ -2118,12 +2122,12 @@ function showitems($items,$parent,$inpublic=false) {
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   //echo '<b>'.$line['name']. "</b>";
-				   echo '<b><span id="D' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   echo '<b><span id="D' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {
 					   printf(_(' showing until %s'), Sanitize::encodeStringForDisplay($enddate));
 				   }
 			   } else {
-				   echo '<i><b><span id="D' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   echo '<i><b><span id="D' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b></i>";
 				   //echo '<i><b>'.$line['name']. "</b></i>";
 				   if ($showdates) {
 					   printf(_(' showing %1$s until %2$s'), Sanitize::encodeStringForDisplay($startdate), Sanitize::encodeStringForDisplay($enddate));
@@ -2133,7 +2137,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo ' <span class="links">';
 				   echo "<a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 				   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
-				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeStringForDisplay($items[$i]) . "\">", _('Copy'), "</a>";
+				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">", _('Scores'), "</a>";
 				  echo '</span>';
 			   }

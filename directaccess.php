@@ -170,7 +170,7 @@
 				exit;
 			} else {
 				require("header.php");
-				echo "<h2>".Sanitize::encodeStringForDisplay($coursename)."</h2>";
+				echo "<h2>" . Sanitize::encodeStringForDisplay($coursename) . "</h2>";
 				echo '<form method="post" action="directaccess.php?cid='.$cid.'">';
 				echo '<p>Incorrect enrollment key.  Try again.</p>';
 				echo "<p>Course Enrollment Key:  <input type=text name=\"ekey\"></p>";
@@ -213,7 +213,7 @@
 		}
 		require("header.php");
 		//echo "<div class=\"breadcrumb\">$breadcrumbbase $coursename Access</div>";
-		echo "<div id=\"header\"><div class=\"vcenter\">$coursename</div></div>";
+		echo "<div id=\"header\"><div class=\"vcenter\">" . Sanitize::encodeStringForDisplay($coursename) . "</div></div>";
 		//echo '<span style="float:right;margin-top:10px;">'.$smallheaderlogo.'</span>';
 
 		$cid = intval($_GET['cid']);
@@ -230,7 +230,7 @@
 		$enrollkey = $stm->fetchColumn(0);
 
 ?>
-<form id="pageform" method="post" action="directaccess.php<?php echo Sanitize::encodeStringForDisplay($querys);?>">
+<form id="pageform" method="post" action="directaccess.php<?php echo Sanitize::encodeStringForDisplay($querys); ?>">
 
 <?php
 if ($enrollkey!='closed') {
@@ -254,7 +254,7 @@ if ($enrollkey!='closed') {
 <span class=form>Password:</span><input class="form" type="password" size="15" id="password" name="password"><br class="form">
 <?php
 if (strlen($enrollkey)>0) {
-	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="'.(isset($_REQUEST['ekey'])?$_REQUEST['ekey']:"").'"/><BR class=form>';
+	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="' . (isset($_REQUEST['ekey']) ? Sanitize::encodeStringForDisplay($_REQUEST['ekey']) : "") . '"/><BR class=form>';
 }
 ?>
 <div class=submit><input type="submit" value="Login and Enroll"></div>
@@ -304,7 +304,7 @@ function setlogintype(n) {
 <p><b>New Student Enrollment</b></p>
 <?php
 if ($page_newaccounterror!='') {
-	echo '<p class=noticetext>'.$page_newaccounterror.'</p>';
+	echo '<p class=noticetext>' . Sanitize::encodeStringForDisplay($page_newaccounterror) . '</p>';
 }
 ?>
 <span class=form><label for="SID"><?php echo $longloginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID <?php if (isset($_POST['SID'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['SID'])); } ?>><BR class=form>

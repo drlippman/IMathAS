@@ -19,9 +19,9 @@ $type = $_GET['type'];
 $w = $_GET['w'];
 $h = $_GET['h'];
 if ($type=='tegrity' && substr($url,0,18)=='https://tegr.it/y/') {
-	echo '<script type="text/javascript" src="'.$url.'"></script>';
+	echo '<script type="text/javascript" src="' . Sanitize::encodeStringForDisplay($url) . '"></script>';
 } else if ($type=='cdf') {
-  	echo '<script type="text/javascript" src="'.$urlmode.'www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script>';
+  	echo '<script type="text/javascript" src="https://www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script>';
 	echo '<script type="text/javascript">var cdf = new cdfplugin();';
 	echo "cdf.embed('$url',$w,$h);</script>";
 }
