@@ -925,7 +925,7 @@ if ($overwriteBody==1) {
 			<span class=form>Require Password (blank for none):</span>
 			<span class=formright><input type="password" name="assmpassword" id="assmpassword" value="<?php echo Sanitize::encodeStringForDisplay($line['password']); ?>" autocomplete="new-password"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
 			<span class=form>Time Limit (minutes, 0 for no time limit): </span>
-			<span class=formright><input type=text size=4 name=timelimit value="<?php echo abs($timelimit);?>">
+			<span class=formright><input type=text size=4 name=timelimit value="<?php echo Sanitize::onlyFloat(abs($timelimit));?>">
 				<input type="checkbox" name="timelimitkickout" <?php if ($timelimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
 			<span class=form>Display method: </span>
 			<span class=formright>

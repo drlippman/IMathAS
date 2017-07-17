@@ -100,7 +100,7 @@
 	$titlesimp = strip_tags($title);
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase $titlesimp</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
 
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);

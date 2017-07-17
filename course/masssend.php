@@ -318,7 +318,7 @@
 		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
-			echo "<option value=\"{$line['id']}\" ";
+			printf("<option value=\"%d\" ", Sanitize::onlyInt($line['id']));
 			if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
 			echo ">".Sanitize::encodeStringForDisplay($line['name'])."</option>\n";
 		}

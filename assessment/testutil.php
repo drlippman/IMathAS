@@ -387,8 +387,8 @@ function printscore($sc,$qn) {
 			$hasmanual = true;
 			$sc = '*';
 		}
-		$out =  "$sc " . _("out of") . " $poss";
-		$pts = $sc;
+		$out = sprintf("%f %s %s", $sc, _("out of"), Sanitize::encodeStringForDisplay($poss));
+		$pts = Sanitize::onlyFloat($sc);
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
 		$ptposs = $qi[$questions[$qn]]['answeights'];
@@ -451,7 +451,8 @@ function printscore($sc,$qn) {
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs);
-		$out =  "$pts " . _("out of") . " $poss (parts: $sc)";
+		$out = sprintf("%s %s %s (parts: %f)", Sanitize::encodeStringForDisplay($pts), _("out of"),
+			Sanitize::encodeStringForDisplay($poss), $sc);
 	}
 	if ($hasmanual) {
 		$out .= _(' (* not auto-graded)');

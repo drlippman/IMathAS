@@ -216,7 +216,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   echo '<p>Group: <select name="groupid"><option value="-1">Select...</option>';
 	$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo '<option value="'.$row[0].'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
+		echo '<option value="'.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 	}
   echo '</select><br/>';
   echo 'CSV file: <input type=file name=uploadedfile /><br/>';

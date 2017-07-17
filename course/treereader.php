@@ -78,7 +78,7 @@ if (isset($backtrack) && count($backtrack)>0) {
 			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 		}
 		//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-		$curBreadcrumb .= $backtrack[$i][0];
+		$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 		if ($i!=count($backtrack)-1) {
 			$curBreadcrumb .= "</a>";
 		}
@@ -330,8 +330,8 @@ function printlist($items) {
 			$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
 			$stm->execute(array(':id'=>$item));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			$typeid = $line['typeid'];
-			$itemtype = $line['itemtype'];
+			$typeid = Sanitize::onlyInt($line['typeid']);
+			$itemtype = Sanitize::simpleString($line['itemtype']);
 			/*if ($line['itemtype']=="Calendar") {
 				$out .=  '<li><img src="'.$imasroot.'/img/calendar_tiny.png"> <a href="showcalendar.php?cid='.$cid.'" target="readerframe">Calendar</a></li>';
 				if ($openitem=='' && $foundfirstitem=='') {
@@ -404,7 +404,7 @@ function printlist($items) {
 						   $tlwrds = '';
 					 }
 					 if ($tlwrds != '') {
-						 $onclick = 'onclick="return confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds). '\')"';
+						 $onclick = 'onclick="return confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), Sanitize::encodeStringForJavascript($tlwrds)). '\')"';
 					 } else {
 						 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
 					 }
@@ -420,12 +420,12 @@ function printlist($items) {
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 					 if ($openitem=='' && $foundfirstitem=='') {
-						 $foundfirstitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+						 $foundfirstitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true;
 					 }
 					 if ($itemtype.$typeid===$openitem) {
-						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;  $opentxt = ' aria-selected="true" ';
+						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a tabindex="-1" href="showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'"  onclick="recordlasttreeview(\''.$itemtype.Sanitize::encodeStringForJavascript($typeid).'\')"  target="readerframe">'.Sanitize::encodeStringForDisplay($line['title']).'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a tabindex="-1" href="showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'"  onclick="recordlasttreeview(\''.Sanitize::encodeStringForJavascript($itemtype).Sanitize::encodeStringForJavascript($typeid).'\')"  target="readerframe">'.Sanitize::encodeStringForDisplay($line['title']).'</a></li>';
 				 }
 			} /*else if ($line['itemtype']=='Forum') {
 				//TODO check availability, etc.

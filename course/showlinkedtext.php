@@ -52,12 +52,12 @@
 			exit;
 		}
 	} else if ((substr($text,0,4)=="http") && (strpos(trim($text)," ")===false)) { //is a web link
-		$text = '<p><a href="'.$text.'" target="_blank">'.$title.'</a> (will open in a new tab or window)</p>';
+		$text = '<p><a href="'.Sanitize::url($text).'" target="_blank">'.Sanitize::encodeStringForDisplay($title).'</a> (will open in a new tab or window)</p>';
 	} else if (substr(strip_tags($text),0,5)=="file:") {
 		$filename = substr(strip_tags($text),5);
 		require_once("../includes/filehandler.php");
 		$alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
-		$text = '<p>Download file: <a href="'.$alink.'">'.$title.'</a></p>';
+		$text = '<p>Download file: <a href="'.Sanitize::url($alink).'">'.Sanitize::encodeStringForDisplay($title).'</a></p>';
 	}
 
 	$placeinhead = '';
@@ -162,7 +162,7 @@
 			} else {
 				$rec = '';
 			}
-			$navbuttons .= '<div class="floatleft" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'">&lt; '._('Previous');
+			$navbuttons .= '<div class="floatleft" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.Sanitize::encodeUrlParam($p['id']).'">&lt; '._('Previous');
 			$navbuttons .= '</a><p class="small" style="line-height:1.4em">'.Sanitize::encodeStringForDisplay($p['title']);
 			$navbuttons .= '</p></div>';
 		}
@@ -173,7 +173,7 @@
 			} else {
 				$rec = '';
 			}
-			$navbuttons .= '<div class="floatright" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'"> '._('Next');
+			$navbuttons .= '<div class="floatright" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.Sanitize::encodeUrlParam($p['id']).'"> '._('Next');
 			$navbuttons .= ' &gt;</a><p class="small" style="line-height:1.4em">'.Sanitize::encodeStringForDisplay($p['title']);
 			$navbuttons .= '</p></div>';
 		}

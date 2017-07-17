@@ -597,7 +597,7 @@ function writeCourseInfo($line, $skipcopyright=2) {
 	}
 	echo '<input type="radio" name="ctc" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ' . ((count($itemclasses)>0)?'class="' . implode(' ',$itemclasses) . '"':'');
 	if ($line['termsurl']!='') {
-		echo ' data-termsurl="'.$line['termsurl'].'"';
+		echo ' data-termsurl="'.Sanitize::url($line['termsurl']).'"';
 	}
 	echo '>';
 	echo Sanitize::encodeStringForDisplay($line['name']);

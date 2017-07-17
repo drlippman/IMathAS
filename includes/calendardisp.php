@@ -743,7 +743,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 				if ($colors[$k]=='') {
 					$style = '';
 				} else {
-					$style = ' style="background-color:'.$colors[$k].'"';
+					$style = ' style="background-color:'.Sanitize::encodeStringForCSS($colors[$k]).'"';
 				}
 				//echo $assess[$ids[$i][$j]][$k];
 				echo "<span class=\"calitem\" id=\"".$itemidref[$k]."\" $style>";

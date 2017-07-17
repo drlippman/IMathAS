@@ -900,7 +900,7 @@ if ($myrights<20) {
 			}
 			$i = $line['id'];
 
-			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 			if ($line['userights']==0) {
 				$page_questionTable[$i]['desc'] = '<span class="noticetext">'.filter($line['description']).'</span>';
 			} else if ($line['replaceby']>0 || $line['junkflag']>0) {
@@ -933,7 +933,7 @@ if ($myrights<20) {
 			}
 
 
-			$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/>";
+			$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,".Sanitize::onlyInt($line['id']).")\"/>";
 			$page_questionTable[$i]['type'] = $line['qtype'];
 			if ($searchall==1) {
 				$page_questionTable[$i]['lib'] = "<a href=\"manageqset.php?cid=$cid&listlib={$line['libid']}\">List lib</a>";
@@ -957,7 +957,7 @@ if ($myrights<20) {
 			} else {
 				$page_questionTable[$i]['mine'] = '';
 			}
-			$page_questionTable[$i]['action'] = "<select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
+			$page_questionTable[$i]['action'] = "<select onchange=\"doaction(this.value,".Sanitize::onlyInt($line['id']).")\"><option value=\"0\">Action..</option>";
 			if ($isadmin || ($isgrpadmin && $line['groupid']==$groupid) || $line['ownerid']==$userid || ($line['userights']==3 && $line['groupid']==$groupid) || $line['userights']>3) {
 				$page_questionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
 			} else {
@@ -1346,7 +1346,7 @@ function getnextprev(formn,loc) {
 				$qid = Sanitize::encodeStringForDisplay($page_libqids[$page_libstouse[$j]][$i]);
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
-				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
+				echo '<td>'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['desc']).'</td>';
 				echo '<td class="nowrap"><div';
 				if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}
 				echo '>'.$page_questionTable[$qid]['extref'].'</div></td>';

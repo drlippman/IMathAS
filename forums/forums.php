@@ -403,7 +403,7 @@ if ($searchtype == 'thread') {
 				echo '<a href="'.getuserfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
 				$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
 				if (isset($itemicons[$extension])) {
-					echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+					echo "<img alt=\"".Sanitize::encodeStringForDisplay($extension)."\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
 				} else {
 					echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
 				}

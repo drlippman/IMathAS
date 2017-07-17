@@ -829,7 +829,7 @@ if (!$beentaken) {
 
 ?>
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['desc']) ?></td>
 					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
 					<td><?php echo Sanitize::encodeStringForDisplay($qid) ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>

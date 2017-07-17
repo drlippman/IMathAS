@@ -300,7 +300,7 @@ if ($overwriteBody==1) {
 			//DB $headerleft .= mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cid));
-			$headerleft .= $stm->fetchColumn(0);
+			$headerleft .= Sanitize::encodeStringForDisplay($stm->fetchColumn(0));
 			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
 		}
 		if (isset($_POST['iname'])) {
@@ -309,7 +309,7 @@ if ($overwriteBody==1) {
 			//DB $headerleft .= mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT LastName FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
-			$headerleft .= $stm->fetchColumn(0);
+			$headerleft .= Sanitize::encodeStringForDisplay($stm->fetchColumn(0));
 		}
 		$headerright = '';
 		if (isset($_POST['sname'])) {

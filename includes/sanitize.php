@@ -202,15 +202,15 @@ class Sanitize
 		$parsed_url = parse_url($url);
 		$scheme = isset($parsed_url['scheme'])
 			? preg_replace('/[^a-z]/i', '', $parsed_url['scheme']) : '';
-		$user = isset($parsed_url['user']) ? rawurlencode($parsed_url['user']) : '';
-		$pass = isset($parsed_url['pass']) ? rawurlencode($parsed_url['pass']) : '';
+		$user = isset($parsed_url['user']) ? rawurlencode(rawurldecode($parsed_url['user'])) : '';
+		$pass = isset($parsed_url['pass']) ? rawurlencode(rawurldecode($parsed_url['pass'])) : '';
 		$host = isset($parsed_url['host'])
 			? preg_replace('/[^\da-z\.-]/i', '', $parsed_url['host']) : '';
 		$port = isset($parsed_url['port']) ? preg_replace('/[^\d]/', '', $parsed_url['port']) : '';
-		$fragment = isset($parsed_url['fragment']) ? rawurlencode($parsed_url['fragment']) : '';
+		$fragment = isset($parsed_url['fragment']) ? rawurlencode(rawurldecode($parsed_url['fragment'])) : '';
 
 		// Sanitize the path
-		$path = rawurlencode($parsed_url['path']);
+		$path = rawurlencode(rawurldecode($parsed_url['path']));
 		$path = preg_replace("/%2F/", "/", $path);
 
 		// Sanitize query string

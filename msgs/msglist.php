@@ -918,7 +918,7 @@ function chgfilter() {
 		} else if ($n>1) {
 			$line['title'] = "Re<sup>$n</sup>: " . Sanitize::encodeStringForDisplay($line['title']);
 		}
-		echo "<tr id=\"tr{$line['id']}\" ";
+		printf("<tr id=\"tr%d\" ", Sanitize::onlyInt($line['id']));
 		$stripe = ($cnt%2==0)?'even':'odd';
 		if (($line['isread']&8)==8) {
 			echo 'class="tagged '.$stripe.'" ';

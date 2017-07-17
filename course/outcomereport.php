@@ -175,7 +175,7 @@ if ($report=='overview') {
 				}
 			} else { //is outcome
 				if ($isheader) {
-					$html .= '<th class="cat'.$gcnt.'"><div>'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.Sanitize::encodeUrlParam($oi).'&amp;type='.Sanitize::encodeUrlParam($type).'">[Details]</a></div></th>';
+					$html .= '<th class="cat'.Sanitize::onlyInt($gcnt).'"><div>'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'<br/><a class="small" href="outcomereport.php?cid='.Sanitize::courseId($cid).'&amp;outcome='.Sanitize::encodeUrlParam($oi).'&amp;type='.Sanitize::encodeUrlParam($type).'">[Details]</a></div></th>';
 					$sarr .= ',"N"';
 				} else {
 					if (isset($ot[$stu][3][$type]) && isset($ot[$stu][3][$type][$oi])) {

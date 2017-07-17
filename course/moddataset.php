@@ -1044,7 +1044,7 @@
 	if (isset($inusecnt) && $inusecnt>0) {
 		echo '<p class=noticetext>This question is currently being used in ';
 		if ($inusecnt>1) {
-			echo $inusecnt.' assessments that are not yours.  ';
+			echo Sanitize::onlyInt($inusecnt).' assessments that are not yours.  ';
 		} else {
 			echo 'one assessment that is not yours.  ';
 		}
@@ -1108,8 +1108,8 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 ?>
 </p>
 <script>
-var curlibs = '<?php echo $inlibs;?>';
-var locklibs = '<?php echo $locklibs;?>';
+var curlibs = '<?php echo Sanitize::encodeStringForJavascript($inlibs);?>';
+var locklibs = '<?php echo Sanitize::encodeStringForJavascript($locklibs);?>';
 function libselect() {
 	window.open('libtree.php?libtree=popup&cid=<?php echo $cid;?>&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }
@@ -1150,7 +1150,7 @@ function decboxsize(box) {
 
 </script>
 <p>
-My library assignments: <span id="libnames"><?php echo $lnames;?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
+My library assignments: <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
 <input type=button value="Select Libraries" onClick="libselect()">
 </p>
 <p>
@@ -1252,8 +1252,8 @@ if (isset($images['vars']) && count($images['vars'])>0) {
 			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
 		}
 		echo "<li>";
-		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$urlimg\" target=\"_blank\">View</a> ";
-		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/> Delete? <input type=checkbox name=\"delimg-$id\"/>";
+		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\"/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
+		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\"/> Delete? <input type=checkbox name=\"delimg-$id\"/>";
 		echo "</li>";
 	}
 }
@@ -1275,7 +1275,7 @@ echo '<ul id="helpbtnlist">';
 if (count($extref)>0) {
 	for ($i=0;$i<count($extref);$i++) {
 		$extrefpt = explode('!!',$extref[$i]);
-		echo '<li>Type: '.ucfirst($extrefpt[0]);
+		echo '<li>Type: '.Sanitize::encodeStringForDisplay(ucfirst($extrefpt[0]));
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}

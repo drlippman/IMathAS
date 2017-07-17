@@ -87,7 +87,7 @@
 	 } else {
 	 	 //no reason we should be here...
 		 if (!empty($_SERVER['QUERY_STRING'])) {
-			 $querys = '?' . $_SERVER['QUERY_STRING'] . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
+			 $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 } else {
 			 $querys = (!empty($addtoquerystring) ? '?' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 }
@@ -279,7 +279,7 @@
 
 
 		 if (!empty($_SERVER['QUERY_STRING'])) {
-			 $querys = '?' . $_SERVER['QUERY_STRING'] . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
+       $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 } else {
 			 $querys = (!empty($addtoquerystring) ? '?' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 }
@@ -416,7 +416,7 @@
 				//DB $cid = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
-				$cid = $stm->fetchColumn(0);
+				$cid = Sanitize::courseId($stm->fetchColumn(0));
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
@@ -559,7 +559,7 @@
 				if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 					require("header.php");
 					echo '<p>This course is currently locked for an assessment</p>';
-					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
 					require("footer.php");
 					//header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
 					exit;

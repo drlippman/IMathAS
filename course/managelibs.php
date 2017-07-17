@@ -907,7 +907,7 @@ function printlist($parent) {
 				//}
 				echo "<span class=op>";
 				if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
-					echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
+					echo "<a href=\"managelibs.php?cid=$cid&modify=".Sanitize::encodeUrlParam($child)."\">Modify</a> | ";
 				}
 				if ($qcount[$child]==0) {
 					echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=" . Sanitize::encodeUrlParam($child) . "\">Add Sub</a> ";

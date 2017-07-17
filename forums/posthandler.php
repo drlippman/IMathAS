@@ -601,7 +601,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					require_once('../includes/filehandler.php');
 					$files = explode('@@',$line['files']);
 					for ($i=0;$i<count($files)/2;$i++) {
-						echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'" aria-label="'._('Description').'"/>';
+						echo '<input type="text" name="filedesc['.$i.']" value="'.Sanitize::encodeStringForDisplay($files[2*$i]).'" aria-label="'._('Description').'"/>';
 						// $_GET['modify'] will be sanitized by getuserfileurl().
 						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
 						echo '<label for="filedel['.$i.']">Delete?</label> <input type="checkbox" name="filedel['.$i.']" id="filedel['.$i.']" value="1"/><br/>';
@@ -614,7 +614,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			if ($taglist!='' && ($_GET['modify']=='new' || $_GET['modify']==$threadid)) {
 				$p = strpos($taglist,':');
-				echo '<span class="form"><label for="tag">'.substr($taglist,0,$p).'</label></span>';
+				echo '<span class="form"><label for="tag">'.Sanitize::encodeStringForDisplay(substr($taglist,0,$p)).'</label></span>';
 				echo '<span class="formright"><select name="tag" id="tag">';
 				echo '<option value="">Select...</option>';
 				$tags = explode(',',substr($taglist,$p+1));

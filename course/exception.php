@@ -263,7 +263,7 @@ if ($overwriteBody==1) {
 	<div id="headerexception" class="pagetitle"><h2>Make Start/Due Date Exception</h2></div>
 
 <?php
-	echo '<h3>'.$stuname.'</h3>';
+	echo '<h3>'.Sanitize::encodeStringForDisplay($stuname).'</h3>';
 	echo $page_isExceptionMsg;
 	echo '<p><span class="form">Assessment:</span><span class="formright">';
 	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],Sanitize::onlyInt($_GET['aid']),"Select an assessment","", " onchange='nextpage()'");
@@ -294,11 +294,11 @@ if ($overwriteBody==1) {
 		   will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="eatlatepass"/></span>
 		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).
-		   Student currently has <?php echo $latepasses;?> latepasses.</span><br class="form"/>
+		   Student currently has <?php echo Sanitize::onlyInt($latepasses);?> latepasses.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="waivereqscore" <?php if ($curwaive==1) echo 'checked="checked"';?>/></span>
 		<span class="formright">Waive "show based on an another assessment" requirements, if applicable.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="overridepenalty" <?php if ($curepenalty!==null) echo 'checked="checked"';?>/></span>
-		<span class="formright">Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="<?php echo ($curepenalty===null)?0:$curepenalty?>"/>% for questions done while in exception.
+		<span class="formright">Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="<?php echo ($curepenalty===null)?0:Sanitize::onlyFloat($curepenalty);?>"/>% for questions done while in exception.
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 

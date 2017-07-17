@@ -157,7 +157,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$processingerror = true;
 			}
 		} else if ($_POST['linktype']=='web') {
-			$_POST['text'] = trim(strip_tags($_POST['web']));
+			$_POST['text'] = Sanitize::url($_POST['web']);
 			if (substr($_POST['text'],0,4)!='http') {
 				$processingerror = true;
 			}
@@ -566,9 +566,9 @@ if ($overwriteBody==1) {
 			<span class="formright">
 			<?php if ($filename != '') {
 				require_once("../includes/filehandler.php");
-				echo '<input type="hidden" name="curfile" value="'.$filename.'"/>';
+				echo '<input type="hidden" name="curfile" value="'.Sanitize::encodeStringForDisplay($filename).'"/>';
 				$alink = getcoursefileurl($filename);
-				echo 'Current file: <a href="' . Sanitize::encodeStringForDisplay($alink) . '">'.basename($filename).'</a><br/>Replace ';
+				echo 'Current file: <a href="' . Sanitize::url($alink) . '">'.Sanitize::encodeStringForDisplay(basename($filename)).'</a><br/>Replace ';
 			} else {
 				echo 'Attach ';
 			}

@@ -346,7 +346,7 @@
 								}
 							}
 
-							echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+							echo Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),$laarr[$k]));
 						}
 						$cnt++;
 					}

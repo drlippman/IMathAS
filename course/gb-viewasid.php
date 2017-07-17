@@ -1157,7 +1157,7 @@
 									}
 								}
 
-								echo str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]);
+								echo Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]));
 							}
 							$cnt++;
 						}

@@ -337,7 +337,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 			if ($row[3]!='') {
 				echo ' data-termsurl="'.Sanitize::encodeStringForDisplay($row[3]).'"';
 			}
-			echo '>'.$row[1].'</option>';
+			echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 		}
 		echo '</optgroup>';
 	}

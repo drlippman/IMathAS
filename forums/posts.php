@@ -391,7 +391,7 @@ if (!$oktoshow) {
 	//DB $prevth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$prevth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::encodeUrlParam($prevth)."&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($prevth)."&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
 	}
@@ -414,7 +414,7 @@ if (!$oktoshow) {
 	//DB $nextth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$nextth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($nextth)."&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
 	} else {
 		echo "Next";
 	}

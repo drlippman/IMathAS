@@ -10,6 +10,7 @@ function delitembyid($itemid) {
 	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
 	$stm->execute(array(':id'=>$itemid));
 	list($itemtype,$typeid) = $stm->fetch(PDO::FETCH_NUM);
+	$typeid = Sanitize::simpleString($typeid);
 
 	if ($itemtype == "InlineText") {
 		//DB $query = "DELETE FROM imas_inlinetext WHERE id='$typeid'";

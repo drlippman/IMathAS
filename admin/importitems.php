@@ -12,6 +12,7 @@ ini_set("post_max_size", "10485760");
 
 /*** master php includes *******/
 require("../init.php");
+require_once(__DIR__ . "/../includes/htmLawed.php");
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -57,6 +58,32 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$valsets = ":courseid";
 		$tosets = 'courseid';
 		$qarr[':courseid'] = $cid;
+
+		// Sanitize summary content.
+		$item[$itemtoadd]['summary'] = myhtmLawed($item[$itemtoadd]['summary']);
+
+        // Sanitize endmsg content.
+        if (isset($item[$itemtoadd]['endmsg'])) {
+            $data = unserialize($item[$itemtoadd]['endmsg']);
+            $data['commonmsg'] = myhtmLawed($data['commonmsg']);
+            $data['def'] = myhtmLawed($data['def']);
+            foreach (array_keys($data['msgs']) as $k) {
+                $data['msgs'][$k] = myhtmLawed($data['msgs'][$k]);
+            }
+        }
+
+
+		// Sanitize intro content.
+        if (isset($item[$itemtoadd]['intro'])) {
+            $json = json_decode($item[$itemtoadd]['intro']);
+            if (null != $json) {
+                $json[0] = myhtmLawed($json[0]);
+                for ($i = 1; $i < count($json); $i++) {
+                    $json[$i]['text'] = myhtmLawed($json[$i]['text']);
+                }
+            }
+        }
+
 		foreach ($setstoadd as $set) {
 			if (isset($item[$itemtoadd][$set])) {
 				$tosets .= ','.$set;
@@ -328,6 +355,22 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$typeid));
 	} else if ($item[$itemtoadd]['type'] == "Forum") {
 		$settings = explode("\n",$item[$itemtoadd]['settings']);
+
+		// Sanitize description content.
+		if (isset($item[$itemtoadd]['description'])) {
+			$item[$itemtoadd]['description'] = myhtmLawed($item[$itemtoadd]['description']);
+		}
+
+		// Sanitize postby content.
+		if (isset($item[$itemtoadd]['postby'])) {
+			$item[$itemtoadd]['postby'] = myhtmLawed($item[$itemtoadd]['postby']);
+		}
+
+		// Sanitize replyby content.
+		if (isset($item[$itemtoadd]['replyby'])) {
+			$item[$itemtoadd]['replyby'] = myhtmLawed($item[$itemtoadd]['replyby']);
+        }
+
 		foreach ($settings as $set) {
 			$pair = explode('=',$set);
 			$item[$itemtoadd][$pair[0]] = $pair[1];
@@ -345,6 +388,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			':points'=>$item[$itemtoadd]['points'], ':cntingb'=>$item[$itemtoadd]['cntingb'], ':settings'=>$item[$itemtoadd]['settings']));
 		$typeid = $DBH->lastInsertId();
 	} else if ($item[$itemtoadd]['type'] == "InlineText") {
+		// Sanitize text content.
+		if (isset($item[$itemtoadd]['text'])) {
+			$item[$itemtoadd]['text'] = myhtmLawed($item[$itemtoadd]['text']);
+		}
+
 		//DB $query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag)";
 		//DB $query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['text']}','{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}')";
 		//DB mysql_query($query) or die("error on: $query: " . mysql_error());
@@ -385,6 +433,16 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$stm->execute(array(':id'=>$typeid, ':fileorder'=>implode(',',$fileorder)));
 		}
 	} else if ($item[$itemtoadd]['type'] == "LinkedText") {
+		// Sanitize text content.
+		if (isset($item[$itemtoadd]['text'])) {
+			$item[$itemtoadd]['text'] = myhtmLawed($item[$itemtoadd]['text']);
+		}
+
+		// Sanitize summary content.
+		if (isset($item[$itemtoadd]['summary'])) {
+			$item[$itemtoadd]['summary'] = myhtmLawed($item[$itemtoadd]['summary']);
+		}
+
 		//DB $query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,avail,startdate,enddate,oncal,caltag,target)";
 		//DB $query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['text']}','{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}','{$item[$itemtoadd]['target']}')";
 		//DB mysql_query($query) or die("error on: $query: " . mysql_error());

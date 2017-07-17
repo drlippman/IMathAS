@@ -420,7 +420,7 @@ if (isset($sessiondata['emulateuseroriginaluser'])) {
 	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
 }
 if ($myrights==100 && count($brokencnt)>0) {
-	echo '<div><span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
+	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
 }
 if ($myrights<75 && ($myspecialrights&(16+32+64))!=0) {
 	echo '<div>';

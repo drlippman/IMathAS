@@ -25,7 +25,7 @@ if (empty($_GET['badgeid'])) {
 		echo '<ul>';
 		//DB while ($row=mysql_fetch_row($result)) {
 		while ($row=$stm->fetch(PDO::FETCH_NUM)) {
-			echo '<li><a href="definebadges.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '">'.$row[1].'</a> ';
+			echo '<li><a href="definebadges.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '">'.Sanitize::encodeStringForDisplay($row[1]).'</a> ';
 			echo '<a class="small" href="definebadges.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '&amp;delete=true" onclick="return confirm(\'Are you sure you want to delete this badge definition and invalidate all awarded badges?\');">[Delete]</a> ';
 			echo '<br/><a href="claimbadge.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '">Link to claim badge</a> (provide to students)';
 			echo '</li>';
