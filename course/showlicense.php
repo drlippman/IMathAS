@@ -48,7 +48,7 @@ $idlist = implode(',',array_map('intval', $ids));
 //DB while ($row = mysql_fetch_assoc($result)) {
 $stm = $DBH->query("SELECT id,uniqueid,author,ancestorauthors,license,otherattribution FROM imas_questionset WHERE id IN ($idlist)");
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<p>Question ID ".$row['id'].' (Universal ID '.$row['uniqueid'].')</p>';
+	echo "<p>Question ID ".Sanitize::onlyInt($row['id']).' (Universal ID '.Sanitize::onlyInt($row['uniqueid']).')</p>';
 	echo '<p style="margin-left:20px">';
 	echo getquestionlicense($row);
 	echo '</p>';

@@ -216,7 +216,7 @@
 			if ($allowlate%10>1) {
 				echo '<p>You may use up to '.($allowlate%10-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
 			}
-			echo "<p>You have $latepasses LatePass(es) remaining.  You can redeem one LatePass for a $latepasshrs hour ";
+			echo "<p>You have ".Sanitize::encodeStringForDisplay($latepasses)." LatePass(es) remaining.  You can redeem one LatePass for a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
 			echo '<input type="hidden" name="confirm" value="true" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";

@@ -53,7 +53,7 @@ if (isset($_POST['message'])) {
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
+			$self = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1]) ."<". Sanitize::emailAddress($row[2]).">";
 			$headers .= "From: $self\r\n";
 			mail($addy,$subject,$message,$headers);
 			$success = _('Email sent');

@@ -105,17 +105,17 @@ $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/cour
 require("../header.php");
 ?>
 <script>
-	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo $cid ?>&folder=';
-	var oblist = '<?php echo Sanitize::encodeStringForJavascript($oblist); ?>';
-	var plblist = '<?php echo Sanitize::encodeStringForJavascript($plblist); ?>';
-	var cid = '<?php echo $cid ?>';
+	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo Sanitize::courseId($cid) ?>&folder=';
+	var oblist = '<?php echo Sanitize::encodeStringForJavascript($oblist) ?>';
+	var plblist = '<?php echo Sanitize::encodeStringForJavascript($plblist) ?>';
+	var cid = '<?php echo Sanitize::courseId($cid) ?>';
 </script>
 <div class=breadcrumb>
 		<?php echo $curBreadcrumb ?>
 		<div class=clear></div>
 </div>
 <?php
- echo "<h2>$curname</h2>\n";
+ echo "<h2>".Sanitize::encodeStringForDisplay($curname)."</h2>\n";
  if (count($items)>0) {
 	 showitems($items,$_GET['folder'],$blockispublic);
  }

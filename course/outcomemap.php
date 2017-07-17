@@ -213,7 +213,7 @@ if ($outcomelinks==0) {
 
 echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th><th>'._('Not Graded').'</th>';
 foreach ($catnames as $cn) {
-	echo '<th>'.$cn.'</th>';
+	echo '<th>'.Sanitize::encodeStringForDisplay($cn).'</th>';
 }
 echo '</tr></thead><tbody>';
 $n = count($catnames)+2;
@@ -246,11 +246,11 @@ function printoutcome($arr,$ind) {
 		}
 		$cnt++;
 		if (is_array($oi)) { //is outcome group
-			echo '<tr class="'.$class.'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
+			echo '<tr class="'.Sanitize::encodeStringForDisplay($class).'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td></tr>';
 			printoutcome($oi['outcomes'],$ind+1);
 		} else {
 			echo '<tr class="'.$class.'">';
-			echo '<td><span class="ind'.$ind.'">'.$outcomeinfo[$oi].'</span></td><td>';
+			echo '<td><span class="ind'.$ind.'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></td><td>';
 			if (isset($outcomeassoc[$oi]['UG'])) {
 				printitems($outcomeassoc[$oi]['UG']);
 			}

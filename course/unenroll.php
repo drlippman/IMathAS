@@ -50,10 +50,10 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=".Sanitize::courseId($cid));
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode']));
 			exit;
 		}
 	} else { //get confirm
@@ -129,9 +129,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
+			echo "<form method=post action=\"listusers.php?cid=".Sanitize::courseId($cid)."&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=unenroll&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
+			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&action=unenroll&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
 		}
 
 
@@ -174,7 +174,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			} else if ($_GET['uid']=="selected") {
 				if (count($_POST['checked'])==0) {
 					if ($calledfrom=='lu') {
-						echo "No users selected.  <a href=\"listusers.php?cid=$cid\">Try again</a></form>";
+						echo "No users selected.  <a href=\"listusers.php?cid=".Sanitize::courseId($cid)."\">Try again</a></form>";
 					}
 
 				} else {
@@ -207,9 +207,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			<input type=submit name="lockinstead" value="Lock Students Out Instead">
 <?php
 			if ($calledfrom=='lu') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=".Sanitize::courseId($cid)."'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."'\">";
 			}
 ?>
 		</p>

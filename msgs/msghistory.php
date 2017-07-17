@@ -266,17 +266,17 @@
 			echo "<span class=right>";
 
 			if ($ownerid[$child]!=$userid && $cansendmsgs) {
-				echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
+				echo "<a href=\"msglist.php?cid=$cid&filtercid=" . Sanitize::encodeUrlParam($filtercid) . "&page=" . Sanitize::encodeUrlParam($page) . "&type=" . Sanitize::encodeUrlParam($type) . "&add=new&to=" . Sanitize::encodeUrlParam($ownerid[$child]) . "&toquote=" . Sanitize::encodeUrlParam($child) . "\">Reply</a> ";
 			}
 
 			echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
 
 			echo "</span>\n";
-			echo "<b>{$subject[$child]}</b><br/>Posted by: ";
+			echo "<b>" . Sanitize::encodeStringForDisplay($subject[$child]) . "</b><br/>Posted by: ";
 			if ($isteacher && $ownerid[$child]!=0) {
-				echo "<a href=\"mailto:{$email[$child]}\">";
+				echo "<a href=\"mailto:" . Sanitize::emailAddress($email[$child]) . "\">";
 			} else if ($allowmsg && $ownerid[$child]!=0) {
-				echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
+				echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to=" . Sanitize::encodeUrlParam($ownerid[$child]) . "\">";
 			}
 			echo Sanitize::encodeStringForDisplay($poster[$child]); // This is a user's first and last name.
 			if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {

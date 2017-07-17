@@ -62,7 +62,7 @@
 
 	$placeinhead = '';
 	if (isset($studentid)) {
-		$rec = "data-base=\"linkedintext-{$_GET['id']}\" ";
+		$rec = "data-base=\"linkedintext-".Sanitize::onlyInt($_GET['id'])."\" ";
 		$text = str_replace('<a ','<a '.$rec, $text);
 		$placeinhead = '<script type="text/javascript">
 			function recunload() {
@@ -70,7 +70,7 @@
 					$.ajax({
 						type: "POST",
 						url: "'.$imasroot.'/course/rectrack.php?cid='.$cid.'",
-						data: "unloadinglinked='.$_GET['id'].'",
+						data: "unloadinglinked='.Sanitize::encodeStringForJavascript($_GET['id']).'",
 						async: false
 					   });
 					recordedunload = true;
@@ -95,11 +95,11 @@
 	if ($shownav) {
 		if (isset($_SESSION['backtrack'])) {
 			echo '<div class="breadcrumb" '.$fixbc.'>'.$_SESSION['backtrack'][0];
-			echo " &gt; $titlesimp</div>";
+			echo " &gt; ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
 		} else {
 			echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			echo "&gt; $titlesimp</div>";
-			echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.$titlesimp.'</h2></div>';
+			echo "&gt; ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
+			echo '<div id="headershowlinkedtext" class="pagetitle"><h2>'.Sanitize::encodeStringForDisplay($titlesimp).'</h2></div>';
 		}
 	}
 	echo '<div class="linkedtextholder" style="padding-left:10px; padding-right: 10px;'.$pad.'">';
@@ -158,23 +158,23 @@
 		if ($thisitemloc>0) {
 			$p = $itemdata[$flatlist[$thisitemloc-1]];
 			if (isset($studentid) && !isset($sessiondata['stuview'])) {
-				$rec = "data-base=\"linkedlink-{$p['id']}\" ";
+				$rec = "data-base=\"linkedlink-".Sanitize::onlyInt($p['id'])."\" ";
 			} else {
 				$rec = '';
 			}
 			$navbuttons .= '<div class="floatleft" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'">&lt; '._('Previous');
-			$navbuttons .= '</a><p class="small" style="line-height:1.4em">'.$p['title'];
+			$navbuttons .= '</a><p class="small" style="line-height:1.4em">'.Sanitize::encodeStringForDisplay($p['title']);
 			$navbuttons .= '</p></div>';
 		}
 		if ($thisitemloc<count($flatlist)-2) {
 			$p = $itemdata[$flatlist[$thisitemloc+1]];
 			if (isset($studentid) && !isset($sessiondata['stuview'])) {
-				$rec = "data-base=\"linkedlink-{$p['id']}\" ";
+				$rec = "data-base=\"linkedlink-".Sanitize::onlyInt($p['id'])."\" ";
 			} else {
 				$rec = '';
 			}
 			$navbuttons .= '<div class="floatright" style="width:45%;text-align:center"><a '.$rec.' class="abutton" style="width:100%;padding:4px 0;height:auto;" href="showlinkedtext.php?cid='.$cid.'&id='.$p['id'].'"> '._('Next');
-			$navbuttons .= ' &gt;</a><p class="small" style="line-height:1.4em">'.$p['title'];
+			$navbuttons .= ' &gt;</a><p class="small" style="line-height:1.4em">'.Sanitize::encodeStringForDisplay($p['title']);
 			$navbuttons .= '</p></div>';
 		}
 		$navbuttons .= '<div class="clear"></div>';

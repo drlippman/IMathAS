@@ -1279,7 +1279,7 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-		echo ', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/></li>";
+	echo ', URL: <a href="'.Sanitize::encodeStringForDisplay($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap

@@ -280,7 +280,7 @@ if ($overwriteBody==1) {
 			//DB while ($row = mysql_fetch_row($result)) {
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$gbcatoptions .= "<option value=\"{$row[0]}\">".Sanitize::encodeStringForDisplay($row[1])."</option>\n";
+				$gbcatoptions .= "<option value=\"".Sanitize::onlyInt($row[0])."\">".Sanitize::encodeStringForDisplay($row[1])."</option>\n";
 			}
 		}
 		foreach ($columndata as $col=>$data) {

@@ -196,7 +196,7 @@ if (isset($_POST['checked'])) { //modifying existing
 			$qns = array();
 			foreach ($_POST['checked'] as $k=>$v) {
 				$v = explode(':',$v);
-				$qids[] = $v[1];
+				$qids[] = Sanitize::onlyInt($v[1]);
 				$qnpts = explode('-',$v[2]);
 				if (count($qnpts)==1) {
 					$qns[$v[1]] = $qnpts[0]+1;
@@ -255,9 +255,9 @@ if (isset($_POST['checked'])) { //modifying existing
 				$qrows[$row[0]] .= '</tr>';
 			}
 			echo "<th>Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
-			echo '<th>Points<br/><i class="grey">Default: '.$defaults['defpoints'].'</i></th>';
-			echo '<th>Attempts (0 for unlimited)<br/><i class="grey">Default: '.$defaults['defattempts'].'</i></th>';
-			echo '<th>Show hints &amp; video buttons?<br/><i class="grey">Default: '.$defaults['showhints'].'</i></th>';
+			echo '<th>Points<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defpoints']).'</i></th>';
+			echo '<th>Attempts (0 for unlimited)<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
+			echo '<th>Show hints &amp; video buttons?<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
 			echo "<th>Additional Copies to Add<br/>&nbsp;</th></tr></thead>";
 			echo "<tbody>";
 
@@ -291,9 +291,9 @@ if (isset($_POST['checked'])) { //modifying existing
 
 		} else { //adding new questions
 			echo "<th>Description</th><th></th><th></th>";
-			echo '<th>Points<br/><i class="grey">Default: '.$defaults['defpoints'].'</i></th>';
-			echo '<th>Attempts (0 for unlimited)<br/><i class="grey">Default: '.$defaults['defattempts'].'</i></th>';
-			echo '<th>Show hints &amp; video buttons?<br/><i class="grey">Default: '.$defaults['showhints'].'</i></th>';
+			echo '<th>Points<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defpoints']).'</i></th>';
+			echo '<th>Attempts (0 for unlimited)<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
+			echo '<th>Show hints &amp; video buttons?<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
 			echo "<th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
@@ -309,7 +309,7 @@ if (isset($_POST['checked'])) { //modifying existing
 				} else {
 					$n = 1;
 				}
-				echo '<tr><td>'.$row[1].'</td>';
+				echo '<tr><td>'.Sanitize::encodeStringForDisplay($row[1]).'</td>';
 				if ($row[2]!='') {
 					$extref = explode('~~',$row[2]);
 					$hasvid = false;  $hasother = false;
@@ -330,15 +330,15 @@ if (isset($_POST['checked'])) { //modifying existing
 				} else {
 					echo '<td></td>';
 				}
-				echo '<td><button type="button" onclick="previewq('.$row[0].')">'._('Preview').'</button></td>';
-				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"\" />";
-				echo '<input type="hidden" name="qparts'.$row[0].'" value="'.$n.'"/></td>';
-				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"\" /></td>";
-				echo "<td><select name=\"showhints{$row[0]}\">";
+				echo '<td><button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($row[0]).')">'._('Preview').'</button></td>';
+				echo "<td><input type=text size=4 name=\"points" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"\" />";
+				echo '<input type="hidden" name="qparts'.Sanitize::encodeStringForDisplay($row[0]).'" value="'.$n.'"/></td>';
+				echo "<td><input type=text size=4 name=\"attempts" . Sanitize::encodeStringForDisplay($row[0]) ."\" value=\"\" /></td>";
+				echo "<td><select name=\"showhints" . Sanitize::encodeStringForDisplay($row[0]) . "\">";
 				echo '<option value="0" selected="selected">Use Default</option>';
 				echo '<option value="1">No</option>';
 				echo '<option value="2">Yes</option></select></td>';
-				echo "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"1\" /></td>";
+				echo "<td><input type=text size=4 name=\"copies" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"1\" /></td>";
 				echo '</tr>';
 			}
 			echo '</tbody></table>';

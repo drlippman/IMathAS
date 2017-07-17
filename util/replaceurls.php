@@ -49,8 +49,8 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		$nas = $stm->fetchColumn(0);
 
 		echo "<p>This action will change: </p>";
-		echo "<p>Inline Texts changed: $ni<br/>Linked texts changed: $nlt";
-		echo "<br/>Assessments changed: $nas</p>";
+		echo "<p>Inline Texts changed: ".Sanitize::onlyInt($ni)."<br/>Linked texts changed: ".Sanitize::onlyInt($nlt);
+		echo "<br/>Assessments changed: ".Sanitize::onlyInt($nas)."</p>";
 		echo '<form method="post">';
 		echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($_POST['from']).'">';
 		echo '<input type="hidden" name="to" value="'.Sanitize::encodeStringForDisplay($_POST['to']).'">';
@@ -74,21 +74,21 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		foreach ($torep as $rep) {
 			$from = $rep[0];
 			$to = $rep[1];
-		
+
 			$stm = $DBH->prepare("UPDATE imas_inlinetext SET text=REPLACE(text,:from2,:to) WHERE text LIKE :from");
 			$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':to'=>$to));
 			$ni += $stm->rowCount();
-	
+
 			$stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE text LIKE :from OR summary LIKE :from4");
 			$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
 			$nlt += $stm->rowCount();
-	
+
 			$stm = $DBH->prepare("UPDATE imas_assessments SET intro=REPLACE(intro,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE intro LIKE :from OR summary LIKE :from4");
 			$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
 			$nas += $stm->rowCount();
 		}
-		echo "<p>Inline Texts changed: $ni<br/>Linked texts changed: $nlt";
-		echo "<br/>Assessments changed: $nas</p>";
+		echo "<p>Inline Texts changed: ".Sanitize::onlyInt($ni)."<br/>Linked texts changed: ".Sanitize::onlyInt($nlt);
+		echo "<br/>Assessments changed: ".Sanitize::onlyInt($nas)."</p>";
 		echo '<p><a href="utils.php">Done</p>';
 	} else {
 		echo '<p>Verify the URLs were identified correctly</p>';
@@ -105,7 +105,7 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		echo '</form>';
 	}
 	exit;
-	
+
 }
 echo '<h3>Replace URL links</h3>';
 echo '<p>This will replace URLS in linkedtext summaries and text, inlinetext summaries, and assessment summaries and intros across ALL courses.</p>';
