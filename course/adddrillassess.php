@@ -489,7 +489,7 @@ if (!$beentaken) {
 				} else {
 					$page_questionTable[$i]['desc'] = filter($line['description']);
 				}
-				$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform','qo$ln',{$line['id']},true,false)\"/>";
+				$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform','qo$ln',". Sanitize::onlyInt($line['id']).",true,false)\"/>";
 				$page_questionTable[$i]['type'] = $line['qtype'];
 				if ($line['avgtime']>0) {
 					$page_useavgtimes = true;
@@ -826,14 +826,14 @@ if (!$beentaken) {
 					for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
 						$qid =$page_libqids[$page_libstouse[$j]][$i];
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-?>
 
+?>
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
 					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
 					<td><?php echo Sanitize::encodeStringForDisplay($qid) ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']) ?></td>
 <?php
 						if ($searchall==1) {
 ?>

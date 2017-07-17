@@ -149,7 +149,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$aid));
 			$assessmentname = $stm->fetchColumn(0);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
-			$body .= "<h3>$assessmentname</h3>";
+			$body .= "<h3>".Sanitize::encodeStringForDisplay($assessmentname)."</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= '<form method="POST" action="'.sprintf('addquestions.php?cid=%s&aid=%d',$cid, $aid).'">';
 			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
@@ -842,14 +842,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_libqids[$line['libid']][] = $line['id'];
 						}
 						$i = $line['id'];
-						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 						if (in_array($i,$existingq)) {
 							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
 						} else {
 							$page_questionTable[$i]['desc'] = filter($line['description']);
 						}
-						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
-						$page_questionTable[$i]['type'] = $line['qtype'];
+						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\"/>";
+						$page_questionTable[$i]['type'] = Sanitize::encodeStringForDisplay($line['qtype']);
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
 						$avgtimepts = explode(',', $line['avgtime']);
@@ -876,10 +876,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						*/
 						if ($searchall==1) {
-							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
+							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib=".Sanitize::encodeUrlParam($line['libid'])."\">List lib</a>";
 						} else {
-							$page_questionTable[$i]['junkflag'] = $line['junkflag'];
-							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
+							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
+							$page_questionTable[$i]['libitemid'] = Sanitize::encodeStringForDisplay($line['libitemid']);
 						}
 						$page_questionTable[$i]['extref'] = '';
 						$page_questionTable[$i]['cap'] = 0;
@@ -927,15 +927,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 
 
-						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
+						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">Add</a>";
 
 						if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
+							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
 						} else {
-							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&aid=$aid&cid=$cid\">View</a>";
+							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">View</a>";
 						}
 
-						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";
+						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&template=true\">Template</a>";
 						//$i++;
 						$ln++;
 

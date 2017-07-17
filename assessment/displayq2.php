@@ -7269,7 +7269,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
 	if ($la=='DNE' || $la=='oo') {
 		$laqs = $la;
-		$answerbox = str_replace('value="'.$la.'"','value=""',$answerbox);
+		$answerbox = str_replace('value="'.$la.'"','value=""', $answerbox);
 	} else {
 		$laqs = '';
 	}

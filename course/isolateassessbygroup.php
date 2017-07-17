@@ -2,7 +2,7 @@
 //IMathAS:  Display grade list for one online assessment by group
 //(c) 2007 David Lippman
 	require("../init.php");
-	
+
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 
@@ -215,7 +215,7 @@
 	} else {
 		$pct = '';
 	}
-	echo "</a></td><td>$pct</td></tr>";
+	echo "</a></td><td>".Sanitize::onlyFloat($pct)."</td></tr>";
 	echo "</tbody></table>";
 	echo "<script> initSortTable('myTable',Array('S','N','N'),true);</script>";
 	require("../footer.php");

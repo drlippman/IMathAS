@@ -380,7 +380,7 @@ initstack.push(focusfirst);
 <?php
 
 if ($page_scoreMsg != '' && $showscore) {
-	echo '<div class="review">Score on last question: '.$page_scoreMsg;
+	echo '<div class="review">Score on last question: '.Sanitize::encodeStringForDisplay($page_scoreMsg);
 	echo '</div>';
 }
 

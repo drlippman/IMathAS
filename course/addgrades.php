@@ -701,7 +701,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			}
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
 			if ($rubric != 0) {
-				echo printrubriclink($rubric,$points,"score{$row[0]}","feedback{$row[0]}");
+				echo printrubriclink($rubric,$points,"score". Sanitize::onlyint($row[0]),"feedback". Sanitize::onlyint($row[0]));
 			}
 			echo "</td>";
 			printf('<td><textarea cols=60 rows=1 id="feedback%d" name="feedback[%d]">%s</textarea></td>',

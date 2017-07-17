@@ -503,7 +503,9 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			echo ' <a class="noticetext" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
-			echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
+			printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data[$i]['id'],
+			_('Posts ('.Sanitize::onlyInt($newpostcnt[$data[$i]['id']]).')'));
+			// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data[$i]['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($type != 'teach' || $data[$i]['ownerid']!=$userid || $myrights<40) {
 			echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';

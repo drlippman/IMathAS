@@ -226,7 +226,7 @@ if ($report=='overview') {
 
 		for ($i=1;$i<count($ot);$i++) {
 			echo '<tr class="'.($i%2==0?'even':'odd').'">';
-			echo '<td><div class="trld"><a href="outcomereport.php?cid='.$cid.'&amp;stu='.Sanitize::encodeUrlParam($ot[$i][0][1]).'&amp;type='.Sanitize::encodeUrlParam($type).'">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</a></div></td>';
+			echo '<td><div class="trld"><a href="outcomereport.php?cid='.Sanitize::encodeUrlParam($cid).'&amp;stu='.Sanitize::encodeUrlParam($ot[$i][0][1]).'&amp;type='.Sanitize::encodeUrlParam($type).'">'.Sanitize::encodeStringForDisplay($ot[$i][0][0]).'</a></div></td>';
 			echo '<td><div></div></td>';
 			/*foreach ($outc as $oc) {
 				if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
@@ -321,7 +321,6 @@ if ($report=='overview') {
 	}
 
 	$ot = outcometable($stu);
-
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Student Detail for: ").Sanitize::encodeStringForDisplay($ot[1][0][0])."</h2></div>\n";
 	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th>';

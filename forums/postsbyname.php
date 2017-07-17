@@ -302,7 +302,7 @@
 				$content = '';  $postcnt = 0; $replycnt = 0;
 			}
 			$laststu = $line['userid'];
-			$lastname = "{$line['LastName']}, {$line['FirstName']}";
+			$lastname = Sanitize::encodeStringForDisplay($line['LastName']).", " . Sanitize::encodeStringForDisplay($line['FirstName']);
 		}
 
 		if ($line['parent']!=0) {
@@ -325,7 +325,7 @@
 
 				$content .= "\"/> Pts ";
 				if ($rubric != 0) {
-					$content .= printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
+					$content .= printrubriclink($rubric,$pointspos,"score".Sanitize::onlyInt($line['id']), "feedback".Sanitize::onlyInt($line['id'])).' ';
 				}
 			} else if (($line['userid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
 				$content .= "<span class=red> ".Sanitize::onlyInt($scores[$line['id']])." pts</span> ";
