@@ -864,7 +864,7 @@ function printlist($parent) {
 				//}
 				echo "<span class=op>";
 				if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
-					echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
+					echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
 				}
 				if ($qcount[$child]==0) {
 					echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
