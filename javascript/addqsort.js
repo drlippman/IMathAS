@@ -430,7 +430,7 @@ function generateMoveSelect2(num) {
 
 		if (!curistxt) {
 			if (itemarray[i-1].length<5) { //is group
-				qcnt += itemarray[i-1][0];//itemarray[i-1][2].length;
+				qcnt += parseInt(itemarray[i-1][0]);//itemarray[i-1][2].length;
 			} else {
 				qcnt++;
 			}
