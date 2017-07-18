@@ -852,10 +852,10 @@ if ($overwriteBody==1) {
 
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
 
-		<span class=form>Available After:</span>
+		<span class=form>Start Date:</span>
 		<span class=formright>
 			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,"0",0); ?>/>
-			Always until end date<br/>
+			Always open until Due Date<br/>
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,"0",1); ?>/>
 			<input type=text size=10 name="sdate" value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
@@ -863,10 +863,10 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 
-		<span class=form>Available Until:</span>
+		<span class=form>Due Date:</span>
 		<span class=formright>
 			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,"2000000000",0); ?>/>
-			 Always after start date<br/>
+			 Always open after Start Date<br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,"2000000000",1); ?>/>
 			<input type=text size=10 name="edate" value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
@@ -877,7 +877,7 @@ if ($overwriteBody==1) {
 		<span class=form>Keep open as review:</span>
 		<span class=formright>
 			<input type=radio name="doreview" value="0" <?php writeHtmlChecked($line['reviewdate'],0,0); ?>> Never<br/>
-			<input type=radio name="doreview" value="2000000000" <?php writeHtmlChecked($line['reviewdate'],2000000000,0); ?>> Always after due date<br/>
+			<input type=radio name="doreview" value="2000000000" <?php writeHtmlChecked($line['reviewdate'],2000000000,0); ?>> Always after Due Date<br/>
 			<input type=radio name="doreview" value="rdate" <?php if ($line['reviewdate']>0 && $line['reviewdate']<2000000000) { echo "checked=1";} ?>> Until:
 			<input type=text size=10 name=rdate value="<?php echo $rdate;?>">
 			<a href="#" onClick="displayDatePicker('rdate', this, 'edate', 'due date'); return false">
