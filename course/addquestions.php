@@ -471,9 +471,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$existingq[] = $line['questionsetid'];
 		//output item array
 		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
-			$canedit = '1';
+			$canedit = 1;
 		} else {
-			$canedit = '0';
+			$canedit = 0;
 		}
 		$extrefval = 0;
 		if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
@@ -506,11 +506,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
 			$extrefval += 8;
 		}
-		$questionjsarr[$line['id']] = array($line['id'], $line['questionsetid'], 
+		$questionjsarr[$line['id']] = array((int)$line['id'], 
+			(int)$line['questionsetid'], 
 			Sanitize::encodeStringForDisplay($line['description']), 
 			Sanitize::encodeStringForDisplay($line['qtype']), 
-			Sanitize::onlyInt($line['points']), $canedit, 
-			Sanitize::onlyInt($line['withdrawn']), $extrefval);
+			(int)Sanitize::onlyInt($line['points']), 
+			(int)$canedit, 
+			(int)Sanitize::onlyInt($line['withdrawn']), 
+			(int)$extrefval);
 
 	}
 
@@ -536,9 +539,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (strpos($items[$i],'~')!==false) {
 			$subs = explode('~',$items[$i]);
 			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid],true))) {
-				$closegrp = '0';
+				$closegrp = 0;
 			} else {
-				$closegrp = '1';
+				$closegrp = 1;
 			}
 			$qsdata = array();
 			for ($j=(strpos($subs[0],'|')===false)?0:1;$j<count($subs);$j++) {
@@ -549,7 +552,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$qncnt++;
 			} else {
 				$grpparts = explode('|',$subs[0]);
-				$jsarr[] = array(Sanitize::onlyInt($grpparts[0]),Sanitize::onlyInt($grpparts[1]),$qsdata,$closegrp);
+				$jsarr[] = array((int)Sanitize::onlyInt($grpparts[0]),
+					(int)Sanitize::onlyInt($grpparts[1]),
+					$qsdata,
+					(int)$closegrp);
 				$qncnt += $grpparts[0];
 			}
 		} else {
