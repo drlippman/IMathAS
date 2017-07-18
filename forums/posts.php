@@ -232,7 +232,7 @@ if ($oktoshow) {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':id'=>$threadid, ':threadid'=>$threadid));
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
+	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
 	//DB while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -253,9 +253,11 @@ if ($oktoshow) {
 			$n++;
 		}
 		if ($n==1) {
-			$line['subject'] = 'Re: '.$line['subject'];
+			$re[$line['id']] = _('Re').': ';
 		} else if ($n>1) {
-			$line['subject'] = "Re<sup>$n</sup>: ".$line['subject'];
+			$re[$line['id']] = _('Re')."<sup>$n</sup>: ";
+		} else {
+			$re[$line['id']] = '';
 		}
 
 		$subject[$line['id']] = $line['subject'];
@@ -368,7 +370,7 @@ if (!$oktoshow) {
 	echo '<p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
 } else {
 	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
-	echo "<b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
+	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
 
 	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";
 	$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid ";
@@ -421,13 +423,6 @@ if (!$oktoshow) {
 	} else {
 		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
 	}
-	/*if ($tagged) {
-		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markuntagged=true\">Unflag</a>";
-	} else {
-		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&marktagged=true\">Flag</a>";
-	}*/
-	//echo "<br/><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
-	//echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
 
 	echo '| <button onclick="expandall()">'._('Expand All').'</button>';
 	echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
@@ -443,7 +438,7 @@ echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$
 
 function printchildren($base,$restricttoowner=false) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	global $DBH,$children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
+	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
 	global $canviewall, $caneditscore, $canviewscore;
@@ -516,7 +511,7 @@ function printchildren($base,$restricttoowner=false) {
 
 		echo "</span>\n";
 		echo '<span style="float:left">';
-		echo "<b>{$subject[$child]}</b><br/>Posted by: ";
+		echo "<b>".$re[$child]. Sanitize::encodeStringForDisplay($subject[$child]) . "</b><br/>"._('Posted by').": ";
 		//if ($isteacher && $ownerid[$child]!=0) {
 		//	echo "<a href=\"mailto:{$email[$child]}\">";
 		//} else if ($allowmsg && $ownerid[$child]!=0) {
