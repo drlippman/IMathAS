@@ -10,6 +10,7 @@ ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
 require("../init.php");
+require_once("../includes/copyiteminc.php");
 
 if ($myrights<100) {
   echo "You're not authorized for this page";
@@ -32,6 +33,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   }
   $handle = fopen_utf8($_FILES['uploadedfile']['tmp_name'],'r');
   while (($data = fgetcsv($handle,2096))!==false) {
+    if (trim($data[0])=='') {continue;}
     if (count($data)<5) {
       echo "Invalid row - skipping<br/>";
       continue;
@@ -161,7 +163,6 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
       $removewithdrawn = true;
       $usereplaceby = "all";
       $newitems = array();
-      require("../includes/copyiteminc.php");
       copyallsub($items,'0',$newitems,$gbcats);
       doaftercopy($sourcecid);
       $itemorder = serialize($newitems);
