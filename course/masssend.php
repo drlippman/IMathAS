@@ -244,7 +244,7 @@
 		} else if ($calledfrom=='gb') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid");
 		} else if ($calledfrom=='itemsearch') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin.php");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin2.php");
 		}
 		exit;
 	} else {

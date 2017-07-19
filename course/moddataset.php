@@ -1015,7 +1015,7 @@
 		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
 	} else {
 		if ($_GET['cid']=="admin") {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; Modify Question</div>\n";
 		} else {
 			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";

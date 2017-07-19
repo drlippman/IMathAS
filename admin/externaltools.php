@@ -123,7 +123,7 @@ if (isset($_POST['tname'])) {
 			echo "&gt; <a href=\"../course/addlinkedtext.php?cid=$cid&amp;id=".Sanitize::encodeUrlParam($_GET['ltfrom'])."\">Modify Linked Text<a/> ";
 		}
 	} else {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> \n";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> \n";
 	}
 	if (isset($_GET['delete'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Delete Tool</div>";

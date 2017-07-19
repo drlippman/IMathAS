@@ -903,7 +903,7 @@ switch($_POST['action']) {
 						$n = $tar->extractToDir("../assessment/qimages/");
 					}
 					require("../header.php");
-					echo "<p>Extracted $n files.  <a href=\"admin.php\">Continue</a></p>\n";
+					echo "<p>Extracted $n files.  <a href=\"admin2.php\">Continue</a></p>\n";
 					require("../footer.php");
 					exit;
 				} else {
@@ -944,7 +944,7 @@ switch($_POST['action']) {
 						}
 					}
 					require("../header.php");
-					echo "<p>Extracted $ne files.  Skipped $ns files.  <a href=\"admin.php\">Continue</a></p>\n";
+					echo "<p>Extracted $ne files.  Skipped $ns files.  <a href=\"admin2.php\">Continue</a></p>\n";
 					require("../footer.php");
 					exit;
 				} else {
@@ -1120,7 +1120,7 @@ switch($_POST['action']) {
 
 session_write_close();
 if (empty($from)) {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin.php");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if (isset($_GET['cid'])) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 } else if ($from=='home') {
@@ -1130,7 +1130,7 @@ if (empty($from)) {
 } else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin.php");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 }
 exit;
 ?>

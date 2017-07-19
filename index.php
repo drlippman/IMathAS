@@ -400,7 +400,7 @@ if (!isset($CFG['GEN']['homelinkbox'])) {
 		echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
 	}
 	if ($myrights >=75) {
-		echo '<br/><a href="admin/admin.php">'._('Admin Page').'</a>';
+		echo '<br/><a href="admin/admin2.php">'._('Admin Page').'</a>';
 	} else if (($myspecialrights&4)==4) {
 		echo '<br/><a href="admin/listdiag.php">'._('Diagnostics').'</a>';
 	}
@@ -516,7 +516,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
 	echo '</div>';
 	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
-		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';
+		echo '<div class="center"><a class="abutton" href="admin/admin2.php">', _('Admin Page'), '</a></div>';
 	}
 	echo '</div>';
 	echo '</div>';

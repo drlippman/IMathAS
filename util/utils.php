@@ -14,7 +14,7 @@ if ($myrights<100) {
 	exit;
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</a>\n";
 
 if (isset($_GET['removelti'])) {
 	$id = intval($_GET['removelti']);
@@ -132,7 +132,7 @@ if (isset($_GET['form'])) {
 					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
 					echo '<form method="post" action="../admin/actions.php?id='.$row['id'].'">';
 					echo '<input type=hidden name=action value="resetpwd" />';
-					echo '<ul><li>Username: <a href="../admin/admin.php?showcourses='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
+					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
 					echo '<li>ID: '.$row['id'].'</li>';
 					if ($row['name']!=null) {
 						echo '<li>Group: '.Sanitize::encodeStringForDisplay($row['name']).'</li>';

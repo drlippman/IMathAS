@@ -321,7 +321,7 @@ if ($myrights < 100) {
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 	$cid = (isset($_GET['cid'])) ? Sanitize::courseId($_GET['cid']) : "admin" ;
 	$isadmin = true;
-	$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Libraries</div>\n";
+	$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Import Libraries</div>\n";
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
@@ -533,7 +533,7 @@ if ($myrights < 100) {
 		$page_uploadSuccessMsg .= "Updated Libraries: $updatel.<br>";
 		$page_uploadSuccessMsg .= "Updated Questions: $updateq.<br>";
 		$page_uploadSuccessMsg .= "New Library items: $newli.<br>";
-			$page_uploadSuccessMsg .=  "<a href=\"" . $GLOBALS['basesiteurl'] . "/admin/admin.php\">Return to Admin page</a>";
+			$page_uploadSuccessMsg .=  "<a href=\"" . $GLOBALS['basesiteurl'] . "/admin/admin2.php\">Return to Admin page</a>";
 
 	} elseif ($_FILES['userfile']['name']!='') { // STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";

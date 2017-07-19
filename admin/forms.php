@@ -4,8 +4,8 @@
 require("../init.php");
 require("../header.php");
 
-$from = 'admin';
-$backloc = 'admin.php';
+$from = 'admin2';
+$backloc = 'admin2.php';
 if (!empty($_GET['from'])) {
 	if ($_GET['from']=='home') {
 		$from = 'home';
@@ -26,7 +26,7 @@ if (!empty($_GET['from'])) {
 if (!isset($_GET['cid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($from == 'admin') {
-		echo "<a href=\"admin.php\">Admin</a> &gt; ";
+		echo "<a href=\"admin2.php\">Admin</a> &gt; ";
 	} else if ($from == 'admin2') {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; ';
 	} else if (substr($_GET['from'],0,2)=='ud') {
@@ -77,6 +77,7 @@ switch($_GET['action']) {
 		echo "\">\n";
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
 		if ($_GET['action'] == "newadmin") {
+			echo '<div class="pagetitle"><h2>'._('New User').'</h2></div>';
 			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):0);
 			$oldrights = 10;
 		} else {
@@ -86,7 +87,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			printf("<h2>%s %s</h2>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
+			printf("<div class=pagetitle><h2>%s %s</h2></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
 				Sanitize::encodeStringForDisplay($line['LastName']));
 			$oldgroup = $line['groupid'];
 			$oldrights = $line['rights'];
@@ -158,8 +159,9 @@ switch($_GET['action']) {
 		if ($myrights==100) {
 			echo "<input type=radio name=\"newrights\" value=\"100\" ";
 			if ($oldrights == 100) {echo "CHECKED";}
-			echo "> Full Admin </span><BR class=form>\n";
+			echo "> Full Admin";
 		}
+		echo "</span><BR class=form>\n";
 		echo '<span class="form">Task Rights:</span><span class="formright">';
 		if ($myrights>=75) {
 			echo '<input type="checkbox" name="specialrights1" id="specialrights1" ';
@@ -870,16 +872,18 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>Modify Groups</h3>\n";
 		echo '</div>';
-		echo "<table><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr>\n";
+		echo "<table class=gb><thead><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr></thead><tbody>\n";
 		//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
+		$alt = 0;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			if ($alt==0) {echo "<tr class=\"even\">"; $alt=1;} else {echo "<tr class=\"odd\">"; $alt=0;}
 			if ($from=='admin2') {
-				echo '<tr><td><a href="admin2.php?groupdetails='.$row[0].'">'.$row[1].'</a></td>';
+				echo '<td><a href="admin2.php?groupdetails='.$row[0].'">'.$row[1].'</a></td>';
 			} else {
-				echo "<tr><td>{$row[1]}</td>";
+				echo "<td>{$row[1]}</td>";
 			}
 			echo "<td><a href=\"forms.php?action=modgroup&id={$row[0]}\">Modify</a></td>\n";
 			if ($row[0]==0) {
@@ -889,7 +893,7 @@ switch($_GET['action']) {
 			}
 			echo "</tr>\n";
 		}
-		echo "</table>\n";
+		echo "</tbody></table>\n";
 		echo "<form method=post action=\"actions.php?from=$from\">\n";
 		echo '<input type=hidden name=action value="addgroup" />';
 		echo "Add new group: <input type=text name=gpname id=gpname size=50><br/>\n";

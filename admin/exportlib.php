@@ -289,7 +289,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 	} else {  //STEP 1 DATA MANIPULATION
 
 		if ($isadmin || $isgrpadmin || $isadminpage) {
-			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Export libraries</div>\n";
+			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Export libraries</div>\n";
 		} else {
 			$curBreadcrumb =  "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Export Libraries</div>\n";
 		}

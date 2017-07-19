@@ -36,8 +36,8 @@ if (!empty($_GET['from'])) {
 		$backtrack = 'listdiag.php?show=g'.$gid;
 	}
 } else {
-	$curBreadcrumb .= "<a href=\"$imasroot/admin/admin.php\">Admin</a> &gt;";
-	$backtrack = 'admin.php';
+	$curBreadcrumb .= "<a href=\"$imasroot/admin/admin2.php\">Admin</a> &gt;";
+	$backtrack = 'admin2.php';
 }
 $curBreadcrumb .= _("Diagnostic Setup").'</div>';
 

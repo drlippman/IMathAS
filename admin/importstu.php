@@ -99,7 +99,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	$isadmin = ($myrights==100 && $cid=="admin") ? true : false ;
 	if ($isadmin) {
-		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Students</div>\n";
+		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Import Students</div>\n";
 	} else {
 		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Import Students</div>\n";
 	}
@@ -220,7 +220,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 		$body = "Import Successful<br/>\n";
 		$body .= "<p>";
 		if ($isadmin) {
-			$body .= "<a href=\"". $GLOBALS['basesiteurl'] . "/admin/admin.php\">Back to Admin Page";
+			$body .= "<a href=\"". $GLOBALS['basesiteurl'] . "/admin/admin2.php\">Back to Admin Page";
 		} else {
 			$body .= "<a href=\"". $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid\">Back to Course Page";
 		}

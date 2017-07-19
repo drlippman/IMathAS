@@ -16,7 +16,7 @@ if ($myrights<100) {
   echo "You're not authorized for this page";
   exit;
 }
-$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Batch Create Instructors</div>\n";
+$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Batch Create Instructors</div>\n";
 
 if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_name'])) {
   if ($_POST['groupid']<1) {
@@ -201,10 +201,10 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     }
   }
 
-  echo '<p>Done. <a href="../admin/admin.php">Admin page</a></p>';
+  echo '<p>Done. <a href="../admin/admin2.php">Admin page</a></p>';
 } else {
   require("../header.php");
-  $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a>\n";
+  $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</a>\n";
   $curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
   echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Batch Create Instructors</div>';
   echo '<form enctype="multipart/form-data" method="post" action="'.$imasroot.'/util/batchcreateinstr.php">';

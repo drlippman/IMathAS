@@ -30,7 +30,7 @@ if ($myrights<20) {
 	}
 
 	if ($_GET['cid']==="admin") {
-		$curBreadcrumb = "$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
 		$curBreadcrumb .= "&gt; <a href=\"managelibs.php?cid=admin\">Manage Libraries</a> &gt; Review Library";
 		if ($myrights == 100) {
 			$isadmin = true;
