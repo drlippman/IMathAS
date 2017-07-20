@@ -48,7 +48,7 @@
 		$from = 'gb';
 		$now = time();
 	}
-	
+
 	$overwriteBody = false;
 
 
@@ -266,7 +266,7 @@
 		} else {
 			$isgroup = isasidgroup($_GET['asid']);
 			$overwriteBody = true;
-			
+
 			if ($isgroup) {
 				$pers = 'group';
 				$body = getconfirmheader(true);
@@ -407,7 +407,7 @@
 			$body .= '<input type="hidden" name="clearq" value="'.Sanitize::encodeStringForDisplay($_GET['clearq']).'"/>';
 			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?$querystring'\"></p>\n";
 			$body .= '</form>';
-						
+
 			//echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\"> \n";
 			//echo "<input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&regen=1&confirmed=true'\" value=\"Really Clear and Regen\"> \n";
 			//echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
@@ -994,7 +994,7 @@
 			echo ' id="qwrap'.($i+1).'"';
 			$totalpossible += $pts[$questions[$i]];
 			echo '>';
-			
+
 			$qsetid = $qsetids[$questions[$i]];
 			if ($isteacher || $istutor || ($testtype=="Practice" && $showans!="V") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="V" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
 
@@ -1247,6 +1247,11 @@
 		require("../footer.php");
 
 	} else if ($links==1) { //show grade detail question/category breakdown
+		$placeinhead = "<script type=\"text/javascript\">function previewq(qn) {
+			var addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid='+qn;
+			previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+			previewpop.focus();
+		}</script>";
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -1321,37 +1326,26 @@
 		foreach(explode(',',$sp[0]) as $k=>$score) {
 			$scores[$qs[$k]] = getpts($score);
 		}
-		//DB $query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		//DB $query .= " AND imas_questions.id IN ({$line['questions']})";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		$query .= " AND imas_questions.id IN (".implode(',', array_map('intval', $qs)).")";
-		$stm = $DBH->query($query);
+
+		$placeholders = Sanitize::generateQueryPlaceholders($qs);
+		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn,imas_questions.questionsetid FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+		$query .= " AND imas_questions.id IN ($placeholders)";
+		$stm = $DBH->prepare($query);
+		$stm->execute($qs);
 		$i=1;
 		$totpt = 0;
 		$totposs = 0;
 		$qbreakdown = '';
-		//DB while ($row = mysql_fetch_row($result)) {
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if ($i%2!=0) {$qbreakdown .= "<tr class=even>"; } else {$qbreakdown .= "<tr class=odd>";}
-			$qbreakdown .= '<td>';
-			if ($row[3]==1) {
-				$qbreakdown .= '<span class="noticetext">Withdrawn</span> ';
+		$qdata = array();
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['points']==9999) {
+				$row['points']= $line['defpoints'];
 			}
-			$qbreakdown .= $row[0];
-			$qbreakdown .= "</td><td>{$scores[$row[1]]} / ";
-			if ($row[2]==9999) {
-				$poss= $line['defpoints'];
-			} else {
-				$poss = $row[2];
-			}
-			$qbreakdown .= $poss;
-
-			$qbreakdown .= "</td></tr>\n";
-			$i++;
-			$totpt += $scores[$row[1]];
-			$totposs += $poss;
+			$totpt += $scores[$row['id']];
+			$totposs += $row['points'];
+			$qdata[$row['id']] = $row;
 		}
+
 		$pc = round(100*$totpt/$totposs,1);
 
 
@@ -1401,8 +1395,21 @@
 
 		if (!($istutor && $isdiag)) {
 			echo "<h4>Question Breakdown</h4>\n";
-			echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
-			echo $qbreakdown;
+			echo "<table cellpadding=5 class=gb><thead><tr><th>Q#</th><th>Question</th><th>Points / Possible</th><th>Preview</th></tr></thead><tbody>\n";
+			foreach ($qs as $i=>$qid) {
+				if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
+				echo '<td>'.($i+1).'</td>';
+				echo '<td>';
+				if ($row['withdrawn']==1) {
+					echo '<span class="noticetext">'._('Withdrawn') . '</span> ';
+				}
+				echo Sanitize::encodeStringForDisplay($qdata[$qid]['description']);
+				echo "</td><td>";
+				echo $scores[$qid] , ' / ' , $qdata[$qid]['points'];
+				echo "</td>";
+				echo "<td><input type=button value=\"Preview\" onClick=\"previewq(".Sanitize::onlyInt($qdata[$qid]['questionsetid']).")\"/></td>";
+				echo "</tr>\n";
+			}
 			echo "</table>\n";
 		}
 
