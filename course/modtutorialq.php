@@ -42,7 +42,7 @@ if (isset($_POST['text'])) {
 	if (!isset($_GET['id'])) {
 		$id = 'new';
 	} else {
-		$id = $_GET['id'];
+		$id = Sanitize::onlyInt($_GET['id']);
 	}
 	//DB $_POST = stripslashes_deep($_POST);
 	$qtext = stripsmartquotes($_POST['text']);
@@ -408,7 +408,7 @@ if (isset($_POST['text'])) {
 	//$query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid=:qsetid";
 	$query = "SELECT libid,deleted FROM imas_library_items WHERE qsetid=:qsetid";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':qsetid'=>$qsetid));
+	$stm->execute(array(':qsetid'=>$id));
 	while($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==0) {
 			$allcurrentlibs[] = $row[0];
@@ -423,14 +423,14 @@ if (isset($_POST['text'])) {
 			$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
 			$query .= "AND (imas_users.groupid=:groupid OR ili.libid=0) AND ili.deleted=0 AND ili.qsetid=:qsetid";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$qsetid));
+			$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$id));
 		} else {
 			//unassigned, or owner and lib not closed or mine
 			$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
 			$query .= "(ili.libid=il.id OR ili.libid=0) AND il.deleted=0 WHERE ili.qsetid=:qsetid AND ili.deleted=0 ";
 			$query .= " AND ((ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)) OR ili.libid=0)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':qsetid'=>$qsetid, ':ownerid'=>$userid, ':ownerid2'=>$userid));
+			$stm->execute(array(':qsetid'=>$id, ':ownerid'=>$userid, ':ownerid2'=>$userid));
 		}
 		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$haverightslibs = array();
@@ -460,19 +460,19 @@ if (isset($_POST['text'])) {
 	if (count($toundelete)>0) {
 		foreach($toundelete as $libid) {
 			$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now,ownerid=:ownerid WHERE qsetid=:qsetid AND libid=:libid");
-			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now, ':ownerid'=>$userid));
+			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$id, ':now'=>$now, ':ownerid'=>$userid));
 		}
 	}
 	if (count($toadd)>0) {
 		foreach($toadd as $libid) {
 			$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
-			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
+			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$id, ':ownerid'=>$userid, ':now'=>$now));
 		}
 	} 
 	if (count($toremove)>0) {
 		foreach($toremove as $libid) {
 			$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid=:libid AND qsetid=:qsetid");
-			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now));
+			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$id, ':now'=>$now));
 		}
 	}
 
