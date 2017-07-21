@@ -102,7 +102,7 @@ function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
 	if (usingASCIIMath) {
 		rendermathnode(document.getElementById("curqtbl"));
-		
+
   }
   updateqgrpcookie();
 	initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
@@ -662,20 +662,24 @@ function groupSelected() {
 		return;
 	}
 	var to = grplist[grplist.length-1];
+	var existingcnt = 0;
 	if (itemarray[to].length<5) {  //moving to existing group
-
+		existingcnt = itemarray[to][2].length;
 	} else {
 		var existing = itemarray[to];
 		itemarray[to] = [1,0,[existing],1];
+		existingcnt = 1;
 	}
 	for (i=0; i<grplist.length-1; i++) { //going from last in current to first in current
 		tomove = itemarray.splice(grplist[i],1);
 		if (tomove[0].length<5) { //if grouping a group
 			for (var j=0; j<tomove[0][2].length; j++) {
-				itemarray[to][2].push(tomove[0][2][j]);
+				//itemarray[to][2].push(tomove[0][2][j]);
+				itemarray[to][2].splice(existingcnt+j,0,tomove[0][2][j]);
 			}
 		} else {
-			itemarray[to][2].push(tomove[0]);
+			//itemarray[to][2].push(tomove[0]);
+			itemarray[to][2].splice(existingcnt,0,tomove[0]);
 		}
 	}
 	submitChanges();
