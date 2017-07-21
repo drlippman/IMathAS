@@ -136,10 +136,12 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "CALTAG\n";
 				echo $line['caltag'] . "\n";
 				echo "INSTRFILES\n";
-				foreach (explode(',',$line['fileorder']) as $fid) {
-					echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
+				if (trim($line['fileorder'])!='') {
+					foreach (explode(',',$line['fileorder']) as $fid) {
+						if (!isset($filenames[$fid])) {continue;}
+						echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
+					}
 				}
-				
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="LinkedText"):

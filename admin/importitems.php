@@ -340,11 +340,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			':avail'=>$item[$itemtoadd]['avail'], ':startdate'=>$item[$itemtoadd]['startdate'], ':enddate'=>$item[$itemtoadd]['enddate'],
 			':oncal'=>$item[$itemtoadd]['oncal'], ':caltag'=>$item[$itemtoadd]['caltag']));
 		$typeid = $DBH->lastInsertId();
-		if (isset($item[$itemtoadd]['instrfiles'])) {
+		if (isset($item[$itemtoadd]['instrfiles']) && trim($item[$itemtoadd]['instrfiles'])!='') {
 			$item[$itemtoadd]['instrfiles'] = explode("\n",$item[$itemtoadd]['instrfiles']);
 			$fileorder = array();
 			foreach ($item[$itemtoadd]['instrfiles'] as $fileinfo) {
-
+				if (trim($fileinfo)==':::') {continue;} //bad file info
 				//DB list($filename,$filedescr) = explode(':::',addslashes($fileinfo));
 				list($filename,$filedescr) = explode(':::',$fileinfo);
 				if (substr($filename,0,4)=='http') {
