@@ -1897,6 +1897,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
 		}
 		if (isset($answer)) {
+			if ($GLOBALS['myrights']>10 && strpos($answer,'|')!==false) {
+				echo 'Warning: use abs(x) not |x| in $answer';
+			}
 			$sa = makeprettydisp($answer);
 			$greekletters = array('alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega');
 

@@ -1062,7 +1062,7 @@ function syntaxcheckexpr(str,format,vl) {
 	  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
 		  err += _("no decimals allowed")+". ";
 	  }
-	  var Pdepth = 0; var Bdepth = 0;
+	  var Pdepth = 0; var Bdepth = 0; var Adepth = 0;
 	  for (var i=0; i<str.length; i++) {
 		if (str.charAt(i)=='(') {
 			Pdepth++;
@@ -1072,10 +1072,15 @@ function syntaxcheckexpr(str,format,vl) {
 			Bdepth++;
 		} else if (str.charAt(i)==']') {
 			Bdepth--;
+		} else if (str.charAt(i)=='|') {
+			Adepth = 1-Adepth;
 		}
 	  }
 	  if (Pdepth!=0 || Bdepth!=0) {
 		  err += " ("+_("unmatched parens")+"). ";
+	  }
+	  if (Adepth!=0) {
+	  	  err += " ("+_("unmatched absolute value bars")+"). ";
 	  }
 	  if (vl) {
 	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*("+vl+"|\\d+)", "i");
@@ -1092,8 +1097,14 @@ function syntaxcheckexpr(str,format,vl) {
 	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";
 	  	  }
 	  }
-	  if (str.match(/\|/)) {
-		  err += _(" Use abs(x) instead of |x| for absolute values")+". ";
+	  if ((str.match(/\|/g)||[]).length>2) {
+	  	  var regex = /\|.*?\|\s*(.|$)/g;
+	  	  while (match = regex.exec(str)) {
+	  	  	if (match[1]!="" && match[1].match(/[^+\-\*\/\^\)]/)) {
+	  	  		err += _(" You may want to use abs(x) instead of |x| for absolute values to avoid ambiguity")+". ";
+	  	  		break;
+	  	  	}
+	  	  }
 	  }
 	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
 	  	  err += _(" Do not use the percent symbol, %")+". ";
