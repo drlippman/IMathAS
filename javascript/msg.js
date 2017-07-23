@@ -2,20 +2,19 @@
 //Flag toggles and pic rotation for message list
 
 function togglecolor(threadid,tagged) {
-	var trchg = document.getElementById("tr"+threadid);
 	var imgchg = document.getElementById("tag"+threadid);
 	if (tagged==1) {
-		trchg.className = "tagged";
+		$('#tr'+threadid).addClass("tagged")
 		imgchg.src = imasroot+"/img/flagfilled.gif";
 	} else {
-		trchg.className = "";
+		$('#tr'+threadid).removeClass("tagged")
 		imgchg.src = imasroot+"/img/flagempty.gif";
 	}
 }
 
 function toggletagged(threadid) {
 	var trchg = document.getElementById("tr"+threadid);
-	if (trchg.className=="tagged") {
+	if ($('#tr'+threadid).hasClass("tagged")) {
 		submitTagged(threadid,0);
 	} else {
 		submitTagged(threadid,1);

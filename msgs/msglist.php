@@ -615,7 +615,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 
 	$pagetitle = "Messages";
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js?v=072217\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $GLOBALS['basesiteurl'] . "/msgs/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
 	require("../header.php");
@@ -897,6 +897,7 @@ function chgfilter() {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}
 	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$cnt = 0;
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';
@@ -912,8 +913,11 @@ function chgfilter() {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
 		echo "<tr id=\"tr{$line['id']}\" ";
+		$stripe = ($cnt%2==0)?'even':'odd';
 		if (($line['isread']&8)==8) {
-			echo 'class="tagged" ';
+			echo 'class="tagged '.$stripe.'" ';
+		} else {
+			echo 'class="'.$stripe.'"';
 		}
 		echo "><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
@@ -955,6 +959,8 @@ function chgfilter() {
 		echo "<td>".Sanitize::encodeStringForDisplay($line['name'])."</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
+		
+		$cnt++;
 	}
 ?>
 	</tbody>
