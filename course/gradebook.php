@@ -586,7 +586,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "</script>\n";
-	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } table.gb tr.highlight { border-bottom:1px solid #333;} table.gb tr {border-bottom:1px solid #fff; } td.trld {display:table-cell;vertical-align:middle;} </style>";
+	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } td.trld {display:table-cell;vertical-align:middle;} </style>";
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";

@@ -103,13 +103,13 @@ function showcalcontents(el) {
 	if (typeof el == 'number') {
 		for (moday in caleventsarr) {
 			if (caleventsarr[moday].data!=null) {
-				html += '<div style="background-color:#ddf;">'+caleventsarr[moday].date + '</div>';
+				html += '<div class="caldatebar">'+caleventsarr[moday].date + '</div>';
 				html += showcalcontentsid(moday);
 			}
 		}
 
 	} else if (caleventsarr[el.id]!=null) {
-		html += '<div style="background-color:#ddf;">'+caleventsarr[el.id].date + '</div>';
+		html += '<div class="caldatebar">'+caleventsarr[el.id].date + '</div>';
 		html += showcalcontentsid(el.id);
 		var mlink = document.getElementById("mcelink");
 		if (mlink!=null) {

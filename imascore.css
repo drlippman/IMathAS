@@ -381,6 +381,9 @@ table.cal td {
 .today {
 	background-color: #fdd;
 }
+.caldatebar {
+	background-color: #ddf;
+}
 div.center {
 	text-align: center;
 }
