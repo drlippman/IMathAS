@@ -870,7 +870,7 @@
 
 			}
 			if (($line['showhints']==1 && $r['showhints']!=1) || $r['showhints']==2) {
-				if ($r[7]!='') {
+				if ($r['extref']!='') {
 					$extref[$r['qid']] = explode('~~',$r['extref']);
 				}
 			}
