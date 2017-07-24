@@ -135,8 +135,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['oncal'] . "\n";
 				echo "CALTAG\n";
 				echo $line['caltag'] . "\n";
-				echo "INSTRFILES\n";
 				if (trim($line['fileorder'])!='') {
+					echo "INSTRFILES\n";
 					foreach (explode(',',$line['fileorder']) as $fid) {
 						if (!isset($filenames[$fid])) {continue;}
 						echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
