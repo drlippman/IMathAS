@@ -70,9 +70,10 @@ if (isset($_GET['delete'])) {
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
 	//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $items = unserialize(mysql_result($r,0,0));
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,name FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	$items = unserialize($stm->fetchColumn(0));
+	list($itemorder,$coursename) = $stm->fetch(PDO::FETCH_NUM);
+	$items = unserialize($itemorder);
 
 	$newdir = $path . '/CCEXPORT'.$cid;
 	mkdir($newdir);
@@ -585,10 +586,10 @@ if (isset($_GET['delete'])) {
 	fwrite($fp, '<lomimscc:lom>
 	      <lomimscc:general>
 		<lomimscc:title>
-		  <lomimscc:string language="en-US">Common Cartridge export of '.$cid.' from '.$installname.'</lomimscc:string>
+		  <lomimscc:string language="en-US">'.htmlentities($coursename,ENT_XML1,'UTF-8',false).'</lomimscc:string>
 		</lomimscc:title>
 		<lomimscc:description>
-		  <lomimscc:string language="en-US">Common Cartridge export of '.$cid.' from '.$installname.'</lomimscc:string>
+		  <lomimscc:string language="en-US">'.htmlentities($coursename,ENT_XML1,'UTF-8',false).'</lomimscc:string>
 		</lomimscc:description>
 		<lomimscc:keyword>
 		  <lomimscc:string language="en-US">IMathAS</lomimscc:string>
