@@ -344,7 +344,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
 		//images_upload_credentials: true,
 		paste_data_images: true,
-		paste_webkit_styles: "color background-color font-size text-decoration",
+		paste_webkit_styles: "color font-size text-decoration",
 		default_link_target: "_blank",
 		browser_spellcheck: true,
 		branding: false,
