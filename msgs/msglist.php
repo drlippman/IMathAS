@@ -908,9 +908,9 @@ function chgfilter() {
 			$n++;
 		}
 		if ($n==1) {
-			$line['title'] = 'Re: '.$line['title'];
+			$line['title'] = 'Re: ' . Sanitize::encodeStringForDisplay($line['title']);
 		} else if ($n>1) {
-			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+			$line['title'] = "Re<sup>$n</sup>: " . Sanitize::encodeStringForDisplay($line['title']);
 		}
 		echo "<tr id=\"tr{$line['id']}\" ";
 		$stripe = ($cnt%2==0)?'even':'odd';
@@ -950,7 +950,8 @@ function chgfilter() {
 			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Not flagged\"/>";
 		}
 		echo '</td>';
-		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+		printf('<td>%s, %s</td>', Sanitize::encodeStringForDisplay($line['LastName']),
+            Sanitize::encodeStringForDisplay($line['FirstName']));
 
 
 		if ($line['name']==null) {

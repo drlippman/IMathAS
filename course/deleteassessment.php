@@ -115,10 +115,10 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $itemname; ?></h3>
+	<h3><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h3>
 	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
 
-	<form method="POST" action="deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeStringForDisplay($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
+	<form method="POST" action="deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>
 	<button type=submit name="remove" value="really">Yes, Delete</button>		
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">

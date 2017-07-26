@@ -596,7 +596,7 @@ if ($overwriteBody==1) {
 			}
 			echo '"/><div>';
 		}
-		echo "{$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/></div>";
+		echo Sanitize::encodeStringForDisplay($names[$i])."<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/></div>";
 		echo "<script> basesdates[$cnt] = ";
 		//if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
 		echo $startdates[$i];

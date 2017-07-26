@@ -224,10 +224,10 @@ END;
 	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
 
 	foreach($itemarr as $qid) {
-		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\" value=\"{$qsetids[$qid]}\"/></td>";
-		echo "<td>{$descriptions[$qid]}</td><td>";
-		echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$qid,{$qsetids[$qid]})\"/>";
-		echo "<select id=\"$qid\" name=\"$qid\" class=\"qsel\">";
+		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
+		echo "<td>" . Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td><td>";
+		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", $qid, $qsetids[$qid]);
+		echo "<select id=\"$qid\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
 		echo ">Uncategorized or Default</option>\n";
@@ -242,17 +242,17 @@ END;
 				echo '<optgroup label="'.htmlentities($oc[0]).'">';
 				$ingrp = true;
 			} else {
-				echo '<option value="'.$oc[0].'" ';
+				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '" ';
 				if ($category[$qid] == $oc[0]) { echo "selected=1"; $issel = true;}
-				echo '>'.$outcomenames[$oc[0]].'</option>';
+				echo '>' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';
 			}
 		}
 		if ($ingrp) { echo '</optgroup>';}
 		echo '<optgroup label="Libraries">';
 		foreach ($questionlibs[$qid] as $qlibid) {
-			echo "<option value=\"{$libnames[$qlibid]}\" ";
+			echo "<option value=\"" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "\" ";
 			if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
-			echo ">{$libnames[$qlibid]}</option>\n";
+			echo ">" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "</option>\n";
 		}
 		echo '</optgroup>\n';
 
@@ -269,9 +269,9 @@ END;
 
 		echo '<optgroup label="Custom">';
 		foreach ($extracats as $cat) {
-			echo "<option value=\"$cat\" ";
+			echo "<option value=\"" . Sanitize::encodeStringForDisplay($cat) . "\" ";
 			if ($category[$qid] == $cat && !$issel) { echo "selected=1";$issel = true;}
-			echo ">$cat</option>\n";
+			echo ">" . Sanitize::encodeStringForDisplay($cat) . "</option>\n";
 		}
 		echo '</optgroup>';
 		echo "</select></td></tr>\n";
@@ -287,7 +287,7 @@ END;
 				echo '<optgroup label="'.htmlentities($oc[0]).'">';
 				$ingrp = true;
 			} else {
-				echo '<option value="'.$oc[0].'">'.$outcomenames[$oc[0]].'</option>';
+				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '">' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';
 			}
 		}
 		if ($ingrp) { echo '</optgroup>';}

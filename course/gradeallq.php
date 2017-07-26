@@ -150,11 +150,14 @@
 		if (isset($_GET['quick'])) {
 			echo "saved";
 		} else if ($page == -1) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid&asid=average");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis.php?"
+				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+                    'asid' => 'average',)));
 		} else {
 			$page++;
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq.php?stu=$stu&cid=$cid&aid=$aid&qid=$qid&page=$page");
-
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq.php?"
+				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
+					'qid' => $qid, 'page' => $page,)));
 		}
 		exit;
 	}
@@ -222,15 +225,15 @@
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
+	echo "&gt; <a href=\"gb-itemanalysis.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
 	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in $aname</h2></div>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
 	echo '<div class="cpmid">';
 	if ($page==-1) {
-		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
+		echo "<a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
-		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=-1\">Grade all students at once</a>";
+		echo "<a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=-1\">Grade all students at once</a>";
 	}
 	echo '</div>';
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
@@ -374,7 +377,7 @@
 		echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
 		echo '</div>';
 	}
-	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=$page&update=true\">\n";
+	echo "<form id=\"mainform\" method=post action=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=" . Sanitize::encodeUrlParam($page) . "&update=true\">\n";
 	if ($isgroup>0) {
 		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
 	}
@@ -382,9 +385,9 @@
 	echo "<p>";
 	if ($ver=='graded') {
 		echo "<b>Showing Graded Attempts.</b>  ";
-		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=last\">Show Last Attempts</a>";
+		echo "<a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&ver=last\">Show Last Attempts</a>";
 	} else if ($ver=='last') {
-		echo "<a href=\"gradeallq.php?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=graded\">Show Graded Attempts</a>.  ";
+		echo "<a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&ver=graded\">Show Graded Attempts</a>.  ";
 		echo "<b>Showing Last Attempts.</b>  ";
 		echo "<br/><b>Note:</b> Grades and number of attempts used are for the Graded Attempt.  Part points might be inaccurate.";
 	}
@@ -436,9 +439,9 @@
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$GLOBALS['assessver'] = $line['ver'];
 		if ($page != -1) {
-			echo '<input type="hidden" name="userid" value="'.$line['userid'].'"/>';
+			echo '<input type="hidden" name="userid" value="' . Sanitize::onlyInt($line['userid']) . '"/>';
 		}
-		$asid = $line['id'];
+		$asid = Sanitize::onlyInt($line['id']);
 		$groupdup = false;
 		if ($line['agroupid']>0) {
 			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
@@ -549,7 +552,7 @@
 			echo "<div class=review>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
 			if (!$groupdup) {
-				echo '<span class="group" style="display:none">'.$groupnames[$line['agroupid']].': </span>';
+				echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
 			}
 			if ($isgroup) {
 
@@ -560,9 +563,9 @@
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
-				echo "<input type=text size=4 id=\"ud-{$line['id']}-$loc\" name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
+				echo "<input type=text size=4 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc\" value=\"$pt\">";
 				if ($rubric != 0) {
-					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc","feedback-{$line['id']}",($loc+1));
+					echo printrubriclink($rubric,$points,"ud-" . Sanitize::onlyInt($line['id']) . "-$loc","feedback-" . Sanitize::onlyInt($line['id']),($loc+1));
 				}
 			}
 			if ($parts!='') {
@@ -572,9 +575,9 @@
 					if ($prts[$j]==-1) {
 						$prts[$j] = 'N/A';
 					}
-					echo "<input type=text size=2 id=\"ud-{$line['id']}-$loc-$j\" name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\">";
+					echo "<input type=text size=2 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
 					if ($rubric != 0) {
-						echo printrubriclink($rubric,$answeights[$j],"ud-{$line['id']}-$loc-$j","feedback-{$line['id']}",($loc+1).' pt '.($j+1));
+						echo printrubriclink($rubric,$answeights[$j],"ud-" . Sanitize::onlyInt($line['id']) . "-$loc-$j","feedback-" . Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
 					}
 					echo ' ';
 				}
@@ -594,13 +597,13 @@
 						$togr[] = $k;
 					}
 				}
-				echo '<br/>Quick grade: <a href="#" onclick="quickgrade('.$loc.',0,\'ud-'.$line['id'].'-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
+				echo '<br/>Quick grade: <a href="#" onclick="quickgrade('.$loc.',0,\'ud-' . Sanitize::onlyInt($line['id']) . '-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
 				if (count($togr)>0) {
 					$togr = implode(',',$togr);
-					echo ' | <a href="#" onclick="quickgrade('.$loc.',1,\'ud-'.$line['id'].'-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
+					echo ' | <a href="#" onclick="quickgrade('.$loc.',1,\'ud-' . Sanitize::onlyInt($line['id']) . '-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
 			} else {
-				echo '<br/>Quick grade: <a href="#" onclick="quicksetscore(\'ud-'.$line['id'].'-'.$loc.'\','.$points.');return false;">Full credit</a>';
+				echo '<br/>Quick grade: <a href="#" onclick="quicksetscore(\'ud-' . Sanitize::onlyInt($line['id']) . '-'.$loc.'\','.$points.');return false;">Full credit</a>';
 			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {
@@ -671,7 +674,7 @@
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
 			echo '<br/>Question #'.($loc+1);
-			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$loc-$qsetid-{$seeds[$loc]}-$aid-{$line['ver']}&to={$line['userid']}\">Use in Msg</a>";
+			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$loc-$qsetid-{$seeds[$loc]}-$aid-" . Sanitize::encodeUrlParam($line['ver']) . "&to=" . Sanitize::onlyInt($line['userid']) . "\">Use in Msg</a>";
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
 			if ($groupdup) {

@@ -101,7 +101,7 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
 	//DB echo mysql_result($result,0,0)."</p>";
-	echo $stm->fetchColumn(0)."</p>";
+	echo Sanitize::encodeStringForDisplay($stm->fetchColumn(0)) . "</p>";
 
 
 
@@ -112,7 +112,7 @@
 		echo "<p>";
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo $row[0]."; ";
+			echo Sanitize::encodeStringForDisplay($row[0]) . "; ";
 		}
 		echo "</p>";
 	}

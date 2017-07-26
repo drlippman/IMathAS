@@ -117,7 +117,7 @@ echo '<table id="myTable" class="gb">';
 echo '<thead><tr><th>Best (# tries)<br/>Last</th>';
 $sarr = "'S'";
 foreach ($itemdescr as $qn=>$v) {
-	echo '<th>'.$v.'</th>';
+	echo '<th>' . Sanitize::encodeStringForDisplay($v) . '</th>';
 	$sarr .= ",'N'";
 }
 echo '</tr></thead><tbody>';

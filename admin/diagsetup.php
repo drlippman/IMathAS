@@ -368,8 +368,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 				for ($i=0;$i<count($sel2[$s1]);$i++) {
 ?>
 				<tr id="trout<?php echo $k . "-" . $i ?>">
-					<td><input type=hidden id="out<?php echo $k . "-" . $i ?>" name="out<?php echo $k . "-" . $i ?>" value="<?php echo $sel2[$s1][$i] ?>">
-					<?php echo $sel2[$s1][$i] ?></td>
+					<td><input type=hidden id="out<?php echo $k . "-" . $i ?>" name="out<?php echo $k . "-" . $i ?>" value="<?php echo Sanitize::encodeStringForDisplay($sel2[$s1][$i]); ?>">
+					<?php echo Sanitize::encodeStringForDisplay($sel2[$s1][$i]); ?></td>
 					<td><a href='#' onclick="removeitem('out<?php echo $k . "-" . $i ?>','out<?php echo $k ?>')">Remove</a>
 					<a href='#' onclick="moveitemup('out<?php echo $k . "-" . $i ?>','out<?php echo $k ?>')">Move up</a>
 					<a href='#' onclick="moveitemdown('out<?php echo $k . "-" . $i ?>','out<?php echo $k ?>')">Move down</a>

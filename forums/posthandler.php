@@ -539,7 +539,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$forumsettings = $stm->fetch(PDO::FETCH_ASSOC);
 		$allowanon = $forumsettings['settings']%2;
 		if ($_GET['modify']=='new') {
-			echo $forumsettings['name'].'</h2>';
+			echo Sanitize::encodeStringForDisplay($forumsettings['name']).'</h2>';
 		}
 		$forumtype = $forumsettings['forumtype'];
 		$taglist = $forumsettings['taglist'];
@@ -563,7 +563,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo '<span class="form">&nbsp;</span><span class="formright">'.$notice.'</span><br class="form"/>';
 		} else {
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
-			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
+			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";
 			if ($forumtype==1) { //file forum
 				echo '<script type="text/javascript">
 					var filecnt = 1;
@@ -1000,7 +1000,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		echo "<input type=\"radio\" name=\"movetof\" value=\"{$row[0]}\" id=\"moveto{$row[0]}\" ";
 			if ($row[0]==$forumid) {echo 'checked="checked"';}
-			echo "/> <label for=\"moveto{$row[0]}\">{$row[1]}</label><br/>";
+			echo "/> <label for=\"moveto{$row[0]}\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
 		}
 		echo '</div>';
 
@@ -1016,7 +1016,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if ($ishead && $row[0]==$threadid) {continue;}
 			echo "<input type=\"radio\" name=\"movetot\" value=\"{$row[0]}\" id=\"movetot{$row[0]}\" ";
 			if ($row[0]==$threadid) {echo 'checked="checked"';}
-			echo "/> <label for=\"movetot{$row[0]}\">{$row[1]}</label><br/>";
+			echo "/> <label for=\"movetot{$row[0]}\">".Sanitize::encodeStringForDisplay($row[1])."</label><br/>";
 		}
 		echo '</div>';
 

@@ -229,7 +229,7 @@ function sanitizeNewInstructorRequestLog($logtext) {
 	}
 	if (!empty($verificationUrl)) {
 		if (!empty($sanitizedLogText)) $sanitizedLogText .= "<br/>";
-		$sanitizedLogText .= "VerificationURL: " . Sanitize::encodeStringForDisplay($verificationUrl);
+		$sanitizedLogText .= "VerificationURL: " . $verificationUrl;
 	}
 	if (!empty($phone)) {
 		if (!empty($sanitizedLogText)) $sanitizedLogText .= "<br/>";

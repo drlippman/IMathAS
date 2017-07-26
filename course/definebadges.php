@@ -25,9 +25,9 @@ if (empty($_GET['badgeid'])) {
 		echo '<ul>';
 		//DB while ($row=mysql_fetch_row($result)) {
 		while ($row=$stm->fetch(PDO::FETCH_NUM)) {
-			echo '<li><a href="definebadges.php?cid='.$cid.'&amp;badgeid='.$row[0].'">'.$row[1].'</a> ';
-			echo '<a class="small" href="definebadges.php?cid='.$cid.'&amp;badgeid='.$row[0].'&amp;delete=true" onclick="return confirm(\'Are you sure you want to delete this badge definition and invalidate all awarded badges?\');">[Delete]</a> ';
-			echo '<br/><a href="claimbadge.php?cid='.$cid.'&amp;badgeid='.$row[0].'">Link to claim badge</a> (provide to students)';
+			echo '<li><a href="definebadges.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '">'.$row[1].'</a> ';
+			echo '<a class="small" href="definebadges.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '&amp;delete=true" onclick="return confirm(\'Are you sure you want to delete this badge definition and invalidate all awarded badges?\');">[Delete]</a> ';
+			echo '<br/><a href="claimbadge.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '">Link to claim badge</a> (provide to students)';
 			echo '</li>';
 		}
 		echo '</ul>';
@@ -137,14 +137,14 @@ if (empty($_GET['badgeid'])) {
 
 		echo '<form method="post" action="definebadges.php?cid='.$cid.'&amp;badgeid='.$badgeid.'">';
 
-		echo '<p>Badge Name: <input type="text" size="80" maxlength="128" name="badgename" value="'.$name.'"/><br/>Max 128 characters</p>';
-		echo '<p>Badge Short Name: <input type="text" size="30" maxlength="128" name="badgetext" value="'.$badgetext.'"/> <br/>';
+		echo '<p>Badge Name: <input type="text" size="80" maxlength="128" name="badgename" value="' . Sanitize::encodeStringForDisplay($name) . '"/><br/>Max 128 characters</p>';
+		echo '<p>Badge Short Name: <input type="text" size="30" maxlength="128" name="badgetext" value="' . Sanitize::encodeStringForDisplay($badgetext) . '"/> <br/>';
 		echo 'This text also displays on the badge image. <br/>Keep it under 24 characters, and not more than 12 characters in a single word.';
 		echo '<br>Alternatively, provide a URL for a 90x90 .png to use as the badge image</p>';
 
-		echo '<p>Badge Short Description: <input type="text" size="80" maxlength="128" name="description" value="'.$descr.'"/><br/>Max 128 characters</p>';
+		echo '<p>Badge Short Description: <input type="text" size="80" maxlength="128" name="description" value="' . Sanitize::encodeStringForDisplay($descr) . '"/><br/>Max 128 characters</p>';
 
-		echo '<p>Badge Long Description:<br/> <textarea name="longdescription" cols="80" rows="5">'.$longdescr.'</textarea></p>';
+		echo '<p>Badge Long Description:<br/> <textarea name="longdescription" cols="80" rows="5">' . Sanitize::encodeStringForDisplay($longdescr) . '</textarea></p>';
 
 		echo '<p>Select the badge requirements.  All conditions must be met for the badge to be earned</p>';
 
@@ -155,7 +155,7 @@ if (empty($_GET['badgeid'])) {
 			writeHtmlSelect("catselect$i",$gbvals,$gblabels,isset($req['data'][$i])?$req['data'][$i][0]:null,'Select...','NS');
 			echo '</td><td>';
 			writeHtmlSelect("cattype$i",$gtvals,$gtlabels,isset($req['data'][$i])?$req['data'][$i][1]:0);
-			echo '</td><td><input type="text" size="3" name="catscore'.$i.'" value="'.(isset($req['data'][$i])?$req['data'][$i][2]:'').'"/>%</td></tr>';
+			echo '</td><td><input type="text" size="3" name="catscore' . $i . '" value="' . (isset($req['data'][$i]) ? Sanitize::encodeStringForDisplay($req['data'][$i][2]) : '').'"/>%</td></tr>';
 		}
 		echo '</tbody></table>';
 		echo '<p><input type="submit" value="Save"/></p>';

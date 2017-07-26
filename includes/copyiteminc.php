@@ -334,7 +334,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 
 		$row['courseid'] = $cid;
 
-		$fields = implode(",",array_keys($row));
+		$fields = implode(",", array_keys($row));
 		//$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";
 		$fieldplaceholders = ':'.implode(',:', array_keys($row));
 

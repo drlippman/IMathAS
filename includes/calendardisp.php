@@ -634,9 +634,9 @@ for ($i=0;$i<count($hdrs);$i++) {
 				}
 				echo '<span class="calitemtitle">';
 				if ($editingon && isset($names[$k]) && trim($names[$k])!='') {
-					echo $names[$k];
+					echo Sanitize::encodeStringForDisplay($names[$k]);
 				} else if (isset($tags[$k])) {
-					echo $tags[$k];
+					echo Sanitize::encodeStringForDisplay($tags[$k]);
 				} else {
 					echo '!';
 				}

@@ -269,28 +269,28 @@ if ($searchtype == 'thread') {
 				$posts = 0;
 				$lastpost = '';
 			}
-			echo "<tr id=\"tr{$line['id']}\" ";
+			echo "<tr id=\"tr" . Sanitize::onlyInt($line['id']) . "\" ";
 			if ($line['tagged']==1) {echo 'class="tagged"';}
 			echo "><td>";
 			echo "<span class=right>\n";
 			if ($line['tag']!='') { //category tags
-				echo '<span class="forumcattag">'.$line['tag'].'</span> ';
+				echo '<span class="forumcattag">' . Sanitize::encodeStringForDisplay($line['tag']) . '</span> ';
 			}
 
 			if ($line['tagged']==1) {
-				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Flagged\" />";
+				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
 			} else {
-				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Not flagged\"/>";
+				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Not flagged\"/>";
 			}
 
 			if ($isteacher) {
-				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
+				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&move=" . Sanitize::onlyInt($line['id']) . "\">Move</a> ";
 			}
 			if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
-				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
+				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&modify=" . Sanitize::onlyInt($line['id']) . "\">Modify</a> ";
 			}
 			if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
-				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a>";
+				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&remove=" . Sanitize::onlyInt($line['id']) . "\">Remove</a>";
 			}
 			echo "</span>\n";
 			if ($line['isanon']==1) {
@@ -298,10 +298,10 @@ if ($searchtype == 'thread') {
 			} else {
 				$name = "{$line['LastName']}, {$line['FirstName']}";
 			}
-			echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}&page=-4\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></b>: ".Sanitize::encodeStringForDisplay($name);
+			echo "<b><a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($line['forumid']) . "&thread=" . Sanitize::encodeUrlParam($line['id']) . "&page=-4\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></b>: " . Sanitize::encodeStringForDisplay($name);
 			echo "</td>\n";
-			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></td>";
-			echo "<td class=c>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
+			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeStringForDisplay($line['forumid']) . "\">" . Sanitize::encodeStringForDisplay($line['name']) . "</a></td>";
+			echo "<td class=c>$posts</td><td class=c>" . Sanitize::encodeStringForDisplay($line['views']) . " </td><td class=c>$lastpost ";
 			echo "</td></tr>\n";
 		}
 	}
@@ -379,14 +379,14 @@ if ($searchtype == 'thread') {
 	}
 	foreach ($result as $line) {
 		echo "<div class=block>";
-		echo "<b>{$line['subject']}</b>";
-		echo ' (in '.$line['name'].')';
+		echo "<b>" . Sanitize::encodeStringForDisplay($line['subject']) ."</b>";
+		echo ' (in ' . Sanitize::encodeStringForDisplay($line['name']).')';
 		if ($line['isanon']==1) {
 			$name = "Anonymous";
 		} else {
 			$name = "{$line['LastName']}, {$line['FirstName']}";
 		}
-		echo "<br/>Posted by: $name, ";
+		echo "<br/>Posted by: " . Sanitize::encodeStringForDisplay($name) . ", ";
 		echo tzdate("F j, Y, g:i a",$line['postdate']);
 
 		echo "</div><div class=blockitems>";
@@ -406,14 +406,14 @@ if ($searchtype == 'thread') {
 				} else {
 					echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
 				}
-				echo $fl[2*$i].'</a> ';
+				echo Sanitize::encodeStringForDisplay($fl[2*$i]) . '</a> ';
 				//if (count($fl)>2) {echo '</li>';}
 			}
 			//if (count($fl)>2) {echo '</ul>';}
 			echo '</p>';
 		}
-		echo filter($line['message']);
-		echo "<p><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['threadid']}&page=-4\">Show full thread</a></p>";
+		echo Sanitize::encodeStringForDisplay(filter($line['message']));
+		echo "<p><a href=\"posts.php?cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&thread=" . Sanitize::onlyInt($line['threadid']) . "&page=-4\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
 
@@ -547,7 +547,7 @@ if (!isset($teacherid)) {
 		}
 		echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> ";
 		if ($newcnt[$line['id']]>0) {
-			 echo "<a href=\"thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext >New Posts ({$newcnt[$line['id']]})</a>";
+			 echo "<a href=\"thread.php?cid=$cid&forum=" . Sanitize::onlyInt($line['id']) . "&page=-1\" class=noticetext >New Posts (" . Sanitize::encodeStringForDisplay($newcnt[$line['id']]) . ")</a>";
 		}
 		echo "</td>\n";
 		if (isset($threadcount[$line['id']])) {
@@ -559,7 +559,7 @@ if (!isset($teacherid)) {
 			$posts = 0;
 			$lastpost = '';
 		}
-		echo "<td class=c>$threads</td><td class=c>$posts</td><td class=c>$lastpost</td></tr>\n";
+		echo "<td class=c>" . Sanitize::onlyInt($threads) . "</td><td class=c>" . Sanitize::onlyInt($posts) . "</td><td class=c>" . Sanitize::encodeStringForDisplay($lastpost) . "</td></tr>\n";
 	}
 ?>
 	</tbody>

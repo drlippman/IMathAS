@@ -124,7 +124,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm2 = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
 			$stm2->execute(array(':id'=>$row[1], ':intro'=>json_encode($introjson)));
-			$converted[] = $row[2];
+			$converted[] = Sanitize::encodeStringForDisplay($row[2]);
 		}
 	}
 	require("../header.php");

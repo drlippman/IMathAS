@@ -258,7 +258,7 @@ $placeinhead .= '</script>';
 	for ($i=0;$i<count($page_courseList);$i++) {
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
-				<td><a href="../course/course.php?cid=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>">
+				<td><a href="../course/course.php?cid=<?php echo Sanitize::courseId($page_courseList[$i]['id']); ?>">
 				<?php
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '<i>';

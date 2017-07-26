@@ -135,8 +135,8 @@ if (isset($_POST['tname'])) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		$name = $stm->fetchColumn(0);
 
-		echo '<p>Are you SURE you want to delete the tool <b>'.$name.'</b>?  Doing so will break ALL placements of this tool.</p>';
-		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$_GET['id'].'">';
+		echo '<p>Are you SURE you want to delete the tool <b>' . Sanitize::encodeStringForDisplay($name) . '</b>?  Doing so will break ALL placements of this tool.</p>';
+		echo '<form method="post" action="externaltools.php?cid=' . $cid . $ltfrom . '&amp;id=' . Sanitize::onlyInt($_GET['id']) . '">';
 		echo '<input type=hidden name=delete value=true />';
 		echo '<input type=submit value="Yes, I\'m Sure">';
 		echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
@@ -176,24 +176,24 @@ if (isset($_POST['tname'])) {
 		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.Sanitize::onlyInt($_GET['id']).'">';
 ?>
 		<span class="form">Tool Name:</span>
-		<span class="formright"><input type="text" size="40" name="tname" value="<?php echo $name;?>" /></span>
+		<span class="formright"><input type="text" size="40" name="tname" value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" /></span>
 		<br class="form" />
 
 		<span class="form">Launch URL:</span>
-		<span class="formright"><input type="text" size="40" name="url" value="<?php echo $url;?>" /></span>
+		<span class="formright"><input type="text" size="40" name="url" value="<?php echo Sanitize::encodeStringForDisplay($url); ?>" /></span>
 		<br class="form" />
 
 		<span class="form">Key:</span>
-		<span class="formright"><input type="text" size="40" name="key" value="<?php echo $key;?>" /></span>
+		<span class="formright"><input type="text" size="40" name="key" value="<?php echo Sanitize::encodeStringForDisplay($key); ?>" /></span>
 		<br class="form" />
 
 		<span class="form">Secret:</span>
-		<span class="formright"><input type="password" size="40" name="secret" value="<?php echo $secret;?>" /></span>
+		<span class="formright"><input type="password" size="40" name="secret" value="<?php echo Sanitize::encodeStringForDisplay($secret); ?>" /></span>
 		<br class="form" />
 
 		<span class="form">Custom Parameters:</span>
 		<span class="formright">
-			<textarea rows="2" cols="30" name="custom"><?php echo $custom;?></textarea>
+			<textarea rows="2" cols="30" name="custom"><?php echo Sanitize::encodeStringForDisplay($custom); ?></textarea>
 		</span>
 		<br class="form" />
 
@@ -243,16 +243,16 @@ if (isset($_POST['tname'])) {
 		} else {
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				echo '<li>'.$row[1];
+				echo '<li>' . Sanitize::encodeStringForDisplay($row[1]);
 				if ($isadmin) {
 					if ($row[2]==null) {
 						echo ' (System-wide)';
 					} else {
-						echo ' (for group '.$row[2].')';
+						echo ' (for group ' . Sanitize::encodeStringForDisplay($row[2]) . ')';
 					}
 				}
-				echo ' <a href="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$row[0].'">Edit</a> ';
-				echo '| <a href="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$row[0].'&amp;delete=ask">Delete</a> ';
+				echo ' <a href="externaltools.php?cid=' . $cid . $ltfrom . '&amp;id=' . Sanitize::onlyInt($row[0]) . '">Edit</a> ';
+				echo '| <a href="externaltools.php?cid=' . $cid . Sanitize::encodeUrlParam($ltfrom) . '&amp;id=' . Sanitize::onlyInt($row[0]) . '&amp;delete=ask">Delete</a> ';
 				echo '</li>';
 			}
 		}

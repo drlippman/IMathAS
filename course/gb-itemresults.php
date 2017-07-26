@@ -144,7 +144,7 @@ $stm->execute(array(':id'=>$aid));
 //DB echo mysql_result($result,0,1).'</h2></div>';
 //DB $itemorder = mysql_result($result,0,2);
 list ($defpoints, $aname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
-echo $aname.'</h2></div>';
+echo Sanitize::encodeStringForDisplay($aname) . '</h2></div>';
 $itemarr = array();
 $itemnum = array();
 foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -275,7 +275,7 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 			if (!isset($res[$k])) {
 				continue;
 			}
-			echo '<tr><td>'.$questions[$k].'</td><td>'.$res[$k];
+			echo '<tr><td>' . Sanitize::encodeStringForDisplay($questions[$k]) . '</td><td>' . Sanitize::encodeStringForDisplay($res[$k]);
 			echo ' <span class="scorebarinner" style="';
 			if (in_array($k,$answer)) {
 				echo 'background:#9f9;';
@@ -290,7 +290,7 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 	} else {
 		arsort($res);
 		foreach ($res as $ans=>$cnt) {
-			echo '<tr><td>'.$ans.'</td><td>'.$cnt;
+			echo '<tr><td>' . Sanitize::encodeStringForDisplay($ans) . '</td><td>' . Sanitize::encodeStringForDisplay($cnt);
 			echo ' <span class="scorebarinner" style="';
 
 			if (in_array($ans,$correct)) {

@@ -80,13 +80,13 @@ ul {
 		}
 		if ($row[0] != $lastgroup) {
 			if ($lastgroup != '') {
-				echo "<p><b>$lastgroup</b>: $grpcnt";
+				echo "<p><b>".Sanitize::encodeStringForDisplay($lastgroup)."</b>: ".Sanitize::encodeStringForDisplay($grpcnt);
 				echo '<ul>'.$grpdata.'</ul></p>';
 			}
 			$grpcnt = 0;  $grpdata = '';
 			$lastgroup = $row[0];
 		}
-		$userdata .= "<li>".Sanitize::encodeStringForDisplay($row[4]).' ('.$row[3].'): <b>'.$row[5].'</b>';
+		$userdata .= "<li>".Sanitize::encodeStringForDisplay($row[4]).' ('.Sanitize::encodeStringForDisplay($row[3]).'): <b>'.Sanitize::encodeStringForDisplay($row[5]).'</b>';
 		if (!in_array($row[3],$seencid)) {
 			$grpcnt += $row[5];
 			$seencid[] = $row[3];
@@ -100,7 +100,7 @@ ul {
 	$grpdata .= '</ul></li>';
 	$userdata = '';
 	$lastuser = $row[1].', '.$row[2];
-	echo "<p><b>$lastgroup</b>: $grpcnt";
+	echo "<p><b>".Sanitize::encodeStringForDisplay($lastgroup)."</b>: ".Sanitize::encodeStringForDisplay($grpcnt);
 	echo '<ul>'.$grpdata.'</ul></p>';
 
 ?>

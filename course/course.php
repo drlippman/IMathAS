@@ -471,7 +471,7 @@ if ($overwriteBody==1) {
 			}
 			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
 		}
-		echo $curBreadcrumb
+		echo $curBreadcrumb;
 		?>
 		<div class=clear></div>
 	</div>
@@ -487,10 +487,10 @@ if ($overwriteBody==1) {
 
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
-			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
-			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
-			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
-			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?>
+			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>" class="essen">
+			<?php echo _('Messages'); ?></a> <?php echo $newmsgs; ?> <br/>
+			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>" class="essen">
+			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt; ?>
 		</p>
 	<?php
 	if (isset($CFG['CPS']['leftnavtools']) && $CFG['CPS']['leftnavtools']=='limited') {
@@ -570,13 +570,13 @@ if ($overwriteBody==1) {
 
 		echo '<p>';
 		if ($msgset<4) {
-			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
-			echo _('Messages').'</a> '.$newmsgs .' <br/>';
-		}
-		if (($toolset&2)==0) {
-			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
-			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
-		}
+				echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder=' . Sanitize::encodeUrlParam($_GET['folder']) . '" class="essen"> ';
+				echo _('Messages').'</a> '.$newmsgs .' <br/>';
+			}
+			if (($toolset&2)==0) {
+				echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder=' . Sanitize::encodeUrlParam($_GET['folder']) . '" class="essen">';
+				echo _('Forums').'</a> '.$newpostscnt.'<br/>';
+			}
 		if (($toolset&1)==0) {
 			echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a><br/>';
 		}

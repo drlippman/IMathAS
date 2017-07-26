@@ -328,7 +328,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 
 		echo "</div><div class=blockitems>";
 		echo filter($row[3]);
-		echo "<p><a href=\"posts.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::encodeStringForDisplay($row[0])."&thread=".Sanitize::encodeStringForDisplay($row[1])."\">Show full thread</a></p>";
+		echo "<p><a href=\"posts.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::encodeUrlParam($row[0])."&thread=".Sanitize::encodeUrlParam($row[1])."\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
 	require("../footer.php");
@@ -541,7 +541,6 @@ if ($page>0) {
 				$prevnext .= "<b>$i</b> ";
 			} else {
 				$prevnext .= "<a href=\"thread.php?page=$i&cid=$cid&forum=$forumid\">$i</a> ";
-
 			}
 		}
 		if ($max!=$numpages-1) { $prevnext .= " ... ";}
@@ -615,7 +614,7 @@ if ($isteacher && $groupsetid>0) {
 	foreach ($groupnames as $gid=>$gname) {
 		echo "<option value=\"$gid\" ";
 		if ($curfilter==$gid) { echo 'selected="1"';}
-		echo ">$gname</option>";
+		echo ">".Sanitize::encodeStringForDisplay($gname)."</option>";
 	}
 	echo '</select></p>';
 } else if ($groupsetid>0 && $groupid>0) {
@@ -819,7 +818,7 @@ echo "</p>";
 				} else {
 					$name = Sanitize::encodeStringForDisplay($line['LastName']) .", ". Sanitize::encodeStringForDisplay($line['FirstName']);
 				}
-				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . Sanitize::encodeStringForDisplay($grpqs) .'\">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
+				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . Sanitize::encodeUrlParam($grpqs) .'\">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
 
 				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
 

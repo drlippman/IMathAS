@@ -144,7 +144,7 @@
 	}
 
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=" . Sanitize::encodeUrlParam($_GET['stu']) . "&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&cid=".Sanitize::courseId($_GET['cid']));
 		exit;
 	}
 
@@ -156,16 +156,16 @@
         Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($_GET['stu']>0) {
-		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Student Detail</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=" . Sanitize::onlyInt($_GET['stu']) . "&cid=$cid\">Student Detail</a> ";
 	} else if ($_GET['stu']==-1) {
-		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Averages</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=" . Sanitize::onlyInt($_GET['stu']) . "&cid=$cid\">Averages</a> ";
 	}
 	echo "&gt; External Tool Grades</div>";
 
 	echo "<div id=\"headerexttoolgrades\" class=\"pagetitle\"><h2>Modify External Tool Grades</h2></div>";
-	echo '<h3>'.$name.'</h3>';
+	echo '<h3>' . Sanitize::encodeStringForDisplay($name) . '</h3>';
 
-	echo "<form id=\"mainform\" method=post action=\"edittoolscores.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&lid=$lid&uid={$_GET['uid']}\">";
+	echo "<form id=\"mainform\" method=post action=\"edittoolscores.php?stu=" . Sanitize::onlyInt($_GET['stu']) . "&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&cid=$cid&lid=$lid&uid=" . Sanitize::encodeUrlParam($_GET['uid']) . "\">";
 
 
 		//DB $query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
@@ -282,21 +282,21 @@
 			} else {
 				echo '<tr><td>';
 			}
-			echo "{$row[1]}, {$row[2]}";
+			echo Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]);
 			echo '</td>';
 			if ($hassection) {
-				echo "<td>{$row[3]}</td>";
+				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}
 			if (isset($score[$row[0]])) {
-				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
-				echo $score[$row[0]];
+				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[" . Sanitize::encodeStringForDisplay($row[0]) . "]\" id=\"score" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"";
+				echo Sanitize::encodeStringForDisplay($score[$row[0]]);
 			} else {
-				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
+				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[" . Sanitize::encodeStringForDisplay($row[0]) . "]\" id=\"score" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"";
 			}
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
 
 			echo "</td>";
-			echo "<td><textarea cols=60 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
+			echo "<td><textarea cols=60 rows=1 id=\"feedback" . Sanitize::encodeStringForDisplay($row[0]) . "\" name=\"feedback[" . Sanitize::encodeStringForDisplay($row[0]) . "]\">" . Sanitize::encodeStringForDisplay($feedback[$row[0]]) . "</textarea></td>";
 			echo "</tr>";
 		}
 

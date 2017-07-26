@@ -61,14 +61,14 @@ function showitemtree($items,$parent) {
 			if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 						($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
 				if ($item['SH'][1]=='T') { //just link to treereader item
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'#B'.$item['id'].'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#B'.$item['id']).'">';
 					showicon('tree', 'treereader');
-					echo $item['name'];
+					echo Sanitize::encodeStringForDisplay($item['name']);
 					echo '</a></li>';
 				} else { //show block contents
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'-'.($k+1).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'-'.($k+1)).'">';
 					showicon('folder');
-					echo $item['name'];
+					echo Sanitize::encodeStringForDisplay($item['name']);
 					echo '</a><ul class="qview">';
 					showitemtree($item['items'], $parent .'-'.($k+1));
 					echo '</ul></li>';
@@ -110,18 +110,18 @@ function showitemtree($items,$parent) {
 				if (($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && ($nothidden || $showgreyedout)) ||
 					($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) || $viewall) {
 					
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'#'.$item.'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
 					showicon('assess', 'Assessment');
-					echo $line['name'];
+					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
 				}
 					
 			} else if ($line['itemtype']=='InlineText') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'#inline'.$line['id'].'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#inline'.$line['id']).'">';
 					showicon('inline', 'Inline Text');
 					if ($line['title']!='##hidden##') {
-						echo $line['title'];
+						echo Sanitize::encodeStringForDisplay($line['title']);
 					} else {
 						echo _('Inline text item');
 					}
@@ -129,16 +129,16 @@ function showitemtree($items,$parent) {
 				}
 			} else if ($line['itemtype']=='LinkedText') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'#'.$item.'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
 					showicon('linked', 'Link');
-					echo $line['title'];
+					echo Sanitize::encodeStringForDisplay($line['title']);
 					echo '</a></li>';
 				}
 			} else if ($line['itemtype']=='Drill') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'#'.$item.'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
 					showicon('drill', 'Drill');
-					echo $line['name'];
+					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
 				}
 			} else if ($line['itemtype']=='Forum') {
@@ -148,16 +148,16 @@ function showitemtree($items,$parent) {
 				}
 
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'#'.$item.'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
 					showicon('forum', 'Forum');
-					echo $line['name'];
+					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
 				}
 			} else if ($line['itemtype']=='Wiki') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.$parent.'#'.$item.'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
 					showicon('wiki', 'Wiki');
-					echo $line['name'];
+					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
 				}
 			} 
@@ -168,7 +168,7 @@ function showitemtree($items,$parent) {
 
 echo '<div class="breadcrumb">';
 echo $breadcrumbbase;
-echo "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> &gt; ";
+echo "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 echo _('Course Map');
 echo '</div>';
 
