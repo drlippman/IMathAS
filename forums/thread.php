@@ -810,7 +810,7 @@ echo "</p>";
 					if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
 						echo "<li><a href=\"thread.php?page=". Sanitize::onlyInt($page) ."&cid=$cid&forum=". Sanitize::onlyInt($line['forumid'])."&remove=".Sanitize::onlyInt($line['id'])."\">Remove</a></li>";
 					}
-					echo '<ul></span>';
+					echo '</ul></span>';
 				}
 				echo "</span>\n";
 				if ($line['isanon']==1) {
