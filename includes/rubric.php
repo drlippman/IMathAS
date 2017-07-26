@@ -30,6 +30,14 @@ function printrubrics($rubricarray) {
 //printrubriclink(rubricId,points,scoreboxid,feedbackboxid,[qn,width])
 function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$width=600) {
 	global $imasroot;
+
+	$rubricid = Sanitize::onlyInt($rubricid);
+	$points = Sanitize::onlyInt($points);
+	$scorebox = Sanitize::encodeStringForJavascript($scorebox);
+	$feedbackbox = Sanitize::encodeStringForJavascript($feedbackbox);
+	$qn = Sanitize::encodeStringForJavascript($qn);
+	$width = Sanitize::onlyInt($width);
+
 	$out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
 	$out .= "<img border=0 src=\"$imasroot/img/assess.png\" alt=\"rubric\"></a>";
 	return $out;

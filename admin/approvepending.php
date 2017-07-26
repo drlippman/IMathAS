@@ -93,13 +93,14 @@ if ($stm->rowCount()==0) {
 
 	echo '<h2>Account Approval</h2>';
 	echo '<form method="post" action="approvepending.php?go=true&amp;skipn='.$offset.'">';
-	echo '<input type="hidden" name="email" value="'.Sanitize::encodeStringForDisplay($row[4]).'"/>';
-	echo '<input type="hidden" name="id" value="'.Sanitize::encodeStringForDisplay($row[0]).'"/>';
-	echo '<p>Username: '.Sanitize::encodeStringForDisplay($row[1]).'<br/>Name: '.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[3]).' ('.Sanitize::encodeStringForDisplay($row[4]).')</p>';
+	echo '<input type="hidden" name="email" value="' . Sanitize::encodeStringForDisplay($row[4]) . '"/>';
+	echo '<input type="hidden" name="id" value="' . Sanitize::encodeStringForDisplay($row[0]) . '"/>';
+	echo '<p>Username: ' . Sanitize::encodeStringForDisplay($row[1]) . '<br/>Name: ' . Sanitize::encodeStringForDisplay($row[2]) . ', ' . Sanitize::encodeStringForDisplay($row[3]) . ' (' . Sanitize::encodeStringForDisplay($row[4]) . ')</p>';
 	echo '<p>Request made: '.$reqdate.'</p>';
 	$school = '';
 	if ($details != '') {
-		echo "<p>$details</p>";
+		$cleanDetails = sanitizeNewInstructorRequestLog($details);
+		echo "<p>$cleanDetails</p>";
 		if (preg_match('/School:(.*?)<br/',$details,$matches)) {
 			$school = normalizeGroup($matches[1]);
 			echo '<p><a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row[3].' '.$row[2].' '.$matches[1]).'">Search</a></p>';
@@ -187,5 +188,54 @@ function normalizeGroup($g) {
 	$g = preg_replace('/\bst(\.|\b)/','saint',$g);
 	$g = trim($g);
 	return $g;
+}
+
+/**
+ * Sanitize a new instructor request log string.
+ *
+ * When a new instructor request is submitted, a row of text with the request details
+ * is placed into the database in the "imas_log" table. The code for this can be found
+ * in /newinstructor.php around line 80. Search for "imas_log".
+ *
+ * Note: If new log data is added via /newinstructor, this function will similarly need
+ * to be updated.
+ *
+ * @param $logtext string The entire "log" column from the "imas_log" table.
+ * @return string The entire string, sanitized.
+ */
+function sanitizeNewInstructorRequestLog($logtext) {
+	$sanitizedLogText = '';
+
+	$school = '';
+	$verificationUrl = '';
+	$phone = '';
+
+	$parts = explode('<br/>', $logtext);
+
+	// First, extract the user input we need to sanitize.
+	foreach ($parts as $part) {
+		if (preg_match("/School:\s?(.*)/", $part, $matches)) {
+			$school = trim($matches[1]);
+		} elseif (preg_match("/VerificationURL:\s?(.*)/", $part, $matches)) {
+			$verificationUrl = trim($matches[1]);
+		} elseif (preg_match("/Phone:\s?(.*)/", $part, $matches)) {
+			$phone = trim($matches[1]);
+		}
+	}
+
+	// Put it all back together and return a sanitized string.
+	if (!empty($school)) {
+		$sanitizedLogText .= "School: " . Sanitize::encodeStringForDisplay($school);
+	}
+	if (!empty($verificationUrl)) {
+		if (!empty($sanitizedLogText)) $sanitizedLogText .= "<br/>";
+		$sanitizedLogText .= "VerificationURL: " . Sanitize::encodeStringForDisplay($verificationUrl);
+	}
+	if (!empty($phone)) {
+		if (!empty($sanitizedLogText)) $sanitizedLogText .= "<br/>";
+		$sanitizedLogText .= "Phone: " . Sanitize::encodeStringForDisplay($phone);
+	}
+
+	return $sanitizedLogText;
 }
 ?>

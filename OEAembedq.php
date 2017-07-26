@@ -258,7 +258,7 @@ if (isset($QS['showscored'])) {
 		$key = $stm->fetchColumn(0);
 
 		echo '<input type="hidden" name="jwtchk" value="'.JWT::encode($verarr,$key).'"/>';
-		echo '<input type="hidden" name="auth" value="'.$QS['auth'].'"/>';
+		echo '<input type="hidden" name="auth" value="'.Sanitize::encodeStringForDisplay($QS['auth']).'"/>';
 	}
 	if (isset($QS['showhints']) && $QS['showhints']==0) {
 		$showhints = false;

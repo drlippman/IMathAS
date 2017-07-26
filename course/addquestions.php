@@ -1149,9 +1149,9 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 		var curcid = <?php echo $cid ?>;
 		var curaid = <?php echo $aid ?>;
-		var defpoints = <?php echo $defpoints ?>;
+		var defpoints = <?php echo Sanitize::encodeStringForDisplay($defpoints); ?>;
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
-		var curlibs = '<?php echo $searchlibs;?>';
+		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
 
@@ -1174,7 +1174,7 @@ if ($overwriteBody==1) {
 <?php
 	}
 ?>
-	<h3>Questions in Assessment - <?php echo $page_assessmentName ?></h3>
+	<h3>Questions in Assessment - <?php echo Sanitize::encodeStringForDisplay($page_assessmentName); ?></h3>
 
 <?php
 	if ($itemorder == '') {
@@ -1239,9 +1239,9 @@ if ($overwriteBody==1) {
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
-		var itemarray = <?php echo json_encode($jsarr) ?>;
+		var itemarray = <?php echo $jsarr; ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-		var displaymethod = "<?php echo $displaymethod;?>";
+		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
 		initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
 		tinymce.init({
@@ -1280,8 +1280,8 @@ if ($overwriteBody==1) {
 	<form method=post action="addquestions.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
 
 		In Libraries:
-		<span id="libnames"><?php echo $lnames ?></span>
-		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
+		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames); ?></span>
+		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>">
 		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
 		or <input type=button value="Select From Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'">
 		<br>
@@ -1334,7 +1334,7 @@ if ($overwriteBody==1) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 						echo '<td></td>';
 						echo '<td>';
-						echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+						echo '<b>' . Sanitize::encodeStringForDisplay($lnamesarr[$page_libstouse[$j]]) . '</b>';
 						echo '</td>';
 						for ($k=0;$k<9;$k++) {echo '<td></td>';}
 						echo '</tr>';
@@ -1345,14 +1345,14 @@ if ($overwriteBody==1) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 
-					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['checkbox']; ?></td>
+					<td><?php echo $page_questionTable[$qid]['desc']; ?></td>
 					<td class="nowrap">
 					   <div <?php if ($page_questionTable[$qid]['cap']) {echo 'class="ccvid"';}?>><?php echo $page_questionTable[$qid]['extref'] ?></div>
 					</td>
-					<td><?php echo $qid ?></td>
-					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($qid); ?></td>
+					<td><?php echo $page_questionTable[$qid]['preview']; ?></td>
+					<td><?php echo $page_questionTable[$qid]['type']; ?></td>
 <?php
 						if ($searchall==1) {
 ?>
@@ -1361,7 +1361,7 @@ if ($overwriteBody==1) {
 						}
 ?>
 					<td class=c><?php
-					echo $page_questionTable[$qid]['times']; ?>
+					echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['times']); ?>
 					</td>
 					<?php if ($page_useavgtimes) {?><td class="c"><?php
 					if (isset($page_questionTable[$qid]['qdata'])) {
@@ -1372,9 +1372,9 @@ if ($overwriteBody==1) {
 					}
 					echo $page_questionTable[$qid]['avgtime'].'</span>'; ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['add']; ?></td>
+					<td><?php echo $page_questionTable[$qid]['src']; ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['templ']; ?></td>
 					<?php if ($searchall==0) {
 						if ($page_questionTable[$qid]['junkflag']==1) {
 							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Flagged\" /></td>";
@@ -1437,7 +1437,7 @@ if ($overwriteBody==1) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td></td>
-				<td><b><?php echo $page_assessmentQuestions['desc'][$i] ?></b></td>
+				<td><b><?php echo $page_assessmentQuestions['desc'][$i]; ?></b></td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1451,19 +1451,19 @@ if ($overwriteBody==1) {
 				for ($x=0;$x<count($page_assessmentQuestions[$i]['desc']);$x++) {
 					if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
-				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x] ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x]; ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x]; ?></td>
 				<td class="nowrap">
-				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></div>
+				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x]; ?></div>
 				</td>
-				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['type'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['times'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['mine'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['add'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['src'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['templ'][$x] ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x]; ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x]; ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['type'][$x]; ?></td>
+				<td class=c><?php echo $page_assessmentQuestions[$i]['times'][$x]; ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['mine'][$x]; ?></td>
+				<td class=c><?php echo $page_assessmentQuestions[$i]['add'][$x]; ?></td>
+				<td class=c><?php echo $page_assessmentQuestions[$i]['src'][$x]; ?></td>
+				<td class=c><?php echo $page_assessmentQuestions[$i]['templ'][$x]; ?></td>
 			</tr>
 
 <?php

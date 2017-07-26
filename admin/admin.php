@@ -258,7 +258,7 @@ $placeinhead .= '</script>';
 	for ($i=0;$i<count($page_courseList);$i++) {
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
-				<td><a href="../course/course.php?cid=<?php echo $page_courseList[$i]['id'] ?>">
+				<td><a href="../course/course.php?cid=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>">
 				<?php
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '<i>';
@@ -282,12 +282,12 @@ $placeinhead .= '</script>';
 				?>
 				</a>
 				</td>
-				<td class=c><?php echo $page_courseList[$i]['id'] ?></td>
+				<td class=c><?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['LastName']) ?>, <?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['FirstName']) ?></td>
-				<td class=c><a href="forms.php?action=modify&id=<?php echo $page_courseList[$i]['id'] ?>" class="sl">Settings</a></td>
-				<td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td>
-				<td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
-				<td class=c><a href="forms.php?action=delete&id=<?php echo $page_courseList[$i]['id'] ?>">Delete</a></td>
+				<td class=c><a href="forms.php?action=modify&id=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>" class="sl">Settings</a></td>
+				<td class=c><?php echo $page_courseList[$i]['addRemove']; ?></td>
+				<td class=c><?php echo $page_courseList[$i]['transfer']; ?></td>
+				<td class=c><a href="forms.php?action=delete&id=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>">Delete</a></td>
 			</tr>
 <?php
 	}
@@ -382,13 +382,13 @@ $placeinhead .= '</script>';
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
 
-				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo $page_diagnosticsId[$i] ?>">
+				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">
 				<?php echo Sanitize::encodeStringForDisplay($page_diagnosticsName[$i]) ?></a></td>
-				<td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
-				<td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
-				<td><a href="diagsetup.php?id=<?php echo $page_diagnosticsId[$i] ?>">Modify</a></td>
-				<td><a href="forms.php?action=removediag&id=<?php echo $page_diagnosticsId[$i] ?>">Remove</a></td>
-				<td><a href="diagonetime.php?id=<?php echo $page_diagnosticsId[$i] ?>">One-time Passwords</a></td>
+				<td class=c><?php echo Sanitize::encodeStringForDisplay($page_diagnosticsAvailable[$i]); ?></td>
+				<td class=c><?php echo Sanitize::encodeStringForDisplay($page_diagnosticsPublic[$i]); ?></td>
+				<td><a href="diagsetup.php?id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">Modify</a></td>
+				<td><a href="forms.php?action=removediag&id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">Remove</a></td>
+				<td><a href="diagonetime.php?id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">One-time Passwords</a></td>
 			</tr>
 <?php
 	}
@@ -419,10 +419,10 @@ $placeinhead .= '</script>';
 				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastName[$i]) . ", " . Sanitize::encodeStringForDisplay($page_userDataFirstName[$i]) ?></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataSid[$i]) ?></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataEmail[$i]) ?></td>
-				<td><?php echo $page_userDataType[$i] ?></td>
-				<td><?php echo $page_userDataLastAccess[$i] ?></td>
-				<td class=c><a href="forms.php?action=chgrights&id=<?php echo $page_userDataId[$i] ?>">Change</a></td>
-				<td class=c><a href="forms.php?action=deladmin&id=<?php echo $page_userDataId[$i] ?>">Delete</a></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataType[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastAccess[$i]); ?></td>
+				<td class=c><a href="forms.php?action=chgrights&id=<?php echo Sanitize::onlyInt($page_userDataId[$i]); ?>">Change</a></td>
+				<td class=c><a href="forms.php?action=deladmin&id=<?php echo Sanitize::onlyInt($page_userDataId[$i]); ?>">Delete</a></td>
 			</tr>
 <?php
 		}

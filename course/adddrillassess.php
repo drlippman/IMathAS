@@ -693,7 +693,7 @@ printf("<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=%s&
 
 		<span class=form>Calendar Tag:</span>
 		<span class=formright>
-			<input name="caltag" type=text size=8 value="<?php echo $caltag;?>"/>
+			<input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($caltag); ?>"/>
 		</span><BR class=form>
 		</div>
 		<span class=form></span>
@@ -714,7 +714,7 @@ echo '<p>Scoring type:';
 $vals = array('nat','nct','ncc','nst','nsc','t');
 $lbls = array('Do N questions then stop.  Record time.','Do N questions correct.  Record time.','Do N questions correct.  Record total attempts.','Do N questions correct in a row.  Record time','Do N questions correct in a row.  Record total attempts','Do as many correct as possible in N seconds');
 writeHtmlSelect('scoretype',$vals,$lbls,$scoretype,null,null,$beentaken?'disabled="disabled"':'');
-echo ' where N = <input type="text" size="4" name="n" value="'.Sanitize::encodeStringForDisplay($n).'" '. ($beentaken?'disabled="disabled"':''). '/></p>';
+echo ' where N = <input type="text" size="4" name="n" value="' . Sanitize::encodeStringForDisplay($n) . '" ' . ($beentaken ? 'disabled="disabled"' : '') . '/></p>';
 echo '<p>Feedback on individual questions:';
 $vals = array(0,1,4,2,3);
 $lbls = array('Show score, and display answer if wrong', 'Show score, don\'t show answers, give new question if wrong','Show score, don\'t show answers, give same question if wrong','Don\'t show score','Don\'t show score, but provide show answer buttons');
@@ -751,7 +751,7 @@ foreach ($itemids as $k=>$id) {
 		generateselect(count($itemids),$k);
 		echo '</td>';
 	}
-	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.Sanitize::encodeStringForDisplay($itemdescr[$k]).'"/></td>';
+	echo '<td><input type="text" size="60" name="descr['.$k.']" value="' . Sanitize::encodeStringForDisplay($itemdescr[$k]) . '"/></td>';
 	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k," . Sanitize::encodeStringForJavascript($itemids[$k]) . ")\"/></td>";
 	if (!$beentaken) {
 		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1"/></td>';
@@ -817,7 +817,7 @@ if (!$beentaken) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 						echo '<td></td>';
 						echo '<td>';
-						echo '<b>'.Sanitize::encodeStringForDisplay($lnamesarr[$page_libstouse[$j]]).'</b>';
+						echo '<b>' . Sanitize::encodeStringForDisplay($lnamesarr[$page_libstouse[$j]]) . '</b>';
 						echo '</td>';
 						for ($k=0;$k<9;$k++) {echo '<td></td>';}
 						echo '</tr>';
@@ -831,7 +831,7 @@ if (!$beentaken) {
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
 					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
-					<td><?php echo $qid ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($qid) ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
 <?php
@@ -841,9 +841,9 @@ if (!$beentaken) {
 <?php
 						}
 ?>
-					<td class=c><?php echo $page_questionTable[$qid]['times'] ?></td>
-					<?php if ($page_useavgtimes) {?><td class="c"><?php echo $page_questionTable[$qid]['avgtime'] ?></td> <?php }?>
-					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
+					<td class=c><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['times']) ?></td>
+					<?php if ($page_useavgtimes) {?><td class="c"><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['avgtime']) ?></td> <?php }?>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['mine']) ?></td>
 					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
 					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
 					<?php if ($searchall==0) {

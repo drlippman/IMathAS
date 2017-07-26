@@ -294,9 +294,9 @@ require_once("includes/sanitize.php");
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=resetpw&id=$id&code=$code\">";
 				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
 				if (isset($CFG['GEN']['useSESmail'])) {
-					SESmail($email, $sendfrom, 'Password Reset Request',$message);
+					SESmail(Sanitize::emailAddress($email), $sendfrom, 'Password Reset Request',$message);
 				} else {
-					mail($email,'Password Reset Request',$message,$headers);
+					mail(Sanitize::emailAddress($email),'Password Reset Request',$message,$headers);
 				}
 
 				require("header.php");
