@@ -486,14 +486,15 @@ if (!(isset($teacherid))) {
 
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 			$items = false;
-			
+
 			$stm = $DBH->prepare("SELECT id,itemorder,picicons FROM imas_courses WHERE id IN (?,?)");
 			$stm->execute(array($_POST['ctc'], $cid));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['id']==$_POST['ctc']) {
 					$items = unserialize($row['itemorder']);
 					$picicons = $row['picicons'];
-				} else if ($row['id']==$cid) {
+				}
+				if ($row['id']==$cid) {
 					$existblocks = array();
 					buildexistblocks(unserialize($row['itemorder']),'0');
 				}
@@ -509,7 +510,7 @@ if (!(isset($teacherid))) {
 			$sums = array();
 			$parents = array();
 			require_once("../includes/loaditemshowdata.php");
-			$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);	
+			$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
 			getsubinfo($items,'0','',false,' ');
 
 			$i=0;

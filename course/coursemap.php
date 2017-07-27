@@ -31,10 +31,10 @@ if (count($exceptions)>0) {
 	upsendexceptions($items);
 }
 
-$itemshowdata = loadItemShowData($items, false, $viewall, false, false);
+$itemshowdata = loadItemShowData($items, -1, $viewall, false, false);
 
 //echo '<pre>';
-//print_r($itemshowdata[1215702]);
+//print_r($itemshowdata);
 //echo '</pre>';
 
 $havecalcedviewedassess = false;
@@ -47,10 +47,10 @@ function showicon($type,$alt='') {
 		echo '<img alt="'.$alt.'" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons'][$type].'" class="mida icon" /> ';
 	}
 }
-					
+
 function showitemtree($items,$parent) {
 	 global $DBH, $CFG, $itemshowdata, $typelookups, $imasroot, $cid, $userid, $exceptions, $viewedassess, $havecalcedviewedassess, $now, $viewall, $studentinfo;
-	 
+
 	 foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (isset($item['grouplimit']) && count($item['grouplimit'])>0 && !$viewall) {
@@ -77,7 +77,7 @@ function showitemtree($items,$parent) {
 		} else {
 			if ($itemshowdata[$item]['itemtype']=='Calendar') {
 				continue; //no need to show calendars in map
-			} 
+			}
 			echo '<li>';;
 			$line = $itemshowdata[$item];
 			if ($line['itemtype']=='Assessment') {
@@ -109,13 +109,13 @@ function showitemtree($items,$parent) {
 				}
 				if (($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && ($nothidden || $showgreyedout)) ||
 					($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) || $viewall) {
-					
+
 					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
 					showicon('assess', 'Assessment');
 					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
 				}
-					
+
 			} else if ($line['itemtype']=='InlineText') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#inline'.$line['id']).'">';
@@ -160,7 +160,7 @@ function showitemtree($items,$parent) {
 					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
 				}
-			} 
+			}
 			echo '</li>';
 		}
 	}

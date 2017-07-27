@@ -1,16 +1,17 @@
 <?php
 
-//the loadItemShowData function loads item data based on a course itemarray 
+//the loadItemShowData function loads item data based on a course itemarray
 
-/*** 
+/***
 * used by loadItemShowData to determine imas_items to pull data for
 *
 *   	$items:  	array from imas_course.itemorder or from subblock
 *	$inpublic:	Are we in a public block?
 *	$viewall:	Is this a teacher/tutor able to see all items?
 *	$tolookup:	Array to store imas_items.id's in
-*	$onlyopen:	Only include items in expanded blocks?
-*	$ispublic:	Are we loading this from public.php? 
+*	$onlyopen:	Only include items in expanded blocks? 1: only open,
+*   0: include non-open, -1: include non-open but exclude treereder contents
+*	$ispublic:	Are we loading this from public.php?
 ***/
 
 function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispublic) {
@@ -33,11 +34,11 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 			 }
 			 if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 				($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
-					if ($onlyopen) {
+					if ($onlyopen==1) {
 						if (in_array($item['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 						if ($firstload && (strlen($item['SH'])==1 || $item['SH'][1]=='O')) {$isopen=true;}
 					}
-					if ((!$onlyopen && $item['SH'][1]!='T') || ($onlyopen && $isopen && $item['SH'][1]!='T' && $item['SH'][1]!='F')) {
+					if ($onlyopen==0 || ($onlyopen==-1 && $item['SH'][1]!='T') || ($onlyopen==1 && $isopen && $item['SH'][1]!='T' && $item['SH'][1]!='F')) {
 						getitemstolookup($item['items'],$inpublic||$turnonpublic,$viewall,$tolookup,$onlyopen,$ispublic);
 					}
 			 }
@@ -47,23 +48,24 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 	}
 }
 
-/*** 
+/***
 * Loads data for items
 *
 *	Returns:	array(imas_items.id => associative array of item data)
 *
 *   	$items:  	array from imas_course.itemorder or from subblock
-*	$onlyopen:	Only include items in expanded blocks?
+*	$onlyopen:	Only include items in expanded blocks?  1: only open,
+*   0: include non-open, -1: include non-open but exclude treereder contents
 *	$viewall:	Is this a teacher/tutor able to see all items?
 *	$inpublic:	Are we in a public block?
-*	$ispublic:	Are we loading this from public.php? 
+*	$ispublic:	Are we loading this from public.php?
 * 	$limittype: 	Limit item type loaded
 *	$limited:	True to only return ids and names/summaries
 ***/
 function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=false,$limittype=false,$limited=false) {
 	global $DBH;
 	$itemshowdata = array();
-	
+	if ($onlyopen===true) {$onlyopen = 1;} else if ($onlyopen===false) {$onlyopen = 0;}
 	$itemstolookup = array();
 	getitemstolookup($items,$inpublic,$viewall,$itemstolookup,$onlyopen,$ispublic);
 	$typelookups = array();
@@ -78,7 +80,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 			$stm = $DBH->prepare($query);
 			$stm->execute($itemstolookup);
 		}
-		
+
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($typelookups[$line['itemtype']])) {$typelookups[$line['itemtype']] = array();}
 			if ($line['itemtype']=='Calendar') {
@@ -172,13 +174,13 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 			$itemshowdata[$typelookups['Wiki'][$line['id']]] = $line;
 		}
 	}
-	
+
 	return $itemshowdata;
-} 
+}
 
 function loadExceptions($cid, $userid) {
 	global $DBH;
-	
+
 	$exceptions = array();
 	$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
 	$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=:userid AND ";
