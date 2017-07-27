@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 	require("../init.php");
-	
+
 	if (!isset($CFG['TE']['navicons'])) {
 		 $CFG['TE']['navicons'] = array(
 			 'untried'=>'te_blue_arrow.png',
@@ -759,7 +759,7 @@
 
 
 	}
-	$preloadqsetdata = ((!isset($_GET['action']) || $_GET['action']=='seq' || $_GET['action']=='scoreall') && !isset($_REQUEST['embedpostback']) && 
+	$preloadqsetdata = ((!isset($_GET['action']) || $_GET['action']=='seq' || $_GET['action']=='scoreall') && !isset($_REQUEST['embedpostback']) &&
 		($testsettings['displaymethod']=='Embed' || $testsettings['displaymethod']=='VideoCue' || $testsettings['displaymethod'] == "AllAtOnce" || $testsettings['displaymethod'] == "Seq"));
 	$qi = getquestioninfo($questions,$testsettings,$preloadqsetdata);
 	srand();
@@ -1625,7 +1625,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	}
 
 	if (isset($_GET['action'])) {
-		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
+		if (($_GET['action']=="skip" || $_GET['action']=="seq") && trim($testsettings['intro'])!='') {
 			echo '<div class="right"><a href="#" aria-controls="intro" aria-expanded="false" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
 			//echo "<div class=right><span onclick=\"document.getElementById('intro').className='intro';\"><a href=\"#\">", _('Show Instructions'), "</a></span></div>\n";
 		}

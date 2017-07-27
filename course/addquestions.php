@@ -458,7 +458,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$grp = 0;
 		$grp0Selected = " selected";
 	}
-	
+
 	$questionjsarr = array();
 	$existingq = array();
 	$query = "SELECT imas_questions.id,imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions ";
@@ -506,20 +506,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
 			$extrefval += 8;
 		}
-		$questionjsarr[$line['id']] = array((int)$line['id'], 
-			(int)$line['questionsetid'], 
-			Sanitize::encodeStringForDisplay($line['description']), 
-			Sanitize::encodeStringForDisplay($line['qtype']), 
-			(int)Sanitize::onlyInt($line['points']), 
-			(int)$canedit, 
-			(int)Sanitize::onlyInt($line['withdrawn']), 
+		$questionjsarr[$line['id']] = array((int)$line['id'],
+			(int)$line['questionsetid'],
+			Sanitize::encodeStringForDisplay($line['description']),
+			Sanitize::encodeStringForDisplay($line['qtype']),
+			(int)Sanitize::onlyInt($line['points']),
+			(int)$canedit,
+			(int)Sanitize::onlyInt($line['withdrawn']),
 			(int)$extrefval);
 
 	}
 
 	$apointstot = 0;
 	$qncnt = 0;
-	
+
 	$jsarr = array();
 	if ($itemorder != '') {
 		$items = explode(",",$itemorder);
@@ -1239,7 +1239,7 @@ if ($overwriteBody==1) {
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
-		var itemarray = <?php echo $jsarr; ?>;
+		var itemarray = <?php echo json_encode($jsarr); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();

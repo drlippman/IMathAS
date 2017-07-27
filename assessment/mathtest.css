@@ -264,7 +264,12 @@ img.skipnav {
 	border: 0px;
 }
 .hidden {
-	display: none;
+	visibility: hidden;
+	position: absolute;
+	top:0;
+	left:0;
+	width:0;
+	height:0;
 }
 span.shown {
 	display: inline;
