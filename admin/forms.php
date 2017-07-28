@@ -163,7 +163,7 @@ switch($_GET['action']) {
 		}
 		echo "</span><BR class=form>\n";
 		echo '<span class="form">Task Rights:</span><span class="formright">';
-		if ($myrights>=75) {
+		if ($myrights==100 || ($myrights>=75 && ($myspecialrights&1)==1)) {
 			echo '<input type="checkbox" name="specialrights1" id="specialrights1" ';
 			if (($oldspecialrights&1)==1) { echo 'checked';}
 			echo '><label for="specialrights1">Designate group template courses</label><br/>';
@@ -173,12 +173,12 @@ switch($_GET['action']) {
 			if (($oldspecialrights&2)==2) { echo 'checked';}
 			echo '><label for="specialrights2">Designate global template courses</label><br/>';
 		}
-		if ($myrights>=75) {
+		if ($myrights==100 || ($myrights>=75 && ($myspecialrights&4)==4)) {
 			echo '<input type="checkbox" name="specialrights4" id="specialrights4" ';
 			if (($oldspecialrights&4)==4) { echo 'checked';}
 			echo '><label for="specialrights4">Create Diagnostic logins</label><br/>';
 		}
-		if ($myrights>=75 && !$allownongrouplibs) {
+		if (($myrights==100 || ($myrights>=75 && ($myspecialrights&8)==8)) && !$allownongrouplibs) {
 			echo '<input type="checkbox" name="specialrights8" id="specialrights8" ';
 			if (($oldspecialrights&8)==8) { echo 'checked';}
 			echo '><label for="specialrights8">Create public (open to all) question libraries</label><br/>';
