@@ -152,8 +152,8 @@ class Sanitize
 	 */
 	public static function encodeUrlParam($string)
 	{
-		$decoded = urldecode($string);
-		return urlencode($decoded);
+		$decoded = rawurldecode($string);
+		return rawurlencode($decoded);
 	}
 
 	/**
