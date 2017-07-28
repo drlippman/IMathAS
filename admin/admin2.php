@@ -88,9 +88,10 @@ if ($myrights < 75) {
       $query .= " LIMIT 200";
       $stm = $DBH->prepare($query);
       $stm->execute(array($words[0].'%', $words[0].'%', '%'.$words[0].'%'));
+      $words[0] = strtolower($words[0]);
       while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if ($row['rights']==11 || $row['rights']==76 || $row['rights']==77) {continue;} //skip LTI creds
-        if ($row['SID']==$words[0] || $row['LastName']==$words[0]) {
+        if (strtolower($row['SID'])==$words[0] || strtolower($row['LastName'])==$words[0]) {
           $row['priority'] = 1;
           $hasp1 = true;
         } else {
@@ -108,14 +109,16 @@ if ($myrights < 75) {
       $stm = $DBH->prepare($query);
       $stm->execute(array($words[0].'%', $words[1].'%', $words[1].'%', $words[0].'%' ));
       $possible_users = array();
+      $words[0] = strtolower($words[0]);
+      $words[1] = strtolower($words[1]);
       while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if ($row['rights']==11 || $row['rights']==76 || $row['rights']==77) {continue;} //skip LTI creds
         $row['priority'] = 0;
-        if ($row['LastName']==$words[0] || $row['LastName']==$words[1]) {
+        if (strtolower($row['LastName'])==$words[0] || strtolower($row['LastName'])==$words[1]) {
           $hasp1 = true;
           $row['priority'] += 1;
         }
-        if ($row['FirstName']==$words[0] || $row['FirstName']==$words[1]) {
+        if (strtolower($row['FirstName'])==$words[0] || strtolower($row['FirstName'])==$words[1]) {
           $hasp1 = true;
           $row['priority'] += 1;
         }

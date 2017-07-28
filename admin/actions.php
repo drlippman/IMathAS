@@ -41,6 +41,14 @@ switch($_POST['action']) {
 		if ($myrights < 100 && $_POST['newrights']>75) {echo "You don't have the authority for this action"; break;}
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 
+		$stm = $DBH->prepare("SELECT rights FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$oldrights = $stm->fetchColumn(0);
+		if ($row === false) {
+			echo "invalid id";
+			exit;
+		}
+		
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_POST['adminname']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -107,6 +115,24 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);
 		}
+		
+		//if student being promoted, enroll in teacher enroll courses
+		if ($oldrights<=10 && $_POST['newrights']>=20 && isset($CFG['GEN']['enrollonnewinstructor'])) {
+			$valbits = array();
+			$valvals = array();
+			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+				$valbits[] = "(?,?)";
+				array_push($valvals, $_GET['id'], $ncid);
+			}
+			$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
+			$stm->execute($valvals);
+		} else if ($oldrights>10 && $_POST['newrights']<=10 && isset($CFG['GEN']['enrollonnewinstructor'])) {
+			require_once("../includes/unenroll.php");
+			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+				unenrollstu($ncid, array($_GET['id']));
+			}
+		}
+		
 		if ($chgSID==false && $row[0]!=$_GET['id']) {
 			echo "Username in use - left unchanged";
 			exit;
@@ -235,7 +261,7 @@ switch($_POST['action']) {
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights);");
 		$stm->execute(array(':SID'=>$_POST['adminname'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
 		$newuserid = $DBH->lastInsertId();
-		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
 			$valbits = array();
 			$valvals = array();
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
