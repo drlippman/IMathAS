@@ -2,12 +2,12 @@
 $cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_GET['calstart'])) {
-	setcookie("calstart".$cid, $_GET['calstart']);
-	$_COOKIE["calstart".$cid] = $_GET['calstart'];
+	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']));
+	$_COOKIE["calstart".$cid] = Sanitize::onlyInt($_GET['calstart']);
 }
 if (isset($_GET['callength'])) {
-	setcookie("callength".$cid, $_GET['callength']);
-	$_COOKIE["callength".$cid] = $_GET['callength'];
+	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']));
+	$_COOKIE["callength".$cid] = Sanitize::onlyInt($_GET['callength']);
 }
 
 require_once("filehandler.php");
@@ -24,18 +24,18 @@ $now= time();
 if (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid] == 0) {
 	$today = $now;
 } else {
-	$today = $_COOKIE['calstart'.$cid];
+	$today = Sanitize::onlyInt($_COOKIE['calstart'.$cid]);
 }
 
 if (isset($_GET['calpageshift'])) {
-	$pageshift = $_GET['calpageshift'];
+	$pageshift = Sanitize::onlyInt($_GET['calpageshift']);
 } else {
 	$pageshift = 0;
 }
 if (!isset($_COOKIE['callength'.$cid])) {
 	$callength = 4;
 } else {
-	$callength = $_COOKIE['callength'.$cid];
+	$callength = Sanitize::onlyInt($_COOKIE['callength'.$cid]);
 }
 if (!isset($editingon)) {
 	$editingon = false;
@@ -84,14 +84,17 @@ for ($i=0;$i<7*$callength;$i++) {
 $address = $GLOBALS['basesiteurl'] . "/course/$refpage.php?cid=$cid";
 
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
-echo '<div class="floatright"><span class="calupdatenotice red"></span> Show <select id="callength" onchange="changecallength(this)">';
+echo '<div class="floatright"><span class="calupdatenotice red"></span> Show <select id="callength" onchange="changecallength(this)" aria-label="'._('Number of weeks to display').'">';
 for ($i=2;$i<26;$i++) {
 	echo '<option value="'.$i.'" ';
 	if ($i==$callength) {echo 'selected="selected"';}
 	echo '>'.$i.'</option>';
 }
-echo '</select> weeks </div>';
-echo '<div class=center><a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'">&lt; &lt;</a> ';
+echo '</select> weeks. ';
+echo '<a href="#" onclick="hidevisualcal();return false;" aria-label="'._('Hide visual calendar and display events list').'" title="'._('Hide visual calendar and display events list').'" aria-controls="caleventslist">';
+echo _('Events List').'</a>';
+echo '</div>';
+echo '<div class=center><a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'" aria-label="'.sprintf(_('Back %d weeks'),$callength).'">&lt; &lt;</a> ';
 //echo $longcurmo.' ';
 
 if ($pageshift==0 && (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid]==0)) {
@@ -99,7 +102,7 @@ if ($pageshift==0 && (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$
 } else {
 	echo '<a href="'.$refpage.'.php?calpageshift=0&calstart=0&cid='.$cid.'">Now</a> ';
 }
-echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'">&gt; &gt;</a> ';
+echo '<a href="'.$refpage.'.php?calpageshift='.($pageshift+1).'&cid='.$cid.'" aria-label="'.sprintf(_('Forward %d weeks'),$callength).'">&gt; &gt;</a> ';
 echo '</div> ';
 
 
@@ -596,7 +599,8 @@ echo "cid = $cid;";
 echo "caleventsarr = $jsarr;";
 echo '$(function() {
 	$(".cal td").off("click.cal").on("click.cal", function() { showcalcontents(this); })
-	 .off("keyup.cal").on("keyup.cal", function(e) { if(e.which==13) {showcalcontents(this);} });
+	 .off("keyup.cal").on("keyup.cal", function(e) { if(e.which==13) {showcalcontents(this);} })
+	 .attr("aria-controls","caleventslist");
 	 });';
 echo '</script>';
 echo "<table class=\"cal\" >";  //onmouseout=\"makenorm()\"
@@ -654,8 +658,8 @@ for ($i=0;$i<count($hdrs);$i++) {
 echo "</tbody></table>";
 
 echo "<div style=\"margin-top: 10px; padding:10px; border:1px solid #000;\">";
-echo '<span class=right><a href="#" onclick="showcalcontents('.(1000*($midtoday - $dayofweek*24*60*60)).'); return false;"/>Show all</a></span>';
-echo "<div id=\"caleventslist\"></div><div class=\"clear\"></div></div>";
+echo '<span class=right id=calshowall><a href="#" onclick="showcalcontents('.(1000*($midtoday - $dayofweek*24*60*60)).'); return false;"/>'._('Show all').'</a></span>';
+echo "<div id=\"caleventslist\" aria-live=\"polite\"></div><div class=\"clear\"></div></div>";
 if ($pageshift==0) {
 	echo "<script>showcalcontents(document.getElementById('{$ids[0][$dayofweek]}'));</script>";
 }

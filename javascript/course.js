@@ -120,10 +120,18 @@ function showcalcontents(el) {
 	}
 
 	document.getElementById('caleventslist').innerHTML = html;
-	$("table.cal td").removeClass("today");
+	jQuery("table.cal td").removeClass("today");
 	if (typeof el != 'number') {
-		$(el).addClass("today");
+		jQuery(el).addClass("today");
+		jQuery("#calshowall").show();
+	} else {
+		jQuery("#calshowall").hide();
 	}
+}
+
+function hidevisualcal() {
+	showcalcontents(1);
+	jQuery("table.cal").toggle();
 }
 
 function showcalcontentsid(elid) {
