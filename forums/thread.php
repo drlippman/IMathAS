@@ -818,7 +818,7 @@ echo "</p>";
 				} else {
 					$name = Sanitize::encodeStringForDisplay($line['LastName']) .", ". Sanitize::encodeStringForDisplay($line['FirstName']);
 				}
-				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . Sanitize::encodeUrlParam($grpqs) .'\">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
+				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . Sanitize::encodeUrlParam($grpqs) .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
 
 				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
 

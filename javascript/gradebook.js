@@ -42,7 +42,7 @@ $(function() {
 	$("a[data-pics]").on("click",function(e) {
 		e.preventDefault();
 		var gbmode = gbmodebase - 10000*gbmod.showpics;
-		gmode += 10000*$(this).attr("data-pics");
+		gbmode += 10000*$(this).attr("data-pics");
 		window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
 	});
 	$("a[data-newflag]").on("click",function(e) {
