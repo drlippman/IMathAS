@@ -513,7 +513,25 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 	if ($isteacher) {
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
-		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report" title="',_("Generate printable grade reports"),'">',_('Print Report'),'</button> ';
+		echo '<span class="dropdown">';
+		echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+		echo _('With Selected').'</a>';
+		echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">';
+		echo ' <li><a href="#" onclick="postGBform(\'Message\');return false;" title="',_("Send a message to the selected students"),'">', _('Message'), "</a></li>";
+		if (!isset($CFG['GEN']['noEmailButton'])) {
+			echo ' <li><a href="#" onclick="postGBform(\'E-mail\');return false;" title="',_("Send e-mail to the selected students"),'">', _('E-mail'), "</a></li>";
+		}
+		echo ' <li><a href="#" onclick="copyemails();return false;" title="',_("Copy e-mail addresses of the selected students"),'">', _('Copy E-mails'), "</a></li>";
+		echo ' <li><a href="#" onclick="postGBform(\'Make Exception\');return false;" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'), "</a></li>";
+		echo ' <li><a href="#" onclick="postGBform(\'Print Report\');return false;" title="',_("Generate printable grade reports"),'">', _('Print Report'), "</a></li>";
+		echo ' <li><a href="#" onclick="postGBform(\'Lock\');return false;" title="',_("Lock selected students out of the course"),'">', _('Lock'), "</a></li>";
+		if (!isset($CFG['GEN']['noInstrUnenroll'])) {
+			echo ' <li><a href="#" onclick="postGBform(\'Unenroll\');return false;" title="',_("Unenroll the selected students"),'">', _('Unenroll'), "</a></li>";
+		}
+
+		echo '</ul></span>';
+	
+		/*echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report" title="',_("Generate printable grade reports"),'">',_('Print Report'),'</button> ';
 		if (!isset($CFG['GEN']['noEmailButton'])) {
 			echo '<button type="submit" name="posted" value="E-mail" title="',_("Send e-mail to the selected students"),'">',_('E-mail'),'</button> ';
 		}
@@ -525,6 +543,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		}
 		echo '<button type="submit" name="posted" value="Lock" title="',_("Lock selected students out of the course"),'">',_('Lock'),'</button> ';
 		echo '<button type="submit" name="posted" value="Make Exception" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'),'</button> ';
+		*/
 	}
 	$includelastchange = false;  //don't need it for instructor view
 	$gbt = gbinstrdisp();

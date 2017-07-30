@@ -209,3 +209,6 @@ function highlightrow(el) {
 function unhighlightrow(el) { 
 	$(el).removeClass("highlight");
 }
+function postGBform(val) {
+	$("#qform").append($("<input>", {name:"posted", value:val, type:"hidden"})).submit();
+}
