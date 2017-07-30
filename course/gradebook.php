@@ -139,15 +139,10 @@ if ($canviewall && isset($_GET['stu'])) {
 if ($isteacher) {
 	if (isset($_GET['togglenewflag'])) {
 		//recording a toggle.  Called via AHAH
-		//DB $query = "SELECT newflag FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $newflag = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT newflag FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$newflag = $stm->fetchColumn(0);
 		$newflag = $newflag ^ 1;  //XOR
-		//DB $query = "UPDATE imas_courses SET newflag = $newflag WHERE id='$cid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET newflag=:newflag WHERE id=:id");
 		$stm->execute(array(':newflag'=>$newflag, ':id'=>$cid));
 		if (($newflag&1)==1) {
@@ -264,199 +259,21 @@ if ($isteacher) {
 require_once("gbtable2.php");
 require("../includes/htmlutil.php");
 
-$placeinhead = '';
-if ($canviewall) {
-	$placeinhead .= "<script type=\"text/javascript\">";
-	$placeinhead .= 'function chgfilter() { ';
-	$placeinhead .= '       var cat = document.getElementById("filtersel").value; ';
-	$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid";
-
-	$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
-	$placeinhead .= "  	window.location = toopen; \n";
-	$placeinhead .= "}\n";
-	if ($isteacher) {
-		$placeinhead .= 'function chgsecfilter() { ';
-		$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-		$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid";
-
-		$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
-		$placeinhead .= "  	window.location = toopen; \n";
-		$placeinhead .= "}\n";
-		$placeinhead .= 'function chgnewflag() { ';
-		$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid&togglenewflag=true";
-
-		$placeinhead .= "       basicahah('$address','newflag','Recording...');\n";
-		$placeinhead .= "}\n";
-	}
-	$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&stu=";
-	$placeinhead .= "function chgstu(el) { 	\$('#updatingicon').show(); window.location = '$address' + el.value;}\n";
-	$placeinhead .= 'function chgtoggle() { ';
-	$placeinhead .= "	var altgbmode = 10000*document.getElementById(\"toggle4\").value + 1000*($totonleft+$avgontop) + 100*(document.getElementById(\"toggle1\").value*1+ document.getElementById(\"toggle5\").value*1) + 10*document.getElementById(\"toggle2\").value + 1*document.getElementById(\"toggle3\").value; ";
-	if ($includelastchange) {
-		$placeinhead .= "     altgbmode += 40;";
-	}
-	if ($lastlogin) {
-		$placeinhead .= "     altgbmode += 4000;";
-	}
-	if ($includeduedate) {
-		$placeinhead .= "     altgbmode += 400;\n";
-	}
-
-	$address = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid&gbmode=";
-	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
-	$placeinhead .= "  	window.location = toopen; \n";
-	$placeinhead .= "}\n";
-	$placeinhead .= '$(function() { $("th a, th select").bind("click", function(e) { e.stopPropagation(); }); });';
-	if ($isteacher) {
-		$placeinhead .= 'function chgexport() { ';
-		$placeinhead .= "	var type = document.getElementById(\"exportsel\").value; ";
-		$address = $GLOBALS['basesiteurl'] . "/course/gb-export.php?stu=$stu&cid=$cid&";
-		$placeinhead .= "	var toopen = '$address';";
-		$placeinhead .= "	if (type==1) { toopen = toopen+'export=true';}\n";
-		$placeinhead .= "	if (type==2) { toopen = toopen+'emailgb=me';}\n";
-		$placeinhead .= "	if (type==3) { toopen = toopen+'emailgb=ask';}\n";
-		$placeinhead .= "	if (type==0) { return false;}\n";
-		$placeinhead .= "  	window.location = toopen; \n";
-		$placeinhead .= "}\n";
-		$placeinhead .= 'function makeofflineeditable(el) {
-					var anchors = document.getElementsByTagName("a");
-					for (var i=0;i<anchors.length;i++) {
-						if (bits=anchors[i].href.match(/addgrades.*gbitem=(\d+)/)) {
-							if (anchors[i].innerHTML.match("-")) {
-							    type = "newscore";
-							} else {
-							    type = "score";
-							}
-							anchors[i].style.display = "none";
-							var newinp = document.createElement("input");
-							newinp.size = 4;
-							if (type=="newscore") {
-							    newinp.name = "newscore["+bits[1]+"]";
-							} else {
-							    newinp.name = "score["+bits[1]+"]";
-							    newinp.value = anchors[i].innerHTML;
-							}
-							anchors[i].parentNode.appendChild(newinp);
-							var newtxta = document.createElement("textarea");
-							newtxta.name = "feedback["+bits[1]+"]";
-							newtxta.cols = 50;
-							var feedbtd = anchors[i].parentNode.nextSibling.nextSibling.nextSibling;
-							newtxta.value = feedbtd.innerHTML;
-							feedbtd.innerHTML = "";
-							feedbtd.appendChild(newtxta);
-						}
-					}
-					document.getElementById("savechgbtn").style.display = "";
-					el.onclick = null;
-				}';
-	}
-
-
-	$placeinhead .= "</script>";
-	$placeinhead .= '<script type="text/javascript">function conditionalColor(table,type,low,high) {
-	var tbl = document.getElementById(table);
-	if (type==0) {  //instr gb view
-		var poss = [];
-		var startat = 2;
-		var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
-		for (var i=0;i<ths.length;i++) {
-			if (k = ths[i].innerHTML.match(/(\d+)(&nbsp;|\u00a0)pts/)) {
-				poss[i] = k[1]*1;
-				if (poss[i]==0) {poss[i]=.0000001;}
-			} else {
-				poss[i] = 100;
-				if(ths[i].className.match(/nocolorize/)) {
-					startat++;
-				}
-			}
-		}
-		var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-		for (var j=0;j<trs.length;j++) {
-			var tds = trs[j].getElementsByTagName("td");
-			for (var i=startat;i<tds.length;i++) {
-				if (low==-1) {
-					if (tds[i].className.match("isact")) {
-						tds[i].style.backgroundColor = "#99ff99";
-					} else {
-						tds[i].style.backgroundColor = "#ffffff";
-					}
-				} else {
-					if (tds[i].innerText) {
-						var v = tds[i].innerText;
-					} else {
-						var v = tds[i].textContent;
-					}
-					if (k = v.match(/\(([\d\.]+)%\)/)) {
-						var perc = k[1]/100;
-					} else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
-						if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
-					} else {
-						v = v.replace(/[^\d\.]/g,"");
-						var perc = v/poss[i];
-					}
-
-					if (perc<low/100) {
-						tds[i].style.backgroundColor = "#ff9999";
-
-					} else if (perc>high/100) {
-						tds[i].style.backgroundColor = "#99ff99";
-					} else {
-						tds[i].style.backgroundColor = "#ffffff";
-					}
-				}
-			}
-		}
-	} else {
-		var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-		for (var j=0;j<trs.length;j++) {
-			var tds = trs[j].getElementsByTagName("td");
-			if (tds[1].innerText) {
-				var poss = tds[1].innerText.replace(/[^\d\.]/g,"");
-				var v = tds[2].innerText.replace(/[^\d\.]/g,"");
-			} else {
-				var poss = tds[1].textContent.replace(/[^\d\.]/g,"");
-				var v = tds[2].textContent.replace(/[^\d\.]/g,"");
-			}
-			if (v/poss<low/100) {
-				tds[2].style.backgroundColor = "#ff6666";
-
-			} else if (v/poss>high/100) {
-				tds[2].style.backgroundColor = "#66ff66";
-			} else {
-				tds[2].style.backgroundColor = "#ffffff";
-
-			}
-
-		}
-	}
-}
-function updateColors(el) {
-	if (el.value==0) {
-		var tds=document.getElementById("myTable").getElementsByTagName("td");
-		for (var i=0;i<tds.length;i++) {
-			tds[i].style.backgroundColor = "";
-		}
-	} else {
-		var s = el.value.split(/:/);
-		conditionalColor("myTable",0,s[0],s[1]);
-	}
-	document.cookie = "colorize-'.$cid.'="+el.value;
-}
-function copyemails() {
-	var ids = [];
-	$("#myTable input:checkbox:checked").each(function(i) {
-		ids.push(this.value);
-	});
-	GB_show("Emails","viewemails.php?cid='.$cid.'&ids="+ids.join("-"),500,500);
-}
-
+$placeinhead = '<script type="text/javascript">
+var cid = '.Sanitize::onlyInt($cid).';
+var stu = '.Sanitize::onlyInt($stu).';
+var basesite = "'.$GLOBALS['basesiteurl'] . '/course/gradebook.php";
+var gbmodebase = '.Sanitize::onlyInt($gbmode).';
+var gbmod = {
+	"hidenc": '.Sanitize::onlyInt($hidenc).',
+	"availshow": '.Sanitize::onlyInt($availshow).',
+	"hidelocked": '.Sanitize::onlyInt($hidelocked).',
+	"links": '.Sanitize::onlyInt($links).',
+	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
+if ($canviewall) {
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js"></script>';
 }
-
-
-
-
-
 
 if (isset($studentid) || $stu!=0) { //show student view
 	if (isset($studentid)) {
@@ -526,18 +343,18 @@ if (isset($studentid) || $stu!=0) { //show student view
 		if ($catfilter==-2) {echo "selected=1";}
 		echo '>', _('Category Totals'), '</option>';
 		echo '</select> | ';
-		echo _('Not Counted:'), " <select id=\"toggle2\" onchange=\"chgtoggle()\">";
+		echo _('Not Counted:'), " <select id=\"hidenc\" onchange=\"chggbfilters()\">";
 		echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">", _('Show all'), "</option>";
 		echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">", _('Show stu view'), "</option>";
 		echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">", _('Hide all'), "</option>";
 		echo "</select>";
-		echo " | ", _('Show:'), " <select id=\"toggle3\" onchange=\"chgtoggle()\">";
+		echo " | ", _('Show:'), " <select id=\"availshow\" onchange=\"chggbfilters()\">";
 		echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">", _('Past due'), "</option>";
 		echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">", _('Past &amp; Attempted'), "</option>";
 		echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">", _('Available Only'), "</option>";
 		echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">", _('Past &amp; Available'), "</option>";
 		echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select>";
-		echo " | ", _('Links:'), " <select id=\"toggle1\" onchange=\"chgtoggle()\">";
+		echo " | ", _('Links:'), " <select id=\"linktoggle\" onchange=\"chglinktoggle()\">";
 		echo "<option value=0 "; writeHtmlSelected($links,0); echo ">", _('View/Edit'), "</option>";
 		echo "<option value=1 "; writeHtmlSelected($links,1); echo ">", _('Scores'), "</option></select>";
 		echo '<input type="hidden" id="toggle4" value="'.$showpics.'" />';
@@ -567,26 +384,10 @@ if (isset($studentid) || $stu!=0) { //show student view
 			$usefullwidth = true;
 		}
 	}
-	$placeinhead .= "\nfunction lockcol() { \n";
-	$placeinhead .= "var tog = ts.toggle(); ";
-	$placeinhead .= "document.cookie = 'gblhdr-$cid=1';\n document.getElementById(\"lockbtn\").value = \"" . _('Unlock headers') . "\"; ";
-	$placeinhead .= "if (tog==1) { "; //going to locked
-	$placeinhead .= "} else {";
-	$placeinhead .= "document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\"; ";
-	//$placeinhead .= " var cont = document.getElementById(\"tbl-container\");\n";
-	//$placeinhead .= " if (cont.style.overflow == \"auto\") {\n";
-	//$placeinhead .= "   cont.style.height = \"auto\"; cont.style.overflow = \"visible\"; cont.style.border = \"0px\";";
-	//$placeinhead .= "document.getElementById(\"myTable\").className = \"gb\"; document.cookie = 'gblhdr-$cid=0';";
-	//$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Lock headers\"; } else {";
-	//$placeinhead .= " cont.style.height = \"75%\"; cont.style.overflow = \"auto\"; cont.style.border = \"1px solid #000\";\n";
-	//$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
-	//$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
-	$placeinhead .= "}}\n ";
-	$placeinhead .= "function cancellockcol() {document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n";
-	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
-	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } td.trld {display:table-cell;vertical-align:middle;} </style>";
+	$placeinhead .= '<style type="text/css"> .arrow-down::after { content: "\\25bc"; padding-left: 0.2em; font-size:70%; position:relative;top:-.2em; }
+		.dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -602,27 +403,46 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "<a href=\"gb-testing.php?cid=$cid\">", _('View diagnostic gradebook'), "</a>";
 	}
 	echo "<div class=cpmid>";
+	$i = 0;
+	$togglehtml = '<span class="dropdown">';
+	$togglehtml .= ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+	$togglehtml .= _('Toggles').'</a>';
+	$togglehtml .= '<ul class="dropdown-menu gbtoggle" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
+	$togglehtml .= '<li class="dropdown-header">'._('Headers').'</li>';
+	$togglehtml .= '<li><a data-hdrs="1">'._('Locked').'</a></li>';
+	$togglehtml .= '<li><a data-hdrs="0">'._('Unlocked').'</a></li>';
+
+	$togglehtml .= '<li class="dropdown-header">'. _('Links'). '</li>';
+	$togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
+	$togglehtml .= '<li><a data-links="1">'. _('Scores'). '</a></li>';
+
+	$togglehtml .= '<li class="dropdown-header">'. _('Pics'). '</li>';
+	$togglehtml .= '<li><a data-pics="0">'. _('None'). '</a></li>';
+	$togglehtml .= '<li><a data-pics="1">'. _('Small').'</a></li>';
+	$togglehtml .= '<li><a data-pics="2">'. _('Big'). '</a></li>';
+	
 	if ($isteacher) {
-		echo _('Offline Grades:'), " <a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">", _('Add'), "</a>, ";
-		echo "<a href=\"chgoffline.php?cid=$cid\">", _('Manage'), "</a> | ";
-		echo '<select id="exportsel" onchange="chgexport()">';
-		echo '<option value="0">', _('Export to...'), '</option>';
-		echo '<option value="1">', _('... file'), '</option>';
-		echo '<option value="2">', _('... my email'), '</option>';
-		echo '<option value="3">', _('... other email'), '</option></select> | ';
-		//echo "Export to <a href=\"gb-export.php?stu=$stu&cid=$cid&export=true\">File</a>, ";
-		//echo "<a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=me\">My Email</a>, or <a href=\"gb-export.php?stu=$stu&cid=$cid&emailgb=ask\">Other Email</a> | ";
-		echo "<a href=\"gbsettings.php?cid=$cid\">", _('GB Settings'), "</a> | ";
-		echo "<a href=\"gradebook.php?cid=$cid&stu=-1\">", _('Averages'), "</a> | ";
-		echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">", _('Comments'), "</a> | ";
-		echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
-		if ($headerslocked) {
-			echo _('Unlock headers');
-		} else {
-			echo _('Lock headers');
-		}
-		echo "\"/>";
-		echo ' | ', _('Color:'), ' <select id="colorsel" onchange="updateColors(this)">';
+		$togglehtml .= '<li class="dropdown-header">'. _('NewFlag'). '</li>';
+		$togglehtml .= '<li><a data-newflag="0">'. _('Off'). '</a></li>';
+		$togglehtml .= '<li><a data-newflag="1">'. _('On').'</a></li>';
+	}
+	$togglehtml .= '</ul></span>';
+	$i++;
+	
+	if ($isteacher) {
+		echo '<span class="dropdown">';
+		echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+		echo _('Offline Grades').'</a>';
+		echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
+		echo " <li><a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">", _('Add'), "</a></li>";
+		echo " <li><a href=\"chgoffline.php?cid=$cid\">", _('Manage'), "</a></li>";
+		echo '</ul></span> &nbsp; ';
+		$i++;
+			
+		echo '<a href="gb-export.php?cid='.$cid.'&export=true">'._('Export').'</a> &nbsp; ';
+		echo "<a href=\"gbsettings.php?cid=$cid\">", _('Settings'), "</a> &nbsp; ";
+		echo "<a href=\"gbcomments.php?cid=$cid&stu=0\">", _('Comments'), "</a> &nbsp; ";
+		echo _('Color:'), ' <select id="colorsel" onchange="updateColors(this)">';
 		echo '<option value="0">', _('None'), '</option>';
 		for ($j=50;$j<90;$j+=($j<70?10:5)) {
 			for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
@@ -636,10 +456,10 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="-1:-1" ';
 		if ($colorize == "-1:-1") { echo 'selected="selected" ';}
 		echo '>', _('Active'), '</option>';
-		echo '</select>';
-		echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
+		echo '</select> &nbsp; ';
+		//echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
-
+		echo $togglehtml;
 		echo "<br/>\n";
 
 	}
@@ -664,37 +484,32 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<option value="-2" ';
 	if ($catfilter==-2) {echo "selected=1";}
 	echo '>', ('Category Totals'), '</option>';
-	echo '</select> | ';
-	echo _('Not Counted:'), " <select id=\"toggle2\" onchange=\"chgtoggle()\">";
+	echo '</select> &nbsp; ';
+	echo _('Not Counted:'), " <select id=\"hidenc\" onchange=\"chggbfilters()\">";
 	echo "<option value=0 "; writeHtmlSelected($hidenc,0); echo ">", _('Show all'), "</option>";
 	echo "<option value=1 "; writeHtmlSelected($hidenc,1); echo ">", _('Show stu view'), "</option>";
 	echo "<option value=2 "; writeHtmlSelected($hidenc,2); echo ">", _('Hide all'), "</option>";
-	echo "</select>";
-	echo " | ", _('Show:'), " <select id=\"toggle3\" onchange=\"chgtoggle()\">";
+	echo "</select> &nbsp; ";
+	echo _('Show:'), " <select id=\"availshow\" onchange=\"chggbfilters()\">";
 	echo "<option value=0 "; writeHtmlSelected($availshow,0); echo ">", _('Past due'), "</option>";
 	echo "<option value=3 "; writeHtmlSelected($availshow,3); echo ">", _('Past &amp; Attempted'), "</option>";
 	echo "<option value=4 "; writeHtmlSelected($availshow,4); echo ">", _('Available Only'), "</option>";
 	echo "<option value=1 "; writeHtmlSelected($availshow,1); echo ">", _('Past &amp; Available'), "</option>";
-	echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select>";
-	echo " | ", _('Links:'), " <select id=\"toggle1\" onchange=\"chgtoggle()\">";
-	echo "<option value=0 "; writeHtmlSelected($links,0); echo ">", _('View/Edit'), "</option>";
-	echo "<option value=1 "; writeHtmlSelected($links,1); echo ">", _('Scores'), "</option></select>";
-	echo " | ", _('Pics:'), " <select id=\"toggle4\" onchange=\"chgtoggle()\">";
-	echo "<option value=0 "; writeHtmlSelected($showpics,0); echo ">", _('None'), "</option>";
-	echo "<option value=1 "; writeHtmlSelected($showpics,1); echo ">", _('Small'), "</option>";
-	echo "<option value=2 "; writeHtmlSelected($showpics,2); echo ">", _('Big'), "</option></select>";
+	echo "<option value=2 "; writeHtmlSelected($availshow,2); echo ">", _('All'), "</option></select> &nbsp; ";
+	
 	if (!$isteacher) {
-
-		echo " | <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
-		if ($headerslocked) {
-			echo _('Unlock headers');
-		} else {
-			echo _('Lock headers');
-		}
-		echo "\"/>\n";
+		echo $togglehtml;
 	}
 
 	echo "</div>";
+	echo '<script type="text/javascript">
+	$(function() {
+		$("a[data-hdrs='.($headerslocked?1:0).']").parent().addClass("active");
+		$("a[data-links='.Sanitize::onlyInt($links).']").parent().addClass("active");
+		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
+		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
+	});
+	</script>';
 
 	if ($isteacher) {
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
@@ -1366,15 +1181,7 @@ function gbstudisp($stu) {
 	echo "</form>";
 
 	echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
-	/*
-	if ($hidepast) {
-		echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
-	} else if ($availshow==2) {
-		echo "<script>initSortTable('myTable',Array($sarr),false,-3);</script>\n";
-	} else {
-		echo "<script>initSortTable('myTable',Array($sarr),false,-2);</script>\n";
-	}
-	*/
+	
 }
 
 function gbinstrdisp() {
@@ -1428,7 +1235,7 @@ function gbinstrdisp() {
 
 		} else if ($gbt[0][0][$i]=='Name') {
 			echo '<br/><span class="small">N='.(count($gbt)-2).'</span><br/>';
-			echo "<select id=\"toggle5\" onchange=\"chgtoggle()\">";
+			echo "<select id=\"lockedtoggle\" onchange=\"chglockedtoggle()\">";
 			echo "<option value=0 "; writeHtmlSelected($hidelocked,0); echo ">", _('Show Locked'), "</option>";
 			echo "<option value=2 "; writeHtmlSelected($hidelocked,2); echo ">", _('Hide Locked'), "</option>";
 			echo "</select>";
