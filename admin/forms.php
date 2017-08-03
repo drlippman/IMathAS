@@ -130,10 +130,10 @@ switch($_GET['action']) {
 		}
 		echo "><BR class=form>\n";
 		if ($_GET['action'] == "newadmin") {
-			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="password"/><br class="form"/>';
+			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="newpassword"/><br class="form"/>';
 		} else {
 			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" /> ';
-			echo 'Reset to: <input type=text size=20 name="password" /></span><br class=form />';
+			echo 'Reset to: <input type=text size=20 name="newpassword" /></span><br class=form />';
 		}
 
 		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";

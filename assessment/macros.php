@@ -1175,11 +1175,11 @@ function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 		echo "min=0, max=0 bad."; return array_fill(0,$n,0);
 	}
 	if ($p<=0) {echo "Error with diffrrands: need to set positive step size"; return array_fill(0,$n,$min);}
-	
+
 	if (floor(($max-$min)/$p)==0) {
 		echo "Error with diffrrands: step size is greater than max-min"; return array_fill(0,$n,$min);
 	}
-	
+
 	$rn = 0;
 	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
 	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
@@ -3043,6 +3043,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			$type = "equation";
 		}
 		$stuorig = $stu;
+		$stu = str_replace(array('[',']'),array('(',')'), $stu);
 		if ($type=='equation') {
 			$stu = preg_replace('/(.*)=(.*)/','$1-($2)',$stu);
 		}
@@ -3050,7 +3051,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 		$fromto = explode(',',$domain);
 		$variables = explode(',',$vars);
 		$vlist = implode("|",$variables);
-
+		$origstu = $stu;
 		$stu = mathphp(makepretty(mathphppre($stu)), $vlist);
 		if ($stu=='') {
 			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
@@ -3079,7 +3080,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			for($j=0; $j < count($variables); $j++) {
 				$tp[$j] = $tps[$i][$j];
 			}
-			$stupts[$i] = @eval("return ($stu);");
+			$stupts[$i] = evalReturnValue("return ($stu);", $origstu, array('tp'=>$tp));//@eval("return ($stu);");
 			if (isNaN($stupts[$i])) {$cntnana++;}
 			if ($stupts[$i]===false) {$correct = false; break;}
 		}
@@ -3096,6 +3097,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				if (substr_count($b, '=')!=1) {continue;}
 				$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
 			}
+			$origb = $b;
 			$b = mathphp(makepretty(mathphppre($b)), $vlist);
 			for($j=0; $j < count($variables); $j++) {
 				$b = str_replace("(".$variables[$j].")",'($tp['.$j.'])',$b);
@@ -3107,7 +3109,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				for($j=0; $j < count($variables); $j++) {
 					$tp[$j] = $tps[$i][$j];
 				}
-				$ansb = @eval("return ($b);");
+				$ansb = evalReturnValue("return ($b);", $origb, array('tp'=>$tp));//@eval("return ($b);");
 				if ($ansb===false) { //invalid option - skip it
 					continue 2;
 				}

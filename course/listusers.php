@@ -283,9 +283,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			if (isset($_POST['doresetpw'])) {
 				if (isset($CFG['GEN']['newpasswords'])) {
 					require_once("../includes/password.php");
-					$newpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+					$newpw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
 				} else {
-					$newpw = md5($_POST['password']);
+					$newpw = md5($_POST['newpassword']);
 				}
 				//DB $query .= ",password='$newpw'";
 				$query .= ",password=:password";
@@ -683,7 +683,7 @@ if ($overwriteBody==1) {
 			<span class=form>Reset password?</span>
 			<span class=formright>
 				<input type=checkbox name="doresetpw" value="1" /> Reset to:
-				<input type=text size=20 name="password" />
+				<input type=text size=20 name="newpassword" />
 			</span><br class=form />
 			<div class=submit><input type=submit value="Update Info"></div>
 		</form>

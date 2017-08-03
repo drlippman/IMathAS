@@ -48,7 +48,7 @@ switch($_POST['action']) {
 			echo "invalid id";
 			exit;
 		}
-		
+
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_POST['adminname']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -71,9 +71,9 @@ switch($_POST['action']) {
 			$specialrights += 8;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
-			$hashpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+			$hashpw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
 		} else {
-			$hashpw = md5($_POST['password']);
+			$hashpw = md5($_POST['newpassword']);
 		}
 		if ($_POST['newrights']>$myrights) { //checked above, but do it again
 			$_POST['newrights'] = $myrights;
@@ -115,7 +115,7 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);
 		}
-		
+
 		//if student being promoted, enroll in teacher enroll courses
 		if ($oldrights<=10 && $_POST['newrights']>=20 && isset($CFG['GEN']['enrollonnewinstructor'])) {
 			$valbits = array();
@@ -132,7 +132,7 @@ switch($_POST['action']) {
 				unenrollstu($ncid, array($_GET['id']));
 			}
 		}
-		
+
 		if ($chgSID==false && $row[0]!=$_GET['id']) {
 			echo "Username in use - left unchanged";
 			exit;
@@ -231,9 +231,9 @@ switch($_POST['action']) {
 			exit;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
-			$md5pw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+			$md5pw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
 		} else {
-			$md5pw =md5($_POST['password']);
+			$md5pw =md5($_POST['newpassword']);
 		}
 		if ($myrights < 100) {
 			$newgroup = $groupid;
