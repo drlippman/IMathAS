@@ -564,7 +564,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $DBH,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange,$latepasshrs,$latepasses,$viewedassess;
+	global $DBH,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange,$latepasshrs,$latepasses,$viewedassess,$hidelocked;
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -638,6 +638,9 @@ function gbstudisp($stu) {
 			}
 			//DB $query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid='$cid' ";
 			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid=:courseid ";
+			if ($hidelocked) {
+				$query .= "AND istu.locked=0 ";
+			}
 			if ($usersort==0) {
 				$query .= "ORDER BY istu.section,iu.LastName,iu.FirstName";
 			} else {
