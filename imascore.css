@@ -388,10 +388,12 @@ div.center {
 	text-align: center;
 }
 span.calitem {
-	line-height: 120%;
-	padding: 0 5px;
+	padding: 0 4px;
 	background-color: #0ff;
 	margin: 1px;
+}
+table.cal span.calitem {
+	display: inline-block;
 }
 /*
 div.td {
