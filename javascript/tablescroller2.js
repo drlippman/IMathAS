@@ -165,6 +165,7 @@ this.preinit = function(try2) {
 				locktds.push(nodes[0]);
 			}
 			nodes[0].firstChild.style.height = max + "px";
+			nodes[0].firstChild.style.width = theads[0].firstChild.style.width;
 			nodes[1].firstChild.style.height = max + "px";
 		}
 		
