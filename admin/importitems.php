@@ -95,7 +95,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$stm = $DBH->prepare("SELECT id,adddate,lastmoddate,deleted FROM imas_questionset WHERE uniqueid=:uniqueid");
 			$stm->execute(array(':uniqueid'=>$questions[$qid]['uqid']));
 			$questionexists = ($stm->rowCount()>0);
-			echo "Question ID ".$questions[$qid]['uqid'].($questionexists?" exists":" not found");
+			//echo "Question ID ".$questions[$qid]['uqid'].($questionexists?" exists":" not found");
 			if ($questionexists) {
 				list($thisqsetid, $qadddate, $qlastmoddate, $qdeleted) = $stm->fetch(PDO::FETCH_NUM);
 			}
@@ -229,20 +229,22 @@ function additem($itemtoadd,$item,$questions,$qset) {
 
 		//resolve any includecodefrom links
 		$qidstoupdate = array();
-		$qidstocheck = implode(',', array_map('intval', $allqids));
-		//look up any refs to UIDs
-		//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
-		//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
-		$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
-		$includedqs = array();
-		//DB while ($row = mysql_fetch_row($result)) {
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$qidstoupdate[] = $row[0];
-			if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
-			}
-			if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row[2],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
+		if (count($allqids)>0) {
+			$qidstocheck = implode(',', array_map('intval', $allqids));
+			//look up any refs to UIDs
+			//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
+			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
+			$includedqs = array();
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$qidstoupdate[] = $row[0];
+				if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
+				}
+				if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row[2],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
+				}
 			}
 		}
 		if (count($qidstoupdate)>0) {
@@ -285,7 +287,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 
 		//recreate itemorder
 		//$item[$itemtoadd]['questions'] = preg_replace("/(\d+)/e",'$questions[\\1]["systemid"]',$item[$itemtoadd]['questions']);
-		$qs = explode(',',$item[$itemtoadd]['questions']);
+		if (trim($item[$itemtoadd]['questions'])=='') {
+			$qs = array();
+		} else {
+			$qs = explode(',',$item[$itemtoadd]['questions']);
+		}
 		$newqorder = array();
 		foreach ($qs as $q) {
 			if (strpos($q,'~')===FALSE) {
