@@ -828,7 +828,7 @@ switch($_POST['action']) {
 			}
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=". Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=". Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
 		exit;
 	case "addteacher":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
@@ -855,7 +855,7 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES ".implode(',',$ins));
 			$stm->execute($insval);
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=" .Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=" .Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
 		exit;
 	case "importmacros":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
