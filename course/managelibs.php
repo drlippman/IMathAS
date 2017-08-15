@@ -350,7 +350,7 @@ if ($myrights<20) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
-				$tlist = implode(",",$_POST['nchecked']);
+				$tlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
 			}
 		}
 	} else if (isset($_GET['transfer'])) {
@@ -491,7 +491,7 @@ if ($myrights<20) {
 			} else {
 				$pagetitle = "Add Library\n";
 				if (isset($_GET['parent'])) {
-					$parent = $_GET['parent'];
+					$parent = Sanitize::encodeStringForDisplay($_GET['parent']);
 				}
 			}
 			if (!isset($name)) {
@@ -686,7 +686,7 @@ if ($overwriteBody==1) {
 		<span class=form>New Parent Library: </span>
 		<span class=formright>
 			<span id="libnames"></span>
-			<input type=hidden name="libs" id="libs"  value="<?php echo $parent ?>">
+			<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($parent); ?>">
 			<input type=button value="Select Library" onClick="libselect()">
 		</span><br class=form>
 
@@ -698,12 +698,12 @@ if ($overwriteBody==1) {
 <?php
 	} else if (isset($_GET['modify'])) {
 ?>
-	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo $_GET['modify'] ?>">
+	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo Sanitize::encodeUrlParam($_GET['modify']); ?>">
 		<span class=form>Library Name:</span>
-		<span class=formright><input type=text name="name" value="<?php echo $name ?>" size=20></span><br class=form>
+		<span class=formright><input type=text name="name" value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" size=20></span><br class=form>
 		<?php
 		if (($isgrpadmin || $isadmin) && isset($ownername)) {
-			echo '<span class=form>Owner:</span><span class=formright>'.$ownername.'</span><br class=form />';
+			echo '<span class=form>Owner:</span><span class=formright>'.Sanitize::encodeStringForDisplay($ownername).'</span><br class=form />';
 		}
 		?>
 		<span class=form>Rights: </span>
@@ -719,8 +719,8 @@ if ($overwriteBody==1) {
 
 		<span class=form>Parent Library:</span>
 		<span class=formright>
-			<span id="libnames"><?php echo $lnames ?></span>
-			<input type=hidden name="libs" id="libs"  value="<?php echo $parent ?>">
+			<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames); ?></span>
+			<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($parent); ?>">
 			<input type=button value="Select Library" onClick="libselect()">
 		</span><br class=form>
 		<div class=submit>
@@ -840,25 +840,25 @@ function printlist($parent) {
 			}
 			if (isset($ltlibs[$child])) { //library has children
 				//echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
-				echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle($child)\"><span class=btn id=\"b$child\">+</span> ";
-				echo "</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=hdr onClick=\"toggle($child)\"><span class=\"r{$rights[$child]}\">{$names[$child]}</span> </span>\n";
+				echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\"><span class=btn id=\"b" . Sanitize::encodeStringForDisplay($child) . "\">+</span> ";
+				echo "</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span> </span>\n";
 				//if ($isadmin) {
 				  echo " ({$qcount[$child]}) ";
 				//}
 				echo "<span class=op>";
 				if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
-					echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
+					echo "<a href=\"managelibs.php?cid=$cid&modify=" . Sanitize::encodeUrlParam($child) . "\">Modify</a> | ";
 				}
-				echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
+				echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=" . Sanitize::encodeUrlParam($child) . "\">Add Sub</a> ";
 				echo "</span>";
-				echo "<ul class=hide id=$child>\n";
+				echo "<ul class=hide id=" . Sanitize::encodeStringForDisplay($child) . ">\n";
 				$count++;
 				printlist($child);
 				echo "</ul></li>\n";
 
 			} else {  //no children
 
-				echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=\"r{$rights[$child]}\">{$names[$child]}</span> ";
+				echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span> ";
 				//if ($isadmin) {
 				  echo " ({$qcount[$child]}) ";
 				//}
@@ -867,9 +867,9 @@ function printlist($parent) {
 					echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
 				}
 				if ($qcount[$child]==0) {
-					echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
+					echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=" . Sanitize::encodeUrlParam($child) . "\">Add Sub</a> ";
 				} else {
-					echo "<a href=\"reviewlibrary.php?cid=$cid&lib=$child\">Preview</a>";
+					echo "<a href=\"reviewlibrary.php?cid=$cid&lib=" . Sanitize::encodeUrlParam($child) . "\">Preview</a>";
 				}
 				echo "</span>";
 				echo "</li>\n";

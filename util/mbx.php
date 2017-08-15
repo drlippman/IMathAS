@@ -162,7 +162,7 @@ function mbxproc($qn,$qsetid,$seed) {
 
 
 
-echo "<myopenmath id=\"$qsetid\">
+echo "<myopenmath id=\"" . Sanitize::onlyInt($qsetid) . "\">
 <statement>
 $statement
 </statement>

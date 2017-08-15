@@ -1,4 +1,6 @@
 <?php
+require_once(__DIR__ . '/../includes/sanitize.php');
+
 $url = $_GET['url'];
 $doembed = false;
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -7,14 +9,14 @@ $doembed = false;
  	 $urlmode = 'http://';
  }
 if (strpos($url,'youtube.com/watch')!==false) {
-	//youtube 	
+	//youtube
 	$vidid = substr($url,strrpos($url,'v=')+2);
 	if (strpos($vidid,'&')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'&'));
 	}
 	if (strpos($vidid,'#')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'#'));
-	} 
+	}
 	$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
 	$timestart = '?rel=0';
 	if (strpos($url,'start=')!==false) {
@@ -22,22 +24,23 @@ if (strpos($url,'youtube.com/watch')!==false) {
 		$timestart .= '&'.$m[0];
 	} else if (strpos($url,'t=')!==false) {
 		preg_match('/\Wt=((\d+)m)?((\d+)s)?/',$url,$m);
-		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
+		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
 	}
-	
+
 	if (strpos($url,'end=')!==false) {
 		preg_match('/end=(\d+)/',$url,$m);
 		$timestart .= '&'.$m[0];
 	}
 	$doembed = true;
-	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.$timestart.'" frameborder="0" allowfullscreen></iframe>';
+	$videoUrl = $urlmode.'www.youtube.com/embed/'.$vidid.$timestart;
+	$out = '<iframe width="640" height="510" src="'.Sanitize::fullUrl($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if (strpos($url,'youtu.be/')!==false) {
-	//youtube 	
+	//youtube
 	$vidid = substr($url,strpos($url,'.be/')+4);
 	if (strpos($vidid,'#')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'#'));
-	} 
+	}
 	if (strpos($vidid,'?')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'?'));
 	}
@@ -48,21 +51,23 @@ if (strpos($url,'youtu.be/')!==false) {
 		$timestart .= '&'.$m[0];
 	} else if (strpos($url,'t=')!==false) {
 		preg_match('/\Wt=((\d+)m)?((\d+)s)?/',$url,$m);
-		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
+		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
 	}
-	
+
 	if (strpos($url,'end=')!==false) {
 		preg_match('/end=(\d+)/',$url,$m);
 		$timestart .= '&'.$m[0];
 	}
 	$doembed = true;
-	$out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$vidid.$timestart.'" frameborder="0" allowfullscreen></iframe>';
+	$videoUrl = $urlmode.'www.youtube.com/embed/'.$vidid.$timestart;
+	$out = '<iframe width="640" height="510" src="'.Sanitize::fullUrl($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if (strpos($url,'vimeo.com/')!==false) {
-	//youtube 	
+	//youtube
 	$vidid = substr($url,strpos($url,'.com/')+5);
 	$doembed = true;
-	$out = '<iframe width="640" height="510" src="http://player.vimeo.com/video/'.$vidid.'" frameborder="0" allowfullscreen></iframe>';
+	$videoUrl = 'http://player.vimeo.com/video/'.$vidid;
+	$out = '<iframe width="640" height="510" src="'.Sanitize::fullUrl($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if ($doembed) {
 	echo '<html><head><title>Video</title>';
@@ -72,6 +77,6 @@ if ($doembed) {
 	echo '</head>';
 	echo '<body>'.$out.'</body></html>';
 } else {
-	header("Location: $url");
+	header("Location:". Sanitize::fullUrl($url));
 }
 ?>

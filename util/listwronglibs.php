@@ -15,7 +15,7 @@ $stm = $DBH->query("SELECT iqs.uniqueid,il.uniqueid FROM imas_questionset AS iqs
   JOIN imas_libraries AS il ON ili.libid=il.id AND il.deleted=0 
   WHERE ili.junkflag>0 AND ili.deleted=0");
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	echo implode('@',$row).'<br/>';
+	echo Sanitize::encodeStringForDisplay(implode('@',$row)).'<br/>';
 }
 
 ?>

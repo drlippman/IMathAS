@@ -3,7 +3,7 @@
 
 require('../init.php');
 require('../includes/userprefs.php');
-$action = "ltiuserprefs.php?cid=$cid";
+$action = "ltiuserprefs.php?cid=".Sanitize::courseId($cid);
 if (isset($_GET['greybox'])) {
 	$flexwidth = true; 
 	$nologo = true;

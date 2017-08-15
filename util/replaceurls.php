@@ -52,8 +52,8 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		echo "<p>Inline Texts changed: $ni<br/>Linked texts changed: $nlt";
 		echo "<br/>Assessments changed: $nas</p>";
 		echo '<form method="post">';
-		echo '<input type="hidden" name="from" value="'.$_POST['from'].'">';
-		echo '<input type="hidden" name="to" value="'.$_POST['to'].'">';
+		echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($_POST['from']).'">';
+		echo '<input type="hidden" name="to" value="'.Sanitize::encodeStringForDisplay($_POST['to']).'">';
 		echo '<input type="submit" name="confirm" value="Make Changes"/> (this will be slow)';
 		echo '</form>';
 	}

@@ -163,11 +163,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 		}
 	}
-
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
 	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
 	$toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
-
 	$toevalsoln = interpret('qtext',$qdata['qtype'],$qdata['solution']);
 	$toevalsoln = str_replace('\\','\\\\',$toevalsoln);
 	$toevalsoln = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalsoln);
@@ -441,6 +439,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
 	eval("\$evaledsoln = \"$toevalsoln\";");
+
 	if ($returnqtxt===2) {
 		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	} else if ($returnqtxt===3) {
@@ -554,7 +553,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 
 	echo "<div>";
-
 	foreach($entryTips as $iidx=>$entryTip) {
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
 			echo "<p class=\"tips\" ";

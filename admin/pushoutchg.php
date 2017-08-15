@@ -90,7 +90,7 @@ if ($myrights==100) {
    	   $stm->execute(array(':userid'=>$userid));
    	   //DB while ($row = mysql_fetch_array($result)) {
    	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-   	   	   echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+   	   	   echo '<option value="'.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
    	   }
    	   echo '</select></p>';
    	   echo '<p><input type="checkbox" name="quesset" value="1"/> Push out individual question settings (points and attempts).  Does not affect defaults, or overwrite questions that already have per-question points or attempts set.</p>';

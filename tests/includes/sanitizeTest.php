@@ -99,6 +99,16 @@ final class SanitizeTest extends TestCase
 	}
 
 	/*
+	 * rawurlencodePath
+	 */
+
+	public function testRawurlencodePath()
+	{
+		$result = Sanitize::rawurlencodePath('one/two three%$four,^*(five');
+		$this->assertEquals('one/two%20three%25%24four%2C%5E%2A%28five', $result);
+	}
+
+	/*
 	 * fullUrl
 	 */
 

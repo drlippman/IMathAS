@@ -27,8 +27,8 @@
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; View Group Scores</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Group Scores</div>";
 
 	//DB $query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id='$aid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -75,7 +75,7 @@
 
 
 	echo '<div id="headerisolateassessgrade" class="pagetitle"><h2>';
-	echo "Group grades for $name</h2></div>";
+	echo "Group grades for " . Sanitize::encodeStringForDisplay($name) . "</h2></div>";
 	echo "<p>$totalpossible points possible</p>";
 
 //	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
@@ -140,7 +140,7 @@
 			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
 		}
 		$lc++;
-		echo "<td>$gname</td>";
+		echo "<td>" . Sanitize::encodeStringForDisplay($gname) . "</td>";
 		if (!isset($scoredata[$gid])) {
 			echo "<td>-</td><td>-</td><td></td>";
 			continue;
@@ -157,20 +157,38 @@
 		$timeused = $line['endtime']-$line['starttime'];
 
 		if ($line['id']==null) {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=gisolate&aid=$aid\">-</a></td><td>-</td><td></td>";
+			$querymap = array(
+				'gbmode' => $gbmode,
+				'cid' => $cid,
+				'asid' => 'new',
+				'uid' => $line['userid'],
+				'from' => 'gisolate',
+				'aid' => $aid
+			);
+
+			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
 		} else {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=gisolate&aid=$aid\">";
+			$querymap = array(
+                'gbmode' => $gbmode,
+                'cid' => $cid,
+                'asid' => $line['id'],
+                'uid' => $line['userid'],
+                'from' => 'gisolate',
+				'aid' => $aid
+			);
+
+            echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
-				echo "{$total}&nbsp;(NC)";
+				echo Sanitize::onlyFloat($total) . "&nbsp;(NC)";
 			} else 	if ($IP==1 && $enddate>$now) {
-				echo "{$total}&nbsp;(IP)";
+				echo Sanitize::onlyFloat($total) . "&nbsp;(IP)";
 			} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
-				echo "{$total}&nbsp;(OT)";
+				echo Sanitize::onlyFloat($total) . "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
-				echo "{$total}&nbsp;(PT)";
+				echo Sanitize::onlyFloat($total) . "&nbsp;(PT)";
 			} else {
-				echo "{$total}";
+				echo Sanitize::onlyFloat($total);
 				$tot += $total;
 				$n++;
 			}

@@ -73,9 +73,9 @@ END;
 		$select = "child";
 	}
 
-	echo "var select = '$select';\n";
+	echo "var select = '" . Sanitize::encodeStringForJavascript($select) . "';\n";
 	if (isset($_GET['type'])) {
-		echo "var treebox = '{$_GET['type']}';\n";
+		echo "var treebox = '" . Sanitize::encodeStringForJavascript($_GET['type']) . "';\n";
 	} else {
 		echo "var treebox = 'checkbox';\n";
 	}
@@ -166,7 +166,7 @@ END;
 		}
 		if (count($arr)==0) {return;}
 		if ($donefirst[$parent]==0) {
-			echo ",\n$parent:[";
+			echo ",\n" . Sanitize::encodeStringForDisplay($parent) . ":[";
 			$donefirst[$parent]==1;
 		}
 		if ($sortorder[$parent]==1) {
@@ -186,7 +186,7 @@ END;
 					}
 				}
 				if ($donefirst[$parent]==2) {echo ",";} else {$donefirst[$parent]=2;}
-				echo "[$child,{$rights[$child]},'{$names[$child]}',";
+				echo "[" . Sanitize::encodeStringForDisplay($child) . "," . Sanitize::encodeStringForDisplay($rights[$child]) . ",'" . Sanitize::encodeStringForDisplay($names[$child]) . "',";
 				if (isset($ltlibs[$child])) { //library has children
 					if ($select == "parent" || $select=="all") {
 						if ($_GET['type']=="radio") {
@@ -251,7 +251,7 @@ END;
 	echo "<input type=button value=\"Uncheck all\" onclick=\"uncheckall(this.form)\"/><br>";
 
 	if (isset($base)) {
-		echo "<input type=hidden name=\"rootlib\" value=$base>{$names[$base]}</span>";
+		echo "<input type=hidden name=\"rootlib\" value=" . Sanitize::encodeStringForDisplay($base) . ">" . Sanitize::encodeStringForDisplay($names[$base]) . "</span>";
 	} else {
 		if ($select == "parent") {
 			echo "<input type=radio name=\"libs\" value=0 ";

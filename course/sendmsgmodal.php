@@ -44,7 +44,7 @@ if (isset($_POST['message'])) {
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
 			$message = filter($message);
-			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . '/',$message);
+			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
 			//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";

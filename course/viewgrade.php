@@ -22,14 +22,15 @@
 	$pagetitle = "View Grade";
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=$gbmode&cid=$cid\">Gradebook</a> ";
+	echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($gbmode)."&cid=".Sanitize::encodeUrlParam($cid)."\">Gradebook</a> ";
 	echo "&gt; View Grade</div>";
 
 	echo '<div id="headerviewgrade" class="pagetitle"><h2>View Grade</h2></div>';
-	echo "<p>Grade on <b>{$row[4]}</b> for <b>{$row[1]} {$row[0]}</b></p>";
-	echo "<p>Grade: <b>{$row[2]}</b></p>";
+	echo "<p>Grade on <b>".Sanitize::encodeStringForDisplay($row[4])."</b> for <b>".Sanitize::encodeStringForDisplay($row[1]).' '.Sanitize::encodeStringForDisplay($row[0]).
+"</b></p>";
+	echo "<p>Grade: <b>".Sanitize::encodeStringForDisplay($row[2])."</b></p>";
 	if (trim($row[3])!='') {
-		echo "<p>Feedback:<br/>".$row[3].'</p>';
+		echo "<p>Feedback:<br/>".Sanitize::encodeStringForDisplay($row[3]).'</p>';
 	}
 	require("../footer.php");
 ?>
