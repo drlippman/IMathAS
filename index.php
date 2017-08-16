@@ -392,7 +392,7 @@ if (!isset($CFG['GEN']['homelinkbox'])) {
 	}
 	echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
 	if ($msgtotal>0) {
-		echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), $msgtotal), '</a>';
+		echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), Sanitize::onlyFloat($msgtotal)), '</a>';
 	}
 	if ($myrights > 10) {
 		echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";

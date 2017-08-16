@@ -282,7 +282,7 @@ if (isset($_POST['mergefrom'])) {
 	foreach ($itemsimporder as $item) {
 		if (!isset($itemsassoc[$item])) { continue; }
 		$id = $itemsassoc[$item];
-		echo "<li><input type=\"text\" size=\"2\" name=\"mergefrom[$id]\" />{$assess[$id]}</li>";
+		echo "<li><input type=\"text\" size=\"2\" name=\"mergefrom[" . Sanitize::onlyInt($id) . "]\" />" . Sanitize::encodeStringForDisplay($assess[$id]) . "</li>";
 	}
 	echo '</ul>';
 	echo '<p>Include assessment name as headers in intro? <input type="checkbox" name="nameasheader" value="1"/></p>';

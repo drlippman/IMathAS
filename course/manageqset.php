@@ -91,9 +91,9 @@ if ($myrights<20) {
 				$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 				$curBreadcrumb .= " &gt; Confirm Delete";
 				if (isset($_POST['remove'])) {
-					$rlist = implode(",",$_POST['nchecked']);
+					$rlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
 				} else {
-					$rlist = $_GET['remove'];
+					$rlist = Sanitize::encodeStringForDisplay($_GET['remove']);
 				}
 			}
 		}
@@ -604,7 +604,7 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; Change Question Rights";
 
-			$clist = implode(",",$_POST['nchecked']);
+			$clist = Sanitize::encodeStringForDisplay(implode(",", $_POST['nchecked']));
 
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
@@ -1012,7 +1012,7 @@ function doaction(todo,id) {
 	window.location = addr;
 }
 
-var curlibs = '<?php echo $searchlibs ?>';
+var curlibs = '<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>';
 
 function libselect() {
 	window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
@@ -1254,7 +1254,7 @@ function getnextprev(formn,loc) {
 
 		echo "<form method=post action=\"manageqset.php?cid=$cid\">\n";
 
-		echo "In Libraries: <span id=\"libnames\">$lnames</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"$searchlibs\">\n";
+		echo "In Libraries: <span id=\"libnames\">" . Sanitize::encodeStringForDisplay($lnames) . "</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"" . Sanitize::encodeStringForDisplay($searchlibs) . "\">\n";
 		//echo " <input type=button value=\"Select Libraries\" onClick=\"libselect()\"> <br>";
 		echo '<input type="button" value="Select Libraries" onClick="GB_show(\'Library Select\',\'libtree2.php?cid='.$cid.'&libtree=popup&libs=\'+curlibs,500,500)" /> <br>';
 
@@ -1306,11 +1306,11 @@ function getnextprev(formn,loc) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td></td>';
 				echo '<td colspan="8">';
-				echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+				echo '<b>'.Sanitize::encodeStringForDisplay($lnamesarr[$page_libstouse[$j]]).'</b>';
 				echo '</td></tr>';
 			}
 			for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
-				$qid =$page_libqids[$page_libstouse[$j]][$i];
+				$qid = Sanitize::encodeStringForDisplay($page_libqids[$page_libstouse[$j]][$i]);
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
@@ -1320,8 +1320,8 @@ function getnextprev(formn,loc) {
 				echo '<td>'.$qid.'</td>';
 				echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
-				echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
-				echo '<td class="c">'.$page_questionTable[$qid]['times'].'</td>';
+				echo '<td>'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']).'</td>';
+				echo '<td class="c">'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['times']).'</td>';
 				echo '<td>'.$page_questionTable[$qid]['lastmod'].'</td>';
 				echo '<td class="c">'.$page_questionTable[$qid]['mine'].'</td>';
 				if ($searchall==1) {

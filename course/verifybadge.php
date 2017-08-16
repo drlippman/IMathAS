@@ -91,12 +91,12 @@ function print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout,
 	global $installname, $imasroot;
 	$coursetheme = "default.css";
 	require("../header.php");
-	echo '<h2>Badge: '.$name.'</h2>';
+	echo '<h2>Badge: '.Sanitize::encodeStringForDisplay($name).'</h2>';
 	if ($stuout != null) {
 		echo '<h3>'.$stuname. ' ('.$email.')</h3>';
 	}
-	if ($descr!='') {echo '<p>'.$descr.'</p>';}
-	if ($longdescr!='') {echo '<p>'.$longdescr.'</p>';}
+	if ($descr!='') {echo '<p>'.Sanitize::encodeStringForDisplay($descr).'</p>';}
+	if ($longdescr!='') {echo '<p>'.Sanitize::encodeStringForDisplay($longdescr).'</p>';}
 
 	echo '<table style="margin-top: 10px;" class="gb"><thead><tr><th>Category/Course Total</th><th>Score Required</th>';
 	if ($stuout != null) {
@@ -104,9 +104,9 @@ function print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout,
 	}
 	echo '</tr></thead><tbody>';
 	foreach ($reqnameout as $i=>$n) {
-		echo '<tr><td>'.$n.'</td><td>'.$reqout[$i];
+		echo '<tr><td>'.Sanitize::encodeStringForDisplay($n).'</td><td>'.Sanitize::encodeStringForDisplay($reqout[$i]);
 		if ($stuout != null) {
-			echo '<td>'.$stuout[$i].'</td><td>'.$metout[$i];
+			echo '<td>'.Sanitize::encodeStringForDisplay($stuout[$i]).'</td><td>'.Sanitize::encodeStringForDisplay($metout[$i]);
 		}
 		echo '</td></tr>';
 	}

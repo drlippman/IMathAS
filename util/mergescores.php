@@ -45,7 +45,7 @@ if (isset($_POST['assess'])) {
         //DB while ($row = mysql_fetch_row($result)) {
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             if (substr_count($row[0],',') != substr_count($sourceitemord,',')) {
-                echo 'one of this things is not like the others.... '.$row[1].' does not match same number of questions.   assessments cannot be merged';
+                echo 'one of this things is not like the others.... '.Sanitize::encodeStringForDisplay($row[1]).' does not match same number of questions.   assessments cannot be merged';
                 $err = true;
                 break;
             }
@@ -133,7 +133,7 @@ if (isset($_POST['assess'])) {
     echo '<p>';
     //DB while ($row = mysql_fetch_row($result)) {
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-        echo '<input type="input" size="1" name="assess['.$row[0].']" />'.$row[1].'<br/>';
+        echo '<input type="input" size="1" name="assess['.Sanitize::encodeStringForDisplay($row[0]).']" />'.Sanitize::encodeStringForDisplay($row[1]).'<br/>';
     }
     echo '</p>';
     echo '<p><input type="submit" value="Submit"/></p>';

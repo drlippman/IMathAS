@@ -712,6 +712,7 @@ function copyqimage($key,$dest) {
 
 function getuserfileurl($key) {
 	global $urlmode,$imasroot;
+	$key = Sanitize::rawurlencodePath($key);
 	if ($GLOBALS['filehandertype'] == 's3') {
 		//return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
 		return 'https://'.$GLOBALS['AWSbucket'].".s3.amazonaws.com/$key";
@@ -721,6 +722,7 @@ function getuserfileurl($key) {
 }
 function getfopenloc($key) {
 	global $urlmode,$imasroot;
+	$key = Sanitize::rawurlencodePath($key);
 	if ($GLOBALS['filehandertype'] == 's3') {
 		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
 	} else {
@@ -746,6 +748,7 @@ function getcoursefileurl($key,$abs=false) {
 }
 function getqimageurl($key,$abs=false) {
 	global $urlmode,$imasroot;
+	$key = Sanitize::rawurlencodePath($key);
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/$key";
 	} else {

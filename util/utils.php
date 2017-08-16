@@ -196,7 +196,7 @@ if (isset($_GET['form'])) {
 						echo '<li>LTI user connections: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $lti_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li>key:'.substr($r[0],0,strpos($r[0],':')).', remote userid:'.$r[2].' <a href="utils.php?removelti='.$r[1].'">Remove connection</a></li>';
+							echo '<li>key:'.substr($r[0],0,strpos($r[0],':')).', remote userid:'.Sanitize::encodeStringForDisplay($r[2]).' <a href="utils.php?removelti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
 						}
 						echo '</ul></li>';
 					}
@@ -209,7 +209,7 @@ if (isset($_GET['form'])) {
 							echo '<li>LTI course connections: <ul>';
 							//DB while ($r = mysql_fetch_row($res2)) {
 							while ($r = $lti_c_stm->fetch(PDO::FETCH_NUM)) {
-								echo '<li>Course: '.$r[2].', key:'.substr($r[0],0,strpos($r[0],':')).', context:'.$r[3].' <a href="utils.php?removecourselti='.$r[1].'">Remove connection</a></li>';
+								echo '<li>Course: '.Sanitize::encodeStringForDisplay($r[2]).', key:'.substr($r[0],0,strpos($r[0],':')).', context:'.$r[3].' <a href="utils.php?removecourselti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
 							}
 							echo '</ul></li>';
 						}

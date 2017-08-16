@@ -213,7 +213,8 @@ unset($dbpassword);
 							$ops = '';
 							//DB while ($row = mysql_fetch_row($result)) {
 							while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-								$ops .= "<option value=\"{$row[0]}\">{$row[1]}, {$row[2]}</option>";
+								$ops .= sprintf('<option value="%d">%s, %s</option>', $row[0],
+									Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 							}
 							foreach ($owners[$ogrp] as $did) {
 								$out .= "Diag <b>".$dnames[$did]."</b> Owner: <select name=\"diag[$did]\">";

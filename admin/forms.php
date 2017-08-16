@@ -210,7 +210,7 @@ switch($_GET['action']) {
 			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				echo "<option value=\"{$row[0]}\" ";
+				printf('<option value="%d" ', $row[0]);
 				if ($oldgroup==$row[0]) {
 					echo "selected=1";
 				}
@@ -326,7 +326,7 @@ switch($_GET['action']) {
 		if ($_GET['action']=="modify") { echo "&id=".Sanitize::encodeUrlParam($_GET['id']); }
 		echo "\">\n";
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']) .'" />';
-		echo "<span class=form>Course ID:</span><span class=formright>$courseid</span><br class=form>\n";
+		echo "<span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($courseid)."</span><br class=form>\n";
 		if ($isadminview) {
 			echo '<span class="form">Owner:</span><span class="formright">';
 			printf('%s, %s (%s)</span><br class="form"/>', Sanitize::encodeStringForDisplay($udat['LastName']),
@@ -349,7 +349,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 			$stm->execute(array(':courseid'=>$_GET['id']));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				echo "<option value=\"{$row[0]}\" ";
+				printf('<option value="%d" ', $row[0]);
 				if ($lockaid==$row[0]) { echo 'selected="1"';}
 				printf(">%s</option>", Sanitize::encodeStringForDisplay($row[1]));
 			}
@@ -382,7 +382,7 @@ switch($_GET['action']) {
 				sort($themes);
 			}
 			foreach ($themes as $k=>$file) {
-				echo "<option value=\"$file\" ";
+				printf('<option value="%s" ', Sanitize::encodeStringForDisplay($file));
 				if ($file==$theme) { echo 'selected="selected"';}
 				echo '>';
 				if (isset($themenames)) {
@@ -545,9 +545,9 @@ switch($_GET['action']) {
 			if (count($groupcourse)>0) {
 				echo '<optgroup label="Group Templates">';
 				foreach ($groupcourse as $id=>$name) {
-					echo '<option value="'.$id.'"';
+					printf('<option value="%d"', $id);
 					if (isset($terms[$id])) {
-						echo ' data-termsurl="'.$terms[$id].'"';
+						printf(' data-termsurl="%s"', Sanitize::encodeStringForDisplay($terms[$id]));
 					}
 					printf('>%s</option>', Sanitize::encodeStringForDisplay($name));
 				}
@@ -558,9 +558,9 @@ switch($_GET['action']) {
 					echo '<optgroup label="System-wide Templates">';
 				}
 				foreach ($globalcourse as $id=>$name) {
-					echo '<option value="'.$id.'"';
+					printf('<option value="%d"', $id);
 					if (isset($terms[$id])) {
-						echo ' data-termsurl="'.$terms[$id].'"';
+						printf(' data-termsurl="%s"', Sanitize::encodeStringForDisplay($terms[$id]));
 					}
 					printf('>%s</option>', Sanitize::encodeStringForDisplay($name));
 				}
@@ -609,7 +609,8 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$_GET['id']));
 		$num = $stm->rowCount();
-		echo '<form method="post" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&cid='.Sanitize::onlyInt($_GET['id']).'&tot='.$num.'">';
+		echo '<form method="post" action="actions.php?' . Sanitize::generateQueryStringFromMap(array(
+				'from' => $from, 'cid' => $_GET['id'], 'tot' => $num)) . '">';
 		echo '<input type=hidden name=action value="remteacher" />';
 		echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
 		echo "<table cellpadding=5>\n";
@@ -617,7 +618,7 @@ switch($_GET['action']) {
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 
-			echo '<tr><td><input type="checkbox" name="tid[]" value="'.$line['id'].'"/></td>';
+				printf('<tr><td><input type="checkbox" name="tid[]" value="%d"/></td>', $line['id']);
 
 			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
@@ -651,7 +652,7 @@ switch($_GET['action']) {
 			if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
 			if ($used[$line['id']]!=true) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
-				echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
+				printf('<tr><td><input type="checkbox" name="atid[]" value="%d"/></td>', $line['id']);
 				printf("<td>%s, %s </td> ", Sanitize::encodeStringForDisplay($line['LastName']),
 					Sanitize::encodeStringForDisplay($line['FirstName']));
 				//echo "<td><a href=\"actions.php?from=$from&action=addteacher&cid=".Sanitize::onlyInt($_GET['id'])."&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
@@ -713,7 +714,7 @@ switch($_GET['action']) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf("<option value=\"%d\">%s, %s</option>\n", $row[0], Sanitize::encodeStringForDisplay($row[2]),
+			printf("<option value=\"%d\">%s, %s</option>\n",$row[0], Sanitize::encodeStringForDisplay($row[2]),
 				Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo "</select>\n";
@@ -751,11 +752,11 @@ switch($_GET['action']) {
 			} else {
 				echo '<td>No</td>';
 			}
-			echo "<td><a href=\"forms.php?action=modltidomaincred&id={$row[0]}\">Modify</a></td>\n";
+			echo "<td><a href=\"forms.php?action=modltidomaincred&id=".Sanitize::encodeUrlParam($row[0])."\">Modify</a></td>\n";
 			if ($row[0]==0) {
 				echo "<td></td>";
 			} else {
-				echo "<td><a href=\"forms.php?from=".Sanitize::encodeUrlParam($from)."&action=delltidomaincred&id={$row[0]}\">Delete</a></td>\n";
+				echo "<td><a href=\"forms.php?from=".Sanitize::encodeUrlParam($from)."&action=delltidomaincred&id=".Sanitize::encodeUrlParam($row[0])."\">Delete</a></td>\n";
 			}
 			echo "</tr>\n";
 		}
@@ -775,8 +776,9 @@ switch($_GET['action']) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
+
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf('<option value="%d">%s</option>', $row[0], Sanitize::encodeStringForDisplay($row[1]));
+			printf('<option value="%d">%s</option>', Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</select><br/>';
 		echo "<input type=submit value=\"Add LTI Credentials\"></p>\n";
@@ -795,7 +797,7 @@ switch($_GET['action']) {
 		echo '</strong>?</p>';
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="delltidomaincred">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "modltidomaincred":
@@ -809,12 +811,12 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<form method=post action=\"actions.php?from=$from&action=modltidomaincred&id={$row[0]}\">\n";
+		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."&action=modltidomaincred&id=".Sanitize::onlyInt($row[0])."\">\n";
 		echo '<input type=hidden name=action value="modltidomaincred" />';
 		echo "Modify LTI key/secret: <br/>";
-		echo "Domain: <input type=text name=\"ltidomain\" value=\"{$row[1]}\" size=20><br/>\n";
-		echo "Key: <input type=text name=\"ltikey\" value=\"{$row[2]}\" size=20><br/>\n";
-		echo "Secret: <input type=text name=\"ltisecret\"  value=\"{$row[3]}\" size=20><br/>\n";
+		echo "Domain: <input type=text name=\"ltidomain\" value=\"".Sanitize::encodeStringForDisplay($row[1])."\" size=20><br/>\n";
+		echo "Key: <input type=text name=\"ltikey\" value=\"".Sanitize::encodeStringForDisplay($row[2])."\" size=20><br/>\n";
+		echo "Secret: <input type=text name=\"ltisecret\"  value=\"".Sanitize::encodeStringForDisplay($row[3])."\" size=20><br/>\n";
 		echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" ";
 		if ($row[4]==11) {echo 'selected="selected"';}
 		echo ">No</option><option value=\"76\" ";
@@ -826,9 +828,9 @@ switch($_GET['action']) {
 		//DB while ($r = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
-			echo '<option value="'.$r[0].'"';
+			printf('<option value="%d"', $r[0]);
 			if ($r[0]==$row[5]) { echo ' selected="selected"';}
-			echo '>'.$r[1].'</option>';
+			echo '>'.Sanitize::encodeStringForDisplay($r[1]).'</option>';
 		}
 		echo '</select><br/>';
 		echo "<input type=submit value=\"Update LTI Credentials\">\n";
@@ -846,11 +848,15 @@ switch($_GET['action']) {
 		$query .= "LEFT JOIN imas_federation_pulls AS pulls ON ifp.id=pulls.peerid GROUP BY pulls.peerid";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			echo "<tr><td>{$row['peername']}</td><td>{$row['peerdescription']}</td>";
-			echo '<td>'.($row['lastpull']>0?tzdate("n/j/y", $row['lastpull']):'Never').'</td>';
-			echo '<td>'.($row['uspull']===null?'Never':tzdate("n/j/y", $row['uspull'])).'</td>';
-			echo "<td><a href=\"forms.php?action=modfedpeers&id={$row['id']}\">Modify</a></td>\n";
-			echo "<td><a href=\"actions.php?action=delfedpeers&id={$row['id']}\" onclick=\"return confirm('Are you sure?');\">Delete</a></td>\n";
+			$lastpull = $row['lastpull'] > 0 ? tzdate("n/j/y", $row['lastpull']) : 'Never';
+			$uspull = $row['uspull'] === null ? 'Never' : tzdate("n/j/y", $row['uspull']);
+
+			printf("<tr><td>%s</td><td>%s</td>", Sanitize::encodeStringForDisplay($row['peername']),
+				Sanitize::encodeStringForDisplay($row['peerdescription']));
+			printf('<td>%s</td>', Sanitize::encodeStringForDisplay($lastpull));
+			printf('<td>%s</td>', Sanitize::encodeStringForDisplay($uspull));
+			printf('<td><a href="forms.php?action=modfedpeers&id=%d">Modify</a></td>\n', $row['id']);
+			printf("<td><a href=\"actions.php?action=delfedpeers&id=%d\" onclick=\"return confirm('Are you sure?');\">Delete</a></td>\n", $row['id']);
 			echo "</tr>\n";
 		}
 		echo "</table>\n";
@@ -874,12 +880,16 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT id,peername,peerdescription,url,secret,lastpull FROM imas_federation_peers WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
-		echo "<form method=post action=\"actions.php?action=modfedpeers&id={$row['id']}\">\n";
+		printf("<form method=post action=\"actions.php?action=modfedpeers&id=%d\">\n", Sanitize::onlyInt($row['id']));
 		echo "Modify federation peer: <br/>";
-		echo "Install Name: <input type=text name=\"peername\" value=\"{$row['peername']}\" size=20><br/>\n";
-		echo "Description: <input type=text name=\"peerdescription\" value=\"{$row['peerdescription']}\" size=50><br/>\n";
-		echo "Root URL: <input type=text name=\"url\" value=\"{$row['url']}\" size=50><br/>\n";
-		echo "Secret: <input type=text name=\"secret\"  value=\"{$row['secret']}\" size=20><br/>\n";
+		printf("Install Name: <input type=text name=\"peername\" value=\"%s\" size=20><br/>\n",
+			Sanitize::encodeStringForDisplay($row['peername']));
+		printf("Description: <input type=text name=\"peerdescription\" value=\"%s\" size=50><br/>\n",
+			Sanitize::encodeStringForDisplay($row['peerdescription']));
+		printf("Root URL: <input type=text name=\"url\" value=\"%s\" size=50><br/>\n",
+			Sanitize::encodeStringForDisplay($row['url']));
+		printf("Secret: <input type=text name=\"secret\"  value=\"%s\" size=20><br/>\n",
+			Sanitize::encodeStringForDisplay($row['secret']));
 		echo "<input type=submit value=\"Update Federation Peer\">\n";
 		echo "</form>\n";
 		break;
@@ -905,12 +915,13 @@ switch($_GET['action']) {
 			if ($row[0]==0) {
 				echo "<td></td>";
 			} else {
-				echo "<td><a href=\"forms.php?from=$from&action=delgroup&id={$row[0]}\">Delete</a></td>\n";
+				printf("<td><a href=\"forms.php?from=%s&action=delgroup&id=%d\">Delete</a></td>\n",
+					Sanitize::encodeUrlParam($from), Sanitize::onlyInt($row[0]));
 			}
 			echo "</tr>\n";
 		}
 		echo "</tbody></table>\n";
-		echo "<form method=post action=\"actions.php?from=$from\">\n";
+		printf("<form method=post action=\"actions.php?from=%s\">\n", Sanitize::encodeUrlParam($from));
 		echo '<input type=hidden name=action value="addgroup" />';
 		echo "Add new group: <input type=text name=gpname id=gpname size=50><br/>\n";
 		echo "<input type=submit value=\"Add Group\">\n";
@@ -929,7 +940,7 @@ switch($_GET['action']) {
 		echo '</strong>?</p>';
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="delgroup">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "modgroup":
@@ -941,7 +952,8 @@ switch($_GET['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($gpname,$parent) = $stm->fetch(PDO::FETCH_NUM);
 
-		echo "<form method=post action=\"actions.php?from=$from&id=".Sanitize::encodeUrlParam($_GET['id'])."\">\n";
+		printf("<form method=post action=\"actions.php?from=%s&id=%s\">\n",
+			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']));
 		echo '<input type=hidden name=action value="modgroup" />';
 		echo "Group name: <input type=text size=50 name=gpname id=gpname value=\"".Sanitize::encodeStringForDisplay($gpname)."\"><br/>\n";
 		echo 'Parent: <select name="parentid"><option value="0" ';
@@ -952,7 +964,7 @@ switch($_GET['action']) {
 		//DB while ($r = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
-			echo '<option value="'.$r[0].'"';
+			echo '<option value="'.Sanitize::encodeStringForDisplay($r[0]).'"';
 			if ($r[0]==$parent) { echo ' selected="selected"';}
 			echo '>'.Sanitize::encodeStringForDisplay($r[1]).'</option>';
 		}
@@ -964,7 +976,7 @@ switch($_GET['action']) {
 		echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="removediag">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='$backloc'\"></p>\n";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 
 		break;

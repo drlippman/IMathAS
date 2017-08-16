@@ -7,7 +7,7 @@
 		echo "Need course id";
 		exit;
 	}
-	$cid = intval($_GET['cid']);
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['from'])) {
 		$pubcid = $cid;  //swap out cid's before calling validate
 	  $cid = Sanitize::courseId($_GET['from']);
@@ -99,8 +99,8 @@
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase View Wiki</div>";
-	echo '<div id="headerviewwiki" class="pagetitle"><h2>'.$wikiname.'</h2></div>';
+	echo "<div class=breadcrumb> $breadcrumbbase View Wiki</div>";
+	echo '<div id="headerviewwiki" class="pagetitle"><h2>'.Sanitize::encodeStringForDisplay($wikiname).'</h2></div>';
 
 	//DB $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
 	//DB $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";

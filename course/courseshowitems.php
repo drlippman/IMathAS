@@ -1897,7 +1897,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '<span class="links">';
 				    echo " <a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
 				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
-				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeStringForDisplay($items[$i]) . "\">", _('Copy'), "</a>";
+				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
 				   echo '</span>';
 			   }

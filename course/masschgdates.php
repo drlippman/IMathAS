@@ -296,9 +296,9 @@ if ($overwriteBody==1) {
 	echo "&gt; Mass Change Dates</div>\n";
 	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
 
-	echo "<script type=\"text/javascript\">var filteraddr = \"$imasroot/course/masschgdates.php?cid=$cid&orderby=$orderby\";";
+	echo "<script type=\"text/javascript\">var filteraddr = \"$imasroot/course/masschgdates.php?cid=$cid&orderby=" . Sanitize::encodeUrlParam($orderby) . "\";";
 
-	echo "var orderaddr = \"$imasroot/course/masschgdates.php?cid=$cid&filter=$filter\";</script>";
+	echo "var orderaddr = \"$imasroot/course/masschgdates.php?cid=$cid&filter=" . Sanitize::encodeUrlParam($filter) . "\";</script>";
 
 	echo '<p>Order by: <select id="orderby" onchange="chgorderby()">';
 	echo '<option value="0" ';
@@ -596,20 +596,20 @@ if ($overwriteBody==1) {
 			}
 			echo '"/><div>';
 		}
-		echo Sanitize::encodeStringForDisplay($names[$i])."<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/></div>";
+		echo Sanitize::encodeStringForDisplay($names[$i])."<input type=hidden id=\"id" . Sanitize::encodeStringForDisplay($cnt) . "\" value=\"" . Sanitize::encodeStringForDisplay($ids[$i]) . "\"/></div>";
 		echo "<script> basesdates[$cnt] = ";
 		//if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
-		echo $startdates[$i];
+		echo Sanitize::encodeStringForJavascript($startdates[$i]);
 		echo "; baseedates[$cnt] = ";
 		//if ($enddates[$i]==0 || $enddates[$i]==2000000000) { echo '"NA"';} else {echo $enddates[$i];}
-		echo $enddates[$i];
+		echo Sanitize::encodeStringForJavascript($enddates[$i]);
 		echo "; baserdates[$cnt] = ";
 		//if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {echo '"NA"';} else { echo $reviewdates[$i];}
-		if ($reviewdates[$i]==-1) {echo '"NA"';} else { echo $reviewdates[$i];}
+		if ($reviewdates[$i]==-1) {echo '"NA"';} else { echo Sanitize::encodeStringForJavascript($reviewdates[$i]);}
 		echo "; basefpdates[$cnt] = ";
-		if ($fpdates[$i]==-1) {echo '"NA"';} else { echo $fpdates[$i];}
+		if ($fpdates[$i]==-1) {echo '"NA"';} else { echo Sanitize::encodeStringForJavascript($fpdates[$i]);}
 		echo "; basefrdates[$cnt] = ";
-		if ($frdates[$i]==-1) {echo '"NA"';} else { echo $frdates[$i];}
+		if ($frdates[$i]==-1) {echo '"NA"';} else { echo Sanitize::encodeStringForJavascript($frdates[$i]);}
 		echo ";</script>";
 		echo "</td>";
 		if ($picicons==0) {
@@ -618,7 +618,7 @@ if ($overwriteBody==1) {
 			echo "</td>";
 		}
 
-		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" alt="Swap" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
+		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" alt="Swap" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.Sanitize::encodeStringForDisplay($cnt).'">'.Sanitize::encodeStringForDisplay($availnames[$avails[$i]]).'</span><input type="hidden" id="avail'.Sanitize::encodeStringForDisplay($cnt).'" value="'.Sanitize::encodeStringForDisplay($avails[$i]).'"/></span></td>';
 
 		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('s',$cnt)\"/>";
 		if ($startdates[$i]==0) {

@@ -27,7 +27,7 @@ $flexwidth = true;
 $nologo = true;
 require("../header.php");
 
-echo '<textarea id="emails" style="width:470px;height:400px;">'.$stuemails.'</textarea>';
+echo '<textarea id="emails" style="width:470px;height:400px;">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
 echo '<script type="text/javascript">addLoadEvent(function(){var el=document.getElementById("emails");el.focus();el.select();})</script>';
 require("../footer.php");
 ?>

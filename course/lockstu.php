@@ -39,7 +39,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "\"");
 			exit;
 		}
 	} else { //get confirm
@@ -73,9 +73,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::onlyInt($_GET['uid']) . "&confirmed=true\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . Sanitize::onlyInt($_GET['uid']) . "&confirmed=true\">";
 		}
 
 
@@ -112,7 +112,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "'\">";
 			}
 ?>
 		</p>

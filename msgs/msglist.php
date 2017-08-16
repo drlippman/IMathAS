@@ -413,7 +413,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message = '';
 			}
 
-			echo "<form method=post action=\"msglist.php?page=$page&type=".Sanitize::encodeUrlParam($type)."&cid=$cid&add={$_GET['add']}&replyto=".Sanitize::onlyInt($replyto).'"';
+			echo "<form method=post action=\"msglist.php?page=$page&type=".Sanitize::encodeUrlParam($type)."&cid=$cid&add=".Sanitize::encodeUrlParam($_GET['add'])."&replyto=".Sanitize::onlyInt($replyto).'"';
 			if (!isset($_GET['to'])) {
 				echo " onsubmit=\"return checkrecipient();\"";
 			}
@@ -429,7 +429,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':courseid'=>$courseid, ':id'=>$_GET['to']));
 				$row = $stm->fetch(PDO::FETCH_NUM);
-				echo $row[0].', '.$row[1];
+				printf('%s, %s', Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 				$ismsgsrcteacher = false;
 				if ($courseid==$cid && $isteacher) {
 					$ismsgsrcteacher = true;
@@ -481,7 +481,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 							if ($cnt==1 && $msgset==1 && !$isteacher) {
 								echo ' selected="selected"';
 							}
-							echo ">{$row[2]}, {$row[1]}</option>";
+							printf(">%s, %s</option>", Sanitize::encodeStringForDisplay($row[2]),
+                                Sanitize::encodeStringForDisplay($row[1]));
 						}
             //DB $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
       			//DB $query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";

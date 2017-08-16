@@ -335,9 +335,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo '<option value="'.$row[0].'"';
+			echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
 			if ($catfilter==$row[0]) {echo "selected=1";}
-			echo '>'.$row[1].'</option>';
+			echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 		}
 		echo '<option value="-2" ';
 		if ($catfilter==-2) {echo "selected=1";}
@@ -477,9 +477,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo '<option value="'.$row[0].'"';
+		echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
 		if ($catfilter==$row[0]) {echo "selected=1";}
-		echo '>'.$row[1].'</option>';
+		echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 	}
 	echo '<option value="-2" ';
 	if ($catfilter==-2) {echo "selected=1";}
@@ -659,7 +659,7 @@ function gbstudisp($stu) {
 					echo '<optgroup label="Section '.htmlentities($row[3]).'">';
 					$lastsec = $row[3];
 				}
-				echo '<option value="'.$row[0].'"';
+				echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
 				if ($row[0]==$stu) {
 					echo ' selected="selected"';
 				}
@@ -668,36 +668,36 @@ function gbstudisp($stu) {
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
 			echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif" alt="Updating..."/>';
-			echo ' <span class="small">('.$gbt[1][0][1].')</span>';
+			echo ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 		} else {
-			echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
+			echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 
 			$now = time();
 		}
 
 		if ($stusection!='') {
-			echo ' <span class="small">Section: '.$stusection.'.</span>';
+			echo ' <span class="small">Section: '.Sanitize::encodeStringForDisplay($stusection).'.</span>';
 		}
 		echo ' <span class="small">'._('Last Login: ').tzdate('D n/j/y g:ia', $lastaccess).'.</span>';
 		echo '</div>';
 		if ($isteacher) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
 			//echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
-			echo "<a href=\"#\" onclick=\"GB_show('Send Email','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=email&cid=$cid',800,'auto')\" title=\"Send Email\">", _('Email'), "</a> | ";
+			echo "<a href=\"#\" onclick=\"GB_show('Send Email','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=email&cid=" . Sanitize::courseId($cid) . "',800,'auto')\" title=\"Send Email\">", _('Email'), "</a> | ";
 
 			//echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
-			echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=msg&cid=$cid',800,'auto')\" title=\"Send Message\">", _('Message'), "</a> | ";
+			echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=" . Sanitize::onlyInt($stu) . "&sendtype=msg&cid=" . Sanitize::courseId($cid) . "',800,'auto')\" title=\"Send Message\">", _('Message'), "</a> | ";
 			//remove since redundant with Make Exception button "with selected"
 			//echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
-			echo "<a href=\"listusers.php?cid=$cid&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
-			echo "<a href=\"viewloginlog.php?cid=$cid&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-			echo "<a href=\"viewactionlog.php?cid=$cid&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
+			echo "<a href=\"listusers.php?cid=" . Sanitize::courseId($cid) . "&chgstuinfo=true&uid=" . Sanitize::onlyInt($stu) . "\">", _('Change Info'), "</a> | ";
+			echo "<a href=\"viewloginlog.php?cid=" . Sanitize::courseId($cid) . "&uid=" . Sanitize::onlyInt($stu) . "&from=gb\">", _('Login Log'), "</a> | ";
+			echo "<a href=\"viewactionlog.php?cid=" . Sanitize::courseId($cid) . "&uid=" . Sanitize::onlyInt($stu) . "&from=gb\">", _('Activity Log'), "</a> | ";
 			echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
 			echo '</div>';
 		} else if ($istutor) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid">';
-			echo "<a href=\"viewloginlog.php?cid=$cid&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-			echo "<a href=\"viewactionlog.php?cid=$cid&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
+			echo "<a href=\"viewloginlog.php?cid=" . Sanitize::courseId($cid) . "&uid=" . Sanitize::onlyInt($stu) . "&from=gb\">", _('Login Log'), "</a> | ";
+			echo "<a href=\"viewactionlog.php?cid=" . Sanitize::courseId($cid) . "&uid=" . Sanitize::onlyInt($stu) . "&from=gb\">", _('Activity Log'), "</a>";
 			echo '</div>';
 		}
 
@@ -705,10 +705,10 @@ function gbstudisp($stu) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."\">";
 				echo _('Gradebook Comment').': '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
-				echo "<textarea name=\"usrcomments\" rows=3 cols=60>$gbcomment</textarea>";
+				echo "<textarea name=\"usrcomments\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbcomment) . "</textarea>";
 				echo '</form>';
 			} else {
-				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">$gbcomment</div><br/>";
+				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";
 			}
 		}
 		//TODO i18n
@@ -718,16 +718,16 @@ function gbstudisp($stu) {
 			$lpmsg = "$latepasses LatePass".($latepasses!=1?"es":"").' available';
 		}
 		if (!$isteacher && !$istutor) {
-			echo $lpmsg;
+			echo Sanitize::encodeStringForDisplay($lpmsg);
 		}
 
 	}
-	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."&uid=$stu\">";
+	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING'])."&uid=" . Sanitize::onlyInt($stu) . "\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
 	if ($isteacher && $stu>0) {
 		echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
-		echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
+		echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.Sanitize::encodeStringForDisplay($lpmsg).'';
 	}
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr>';
@@ -784,7 +784,7 @@ function gbstudisp($stu) {
 				}
 			}
 
-			echo '<td class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0];
+			echo '<td class="cat'.Sanitize::onlyInt($gbt[0][1][$i][1]).'">'.Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
 			$afterduelatepass = false;
 			if (!$isteacher && !$istutor && $latepasses>0 && !isset($gbt[1][1][$i][10])) {
 				//not started, so no canuselatepass record
@@ -834,14 +834,30 @@ function gbstudisp($stu) {
 						}
 					} else {
 						if (isset($gbt[1][1][$i][0])) { //has score
-							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[1][1][$i][4]}&uid={$gbt[1][4][0]}\"";
+							$querymap = array(
+                                'stu' => $stu,
+                                'cid' => $cid,
+                                'asid' => $gbt[1][1][$i][4],
+                                'uid' => $gbt[1][4][0]
+                            );
+
+							echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+
 							if ($afterduelatepass) {
 								echo ' onclick="return confirm(\''._('If you view this assignment, you will not be able to use a LatePass on it').'\');"';
 							}
 							echo ">";
 							$haslink = true;
 						} else if ($isteacher) {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$i][7]}&uid={$gbt[1][4][0]}\">";
+                            $querymap = array(
+                                'stu' => $stu,
+                                'cid' => $cid,
+                                'aid' => $gbt[0][1][$i][7],
+                                'uid' => $gbt[1][4][0],
+                                'asid' => 'new'
+                            );
+
+                            echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
 							$haslink = true;
 						}
 					}
@@ -849,22 +865,50 @@ function gbstudisp($stu) {
 					if ($isteacher || ($istutor && $gbt[0][1][$i][8]==1)) {
 						if ($stu==-1) {
 							if (isset($gbt[1][1][$i][0])) { //has score
-								echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">";
+                                $querymap = array(
+                                    'stu' => $stu,
+                                    'cid' => $cid,
+                                    'grades' => 'all',
+                                    'gbitem' => $gbt[0][1][$i][7]
+                                );
+
+                                echo '<a href="addgrades.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
 								$haslink = true;
 							}
 						} else {
-							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[1][4][0]}&gbitem={$gbt[0][1][$i][7]}\">";
+                            $querymap = array(
+                                'stu' => $stu,
+                                'cid' => $cid,
+                                'grades' => $gbt[1][4][0],
+                                'gbitem' => $gbt[0][1][$i][7]
+                            );
+
+                            echo '<a href="addgrades.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
 							$haslink = true;
 						}
 					}
 				} else if ($gbt[0][1][$i][6]==2) {//discuss
 					if ($stu != -1) {
-						echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[1][4][0]}&fid={$gbt[0][1][$i][7]}\">";
+                        $querymap = array(
+                            'cid' => $cid,
+                            'stu' => $stu,
+                            'grades' => $gbt[1][4][0],
+                            'fid' => $gbt[0][1][$i][7]
+                        );
+
+                        echo '<a href="viewforumgrade.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
 						$haslink = true;
 					}
 				} else if ($gbt[0][1][$i][6]==3) {//exttool
 					if ($isteacher || ($istutor && $gbt[0][1][$i][8]==1)) {
-						echo "<a href=\"edittoolscores.php?cid=$cid&stu=$stu&uid={$gbt[1][4][0]}&lid={$gbt[0][1][$i][7]}\">";
+					    $querymap = array(
+					        'cid' => $cid,
+                            'stu' => $stu,
+                            'grades' => $gbt[1][4][0],
+                            'lid' => $gbt[0][1][$i][7]
+                        );
+
+					    echo '<a href="edittoolscores.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
 						$haslink = true;
 					}
 				}
@@ -959,7 +1003,7 @@ function gbstudisp($stu) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $show = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT stugbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
+		$stm->execute(array(':courseid'=>Sanitize::courseId($cid)));
 		$show = $stm->fetchColumn(0);
 		//echo '</tbody></table><br/>';
 
@@ -994,16 +1038,16 @@ function gbstudisp($stu) {
 				//} else {
 					echo '<tr class="grid">';
 				//}
-				echo '<td class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">'.$gbt[0][2][$i][0].'</span>';
+				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]).'</span>';
 				if (isset($gbt[0][2][$i][11])) {  //category weight
-					echo ' ('.$gbt[0][2][$i][11].'%'.')';
+					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}
 				echo '</td>';
 				if (($show&1)==1) {
 					echo '<td>';
 					//show points if not averaging or if points possible scoring
 					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo $gbt[1][2][$i][0].'/'.$gbt[0][2][$i][3].' (';
+						echo Sanitize::onlyFloat($gbt[1][2][$i][0]).'/'.Sanitize::onlyFloat($gbt[0][2][$i][3]).' (';
 					}
 					if ($gbt[0][2][$i][3]>0) {
 						echo round(100*$gbt[1][2][$i][0]/$gbt[0][2][$i][3],1).'%';
@@ -1019,7 +1063,7 @@ function gbstudisp($stu) {
 				if (($show&2)==2) {
 					echo '<td>';
 					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo $gbt[1][2][$i][3].'/'.$gbt[1][2][$i][4].' (';
+						echo Sanitize::onlyFloat($gbt[1][2][$i][3]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][4]).' (';
 					}
 					if ($gbt[1][2][$i][4]>0) {
 						echo round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][4],1).'%';
@@ -1035,7 +1079,7 @@ function gbstudisp($stu) {
 				if (($show&4)==4) {
 					echo '<td>';
 					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo $gbt[1][2][$i][1].'/'.$gbt[0][2][$i][4].' (';
+						echo Sanitize::onlyFloat($gbt[1][2][$i][1]).'/'.Sanitize::onlyFloat($gbt[0][2][$i][4]).' (';
 					}
 					if ($gbt[0][2][$i][4]>0) {
 						echo round(100*$gbt[1][2][$i][1]/$gbt[0][2][$i][4],1).'%';
@@ -1051,7 +1095,7 @@ function gbstudisp($stu) {
 				if (($show&8)==8) {
 					echo '<td>';
 					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo $gbt[1][2][$i][2].'/'.$gbt[0][2][$i][5].' (';
+						echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[0][2][$i][5]).' (';
 					}
 					if ($gbt[0][2][$i][5]>0) {
 						echo round(100*$gbt[1][2][$i][2]/$gbt[0][2][$i][5],1).'%';
@@ -1074,24 +1118,24 @@ function gbstudisp($stu) {
 			if (isset($gbt[0][3][0])) { //using points based
 				echo '<td>', _('Total'), '</td>';
 				if (($show&1)==1) {
-					echo '<td>'.$gbt[1][3][0].'/'.$gbt[0][3][0].' ('.$gbt[1][3][3].'%)</td>';
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'/'.Sanitize::onlyFloat($gbt[0][3][0]).' ('.Sanitize::onlyFloat($gbt[1][3][3]).'%)</td>';
 				}
 				if (($show&2)==2) {
-					echo '<td>'.$gbt[1][3][6].'/'.$gbt[1][3][7].' ('.$gbt[1][3][8].'%)</td>';
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][6]).'/'.Sanitize::onlyFloat($gbt[1][3][7]).' ('.Sanitize::onlyFloat($gbt[1][3][8]).'%)</td>';
 				}
 				if (($show&4)==4) {
-					echo '<td>'.$gbt[1][3][1].'/'.$gbt[0][3][1].' ('.$gbt[1][3][4].'%)</td>';
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'/'.Sanitize::onlyFloat($gbt[0][3][1]).' ('.Sanitize::onlyFloat($gbt[1][3][4]).'%)</td>';
 				}
 				if (($show&8)==8) {
-					echo '<td>'.$gbt[1][3][2].'/'.$gbt[0][3][2].' ('.$gbt[1][3][5].'%)</td>';
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'/'.Sanitize::onlyFloat($gbt[0][3][2]).' ('.Sanitize::onlyFloat($gbt[1][3][5]).'%)</td>';
 				}
 
 			} else {
 				echo '<td>', _('Weighted Total'), '</td>';
-				if (($show&1)==1) { echo '<td>'.$gbt[1][3][0].'%</td>';}
-				if (($show&2)==2) {echo '<td>'.$gbt[1][3][6].'%</td>';}
-				if (($show&4)==4) {echo '<td>'.$gbt[1][3][1].'%</td>';}
-				if (($show&8)==8) {echo '<td>'.$gbt[1][3][2].'%</td>';}
+				if (($show&1)==1) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'%</td>';}
+				if (($show&2)==2) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][6]).'%</td>';}
+				if (($show&4)==4) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'%</td>';}
+				if (($show&8)==8) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'%</td>';}
 			}
 			echo '</tr>';
 			/*if ($availshow==2) {
@@ -1247,11 +1291,11 @@ function gbinstrdisp() {
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[0]=='') { continue;}
-				echo  "<option value=\"{$row[0]}\" ";
+				echo  "<option value=\"" . Sanitize::encodeStringForDisplay($row[0]) . "\" ";
 				if ($row[0]==$secfilter) {
 					echo  'selected=1';
 				}
-				echo  ">{$row[0]}</option>";
+				echo  ">" . Sanitize::encodeStringForDisplay($row[0]) . "</option>";
 			}
 			echo  "</select>";
 

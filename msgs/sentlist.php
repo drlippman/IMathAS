@@ -216,7 +216,7 @@ function chgfilter() {
 		if ($filtercid==$row[0]) {
 			echo 'selected=1';
 		}
-		echo " >{$row[1]}</option>";
+		printf(" >%s</option>", Sanitize::encodeStringForDisplay($row[1]));
 	}
 	echo "</select> ";
 	echo 'By recipient: <select id="filteruid" onchange="chgfilter()"><option value="0" ';

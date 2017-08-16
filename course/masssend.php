@@ -81,9 +81,9 @@
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
 			$messagep1 = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-			$messagep1 .= "<p>You've received a new message</p><p>From: $from<br />Course: $coursename.</p>\r\n";
+			$messagep1 .= "<p>You've received a new message</p><p>From: $from<br />Course: ".Sanitize::encodeStringForDisplay($coursename).".</p>\r\n";
 			//DB $messagep1 .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
-			$messagep1 .= "<p>Subject: ".$_POST['subject']."</p>";
+			$messagep1 .= "<p>Subject: ".$_POST['subject']."</p>"; // Sanitized by htmLawed near line 40.
 			$messagep1 .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=$cid&msgid=";
 			$messagep2 = "\">";
 			$messagep2 .= "View Message</a></p>\r\n";
@@ -176,7 +176,7 @@
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
 			$message = filter($message);
-			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) .'/',$message);
+			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$GLOBALS['basesiteurl'] .'/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
@@ -258,31 +258,31 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		if ($calledfrom=='lu') {
-			echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass $sendtype</div>\n";
+			echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 		} else if ($calledfrom=='gb') {
-			echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Gradebook</a> &gt; Send Mass $sendtype</div>\n";
+			echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 		} else if ($calledfrom=='itemsearch') {
-			echo "&gt; Send Mass $sendtype</div>\n";
+			echo "&gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 		}
 		if (count($_POST['checked'])==0) {
 			echo "No users selected.  ";
 			if ($calledfrom=='lu') {
 				echo "<a href=\"listusers.php?cid=$cid\">Try again</a>\n";
 			} else if ($calledfrom=='gb') {
-				echo "<a href=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}\">Try again</a>\n";
+				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Try again</a>\n";
 			}
 			require("../footer.php");
 			exit;
 		}
 		echo '<div id="headermasssend" class="pagetitle">';
-		echo "<h3>Send Mass $sendtype</h3>\n";
+		echo "<h3>Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</h3>\n";
 		echo '</div>';
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=$sendtype\">\n";
+			echo "<form method=post action=\"listusers.php?cid=$cid&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}&masssend=$sendtype\">\n";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='itemsearch') {
-			echo "<form method=post action=\"itemsearch.php?masssend=$sendtype\">\n";
+			echo "<form method=post action=\"itemsearch.php?masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";
@@ -319,10 +319,11 @@
 		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			echo "<option value=\"{$line['id']}\" ";
 			if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
-			echo ">{$line['name']}</option>\n";
+			echo ">".Sanitize::encodeStringForDisplay($line['name'])."</option>\n";
 		}
 		echo "</select>\n";
-		echo "<input type=hidden name=\"tolist\" value=\"" . implode(',',$_POST['checked']) . "\">\n";
+		echo "<input type=hidden name=\"tolist\" value=\""
+			. Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
 		echo "</span><br class=form />\n";
 		echo "<div class=submit><input type=submit value=\"Send $sendtype\"></div>\n";
 		echo "</form>\n";
