@@ -571,10 +571,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		if ($forumsettings['postinstr'] != '' && $_GET['modify']=="new") {
 			echo '<h4>'._('Posting Instructions').'</h4>';
-			echo '<div class="intro">'.Sanitize::encodeStringForDisplay($forumsettings['postinstr']).'</div><br/>';
+			// $forumsettings['postinstr'] contains HTML.
+			echo '<div class="intro">'.$forumsettings['postinstr'].'</div><br/>';
 		} else if ($forumsettings['replyinstr'] != '' && $_GET['modify']=="reply") {
 			echo '<h4>'._('Reply Instructions').'</h4>';
-			echo '<div class="intro">'.Sanitize::encodeStringForDisplay($forumsettings['replyinstr']).'</div><br/>';
+			// $forumsettings['replyinstr'] contains HTML.
+			echo '<div class="intro">'.$forumsettings['replyinstr'].'</div><br/>';
 		}
 		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify=".Sanitize::encodeUrlParam($_GET['modify'])."&replyto=".Sanitize::encodeUrlParam($_GET['replyto'])."\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
@@ -723,7 +725,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';
-				echo '<input type="text" size="4" name="points" id="points" value="'.Sanitize::onlyInt($points).'" /></span><br class="form" />';
+				echo '<input type="text" size="4" name="points" id="points" value="'.Sanitize::onlyFloat($points).'" /></span><br class="form" />';
 			}
 			if ($_GET['modify']=='reply') {
 				echo "<div class=submit><input type=submit value='Post Reply'></div>\n";

@@ -125,7 +125,8 @@
 			}
 			$sentto = implode('<br/>',$fullnames);
 			//DB $message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
-			$message = Sanitize::encodeStringForDisplay($_POST['message']) . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".Sanitize::emailAddress($sentto)." </p>\n";
+			// $_POST['message'] is sanitized by htmlLawed near line 40.
+			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".Sanitize::emailAddress($sentto)." </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_tutors,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ");
@@ -325,7 +326,7 @@
 		echo "<input type=hidden name=\"tolist\" value=\""
 	. Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
 		echo "</span><br class=form />\n";
-		echo "<div class=submit><input type=submit value=\"Send".Sanitize::encodeStringForDisplay($sendtype)."\"></div>\n";
+		echo "<div class=submit><input type=submit value=\"Send ".Sanitize::encodeStringForDisplay($sendtype)."\"></div>\n";
 		echo "</form>\n";
 		//DB $tolist = "'".implode("','",$_POST['checked'])."'";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));

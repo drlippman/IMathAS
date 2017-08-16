@@ -286,7 +286,7 @@ if ($overwriteBody==1) {
 
 		$headerleft = '';
 		if (isset($_POST['aname'])) {
-			$headerleft .= $line['name'];
+			$headerleft .= Sanitize::encodeStringForDisplay($line['name']);
 		}
 		if ($copies>1) {
 			$headerleft .= ' - Form ' . ($j+1);
@@ -319,7 +319,7 @@ if ($overwriteBody==1) {
 			}
 		}
 		if (isset($_POST['otherheader'])) {
-			$headerright .= $_POST['otherheadertext'] . '____________________________';
+			$headerright .= Sanitize::encodeStringForDisplay($_POST['otherheadertext']) . '____________________________';
 		}
 
 		echo "<div class=q>\n";
@@ -328,8 +328,9 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<div class=m>\n";
 		}
-		echo "<div id=headerleft>".Sanitize::encodeStringForDisplay($headerleft)."</div><div id=headerright>".Sanitize::encodeStringForDisplay($headerright)."</div>\n";
-		echo "<div id=intro>".Sanitize::encodeStringForDisplay($line['intro'])."</div>\n";
+		echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
+		// $line['intro'] contains HTML.
+		echo "<div id=intro>{$line['intro']}</div>\n";
 		echo "</div>\n";
 		if (!$isfinal) {
 			echo "<div class=cbutn><a href=\"printtest.php?cid=$cid&aid=$aid\">Cancel</a></div>\n";

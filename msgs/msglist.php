@@ -928,9 +928,9 @@ function chgfilter() {
 		echo "><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid=".Sanitize::onlyInt($line['id'])."\">";
 		if (($line['isread']&1)==0) {
-			echo "<b>" . Sanitize::encodeStringForDisplay($line['title']). "</b>";
+			echo "<b>" . $line['title']. "</b>";
 		} else {
-			echo Sanitize::encodeStringForDisplay($line['title']);
+			echo $line['title'];
 		}
 		echo "</a></td><td>";
 		if ($line['replied']==1) {

@@ -37,8 +37,8 @@ if ($myrights<20) {
 		$onlychk = 0;
 	}
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
-		$formn = Sanitize::onlyInt($_GET['formn']);
-		$loc = $_GET['loc'];
+		$formn = Sanitize::simpleString($_GET['formn']);
+		$loc = Sanitize::simpleString($_GET['loc']);
 		if (isset($_GET['checked']) || isset($_GET['usecheck'])) {
 			$chk = "&checked=0";
 		} else {
@@ -285,7 +285,7 @@ if ($overwriteBody==1) {
 			. Sanitize::generateQueryStringFromMap(array('subject' => 'Problem with question id ' . $_GET['qsetid']))
 			. "\">E-mail owner</a> to report problems</p>";
 	}
-	printf("<p>Description: %s</p><p>Author: %s</p>", Sanitize::sanitizeFilenameAndCheckBlacklist($line['description']),
+	printf("<p>Description: %s</p><p>Author: %s</p>", Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
 	echo "<p>Last Modified: $lastmod</p>";
 	if ($line['deleted']==1) {
