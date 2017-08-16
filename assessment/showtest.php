@@ -3532,8 +3532,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$stm = $DBH->prepare("SELECT * from imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$userinfo = $stm->fetch(PDO::FETCH_ASSOC);
-			echo "<h3>{$userinfo['LastName']}, {$userinfo['FirstName']}: ";
-			echo substr($userinfo['SID'],0,strpos($userinfo['SID'],'~'));
+			printf("<h3>%s, %s: ", Sanitize::encodeStringForDisplay($userinfo['LastName']),
+				Sanitize::encodeStringForDisplay($userinfo['FirstName']));
+			echo Sanitize::encodeStringForDisplay(substr($userinfo['SID'],0,strpos($userinfo['SID'],'~')));
 			echo "</h3>\n";
 		}
 

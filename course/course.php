@@ -225,14 +225,14 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 				//DB $sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
 				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".Sanitize::encodeStringForDisplay($backtrack[$i][0]).'</a>';
 				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-				$curBreadcrumb .= $backtrack[$i][0];
+				$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}
 			}
 			$curname = $backtrack[count($backtrack)-1][0];
 			if (count($backtrack)>$depth) {
-				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[count($backtrack)-2][1])."\">" . _('Back') . "</a></span><br class=\"form\" />";
 			}
 			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
 

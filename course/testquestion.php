@@ -305,7 +305,7 @@ if ($overwriteBody==1) {
 	$license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike','Creative Commons Attribution-ShareAlike');
 	echo $license[$line['license']];
 	if ($line['otherattribution']!='') {
-		echo '<br/>Other Attribution: '.$line['otherattribution'];
+		echo '<br/>Other Attribution: '.Sanitize::encodeStringForDisplay($line['otherattribution']);
 	}
 	echo '</p>';
 

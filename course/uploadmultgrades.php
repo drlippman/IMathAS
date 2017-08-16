@@ -290,7 +290,7 @@ if ($overwriteBody==1) {
 			if ($data[3]==0) {echo 'selected="selected"';}
 			echo '>Add as new item</option>';
 			if ($data[3]>0) {
-				echo '<option value="'.$data[3].'" selected="selected">Overwrite existing scores</option>';
+				echo '<option value="'.Sanitize::encodeStringForDisplay($data[3]).'" selected="selected">Overwrite existing scores</option>';
 			}
 			echo '</select></td>';
 			echo '<td><input type="text" size="20" name="colname'.$col.'" value="'.htmlentities($data[0]).'" /></td>';

@@ -449,11 +449,11 @@ if ($postinstr != '' || $replyinstr != '') {
 	echo '<div id="postreplyinstr" style="display:none;" class="intro">';
 	if ($postinstr != '') {
 		echo '<h4>'._('Posting Instructions').'</h4>';
-		echo $postinstr;
+		echo Sanitize::encodeStringForDisplay($postinstr);
 	}
 	if ($replyinstr != '') {
 		echo '<h4>'._('Reply Instructions').'</h4>';
-		echo $replyinstr;
+		echo Sanitize::encodeStringForDisplay($replyinstr);
 	}
 	echo '</div><br/>';
 }
@@ -642,7 +642,7 @@ if ($page<0) {
 	if ($taglist!='') {
 		$p = strpos($taglist,':');
 
-		$tagselect = 'Filter by '.substr($taglist,0,$p).': ';
+		$tagselect = 'Filter by '.Sanitize::encodeStringForDisplay(substr($taglist,0,$p)).': ';
 		$tagselect .= '<select id="tagfilter" onChange="chgtagfilter()"><option value="" ';
 		if ($tagfilter=='') {
 			$tagselect .= 'selected="selected"';

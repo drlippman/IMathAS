@@ -312,13 +312,13 @@ function printlist($items) {
 					$isopen = true;
 				}
 				if ($bisopen) {
-					$out .=  "<li class=lihdr aria-expanded=true ><span class=hdr><span class=btn id=\"b{$item['id']}\">-</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
-					$out .=  "<span class=blocklbl>{$item['name']}</span></span>\n";
-					$out .=  '<ul class="nomark" id="'.$item['id'].'">';
+					$out .=  "<li class=lihdr aria-expanded=true ><span class=hdr><span class=btn id=\"b".Sanitize::encodeStringForDisplay($item['id'])."\">-</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
+					$out .=  "<span class=blocklbl>".Sanitize::encodeStringForDisplay($item['name'])."</span></span>\n";
+					$out .=  '<ul class="nomark" id="'.Sanitize::encodeStringForDisplay($item['id']).'">';
 				} else {
-					$out .=  "<li class=lihdr aria-expanded=false><span class=hdr><span class=btn id=\"b{$item['id']}\">+</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
-					$out .=  "<span class=blocklbl>{$item['name']}</span></span>\n";
-					$out .=  '<ul class="nomark" id="'.$item['id'].'">';
+					$out .=  "<li class=lihdr aria-expanded=false><span class=hdr><span class=btn id=\"b".Sanitize::encodeStringForDisplay($item['id'])."\">+</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
+					$out .=  "<span class=blocklbl>".Sanitize::encodeStringForDisplay($item['name'])."</span></span>\n";
+					$out .=  '<ul class="nomark" id="'.Sanitize::encodeStringForDisplay($item['id']).'">';
 				}
 				$out .= $subcontent;
 				$out .=  '</ul></li>';
@@ -357,10 +357,10 @@ function printlist($items) {
 				 }
 				 if ($viewall || ($line['avail']==1 && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
 					 if ($openitem=='' && $foundfirstitem=='') {
-						 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+						 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true;
 					 }
 					 if ($itemtype.$typeid===$openitem) {
-						 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true; $opentxt = ' aria-selected="true" ';
+						 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true; $opentxt = ' aria-selected="true" ';
 					 }
 					 $out .= '<li '.$opentxt.'>';
 					 if ($line['displaymethod']!='Embed') {
@@ -408,7 +408,7 @@ function printlist($items) {
 					 } else {
 						 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
 					 }
-					 $out .= '<a tabindex="-1" href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.$line['name'].'</a></li>';
+					 $out .= '<a tabindex="-1" href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
 				 }
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
@@ -425,7 +425,7 @@ function printlist($items) {
 					 if ($itemtype.$typeid===$openitem) {
 						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a tabindex="-1" href="showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a tabindex="-1" href="showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'"  onclick="recordlasttreeview(\''.$itemtype.Sanitize::encodeStringForJavascript($typeid).'\')"  target="readerframe">'.Sanitize::encodeStringForDisplay($line['title']).'</a></li>';
 				 }
 			} /*else if ($line['itemtype']=='Forum') {
 				//TODO check availability, etc.
@@ -454,7 +454,7 @@ function printlist($items) {
 					 if ($itemtype.$typeid===$openitem) {
 						 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/wiki_tiny.png" alt="Wiki"> <a tabindex="-1" href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/wiki_tiny.png" alt="Wiki"> <a tabindex="-1" href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.Sanitize::encodeStringForJavascript($typeid).'\')" target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
 				 }
 			}
 

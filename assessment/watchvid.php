@@ -33,7 +33,7 @@ if (strpos($url,'youtube.com/watch')!==false) {
 	}
 	$doembed = true;
 	$videoUrl = $urlmode.'www.youtube.com/embed/'.$vidid.$timestart;
-	$out = '<iframe width="640" height="510" src="'.Sanitize::fullUrl($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
+	$out = '<iframe width="640" height="510" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if (strpos($url,'youtu.be/')!==false) {
 	//youtube
@@ -60,14 +60,14 @@ if (strpos($url,'youtu.be/')!==false) {
 	}
 	$doembed = true;
 	$videoUrl = $urlmode.'www.youtube.com/embed/'.$vidid.$timestart;
-	$out = '<iframe width="640" height="510" src="'.Sanitize::fullUrl($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
+	$out = '<iframe width="640" height="510" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if (strpos($url,'vimeo.com/')!==false) {
 	//youtube
 	$vidid = substr($url,strpos($url,'.com/')+5);
 	$doembed = true;
 	$videoUrl = 'http://player.vimeo.com/video/'.$vidid;
-	$out = '<iframe width="640" height="510" src="'.Sanitize::fullUrl($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
+	$out = '<iframe width="640" height="510" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
 }
 if ($doembed) {
 	echo '<html><head><title>Video</title>';
@@ -77,6 +77,6 @@ if ($doembed) {
 	echo '</head>';
 	echo '<body>'.$out.'</body></html>';
 } else {
-	header("Location:". Sanitize::fullUrl($url));
+	header("Location:". Sanitize::url($url));
 }
 ?>

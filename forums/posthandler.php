@@ -149,7 +149,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$sendemail = false;
 				require("../header.php");
 				echo '<h2>Error:</h2><p>It looks like the post you were replying to was deleted.  Your post is below in case you ';
-				echo 'want to copy-and-paste it somewhere. <a href="'.Sanitize::fullUrl($returnurl).'">Continue</a></p>';
+				echo 'want to copy-and-paste it somewhere. <a href="'.Sanitize::url($returnurl).'">Continue</a></p>';
 				echo '<hr>';
 				//DB echo '<p>Message:</p><div class="editor">'.filter(stripslashes($_POST['message'])).'</div>';
 				echo '<p>Message:</p><div class="editor">'.filter($_POST['message']).'</div>';

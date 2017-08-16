@@ -154,11 +154,11 @@ foreach ($actions as $r) {
 	if (isset($r[3])) {
 		$r3pts = explode('::',$r[3]);
 		if (count($r3pts)==2) {
-			$thelink = '<a href="'.Sanitize::fullUrl($r3pts[0]).'" target="_blank">'.Sanitize::encodeStringForDisplay($r3pts[1]).'</a>';
-			$href = Sanitize::fullUrl($r3pts[0]);
+			$thelink = '<a href="'.Sanitize::url($r3pts[0]).'" target="_blank">'.Sanitize::encodeStringForDisplay($r3pts[1]).'</a>';
+			$href = Sanitize::url($r3pts[0]);
 		} else {
-			$thelink = Sanitize::fullUrl($r[3]);
-			$href = Sanitize::fullUrl($r[3]);
+			$thelink = Sanitize::url($r[3]);
+			$href = Sanitize::url($r[3]);
 		}
 	}
 	echo '<tr>';
@@ -190,7 +190,7 @@ foreach ($actions as $r) {
 		break;
 	case 'extref':
 		$p = explode(': ',$r[3]);
-		echo 'In assessment '.Sanitize::encodeStringForDisplay($exnames[$r[1]]).', clicked help for <a target="_blank" href="'.Sanitize::fullUrl($p[1]).'">'.Sanitize::encodeStringForDisplay($p[0]).'</a>';
+		echo 'In assessment '.Sanitize::encodeStringForDisplay($exnames[$r[1]]).', clicked help for <a target="_blank" href="'.Sanitize::url($p[1]).'">'.Sanitize::encodeStringForDisplay($p[0]).'</a>';
 		break;
 	case 'assessintro':
 		echo 'In assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]).' intro, clicked link to '.$thelink;

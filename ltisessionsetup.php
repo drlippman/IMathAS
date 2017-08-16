@@ -6,7 +6,7 @@ if ($_SERVER['HTTP_HOST'] != 'localhost') {
 	session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
 }
 session_start();
-$redir = Sanitize::fullUrl($_GET['redirect_url']);
+$redir = Sanitize::url($_GET['redirect_url']);
 ?>
 <!DOCTYPE html>
 <html>

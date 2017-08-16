@@ -416,7 +416,7 @@ if ($overwriteBody==1) {
 	}
 	if ($isfinal) {
 		$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
-		echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::fullUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
+		echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::url($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
 		echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 	}
 	echo "</form>\n";

@@ -253,7 +253,7 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 	function nextpage() {
 	   var aid = document.getElementById('aidselect').value;
-	   var togo = '<?php echo Sanitize::fullUrl($address); ?>&aid=' + aid;
+	   var togo = '<?php echo Sanitize::url($address); ?>&aid=' + aid;
 	   window.location = togo;
 	}
 	</script>

@@ -1540,6 +1540,9 @@ function showitems($items,$parent,$inpublic=false) {
    			$html = '<div class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		}
 
+   		$blk = Sanitize::encodeUrlParam($blk);
+   		$tb = Sanitize::encodeUrlParam($tb);
+
 		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
 			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
@@ -1598,7 +1601,9 @@ function showitems($items,$parent,$inpublic=false) {
 		$html .= '</div>';
 
    	} else {
-   		$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
+   		$html = sprintf("<select name=addtype id=\"addtype%s-%s\" onchange=\"additem('%s','%s')\" ",
+			Sanitize::encodeStringForDisplay($blk), Sanitize::encodeStringForDisplay($tb),
+			Sanitize::encodeStringForJavascript($blk), Sanitize::encodeStringForJavascript($tb));
 		if ($tb=='t') {
 			$html .= 'style="margin-bottom:5px;"';
 		}

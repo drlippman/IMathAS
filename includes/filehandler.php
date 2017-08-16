@@ -637,6 +637,7 @@ function deletefilebykey($key) {
 }
 
 function deleteallpostfiles($postid) {
+	$postid = Sanitize::onlyInt($postid);
 	$delcnt = 0;
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
