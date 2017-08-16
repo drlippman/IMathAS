@@ -22,9 +22,9 @@ function printlist($parent) {
 		if (!in_array($child,$parents)) { //if no children
 			echo "<li><span class=dd>-</span><input type=checkbox name=\"libs[]\" value=\"".Sanitize::encodeStringForDisplay($child)."\" CHECKED>".Sanitize::encodeStringForDisplay($names[$child])."</li>";
 		} else { // if children
-			echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle(".Sanitize::encodeStringForJavascript($child)."\"><span class=btn id=\"b$child\">+</span> ";
+			echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle(".Sanitize::encodeStringForJavascript($child).")\"><span class=btn id=\"b$child\">+</span> ";
 			echo "</span><input type=checkbox name=\"libs[]\" value=\"".Sanitize::encodeStringForDisplay($child)."\" CHECKED>";
-			echo "<span class=hdr onClick=\"toggle(".Sanitize::encodeStringForJavascript($child)."\">".Sanitize::encodeStringForDisplay($names[$child])."</span>";
+			echo "<span class=hdr onClick=\"toggle(".Sanitize::encodeStringForJavascript($child).")\">".Sanitize::encodeStringForDisplay($names[$child])."</span>";
 			echo "<ul class=hide id=$child>\n";
 			printlist($child);
 			echo "</ul></li>\n";
