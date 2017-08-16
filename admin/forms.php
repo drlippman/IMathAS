@@ -99,8 +99,8 @@ switch($_GET['action']) {
 				if (selrights<75) {
 					$("input[name^=specialrights]").prop("checked",false);
 				} else if (selrights==75) {
-					$("#specialrights1,#specialrights4,#specialrights8").prop("checked",true);
-					$("#specialrights2").prop("checked",false);
+					$("input[name^=specialrights]").prop("checked",false);
+					$("#specialrights1,#specialrights4,#specialrights8,#specialrights16").prop("checked",true);
 				} else if (selrights==100) {
 					$("input[name^=specialrights]").prop("checked",true);
 				}
@@ -153,9 +153,11 @@ switch($_GET['action']) {
 		echo "<input type=radio name=\"newrights\" value=\"40\" ";
 		if ($oldrights == 40) {echo "CHECKED";}
 		echo "> Limited Course Creator <BR>\n";
-		echo "<input type=radio name=\"newrights\" value=\"75\" ";
-		if ($oldrights == 75) {echo "CHECKED";}
-		echo "> Group Admin <BR>\n";
+		if ($myrights>=75) {
+			echo "<input type=radio name=\"newrights\" value=\"75\" ";
+			if ($oldrights == 75) {echo "CHECKED";}
+			echo "> Group Admin <BR>\n";
+		}
 		if ($myrights==100) {
 			echo "<input type=radio name=\"newrights\" value=\"100\" ";
 			if ($oldrights == 100) {echo "CHECKED";}
@@ -183,9 +185,23 @@ switch($_GET['action']) {
 			if (($oldspecialrights&8)==8) { echo 'checked';}
 			echo '><label for="specialrights8">Create public (open to all) question libraries</label><br/>';
 		}
+		if ($myrights>=75) {
+			echo '<input type="checkbox" name="specialrights16" id="specialrights16" ';
+			if (($oldspecialrights&16)==16) { echo 'checked';}
+			echo '><label for="specialrights16">Create new instructor accounts (own group)</label><br/>';
+		}
+		if ($myrights==100) {
+			echo '<input type="checkbox" name="specialrights32" id="specialrights32" ';
+			if (($oldspecialrights&32)==32) { echo 'checked';}
+			echo '><label for="specialrights32">Create new instructor accounts (any group)</label><br/>';
+			
+			echo '<input type="checkbox" name="specialrights64" id="specialrights64" ';
+			if (($oldspecialrights&64)==64) { echo 'checked';}
+			echo '><label for="specialrights64">Approve instructor account requests</label><br/>';
+		}
 		echo '</span><br class="form"/>';
 
-		if ($myrights == 100) {
+		if ($myrights == 100 || ($myspecialrights&32)==32) {
 			echo "<span class=form>Assign to group: </span>";
 			echo "<span class=formright><select name=\"group\" id=\"group\">";
 			echo "<option value=0>Default</option>\n";

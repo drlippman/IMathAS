@@ -2,7 +2,7 @@
 
 require("../init.php");
 
-if ($myrights<100) {exit;}
+if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
 if (isset($_GET['skipn'])) {
 	$offset =  Sanitize::onlyInt(($_GET['skipn']));

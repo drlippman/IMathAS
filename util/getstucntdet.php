@@ -10,7 +10,7 @@ ul {
 <body>
 <?php
 	require("../init.php");
-	if ($myrights<40) {
+	if ($myrights<100 && ($myspecialrights&(16+32+64))==0) {
 		exit;
 	}
 	$now = time();

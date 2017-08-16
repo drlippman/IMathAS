@@ -421,7 +421,16 @@ if (isset($sessiondata['emulateuseroriginaluser'])) {
 if ($myrights==100 && count($brokencnt)>0) {
 	echo '<div><span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
 }
-
+if ($myrights<75 && ($myspecialrights&(16+32+64))!=0) {
+	echo '<div>';
+	if (($myspecialrights&(16+32))!=0) {
+		echo '<a href="admin/forms.php?from=home&action=newadmin">'._('Add New User').'</a> ';
+	}
+	if (($myspecialrights&64)!=0) {
+		echo '<a href="admin/approvepending.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
+	}
+	echo '</div>';
+} 
 if (isset($tzname) && isset($sessiondata['logintzname']) && $tzname!=$sessiondata['logintzname']) {
 	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';
 }

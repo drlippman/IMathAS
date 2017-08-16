@@ -38,9 +38,10 @@ switch($_POST['action']) {
 		$stm->execute(array(':userid'=>$be, ':sessionid'=>$sessionid));
 		break;
 	case "chgrights":
-		if ($myrights < 100 && $_POST['newrights']>75) {echo "You don't have the authority for this action"; break;}
-		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
-
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($_POST['newrights']>$myrights) {
+			$_POST['newrights'] = $myrights;
+		}
 		$stm = $DBH->prepare("SELECT rights FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$oldrights = $stm->fetchColumn(0);
@@ -58,17 +59,26 @@ switch($_POST['action']) {
 		}
 
 		$specialrights = 0;
-		if (isset($_POST['specialrights1'])) {
+		if (isset($_POST['specialrights1']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&1)==1))) {
 			$specialrights += 1;
 		}
 		if (isset($_POST['specialrights2']) && $myrights==100) {
 			$specialrights += 2;
 		}
-		if (isset($_POST['specialrights4'])) {
+		if (isset($_POST['specialrights4']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&4)==4))) {
 			$specialrights += 4;
 		}
-		if (isset($_POST['specialrights8'])) {
+		if (isset($_POST['specialrights8']) && (($myrights==100 || ($myrights>=75 && ($myspecialrights&8)==8)) && !$allownongrouplibs)) {
 			$specialrights += 8;
+		}
+		if ((isset($_POST['specialrights16']) && $myrights>=75) || $_POST['newrights']>=75) {
+			$specialrights += 16;
+		}
+		if ((isset($_POST['specialrights32']) && $myrights==100) || $_POST['newrights']==100) {
+			$specialrights += 32;
+		}
+		if ((isset($_POST['specialrights64']) && $myrights==100) || $_POST['newrights']==100) {
+			$specialrights += 64;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
 			$hashpw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
@@ -79,7 +89,7 @@ switch($_POST['action']) {
 			$_POST['newrights'] = $myrights;
 		}
 
-		$arr = array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'], ':groupid'=>$_POST['group'],
+		$arr = array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'],
 				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 				':email'=>Sanitize::stripHtmlTags($_POST['email']));
@@ -90,7 +100,9 @@ switch($_POST['action']) {
 			$arr[':password'] = $hashpw;
 		}
 
-		if ($myrights == 100) { //update library groupids
+		if ($myrights == 100 || ($myspecialrights&32)==32) { //update library groupids
+			$arr[':groupid'] = $_POST['group'];
+			
 			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid,FirstName=:FirstName,LastName=:LastName,email=:email";
 			if ($chgSID) {
 				$query .= ',SID=:SID';
@@ -104,6 +116,8 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=:groupid WHERE ownerid=:ownerid");
 			$stm->execute(array(':groupid'=>$_POST['group'], ':ownerid'=>$_GET['id']));
 		} else {
+			$arr[':groupid'] = $groupid;
+			
 			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,FirstName=:FirstName,LastName=:LastName,email=:email";
 			if ($chgSID) {
 				$query .= ',SID=:SID';
@@ -219,8 +233,10 @@ switch($_POST['action']) {
 		}
 		break;
 	case "newadmin":
-		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
-		if ($myrights < 100 && $_POST['newrights']>75) { break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($_POST['newrights']>$myrights) {
+			$_POST['newrights'] = $myrights;
+		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_POST['adminname']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -235,10 +251,10 @@ switch($_POST['action']) {
 		} else {
 			$md5pw =md5($_POST['newpassword']);
 		}
-		if ($myrights < 100) {
+		if ($myrights == 100 || ($myspecialrights&32)==32) {
+			$newgroup = Sanitize::onlyInt($_POST['group']);
+		} else {
 			$newgroup = $groupid;
-		} else if ($myrights == 100) {
-			$newgroup = $_POST['group'];
 		}
 		if (isset($CFG['GEN']['homelayout'])) {
 			$homelayout = $CFG['GEN']['homelayout'];
@@ -246,17 +262,26 @@ switch($_POST['action']) {
 			$homelayout = '|0,1,2||0,1';
 		}
 		$specialrights = 0;
-		if (isset($_POST['specialrights1'])) {
+		if (isset($_POST['specialrights1']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&1)==1))) {
 			$specialrights += 1;
 		}
 		if (isset($_POST['specialrights2']) && $myrights==100) {
 			$specialrights += 2;
 		}
-		if (isset($_POST['specialrights4'])) {
+		if (isset($_POST['specialrights4']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&4)==4))) {
 			$specialrights += 4;
 		}
-		if (isset($_POST['specialrights8'])) {
+		if (isset($_POST['specialrights8']) && (($myrights==100 || ($myrights>=75 && ($myspecialrights&8)==8)) && !$allownongrouplibs)) {
 			$specialrights += 8;
+		}
+		if (isset($_POST['specialrights16']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&16)==16))) {
+			$specialrights += 16;
+		}
+		if (isset($_POST['specialrights32']) && $myrights==100) {
+			$specialrights += 32;
+		}
+		if (isset($_POST['specialrights64']) && $myrights==100) {
+			$specialrights += 64;
 		}
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights);");
 		$stm->execute(array(':SID'=>$_POST['adminname'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
@@ -1145,12 +1170,12 @@ switch($_POST['action']) {
 }
 
 session_write_close();
-if (empty($from)) {
+if ($myrights<75 || $from=='home') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+} else if (empty($from)) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if (isset($_GET['cid'])) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
-} else if ($from=='home') {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 } else if ($from=='admin2') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
