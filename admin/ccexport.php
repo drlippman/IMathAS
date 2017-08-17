@@ -363,7 +363,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
@@ -415,6 +415,7 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
 						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>');
 						fwrite($fp,'<grading_type>points</grading_type>');
+						fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>');
 						fwrite($fp,'<assignment_group_identifierref>assngroup</assignment_group_identifierref>');
 						fwrite($fp,'<submission_types>external_tool</submission_types>');
 						fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
