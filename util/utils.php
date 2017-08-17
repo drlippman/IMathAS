@@ -48,11 +48,11 @@ if (isset($_GET['fixorphanqs'])) {
 }
 if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$_POST['cid']);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid']));
 	} else if (!empty($_POST['pqid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".$_POST['pqid']);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".Sanitize::onlyInt($_POST['pqid']));
 	} else if (!empty($_POST['eqid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/moddataset.php?cid=admin&id=".$_POST['eqid']);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/moddataset.php?cid=admin&id=".Sanitize::onlyInt($_POST['eqid']));
 	}
 	exit;
 }

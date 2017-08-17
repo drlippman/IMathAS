@@ -147,7 +147,7 @@
 		   //echo generateadditem($_GET['folder'],'b');
 	   }
    } else if (isset($teacherid)) {
-	 echo generateadditem($_GET['folder'],'b');
+	 echo generateadditem(Sanitize::onlyInt($_GET['folder']),'b');
    }
 
 

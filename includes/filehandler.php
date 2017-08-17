@@ -765,7 +765,7 @@ function getqimageurl($key,$abs=false) {
 		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/$key";
 	} else {
 		if ($abs==true) {
-			return $urlmode.$_SERVER['HTTP_HOST']."$imasroot/assessment/qimages/$key";
+			return $GLOBALS['basesiteurl'] . "/assessment/qimages/$key";
 		} else {
 			return "$imasroot/assessment/qimages/$key";
 		}

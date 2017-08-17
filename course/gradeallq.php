@@ -28,7 +28,7 @@
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$qid = $_GET['qid'];
+	$qid = Sanitize::onlyInt($_GET['qid']);
 	if (isset($_GET['ver'])) {
 		$ver = $_GET['ver'];
 	} else {

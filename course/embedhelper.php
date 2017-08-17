@@ -23,7 +23,7 @@ if ($type=='tegrity' && substr($url,0,18)=='https://tegr.it/y/') {
 } else if ($type=='cdf') {
   	echo '<script type="text/javascript" src="https://www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script>';
 	echo '<script type="text/javascript">var cdf = new cdfplugin();';
-	echo "cdf.embed('$url',$w,$h);</script>";
+	echo "cdf.embed('" . Sanitize::encodeStringForJavascript($url) . "'," . Sanitize::encodeStringForJavascript($w) . "," . Sanitize::encodeStringForJavascript($h) . ");</script>";
 }
 ?>
 </body>

@@ -85,7 +85,7 @@
 				$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 			}
 			//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-			$curBreadcrumb .= $backtrack[$i][0];
+			$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 			if ($i!=count($backtrack)-1) {
 				$curBreadcrumb .= "</a>";
 			}

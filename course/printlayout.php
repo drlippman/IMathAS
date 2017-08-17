@@ -129,8 +129,8 @@ if ($overwriteBody==1) {
 		  position: absolute;
 		  left: 0px;
 		  border: 1px solid;
-		  width: <?php echo $pwss ?>in;
-		  height: <?php echo $phs ?>in;
+		  width: <?php echo Sanitize::onlyFloat($pwss); ?>in;
+		  height: <?php echo Sanitize::onlyFloat($phs); ?>in;
 		}
 		div.a {
 		  border: 3px double #33f;
@@ -149,7 +149,7 @@ if ($overwriteBody==1) {
 	} else {
 		$pt = 0;
 		for ($i=0;$i<ceil($numq/3)+1;$i++) {
-			echo "div#pg$i { top: {$pt}in;}\n";
+			echo "div#pg$i { top: " . Sanitize::onlyFloat($pt) . "in;}\n";
 			$pt+=$ph;
 			if ($_POST['browser']==1) {$pt -= .4;}
 		}

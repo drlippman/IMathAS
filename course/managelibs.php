@@ -196,7 +196,7 @@ if ($myrights<20) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
-				$tlist = implode(",",$_POST['nchecked']);
+				$tlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
 				$page_libRights = array();
 				$page_libRights['val'][0] = 0;
 				$page_libRights['val'][1] = 1;
@@ -254,7 +254,7 @@ if ($myrights<20) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
-				$tlist = implode(",",$_POST['nchecked']);
+				$tlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
 			}
 		}
 

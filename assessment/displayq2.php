@@ -17,6 +17,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//$starttime = microtime(true);
 	global $DBH, $RND, $imasroot, $myrights, $showtips, $urlmode, $CFG;
 
+	$qnidx = Sanitize::onlyInt($qnidx);
+	$qidx = Sanitize::onlyInt($qidx);
+	$seed = Sanitize::onlyInt($seed);
+
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 
 	//clear out choicemap if needed

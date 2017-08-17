@@ -108,7 +108,7 @@
 	if (!($_GET['from'])) {
 		echo "<div class=right><a href=\"course.php?cid=$cid\">Back</a></div>\n";
 	} else if ($fcid>0) {
-		echo "<div class=right><a href=\"{$_SERVER['HTTP_REFERER']}\">Back</a></div>\n";
+		echo "<div class=right><a href=\"" . Sanitize::fullUrl($_SERVER['HTTP_REFERER']) . "\">Back</a></div>\n";
 	} else {
 		echo "<div class=right><a href=\"public.php?cid=$cid\">Return to the Public Course Page</a></div>\n";
 	}

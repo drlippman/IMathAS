@@ -45,9 +45,9 @@ if ($myrights<20) {
 			$chk = '';
 		}
 		if ($onlychk==1) {
-		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$_GET['loc']}',true);";
+		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','" . Sanitize::encodeStringForJavascript($_GET['loc']) . "',true);";
 		} else {
-		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$_GET['loc']}');";
+		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','" . Sanitize::encodeStringForJavascript($_GET['loc']) . "');";
 		}
 	}
 
@@ -196,7 +196,7 @@ if ($overwriteBody==1) {
 		echo "/> Mark Question for Use</p>";
 		echo "
 		  <script type=\"text/javascript\">
-		  var parentcbox = opener.document.getElementById(\"{$_GET['loc']}\");
+		  var parentcbox = opener.document.getElementById(\"" . Sanitize::encodeStringForJavascript($_GET['loc']) . "\");
 		  document.getElementById(\"usecheck\").checked = parentcbox.checked;
 		  function togglechk(ischk) {
 			  if (numchked!=-1) {

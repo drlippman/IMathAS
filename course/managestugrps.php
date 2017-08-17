@@ -152,7 +152,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_GET['addgrp'] = true;
 			$stulist = implode(',',$stustoadd);
 		} else {
-			$grpid = $_POST['addtogrpid'];
+			$grpid = Sanitize::onlyInt($_POST['addtogrpid']);
 			$loginfo = "instr adding stu to group $grpid. ";
 			if (!is_array($stustoadd)) {
 				$stustoadd = explode(',',$stustoadd);
