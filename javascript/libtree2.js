@@ -33,7 +33,7 @@ function buildbranch(parentid) {
                 node = document.createElement("li"); 
                 node.id = 'li'+tree[parentid][i][0]; 
 		dashspan = document.createElement("span"); 
-		if (tree[tree[parentid][i][0]]==null && (select=="parent" || treebox=="radio"))  {
+		if ((tree[tree[parentid][i][0]]==null || tree[parentid][i][0]==0) && (select=="parent" || treebox=="radio"))  {
 			dashspan.appendChild(document.createTextNode('---'));
 		} else {
 			dashspan.appendChild(document.createTextNode('-'));
@@ -65,7 +65,8 @@ function buildbranch(parentid) {
                 span = document.createElement("span"); 
                 span.id = 'n'+tree[parentid][i][0]; 
                 span.className = 'r'+tree[parentid][i][1]; 
-                span.appendChild(document.createTextNode(' '+tree[parentid][i][2])); 
+                //span.appendChild(document.createTextNode(' '+tree[parentid][i][2]));
+                span.innerHTML = ' '+tree[parentid][i][2];
                 if (tree[tree[parentid][i][0]]!=null && tree[parentid][i][0]!=0) {  //has children 
                         node.className = 'lihdr'; 
                         hdr = document.createElement("span"); 

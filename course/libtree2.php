@@ -31,7 +31,7 @@ END;
 <link rel="stylesheet" href="$imasroot/course/libtree.css" type="text/css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="$imasroot/javascript/general.js?v=031111"></script>
-<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=031111"></script>
+<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=081717"></script>
 </head>
 <body>
 <form id="libselectform">
@@ -136,15 +136,13 @@ END;
 	$checked = array_merge($checked,$locked);
 	$toopen = array();
 
-	echo "var tree = {\n";
-	echo " 0:[\n";
-	$donefirst[0] = 2;
+	$treearr = array();
 	if ($_GET['type']=="radio" && $select == "child") {
-		echo "[0,8,\"Unassigned\",0,";
-		if (in_array(0,$checked)) { echo "1";} else {echo "0";}
-		echo "]";
+		$treearr[0] = array(array(0,8,_('Unassigned'),0,in_array(0,$checked)?1:0));
+	} else if ($_GET['type']=="radio" && $select == "parent") {
+		$treearr[0] = array(array(0,8,_('Unassigned'),-1,0));
 	} else {
-		echo "[0,8,\"Unassigned\",0,0]";
+		$treearr[0] = array(array(0,8,_('Unassigned'),0,0));
 	}
 
 	if (isset($ltlibs[0])) {
@@ -156,7 +154,7 @@ END;
 	}
 
 	function printlist($parent) {
-		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
+		global $treearr,$names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin;
 		$newchildren = array();
 		$arr = array();
 		if ($parent==0 && isset($published)) {
@@ -165,9 +163,8 @@ END;
 			$arr = $ltlibs[$parent];
 		}
 		if (count($arr)==0) {return;}
-		if ($donefirst[$parent]==0) {
-			echo ",\n" . Sanitize::encodeStringForDisplay($parent) . ":[";
-			$donefirst[$parent]==1;
+		if (!isset($treearr[$parent])) {
+			$treearr[$parent] = array();
 		}
 		if ($sortorder[$parent]==1) {
 			$orderarr = array();
@@ -180,70 +177,42 @@ END;
 		foreach ($arr as $child) {
 			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
 			//if ($rights[$child]>$selectrights || $ownerids[$child]==$userid || $isadmin) {
+				$thisjson = array();
 				if (!$isadmin) {
 					if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
 						$rights[$child]=4;  //adjust coloring
 					}
 				}
-				if ($donefirst[$parent]==2) {echo ",";} else {$donefirst[$parent]=2;}
-				echo "[" . Sanitize::encodeStringForDisplay($child) . "," . Sanitize::encodeStringForDisplay($rights[$child]) . ",'" . Sanitize::encodeStringForDisplay($names[$child]) . "',";
+				$thisjson[0] = Sanitize::onlyInt($child);
+				$thisjson[1] = Sanitize::onlyInt($rights[$child]);
+				$thisjson[2] = Sanitize::encodeStringForDisplay($names[$child]);
 				if (isset($ltlibs[$child])) { //library has children
 					if ($select == "parent" || $select=="all") {
-						if ($_GET['type']=="radio") {
-							if (in_array($child,$locked)) { //removed the following which prevented creation of sublibraries of "open to all" libs.  Not sure why I had that.   || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						} else {
-							if (in_array($child,$locked)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						}
+						$thisjson[3] = in_array($child,$locked)?1:0;
+						$thisjson[4] = in_array($child,$checked)?1:0;
 					} else {
-						echo "-1,]";
+						$thisjson[3] = -1;
+						$thisjson[4] = 0;
 					}
 					$newchildren[] = $child;
-				} else {  //no children
+				} else { // no children
 					if ($select == "child" || $select=="all" || $isempty[$child]==true) {
-						if ($_GET['type']=="radio") {
-							if (in_array($child,$locked)) { // || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						} else {
-							if (in_array($child,$locked)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						}
+						$thisjson[3] = in_array($child,$locked)?1:0;
+						$thisjson[4] = in_array($child,$checked)?1:0;
 					} else {
-						echo "-1,]";
-					}
-
+						$thisjson[3] = -1;
+						$thisjson[4] = 0;
+					}	
 				}
+				$treearr[$parent][] = $thisjson;
 			}
 		}
-		echo "]";
 		foreach ($newchildren as $newchild) {
-			$donefirst[$newchild] = false;
 			printlist($newchild);
 		}
 	}
 
-	echo "};";
+	echo "var tree = ".json_encode($treearr).";";
 	echo "</script>";  //end tree definition script
 	if (isset($_GET['base'])) {
 		$base = $_GET['base'];
