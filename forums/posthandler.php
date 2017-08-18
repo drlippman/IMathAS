@@ -663,7 +663,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<input type=radio name=replyby id=replyby3 value=\"Date\" ";
 				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1 ";}
 				echo "/> <label for=replyby3>Before:</label> ";
-				echo "<input type=text size=10 name=replybydate value=\"".Sanitize::encodeStringForDisplay($replybytime)."\" aria-label=\"reply by date\"/>";
+				echo "<input type=text size=10 name=replybydate value=\"".Sanitize::encodeStringForDisplay($replybydate)."\" aria-label=\"reply by date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
 				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
 				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";

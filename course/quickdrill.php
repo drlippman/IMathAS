@@ -254,7 +254,7 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
-	echo "<p>Score:  ".Sanitize::onlyInt($curscore)." out of ".count($scores)." possible</p>";
+	echo "<p>Score:  ".Sanitize::onlyFloat($curscore)." out of ".count($scores)." possible</p>";
 	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
@@ -298,7 +298,7 @@ if ($timesup == true) { //if time has expired
 		$cur = $cur - 60*$minutes;
 	} else {$minutes=0;}
 	$seconds = $cur;
-	echo "<p>Score:  ".Sanitize::onlyInt($curscore)." out of ".count($scores)." possible</p>";
+	echo "<p>Score:  ".Sanitize::onlyFloat($curscore)." out of ".count($scores)." possible</p>";
 	echo "<p>In ";
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
@@ -315,7 +315,7 @@ if ($timesup == true) { //if time has expired
 }
 
 if ($showscore) {
-	echo '<div class="review">Current score: '.Sanitize::onlyInt($curscore)." out of ".count($scores);
+	echo '<div class="review">Current score: '.Sanitize::onlyFloat($curscore)." out of ".count($scores);
 	echo '</div>';
 }
 if ($mode=='cntup' || $mode=='cntdown') {
@@ -380,7 +380,7 @@ initstack.push(focusfirst);
 <?php
 
 if ($page_scoreMsg != '' && $showscore) {
-	echo '<div class="review">Score on last question: '.Sanitize::encodeStringForDisplay($page_scoreMsg);
+	echo '<div class="review">Score on last question: '.$page_scoreMsg;
 	echo '</div>';
 }
 
@@ -506,7 +506,7 @@ function printscore($sc,$qsetid,$seed) {
 	}
 
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;
+	return $bar . Sanitize::encodeStringForDisplay($out);
 }
 
 function getpts($sc) {

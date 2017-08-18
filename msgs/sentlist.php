@@ -309,6 +309,7 @@ function chgfilter() {
 			$line['title'] = substr($line['title'],4);
 			$n++;
 		}
+		$line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 		if ($n==1) {
 			$line['title'] = 'Re: '.$line['title'];
 		} else if ($n>1) {
@@ -316,7 +317,7 @@ function chgfilter() {
 		}
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid=".Sanitize::onlyInt($line['id'])."\">";
-		echo Sanitize::encodeStringForDisplay($line['title']);
+		echo $line['title'];
 		echo "</a></td>";
 		printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
             Sanitize::encodeStringForDisplay($line['FirstName']));

@@ -90,6 +90,7 @@
 			$line['title'] = substr($line['title'],4);
 			$n++;
 		}
+		$line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 		if ($n==1) {
 			$line['title'] = 'Re: '.$line['title'];
 		} else if ($n>1) {
@@ -272,7 +273,7 @@
 			echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
 
 			echo "</span>\n";
-			echo "<b>" . Sanitize::encodeStringForDisplay($subject[$child]) . "</b><br/>Posted by: ";
+			echo "<b>{$subject[$child]}</b><br/>Posted by: ";
 			if ($isteacher && $ownerid[$child]!=0) {
 				echo "<a href=\"mailto:" . Sanitize::emailAddress($email[$child]) . "\">";
 			} else if ($allowmsg && $ownerid[$child]!=0) {

@@ -158,7 +158,7 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				$gcnt++;
 				if ($isheader) {
-					$html .= '<th class="cat'.Sanitize::encodeStringForDisplay()$gcnt).'"><div><span class="cattothdr">'.Sanitize::encodeStringForDisplay($oi['name']).'</span></div></th>';
+					$html .= '<th class="cat'.Sanitize::encodeStringForDisplay($gcnt).'"><div><span class="cattothdr">'.Sanitize::encodeStringForDisplay($oi['name']).'</span></div></th>';
 					$sarr .= ',"N"';
 					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$html .= $subhtml;
@@ -322,7 +322,7 @@ if ($report=='overview') {
 
 	$ot = outcometable($stu);
 
-	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Student Detail for: ").Sanitize::encodeStringForDisplay($ot[1][0][0)]."</h2></div>\n";
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Student Detail for: ").Sanitize::encodeStringForDisplay($ot[1][0][0])."</h2></div>\n";
 	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th>';
 

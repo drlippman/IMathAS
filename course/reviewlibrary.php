@@ -352,7 +352,7 @@ if ($myrights<20) {
 		require("../assessment/displayq2.php");
 		if (isset($_POST['seed'])) {
 			list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
-			$page_lastScore = "<p>Score on last answer: ".Sanitize::onlyInt($score)."/1</p>\n";
+			$page_lastScore = "<p>Score on last answer: ".Sanitize::onlyFloat($score)."/1</p>\n";
 		}
 
 		$twobx = ($lineQSet['qcontrol']=='' && $lineQSet['answer']=='');
