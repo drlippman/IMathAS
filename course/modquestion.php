@@ -260,7 +260,8 @@ if ($overwriteBody==1) {
 ?>
 </p>
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
-<p>Leave items blank to use the assessment's default values.</p>
+<p>Leave items blank to use the assessment's default values.
+<input type="submit" value="<?php echo ('Save Settings');?>"></p>
 
 <span class=form>Points for this problem:</span>
 <span class=formright> <input type=text size=4 name=points value="<?php echo Sanitize::encodeStringForDisplay($line['points']);?>"><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defpoints']);?></i></span><BR class=form>
