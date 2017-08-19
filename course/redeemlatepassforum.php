@@ -155,12 +155,12 @@
 			$itemtype = $r[3];
 		}
 
-		$addtimepost = 0; $addtimereply = 0; $startdate = 0; $enddate = 0;
-		if (($itemtype=='F' || $itemtype=='P') && ($allowlaten==1 || $allowlaten-1>$usedlatepassespost) && ($now<$thispostby || ($allowlate>100 && ($now-$thispostby)<$hours*3600))) {
+		$addtimepost = 0; $addtimereply = 0; $startdate = $postby; $enddate = $replyby;
+		if (($itemtype=='F' || $itemtype=='P') && $postby<2000000000 && $postby>0 && ($allowlaten==1 || $allowlaten-1>$usedlatepassespost) && ($now<$thispostby || ($allowlate>100 && ($now-$thispostby)<$hours*3600))) {
 			$addtimepost = $addtime;
 			$startdate = $postby + $addtimepost;
 		}
-		if (($itemtype=='F' || $itemtype=='R') && ($allowlaten==1 || $allowlaten-1>$usedlatepassesreply) && ($now<$thisreplyby || ($allowlate>100 && ($now-$thisreplyby)<$hours*3600))) {
+		if (($itemtype=='F' || $itemtype=='R') && $replyby<2000000000 && $replyby>0 && ($allowlaten==1 || $allowlaten-1>$usedlatepassesreply) && ($now<$thisreplyby || ($allowlate>100 && ($now-$thisreplyby)<$hours*3600))) {
 			$addtimereply = $addtime;
 			$enddate = $replyby + $addtimereply;
 		}

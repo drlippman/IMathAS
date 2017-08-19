@@ -645,7 +645,7 @@ if ($overwriteBody==1) {
 ?>
 		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo Sanitize::onlyInt($_GET['uid']) ?>"/>
 			<span class=form><label for="username">Enter User Name (login name):</label></span>
-			<input class=form type=text size=20 id=username name=username value="<?php echo Sanitize::onlyInt($lineStudent['SID']); ?>"/><br class=form>
+			<input class=form type=text size=20 id=username name=username value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
 			<span class=form><label for="firstname">Enter First Name:</label></span>
 			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
 			<span class=form><label for="lastname">Enter Last Name:</label></span>
