@@ -59,11 +59,11 @@ if ($myrights < 75) {
     $hasp1 = false;
     if (trim($_GET['findteacher'])!=='') {
       $limitToTeacher = true;
-      $words = preg_split('/\s+/', trim($_GET['findteacher']));
+      $words = preg_split('/\s+/', str_replace(',',' ',trim($_GET['findteacher'])));
       $pagetitle = _("Select Teacher");
     } else if (trim($_GET['finduser'])!=='') {
       $limitToTeacher = false;
-      $words = preg_split('/\s+/', trim($_GET['finduser']));
+      $words = preg_split('/\s+/', str_replace(',',' ',trim($_GET['finduser'])));
       $pagetitle = _("Select User");
     }
     if (count($words)==1 && strpos($words[0],'@')!==false) {
