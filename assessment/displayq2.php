@@ -4206,7 +4206,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		$correct = 0;
-
+		$correctanyformat = 0;
 		foreach($anarr as $i=>$anss) {
 			$foundloc = -1;
 			if (in_array('orderedlist',$ansformats)) {
@@ -4238,15 +4238,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if (is_array($anans)) {
 							if (($anans[1]=="(" && $givenans>$anans[2]) || ($anans[1]=="[" && $givenans>=$anans[2])) {
 								if (($anans[4]==")" && $givenans<$anans[3]) || ($anans[4]=="]" && $givenans<=$anans[3])) {
-									if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+									if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 								}
 							}
 						} else if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
-							if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+							if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 						} else if (($anans=="+oo" || $anans=="oo") && ($givenans=="+oo" || $givenans=="oo")) {
-							if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+							if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 						} else if ($anans=="-oo" && $givenans=="-oo") {
-							if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+							if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 						}/* moved to preprocessing
 						else if (is_numeric($givenans)) {
 							//try evaling answer
@@ -4263,7 +4263,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
 									$formatok = "nopart";  $partformatok = false;
 								}
-								if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+								if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 							}
 						} else {
 							if ($anans==0) {
@@ -4271,14 +4271,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 									if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
 										$formatok = "nopart";  $partformatok = false;
 									}
-									if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+									if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 								}
 							} else {
 								if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {
 									if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
 										$formatok = "nopart";  $partformatok = false;
 							}
-									if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;
+									if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 						}
 					}
 				}
@@ -4304,7 +4304,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		if ($score<0) { $score = 0; }
-		if ($formatok != "all") {
+		if ($formatok != "all" && $correctanyformat>0) {
 			$GLOBALS['partlastanswer'] .= '$f$1';
 			if ($formatok == 'nowhole') {
 				$score = 0;
