@@ -90,11 +90,29 @@ if (isset($_GET['delete'])) {
 
 	$htmldir = '';
 	$filedir = '';
+	$gbcats = array();
+	$usedcats = array();
 	if ($linktype=='canvas') {
 		mkdir($newdir.'/wiki_content');
 		mkdir($newdir.'/web_resources');
 		$htmldir = 'wiki_content/';
 		$filedir = 'web_resources/';
+		
+		$stm = $DBH->prepare("SELECT useweights,defaultcat FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		list($useweights,$defaultcat) = $stm->fetch(PDO::FETCH_NUM);
+		$r = explode(',',$defaultcat);
+		$row['name'] = 'Default';
+		$row['dropn'] = $r[3];
+		$row['weight'] = $r[4];
+		$gbcats[0] = $row;
+		$usedcats[0] = 0;
+		$stm = $DBH->prepare("SELECT id,name,dropn,weight FROM imas_gbcats WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$gbcats[$row['id']] = $row;
+			$usedcats[$row['id']] = 0;
+		}
 	}
 
 	function filtercapture($str,&$res) {
@@ -129,7 +147,7 @@ if (isset($_GET['delete'])) {
 
 	function getorg($it,$parent,&$res,$ind) {
 		global $DBH,$iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
-		global $usechecked,$checked;
+		global $usechecked,$checked,$usedcats;
 
 		$out = '';
 
@@ -363,7 +381,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate FROM imas_assessments WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
@@ -372,8 +390,8 @@ if (isset($_GET['delete'])) {
 					$out .= $ind.'</item>'."\n";
 					if ($linktype=='canvas') {
 						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-						$canvout .= '<content_type>Assignment</content_type>';
-						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+						$canvout .= '<content_type>Assignment</content_type>'."\n";
+						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>'."\n";
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
@@ -411,14 +429,15 @@ if (isset($_GET['delete'])) {
 						}
 						mkdir($newdir.'/assn'.$iteminfo[$item][1]);
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignment_settings.xml','w');
-						fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">');
-						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
-						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>');
-						fwrite($fp,'<grading_type>points</grading_type>');
-						fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>');
-						fwrite($fp,'<assignment_group_identifierref>assngroup</assignment_group_identifierref>');
-						fwrite($fp,'<submission_types>external_tool</submission_types>');
-						fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
+						fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">'."\n");
+						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n");
+						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>'."\n");
+						fwrite($fp,'<grading_type>points</grading_type>'."\n");
+						fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>'."\n");
+						fwrite($fp,'<assignment_group_identifierref>GBCAT'.$row[5].'</assignment_group_identifierref>'."\n");
+						$usedcats[$row[5]]++;
+						fwrite($fp,'<submission_types>external_tool</submission_types>'."\n");
+						fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>'."\n");
 						fwrite($fp,'</assignment>');
 						fclose($fp);
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');
@@ -561,12 +580,24 @@ if (isset($_GET['delete'])) {
     		fwrite($fp,'<html><body> </body></html>');
     		fclose($fp);
     		$fp = fopen($newdir.'/course_settings/assignment_groups.xml','w');
-    		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
-			<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
-			  <assignmentGroup identifier="assngroup">
-			    <title>Assignments</title>
-			  </assignmentGroup>
-			</assignmentGroups>');
+    		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>'."\n");
+    		fwrite($fp, '<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">'."\n");
+		$pcnt = 1;
+		foreach ($gbcats as $i=>$cat) {
+			if ($usedcats[$i]==0) {continue;}
+			fwrite($fp, ' <assignmentGroup identifier="GBCAT'.$i.'">'."\n");
+			fwrite($fp, '  <title>'.htmlentities($cat['name'],ENT_XML1,'UTF-8',false).'</title>'."\n");
+			fwrite($fp, '  <position>'.$pcnt.'</position>'."\n");
+			$pcnt++;
+			if ($useweights && $cat['weight']>-1) {
+				fwrite($fp, '  <group_weight>'.number_format($cat['weight'],1).'</group_weight>'."\n");
+			}
+			if ($cat['dropn']>0) {
+				fwrite($fp, '  <rules><rule><drop_type>drop_lowest</drop_type><drop_count>'.$cat['dropn'].'</drop_count></rule></rules>'."\n");
+			}
+			fwrite($fp, ' </assignmentGroup>'."\n");
+		}
+		fwrite($fp,'</assignmentGroups>');
 		fclose($fp);
 		$fp = fopen($newdir.'/course_settings/module_meta.xml','w');
 		fwrite($fp,$module_meta);
@@ -574,9 +605,11 @@ if (isset($_GET['delete'])) {
 		$fp = fopen($newdir.'/course_settings/course_settings.xml','w');
 		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
 <course xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" identifier="coursesettings1" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
-  <title>imp test</title>
-</course>
-');
+  <title>'.htmlentities($coursename,ENT_XML1,'UTF-8',false).'</title>'."\n");
+  		if ($useweights) {
+  			fwrite($fp, '<group_weighting_scheme>percent</group_weighting_scheme>'."\n");
+  		}
+  		fwrite($fp, '</course>');
 		fclose($fp);
 	}
 
