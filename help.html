@@ -2254,6 +2254,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	$ansprompt = "One value, x=;No values;Many values"</li>
 	</ul>
 	</dd>
+<dt>$formatfeedbackon = true</dt>
+	<dd>Turns on "right answer, wrong format" feedback on the question</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -2450,6 +2452,8 @@ A student is asked to enter a function
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
 	values or raise numbers to very large powers.</dd>
+<dt>$formatfeedbackon = true</dt>
+	<dd>Turns on "right answer, wrong format" feedback on the question</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -2578,7 +2582,7 @@ drawn line from the correct line.
 	    Dots:  "x,y" for closed dots, "x,y,open" for open dots, like "2,3"</dd>
 </dl>
 </p>
-<div><b>Recommended Variables</b><BR>
+<b>Recommended Variables</b><BR>
 <dl>
 <dt>$answerformat = "twopoint", "polygon", "inequality", "numberline", or (for the older tools), "line,lineseg,dot,opendot" </dt>
 	<dd>Limits the drawing tools available to students.  Defaults to the older drawing tools "line,dot,opendot".
@@ -2600,11 +2604,12 @@ drawn line from the correct line.
 	        	<li>trig (sin and cos)</li>
 	        	<li>vector (position or displacement vectors)</li>
 	        	<li>exp (exponential with horizontal asymptote at y=0)</li>
+	        	<li>log (logarithm with vertical asymptote at x=0)</li>
 	        	<li>rational (linear/linear rational)</li>
 	        	<li>ellipse (ellipses)</li>
 	        	<li>hyperbola (vertical or horizontal hyperbolas)</li>
 	        	</ul>
-	        <li>For lines, vertical parabolas, absolute values, square roots, sines, cosines, exponentials, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
+	        <li>For lines, vertical parabolas, absolute values, square roots, sines, cosines, exponentials, logs, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
 	        <li>For line segments and rays, given $answers as a function with domain, like "2x+4,-oo,3", or for vertical line segments use x= and give the range, like "x=4,-2,3"</li>
 	        <li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
 	        <li>For circles, give $answers as "circle,x,y,radius", like "circle,2,-1,3"</li>
@@ -2634,7 +2639,8 @@ drawn line from the correct line.
 	too large.  In that case, use the getsnapwidthheight macro to compute an imagewidth and imageheight that will be pixel accurate.</dd>
 </dl>
 </p>
-<div><b>Optional Variables</b><BR>
+
+<b>Optional Variables</b><BR>
 <dl>
 <dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" </dt>
 	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
@@ -2666,7 +2672,6 @@ drawn line from the correct line.
 This should only be used when a question type is being used in an unintentional way,
 or if the question type gives away critical info to the student.</dd>
 </dl>
-</div>
 
 </div>
 <div class=h3>

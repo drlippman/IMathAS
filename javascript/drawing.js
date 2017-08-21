@@ -948,6 +948,43 @@ function drawTarget(x,y) {
 					}
 				}
 			}
+		} else if (tptypes[curTarget][i]==8.4) {//if a tp log (unshifted)
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null && x2!=tplines[curTarget][i][0][0] && y2!=tplines[curTarget][i][0][1]) {
+				// Treat as x = ab^y
+				// (x1, y1) (x2, y2)
+				// b^(y2-y1) = x2/x1
+				// a = x1/b^y1
+
+				var originx = -targets[curTarget].xmin*targets[curTarget].pixperx + targets[curTarget].imgborder;
+				var adjx1 = originx - tplines[curTarget][i][0][0];
+				var adjx2 = originx - x2;
+				if (adjx1*adjx2>0 && y2 != tplines[curTarget][i][0][1]) {
+					var expbase = safepow(adjx2/adjx1, 1/(y2-tplines[curTarget][i][0][1]));
+					var stretch = adjx2/safepow(expbase,y2);
+					ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
+					var cury = 0;
+					for (var cury=0;cury < targets[curTarget].imgheight+4;cury += 3) {
+						curx = originx - stretch*safepow(expbase,cury);
+						if (curx<-100) { curx = -100;}
+						if (curx>targets[curTarget].imgwidth+100) { curx=targets[curTarget].imgwidth+100;}
+						if (cury==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				}
+				
+			}
 		} else if (tptypes[curTarget][i]==8.2) {//if a tp linear/linear rational
 			var y2 = null;
 			var x2 = null;
