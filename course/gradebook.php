@@ -892,7 +892,7 @@ function gbstudisp($stu) {
                         $querymap = array(
                             'cid' => $cid,
                             'stu' => $stu,
-                            'grades' => $gbt[1][4][0],
+                            'uid' => $gbt[1][4][0],
                             'fid' => $gbt[0][1][$i][7]
                         );
 
