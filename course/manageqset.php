@@ -69,11 +69,11 @@ if ($myrights<20) {
 				}
 				//remlist now only contains questions ok to remove
 				$now = time();
-				
+
 				//delete all library items for that question, regardless of owner
 				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE qsetid IN ($remlist) AND deleted=0");
 				$stm->execute(array(':now'=>$now));
-				
+
 				//now delete the questions
 				$stm = $DBH->prepare("UPDATE imas_questionset SET deleted=1,lastmoddate=:now WHERE id IN ($remlist)");
 				$stm->execute(array(':now'=>$now));
@@ -141,7 +141,7 @@ if ($myrights<20) {
 			$pagetitle ="Transfer Ownership";
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; Transfer QSet";
-		
+
 			if (isset($_POST['transfer']) && !isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
 				$body = "No questions selected.  <a href=\"manageqset.php?cid=$cid\">Go back</a>\n";
@@ -215,7 +215,7 @@ if ($myrights<20) {
 						$dellibs[$row[0]][] = $row[1];
 					}
 				}
-				
+
 				//pull a list of non-deleted library items for these questions that user has the rights to modify
 				if ($isadmin) {
 					$query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
@@ -263,9 +263,9 @@ if ($myrights<20) {
 							$toundel = array();
 						}
 						$toaddnew = array_values(array_diff($toadd, $toundel));
-						
-						$alladded = array_merge($toaddnew,$toundel);				
-						
+
+						$alladded = array_merge($toaddnew,$toundel);
+
 						foreach ($toundel as $libid) {
 							if ($libid==0) { continue;} //no need to add to unassigned using "keep existing"
 							$undel_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
@@ -291,7 +291,7 @@ if ($myrights<20) {
 					$del_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid=:libid AND qsetid=:qsetid");
 					$sel_stm = $DBH->prepare("SELECT id,deleted FROM imas_library_items WHERE qsetid=:qsetid AND (deleted=0 OR (libid=0 AND deleted=1)) ORDER BY deleted");
 					$unassn_undel_stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now WHERE libid=0 AND qsetid=:qsetid");
-					
+
 					foreach ($libarray as $qsetid) { //for each question
 						//determine which checked libraries it's not already in
 						if (isset($alllibs[$qsetid])) {
@@ -308,7 +308,7 @@ if ($myrights<20) {
 						//print_r($toundel);
 						//print_r($toaddnew);
 						//exit;
-						
+
 						//and add them
 						foreach ($toundel as $libid) {
 							if ($libid==0) { continue;} //we'll handle unassigned later
@@ -612,7 +612,7 @@ if ($myrights<20) {
 			}
 		}
 	} else if (isset($_GET['transfer'])) {
-		
+
 		//postback handled by $_POST['transfer'] block
 		$pagetitle = "Transfer Ownership";
 		$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
@@ -700,6 +700,7 @@ if ($myrights<20) {
 			$safesearch = '';
 		}
     $searchlikevals = array();
+		$isIDsearch = false;
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
 		} else {
@@ -737,10 +738,11 @@ if ($myrights<20) {
 						$searchlikevals[] = "%$t%";
 					}
 
-					if (is_numeric($safesearch)) {
+					if (ctype_digit($safesearch)) {
 	          //DB $searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
 						$searchlikes .= "OR imas_questionset.id=?) AND ";
 						$searchlikevals[] = $safesearch;
+						$isIDsearch = true;
 					} else {
 						$searchlikes .= ") AND";
 					}
@@ -820,15 +822,27 @@ if ($myrights<20) {
 			//DB $query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid='$groupid')";
 			$query .= "AND (imas_users.groupid=? OR imas_questionset.userights>0) ";
 			$qarr[] = $groupid;
-			$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=?)";
-			$qarr[] = $groupid;
+			if ($isIDsearch) {
+				$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=? OR imas_questionset.id=?)";
+				$qarr[] = $groupid;
+				$qarr[] = $safesearch;
+			} else {
+				$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=?)";
+				$qarr[] = $groupid;
+			}
 		} else {
 			//DB $query .= "AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) ";
 			//DB $query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid')";
 			$query .= "AND (imas_questionset.ownerid=? OR imas_questionset.userights>0) ";
 			$qarr[] = $userid;
-			$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?)";
-			$qarr[] = $userid;
+			if ($isIDsearch) {
+				$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=? OR imas_questionset.id=?)";
+				$qarr[] = $userid;
+				$qarr[] = $safesearch;
+			} else {
+				$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?)";
+				$qarr[] = $userid;
+			}
 		}
 		if ($searchall==0) {
 			$query .= " AND imas_library_items.libid IN ($llist)";
@@ -1223,7 +1237,7 @@ function getnextprev(formn,loc) {
 ?>
 		Are you SURE you want to delete this question from the Question Set.  This will make it unavailable
 		to all users.  If it is currently being used in an assessment, it will mess up that assessment.
-	
+
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>&confirmed=true">
 			<input type=hidden name=remove value="<?php echo Sanitize::onlyInt($_GET['remove']); ?>">
 			<p>
@@ -1234,7 +1248,7 @@ function getnextprev(formn,loc) {
 <?php
 	} else if (isset($_GET['transfer'])) {
 ?>
-		
+
 		<form method=post action="manageqset.php?cid=<?php echo $cid ?>">
 			<input type=hidden name=transfer value="<?php echo Sanitize::onlyInt($_GET['transfer']); ?>">
 			Transfer question ownership to:
@@ -1246,7 +1260,7 @@ function getnextprev(formn,loc) {
 				<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manageqset.php?cid=<?php echo $cid ?>'">
 			</p>
 		</form>
-		
+
 <?php
 	} else { //DEFAULT DISPLAY
 
