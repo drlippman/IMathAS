@@ -319,7 +319,7 @@
 		/*
 		$query = "DELETE FROM imas_sessions WHERE userid='$userid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::fullUrl($querys));
+		header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::url($querys));
 		exit;
 		*/
 	}

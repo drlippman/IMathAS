@@ -109,7 +109,7 @@ final class SanitizeTest extends TestCase
 	}
 
 	/*
-	 * fullUrl
+	 * url
 	 */
 
 	public function testUrl_Complete()
