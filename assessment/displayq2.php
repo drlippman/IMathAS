@@ -3893,6 +3893,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (count($gaarr)==0) {
 			return 0;
 		}
+		$gaarrcnt = count($gaarr);
 		$extrapennum = count($gaarr)+count($anarr);
 		$correct = 0;
 		foreach ($anarr as $i=>$answer) {
@@ -3930,7 +3931,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;
+		if ($gaarrcnt<=count($anarr)) {
+			$score = $correct/count($anarr);
+		} else {
+			$score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/$extrapennum;  //take off points for extranous stu answers
+		}
+		//$score = $correct/count($anarr) - count($gaarr)/$extrapennum;
 		if ($score<0) { $score = 0; }
 		return ($score);
 
