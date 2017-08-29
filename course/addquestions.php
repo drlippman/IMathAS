@@ -849,7 +849,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['desc'] = filter($line['description']);
 						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\"/>";
-						$page_questionTable[$i]['type'] = Sanitize::encodeStringForDisplay($line['qtype']);
+						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
 						$avgtimepts = explode(',', $line['avgtime']);
@@ -1358,7 +1358,7 @@ if ($overwriteBody==1) {
 					</td>
 					<td><?php echo Sanitize::encodeStringForDisplay($qid); ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview']; ?></td>
-					<td><?php echo $page_questionTable[$qid]['type']; ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']); ?></td>
 <?php
 						if ($searchall==1) {
 ?>

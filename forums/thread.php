@@ -449,11 +449,13 @@ if ($postinstr != '' || $replyinstr != '') {
 	echo '<div id="postreplyinstr" style="display:none;" class="intro">';
 	if ($postinstr != '') {
 		echo '<h4>'._('Posting Instructions').'</h4>';
-		echo Sanitize::encodeStringForDisplay($postinstr);
+		// $postinstr contains HTML.
+		echo $postinstr;
 	}
 	if ($replyinstr != '') {
 		echo '<h4>'._('Reply Instructions').'</h4>';
-		echo Sanitize::encodeStringForDisplay($replyinstr);
+		// $postinstr contains HTML.
+		echo $replyinstr;
 	}
 	echo '</div><br/>';
 }

@@ -621,7 +621,7 @@ if ($overwriteBody==1) {
 				<span class="formright">
 	<?php
 		writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
-		echo '<input type="hidden" name="gradesecret" value="'.Sanitize::onlyInt($gradesecret).'"/>';
+		echo '<input type="hidden" name="gradesecret" value="'.Sanitize::encodeStringForDisplay($gradesecret).'"/>';
 	?>
 			</span><br class="form" />
 			</div>

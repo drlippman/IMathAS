@@ -37,14 +37,13 @@ if ($myrights<20) {
 		$onlychk = 0;
 	}
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
-		$formn = Sanitize::simpleString($_GET['formn']);
-		$loc = Sanitize::simpleString($_GET['loc']);
+		$formn = Sanitize::encodeStringForJavascript($_GET['formn']);
+		$loc = Sanitize::encodeStringForJavascript($_GET['loc']);
 		if (isset($_GET['checked']) || isset($_GET['usecheck'])) {
 			$chk = "&checked=0";
 		} else {
 			$chk = '';
 		}
-    $loc = Sanitize::encodeStringForJavascript($_GET['loc']);
 		if ($onlychk==1) {
 		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','$loc',true);";
 		} else {
@@ -195,7 +194,6 @@ if ($overwriteBody==1) {
 	if (isset($_GET['checked'])) {
 		echo "<p><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
 		echo "/> Mark Question for Use</p>";
-    $loc = Sanitize::encodeStringForJavascript($_GET['loc']);
 		echo "
 		  <script type=\"text/javascript\">
 		  var parentcbox = opener.document.getElementById(\"$loc\");
@@ -283,8 +281,8 @@ if ($overwriteBody==1) {
 		echo "<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&";
 		echo "quoteq=".Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}")."\" target=\"reperr\">Message owner</a> to report problems</p>";
 	} else {
-		echo "<p>Question id: ".Sanitize::encodeStringForDisplay($_GET['qsetid']).".  <a href=\"mailto:".Sanitize::emailAddress($line['email'])."?"
-			. Sanitize::generateQueryStringFromMap(array('subject' => 'Problem with question id ' .Sanitize::encodeStringForDisplay( $_GET['qsetid'])))
+		echo "<p>Question id: ".Sanitize::encodeStringForDisplay($_GET['qsetid']).".  <a href=\"mailto:".Sanitize::emailAddress($line['email'])
+            ."?subject=" . Sanitize::encodeUrlParam("Problem with question id " . $_GET['qsetid'])
 			. "\">E-mail owner</a> to report problems</p>";
 	}
 	printf("<p>Description: %s</p><p>Author: %s</p>", Sanitize::encodeStringForDisplay($line['description']),

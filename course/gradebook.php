@@ -672,7 +672,7 @@ function gbstudisp($stu) {
 			echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif" alt="Updating..."/>';
 			echo ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 		} else {
-			echo Sanitize::encodeStringForDisplay(strip_tags($gbt[1][0][0])) . ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
+			echo Sanitize::encodeStringForDisplay($gbt[1][0][0]) . ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 
 			$now = time();
 		}

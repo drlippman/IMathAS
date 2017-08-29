@@ -541,7 +541,6 @@ switch($_GET['action']) {
 		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";
 		echo "to gain access to your data</p>";
 
-		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=' . $GLOBALS['basesiteurl'] . '/google-postreader.php"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
 		echo "<p>Access Code: ".Sanitize::encodeStringForDisplay($code)."</p>";
 		echo "<p><a href=\"forms.php?action=googlegadget&regen=true$gb\">Generate a new Access code<a/><br/>";
 		echo "<p><a href=\"actions.php?action=googlegadget&clear=true$gb\">Clear Access code</a></p>";

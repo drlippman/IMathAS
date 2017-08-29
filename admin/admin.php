@@ -104,7 +104,8 @@ if ($myrights < 40) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_teacherSelectVal[$i] = $row[0];
-		$page_teacherSelectLabel[$i] = $row[1] . ", " . Sanitize::encodeStringForDisplay($row[2]). ' ('.Sanitize::encodeStringForDisplay($row[3]).')';
+		$page_teacherSelectLabel[$i] = sprintf("%s, %s (%s)", Sanitize::encodeStringForDisplay($row[1]),
+            Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[3]));
 		$i++;
 	}
 

@@ -41,7 +41,7 @@
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 			$stm->execute(array(':SID'=>$_POST['SID']));
 			if ($stm->rowCount()>0) {
-				$page_newaccounterror .= "$loginprompt '" . Sanitize::onlyInt($_POST['SID']) . "' is already used. ";
+				$page_newaccounterror .= "$loginprompt '" . Sanitize::encodeStringForDisplay($_POST['SID']) . "' is already used. ";
 			}
 		}
 		if (!preg_match('/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',$_POST['email'])) {

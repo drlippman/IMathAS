@@ -23,5 +23,5 @@
 			$AS->outputimage($imgdir.$fn.'.png');
 		}
 	}
-	header("Location: " . $GLOBALS['basesiteurl'] . "/$imgdir$fn.png");
+	header("Location: " . $GLOBALS['basesiteurl'] . "/filter/graph/$imgdir$fn.png");
 ?>

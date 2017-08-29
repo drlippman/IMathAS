@@ -553,7 +553,7 @@ if ($myrights<20) {
 			$curBreadcrumb .= " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set </a>";
 			$curBreadcrumb .= " &gt; "._("Change Question License/Attribution");
 
-			$clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']);
+			$clist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
 
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;

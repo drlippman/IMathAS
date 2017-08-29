@@ -152,7 +152,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo 'want to copy-and-paste it somewhere. <a href="'.Sanitize::url($returnurl).'">Continue</a></p>';
 				echo '<hr>';
 				//DB echo '<p>Message:</p><div class="editor">'.filter(stripslashes($_POST['message'])).'</div>';
-				echo '<p>Message:</p><div class="editor">'.Sanitize::encodeStringForDisplay(filter($_POST['message'])).'</div>';
+				// $_POST['message'] contains HTML.
+				echo '<p>Message:</p><div class="editor">'.filter($_POST['message']).'</div>';
 				echo '<p>HTML format:</p>';
 				//DB echo '<div class="editor">'.htmlentities(stripslashes($_POST['message'])).'</div>';
 				echo '<div class="editor">'.htmlentities($_POST['message']).'</div>';
