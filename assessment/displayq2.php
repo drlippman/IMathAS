@@ -2660,7 +2660,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (strpos($settings[2],'0:')===0) {
 				$settings[2] = substr($settings[2],2);
 			}
-			if (strpos($grid[4],'/')!==false) {
+			if (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false) {
 				if (strpos($settings[4],':')!==false) {
 					$settings4pts = explode(':',$settings[4]);
 					$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings4pts[1];
@@ -2746,7 +2746,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (is_array($settings[5]) && count($settings[5]>2)) {
 			$plot = addlabel($plot,0,$settings[3],$settings[5][2],"black","belowright");
 		}
-		if (isset($grid) && strpos($grid[4],'/')!==false) {
+		if (isset($grid) && (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false)) {
 			$plot = addfractionaxislabels($plot,$grid[4]);
 		}
 
@@ -3104,14 +3104,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$saarr = array_merge($saarr,$backg);
 					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
-					if (isset($grid) && strpos($grid[4],'/')!==false) {
+					if (isset($grid) && (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false)) {
 						$sa = addfractionaxislabels($sa,$grid[4]);
 					}
 				}
 
 			} else {
 				$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
-				if (isset($grid) && strpos($grid[4],'/')!==false) {
+				if (isset($grid) && (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false)) {
 					$sa = addfractionaxislabels($sa,$grid[4]);
 				}
 			}
