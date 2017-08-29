@@ -538,7 +538,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if (strpos($items[$i],'~')!==false) {
 			$subs = explode('~',$items[$i]);
-			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid],true))) {
+			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid]))) {
 				$closegrp = 0;
 			} else {
 				$closegrp = 1;
