@@ -68,14 +68,15 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,ownerid FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 
 	$itemcnt = 0;
 	$toexport = array();
 	$qcnt = 0;
 	//DB $items = unserialize(mysql_result($result,0,0));
-	$items = unserialize($stm->fetchColumn(0));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	$items = unserialize($line['itemorder']);
 	$newitems = array();
 	$qtoexport = array();
 	$qsettoexport = array();
@@ -84,6 +85,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	//print_r($newitems);
 	echo "EXPORT DESCRIPTION\n";
 	echo $_POST['description']."\n";
+	echo "EXPORT OWNERID\n";
+  echo $line['ownerid']."\n";
 	echo "ITEM LIST\n";
 	echo serialize($newitems)."\n";
 	$coursefiles = array();
@@ -379,6 +382,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			echo rtrim($line['description']) . "\n";
 			echo "\nAUTHOR\n";
 			echo rtrim($line['author']) . "\n";
+			echo "\nOWNERID\n";
+      echo rtrim($line['ownerid']) . "\n";
 			echo "\nCONTROL\n";
 			echo rtrim($line['control']) . "\n";
 			echo "\nQCONTROL\n";
@@ -419,7 +424,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 
 
 	}
-	
+
 	exit;
 
 } else { //STEP 1 DATA PROCESSING, INITIAL LOAD
@@ -485,7 +490,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p><input type=submit name="export" value="Export Items"></p>
 	</form>
-	
+
 	<p>If you were wanting to export this course to a different Learning Management System, you can try the <a href="ccexport.php?cid=<?php echo $cid;?>">
 	Common Cartridge export</a></p>
 <?php

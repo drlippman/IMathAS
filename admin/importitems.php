@@ -427,6 +427,9 @@ function parsefile($file) {
 			case  "EXPORT DESCRIPTION":
 				$desc = rtrim(fgets($handle, 4096));
 				break;
+			case  "EXPORT OWNERID":
+				$ownerid = rtrim(fgets($handle, 4096));
+				break;
 			case  "ITEM LIST":
 				$itemlist = rtrim(fgets($handle, 44096));
 				break;
@@ -518,6 +521,7 @@ function parsefile($file) {
 			case  "UNIQUEID":
 			case  "LASTMOD":
 			case  "AUTHOR":
+			case  'OWNERID':
 			case  "CONTROL":
 			case  "QCONTROL":
 			case  "QTEXT":

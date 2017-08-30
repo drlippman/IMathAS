@@ -189,6 +189,9 @@ function parseqs($file,$touse,$rights) {
 		} else if ($line == "AUTHOR") {
 			$part = 'author';
 			continue;
+		}else if ($line == "OWNERID") {
+			$part = 'ownerid';
+			continue;
 		} else if ($line == "CONTROL") {
 			$part = 'control';
 			continue;

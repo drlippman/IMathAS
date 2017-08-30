@@ -250,6 +250,8 @@ if (!(isset($teacherid)) && $myrights<20) {
 			echo rtrim($line['description']) . "\n";
 			echo "\nAUTHOR\n";
 			echo rtrim($line['author']) . "\n";
+      echo "\nOWNERID\n";
+      echo rtrim($line['ownerid']) . "\n";
 			echo "\nCONTROL\n";
 			echo rtrim($line['control']) . "\n";
 			echo "\nQCONTROL\n";
@@ -284,7 +286,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 				}
 			}
 		}
-		
+
 		exit;
 	} else {  //STEP 1 DATA MANIPULATION
 
