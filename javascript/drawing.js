@@ -797,7 +797,7 @@ function drawTarget(x,y) {
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
 					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
-						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.strokeStyle = "rgb(0,255,255)";
 						ctx.lineWidth = 1;
 						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
 						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
@@ -839,7 +839,7 @@ function drawTarget(x,y) {
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
 					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
-						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.strokeStyle = "rgb(0,255,255)";
 						ctx.lineWidth = 1;
 						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
 						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
@@ -983,7 +983,7 @@ function drawTarget(x,y) {
 						}
 					}
 				}
-				
+
 			}
 		} else if (tptypes[curTarget][i]==8.2) {//if a tp linear/linear rational
 			var y2 = null;
@@ -1274,6 +1274,7 @@ function drawMouseDown(ev) {
 	}
 
 	if (curTarget!=null) { //is a target currectly in action?
+		ev.preventDefault();  //prevent scrolling
 		mouseisdown = true;
 		var tarelpos = getPosition(targets[curTarget].el);
 		//$(".tips").html(curTPcurve+","+clickcnt);
@@ -1716,7 +1717,7 @@ function drawMouseMove(ev) {
 			return true;  //bypass when multitouching to prevent interference with pinch zoom
 		} else if (typeof ev != 'undefined') {
 			ev.preventDefault();
-		} 
+		}
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
