@@ -1,18 +1,18 @@
 /*
 tree form:
-[id,rights,name,disabled,checked]
+[id,rights,name,disabled,checked,federated]
 
 var tree = { 
 0:[ 
-   [1,4,"Root1",0,0], 
-   [2,8,"Root2",0,0],
-   [3,4,"Root3",0,0] ], 
+   [1,4,"Root1",0,0,0], 
+   [2,8,"Root2",0,0,0],
+   [3,4,"Root3",0,0,0] ], 
 1:[ 
-   [4,4,"Child1",1,0], 
-   [5,4,"Child2",0,0] ],
+   [4,4,"Child1",1,0,0], 
+   [5,4,"Child2",0,0,0] ],
 3:[ 
-   [6,4,"Child3",0,0], 
-   [7,4,"Child4",1,0] ]
+   [6,4,"Child3",0,0,0], 
+   [7,4,"Child4",1,0,0] ]
 }; 
 
 var treebox = "checkbox";
@@ -66,7 +66,7 @@ function buildbranch(parentid) {
                 span.id = 'n'+tree[parentid][i][0]; 
                 span.className = 'r'+tree[parentid][i][1]; 
                 //span.appendChild(document.createTextNode(' '+tree[parentid][i][2]));
-                span.innerHTML = ' '+tree[parentid][i][2];
+                span.innerHTML = ' '+tree[parentid][i][2]+(tree[parentid][i][5]?' <span class=fedico title="Federated">&lrarr;</span>':'');
                 if (tree[tree[parentid][i][0]]!=null && tree[parentid][i][0]!=0) {  //has children 
                         node.className = 'lihdr'; 
                         hdr = document.createElement("span"); 
@@ -161,6 +161,7 @@ function uncheckall(frm) {
 		} catch(er) {}
 	}
 }
+
 
 
 

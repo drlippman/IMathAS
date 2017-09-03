@@ -28,10 +28,11 @@ END;
 		echo '<link rel="stylesheet" href="'."$imasroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
 	}
 	echo <<<END
-<link rel="stylesheet" href="$imasroot/course/libtree.css" type="text/css" />
+<script type="text/javascript">var imasroot = "$imasroot";</script>
+<link rel="stylesheet" href="$imasroot/course/libtree.css?v=090317" type="text/css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="$imasroot/javascript/general.js?v=031111"></script>
-<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=081717"></script>
+<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=090317"></script>
 </head>
 <body>
 <form id="libselectform">
@@ -40,7 +41,7 @@ END;
 	echo "<script type=\"text/javascript\">";
 	//DB $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
 	//DB $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
-	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
+	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,imas_libraries.federationlevel,COUNT(imas_library_items.id) AS count ";
 	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 WHERE imas_libraries.deleted=0 ";
 	$qarr = array();
 	if ($isadmin) {
@@ -89,6 +90,7 @@ END;
 
 	$rights = array();
 	$sortorder = array();
+	$federated = array();
 	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$id = $line['id'];
@@ -105,6 +107,7 @@ END;
 		$sortorder[$id] = $line['sortorder'];
 		$ownerids[$id] = $line['ownerid'];
 		$groupids[$id] = $line['groupid'];
+		$federated[$id] = ($line['federationlevel']>0);
 	}
 	//if parent has lower userights, up them to match child library
 	function setparentrights($alibid) {
@@ -140,9 +143,9 @@ END;
 	if ($_GET['type']=="radio" && $select == "child") {
 		$treearr[0] = array(array(0,8,_('Unassigned'),0,in_array(0,$checked)?1:0));
 	} else if ($_GET['type']=="radio" && $select == "parent") {
-		$treearr[0] = array(array(0,8,_('Unassigned'),-1,0));
+		$treearr[0] = array(array(0,8,_('Unassigned'),-1,0,0));
 	} else {
-		$treearr[0] = array(array(0,8,_('Unassigned'),0,0));
+		$treearr[0] = array(array(0,8,_('Unassigned'),0,0,0));
 	}
 
 	if (isset($ltlibs[0])) {
@@ -154,13 +157,17 @@ END;
 	}
 
 	function printlist($parent) {
-		global $treearr,$names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin;
+		global $treearr,$names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$federated;
 		$newchildren = array();
 		$arr = array();
 		if ($parent==0 && isset($published)) {
 			$arr = explode(',',$published);
 		} else {
 			$arr = $ltlibs[$parent];
+		}
+		if ($parent==0 && $isadmin) {
+			$toplevelprivate = array();
+			$toplevelgroup = array();
 		}
 		if (count($arr)==0) {return;}
 		if (!isset($treearr[$parent])) {
@@ -204,7 +211,26 @@ END;
 						$thisjson[4] = 0;
 					}	
 				}
-				$treearr[$parent][] = $thisjson;
+				$thisjson[5] = $federated[$child];
+				if ($isadmin && $parent==0 && $rights[$child]<5) {
+					if ($rights[$child]==0) {
+						$toplevelprivate[] = $thisjson;
+					} else {
+						$toplevelgroup[] = $thisjson;
+					}
+				} else {
+					$treearr[$parent][] = $thisjson;
+				}
+			}
+		}
+		if ($parent==0 && $isadmin) {
+			if (count($toplevelprivate)>0) {
+				$treearr[$parent][] = array(-2,0,_('Root Level Private Libraries'),-1,0,0);
+				$treearr[-2] = $toplevelprivate;
+			}
+			if (count($toplevelprivate)>0) {
+				$treearr[$parent][] = array(-3,2,_('Root Level Group Libraries'),-1,0,0);
+				$treearr[-3] = $toplevelgroup;
 			}
 		}
 		foreach ($newchildren as $newchild) {
