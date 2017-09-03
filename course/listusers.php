@@ -21,6 +21,18 @@ if (isset($_GET['secfilter'])) {
 } else {
 	$secfilter = -1;
 }
+if (isset($_GET['rmode'])) {
+	$rmode = $_GET['rmode'];
+	$sessiondata[$cid.'rmode'] = $rmode;
+	writesessiondata();
+} else if (isset($sessiondata[$cid.'rmode'])) {
+	$rmode = $sessiondata[$cid.'rmode'];
+} else {
+	$rmode = 0;
+}
+$showemail = (($rmode&1)==1);
+$showSID = (($rmode&2)==2);
+
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "";
@@ -722,6 +734,10 @@ if ($overwriteBody==1) {
 			}
 		}
 	}
+	function chgrmode() {
+		var rmode = 1*$("#showemail").val()+2*$("#showsid").val();
+		window.location = "listusers.php?cid="+cid+"&rmode="+rmode;
+	}
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
 	<div class="cpmid">
@@ -749,10 +765,19 @@ if ($overwriteBody==1) {
 	echo '</span>';
 	echo '<br class="clear"/>';
 	echo '</div>';
-	echo '<p>Show pictures: <select id="picsize" onchange="chgpicsize()">';
+	echo '<p>Pictures: <select id="picsize" onchange="chgpicsize()">';
 	echo "<option value=0 selected>", _('None'), "</option>";
 	echo "<option value=1>", _('Small'), "</option>";
-	echo "<option value=2>", _('Big'), "</option></select></p>";
+	echo "<option value=2>", _('Big'), "</option></select> ";
+	echo 'Email: <select id="showemail" onchange="chgrmode()">';
+	echo '<option value=1 '.($showemail==true?'selected':'').'>'._('Show').'</option>';
+	echo '<option value=0 '.($showemail==true?'':'selected').'>'._('Hide').'</option>';
+	echo '</select> ';
+	echo Sanitize::encodeStringForDisplay($loginprompt).': <select id="showsid" onchange="chgrmode()">';
+	echo '<option value=1 '.($showSID==true?'selected':'').'>'._('Show').'</option>';
+	echo '<option value=0 '.($showSID==true?'':'selected').'>'._('Hide').'</option>';
+	echo '</select> ';
+	echo '</p>';
 	?>
 	<form id="qform" method=post action="listusers.php?cid=<?php echo $cid ?>">
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
@@ -782,6 +807,14 @@ if ($overwriteBody==1) {
 			<?php echo $hasCodeRowHeader; ?>
 			<th>Name</th>
 			<th></th>
+			<?php
+			if ($showSID) {
+				echo '<th>'.Sanitize::encodeStringForDisplay($loginprompt).'</th>';
+			}
+			if ($showemail) {
+				echo '<th>'._('Email').'</th>';
+			}
+			?>
 			<th>Last Access</th>
 			<th>Grades</th>
 			<?php echo $hasLatePassHeader; ?>
@@ -837,10 +870,22 @@ if ($overwriteBody==1) {
 				if ($line['locked']>0) {
 					echo '<td><span class="greystrike">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
+					if ($showSID) {
+						echo '<td><span class="greystrike">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
+					}
+					if ($showemail) {
+						echo '<td><span class="greystrike">'.Sanitize::emailAddress($line['email']).'</span></td>';
+					}
 					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></span></td>';
 				} else {
 					echo '<td>'.$nameline.'</td>';
 					echo '<td>'.$icons.'</td>';
+					if ($showSID) {
+						echo '<td>'.Sanitize::encodeStringForDisplay($line['SID']).'</td>';
+					}
+					if ($showemail) {
+						echo '<td>'.Sanitize::emailAddress($line['email']).'</td>';
+					}
 					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></td>';
 				}
 				?>

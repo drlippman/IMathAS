@@ -155,6 +155,11 @@ function flattenitems($items,&$addto) {
 function gbtable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
 	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs,$includeendmsg;
+	global $hidesection,$hidecode;
+
+	if (!isset($hidesection)) {$hidesection = false;}
+	if (!isset($hidecode)) {$hidecode= false;}
+
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
@@ -201,8 +206,8 @@ function gbtable() {
 	$stm = $DBH->prepare("SELECT count(DISTINCT section),count(DISTINCT code) FROM imas_students WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
-	$hassection = ($row[0]>0);
-	$hascode = ($row[1]>0);
+	$hassection = ($row[0]>0 && !$hidesection);
+	$hascode = ($row[1]>0 && !$hidecode);
 
 	if ($hassection && !$isdiag) {
 		$gb[0][0][] = "Section";

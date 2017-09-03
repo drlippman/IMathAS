@@ -37,9 +37,9 @@
 		}
 		exit;
 	}
-	
+
 	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
-		
+
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
@@ -108,6 +108,8 @@
 		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
 		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
 		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
+		if (!isset($_POST['gbmode100000'])) {$defgbmode += 100000;}
+		if (!isset($_POST['gbmode200000'])) {$defgbmode += 200000;}
 		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
 		//DB $query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -182,7 +184,7 @@
 				url: "gbsettings.php?cid='.$cid.'",
 				data: "remove="+id
 			}).done(function(msg) {
-				if (msg=="OK") {	
+				if (msg=="OK") {
 					var torem = document.getElementById("catrow"+id);
 					document.getElementById("cattbody").removeChild(torem);
 				} else {
@@ -231,6 +233,8 @@
 	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = $stm->fetch(PDO::FETCH_NUM);
+	$hidesection = (((floor($defgbmode/100000)%10)&1)==1);
+	$hidecode = (((floor($defgbmode/100000)%10)&2)==2);
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
@@ -342,6 +346,8 @@
 
 	<span class=form>Include details:</span>
 	<span class=formright>
+		<input type="checkbox" name="gbmode100000" value="1" id="secshow" <?php writeHtmlChecked($hidesection,false);?>/><label for="secshow">Section column (if used)</label><br/>
+		<input type="checkbox" name="gbmode200000" value="2" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow">Code column (if used)</label><br/>
 		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
 		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers, and column in single-student view</label><br/>
 		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label>

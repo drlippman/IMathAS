@@ -270,8 +270,8 @@ function graphdijkstra($g,$dest=-1) {
 		}
 		$eaten[$cur] = 1; //remove vertex
 		for ($i=0; $i<$n; $i++) {
-			if (!isset($eaten[$i]) && $g[$i][$cur]>0) { //vertices leading to $cur
-				$alt = $dist[$cur] + $g[$i][$cur];
+			if (!isset($eaten[$i]) && (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i])>0) { //vertices leading to $cur
+				$alt = $dist[$cur] + (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i]);
 				if ($alt<$dist[$i]) {
 					$dist[$i] = $alt;
 					$next[$i] = $cur;

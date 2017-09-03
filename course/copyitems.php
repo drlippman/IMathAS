@@ -128,18 +128,19 @@ if (!(isset($teacherid))) {
 			exit;
 		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 			if ($_POST['whattocopy']=='all') {
-				$_POST['copycourseopt'] = 1;
+				/*$_POST['copycourseopt'] = 1;
 				$_POST['copygbsetup'] = 1;
 				$_POST['removewithdrawn'] = 1;
 				$_POST['usereplaceby'] = 1;
 				$_POST['copyrubrics'] = 1;
 				$_POST['copyoutcomes'] = 1;
 				$_POST['copystickyposts'] = 1;
-				$_POST['append'] = '';
 				if (isset($_POST['copyofflinewhole'])) {
 					$_POST['copyoffline'] = 1;
 				}
+				*/
 				$_POST['addto'] = 'none';
+				$_POST['append'] = '';
 			}
 			//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 			$DBH->beginTransaction();
@@ -643,8 +644,14 @@ $placeinhead .= '<script type="text/javascript">
 	function updatetocopy(el) {
 		if (el.value=="all") {
 			$("#selectitemstocopy").hide();$("#allitemsnote").show();
+			$("#copyoptions").show();
+			$("#copyoptions .selectonly").hide();
+			$("#copyoptions .allon input[type=checkbox]").prop("checked",true);
 		} else {
 			$("#selectitemstocopy").show();$("#allitemsnote").hide();
+			$("#copyoptions").show();
+			$("#copyoptions .selectonly").show();
+			$("#copyoptions .allon input[type=checkbox]").prop("checked",false);
 		}
 	}
 	function copyitemsonsubmit() {
@@ -751,10 +758,9 @@ if ($overwriteBody==1) {
 	<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"> <label for=whattocopy2>Select items to copy</label></p>
 
 	<div id="allitemsnote" style="display:none;">
-	<p><input type=checkbox name="copyofflinewhole"  value="1"/> Copy offline grade items </p>
-	<p>Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.
-	   To change these options, choose "Select items to copy" instead.</p>
 	<p class="noticetext">You are about to copy ALL items in this course.</p>
+	<p>In most cases, you'll want to leave the options below set to their default
+		values </p>
 	</div>
 	<div id="selectitemstocopy" style="display:none;">
 	<h4>Select Items to Copy</h4>
@@ -820,12 +826,14 @@ if ($overwriteBody==1) {
 
 		</tbody>
 	</table>
+</div>
 	<p> </p>
+<div id="copyoptions" style="display:none;">
 	<fieldset><legend>Options</legend>
 	<table>
 	<tbody>
-	<tr><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
-	<tr><td class="r">Copy gradebook scheme and categories<br/>(<i>will overwrite current scheme</i>)? </td><td>
+	<tr class="allon"><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
+	<tr class="allon"><td class="r">Copy gradebook scheme and categories<br/>(<i>will overwrite current scheme</i>)? </td><td>
 		<input type=checkbox name="copygbsetup" value="1"/></td></tr>
 	<tr><td class="r">Set all copied items as hidden to students?</td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
 	<tr><td class="r">Copy offline grade items?</td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
@@ -837,8 +845,8 @@ if ($overwriteBody==1) {
 
 	<tr><td class="r">Copy "display at top" instructor forum posts? </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
 
-	<tr><td class="r">Append text to titles?</td><td> <input type="text" name="append"></td></tr>
-	<tr><td class="r">Add to block:</td><td>
+	<tr class="selectonly"><td class="r">Append text to titles?</td><td> <input type="text" name="append"></td></tr>
+	<tr class="selectonly"><td class="r">Add to block:</td><td>
 
 <?php
 writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$selectedVal=null,$defaultLabel="Main Course Page",$defaultVal="none",$actions=null);
