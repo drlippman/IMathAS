@@ -91,7 +91,7 @@
 		$grpcnt += $row[2];
 	}
 	echo "<b>".Sanitize::encodeStringForDisplay($lastgroup). "</b>: " .Sanitize::onlyInt($grpcnt) ."<br/>";
-	echo Sanitize::encodeStringForDisplay($grpdata);
+	echo $grpdata;
 
 	echo "<p>Active students last hour: ";
 	$date = $now - 60*60;
