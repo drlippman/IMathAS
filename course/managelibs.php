@@ -57,7 +57,7 @@ if ($myrights<20) {
 						$stm->execute(array(':groupid'=>$groupid));
 					} else {
 						$stm = $DBH->prepare("SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid=:ownerid");
-						$stm->execute(array(':ownerid'=>$userid));	
+						$stm->execute(array(':ownerid'=>$userid));
 					}
 					$oklib = array();
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -71,14 +71,14 @@ if ($myrights<20) {
 				$now = time();
 				$stm = $DBH->prepare("UPDATE imas_libraries SET deleted=1,lastmoddate=:now WHERE id IN ($remlist)");
 				$stm->execute(array(':now'=>$now));
-				
+
 				// note the question IDs in the deleted libraries
 				$qidstocheck = array();
 				$stm = $DBH->query("SELECT DISTINCT qsetid FROM imas_library_items WHERE libid IN ($remlist) AND deleted=0");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$qidstocheck[] = $row[0];
 				}
-				
+
 				// delete the library items
 				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid IN ($remlist)");
 				$stm->execute(array(':now'=>$now));
@@ -109,7 +109,7 @@ if ($myrights<20) {
 								delqimgs($qid);
 							}*/
 					} else if (count($qidstofix)>0) {
-						//see which questions with no active lib items already have an unassigned lib item we can undeleted 
+						//see which questions with no active lib items already have an unassigned lib item we can undeleted
 						$stm = $DBH->prepare("SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qlist_query_placeholders) AND libid=0 AND deleted=1");
 						$stm->execute($qlist);
 						$toundelqids = array();
@@ -135,7 +135,7 @@ if ($myrights<20) {
 				$DBH->commit();
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
-				
+
 			exit;
 		} else {
 			$pagetitle = "Confirm Removal";
@@ -163,8 +163,13 @@ if ($myrights<20) {
 				//DB $llist = "'".implode("','",explode(',',$_POST['chgrights']))."'";
 				$llist = implode(',', array_map('intval', explode(',',$_POST['chgrights'])));
 				//DB $query = "UPDATE imas_libraries SET userights='{$_POST['newrights']}',lastmoddate=$now WHERE id IN ($llist)";
-				$query = "UPDATE imas_libraries SET userights=:userights,lastmoddate=:lastmoddate WHERE id IN ($llist)";
-				$qarr = array(':userights'=>$_POST['newrights'], ':lastmoddate'=>$now);
+        if ($isadmin && $_POST['newfed']>-1) {
+          $query = "UPDATE imas_libraries SET userights=:userights,federationlevel=:fedlevel,lastmoddate=:lastmoddate WHERE id IN ($llist)";
+				  $qarr = array(':userights'=>$_POST['newrights'], ':fedlevel'=>$_POST['newfed'], ':lastmoddate'=>$now);
+        } else {
+				  $query = "UPDATE imas_libraries SET userights=:userights,lastmoddate=:lastmoddate WHERE id IN ($llist)";
+				  $qarr = array(':userights'=>$_POST['newrights'], ':lastmoddate'=>$now);
+        }
 				if (!$isadmin) {
 					//DB $query .= " AND groupid='$groupid'";
 					$query .= " AND groupid=:groupid";
@@ -269,7 +274,7 @@ if ($myrights<20) {
 				//DB $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
 				$query = "UPDATE imas_libraries SET ownerid=:ownerid,groupid=:groupid WHERE imas_libraries.id IN ($translist)";
 				$qarr = array(':ownerid'=>$_POST['newowner'], ':groupid'=>$newgpid);
-	
+
 				if (!$isadmin) {
 				  //DB $query .= " AND groupid='$groupid'";
 				  $query .= " AND groupid=:groupid";
@@ -420,11 +425,12 @@ if ($myrights<20) {
 					//DB $query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,sortorder,parent,groupid) VALUES ";
 					//DB $query .= "($uqid,$now,$now,'{$_POST['name']}','$userid','{$_POST['rights']}','{$_POST['sortorder']}','{$_POST['libs']}','$groupid')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,sortorder,parent,groupid) VALUES ";
-					$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :sortorder, :parent, :groupid)";
+					$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,sortorder,parent,groupid,federationlevel) VALUES ";
+					$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :sortorder, :parent, :groupid, :fedlevel)";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>$_POST['name'], ':ownerid'=>$userid,
-						':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':parent'=>$_POST['libs'], ':groupid'=>$groupid));
+						':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':parent'=>$_POST['libs'], ':groupid'=>$groupid,
+            ':fedlevel'=>($isadmin?$_POST['fedlevel']:0)));
 					header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
 					exit;
 				}
@@ -441,6 +447,10 @@ if ($myrights<20) {
 					$query .= ",parent=:parent";
 					$qarr[':parent']=$_POST['libs'];
 				}
+        if ($isadmin) {
+          $query .= ",federationlevel=:fedlevel";
+          $qarr[':fedlevel'] = $_POST['fedlevel'];
+        }
 				$query .= " WHERE id=:id";
 
 				if ($isgrpadmin) {
@@ -470,7 +480,7 @@ if ($myrights<20) {
 					$stm->execute(array(':id'=>$_GET['modify'], ':groupid'=>$groupid));
 				} else if ($isadmin) {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}'";
-					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id");
+					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName,il.federationlevel FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id");
 					$stm->execute(array(':id'=>$_GET['modify']));
 				} else {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}' AND ownerid='$userid'";
@@ -486,13 +496,17 @@ if ($myrights<20) {
 					$sortorder = $row[3];
 					if ($isgrpadmin || $isadmin) {
 						$ownername = $row[5].', '.$row[4];
-				}
+				  }
+          if ($isadmin) {
+            $fedlevel = $row[6];
+          }
 				}
 			} else {
 				$pagetitle = "Add Library\n";
 				if (isset($_GET['parent'])) {
 					$parent = Sanitize::encodeStringForDisplay($_GET['parent']);
 				}
+        $fedlevel = 0;
 			}
 			if (!isset($name)) {
 				$name = '';
@@ -555,9 +569,9 @@ if ($myrights<20) {
 		//DB $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id ";
 		//DB $query .= "GROUP BY imas_libraries.id";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
+		$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.federationlevel,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
 		$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id and imas_library_items.deleted=0 ";
-		$query .= "WHERE imas_libraries.deleted=0 GROUP BY imas_libraries.id";
+		$query .= "WHERE imas_libraries.deleted=0 GROUP BY imas_libraries.id ORDER BY imas_libraries.federationlevel DESC,imas_libraries.id";
 		$stm = $DBH->query($query);
 		$rights = array();
 		$sortorder = array();
@@ -575,6 +589,7 @@ if ($myrights<20) {
 			$sortorder[$id] = $line['sortorder'];
 			$ownerids[$id] = $line['ownerid'];
 			$groupids[$id] = $line['groupid'];
+			$federated[$id] = ($line['federationlevel']>0);
 		}
 
 		$page_appliesToMsg = (!$isadmin) ? "(Only applies to your libraries)" : "";
@@ -612,6 +627,9 @@ if ($overwriteBody==1) {
 	ul.base li {
 		border-bottom: 1px solid #ddd;
 		padding-top: 5px;
+	}
+	span.fedico {
+		color: #aaa;
 	}
 	</style>
 
@@ -658,6 +676,14 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<?php writeHtmlSelect ("newrights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</span><br class=form>
+    <?php
+    if ($isadmin) {
+      echo '<span class=form>Federation: </span>';
+      echo '<span class=formright>';
+      writeHtmlSelect("newfed",array(-1,0,1,2),array("Don't change","Not federated","Federated","Federated, top of list"));
+      echo '</span><br class=form>';
+    }
+    ?>
 		<p>
 			<input type=submit value="Change Rights">
 			<input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
@@ -711,6 +737,15 @@ if ($overwriteBody==1) {
 			<?php writeHtmlSelect ("rights",$page_libRights['val'],$page_libRights['label'],$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</span><br class=form>
 
+    <?php
+    if ($isadmin) {
+      echo '<span class=form>Federation: </span>
+      <span class=formright>';
+      writeHtmlSelect ("fedlevel",array(0,1,2),array('Not federated','Federated','Federated, top of list'),$fedlevel);
+      echo '</span><br class=form>';
+    }
+
+     ?>
 		<span class=form>Sort order: </span>
 		<span class=formright>
 			<input type="radio" name="sortorder" value="0" <?php writeHtmlChecked($sortorder,0); ?> />Creation date<br/>
@@ -819,7 +854,7 @@ function delqimgs($qsid) {
 }
 
 function printlist($parent) {
-	global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin;
+	global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin,$federated;
 	$arr = $ltlibs[$parent];
 	if ($sortorder[$parent]==1) {
 		$orderarr = array();
@@ -841,7 +876,11 @@ function printlist($parent) {
 			if (isset($ltlibs[$child])) { //library has children
 				//echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
 				echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\"><span class=btn id=\"b" . Sanitize::encodeStringForDisplay($child) . "\">+</span> ";
-				echo "</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span> </span>\n";
+				echo "</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) ;
+				if ($federated[$child]) {
+					echo ' <span class=fedico title="Federated">&lrarr;</span>';
+				}
+				echo "</span> </span>\n";
 				//if ($isadmin) {
 				  echo " ({$qcount[$child]}) ";
 				//}
@@ -858,7 +897,11 @@ function printlist($parent) {
 
 			} else {  //no children
 
-				echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) . "</span> ";
+				echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]);
+				if ($federated[$child]) {
+					echo ' <span class=fedico title="Federated">&lrarr;</span>';
+				}
+				echo "</span> ";
 				//if ($isadmin) {
 				  echo " ({$qcount[$child]}) ";
 				//}

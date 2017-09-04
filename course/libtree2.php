@@ -58,6 +58,7 @@ END;
 		$qarr[':userid'] = $userid;
 	}
 	$query .= " GROUP BY imas_libraries.id";
+	$query .= " ORDER BY imas_libraries.federationlevel DESC,imas_libraries.id";
 	if (count($qarr)==0) {
 		$stm = $DBH->query($query);
 	} else {

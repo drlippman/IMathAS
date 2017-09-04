@@ -252,6 +252,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="utils.php?form=emu">Emulate User</a><br/>';
 	echo '<a href="listextref.php">List ExtRefs</a><br/>';
 	echo '<a href="updateextref.php">Update ExtRefs</a><br/>';
+	echo '<a href="delwronglibs.php">Delete Questions with WrongLib Flag</a><br/>';
 	echo '<a href="listwronglibs.php">List WrongLibFlags</a><br/>';
 	echo '<a href="updatewronglibs.php">Update WrongLibFlags</a><br/>';
 	echo '<a href="blocksearch.php">Search Block titles</a><br/>';

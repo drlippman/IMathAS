@@ -842,26 +842,39 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h3>View Federation Peers</h3>\n";
 		echo '</div>';
-		echo "<table><tr><th>Name</th><th>Description</th><th>Their Last Pull</th><th>Our Last Pull</th><th>Modify</th><th>Delete</th></tr>\n";
+		echo "<table><tr><th>Name</th><th>Description</th><th>Their Last Pull</th><th>Our Last Pull</th><th>Modify</th><th>Delete</th><th>Pull</th></tr>\n";
 
 		$query = "SELECT ifp.id,ifp.peername,ifp.peerdescription,ifp.lastpull,max(pulls.pulltime) as uspull FROM imas_federation_peers AS ifp ";
 		$query .= "LEFT JOIN imas_federation_pulls AS pulls ON ifp.id=pulls.peerid GROUP BY pulls.peerid";
+
+		$query = "SELECT ifp.*,pulls.pulltime AS uspull,pulls.step FROM imas_federation_peers AS ifp ";
+		$query .= "LEFT JOIN imas_federation_pulls as pulls ON ifp.id=pulls.peerid WHERE ";
+		$query .= "pulls.id=(SELECT id FROM imas_federation_pulls AS ifps WHERE ifps.peerid=ifp.id ORDER BY pulltime DESC LIMIT 1) ";
+		$query .= "OR pulls.id IS NULL";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$lastpull = $row['lastpull'] > 0 ? tzdate("n/j/y", $row['lastpull']) : 'Never';
-			$uspull = $row['uspull'] === null ? 'Never' : tzdate("n/j/y", $row['uspull']);
+			$lastpull = $row['lastpull'] > 0 ? tzdate("n/j/y", $row['lastpull']) : _('Never');
+			$uspull = $row['uspull'] === null ? _('Never') : tzdate("n/j/y", $row['uspull']);
 
 			printf("<tr><td>%s</td><td>%s</td>", Sanitize::encodeStringForDisplay($row['peername']),
 				Sanitize::encodeStringForDisplay($row['peerdescription']));
-			printf('<td>%s</td>', Sanitize::encodeStringForDisplay($lastpull));
-			printf('<td>%s</td>', Sanitize::encodeStringForDisplay($uspull));
-			printf('<td><a href="forms.php?action=modfedpeers&id=%d">Modify</a></td>\n', $row['id']);
-			printf("<td><a href=\"actions.php?action=delfedpeers&id=%d\" onclick=\"return confirm('Are you sure?');\">Delete</a></td>\n", $row['id']);
+			echo '<td>'.Sanitize::encodeStringForDisplay($lastpull).'</td>';
+			echo '<td>'.Sanitize::encodeStringForDisplay($uspull);
+			if ($row['uspull']!==null && $row['step']<99) {
+				echo '<br/>'._('Incomplete').'. <a href="federationpull.php?peer='.Sanitize::onlyInt($row['id']).'">'._('Continue').'</a>.';
+			}
+			echo '</td>';
+			printf('<td><a href="forms.php?action=modfedpeers&id=%d&from=%s">', $row['id'], Sanitize::encodeUrlParam($from));
+			echo _('Modify'),'</a></td>';
+			printf("<td><a href=\"actions.php?action=delfedpeers&id=%d&from=%s\" onclick=\"return confirm('Are you sure?');\">", $row['id'],  Sanitize::encodeUrlParam($from));
+			echo _('Delete'),'</a></td>';
+			echo '<td><a href="federationpull.php?peer='.Sanitize::onlyInt($row['id']).'&stage=-1">'._('Start New Pull').'</a></td>';
 			echo "</tr>\n";
 		}
 		echo "</table>\n";
-		echo "<form method=post action=\"actions.php?action=modfedpeers&id=new\">\n";
+		echo "<form method=post action=\"actions.php?id=new&from=".Sanitize::encodeUrlParam($from)."\">\n";
 		echo "<p>Add new federation peer: <br/>";
+		echo '<input type="hidden" name="action" value="modfedpeers" />';
 		echo "Install Name: <input type=text name=\"peername\" size=20><br/>\n";
 		echo "Description: <input type=text name=\"peerdescription\" size=50><br/>\n";
 		echo "Root URL: <input type=text name=\"url\" size=50><br/>\n";
@@ -880,8 +893,9 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT id,peername,peerdescription,url,secret,lastpull FROM imas_federation_peers WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
-		printf("<form method=post action=\"actions.php?action=modfedpeers&id=%d\">\n", Sanitize::onlyInt($row['id']));
+		printf("<form method=post action=\"actions.php?id=%d&from=%s\">\n", Sanitize::onlyInt($row['id']), Sanitize::encodeUrlParam($from));
 		echo "Modify federation peer: <br/>";
+		echo '<input type="hidden" name="action" value="modfedpeers" />';
 		printf("Install Name: <input type=text name=\"peername\" value=\"%s\" size=20><br/>\n",
 			Sanitize::encodeStringForDisplay($row['peername']));
 		printf("Description: <input type=text name=\"peerdescription\" value=\"%s\" size=50><br/>\n",

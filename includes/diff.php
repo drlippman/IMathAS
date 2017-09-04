@@ -4,19 +4,19 @@
 	Paul's Simple Diff Algorithm v 0.1
 	(C) Paul Butler 2007 <http://www.paulbutler.org/>
 	May be used and distributed under the zlib/libpng license.
-	
+
 	This code is intended for learning purposes; it was written with short
 	code taking priority over performance. It could be used in a practical
 	application, but there are a few ways it could be optimized.
-	
+
 	Given two arrays, the function diff will return an array of the changes.
 	I won't describe the format of the array, but it will be obvious
 	if you use print_r() on the result of a diff on some test data.
-	
+
 	htmlDiff is a wrapper for the diff command, it takes two strings and
 	returns the differences in HTML. The tags used are <ins> and <del>,
-	which can easily be styled with CSS.  
-	
+	which can easily be styled with CSS.
+
 */
 
 function diff($old, $new){
@@ -30,7 +30,7 @@ function diff($old, $new){
 				$omax = $oindex + 1 - $maxlen;
 				$nmax = $nindex + 1 - $maxlen;
 			}
-		}	
+		}
 	}
 	if($maxlen == 0) return array(array('d'=>$old, 'i'=>$new));
 	return array_merge(
@@ -56,14 +56,14 @@ function diffsparsejson($old, $new) {
 				$adj += 1;
 			} else if (empty($v['i'])) { //delete
 				$out[] = array(1,$k-$adj,count($v['d']));
-				$adj -= count($v['d'])-1; 
+				$adj -= count($v['d'])-1;
 			} else { //replace
 				$out[] = array(2,$k-$adj,count($v['d']),$v['i']);
 				$adj -= count($v['d'])-1;
 
 			}
 		}
-	}	
+	}
 	if (count($out)==0) {
 		return '';
 	} else {
@@ -94,7 +94,7 @@ function diffapplydiff($base,$diff) {
 			array_splice($base,$diffs[$i][1],$diffs[$i][2]);
 		}
 	}
-	
+
 	return $base;
 }
 
@@ -114,7 +114,7 @@ function diffstringsplit($str) {
 				$cont = str_replace('><','> <',$cont);
 			}
 			$out = array_merge($out,preg_split('/\s+/',$cont));
-			
+
 		} else {
 			$out[] = $cont;
 		}
@@ -137,15 +137,15 @@ function diffsparse($old, $new) {
 				continue;
 			} else if (empty($v['d'])) {//insert
 				$out[] = array('i',$k-$adj,$v['i']);
-				$adj += 1;//count($v['i'])-1; 
+				$adj += 1;//count($v['i'])-1;
 			} else if (empty($v['i'])) { //delete
 				$out[] = array('d',$k-$adj,count($v['d']));
-				$adj -= count($v['d'])-1; 
+				$adj -= count($v['d'])-1;
 			} else { //replace
 				$out[] = array('r',$k-$adj,count($v['d']),$v['i']);
 			}
 		}
-	}	
+	}
 	return $out;
 }
 
@@ -161,7 +161,7 @@ function reapplydiff($old,$diff) {
 		}
 	}
 	return $old;
-	
+
 }
 
 
@@ -176,5 +176,15 @@ function htmlDiff($old, $new){
 	return $ret;
 }
 */
+function htmlDiff($old, $new){
+	$diff = diff(explode(' ', $old), explode(' ', $new));
+	foreach($diff as $k){
+		if(is_array($k))
+			$ret .= (!empty($k['d'])?"<del>".implode(' ',$k['d'])."</del> ":'').
+				(!empty($k['i'])?"<ins>".implode(' ',$k['i'])."</ins> ":'');
+		else $ret .= $k . ' ';
+	}
+	return $ret;
+}
 
 ?>

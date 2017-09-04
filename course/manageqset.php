@@ -673,6 +673,8 @@ if ($myrights<20) {
 				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
 				$searchall = 0;
 			}
+			$hidepriv = 0;
+			$skipfederated = 0;
 			if ($isadmin) {
 				if (isset($_POST['hidepriv'])) {
 					$hidepriv = 1;
@@ -680,6 +682,12 @@ if ($myrights<20) {
 					$hidepriv = 0;
 				}
 				$sessiondata['hidepriv'.$cid] = $hidepriv;
+				if (isset($_POST['skipfederated'])) {
+					$skipfederated = 1;
+				} else {
+					$skipfederated = 0;
+				}
+				$sessiondata['skipfederated'.$cid] = $skipfederated;
 			}
 
 			writesessiondata();
@@ -690,13 +698,17 @@ if ($myrights<20) {
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
 			$searchmine = $sessiondata['searchmine'.$cid];
+			$hidepriv = 0; $skipfederated = 0;
 			if ($isadmin) {
 				$hidepriv = $sessiondata['hidepriv'.$cid];
+				$skipfederated = $sessiondata['skipfederated'.$cid];
 			}
 		} else {
 			$search = '';
 			$searchall = 0;
 			$searchmine = 0;
+			$hidepriv = 0; 
+			$skipfederated = 0;
 			$safesearch = '';
 		}
     $searchlikevals = array();
@@ -851,6 +863,10 @@ if ($myrights<20) {
 			//DB $query .= " AND imas_questionset.ownerid='$userid'";
 			$query .= " AND imas_questionset.ownerid=?";
 			$qarr[] = $userid;
+		}
+		if ($skipfederated==1) {
+			$query .= " AND imas_questionset.id NOT IN (SELECT iq.id FROM imas_questionset AS iq JOIN imas_library_items as ili on ili.qsetid=iq.id AND ili.deleted=0";
+			$query .= " JOIN imas_libraries AS il ON ili.libid=il.id AND il.deleted=0 WHERE il.federationlevel>0)";
 		}
 		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id ";
 		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist{0}=='0')) {
@@ -1281,6 +1297,9 @@ function getnextprev(formn,loc) {
 			echo "<input type=checkbox name=\"hidepriv\" value=\"1\" ";
 			if ($hidepriv==1) {echo "checked=1";}
 			echo "/>Hide Private ";
+			echo "<input type=checkbox name=\"skipfederated\" value=\"1\" ";
+			if ($skipfederated==1) {echo "checked=1";}
+			echo "/>Hide Federated ";
 		}
 
 		echo '<input type=submit value="Search" title="List or search selected libraries">';

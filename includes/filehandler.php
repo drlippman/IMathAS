@@ -724,7 +724,7 @@ function getfopenloc($key) {
 	global $urlmode,$imasroot;
 	$key = Sanitize::rawurlencodePath($key);
 	if ($GLOBALS['filehandertype'] == 's3') {
-		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
+		return 'https://'.$GLOBALS['AWSbucket'].".s3.amazonaws.com/$key";
 	} else {
 		return "../filestore/$key";
 	}

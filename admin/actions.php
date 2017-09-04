@@ -1149,11 +1149,15 @@ switch($_POST['action']) {
 			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'],
 				':secret'=>$_POST['secret'], ':url'=>$_POST['url'], ':id'=>$_GET['id']));
 		}
+		header('Location: ' . $GLOBALS['basesiteurl'] . '/admin/forms.php?action=listfedpeers&from='.Sanitize::encodeUrlParam($from));
+		exit;
 		break;
 	case "delfedpeers":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$stm = $DBH->prepare("DELETE FROM imas_federation_peers WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . '/admin/forms.php?action=listfedpeers&from='.Sanitize::encodeUrlParam($from));
+		exit;
 		break;
 	case "removediag";
 		if ($myrights <60) { echo "You don't have the authority for this action"; break;}
