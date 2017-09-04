@@ -361,10 +361,10 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$stm = $DBH->prepare("SELECT title,message,courseid FROM imas_msgs WHERE id=:id");
 				$stm->execute(array(':id'=>$replyto));
         list($title, $message, $courseid) = $stm->fetch(PDO::FETCH_NUM);
-				$title = "Re: ".str_replace('"','&quot;',$title);
+				$title = _("Re: ").$title;
 				if (isset($_GET['toquote'])) {
 					//DB $message = mysql_result($result,0,1);
-					$message = '<br/><hr/>In reply to:<br/>'.$message;
+					$message = '<br/><hr/>'._('In reply to:').'<br/>'.$message;
 				} else {
 					$message = '';
 				}
@@ -386,17 +386,22 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 
 				$message = '<br/><hr/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
-				if (isset($parts[3])) {  //sending out of assessment instructor
+				if (isset($parts[3]) && $parts[3] === 'reperr') {
+					$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
+					$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
+					$stm->execute(array(':id'=>$parts[1]));
+					$_GET['to'] = $stm->fetchColumn(0);
+				} else if (isset($parts[3]) && $parts[3]>0) {  //sending out of assessment instructor
 					//DB $query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 					//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 					$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$parts[3]));
 					if (isset($teacherid) || isset($tutorid)) {
 						//DB $title = 'Question #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
-						$title = 'Question #'.($parts[0]+1).' in '.str_replace('"','&quot;',$stm->fetchColumn(0));
+						$title = 'Question #'.($parts[0]+1).' in '.$stm->fetchColumn(0);
 					} else {
 						//DB $title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
-						$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',$stm->fetchColumn(0));
+						$title = 'Question about #'.($parts[0]+1).' in '.$stm->fetchColumn(0);
 					}
 					if ($_GET['to']=='instr') {
 						unset($_GET['to']);

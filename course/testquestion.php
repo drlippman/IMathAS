@@ -277,7 +277,9 @@ if ($overwriteBody==1) {
 	echo '</code>';
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
+		echo "<p>Question id: {$_GET['qsetid']}.  ";//<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
+		echo "<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&";
+		echo "quoteq=".Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}")."\" target=\"reperr\">Message owner</a> to report problems</p>";
 	} else {
 		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:{$line['email']}?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
 	}

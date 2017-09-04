@@ -783,14 +783,19 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single,$showqnum=0) {
-	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
+	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot,$CFG;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
 			echo '<div class="review clearfix">';
 		}
 		if ($sessiondata['isteacher']) {
-			echo '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'];
-			echo '<br/><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qi[$questions[$qn]]['questionsetid'].'">'._('License').'</a></span>';
+			echo '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').Sanitize::onlyInt($qi[$questions[$qn]]['questionsetid']);
+			echo '<br/><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.Sanitize::onlyInt($qi[$questions[$qn]]['questionsetid']).'">'._('License').'</a>';
+			if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+				echo "<br/><a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&";
+				echo "quoteq=".Sanitize::encodeUrlParam("0-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-reperr-{$GLOBALS['assessver']}")."\" target=\"reperr\">Report Problems</a>";
+			}
+			echo '</span>';
 		} else {
 			echo '<span style="float:right;font-size:70%"><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qi[$questions[$qn]]['questionsetid'].'">'._('License').'</a></span>';
 		}
@@ -864,13 +869,15 @@ function showquestioncontactlinks($qn) {
 	global $testsettings,$imasroot,$qi,$seeds,$questions;
 	$out = '';
 	if ($testsettings['msgtoinstr']==1) {
-		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}&to=instr\">". _('Message instructor about this question'). "</a>";
+		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=".Sanitize::encodeUrlParam($testsettings['courseid']);
+		$out .= "&add=new&quoteq=".Sanitize::encodeUrlParam("$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}")."&to=instr\">". _('Message instructor about this question'). "</a>";
 	}
 	if ($testsettings['posttoforum']>0) {
 		if ($out != '') {
 			$out .= "<br/>";
 		}
-		$out .= "<a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}\">". _('Post this question to forum'). "</a>";
+		$out .= "<a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid=".Sanitize::encodeUrlParam($testsettings['courseid'])."&forum=".Sanitize::encodeUrlParam($testsettings['posttoforum']);
+		$out .= "&modify=new&quoteq=".Sanitize::encodeUrlParam("$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}")."\">". _('Post this question to forum'). "</a>";
 	}
 	return $out;
 }
