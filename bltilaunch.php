@@ -475,6 +475,9 @@ if (isset($_GET['launch'])) {
 	//not postback of new LTI user info, so must be fresh request
 
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
+	if (empty($_REQUEST['lti_version'])) {
+		reporterror("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again");
+	}
 	if (empty($_REQUEST['user_id'])) {
 		reporterror("Unable to launch - User information not provided (user_id is required)");
 	} else {
@@ -1851,6 +1854,9 @@ if (isset($_GET['launch'])) {
 	//not postback of new LTI user info, so must be fresh request
 
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
+	if (empty($_REQUEST['lti_version'])) {
+		reporterror("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again");
+	}
 	if (empty($_REQUEST['user_id'])) {
 		reporterror("Unable to launch - User information not provided (user_id is required)");
 	} else {
@@ -2016,11 +2022,21 @@ if (isset($_GET['launch'])) {
 	//look if we know this student
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when GUID change, while still storing it
 	$shortorg = $orgparts[0];
-	//DB $query = "SELECT userid FROM imas_ltiusers WHERE org LIKE '$shortorg:%' AND ltiuserid='$ltiuserid' ORDER BY id";
+	$query = "SELECT lti.userid FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
+	//DB $query .= "WHERE lti.org LIKE '$shortorg:%' AND lti.ltiuserid='$ltiuserid' ";
+	$query .= "WHERE lti.org LIKE :org AND lti.ltiuserid=:ltiuserid ";
+	if ($ltirole!='learner') {
+		//if they're a teacher, make sure their imathas account is too. If not, we'll act like we don't know them
+		//and require a new connection
+		$query .= "AND iu.rights>19 ";
+	}
+	//if multiple accounts, use student one first (if not $ltirole of teacher) then higher rights.
+	//if there was a mixup and multiple records were created, use the first one
+	$query .= "ORDER BY iu.rights, lti.id";
+
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result) > 0) {
-	$stm = $DBH->prepare("SELECT userid FROM imas_ltiusers WHERE org LIKE :org AND ltiuserid=:ltiuserid ORDER BY id");
-	$stm->execute(array(':ltiuserid'=>$ltiuserid, ':org'=>"$shortorg:%"));
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':org'=>"$shortorg:%", ':ltiuserid'=>$ltiuserid));
 	if ($stm->rowCount() > 0) {
 		//DB $userid = mysql_result($result,0,0);
 		$userid = $stm->fetchColumn(0);
