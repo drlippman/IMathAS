@@ -59,6 +59,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 		echo "PACKAGE DESCRIPTION\n";
 		echo $_POST['packdescription'];
 		echo "\n";
+		echo "INSTALLNAME\n";
+		echo $installname;
+		echo "\n";
 
 		$rootlibs = $_POST['libs'];  //root libs
 		if (isset($_POST['rootlib'])) {
@@ -77,7 +80,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		//$parents is childnewid=>parentnewid
 
 		//get root lib names
-		$query = "SELECT id,name,parent,uniqueid,lastmoddate FROM imas_libraries WHERE id IN ($rootlist)";
+		$query = "SELECT id,name,parent,uniqueid,lastmoddate,ownerid,userights FROM imas_libraries WHERE id IN ($rootlist)";
 		if ($nonpriv) {
 			$query .= " AND userights>0";
 		}
@@ -96,6 +99,10 @@ if (!(isset($teacherid)) && $myrights<20) {
 				echo rtrim($row[3]) . "\n";
 				echo "LASTMODDATE\n";
 				echo rtrim($row[4]) . "\n";
+				echo "OWNERID\n";
+				echo rtrim($row[5]) . "\n";
+				echo "USERIGHTS\n";
+				echo rtrim($row[6]) . "\n";
 				echo "NAME\n";
 				echo rtrim($row[1]) . "\n";
 				echo "PARENT\n";
@@ -135,6 +142,10 @@ if (!(isset($teacherid)) && $myrights<20) {
 						echo rtrim($row[2]) . "\n";
 						echo "LASTMODDATE\n";
 						echo rtrim($row[3]) . "\n";
+						echo "OWNERID\n";
+						echo rtrim($row[5]) . "\n";
+						echo "USERIGHTS\n";
+						echo rtrim($row[6]) . "\n";
 						echo "NAME\n";
 						echo rtrim($row[1]) . "\n";
 						echo "PARENT\n";
@@ -250,8 +261,10 @@ if (!(isset($teacherid)) && $myrights<20) {
 			echo rtrim($line['description']) . "\n";
 			echo "\nAUTHOR\n";
 			echo rtrim($line['author']) . "\n";
-      echo "\nOWNERID\n";
-      echo rtrim($line['ownerid']) . "\n";
+			echo "\nOWNERID\n";
+			echo rtrim($line['ownerid']) . "\n";
+			echo "\nUSERIGHTS\n";
+			echo rtrim($line['userights']) . "\n";
 			echo "\nCONTROL\n";
 			echo rtrim($line['control']) . "\n";
 			echo "\nQCONTROL\n";

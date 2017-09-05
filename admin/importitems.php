@@ -43,7 +43,7 @@ $updateqcnt = 0;
 function additem($itemtoadd,$item,$questions,$qset) {
 
 	global $DBH,$newlibs;
-	global $userid, $userights, $cid, $missingfiles, $newqcnt, $updateqcnt;
+	global $userid, $userights, $cid, $missingfiles, $newqcnt, $updateqcnt, $sourceinstall;
 	$mt = microtime();
 	if ($item[$itemtoadd]['type'] == "Assessment") {
 		//add assessment.  set $typeid
@@ -186,11 +186,21 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				} else {
 					$hasimg = 0;
 				}
+				if (isset($qset['userights'][$n]) && isset($_POST['reuseqrights'])) {
+					$thisqrights = $qset['userights'][$n];
+				} else {
+					$thisqrights = $userights;
+				}
+				if (isset($GLOBALS['mapusers']) && isset($GLOBALS['mapusers'][$sourceinstall][$qset['ownerid'][$n]])) {
+					$thisownerid = $GLOBALS['mapusers'][$sourceinstall][$qset['ownerid'][$n]]['id'];
+				} else {
+					$thisownerid = $userid;
+				}
 				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) ";
 				$query .= "VALUES (:adddate, :lastmoddate, :uniqueid, :ownerid, :author, :userights, :description, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':adddate'=>$now, ':lastmoddate'=>$qset['lastmod'][$n], ':uniqueid'=>$qset['uniqueid'][$n], ':ownerid'=>$userid,
-					':author'=>$qset['author'][$n], ':userights'=>$userights, ':description'=>$qset['description'][$n], ':qtype'=>$qset['qtype'][$n],
+				$stm->execute(array(':adddate'=>$now, ':lastmoddate'=>$qset['lastmod'][$n], ':uniqueid'=>$qset['uniqueid'][$n], ':ownerid'=>$thisownerid,
+					':author'=>$qset['author'][$n], ':userights'=>$thisqrights, ':description'=>$qset['description'][$n], ':qtype'=>$qset['qtype'][$n],
 					':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
 					':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':extref'=>$qset['extref'][$n], ':license'=>$qset['license'][$n],
 					':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
@@ -427,6 +437,9 @@ function parsefile($file) {
 			case  "EXPORT DESCRIPTION":
 				$desc = rtrim(fgets($handle, 4096));
 				break;
+			case  "INSTALLNAME":
+				$sourceinstall = rtrim(fgets($handle, 4096));
+				break;
 			case  "EXPORT OWNERID":
 				$ownerid = rtrim(fgets($handle, 4096));
 				break;
@@ -522,6 +535,7 @@ function parsefile($file) {
 			case  "LASTMOD":
 			case  "AUTHOR":
 			case  'OWNERID':
+			case  'USERIGHTS':
 			case  "CONTROL":
 			case  "QCONTROL":
 			case  "QTEXT":
@@ -548,7 +562,7 @@ function parsefile($file) {
 		}
 	}
 
-	return array($desc,$itemlist,$item,$questions,$qset);
+	return array($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid);
 }
 
 function copysub($items,$parent,&$addtoarr) {
@@ -606,7 +620,7 @@ if (!(isset($teacherid))) {
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
-		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($filename);
+		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
 
 		$userights = $_POST['userights'];
 		$newlibs = explode(",",$_POST['libs']);
@@ -668,7 +682,7 @@ if (!(isset($teacherid))) {
 			echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
 			exit;
 		}
-		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($uploadfile);
+		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($uploadfile);
 		if (!isset($desc)) {
 			$page_fileErrorMsg .=  "This does not appear to be a course items file.  It may be ";
 			$page_fileErrorMsg .=  "a question or library export.\n";
@@ -764,6 +778,8 @@ function chkgrp(frm, arr, mark) {
 				<option value="3">Allow use by all and modifications by group</option>
 				<option value="4">Allow use and modifications by all</option>
 			</select>
+			<br/><input type="checkbox" name="reuseqrights" checked /> Use rights in import, if available.
+			
 		</p>
 		<p>
 

@@ -115,13 +115,23 @@ function parseqs($file,$touse,$rights) {
 			} else {
 				$hasimg = 0;
 			}
+			if (isset($qd['userights']) && isset($_POST['reuseqrights'])) {
+				$thisqrights = $qd['userights'];
+			} else {
+				$thisqrights = $rights;
+			}
+			if (isset($GLOBALS['mapusers']) && isset($GLOBALS['mapusers'][$sourceinstall][$qd['ownerid']])) {
+				$thisownerid = $GLOBALS['mapusers'][$sourceinstall][$qd['ownerid']]['id'];
+			} else {
+				$thisownerid = $userid;
+			}
 			//DB $query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) VALUES ";
 			//DB $query .= "('{$qd['uqid']}',$now,$now,'$userid','$rights','{$qd['description']}','{$qd['author']}','{$qd['qtype']}','{$qd['control']}','{$qd['qcontrol']}','{$qd['qtext']}','{$qd['answer']}','{$qd['solution']}','{$qd['solutionopts']}','{$qd['extref']}','{$qd['license']}','{$qd['ancestorauthors']}','{$qd['otherattribution']}',$hasimg,$importuid)";
 			//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
 			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) VALUES ";
 			$query .= "(:uniqueid, :adddate, :lastmoddate, :ownerid, :userights, :description, :author, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':uniqueid'=>$qd['uqid'], ':adddate'=>$now, ':lastmoddate'=>$now, ':ownerid'=>$userid, ':userights'=>$rights,
+			$stm->execute(array(':uniqueid'=>$qd['uqid'], ':adddate'=>$now, ':lastmoddate'=>$now, ':ownerid'=>$userid, ':userights'=>$thisqrights,
 				':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'], ':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'],
 				':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'], ':extref'=>$qd['extref'],
 				':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'], ':otherattribution'=>$qd['otherattribution'], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
@@ -189,8 +199,11 @@ function parseqs($file,$touse,$rights) {
 		} else if ($line == "AUTHOR") {
 			$part = 'author';
 			continue;
-		}else if ($line == "OWNERID") {
+		} else if ($line == "OWNERID") {
 			$part = 'ownerid';
+			continue;
+		} else if ($line == "USERIGHTS") {
+			$part = 'userights';
 			continue;
 		} else if ($line == "CONTROL") {
 			$part = 'control';
@@ -275,6 +288,9 @@ function parselibs($file) {
 		if ($line=="PACKAGE DESCRIPTION") {
 			$dopackd = true;
 			$packname = rtrim(fgets($handle, 4096));
+		} else if ($line=="INSTALLNAME") {
+			$dopackd = false;
+			$sourceinstall = rtrim(fgets($handle, 4096));
 		} else if ($line=="START LIBRARY") {
 			$dopackd = false;
 			$libid = -1;
@@ -284,6 +300,10 @@ function parselibs($file) {
 			$unique[$libid] = rtrim(fgets($handle, 4096));
 		} else if ($line=="LASTMODDATE") {
 			$lastmoddate[$libid] = rtrim(fgets($handle, 4096));
+		} else if ($line=="OWNERID") {
+			$ownerid[$libid] = rtrim(fgets($handle, 4096));
+		} else if ($line=="USERIGHTS") {
+			$userights[$libid] = rtrim(fgets($handle, 4096));
 		} else if ($line=="NAME") {
 			if ($libid != -1) {
 				$names[$libid] = rtrim(fgets($handle, 4096));
@@ -309,7 +329,7 @@ function parselibs($file) {
 	} else {
 		gzclose($handle);
 	}
-	return array($packname,$names,$parents,$libitems,$unique,$lastmoddate);
+	return array($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall);
 }
 
  //set some page specific variables and counters
@@ -332,7 +352,7 @@ if ($myrights < 100) {
 
 		$libstoadd = $_POST['libs'];
 
-		list($packname,$names,$parents,$libitems,$unique,$lastmoddate) = parselibs($filename);
+		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($filename);
 		//DB //need to addslashes before SQL insert
 		//DB $names = array_map('addslashes_deep', $names);
 		//DB $parents = array_map('addslashes_deep', $parents);
@@ -409,6 +429,18 @@ if ($myrights < 100) {
 				if ($unique[$libid]==0 || (isset($exists[$unique[$libid]]) && $_POST['merge']==0)) {
 					$unique[$libid] = substr($mt,11).substr($mt,2,2).str_pad($libid,4,0,STR_PAD_LEFT);
 				}
+				if (isset($userights[$libid]) && isset($_POST['reuselibrights'])) {
+					$thislibrights = $userights[$libid];
+				} else {
+					$thislibrights = $librights;
+				}
+				if (isset($GLOBALS['mapusers']) && isset($GLOBALS['mapusers'][$sourceinstall][$ownerid[$libid]])) {
+					$thisownerid = $GLOBALS['mapusers'][$sourceinstall][$ownerid[$libid]]['id'];
+					$thisgroupid = $GLOBALS['mapusers'][$sourceinstall][$ownerid[$libid]]['groupid'];
+				} else {
+					$thisownerid = $userid;
+					$thisgroupid = $groupid;
+				}
 				//DB $query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				//DB $query .= "('{$unique[$libid]}',$now,$now,'{$names[$libid]}','$userid','$librights','$parent','$groupid')";
 				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
@@ -416,8 +448,8 @@ if ($myrights < 100) {
 				$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :parent, :groupid)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':uniqueid'=>$unique[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>$names[$libid], ':ownerid'=>$userid,
-					':userights'=>$librights, ':parent'=>$parent, ':groupid'=>$groupid));
+				$stm->execute(array(':uniqueid'=>$unique[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>$names[$libid], ':ownerid'=>$thisownerid,
+					':userights'=>$thislibrights, ':parent'=>$parent, ':groupid'=>$thisgroupid));
 				$libs[$libid] = $DBH->lastInsertId();
 				$newl++;
 			}
@@ -549,7 +581,7 @@ if ($myrights < 100) {
 			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
 		}
 
-		list($packname,$names,$parents,$libitems,$unique,$lastmoddate) = parselibs($uploadfile);
+		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($uploadfile);
 
 		if (!isset($parents)) {
 			$page_fileErrorMsg .=  "<p>This file does not appear to contain a library structure.  It may be a question set export. ";
@@ -633,15 +665,16 @@ if ($overwriteBody==1) {
 			</p>
 
 			<p>
-			Set Question Use Rights to:
+			For Added Questions, Set Question Use Rights to:
 			<select name=qrights>
 				<option value="0">Private</option>
 				<option value="2" SELECTED>Allow use, use as template, no modifications</option>
 				<option value="3">Allow use and modifications</option>
 			</select>
+			<br/><input type="checkbox" name="reuseqrights" checked /> Use rights in import, if available.
 			</p>
 			<p>
-			Set Library Use Rights to:
+			For Added Libraries, Set Library Use Rights to:
 			<select name="librights">
 				<option value="0">Private</option>
 				<option value="1">Closed to group, private to others</option>
@@ -650,6 +683,7 @@ if ($overwriteBody==1) {
 				<option value="5">Open to group, closed to others</option>
 				<option value="8">Open to all</option>
 			</select>
+			<br/><input type="checkbox" name="reuselibrights" checked /> Use rights in import, if available.
 			</p>
 
 			<p>Parent library:
