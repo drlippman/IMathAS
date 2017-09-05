@@ -108,7 +108,7 @@ function parseqs($file,$touse,$rights) {
 			if ($qd['uqid']=='0') {
 				$importuid = $qd['uqid'];
 				$mt = microtime();
-				$qd['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
+				$qd['uqid'] = substr($mt,11).substr($mt,2,1).str_pad($qn,5,0,STR_PAD_LEFT);
 			}
 			if (!empty($qd['qimgs'])) {
 				$hasimg = 1;
@@ -404,7 +404,7 @@ if ($myrights < 100) {
 			} else {
 				//if lib does not exist, add it
 				if ($unique[$libid]==0 || (isset($exists[$unique[$libid]]) && $_POST['merge']==0)) {
-					$unique[$libid] = substr($mt,11).substr($mt,2,2).$libid;
+					$unique[$libid] = substr($mt,11).substr($mt,2,2).str_pad($libid,4,0,STR_PAD_LEFT);
 				}
 				//DB $query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				//DB $query .= "('{$unique[$libid]}',$now,$now,'{$names[$libid]}','$userid','$librights','$parent','$groupid')";
