@@ -37,7 +37,7 @@ $outcomeinfo = array();
 $stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$outcomeinfo[$row[0]] = $row[1];
+	$outcomeinfo[$row[0]] = Sanitize::encodeStringForDisplay($row[1]);  //Isnt being used elsewhere in a conditional
 }
 
 if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
@@ -158,7 +158,7 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				$gcnt++;
 				if ($isheader) {
-					$html .= '<th class="cat'.Sanitize::encodeStringForDisplay($gcnt).'"><div><span class="cattothdr">'.Sanitize::encodeStringForDisplay($oi['name']).'</span></div></th>';
+					$html .= '<th class="cat'.Sanitize::onlyInt($gcnt).'"><div><span class="cattothdr">'.Sanitize::encodeStringForDisplay($oi['name']).'</span></div></th>';
 					$sarr .= ',"N"';
 					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$html .= $subhtml;

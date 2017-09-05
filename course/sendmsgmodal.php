@@ -35,7 +35,7 @@ if (isset($_POST['message'])) {
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$row[2] = trim($row[2]);
 		if ($row[2]!='' && $row[2]!='none@none.com') {
-			$addy = "{$row[0]} {$row[1]} <{$row[2]}>";
+			$addy = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1])." <".Sanitize::emailAddress($row[2]).">";
 			//DB $subject = stripslashes($_POST['subject']);
 			//DB $message = stripslashes($_POST['message']);
 			$subject = $_POST['subject']; // Sanitized by strip_tags near line 14.

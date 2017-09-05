@@ -75,7 +75,7 @@ if (isset($backtrack) && count($backtrack)>0) {
 	for ($i=0;$i<count($backtrack);$i++) {
 		$curBreadcrumb .= "&gt; ";
 		if ($i!=count($backtrack)-1) {
-			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[$i][1])."\">";
 		}
 		//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
 		$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
@@ -87,11 +87,11 @@ if (isset($backtrack) && count($backtrack)>0) {
 	if (count($backtrack)==1) {
 		$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">Back</a></span><br class=\"form\" />";
 	} else {
-		$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span><br class=\"form\" />";
+		$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[count($backtrack)-2][1])."\">Back</a></span><br class=\"form\" />";
 	}
 } else {
-	$curBreadcrumb .= $coursename;
-	$curname = $coursename;
+	$curBreadcrumb .= Sanitize::encodeStringForDisplay($coursename);
+	$curname = Sanitize::encodeStringForDisplay($coursename);
 }
 
 
@@ -117,7 +117,7 @@ function resizeiframe() {
 }
 
 function recordlasttreeview(id) {
-	var url = "' . $GLOBALS['basesiteurl'] . '/course/treereader.php?cid='.$cid.'&folder='.$_GET['folder'].'&recordbookmark=" + id;
+	var url = "' . $GLOBALS['basesiteurl'] . '/course/treereader.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($_GET['folder']).'&recordbookmark=" + id;
 	basicahah(url, "bmrecout");
 }
 var treereadernavstate = 1;

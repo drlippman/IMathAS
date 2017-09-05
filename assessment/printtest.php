@@ -265,7 +265,7 @@
 			$qattempts = $qi[$questions[$i]]['attempts'];
 			if ($scoredview) {
 				echo "<div>#".($i+1)." ";
-				echo printscore($scores[$i], $i);
+				echo printscore(Sanitize::encodeStringForDisplay($scores[$i]), $i);
 				echo "</div>";
 			} else {
 				echo "<div>#".($i+1)." Points possible: ".Sanitize::encodeStringForDisplay($points).".  Total attempts: ".Sanitize::encodeStringForDisplay($qattempts)."</div>";
