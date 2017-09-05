@@ -339,7 +339,9 @@ if ($overwriteBody==1) {
       echo '<th>'._('Role').'</th>';
       echo '<th>'._('Last Login').'</th>';
       echo '<th>'._('Edit').'</th>';
-      echo '<th>'._('Delete').'</th>';
+      if ($page != 'groupadmin') {
+      	      echo '<th>'._('Delete').'</th>';
+      }
       echo '</tr></thead>';
       echo '<tbody>';
       $alt = 0;
@@ -356,12 +358,14 @@ if ($overwriteBody==1) {
           echo '<td>'.Sanitize::encodeStringForDisplay($user['role']).'</td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['lastaccess']).'</td>';
           echo '<td><a href="forms.php?from='.$from.'&action=chgrights&id='.$user['id'].'">'._('Edit').'</a></td>';
-          echo '<td><a href="forms.php?from='.$from.'&action=deladmin&id='.$user['id'].'">'._('Delete').'</a></td>';
+          if ($page != 'groupadmin') {
+          	  echo '<td><a href="forms.php?from='.$from.'&action=deladmin&id='.$user['id'].'">'._('Delete').'</a></td>';
+          }
           echo '</tr>';
       }
       echo '</tbody></table>';
       echo '<script type="text/javascript">
-  		  initSortTable("myTable",Array("S","S","S","S","D",false,false),true);
+  		  initSortTable("myTable",Array("S","S","S","S","D",false'.(($page != 'groupadmin')?',false':'').'),true);
   		  </script>';
 
     } else if ($page=='main') {
