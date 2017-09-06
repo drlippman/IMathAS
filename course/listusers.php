@@ -433,25 +433,25 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "lockstu.php";
 
-	} /*elseif (isset($_GET['action']) && $_GET['action']=="lockone" && is_numeric($_GET['uid'])) {
+	} elseif (isset($_POST['action']) && $_POST['action']=="lockone" && is_numeric($_POST['uid'])) {
 		$now = time();
 		//DB $query = "UPDATE imas_students SET locked='$now' WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE courseid=:courseid AND userid=:userid");
-		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid, ':userid'=>$_GET['uid']));
+		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid, ':userid'=>$_POST['uid']));
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
-	} elseif (isset($_GET['action']) && $_GET['action']=="unlockone" && is_numeric($_GET['uid'])) {
+	} elseif (isset($_POST['action']) && $_POST['action']=="unlockone" && is_numeric($_POST['uid'])) {
 		$now = time();
 		//DB $query = "UPDATE imas_students SET locked=0 WHERE courseid='$cid' AND userid=".intval($_GET['uid']);
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=0 WHERE courseid=:courseid AND userid=:userid");
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$_GET['uid']));
+		$stm->execute(array(':courseid'=>$cid, ':userid'=>$_POST['uid']));
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
-	}*/ else { //DEFAULT DATA MANIPULATION HERE
+	} else { //DEFAULT DATA MANIPULATION HERE
 
 		$curBreadcrumb .= " &gt; Roster\n";
 		$pagetitle = "Student Roster";
@@ -568,6 +568,31 @@ $placeinhead .= '$(function() { $(".lal").attr("title","View login log");
 	$("input[type=checkbox]").on("change",function() {$(this).parents("tr").toggleClass("highlight");});
 	});';
 $placeinhead .= "</script>";
+$placeinhead .= '<script type="text/javascript">$(function() {
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="../img/gears.png" alt="Options"/></a>\';
+  html += \'<ul role="menu" class="dropdown-menu">\';
+  $("img[data-uid]").each(function (i,el) {
+  	var uid = $(el).attr("data-uid");
+	var thishtml = html + \' <li><a href="listusers.php?cid=\'+cid+\'&chgstuinfo=true&uid=\'+uid+\'">'._('Student profile and options').'</a></li>\';
+	if ($(el).siblings("span.greystrike").length) {
+		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'unlockone\\\');return false;">'._('Unlock').'</a></li>\';
+	} else {
+		thishtml += \' <li><a href="#" onclick="postRosterForm(\'+uid+\',\\\'lockone\\\');return false;">'._('Lock out of course').'</a></li>\';
+	}
+	thishtml += \' <li><a href="viewloginlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Login Log').'</a></li>\';
+	thishtml += \' <li><a href="viewactionlog.php?cid=\'+cid+\'&uid=\'+uid+\'">'._('Activity Log').'</a></li>\';
+	thishtml += \'</ul></span> \';
+	$(el).replaceWith(thishtml);
+  });
+  $(".dropdown-toggle").dropdown();
+  });
+  function postRosterForm(uid,action) {
+  	$("<form>", {method: "POST", action: $("#qform").attr("action")})
+	  .append($("<input>", {name:"action", value:action, type:"hidden"}))
+	  .append($("<input>", {name:"uid", value:uid, type:"hidden"}))
+	  .appendTo("body").submit();
+  }
+  </script>';
 
 require("../header.php");
 $curdir = rtrim(dirname(__FILE__), '/\\');
@@ -867,8 +892,9 @@ if ($overwriteBody==1) {
 				echo $hasCodeData;
 				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid=' . Sanitize::onlyInt($line['userid']) . '" class="ui">';
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
+				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="../img/gears.png"/> ';
 				if ($line['locked']>0) {
-					echo '<td><span class="greystrike">'.$nameline.'</span></td>';
+					echo '<span class="greystrike">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
 						echo '<td><span class="greystrike">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
@@ -878,7 +904,7 @@ if ($overwriteBody==1) {
 					}
 					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></span></td>';
 				} else {
-					echo '<td>'.$nameline.'</td>';
+					echo $nameline.'</td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
 						echo '<td>'.Sanitize::encodeStringForDisplay($line['SID']).'</td>';
