@@ -7106,6 +7106,10 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of mathematical expressions'), $listtype):_('Enter a mathematical expression');
 	}
+	if ((in_array('fraction',$ansformats) || in_array('reducedfraction',$ansformats)) && !in_array('allowmixed',$ansformats)) {
+		$tip .= '<br/>'._('Do not enter mixed numbers');
+		$shorttip .= _(' (no mixed numbers)');
+	}
 	if ($calledfrom != 'calcmatrix') {
 		$tip .= "<br/>" . _('Enter DNE for Does Not Exist, oo for Infinity');
 	}
