@@ -25,11 +25,11 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		$ni = $stm->rowCount();
 
 		$stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE text LIKE :from OR summary LIKE :from4");
-		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
+		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>"%$from%", ':to'=>$to, ':to2'=>$to));
 		$nlt = $stm->rowCount();
 
 		$stm = $DBH->prepare("UPDATE imas_assessments SET intro=REPLACE(intro,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE intro LIKE :from OR summary LIKE :from4");
-		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
+		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>"%$from%", ':to'=>$to, ':to2'=>$to));
 		$nas = $stm->rowCount();
 
 		echo "<p>Inline Texts changed: $ni<br/>Linked texts changed: $nlt";
