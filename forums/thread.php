@@ -327,7 +327,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		echo tzdate("F j, Y, g:i a",$row[6]);
 
 		echo "</div><div class=blockitems>";
-		echo filter($row[3]);
+		echo Sanitize::outgoingHtml(filter($row[3]));
 		echo "<p><a href=\"posts.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::encodeUrlParam($row[0])."&thread=".Sanitize::encodeUrlParam($row[1])."\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
@@ -450,12 +450,12 @@ if ($postinstr != '' || $replyinstr != '') {
 	if ($postinstr != '') {
 		echo '<h4>'._('Posting Instructions').'</h4>';
 		// $postinstr contains HTML.
-		echo $postinstr;
+		echo Sanitize::outgoingHtml($postinstr);
 	}
 	if ($replyinstr != '') {
 		echo '<h4>'._('Reply Instructions').'</h4>';
 		// $postinstr contains HTML.
-		echo $replyinstr;
+		echo Sanitize::outgoingHtml($replyinstr);
 	}
 	echo '</div><br/>';
 }

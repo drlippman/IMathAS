@@ -558,6 +558,7 @@ function deleteuserfile($uid,$file) {
 }
 
 function deleteforumfile($postid,$file) {
+	$postid = Sanitize::simpleString($postid);
 	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);

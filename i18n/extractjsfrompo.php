@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__ . "/../includes/sanitize.php");
 
 if (php_sapi_name() !== 'cli') {
 	echo "this script can only be run on the command line";
@@ -9,7 +10,7 @@ if (count($argv)!==2) {
 	exit;
 }
 
-$locale = $argv[1];
+$locale = Sanitize::simpleString($argv[1]);
 if (strlen($locale)!=2) {
 	echo "invalid locale- should be two letters";
 }

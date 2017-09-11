@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . "/htmLawed.php");
+
 class Sanitize
 {
 
@@ -451,6 +453,33 @@ class Sanitize
 		}
 
 		return $placeholders;
+	}
+
+	/**
+	 * Sanitize OUTGOING content containing HTML. Use this when you want valid HTML to be passed
+	 * through, with evil HTML removed. This will also encode dangerous characters.
+	 *
+	 * Note: This method currently uses htmLawed.
+	 *
+	 * @param $unsafeContent string The content to sanitize.
+	 * @return string The sanitized content.
+	 */
+	public static function outgoingHtml($unsafeContent) {
+		return myhtmLawed($unsafeContent);
+	}
+
+
+	/**
+	 * Sanitize INCOMING content containing HTML. Use this when you want valid HTML to be passed
+	 * through, with evil HTML removed. This will also encode dangerous characters.
+	 *
+	 * Note: This method currently uses htmLawed.
+	 *
+	 * @param $unsafeContent string The content to sanitize.
+	 * @return string The sanitized content.
+	 */
+	public static function incomingHtml($unsafeContent) {
+		return myhtmLawed($unsafeContent);
 	}
 
 }

@@ -122,7 +122,7 @@ if (!isset($teacherid)) {
 		if ($row[5]=='A') {
 			$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
 		} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
-			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],$row[5]);
+			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],Sanitize::simpleString($row[5]));
 		}
 	}
 }

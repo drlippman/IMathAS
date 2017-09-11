@@ -122,7 +122,7 @@ if ($showmessagesgadget) {
 	$stm = $DBH->prepare("SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND (isread=0 OR isread=4) GROUP BY courseid");
 	$stm->execute(array(':msgto'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$newmsgcnt[$row[0]] = $row[1];
+		$newmsgcnt[$row[0]] = Sanitize::onlyInt($row[1]);
 	}
 }
 

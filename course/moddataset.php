@@ -59,7 +59,7 @@
 			}
 			$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
 		}
-		return $vidid;
+		return Sanitize::simpleString($vidid);
  	}
 
  	$cid = Sanitize::courseId($_GET['cid']);

@@ -251,7 +251,7 @@ if ($overwriteBody==1) {
 
 				echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
 				// $line['intro'] contains HTML.
-				echo "<div id=intro>{$line['intro']}</div>\n";
+				printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 				echo "</div>\n";
 				echo "</div>\n";
 
@@ -296,7 +296,7 @@ if ($overwriteBody==1) {
 
 			echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
 			// $line['intro'] contains HTML.
-			echo "<div id=intro>{$line['intro']}</div>\n";
+			printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 			echo "</div>\n";
 			echo "</div>\n";
 			for ($i=0; $i<$numq; $i++) {

@@ -330,7 +330,7 @@ if ($overwriteBody==1) {
 		}
 		echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
 		// $line['intro'] contains HTML.
-		echo "<div id=intro>{$line['intro']}</div>\n";
+		printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 		echo "</div>\n";
 		if (!$isfinal) {
 			echo "<div class=cbutn><a href=\"printtest.php?cid=$cid&aid=$aid\">Cancel</a></div>\n";

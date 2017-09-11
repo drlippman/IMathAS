@@ -186,7 +186,7 @@
 			$text .= '<hr/>'.$navbuttons;
 		}
 	}
-	echo filter($text);
+	echo Sanitize::outgoingHtml(filter($text));
 	echo '</div>';
 	if ($shownav) {
 		if (isset($_SESSION['backtrack'])) {

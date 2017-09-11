@@ -152,6 +152,8 @@ if ($report=='overview') {
 	$gcnt = -1;
 	function printOutcomeRow($arr,$isheader,$level,$stu=0) {
 		global $outcomeinfo,$ot,$gcnt,$type,$cid,$sarr;
+		$level = Sanitize::simpleString($level);
+
 		$tots = array();
 		$html = '';
 		foreach ($arr as $k=>$oi) {
@@ -351,7 +353,7 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				list($subhtml,$subtots) = printoutcomestu($oi['outcomes'],$ind+1);
 				//$html .= '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
-				$html .= '<tr class="'.$class.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td>';
+				$html .= '<tr class="'.$class.'"><td><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td>';
 				for ($i=0;$i<count($ot[0][2])+1;$i++) {
 					if (count($subtots[$i])>0) {
 						$html .= '<td><b>'.round(array_sum($subtots[$i])/count($subtots[$i]),1).'%</b></td>';
@@ -364,7 +366,7 @@ if ($report=='overview') {
 				$tots = $tots + $subtots;
 			} else {
 				$html .= '<tr class="'.$class.'">';
-				$html .= '<td><span class="ind'.$ind.'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></td>';
+				$html .= '<td><span class="ind'.Sanitize::onlyInt($ind).'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></td>';
 				if (isset($ot[1][3][$type]) && isset($ot[1][3][$type][$oi])) {
 					$html .= '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';
 					$tots[0][] = round(100*$ot[1][3][$type][$oi],1);

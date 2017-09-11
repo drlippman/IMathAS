@@ -57,7 +57,7 @@ if ($myrights<20) {
 		list($score,$rawscores[0]) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0'],$attempt-1);
 		$scores[0] = $score;
 		//DB $lastanswers[0] = stripslashes($lastanswers[0]);
-		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
+		$page_scoreMsg =  "<p>Score on last answer: ".Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
 		$scores = array(-1);
@@ -277,7 +277,7 @@ if ($overwriteBody==1) {
 	echo '</code>';
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-		echo "<p>Question id: {$_GET['qsetid']}.  ";//<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
+		printf("<p>Question id: %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));//<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
 		echo "<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&";
 		echo "quoteq=".Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}")."\" target=\"reperr\">Message owner</a> to report problems</p>";
 	} else {

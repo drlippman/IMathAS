@@ -354,7 +354,7 @@
 			$content .= " <span class=noticetext>New</span>\n";
 		}
 		$content .= '</div>';
-		$content .= "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
+		$content .= "<div id=\"m$cnt\" class=\"hidden\">".Sanitize::outgoingHtml(filter($line['message']));
 		if ($haspoints) {
 			if ($caneditscore && $line['userid']!=$userid) {
 				$content .= '<hr/>';

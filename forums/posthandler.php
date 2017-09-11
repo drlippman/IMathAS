@@ -153,10 +153,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo '<hr>';
 				//DB echo '<p>Message:</p><div class="editor">'.filter(stripslashes($_POST['message'])).'</div>';
 				// $_POST['message'] contains HTML.
-				echo '<p>Message:</p><div class="editor">'.filter($_POST['message']).'</div>';
+				echo '<p>Message:</p><div class="editor">'.Sanitize::outgoingHtml(filter($_POST['message'])).'</div>';
 				echo '<p>HTML format:</p>';
 				//DB echo '<div class="editor">'.htmlentities(stripslashes($_POST['message'])).'</div>';
-				echo '<div class="editor">'.htmlentities($_POST['message']).'</div>';
+				echo '<div class="editor">'.Sanitize::encodeStringForDisplay($_POST['message']).'</div>';
 				require("../footer.php");
 				exit;
 			} else {

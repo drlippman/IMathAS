@@ -115,8 +115,8 @@
 	$row = $stm->fetch(PDO::FETCH_NUM);
 	$text = $row[1];
 	if (strlen($text)>6 && substr($text,0,6)=='**wver') {
-		$wikiver = substr($text,6,strpos($text,'**',6)-6);
-		$text = substr($text,strpos($text,'**',6)+2);
+		$wikiver = Sanitize::onlyInt(substr($text,6,strpos($text,'**',6)-6));
+		$text = Sanitize::outgoingHtml(substr($text,strpos($text,'**',6)+2));
 	} else {
 		$wikiver = 1;
 	}
