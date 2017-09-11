@@ -37,7 +37,7 @@ $outcomeinfo = array();
 $stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$outcomeinfo[$row[0]] = Sanitize::encodeStringForDisplay($row[1]);  //Isnt being used elsewhere in a conditional
+	$outcomeinfo[$row[0]] = $row[1];
 }
 
 if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
@@ -364,7 +364,7 @@ if ($report=='overview') {
 				$tots = $tots + $subtots;
 			} else {
 				$html .= '<tr class="'.$class.'">';
-				$html .= '<td><span class="ind'.$ind.'">'.$outcomeinfo[$oi].'</span></td>';
+				$html .= '<td><span class="ind'.$ind.'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></td>';
 				if (isset($ot[1][3][$type]) && isset($ot[1][3][$type][$oi])) {
 					$html .= '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';
 					$tots[0][] = round(100*$ot[1][3][$type][$oi],1);
@@ -442,7 +442,7 @@ if ($report=='overview') {
 				}
 			} else { //is outcome
 				if ($isheader) {
-					$html[] = $outcomeinfo[$oi];
+					$html[] = Sanitize::encodeStringForDisplay($outcomeinfo[$oi]);
 				} else {
 					if (isset($ot[$stu][3][$type]) && isset($ot[$stu][3][$type][$oi])) {
 						$html[] = round(100*$ot[$stu][3][$type][$oi],1).'%';

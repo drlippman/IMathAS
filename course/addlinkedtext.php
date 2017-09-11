@@ -568,7 +568,7 @@ if ($overwriteBody==1) {
 				require_once("../includes/filehandler.php");
 				echo '<input type="hidden" name="curfile" value="'.Sanitize::encodeStringForDisplay($filename).'"/>';
 				$alink = getcoursefileurl($filename);
-				echo 'Current file: <a href="' . Sanitize::url($alink) . '">'.Sanitize::encodeStringForDisplay(basename($filename)).'</a><br/>Replace ';
+				echo 'Current file: <a target="_blank" href="' . Sanitize::url($alink) . '">'.Sanitize::encodeStringForDisplay(basename($filename)).'</a><br/>Replace ';
 			} else {
 				echo 'Attach ';
 			}

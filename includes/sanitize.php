@@ -136,7 +136,7 @@ class Sanitize
 		$stringLength = strlen($string);
 		for ($i = 0; $i < $stringLength; $i++) {
 			$char = substr($string, $i, 1);
-			$safeString .= preg_match("/[\da-z]/i", $char) ? $char : '\\' . dechex(ord($char));
+			$safeString .= preg_match("/[\da-z\;#]/i", $char) ? $char : '\\' . dechex(ord($char));
 		}
 
 		return $safeString;

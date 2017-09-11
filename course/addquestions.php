@@ -844,9 +844,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 						if (in_array($i,$existingq)) {
-							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
 						} else {
-							$page_questionTable[$i]['desc'] = filter($line['description']);
+							$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
 						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
@@ -1043,9 +1043,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strpos($qid,'|')!==false) { continue;}
 					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . Sanitize::onlyFloat($qsetid[$qid]) . "'>";
 					if (in_array($qsetid[$qid],$existingq)) {
-						$page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.filter($descr[$qid]).'</span>';
+						$page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($descr[$qid])).'</span>';
 					} else {
-						$page_assessmentQuestions[$x]['desc'][$y] = filter($descr[$qid]);
+						$page_assessmentQuestions[$x]['desc'][$y] = Sanitize::encodeStringForDisplay(filter($descr[$qid]));
 					}
 					//$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
 					$page_assessmentQuestions[$x]['qsetid'][$y] = $qsetid[$qid];
@@ -1352,7 +1352,7 @@ if ($overwriteBody==1) {
 ?>
 
 					<td><?php echo $page_questionTable[$qid]['checkbox']; ?></td>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['desc']); ?></td>
+					<td><?php echo $page_questionTable[$qid]['desc']; ?></td>
 					<td class="nowrap">
 					   <div <?php if ($page_questionTable[$qid]['cap']) {echo 'class="ccvid"';}?>><?php echo $page_questionTable[$qid]['extref'] ?></div>
 					</td>
@@ -1443,7 +1443,7 @@ if ($overwriteBody==1) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td></td>
-				<td><b><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions['desc'][$i]); ?></b></td>
+				<td><b><?php echo $page_assessmentQuestions['desc'][$i]; ?></b></td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1458,11 +1458,11 @@ if ($overwriteBody==1) {
 					if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x]; ?></td>
-				<td><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions[$i]['desc'][$x]); ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x]; ?></td>
 				<td class="nowrap">
 				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x]; ?></div>
 				</td>
-				<td><?php echo Sanitize::onlyFloat($page_assessmentQuestions[$i]['qsetid'][$x]); ?></td>
+				<td><?php echo Sanitize::onlyInt($page_assessmentQuestions[$i]['qsetid'][$x]); ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x]; ?></td>
 				<td><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions[$i]['type'][$x]); ?></td>
 				<td class=c><?php echo Sanitize::onlyInt($page_assessmentQuestions[$i]['times'][$x]); ?></td>

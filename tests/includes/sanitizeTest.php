@@ -82,10 +82,16 @@ final class SanitizeTest extends TestCase
 	 * encodeStringForCSS
 	 */
 
-	public function testEncodeStringForCSS()
+	public function testEncodeStringForCSS_Colors()
 	{
-		$result = Sanitize::encodeStringForCSS("<h1 style='color: red;'>Hello, world!</h1>");
-		$this->assertEquals('\3ch1\20style\3d\27color\3a\20red\3b\27\3eHello\2c\20world\21\3c\2fh1\3e', $result);
+		$result = Sanitize::encodeStringForCSS("#fff;");
+		$this->assertEquals('#fff;', $result);
+	}
+
+	public function testEncodeStringForCSS_LotsOfStuff()
+	{
+		$result = Sanitize::encodeStringForCSS("<h1 style='color: red; background-color: #fff;'>Hello, world!</h1>");
+		$this->assertEquals('\3ch1\20style\3d\27color\3a\20red;\20background\2dcolor\3a\20#fff;\27\3eHello\2c\20world\21\3c\2fh1\3e', $result);
 	}
 
 	/*

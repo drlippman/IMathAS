@@ -485,9 +485,9 @@ if (!$beentaken) {
 				$i = $line['id'];
 				$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::encodeStringForDisplay($line['id']) . "' id='qo$ln'>";
 				if (in_array($i,$itemids)) {
-					$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+					$page_questionTable[$i]['desc'] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
 				} else {
-					$page_questionTable[$i]['desc'] = filter($line['description']);
+					$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
 				}
 				$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform','qo$ln',". Sanitize::onlyInt($line['id']).",true,false)\"/>";
 				$page_questionTable[$i]['type'] = $line['qtype'];
@@ -829,7 +829,7 @@ if (!$beentaken) {
 
 ?>
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['desc']) ?></td>
+					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
 					<td class="nowrap"><?php echo $page_questionTable[$qid]['extref'] ?></td>
 					<td><?php echo Sanitize::encodeStringForDisplay($qid) ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>

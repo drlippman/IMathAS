@@ -902,11 +902,11 @@ if ($myrights<20) {
 
 			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 			if ($line['userights']==0) {
-				$page_questionTable[$i]['desc'] = '<span class="noticetext">'.filter($line['description']).'</span>';
+				$page_questionTable[$i]['desc'] = '<span class="noticetext">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
 			} else if ($line['replaceby']>0 || $line['junkflag']>0) {
-				$page_questionTable[$i]['desc'] = '<span class="grey"><i>'.filter($line['description']).'</i></span>';
+				$page_questionTable[$i]['desc'] = '<span class="grey"><i>'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</i></span>';
 			} else {
-				$page_questionTable[$i]['desc'] = filter($line['description']);
+				$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
 			}
 
 			if ($line['extref']!='') {
@@ -1346,7 +1346,7 @@ function getnextprev(formn,loc) {
 				$qid = Sanitize::encodeStringForDisplay($page_libqids[$page_libstouse[$j]][$i]);
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
-				echo '<td>'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['desc']).'</td>';
+				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
 				echo '<td class="nowrap"><div';
 				if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}
 				echo '>'.$page_questionTable[$qid]['extref'].'</div></td>';

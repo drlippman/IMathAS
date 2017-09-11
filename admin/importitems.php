@@ -361,14 +361,14 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$item[$itemtoadd]['description'] = myhtmLawed($item[$itemtoadd]['description']);
 		}
 
-		// Sanitize postby content.
-		if (isset($item[$itemtoadd]['postby'])) {
-			$item[$itemtoadd]['postby'] = myhtmLawed($item[$itemtoadd]['postby']);
+		// Sanitize postinstr content.
+		if (isset($item[$itemtoadd]['postinstr'])) {
+			$item[$itemtoadd]['postinstr'] = myhtmLawed($item[$itemtoadd]['postinstr']);
 		}
 
-		// Sanitize replyby content.
-		if (isset($item[$itemtoadd]['replyby'])) {
-			$item[$itemtoadd]['replyby'] = myhtmLawed($item[$itemtoadd]['replyby']);
+		// Sanitize replyinstr content.
+		if (isset($item[$itemtoadd]['replyinstr'])) {
+			$item[$itemtoadd]['replyinstr'] = myhtmLawed($item[$itemtoadd]['replyinstr']);
         }
 
 		foreach ($settings as $set) {

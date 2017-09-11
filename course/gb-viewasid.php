@@ -1104,60 +1104,35 @@
 								$url = getasidfileurl($match[1]);
 								echo "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
 							} else {
-								if (strpos($laarr[$k],'$f$')) {
-									if (strpos($laarr[$k],'&')) { //is multipart q
-										$laparr = explode('&',$laarr[$k]);
-										foreach ($laparr as $lk=>$v) {
-											if (strpos($v,'$f$')) {
-												$tmp = explode('$f$',$v);
-												$laparr[$lk] = $tmp[0];
-											}
-										}
-										$laarr[$k] = implode('&',$laparr);
-									} else {
-										$tmp = explode('$f$',$laarr[$k]);
-										$laarr[$k] = $tmp[0];
-									}
-								}
+								//remove any $f$ wrong format markers
+								$laarr[$k] = preg_replace('/\$f\$.*?(&|$)/','$1', $laarr[$k]);
+
+								//remove any $#$ numeric value bits
+								$laarr[$k] = preg_replace('/\$#\$.*?(&|$)/','$1', $laarr[$k]);
+
+								//replace MC with visual of answer
 								if (strpos($laarr[$k],'$!$')) {
 									if (strpos($laarr[$k],'&')) { //is multipart q
 										$laparr = explode('&',$laarr[$k]);
 										foreach ($laparr as $lk=>$v) {
-											if (strpos($v,'$!$')) {
+											if (strpos($v,'$!$')!==false) {
 												$qn = ($i+1)*1000+$lk;
 												$tmp = explode('$!$',$v);
-												//$laparr[$lk] = $tmp[0];
 												$laparr[$lk] = prepchoicedisp($choicesdata[$qn][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$qn]);
+											} else {
+												$laparr[$lk] = Sanitize::encodeStringForDisplay(str_replace(array('%nbsp;','%%'),array('&nbsp;','&'),$laparr[$lk]));
 											}
 										}
-										$laarr[$k] = implode('&',$laparr);
+										$laarr[$k] = implode('; ',$laparr);
 									} else {
 										$tmp = explode('$!$',$laarr[$k]);
-										//$laarr[$k] = $tmp[0];
 										$laarr[$k] = prepchoicedisp($choicesdata[$i][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$i]);
 									}
 								} else {
-									$laarr[$k] = strip_tags($laarr[$k]);
+									$laarr[$k] = Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'),strip_tags($laarr[$k])));
 								}
 
-
-								if (strpos($laarr[$k],'$#$')) {
-									if (strpos($laarr[$k],'&')) { //is multipart q
-										$laparr = explode('&',$laarr[$k]);
-										foreach ($laparr as $lk=>$v) {
-											if (strpos($v,'$#$')) {
-												$tmp = explode('$#$',$v);
-												$laparr[$lk] = $tmp[0];
-											}
-										}
-										$laarr[$k] = implode('&',$laparr);
-									} else {
-										$tmp = explode('$#$',$laarr[$k]);
-										$laarr[$k] = $tmp[0];
-									}
-								}
-
-								echo Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'), $laarr[$k]));
+								echo $laarr[$k];
 							}
 							$cnt++;
 						}
@@ -1648,7 +1623,6 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 function prepchoicedisp($v,$choicesdata) {
 	if ($v=='') {return '';}
 	foreach ($choicesdata[1] as $k=>$c) {
-		$c = str_replace('&','%%',$c);
 		$sh = strip_tags($c);
 		if (trim($sh)=='' || strpos($c,'<table')!==false) {
 			$sh = "[view]";
@@ -1656,7 +1630,7 @@ function prepchoicedisp($v,$choicesdata) {
 			$sh = substr($sh,0,15).'...';
 		}
 		if ($sh!=$c) {
-			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.trim(str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401))).'\')" onmouseout="tipout()">'.$sh.'</span>';
+			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.Sanitize::encodeStringForDisplay(trim(str_replace("\n",' ',$c))).'\')" onmouseout="tipout()">'.Sanitize::encodeStringForDisplay($sh).'</span>';
 		}
 	}
 	if ($choicesdata[0]=='choices') {

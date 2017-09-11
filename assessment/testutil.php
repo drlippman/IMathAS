@@ -387,7 +387,7 @@ function printscore($sc,$qn) {
 			$hasmanual = true;
 			$sc = '*';
 		}
-		$out = sprintf("%f %s %s", $sc, _("out of"), Sanitize::encodeStringForDisplay($poss));
+		$out = sprintf("%g %s %s", $sc, _("out of"), Sanitize::encodeStringForDisplay($poss));
 		$pts = Sanitize::onlyFloat($sc);
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
@@ -451,7 +451,7 @@ function printscore($sc,$qn) {
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs);
-		$out = sprintf("%s %s %s (parts: %f)", Sanitize::encodeStringForDisplay($pts), _("out of"),
+		$out = sprintf("%s %s %s (parts: %g)", Sanitize::encodeStringForDisplay($pts), _("out of"),
 			Sanitize::encodeStringForDisplay($poss), $sc);
 	}
 	if ($hasmanual) {
