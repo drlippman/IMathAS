@@ -341,7 +341,24 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 		echo '</optgroup>';
 	}
-
+	
+	$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+	$query .= "iu.groupid=:groupid AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':groupid'=>$groupid));
+	if ($stm->rowCount()>0) {
+		echo '<optgroup label="Group Template Courses">';
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
+			if ($row[3]!='') {
+				echo ' data-termsurl="'.Sanitize::encodeStringForDisplay($row[3]).'"';
+			}
+			echo '>'.$row[1].'</option>';
+		}
+		echo '</optgroup>';
+	}
+	
 	echo '</select>';
 	echo '<p id="termsbox" style="display:none;">This course has special <a id="termsurl">Terms of Use</a>.  By copying this course, you agree to these terms.</p>';
 	echo '<input type="Submit" value="Create"/>';
