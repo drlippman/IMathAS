@@ -26,7 +26,13 @@ function convertdatauris($in) {
 
 function myhtmLawed($t, $NC=1, $NS='') {
 	$t = convertdatauris($t);
-	$C = array('elements'=>'*-script-form', 'direct_list_nest'=>1);
+	$C = array(
+		'elements'=>'*-script-form',
+		'direct_list_nest'=>1,
+		'deny_attribute'=>'on*',
+		'cdata'=>0,
+		'comment'=>0
+		);
 	$S = "embed=sscr,script";
 	if (is_array($NC)) { //overwrite or append new config
 		foreach ($NC as $k=>$v) {
