@@ -2628,6 +2628,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$settings = array(-5,5,-5,5,1,1,300,300,"","");
 			$locky = 0;
 		}
+		$xsclgridpts = array('');
 		if (isset($grid)) {
 			if (!is_array($grid)) {
 				$grid = array_map('trim',explode(',',$grid));
@@ -2660,13 +2661,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (strpos($settings[2],'0:')===0) {
 				$settings[2] = substr($settings[2],2);
 			}
-			if (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false) {
+			if (isset($grid[4])) {
+				$xsclgridpts = explode(':',$grid[4]);
+			} 
+			if (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false) {
 				if (strpos($settings[4],':')!==false) {
 					$settings4pts = explode(':',$settings[4]);
 					$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings4pts[1];
 				} else {
-				$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings[4];
-			}
+					$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings[4];
+				}
 			}
 		} else {
 			$origxmin = $settings[0];
@@ -2746,8 +2750,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (is_array($settings[5]) && count($settings[5]>2)) {
 			$plot = addlabel($plot,0,$settings[3],$settings[5][2],"black","belowright");
 		}
-		if (isset($grid) && (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false)) {
-			$plot = addfractionaxislabels($plot,$grid[4]);
+		if (isset($grid) && (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false)) {
+			$plot = addfractionaxislabels($plot,$xsclgridpts[0]);
 		}
 
 
@@ -3104,15 +3108,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$saarr = array_merge($saarr,$backg);
 					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
-					if (isset($grid) && (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false)) {
-						$sa = addfractionaxislabels($sa,$grid[4]);
+					if (isset($grid) && (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false)) {
+						$sa = addfractionaxislabels($sa,$xsclgridpts[0]);
 					}
 				}
 
 			} else {
 				$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
-				if (isset($grid) && (strpos($grid[4],'/')!==false || strpos($grid[4],'pi')!==false)) {
-					$sa = addfractionaxislabels($sa,$grid[4]);
+				if (isset($grid) && (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false)) {
+					$sa = addfractionaxislabels($sa,$xsclgridpts[0]);
 				}
 			}
 			if ($answerformat[0]=="polygon") {
