@@ -293,7 +293,9 @@ this.lock = function() {
 		  }
 		  trs[0].attachEvent('onclick', ierelock); 
 	} else {
-		if (window.innerHeight<600) {
+		//use window height if remaining space is under 200px
+		if (window.innerHeight - findPos(locktds[0])[1] < 200) {
+		//if (window.innerHeight<600) {
 			winh = Math.min(Math.round(.9*window.innerHeight),thetable.offsetHeight+30);	
 		} else {
 			winh = Math.min(Math.round(window.innerHeight - findPos(thetable)[1]-10),thetable.offsetHeight+30);
