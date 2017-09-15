@@ -63,10 +63,11 @@ echo '<div id="headercalfeed" class="pagetitle"><h2>'._('Generate Calendar Feed'
 
 echo '<p>';
 echo _('The link below can be used to subscribe to a calendar feed for the due dates and events in this course. ');
-echo _('To add notifications (reminder alarms), change the settings below to update the link.');
+//echo _('To add notifications (reminder alarms), change the settings below to update the link.');
 echo '</p><p>';
 echo _('Calendar feed').': <a href="'.$url.'" id="calfeedurl">'.$url.'</a>';
 echo '</p>';
+/*
 echo '<form id="calfeedform" method="post"><fieldset><legend>'._('Feed Options').'</legend>';
 echo '<p>'._('Indicate how long before the due date you want to receive notifications (reminder alarms).').'</p>';
 
@@ -93,7 +94,7 @@ echo '</span><br class="form" />';
 echo '<div class="form"><button type="button" onclick="updatecallink()">'._('Update feed link').'</button> ';
 echo '<span id="updatenotice" class="noticetext"></span></div>';
 echo '</fieldset></form>';
-
+*/
 echo '<h3>'._('To load in the calendar feed').'</h3>';
 echo '<h4>'._('Google Calendar').'</h4>';
 echo '<p>';
