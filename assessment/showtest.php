@@ -175,6 +175,45 @@
 		}
 
 		//check for password
+		
+		if (trim($adata['password'])!='' && preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.[\d\*\-]+/',$adata['password'])) {
+			//if PW is an IP address, compare against user's
+			$userip = explode('.', $_SERVER['REMOTE_ADDR']);
+			$pwips = explode(',', $adata['password']);
+			$isoneIPok = false;
+			foreach ($pwips as $pwip) {
+				$pwip = explode('.', $pwip);
+				$thisIPok = true;
+				for ($i=0;$i<3;$i++) {
+					if ($pwip[$i]!=$userip[$i]) {
+						$thisIPok = false;
+					}
+				}
+				$lastpts = explode('-',$pwip[3]);
+				if (count($lastpts)==1) {
+					if ($lastpts[0]=='*') {
+						
+					} else if ($lastpts[0]!=$userip[3]) {
+						$thisIPok = false;
+					}
+				} else {
+					if ($userip[3]<$lastpts[0] || $useripd[3]>$lastpts[1]) {
+						$thisIPok = false;	
+					}
+				}
+				if ($thisIPok) {
+					$isoneIPok = true;
+					break;
+				}
+			}
+			if ($isoneIPok) {
+				$adata['password'] = '';
+			} else {
+				echo "<p>Not authorized from this computer</p>";
+				require("../footer.php");
+				exit;
+			}
+		}
 		if (trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
