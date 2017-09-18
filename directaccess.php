@@ -20,7 +20,7 @@
 		 $urlmode = 'http://';
 	 }
 	if (isset($_SERVER['QUERY_STRING'])) {
-		 $querys = '?'.$_SERVER['QUERY_STRING'];
+		 $querys = '?'.Sanitize::fullQueryString($_SERVER['QUERY_STRING']);
 	 } else {
 		 $querys = '';
 	 }
@@ -230,7 +230,7 @@
 		$enrollkey = $stm->fetchColumn(0);
 
 ?>
-<form id="pageform" method="post" action="directaccess.php<?php echo Sanitize::encodeStringForDisplay($querys); ?>">
+<form id="pageform" method="post" action="directaccess.php<?php echo $querys; ?>">
 
 <?php
 if ($enrollkey!='closed') {
