@@ -96,9 +96,8 @@ if (isset($_POST['snippets'])) {
 			}).attr("size",50),
 		  $("<button>", {
 		  	type: "button",
-		  	text: "'._('Delete').'",
-		  	onclick: deletesnip
-		  }),
+		  	text: "'._('Delete').'"
+		  }).on("click", deletesnip),
 		  $("<div>", {
 			class: "snipcont",
 			id: "newsnip"+newsnipcnt
