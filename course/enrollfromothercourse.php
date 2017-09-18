@@ -29,34 +29,36 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$todo[] = $stu;
 			}
 		}
-		$todolist = implode(',', $todo);
-		$dontdo = array();
-		//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid' AND userid IN ($todolist)";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
-		$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=:courseid AND userid IN ($todolist)");
-		$stm->execute(array(':courseid'=>$cid));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$dontdo[] = $row[0];
-		}
-		$vals = array();
-		$qarr = array();
-		$_POST['section'] = trim($_POST['section']);
-		foreach ($todo as $stu) {
-			if (in_array($stu,$dontdo)) {continue;}
-			//DB $vals[] = "($stu,'$cid'$section)";
-			$vals[] = "(?,?,?,?)";
-			array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null, $deflatepass);
-		}
-		if (count($vals)>0) {
-			//DB $query = 'INSERT INTO imas_students (userid,courseid';
-			//DB if (trim($_POST['section'])!='') {
-			//DB 	$query .= ',section';
-			//DB }
-			//DB $query .= ') VALUES '.implode(',',$vals);
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section,latepass) VALUES '.implode(',', $vals));
-			$stm->execute($qarr);
+		if (count($todo)>0) {
+			$todolist = implode(',', $todo);
+			$dontdo = array();
+			//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid' AND userid IN ($todolist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=:courseid AND userid IN ($todolist)");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$dontdo[] = $row[0];
+			}
+			$vals = array();
+			$qarr = array();
+			$_POST['section'] = trim($_POST['section']);
+			foreach ($todo as $stu) {
+				if (in_array($stu,$dontdo)) {continue;}
+				//DB $vals[] = "($stu,'$cid'$section)";
+				$vals[] = "(?,?,?,?)";
+				array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null, $deflatepass);
+			}
+			if (count($vals)>0) {
+				//DB $query = 'INSERT INTO imas_students (userid,courseid';
+				//DB if (trim($_POST['section'])!='') {
+				//DB 	$query .= ',section';
+				//DB }
+				//DB $query .= ') VALUES '.implode(',',$vals);
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section,latepass) VALUES '.implode(',', $vals));
+				$stm->execute($qarr);
+			}
 		}
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
