@@ -99,6 +99,7 @@ function handleClickTextSegmentButton(e) {
 }
 
 function refreshTable() {
+	tinymce.remove();
 	document.getElementById("curqtbl").innerHTML = generateTable();
 	if (usingASCIIMath) {
 		rendermathnode(document.getElementById("curqtbl"));
@@ -837,7 +838,6 @@ function updateqgrpcookie() {
 function generateTable() {
 	olditemarray = itemarray;
 	itemcount = itemarray.length;
-	tinymce.editors = []; // clear any previous editors
 	var alt = 0;
 	var ln = 0;
 	var pttotal = 0;
@@ -1140,7 +1140,7 @@ function submitChanges() {
 			status + "\n" +req.statusText+
 			"\nError: "+errorThrown
 		itemarray = olditemarray;
-		generateTable();
+		refreshTable();
 	})
 }
 

@@ -396,9 +396,10 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 	if (setupfunction) {
 		edsetup.setup = setupfunction;
 	}
-	for (var i in tinymce.editors) {
-		tinymce.editors[i].remove();
-	}
+	//for (var i in tinymce.editors) {
+	//	tinymce.editors[i].remove();
+	//}
+	tinymce.remove();
 	tinymce.init(edsetup);
 
 };
