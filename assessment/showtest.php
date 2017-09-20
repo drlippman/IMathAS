@@ -1673,7 +1673,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$GLOBALS['scoremessages'] = '';
 			for ($i=0; $i < count($questions); $i++) {
 				//if (isset($_POST["qn$i"]) || isset($_POST['qn'.(1000*($i+1))]) || isset($_POST["qn$i-0"]) || isset($_POST['qn'.(1000*($i+1)).'-0'])) {
-					if ($_POST['verattempts'][$i]!=$attempts[$i]) {
+					if (!isset($_POST['verattempts'][$i])) {
+						//question not redisplayed, or error - just skip with no warning
+					} else if ($_POST['verattempts'][$i]!=$attempts[$i]) {
 						echo sprintf(_('Question %d has been submitted since you viewed it.  Your answer just submitted was not scored or recorded.'), ($i+1)), "<br/>";
 					} else {
 						scorequestion($i,false);
