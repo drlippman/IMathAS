@@ -85,7 +85,7 @@ if (isset($_POST['snippets'])) {
 		*/
 	});
 	var newsnipcnt = 0;
-	function addsnip() {
+	function addsnip(event) {
 		$("<li>", {class: "snipwrap"})
 		.html("<span class=icon style=\"background-color:#0f0\">S</span> '._('Snippet Title').': ")
 		.append(
@@ -130,7 +130,7 @@ if (isset($_POST['snippets'])) {
 		 ).appendTo($(".grouplist"));
 		 markDirty();
 	}
-	function togglegrp() {
+	function togglegrp(event) {
 		event.preventDefault();
 		var $t = $(event.target);
 		if ($t.text()=="-") {
@@ -141,7 +141,7 @@ if (isset($_POST['snippets'])) {
 		$t.siblings(".snipgroup").slideToggle();
 		return false;
 	}
-	function deletesnip() {
+	function deletesnip(event) {
 		if (confirm("'._('Are you SURE you want to delete this snippet?').'")) {
 			$(event.target).closest(".snipwrap").slideUp("normal", function() { $(this).remove(); });
 			markDirty();
@@ -234,15 +234,15 @@ if (isset($_POST['snippets'])) {
 		echo _('Group Title'),': ';
 		echo '<input type="text" class="grptitle" oninput="markDirty()" ';
 		echo 'value="'.Sanitize::encodeStringForDisplay($snipgroup['text']).'" size=50 /> ';
-		echo '<button type="button" onclick="addsnip()">'._('Add Snippet').'</button>';
-		echo '<button type="button" onclick="togglegrp()">-</button>';
+		echo '<button type="button" onclick="addsnip(event)">'._('Add Snippet').'</button>';
+		echo '<button type="button" onclick="togglegrp(event)">-</button>';
 		echo '<ul class="snipgroup">';
 		foreach ($snipgroup['items'] as $snip) {
 			echo '<li class="snipwrap"><span class=icon style="background-color:#0f0">S</span> ';
 			echo _('Snippet Title').': ';
 			echo '<input type="text" class="sniptitle" oninput="markDirty()" ';
 			echo 'value="'.Sanitize::encodeStringForDisplay($snip['text']).'" size=50 /> ';
-			echo '<button type="button" onclick="deletesnip()">'._('Delete').'</button>';
+			echo '<button type="button" onclick="deletesnip(event)">'._('Delete').'</button>';
 			echo '<div id="snip'.$snipcnt.'" class="snipcont">';
 			//presanitized HTML
 			echo $snip['content'].'</div></li>';
