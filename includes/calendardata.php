@@ -225,7 +225,7 @@ function getCalendarEventData($cid, $userid) {
 		$calevents[] = array('C'.$row['id'],$row['date'], $row['tag'], $row['title']);
 	}
 	
-	return $calevents;
+	return array($coursename,$calevents);
 }
 
 function flattenitems($items,&$addto,$viewall, $studentinfo) {

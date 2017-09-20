@@ -65,7 +65,7 @@ echo '<p>';
 echo _('The link below can be used to subscribe to a calendar feed for the due dates and events in this course. ');
 //echo _('To add notifications (reminder alarms), change the settings below to update the link.');
 echo '</p><p>';
-echo _('Calendar feed').': <a href="'.$url.'" id="calfeedurl">'.$url.'</a>';
+echo _('Calendar feed link').': <a href="'.$url.'" id="calfeedurl">'.$url.'</a>';
 echo '</p>';
 /*
 echo '<form id="calfeedform" method="post"><fieldset><legend>'._('Feed Options').'</legend>';
@@ -96,9 +96,12 @@ echo '<span id="updatenotice" class="noticetext"></span></div>';
 echo '</fieldset></form>';
 */
 echo '<h3>'._('To load in the calendar feed').'</h3>';
+echo '<p>'._('Start by copying the link above. Usually you can do that by right-clicking on it and Copy Link Address').'</p>';
 echo '<h4>'._('Google Calendar').'</h4>';
 echo '<p>';
 echo _('In the left column, click the triangle after "Other calendars" and select "Add by URL". Paste in the feed link and Add Calendar.');
+echo '</p><p>';
+echo _('If you wish to set up notifications/alarms, after adding the calendar click the arrow that shows when you hover over the calendar. Click Edit Notifications, then under Event Notifications click Add a notification.');
 echo '</p>';
 
 echo '<h4>'._('iOS').'</h4>';

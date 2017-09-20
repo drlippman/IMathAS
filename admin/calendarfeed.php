@@ -43,7 +43,7 @@ if (isset($JWTsess->T) && $a = toalarmformat($JWTsess->C)) {
 	
 require("../includes/calendardata.php");
 
-$calevents = getCalendarEventData($cid, $userid);
+list($coursename,$calevents) = getCalendarEventData($cid, $userid);
 
 //add alarms
 foreach ($calevents as $k=>$v) {
