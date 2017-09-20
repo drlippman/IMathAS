@@ -249,7 +249,7 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid));
+	$stm->execute(array(':userid'=>$userid, ':now'=>$now));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
