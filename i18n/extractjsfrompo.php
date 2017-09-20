@@ -14,7 +14,6 @@ $locale = Sanitize::simpleString($argv[1]);
 if (strlen($locale)!=2) {
 	echo "invalid locale- should be two letters";
 }
-$locale = preg_replace('/\W/','',$locale);
 
 $fp = fopen(__dir__.'/'.$locale.'.po', 'r');
 

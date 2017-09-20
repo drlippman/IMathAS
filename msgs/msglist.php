@@ -913,10 +913,11 @@ function chgfilter() {
 			$line['title'] = substr($line['title'],4);
 			$n++;
 		}
+		$line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 		if ($n==1) {
-			$line['title'] = 'Re: ' . Sanitize::encodeStringForDisplay($line['title']);
+			$line['title'] = 'Re: ' . $line['title'];
 		} else if ($n>1) {
-			$line['title'] = "Re<sup>$n</sup>: " . Sanitize::encodeStringForDisplay($line['title']);
+			$line['title'] = "Re<sup>$n</sup>: " . $line['title'];
 		}
 		printf("<tr id=\"tr%d\" ", Sanitize::onlyInt($line['id']));
 		$stripe = ($cnt%2==0)?'even':'odd';
@@ -928,9 +929,9 @@ function chgfilter() {
 		echo "><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid=".Sanitize::onlyInt($line['id'])."\">";
 		if (($line['isread']&1)==0) {
-			echo "<b>" . Sanitize::encodeStringForDisplay($line['title']). "</b>";
+			echo "<b>" . $line['title']. "</b>";
 		} else {
-			echo Sanitize::encodeStringForDisplay($line['title']);
+			echo $line['title'];
 		}
 		echo "</a></td><td>";
 		if ($line['replied']==1) {
