@@ -58,7 +58,8 @@
 		$diagqtr = $line['term'];
 	}
 	$sel1 = explode(',',$line['sel1list']);
-
+	$entryformat = $line['entryformat'];
+	
 	if (!($line['public']&1)) {
 		echo "<html><body>", _('This diagnostic is not currently available to be taken'), "</body></html>";
 		exit;
@@ -109,13 +110,6 @@ if (isset($_POST['SID'])) {
 		echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
 			exit;
 	}
-	//DB $query = "SELECT entryformat,sel1list from imas_diags WHERE id='$diagid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $entryformat = mysql_result($result,0,0);
-	//DB $sel1 = explode(',',mysql_result($result,0,1));
-	$stm = $DBH->prepare("SELECT entryformat,sel1list from imas_diags WHERE id=:id");
-	$stm->execute(array(':id'=>$diagid));
-	list($entryformat, $sel1) = $stm->fetch(PDO::FETCH_NUM);
 
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
 	$entrydig = substr($entryformat,1); //$entryformat{1};
@@ -403,9 +397,9 @@ function getteach() {
 
 </script>
 
-<span class=form><?php Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel1name'])); ?></span><span class=formright>
+<span class=form><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel1name'])); ?></span><span class=formright>
 <select name="course" id="course" onchange="getteach()">
-<option value="-1"><?php Sanitize::encodeStringForDisplay(sprintf(_('Select a %s'), $line['sel1name'])); ?></option>
+<option value="-1"><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select a %s'), $line['sel1name'])); ?></option>
 <?php
 for ($i=0;$i<count($sel1);$i++) {
 	echo "<option value=\"$i\">".Sanitize::encodeStringForDisplay($sel1[$i])."</option>\n";
@@ -413,9 +407,9 @@ for ($i=0;$i<count($sel1);$i++) {
 ?>
 </select></span><br class=form>
 
-<span class=form><?php Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel2name'])); ?></span><span class=formright>
+<span class=form><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel2name'])); ?></span><span class=formright>
 <select name="teachers" id="teachers">
-<option value="not selected"><?php Sanitize::encodeStringForDisplay(sprintf(_('Select a %s first'), $line['sel1name'])); ?></option>
+<option value="not selected"><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select a %s first'), $line['sel1name'])); ?></option>
 </select></span><br class=form>
 
 <?php
