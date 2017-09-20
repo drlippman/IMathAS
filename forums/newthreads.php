@@ -14,8 +14,8 @@ $now = time();
 //DB $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
 //DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,mfv.tagged FROM imas_forum_threads ";
-$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-$array = array();
+$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
+$array = array(':now'=>$now);
 if (!isset($teacherid)) {
   $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 }
@@ -126,16 +126,18 @@ echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?
 
 if (count($lastpost)>0) {
   echo '<table class="gb forum" id="newthreads"><thead><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
-  $threadids = implode(',', array_map('intval', array_keys($lastpost)));
+  $threadids = array_map('intval', array_keys($lastpost));
   //DB $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   //DB $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
   //DB $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_posts.forumid, imas_forum_threads.lastposttime DESC";
   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
   //DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$ph = Sanitize::generateQueryPlaceholders($threadids);
   $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
-  $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
-  $stm = $DBH->query($query);
+  $query .= "imas_forum_posts.threadid IN ($ph) AND imas_forum_threads.lastposttime<? AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
+  $stm = $DBH->prepare($query);
+	$stm->execute(array_merge($threadids, array($now)));
   $alt = 0;
   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
     if ($line['isanon']==1) {

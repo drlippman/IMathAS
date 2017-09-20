@@ -25,6 +25,7 @@
 	//DB $userid = mysql_result($result,0,0);
 	$userid = $stm->fetchColumn(0);
   $tzoffset = Sanitize::onlyInt($_GET['tzoffset']);
+	$now = time();
 
 	function tzdate($string,$time) {
 		  global $tzoffset;
@@ -111,11 +112,11 @@
 		$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 		$query .= "JOIN imas_students ON imas_forums.courseid=imas_students.courseid AND imas_students.userid=:userid ";
 		$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:useridB ";
-		$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+		$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid)) ";
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':userid'=>$userid, ':userid'=>$userid, ':useridB'=>$userid));
+		$stm->execute(array(':userid'=>$userid, ':userid'=>$userid, ':useridB'=>$userid, 'now'=>$now));
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();

@@ -9,8 +9,8 @@ $from = $_GET['from'];
 
 $now = time();
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
-$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-$array = array();
+$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
+$array = array(':now'=>$now);
 if (!isset($teacherid)) {
   $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 }
@@ -72,7 +72,7 @@ if (count($lastpost)>0) {
   //DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
   $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
-  $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
+  $query .= "imas_forum_posts.threadid IN ($threadids) imas_forum_threads.lastposttime<$now AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
   $stm = $DBH->query($query);
   $alt = 0;
   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {

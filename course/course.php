@@ -307,16 +307,16 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	}
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE imas_forum_threads.lastposttime<:now AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	if (!isset($teacherid)) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
 	}
 	$query .= "GROUP BY imas_forum_threads.forumid";
 	$stm = $DBH->prepare($query);
 	if (!isset($teacherid)) {
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid, ':userid2'=>$userid));
+		$stm->execute(array(':now'=>$now, ':courseid'=>$cid, ':userid'=>$userid, ':userid2'=>$userid));
 	} else {
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+		$stm->execute(array(':now'=>$now, ':courseid'=>$cid, ':userid'=>$userid));
 	}
 
 

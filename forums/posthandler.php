@@ -28,6 +28,8 @@ if ($caller=="posts") {
 	$returnname = "Forum Topics";
 }
 
+$now = time();
+
 if (isset($_GET['modify'])) { //adding or modifying post
 	if ($caller=='thread') {
 		$threadid = $_GET['modify'];
@@ -73,7 +75,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if (trim($_POST['subject'])=='') {
 			$_POST['subject']= '(none)';
 		}
-		$now = time();
+		$thisposttime = $now;
+		if ($isteacher) {
+			if ($_POST['releaseon']=='Date') {
+				require_once("../includes/parsedatetime.php");
+				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime']);
+			}
+		}
 		if ($_GET['modify']=="new") { //new thread
 			if ($groupsetid>0) {
 				if ($isteacher) {
@@ -90,6 +98,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					exit;
 				}
 			}
+
 			//DB $query = "INSERT INTO imas_forum_posts (forumid,subject,message,userid,postdate,parent,posttype,isanon,replyby,tag) VALUES ";
 			//DB $query .= "('$forumid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,0,'$type','$isanon',$replyby,'$tag')";
 			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -97,7 +106,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$query = "INSERT INTO imas_forum_posts (forumid,subject,message,userid,postdate,parent,posttype,isanon,replyby,tag) VALUES ";
 			$query .= "(:forumid, :subject, :message, :userid, :postdate, :parent, :posttype, :isanon, :replyby, :tag)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':forumid'=>$forumid, ':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':userid'=>$userid, ':postdate'=>$now, ':parent'=>0, ':posttype'=>$type, ':isanon'=>$isanon, ':replyby'=>$replyby, ':tag'=>$tag));
+			$stm->execute(array(':forumid'=>$forumid, ':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':userid'=>$userid, ':postdate'=>$thisposttime, ':parent'=>0, ':posttype'=>$type, ':isanon'=>$isanon, ':replyby'=>$replyby, ':tag'=>$tag));
 			$threadid = $DBH->lastInsertId();
 
 			//DB $query = "UPDATE imas_forum_posts SET threadid='$threadid' WHERE id='$threadid'";
@@ -108,7 +117,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			//DB $query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser,stugroupid) VALUES ('$threadid','$forumid',$now,'$userid','$groupid')";
 			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 	 		$stm = $DBH->prepare("INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser,stugroupid) VALUES (:id, :forumid, :lastposttime, :lastpostuser, :stugroupid)");
-	 		$stm->execute(array(':id'=>$threadid, ':forumid'=>$forumid, ':lastposttime'=>$now, ':lastpostuser'=>$userid, ':stugroupid'=>$groupid));
+	 		$stm->execute(array(':id'=>$threadid, ':forumid'=>$forumid, ':lastposttime'=>$thisposttime, ':lastpostuser'=>$userid, ':stugroupid'=>$groupid));
 
 			//DB $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','$threadid',$now)";
 			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -216,15 +225,21 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		} else {
 			//DB $query = "UPDATE imas_forum_posts SET subject='{$_POST['subject']}',message='{$_POST['message']}',isanon='$isanon',tag='$tag',posttype='$type',replyby=$replyby ";
 			//DB $query .= "WHERE id='{$_GET['modify']}'";
-			$query = "UPDATE imas_forum_posts SET subject=:subject,message=:message,isanon=:isanon,tag=:tag,posttype=:posttype,replyby=:replyby ";
-			$query .= "WHERE id=:id";
+			$query = "UPDATE imas_forum_posts SET subject=:subject,message=:message,isanon=:isanon,tag=:tag,posttype=:posttype,replyby=:replyby";
+			$arr = array(':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':isanon'=>$isanon, ':tag'=>$tag, ':posttype'=>$type, ':replyby'=>$replyby, ':id'=>$_GET['modify']);
+			if ($isteacher && isset($_POST['releaseon']) && $_POST['releaseon'] != 'nochange') {
+					$query .= ",postdate=:postdate";
+					$arr[':postdate'] = $thisposttime;
+			}
+			$query .= " WHERE id=:id";
 			if (!$isteacher) {
 				$query .= " AND userid=:userid";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':isanon'=>$isanon, ':tag'=>$tag, ':posttype'=>$type, ':replyby'=>$replyby, ':id'=>$_GET['modify'], ':userid'=>$userid));
+				$arr[':userid'] = $userid;
+				$stm->execute($arr);
 			} else {
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':isanon'=>$isanon, ':tag'=>$tag, ':posttype'=>$type, ':replyby'=>$replyby, ':id'=>$_GET['modify']));
+				$stm->execute($arr);
 			}
 			// mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($caller=='thread' || $_GET['thread']==$_GET['modify']) {
@@ -235,6 +250,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$stm = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=:stugroupid WHERE id=:id");
 					$stm->execute(array(':stugroupid'=>$groupid, ':id'=>$_GET['modify']));
 
+				}
+				if ($isteacher && isset($_POST['releaseon']) && $_POST['releaseon'] != 'nochange') {
+					$stm = $DBH->prepare("UPDATE imas_forum_threads SET lastposttime=:newtime WHERE id=:id");
+					$stm->execute(array(':newtime'=>$thisposttime, ':id'=>$_GET['modify']));
 				}
 			}
 
@@ -669,7 +688,37 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					}
 					echo '</select></span><br class="form" />';
 				}
+				$thread_lastposttime = 0;
 
+				if ($_GET['modify']!='new' && $line['parent']==0) {
+					$stm = $DBH->prepare("SELECT lastposttime FROM imas_forum_threads WHERE id=:id");
+					$stm->execute(array(':id'=>$line['id']));
+					$thread_lastposttime = $stm->fetchColumn(0);
+					$releasebydate = tzdate("m/d/Y",$thread_lastposttime);
+					$releasebytime = tzdate("g:i a",$thread_lastposttime);
+				} else {
+					$releasebydate = tzdate("m/d/Y",$now);
+					$releasebytime = tzdate("g:i a",$now);
+				}
+				echo "<span class=form>Release Post:</span><span class=formright>\n";
+				if ($_GET['modify']=='new') {
+					echo "<input type=radio name=releaseon id=releaseon1 value=\"Immediately\" ";
+					if ($thread_lastposttime<=$now) { echo "checked=1 ";}
+					echo "/> <label for=releaseon1>Immediately</label><br/>";
+				} else {
+					echo "<input type=radio name=releaseon id=releaseon1 value=\"nochange\" ";
+					if ($thread_lastposttime<=$now) { echo "checked=1 ";}
+					echo "/> <label for=releaseon1>Keep original post date</label><br/>";
+					echo "<input type=radio name=releaseon id=releaseon2 value=\"Immediately\"/> ";
+					echo "<label for=releaseon2>Change post date to now</label><br/>";
+				}
+				echo "<input type=radio name=releaseon id=releaseon3 value=\"Date\" ";
+				if ($thread_lastposttime>$now) { echo "checked=1 ";}
+				echo "/> <label for=releaseon3>Later:</label> ";
+				echo "<input type=text size=10 name=releasedate value=\"$releasebydate\" aria-label=\"post release date\"/>";
+				echo '<a href="#" onClick="displayDatePicker(\'releasedate\', this); return false">';
+				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
+				echo "at <input type=text size=10 name=releasetime value=\"$releasebytime\" aria-label=\"post release time\"></span><br class=\"form\" />";
 			}
 			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';

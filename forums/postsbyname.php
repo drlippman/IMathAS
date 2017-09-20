@@ -3,7 +3,7 @@
 	//(c) 2006 David Lippman
 
 	require("../init.php");
-	
+
 
 	/*if (!isset($teacherid) && !isset($tutorid)) {
 	   require("../header.php");
@@ -240,27 +240,10 @@
 			$groupid=0;
 		}
 		$dofilter = true;
-		//DB $query = "SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid='$groupid') AND forumid='$forumid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid=:stugroupid) AND forumid=:forumid");
-		$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid));
-		$limthreads = array();
-		//DB while ($row = mysql_fetch_row($result)) {
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$limthreads[] = $row[0];
-		}
-		if (count($limthreads)==0) {
-			$limthreads = '0';
-		} else {
-			$limthreads = implode(',',$limthreads); //INT from DB - safe
-		}
 	}
 	$blockreplythreads = array();
 	if (!$canviewall) { //this should probably be refactored in a more elegant way
 		$query = "SELECT threadid FROM imas_forum_posts WHERE forumid=:forumid AND parent=0 AND posttype=3 ";
-		if ($dofilter) {
-			$query .= "AND threadid IN ($limthreads) ";
-		}
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':forumid'=>$forumid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -271,17 +254,21 @@
 	//DB $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
 	//DB $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
 	//DB $query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ";
-	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
+	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview FROM imas_forum_posts JOIN ";
+	$query .= "imas_forum_threads AS ift ON ift.id=imas_forum_posts.threadid AND ift.lastposttime<:now JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid=:userid) AS ifv ON ";
 	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid=:forumid AND imas_forum_posts.isanon=0 ";
+	$arr = array(':userid'=>$userid, ':forumid'=>$forumid, ':now'=>$now);
 	if ($dofilter) {
-		$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+		//$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+		$query .= "AND (ift.stugroupid=0 OR ift.stugroupid=:stugroupid) ";
+		$arr[':stugroupid']=$groupid;
 	}
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid, ':forumid'=>$forumid));
+	$stm->execute($arr);
 
 	$laststu = -1;
 	$cnt = 0;

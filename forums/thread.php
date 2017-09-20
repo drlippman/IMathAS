@@ -190,12 +190,12 @@ if ($groupsetid>0) {
 		$limthreads = array();
 		if ($isteacher || $groupid==0) {
 			//DB $query = "SELECT id FROM imas_forum_threads WHERE stugroupid='$groupid' AND forumid='$forumid'";
-			$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE stugroupid=:stugroupid AND forumid=:forumid");
-			$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid));
+			$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE stugroupid=:stugroupid AND forumid=:forumid AND lastposttime<:now");
+			$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
 		} else {
 			//DB $query = "SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid='$groupid') AND forumid='$forumid'";
-			$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid=:stugroupid) AND forumid=:forumid");
-			$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid));
+			$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid=:stugroupid) AND forumid=:forumid AND lastposttime<:now");
+			$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid, ':now'=>$now));
 		}
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -710,8 +710,10 @@ echo "</p>";
 
 			//DB $query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
 			//DB $query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumid' ";
-			$query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
+			$query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid,imas_forum_threads.lastposttime ";
+			$query .= "FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
 			$query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid=:forumid ";
+			$query .= "AND imas_forum_threads.lastposttime<:now ";
 			if ($dofilter) {
 				$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
 			}
@@ -733,7 +735,7 @@ echo "</p>";
 			}
 			// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':forumid'=>$forumid));
+			$stm->execute(array(':forumid'=>$forumid, ':now'=>$isteacher?2000000000:$now));
 
 			//DB $query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
 			//DB $query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumid' ";
@@ -777,6 +779,9 @@ echo "</p>";
 				}
 				echo "><td>";
 				echo "<span class=\"right\">\n";
+				if ($line['lastposttime']>$now) {
+					echo "<img class=mida src=\"$imasroot/img/time.png\" alt=\"Scheduled\" title=\"Scheduled for later release\" /> ";
+				}
 				if ($line['tag']!='') { //category tags
 					echo '<span class="forumcattag">'.Sanitize::encodeStringForDisplay($line['tag']).'</span> ';
 				}
@@ -818,8 +823,13 @@ echo "</p>";
 				} else {
 					$name = Sanitize::encodeStringForDisplay($line['LastName']) .", ". Sanitize::encodeStringForDisplay($line['FirstName']);
 				}
+				if ($line['lastposttime']>$now) {
+					echo '<i class="grey">';
+				}
 				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . Sanitize::encodeUrlParam($grpqs) .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
-
+				if ($line['lastposttime']>$now) {
+					echo '</i>';
+				}
 				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
 
 				if ($isteacher && $groupsetid>0 && !$dofilter) {

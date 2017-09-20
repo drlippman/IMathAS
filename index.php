@@ -246,7 +246,7 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";  //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':userid'=>$userid));
@@ -284,12 +284,12 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";    //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	//this is not consistent with above...
 	//$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "GROUP BY imas_forums.courseid";
 	$stm2 = $DBH->prepare($query);
-	$stm2->execute(array(':userid'=>$userid));
+	$stm2->execute(array(':userid'=>$userid, ':now'=>$now));
 	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
@@ -317,11 +317,11 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid));
+	$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
@@ -358,11 +358,11 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "GROUP BY imas_forums.courseid";
 	$stm2 = $DBH->prepare($query);
-	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid));
+	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now));
 	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
@@ -430,7 +430,7 @@ if ($myrights<75 && ($myspecialrights&(16+32+64))!=0) {
 		echo '<a href="admin/approvepending.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
 	}
 	echo '</div>';
-} 
+}
 if (isset($tzname) && isset($sessiondata['logintzname']) && $tzname!=$sessiondata['logintzname']) {
 	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';
 }

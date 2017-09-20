@@ -203,10 +203,10 @@ if ($searchtype == 'thread') {
 	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
-	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
+	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid AND imas_forum_threads.lastposttime<? ";
 	$query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid=? ";
 	$query .= "WHERE imas_forums.courseid=? AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
-	$arr = array($userid, $cid );
+	$arr = array($now, $userid, $cid );
 	if ($searchstr != '') {
 		//DB $searchterms = explode(" ",addslashes($searchstr));
 		$searchterms = explode(" ", $searchstr);
@@ -345,7 +345,8 @@ if ($searchtype == 'thread') {
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
 	$array = array();
 	if ($anyforumsgroup && !$isteacher) {
-		$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
+		$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid AND imas_forum_threads.lastposttime<?";
+		$array[] = $now;
 	}
 	$query .= "WHERE imas_forums.courseid=? ";
 	$array[]= $cid;
@@ -438,10 +439,11 @@ if ($searchtype == 'thread') {
 	//DB $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	//DB $query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-  $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
-	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid=:courseid GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
+  $query = "SELECT imas_forums.id,COUNT(imas_forum_threads.id) FROM imas_forums LEFT JOIN imas_forum_threads ON ";
+	$query .= "imas_forums.id=imas_forum_threads.forumid AND imas_forum_threads.lastposttime<:now ";
+	$query .= "WHERE imas_forums.courseid=:courseid GROUP BY imas_forum_threads.forumid ORDER BY imas_forums.id";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid));
+	$stm->execute(array(':now'=>$now, ':courseid'=>$cid));
 	$result=$stm->fetchALL(PDO::FETCH_NUM);
 	foreach ($result as $row) {
 		$threadcount[$row[0]] = $row[1];
@@ -486,8 +488,8 @@ if ($searchtype == 'thread') {
 	$query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid=:courseid ";
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-  $array = array(':courseid'=>$cid, ':userid'=>$userid);
+	$query .= "WHERE imas_forum_threads.lastposttime<:now  AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+  $array = array(':now'=>$now, ':courseid'=>$cid, ':userid'=>$userid);
 if (!isset($teacherid)) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
 		$array[':userid']=$userid;

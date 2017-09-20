@@ -373,8 +373,8 @@ if (!$oktoshow) {
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
 
 	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";
-	$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid ";
-	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid);
+	$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid AND lastposttime<:now ";
+	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
 	if ($groupset>0 && $groupid!=-1) {
 		//DB $query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";
 		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
@@ -396,8 +396,8 @@ if (!$oktoshow) {
 	}
 
 	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id>'$threadid' ";
-	$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid ";
-	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid);
+	$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid AND lastposttime<:now ";
+	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
 	if ($groupset>0 && $groupid!=-1) {
 		//DB $query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";
 		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
