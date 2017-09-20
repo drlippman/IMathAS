@@ -5,6 +5,7 @@
 
 /*** master includes ***/
 require("./init.php");
+$now = time();
 
 //0: classes you're teaching
 //1: classes you're tutoring
