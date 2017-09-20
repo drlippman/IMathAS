@@ -15,7 +15,10 @@ try {
 	echo "Error:", $e->getMessage();
 	exit;
 }
-
+if (!isset($JWTsess->uid)) {
+	echo 'Invalid token parameters';
+	exit;
+}
 $userid = intval($JWTsess->uid);
 $cid = intval($JWTsess->cid);
 $alarms = array('T'=>'', 'A'=>'', 'F'=>'', 'C'=>'');
