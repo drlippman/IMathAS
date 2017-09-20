@@ -1348,12 +1348,11 @@
 
 		$pc = round(100*$totpt/$totposs,1);
 
-
 		$endmsg = unserialize($line['endmsg']);
 		$outmsg = '';
 		if (isset($endmsg['msgs'])) {
 			foreach ($endmsg['msgs'] as $sc=>$msg) { //array must be reverse sorted
-				if (($endmsg['type']==0 && $total>=$sc) || ($endmsg['type']==1 && $pc>=$sc)) {
+				if (($endmsg['type']==0 && $totpt>=$sc) || ($endmsg['type']==1 && $pc>=$sc)) {
 					$outmsg = $msg;
 					break;
 				}
