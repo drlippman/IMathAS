@@ -1461,21 +1461,19 @@ $a is the variable a.  Most lines will take one of these forms:
 <li>$var = function.  Example:  $a = showplot(&quot;sin(x)&quot;)</li>
 <li>$var = randomizer.  Example:  $a = rand(-5,5)</li>
 </ul>
-In some cases you want to define several variables at once.  There are two ways to
-do this:
+</p>
+
+<p><b>Variable Types</b></p>
+<p>
+There are a few types of variables:
 <ul>
-<li>$var1,$var2 = arrayfunction.  Example: $a,$b = diffrands(-5,5,2)</li>
-<li>$ar = arrayfunction.  Example: $ar = diffrands(-5,5,2)</li>
+ <li>A number:  $a = 15.  A calculation like $a = 3^2 will also result in a number</li>
+ <li>An array:  $a = array(6,8,10).  This is a collection of variables. You can reference the parts using an index (note that arrays are zero-indexed), so $a[0] = 6.</li>
+ <li>A string:  $a = "hi there".</li>
+ <li>Boolean:  $a = true</li>
 </ul>
-In the first example, variables $a and $b each take on a value.  In the second example,
-the variable $ar is an array; the elements can be accessed as $ar[0] and $ar[1] (note
-that arrays are zero-indexed).  If you use this approach, enclose the variable reference in
-parenthesis in calculations, like $new = ($ar[0])^2, and in curly brackets inside strings,
-like $string = "there were {$ar[0]} people".
-</p><p>
-You can also literally define an array using the &quot;array&quot; function.
-Examples:  $ar = array(2,3,4,5), or $ar = array(&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;)
-</p><p>
+</p>
+<p>
 Note that numbers are not in quotes, and strings are in quotes.  When you use
 the double-quote mark (&quot;) to define a string, you can interpolate variables into
 the string.  Example:
@@ -1486,6 +1484,27 @@ $str = &quot;What is $a/$b&quot;
 </pre>
 In this example, $str now contains &quot;What is 3/5&quot;.
 </p>
+<p>Note that strings in single quotes will not interpolate variables</p>
+
+<p><b>Array assignment</b></p>
+<p>
+In some cases you want to define several variables at once.  There are two ways to
+do this:
+<ul>
+<li>$var1,$var2 = arrayfunction.  Example: $a,$b = diffrands(-5,5,2)</li>
+<li>$ar = arrayfunction.  Example: $ar = diffrands(-5,5,2)</li>
+</ul>
+In the first example, variables $a and $b each take on a single value.  In the second example,
+the variable $ar is an array; the elements can be accessed as $ar[0] and $ar[1] (note
+that arrays are zero-indexed).  If you use this approach, enclose the variable reference in
+parenthesis in calculations, like $new = ($ar[0])^2, and in curly brackets inside strings,
+like $string = "there were {$ar[0]} people".
+</p><p>
+You can also literally define an array using the &quot;array&quot; function.
+Examples:  $ar = array(2,3,4,5), or $ar = array(&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;)
+</p>
+
+<p><b>Working with Strings</b></p>
 <p>If needed, you can concatenate (combine) two strings using the . operator.  Example:
 <pre>
 $a = &quot;string one &quot;
@@ -1511,7 +1530,7 @@ will be interpreted as:
 $showanswer = "Do this first. &lt;br/&gt;Then do this."
 </pre>
 </p>
-<div class=h4>
+
 <h4><a name="conditionals">Conditionals</a></h4>
 
 Any assignment line can be followed by one of two conditional:  &quot;where&quot; or &quot;if&quot;.
@@ -1586,8 +1605,7 @@ if ($a==0) {
 } where ($a+$b !==0)
 </pre>
 </p>
-</div>
-<div class=h4>
+
 <h4><a name="loops">Loops</a></h4>
 <p>There are several looping macros (such as calconarray) that can meet most needs.  For more general use
 there is a "for" loop:</p>
@@ -1614,7 +1632,7 @@ for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
 {for ($i=1..5) {$a = $a+$i} } if ($a>2)    WORKS
 </pre>
 </p>
-</div>
+
 </div>
 <div class=h2>
 <h2><a name="randomizers">Randomizers</a></h2>
@@ -2122,7 +2140,7 @@ when there is a multipart question with only one part.
 <li><b>$attemptn</b>: This variable holds the attempt number of the current attempt.  0 is the initial attempt, 1 is the next attempt, etc.</li>
 <li><b>$requestclearla</b>:  If you set $requestclearla=true in your code, it will request the display to clear out the student's last answer.
   This might be useful if your question branches based on attempt count.  Example: <code>$requestclearla = true if ($attemptn==2 &amp;&amp; !$scoreiscorrect[$thisq])</code></li>
-
+</ul>
 <h4>Reusing Code</h4>
 <p>You can import in the Common Control code from another question using
 <pre>includecodefrom(questionid)</pre>
@@ -2188,11 +2206,13 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also
 	round your $answer if needed for the $showanswer.</dd>
-<dt>$answerformat = "list", "exactlist", "orderedlist", "nosoln", or "nosolninf"</dt
+<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "nosoln", or "nosolninf"</dt>
 	<dd>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
 	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.
+	<br/>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)
 	<br/>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
-	$ansprompt = "One value, x=;No values;Many values"</dd>
+	$ansprompt = "One value, x=;No values;Many values"
+	<br/>Answerformats can be combined, like $answerformat = "nosoln,list"</dd>
 <dt>$partialcredit = array(number,score,[number,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
 	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
@@ -2227,7 +2247,9 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 <dt>$answer = a number or calculation resulting in a number </dt>
 	<dd>Defines the answer.  Define multiple acceptable answers in a string separated by or:  $answer = "3 or 5 or 7".
 	Alternatively, you can provide an interval notation range of
-	acceptable answers, like $answer = "(2,5]".  Providing a range will override any tolerances set</dd>
+	acceptable answers, like $answer = "(2,5]".  Providing a range will override any tolerances set<br/><br/>
+	To have the answer display as a rendered expression, provide the answer as a string.  For example, if you want the answer to show as 2<sup>4</sup> then 
+	you'd specify $answer = "2^4".  If you specified $answer = 2^4, the answer would display as 16.</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>

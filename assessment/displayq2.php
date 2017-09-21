@@ -1030,14 +1030,29 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$rightb = '';
 		}
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
-			$tip = _('Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5172') . "<br/>";
-			$shorttip = _('Enter a list of whole or decimal numbers');
+			if (in_array('integer',$ansformats)) {
+				$tip = _('Enter your answer as a list of integers separated with commas: Example: -4, 3, 2') . "<br/>";
+				$shorttip = _('Enter a list of integers');
+			} else {
+				$tip = _('Enter your answer as a list of integer or decimal numbers separated with commas: Examples: -4, 3, 2.5172') . "<br/>";
+				$shorttip = _('Enter a list of integer or decimal numbers');
+			}
 		} else if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
-			$tip = _('Enter your answer as a set of whole or decimal numbers separated with commas: Example: {-4, 3, 2.5172}') . "<br/>";
-			$shorttip = _('Enter a set of whole or decimal numbers');
+			if (in_array('integer',$ansformats)) {
+				$tip = _('Enter your answer as a set of integers separated with commas: Example: {-4, 3, 2}') . "<br/>";
+				$shorttip = _('Enter a set of integers');
+			} else {
+				$tip = _('Enter your answer as a set of integer or decimal numbers separated with commas: Example: {-4, 3, 2.5172}') . "<br/>";
+				$shorttip = _('Enter a set of integer or decimal numbers');
+			}
 		} else {
-			$tip = _('Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5172') . "<br/>";
-			$shorttip = _('Enter a whole or decimal number');
+			if (in_array('integer',$ansformats)) {
+				$tip = _('Enter your answer as an integer.  Examples: 3, -4, 0') . "<br/>";
+				$shorttip = _('Enter an integer');
+			} else {
+				$tip = _('Enter your answer as an integer or decimal number.  Examples: 3, -4, 5.5172') . "<br/>";
+				$shorttip = _('Enter an integer or decimal number');
+			}
 		}
 		$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
 		if (isset($reqdecimals)) {
@@ -3227,6 +3242,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 
 		if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
+			return 0;
+		}
+		if (in_array('integer',$ansformats) && preg_match('/\..*[1-9]/',$givenans)) {
 			return 0;
 		}
 
