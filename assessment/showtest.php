@@ -1885,9 +1885,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 					}
 				}
 
-				if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
+				if (($reattemptsremain == false || $regenonreattempt) && $showeachscore && $testsettings['showans']!='N') {
 					//TODO i18n
-
+					unset($GLOBALS['nocolormark']);
 					echo "<p>" . _("This question, with your last answer");
 					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
 						echo _(" and correct answer");
@@ -2021,7 +2021,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 					if ($lefttodo == 0 && $testsettings['testtype']!="NoScores") {
 						echo "<a href=\"showtest.php?action=skip&amp;done=true\">", _('When you are done, click here to see a summary of your score'), "</a>\n";
 					}
-					if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
+					if ($testsettings['showans']!='N') {// && $showeachscore) {  //(!$reattemptsremain || $regenonreattempt) && 
+						unset($GLOBALS['nocolormark']);
 						echo "<p>", _('Question with last attempt is displayed for your review only'), "</p>";
 
 						if (!$noraw && $showeachscore) {
