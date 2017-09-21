@@ -97,19 +97,24 @@
 
 	$itemarr = array();
 	$itemnum = array();
+	$curqnum = 1;
 	foreach (explode(',',$itemorder) as $k=>$itel) {
 		if (strpos($itel,'~')!==false) {
 			$sub = explode('~',$itel);
 			if (strpos($sub[0],'|')!==false) {
-				array_shift($sub);
+				$grppts = explode('|', array_shift($sub));
+			} else {
+				$grppts = array(1);
 			}
 			foreach ($sub as $j=>$itsub) {
 				$itemarr[] = $itsub;
-				$itemnum[$itsub] = ($k+1).'-'.($j+1);
+				$itemnum[$itsub] = $curqnum.'-'.($j+1);
 			}
+			$curqnum += $grppts[0];
 		} else {
 			$itemarr[] = $itel;
-			$itemnum[$itel] = ($k+1);
+			$itemnum[$itel] = $curqnum;
+			$curqnum++;
 		}
 	}
 

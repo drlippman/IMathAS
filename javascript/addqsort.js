@@ -856,7 +856,7 @@ function generateTable() {
 		html += "<th>Template</th><th>Remove</th>";
 	}
 	html += "</thead><tbody>";
-	var text_segment_count = 0; var curqnum = 0;
+	var text_segment_count = 0; var curqnum = 0; var curqitemloc = 0;
 	for (var i=0; i<itemcount; i++) {
 		curistext = 0;
 		curisgroup = 0;
@@ -871,7 +871,7 @@ function generateTable() {
 			var curitems = new Array();
 			curitems[0] = itemarray[i];
 		}
-		curqnum = i-text_segment_count;
+		curqitemloc = i-text_segment_count;
 		//var ms = generateMoveSelect(i,itemcount);
 		var ms = generateMoveSelect2(i);
 		for (var j=0; j<curitems.length; j++) {
@@ -1031,7 +1031,7 @@ function generateTable() {
 					if (curitems[j][6]==1) {
 						html += "<td><span class='red'>Withdrawn</span></td>";
 					} else {
-						html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?curqnum+'-'+j:curqnum)+"\">Withdraw</a></td>";
+						html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?curqitemloc+'-'+j:curqitemloc)+"\">Withdraw</a></td>";
 					}
 				} else {
 					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
@@ -1043,6 +1043,7 @@ function generateTable() {
 		}
 		if (curistext==0) {
 			pttotal += curpt*(curisgroup?itemarray[i][0]:1);
+			curqnum += curisgroup?itemarray[i][0]:1;
 		}
 		alt = 1-alt;
 	}
