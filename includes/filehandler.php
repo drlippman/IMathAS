@@ -96,7 +96,6 @@ function relocatefileifneeded($file, $key, $sec="public") {
 }
 
 function storeuploadedfile($id,$key,$sec="private") {
-	echo "type: ".getfilehandlertype('filehandlertype');
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
