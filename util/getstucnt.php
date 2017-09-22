@@ -81,7 +81,7 @@
 		if ($row[0] != $lastgroup) {
 			if ($lastgroup != '') {
 				echo "<b>". Sanitize::encodeStringForDisplay($lastgroup)."</b>: ". Sanitize::onlyInt($grpcnt)."<br/>";
-				echo Sanitize::encodeStringForDisplay($grpdata);
+				echo $grpdata;
 			}
 			$grpcnt = 0;  $grpdata = '';
 			$lastgroup = $row[0];
