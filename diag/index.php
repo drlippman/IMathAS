@@ -59,7 +59,7 @@
 	}
 	$sel1 = explode(',',$line['sel1list']);
 	$entryformat = $line['entryformat'];
-	
+
 	if (!($line['public']&1)) {
 		echo "<html><body>", _('This diagnostic is not currently available to be taken'), "</body></html>";
 		exit;
@@ -325,8 +325,11 @@ if (isset($_POST['SID'])) {
 	$userid = $DBH->lastInsertId();
 	//DB $query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$pcid','{$_POST['teachers']}');";
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
-	$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section) VALUES (:userid, :courseid, :section);");
-	$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers']));
+	if (!isset($_POST['timelimitmult'])) {
+		$_POST['timelimitmult'] = 1;
+	}
+	$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,timelimitmult) VALUES (:userid, :courseid, :section, :timelimitmult);");
+	$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 
 	$sessiondata['mathdisp'] = $_POST['mathdisp'];//1;
 	$sessiondata['graphdisp'] = $_POST['graphdisp'];//1;
@@ -416,6 +419,9 @@ for ($i=0;$i<count($sel1);$i++) {
 	if (!$noproctor) {
 		echo "<b>", _('This test can only be accessed from this location with an access password'), "</b></br>\n";
 		echo "<span class=form>", _('Access password:'), "</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+		echo "<span class=form>", _('Time limit (if timed):'), "</span>  ";
+		echo '<select name=timelimitmult><option value="1">'._('Standard').'</option><option value="1.5">'._('1.5x standard').'</option>';
+		echo '<option value="2">'._('2x standard').'</option></select><BR class=form>';
 	}
 ?>
 <input type="hidden" id="tzoffset" name="tzoffset" value="">
