@@ -948,7 +948,7 @@ switch($_POST['action']) {
 				$tar = new tar();
 				$tar->openTAR($uploadfile);
 				if ($tar->hasFiles()) {
-					if (getfilehandlertype('filehandertypecfiles') == 's3') {
+					if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 						$n = $tar->extractToS3("qimages","public");
 					} else {
 						$n = $tar->extractToDir("../assessment/qimages/");

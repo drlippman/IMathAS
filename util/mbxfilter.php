@@ -23,7 +23,7 @@ function mbxfilter($str) {
 	$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 	//store in S3 if needed
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	if (getfilehandlertype('filehandertype') == 's3') {
+	if (getfilehandlertype('filehandlertype') == 's3') {
 		$str = preg_replace_callback('#"'.$imasroot.'/filter/graph/imgs/(\w+\.png)#', function($m) {
 			global $curdir;
 			$newurl = relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$m[1], 'gimgs/'.$m[1]);

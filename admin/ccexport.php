@@ -202,7 +202,7 @@ if (isset($_GET['delete'])) {
 							//if s3 filehandler, do files as weblinks rather than including the file itself
 							if (substr($r[2],0,4)=='http') {
 								//do nothing
-							} else if (getfilehandlertype('filehandertypecfiles') == 's3') {
+							} else if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 								$r[2] = getcoursefileurl($r[2]);
 							} else {
 								//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
@@ -237,7 +237,7 @@ if (isset($_GET['delete'])) {
 					if ($row[2]!='') {
 						fwrite($fp,'<ul>');
 						foreach ($files as $f) {
-							if (getfilehandlertype('filehandertypecfiles') == 's3') {
+							if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 								fwrite($fp,'<li><a href="'.$filesout[$f][1].'">'.htmlentities($filesout[$f][0]).'</a></li>');
 							} else {
 								fwrite($fp,'<li><a href="'.$filedir.basename($filesout[$f][1]).'">'.htmlentities($filesout[$f][0]).'</a></li>');
@@ -260,7 +260,7 @@ if (isset($_GET['delete'])) {
 					$row = $stm->fetch(PDO::FETCH_NUM);
 
 					//if s3 filehandler, do files as weblinks rather than including the file itself
-					if (getfilehandlertype('filehandertypecfiles') == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
+					if (getfilehandlertype('filehandlertypecfiles') == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
 						$row[1] = getcoursefileurl(trim(substr(strip_tags($row[1]),5)));
 					}
 
