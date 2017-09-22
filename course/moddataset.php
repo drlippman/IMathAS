@@ -112,7 +112,7 @@
 		}
 
 		if (strpos($_POST['qtext'],'data:image')!==false) {
-			require("../includes/htmLawed.php");
+			require_once("../includes/htmLawed.php");
 			$_POST['qtext'] = convertdatauris($_POST['qtext']);
 		}
 		//DB $_POST['qtext'] = addslashes($_POST['qtext']);

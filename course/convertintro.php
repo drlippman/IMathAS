@@ -1,7 +1,7 @@
 <?php
 
 require("../init.php");
-require("../includes/htmLawed.php");
+require_once("../includes/htmLawed.php");
 
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
