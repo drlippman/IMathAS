@@ -102,7 +102,7 @@ switch($_POST['action']) {
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) { //update library groupids
 			$arr[':groupid'] = $_POST['group'];
-			
+
 			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid,FirstName=:FirstName,LastName=:LastName,email=:email";
 			if ($chgSID) {
 				$query .= ',SID=:SID';
@@ -117,7 +117,7 @@ switch($_POST['action']) {
 			$stm->execute(array(':groupid'=>$_POST['group'], ':ownerid'=>$_GET['id']));
 		} else {
 			$arr[':groupid'] = $groupid;
-			
+
 			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,FirstName=:FirstName,LastName=:LastName,email=:email";
 			if ($chgSID) {
 				$query .= ',SID=:SID';
@@ -948,7 +948,7 @@ switch($_POST['action']) {
 				$tar = new tar();
 				$tar->openTAR($uploadfile);
 				if ($tar->hasFiles()) {
-					if ($GLOBALS['filehandertypecfiles'] == 's3') {
+					if (getfilehandlertype('filehandertypecfiles') == 's3') {
 						$n = $tar->extractToS3("qimages","public");
 					} else {
 						$n = $tar->extractToDir("../assessment/qimages/");

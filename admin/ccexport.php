@@ -97,7 +97,7 @@ if (isset($_GET['delete'])) {
 		mkdir($newdir.'/web_resources');
 		$htmldir = 'wiki_content/';
 		$filedir = 'web_resources/';
-		
+
 		$stm = $DBH->prepare("SELECT useweights,defaultcat FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		list($useweights,$defaultcat) = $stm->fetch(PDO::FETCH_NUM);
@@ -202,7 +202,7 @@ if (isset($_GET['delete'])) {
 							//if s3 filehandler, do files as weblinks rather than including the file itself
 							if (substr($r[2],0,4)=='http') {
 								//do nothing
-							} else if ($GLOBALS['filehandertypecfiles'] == 's3') {
+							} else if (getfilehandlertype('filehandertypecfiles') == 's3') {
 								$r[2] = getcoursefileurl($r[2]);
 							} else {
 								//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
@@ -237,7 +237,7 @@ if (isset($_GET['delete'])) {
 					if ($row[2]!='') {
 						fwrite($fp,'<ul>');
 						foreach ($files as $f) {
-							if ($GLOBALS['filehandertypecfiles'] == 's3') {
+							if (getfilehandlertype('filehandertypecfiles') == 's3') {
 								fwrite($fp,'<li><a href="'.$filesout[$f][1].'">'.htmlentities($filesout[$f][0]).'</a></li>');
 							} else {
 								fwrite($fp,'<li><a href="'.$filedir.basename($filesout[$f][1]).'">'.htmlentities($filesout[$f][0]).'</a></li>');
@@ -260,7 +260,7 @@ if (isset($_GET['delete'])) {
 					$row = $stm->fetch(PDO::FETCH_NUM);
 
 					//if s3 filehandler, do files as weblinks rather than including the file itself
-					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
+					if (getfilehandlertype('filehandertypecfiles') == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
 						$row[1] = getcoursefileurl(trim(substr(strip_tags($row[1]),5)));
 					}
 
@@ -786,7 +786,7 @@ if (isset($_GET['delete'])) {
 		</table>
 	</div>
 	<?php
-	//echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>"; 
+	//echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>";
 	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in BlackBoard and Moodle)</button></p>";
 	echo '<p>If exporting for Canvas: <br/>';
 	echo '<input type=radio name=includeappconfig value=1 checked />Include App Configuration.<br/>';
