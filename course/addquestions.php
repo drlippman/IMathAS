@@ -260,9 +260,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $defpoints = mysql_result($result,0,1);
 			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			$itemorder = explode(',', $itemorder);
-print_r($itemorder);
-echo "torem: $toremove";
-exit;
+
 			$qids = array();
 			if ($isingroup && $_POST['withdrawtype']!='full') { //is group remove
 				$qids = explode('~',$itemorder[$toremove]);
