@@ -12,10 +12,10 @@ $snippets = array();
 
 if (isset($_POST['snippets'])) {
 	require_once("../includes/htmLawed.php");
-	
+
 	$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 	$stm->execute(array(':id'=>$userid));
-	
+
 	$jsondata = json_decode($stm->fetchColumn(0), true);
 	if ($jsondata===null) {
 		$jsondata = array();
@@ -47,13 +47,13 @@ if (isset($_POST['snippets'])) {
 	$jsondata['snippets'] = $safesnips;
 	$stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
 	$stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$userid));
-	
+
 	echo _("Snippets saved");
-	
+
 } else {
 	$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 	$stm->execute(array(':id'=>$userid));
-	
+
 	$jsondata = json_decode($stm->fetchColumn(0), true);
 	if ($jsondata===null) {
 		$jsondata = array();
@@ -63,7 +63,7 @@ if (isset($_POST['snippets'])) {
 	} else {
 		$snippets = array();
 	}
-		
+
 	$useeditor = "noinit";
 	$placeinhead = '<script src="../javascript/jquery-sortable.js"></script>';
 	$placeinhead .= '<script type="text/javascript">
@@ -170,8 +170,7 @@ if (isset($_POST['snippets'])) {
 		})
 		.fail(function(xhr, status, errorThrown) {
 		    	$(".submitnotice").text("Error saving changes: "+
-				status + "; " +req.statusText+
-				"; Error: "+errorThrown);
+				status + "; Error: "+errorThrown);
 		});
 	}
 	function editorSetup(editor) {
@@ -200,7 +199,7 @@ if (isset($_POST['snippets'])) {
 		  opacity: 0.5;
 		  z-index: 2000;
 		}
-		
+
 		li.placeholder {
 		  position: relative;
 		  background-color: #cfc;
@@ -219,12 +218,12 @@ if (isset($_POST['snippets'])) {
 		}
 	</style>';
 	require("../header.php");
-	
+
 
 	echo '<div class=breadcrumb>'.$breadcrumbbase.' '._("Prewritten Snippets").'</div>';
 
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Prewritten Snippets")."</h2></div>\n";
-	
+
 	echo '<p><button type="button" class="savebtn" onclick="savesnippets()">'._('Save Changes').'</button> ';
 	echo '<span class="submitnotice noticetext"></span></p>';
 	echo '<ul class="grouplist">';
@@ -248,12 +247,12 @@ if (isset($_POST['snippets'])) {
 			echo $snip['content'].'</div></li>';
 			$snipcnt++;
 		}
-		
+
 		echo '</ul></li>';
 	}
 	echo '</ul>';
 	echo '<p><button type="button" onclick="addgrp()">'._('Add Group').'</button> ';
 	echo '<button type="button" class="savebtn" onclick="savesnippets()">'._('Save Changes').'</button> <span class="submitnotice noticetext"></span></p>';
-	
-	require("../footer.php");	
+
+	require("../footer.php");
 }
