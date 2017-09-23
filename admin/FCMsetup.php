@@ -7,7 +7,7 @@ if (isset($_POST['token'])) {
 	echo "OK";
 	exit;
 }
-if (isset($_GET['remove'])) {
+if (isset($_POST['remove'])) {
 	$stm = $DBH->prepare("UPDATE imas_users SET FCMtoken='' WHERE id=:id");
 	$stm->execute(array(":id"=>$userid));
 	echo "OK";
@@ -19,8 +19,8 @@ $placeinhead = '<script src="https://www.gstatic.com/firebasejs/3.5.3/firebase-a
 <script>
   // Initialize Firebase
   var FCMconfig = {
-    apiKey: "'.$CFG['FCM']['webApiKey'].'",
-    messagingSenderId: "'.$CFG['FCM']['SenderId'].'"
+    apiKey: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['webApiKey']).'",
+    messagingSenderId: "'.Sanitize::encodeStringForJavascript($CFG['FCM']['SenderId']).'"
   };
   firebase.initializeApp(FCMconfig);
 
@@ -30,10 +30,10 @@ $placeinhead = '<script src="https://www.gstatic.com/firebasejs/3.5.3/firebase-a
 	    // Registration was successful
 	    console.log("ServiceWorker registration successful with scope: ", registration.scope);
 			messaging.useServiceWorker(registration);
-			if ("'.$FCMtoken.'" != "") {
+			if ("'.Sanitize::encodeStringForJavascript($FCMtoken).'" != "") {
 				messaging.getToken()
 				.then(function(token) {
-					if (token=="'.$FCMtoken.'") {
+					if (token=="'.Sanitize::encodeStringForJavascript($FCMtoken).'") {
 						$("#havetoken").show(); $("#dosetup").hide();
 					}
 				})
@@ -49,7 +49,9 @@ $placeinhead = '<script src="https://www.gstatic.com/firebasejs/3.5.3/firebase-a
 
 function removeNotifications() {
 	$.ajax({
-		url: "FCMsetup.php?remove=true"
+		url: "FCMsetup.php",
+		type: "POST",
+		data: {"remove": true}
 	}).done(function() {
 		$("#havetoken").hide(); $("#otherdevice").hide(); $("#dosetup").show(); $("#stopnotifications").hide();
 	});
@@ -100,7 +102,7 @@ require("../header.php");
 <div class="breadcrumb"><a href="../index.php">Home</a> &gt; <a href="../forms.php?action=chguserinfo">User Profile</a> &gt; Notification Settings</div>
 
 <div id="dosetup">
-	<p>If you would like to receive new message notifications on this system, even when not visiting this site,
+	<p>If you would like to receive new message notifications from this system, even when not visiting this site,
 	click the button below.  When your browser asks for permissions, click Allow.  Note this system only works in some browsers
 	(Chrome and Firefox).</p>
 	<?php
@@ -113,9 +115,9 @@ require("../header.php");
 </div>
 <div id="havetoken" style="display:none">Notifications are set up on this device.</div>
 
+<p id="stopnotifications" <?php	if ($FCMtoken=='') { echo 'style="display:none"';} ?>>
+<button type="button" onclick="removeNotifications()">Stop Notifications</button></p>
+
 <?php
-if ($FCMtoken != '') {
-	echo '<p id="stopnotifications"><button type="button" onclick="removeNotifications()">Stop Notifications</button></p>';
-}
 require("../footer.php");
 ?>

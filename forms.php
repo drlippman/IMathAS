@@ -176,6 +176,10 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
 		echo " /></span><BR class=form>\n";
+		if (isset($CFG['FCM']) && isset($CFG['FCM']['webApiKey']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
+			echo '<span class=form>'._('Push notifications:').'</span><span class=formright>';
+			echo '<a href="'.$imasroot.'/admin/FCMsetup.php">'.('Setup push notifications on this device').'</a></span><br class=form>';
+		}
 
 		echo "<span class=form><label for=\"stupic\">Picture:</label></span>";
 		echo "<span class=\"formright\">";
