@@ -339,7 +339,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
 		file_picker_callback: filePickerCallBackFunc,
-		file_browser_types: 'file image',
+		file_picker_types: 'file image',
 		//imagetools_cors_hosts: ['s3.amazonaws.com'],
 		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
 		//images_upload_credentials: true,
