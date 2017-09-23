@@ -18,6 +18,13 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	global $DBH, $RND, $imasroot, $myrights, $showtips, $urlmode, $CFG;
 
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
+	
+	//clear out choicemap if needed
+	unset($_SESSION['choicemap'][$qnidx]);
+	for ($iidx=0;isset($_SESSION['choicemap'][1000*($qnidx+1)+$iidx]);$iidx++) {
+		unset($_SESSION['choicemap'][1000*($qnidx+1)+$iidx]);
+	}
+	
 	$GLOBALS['inquestiondisplay'] = true;
 
 	$RND->srand($seed);
@@ -618,6 +625,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	unset($abstolerance);
 	$RND->srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;
+	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	
 	if (isset($GLOBALS['qdatafordisplayq'])) {
 		$qdata = $GLOBALS['qdatafordisplayq'];
@@ -694,6 +702,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	unset($stuanswers[$thisq]);  //unset old stuanswer for this question
 
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
+		$stuanswers[$thisq] = array();
 		$postpartstoprocess = array();
 		foreach ($_POST as $postk=>$postv) {
 			$prefix = substr($postk,0,2);
