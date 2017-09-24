@@ -429,14 +429,14 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
 			$anstypes[$sn] = 'string'; $displayformat[$sn] = $disptype; $questions[$sn] = $ops; $answer[$sn] = $jd['debits'][$i]; $answerboxsize[$sn] = $maxsizedescr;
 
 			if ($jd['debits'][$i+1]=='') {
-				$anstypes[$sn+1] = 'string'; $displayformat[$sn+1] = 'debit'; $answer[$sn+1] = ''; $answerboxsize[$sn+1] = $maxsizeentry;
+				$anstypes[$sn+1] = 'number'; $displayformat[$sn+1] = 'debit'; $answer[$sn+1] = ''; $answerboxsize[$sn+1] = $maxsizeentry;
 				$sa .= '<td>'.$jd['debits'][$i].'</td><td class="r"></td><td></td></tr>';
 			} else {
 				$jd['debits'][$i+1] = str_replace(array('$',',',' '),'',$jd['debits'][$i+1])*1;
 				$sa .= '<td>'.$jd['debits'][$i].'</td><td class="r">'.($hasdecimals?number_format($jd['debits'][$i+1],2,'.',','):number_format($jd['debits'][$i+1])).'</td><td></td></tr>';
 				$anstypes[$sn+1] = 'number'; $displayformat[$sn+1] = 'debit'; $answer[$sn+1] = $jd['debits'][$i+1]; $answerboxsize[$sn+1] = $maxsizeentry;
 			}
-			$anstypes[$sn+2] = 'string'; $displayformat[$sn+2] = 'credit'; $answer[$sn+2] = ''; $answerboxsize[$sn+2] = $maxsizeentry;
+			$anstypes[$sn+2] = 'number'; $displayformat[$sn+2] = 'credit'; $answer[$sn+2] = ''; $answerboxsize[$sn+2] = $maxsizeentry;
 
 			$sn += 3;
 		}
@@ -450,7 +450,7 @@ function makejournal($j, $sn, $ops, &$anstypes, &$questions, &$answer, &$showans
 			$sa .= '<td>&nbsp;&nbsp;&nbsp;'.$jd['credits'][$i].'</td><td></td><td class="r">'.($hasdecimals?number_format($jd['credits'][$i+1],2,'.',','):number_format($jd['credits'][$i+1])).'</td></tr>';
 			//$anstypes[$sn] = 'string'; $displayformat[$sn] = 'typeahead'; $questions[$sn] = $ops;  $answer[$sn] = $jd['credits'][$i]; $answerboxsize[$sn] = $maxsizedescr;
 			$anstypes[$sn] = 'string'; $displayformat[$sn] = $disptype; $questions[$sn] = $ops;  $answer[$sn] =$jd['credits'][$i]; $answerboxsize[$sn] = $maxsizedescr;
-			$anstypes[$sn+1] = 'string'; $displayformat[$sn+1] = 'debit'; $answer[$sn+1] = ''; $answerboxsize[$sn+1] = $maxsizeentry;
+			$anstypes[$sn+1] = 'number'; $displayformat[$sn+1] = 'debit'; $answer[$sn+1] = ''; $answerboxsize[$sn+1] = $maxsizeentry;
 			$anstypes[$sn+2] = 'number'; $displayformat[$sn+2] = 'credit'; $answer[$sn+2] = $jd['credits'][$i+1]; $answerboxsize[$sn+2] = $maxsizeentry;
 
 			$sn += 3;

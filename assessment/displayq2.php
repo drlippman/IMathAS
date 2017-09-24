@@ -18,13 +18,13 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	global $DBH, $RND, $imasroot, $myrights, $showtips, $urlmode, $CFG;
 
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
-	
+
 	//clear out choicemap if needed
 	unset($_SESSION['choicemap'][$qnidx]);
 	for ($iidx=0;isset($_SESSION['choicemap'][1000*($qnidx+1)+$iidx]);$iidx++) {
 		unset($_SESSION['choicemap'][1000*($qnidx+1)+$iidx]);
 	}
-	
+
 	$GLOBALS['inquestiondisplay'] = true;
 
 	$RND->srand($seed);
@@ -626,7 +626,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	$RND->srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
-	
+
 	if (isset($GLOBALS['qdatafordisplayq'])) {
 		$qdata = $GLOBALS['qdatafordisplayq'];
 	} else if (isset($GLOBALS['qi']) && isset($GLOBALS['qi'][$GLOBALS['questions'][$qnidx]]['qtext'])) {
@@ -946,7 +946,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
 			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn$partnum"],$options,$qnidx+1);
 			if (isset($scoremethod) && $scoremethod=='acct') {
-				if ($anstype=='string' && $answer[$kidx]==='') {
+				if (($anstype=='string' || $anstype=='number') && $answer[$kidx]==='') {
 					$scores[$kidx] = $raw[$kidx]-1;  //0 if correct, -1 if wrong
 				} else {
 					$scores[$kidx] = $raw[$kidx];
@@ -2687,7 +2687,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			if (isset($grid[4])) {
 				$xsclgridpts = explode(':',$grid[4]);
-			} 
+			}
 			if (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false) {
 				if (strpos($settings[4],':')!==false) {
 					$settings4pts = explode(':',$settings[4]);
@@ -3248,6 +3248,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		$GLOBALS['partlastanswer'] = $givenans;
 
+		if ($answer==='' && $givenans==='') {
+			return 1;
+		}
 
 
 		if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
@@ -5336,7 +5339,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$xbp = $x3p + $pixelsperx;
 						}
 						$ybp = $settings[7] - ($yb-$settings[2])*$pixelspery - $imgborder;
-						
+
 						if ($ybp>$yap) {
 							$base = safepow(($xop-$xbp)/($xop-$xap), 1/($ybp-$yap));
 						} else {
@@ -5344,7 +5347,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 						$str = ($xop-$xbp)/safepow($base,$ybp-$yop);
 						$anslogs[$key] = array($str,$base);
-						
+
 					} else if (strpos($function[0],'abs')!==false) { //is abs
 						$y0 = $func($x0);
 						$y4 = $func($x4);
