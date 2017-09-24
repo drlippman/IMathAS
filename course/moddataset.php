@@ -1431,7 +1431,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 	// Show Quick Save and Preview buttons
 	$(function() {
 		$(".quickSaveButton").css("display", "inline");
-		//$(".saveandtest").remove();
+		$(".saveandtest").remove();
 	});
 } else { // No FormData object
 	$(function() {
