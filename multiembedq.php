@@ -57,7 +57,7 @@ if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and draw
 	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	setcookie("embedquserprefs", json_encode(array(
-		'graphdisp'=>$sessiondata['userprefs']['graphdisp'], 
+		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
 		'drawentry'=>$sessiondata['userprefs']['drawentry']
 		)));
 }
@@ -188,7 +188,45 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead = '<style type="text/css">html,body {margin:0px;} div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
-
+if ($targetid != '') {
+	$placeinhead .= '<script type="text/javascript">
+	function sendresizemsg() {
+	 if(self != top){
+	  var default_height = Math.max(
+              document.body.scrollHeight, document.body.offsetHeight,
+              document.documentElement.clientHeight, document.documentElement.scrollHeight,
+              document.documentElement.offsetHeight);
+	  window.parent.postMessage( JSON.stringify({
+	      subject: "lti.frameResize",
+	      height: default_height,
+	      iframe_resize_id: "'.$targetid.'",
+	      element_id: "'.$targetid.'",
+	      frame_id: "'.$targetid.'"
+	  }), "*");
+	 }
+	}
+	if (mathRenderer == "Katex") {
+		window.katexDoneCallback = sendresizemsg;
+	} else if (mathRenderer == "MathJax") {
+		//done seperately
+	} else {
+		$(function() {
+			sendresizemsg();
+		});
+	}
+	$(function() {
+		$(window).on("ImathasEmbedReload", sendresizemsg);
+	});
+	</script>';
+	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+		//mathjax requires different handling
+		$placeinhead .= '<script type="text/x-mathjax-config">
+			MathJax.Hub.Queue(function () {
+				sendresizemsg();
+			});
+			</script>';
+	}
+}
 if ($theme != '') {
 	$sessiondata['coursetheme'] = $theme.'.css';
 }
@@ -230,37 +268,7 @@ foreach ($qids as $i=>$qid) {
 	echo '<input type="hidden" id="verattempts'.$i.'" value="'.$attempts[$i].'"/>';
 	echo '</div>';
 }
-if ($targetid != '') {
-echo '<script type="text/javascript">
-	function sendresizemsg() {
-	 if(self != top){
-	  var default_height = Math.max(
-              document.body.scrollHeight, document.body.offsetHeight,
-              document.documentElement.clientHeight, document.documentElement.scrollHeight,
-              document.documentElement.offsetHeight);
-	  window.parent.postMessage( JSON.stringify({
-	      subject: "lti.frameResize",
-	      height: default_height,
-	      iframe_resize_id: "'.$targetid.'",
-	      element_id: "'.$targetid.'",
-	      frame_id: "'.$targetid.'"
-	  }), "*");
-	 }
-	}
-	if (MathJax) {
-		MathJax.Hub.Queue(function () {
-			sendresizemsg();
-		});
-	} else {
-		$(function() {
-			sendresizemsg();
-		});
-	}
-	$(function() {
-		$(window).on("ImathasEmbedReload", sendresizemsg);
-	});
-</script>';
-}
+
 
 require("./footer.php");
 
