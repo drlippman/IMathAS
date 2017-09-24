@@ -53,7 +53,7 @@ $page_formAction = "embedq.php?id=$qsetid";
 if (isset($_GET['theme'])) {
 	$theme = preg_replace('/\W/','',$_GET['theme']);
 	$sessiondata['coursetheme'] = $theme . '.css';
-	$page_formAction .= "&theme=$theme";	
+	$page_formAction .= "&theme=$theme";
 } else {
 	$sessiondata['coursetheme'] = $coursetheme;
 }
@@ -117,6 +117,44 @@ $useeditor = 1;
 if (isset($_GET['resizer'])) {
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/iframeSizer_contentWindow_min.js"></script>';
 }
+if (isset($_GET['frame_id'])) {
+	$frameid = preg_replace('/[^\w:.-]/','',$_GET['frame_id']);
+	$placeinhead .= '<script type="text/javascript">
+		function sendresizemsg() {
+		 if(self != top){
+		  var default_height = Math.max(
+	              document.body.scrollHeight, document.body.offsetHeight,
+	              document.documentElement.clientHeight, document.documentElement.scrollHeight,
+	              document.documentElement.offsetHeight);
+		  window.parent.postMessage( JSON.stringify({
+		      subject: "lti.frameResize",
+		      height: default_height,
+		      frame_id: "'.$frameid.'"
+		  }), "*");
+		 }
+		}
+
+		if (mathRenderer == "Katex") {
+			window.katexDoneCallback = sendresizemsg;
+		} else if (mathRenderer == "MathJax") {
+			//done seperately
+		} else {
+			$(function() {
+				sendresizemsg();
+			});
+		}
+		</script>';
+	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+		//mathjax requires different handling
+		$placeinhead .= '<script type="text/x-mathjax-config">
+			MathJax.Hub.Queue(function () {
+				sendresizemsg();
+			});
+			</script>';
+	}
+}
+
+
 require("./assessment/header.php");
 
 if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {

@@ -38,7 +38,7 @@ if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and draw
 	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	setcookie("OEAembeduserprefs", json_encode(array(
-		'graphdisp'=>$sessiondata['userprefs']['graphdisp'], 
+		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
 		'drawentry'=>$sessiondata['userprefs']['drawentry']
 		)));
 }
@@ -101,13 +101,46 @@ $showans = false;
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
+$placeinhead .= '<script type="text/javascript">
+	function sendresizemsg() {
+	 if(self != top){
+		var default_height = Math.max(
+							document.body.scrollHeight, document.body.offsetHeight,
+							document.documentElement.clientHeight, document.documentElement.scrollHeight,
+							document.documentElement.offsetHeight);
+		window.parent.postMessage( JSON.stringify({
+				subject: "lti.frameResize",
+				height: default_height,
+				frame_id: "'.$frameid.'"
+		}), "*");
+	 }
+	}
+
+	if (mathRenderer == "Katex") {
+		window.katexDoneCallback = sendresizemsg;
+	} else if (mathRenderer == "MathJax") {
+		//done seperately
+	} else {
+		$(function() {
+			sendresizemsg();
+		});
+	}
+	</script>';
+if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+	//mathjax requires different handling
+	$placeinhead .= '<script type="text/x-mathjax-config">
+		MathJax.Hub.Queue(function () {
+			sendresizemsg();
+		});
+	</script>';
+}
 $useeditor = 1;
 require("./assessment/header.php");
 
 if ($sessiondata['graphdisp'] == 1) {
-	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';  
+	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';
 } else {
-	echo '<div style="float:right;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=1">Enable visual graph display and drawing entry</a></div>';  
+	echo '<div style="float:right;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=1">Enable visual graph display and drawing entry</a></div>';
 }
 
 //seeds 1-4999 are for summative requests that are signed
@@ -285,32 +318,6 @@ if (isset($QS['showscored'])) {
 
 }
 
-echo '<script type="text/javascript">
-	function sendresizemsg() {
-	 if(self != top){
-	  var default_height = Math.max(
-              document.body.scrollHeight, document.body.offsetHeight,
-              document.documentElement.clientHeight, document.documentElement.scrollHeight,
-              document.documentElement.offsetHeight);
-	  window.parent.postMessage( JSON.stringify({
-	      subject: "lti.frameResize",
-	      height: default_height,
-	      frame_id: "'.$frameid.'"
-	  }), "*");
-	 }
-	}
-	if (mathRenderer == "Katex") {
-		window.katexDoneCallback = sendresizemsg;
-	} else if (MathJax) {
-		MathJax.Hub.Queue(function () {
-			sendresizemsg();
-		});
-	} else {
-		$(function() {
-			sendresizemsg();
-		});
-	}
-	</script>';
 require("./footer.php");
 
 
