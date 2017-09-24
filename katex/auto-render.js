@@ -135,7 +135,6 @@ var normalizemathunicode = function(str) {
 	return str;
 }
 var renderMathInText = function(text, delimiters) {
-		text = normalizemathunicode(text);
     var data = splitWithDelimiters(text, delimiters);
 
     var fragment = document.createDocumentFragment();
@@ -145,7 +144,7 @@ var renderMathInText = function(text, delimiters) {
             fragment.appendChild(document.createTextNode(data[i].data.replace("\\`","`")));
         } else {
             var span = document.createElement("span");
-            var math = data[i].data;
+            var math = normalizemathunicode(data[i].data);
             if (data[i].format == "asciimath") {
             	    math = "\\displaystyle "+AMTparseAMtoTeX(math);
             } else if (math.indexOf("\\displaystyle")==-1) {
