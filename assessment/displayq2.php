@@ -6209,8 +6209,31 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$maxp = explode(',', $lines[$k][count($lines[$k])-1]);
 					$lines[$k] = array(min($minp[0], $maxp[0]), max($minp[0], $maxp[0]));
 				}
+				$newlines = array($lines[0]);
+				for ($i=1;$i<count($lines);$i++) {
+					$overlap = -1;
+					for ($j=count($newlines)-1;$j>=0;$j--) {
+						if ($lines[$i][0]<=$newlines[$j][1] && $lines[$i][1]>=$newlines[$j][0]) {
+							//has overlap
+							if ($overlap>-1) {
+								//already had overlap - merge
+								$newlines[$overlap][0] = min($newlines[$j][0], $newlines[$overlap][0], $lines[$i][0]);
+								$newlines[$overlap][1] = max($newlines[$j][1], $newlines[$overlap][1], $lines[$i][1]);
+								unset($newlines[$j]);
+							} else {
+								$newlines[$j][0] = min($newlines[$j][0], $lines[$i][0]);
+								$newlines[$j][1] = max($newlines[$j][1], $lines[$i][1]);
+								$overlap = $j;	
+							}
+						}
+					}
+					if ($overlap==-1) {
+						$newlines[] = $lines[$i];
+					}
+				}
+				$lines = $newlines;
 			}
-
+			$defpttol = 5;
 			if ($dots=='') {
 				$dots = array();
 			} else {
@@ -6218,6 +6241,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				foreach ($dots as $k=>$pt) {
 					$dots[$k] = explode(',',$pt);
 				}
+				//remove duplicate dots
+				for ($k=count($dots)-1;$k>0;$k--) {
+					for ($j=0;$j<$k;$j++) {
+						if (abs($dots[$k][0]-$dots[$j][0])<$defpttol && abs($dots[$k][1]==$dots[$j][1])<$defpttol) {
+							unset($dots[$k]);
+							continue 2;
+						}
+					}
+				}
+				
 			}
 			if ($odots=='') {
 				$odots = array();
@@ -6225,6 +6258,21 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$odots = explode('),(', substr($odots,1,strlen($odots)-2));
 				foreach ($odots as $k=>$pt) {
 					$odots[$k] = explode(',',$pt);
+				}
+				//remove duplicate odots, and dots below odots
+				for ($k=count($odots)-1;$k>=0;$k--) {
+					for ($j=0;$j<count($dots);$j++) {
+						if (abs($odots[$k][0]-$dots[$j][0])<$defpttol && abs($odots[$k][1]==$dots[$j][1])<$defpttol) {
+							unset($dots[$j]);
+							break;
+						}
+					}
+					for ($j=0;$j<$k;$j++) {
+						if (abs($odots[$k][0]-$odots[$j][0])<$defpttol && abs($odots[$k][1]==$odots[$j][1])<$defpttol) {
+							unset($odots[$k]);
+							continue 2;
+						}
+					}
 				}
 			}
 
@@ -6235,7 +6283,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
 			}
 
-			$defpttol = 5;
 			foreach ($ansdots as $key=>$ansdot) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($dots); $i++) {
