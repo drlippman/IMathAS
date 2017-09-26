@@ -175,7 +175,7 @@
 		}
 
 		//check for password
-		
+
 		if (trim($adata['password'])!='' && preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.[\d\*\-]+/',$adata['password'])) {
 			//if PW is an IP address, compare against user's
 			$userip = explode('.', $_SERVER['REMOTE_ADDR']);
@@ -192,13 +192,13 @@
 				$lastpts = explode('-',$pwip[3]);
 				if (count($lastpts)==1) {
 					if ($lastpts[0]=='*') {
-						
+
 					} else if ($lastpts[0]!=$userip[3]) {
 						$thisIPok = false;
 					}
 				} else {
 					if ($userip[3]<$lastpts[0] || $useripd[3]>$lastpts[1]) {
-						$thisIPok = false;	
+						$thisIPok = false;
 					}
 				}
 				if ($thisIPok) {
@@ -1889,7 +1889,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					//TODO i18n
 					unset($GLOBALS['nocolormark']);
 					echo "<p>" . _("This question, with your last answer");
-					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
+					if ((($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') && $reattemptsremain == false) {
 						echo _(" and correct answer");
 						$showcorrectnow = true;
 					} else if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) ||
@@ -2021,7 +2021,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					if ($lefttodo == 0 && $testsettings['testtype']!="NoScores") {
 						echo "<a href=\"showtest.php?action=skip&amp;done=true\">", _('When you are done, click here to see a summary of your score'), "</a>\n";
 					}
-					if ($testsettings['showans']!='N') {// && $showeachscore) {  //(!$reattemptsremain || $regenonreattempt) && 
+					if ($testsettings['showans']!='N') {// && $showeachscore) {  //(!$reattemptsremain || $regenonreattempt) &&
 						unset($GLOBALS['nocolormark']);
 						echo "<p>", _('Question with last attempt is displayed for your review only'), "</p>";
 
@@ -2035,7 +2035,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 						} else {
 							$colors = array();
 						}
-						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') ||
+						$qshowans = (((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') && !$reattemptsremain) ||
 							($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']) ||
 							($qi[$questions[$next]]['showansduring'] && $attempts[$next]>=$qi[$questions[$next]]['showans']));
 						if ($qshowans) {
