@@ -118,8 +118,10 @@ $placeinhead .= '<script type="text/javascript">
 
 	if (mathRenderer == "Katex") {
 		window.katexDoneCallback = sendresizemsg;
-	} else if (mathRenderer == "MathJax") {
-		//done seperately
+	} else if (typeof MathJax != "undefined") {
+		MathJax.Hub.Queue(function () {
+			sendresizemsg();
+		});
 	} else {
 		$(function() {
 			sendresizemsg();
@@ -127,7 +129,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	</script>';
 if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
-	//mathjax requires different handling
+	//in case MathJax isn't loaded yet
 	$placeinhead .= '<script type="text/x-mathjax-config">
 		MathJax.Hub.Queue(function () {
 			sendresizemsg();
