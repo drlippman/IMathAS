@@ -232,8 +232,32 @@ if (isset($CFG['GEN']['translatewidgetID'])) {
 }
 if (isset($sessiondata['ltiitemtype'])) {
 	echo '<script type="text/javascript">
-	$(function(){parent.postMessage(JSON.stringify({subject:\'lti.frameResize\', height: $(document).height()+"px"}), \'*\');});
+	function sendLTIresizemsg() {
+		var default_height = Math.max(
+							document.body.scrollHeight, document.body.offsetHeight,
+							document.documentElement.clientHeight, document.documentElement.scrollHeight,
+							document.documentElement.offsetHeight)+100;
+		parent.postMessage(JSON.stringify({subject:\'lti.frameResize\', height: default_height}), \'*\');
+	}
+	if (mathRenderer == "Katex") {
+		window.katexDoneCallback = sendLTIresizemsg;
+	} else if (typeof MathJax != "undefined") {
+		MathJax.Hub.Queue(function () {
+			sendLTIresizemsg();
+		});
+	} else {
+		$(function() {
+			sendLTIresizemsg();
+		});
+	}
 	</script>';
+	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+		echo '<script type="text/x-mathjax-config">
+			MathJax.Hub.Queue(function () {
+				sendresizemsg();
+			});
+		</script>';
+	}
 }
 echo '</head>';
 if ($isfw!==false) {
