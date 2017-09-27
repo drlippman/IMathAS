@@ -198,7 +198,7 @@ function AutoSuggest(elem, suggestions)
 	********************************************************/
 	this.showDiv = function()
 	{
-		this.div.style.display = 'block';
+		me.div.style.display = 'block';
 	};
 
 	/********************************************************
@@ -206,8 +206,8 @@ function AutoSuggest(elem, suggestions)
 	********************************************************/
 	this.hideDiv = function()
 	{
-		this.div.style.display = 'none';
-		this.highlighted = -1;
+		me.div.style.display = 'none';
+		me.highlighted = -1;
 	};
 
 	/********************************************************
@@ -309,7 +309,7 @@ function AutoSuggest(elem, suggestions)
 		ul.onclick = function(ev)
 		{
 			me.useSuggestion("click");
-			me.hideDiv();on
+			me.hideDiv();
 			me.cancelEvent(ev);
 			return false;
 		};
