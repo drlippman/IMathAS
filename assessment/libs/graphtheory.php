@@ -524,7 +524,6 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	}
 	if (array_sum($notvis)>0) {
 		//some vertex not visisted.  Should have already been caught
-		echo "sum";
 		return false;
 	}
 	return true;
@@ -1224,7 +1223,7 @@ function graphcomparecircuits($a,$b) {
 	$newb = substr($b,$loc).substr($b,0,$loc);
 	$a = $a.$a[0];
 	$newb = $newb.$newb[0];
-	echo "$a, $newb";
+	//echo "$a, $newb";
 	if ($a==$newb || $a==strrev($newb)) {
 		return true;
 	} else {

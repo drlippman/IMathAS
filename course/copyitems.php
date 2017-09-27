@@ -527,24 +527,24 @@ if (!(isset($teacherid))) {
 			//DB $query = "SELECT id,name FROM imas_groups";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
-			$stm = $DBH->query("SELECT id,name FROM imas_groups");
+			$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 			if ($stm->rowCount()>0) {
 				$page_hasGroups=true;
 				$grpnames = array();
-				$grpnames[0] = "Default Group";
+				$grpnames[] = array('id'=>0,'name'=>"Default Group");
 				//DB while ($row = mysql_fetch_row($result)) {
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$grpnames[$row[0]] = $row[1];
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+					if ($row['id']==$groupid) {continue;}
+					$grpnames[] = $row;
 				}
 			}
 
-			//DB $query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-			//DB $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
-			//DB $courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,it.userid,ic.name";
+		} else if (isset($_GET['loadothergroup'])) {
+
+			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu  WHERE ";
+			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 			$courseGroupResults = $DBH->prepare($query);
-			$courseGroupResults->execute(array(':groupid'=>$groupid, ':userid'=>$userid));
+			$courseGroupResults->execute(array(':groupid'=>$_GET['loadothergroup'], ':userid'=>$userid));
 
 
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
@@ -637,7 +637,7 @@ function writeOtherGrpTemplates($grptemplatelist) {
 
 /******* begin html output ********/
 
-if (!isset($_GET['loadothers'])) {
+if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/libtree.js\"></script>\n";
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
 $placeinhead .= '<script type="text/javascript">
@@ -684,7 +684,7 @@ require("../header.php");
 if ($overwriteBody==1) {
 	echo $body;
 } else {
-	if (!isset($_GET['loadothers'])) {
+	if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
@@ -863,33 +863,31 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	} else if (isset($_GET['loadothers'])) { //loading others subblock
 	 if ($page_hasGroups) {
-				$lastteacher = 0;
-				$lastgroup = -1;
-				$grptemplatelist = array();
-				//DB while ($line = mysql_fetch_array($courseGroupResults, MYSQL_ASSOC)) {
-				while ($line = $courseGroupResults->fetch(PDO::FETCH_ASSOC)) {
-					if ($line['groupid']!=$lastgroup) {
-						if ($lastgroup!=-1) {
-							echo "				</ul>\n			</li>\n";
-							writeOtherGrpTemplates($grptemplatelist);
-							echo "			</ul>\n		</li>\n";
-							$lastteacher = 0;
-							$grptemplatelist = array();
-						}
-	?>
-				<li class=lihdr>
-					<span class=dd>-</span>
-					<span class=hdr onClick="toggle('g<?php echo Sanitize::encodeStringForJavascript($line['groupid']); ?>')">
-						<span class=btn id="bg<?php echo Sanitize::encodeStringForDisplay($line['groupid']); ?>">+</span>
-					</span>
-					<span class=hdr onClick="toggle('g<?php echo Sanitize::encodeStringForJavascript($line['groupid']); ?>')">
-						<span id="ng<?php echo Sanitize::encodeStringForDisplay($line['groupid']); ?>" ><?php echo Sanitize::encodeStringForDisplay($grpnames[$line['groupid']]); ?></span>
-					</span>
-					<ul class=hide id="g<?php echo Sanitize::encodeStringForDisplay($line['groupid']); ?>">
+				foreach ($grpnames as $grp) {
+					?>
+								<li class=lihdr>
+									<span class=dd>-</span>
+									<span class=hdr onClick="loadothergroup('<?php echo Sanitize::encodeStringForJavascript($grp['id']); ?>')">
+										<span class=btn id="bg<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>">+</span>
+									</span>
+									<span class=hdr onClick="loadothergroup('<?php echo Sanitize::encodeStringForJavascript($grp['id']); ?>')">
+										<span id="ng<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>" ><?php echo Sanitize::encodeStringForDisplay($grp['name']); ?></span>
+									</span>
+									<ul class=hide id="g<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>">
+										<li>Loading...</li>
+									</ul>
+								</li>
+					<?php
+				}
+		 } else {
+			 echo '<li>No other users</li>';
+		 }
 
-	<?php
-						$lastgroup = $line['groupid'];
-					}
+	} else if (isset($_GET['loadothergroup'])) { //loading others subblock
+	 if ($courseGroupResults->rowCount()>0) {
+				$lastteacher = 0;
+				$grptemplatelist = array(); //writeOtherGrpTemplates($grptemplatelist);
+				while ($line = $courseGroupResults->fetch(PDO::FETCH_ASSOC)) {
 					if ($line['userid']!=$lastteacher) {
 						if ($lastteacher!=0) {
 							echo "				</ul>\n			</li>\n";
@@ -927,26 +925,33 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 						</ul>
 					</li>
 					<?php writeOtherGrpTemplates($grptemplatelist);?>
-				</ul>
-			</li>
-		</ul>
-	</li>
+
 	<?php
 		 } else {
-			 echo '<li>No other users</li>';
+			 echo '<li>No group members</li>';
 		 }
 
 	} else { //DEFAULT DISPLAY BLOCK
 ?>
 	<script type="text/javascript">
 	var othersloaded = false;
-	var ahahurl = '<?php echo $imasroot?>/course/copyitems.php?cid=<?php echo $cid ?>&loadothers=true';
+	var othergroupsloaded = [];
+	var ahahurl = '<?php echo $imasroot?>/course/copyitems.php?cid=<?php echo $cid ?>';
 	function loadothers() {
 		if (!othersloaded) {
 			//basicahah(ahahurl, "other");
-			$.ajax({url:ahahurl, dataType:"html"}).done(function(resp) {
+			$.ajax({url:ahahurl+"&loadothers=true", dataType:"html"}).done(function(resp) {
 				$('#other').html(resp);
-				$("#other input:radio").change(function() {
+			});
+			othersloaded = true;
+		}
+	}
+	function loadothergroup(n) {
+		toggle("g"+n);
+		if (othergroupsloaded.indexOf(n) === -1) {
+			$.ajax({url:ahahurl+"&loadothergroup="+n, dataType:"html"}).done(function(resp) {
+				$('#g'+n).html(resp);
+				$("#g"+n+" input:radio").change(function() {
 					if ($(this).hasClass("copyr")) {
 						$("#ekeybox").show();
 					} else {
@@ -960,7 +965,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 					}
 				});
 			});
-			othersloaded = true;
+			othergroupsloaded.push(n);
 		}
 	}
 	</script>
