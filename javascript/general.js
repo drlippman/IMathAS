@@ -624,7 +624,7 @@ function hidefromcourselist(el,cid,type) {
 	if (confirm("Are you SURE you want to hide this course from your course list?")) {
 		jQuery.ajax({
 				type: "GET",
-				url: imasroot+'/admin/hidefromcourselist.php?cid='+cid+'&type='+type
+				url: imasroot+'/admin/hidefromcourselist.php?tohide='+cid+'&type='+type
 		}).done(function(msg) {
 			if (msg=='OK') {
 				jQuery(el).closest("ul.courselist > li").slideUp();

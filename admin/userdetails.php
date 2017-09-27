@@ -330,6 +330,7 @@ if ($overwriteBody==1) {
 
   //TODO: Implement course hide/unhide from here.
   echo '<script type="text/javascript">
+	var detailPageUser = "'.Sanitize::encodeStringForDisplay($uid).'";
   function unhidecourse(el) {
     var coursetochange = $(el).closest("td").attr("data-cid");
     var tableid = $(el).closest("table").attr("id");
@@ -342,7 +343,7 @@ if ($overwriteBody==1) {
     $.ajax({
       url: "unhidefromcourselist.php",
       type: "GET",
-      data: {"type": tochg, "cid": coursetochange, "ajax": true}
+      data: {"type": tochg, "tohide": coursetochange, "user": detailPageUser, "ajax": true}
     }).done(function(msg) {
       if (msg=="OK") {
         $(el).closest("tr").find("span.hocp").remove();
@@ -365,7 +366,7 @@ if ($overwriteBody==1) {
     $.ajax({
       url: "hidefromcourselist.php",
       type: "GET",
-      data: {"type": tochg, "cid": coursetochange, "ajax": true}
+      data: {"type": tochg, "tohide": coursetochange, "user": detailPageUser, "ajax": true}
     }).done(function(msg) {
       if (msg=="OK") {
         var hiddenstr = "<span class=hocp>'._("Hidden on User's Home Page").'</span>";

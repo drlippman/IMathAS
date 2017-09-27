@@ -1,6 +1,6 @@
 <?php
 require("../init.php");
-$cid = Sanitize::courseId($_GET['cid']);
+$tohide = Sanitize::courseId($_GET['tohide']);
 if (!isset($_GET['type'])) {
 	$type = 'take';
 } else {
@@ -17,13 +17,22 @@ if ($type=='teach') {
 	$table = 'imas_students';
 	$type = 'take';
 }
-
-if (isset($_GET['cid'])) {
-	if ($cid>0) {
+$actionuserid = $userid;
+if ($myrights==100 && isset($_GET['user'])) {
+	$actionuserid = Sanitize::onlyInt($_GET['user']);
+} else if ($myrights>=75 && isset($_GET['user'])) {
+	$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=:id");
+	$stm->execute(array(':id'=>$_GET['user']));
+	if ($groupid==$stm->fetchColumn(0)) {
+		$actionuserid = Sanitize::onlyInt($_GET['user']);
+	}
+}
+if (isset($_GET['tohide'])) {
+	if ($tohide>0) {
 		//DB $query = "UPDATE imas_students SET hidefromcourselist=0 WHERE courseid='$cid' AND userid='$userid'";
 		//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$stm = $DBH->prepare("UPDATE $table SET hidefromcourselist=0 WHERE courseid=:courseid AND userid=:userid");
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+		$stm->execute(array(':courseid'=>$tohide, ':userid'=>$actionuserid));
 		if (isset($_GET['ajax'])) {
 			if ($stm->rowCount()>0) {
 				echo "OK";
@@ -70,7 +79,7 @@ if ($stm->rowCount()==0) {
 			echo ' <span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 			echo '<img src="../img/gears.png" alt="Options" class="mida"/></a>';
 			echo '<ul role="menu" class="dropdown-menu">';
-			echo ' <li><a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&cid='.$row['id'].'">'._('Un-hide from course list').'</a></li>';
+			echo ' <li><a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&tohide='.$row['id'].'">'._('Un-hide from course list').'</a></li>';
 			if ($row['ownerid']==$userid) {
 				echo ' <li><a href="forms.php?from=home&action=modify&id='.$row['id'].'">'._('Settings').'</a></li>';
 				echo '<li><a href="forms.php?from=home&action=chgteachers&id='.$row['id'].'">'._('Add/remove teachers').'</a></li>';
@@ -84,7 +93,7 @@ if ($stm->rowCount()==0) {
 			}
 		} else {
 			echo '<a href="../course/course.php?cid='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['name']).'</a> ';
-			echo ' <a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&cid='.$row['id'].'" class="small">Unhide</a>';
+			echo ' <a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&tohide='.$row['id'].'" class="small">Unhide</a>';
 		}
 
 		echo '</li>';
