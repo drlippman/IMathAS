@@ -1138,7 +1138,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	}
 }
-if (!isset($_GET['loadothers'])) {
+if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
  require ("../footer.php");
 }
 ?>
