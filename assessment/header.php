@@ -254,7 +254,7 @@ if (isset($sessiondata['ltiitemtype'])) {
 	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
 		echo '<script type="text/x-mathjax-config">
 			MathJax.Hub.Queue(function () {
-				sendresizemsg();
+				sendLTIresizemsg();
 			});
 		</script>';
 	}
