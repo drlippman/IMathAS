@@ -58,7 +58,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 	$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
-	$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):'NULL';
+	$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
 
 	if (isset($_POST['sdate'])) {
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
