@@ -6,7 +6,7 @@
 require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
-require("../includes/filehandler.php");
+require_once("../includes/filehandler.php");
 
 @set_time_limit(0);
 ini_set("max_input_time", "600");

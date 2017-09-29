@@ -944,7 +944,7 @@ switch($_POST['action']) {
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.tar.gz')!==FALSE) {
 				include("../includes/tar.class.php");
-				include("../includes/filehandler.php");
+				require_once("../includes/filehandler.php");
 				$tar = new tar();
 				$tar->openTAR($uploadfile);
 				if ($tar->hasFiles()) {
@@ -979,7 +979,7 @@ switch($_POST['action']) {
 		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
-				require("../includes/filehandler.php");
+				require_once("../includes/filehandler.php");
 				$zip = new ZipArchive();
 				$res = $zip->open($uploadfile);
 				$ne = 0;  $ns = 0;

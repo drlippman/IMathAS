@@ -47,7 +47,7 @@ if (isset($_GET['delete'])) {
 	unlink($path.'/CCEXPORT'.$cid.'.imscc');
 	echo "export file deleted";
 } else if (isset($_GET['create'])) {
-	require("../includes/filehandler.php");
+	require_once("../includes/filehandler.php");
 	$usechecked = ($_POST['whichitems']=='select');
 	if ($usechecked) {
 		$checked = $_POST['checked'];

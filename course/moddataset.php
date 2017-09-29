@@ -90,7 +90,7 @@
 	$outputmsg = '';
 	$errmsg = '';
 	if (isset($_POST['qtext'])) {
-		require("../includes/filehandler.php");
+		require_once("../includes/filehandler.php");
 		$now = time();
 		//DB $_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
 		//DB $_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));

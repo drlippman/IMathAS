@@ -1,7 +1,7 @@
 <?php
   //check credentials
   require("../init.php");
-  require("../includes/filehandler.php");
+  require_once("../includes/filehandler.php");
 
 
 @set_time_limit(0);
