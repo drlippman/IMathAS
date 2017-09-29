@@ -85,8 +85,8 @@ if ($myrights < 40) {
 		} else {
 			$minrights = 40;
 		}
-		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\" class=\"artl\">Add/Remove</a>";
-		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\" class=\"trl\">Transfer</a>";
+		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id=".Sanitize::onlyInt($line['id'])."\" class=\"artl\">Add/Remove</a>";
+		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id=".Sanitize::onlyInt($line['id'])."\" class=\"trl\">Transfer</a>";
 		$i++;
 	}
 
@@ -104,7 +104,8 @@ if ($myrights < 40) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_teacherSelectVal[$i] = $row[0];
-		$page_teacherSelectLabel[$i] = $row[1] . ", " . $row[2]. ' ('.$row[3].')';
+		$page_teacherSelectLabel[$i] = sprintf("%s, %s (%s)", Sanitize::encodeStringForDisplay($row[1]),
+            Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[3]));
 		$i++;
 	}
 

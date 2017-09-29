@@ -22,13 +22,13 @@ if ($myrights<20) {
 	//data manipulation here
 	$useeditor = 1;
 	if (isset($_GET['seed'])) {
-		$seed = $_GET['seed'];
+		$seed = Sanitize::onlyInt($_GET['seed']);
 		$attempt = 0;
 	} else if (!isset($_POST['seed']) || isset($_POST['regen'])) {
 		$seed = rand(0,10000);
 		$attempt = 0;
 	} else {
-		$seed = $_POST['seed'];
+		$seed = Sanitize::onlyInt($_POST['seed']);
 		$attempt = $_POST['attempt']+1;
 	}
 	if (isset($_GET['onlychk']) && $_GET['onlychk']==1) {
@@ -37,17 +37,17 @@ if ($myrights<20) {
 		$onlychk = 0;
 	}
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
-		$formn = $_GET['formn'];
-		$loc = $_GET['loc'];
+		$formn = Sanitize::encodeStringForJavascript($_GET['formn']);
+		$loc = Sanitize::encodeStringForJavascript($_GET['loc']);
 		if (isset($_GET['checked']) || isset($_GET['usecheck'])) {
 			$chk = "&checked=0";
 		} else {
 			$chk = '';
 		}
 		if ($onlychk==1) {
-		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$_GET['loc']}',true);";
+		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','$loc',true);";
 		} else {
-		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$_GET['loc']}');";
+		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','$loc');";
 		}
 	}
 
@@ -57,7 +57,7 @@ if ($myrights<20) {
 		list($score,$rawscores[0]) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0'],$attempt-1);
 		$scores[0] = $score;
 		//DB $lastanswers[0] = stripslashes($lastanswers[0]);
-		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
+		$page_scoreMsg =  "<p>Score on last answer: ".Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
 		$scores = array(-1);
@@ -65,19 +65,19 @@ if ($myrights<20) {
 		$_SESSION['choicemap'] = array();
 	}
   $cid = Sanitize::courseId($_GET['cid']);
-	$page_formAction = "testquestion.php?cid=$cid&qsetid={$_GET['qsetid']}";
+	$page_formAction = "testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['qsetid']);
 
 	if (isset($_POST['usecheck'])) {
-		$page_formAction .=  "&checked=".$_GET['usecheck'];
+		$page_formAction .=  "&checked=".Sanitize::encodeUrlParam($_GET['usecheck']);
 	} else if (isset($_GET['checked'])) {
-		$page_formAction .=  "&checked=".$_GET['checked'];
+		$page_formAction .=  "&checked=".Sanitize::encodeUrlParam($_GET['checked']);
 	}
 	if (isset($_GET['formn'])) {
-		$page_formAction .=  "&formn=".$_GET['formn'];
-		$page_formAction .=  "&loc=".$_GET['loc'];
+		$page_formAction .=  "&formn=".Sanitize::encodeUrlParam($_GET['formn']);
+		$page_formAction .=  "&loc=".Sanitize::encodeUrlParam($_GET['loc']);
 	}
 	if (isset($_GET['onlychk'])) {
-		$page_formAction .=  "&onlychk=".$_GET['onlychk'];
+		$page_formAction .=  "&onlychk=".Sanitize::encodeUrlParam($_GET['onlychk']);
 	}
 	if (isset($_GET['fixedseeds'])) {
 		$page_formAction .=  "&fixedseeds=1";
@@ -124,7 +124,7 @@ if ($overwriteBody==1) {
 	echo $body;
 } else { //DISPLAY BLOCK HERE
 	$useeditor = 1;
-	$brokenurl = $GLOBALS['basesiteurl'] . "/course/savebrokenqflag.php?qsetid=".$_GET['qsetid'].'&flag=';
+	$brokenurl = $GLOBALS['basesiteurl'] . "/course/savebrokenqflag.php?qsetid=".Sanitize::encodeUrlParam($_GET['qsetid']).'&flag=';
 	?>
 	<script type="text/javascript">
 		var BrokenFlagsaveurl = '<?php echo $brokenurl;?>';
@@ -196,7 +196,7 @@ if ($overwriteBody==1) {
 		echo "/> Mark Question for Use</p>";
 		echo "
 		  <script type=\"text/javascript\">
-		  var parentcbox = opener.document.getElementById(\"{$_GET['loc']}\");
+		  var parentcbox = opener.document.getElementById(\"$loc\");
 		  document.getElementById(\"usecheck\").checked = parentcbox.checked;
 		  function togglechk(ischk) {
 			  if (numchked!=-1) {
@@ -277,13 +277,16 @@ if ($overwriteBody==1) {
 	echo '</code>';
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-		echo "<p>Question id: {$_GET['qsetid']}.  ";//<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
+		printf("<p>Question id: %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));//<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
 		echo "<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&";
 		echo "quoteq=".Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}")."\" target=\"reperr\">Message owner</a> to report problems</p>";
 	} else {
-		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"mailto:{$line['email']}?subject=Problem%20with%20question%20id%20{$_GET['qsetid']}\">E-mail owner</a> to report problems</p>";
+		echo "<p>Question id: ".Sanitize::encodeStringForDisplay($_GET['qsetid']).".  <a href=\"mailto:".Sanitize::emailAddress($line['email'])
+            ."?subject=" . Sanitize::encodeUrlParam("Problem with question id " . $_GET['qsetid'])
+			. "\">E-mail owner</a> to report problems</p>";
 	}
-	echo "<p>Description: {$line['description']}</p><p>Author: {$line['author']}</p>";
+	printf("<p>Description: %s</p><p>Author: %s</p>", Sanitize::encodeStringForDisplay($line['description']),
+        Sanitize::encodeStringForDisplay($line['author']));
 	echo "<p>Last Modified: $lastmod</p>";
 	if ($line['deleted']==1) {
 		echo '<p class=noticetext>This question has been marked for deletion.  This might indicate there is an error in the question. ';
@@ -302,7 +305,7 @@ if ($overwriteBody==1) {
 	$license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike','Creative Commons Attribution-ShareAlike');
 	echo $license[$line['license']];
 	if ($line['otherattribution']!='') {
-		echo '<br/>Other Attribution: '.$line['otherattribution'];
+		echo '<br/>Other Attribution: '.Sanitize::encodeStringForDisplay($line['otherattribution']);
 	}
 	echo '</p>';
 
@@ -310,25 +313,25 @@ if ($overwriteBody==1) {
 	echo '<ul>';
 	//DB while ($row = mysql_fetch_row($resultLibNames)) {
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
-		echo '<li>'.$row[0];
+		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
 		if ($myrights==100) {
-			echo ' ('.$row[1].', '.$row[2].')';
+			printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 		}
 		echo '</li>';
 	}
 	echo '</ul></p>';
 
 	if ($line['ancestors']!='') {
-		echo "<p>Derived from: {$line['ancestors']}";
+		echo "<p>Derived from: ".Sanitize::encodeStringForDisplay($line['ancestors']);
 		if ($line['ancestorauthors']!='') {
-			echo '<br/>Created by: '.$line['ancestorauthors'];
+			echo '<br/>Created by: '.Sanitize::encodeStringForDisplay($line['ancestorauthors']);
 		}
 		echo "</p>";
 	} else if ($line['ancestorauthors']!='') {
-		echo '<p>Derived from work by: '.$line['ancestorauthors'].'</p>';
+		echo '<p>Derived from work by: '.Sanitize::encodeStringForDisplay($line['ancestorauthors']).'</p>';
 	}
 	if ($myrights==100) {
-		echo '<p>UniqueID: '.$line['uniqueid'].'</p>';
+		echo '<p>UniqueID: '.Sanitize::encodeStringForDisplay($line['uniqueid']).'</p>';
 	}
 }
 require("../footer.php");

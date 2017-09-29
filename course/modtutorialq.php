@@ -476,7 +476,7 @@ if (isset($_POST['text'])) {
 		}
 	}
 
-	$editmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid=$id';";
+	$editmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid=" . Sanitize::onlyInt($id) . "'";
 			//echo "function previewit() {";
 	$editmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
 	$editmsg .=  "previewpop.focus();";
@@ -1070,7 +1070,7 @@ if (isset($_GET['aid'])) {
 
 } else if (isset($_GET['daid'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+	echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
 } else {
 	if ($_GET['cid']=="admin") {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
@@ -1106,7 +1106,7 @@ if ($line['deleted']==1) {
 if (isset($inusecnt) && $inusecnt>0) {
 	echo '<p class=noticetext>This question is currently being used in ';
 	if ($inusecnt>1) {
-		echo $inusecnt.' assessments that are not yours.  ';
+		echo Sanitize::encodeStringForDisplay($inusecnt).' assessments that are not yours.  ';
 	} else {
 		echo 'one assessment that is not yours.  ';
 	}
@@ -1114,7 +1114,7 @@ if (isset($inusecnt) && $inusecnt>0) {
 
 }
 if (isset($_GET['qid'])) {
-	echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
+	echo "<p><a href=\"moddataset.php?id=".Sanitize::encodeUrlParam($_GET['id'])."&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=".Sanitize::encodeUrlParam($_GET['qid'])."\">Template this question</a> for use in this assessment.  ";
 	echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
 }
 if (!$myq) {
@@ -1297,13 +1297,13 @@ function setupKeepcodeEditor() {
 		echo "&aid=".Sanitize::onlyInt($_GET['aid']);
 	}
 	if (isset($_GET['id']) && !isset($_GET['template'])) {
-		echo "&id={$_GET['id']}";
+		echo "&id=" . Sanitize::onlyInt($_GET['id']);
 	}
 	if (isset($_GET['template'])) {
-		echo "&templateid={$_GET['id']}";
+		echo "&templateid=" . Sanitize::onlyInt($_GET['id']);
 	}
 	if (isset($_GET['makelocal'])) {
-		echo "&makelocal={$_GET['makelocal']}";
+		echo "&makelocal=" . Sanitize::encodeUrlParam($_GET['makelocal']);
 	}
 	if ($frompot==1) {
 		echo "&frompot=1";
@@ -1312,10 +1312,10 @@ function setupKeepcodeEditor() {
 
 <p>
 Description:<BR>
-<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea>
+<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>
 </p>
 <p>
-Author: <?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>">
+Author: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input type="hidden" name="author" value="<?php echo Sanitize::encodeStringForDisplay($author); ?>">
 </p>
 <p>
 <?php
@@ -1338,8 +1338,8 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 </select>
 </p>
 <script>
-var curlibs = '<?php echo $inlibs;?>';
-var locklibs = '<?php echo $locklibs;?>';
+var curlibs = '<?php echo Sanitize::encodeStringForJavascript($inlibs);?>';
+var locklibs = '<?php echo Sanitize::encodeStringForJavascript($locklibs);?>';
 function libselect() {
 	window.open('libtree.php?libtree=popup&cid=<?php echo $cid;?>&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }
@@ -1358,7 +1358,7 @@ function setlibnames(libn) {
 }
 </script>
 <p>
-My library assignments: <span id="libnames"><?php echo $lnames;?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
+My library assignments: <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
 <input type=button value="Select Libraries" onClick="libselect()">
 </p>
 
@@ -1432,8 +1432,8 @@ for ($n=0;$n<10;$n++) {
 	echo '> values that will receive feedback. Use a(n) ';
 	writeHtmlSelect("qtol$n",$qtolval,$qtollbl, $qtol[$n]);
 
-	echo ' tolerance of <input autocomplete="off" name="tol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?$qtold[$n]:0.001).'"/>.';
-	echo ' Box size: <input autocomplete="off" name="numboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?$answerboxsize[$n]:5).'"/>.';
+	echo ' tolerance of <input autocomplete="off" name="tol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
+	echo ' Box size: <input autocomplete="off" name="numboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):5).'"/>.';
 	echo '</span>';
 
 	//calc
@@ -1441,8 +1441,8 @@ for ($n=0;$n<10;$n++) {
 	if ($qtype[$n]!='calculated') {echo ' style="display:none;"';};
 	echo '> numeric expressions that will receive feedback. Use a(n) ';
 	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
-	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?$qtold[$n]:0.001).'"/>.';
-	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?$answerboxsize[$n]:20).'"/>.';
+	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
+	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
 	echo ' Answer format: ';// <select name="answerformat'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?$variables[$n]:'x').'"/>.';
 	writeHtmlSelect("answerformat$n",$ansfmtval,$ansfmtlbl, ($qtype[$n]=='calculated'?$answerformat[$n]:""));
 	echo '</span>';
@@ -1452,9 +1452,9 @@ for ($n=0;$n<10;$n++) {
 	if ($qtype[$n]!='numfunc') {echo ' style="display:none;"';};
 	echo '> algebraic expressions that will receive feedback. Use a(n) ';
 	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
-	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?$qtold[$n]:0.001).'"/>.';
-	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?$answerboxsize[$n]:20).'"/>.';
-	echo ' Variables: <input autocomplete="off" name="variables'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?$variables[$n]:'x').'"/>.';
+	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
+	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
+	echo ' Variables: <input autocomplete="off" name="variables'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?Sanitize::encodeStringForDisplay($variables[$n]):'x').'"/>.';
 	echo '</span>';
 
 	echo '</span>'; // end question parts span
@@ -1462,7 +1462,7 @@ for ($n=0;$n<10;$n++) {
 
 	echo '<span id="essayopts'.$n.'" ';
 	if ($qtype[$n]!='essay') {echo ' style="display:none;"';};
-	echo '> <input autocomplete="off" name="essayrows'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?$answerboxsize[$n]:3).'"/> rows. ';
+	echo '> <input autocomplete="off" name="essayrows'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):3).'"/> rows. ';
 	echo '<input type="checkbox" name="useeditor'.$n.'" ';
 	if (isset($displayformat[$n]) && $displayformat[$n]=='editor') {
 		echo 'checked="checked"';
@@ -1492,7 +1492,7 @@ for ($n=0;$n<10;$n++) {
 		echo '/></td>';
 		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
 		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
-		echo '<td><input autocomplete="off" id="pc'.$n.'-'.$i.'" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?$partial[$n][$i]:"").'"/></td>';
+		echo '<td><input autocomplete="off" id="pc'.$n.'-'.$i.'" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?Sanitize::encodeStringForDisplay($partial[$n][$i]):"").'"/></td>';
 
 		echo '</tr>';
 	}

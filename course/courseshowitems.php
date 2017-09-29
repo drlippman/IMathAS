@@ -1540,56 +1540,59 @@ function showitems($items,$parent,$inpublic=false) {
    			$html = '<div class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		}
 
-		$html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$cid\">";
+   		$blkUrlParam = Sanitize::encodeUrlParam($blk);
+   		$tbUrlParam = Sanitize::encodeUrlParam($tb);
+
+		$html .= "<a href=\"addassessment.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
 			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
 		}
 		$html .= _('Assessment') ."</a> | ";
 
-		/*$html .= "<a href=\"adddrillassess.php?block=$blk&tb=$tb&cid=$cid\">";
+		/*$html .= "<a href=\"adddrillassess.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['drill'])) {
 			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
 		}
 		$html .= "Drill</a> | ";
 		*/
 
-		$html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$cid\">";
+		$html .= "<a href=\"addinlinetext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['inline'])) {
 			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
 		}
 		$html .= _('Text') . "</a> | ";
 
-		$html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$cid\">";
+		$html .= "<a href=\"addlinkedtext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['linked'])) {
 			$html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
 		}
 		$html .= _('Link') . "</a> | ";
 
-		$html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$cid\">";
+		$html .= "<a href=\"addforum.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['forum'])) {
 			$html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
 		}
 		$html .= _('Forum') . "</a> | ";
 
-		$html .= "<a href=\"addwiki.php?block=$blk&tb=$tb&cid=$cid\">";
+		$html .= "<a href=\"addwiki.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['wiki'])) {
 			$html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
 		}
 		$html .= _('Wiki') . "</a> | ";
 
-		$html .= "<a href=\"adddrillassess.php?block=$blk&tb=$tb&cid=$cid\">";
+		$html .= "<a href=\"adddrillassess.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['drill'])) {
 			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
 		}
 		$html .= _('Drill') . "</a> | ";
 
-		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">";
+		$html .= "<a href=\"addblock.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
 			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
 		}
 		$html .= _('Block') . "</a> | ";
 
-		$html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$cid\">";
+		$html .= "<a href=\"addcalendar.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['calendar'])) {
 			$html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
 		}
@@ -1598,7 +1601,9 @@ function showitems($items,$parent,$inpublic=false) {
 		$html .= '</div>';
 
    	} else {
-   		$html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
+   		$html = sprintf("<select name=addtype id=\"addtype%s-%s\" onchange=\"additem('%s','%s')\" ",
+			Sanitize::encodeStringForDisplay($blk), Sanitize::encodeStringForDisplay($tb),
+			Sanitize::encodeStringForJavascript($blk), Sanitize::encodeStringForJavascript($tb));
 		if ($tb=='t') {
 			$html .= 'style="margin-bottom:5px;"';
 		}

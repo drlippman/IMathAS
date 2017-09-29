@@ -159,7 +159,7 @@
 	$qi = getquestioninfo($questions,$testsettings,true);
 
 	echo "<h4 style=\"float:right;\">Name: " . Sanitize::encodeStringForDisplay($userfullname) . " </h4>\n";
-	echo "<h3>".$testsettings['name']."</h3>\n";
+	echo "<h3>".Sanitize::encodeStringForDisplay($testsettings['name'])."</h3>\n";
 
 
 	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
@@ -258,17 +258,17 @@
 			//DB echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
 			$stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
 			$stm->execute(array(':id'=>$qsetid));
-			echo '<div>ID:'.$qsetid.', '.$stm->fetchColumn(0).'</div>';
+			echo '<div>ID:'.Sanitize::onlyInt($qsetid).', '.Sanitize::encodeStringForDisplay($stm->fetchColumn(0)).'</div>';
 		} else {
 			//list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
 			$points = $qi[$questions[$i]]['points'];
 			$qattempts = $qi[$questions[$i]]['attempts'];
 			if ($scoredview) {
 				echo "<div>#".($i+1)." ";
-				echo printscore($scores[$i], $i);
+				echo printscore(Sanitize::encodeStringForDisplay($scores[$i]), $i);
 				echo "</div>";
 			} else {
-				echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";
+				echo "<div>#".($i+1)." Points possible: ".Sanitize::encodeStringForDisplay($points).".  Total attempts: ".Sanitize::encodeStringForDisplay($qattempts)."</div>";
 			}
 		}
 		if ($scoredview) {
@@ -346,7 +346,7 @@
 								}
 							}
 
-							echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+							echo Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),$laarr[$k]));
 						}
 						$cnt++;
 					}
@@ -377,6 +377,6 @@
 	if ($endtext != '') {
 		echo '<div class="intro">'.filter($endtext).'</div>';
 	}
-	
+
 	require("../footer.php");
 ?>

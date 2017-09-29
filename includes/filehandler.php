@@ -558,6 +558,7 @@ function deleteuserfile($uid,$file) {
 }
 
 function deleteforumfile($postid,$file) {
+	$postid = Sanitize::simpleString($postid);
 	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -637,6 +638,7 @@ function deletefilebykey($key) {
 }
 
 function deleteallpostfiles($postid) {
+	$postid = Sanitize::onlyInt($postid);
 	$delcnt = 0;
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -764,7 +766,7 @@ function getqimageurl($key,$abs=false) {
 		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/$key";
 	} else {
 		if ($abs==true) {
-			return $urlmode.$_SERVER['HTTP_HOST']."$imasroot/assessment/qimages/$key";
+			return $GLOBALS['basesiteurl'] . "/assessment/qimages/$key";
 		} else {
 			return "$imasroot/assessment/qimages/$key";
 		}

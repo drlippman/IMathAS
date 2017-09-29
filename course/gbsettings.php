@@ -471,7 +471,7 @@
 			echo "checked=1 ";
 		}
 		$absr4=abs($row['dropn']);
-		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"$absr4\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 onclick=\"calctypechange($id,1)\" ";
+		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 onclick=\"calctypechange($id,1)\" ";
 		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}

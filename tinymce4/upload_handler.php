@@ -17,17 +17,6 @@ ini_set("post_max_size", "10485760");
   $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist(str_replace(' ','_',$temp['name']));
   if (is_uploaded_file($temp['tmp_name'])){
 
-    if (isset($_SERVER['HTTP_ORIGIN']) && isset($CFG['GEN']['accepted_origins'])) {
-      // same-origin requests won't set an origin. If the origin is set, it must be valid.
-      if (in_array($_SERVER['HTTP_ORIGIN'], $CFG['GEN']['accepted_origins'])) {
-        header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-      } else {
-        header("HTTP/1.0 403 Origin Denied");
-        return;
-      }
-    }
-
-
     /*
       If your script needs to receive cookies, set images_upload_credentials : true in
       the configuration and enable the following two headers.

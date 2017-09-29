@@ -35,12 +35,12 @@ if (isset($_POST['data'])) {
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare($query); //we know values are all numeric
 				$stm->execute(array(':replaceby'=>intval($ref[$replace[$row[1]]]), ':id'=>$row[0]));
-				echo "Updated question ID {$row[0]}<br/>";
+				echo "Updated question ID ".Sanitize::onlyInt($row[0])."<br/>";
 			} else {
-				echo "Skipped question ID {$row[0]}; replaceby not found (".Sanitize::encodeStringForDisplay($names[$replace[$row[1]]]).")<br/>";
+				echo "Skipped question ID ".Sanitize::onlyInt($row[0])."; replaceby not found (".Sanitize::encodeStringForDisplay($names[$replace[$row[1]]]).")<br/>";
 			}
 		} else {
-			echo "Skipped question ID {$row[0]}; already has replaceby<br/>";
+			echo "Skipped question ID ".Sanitize::onlyInt($row[0])."; already has replaceby<br/>";
 		}
 	}
 

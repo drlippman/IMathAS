@@ -90,6 +90,7 @@
 		$lastcourse = '';
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		    $line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 			if ($line['name']!=$lastcourse) {
 				if($lastcourse!='') {
 					echo '</tbody></table>';
@@ -111,8 +112,10 @@
 			} else if ($n>1) {
 				$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 			}
-			echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-			echo "<a href=\"viewmsg.php?cid={$line['cid']}&type=new&msgid={$line['id']}\">";
+			printf("<tr><td><input type=checkbox name=\"checked[]\" value=\"%d\"/></td><td>",
+                Sanitize::onlyInt($line['id']));
+			printf("<a href=\"viewmsg.php?cid=%s&type=new&msgid=%d\">", Sanitize::courseId($line['cid']),
+                Sanitize::onlyInt($line['id']));
 			if (($line['isread']&1)==0) {
 				echo "<b>{$line['title']}</b>";
 			} else {

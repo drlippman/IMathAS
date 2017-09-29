@@ -215,7 +215,7 @@ switch($_GET['action']) {
 			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				printf('<option value="%d" ', $row[0]);
+				printf('<option value="%d" ', Sanitize::onlyInt($row[0]));
 				if ($oldgroup==$row[0]) {
 					echo "selected=1";
 				}
@@ -354,7 +354,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 			$stm->execute(array(':courseid'=>$_GET['id']));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				printf('<option value="%d" ', $row[0]);
+				printf('<option value="%d" ', Sanitize::onlyInt($row[0]));
 				if ($lockaid==$row[0]) { echo 'selected="1"';}
 				printf(">%s</option>", Sanitize::encodeStringForDisplay($row[1]));
 			}
@@ -623,7 +623,7 @@ switch($_GET['action']) {
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 
-				printf('<tr><td><input type="checkbox" name="tid[]" value="%d"/></td>', $line['id']);
+				printf('<tr><td><input type="checkbox" name="tid[]" value="%d"/></td>', Sanitize::onlyInt($line['id']));
 
 			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
@@ -657,7 +657,7 @@ switch($_GET['action']) {
 			if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
 			if ($used[$line['id']]!=true) {
 				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
-				printf('<tr><td><input type="checkbox" name="atid[]" value="%d"/></td>', $line['id']);
+				printf('<tr><td><input type="checkbox" name="atid[]" value="%d"/></td>', Sanitize::onlyInt($line['id']));
 				printf("<td>%s, %s </td> ", Sanitize::encodeStringForDisplay($line['LastName']),
 					Sanitize::encodeStringForDisplay($line['FirstName']));
 				//echo "<td><a href=\"actions.php?from=$from&action=addteacher&cid=".Sanitize::onlyInt($_GET['id'])."&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
@@ -719,7 +719,7 @@ switch($_GET['action']) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf("<option value=\"%d\">%s, %s</option>\n",$row[0], Sanitize::encodeStringForDisplay($row[2]),
+			printf("<option value=\"%d\">%s, %s</option>\n",Sanitize::onlyInt($row[0]), Sanitize::encodeStringForDisplay($row[2]),
 				Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo "</select>\n";
@@ -833,7 +833,7 @@ switch($_GET['action']) {
 		//DB while ($r = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
-			printf('<option value="%d"', $r[0]);
+			printf('<option value="%d"', Sanitize::onlyInt($r[0]));
 			if ($r[0]==$row[5]) { echo ' selected="selected"';}
 			echo '>'.Sanitize::encodeStringForDisplay($r[1]).'</option>';
 		}
@@ -926,11 +926,12 @@ switch($_GET['action']) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($alt==0) {echo "<tr class=\"even\">"; $alt=1;} else {echo "<tr class=\"odd\">"; $alt=0;}
 			if ($from=='admin2') {
-				echo '<td><a href="admin2.php?groupdetails='.$row[0].'">'.$row[1].'</a></td>';
+				echo '<td><a href="admin2.php?groupdetails='.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</a></td>';
 			} else {
 				echo "<td>".Sanitize::encodeStringForDisplay($row[1])."</td>";
 			}
-			echo "<td><a href=\"forms.php?action=modgroup&id={$row[0]}\">Modify</a></td>\n";
+			printf("<td><a href=\"forms.php?action=modgroup&id=%s\">Modify</a></td>\n",
+				Sanitize::encodeUrlParam($row[0]));
 			if ($row[0]==0) {
 				echo "<td></td>";
 			} else {

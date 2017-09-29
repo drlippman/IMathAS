@@ -333,7 +333,7 @@ if ($overwriteBody==1) {
 
 <?php
 		foreach($_POST as $k=>$v) {
-			echo "<input type=hidden name=\"$k\" value=\"".Sanitize::encodeStringForDisplay($v)."\">\n";
+			echo "<input type=hidden name=\"" . Sanitize::encodeStringForDisplay($k) . "\" value=\"".Sanitize::encodeStringForDisplay($v)."\">\n";
 		}
 		echo "<p><input type=submit name=\"process\" value=\"Accept and Enroll\"></p>\n";
 	} else { //STEP 1 DISPLAY

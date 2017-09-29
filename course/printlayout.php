@@ -129,8 +129,8 @@ if ($overwriteBody==1) {
 		  position: absolute;
 		  left: 0px;
 		  border: 1px solid;
-		  width: <?php echo $pwss ?>in;
-		  height: <?php echo $phs ?>in;
+		  width: <?php echo Sanitize::onlyFloat($pwss); ?>in;
+		  height: <?php echo Sanitize::onlyFloat($phs); ?>in;
 		}
 		div.a {
 		  border: 3px double #33f;
@@ -143,13 +143,13 @@ if ($overwriteBody==1) {
 	if ($isfinal) {
 		$heights = explode(',',$_POST['heights']);
 		for ($i=0;$i<count($heights);$i++) {
-			echo "div.trq$i {float: left; width: {$pw}in; height: {$heights[$i]}in; padding: 0px; overflow: hidden;}\n";
+			echo "div.trq$i {float: left; width: ".Sanitize::encodeStringForCSS($pw)."in; height: ".Sanitize::encodeStringForCSS($heights[$i])."in; padding: 0px; overflow: hidden;}\n";
 		}
-		echo "div.hdrm {width: {$pw}in; padding: 0px; overflow: hidden;}\n";
+		echo "div.hdrm {width: ".Sanitize::encodeStringForCSS($pw)."in; padding: 0px; overflow: hidden;}\n";
 	} else {
 		$pt = 0;
 		for ($i=0;$i<ceil($numq/3)+1;$i++) {
-			echo "div#pg$i { top: {$pt}in;}\n";
+			echo "div#pg$i { top: " . Sanitize::onlyFloat($pt) . "in;}\n";
 			$pt+=$ph;
 			if ($_POST['browser']==1) {$pt -= .4;}
 		}
@@ -227,7 +227,7 @@ if ($overwriteBody==1) {
 			display: none;
 		}
 		div.m {
-			width: <?php echo $pw ?>in;
+			width: <?php echo Sanitize::encodeStringForCSS($pw); ?>in;
 			border: 0px;
 		}
 		div.cbutn {
@@ -286,7 +286,7 @@ if ($overwriteBody==1) {
 
 		$headerleft = '';
 		if (isset($_POST['aname'])) {
-			$headerleft .= $line['name'];
+			$headerleft .= Sanitize::encodeStringForDisplay($line['name']);
 		}
 		if ($copies>1) {
 			$headerleft .= ' - Form ' . ($j+1);
@@ -300,7 +300,7 @@ if ($overwriteBody==1) {
 			//DB $headerleft .= mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cid));
-			$headerleft .= $stm->fetchColumn(0);
+			$headerleft .= Sanitize::encodeStringForDisplay($stm->fetchColumn(0));
 			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
 		}
 		if (isset($_POST['iname'])) {
@@ -309,7 +309,7 @@ if ($overwriteBody==1) {
 			//DB $headerleft .= mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT LastName FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
-			$headerleft .= $stm->fetchColumn(0);
+			$headerleft .= Sanitize::encodeStringForDisplay($stm->fetchColumn(0));
 		}
 		$headerright = '';
 		if (isset($_POST['sname'])) {
@@ -319,7 +319,7 @@ if ($overwriteBody==1) {
 			}
 		}
 		if (isset($_POST['otherheader'])) {
-			$headerright .= $_POST['otherheadertext'] . '____________________________';
+			$headerright .= Sanitize::encodeStringForDisplay($_POST['otherheadertext']) . '____________________________';
 		}
 
 		echo "<div class=q>\n";
@@ -329,7 +329,8 @@ if ($overwriteBody==1) {
 			echo "<div class=m>\n";
 		}
 		echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-		echo "<div id=intro>{$line['intro']}</div>\n";
+		// $line['intro'] contains HTML.
+		printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 		echo "</div>\n";
 		if (!$isfinal) {
 			echo "<div class=cbutn><a href=\"printtest.php?cid=$cid&aid=$aid\">Cancel</a></div>\n";
@@ -369,8 +370,8 @@ if ($overwriteBody==1) {
 
 <?php
 		echo "<input type=hidden id=heights name=heights value=\"\">\n";
-		echo "<input type=hidden name=pw value=\"$pw\">\n";
-		echo "<input type=hidden name=ph value=\"$ph\">\n";
+		echo "<input type=hidden name=pw value=\"".Sanitize::encodeStringForDisplay($pw)."\">\n";
+		echo "<input type=hidden name=ph value=\"".Sanitize::encodeStringForDisplay($ph)."\">\n";
 		if (isset($_POST['points'])) {
 			echo "<input type=hidden name=points value=1>\n";
 		}
@@ -391,7 +392,7 @@ if ($overwriteBody==1) {
 		}
 		if (isset($_POST['otherheader'])) {
 			echo "<input type=hidden name=otherheader value=1>\n";
-			echo "<input type=hidden name=otherheadertext value=\"{$_POST['otherheadertext']}\">\n";
+			echo "<input type=hidden name=otherheadertext value=\"".Sanitize::encodeStringForDisplay($_POST['otherheadertext'])."\">\n";
 		}
 		echo "<div class=q><div class=m>&nbsp;</div><div class=cbutn><input type=submit value=\"Continue\"></div></div>\n";
 	} else if ($_POST['keys']>0) { //print answer keys
@@ -415,7 +416,7 @@ if ($overwriteBody==1) {
 	}
 	if ($isfinal) {
 		$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
-		echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::fullUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
+		echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::url($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
 		echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 	}
 	echo "</form>\n";

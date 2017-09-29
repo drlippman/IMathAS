@@ -65,15 +65,15 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	$out = '';
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$out .= "<p><b>{$row[1]}</b><ul>";
+		$out .= "<p><b>".Sanitize::encodeStringForDisplay($row[1])."</b><ul>";
 		foreach ($sessiondata['drillresults'][$row[0]] as $item) {
 			$out .= '<li>';
 			if ($item[0]=='n') {
-				$out .= $item[1].' questions completed in '.$item[2].', score: '.$item[3];
+				$out .= $item[1].' questions completed in '.Sanitize::encodeStringForDisplay($item[2]).', score: '.Sanitize::encodeStringForDisplay($item[3]);
 			} elseif ($item[0]=='nc') {
-				$out .= $item[1].' questions completed correctly in '.$item[2].', '.$item[3];
+				$out .= $item[1].' questions completed correctly in '.Sanitize::encodeStringForDisplay($item[2]).', '.Sanitize::encodeStringForDisplay($item[3]);
 			} elseif ($item[0]=='t') {
-				$out .= 'Score: '.$item[2].', in '.$item[1];
+				$out .= 'Score: '.Sanitize::encodeStringForDisplay($item[2]).', in '.Sanitize::encodeStringForDisplay($item[1]);
 			}
 			$out .= '</li>';
 		}
@@ -81,7 +81,7 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	}
 	echo $out;
 	if (isset($_GET['email']) && isset($_GET['public']) && !isset($_POST['stuname'])) {
-		$addy = 'quickdrill.php?public=true&showresults=true&email='.$_GET['email'];
+		$addy = 'quickdrill.php?public=true&showresults=true&email='.Sanitize::emailAddress($_GET['email']);
 		echo '<p><b>Send results to instructor</b><br/>';
 		echo "<form action=\"$addy\" method=\"post\">";
 		echo 'Your name: <input type="text" name="stuname" /></p>';
@@ -194,9 +194,9 @@ if (isset($_POST['seed'])) {
 	$page_scoreMsg =  printscore($score,$qsetid,$_POST['seed']);
 	if (getpts($score)<1 && $sa==0) {
 		$showans = true;
-		$seed = $_POST['seed'];
+		$seed = Sanitize::onlyInt($_POST['seed']);
 	} else if (getpts($score)<1 && $sa==4) {
-		$seed = $_POST['seed'];
+		$seed = Sanitize::onlyInt($_POST['seed']);
 		unset($lastanswers);
 	} else {
 		unset($lastanswers);
@@ -254,7 +254,7 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
-	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
+	echo "<p>Score:  ".Sanitize::onlyFloat($curscore)." out of ".count($scores)." possible</p>";
 	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
@@ -298,7 +298,7 @@ if ($timesup == true) { //if time has expired
 		$cur = $cur - 60*$minutes;
 	} else {$minutes=0;}
 	$seconds = $cur;
-	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
+	echo "<p>Score:  ".Sanitize::onlyFloat($curscore)." out of ".count($scores)." possible</p>";
 	echo "<p>In ";
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
@@ -315,7 +315,7 @@ if ($timesup == true) { //if time has expired
 }
 
 if ($showscore) {
-	echo '<div class="review">Current score: '.$curscore." out of ".count($scores);
+	echo '<div class="review">Current score: '.Sanitize::onlyFloat($curscore)." out of ".count($scores);
 	echo '</div>';
 }
 if ($mode=='cntup' || $mode=='cntdown') {
@@ -380,7 +380,7 @@ initstack.push(focusfirst);
 <?php
 
 if ($page_scoreMsg != '' && $showscore) {
-	echo '<div class="review">Score on last question: '.$page_scoreMsg;
+	echo '<div class="review">Score on last question: '.Sanitize::encodeStringForDisplay($page_scoreMsg);
 	echo '</div>';
 }
 
@@ -396,7 +396,7 @@ if ($showans) {
 		$doshowans = 0;
 	}
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
-	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
+	echo "<input type=\"hidden\" name=\"seed\" value=\"".Sanitize::encodeStringForDisplay($seed)."\" />";
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
 	if ($sa==3) {
 		echo "<input type=submit name=\"next\" value=\"Next Question\">\n";
@@ -506,7 +506,7 @@ function printscore($sc,$qsetid,$seed) {
 	}
 
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;
+	return $bar . Sanitize::encodeStringForDisplay($out);
 }
 
 function getpts($sc) {

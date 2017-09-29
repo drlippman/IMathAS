@@ -72,9 +72,9 @@ if ($overwriteBody==1) {
 		echo "</form>\n";
 	} else {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid&final=1\">\n";
-		echo "<input type=hidden name=heights value=\"{$_POST['heights']}\">\n";
-		echo "<input type=hidden name=pw value=\"{$_POST['pw']}\">\n";
-		echo "<input type=hidden name=ph value=\"{$_POST['ph']}\">\n";
+		echo "<input type=hidden name=heights value=\"".Sanitize::encodeStringForDisplay($_POST['heights'])."\">\n";
+		echo "<input type=hidden name=pw value=\"".Sanitize::encodeStringForDisplay($_POST['pw'])."\">\n";
+		echo "<input type=hidden name=ph value=\"".Sanitize::encodeStringForDisplay($_POST['ph'])."\">\n";
 		if (isset($_POST['points'])) {
 			echo "<input type=hidden name=points value=1>\n";
 		}
@@ -95,7 +95,7 @@ if ($overwriteBody==1) {
 		}
 		if (isset($_POST['otherheader'])) {
 			echo "<input type=hidden name=otherheader value=1>\n";
-			echo "<input type=hidden name=otherheadertext value=\"{$_POST['otherheadertext']}\">\n";
+			echo "<input type=hidden name=otherheadertext value=\"".Sanitize::encodeStringForDisplay($_POST['otherheadertext'])."\">\n";
 		}
 		echo "<h4>Final print settings</h4>\n";
 		echo "<p>Number of different versions to print: <input type=text name=versions value=\"1\"></p>\n";

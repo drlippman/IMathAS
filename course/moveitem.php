@@ -181,7 +181,7 @@ require("../header.php");
 <div id="headerforms" class="pagetitle">
  <h2>Move Item</h2>
 </div>
-<p>Moving <b><?php echo $itemtomovename; ?></b></p>
+<p>Moving <b><?php echo Sanitize::encodeStringForDisplay($itemtomovename); ?></b></p>
 <p>
 <label for="blockselect">Move this item into block</label> <br/>
 <select id="blockselect" name="blockselect"></select>

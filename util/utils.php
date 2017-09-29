@@ -48,11 +48,11 @@ if (isset($_GET['fixorphanqs'])) {
 }
 if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$_POST['cid']);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid']));
 	} else if (!empty($_POST['pqid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".$_POST['pqid']);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".Sanitize::onlyInt($_POST['pqid']));
 	} else if (!empty($_POST['eqid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/moddataset.php?cid=admin&id=".$_POST['eqid']);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/moddataset.php?cid=admin&id=".Sanitize::onlyInt($_POST['eqid']));
 	}
 	exit;
 }
@@ -130,9 +130,9 @@ if (isset($_GET['form'])) {
 				//DB while ($row = mysql_fetch_assoc($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
-					echo '<form method="post" action="../admin/actions.php?id='.$row['id'].'">';
+					echo '<form method="post" action="../admin/actions.php?id='.Sanitize::encodeUrlParam($row['id']).'">';
 					echo '<input type=hidden name=action value="resetpwd" />';
-					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
+					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.Sanitize::encodeUrlParam($row['id']).'">'.Sanitize::encodeStringForDisplay($row['SID']).'</a></li>';
 					echo '<li>ID: '.$row['id'].'</li>';
 					if ($row['name']!=null) {
 						echo '<li>Group: '.Sanitize::encodeStringForDisplay($row['name']).'</li>';
@@ -145,10 +145,10 @@ if (isset($_GET['form'])) {
 							echo '<li>Parent Group: '.Sanitize::encodeStringForDisplay($r[0]).'</li>';
 						}
 					}
-					echo '<li><a href="utils.php?emulateuser='.$row['id'].'">Emulate User</li>';
+					echo '<li><a href="utils.php?emulateuser='.Sanitize::encodeUrlParam($row['id']).'">Emulate User</li>';
 					echo '<li>Email: '.Sanitize::encodeStringForDisplay($row['email']).'</li>';
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
-					echo '<li>Rights: '.$row['rights'].' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.$row['id'].'">[edit]</a></li>';
+					echo '<li>Rights: '.Sanitize::encodeStringForDisplay($row['rights']).' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.Sanitize::encodeUrlParam($row['id']).'">[edit]</a></li>';
 					echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
 					//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
 					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -158,7 +158,7 @@ if (isset($_GET['form'])) {
 						echo '<li>Enrolled as student in: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $stu_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.$r[0].')</a></li>';
+							echo '<li><a target="_blank" href="../course/course.php?cid='.Sanitize::encodeUrlParam($r[0]).'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.Sanitize::encodeStringForDisplay($r[0]).')</a></li>';
 						}
 						echo '</ul></li>';
 					}
@@ -170,7 +170,7 @@ if (isset($_GET['form'])) {
 						echo '<li>Tutor in: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $tutor_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.$r[0].')</a></li>';
+							echo '<li><a target="_blank" href="../course/course.php?cid='.Sanitize::encodeUrlParam($r[0]).'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.Sanitize::encodeStringForDisplay($r[0]).')</a></li>';
 						}
 						echo '</ul></li>';
 					}
@@ -183,7 +183,7 @@ if (isset($_GET['form'])) {
 						echo '<li>Teacher in: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $teach_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.$r[0].')</a></li>';
+							echo '<li><a target="_blank" href="../course/course.php?cid='.Sanitize::encodeUrlParam($r[0]).'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.Sanitize::encodeStringForDisplay($r[0]).')</a></li>';
 							$teachercourses[] = $r[0];
 						}
 						echo '</ul></li>';
@@ -196,7 +196,7 @@ if (isset($_GET['form'])) {
 						echo '<li>LTI user connections: <ul>';
 						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $lti_stm->fetch(PDO::FETCH_NUM)) {
-							echo '<li>key:'.substr($r[0],0,strpos($r[0],':')).', remote userid:'.Sanitize::encodeStringForDisplay($r[2]).' <a href="utils.php?removelti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
+							echo '<li>key:'.Sanitize::encodeStringForDisplay(substr($r[0],0,strpos($r[0],':'))).', remote userid:'.Sanitize::encodeStringForDisplay($r[2]).' <a href="utils.php?removelti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
 						}
 						echo '</ul></li>';
 					}
@@ -209,7 +209,7 @@ if (isset($_GET['form'])) {
 							echo '<li>LTI course connections: <ul>';
 							//DB while ($r = mysql_fetch_row($res2)) {
 							while ($r = $lti_c_stm->fetch(PDO::FETCH_NUM)) {
-								echo '<li>Course: '.Sanitize::encodeStringForDisplay($r[2]).', key:'.substr($r[0],0,strpos($r[0],':')).', context:'.$r[3].' <a href="utils.php?removecourselti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
+								echo '<li>Course: '.Sanitize::encodeStringForDisplay($r[2]).', key:'.Sanitize::encodeStringForDisplay(substr($r[0],0,strpos($r[0],':'))).', context:'.Sanitize::encodeStringForDisplay($r[3]).' <a href="utils.php?removecourselti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
 							}
 							echo '</ul></li>';
 						}

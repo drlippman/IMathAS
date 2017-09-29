@@ -220,29 +220,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 					$sendcrumb .= " &gt; ";
 				}
 				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=" . Sanitize::encodeUrlParam($backtrack[$i][1]) . "\">";
 				}
 				//DB $sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
-				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".Sanitize::encodeStringForDisplay($backtrack[$i][0]).'</a>';
-				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-				$curBreadcrumb .= $backtrack[$i][0];
-				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "</a>";
-				}
-			}
-			$curname = $backtrack[count($backtrack)-1][0];
-			if (count($backtrack)>$depth) {
-				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
-			}
-			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
-
-		} else {
-			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			for ($i=0;$i<count($backtrack);$i++) {
-				$curBreadcrumb .= " &gt; ";
-				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
-				}
+				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder=" . Sanitize::encodeUrlParam($backtrack[$i][1]) . "\">".Sanitize::encodeStringForDisplay($backtrack[$i][0]).'</a>';
 				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
 				$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 				if ($i!=count($backtrack)-1) {
@@ -250,11 +231,30 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 				}
 			}
 			$curname = $backtrack[count($backtrack)-1][0];
-			if (count($backtrack)==1) {
-				$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
-			} else {
-				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+			if (count($backtrack)>$depth) {
+				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[count($backtrack)-2][1])."\">" . _('Back') . "</a></span><br class=\"form\" />";
 			}
+			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
+
+		} else {
+			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			for ($i=0;$i<count($backtrack);$i++) {
+				$curBreadcrumb .= " &gt; ";
+			if ($i!=count($backtrack)-1) {
+				$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=" . Sanitize::encodeUrlParam($backtrack[$i][1]) . "\">";
+			}
+				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
+				if ($i!=count($backtrack)-1) {
+					$curBreadcrumb .= "</a>";
+				}
+            }
+            $curname = $backtrack[count($backtrack)-1][0];
+            if (count($backtrack)==1) {
+                $backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+            } else {
+                $backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[count($backtrack)-2][1])."\">" . _('Back') . "</a></span><br class=\"form\" />";
+            }
 		}
 	} else {
 		$curBreadcrumb .= Sanitize::encodeStringForDisplay($coursename);
@@ -425,8 +425,8 @@ if ($overwriteBody==1) {
 ?>
 	<script type="text/javascript">
 		var getbiaddr = 'getblockitems.php?cid=<?php echo $cid ?>&folder=';
-		var oblist = '<?php echo $oblist ?>';
-		var plblist = '<?php echo $plblist ?>';
+		var oblist = '<?php echo Sanitize::encodeStringForJavascript($oblist); ?>';
+		var plblist = '<?php echo Sanitize::encodeStringForJavascript($plblist); ?>';
 		var cid = '<?php echo $cid ?>';
 	</script>
 
@@ -637,6 +637,7 @@ if ($overwriteBody==1) {
 			echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
 			echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
 	   	   }
+	   	// $_GET['folder'] is sanitized in generateadditem()
 	   	echo generateadditem($_GET['folder'],'t');
 	   }
    }

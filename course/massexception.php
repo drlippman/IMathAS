@@ -329,13 +329,13 @@
 					Sanitize::encodeStringForDisplay($row['eid']), Sanitize::encodeStringForDisplay($row['LastName']),
 					Sanitize::encodeStringForDisplay($row['FirstName']));
 				if ($row['itemtype']=='A') {
-					echo "($sdate - $edate)";
+					echo Sanitize::encodeStringForDisplay("($sdate - $edate)");
 				} else if ($row['itemtype']=='F') {
-					echo "(PostBy: $sdate, ReplyBy: $edate)";
+					echo Sanitize::encodeStringForDisplay("(PostBy: $sdate, ReplyBy: $edate)");
 				} else if ($row['itemtype']=='P') {
-					echo "(PostBy: $sdate)";
+					echo Sanitize::encodeStringForDisplay("(PostBy: $sdate)");
 				} else if ($row['itemtype']=='R') {
-					echo "(ReplyBy: $edate)";
+					echo Sanitize::encodeStringForDisplay("(ReplyBy: $edate)");
 				}
 				if ($row['waivereqscore']==1) {
 					echo ' <i>('._('waives prereq').')</i>';

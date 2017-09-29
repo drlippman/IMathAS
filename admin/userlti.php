@@ -123,7 +123,7 @@ if ($overwriteBody==1) {
     if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
     echo '<td>',Sanitize::encodeStringForDisplay($u['org']),'</td>';
     echo '<td>',Sanitize::encodeStringForDisplay($u['ltiuserid']),'</td>';
-    echo '<td><a onclick="return removeuserlti(this,'.$u['id'].')" href="#">';
+    echo '<td><a onclick="return removeuserlti(this,'.Sanitize::encodeStringForJavascript($u['id']).')" href="#">';
     echo _('Remove connection').'</a></td>';
     echo '</tr>';
   }
@@ -147,7 +147,7 @@ if ($overwriteBody==1) {
     echo '<td>',Sanitize::encodeStringForDisplay($u['courseid']),'</td>';
     echo '<td>',Sanitize::encodeStringForDisplay($u['org']),'</td>';
     echo '<td>',Sanitize::encodeStringForDisplay($u['contextid']),'</td>';
-    echo '<td><a onclick="return removecourselti(this,'.$u['id'].')" href="#">';
+    echo '<td><a onclick="return removecourselti(this,'.Sanitize::encodeStringForJavascript($u['id']).')" href="#">';
     echo _('Remove connection').'</a></td>';
     echo '</tr>';
   }

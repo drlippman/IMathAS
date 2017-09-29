@@ -212,7 +212,7 @@ function chgfilter() {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':msgfrom'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<option value=\"{$row[0]}\" ";
+		echo "<option value=\"".Sanitize::onlyInt($row[0])."\" ";
 		if ($filtercid==$row[0]) {
 			echo 'selected=1';
 		}
@@ -245,7 +245,7 @@ function chgfilter() {
 		$stm->execute(array(':msgfrom'=>$userid));
 	}
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<option value=\"{$row[0]}\" ";
+		echo "<option value=\"".Sanitize::onlyInt($row[0])."\" ";
 		if ($filteruid==$row[0]) {
 			echo 'selected=1';
 		}
@@ -309,13 +309,14 @@ function chgfilter() {
 			$line['title'] = substr($line['title'],4);
 			$n++;
 		}
+		$line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 		if ($n==1) {
 			$line['title'] = 'Re: '.$line['title'];
 		} else if ($n>1) {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
-		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid={$line['id']}\">";
+		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\"/></td><td>";
+		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid=".Sanitize::onlyInt($line['id'])."\">";
 		echo $line['title'];
 		echo "</a></td>";
 		printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),

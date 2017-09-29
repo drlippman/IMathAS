@@ -152,7 +152,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_GET['addgrp'] = true;
 			$stulist = implode(',',$stustoadd);
 		} else {
-			$grpid = $_POST['addtogrpid'];
+			$grpid = Sanitize::onlyInt($_POST['addtogrpid']);
 			$loginfo = "instr adding stu to group $grpid. ";
 			if (!is_array($stustoadd)) {
 				$stustoadd = explode(',',$stustoadd);
@@ -340,7 +340,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
 		$stm->execute(array(':id'=>$grpsetid));
 		$page_grpsetname = $stm->fetchColumn(0);
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Add Group";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Add Group";
 	} else if (isset($_GET['delgrp'])) {
 		//deleting groupset
 		if (isset($_GET['confirm']) && isset($_POST['delposts'])) {
@@ -363,7 +363,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
 
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Delete Group";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Delete Group";
 	} else if (isset($_GET['rengrp'])) {
 		//renaming groupset
 		if (isset($_POST['grpname'])) {
@@ -388,7 +388,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$grpsetid));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Rename Group";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Rename Group";
 	} else if (isset($_GET['removeall'])) {
 		//removing all group members
 		if (isset($_POST['confirm'])) {
@@ -410,7 +410,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$grpsetid));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove all group members";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove all group members";
 
 	} else if (isset($_GET['remove']) && isset($_GET['grpid'])) {
 		//removing one group member
@@ -439,7 +439,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$grpsetid));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove group member";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove group member";
 
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected, show groups
@@ -776,7 +776,7 @@ if ($overwriteBody==1) {
 			echo '<input type="submit" value="Add"/>';
 			echo '<ul class="nomark">';
 			foreach ($page_ungrpstu as $uid=>$name) {
-				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"$uid\" id=\"chk$uid\"/><label for=\"chk$uid\">";
+				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"".Sanitize::encodeStringForDisplay($uid)."\" id=\"chk".Sanitize::encodeStringForDisplay($uid)."\"/><label for=\"chk".Sanitize::encodeStringForDisplay($uid)."\">";
 				if ($hasuserimg[$uid]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 						echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";

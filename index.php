@@ -122,7 +122,7 @@ if ($showmessagesgadget) {
 	$stm = $DBH->prepare("SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND (isread=0 OR isread=4) GROUP BY courseid");
 	$stm->execute(array(':msgto'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$newmsgcnt[$row[0]] = $row[1];
+		$newmsgcnt[$row[0]] = Sanitize::onlyInt($row[1]);
 	}
 }
 
@@ -420,7 +420,7 @@ if (isset($sessiondata['emulateuseroriginaluser'])) {
 	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
 }
 if ($myrights==100 && count($brokencnt)>0) {
-	echo '<div><span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
+	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
 }
 if ($myrights<75 && ($myspecialrights&(16+32+64))!=0) {
 	echo '<div>';
@@ -503,7 +503,9 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			echo ' <a class="noticetext" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
-			echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
+			printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data[$i]['id'],
+			_('Posts ('.Sanitize::onlyInt($newpostcnt[$data[$i]['id']]).')'));
+			// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data[$i]['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($type != 'teach' || $data[$i]['ownerid']!=$userid || $myrights<40) {
 			echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';

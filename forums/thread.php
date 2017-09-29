@@ -327,7 +327,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		echo tzdate("F j, Y, g:i a",$row[6]);
 
 		echo "</div><div class=blockitems>";
-		echo filter($row[3]);
+		echo Sanitize::outgoingHtml(filter($row[3]));
 		echo "<p><a href=\"posts.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::encodeUrlParam($row[0])."&thread=".Sanitize::encodeUrlParam($row[1])."\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
@@ -449,11 +449,13 @@ if ($postinstr != '' || $replyinstr != '') {
 	echo '<div id="postreplyinstr" style="display:none;" class="intro">';
 	if ($postinstr != '') {
 		echo '<h4>'._('Posting Instructions').'</h4>';
-		echo $postinstr;
+		// $postinstr contains HTML.
+		echo Sanitize::outgoingHtml($postinstr);
 	}
 	if ($replyinstr != '') {
 		echo '<h4>'._('Reply Instructions').'</h4>';
-		echo $replyinstr;
+		// $postinstr contains HTML.
+		echo Sanitize::outgoingHtml($replyinstr);
 	}
 	echo '</div><br/>';
 }
@@ -642,7 +644,7 @@ if ($page<0) {
 	if ($taglist!='') {
 		$p = strpos($taglist,':');
 
-		$tagselect = 'Filter by '.substr($taglist,0,$p).': ';
+		$tagselect = 'Filter by '.Sanitize::encodeStringForDisplay(substr($taglist,0,$p)).': ';
 		$tagselect .= '<select id="tagfilter" onChange="chgtagfilter()"><option value="" ';
 		if ($tagfilter=='') {
 			$tagselect .= 'selected="selected"';

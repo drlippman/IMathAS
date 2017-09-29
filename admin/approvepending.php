@@ -136,7 +136,7 @@ if ($stm->rowCount()==0) {
 	$opts = '';
 	$groups = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$opts .= '<option value="'.$row[0].'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
+		$opts .= '<option value="'.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 		if ($school!='' && !$havesuggestion) {
 			$groups[] = array(levenshtein($school,normalizeGroup($row[1])), $row[0], $row[1]);
 		}
@@ -164,7 +164,7 @@ if ($stm->rowCount()==0) {
 		} else {
 			foreach ($groups as $group) {
 				if ($group[0]>=$breakdist) {break;}
-				echo '<option value="'.$group[1].'"'.($first&&$group[0]<3?' selected':'').'>'.Sanitize::encodeStringForDisplay($group[2]).'</option>';
+				echo '<option value="'.Sanitize::onlyInt($group[1]).'"'.($first&&$group[0]<3?' selected':'').'>'.Sanitize::encodeStringForDisplay($group[2]).'</option>';
 				$first = false;
 			}
 		}
@@ -229,6 +229,7 @@ function sanitizeNewInstructorRequestLog($logtext) {
 	}
 	if (!empty($verificationUrl)) {
 		if (!empty($sanitizedLogText)) $sanitizedLogText .= "<br/>";
+		//$verificationUrl is html so dont sanitize
 		$sanitizedLogText .= "VerificationURL: " . $verificationUrl;
 	}
 	if (!empty($phone)) {

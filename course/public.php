@@ -82,10 +82,10 @@
 		for ($i=0;$i<count($backtrack);$i++) {
 			$curBreadcrumb .= "&gt; ";
 			if ($i!=count($backtrack)-1) {
-				$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+				$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[$i][1])."\">";
 			}
 			//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-			$curBreadcrumb .= $backtrack[$i][0];
+			$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 			if ($i!=count($backtrack)-1) {
 				$curBreadcrumb .= "</a>";
 			}
@@ -97,7 +97,7 @@
 			$backlink = "<span class=right><a href=\"public.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span><br class=\"form\" />";
 		}
 	} else {
-		$curBreadcrumb .= $coursename;
+		$curBreadcrumb .= Sanitize::encodeStringForDisplay($coursename);
 		$curname = $coursename;
 	}
 
@@ -105,17 +105,17 @@ $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/cour
 require("../header.php");
 ?>
 <script>
-	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo $cid ?>&folder=';
-	var oblist = '<?php echo $oblist ?>';
-	var plblist = '<?php echo $plblist ?>';
-	var cid = '<?php echo $cid ?>';
+	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo Sanitize::courseId($cid) ?>&folder=';
+	var oblist = '<?php echo Sanitize::encodeStringForJavascript($oblist) ?>';
+	var plblist = '<?php echo Sanitize::encodeStringForJavascript($plblist) ?>';
+	var cid = '<?php echo Sanitize::courseId($cid) ?>';
 </script>
 <div class=breadcrumb>
 		<?php echo $curBreadcrumb ?>
 		<div class=clear></div>
 </div>
 <?php
- echo "<h2>$curname</h2>\n";
+ echo "<h2>".Sanitize::encodeStringForDisplay($curname)."</h2>\n";
  if (count($items)>0) {
 	 showitems($items,$_GET['folder'],$blockispublic);
  }

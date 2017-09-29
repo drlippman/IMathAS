@@ -28,7 +28,7 @@
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$qid = $_GET['qid'];
+	$qid = Sanitize::onlyInt($_GET['qid']);
 	if (isset($_GET['ver'])) {
 		$ver = $_GET['ver'];
 	} else {
@@ -227,7 +227,7 @@
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
-	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in $aname</h2></div>";
+	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h2></div>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
 	echo '<div class="cpmid">';
 	if ($page==-1) {
@@ -448,7 +448,7 @@
 			if (isset($onepergroup[$line['agroupid']])) {
 				$groupdup = true;
 			} else {
-				echo "<input type=\"hidden\" name=\"groupasid[{$line['agroupid']}]\" value=\"{$line['id']}\" />";
+				echo "<input type=\"hidden\" name=\"groupasid[".Sanitize::onlyInt($line['agroupid'])."]\" value=\"".Sanitize::onlyInt($line['id'])."\" />";
 				$onepergroup[$line['agroupid']] = $line['id'];
 			}
 		} else {
@@ -563,7 +563,7 @@
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
-				echo "<input type=text size=4 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc\" value=\"$pt\">";
+				echo "<input type=text size=4 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
 				if ($rubric != 0) {
 					echo printrubriclink($rubric,$points,"ud-" . Sanitize::onlyInt($line['id']) . "-$loc","feedback-" . Sanitize::onlyInt($line['id']),($loc+1));
 				}
@@ -575,7 +575,7 @@
 					if ($prts[$j]==-1) {
 						$prts[$j] = 'N/A';
 					}
-					echo "<input type=text size=2 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-$loc-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
+					echo "<input type=text size=2 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
 					if ($rubric != 0) {
 						echo printrubriclink($rubric,$answeights[$j],"ud-" . Sanitize::onlyInt($line['id']) . "-$loc-$j","feedback-" . Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
 					}
@@ -583,13 +583,13 @@
 				}
 
 			}
-			echo " out of $points ";
+			printf(" out of %d ", $points);
 
 			if ($parts!='') {
 				$answeights = implode(', ',$answeights);
 				echo "(parts: $answeights) ";
 			}
-			echo "in {$attempts[$loc]} attempt(s)\n";
+			printf("in %s attempt(s)\n", Sanitize::encodeStringForDisplay($attempts[$loc]));
 			if ($parts!='') {
 				$togr = array();
 				foreach ($qtypes as $k=>$t) {
@@ -597,13 +597,13 @@
 						$togr[] = $k;
 					}
 				}
-				echo '<br/>Quick grade: <a href="#" onclick="quickgrade('.$loc.',0,\'ud-' . Sanitize::onlyInt($line['id']) . '-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
+				echo '<br/>Quick grade: <a href="#" onclick="quickgrade('.Sanitize::onlyFloat($loc).',0,\'ud-' . Sanitize::onlyInt($line['id']) . '-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
 				if (count($togr)>0) {
 					$togr = implode(',',$togr);
-					echo ' | <a href="#" onclick="quickgrade('.$loc.',1,\'ud-' . Sanitize::onlyInt($line['id']) . '-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
+					echo ' | <a href="#" onclick="quickgrade('.Sanitize::onlyFloat($loc).',1,\'ud-' . Sanitize::onlyInt($line['id']) . '-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
 			} else {
-				echo '<br/>Quick grade: <a href="#" onclick="quicksetscore(\'ud-' . Sanitize::onlyInt($line['id']) . '-'.$loc.'\','.$points.');return false;">Full credit</a>';
+				echo '<br/>Quick grade: <a href="#" onclick="quicksetscore(\'ud-' . Sanitize::onlyInt($line['id']) . '-'.Sanitize::onlyFloat($loc).'\','.Sanitize::onlyInt($points).');return false;">Full credit</a>';
 			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {
@@ -663,7 +663,7 @@
 									$laarr[$k] = $tmp[0];
 								}
 							}
-							echo str_replace(array('&','%nbsp;','%%','<','>'),array('; ','&nbsp;','&','&lt;','&gt;'),strip_tags($laarr[$k]));
+							echo Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;','%%','<','>'),array('; ','&nbsp;','&','&lt;','&gt;'),$laarr[$k]));
 						}
 						$cntb++;
 					}
@@ -672,9 +672,11 @@
 
 			//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
-			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
+			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-".Sanitize::onlyInt($line['id'])."\" name=\"feedback-".Sanitize::onlyInt($line['id'])."\">".Sanitize::encodeStringForDisplay($line['feedback'])."</textarea>";
 			echo '<br/>Question #'.($loc+1);
-			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$loc-$qsetid-{$seeds[$loc]}-$aid-" . Sanitize::encodeUrlParam($line['ver']) . "&to=" . Sanitize::onlyInt($line['userid']) . "\">Use in Msg</a>";
+			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
+					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$seeds[$loc]}-$aid-{$line['ver']}",
+					'to' => $line['userid'])) . "\">Use in Msg</a>";
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
 			if ($groupdup) {

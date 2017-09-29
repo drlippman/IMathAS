@@ -128,7 +128,7 @@ foreach ($studata as $i=>$sturow) {
 		echo '<tr class="odd" onMouseOver="highlightrow(this)" onMouseOut="unhighlightrow(this)">';
 	}
 	foreach ($sturow as $stuval) {
-		echo '<td>'.$stuval.'</td>';
+		echo '<td>'.Sanitize::encodeStringForDisplay($stuval).'</td>';
 	}
 	echo '</tr>';
 }

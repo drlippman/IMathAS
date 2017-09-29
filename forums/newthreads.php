@@ -4,6 +4,7 @@
 require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'];
+
 /*
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_posts.threadid,max(imas_forum_posts.postdate) as lastpost,mfv.lastview,count(imas_forum_posts.id) as pcount FROM imas_forum_posts ";
 $query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
@@ -115,14 +116,14 @@ if (isset($_GET['markallread'])) {
   exit;
 }
 
-
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
 $pagetitle = _('New Forum Posts');
 require("../header.php");
+
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; New Forum Posts</div>\n";
 echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
-echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?from=$from&cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
+echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?from=".Sanitize::encodeUrlParam($from)."&cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
 
 if (count($lastpost)>0) {
   echo '<table class="gb forum" id="newthreads"><thead><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
@@ -143,14 +144,14 @@ if (count($lastpost)>0) {
     if ($line['isanon']==1) {
       $name = "Anonymous";
     } else {
-      $name = "{$line['LastName']}, {$line['FirstName']}";
+      $name = Sanitize::encodeStringForDisplay($line['LastName']).", ". Sanitize::encodeStringForDisplay($line['FirstName']);
     }
     if ($alt==0) {$stripe = "even"; $alt=1;} else {$stripe = "odd"; $alt=0;}
     echo '<tr>';
-    echo "<td><a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
+    echo "<td><a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
     printf("<td>%s</td>", Sanitize::encodeStringForDisplay($name));
-    echo "<td><a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></td>';
-    echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
+    echo "<td><a href=\"thread.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
+    echo "<td>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</td></tr>";
   }
   echo '</tbody></table>';
   echo '<script type="text/javascript">	initSortTable("newthreads",Array("S","S","S","D"),true);</script>';

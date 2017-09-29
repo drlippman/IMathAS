@@ -88,7 +88,8 @@
 							$n = $row[1];
 						}
 					}
-					echo "<p>Returning $n LatePass".($n>1?"es":"")."</p>";
+					printf("<p>Returning %d LatePass", $n);
+					echo ($n>1?"es":"")."</p>";
 					//DB $query = "UPDATE imas_students SET latepass=latepass+$n WHERE userid='$userid' AND courseid='$cid'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass+:n WHERE userid=:userid AND courseid=:courseid");
@@ -215,7 +216,7 @@
 			if ($allowlate%10>1) {
 				echo '<p>You may use up to '.($allowlate%10-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
 			}
-			echo "<p>You have $latepasses LatePass(es) remaining.  You can redeem one LatePass for a $latepasshrs hour ";
+			echo "<p>You have ".Sanitize::encodeStringForDisplay($latepasses)." LatePass(es) remaining.  You can redeem one LatePass for a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
 			echo '<input type="hidden" name="confirm" value="true" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";

@@ -229,16 +229,16 @@ if ($overwriteBody==1) {
 	for ($pt=0;$pt<$printtwice;$pt++) {
 		if ($pt==1) {
 			$sessiondata['mathdisp'] = 0;
-			echo $_POST['vsep'].'<br/>';;
+			echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';;
 
 		}
 
 		if ($_POST['format']=='trad') {
 			for ($j=0; $j<$copies; $j++) {
-				if ($j>0) { echo $_POST['vsep'].'<br/>';}
+				if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';}
 
 				$headerleft = '';
-				$headerleft .= $line['name'];
+				$headerleft .= Sanitize::encodeStringForDisplay($line['name']);
 				if ($copies>1) {
 					$headerleft .= ' - Form ' . ($j+1);
 				}
@@ -250,13 +250,14 @@ if ($overwriteBody==1) {
 				echo "<div class=hdrm>\n";
 
 				echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-				echo "<div id=intro>{$line['intro']}</div>\n";
+				// $line['intro'] contains HTML.
+				printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 				echo "</div>\n";
 				echo "</div>\n";
 
 
 				for ($i=0; $i<$numq; $i++) {
-					if ($i>0) { echo $_POST['qsep'];}
+					if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
 					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
 
@@ -264,7 +265,7 @@ if ($overwriteBody==1) {
 
 			if ($_POST['keys']>0) { //print answer keys
 				for ($j=0; $j<$copies; $j++) {
-					echo $_POST['vsep'].'<br/>';
+					echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';
 					echo '<b>Key - Form ' . ($j+1) . "</b>\n";
 					echo "<ol>\n";
 					for ($i=0; $i<$numq; $i++) {
@@ -285,7 +286,7 @@ if ($overwriteBody==1) {
 		} else if ($_POST['format']=='inter') {
 
 			$headerleft = '';
-			$headerleft .= $line['name'];
+			$headerleft .= Sanitize::encodeStringForDisplay($line['name']);
 			if ((isset($_POST['iname']) || isset($_POST['cname'])) && isset($_POST['aname'])) {
 				$headerleft .= "<br/>";
 			}
@@ -294,18 +295,19 @@ if ($overwriteBody==1) {
 			echo "<div class=hdrm>\n";
 
 			echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-			echo "<div id=intro>{$line['intro']}</div>\n";
+			// $line['intro'] contains HTML.
+			printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 			echo "</div>\n";
 			echo "</div>\n";
 			for ($i=0; $i<$numq; $i++) {
-				if ($i>0) { echo $_POST['qsep'];}
+				if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
 				for ($j=0; $j<$copies;$j++) {
-					if ($j>0) { echo $_POST['qsep'];}
+					if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
 					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
 			}
 			if ($_POST['keys']>0) { //print answer keys
-				echo $_POST['vsep'].'<br/>';
+				echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';
 				echo "<b>Key</b>\n";
 				echo "<ol>\n";
 				for ($i=0; $i<count($sa); $i++) {
@@ -322,7 +324,7 @@ if ($overwriteBody==1) {
 		}
 	}
 	$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
-	echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::fullUrl($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
+	echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::url($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
 
 	echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 

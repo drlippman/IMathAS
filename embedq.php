@@ -46,7 +46,7 @@ if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;
 }
-$qsetid=$_GET['id'];
+$qsetid=Sanitize::onlyInt($_GET['id']);
 
 $page_formAction = "embedq.php?id=$qsetid";
 

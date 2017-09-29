@@ -16,6 +16,7 @@ Because of this, this file does NOT contain the full up-to-date database schema.
 ***************/
 
 $dbsetup = true;
+$use_local_sessions = true;
 include("init_without_validate.php");
 
 //DB $query = "SELECT ver FROM imas_dbschema WHERE id=1";

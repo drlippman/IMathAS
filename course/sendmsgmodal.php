@@ -35,7 +35,7 @@ if (isset($_POST['message'])) {
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$row[2] = trim($row[2]);
 		if ($row[2]!='' && $row[2]!='none@none.com') {
-			$addy = "{$row[0]} {$row[1]} <{$row[2]}>";
+			$addy = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1])." <".Sanitize::emailAddress($row[2]).">";
 			//DB $subject = stripslashes($_POST['subject']);
 			//DB $message = stripslashes($_POST['message']);
 			$subject = $_POST['subject']; // Sanitized by strip_tags near line 14.
@@ -53,7 +53,7 @@ if (isset($_POST['message'])) {
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
+			$self = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1]) ."<". Sanitize::emailAddress($row[2]).">";
 			$headers .= "From: $self\r\n";
 			mail($addy,$subject,$message,$headers);
 			$success = _('Email sent');
@@ -125,9 +125,9 @@ if (isset($_POST['message'])) {
 
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
-	echo '<input type="hidden" name="sendtype" value="'.$_GET['sendtype'].'"/>';
+	echo '<input type="hidden" name="sendtype" value="'.Sanitize::encodeStringForDisplay($_GET['sendtype']).'"/>';
 	echo "To: $to<br/>\n";
-	echo "Subject: <input type=text size=50 name=subject id=subject value=\"$title\"><br/>\n";
+	echo "Subject: <input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"><br/>\n";
 	echo "Message: <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 	echo htmlentities($message);
 	echo "</textarea></div><br/>\n";

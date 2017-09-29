@@ -82,10 +82,16 @@ final class SanitizeTest extends TestCase
 	 * encodeStringForCSS
 	 */
 
-	public function testEncodeStringForCSS()
+	public function testEncodeStringForCSS_Colors()
 	{
-		$result = Sanitize::encodeStringForCSS("<h1 style='color: red;'>Hello, world!</h1>");
-		$this->assertEquals('\3ch1\20style\3d\27color\3a\20red\3b\27\3eHello\2c\20world\21\3c\2fh1\3e', $result);
+		$result = Sanitize::encodeStringForCSS("#fff;");
+		$this->assertEquals('#fff;', $result);
+	}
+
+	public function testEncodeStringForCSS_LotsOfStuff()
+	{
+		$result = Sanitize::encodeStringForCSS("<h1 style='color: red; background-color: #fff;'>Hello, world!</h1>");
+		$this->assertEquals('\3ch1\20style\3d\27color\3a\20red;\20background\2dcolor\3a\20#fff;\27\3eHello\2c\20world\21\3c\2fh1\3e', $result);
 	}
 
 	/*
@@ -95,7 +101,7 @@ final class SanitizeTest extends TestCase
 	public function testEncodeUrlParam()
 	{
 		$result = Sanitize::encodeUrlParam("<h1>Hello, world!</h1>");
-		$this->assertEquals("%3Ch1%3EHello%2C+world%21%3C%2Fh1%3E", $result);
+		$this->assertEquals("%3Ch1%3EHello%2C%20world%21%3C%2Fh1%3E", $result);
 	}
 
 	/*
@@ -109,35 +115,56 @@ final class SanitizeTest extends TestCase
 	}
 
 	/*
-	 * fullUrl
+	 * url
 	 */
 
-	public function testFullUrl()
+	public function testUrl_Complete()
 	{
 		$testUrl = 'https://user:pass@www.test.example.com:8080/index.html?page-id=123&validchars=a-_~:;/?#<h1>Hi!</h1>[321]@!$(\'z\')*+,%b#fragmentName';
 		$expectedUrl = 'https://user:pass@www.test.example.com:8080/index.html?page-id=123&validchars=a-_%7E%3A%3B%2F%3F#%3Ch1%3EHi%21%3C%2Fh1%3E%5B321%5D%40%21%24%28%27z%27%29%2A%2B%2C%25b%23fragmentName';
 
-		$result = Sanitize::fullUrl($testUrl);
+		$result = Sanitize::url($testUrl);
 
 		$this->assertEquals($expectedUrl, $result);
 	}
 
-	public function testFullUrl_MissingOptionalParts()
+	public function testUrl_MissingPortAuthFragment()
 	{
 		$testUrl = 'https://www.test.example.com/index.html?page-id=123&validchars=a-_~:;/?<h1>Hi!</h1>[321]@!$(\'z\')*,%b';
 		$expectedUrl = 'https://www.test.example.com/index.html?page-id=123&validchars=a-_%7E%3A%3B%2F%3F%3Ch1%3EHi%21%3C%2Fh1%3E%5B321%5D%40%21%24%28%27z%27%29%2A%2C%25b';
 
-		$result = Sanitize::fullUrl($testUrl);
+		$result = Sanitize::url($testUrl);
 
 		$this->assertEquals($expectedUrl, $result);
 	}
 
-	public function testFullUrlWithInvalid()
+	public function testUrl_MissingProtocolAuth()
+	{
+		// If the protocol (http/https) is missing, credentials are not passed in the URL even if provided.
+		$testUrl = '//www.test.example.com:8080/index.html?page-id=123&validchars=a-_~:;/?#<h1>Hi!</h1>[321]@!$(\'z\')*+,%b#fragmentName';
+		$expectedUrl = '//www.test.example.com:8080/index.html?page-id=123&validchars=a-_%7E%3A%3B%2F%3F#%3Ch1%3EHi%21%3C%2Fh1%3E%5B321%5D%40%21%24%28%27z%27%29%2A%2B%2C%25b%23fragmentName';
+
+		$result = Sanitize::url($testUrl);
+
+		$this->assertEquals($expectedUrl, $result);
+	}
+
+	public function testUrl_MissingProtocolAuthHostPort()
+	{
+		$testUrl = '/index.html?page-id=123&validchars=a-_~:;/?#<h1>Hi!</h1>[321]@!$(\'z\')*+,%b#fragmentName';
+		$expectedUrl = '/index.html?page-id=123&validchars=a-_%7E%3A%3B%2F%3F#%3Ch1%3EHi%21%3C%2Fh1%3E%5B321%5D%40%21%24%28%27z%27%29%2A%2B%2C%25b%23fragmentName';
+
+		$result = Sanitize::url($testUrl);
+
+		$this->assertEquals($expectedUrl, $result);
+	}
+
+	public function testUrl_ContainsHTML()
 	{
 		$testUrl = "https://user:pass@www.test.example.com:8080/index.html?page-id=123&invalid=<h1>\"^Hello, world!\"</h1>#fragmentName";
 		$expectedUrl = "https://user:pass@www.test.example.com:8080/index.html?page-id=123&invalid=%3Ch1%3E%22%5EHello%2C+world%21%22%3C%2Fh1%3E#fragmentName";
 
-		$result = Sanitize::fullUrl($testUrl);
+		$result = Sanitize::url($testUrl);
 
 		$this->assertEquals($expectedUrl, $result);
 	}

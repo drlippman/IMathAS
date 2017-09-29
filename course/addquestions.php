@@ -149,7 +149,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$aid));
 			$assessmentname = $stm->fetchColumn(0);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
-			$body .= "<h3>$assessmentname</h3>";
+			$body .= "<h3>".Sanitize::encodeStringForDisplay($assessmentname)."</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= '<form method="POST" action="'.sprintf('addquestions.php?cid=%s&aid=%d',$cid, $aid).'">';
 			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
@@ -842,13 +842,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_libqids[$line['libid']][] = $line['id'];
 						}
 						$i = $line['id'];
-						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 						if (in_array($i,$existingq)) {
-							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
 						} else {
-							$page_questionTable[$i]['desc'] = filter($line['description']);
+							$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
 						}
-						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
+						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
@@ -876,10 +876,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						*/
 						if ($searchall==1) {
-							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
+							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib=".Sanitize::encodeUrlParam($line['libid'])."\">List lib</a>";
 						} else {
-							$page_questionTable[$i]['junkflag'] = $line['junkflag'];
-							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
+							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
+							$page_questionTable[$i]['libitemid'] = Sanitize::encodeStringForDisplay($line['libitemid']);
 						}
 						$page_questionTable[$i]['extref'] = '';
 						$page_questionTable[$i]['cap'] = 0;
@@ -927,15 +927,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 
 
-						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
+						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">Add</a>";
 
 						if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
+							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
 						} else {
-							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&aid=$aid&cid=$cid\">View</a>";
+							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">View</a>";
 						}
 
-						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";
+						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&template=true\">Template</a>";
 						//$i++;
 						$ln++;
 
@@ -1041,21 +1041,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
 					if (strpos($qid,'|')!==false) { continue;}
-					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . $qsetid[$qid] . "'>";
+					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . Sanitize::onlyFloat($qsetid[$qid]) . "'>";
 					if (in_array($qsetid[$qid],$existingq)) {
-						$page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.filter($descr[$qid]).'</span>';
+						$page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($descr[$qid])).'</span>';
 					} else {
-						$page_assessmentQuestions[$x]['desc'][$y] = filter($descr[$qid]);
+						$page_assessmentQuestions[$x]['desc'][$y] = Sanitize::encodeStringForDisplay(filter($descr[$qid]));
 					}
 					//$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
 					$page_assessmentQuestions[$x]['qsetid'][$y] = $qsetid[$qid];
-					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";
+					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyFloat($qsetid[$qid]).",true)\"/>";
 					$page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
 					$page_assessmentQuestions[$x]['times'][$y] = $qsetusecnts[$qsetid[$qid]];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;
-					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=$qsetid[$qid]&aid=$aid&cid=$cid\">Add</a>";
-					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=$qsetid[$qid]&aid=$aid&cid=$cid\">View</a>" ;
-					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&template=true\">Template</a>";
+					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">Add</a>";
+					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">View</a>" ;
+					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&template=true\">Template</a>";
 					$page_assessmentQuestions[$x]['extref'][$y] = '';
 					$page_assessmentQuestions[$x]['cap'][$y] = 0;
 					if ($extref[$qid]!='') {
@@ -1358,7 +1358,7 @@ if ($overwriteBody==1) {
 					</td>
 					<td><?php echo Sanitize::encodeStringForDisplay($qid); ?></td>
 					<td><?php echo $page_questionTable[$qid]['preview']; ?></td>
-					<td><?php echo $page_questionTable[$qid]['type']; ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']); ?></td>
 <?php
 						if ($searchall==1) {
 ?>
@@ -1462,10 +1462,10 @@ if ($overwriteBody==1) {
 				<td class="nowrap">
 				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x]; ?></div>
 				</td>
-				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x]; ?></td>
+				<td><?php echo Sanitize::onlyInt($page_assessmentQuestions[$i]['qsetid'][$x]); ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x]; ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['type'][$x]; ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['times'][$x]; ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions[$i]['type'][$x]); ?></td>
+				<td class=c><?php echo Sanitize::onlyInt($page_assessmentQuestions[$i]['times'][$x]); ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['mine'][$x]; ?></td>
 				<td class=c><?php echo $page_assessmentQuestions[$i]['add'][$x]; ?></td>
 				<td class=c><?php echo $page_assessmentQuestions[$i]['src'][$x]; ?></td>

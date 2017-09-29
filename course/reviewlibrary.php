@@ -24,7 +24,7 @@ if ($myrights<20) {
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['source'])) {
-		$source = $_GET['source'];
+		$source = Sanitize::onlyInt($_GET['source']);
 	} else {
 		$source = 0;
 	}
@@ -69,9 +69,9 @@ if ($myrights<20) {
 
 	} else {
 
-		$lib = $_REQUEST['lib'];
+		$lib = Sanitize::onlyInt($_REQUEST['lib']);
 		if (isset($_GET['offset'])) {
-			$offset = $_GET['offset'];
+			$offset = Sanitize::onlyInt($_GET['offset']);
 		} else {
 			$offset = 0;
 		}
@@ -352,7 +352,7 @@ if ($myrights<20) {
 		require("../assessment/displayq2.php");
 		if (isset($_POST['seed'])) {
 			list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
-			$page_lastScore = "<p>Score on last answer: $score/1</p>\n";
+			$page_lastScore = "<p>Score on last answer: ".Sanitize::onlyFloat($score)."/1</p>\n";
 		}
 
 		$twobx = ($lineQSet['qcontrol']=='' && $lineQSet['answer']=='');
@@ -407,7 +407,7 @@ if ($overwriteBody==1) {
 
 	<form method=post action="reviewlibrary.php?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=0">
 		Library to review:
-		<span id="libnames"><?php echo $lnames ?></span>
+		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames) ?></span>
 		<input type=hidden name="lib" id="lib" size="10" value="<?php echo $inlibs ?>">
 		<input type=button value="Select Libraries" onClick="libselect()"><br/>
 		<input type=submit value=Submit>
@@ -434,7 +434,7 @@ if ($overwriteBody==1) {
 	<p style="color: red;"><?php echo $page_updatedMsg; ?></p>
 	<p><?php echo $page_lastLink . " | " . $page_nextLink; ?></p>
 
-	<h4><?php echo $qsetid ?>: <?php echo $lineQSet['description'] ?></h4>
+	<h4><?php echo Sanitize::onlyInt($qsetid) ?>: <?php echo Sanitize::encodeStringForDisplay($lineQSet['description'])?></h4>
 
 	<div><?php echo  $page_deleteForm; ?></div>
 	<div><?php echo  $page_lastScore; ?></div>
@@ -489,7 +489,7 @@ if ($overwriteBody==1) {
 		<input type=submit name="update" value="Update"><br/>
 
 		Description:<BR>
-		<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['description'];?></textarea>
+		<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($lineQSet['description']);?></textarea>
 
 		<p>
 			Question type:
@@ -527,25 +527,25 @@ if ($overwriteBody==1) {
 			Common Control:
 			<span class=pointer onclick="incboxsize('control')">[+]</span>
 			<span class=pointer onclick="decboxsize('control')">[-]</span><BR>
-			<textarea cols=60 rows=<?php if ($twobx) {echo "20";} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['control'];?></textarea>
+			<textarea cols=60 rows=<?php if ($twobx) {echo "20";} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($lineQSet['control']);?></textarea>
 		</div>
 		<div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
 			Question Control:
 			<span class=pointer onclick="incboxsize('qcontrol')">[+]</span>
 			<span class=pointer onclick="decboxsize('qcontrol')">[-]</span><BR>
-			<textarea cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['qcontrol'];?></textarea>
+			<textarea cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($lineQSet['qcontrol']);?></textarea>
 		</div>
 		<div id=qtbox>
 			Question Text:
 			<span class=pointer onclick="incboxsize('qtext')">[+]</span>
 			<span class=pointer onclick="decboxsize('qtext')">[-]</span><BR>
-			<textarea cols=60 rows=10 id=qtext name=qtext <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['qtext'];?></textarea>
+			<textarea cols=60 rows=10 id=qtext name=qtext <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($lineQSet['qtext']);?></textarea>
 		</div>
 		<div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
 			Answer:
 			<span class=pointer onclick="incboxsize('answer')">[+]</span>
 			<span class=pointer onclick="decboxsize('answer')">[-]</span><BR>
-			<textarea cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['answer'];?></textarea>
+			<textarea cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($lineQSet['answer']);?></textarea>
 		</div>
 		<input type=submit name="update" value="Update">
 	</form>

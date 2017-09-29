@@ -11,6 +11,7 @@ if (!isset($imasroot)) {
 	}
 }
 require_once("../includes/sanitize.php");
+require_once("../includes/htmLawed.php");
 
 	$cid = Sanitize::courseId($_GET['cid']);
 
@@ -18,20 +19,19 @@ require_once("../includes/sanitize.php");
 		$endmsg = array();
 		$endmsg['type'] = $_POST['type'];
 		//DB $endmsg['def'] = stripslashes($_POST['msg'][0]);
-		$endmsg['def'] = $_POST['msg'][0];
+		$endmsg['def'] = myhtmLawed($_POST['msg'][0]);
 		$i=1;
 		$msgarr = array();
 		while (isset($_POST['sc'][$i]) && !empty($_POST['sc'][$i]) ) {
 			$key = (int)$_POST['sc'][$i];
 			if ($key>0) {
 				//DB $msgarr[$key] = stripslashes($_POST['msg'][$i]);
-				$msgarr[$key] = $_POST['msg'][$i];
+				$msgarr[$key] = myhtmLawed($_POST['msg'][$i]);
 			}
 			$i++;
 		}
 		krsort($msgarr);
 		$endmsg['msgs'] = $msgarr;
-		require_once("../includes/htmLawed.php");
 		//DB $endmsg['commonmsg'] = myhtmLawed(stripslashes($_POST['commonmsg']));
 		$endmsg['commonmsg'] = myhtmLawed($_POST['commonmsg']);
 		//DB $msgstr = addslashes(serialize($endmsg));

@@ -674,7 +674,7 @@ if ($overwriteBody==1) {
 		if (count($_POST['checked'])==0) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
 		} else {
-			echo '<textarea id="emails" rows="30" cols="60">'.$stuemails.'</textarea>';
+			echo '<textarea id="emails" rows="30" cols="60">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
 			echo '<script type="text/javascript">addLoadEvent(function(){var el=document.getElementById("emails");el.focus();el.select();})</script>';
 		}
 

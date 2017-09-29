@@ -703,7 +703,7 @@ function getiteminfo($itemid) {
 	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
 	$stm->execute(array(':id'=>$itemid));
 	if ($stm->rowCount()==0) {
-		echo "Uh oh, item #$itemid doesn't appear to exist";
+		echo "Uh oh, item #".Sanitize::onlyInt($itemid)." doesn't appear to exist";
 		return array(false,false,false,false);
 	}
 	//DB $itemtype = mysql_result($result,0,0);

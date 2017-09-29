@@ -115,14 +115,14 @@
 	$row = $stm->fetch(PDO::FETCH_NUM);
 	$text = $row[1];
 	if (strlen($text)>6 && substr($text,0,6)=='**wver') {
-		$wikiver = substr($text,6,strpos($text,'**',6)-6);
+		$wikiver = Sanitize::onlyInt(substr($text,6,strpos($text,'**',6)-6));
 		$text = substr($text,strpos($text,'**',6)+2);
 	} else {
 		$wikiver = 1;
 	}
 
 	echo '<div style="padding-left:10px; padding-right: 10px; border: 1px solid #000;">';
-	echo filter($text);
+	echo Sanitize::outgoingHtml(filter($text));
 	echo '</div>';
 
 	echo "<div class=right><a href=\"../course/public.php?cid=$cid\">Return to Public Course Page</a></div>\n";
