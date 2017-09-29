@@ -4016,6 +4016,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($cpts[1]{0}=='+') {
 						$cpts[1] = substr($cpts[1],1);
 					}
+					if ($cpts[1]!='' && $cpts[1][strlen($cpts[1])-1]=='*') {
+						$cpts[1] = substr($cpts[1],0,-1);
+					}
 					//echo $cpts[0].','.$cpts[1].'<br/>';
 					if ($answer!='DNE'&&$answer!='oo' && (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats))) {
 						return 0;
@@ -4058,6 +4061,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (!is_array($cparts)) {
 				$ansparts = parsesloppycomplex($answer);
 			} else {
+				if ($cparts[1]!='' && $cparts[1][strlen($cparts[1])-1]=='*') {
+					$cparts[1] = substr($cparts[1],0,-1);
+				}
 				$ansparts[0] = evalMathPHP($cparts[0],null);//eval('return ('.mathphp($cparts[0],null).');');
 				$ansparts[1] = evalMathPHP($cparts[1],null);//eval('return ('.mathphp($cparts[1],null).');');
 			}
@@ -6223,7 +6229,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							} else {
 								$newlines[$j][0] = min($newlines[$j][0], $lines[$i][0]);
 								$newlines[$j][1] = max($newlines[$j][1], $lines[$i][1]);
-								$overlap = $j;	
+								$overlap = $j;
 							}
 						}
 					}
@@ -6250,7 +6256,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					}
 				}
-				
+
 			}
 			if ($odots=='') {
 				$odots = array();
