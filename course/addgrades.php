@@ -62,7 +62,7 @@
 			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['del']));
 			$itemname = $stm->fetchColumn(0);
-			
+
 			echo "<p>Are you SURE you want to delete <strong>".Sanitize::encodeStringForDisplay($itemname);
 			echo "</strong> and all associated grades from the gradebook?</p>";
 			echo '<form method="POST" action="'.sprintf("addgrades.php?stu=%s&cid=%s&del=%s",
@@ -71,7 +71,7 @@
 
 			printf(" <input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addgrades.php?stu=%s&cid=%s&gbitem=%d&grades=all'\" />",
 				Sanitize::encodeUrlParam($_GET['stu']), $cid, $_GET['del']);
-			
+
 			echo '</p></form>';
 			require("../footer.php");
 			exit;
@@ -263,7 +263,7 @@
 	}
 
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=092617\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=092817\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {
@@ -611,7 +611,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		}
 		echo '<td><input type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
 		echo '<td><textarea id="qafeedback" rows="1" cols="40"></textarea>';
-		echo '<input type="button" value="Next" onfocus="addsuggest()" /></td></tr>';
+		echo '<input type="button" value="Next" onclick="addsuggest()" /></td></tr>';
 		if ($_GET['gbitem']=="new") {
 			//DB $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked ";
 			//DB $query .= "FROM imas_users,imas_students WHERE ";

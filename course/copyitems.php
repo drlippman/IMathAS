@@ -928,7 +928,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 
 	<?php
 		 } else {
-			 echo '<li>No group members</li>';
+			 echo '<li>No group members with courses</li>';
 		 }
 
 	} else { //DEFAULT DISPLAY BLOCK
