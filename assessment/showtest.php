@@ -3658,10 +3658,16 @@ if (!isset($_REQUEST['embedpostback'])) {
 		}
 		if ($reviewatend) {
 			global $qi, $questions, $testtype, $scores, $saenddate, $isteacher, $istutor, $seeds, $attempts, $rawscores, $noraw;
-
-			$showa=false;
+			global $showansafterlast, $showansduring;
 
 			for ($i=0; $i<count($questions); $i++) {
+				$showa = false;
+				if ((($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') && hasreattempts($i) == false) {
+					$showa = true;
+				} else if (($showansduring && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']<=$attempts[$i]) ||
+						 ($qi[$questions[$i]]['showansduring'] && $qi[$questions[$i]]['showans']<=$attempts[$i])) {
+					$showa = true;
+				}
 				echo '<div>';
 				if (!$noraw) {
 					if (strpos($rawscores[$i],'~')!==false) {
