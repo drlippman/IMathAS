@@ -1902,16 +1902,23 @@ function prettytime($time,$in,$out) {
 	$min = $time/60;
 	$outst = '';
 	if (strpos($out,'clock')!==false) { //clock time
-		$ampm = ($hrs<12?"am":"pm");
 		$hrs = floor($hrs);
+		$min = floor($min -60*$hrs);
+		$sec = round($time - 60*$min - 3600*$hrs);
+		while ($hrs>24) {
+			$hrs -= 24;
+		}
+		$ampm = ($hrs<12?"am":"pm");
+		if ($hrs>=13) {
+			$hrs -= 12;
+		} else if ($hrs==0) {
+			$hrs = 12;
+		}
 		if ($out=='sclock') {
-			$min = floor($min -60*$hrs);
-			$sec = round($time - 60*$min - 3600*$hrs);
 			if ($min<10) {	$min = '0'.$min;}
 			if ($sec<10) {	$sec = '0'.$sec;}
 			$outst = "$hrs:$min:$sec $ampm";
 		} else {
-			$min = round($min -60*$hrs);
 			if ($min<10) {	$min = '0'.$min;}
 			$outst = "$hrs:$min $ampm";
 		}
