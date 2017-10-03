@@ -147,11 +147,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
-			require_once("../includes/htmLawed.php");
-			//DB $_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
-			//DB $_POST['subject'] = addslashes(htmlentities(stripslashes($_POST['subject'])));
-      $_POST['message'] = myhtmLawed($_POST['message']);
-			$_POST['subject'] = htmlentities($_POST['subject']);
+      $_POST['message'] = Sanitize::incomingHtml($_POST['message']);
+			$_POST['subject'] = Sanitize::stripHtmlTags($_POST['subject']);
 
       $now = time();
 			//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -967,7 +964,7 @@ function chgfilter() {
 		echo "<td>".Sanitize::encodeStringForDisplay($line['name'])."</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
-		
+
 		$cnt++;
 	}
 ?>
