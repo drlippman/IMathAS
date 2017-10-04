@@ -6,8 +6,8 @@ if (isset($_POST['data'])) {
 	$info = array();
 	$lines = explode("\n",$_POST['data']);
 	foreach ($lines as $line) {
-		list($uid,$lastm,$extref) = explode('@',$line);
-		$extref = str_replace(array("\r","\t"," "),'',$extref);
+		list($uid,$lastm,$extref) = explode('@',trim($line));
+		$extref = str_replace(array("\r","\t"),'',$extref);
 		$info[$uid] = array($lastm,$extref);
 	}
 	$add_extref_stm = $DBH->prepare("UPDATE imas_questionset SET extref=:extref WHERE id=:id");
