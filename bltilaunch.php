@@ -173,6 +173,11 @@ if (isset($_GET['launch'])) {
             .".  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($sessiondata['ltitlwrds']).".</p>";
 		echo '<div class="textright"><input type="submit" value="Continue" /></div>';
+
+		if ($sessiondata['lticanuselatepass']) {
+			echo "<p><a href=\"$imasroot/course/redeemlatepass.php?from=ltitimelimit&cid=".Sanitize::encodeUrlParam($sessiondata['ltiitemcid'])."&aid=".Sanitize::encodeUrlParam($sessiondata['ltiitemid'])."\">", _('Use LatePass'), "</a></p>";
+		}
+
 	} else {
 		echo ">";
 	}
@@ -1174,7 +1179,7 @@ if ($linkparts[0]=='cid') {
 	//DB $query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT id,courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
   if ($line===false) {
@@ -1193,14 +1198,14 @@ if ($linkparts[0]=='cid') {
 		//DB $row = mysql_fetch_row($result2);
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-		$row = $stm->fetch(PDO::FETCH_NUM);
+		$exceptionrow = $stm->fetch(PDO::FETCH_NUM);
 		$useexception = false;
-		if ($row!=null) {
+		if ($exceptionrow!=null) {
 			require_once("./includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($row, $line, true);
+			$useexception = getCanUseAssessException($exceptionrow, $line, true);
 		}
-		if ($row!=null && $useexception) {
-			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
+		if ($exceptionrow!=null && $useexception) {
+			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
 				} else {
@@ -1211,7 +1216,7 @@ if ($linkparts[0]=='cid') {
 					$inexception = true; //only trigger if past due date for penalty
 				}
 			}
-			$exceptionduedate = $row[1];
+			$exceptionduedate = $exceptionrow[1];
 		} else { //has no exception
 			if ($now < $line['startdate'] || $line['enddate'] < $now) { //outside normal dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
@@ -1263,6 +1268,7 @@ if ($linkparts[0]=='cid') {
 
 //see if student is enrolled, if appropriate to action type
 if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || $linkparts[0]=='folder') {
+	$latepasses = 0;
 	if ($_SESSION['ltirole']=='instructor') {
 		//DB $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1285,7 +1291,7 @@ if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || 
 		//DB $query = "SELECT id,timelimitmult FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_num_rows($result) == 0) {
-		$stm = $DBH->prepare("SELECT id,timelimitmult FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm = $DBH->prepare("SELECT timelimitmult,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		if ($stm->rowCount() == 0) {
 			//DB $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
@@ -1319,7 +1325,7 @@ if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || 
 			$timelimitmult = 1;
 		} else {
 			//DB $timelimitmult = mysql_result($result,0,1);
-			$timelimitmult = $stm->fetchColumn(1);
+			list($timelimitmult,$latepasses) = $stm->fetch(PDO::FETCH_NUM);
 		}
 	}
 }
@@ -1395,9 +1401,22 @@ if ($linkparts[0]=='aid') {
 		$tlwrds = '';
 	}
 	//this sessiondata tells WAMAP to limit access to the specific resouce requested
+
 	$sessiondata['ltitlwrds'] = $tlwrds;
 	$sessiondata['ltiitemtype']=0;
 	$sessiondata['ltiitemid'] = $aid;
+
+	$sessiondata['lticanuselatepass'] = false;
+	if ($_SESSION['ltirole']!='instructor' && $line['allowlate']>0) {
+		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$latepasshrs = $stm->fetchColumn(0);
+		require_once("./includes/exceptionfuncs.php");
+		$viewedassess = getViewedAssess($cid, $userid);
+		list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptionrow, $line);
+		$sessiondata['lticanuselatepass'] = $canuselatepass;
+	}
+
 }  else if ($linkparts[0]=='cid') { //is cid
 	$sessiondata['ltiitemtype']=1;
 	$sessiondata['ltiitemid'] = $cid;

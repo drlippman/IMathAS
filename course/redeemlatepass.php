@@ -9,6 +9,12 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 
+	if (isset($_REQUEST['from'])) {
+		$from = Sanitize::simpleString($_REQUEST['from']);
+	} else {
+		$from = 'default';
+	}
+
 	//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $latepasshrs = mysql_result($result,0,0);
@@ -36,7 +42,10 @@
 
 	if (isset($_GET['undo'])) {
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase ";
+		echo "<div class=breadcrumb>";
+		if ($from != 'ltitimelimit') {
+			echo "$breadcrumbbase ";
+		}
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
@@ -100,6 +109,8 @@
 
 		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
+		} else if ($from=='ltitimelimit') {
+			echo "<p><a href=\"../bltilaunch.php?accessibility=ask'\">Continue</a></p>";
 		} else {
 			echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Continue</a></p>";
 		}
@@ -163,12 +174,17 @@
 		}
 		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+		} else if ($from=='ltitimelimit') {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask");
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 		}
 	} else {
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase ";
+		echo "<div class=breadcrumb>";
+		if ($from != 'ltitimelimit') {
+			echo "$breadcrumbbase ";
+		}
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
@@ -219,9 +235,12 @@
 			echo "<p>You have ".Sanitize::encodeStringForDisplay($latepasses)." LatePass(es) remaining.  You can redeem one LatePass for a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
 			echo '<input type="hidden" name="confirm" value="true" />';
+			echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($from).'" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
 			if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+			} else if ($from=='ltitimelimit') {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../bltilaunch.php?accessibility=ask'\"/>";
 			} else {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
 			}

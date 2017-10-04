@@ -13,7 +13,8 @@ function getCanUseAssessException($exception, $adata, $limit=false) {
 	$now = time();
 	$canuselatepass = false;
 	$canundolatepass = false;
-	$useexception = ($exception!==null); //use by default
+
+	$useexception = ($exception!==null && $exception!==false); //use by default
 	if ($exception!==null && $exception[2]>0 && $adata['enddate']>$exception[1]) {
 		//if latepass and assessment enddate is later than exception enddate, skip exception
 		$useexception = false;
@@ -41,7 +42,6 @@ function getCanUseAssessException($exception, $adata, $limit=false) {
 				$latepasscnt = 0;
 			}
 		}
-		
 		if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
 			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600) {
 				$canuselatepass = true;
@@ -53,7 +53,7 @@ function getCanUseAssessException($exception, $adata, $limit=false) {
 	} else {
 		return $useexception;
 	}
-	
+
 }
 
 //get if latepass can be used.  Should only be called if exception doesn't already exist
@@ -62,7 +62,7 @@ function getCanUseAssessLatePass($adata) {
 	if (!isset($actas)) {$actas = false;}
 	$now = time();
 	$canuselatepass = false;
-	$latepasscnt = 0; 
+	$latepasscnt = 0;
 	if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
 		if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600) {
 			$canuselatepass = true;
@@ -71,6 +71,18 @@ function getCanUseAssessLatePass($adata) {
 		}
 	}
 	return $canuselatepass;
+}
+
+//get viewedassess
+function getViewedAssess($cid, $uid) {
+	global $DBH;
+	$viewedassess = array();
+	$stm = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
+	$stm->execute(array(':courseid'=>$cid, ':userid'=>$uid));
+	while ($r = $stm->fetch(PDO::FETCH_NUM)) {
+		$viewedassess[] = $r[0];
+	}
+	return $viewedassess;
 }
 
 //$exception should be from imas_exceptions, and be null, or
