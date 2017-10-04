@@ -210,10 +210,10 @@ END;
 					} else {
 						$thisjson[3] = -1;
 						$thisjson[4] = 0;
-					}	
+					}
 				}
 				$thisjson[5] = $federated[$child];
-				if ($isadmin && $parent==0 && $rights[$child]<5) {
+				if ($isadmin && $parent==0 && $rights[$child]<5 && $ownerids[$child]!=$userid && ($rights[$child]==0 || $groupids[$child]!=$groupid)) {
 					if ($rights[$child]==0) {
 						$toplevelprivate[] = $thisjson;
 					} else {

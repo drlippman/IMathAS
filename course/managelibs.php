@@ -856,6 +856,7 @@ function delqimgs($qsid) {
 function printlist($parent) {
 	global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin,$federated;
 	$arr = $ltlibs[$parent];
+
 	if ($sortorder[$parent]==1) {
 		$orderarr = array();
 		foreach ($arr as $child) {
@@ -864,8 +865,26 @@ function printlist($parent) {
 		natcasesort($orderarr);
 		$arr = array_keys($orderarr);
 	}
+	if ($parent==0 && $isadmin) {
+		$arr[] = -2;
+		$arr[] = -3;
+		$names[-2] = "Root Level Private Libraries";
+		$names[-3] = "Root Level Group Libraries";
+		$rights[-2] = 0;
+		$rights[-3] = 2;
+		$ltlibs[-2] = array();
+		$ltlibs[-3] = array();
+	}
 
 	foreach ($arr as $child) {
+		if ($isadmin && $parent==0 && $rights[$child]<5 && $child>=0 && $ownerids[$child]!=$userid && ($rights[$child]==0 || $groupids[$child]!=$groupid)) {
+			if ($rights[$child]==0) {
+				$ltlibs[-2][] = $child;
+			} else {
+				$ltlibs[-3][] = $child;
+			}
+			continue;
+		}
 		//if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
 		if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
 			if (!$isadmin) {
@@ -875,27 +894,32 @@ function printlist($parent) {
 			}
 			if (isset($ltlibs[$child])) { //library has children
 				//echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
-				echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\"><span class=btn id=\"b" . Sanitize::encodeStringForDisplay($child) . "\">+</span> ";
-				echo "</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=hdr onClick=\"toggle(" . Sanitize::encodeStringForJavascript($child) . ")\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) ;
+				echo "<li class=lihdr><span class=dd>-</span><span class=\"hdr btn\" id=\"bn" . Sanitize::encodeStringForDisplay($child) . "\" onClick=\"toggle('n" . Sanitize::encodeStringForJavascript($child) . "')\">+</span> ";
+				if ($child>=0) {
+					echo "<input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> ";
+				}
+				echo "<span class=hdr onClick=\"toggle('n" . Sanitize::encodeStringForJavascript($child) . "')\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) ;
 				if ($federated[$child]) {
 					echo ' <span class=fedico title="Federated">&lrarr;</span>';
 				}
 				echo "</span> </span>\n";
 				//if ($isadmin) {
+				if ($child>=0) {
 				  echo " ({$qcount[$child]}) ";
-				//}
-				echo "<span class=op>";
-				if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
-					echo "<a href=\"managelibs.php?cid=$cid&modify=" . Sanitize::encodeUrlParam($child) . "\">Modify</a> | ";
+
+					echo "<span class=op>";
+					if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
+						echo "<a href=\"managelibs.php?cid=$cid&modify=" . Sanitize::encodeUrlParam($child) . "\">Modify</a> | ";
+					}
+					echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=" . Sanitize::encodeUrlParam($child) . "\">Add Sub</a> ";
+					echo "</span>";
 				}
-				echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=" . Sanitize::encodeUrlParam($child) . "\">Add Sub</a> ";
-				echo "</span>";
-				echo "<ul class=hide id=" . Sanitize::encodeStringForDisplay($child) . ">\n";
+				echo "<ul class=hide id=\"n" . Sanitize::encodeStringForDisplay($child) . "\">\n";
 				$count++;
 				printlist($child);
 				echo "</ul></li>\n";
 
-			} else {  //no children
+			} else if ($child>=0) {  //no children
 
 				echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> <span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]);
 				if ($federated[$child]) {
