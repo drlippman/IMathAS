@@ -33,3 +33,12 @@ deny from all
 deny from all
 </Files>
 
+# Annoying vulnerability scans
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule (.*admin.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule (.*mysql.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^sql(.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^db(.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^php(.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^pma(.*) http://localhost/$1 [R=301,L,NC]
+
