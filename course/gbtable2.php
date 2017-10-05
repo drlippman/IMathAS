@@ -1034,15 +1034,16 @@ function gbtable() {
 
 	//pull exceptions
 	$exceptions = array();
+	$canuseexception = array();
 	$forumexceptions = array();
 	//DB $query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
 	//DB $query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
 	//DB $query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
 	//DB $query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid='$cid'";
 	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
+	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate FROM imas_exceptions AS ie,imas_assessments WHERE ";
 	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
-	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
+	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_forums.enddate,imas_forums.startdate FROM imas_exceptions AS ie,imas_forums WHERE ";
 	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
@@ -1050,11 +1051,25 @@ function gbtable() {
 	while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($sturow[$r['userid']])) { continue;}
 		if ($r['itemtype']=='A') {
-			$exceptions[$r['typeid']][$r['userid']] = array($r['startdate'],$r['enddate'],$r['islatepass']);
+			$exceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
+			if ($limuser>0) {
+				$useexception = getCanUseAssessException($exceptions[$r['typeid']][$r['userid']], $r, true);
+				if ($useexception) {
+					$gb[0][1][$assesscol[$r['typeid']]][11] = $r['exceptionenddate']; //override due date header if one stu display
+					/*  Doesn't work right, since doesn't re-calculate cat possible
+					//change $avail past/cur/future based on exception
+					if ($now<$r['exceptionenddate']) {
+						$gb[0][1][$col][3] = 1;
+					} else {
+						$gb[0][1][$col][3] = 0;
+					}
+					*/
+				}
+			}
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		} else if ($r['itemtype']=='F' || $r['itemtype']=='P' || $r['itemtype']=='R') {
-			$forumexceptions[$r['typeid']][$r['userid']] = array($r['startdate'],$r['enddate'],$r['islatepass']);
+			$forumexceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
 			$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			//$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		}
@@ -1135,14 +1150,16 @@ function gbtable() {
 			$canuselatepass = getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid']));
 		}
 		//if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
+
 		if ($useexception) {
-			//TODO:  Does not change due date display in individual user gradebook view
+			//TODO:  Does not change due date display in individual user gradebook view when no asid
 			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
 				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
-				if ($limuser>0 && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
+				if ($limuser>0) { // && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
+					//Doesn't work right, since doesn't re-calculate cat possible
 					if ($now<$thised) {
 						$gb[0][1][$col][3] = 1;
 					} else {

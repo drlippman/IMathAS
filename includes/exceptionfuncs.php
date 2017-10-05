@@ -18,7 +18,7 @@ function getCanUseAssessException($exception, $adata, $limit=false) {
 	if ($exception!==null && $exception[2]>0 && $adata['enddate']>$exception[1]) {
 		//if latepass and assessment enddate is later than exception enddate, skip exception
 		$useexception = false;
-	} else if ($exception!==null && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
+	} else if ($exception!==null && $exception!==false && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
 		//if manual exception and start of exception is equal or after original startdate and asessment enddate is later than exception enddate, skip exception
 		//presumption: exception was made to extend due date, not start assignment early
 		$useexception = false;
