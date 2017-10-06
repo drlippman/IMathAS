@@ -3324,16 +3324,27 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$anarr = explode(',',$answer);
 			$islist = true;
 		} else if (in_array('list',$ansformats)) {
-			$tmp = array_map('trim', explode(',',$givenans));
-			sort($tmp);
-			$gaarr = array($tmp[0]);
-			for ($i=1;$i<count($tmp);$i++) {
-				if ($tmp[$i]-$tmp[$i-1]>1E-12) {
-					$gaarr[] = $tmp[$i];
+			$tmp = array();
+			$gaarr = array();
+			foreach (array_map('trim', explode(',',$givenans)) as $v) {
+				if (is_numeric($v)) {
+					$tmp[] = $v;
+				} else {
+					$gaarr[] = $v;
+				}
+			}
+			//$tmp = array_map('trim', explode(',',$givenans));
+			if (count($tmp)>0) {
+				sort($tmp);
+				$gaarr[] = $tmp[0];
+				for ($i=1;$i<count($tmp);$i++) {
+					if ($tmp[$i]-$tmp[$i-1]>1E-12) {
+						$gaarr[] = $tmp[$i];
+					}
 				}
 			}
 			$gaarrcnt = count($gaarr);
-			$tmp = explode(',',$answer);
+			$tmp = array_map('trim', explode(',',$answer));
 			sort($tmp);
 			$anarr = array($tmp[0]);
 			for ($i=1;$i<count($tmp);$i++) {
@@ -3343,10 +3354,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$islist = true;
 		} else {
-			$givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
-			$givenans = str_replace(',','99999999',$givenans); //force wrong ans on lingering commas
-
-			$gaarr = array(str_replace(array('$',',',' ','/','^','*'),'',$givenans));
+			$givenan = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenan);
+			$givenan = str_replace(',','99999999',$givenan); //force wrong ans on lingering commas
+			$gaarr = array($givenans);
 
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
 				$anarr = array(str_replace(',','',$answer));
@@ -3354,6 +3364,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$anarr = array($answer);
 			}
 			$islist = false;
+		}
+		foreach ($gaarr as $k=>$v) {
+			$gaarr[$k] = str_replace(array('$',',',' ','/','^','*'),'',$v);
 		}
 
 
@@ -3408,9 +3421,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					} else {//{if (is_numeric($givenans)) {
 						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
-						$givenans = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)[^+\-]*$/','$1',trim($givenans)); //strip out units
+						$givenans = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)\s*(?!(x|y|z|r||t|i|X|Y|Z|I)\b)[^+\-]*$/','$1',trim($givenans)); //strip out units
 						if (is_numeric($givenans)) {
-
 							if (isset($reqsigfigs)) {
 								if ($givenans*$anans < 0) { continue;} //move on if opposite signs
 								if ($anans!=0) {
