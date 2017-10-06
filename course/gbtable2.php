@@ -145,7 +145,9 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 function flattenitems($items,&$addto) {
 	foreach ($items as $item) {
 		if (is_array($item)) {
-			flattenitems($item['items'],$addto);
+			if ($item['avail']>0) {
+				flattenitems($item['items'],$addto);
+			}
 		} else {
 			$addto[] = $item;
 		}
@@ -222,33 +224,25 @@ function gbtable() {
 		$gb[0][0][] = "Login Count";
 	}
 
-	//orderby 10: course order (11 cat first), 12: course order rev (13 cat first)
-	if ($orderby>=10 && $orderby <=13) {
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB $courseitemorder = unserialize(mysql_result($result,0,0));
-		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$cid));
-		$courseitemorder = unserialize($stm->fetchColumn(0));
-		$courseitemsimporder = array();
 
-		flattenitems($courseitemorder,$courseitemsimporder);
-		$courseitemsimporder = array_flip($courseitemsimporder);
-		$courseitemsassoc = array();
-		//DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
-		$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if (!isset($courseitemsimporder[$row[0]])) { //error catch items not in course.itemorder
-				$courseitemsassoc[$row[1].$row[2]] = 999+count($courseitemsassoc);
-			} else {
-				$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
-			}
-		}
 
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$courseitemorder = unserialize($stm->fetchColumn(0));
+	$courseitemsimporder = array();
+
+	flattenitems($courseitemorder,$courseitemsimporder);
+	$ph = Sanitize::generateQueryPlaceholders($courseitemsimporder);
+	$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE id IN ($ph)");
+	$stm->execute($courseitemsimporder);
+
+	$courseitemsimporder = array_flip($courseitemsimporder);
+	$courseitemsassoc = array();
+
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
 	}
+
 
 	//pre-pull questions data
 	$questionpointdata = array();
@@ -331,6 +325,9 @@ function gbtable() {
 	$endmsgs = array();
 	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		if (!isset($courseitemsassoc['Assessment'.$line['id']])) {
+			continue; //assess is in hidden block - skip it
+		}
 		$assessments[$kcnt] = $line['id'];
 		if (isset($courseitemsassoc)) {
 			$courseorder[$kcnt] = $courseitemsassoc['Assessment'.$line['id']];
@@ -469,6 +466,9 @@ function gbtable() {
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		if (!isset($courseitemsassoc['Forum'.$line['id']])) {
+			continue; //assess is in hidden block - skip it
+		}
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
@@ -530,6 +530,9 @@ function gbtable() {
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		if (!isset($courseitemsassoc['LinkedText'.$line['id']])) {
+			continue; //assess is in hidden block - skip it
+		}
 		if (substr($line['text'],0,8)!='exttool:') {
 			continue;
 		}
@@ -935,6 +938,9 @@ function gbtable() {
 	while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($sturow[$r['userid']])) { continue;}
 		if ($r['itemtype']=='A') {
+			if (!isset($assesscol[$r['typeid']])) {
+				continue; //assessment is hidden
+			}
 			$exceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
 			if ($limuser>0) {
 				$useexception = getCanUseAssessException($exceptions[$r['typeid']][$r['userid']], $r, true);
@@ -952,6 +958,9 @@ function gbtable() {
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		} else if ($r['itemtype']=='F' || $r['itemtype']=='P' || $r['itemtype']=='R') {
+			if (!isset($discusscol[$r['typeid']])) {
+				continue; //assessment is hidden
+			}
 			$forumexceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
 			$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			//$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists

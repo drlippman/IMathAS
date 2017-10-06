@@ -346,9 +346,9 @@ if ($overwriteBody==1) {
 	<BR class=form>
 	<span class=form>Show:</span>
 	<span class=formright>
-		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
-		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
-		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
+		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('availbhdiv').style.display='none';"/>Hide <span class=small>(this will hide all items in the block from the gradebook)</span><br/>
+		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="document.getElementById('datediv').style.display='block';document.getElementById('availbhdiv').style.display='block';"/>Show by Dates<br/>
+		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('availbhdiv').style.display='block';"/>Show Always<br/>
 	</span><br class="form"/>
 
 	<div id="datediv" style="display:<?php echo ($avail==1)?"block":"none"; ?>">
@@ -374,7 +374,7 @@ if ($overwriteBody==1) {
 	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
 	<BR class=form>
 	</div>
-
+	<div id="availbhdiv" style="display:<?php echo ($avail==0)?"none":"block"; ?>">
 	<span class=form>When available:</span>
 	<span class=formright>
 	<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
@@ -402,6 +402,8 @@ if ($overwriteBody==1) {
 	<span class=formright>
 	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> />
 	</span><br class=form />
+	</div>
+
 	<span class=form>Block colors:</span>
 	<span class=formright>
 	<input type=radio name="colors" value="def" <?php  writeHtmlChecked($usedef,1) ?> />Use defaults<br/>
