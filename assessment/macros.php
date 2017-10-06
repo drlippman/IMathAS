@@ -254,11 +254,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$path .= "fill=\"none\";";
 
 		if ($isxequals) { //handle x-equals case separately
+			if (isset($function[2]) && $function[2]!='') {
+				$thisymin = $function[2];
+			} else {$thisymin = $yymin; }
+			if (isset($function[3]) && $function[3]!='') {
+				$thisymax = $function[3];
+			} else {$thisymax = $yymax;}
 			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
-			$alt .= "<tr><td>$val</td><td>$ymin</td></tr>";
-			$alt .= "<tr><td>$val</td><td>$ymax</td></tr>";
+			$alt .= "<tr><td>$val</td><td>$thisymin</td></tr>";
+			$alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
 			$alt .= '</tbody></table>';
-			$path .= "line([$val,$ymin],[$val,$ymax]);";
+			$path .= "line([$val,$thisymin],[$val,$thisymax]);";
 			$path .= "stroke=\"none\";strokedasharray=\"none\";";
 			if ($function[1]=='red' || $function[1]=='green') {
 				$path .= "fill=\"trans{$function[1]}\";";
@@ -267,10 +273,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			if ($isineq) {
 				if ($ineqtype{0}=='<') {
-					$path .= "rect([$xxmin,$yymin],[$val,$yymax]);";
+					$path .= "rect([$xxmin,$thisymin],[$val,$thisymax]);";
 					$alt .= "Shaded left";
 				} else {
-					$path .= "rect([$val,$yymin],[$xxmax,$yymax]);";
+					$path .= "rect([$val,$thisymin],[$xxmax,$thisymax]);";
 					$alt .= "Shaded right";
 				}
 			}
