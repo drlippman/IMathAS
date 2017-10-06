@@ -2451,7 +2451,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
 			$out .=  '<div style="background:#fff;padding:10px;">';
 			$out .=  '<p style="margin:0px";>Shade: <select id="shaderegions'.$qn.'" onchange="imathasDraw.chgnormtype(this.id.substring(12));"><option value="1L">' . _('Left of a value') . '</option><option value="1R">' . _('Right of a value') . '</option>';
-			$out .=  '<option value="2B">' . _('Between two values') . '</option><option value="2O">' . _('2 regions') . '</option></select>. ' . _('Click and drag and arrows to adjust the values.');
+			$out .=  '<option value="2B">' . _('Between two values') . '</option><option value="2O">' . _('2 regions') . '</option></select>. ' . _('Click and drag the arrows to adjust the values.');
 
 			$out .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;">';
 			//for future development of non-standard normal
