@@ -332,6 +332,17 @@ class Sanitize
 	}
 
 	/**
+	 * Sanitize data so it only contains ASCII 32-127.
+	 * Also strips HTML tags
+	 *
+	 * @param $data mixed A variable containing a number.
+	 * @return string A sanitized variable containing ASCII 32-127.
+	 */
+	public static function simpleASCII($data)
+	{
+		return filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
+	}
+	/**
 	 * Sanitize a domain name without a port.
 	 *
 	 * @see Sanitize::domainNameWithPort()
