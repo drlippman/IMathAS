@@ -857,6 +857,7 @@ function generateTable() {
 	}
 	html += "</thead><tbody>";
 	var text_segment_count = 0; var curqnum = 0; var curqitemloc = 0;
+	var badgrppoints = false; var badthisgrppoints = false; var grppoints = -1;
 	for (var i=0; i<itemcount; i++) {
 		curistext = 0;
 		curisgroup = 0;
@@ -874,6 +875,7 @@ function generateTable() {
 		curqitemloc = i-text_segment_count;
 		//var ms = generateMoveSelect(i,itemcount);
 		var ms = generateMoveSelect2(i);
+		grppoints = -1; badthisgrppoints = false;
 		for (var j=0; j<curitems.length; j++) {
 			if (alt == 0) {
 				curclass = 'even';
@@ -1014,12 +1016,25 @@ function generateTable() {
 				}
 				html += "<td>"+curitems[j][3]+"</td>"; //question type
 				if (curitems[j][4]==9999) { //points
-					html += "<td>"+defpoints+"</td>";
 					curpt = defpoints;
 				} else {
-					html += "<td>"+curitems[j][4]+"</td>";
 					curpt = curitems[j][4];
 				}
+				if (curisgroup) {
+					if (grppoints==-1) {
+						grppoints = curpt;
+					} else if (curpt != grppoints) {
+						badgrppoints = true;
+						badthisgrppoints = true;
+					}
+				}
+				if (badthisgrppoints) {
+					html += "<td><span class=noticehighlight>"+curpt+"</span></td>"; //points
+				} else {
+					html += "<td>"+curpt+"</td>"; //points
+				}
+
+
 				html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change</a></td>"; //settings
 				if (curitems[j][5]==1) {
 					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
@@ -1061,6 +1076,9 @@ function generateTable() {
 	html += '</td><td></td><td></td></tr>';
 
 	html += "</tbody></table>";
+	if (badgrppoints) {
+		html += "<p class=noticetext>WARNING: All question in a group should be given the same point values.</p>";
+	}
 	document.getElementById("pttotal").innerHTML = pttotal;
 	return html;
 }
