@@ -544,8 +544,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$qsdata = array();
 			for ($j=(strpos($subs[0],'|')===false)?0:1;$j<count($subs);$j++) {
+				if (!isset($questionjsarr[$subs[$j]])) {continue;} //should never happen
 				$qsdata[] = $questionjsarr[$subs[$j]];
 			}
+			if (count($qsdata)==0) { continue; } //should never happen
 			if (strpos($subs[0],'|')===false) { //for backwards compat
 				$jsarr[] = array(1,0,$qsdata,$closegrp);
 				$qncnt++;
@@ -558,6 +560,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$qncnt += $grpparts[0];
 			}
 		} else {
+			if (!isset($questionjsarr[$items[$i]])) {continue;} //should never happen
 			$jsarr[] = $questionjsarr[$items[$i]];
 			$qncnt++;
 		}
