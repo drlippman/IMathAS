@@ -52,8 +52,8 @@ END;
 		$qarr[':groupid'] = $groupid;
 	} else {
 		//owned, group
-		$query .= "AND (imas_libraries.ownerid=:userid OR imas_libraries.userights>2) ";
-		$query .= "OR (imas_libraries.userights>0 AND imas_libraries.userights<3 AND imas_libraries.groupid=:groupid) ";
+		$query .= "AND ((imas_libraries.ownerid=:userid OR imas_libraries.userights>2) ";
+		$query .= "OR (imas_libraries.userights>0 AND imas_libraries.userights<3 AND imas_libraries.groupid=:groupid)) ";
 		$qarr[':groupid'] = $groupid;
 		$qarr[':userid'] = $userid;
 	}
