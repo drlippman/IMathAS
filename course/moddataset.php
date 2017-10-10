@@ -221,7 +221,7 @@
 
 			//checked separately above now
 			//if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
-			if ($isok) {
+			if ($isok && !isset($_POST['justupdatelibs'])) {
 				//DB $query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',license='{$_POST['license']}',";
 				//DB $query .= "otherattribution='{$_POST['addattr']}',qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',solution='{$_POST['solution']}',";
 				//DB $query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby,solutionopts=$solutionopts";
@@ -1125,6 +1125,7 @@ function setlibnames(libn) {
 		libn = libn.substring(11);
 	}
 	document.getElementById("libnames").innerHTML = libn;
+	$("#libonlysubmit").show();
 }
 function swapentrymode() {
 	var butn = document.getElementById("entrymode");
@@ -1152,6 +1153,10 @@ function decboxsize(box) {
 <p>
 My library assignments: <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
 <input type=button value="Select Libraries" onClick="libselect()">
+<?php
+if (isset($_GET['id']) && $myq) {
+	echo '<span id=libonlysubmit style="display:none"><input type=submit name=justupdatelibs value="Save Library Change Only"/></span>';
+} ?>
 </p>
 <p>
 Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
