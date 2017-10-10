@@ -1343,7 +1343,11 @@
 		}
 
 		echo "<h4>{$line['name']}</h4>\n";
-		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
+		if ($line['starttime']==0) {
+			echo '<p>Started: Not yet started<br/>';
+		} else {
+			echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
+		}
 		if ($line['endtime']==0) {
 			echo "Not Submitted</p>\n";
 		} else {

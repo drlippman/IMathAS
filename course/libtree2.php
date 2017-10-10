@@ -158,7 +158,8 @@ END;
 	}
 
 	function printlist($parent) {
-		global $treearr,$names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$federated;
+		global $treearr,$names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid;
+		global $locked,$groupids,$groupid,$isgrpadmin,$federated,$parents;
 		$newchildren = array();
 		$arr = array();
 		if ($parent==0 && isset($published)) {
@@ -216,8 +217,10 @@ END;
 				if ($isadmin && $parent==0 && $rights[$child]<5 && $ownerids[$child]!=$userid && ($rights[$child]==0 || $groupids[$child]!=$groupid)) {
 					if ($rights[$child]==0) {
 						$toplevelprivate[] = $thisjson;
+						$parents[$child] = -2;
 					} else {
 						$toplevelgroup[] = $thisjson;
+						$parents[$child] = -3;
 					}
 				} else {
 					$treearr[$parent][] = $thisjson;
@@ -228,10 +231,12 @@ END;
 			if (count($toplevelprivate)>0) {
 				$treearr[$parent][] = array(-2,0,_('Root Level Private Libraries'),-1,0,0);
 				$treearr[-2] = $toplevelprivate;
+				$parents[-2] = 0;
 			}
 			if (count($toplevelprivate)>0) {
 				$treearr[$parent][] = array(-3,2,_('Root Level Group Libraries'),-1,0,0);
 				$treearr[-3] = $toplevelgroup;
+				$parents[-3] = 0;
 			}
 		}
 		foreach ($newchildren as $newchild) {
@@ -285,6 +290,7 @@ END;
 				setshow($parents[$id]);
 			}
 		} else {
+			
 			if (isset($parents[$id]) && $parents[$id]!=0) {
 				setshow($parents[$id]);
 			}
