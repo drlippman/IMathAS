@@ -230,17 +230,19 @@ function gbtable() {
 	$stm->execute(array(':id'=>$cid));
 	$courseitemorder = unserialize($stm->fetchColumn(0));
 	$courseitemsimporder = array();
-
-	flattenitems($courseitemorder,$courseitemsimporder);
-	$ph = Sanitize::generateQueryPlaceholders($courseitemsimporder);
-	$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE id IN ($ph)");
-	$stm->execute($courseitemsimporder);
-
-	$courseitemsimporder = array_flip($courseitemsimporder);
 	$courseitemsassoc = array();
 
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
+	flattenitems($courseitemorder,$courseitemsimporder);
+	if (count($courseitemsimporder)>0) {
+		$ph = Sanitize::generateQueryPlaceholders($courseitemsimporder);
+		$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE id IN ($ph)");
+		$stm->execute($courseitemsimporder);
+
+		$courseitemsimporder = array_flip($courseitemsimporder);
+
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
+		}
 	}
 
 
