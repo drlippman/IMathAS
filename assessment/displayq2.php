@@ -3422,7 +3422,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					} else {//{if (is_numeric($givenans)) {
 						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
-						$givenans = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)[^+\-]*$/','$1',trim($givenans)); //strip out units
+						if (preg_match('/\d\s*(x|y|z|r|t|i|X|Y|Z|I)\b/', $givenans)) {
+							//has a variable - don't strip	
+						} else {
+							$givenans = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)[^+\-]*$/','$1',trim($givenans)); //strip out units
+						}
 						if (is_numeric($givenans)) {
 							if (isset($reqsigfigs)) {
 								if ($givenans*$anans < 0) { continue;} //move on if opposite signs
