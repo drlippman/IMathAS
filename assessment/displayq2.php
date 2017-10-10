@@ -3393,7 +3393,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 
 			foreach($gaarr as $j=>$givenans) {
-				
+
 				$givenans = trim($givenans);
 				if (isset($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
 					continue;
@@ -3422,8 +3422,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					} else {//{if (is_numeric($givenans)) {
 						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
-						if (preg_match('/\d\s*(x|y|z|r|t|i|X|Y|Z|I)\b/', $givenans)) {
-							//has a variable - don't strip	
+						if (preg_match('/\d\s*(x|y|z|r|t|i|X|Y|Z|I)([^a-zA-Z]|$)/', $givenans)) {
+							//has a variable - don't strip
 						} else {
 							$givenans = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)[^+\-]*$/','$1',trim($givenans)); //strip out units
 						}
@@ -3488,7 +3488,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else {
 			$score = $correct/count($anarr);
 		}
-		
+
 		if ($score<0) { $score = 0; }
 		if ($score==0 && isset($partialcredit) && !$islist && is_numeric($givenans)) {
 			foreach ($altanswers as $i=>$anans) {
