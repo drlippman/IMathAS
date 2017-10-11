@@ -1780,6 +1780,7 @@ The following macros help with formatting values for display:
 <li><b>prettyreal(number,decimals,[comma])</b>:  Adds commas in thousands spaces of number, and displays the value to a fixed number of decimals places (rounding if needed).
    Example: prettyreal(1234.567,2) will return "1,234.57", and prettyreal(1.8,3) will return "1.800".  The result is a string, which
    can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li>
+<li><b>prettysmallnumber(number)</b>:  Prevents very small numbers from being displayed as scientific notation</li>
 <li><b>prettysigfig(number,sigfigs,[comma,choptrailingzeros])</b>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" override.
    Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.</li>
 <li><b>makescinot(number,[decimals,format])</b>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
@@ -2248,7 +2249,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<dd>Defines the answer.  Define multiple acceptable answers in a string separated by or:  $answer = "3 or 5 or 7".
 	Alternatively, you can provide an interval notation range of
 	acceptable answers, like $answer = "(2,5]".  Providing a range will override any tolerances set<br/><br/>
-	To have the answer display as a rendered expression, provide the answer as a string.  For example, if you want the answer to show as 2<sup>4</sup> then 
+	To have the answer display as a rendered expression, provide the answer as a string.  For example, if you want the answer to show as 2<sup>4</sup> then
 	you'd specify $answer = "2^4".  If you specified $answer = 2^4, the answer would display as 16.</dd>
 </dl>
 </p>
