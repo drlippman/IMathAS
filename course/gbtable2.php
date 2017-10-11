@@ -145,7 +145,7 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 function flattenitems($items,&$addto) {
 	foreach ($items as $item) {
 		if (is_array($item)) {
-			if ($item['avail']>0) {
+			if (!isset($item['avail']) || $item['avail']>0) {
 				flattenitems($item['items'],$addto);
 			}
 		} else {
