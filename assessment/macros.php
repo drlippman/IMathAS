@@ -1581,10 +1581,15 @@ function prettyreal($n,$d,$comma=',') {
 	return number_format($n,$d,'.',$comma);
 }
 function prettysmallnumber($n) {
-	if ($n<.1) {
+	if (abs($n)<.01) {
 		$a = explode("E",$n);
 		if (count($a)==2) {
-			$n = "0.".str_repeat("0", -$a[1]-1).str_replace('.','',$a[0]);
+			if ($n<0) {
+				$sign = '-';
+			} else {
+				$sign = '';
+			}
+			$n = $sign."0.".str_repeat("0", -$a[1]-1).str_replace('.','',abs($a[0]));
 		}
 	}
 	return $n;

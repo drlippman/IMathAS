@@ -1141,6 +1141,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($answer)) {
 			if (in_array('parenneg',$ansformats) && $answer < 0) {
 				$sa = '('.(-1*$answer).')';
+			} else if (is_numeric($answer) && $answer!=0 && abs($answer)<.001) {
+				$sa = prettysmallnumber($answer);
 			} else {
 				$sa = $answer;
 			}
