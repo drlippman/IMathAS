@@ -7,7 +7,8 @@
 
 // does NOT work for randomized questions or matching.
 
-require("../validate.php");
+require("../init.php");
+
 if (!isset($teacherid) && !isset($tutorid)) {
 	require("../header.php");
 	echo "You need to log in as a teacher or tutor to access this page";
@@ -16,7 +17,7 @@ if (!isset($teacherid) && !isset($tutorid)) {
 }
 
 $cid = intval($_GET['cid']);
-$aid = intval($_GET['aid']); //imas_assessments id
+$aid = Sanitize::onlyInt($_GET['aid']); //imas_assessments id
 $att = $_GET['att'];
 
 
@@ -37,7 +38,9 @@ $qsdata = array();
 //DB $query = "SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB while ($row = mysql_fetch_row($result)) {
-$stm = $DBH->query("SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")"); //INT from DB
+$query_placeholders = Sanitize::generateQueryPlaceholders($qsids);
+$stm = $DBH->prepare("SELECT id,qtype,control,description FROM imas_questionset WHERE id IN ($query_placeholders)");
+$stm->execute(array_values($qsids)); //INT from DB
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$qsdata[$row[0]] = array($row[1],$row[2],$row[3]);
 }
@@ -128,7 +131,7 @@ $placeinhead = ' <style type="text/css">
 }
 </style>';
 require("../assessment/header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
 echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Results: ';
@@ -141,7 +144,7 @@ $stm->execute(array(':id'=>$aid));
 //DB echo mysql_result($result,0,1).'</h2></div>';
 //DB $itemorder = mysql_result($result,0,2);
 list ($defpoints, $aname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
-echo $aname.'</h2></div>';
+echo Sanitize::encodeStringForDisplay($aname) . '</h2></div>';
 $itemarr = array();
 $itemnum = array();
 foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -165,7 +168,7 @@ require("../assessment/displayq2.php");
 $questions = array_keys($qdata);
 foreach ($itemarr as $k=>$q) {
 	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
-	echo '<p><span style="float:right">(Question ID '.$qsids[$q].')</span><b>'.$qsdata[$qsids[$q]][2].'</b></p>';
+	echo '<p><span style="float:right">(Question ID '.Sanitize::onlyInt($qsids[$q]).')</span><b>'.Sanitize::encodeStringForDisplay($qsdata[$qsids[$q]][2]).'</b></p>';
 	echo '<br class="clear"/>';
 	echo '<div style="float:left;width:35%;">';
 	showresults($q,$qsdata[$qsids[$q]][0]);
@@ -272,7 +275,7 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 			if (!isset($res[$k])) {
 				continue;
 			}
-			echo '<tr><td>'.$questions[$k].'</td><td>'.$res[$k];
+			echo '<tr><td>' . Sanitize::encodeStringForDisplay($questions[$k]) . '</td><td>' . Sanitize::encodeStringForDisplay($res[$k]);
 			echo ' <span class="scorebarinner" style="';
 			if (in_array($k,$answer)) {
 				echo 'background:#9f9;';
@@ -287,7 +290,7 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 	} else {
 		arsort($res);
 		foreach ($res as $ans=>$cnt) {
-			echo '<tr><td>'.$ans.'</td><td>'.$cnt;
+			echo '<tr><td>' . Sanitize::encodeStringForDisplay($ans) . '</td><td>' . Sanitize::encodeStringForDisplay($cnt);
 			echo ' <span class="scorebarinner" style="';
 
 			if (in_array($ans,$correct)) {

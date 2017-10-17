@@ -2,6 +2,7 @@
 //IMathAS:  Make deadline exceptions for a multiple students; included by listusers and gradebook
 //(c) 2007 David Lippman
 
+
 	if (!isset($imasroot)) {
 		echo "This file cannot be called directly";
 		exit;
@@ -27,28 +28,46 @@
 
 		if (!isset($_POST['addexc'])) { $_POST['addexc'] = array();}
 		if (!isset($_POST['addfexc'])) { $_POST['addfexc'] = array();}
-		foreach(explode(',',$_POST['tolist']) as $stu) {
-			foreach($_POST['addexc'] as $aid) {
-				//DB $query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$aid' and itemtype='A'";
-				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
-				$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid and itemtype='A'");
-				$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
-				if ($stm->rowCount()==0) {
-					//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,itemtype) VALUES ";
-					//DB $query .= "('$stu','$aid',$startdate,$enddate,$waivereqscore,$epenalty,'A')";
-					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,itemtype) VALUES ";
-					$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :itemtype)";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':itemtype'=>'A'));
-				} else {
-					//DB $eid = mysql_result($result,0,0);
-					$eid = $stm->fetchColumn(0);
-					//DB $query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore,exceptionpenalty=$epenalty WHERE id=$eid";
-					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty WHERE id=:id");
-					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':id'=>$eid));
+		$toarr = array_map('Sanitize::onlyInt', explode(',', $_POST['tolist']));
+		$addexcarr = array_map('Sanitize::onlyInt', $_POST['addexc']);
+		$addfexcarr = array_map('Sanitize::onlyInt', $_POST['addfexc']);
+		$existingExceptions = array();
+		if (count($addexcarr)>0 && count($toarr)>0) {
+			//prepull users with exceptions
+			$uidplaceholders = Sanitize::generateQueryPlaceholders($toarr);
+			$aidplaceholders = Sanitize::generateQueryPlaceholders($addexcarr);
+			$stm = $DBH->prepare("SELECT userid,assessmentid FROM imas_exceptions WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
+			$stm->execute(array_merge($toarr, $addexcarr));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$existingExceptions[$row[0].'-'.$row[1]] = 1;
+			}
+		}
+		//set up inserts
+		$insertExceptionHolders = array();
+		$insertExceptionVals = array();
+		foreach ($toarr as $stu) {
+			foreach ($addexcarr as $aid) {
+				if (!isset($existingExceptions[$stu.'-'.$aid])) {
+					$insertExceptionHolders[] = "(?,?,?,?,?,?,?)";
+					array_push($insertExceptionVals, $stu, $aid, $startdate, $enddate, $waivereqscore, $epenalty, 'A');
 				}
-				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+			}
+		}
+		//run update
+		if (count($addexcarr)>0 && count($toarr)>0) {
+			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
+			$stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty), $toarr, $addexcarr));
+		}
+
+		//run inserts
+		if (count($insertExceptionVals)>0) {
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,itemtype) VALUES ";
+			$query .= implode(',', $insertExceptionHolders);
+			$stm = $DBH->prepare($query);
+			$stm->execute($insertExceptionVals);
+		}
+		foreach($toarr as $stu) {
+			foreach($addexcarr as $aid) {
 				if (isset($_POST['forceregen'])) {
 					//this is not group-safe
 					//DB $query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
@@ -125,7 +144,20 @@
 				}
 
 			}
-			foreach($_POST['addfexc'] as $fid) {
+			/* work in progress
+			$existingForumExceptions = array();
+			if (count($addfexcarr)>0 && count($toarr)>0) {
+				//prepull users with forum exceptions
+				$uidplaceholders = Sanitize::generateQueryPlaceholders($toarr);
+				$fidplaceholders = Sanitize::generateQueryPlaceholders($addfexcarr);
+				$stm = $DBH->prepare("SELECT userid,assessmentid FROM imas_exceptions WHERE userid IN ($uidplaceholders) AND assessmentid IN ($fidplaceholders) and (itemtype='F' OR itemtype='P' OR itemtype='R')");
+				$stm->execute(array_merge($toarr, $addfexcarr));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$existingForumExceptions[$row[0].'-'.$row[1]] = 1;
+				}
+			}
+			*/
+			foreach($addfexcarr as $fid) {
 				//DB $query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$fid' and (itemtype='F' OR itemtype='P' OR itemtype='R')";
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB if (mysql_num_rows($result)==0) {
@@ -148,6 +180,7 @@
 				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 			}
 		}
+
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
 			//DB $tolist = implode("','",explode(',',$_POST['tolist']));
@@ -180,14 +213,14 @@
 
 	require("../header.php");
 
-
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	$cid = Sanitize::courseId($_GET['cid']);
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	if ($calledfrom=='lu') {
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Manage Exceptions</div>\n";
 	} else if ($calledfrom=='gb') {
 		echo "&gt; <a href=\"gradebook.php?cid=$cid";
 		if (isset($_GET['uid'])) {
-			echo "&stu={$_GET['uid']}";
+			echo "&stu=" . Sanitize::onlyInt($_GET['uid']);
 		}
 		echo "\">Gradebook</a> &gt; Manage Exceptions</div>\n";
 	}
@@ -198,7 +231,7 @@
 	} else if ($calledfrom=='gb') {
 		echo "<form method=post action=\"gradebook.php?cid=$cid&massexception=1";
 		if (isset($_GET['uid'])) {
-			echo "&uid={$_GET['uid']}";
+			echo "&uid=" . Sanitize::onlyInt($_GET['uid']);
 		}
 		echo "\" id=\"qform\">\n";
 	}
@@ -209,7 +242,7 @@
 	if (isset($_GET['uid'])) {
 		//DB $tolist = "'{$_GET['uid']}'";
 		$tolist = intval($_GET['uid']);
-		echo "<input type=hidden name=\"tolist\" value=\"{$_GET['uid']}\">\n";
+		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::onlyInt($_GET['uid']) . "\">\n";
 	} else {
 		if (count($_POST['checked'])==0) {
 			echo "<p>No students selected.</p>";
@@ -221,7 +254,7 @@
 			require("../footer.php");
 			exit;
 		}
-		echo "<input type=hidden name=\"tolist\" value=\"" . implode(',',$_POST['checked']) . "\">\n";
+		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
 		//DB $tolist = "'".implode("','",$_POST['checked'])."'";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));
 	}
@@ -241,9 +274,9 @@
 		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=:id AND istu.courseid=:courseid");
 		$stm->execute(array(':id'=>$tolist, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<h2>{$row[0]}, {$row[1]}";
+		echo "<h2>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]);
 		if ($row[2]!='') {
-			echo ' <span class="small">(Section: '.$row[2].')</span>';
+			echo ' <span class="small">(Section: '.Sanitize::encodeStringForDisplay($row[2]).')</span>';
 		}
 		echo "</h2>";
 	}
@@ -289,18 +322,20 @@
 					if ($lasta!=0) {
 						echo "</ul></li>";
 					}
-					echo "<li>{$row['itemname']} <ul>";
+					echo "<li>" . Sanitize::encodeStringForDisplay($row['itemname']) ." <ul>";
 					$lasta = $row['itemid'];
 				}
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"{$row['eid']}\" />{$row['LastName']}, {$row['FirstName']} ";
+				printf('<li><input type=checkbox name="clears[]" value="%s" />%s, %s ',
+					Sanitize::encodeStringForDisplay($row['eid']), Sanitize::encodeStringForDisplay($row['LastName']),
+					Sanitize::encodeStringForDisplay($row['FirstName']));
 				if ($row['itemtype']=='A') {
-					echo "($sdate - $edate)";
+					echo Sanitize::encodeStringForDisplay("($sdate - $edate)");
 				} else if ($row['itemtype']=='F') {
-					echo "(PostBy: $sdate, ReplyBy: $edate)";
+					echo Sanitize::encodeStringForDisplay("(PostBy: $sdate, ReplyBy: $edate)");
 				} else if ($row['itemtype']=='P') {
-					echo "(PostBy: $sdate)";
+					echo Sanitize::encodeStringForDisplay("(PostBy: $sdate)");
 				} else if ($row['itemtype']=='R') {
-					echo "(ReplyBy: $edate)";
+					echo Sanitize::encodeStringForDisplay("(ReplyBy: $edate)");
 				}
 				if ($row['waivereqscore']==1) {
 					echo ' <i>('._('waives prereq').')</i>';
@@ -319,12 +354,13 @@
 					if ($lasts!=0) {
 						natsort($assessarr);
 						foreach ($assessarr as $id=>$val) {
-							echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />$val</li>";
+							echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val)."</li>";
 						}
 						echo "</ul></li>";
 						$assessarr = array();
 					}
-					echo "<li>{$row['LastName']}, {$row['FirstName']} <ul>";
+					printf("<li>%s, %s <ul>", Sanitize::encodeStringForDisplay($row['LastName']),
+						Sanitize::encodeStringForDisplay($row['FirstName']));
 					$lasts = $row['userid'];
 				}
 				$assessarr[$row['eid']] = "{$row['itemname']} ";
@@ -344,7 +380,7 @@
 			}
 			natsort($assessarr);
 			foreach ($assessarr as $id=>$val) {
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"$id\" />$val</li>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val)."</li>";
 			}
 			echo "</ul></li>";
 		}
@@ -379,7 +415,7 @@
 	//echo "<h4>Make New Exception</h4>";
 	echo '<h3>'._("Make New Exception").'</h3>';
 	echo '<fieldset class="optionlist"><legend>'._("Exception Options").'</legend>';
-	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.$lpmsg.'</p>';
+	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
 	echo '<p class="list"><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
 	echo '<p>For assessments:</p>';
 	echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
@@ -449,7 +485,7 @@
 		foreach ($assessarr as $id=>$val) {
 			echo "<li><input type=checkbox name=\"addexc[]\" value=\"$id\" ";
 			if (isset($_POST['assesschk']) && in_array($id,$_POST['assesschk'])) { echo 'checked="checked" ';}
-			echo "/>$val</li>";
+			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</li>";
 		}
 		echo '</ul>';
 		echo "<input type=submit value=\"Record Changes\" />";
@@ -493,7 +529,7 @@
 		foreach ($forumarr as $id=>$val) {
 			echo "<li><input type=checkbox name=\"addfexc[]\" value=\"$id\" ";
 			if (isset($_POST['forumchk']) && in_array($id,$_POST['forumchk'])) { echo 'checked="checked" ';}
-			echo "/>$val</li>";
+			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</li>";
 		}
 		echo '</ul>';
 		echo "<input type=submit value=\"Record Changes\" />";
@@ -511,7 +547,8 @@
 		echo "<ul>";
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<li>{$row[0]}, {$row[1]}</li>";
+			printf("<li>%s, %s</li>", Sanitize::encodeStringForDisplay($row[0]),
+				Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</ul>';
 		echo '</fieldset>';

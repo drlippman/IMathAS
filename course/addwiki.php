@@ -3,8 +3,9 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -13,10 +14,10 @@ $overwriteBody = 0;
 $body = "";
 $useeditor = "description";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (isset($_GET['tb'])) {
-	$totb = $_GET['tb'];
+	$totb = Sanitize::encodeStringForDisplay($_GET['tb']);
 } else {
 	$totb = 'b';
 }
@@ -28,17 +29,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
-	if (isset($_GET['clearattempts'])) {
-		if ($_GET['clearattempts']=='true') {
-			$id = $_GET['id'];
+	if (isset($_REQUEST['clearattempts'])) {
+		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="true") {
+			$id = Sanitize::onlyInt($_GET['id']);
 			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
 			$stm->execute(array(':wikiid'=>$id));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addwiki.php?cid=$cid&id=$id");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addwiki.php?cid=$cid&id=$id");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"addwiki.php?cid=$cid&id=$id\">Modify Wiki</a>";
@@ -143,7 +144,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
@@ -195,9 +196,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$savetitle = _("Create Wiki");
 		}
 
-		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
-		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
-		$page_formActionTag .= "&tb=$totb";
+		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
+		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::encodeUrlParam($_GET['id']) : "";
+		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
 		$hr = floor($coursedeftime/60)%12;
 		$min = $coursedeftime%60;
@@ -266,23 +267,26 @@ if ($overwriteBody==1) {
 	<div id="headeraddwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 <?php
 if (isset($_GET['clearattempts'])) {
-	$id = $_GET['id'];
+	$id = Sanitize::onlyInt($_GET['id']);
 	echo '<p>Are you SURE you want to delete all contents and history for this Wiki page? ';
 	echo 'This will clear contents for all groups if you are using groups.</p>';
-	echo "<p><a href=\"addwiki.php?cid=$cid&id=$id&clearattempts=true\">Yes, I'm Sure</a> | ";
-	echo "<a href=\"addwiki.php?cid=$cid&id=$id\">Nevermind</a></p>";
+
+	echo '<form method="POST" action="'.sprintf('addwiki.php?cid=%d&id=%d', $cid, $id) .'">';
+	echo '<p><button type=submit name="clearattempts" value="true">'._("Yes, I'm Sure").'</button>';
+	echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".sprintf('addwiki.php?cid=%d&id=%d', $cid, $id)."'\"></p>\n";
+	echo '</form>';
 
 } else { //default display
 
 if ($started) {
 	echo '<p>Revisions have already been made on this wiki.  Changing group settings has been disabled.  If you want to change the ';
 	echo 'group settings, you should clear all existing wiki content.</p>';
-	echo '<p><input type="button" value="Clear All Wiki Content"  onclick="window.location=\'addwiki.php?cid='.$cid.'&id='.$_GET['id'].'&clearattempts=ask\'" /></p>';
+	echo '<p><input type="button" value="Clear All Wiki Content"  onclick="window.location=\'addwiki.php?cid='.$cid.'&id=' . Sanitize::onlyInt($_GET['id']) . '&clearattempts=ask\'" /></p>';
 }
 
 ?>
 
-	<form method=post action="addwiki.php<?php echo $page_formActionTag ?>">
+	<form method=post action="addwiki.php<?php echo $page_formActionTag; ?>">
 		<span class=form>Name: </span>
 		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span>
 		<BR class=form>

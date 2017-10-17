@@ -1,8 +1,9 @@
 <?php
 //IMathAS:  Add/remove class tutors
 //(c) 2009 David Lippman
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/htmlutil.php");
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -14,7 +15,7 @@
 		echo "Adding tutors is not allowed";
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	//*** PROCESSING ***
 	$err = '';
@@ -70,8 +71,8 @@
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if (mysql_num_rows($result)>0) {
 					//DB while ($row = mysql_fetch_row($result)) {
-				$in  = str_repeat('?,', count($sidstouse) - 1) . '?';
-				$stm = $DBH->prepare("SELECT id,SID FROM imas_users WHERE SID IN ($in)");
+				$query_placeholders = Sanitize::generateQueryPlaceholders($sidstouse);
+				$stm = $DBH->prepare("SELECT id,SID FROM imas_users WHERE SID IN ($query_placeholders)");
 				$stm->execute($sidstouse);
 				$insvals = array();
 				if ($stm->rowCount()>0) {
@@ -91,7 +92,7 @@
 					if (count($notfound)>0) {
 						$err .= "<p>Some usernames not found:<br/>";
 						foreach ($notfound as $nf) {
-							$err .= "$nf<br/>";
+							$err .= Sanitize::encodeStringForDisplay($nf) . "<br/>";
 						}
 						$err .= '</p>';
 					}
@@ -101,7 +102,7 @@
 			}
 		} else {
 			//if not adding new, redirect back to listusers
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 			exit;
 		}
 	}
@@ -158,7 +159,8 @@
 	//*** DISPLAY ***
 	$pagetitle = "Manage Tutors";
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	$cid = Sanitize::courseId($_GET['cid']);
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Users</a> &gt; Manage Tutors</div>";
 
 ?>
@@ -173,7 +175,7 @@
 	<thead>
 		<tr>
 			<th>Tutor name</th>
-			<th>Limit to <?php echo $limitname; ?></th>
+			<th>Limit to <?php echo Sanitize::encodeStringForDisplay($limitname); ?></th>
 
 			<th>Remove?
 			Check: <a href="#" onclick="return chkAllNone('curform','remove[]',true)">All</a> <a href="#" onclick="return chkAllNone('curform','remove[]',false)">None</a></th>
@@ -187,13 +189,13 @@ if (count($tutorlist)==0) {
 }
 foreach ($tutorlist as $tutor) {
 	echo '<tr>';
-	echo '<td>'.$tutor['name'].'</td>';
+	echo '<td>'.Sanitize::encodeStringForDisplay($tutor['name']).'</td>';
 	echo '<td>';
 	//section
-	echo '<select name="section['.$tutor['id'].']">';
+	echo '<select name="section['.Sanitize::encodeStringForDisplay($tutor['id']).']">';
 	echo '<option value="" '.getHtmlSelected($tutor['section'],"").'>All</option>';
 	foreach ($sections as $sec) {
-		echo '<option value="'.$sec.'" '.getHtmlSelected($tutor['section'],$sec).'>'.$sec.'</option>';
+		echo '<option value="'.Sanitize::encodeStringForDisplay($sec).'" '.getHtmlSelected($tutor['section'],$sec).'>'.Sanitize::encodeStringForDisplay($sec).'</option>';
 	}
 	if (!in_array($tutor['section'],$sections) && $tutor['section']!='') {
 		echo '<option value="invalid" selected="selected">Invalid - reselect</option>';
@@ -201,7 +203,7 @@ foreach ($tutorlist as $tutor) {
 	echo '</select>';
 	echo '</td>';
 	echo '<td>';
-	echo '<input type="checkbox" name="remove[]" value="'.$tutor['id'].'" />';
+	echo '<input type="checkbox" name="remove[]" value="'.Sanitize::encodeStringForDisplay($tutor['id']).'" />';
 	echo '</td>';
 	echo '</tr>';
 }

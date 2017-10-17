@@ -6,7 +6,9 @@
 	//1      2         4                   8
 	//Read   Deleted   Deleted by Sender   Tagged
 
-	require("../validate.php");
+	require("../init.php");
+	
+
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -21,7 +23,7 @@
 	$cansendmsgs = false;
 	$threadsperpage = $listperpage;
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['read']) && count($_POST['checked'])>0) {
 		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
@@ -56,7 +58,7 @@
 
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
-		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "&gt; <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 	echo "&gt; New Message List</div>";
 	echo '<div id="headernewmsglist" class="pagetitle"><h2>New Messages</h2></div>';
@@ -88,11 +90,12 @@
 		$lastcourse = '';
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		    $line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 			if ($line['name']!=$lastcourse) {
 				if($lastcourse!='') {
 					echo '</tbody></table>';
 				}
-				echo '<h4>Course: '.$line['name'].'</h4>';
+				echo '<h4>Course: '.Sanitize::encodeStringForDisplay($line['name']).'</h4>';
 				echo '<table class="gb"><thead><tr><th></th><th>Message</th><th>Replied</th><th>From</th><th>Course</th><th>Sent</th></tr></thead><tbody>';
 				$lastcourse = $line['name'];
 			}
@@ -109,8 +112,10 @@
 			} else if ($n>1) {
 				$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 			}
-			echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-			echo "<a href=\"viewmsg.php?cid={$line['cid']}&type=new&msgid={$line['id']}\">";
+			printf("<tr><td><input type=checkbox name=\"checked[]\" value=\"%d\"/></td><td>",
+                Sanitize::onlyInt($line['id']));
+			printf("<a href=\"viewmsg.php?cid=%s&type=new&msgid=%d\">", Sanitize::courseId($line['cid']),
+                Sanitize::onlyInt($line['id']));
 			if (($line['isread']&1)==0) {
 				echo "<b>{$line['title']}</b>";
 			} else {
@@ -123,11 +128,12 @@
 			if ($line['LastName']==null) {
 				$line['LastName'] = "[Deleted]";
 			}
-			echo "</td><td>{$line['LastName']}, {$line['FirstName']}</td>";
+			printf("</td><td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+                Sanitize::encodeStringForDisplay($line['FirstName']));
 			if ($line['name']==null) {
 				$line['name'] = "[Deleted]";
 			}
-			echo "<td>{$line['name']}</td>";
+			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['name']));
 			$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 			echo "<td>$senddate</td></tr>";
 		}

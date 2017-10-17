@@ -3,14 +3,14 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";
 	exit;
 }
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_POST['checked'])) { //form submitted
 	$checked = $_POST['checked'];
@@ -206,7 +206,7 @@ if (isset($_POST['checked'])) { //form submitted
 		}
 
 	}
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	exit;
 }
 
@@ -309,7 +309,7 @@ $(function() {
 
 require("../header.php");
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Mass Change Forums</div>";
 echo '<div id="headerchgforums" class="pagetitle"><h2>Mass Change Forums</h2></div>';
 
@@ -330,7 +330,7 @@ Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All<
 <?php
 
 foreach($forumitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.'</li>';
+	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.Sanitize::encodeStringForDisplay($name).'</li>';
 }
 ?>
 </ul>

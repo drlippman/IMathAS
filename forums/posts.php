@@ -2,7 +2,9 @@
 //Displays forums posts
 //(c) 2006 David Lippman
 
-require("../validate.php");
+require("../init.php");
+
+
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	require("../header.php");
 	echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -15,10 +17,10 @@ if (isset($teacherid)) {
 	$isteacher = false;
 }
 
-$cid = $_GET['cid'];
-$forumid = $_GET['forum'];
-$threadid = $_GET['thread'];
-$page = $_GET['page'];
+$cid = Sanitize::courseId($_GET['cid']);
+$forumid = Sanitize::onlyInt($_GET['forum']);
+$threadid = Sanitize::onlyInt($_GET['thread']);
+$page = Sanitize::onlyInt($_GET['page']);
 //special "page"s
 //-1 new posts from forum page
 //-2 tagged posts from forum page
@@ -27,14 +29,14 @@ $page = $_GET['page'];
 //-5 tagged posts page
 
 if ($page==-4) {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid";
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/forums.php?cid=$cid";
 } else if ($page==-3) {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid";
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/newthreads.php?cid=$cid";
 } else if ($page==-5) {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/flaggedthreads.php?cid=$cid";
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/flaggedthreads.php?cid=$cid";
 } else {
-	$redirecturl = $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page";
-} 
+	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=$cid&forum=$forumid&page=$page";
+}
 if (isset($_GET['markunread'])) {
 	//DB $query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -169,6 +171,7 @@ if ($haspoints && $caneditscore && $rubric != 0) {
 	$stm->execute(array(':id'=>$rubric));
 	if ($stm->rowCount()>0) {
 		$row = $stm->fetch(PDO::FETCH_NUM);
+		// $row data is sanitized by printrubrics().
 		echo printrubrics(array($row));
 	}
 }
@@ -230,7 +233,7 @@ if ($oktoshow) {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':id'=>$threadid, ':threadid'=>$threadid));
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$children = array(); $date = array(); $subject = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
+	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
 	//DB while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -251,9 +254,11 @@ if ($oktoshow) {
 			$n++;
 		}
 		if ($n==1) {
-			$line['subject'] = 'Re: '.$line['subject'];
+			$re[$line['id']] = _('Re').': ';
 		} else if ($n>1) {
-			$line['subject'] = "Re<sup>$n</sup>: ".$line['subject'];
+			$re[$line['id']] = _('Re')."<sup>$n</sup>: ";
+		} else {
+			$re[$line['id']] = '';
 		}
 
 		$subject[$line['id']] = $line['subject'];
@@ -350,7 +355,7 @@ if ($oktoshow) {
 	}
 }
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 if ($page==-4) {
 	echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";
 } else if ($page==-3) {
@@ -358,19 +363,19 @@ if ($page==-4) {
 } else if ($page==-5) {
 	echo "<a href=\"flaggedthreads.php?cid=$cid\">Flagged Threads</a> ";
 } else {
-	echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">$forumname</a> ";
+	echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">".Sanitize::encodeStringForDisplay($forumname)."</a> ";
 }
 echo "&gt; Posts</div>\n";
 
 if (!$oktoshow) {
 	echo '<p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
 } else {
-	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
-	echo "<b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
+	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h2></div>';
+	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
 
 	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";
-	$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid ";
-	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid);
+	$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid AND lastposttime<:now ";
+	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
 	if ($groupset>0 && $groupid!=-1) {
 		//DB $query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";
 		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
@@ -386,14 +391,14 @@ if (!$oktoshow) {
 	//DB $prevth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$prevth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$prevth&grp=$groupid\">Prev</a> ";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($prevth)."&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
 	}
 
 	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id>'$threadid' ";
-	$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid ";
-	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid);
+	$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid AND lastposttime<:now ";
+	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
 	if ($groupset>0 && $groupid!=-1) {
 		//DB $query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";
 		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
@@ -409,7 +414,7 @@ if (!$oktoshow) {
 	//DB $nextth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$nextth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=$nextth&grp=$groupid\">Next</a>";
+		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($nextth)."&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
 	} else {
 		echo "Next";
 	}
@@ -419,13 +424,6 @@ if (!$oktoshow) {
 	} else {
 		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
 	}
-	/*if ($tagged) {
-		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markuntagged=true\">Unflag</a>";
-	} else {
-		echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&marktagged=true\">Flag</a>";
-	}*/
-	//echo "<br/><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
-	//echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
 
 	echo '| <button onclick="expandall()">'._('Expand All').'</button>';
 	echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
@@ -441,7 +439,7 @@ echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$
 
 function printchildren($base,$restricttoowner=false) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	global $DBH,$children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
+	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
 	global $canviewall, $caneditscore, $canviewscore;
@@ -474,7 +472,7 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		if ($hasuserimg[$child]==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
+				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
 			} else {
 				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
 			}
@@ -495,8 +493,8 @@ function printchildren($base,$restricttoowner=false) {
 			echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$child.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 			echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
 			echo '</a>';
-			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';	
-					
+			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';
+
 			if ($isteacher) {
 				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a></li>\n";
 			}
@@ -508,13 +506,13 @@ function printchildren($base,$restricttoowner=false) {
 			if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 				echo "<li><a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a></li>\n";
 			}
-			
+
 			echo '</ul></span>';
 		}
 
 		echo "</span>\n";
 		echo '<span style="float:left">';
-		echo "<b>{$subject[$child]}</b><br/>Posted by: ";
+		echo "<b>".$re[$child]. Sanitize::encodeStringForDisplay($subject[$child]) . "</b><br/>"._('Posted by').": ";
 		//if ($isteacher && $ownerid[$child]!=0) {
 		//	echo "<a href=\"mailto:{$email[$child]}\">";
 		//} else if ($allowmsg && $ownerid[$child]!=0) {
@@ -525,7 +523,7 @@ function printchildren($base,$restricttoowner=false) {
 			}
 			echo ">";
 		}
-		echo $poster[$child];
+		echo Sanitize::encodeStringForDisplay($poster[$child]); // This is the user's first and last name.
 		if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 			echo "</a>";
 		}
@@ -672,11 +670,11 @@ printchildren(0);
 if ($caneditscore && $haspoints) {
 	echo '<div><input type=submit name="save" value="Save Grades" /></div>';
 	if ($prevth!='' && $page!=-3) {
-		echo '<input type="hidden" name="prevth" value="'.$prevth.'"/>';
+		echo '<input type="hidden" name="prevth" value="'.Sanitize::encodeStringForDisplay($prevth).'"/>';
 		echo '<input type="submit" name="save" value="Save Grades and View Previous"/>';
 	}
 	if ($nextth!='' && $page!=-3) {
-		echo '<input type="hidden" name="nextth" value="'.$nextth.'"/>';
+		echo '<input type="hidden" name="nextth" value="'.Sanitize::encodeStringForDisplay($nextth).'"/>';
 		echo '<input type="submit" name="save" value="Save Grades and View Next"/>';
 	}
 	echo "</form>";

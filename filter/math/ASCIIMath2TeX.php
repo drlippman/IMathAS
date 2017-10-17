@@ -7,12 +7,12 @@ to TeX, which can be rendered via CGI to images.
 Use:
 	$AMT = new AMtoTeX;
 	$tex = $AMT->convert($AMstring); //convert ASCIIMath string to TeX
-	
+
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
   updated to match 2.2
-  
+
 This is a PHP port of a Javascript modification of ASCIIMathML
-Modified with TeX conversion for IMG rendering 
+Modified with TeX conversion for IMG rendering
 Sept 7, 2006 (c) David Lippman http://www.pierce.ctc.edu/dlippman
 
 This program is free software; you can redistribute it and/or modify
@@ -20,13 +20,13 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or (at
 your option) any later version.
 
-This program is distributed in the hope that it will be useful, 
+This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License (at http://www.gnu.org/copyleft/gpl.html) 
+General Public License (at http://www.gnu.org/copyleft/gpl.html)
 for more details.
 */
-class AMtoTeX 
+class AMtoTeX
 {
 
 var $decimalsign = "."; //change if needed - might mess up matrices if comma
@@ -109,11 +109,11 @@ array( 'input'=>'uuu', 'tex'=>'bigcup', 'underover'=>TRUE),
 
 // Binary relation symbols
 array( 'input'=>'!=', 'tex'=>'ne'),
-array( 'input'=>':=' ), 			
+array( 'input'=>':=' ),
 array( 'input'=>'<', 'tex'=>'lt'),
 array( 'input'=>'<=', 'tex'=>'le'),
 array( 'input'=>'lt=', 'tex'=>'leq'),
-array( 'input'=>'>', 'tex'=>'gt'), 
+array( 'input'=>'>', 'tex'=>'gt'),
 array( 'input'=>'>=', 'tex'=>'ge'),
 array( 'input'=>'gt=', 'tex'=>'geq'),
 array( 'input'=>'-<', 'tex'=>'prec'),
@@ -138,7 +138,7 @@ array( 'input'=>'not', 'tex'=>'neg'),
 array( 'input'=>'=>', 'tex'=>'Rightarrow'),
 array( 'input'=>'implies', 'output'=>'=>', 'definition'=>TRUE),
 array( 'input'=>'if', 'space'=>TRUE),
-array( 'input'=>'<=>', 'tex'=>'Leftrightarrow'), 
+array( 'input'=>'<=>', 'tex'=>'Leftrightarrow'),
 array( 'input'=>'iff', 'output'=>'<=>', 'definition'=>TRUE),
 array( 'input'=>'AA', 'tex'=>'forall'),
 array( 'input'=>'EE', 'tex'=>'exists'),
@@ -149,9 +149,9 @@ array( 'input'=>'|--', 'tex'=>'vdash'),
 // Miscellaneous symbols
 array( 'input'=>'int'),
 array( 'input'=>'dx', 'output'=>'{:d x:}', 'definition'=>TRUE),
-array( 'input'=>'dy', 'output'=>'{:d y:}', 'definition'=>TRUE), 
-array( 'input'=>'dz', 'output'=>'{:d z:}', 'definition'=>TRUE), 
-array( 'input'=>'dt', 'output'=>'{:d t:}', 'definition'=>TRUE), 
+array( 'input'=>'dy', 'output'=>'{:d y:}', 'definition'=>TRUE),
+array( 'input'=>'dz', 'output'=>'{:d z:}', 'definition'=>TRUE),
+array( 'input'=>'dt', 'output'=>'{:d t:}', 'definition'=>TRUE),
 array( 'input'=>'oint'),
 array( 'input'=>'del', 'tex'=>'partial'),
 array( 'input'=>'grad', 'tex'=>'nabla'),
@@ -169,8 +169,8 @@ array( 'input'=>'frown'),
 array( 'input'=>'quad'),
 array( 'input'=>'qquad'),
 array( 'input'=>'cdots'),
-array( 'input'=>'vdots'), 
-array( 'input'=>'ddots'), 
+array( 'input'=>'vdots'),
+array( 'input'=>'ddots'),
 array( 'input'=>'diamond'),
 array( 'input'=>'square', 'tex'=>'boxempty'),
 array( 'input'=>'|__', 'tex'=>'lfloor'),
@@ -187,13 +187,13 @@ array( 'input'=>'ZZ', 'tex'=>'mathbb{Z}', 'notexcopy'=>TRUE),
 
 // Standard functions
 array( 'input'=>'lim', 'underover'=>TRUE),
-array( 'input'=>'Lim', 'underover'=>TRUE), 
+array( 'input'=>'Lim', 'underover'=>TRUE),
 array( 'input'=>'sin', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'cos', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'tan', 'unary'=>TRUE, 'func'=>TRUE),
-array( 'input'=>'arcsin', 'unary'=>TRUE, 'func'=>TRUE), 
-array( 'input'=>'arccos', 'unary'=>TRUE, 'func'=>TRUE), 
-array( 'input'=>'arctan', 'unary'=>TRUE, 'func'=>TRUE), 
+array( 'input'=>'arcsin', 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'arccos', 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'arctan', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'sinh', 'tex'=>'text{sinh}', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'cosh', 'tex'=>'text{cosh}', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'tanh', 'tex'=>'text{tanh}',  'unary'=>TRUE, 'func'=>TRUE),
@@ -222,9 +222,9 @@ array( 'input'=>'Sech', 'output'=>'sech', 'definition'=>TRUE),
 array( 'input'=>'Csch', 'output'=>'csch', 'definition'=>TRUE),
 array( 'input'=>'Log', 'output'=>'log', 'definition'=>TRUE),
 array( 'input'=>'Ln', 'output'=>'ln', 'definition'=>TRUE),
-array( 'input'=>'abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("|","|")), 
+array( 'input'=>'abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("|","|")),
 array( 'input'=>'Abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("|","|")),
-array( 'input'=>'norm', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("\\|","\\|")), 
+array( 'input'=>'norm', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("\\|","\\|")),
 array( 'input'=>'floor', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("\\lfloor","\\rfloor")),
 array( 'input'=>'ceil', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("\\lceil","\\rceil")),
 array( 'input'=>'det', 'unary'=>TRUE, 'func'=>TRUE),
@@ -233,10 +233,10 @@ array( 'input'=>'dim'),
 array( 'input'=>'mod', 'tex'=>'text{mod}', 'notexcopy'=>TRUE),
 array( 'input'=>'gcd', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'lcm', 'tex'=>'text{lcm}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'func'=>TRUE),
-array( 'input'=>'lub'), 
-array( 'input'=>'glb'), 
-array( 'input'=>'min', 'underover'=>TRUE), 
-array( 'input'=>'max', 'underover'=>TRUE), 
+array( 'input'=>'lub'),
+array( 'input'=>'glb'),
+array( 'input'=>'min', 'underover'=>TRUE),
+array( 'input'=>'max', 'underover'=>TRUE),
 array( 'input'=>'f', 'output'=>'f', 'unary'=>TRUE, 'func'=>TRUE,'val'=>TRUE),
 array( 'input'=>'g', 'output'=>'g', 'unary'=>TRUE, 'func'=>TRUE,'val'=>TRUE),
 
@@ -252,7 +252,7 @@ array( 'input'=>'->', 'tex'=>'to'),
 array( 'input'=>'>->', 'tex'=>'rightarrowtail'),
 array( 'input'=>'->>', 'tex'=>'twoheadrightarrow'),
 array( 'input'=>'>->>', 'tex'=>'twoheadrightarrowtail'),
-array( 'input'=>'|->', 'tex'=>'mapsto'), 
+array( 'input'=>'|->', 'tex'=>'mapsto'),
 array( 'input'=>'larr', 'tex'=>'leftarrow'),
 array( 'input'=>'harr', 'tex'=>'leftrightarrow'),
 array( 'input'=>'rArr', 'tex'=>'Rightarrow'),
@@ -296,8 +296,8 @@ array( 'input'=>'(:', 'tex'=>'langle', 'leftbracket'=>TRUE),
 array( 'input'=>':)', 'tex'=>'rangle', 'rightbracket'=>TRUE),
 array( 'input'=>'{:', 'leftbracket'=>TRUE, 'invisible'=>TRUE),
 array( 'input'=>':}', 'rightbracket'=>TRUE ,'invisible'=>TRUE),
-array( 'input'=>'<<', 'tex'=>'langle', 'leftbracket'=>TRUE, 'notexcopy'=>TRUE), 
-array( 'input'=>'>>', 'tex'=>'rangle', 'rightbracket'=>TRUE, 'notexcopy'=>TRUE), 
+array( 'input'=>'<<', 'tex'=>'langle', 'leftbracket'=>TRUE, 'notexcopy'=>TRUE),
+array( 'input'=>'>>', 'tex'=>'rangle', 'rightbracket'=>TRUE, 'notexcopy'=>TRUE),
 
 //fonts
 array('input'=>'color', 'binary'=>TRUE),
@@ -326,14 +326,14 @@ function AMinitSymbols() {
 		}
 	}
 	usort($this->AMsymbols, array($this,"AMcompareNames"));
-	
+
 	for ($i=0; $i<count($this->AMsymbols); $i++) {
 		$this->AMnames[$i] = $this->AMsymbols[$i]['input'];
 	}
 }
 
 function AMnewcommand($oldstr,$newstr) {
-	
+
 	array_push($this->AMsymbols, array('input'=>$oldstr, 'output'=>$newstr, 'definition'=>true));
 }
 
@@ -375,7 +375,7 @@ function AMposition($arr, $str, $n) {
 
 
 function AMgetSymbol($str) {
-	
+
 	$k =0;
 	$j =0;
 	$match = "";
@@ -432,7 +432,7 @@ function AMgetSymbol($str) {
 
 function AMTremoveBrackets($node) {
 	if ($node{0}=='{' && $node{strlen($node)-1}=='}') {
-		
+
 		$leftchop = 0;
 		$st = substr($node,1,5);
 		if ($st=='\\left') {
@@ -451,7 +451,7 @@ function AMTremoveBrackets($node) {
 				$leftchop = 2;
 			}
 		}
-	
+
 		if ($leftchop>0) {
 			$st = substr($node,-8);
 			if ($st=='\\right)}' || $st=='\\right]}' || $st=='\\right.}') {
@@ -462,7 +462,7 @@ function AMTremoveBrackets($node) {
 				$node = substr($node,0,strlen($node)-14).'}';
 			}
 		}
-		
+
 	}
 	return $node;
 }
@@ -491,12 +491,12 @@ function AMTgetTeXsymbol($symb) {
 	}
 }
 
-function AMTparseSexpr($str) { 
-	
+function AMTparseSexpr($str) {
+
 	$newFrag = '';
 	$str = $this->AMremoveCharsAndBlanks($str,0);
 	$symbol = $this->AMgetSymbol($str);
-	
+
 	if ($symbol == null || (isset($symbol['rightbracket']) && $this->AMnestingDepth>0)) {
 		return array(null,$str);
 	}
@@ -522,7 +522,7 @@ function AMTparseSexpr($str) {
 				if ($st=='\\rbrace') {
 					$leftchop = 13;
 				}
-			}	
+			}
 		}
 		if ($leftchop>0) {
 			$result[0] = substr($result[0],$leftchop);
@@ -683,12 +683,12 @@ function AMTparseIexpr($str) {
 			}
 		}
 	}
-	
+
 	return array($node,$str);
 }
 
 function AMTparseExpr($str,$rightbracket) {
-	
+
 	$newFrag = '';
 	$addedright = false;
 	do {
@@ -760,8 +760,8 @@ function AMTparseExpr($str,$rightbracket) {
 								$matrix = false;
 							}
 						}
-						
-					} 
+
+					}
 					array_push($pos,$len);
 					$lastmxsubcnt = -1;
 					if ($mxnestingd==0 && count($pos)>0 && $matrix) {
@@ -828,13 +828,13 @@ function AMTparseAMtoTeX($str) {
 	$str = str_replace(array('&nbsp;','&gt;','&lt;'),array('','>','<'),$str);
 	$str = preg_replace('/^\s+/','',$str);
 	if (trim($str)=='') {return '';}
-	
+
 	$result = $this->AMTparseExpr($str, false);
 	$result[0] = '\\displaystyle'.str_replace('$','\\$',$result[0]);
 	return ($result[0]);
 }
 
-function AMtoTeX() { //constructor
+function __construct() { //constructor
 	$this->AMinitSymbols();
 }
 function convert($str) {

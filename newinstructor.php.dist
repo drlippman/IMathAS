@@ -1,6 +1,6 @@
 <?php
 
-	require("config.php");
+	require("init_without_validate.php");
 	$pagetitle = "New instructor account request";
 	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 	$nologo = true;
@@ -27,7 +27,7 @@
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 			$stm->execute(array(':SID'=>$_POST['username']));
 			if ($stm->rowCount()>0) {
-				echo "<p>Username <b>{$_POST['username']}</b> is already in use.  Please try another</p>\n";
+				echo "<p>Username <b>".Sanitize::encodeStringForDisplay($_POST['username'])."</b> is already in use.  Please try another</p>\n";
 			} else {
 				if (isset($CFG['GEN']['homelayout'])) {
 					$homelayout = $CFG['GEN']['homelayout'];
@@ -89,12 +89,12 @@
 			}
 		}
 	}
-	if (isset($_POST['firstname'])) {$firstname=$_POST['firstname'];} else {$firstname='';}
-	if (isset($_POST['lastname'])) {$lasname=$_POST['lastname'];} else {$lastname='';}
-	if (isset($_POST['email'])) {$email=$_POST['email'];} else {$email='';}
-	if (isset($_POST['phone'])) {$phone=$_POST['phone'];} else {$phone='';}
-	if (isset($_POST['school'])) {$school=$_POST['school'];} else {$school='';}
-	if (isset($_POST['username'])) {$username=$_POST['username'];} else {$username='';}
+	if (isset($_POST['firstname'])) {$firstname=Sanitize::encodeStringForDisplay($_POST['firstname']);} else {$firstname='';}
+	if (isset($_POST['lastname'])) {$lasname=Sanitize::encodeStringForDisplay($_POST['lastname']);} else {$lastname='';}
+	if (isset($_POST['email'])) {$email=Sanitize::encodeStringForDisplay($_POST['email']);} else {$email='';}
+	if (isset($_POST['phone'])) {$phone=Sanitize::encodeStringForDisplay($_POST['phone']);} else {$phone='';}
+	if (isset($_POST['school'])) {$school=Sanitize::encodeStringForDisplay($_POST['school']);} else {$school='';}
+	if (isset($_POST['username'])) {$username=Sanitize::encodeStringForDisplay($_POST['username']);} else {$username='';}
 
 	echo "<h3>New Instructor Account Request</h3>\n";
 	echo "<form method=post action=\"newinstructor.php\">\n";

@@ -1,6 +1,7 @@
 <?php
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
+
 	if (!isset($_GET['cid'])) {
 		echo "Need course id";
 		exit;
@@ -11,19 +12,19 @@
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = intval($_GET['from']);
 		$_GET['cid'] = intval($_GET['from']);
-		require("../validate.php");
+		require("../init.php");
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else if (isset($_SERVER['HTTP_REFERER']) && preg_match('/cid=(\d+)/',$_SERVER['HTTP_REFERER'],$matches) && $matches[1]!=$cid) {
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = intval($matches[1]);
 		$_GET['cid'] = intval($matches[1]);
-		require("../validate.php");
+		require("../init.php");
 		$fcid = $cid;
 		$cid = $pubcid;
 	} else {
 		$fcid = 0;
-		require("../config.php");
+		require("../init_without_validate.php");
 	}
 
 	function findinpublic($items,$id) {
@@ -72,9 +73,9 @@
 		//DB $coursetheme = mysql_result($result,0,2);
 		$coursename = $itemcoursename;
 		$coursetheme = $itemcoursetheme;
-		$breadcrumbbase = "<a href=\"public.php?cid=$cid\">$coursename</a> &gt; ";
+		$breadcrumbbase = "<a href=\"public.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	} else {
-		$breadcrumbbase = "$breadcrumbbase <a href=\"course.php?cid=$fcid\">$coursename</a> &gt; ";
+		$breadcrumbbase = "$breadcrumbbase <a href=\"course.php?cid=$fcid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 
 	if (!findinpublic($items,$itemid)) {
@@ -99,18 +100,17 @@
 	$titlesimp = strip_tags($title);
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase $titlesimp</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
 
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';
-
-	if (isset($_GET['from'])) {
-		echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Back</a></div>\n";
+	if (!($_GET['from'])) {
+		echo "<div class=right><a href=\"course.php?cid=$cid\">Back</a></div>\n";
 	} else if ($fcid>0) {
-		echo "<div class=right><a href=\"{$_SERVER['HTTP_REFERER']}\">Back</a></div>\n";
+		echo "<div class=right><a href=\"" . Sanitize::url($_SERVER['HTTP_REFERER']) . "\">Back</a></div>\n";
 	} else {
-		echo "<div class=right><a href=\"public.php?cid={$_GET['cid']}\">Return to the Public Course Page</a></div>\n";
+		echo "<div class=right><a href=\"public.php?cid=$cid\">Return to the Public Course Page</a></div>\n";
 	}
 	require("../footer.php");
 

@@ -66,7 +66,7 @@ div.itemhdr {
 	min-height: 26px;
 }
 .itemhdricon {
-	position: absolute; 
+	position: absolute;
 }
 .itemhdricon div {
 	padding-left: 5px;
@@ -381,14 +381,19 @@ table.cal td {
 .today {
 	background-color: #fdd;
 }
+.caldatebar {
+	background-color: #ddf;
+}
 div.center {
 	text-align: center;
 }
 span.calitem {
-	line-height: 120%;
-	padding: 0 5px;
+	padding: 0 4px;
 	background-color: #0ff;
 	margin: 1px;
+}
+table.cal span.calitem {
+	display: inline-block;
 }
 /*
 div.td {
@@ -558,15 +563,15 @@ ul.courselist > li > a {
 	display:inline-block;
 	margin-right:10px;
 }
-ul.courselist li { 
-	position: relative; 
+ul.courselist li {
+	position: relative;
 }
-div.coursedd { 
-	position: absolute; 
-	right: 0px; 
+div.coursedd {
+	position: absolute;
+	right: 0px;
 	top: 2px;
 }
-   
+
 div.block h3 {
 	margin: 2px;
 }
@@ -664,7 +669,7 @@ input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus
   margin: 0;
   text-align: left;
 }
-#GB_caption a {
+#GB_caption a, #GB_caption a:hover, #GB_caption a:focus {
 	color: #fff;
 	text-decoration: none;
 }
@@ -707,8 +712,18 @@ span.boxed {
 	padding: 2px 5px;
 }
 a.attach {
-    background: url(editor/plugins/attach/img/ed_attach.gif) center left no-repeat;
+    background: url(tinymce4/plugins/attach/ed_attach.gif) center left no-repeat;
     padding-left: 20px;
+}
+a[target=_blank]:after {
+	content: "";
+	width:16px;
+	height:1em;
+	display: inline-block;
+	background: url(img/extlink.png) center right no-repeat;
+}
+.mce-content-body a[target=_blank]:after {
+	display: none;
 }
 div.forumgrp img {
 	max-width: 90%;
@@ -733,7 +748,7 @@ div.multiselitem {
 }
 .ind3 {
 	margin-left: 2.25em;
-} 
+}
 .ind4 {
 	margin-left: 3em;
 }
@@ -815,7 +830,7 @@ pre {
 	opacity: .6;
 }
 .greystrike.a {
-	
+
 }
 .altContentOff {
 	display:none;
@@ -888,22 +903,20 @@ a.dropdown-toggle:hover {
   clear: both;
   font-weight: normal;
   line-height: 1.42857143;
-  color: #333;
+  color: #000;
   white-space: nowrap;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
-  color: #262626;
+  color: #000;
   text-decoration: none;
   background-color: #f5f5f5;
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
-  color: #fff;
   text-decoration: none;
-  background-color: #337ab7;
-  outline: 0;
+  background-color: #ddddff;
 }
 .dropdown-menu > .disabled > a,
 .dropdown-menu > .disabled > a:hover,
@@ -937,7 +950,8 @@ a.dropdown-toggle:hover {
   padding: 3px 20px;
   font-size: 12px;
   line-height: 1.42857143;
-  color: #777;
+  background-color: #036;
+  color: #fff;
   white-space: nowrap;
 }
 .dropdown-backdrop {
@@ -985,4 +999,3 @@ a.dropdown-toggle:hover {
 	max-width: 1920px;
 	margin: auto;
 }
-

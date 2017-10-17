@@ -299,12 +299,12 @@ function encodea11ydraw() {
 			var outpts = [];
 			for (var i=1;i<input.length;i+=2) {
 				try {
-					with (Math) input[i-1] = eval(mathjs(input[i-1]));
+					input[i-1] = eval(prepWithMath(mathjs(input[i-1])));
 				} catch(e) {
 					input[i-1] = NaN;
 				}
 				try {
-					with (Math) input[i] = eval(mathjs(input[i]));
+					input[i] = eval(prepWithMath(mathjs(input[i])));
 				} catch(e) {
 					input[i] = NaN;
 				}
@@ -320,7 +320,7 @@ function encodea11ydraw() {
 				lines.push('('+outpts.join('),(')+')');
 			} else if (mode>=5 && mode<10 && outpts.length==2) {
 				tplines.push('('+mode+','+outpts.join(',')+')');
-			} else if (mode>10 && outpts.length==3) {
+			} else if (mode>=10 && outpts.length==3) {
 				tpineq.push('('+mode+','+outpts.join(',')+')');
 			}
 		});
@@ -797,7 +797,7 @@ function drawTarget(x,y) {
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
 					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
-						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.strokeStyle = "rgb(0,255,255)";
 						ctx.lineWidth = 1;
 						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
 						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
@@ -839,7 +839,7 @@ function drawTarget(x,y) {
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
 					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
-						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.strokeStyle = "rgb(0,255,255)";
 						ctx.lineWidth = 1;
 						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
 						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
@@ -947,6 +947,43 @@ function drawTarget(x,y) {
 						}
 					}
 				}
+			}
+		} else if (tptypes[curTarget][i]==8.4) {//if a tp log (unshifted)
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null && x2!=tplines[curTarget][i][0][0] && y2!=tplines[curTarget][i][0][1]) {
+				// Treat as x = ab^y
+				// (x1, y1) (x2, y2)
+				// b^(y2-y1) = x2/x1
+				// a = x1/b^y1
+
+				var originx = -targets[curTarget].xmin*targets[curTarget].pixperx + targets[curTarget].imgborder;
+				var adjx1 = originx - tplines[curTarget][i][0][0];
+				var adjx2 = originx - x2;
+				if (adjx1*adjx2>0 && y2 != tplines[curTarget][i][0][1]) {
+					var expbase = safepow(adjx2/adjx1, 1/(y2-tplines[curTarget][i][0][1]));
+					var stretch = adjx2/safepow(expbase,y2);
+					ctx.moveTo(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1]);
+					var cury = 0;
+					for (var cury=0;cury < targets[curTarget].imgheight+4;cury += 3) {
+						curx = originx - stretch*safepow(expbase,cury);
+						if (curx<-100) { curx = -100;}
+						if (curx>targets[curTarget].imgwidth+100) { curx=targets[curTarget].imgwidth+100;}
+						if (cury==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				}
+
 			}
 		} else if (tptypes[curTarget][i]==8.2) {//if a tp linear/linear rational
 			var y2 = null;
@@ -1216,9 +1253,10 @@ function drawMouseDown(ev) {
 	}
 	if (hasTouch) {
 		window.clearTimeout(hasTouchTimer);
-		$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
-		$(document).on("touchmove.imathasdraw", drawMouseMove);
+		$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+		$(".drawcanvas").on("touchmove.imathasdraw", drawMouseMove);
 		$(document).on("touchend.imathasdraw", drawMouseUp);
+		$(document).on("touchcancel.imathasdraw", drawMouseUp);
 	} else {
 		$(document).on("mousemove.imathasdraw", drawMouseMove);
 		$(document).on("mouseup.imathasdraw", drawMouseUp);
@@ -1236,6 +1274,7 @@ function drawMouseDown(ev) {
 	}
 
 	if (curTarget!=null) { //is a target currectly in action?
+		ev.preventDefault();  //prevent scrolling
 		mouseisdown = true;
 		var tarelpos = getPosition(targets[curTarget].el);
 		//$(".tips").html(curTPcurve+","+clickcnt);
@@ -1243,9 +1282,11 @@ function drawMouseDown(ev) {
 
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
+			/*  not necessary
 			if( navigator.userAgent.match(/Android/i) ) {
-				//ev.preventDefault(); //prevent pinch-zoom too
+				ev.preventDefault(); //prevent pinch-zoom too
 			}
+			*/
 			if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 			if (drawlocky[curTarget]==1) {
 				mouseOff.y = targets[curTarget].imgheight/2;
@@ -1623,13 +1664,13 @@ function drawMouseUp(ev) {
 			hasTouch = false;
 			clearAllDrawListners();
 			$(document).on("mousemove.imathasdraw", drawMouseMove);
-			$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+			$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 			$(document).on("mousedown.imathasdraw", drawMouseDown);
 		}, 350);
 	} else {
 		clearAllDrawListners();
 		$(document).on("mousemove.imathasdraw", drawMouseMove);
-		$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+		$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 		$(document).on("mousedown.imathasdraw", drawMouseDown);
 	}
 }
@@ -1832,12 +1873,13 @@ function getPosition(e){
 
 function clearAllDrawListners() {
 	$(document).off("mousedown.imathasdraw").off("mousemove.imathasdraw").off("mouseup.imathasdraw");
-	$(document).off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw");
+	$(document).off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw").off("touchcancel.imathasdraw");
+	$(".drawcanvas").off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw").off("touchcancel.imathasdraw");
 }
 function initCanvases(k) {
 	clearAllDrawListners();
-	$(document).on("mousemove.imathasdraw", drawMouseMove);
-	$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+	$(".drawcanvas").on("mousemove.imathasdraw", drawMouseMove);
+	$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 	$(document).on("mousedown.imathasdraw", drawMouseDown);
 
 	try {

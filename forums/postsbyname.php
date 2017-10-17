@@ -2,7 +2,9 @@
 	//Lists forum posts by Student name
 	//(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
+
+
 	/*if (!isset($teacherid) && !isset($tutorid)) {
 	   require("../header.php");
 	   echo "You must be a teacher to access this page\n";
@@ -15,8 +17,8 @@
 		$isteacher = false;
 	}
 
-	$forumid = $_GET['forum'];
-	$cid = $_GET['cid'];
+	$forumid = Sanitize::onlyInt($_GET['forum']);
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['markallread'])) {
 		//DB $query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
@@ -46,7 +48,6 @@
 		}
 		}
 	}
-
 	//DB $query = "SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid FROM imas_forums WHERE id='$forumid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	//DB list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid) = mysql_fetch_row($result);
@@ -73,10 +74,10 @@
 		require("../includes/rubric.php");
 	}
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Forum Topics</a> &gt; Posts by Name</div>\n";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."\">Forum Topics</a> &gt; Posts by Name</div>\n";
 
 	echo '<div id="headerpostsbyname" class="pagetitle">';
-	echo "<h2>Posts by Name - $forumname</h2>\n";
+	echo "<h2>Posts by Name - ".Sanitize::encodeStringForDisplay($forumname)."</h2>\n";
 	echo '</div>';
 	if (!$canviewall && $postbeforeview) {
 		//DB $query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";
@@ -204,6 +205,7 @@
 		$stm->execute(array(':id'=>$rubric));
 		if ($stm->rowCount()>0) {
 			$row = $stm->fetch(PDO::FETCH_NUM);
+			// $row data is sanitized by printrubrics().
 			echo printrubrics(array($row));
 		}
 	}
@@ -238,27 +240,10 @@
 			$groupid=0;
 		}
 		$dofilter = true;
-		//DB $query = "SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid='$groupid') AND forumid='$forumid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$stm = $DBH->prepare("SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid=:stugroupid) AND forumid=:forumid");
-		$stm->execute(array(':stugroupid'=>$groupid, ':forumid'=>$forumid));
-		$limthreads = array();
-		//DB while ($row = mysql_fetch_row($result)) {
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$limthreads[] = $row[0];
-		}
-		if (count($limthreads)==0) {
-			$limthreads = '0';
-		} else {
-			$limthreads = implode(',',$limthreads); //INT from DB - safe
-		}
 	}
 	$blockreplythreads = array();
 	if (!$canviewall) { //this should probably be refactored in a more elegant way
 		$query = "SELECT threadid FROM imas_forum_posts WHERE forumid=:forumid AND parent=0 AND posttype=3 ";
-		if ($dofilter) {
-			$query .= "AND threadid IN ($limthreads) ";
-		}
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':forumid'=>$forumid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -269,17 +254,21 @@
 	//DB $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
 	//DB $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
 	//DB $query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ";
-	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
+	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview FROM imas_forum_posts JOIN ";
+	$query .= "imas_forum_threads AS ift ON ift.id=imas_forum_posts.threadid AND ift.lastposttime<:now JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid=:userid) AS ifv ON ";
 	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid=:forumid AND imas_forum_posts.isanon=0 ";
+	$arr = array(':userid'=>$userid, ':forumid'=>$forumid, ':now'=>$now);
 	if ($dofilter) {
-		$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+		//$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+		$query .= "AND (ift.stugroupid=0 OR ift.stugroupid=:stugroupid) ";
+		$arr[':stugroupid']=$groupid;
 	}
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid, ':forumid'=>$forumid));
+	$stm->execute($arr);
 
 	$laststu = -1;
 	$cnt = 0;
@@ -289,17 +278,17 @@
 	echo "<button type=\"button\" onclick=\"window.location.href='postsbyname.php?cid=$cid&forum=$forumid&markallread=true'\">"._('Mark all Read')."</button><br/>";
 
 	if ($caneditscore && $haspoints) {
-		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\" onsubmit=\"onsubmittoggle()\">";
+		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	function printuserposts($name, $uid, $content, $postcnt, $replycnt) {
-		echo "<b>$name</b> (";
+		printf("<b>%s</b> (", Sanitize::encodeStringForDisplay($name));
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm$uid.jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			} else {
-				echo "<img src=\"$imasroot/course/files/userimg_sm$uid.jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img src=\"$imasroot/course/files/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			}
 		}
 		echo '<div class="forumgrp">'.$content.'</div>';
@@ -313,7 +302,7 @@
 				$content = '';  $postcnt = 0; $replycnt = 0;
 			}
 			$laststu = $line['userid'];
-			$lastname = "{$line['LastName']}, {$line['FirstName']}";
+			$lastname = Sanitize::encodeStringForDisplay($line['LastName']).", " . Sanitize::encodeStringForDisplay($line['FirstName']);
 		}
 
 		if ($line['parent']!=0) {
@@ -329,53 +318,54 @@
 		$content .= '<span class="right">';
 		if ($haspoints) {
 			if ($caneditscore && $line['userid']!=$userid) {
-				$content .= "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
+				$content .= "<input type=text size=2 name=\"score[".Sanitize::onlyInt($line['id'])."]\" id=\"score".Sanitize::onlyInt($line['id'])."\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
 				if (isset($scores[$line['id']])) {
-					$content .= $scores[$line['id']];
+					$content .= Sanitize::encodeStringForDisplay($scores[$line['id']]);
 				}
 
 				$content .= "\"/> Pts ";
 				if ($rubric != 0) {
-					$content .= printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
+					$content .= printrubriclink($rubric,$pointspos,"score".Sanitize::onlyInt($line['id']), "feedback".Sanitize::onlyInt($line['id'])).' ';
 				}
 			} else if (($line['userid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
-				$content .= "<span class=red>{$scores[$line['id']]} pts</span> ";
+				$content .= "<span class=red> ".Sanitize::onlyInt($scores[$line['id']])." pts</span> ";
 			}
 		}
-		$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['threadid']}\">Thread</a> ";
+		$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."\">Thread</a> ";
 		if ($isteacher || ($line['userid']==$userid && $allowmod)) {
-			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify={$line['id']}\">Modify</a> \n";
+			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&modify=".Sanitize::onlyInt($line['id'])."\">Modify</a> \n";
 		}
 		if ($isteacher || ($allowdel && $line['userid']==$userid)) {
-			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={$line['id']}\">Remove</a> \n";
+			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&remove=".Sanitize::onlyInt($line['id'])."\">Remove</a> \n";
 		}
 		if ($line['posttype']!=2 && $myrights > 5 && $allowreply) {
-			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify=reply&replyto={$line['id']}\">Reply</a>";
+			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&modify=reply&replyto=".Sanitize::onlyInt($line['id'])."\">Reply</a>";
 		}
 		$content .= '</span>';
 		$content .= "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
-		$content .= '<b>'.$line['subject'].'</b>';
+		$content .= '<b>'.Sanitize::encodeStringForDisplay($line['subject']).'</b>';
 		if ($line['parent']!=0) {
 			$content .= '</span>';
 		}
 		$dt = tzdate("F j, Y, g:i a",$line['postdate']);
-		$content .= ', Posted: '.$dt;
+		$content .= ', Posted: '.Sanitize::encodeStringForDisplay($dt);
+
 		if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
 			$content .= " <span class=noticetext>New</span>\n";
 		}
 		$content .= '</div>';
-		$content .= "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
+		$content .= "<div id=\"m$cnt\" class=\"hidden\">".Sanitize::outgoingHtml(filter($line['message']));
 		if ($haspoints) {
 			if ($caneditscore && $line['userid']!=$userid) {
 				$content .= '<hr/>';
-				$content .= "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
+				$content .= "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[". Sanitize::onlyInt($line['id'])."]\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
 				if ($feedback[$line['id']]!==null) {
-					$content .= $feedback[$line['id']];
+					$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
 				}
 				$content .= "</textarea>";
 			} else if (($line['userid']==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
 				$content .= '<div class="signup">Private Feedback: ';
-				$content .= $feedback[$line['id']];
+				$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
 				$content .= '</div>';
 			}
 		}
@@ -391,7 +381,7 @@
 
 	echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
 
-	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page={$_GET['page']}\">Back to Thread List</a></p>";
+	echo "<p><a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($_GET['page'])."\">Back to Thread List</a></p>";
 
 	require("../footer.php");
 

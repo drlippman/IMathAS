@@ -2,7 +2,8 @@
 //IMathAS:  Manage LatePasses
 //(c) 2007 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -10,7 +11,7 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['hours'])) {
 		if (isset($_POST['latepass'])) {
@@ -25,12 +26,13 @@
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET latepasshrs=:latepasshrs WHERE id=:id");
 		$stm->execute(array(':latepasshrs'=>$_POST['hours'], ':id'=>$cid));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+    printf('<div class=breadcrumb>%s <a href="course.php?cid=%s">%s</a> ', $breadcrumbbase,
+        Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
 	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> ";
 	echo "&gt; Manage LatePasses</div>";
 
@@ -146,7 +148,7 @@ function sendtoall(type) {
 		$stm->execute(array(':id'=>$cid));
 		$hours = $stm->fetchColumn(0);
 		echo '<p>Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.  Students must redeem the LatePass before the Due Date, unless you opt in your assessment settings to allow use after the due date (but within 1 LatePass period, specified below).</p>';
-		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"$hours\"/> hours</p>";
+		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"" . Sanitize::encodeStringForDisplay($hours) . "\"/> hours</p>";
 		echo "<p>To all students:  <input type=\"text\" size=\"3\" value=\"1\" id=\"toall\"/> ";
 		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';
 		echo "<table id=myTable><thead><tr><th>Name</th>";
@@ -173,12 +175,12 @@ function sendtoall(type) {
 
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td>{$row[1]}, {$row[2]}</td>";
+			echo "<tr><td>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</td>";
 			if ($hassection) {
-				echo "<td>{$row[3]}</td>";
+				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}
 
-			echo "<td><input type=text size=3 name=\"latepass[{$row[0]}]\" value=\"{$row[4]}\"";
+			echo "<td><input type=text size=3 name=\"latepass[" . Sanitize::encodeStringForDisplay($row[0]) . "]\" value=\"" . Sanitize::encodeStringForDisplay($row[4]) . "\"";
 			echo " onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" /></td>";
 			echo "</tr>";
 		}

@@ -1,9 +1,9 @@
 <?php
 //IMathAS:  Save changes to addquestions submitted through AHAH
 //(c) 2007 IMathAS/WAMAP Project
-	require("../validate.php");
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	require("../init.php");
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (!isset($teacherid)) {
 		echo "error: validation";
 	}

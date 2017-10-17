@@ -3,7 +3,7 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 
 /*** pre-html data manipulation, including function code *******/
@@ -54,7 +54,7 @@ function updateBlocksArray(&$items,$tochg,$sets) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Block Settings";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Mass Change Block Settings";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid']).'">'.Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Block Settings";
 
 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -113,7 +113,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
 	exit;
 
@@ -185,12 +185,12 @@ Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php e
 <ul class="nomark">
 <?php
 foreach ($existblocks as $pos=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$existblockids[$pos].'"/>';
+	echo '<li><input type="checkbox" name="checked[]" value="' . Sanitize::encodeStringForDisplay($existblockids[$pos]) . '"/>';
 	$n = substr_count($pos,"-")-1;
 	for ($i=0;$i<$n;$i++) {
 		echo '&nbsp;&nbsp;';
 	}
-	echo $name.'</li>';
+	echo Sanitize::encodeStringForDisplay($name) . '</li>';
 }
 ?>
 </ul>

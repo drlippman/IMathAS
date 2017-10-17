@@ -2,11 +2,18 @@
 //IMathAS:  Redeem latepasses
 //(c) 2007 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/exceptionfuncs.php");
-	
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+
+
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
+
+	if (isset($_REQUEST['from'])) {
+		$from = Sanitize::simpleString($_REQUEST['from']);
+	} else {
+		$from = 'default';
+	}
 
 	//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -15,7 +22,7 @@
 	$stm->execute(array(':id'=>$cid));
 	$latepasshrs = $stm->fetchColumn(0);
 	$now = time();
-	
+
 	//DB $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $latepasses = mysql_result($result,0,0);
@@ -35,9 +42,12 @@
 
 	if (isset($_GET['undo'])) {
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase ";
+		echo "<div class=breadcrumb>";
+		if ($from != 'ltitimelimit') {
+			echo "$breadcrumbbase ";
+		}
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Un-use LatePass</div>";
 		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
@@ -87,7 +97,8 @@
 							$n = $row[1];
 						}
 					}
-					echo "<p>Returning $n LatePass".($n>1?"es":"")."</p>";
+					printf("<p>Returning %d LatePass", $n);
+					echo ($n>1?"es":"")."</p>";
 					//DB $query = "UPDATE imas_students SET latepass=latepass+$n WHERE userid='$userid' AND courseid='$cid'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass+:n WHERE userid=:userid AND courseid=:courseid");
@@ -98,12 +109,14 @@
 
 		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
+		} else if ($from=='ltitimelimit') {
+			echo "<p><a href=\"../bltilaunch.php?accessibility=ask'\">Continue</a></p>";
 		} else {
 			echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Continue</a></p>";
 		}
 		require("../footer.php");
 
-	} else if (isset($_GET['confirm'])) {
+	} else if (isset($_POST['confirm'])) {
 		$addtime = $latepasshrs*60*60;
 		//DB $query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -151,7 +164,7 @@
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+1 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 					$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid, ':enddate'=>$enddate));
 				} else {
-					
+
 					//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES ('$userid','$aid','$startdate','$enddate',1,'A')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES (:userid, :assessmentid, :startdate, :enddate, :islatepass, :itemtype)");
@@ -160,15 +173,20 @@
 			}
 		}
 		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+		} else if ($from=='ltitimelimit') {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 		}
 	} else {
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase ";
+		echo "<div class=breadcrumb>";
+		if ($from != 'ltitimelimit') {
+			echo "$breadcrumbbase ";
+		}
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Redeem LatePass</div>\n";
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
@@ -210,15 +228,19 @@
 			echo "<p>You have no late passes remaining.</p>";
 		} else if ($canuselatepass) {
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
-			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid&confirm=true\">";
+			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid\">";
 			if ($allowlate%10>1) {
 				echo '<p>You may use up to '.($allowlate%10-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
 			}
-			echo "<p>You have $latepasses LatePass(es) remaining.  You can redeem one LatePass for a $latepasshrs hour ";
+			echo "<p>You have ".Sanitize::encodeStringForDisplay($latepasses)." LatePass(es) remaining.  You can redeem one LatePass for a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour ";
 			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
+			echo '<input type="hidden" name="confirm" value="true" />';
+			echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($from).'" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
 			if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+			} else if ($from=='ltitimelimit') {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../bltilaunch.php?accessibility=ask'\"/>";
 			} else {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
 			}

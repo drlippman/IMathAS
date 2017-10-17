@@ -1,6 +1,7 @@
 <?php
 
-require("../config.php");
+require("../init_without_validate.php");
+
 
 if (empty($_GET['badgeid'])) {
 	exit;
@@ -90,12 +91,12 @@ function print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout,
 	global $installname, $imasroot;
 	$coursetheme = "default.css";
 	require("../header.php");
-	echo '<h2>Badge: '.$name.'</h2>';
+	echo '<h2>Badge: '.Sanitize::encodeStringForDisplay($name).'</h2>';
 	if ($stuout != null) {
 		echo '<h3>'.$stuname. ' ('.$email.')</h3>';
 	}
-	if ($descr!='') {echo '<p>'.$descr.'</p>';}
-	if ($longdescr!='') {echo '<p>'.$longdescr.'</p>';}
+	if ($descr!='') {echo '<p>'.Sanitize::encodeStringForDisplay($descr).'</p>';}
+	if ($longdescr!='') {echo '<p>'.Sanitize::encodeStringForDisplay($longdescr).'</p>';}
 
 	echo '<table style="margin-top: 10px;" class="gb"><thead><tr><th>Category/Course Total</th><th>Score Required</th>';
 	if ($stuout != null) {
@@ -103,9 +104,9 @@ function print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout,
 	}
 	echo '</tr></thead><tbody>';
 	foreach ($reqnameout as $i=>$n) {
-		echo '<tr><td>'.$n.'</td><td>'.$reqout[$i];
+		echo '<tr><td>'.Sanitize::encodeStringForDisplay($n).'</td><td>'.Sanitize::encodeStringForDisplay($reqout[$i]);
 		if ($stuout != null) {
-			echo '<td>'.$stuout[$i].'</td><td>'.$metout[$i];
+			echo '<td>'.Sanitize::encodeStringForDisplay($stuout[$i]).'</td><td>'.Sanitize::encodeStringForDisplay($metout[$i]);
 		}
 		echo '</td></tr>';
 	}
@@ -122,7 +123,7 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 	} else {
 		$urlmode = 'http://';
 	}
-	$urlbase = $urlmode . $_SERVER['HTTP_HOST'];
+	$urlbase = $urlmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 	$salt = generateSalt();
 	$hash = 'sha256$'.hash('sha256', $email . $salt);
 
@@ -130,7 +131,7 @@ function print_assertation($cid, $badgetext, $badgename, $descr, $userid, $email
 	if ($bs=='http://' || $bs=='https:/') {
 		$img = $badgetext;
 	} else {
-		$img = "$imasroot/img/badge.php?text=".urlencode($badgetext);
+		$img = "$imasroot/img/badge.php?text=".Sanitize::encodeUrlParam($badgetext);
 	}
 
 	/*$query = "SELECT imas_courses.name AS cname, imas_users.LastName, imas_users.FirstName, imas_users.email, imas_groups.name FROM imas_courses JOIN imas_teachers ON imas_courses.id=imas_teachers.courseid ";

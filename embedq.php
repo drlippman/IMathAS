@@ -1,8 +1,9 @@
 <?php
 //IMathAS:  Embed a Question via iFrame
 //(c) 2010 David Lippman
-
-require("./config.php");
+$init_skip_csrfp = true;
+require("./init_without_validate.php");
+unset($init_skip_csrfp);
 require("i18n/i18n.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $public = '?public=true';
@@ -16,8 +17,25 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 require("./assessment/displayq2.php");
 
 $sessiondata = array();
-$sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 1;
+$prefdefaults = array(
+	'mathdisp'=>1,
+	'graphdisp'=>1,
+	'drawentry'=>1,
+	'useed'=>1,
+	'livepreview'=>1);
+$prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
+$sessiondata['userprefs'] = array();
+foreach($prefdefaults as $key=>$def) {
+	if ($prefcookie!==null && isset($prefcookie[$key])) {
+		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+	} else {
+		$sessiondata['userprefs'][$key] = $def;
+	}
+}
+foreach(array('graphdisp','mathdisp','useed') as $key) {
+	$sessiondata[$key] = $sessiondata['userprefs'][$key];
+}
+
 $showtips = 2;
 $useeqnhelper = 4;
 $sessiondata['drill']['cid'] = 0;
@@ -28,14 +46,14 @@ if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;
 }
-$qsetid=$_GET['id'];
+$qsetid=Sanitize::onlyInt($_GET['id']);
 
 $page_formAction = "embedq.php?id=$qsetid";
 
 if (isset($_GET['theme'])) {
 	$theme = preg_replace('/\W/','',$_GET['theme']);
 	$sessiondata['coursetheme'] = $theme . '.css';
-	$page_formAction .= "&theme=$theme";	
+	$page_formAction .= "&theme=$theme";
 } else {
 	$sessiondata['coursetheme'] = $coursetheme;
 }
@@ -99,6 +117,46 @@ $useeditor = 1;
 if (isset($_GET['resizer'])) {
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/iframeSizer_contentWindow_min.js"></script>';
 }
+if (isset($_GET['frame_id'])) {
+	$frameid = preg_replace('/[^\w:.-]/','',$_GET['frame_id']);
+	$placeinhead .= '<script type="text/javascript">
+		function sendresizemsg() {
+		 if(self != top){
+		  var default_height = Math.max(
+	              document.body.scrollHeight, document.body.offsetHeight,
+	              document.documentElement.clientHeight, document.documentElement.scrollHeight,
+	              document.documentElement.offsetHeight);
+		  window.parent.postMessage( JSON.stringify({
+		      subject: "lti.frameResize",
+		      height: default_height,
+		      frame_id: "'.$frameid.'"
+		  }), "*");
+		 }
+		}
+
+		if (mathRenderer == "Katex") {
+			window.katexDoneCallback = sendresizemsg;
+		} else if (typeof MathJax != "undefined") {
+			MathJax.Hub.Queue(function () {
+				sendresizemsg();
+			});
+		} else {
+			$(function() {
+				sendresizemsg();
+			});
+		}
+		</script>';
+	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+		//in case MathJax isn't loaded yet
+		$placeinhead .= '<script type="text/x-mathjax-config">
+			MathJax.Hub.Queue(function () {
+				sendresizemsg();
+			});
+			</script>';
+	}
+}
+
+
 require("./assessment/header.php");
 
 if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
@@ -107,14 +165,14 @@ if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
 }
 
 if ($showans) {
-	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
 	echo "<p>" . _('Displaying last question with solution') . " <input type=submit name=\"next\" value=\"" . _('New Question') . "\"/></p>\n";
 	displayq(0,$qsetid,$seed,2,true,0);
 	echo "</form>\n";
 } else {
 	$doshowans = 0;
-	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
-	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
+	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
+	echo "<input type=\"hidden\" name=\"seed\" value=\"" . Sanitize::encodeStringForDisplay($seed) . "\" />";
 	$lastanswers = array();
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
 	echo "<input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";

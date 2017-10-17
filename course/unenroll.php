@@ -5,13 +5,15 @@
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 
+require_once(__DIR__ . "/../includes/sanitize.php");
+
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
 		require("../footer.php");
 		exit;
 	}
-	if (isset($_GET['confirmed'])) { //do unenroll
+	if (isset($_POST['dounenroll'])) { //do unenroll - postback
 		if ($_GET['uid']=="selected") {
 			$tounenroll = explode(",",$_POST['tounenroll']);
 		} else if ($_GET['uid']=="all") {
@@ -48,10 +50,10 @@ ini_set("max_execution_time", "600");
 
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=".Sanitize::courseId($cid));
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode']));
 			exit;
 		}
 	} else { //get confirm
@@ -118,16 +120,18 @@ ini_set("max_execution_time", "600");
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['uid']));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$unenrollConfirm =  "Are you SURE you want to unenroll {$row[0]} {$row[1]} ($row[2])?";
+			$unenrollConfirm =  sprintf("Are you SURE you want to unenroll %s %s (%s)?",
+                Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
+                Sanitize::encodeStringForDisplay($row[2]));
 		}
 
 		/**** confirmation page body *****/
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action={$_GET['action']}&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"listusers.php?cid=".Sanitize::courseId($cid)."&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=unenroll&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&action=unenroll&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
 		}
 
 
@@ -140,7 +144,9 @@ ini_set("max_execution_time", "600");
 <?php
 					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
-						echo "			<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+						printf("			<li>%s %s (%s)</li>",
+                            Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
+                            Sanitize::encodeStringForDisplay($row[2]));
 					}
 ?>
 		</ul>
@@ -168,7 +174,7 @@ ini_set("max_execution_time", "600");
 			} else if ($_GET['uid']=="selected") {
 				if (count($_POST['checked'])==0) {
 					if ($calledfrom=='lu') {
-						echo "No users selected.  <a href=\"listusers.php?cid=$cid\">Try again</a></form>";
+						echo "No users selected.  <a href=\"listusers.php?cid=".Sanitize::courseId($cid)."\">Try again</a></form>";
 					}
 
 				} else {
@@ -180,13 +186,15 @@ ini_set("max_execution_time", "600");
 <?php
 					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
-						echo "			<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+						printf("			<li>%s %s (%s)</li>",
+							Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
+							Sanitize::encodeStringForDisplay($row[2]));
 					}
 ?>
 		</ul>
 		<?php echo $delForumMsg; ?>
 		<?php echo $delWikiMsg; ?>
-		<input type=hidden name="tounenroll" value="<?php echo implode(",",$_POST['checked']) ?>">
+		<input type=hidden name="tounenroll" value="<?php echo Sanitize::encodeStringForDisplay(implode(",",$_POST['checked'])); ?>">
 <?php
 				}
 			} else {
@@ -195,13 +203,13 @@ ini_set("max_execution_time", "600");
 ?>
 
 		<p>
-			<input type=submit class="secondarybtn" value="Unenroll">
+			<input type=submit name="dounenroll" class="secondarybtn" value="Unenroll">
 			<input type=submit name="lockinstead" value="Lock Students Out Instead">
 <?php
 			if ($calledfrom=='lu') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=".Sanitize::courseId($cid)."'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."'\">";
 			}
 ?>
 		</p>

@@ -2,8 +2,10 @@
 //IMathAS:  GB view for testing center staff
 //(c) 2008 David Lippman
 
-require("../validate.php");
-$cid = $_GET['cid'];
+require("../init.php");
+
+
+$cid = Sanitize::courseId($_GET['cid']);
 if (isset($teacherid)) {
 	$isteacher = true;
 }
@@ -70,7 +72,7 @@ $placeinhead = '';
 $placeinhead .= "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgtimefilter() { ';
 $placeinhead .= '       var tm = document.getElementById("timetoggle").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=$cid";
 
 $placeinhead .= "       var toopen = '$address&timefilter=' + tm;\n";
 $placeinhead .= "  	window.location = toopen; \n";
@@ -78,7 +80,7 @@ $placeinhead .= "}\n";
 
 $placeinhead .= 'function chglnfilter() { ';
 $placeinhead .= '       var ln = document.getElementById("lnfilter").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=$cid";
 
 $placeinhead .= "       var toopen = '$address&lnfilter=' + ln;\n";
 $placeinhead .= "  	window.location = toopen; \n";
@@ -86,7 +88,7 @@ $placeinhead .= "}\n";
 
 $placeinhead .= 'function chgsecfilter() { ';
 $placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
+$address = $GLOBALS['basesiteurl'] . "/course/gb-testing.php?stu=$stu&cid=$cid";
 
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
@@ -119,7 +121,7 @@ $placeinhead .= "</script>\n";
 $placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .endmsg {display:none;}</style>";
 
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Diagnostic Gradebook</div>";
 echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 
@@ -138,7 +140,7 @@ echo "<option value=8760 "; writeHtmlSelected($timefilter,8760); echo ">last yea
 echo "<option value=0 "; writeHtmlSelected($timefilter,0); echo ">all time</option>";
 echo "</select>";
 
-echo " Last name: <input type=text id=\"lnfilter\" value=\"$lnfilter\" />";
+echo " Last name: <input type=text id=\"lnfilter\" value=\"" . Sanitize::encodeStringForDisplay($lnfilter) . "\" />";
 echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
 echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="display:none;">Show End Messages</button>';
 echo "</div>";
@@ -188,11 +190,11 @@ function gbinstrdisp() {
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[0]=='') { continue;}
-				echo  "<option value=\"{$row[0]}\" ";
+				echo  "<option value=\"" . Sanitize::encodeStringForDisplay($row[0]) . "\" ";
 				if ($row[0]==$secfilter) {
 					echo  'selected=1';
 				}
-				echo  ">{$row[0]}</option>";
+				echo  ">" . Sanitize::encodeStringForDisplay($row[0]) . "</option>";
 			}
 			echo  "</select>";
 

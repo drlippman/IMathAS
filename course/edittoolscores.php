@@ -2,8 +2,9 @@
 //IMathAS:  Add/modify external tool scores
 //(c) 2014 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/htmlutil.php");
+
 
 	$istutor = false;
 	$isteacher = false;
@@ -49,23 +50,32 @@
 	}
 
 
-	if (isset($_GET['clear']) && $isteacher) {
-		if (isset($_GET['confirm'])) {
+	/*Not called from anywhere?
+	if (isset($_REQUEST['clear']) && $isteacher) {
+		if (isset($_POST['confirm'])) {
 			//DB $query = "DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid='$lid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid=:gradetypeid");
 			$stm->execute(array(':gradetypeid'=>$lid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid={$_GET['cid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
 			exit;
 		} else {
 			require("../header.php");
 			echo "<p>Are you SURE you want to clear all associated grades on this item from the gradebook?</p>";
-			echo "<p><a href=\"edittoolscores.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&lid=$lid&confirm=true\">Clear Scores</a>";
-			echo " <a href=\"gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid\">Nevermind</a>";
+			
+			$querystring = http_build_query(array('stu'=>$_GET['stu'], 'cid'=>$cid, 'lid'=> $lid));
+			echo '<form method="POST" action="edittoolscores.php?'.$querystring.'">';
+			echo '<p><button type=submit name="confirm" value="true">'._('Clear Scores').'</button>';
+			
+			$querystring2 = http_build_query(array('stu'=>$_GET['stu'], 'cid'=>$cid));
+			echo " <a href=\"gradebook.php?$querystring2\">Nevermind</a></p>";
+			echo '</form>';
+			
 			require("../footer.php");
 			exit;
 		}
 	}
+	*/
 
 	//check for grades marked as newscore that aren't really new
 	//shouldn't happen, but could happen if two browser windows open
@@ -134,7 +144,7 @@
 	}
 
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=" . Sanitize::encodeUrlParam($_GET['stu']) . "&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&cid=".Sanitize::courseId($_GET['cid']));
 		exit;
 	}
 
@@ -142,19 +152,20 @@
 
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+    printf('<div class=breadcrumb>%s <a href="course.php?cid=%s">%s</a> ', $breadcrumbbase,
+        Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($_GET['stu']>0) {
-		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Student Detail</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=" . Sanitize::onlyInt($_GET['stu']) . "&cid=$cid\">Student Detail</a> ";
 	} else if ($_GET['stu']==-1) {
-		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Averages</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=" . Sanitize::onlyInt($_GET['stu']) . "&cid=$cid\">Averages</a> ";
 	}
 	echo "&gt; External Tool Grades</div>";
 
 	echo "<div id=\"headerexttoolgrades\" class=\"pagetitle\"><h2>Modify External Tool Grades</h2></div>";
-	echo '<h3>'.$name.'</h3>';
+	echo '<h3>' . Sanitize::encodeStringForDisplay($name) . '</h3>';
 
-	echo "<form id=\"mainform\" method=post action=\"edittoolscores.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&lid=$lid&uid={$_GET['uid']}\">";
+	echo "<form id=\"mainform\" method=post action=\"edittoolscores.php?stu=" . Sanitize::onlyInt($_GET['stu']) . "&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&cid=$cid&lid=$lid&uid=" . Sanitize::encodeUrlParam($_GET['uid']) . "\">";
 
 
 		//DB $query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
@@ -271,21 +282,21 @@
 			} else {
 				echo '<tr><td>';
 			}
-			echo "{$row[1]}, {$row[2]}";
+			echo Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]);
 			echo '</td>';
 			if ($hassection) {
-				echo "<td>{$row[3]}</td>";
+				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}
 			if (isset($score[$row[0]])) {
-				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
-				echo $score[$row[0]];
+				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[" . Sanitize::encodeStringForDisplay($row[0]) . "]\" id=\"score" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"";
+				echo Sanitize::encodeStringForDisplay($score[$row[0]]);
 			} else {
-				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
+				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[" . Sanitize::encodeStringForDisplay($row[0]) . "]\" id=\"score" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"";
 			}
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
 
 			echo "</td>";
-			echo "<td><textarea cols=60 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
+			echo "<td><textarea cols=60 rows=1 id=\"feedback" . Sanitize::encodeStringForDisplay($row[0]) . "\" name=\"feedback[" . Sanitize::encodeStringForDisplay($row[0]) . "]\">" . Sanitize::encodeStringForDisplay($feedback[$row[0]]) . "</textarea></td>";
 			echo "</tr>";
 		}
 

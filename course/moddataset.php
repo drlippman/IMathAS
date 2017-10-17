@@ -9,7 +9,8 @@
 //3 - CC-BY-SA-NC
 //4 - CC-BY-SA
 
-	require("../validate.php");
+	require("../init.php");
+
 
 	if ($myrights<20) {
 		require("../header.php");
@@ -58,10 +59,10 @@
 			}
 			$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
 		}
-		return $vidid;
+		return Sanitize::simpleString($vidid);
  	}
 
- 	$cid = $_GET['cid'];
+ 	$cid = Sanitize::courseId($_GET['cid']);
 	$isadmin = false;
 	$isgrpadmin = false;
 	if ($_GET['cid']=='admin') {
@@ -89,7 +90,7 @@
 	$outputmsg = '';
 	$errmsg = '';
 	if (isset($_POST['qtext'])) {
-		require("../includes/filehandler.php");
+		require_once("../includes/filehandler.php");
 		$now = time();
 		//DB $_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
 		//DB $_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
@@ -111,7 +112,7 @@
 		}
 
 		if (strpos($_POST['qtext'],'data:image')!==false) {
-			require("../includes/htmLawed.php");
+			require_once("../includes/htmLawed.php");
 			$_POST['qtext'] = convertdatauris($_POST['qtext']);
 		}
 		//DB $_POST['qtext'] = addslashes($_POST['qtext']);
@@ -183,7 +184,6 @@
 		$_POST['solution'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['solution']);
 		$_POST['solution'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['solution']);
 		$_POST['solution'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['solution']);
-		$_POST['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
 
 		if (isset($_GET['id'])) { //modifying existing
 			$qsetid = intval($_GET['id']);
@@ -221,7 +221,7 @@
 
 			//checked separately above now
 			//if (!$isadmin && !$isgrpadmin) { $query .= " AND (ownerid='$userid' OR userights>2);";}
-			if ($isok) {
+			if ($isok && !isset($_POST['justupdatelibs'])) {
 				//DB $query = "UPDATE imas_questionset SET description='{$_POST['description']}',author='{$_POST['author']}',userights='{$_POST['userights']}',license='{$_POST['license']}',";
 				//DB $query .= "otherattribution='{$_POST['addattr']}',qtype='{$_POST['qtype']}',control='{$_POST['control']}',qcontrol='{$_POST['qcontrol']}',solution='{$_POST['solution']}',";
 				//DB $query .= "qtext='{$_POST['qtext']}',answer='{$_POST['answer']}',lastmoddate=$now,extref='$extref',replaceby=$replaceby,solutionopts=$solutionopts";
@@ -259,14 +259,16 @@
 			$imgcnt = $stm->rowCount();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (isset($_POST['delimg-'.$row[0]])) {
-					//DB $query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
-					//DB $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
-					//DB if (mysql_num_rows($r2)==1) {
-					$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
-					$stm2->execute(array(':filename'=>$row[1]));
-					if ($stm2->rowCount()==1) {
-						//unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
-						deleteqimage($row[1]);
+					if (substr($row[1],0,4)!='http') {
+						//DB $query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
+						//DB $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
+						//DB if (mysql_num_rows($r2)==1) {
+						$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
+						$stm2->execute(array(':filename'=>$row[1]));
+						if ($stm2->rowCount()==1) {
+							//unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+							deleteqimage($row[1]);
+						}
 					}
 					//DB $query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
 					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -284,7 +286,7 @@
 					$newalt = $_POST['imgalt-'.$row[0]];
 					$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
 					if (in_array($newvar,$disallowedvar)) {
-						$errmsg .= "<p>$newvar is not an allowed variable name</p>";
+						$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
 					} else {
 						//DB $query = "UPDATE imas_qimages SET var='$newvar',alttext='$newalt' WHERE id='{$row[0]}'";
 						//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -381,11 +383,11 @@
 			if (trim($_POST['newimgvar'])=='') {
 				$errmsg .= "<p>Need to specify variable for image to be referenced by</p>";
 			} else if (in_array($_POST['newimgvar'],$disallowedvar)) {
-				$errmsg .= "<p>$newvar is not an allowed variable name</p>";
+				$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
 			} else {
 				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/';
 				//$filename = basename($_FILES['imgfile']['name']);
-				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['imgfile']['name']));
+				$userfilename = preg_replace('/[^\w\.]/','',basename(str_replace('\\','/',$_FILES['imgfile']['name'])));
 				$filename = $userfilename;
 
 				//$uploadfile = $uploaddir . $filename;
@@ -423,96 +425,107 @@
 		//update libraries
 		$newlibs = explode(",",$_POST['libs']);
 
-		if (in_array('0',$newlibs) && count($newlibs)>1) {
+		if (in_array('0',$newlibs)) { //we'll handle unassigned as a special case
 			array_shift($newlibs);
 		}
 
 		if ($_POST['libs']=='') {
 			$newlibs = array();
 		}
-		if ($isadmin) {
-			$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
-			$query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid=:qsetid";
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':qsetid'=>$qsetid));
-		} else if ($isgrpadmin) {
-			//DB $query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-			//DB $query .= "AND (imas_users.groupid='$groupid' OR ili.libid=0) AND ili.qsetid='$qsetid'";
-			$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-			$query .= "AND (imas_users.groupid=:groupid OR ili.libid=0) AND ili.qsetid=:qsetid";
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$qsetid));
-		} else {
-			//unassigned, or owner and lib not closed or mine
-			//DB $query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
-			//DB $query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid='$qsetid'";
-			//DB $query .= " AND ((ili.ownerid='$userid' AND (il.ownerid='$userid' OR il.userights%3<>1)) OR ili.libid=0)";
-			$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
-			$query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid=:qsetid";
-			$query .= " AND ((ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)) OR ili.libid=0)";
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':qsetid'=>$qsetid, ':ownerid'=>$userid, ':ownerid2'=>$userid));
 
-		}
-		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-		$existing = array();
-		//DB while($row = mysql_fetch_row($result)) {
+		$allcurrentlibs = array();
+		$alldeletedlibs = array();
+		//$query = "SELECT ili.libid,ili.deleted FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
+		//$query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid=:qsetid";
+		$query = "SELECT libid,deleted FROM imas_library_items WHERE qsetid=:qsetid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':qsetid'=>$qsetid));
 		while($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$existing[] = $row[0];
+			if ($row[1]==0) {
+				$allcurrentlibs[] = $row[0];
+			} else {
+				$alldeletedlibs[] = $row[0];
+			}
+		}
+		if ($isadmin) {
+			$haverightslibs = $allcurrentlibs;
+		} else {
+			if ($isgrpadmin) {
+				$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
+				$query .= "AND (imas_users.groupid=:groupid OR ili.libid=0) AND ili.deleted=0 AND ili.qsetid=:qsetid";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$qsetid));
+			} else {
+				//unassigned, or owner and lib not closed or mine
+				$query = "SELECT ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
+				$query .= "ili.libid=il.id AND il.deleted=0 WHERE ili.qsetid=:qsetid AND ili.deleted=0 AND ";
+				$query .= "(ili.libid=0 OR (ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)))";
+
+				//$query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
+				//$query .= "(ili.libid=il.id OR ili.libid=0) AND il.deleted=0 WHERE ili.qsetid=:qsetid AND ili.deleted=0 ";
+				//$query .= " AND ((ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)) OR ili.libid=0)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':qsetid'=>$qsetid, ':ownerid'=>$userid, ':ownerid2'=>$userid));
+			}
+			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$haverightslibs = array();
+			//DB while($row = mysql_fetch_row($result)) {
+			while($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$haverightslibs[] = $row[0];
+			}
 		}
 
-		$toadd = array_values(array_diff($newlibs,$existing));
-		$toremove = array_values(array_diff($existing,$newlibs));
+		//remove any that we have the rights to but are not in newlibs
+		$toremove = array_values(array_diff($haverightslibs,$newlibs));
+		//undelete any libs that are new and in deleted libs
+		$toundelete = array_values(array_intersect($newlibs,$alldeletedlibs));
+		//add any new librarys that are not current and aren't being undeleted
+		$toadd = array_values(array_diff($newlibs,$allcurrentlibs,$toundelete));
 
+		//no selected libs, we're removing all current libs (or none of either)
+		// nothing to undelete, nothing to add.
+		// Create unassigned
+		if (count($newlibs)==0 && count($toremove)==count($allcurrentlibs) && count($toundelete)==0 && count($toadd)==0) {
+			if (in_array(0, $alldeletedlibs)) {  //have unassigned to undelete
+				$toundelete[] = 0;
+			} else if (count($toremove)==1 && $toremove[0]==0) { //already have an unassigned - don't delete it
+				array_shift($toremove);
+			} else { //create new unassigned
+				$toadd[] = 0;
+			}
+		}
 
-
-		while(count($toremove)>0 && count($toadd)>0) {
-			$tochange = array_shift($toremove);
-			$torep = array_shift($toadd);
-			//DB $query = "UPDATE imas_library_items SET libid='$torep' WHERE qsetid='$qsetid' AND libid='$tochange'";
-			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-			$stm = $DBH->prepare("UPDATE imas_library_items SET libid=:libidnew WHERE qsetid=:qsetid AND libid=:libidold");
-			$stm->execute(array(':libidnew'=>$torep, ':qsetid'=>$qsetid, ':libidold'=>$tochange));
+		$now = time();
+		if (count($toundelete)>0) {
+			foreach($toundelete as $libid) {
+				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=0,lastmoddate=:now,ownerid=:ownerid WHERE qsetid=:qsetid AND libid=:libid");
+				$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now, ':ownerid'=>$userid));
+			}
 		}
 		if (count($toadd)>0) {
 			foreach($toadd as $libid) {
-				//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$libid','$qsetid','$userid')";
-				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
-				$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid));
+				$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+				$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 			}
-		} else if (count($toremove)>0) {
+		}
+		if (count($toremove)>0) {
 			foreach($toremove as $libid) {
-				//DB $query = "DELETE FROM imas_library_items WHERE libid='$libid' AND qsetid='$qsetid'";
-				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$stm = $DBH->prepare("DELETE FROM imas_library_items WHERE libid=:libid AND qsetid=:qsetid");
-				$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid));
+				$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid=:libid AND qsetid=:qsetid");
+				$stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now));
 			}
 		}
-		if (count($newlibs)==0) {
-			//DB $query = "SELECT id FROM imas_library_items WHERE qsetid='$qsetid'";
-			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			//DB if (mysql_num_rows($result)==0) {
-			$stm = $DBH->prepare("SELECT id FROM imas_library_items WHERE qsetid=:qsetid");
-			$stm->execute(array(':qsetid'=>$qsetid));
-			if ($stm->rowCount()==0) {
-				//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (0,'$qsetid','$userid')";
-				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-				$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
-				$stm->execute(array(':libid'=>0, ':qsetid'=>$qsetid, ':ownerid'=>$userid));
-			}
-		}
+
 		if (!isset($_GET['aid'])) {
 			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 		} else {
 			if ($frompot==1) {
-				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid={$_GET['aid']}\">Add Question to Assessment</a> | \n";
+				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
 			}
-			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid={$_GET['aid']}\">Return to Assessment</a>\n";
+			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 		}
 		if ($_POST['test']=="Save and Test Question") {
-			$outputmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}';";
+			$outputmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
 			//echo "function previewit() {";
 			$outputmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
 			$outputmsg .= "previewpop.focus();";
@@ -523,9 +536,9 @@
 			// Don't echo or die if in quicksave mode.
 		} else {
 			if ($errmsg == '' && !isset($_GET['aid'])) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/manageqset.php?cid='.$cid);
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/manageqset.php?cid='.$cid);
 			} else if ($errmsg == '' && $frompot==0) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/addquestions.php?cid='.$cid.'&aid='.$_GET['aid']);
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/addquestions.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']));
 			} else {
 				require("../header.php");
 				echo $errmsg;
@@ -616,7 +629,7 @@
 						//DB while ($row = mysql_fetch_row($result)) {
 						$query = "SELECT imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid ";
 						$query .= "FROM imas_libraries,imas_library_items WHERE imas_library_items.libid=imas_libraries.id ";
-						$query .= "AND imas_library_items.qsetid=:qsetid";
+						$query .= "AND imas_library_items.qsetid=:qsetid AND imas_library_items.deleted=0";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':qsetid'=>$_GET['id']));
 						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -646,18 +659,18 @@
 			} else {
 				if ($isadmin) {
 					//DB $query = "SELECT DISTINCT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}'";
-					$stm = $DBH->prepare("SELECT DISTINCT libid FROM imas_library_items WHERE qsetid=:qsetid");
+					$stm = $DBH->prepare("SELECT DISTINCT libid FROM imas_library_items WHERE qsetid=:qsetid AND imas_library_items.deleted=0");
 					$stm->execute(array(':qsetid'=>$_GET['id']));
 				} else if ($isgrpadmin) {
 					//DB $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
 					//DB $query .= "AND imas_users.groupid='$groupid' AND ili.qsetid='{$_GET['id']}'";
 					$query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-					$query .= "AND imas_users.groupid=:groupid AND ili.qsetid=:qsetid";
+					$query .= "AND imas_users.groupid=:groupid AND ili.qsetid=:qsetid AND ili.deleted=0";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$_GET['id']));
 				} else {
 					//DB $query = "SELECT DISTINCT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}' AND ownerid='$userid'";
-					$stm = $DBH->prepare("SELECT DISTINCT libid FROM imas_library_items WHERE qsetid=:qsetid AND ownerid=:ownerid");
+					$stm = $DBH->prepare("SELECT DISTINCT libid FROM imas_library_items WHERE qsetid=:qsetid AND ownerid=:ownerid AND deleted=0");
 					$stm->execute(array(':qsetid'=>$_GET['id'], ':ownerid'=>$userid));
 				}
 				//$query = "SELECT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}' AND imas_library_items.ownerid='$userid'";
@@ -673,12 +686,12 @@
 						//DB $query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
 						//DB $query .= "AND imas_users.groupid!='$groupid' AND ili.qsetid='{$_GET['id']}'";
 						$query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-						$query .= "AND imas_users.groupid!=:groupid AND ili.qsetid=:qsetid";
+						$query .= "AND imas_users.groupid!=:groupid AND ili.qsetid=:qsetid AND ili.deleted=0";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':qsetid'=>$_GET['id'], ':groupid'=>$groupid));
 					} else if (!$isadmin) {
 						//DB $query = "SELECT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}' AND imas_library_items.ownerid!='$userid'";
-						$stm = $DBH->prepare("SELECT libid FROM imas_library_items WHERE qsetid=:qsetid AND imas_library_items.ownerid!=:userid");
+						$stm = $DBH->prepare("SELECT libid FROM imas_library_items WHERE qsetid=:qsetid AND imas_library_items.ownerid!=:userid AND deleted=0");
 						$stm->execute(array(':qsetid'=>$_GET['id'], ':userid'=>$userid));
 					}
 					//$query = "SELECT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}' AND imas_library_items.ownerid!='$userid'";
@@ -740,7 +753,7 @@
 			$line['deleted'] = 0;
 			$line['replaceby'] = 0;
 			if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
-				$inlibs = $sessiondata['lastsearchlibs'.$_GET['aid']];
+				$inlibs = $sessiondata['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
 			} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
 				//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
 				$inlibs = $sessiondata['lastsearchlibs'.$cid];
@@ -792,10 +805,10 @@
 	// Build form action
 	$formAction = "moddataset.php?process=true"
 		. (isset($_GET['cid']) ? "&cid=$cid" : "")
-		. (isset($_GET['aid']) ? "&aid={$_GET['aid']}" : "")
-		. ((isset($_GET['id']) && !isset($_GET['template'])) ? "&id={$_GET['id']}" : "")
-		. (isset($_GET['template']) ? "&templateid={$_GET['id']}" : "")
-		. (isset($_GET['makelocal']) ? "&makelocal={$_GET['makelocal']}" : "")
+		. (isset($_GET['aid']) ? "&aid=".Sanitize::encodeUrlParam($_GET['aid']) : "")
+		. ((isset($_GET['id']) && !isset($_GET['template'])) ? "&id=".Sanitize::encodeUrlParam($_GET['id']) : "")
+		. (isset($_GET['template']) ? "&templateid=".Sanitize::encodeUrlParam($_GET['id']) : "")
+		. (isset($_GET['makelocal']) ? "&makelocal=".Sanitize::encodeUrlParam($_GET['makelocal']) : "")
 		. ($frompot==1 ? "&frompot=1" : "");
 
 	// If in quick-save mode, build return packet and exit here
@@ -819,7 +832,7 @@
 		$qsPacket['id'] = isset($_GET['id']) ? $_GET['id'] : 0;
 		// Build img base url
 		if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true){
-			$qsPacket['imgUrlBase'] = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/";
+			$qsPacket['imgUrlBase'] = $urlmode."{$GLOBALS['AWSbucket']}.s3.amazonaws.com/qimages/";
 		} else {
 			$qsPacket['imgUrlBase'] = "$imasroot/assessment/qimages/";
 		}
@@ -993,20 +1006,20 @@
 
 
 	if (isset($_GET['aid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid={$_GET['aid']}&cid={$_GET['cid']}\">Add/Remove Questions</a> &gt; Modify Questions</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
 
 	} else if (isset($_GET['daid'])) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"adddrillassess.php?daid={$_GET['daid']}&cid={$_GET['cid']}\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
 	} else {
 		if ($_GET['cid']=="admin") {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin.php\">Admin</a>";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
 			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; Modify Question</div>\n";
 		} else {
 			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 			if ($cid>0) {
-				echo "&gt; <a href=\"course.php?cid=$cid\">$coursename</a>";
+				echo "&gt; <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 			}
 			echo " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; Modify Question</div>\n";
 		}
@@ -1016,11 +1029,11 @@
 	echo "<div id='outputmsgContainer'>$outputmsg</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
-	echo "<h2>$addmod QuestionSet Question</h2>\n";
+	echo "<h2>" . Sanitize::encodeStringForDisplay($addmod) . " QuestionSet Question</h2>\n";
 	echo '</div>';
 
 	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {
-		echo '<p>This question appears to be a Tutorial Style question.  <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Open in the tutorial question editor</a></p>';
+		echo '<p>This question appears to be a Tutorial Style question.  <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">Open in the tutorial question editor</a></p>';
 	}
 
 	if ($line['deleted']==1) {
@@ -1031,7 +1044,7 @@
 	if (isset($inusecnt) && $inusecnt>0) {
 		echo '<p class=noticetext>This question is currently being used in ';
 		if ($inusecnt>1) {
-			echo $inusecnt.' assessments that are not yours.  ';
+			echo Sanitize::onlyInt($inusecnt).' assessments that are not yours.  ';
 		} else {
 			echo 'one assessment that is not yours.  ';
 		}
@@ -1039,21 +1052,21 @@
 
 	}
 	if (isset($_GET['qid'])) {
-		echo "<p><a href=\"moddataset.php?id={$_GET['id']}&cid=$cid&aid={$_GET['aid']}&template=true&makelocal={$_GET['qid']}\">Template this question</a> for use in this assessment.  ";
+		echo "<p><a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">Template this question</a> for use in this assessment.  ";
 		echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
 	}
 	if (!$myq) {
 		echo "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
 	}
 ?>
-<form enctype="multipart/form-data" method=post action="<?php echo $formAction; ?>">
-<input type="hidden" name="hasimg" value="<?php echo $line['hasimg'];?>"/>
+<form enctype="multipart/form-data" method=post action="<?php echo $formAction; // Sanitized near line 806 ?>">
+<input type="hidden" name="hasimg" value="<?php echo Sanitize::encodeStringForDisplay($line['hasimg']);?>"/>
 <p>
 Description:<BR>
-<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea>
+<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>
 </p>
 <p>
-Author: <?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>">
+Author: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input type="hidden" name="author" value="<?php echo Sanitize::encodeStringForDisplay($author); ?>">
 </p>
 <p>
 <?php
@@ -1077,7 +1090,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
 	echo '<option value="2" '.($line['license']==2?'selected':'').'>Public Domain</option>';
 	echo '<option value="3" '.($line['license']==3?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
-	echo '<option value="3" '.($line['license']==4?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
+	echo '<option value="4" '.($line['license']==4?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
 	echo '</select><span id="licensewarn" class=noticetext style="font-size:80%;"></span>';
 	if ($line['otherattribution']=='') {
 		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
@@ -1095,8 +1108,8 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 ?>
 </p>
 <script>
-var curlibs = '<?php echo $inlibs;?>';
-var locklibs = '<?php echo $locklibs;?>';
+var curlibs = '<?php echo Sanitize::encodeStringForJavascript($inlibs);?>';
+var locklibs = '<?php echo Sanitize::encodeStringForJavascript($locklibs);?>';
 function libselect() {
 	window.open('libtree.php?libtree=popup&cid=<?php echo $cid;?>&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }
@@ -1112,6 +1125,7 @@ function setlibnames(libn) {
 		libn = libn.substring(11);
 	}
 	document.getElementById("libnames").innerHTML = libn;
+	$("#libonlysubmit").show();
 }
 function swapentrymode() {
 	var butn = document.getElementById("entrymode");
@@ -1137,8 +1151,12 @@ function decboxsize(box) {
 
 </script>
 <p>
-My library assignments: <span id="libnames"><?php echo $lnames;?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
+My library assignments: <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
 <input type=button value="Select Libraries" onClick="libselect()">
+<?php
+if (isset($_GET['id']) && $myq) {
+	echo '<span id=libonlysubmit style="display:none"><input type=submit name=justupdatelibs value="Save Library Change Only"/></span>';
+} ?>
 </p>
 <p>
 Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
@@ -1166,10 +1184,10 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 </select>
 </p>
 <p>
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a> |
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a> |
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
 <?php if (!isset($_GET['id'])) {
-	echo ' | <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
+	echo ' | <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">Tutorial Style editor</a>';
 }?>
 </p>
 <div id=ccbox>
@@ -1207,7 +1225,9 @@ Detailed Solution:
 <span class="noselect"><span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span></span>
 <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
 <input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question" class="saveandtest" /><br/>
+<input type=submit name=test value="Save and Test Question" class="saveandtest" />
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<br/>
 <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
 Uses random variables from the question.
@@ -1229,14 +1249,16 @@ Image file: <input type="file" name="imgfile"/> assign to variable: <input type=
 <?php
 if (isset($images['vars']) && count($images['vars'])>0) {
 	foreach ($images['vars'] as $id=>$var) {
-		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			$urlimg = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$images['files'][$id]}";
+		if (substr($images['files'][$id],0,4)=='http') {
+			$urlimg = $images['files'][$id];
+		} else if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+			$urlimg = $urlmode."{$GLOBALS['AWSbucket']}.s3.amazonaws.com/qimages/{$images['files'][$id]}";
 		} else {
 			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
 		}
 		echo "<li>";
-		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$urlimg\" target=\"_blank\">View</a> ";
-		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/> Delete? <input type=checkbox name=\"delimg-$id\"/>";
+		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\"/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
+		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\"/> Delete? <input type=checkbox name=\"delimg-$id\"/>";
 		echo "</li>";
 	}
 }
@@ -1258,11 +1280,11 @@ echo '<ul id="helpbtnlist">';
 if (count($extref)>0) {
 	for ($i=0;$i<count($extref);$i++) {
 		$extrefpt = explode('!!',$extref[$i]);
-		echo '<li>Type: '.ucfirst($extrefpt[0]);
+		echo '<li>Type: '.Sanitize::encodeStringForDisplay(ucfirst($extrefpt[0]));
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-		echo ', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/></li>";
+	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
@@ -1364,7 +1386,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				if (res.extref.length>0) {
 					$("#helpbtnlist").html('');
 					for (var i=0;i<res.extref.length;i++) {
-						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] + 
+						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] +
 							", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
 							"Delete? <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
 					}
@@ -1373,7 +1395,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 					$("#helpbtnwrap").addClass("hidden");
 				}
 				$("input[name=helpurl]").val('');
-				
+
 				// Empty notices
 				$(".quickSaveNotice").empty();
 				// Load preview page
@@ -1385,8 +1407,8 @@ if (FormData){ // Only allow quicksave if FormData object exists
 			}
 		});
 	}
-	quickSaveQuestion.url = "<?php echo $formAction;?>&quick=1";
-	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid={$_GET['id']}"; ?>';
+	quickSaveQuestion.url = "<?php echo $formAction; // Sanitized near line 806 ?>&quick=1";
+	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id']); ?>';
 	// Method to handle errors...
 	quickSaveQuestion.errorFunc = function(){
 		$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");
@@ -1414,7 +1436,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 	// Show Quick Save and Preview buttons
 	$(function() {
 		$(".quickSaveButton").css("display", "inline");
-		//$(".saveandtest").remove();
+		$(".saveandtest").remove();
 	});
 } else { // No FormData object
 	$(function() {

@@ -2,7 +2,7 @@
 //IMathAS:  Embed a Question via iFrame
 //(c) 2010 David Lippman
 
-require("./config.php");
+require("./init_without_validate.php");
 require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
@@ -17,16 +17,35 @@ require("./assessment/displayq2.php");
 $GLOBALS['assessver'] = 2;
 
 $sessiondata = array();
-if (isset($_GET['graphdisp'])) {
-	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
-	setcookie("OEAembed-graphdisp", $sessiondata['graphdisp']);
-} else if (isset($_COOKIE['OEAembed-graphdisp'])) {
-	$sessiondata['graphdisp'] = intval($_COOKIE['OEAembed-graphdisp']);
-} else {
-	$sessiondata['graphdisp'] = 1;
+
+$prefdefaults = array(
+	'mathdisp'=>6,
+	'graphdisp'=>1,
+	'drawentry'=>1,
+	'useed'=>1,
+	'livepreview'=>1);
+
+$prefcookie = json_decode($_COOKIE["OEAembeduserprefs"], true);
+$sessiondata['userprefs'] = array();
+foreach($prefdefaults as $key=>$def) {
+	if ($prefcookie!==null && isset($prefcookie[$key])) {
+		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+	} else {
+		$sessiondata['userprefs'][$key] = $def;
+	}
+}
+if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
+	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	setcookie("OEAembeduserprefs", json_encode(array(
+		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
+		'drawentry'=>$sessiondata['userprefs']['drawentry']
+		)));
+}
+foreach(array('graphdisp','mathdisp','useed') as $key) {
+	$sessiondata[$key] = $sessiondata['userprefs'][$key];
 }
 
-$sessiondata['mathdisp'] = 6;
 $sessiondata['secsalt'] = "12345";
 $cid = "embedq";
 $showtips = 2;
@@ -82,11 +101,48 @@ $showans = false;
 
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
+$placeinhead .= '<script type="text/javascript">
+	function sendresizemsg() {
+	 if(self != top){
+		var default_height = Math.max(
+							document.body.scrollHeight, document.body.offsetHeight,
+							document.documentElement.clientHeight, document.documentElement.scrollHeight,
+							document.documentElement.offsetHeight);
+		window.parent.postMessage( JSON.stringify({
+				subject: "lti.frameResize",
+				height: default_height,
+				frame_id: "'.$frameid.'"
+		}), "*");
+	 }
+	}
+
+	if (mathRenderer == "Katex") {
+		window.katexDoneCallback = sendresizemsg;
+	} else if (typeof MathJax != "undefined") {
+		MathJax.Hub.Queue(function () {
+			sendresizemsg();
+		});
+	} else {
+		$(function() {
+			sendresizemsg();
+		});
+	}
+	</script>';
+if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+	//in case MathJax isn't loaded yet
+	$placeinhead .= '<script type="text/x-mathjax-config">
+		MathJax.Hub.Queue(function () {
+			sendresizemsg();
+		});
+	</script>';
+}
 $useeditor = 1;
 require("./assessment/header.php");
 
 if ($sessiondata['graphdisp'] == 1) {
-	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';  
+	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';
+} else {
+	echo '<div style="float:right;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=1">Enable visual graph display and drawing entry</a></div>';
 }
 
 //seeds 1-4999 are for summative requests that are signed
@@ -214,7 +270,7 @@ if (isset($QS['showscored'])) {
 	}
 	$doshowans = 0;
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
-	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
+	echo "<input type=\"hidden\" name=\"seed\" value=\"".Sanitize::encodeStringForDisplay($seed)."\" />";
 	$scoredonsubmit = false;
 	if (isset($QS['showscoredonsubmit']) && ($QS['showscoredonsubmit']=='1' || $QS['showscoredonsubmit']=='true')) {
 		echo '<input type="hidden" name="showscoredonsubmit" value="1"/>';
@@ -237,7 +293,7 @@ if (isset($QS['showscored'])) {
 		$key = $stm->fetchColumn(0);
 
 		echo '<input type="hidden" name="jwtchk" value="'.JWT::encode($verarr,$key).'"/>';
-		echo '<input type="hidden" name="auth" value="'.$QS['auth'].'"/>';
+		echo '<input type="hidden" name="auth" value="'.Sanitize::encodeStringForDisplay($QS['auth']).'"/>';
 	}
 	if (isset($QS['showhints']) && $QS['showhints']==0) {
 		$showhints = false;
@@ -264,32 +320,6 @@ if (isset($QS['showscored'])) {
 
 }
 
-echo '<script type="text/javascript">
-	function sendresizemsg() {
-	 if(self != top){
-	  var default_height = Math.max(
-              document.body.scrollHeight, document.body.offsetHeight,
-              document.documentElement.clientHeight, document.documentElement.scrollHeight,
-              document.documentElement.offsetHeight);
-	  window.parent.postMessage( JSON.stringify({
-	      subject: "lti.frameResize",
-	      height: default_height,
-	      frame_id: "'.$frameid.'"
-	  }), "*");
-	 }
-	}
-	if (mathRenderer == "Katex") {
-		window.katexDoneCallback = sendresizemsg;
-	} else if (MathJax) {
-		MathJax.Hub.Queue(function () {
-			sendresizemsg();
-		});
-	} else {
-		$(function() {
-			sendresizemsg();
-		});
-	}
-	</script>';
 require("./footer.php");
 
 

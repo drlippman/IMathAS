@@ -7,7 +7,7 @@
 ini_set("max_execution_time", "600");
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/copyiteminc.php");
 require("../includes/htmlutil.php");
 
@@ -18,7 +18,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> &gt; Copy Course Items";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Copy Course Items";
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
@@ -26,7 +26,7 @@ if (!(isset($teacherid))) {
 	$body = "You need to log in as a teacher to access this page";
 } else {
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$oktocopy = 1;
 
 	if (isset($_GET['action'])) {
@@ -124,22 +124,23 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 			exit;
 		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 			if ($_POST['whattocopy']=='all') {
-				$_POST['copycourseopt'] = 1;
+				/*$_POST['copycourseopt'] = 1;
 				$_POST['copygbsetup'] = 1;
 				$_POST['removewithdrawn'] = 1;
 				$_POST['usereplaceby'] = 1;
 				$_POST['copyrubrics'] = 1;
 				$_POST['copyoutcomes'] = 1;
 				$_POST['copystickyposts'] = 1;
-				$_POST['append'] = '';
 				if (isset($_POST['copyofflinewhole'])) {
 					$_POST['copyoffline'] = 1;
 				}
+				*/
 				$_POST['addto'] = 'none';
+				$_POST['append'] = '';
 			}
 			//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 			$DBH->beginTransaction();
@@ -479,36 +480,39 @@ if (!(isset($teacherid))) {
 					$calitems[] = $row;
 				}
 			} else {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
 				exit;
 			}
 
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
+			$items = false;
 
-			//DB $query = "SELECT itemorder,picicons FROM imas_courses WHERE id='{$_POST['ctc']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB list($itemorder,$picicons) = mysql_fetch_row($result);
-			$stm = $DBH->prepare("SELECT itemorder,picicons FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_POST['ctc']));
-			list($itemorder,$picicons) = $stm->fetch(PDO::FETCH_NUM);
-			$items = unserialize($itemorder);
+			$stm = $DBH->prepare("SELECT id,itemorder,picicons FROM imas_courses WHERE id IN (?,?)");
+			$stm->execute(array($_POST['ctc'], $cid));
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if ($row['id']==$_POST['ctc']) {
+					$items = unserialize($row['itemorder']);
+					$picicons = $row['picicons'];
+				}
+				if ($row['id']==$cid) {
+					$existblocks = array();
+					buildexistblocks(unserialize($row['itemorder']),'0');
+				}
+			}
+			if ($items===false) {
+				echo 'Error with course to copy';
+				exit;
+			}
+
 			$ids = array();
 			$types = array();
 			$names = array();
 			$sums = array();
 			$parents = array();
+			require_once("../includes/loaditemshowdata.php");
+			$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
 			getsubinfo($items,'0','',false,' ');
-
-			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $items = unserialize(mysql_result($result,0,0));
-			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$cid));
-			$items = unserialize($stm->fetchColumn(0));
-			$existblocks = array();
-
-			buildexistblocks($items,'0');
 
 			$i=0;
 			$page_blockSelect = array();
@@ -523,24 +527,24 @@ if (!(isset($teacherid))) {
 			//DB $query = "SELECT id,name FROM imas_groups";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
-			$stm = $DBH->query("SELECT id,name FROM imas_groups");
+			$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 			if ($stm->rowCount()>0) {
 				$page_hasGroups=true;
 				$grpnames = array();
-				$grpnames[0] = "Default Group";
+				$grpnames[] = array('id'=>0,'name'=>"Default Group");
 				//DB while ($row = mysql_fetch_row($result)) {
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$grpnames[$row[0]] = $row[1];
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+					if ($row['id']==$groupid) {continue;}
+					$grpnames[] = $row;
 				}
 			}
 
-			//DB $query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-			//DB $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
-			//DB $courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
+		} else if (isset($_GET['loadothergroup'])) {
+
+			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu  WHERE ";
+			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 			$courseGroupResults = $DBH->prepare($query);
-			$courseGroupResults->execute(array(':groupid'=>$groupid, ':userid'=>$userid));
+			$courseGroupResults->execute(array(':groupid'=>$_GET['loadothergroup'], ':userid'=>$userid));
 
 
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
@@ -561,7 +565,7 @@ if (!(isset($teacherid))) {
 			//DB $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
 			//DB $courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
-			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
+			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 			$courseTreeResult = $DBH->prepare($query);
 			$courseTreeResult->execute(array(':groupid'=>$groupid, ':userid'=>$userid));
 			$lastteacher = 0;
@@ -591,17 +595,17 @@ function writeCourseInfo($line, $skipcopyright=2) {
 	if ($line['termsurl']!='') {
 		$itemclasses[] = 'termsurl';
 	}
-	echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.((count($itemclasses)>0)?'class="'.implode(' ',$itemclasses).'"':'');
+	echo '<input type="radio" name="ctc" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ' . ((count($itemclasses)>0)?'class="' . implode(' ',$itemclasses) . '"':'');
 	if ($line['termsurl']!='') {
-		echo ' data-termsurl="'.$line['termsurl'].'"';
+		echo ' data-termsurl="'.Sanitize::url($line['termsurl']).'"';
 	}
 	echo '>';
-	echo $line['name'];
+	echo Sanitize::encodeStringForDisplay($line['name']);
 
 	if ($line['copyrights']<$skipcopyright) {
 		echo "&copy;\n";
 	} else {
-		echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\" class=\"small\">Preview</a>";
+		echo " <a href=\"course.php?cid=" . Sanitize::courseId($line['id']) . "\" target=\"_blank\" class=\"small\">Preview</a>";
 	}
 }
 
@@ -633,16 +637,22 @@ function writeOtherGrpTemplates($grptemplatelist) {
 
 /******* begin html output ********/
 
-if (!isset($_GET['loadothers'])) {
+if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/libtree.js\"></script>\n";
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
 $placeinhead .= '<script type="text/javascript">
 	function updatetocopy(el) {
 		if (el.value=="all") {
 			$("#selectitemstocopy").hide();$("#allitemsnote").show();
+			$("#copyoptions").show();
+			$("#copyoptions .selectonly").hide();
+			$("#copyoptions .allon input[type=checkbox]").prop("checked",true);
 		} else {
 			$("#selectitemstocopy").show();$("#allitemsnote").hide();
-		} 
+			$("#copyoptions").show();
+			$("#copyoptions .selectonly").show();
+			$("#copyoptions .allon input[type=checkbox]").prop("checked",false);
+		}
 	}
 	function copyitemsonsubmit() {
 		if (!document.getElementById("whattocopy1").checked && !document.getElementById("whattocopy2").checked) {
@@ -674,7 +684,7 @@ require("../header.php");
 if ($overwriteBody==1) {
 	echo $body;
 } else {
-	if (!isset($_GET['loadothers'])) {
+	if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
@@ -686,8 +696,8 @@ if ($overwriteBody==1) {
 //DISPLAY BLOCK FOR selecting calendar items to copy
 ?>
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
-	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
-	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
+	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
+	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($_POST['ctc']); ?>">
 	<h4>Select Calendar Items to Copy</h4>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
@@ -702,11 +712,11 @@ if ($overwriteBody==1) {
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 ?>
 			<td>
-			<input type=checkbox name='checked[]' value='<?php echo $calitems[$i][0];?>' checked="checked"/>
+			<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($calitems[$i][0]); ?>' checked="checked"/>
 			</td>
 			<td class="nowrap"><?php echo tzdate("m/d/Y",$calitems[$i][1]); ?></td>
-			<td><?php echo $calitems[$i][2]; ?></td>
-			<td><?php echo $calitems[$i][3]; ?></td>
+			<td><?php echo Sanitize::encodeStringForDisplay($calitems[$i][2]); ?></td>
+			<td><?php echo Sanitize::encodeStringForDisplay($calitems[$i][3]); ?></td>
 		</tr>
 <?php
 		}
@@ -737,21 +747,20 @@ if ($overwriteBody==1) {
 	</script>
 
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
-	<input type=hidden name=ekey id=ekey value="<?php echo $_POST['ekey'] ?>">
-	<input type=hidden name=ctc id=ctc value="<?php echo $_POST['ctc'] ?>">
-	<p>What to copy: 
+	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
+	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($_POST['ctc']); ?>">
+	<p>What to copy:
 	<?php
 		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.$_POST['ctc'].'">Preview source course</a>';}
 	?>
 	<br/>
 	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>
 	<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"> <label for=whattocopy2>Select items to copy</label></p>
-	
+
 	<div id="allitemsnote" style="display:none;">
-	<p><input type=checkbox name="copyofflinewhole"  value="1"/> Copy offline grade items </p>
-	<p>Copying the whole course will also copy (and overwrite) course settings, gradebook categories, outcomes, and rubrics.
-	   To change these options, choose "Select items to copy" instead.</p>
 	<p class="noticetext">You are about to copy ALL items in this course.</p>
+	<p>In most cases, you'll want to leave the options below set to their default
+		values </p>
 	</div>
 	<div id="selectitemstocopy" style="display:none;">
 	<h4>Select Items to Copy</h4>
@@ -817,12 +826,14 @@ if ($overwriteBody==1) {
 
 		</tbody>
 	</table>
+</div>
 	<p> </p>
+<div id="copyoptions" style="display:none;">
 	<fieldset><legend>Options</legend>
 	<table>
 	<tbody>
-	<tr><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
-	<tr><td class="r">Copy gradebook scheme and categories<br/>(<i>will overwrite current scheme</i>)? </td><td>
+	<tr class="allon"><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
+	<tr class="allon"><td class="r">Copy gradebook scheme and categories<br/>(<i>will overwrite current scheme</i>)? </td><td>
 		<input type=checkbox name="copygbsetup" value="1"/></td></tr>
 	<tr><td class="r">Set all copied items as hidden to students?</td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
 	<tr><td class="r">Copy offline grade items?</td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
@@ -834,8 +845,8 @@ if ($overwriteBody==1) {
 
 	<tr><td class="r">Copy "display at top" instructor forum posts? </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
 
-	<tr><td class="r">Append text to titles?</td><td> <input type="text" name="append"></td></tr>
-	<tr><td class="r">Add to block:</td><td>
+	<tr class="selectonly"><td class="r">Append text to titles?</td><td> <input type="text" name="append"></td></tr>
+	<tr class="selectonly"><td class="r">Add to block:</td><td>
 
 <?php
 writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$selectedVal=null,$defaultLabel="Main Course Page",$defaultVal="none",$actions=null);
@@ -852,33 +863,31 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	} else if (isset($_GET['loadothers'])) { //loading others subblock
 	 if ($page_hasGroups) {
-				$lastteacher = 0;
-				$lastgroup = -1;
-				$grptemplatelist = array();
-				//DB while ($line = mysql_fetch_array($courseGroupResults, MYSQL_ASSOC)) {
-				while ($line = $courseGroupResults->fetch(PDO::FETCH_ASSOC)) {
-					if ($line['groupid']!=$lastgroup) {
-						if ($lastgroup!=-1) {
-							echo "				</ul>\n			</li>\n";
-							writeOtherGrpTemplates($grptemplatelist);
-							echo "			</ul>\n		</li>\n";
-							$lastteacher = 0;
-							$grptemplatelist = array();
-						}
-	?>
-				<li class=lihdr>
-					<span class=dd>-</span>
-					<span class=hdr onClick="toggle('g<?php echo $line['groupid'] ?>')">
-						<span class=btn id="bg<?php echo $line['groupid'] ?>">+</span>
-					</span>
-					<span class=hdr onClick="toggle('g<?php echo $line['groupid'] ?>')">
-						<span id="ng<?php echo $line['groupid'] ?>" ><?php echo $grpnames[$line['groupid']] ?></span>
-					</span>
-					<ul class=hide id="g<?php echo $line['groupid'] ?>">
+				foreach ($grpnames as $grp) {
+					?>
+								<li class=lihdr>
+									<span class=dd>-</span>
+									<span class=hdr onClick="loadothergroup('<?php echo Sanitize::encodeStringForJavascript($grp['id']); ?>')">
+										<span class=btn id="bg<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>">+</span>
+									</span>
+									<span class=hdr onClick="loadothergroup('<?php echo Sanitize::encodeStringForJavascript($grp['id']); ?>')">
+										<span id="ng<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>" ><?php echo Sanitize::encodeStringForDisplay($grp['name']); ?></span>
+									</span>
+									<ul class=hide id="g<?php echo Sanitize::encodeStringForDisplay($grp['id']); ?>">
+										<li>Loading...</li>
+									</ul>
+								</li>
+					<?php
+				}
+		 } else {
+			 echo '<li>No other users</li>';
+		 }
 
-	<?php
-						$lastgroup = $line['groupid'];
-					}
+	} else if (isset($_GET['loadothergroup'])) { //loading others subblock
+	 if ($courseGroupResults->rowCount()>0) {
+				$lastteacher = 0;
+				$grptemplatelist = array(); //writeOtherGrpTemplates($grptemplatelist);
+				while ($line = $courseGroupResults->fetch(PDO::FETCH_ASSOC)) {
 					if ($line['userid']!=$lastteacher) {
 						if ($lastteacher!=0) {
 							echo "				</ul>\n			</li>\n";
@@ -886,15 +895,15 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	?>
 				<li class=lihdr>
 					<span class=dd>-</span>
-					<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-						<span class=btn id="b<?php echo $line['userid'] ?>">+</span>
+					<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
+						<span class=btn id="b<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">+</span>
 					</span>
-					<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-						<span id="n<?php echo $line['userid'] ?>" ><?php echo $line['LastName'] . ", " . $line['FirstName'] . "\n" ?>
+					<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
+						<span id="n<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" ><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
 						</span>
 					</span>
-					<a href="mailto:<?php echo $line['email'] ?>">Email</a>
-					<ul class=hide id="<?php echo $line['userid'] ?>">
+					<a href="mailto:<?php echo Sanitize::emailAddress($line['email']); ?>">Email</a>
+					<ul class=hide id="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">
 	<?php
 						$lastteacher = $line['userid'];
 					}
@@ -916,26 +925,33 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 						</ul>
 					</li>
 					<?php writeOtherGrpTemplates($grptemplatelist);?>
-				</ul>
-			</li>
-		</ul>
-	</li>
+
 	<?php
 		 } else {
-			 echo '<li>No other users</li>';
+			 echo '<li>No group members with courses</li>';
 		 }
 
 	} else { //DEFAULT DISPLAY BLOCK
 ?>
 	<script type="text/javascript">
 	var othersloaded = false;
-	var ahahurl = '<?php echo $imasroot?>/course/copyitems.php?cid=<?php echo $cid ?>&loadothers=true';
+	var othergroupsloaded = [];
+	var ahahurl = '<?php echo $imasroot?>/course/copyitems.php?cid=<?php echo $cid ?>';
 	function loadothers() {
 		if (!othersloaded) {
 			//basicahah(ahahurl, "other");
-			$.ajax({url:ahahurl, dataType:"html"}).done(function(resp) {
+			$.ajax({url:ahahurl+"&loadothers=true", dataType:"html"}).done(function(resp) {
 				$('#other').html(resp);
-				$("#other input:radio").change(function() {
+			});
+			othersloaded = true;
+		}
+	}
+	function loadothergroup(n) {
+		toggle("g"+n);
+		if (othergroupsloaded.indexOf(n) === -1) {
+			$.ajax({url:ahahurl+"&loadothergroup="+n, dataType:"html"}).done(function(resp) {
+				$('#g'+n).html(resp);
+				$("#g"+n+" input:radio").change(function() {
 					if ($(this).hasClass("copyr")) {
 						$("#ekeybox").show();
 					} else {
@@ -949,7 +965,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 					}
 				});
 			});
-			othersloaded = true;
+			othergroupsloaded.push(n);
 		}
 	}
 	</script>
@@ -1006,15 +1022,15 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 ?>
 					<li class=lihdr>
 						<span class=dd>-</span>
-						<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-							<span class=btn id="b<?php echo $line['userid'] ?>">+</span>
+						<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
+							<span class=btn id="b<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">+</span>
 						</span>
-						<span class=hdr onClick="toggle(<?php echo $line['userid'] ?>)">
-							<span id="n<?php echo $line['userid'] ?>"><?php echo $line['LastName'] . ", " . $line['FirstName'] . "\n" ?>
+						<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
+							<span id="n<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
 							</span>
 						</span>
-						<a href="mailto:<?php echo $line['email'] ?>">Email</a>
-						<ul class=hide id="<?php echo $line['userid'] ?>">
+						<a href="mailto:<?php echo Sanitize::emailAddress($line['email']); ?>">Email</a>
+						<ul class=hide id="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">
 <?php
 					$lastteacher = $line['userid'];
 				}
@@ -1122,7 +1138,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	}
 }
-if (!isset($_GET['loadothers'])) {
+if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
  require ("../footer.php");
 }
 ?>

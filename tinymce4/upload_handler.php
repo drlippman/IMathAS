@@ -1,8 +1,9 @@
 <?php
   //check credentials
-  require("../validate.php");
-  require("../includes/filehandler.php");
-  
+  require("../init.php");
+  require_once("../includes/filehandler.php");
+
+
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
@@ -13,18 +14,8 @@ ini_set("post_max_size", "10485760");
   reset ($_FILES);
   $tempkey = key($_FILES);
   $temp = current($_FILES);
+  $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist(str_replace(' ','_',$temp['name']));
   if (is_uploaded_file($temp['tmp_name'])){
-    
-    if (isset($_SERVER['HTTP_ORIGIN']) && isset($CFG['GEN']['accepted_origins'])) {
-      // same-origin requests won't set an origin. If the origin is set, it must be valid.
-      if (in_array($_SERVER['HTTP_ORIGIN'], $CFG['GEN']['accepted_origins'])) {
-        header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-      } else {
-        header("HTTP/1.0 403 Origin Denied");
-        return;
-      }
-    }
-    
 
     /*
       If your script needs to receive cookies, set images_upload_credentials : true in
@@ -46,9 +37,7 @@ ini_set("post_max_size", "10485760");
     }
 
     // Accept upload if there was no origin, or if it is an accepted origin
-    $filename = basename($temp['name']);
-    $filename = str_replace(' ','_',$filename);
-    $filename = preg_replace('/[^\w\.\-_]/','',$filename);
+    $filename = basename(str_replace('\\','/',$temp['name']));
     $ncnt = 1;
     $filenamepts = explode('.',$filename);
     $skipcheck = false;

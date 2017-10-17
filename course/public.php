@@ -8,11 +8,13 @@
 		$urlmode = 'http://';
 	}
 	/*** master php includes *******/
-	require("../config.php");
+	require("../init_without_validate.php");
 	require("../i18n/i18n.php");
 	require("courseshowitems.php");
+
+
 	$ispublic = true;
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	$stm = $DBH->prepare("SELECT name,theme,itemorder,hideicons,picicons,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
@@ -40,6 +42,13 @@
 			if ($items[$blocktree[$i]-1]['public']==1) {
 				$blockispublic = true;
 			}
+			if (!is_array($items[$blocktree[$i]-1])) { //invalid blocktree
+				$_GET['folder'] = 0;
+				$items = unserialize($line['itemorder']);
+				unset($backtrack);
+				unset($blocktree);
+				break;
+			}
 			if (!isset($teacherid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
 				$_GET['folder'] = 0;
 				$items = unserialize($line['itemorder']);
@@ -54,12 +63,11 @@
 			$items = unserialize($line['itemorder']);
 			unset($backtrack);
 			unset($blocktree);
-			break;
 		}
 	}
 
-	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/public.php?cid={$_GET['cid']}";
-	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/public.php?cid=".Sanitize::courseId($_GET['cid']);
+	$jsAddress2 = $GLOBALS['basesiteurl'] . '/course';
 
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);
@@ -70,14 +78,14 @@
 
 	$curBreadcrumb = $breadcrumbbase;
 	if (isset($backtrack) && count($backtrack)>0) {
-		$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder=0\">$coursename</a> ";
+		$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		for ($i=0;$i<count($backtrack);$i++) {
 			$curBreadcrumb .= "&gt; ";
 			if ($i!=count($backtrack)-1) {
-				$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+				$curBreadcrumb .= "<a href=\"public.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[$i][1])."\">";
 			}
 			//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-			$curBreadcrumb .= $backtrack[$i][0];
+			$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 			if ($i!=count($backtrack)-1) {
 				$curBreadcrumb .= "</a>";
 			}
@@ -89,7 +97,7 @@
 			$backlink = "<span class=right><a href=\"public.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span><br class=\"form\" />";
 		}
 	} else {
-		$curBreadcrumb .= $coursename;
+		$curBreadcrumb .= Sanitize::encodeStringForDisplay($coursename);
 		$curname = $coursename;
 	}
 
@@ -97,17 +105,17 @@ $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/cour
 require("../header.php");
 ?>
 <script>
-	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo $cid ?>&folder=';
-	var oblist = '<?php echo $oblist ?>';
-	var plblist = '<?php echo $plblist ?>';
-	var cid = '<?php echo $cid ?>';
+	var getbiaddr = 'getblockitemspublic.php?cid=<?php echo Sanitize::courseId($cid) ?>&folder=';
+	var oblist = '<?php echo Sanitize::encodeStringForJavascript($oblist) ?>';
+	var plblist = '<?php echo Sanitize::encodeStringForJavascript($plblist) ?>';
+	var cid = '<?php echo Sanitize::courseId($cid) ?>';
 </script>
 <div class=breadcrumb>
 		<?php echo $curBreadcrumb ?>
 		<div class=clear></div>
 </div>
 <?php
- echo "<h2>$curname</h2>\n";
+ echo "<h2>".Sanitize::encodeStringForDisplay($curname)."</h2>\n";
  if (count($items)>0) {
 	 showitems($items,$_GET['folder'],$blockispublic);
  }

@@ -2,7 +2,8 @@
 //IMathAS:  Add/modify gradebook comments
 //(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -10,19 +11,27 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['comtype'])) {
 		$comtype = $_GET['comtype'];
 	} else {
 		$comtype = 'stu';
 	}
+	function fopen_utf8 ($filename, $mode) {
+	    $file = @fopen($filename, $mode);
+	    $bom = fread($file, 3);
+	    if ($bom != b"\xEF\xBB\xBF") {
+	        rewind($file);
+	    }
+	    return $file;
+	}
 
 	if (isset($_GET['upload'])) {
 		require("../header.php");
 
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
-		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Gradebook Comments</a> &gt; Upload Comments</div>";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
+		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Gradebook Comments</a> &gt; Upload Comments</div>";
 
 		if ($comtype=='stu') {
 			echo '<div id="headergbcomments" class="pagetitle"><h2>Upload Student Comments</h2></div>';
@@ -43,7 +52,8 @@
 				}
 				$scorecol = $_POST['gradecol']-1;
 
-				$handle = fopen($_FILES['userfile']['tmp_name'],'r');
+				// $_FILES[]['tmp_name'] is not user provided. This is safe.
+				$handle = fopen_utf8($_FILES['userfile']['tmp_name'],'r');
 				if ($_POST['hashdr']==1) {
 					$data = fgetcsv($handle,4096,',');
 				} else if ($_POST['hashdr']==2) {
@@ -93,14 +103,14 @@
 					}
 				}
 
-				echo "<p>Comments uploaded.  $successes records.</p> ";
+				echo "<p>Comments uploaded.". Sanitize::encodeStringForDisplay($successes) ."records.</p> ";
 				if (count($failures)>0) {
 					echo "<p>Comment upload failure on: <br/>";
 					echo implode('<br/>',$failures);
 					echo '</p>';
 				}
 				if ($successes>0) {
-					echo "<a href=\"gbcomments.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid&comtype=$comtype\">Return to comments list</a></p>";
+					echo "<a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Return to comments list</a></p>";
 					require("../footer.php");
 					exit;
 				}
@@ -111,7 +121,7 @@
 			}
 		}
 
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"gbcomments.php?cid=$cid&gbmode={$_GET['gbmode']}&comtype=$comtype&upload=true\">\n";
+		echo "<form enctype=\"multipart/form-data\" method=post action=\"gbcomments.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&comtype=".Sanitize::encodeUrlParam($comtype)."&upload=true\">\n";
 
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />\n";
 		echo "<span class=form>Grade file (CSV): </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
@@ -158,7 +168,7 @@
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid");
 		exit;
 	}
 
@@ -175,23 +185,23 @@
 	echo '   }'."\n";
 	echo ' } </script>'."\n";
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 	if ($comtype=='stu') {
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
-		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=instr\">View/Edit Instructor notes</a></div>";
+		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=". Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
+		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=instr\">View/Edit Instructor notes</a></div>";
 		echo '<h2>Modify Gradebook Comments</h2>';
 		echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
 
 	} else if ($comtype=='instr') {
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
-		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=stu\">View/Edit Student comments</a></div>";
+		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
+		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=stu\">View/Edit Student comments</a></div>";
 		echo '<h2>Modify Instructor Notes</h2>';
 		echo "<p>These notes will only display on this page and gradebook exports.  They will not be visible to students.</p>";
 	}
-	echo "<p><a href=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&upload=true&comtype=$comtype\">Upload comments</a></p>";
+	echo "<p><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&upload=true&comtype=".Sanitize::encodeUrlParam($comtype)."\">Upload comments</a></p>";
 
-	echo "<form id=\"mainform\" method=post action=\"gbcomments.php?cid=$cid&stu={$_GET['stu']}&comtype=$comtype&record=true\">";
+	echo "<form id=\"mainform\" method=post action=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=".Sanitize::encodeUrlParam($comtype)."&record=true\">";
 	echo "<span class=form>Add/Replace to all:</span><span class=formright><textarea cols=50 rows=3 id=\"toall\" ></textarea>";
 
 	echo '<br/><input type=button value="Prepend" onClick="sendtoall(0);"/> <input type=button value="Append" onclick="sendtoall(1)"/> <input type=button value="Replace" onclick="sendtoall(2)"/></span><br class="form"/>';
@@ -207,7 +217,7 @@
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<span class=form>{$row[1]}, {$row[2]}</span><span class=formright><textarea cols=50 rows=3 name=\"{$row[0]}\">{$row[3]}</textarea></span><br class=form>";
+		echo "<span class=form>".Sanitize::encodeStringForDisplay($row[1]).", ". Sanitize::encodeStringForDisplay($row[2])."</span><span class=formright><textarea cols=50 rows=3 name=\"".Sanitize::encodeStringForDisplay($row[0])."\">".Sanitize::encodeStringForDisplay($row[3])."</textarea></span><br class=form>";
 	}
 	echo '<div class="submit"><input type="submit" value="'._('Save Comments').'"/></div>';
 	echo "</form>";

@@ -3,9 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/copyiteminc.php");
+require("../includes/loaditemshowdata.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -13,20 +14,20 @@ require("../includes/copyiteminc.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Assessment Settings";
-
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Mass Change Assessment Settings";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Assessment Settings";
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } else {
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['checked'])) { //if the form has been submitted
 		$checked = array();
 		foreach ($_POST['checked'] as $id) {
-			$id = intval($id);
+			$id = Sanitize::onlyInt($id);
 			if ($id != 0) {
 				$checked[] = $id;
 			}
@@ -370,7 +371,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']));
 		}
 		exit;
 
@@ -418,6 +419,7 @@ if (!(isset($teacherid))) {
 		$parents = array();
 		$agbcats = array();
 		$prespace = array();
+		$itemshowdata = loadItemShowData($items,false,true,false,false,'Assessment',true);
 		getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
 
 		//DB $query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
@@ -622,7 +624,7 @@ $(function() {
 					$blockout = '';
 				}
 				echo '<li>';
-				echo "<input type=checkbox name='checked[]' value='{$gitypeids[$i]}' id='{$parents[$i]}.{$ids[$i]}:{$agbcats[$gitypeids[$i]]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='" . Sanitize::encodeStringForDisplay($gitypeids[$i]) . "' id='" . Sanitize::encodeStringForDisplay($parents[$i] . "." . $ids[$i] . ":" . $agbcats[$gitypeids[$i]]) . "' checked=checked ";
 				echo '/>';
 				$pos = strrpos($types[$i],'-');
 				if ($pos!==false) {

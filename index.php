@@ -4,7 +4,8 @@
 //(c) 2010 David Lippman
 
 /*** master includes ***/
-require("./validate.php");
+require("./init.php");
+$now = time();
 
 //0: classes you're teaching
 //1: classes you're tutoring
@@ -49,10 +50,18 @@ $placeinhead = '
    div.pagetitle h2 {
   	margin-top: 0px;
   	}
+  div.sysnotice {
+   	border: 1px solid #faa;
+   	background-color: #fff3f3;
+   	padding: 5px;
+   	margin-bottom: 5px;
+   	clear: both;
+   }
    #homefullwidth { clear: both;}
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-$placeinhead .= '<script type="text/javascript">$(function() {
+if ($myrights>15) {
+  $placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
   $(".courselist-teach li").css("clear","both").each(function (i,el) {
@@ -65,11 +74,12 @@ $placeinhead .= '<script type="text/javascript">$(function() {
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
   		thishtml += \'</ul></div>\';
   		$(el).append(thishtml);
-  	} 
+  	}
   });
   $(".dropdown-toggle").dropdown();
   });
   </script>';
+}
 $nologo = true;
 
 
@@ -112,7 +122,7 @@ if ($showmessagesgadget) {
 	$stm = $DBH->prepare("SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND (isread=0 OR isread=4) GROUP BY courseid");
 	$stm->execute(array(':msgto'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$newmsgcnt[$row[0]] = $row[1];
+		$newmsgcnt[$row[0]] = Sanitize::onlyInt($row[1]);
 	}
 }
 
@@ -237,10 +247,10 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";  //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid));
+	$stm->execute(array(':userid'=>$userid, ':now'=>$now));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
@@ -275,12 +285,12 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";    //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	//this is not consistent with above...
 	//$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "GROUP BY imas_forums.courseid";
 	$stm2 = $DBH->prepare($query);
-	$stm2->execute(array(':userid'=>$userid));
+	$stm2->execute(array(':userid'=>$userid, ':now'=>$now));
 	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
@@ -308,11 +318,11 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid));
+	$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
@@ -349,11 +359,11 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "GROUP BY imas_forums.courseid";
 	$stm2 = $DBH->prepare($query);
-	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid));
+	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now));
 	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
@@ -372,39 +382,59 @@ if ($myrights==100) {
 /*** done pulling stuff.  Time to display something ***/
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
-echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
-if (!isset($CFG['GEN']['hidedefindexmenu'])) {
-	if ($myrights>5) {
-		echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
-		echo "<a href=\"forms.php?action=chgpwd\">", _('Change Password'), "</a> | \n";
+if (!isset($CFG['GEN']['homelinkbox'])) {
+	echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
+	if (!isset($CFG['GEN']['hidedefindexmenu'])) {
+		if ($myrights>5) {
+			echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
+			echo "<a href=\"forms.php?action=chgpwd\">", _('Change Password'), "</a> | \n";
+		}
+		echo '<a href="actions.php?action=logout">', _('Log Out'), '</a><br/>';
 	}
-	echo '<a href="actions.php?action=logout">', _('Log Out'), '</a><br/>';
-}
-echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
-if ($msgtotal>0) {
-	echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), $msgtotal), '</a>';
-}
-if ($myrights > 10) {
-	echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
-} else if ($myrights > 9) {
-	echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
-}
-if ($myrights >=75) {
-	echo '<br/><a href="admin/admin.php">'._('Admin Page').'</a>';
+	echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
+	if ($msgtotal>0) {
+		echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), Sanitize::onlyFloat($msgtotal)), '</a>';
+	}
+	if ($myrights > 10) {
+		echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
+	} else if ($myrights > 9) {
+		echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
+	}
+	if ($myrights >=75) {
+		echo '<br/><a href="admin/admin2.php">'._('Admin Page').'</a>';
+	} else if (($myspecialrights&4)==4) {
+		echo '<br/><a href="admin/listdiag.php">'._('Diagnostics').'</a>';
+	}
+	echo '</div>';
 }
 
-echo '</div>';
 echo '<div class="pagetitle" id="headerhome" role="banner"><h2>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
 } else {
-	echo _('Welcome to'), " $installname, $userfullname";
+	echo _('Welcome to'), " $installname, " . Sanitize::encodeStringForDisplay($userfullname);
 }
 echo '</h2>';
-if ($myrights==100 && count($brokencnt)>0) {
-	echo '<span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
-}
 echo '</div>';
+if (isset($sessiondata['emulateuseroriginaluser'])) {
+	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
+}
+if ($myrights==100 && count($brokencnt)>0) {
+	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
+}
+if ($myrights<75 && ($myspecialrights&(16+32+64))!=0) {
+	echo '<div>';
+	if (($myspecialrights&(16+32))!=0) {
+		echo '<a href="admin/forms.php?from=home&action=newadmin">'._('Add New User').'</a> ';
+	}
+	if (($myspecialrights&64)!=0) {
+		echo '<a href="admin/approvepending.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
+	}
+	echo '</div>';
+}
+if (isset($tzname) && isset($sessiondata['logintzname']) && $tzname!=$sessiondata['logintzname']) {
+	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';
+}
 
 
 for ($i=0; $i<3; $i++) {
@@ -460,20 +490,22 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			echo ' data-isowner="'.($data[$i]['ownerid']==$userid?'true':'false').'"';
 			echo ' data-cid="'.$data[$i]['id'].'"';
 		}
-		echo '>'; 
+		echo '>';
 		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
-		echo $data[$i]['name'].'</a>';
+		echo Sanitize::encodeStringForDisplay($data[$i]['name']).'</a>';
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
-			echo ' <span style="color:green;">', _('Hidden'), '</span>';
+			echo ' <em style="color:green;">', _('Unavailable'), '</em>';
 		}
 		if (isset($data[$i]['lockaid']) && $data[$i]['lockaid']>0) {
-			echo ' <span style="color:green;">', _('Lockdown'), '</span>';
+			echo ' <em style="color:green;">', _('Lockdown'), '</em>';
 		}
 		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
 			echo ' <a class="noticetext" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
-			echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
+			printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data[$i]['id'],
+			_('Posts ('.Sanitize::onlyInt($newpostcnt[$data[$i]['id']]).')'));
+			// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data[$i]['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($type != 'teach' || $data[$i]['ownerid']!=$userid || $myrights<40) {
 			echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';
@@ -491,12 +523,12 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	} else if ($type=='teach' && $myrights>39) {
 		echo '<div class="center"><a class="abutton" href="admin/forms.php?from=home&action=addcourse">', _('Add New Course'), '</a></div>';
 	}
-	
+
 	echo '<div class="center">';
 	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
 	echo '</div>';
 	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
-		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';
+		echo '<div class="center"><a class="abutton" href="admin/admin2.php">', _('Admin Page'), '</a></div>';
 	}
 	echo '</div>';
 	echo '</div>';
@@ -525,15 +557,15 @@ function printMessagesGadget() {
 			$n++;
 		}
 		if ($n==1) {
-			$line['title'] = 'Re: '.$line['title'];
+			$line['title'] = 'Re: '.Sanitize::encodeStringForDisplay($line['title']);
 		} else if ($n>1) {
-			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+			$line['title'] = "Re<sup>$n</sup>: ".Sanitize::encodeStringForDisplay($line['title']);
 		}
 		echo "<td><a href=\"msgs/viewmsg.php?cid={$line['courseid']}&type=new&msgid={$line['id']}\">";
 		echo $line['title'];
 		echo '</a></td>';
-		echo '<td>'.$line['LastName'].', '.$line['FirstName'].'</td>';
-		echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
+		echo '<td>'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).'</td>';
+		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']]).'</td>';
 		echo '<td>'.tzdate("D n/j/y, g:i a",$line['senddate']).'</td>';
 		echo '</tr>';
 	}
@@ -584,9 +616,9 @@ function printPostsGadget() {
 			$n++;
 		}
 		if ($n==1) {
-			$subject = 'Re: '.$subject;
+			$subject = 'Re: '.Sanitize::encodeStringForDisplay($subject);
 		} else if ($n>1) {
-			$subject = "Re<sup>$n</sup>: ".$subject;
+			$subject = "Re<sup>$n</sup>: ".Sanitize::encodeStringForDisplay($subject);
 		}
 		echo "<td><a href=\"forums/posts.php?page=-3&cid={$line['courseid']}&forum={$line['id']}&thread={$line['threadid']}\">";
 		echo $subject;
@@ -594,9 +626,9 @@ function printPostsGadget() {
 		if ($threaddata[$line['threadid']]['isanon']==1) {
 			echo '<td>', _('Anonymous'), '</td>';
 		} else {
-			echo '<td>'.$threaddata[$line['threadid']]['LastName'].', '.$threaddata[$line['threadid']]['FirstName'].'</td>';
+			echo '<td>'.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['LastName']).', '.Sanitize::encodeStringForDisplay($threaddata[$line['threadid']]['FirstName']).'</td>';
 		}
-		echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
+		echo '<td>'.Sanitize::encodeStringForDisplay($page_coursenames[$line['courseid']]).'</td>';
 		echo '<td>'.tzdate("D n/j/y, g:i a",$line['lastposttime']).'</td>';
 		echo '</tr>';
 	}

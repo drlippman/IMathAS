@@ -1,14 +1,14 @@
 <?php
 //Utility function for copying questions used in an assessment into a seperate library
 //not integrated into user interface
-require("../validate.php");
+require("../init.php");
 if (!isset($teacherid)) {exit;}
 
 if (!isset($_GET['cid'])) {
 	echo "No course identified";
 	exit;
 }
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if (!isset($_POST['libs']) || $_POST['libs']=='') {
 	require("../header.php");
 	if (isset($_POST['libs'])) {

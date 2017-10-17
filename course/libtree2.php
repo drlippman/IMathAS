@@ -1,5 +1,5 @@
 <?php
-	require_once("../validate.php");
+	require_once("../init.php");
 
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		$isadmin = false;
@@ -28,10 +28,11 @@ END;
 		echo '<link rel="stylesheet" href="'."$imasroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
 	}
 	echo <<<END
-<link rel="stylesheet" href="$imasroot/course/libtree.css" type="text/css" />
+<script type="text/javascript">var imasroot = "$imasroot";</script>
+<link rel="stylesheet" href="$imasroot/course/libtree.css?v=090317" type="text/css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="$imasroot/javascript/general.js?v=031111"></script>
-<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=031111"></script>
+<script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=090317"></script>
 </head>
 <body>
 <form id="libselectform">
@@ -40,9 +41,31 @@ END;
 	echo "<script type=\"text/javascript\">";
 	//DB $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
 	//DB $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
-	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
-	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
-	$stm = $DBH->query($query);
+	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,imas_libraries.federationlevel,COUNT(imas_library_items.id) AS count ";
+	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 WHERE imas_libraries.deleted=0 ";
+	$qarr = array();
+	if ($isadmin) {
+		//no filter
+	} else if ($isgrpadmin) {
+		//any group owned library or visible to all
+		$query .= "AND (imas_libraries.groupid=:groupid OR imas_libraries.userights>2) ";
+		$qarr[':groupid'] = $groupid;
+	} else {
+		//owned, group
+		$query .= "AND ((imas_libraries.ownerid=:userid OR imas_libraries.userights>2) ";
+		$query .= "OR (imas_libraries.userights>0 AND imas_libraries.userights<3 AND imas_libraries.groupid=:groupid)) ";
+		$qarr[':groupid'] = $groupid;
+		$qarr[':userid'] = $userid;
+	}
+	$query .= " GROUP BY imas_libraries.id";
+	$query .= " ORDER BY imas_libraries.federationlevel DESC,imas_libraries.id";
+	if (count($qarr)==0) {
+		$stm = $DBH->query($query);
+	} else {
+		$stm = $DBH->prepare($query);
+		$stm->execute($qarr);
+	}
+
 	//$query = "SELECT id,name,parent FROM imas_libraries ORDER BY parent";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 
@@ -52,9 +75,9 @@ END;
 		$select = "child";
 	}
 
-	echo "var select = '$select';\n";
+	echo "var select = '" . Sanitize::encodeStringForJavascript($select) . "';\n";
 	if (isset($_GET['type'])) {
-		echo "var treebox = '{$_GET['type']}';\n";
+		echo "var treebox = '" . Sanitize::encodeStringForJavascript($_GET['type']) . "';\n";
 	} else {
 		echo "var treebox = 'checkbox';\n";
 	}
@@ -68,6 +91,7 @@ END;
 
 	$rights = array();
 	$sortorder = array();
+	$federated = array();
 	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$id = $line['id'];
@@ -84,6 +108,7 @@ END;
 		$sortorder[$id] = $line['sortorder'];
 		$ownerids[$id] = $line['ownerid'];
 		$groupids[$id] = $line['groupid'];
+		$federated[$id] = ($line['federationlevel']>0);
 	}
 	//if parent has lower userights, up them to match child library
 	function setparentrights($alibid) {
@@ -115,15 +140,13 @@ END;
 	$checked = array_merge($checked,$locked);
 	$toopen = array();
 
-	echo "var tree = {\n";
-	echo " 0:[\n";
-	$donefirst[0] = 2;
+	$treearr = array();
 	if ($_GET['type']=="radio" && $select == "child") {
-		echo "[0,8,\"Unassigned\",0,";
-		if (in_array(0,$checked)) { echo "1";} else {echo "0";}
-		echo "]";
+		$treearr[0] = array(array(0,8,_('Unassigned'),0,in_array(0,$checked)?1:0));
+	} else if ($_GET['type']=="radio" && $select == "parent") {
+		$treearr[0] = array(array(0,8,_('Unassigned'),-1,0,0));
 	} else {
-		echo "[0,8,\"Unassigned\",0,0]";
+		$treearr[0] = array(array(0,8,_('Unassigned'),0,0,0));
 	}
 
 	if (isset($ltlibs[0])) {
@@ -135,7 +158,8 @@ END;
 	}
 
 	function printlist($parent) {
-		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
+		global $treearr,$names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid;
+		global $locked,$groupids,$groupid,$isgrpadmin,$federated,$parents;
 		$newchildren = array();
 		$arr = array();
 		if ($parent==0 && isset($published)) {
@@ -143,10 +167,13 @@ END;
 		} else {
 			$arr = $ltlibs[$parent];
 		}
+		if ($parent==0 && $isadmin) {
+			$toplevelprivate = array();
+			$toplevelgroup = array();
+		}
 		if (count($arr)==0) {return;}
-		if ($donefirst[$parent]==0) {
-			echo ",\n$parent:[";
-			$donefirst[$parent]==1;
+		if (!isset($treearr[$parent])) {
+			$treearr[$parent] = array();
 		}
 		if ($sortorder[$parent]==1) {
 			$orderarr = array();
@@ -159,70 +186,65 @@ END;
 		foreach ($arr as $child) {
 			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
 			//if ($rights[$child]>$selectrights || $ownerids[$child]==$userid || $isadmin) {
+				$thisjson = array();
 				if (!$isadmin) {
 					if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
 						$rights[$child]=4;  //adjust coloring
 					}
 				}
-				if ($donefirst[$parent]==2) {echo ",";} else {$donefirst[$parent]=2;}
-				echo "[$child,{$rights[$child]},'{$names[$child]}',";
+				$thisjson[0] = Sanitize::onlyInt($child);
+				$thisjson[1] = Sanitize::onlyInt($rights[$child]);
+				$thisjson[2] = Sanitize::encodeStringForDisplay($names[$child]);
 				if (isset($ltlibs[$child])) { //library has children
 					if ($select == "parent" || $select=="all") {
-						if ($_GET['type']=="radio") {
-							if (in_array($child,$locked)) { //removed the following which prevented creation of sublibraries of "open to all" libs.  Not sure why I had that.   || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						} else {
-							if (in_array($child,$locked)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						}
+						$thisjson[3] = in_array($child,$locked)?1:0;
+						$thisjson[4] = in_array($child,$checked)?1:0;
 					} else {
-						echo "-1,]";
+						$thisjson[3] = -1;
+						$thisjson[4] = 0;
 					}
 					$newchildren[] = $child;
-				} else {  //no children
+				} else { // no children
 					if ($select == "child" || $select=="all" || $isempty[$child]==true) {
-						if ($_GET['type']=="radio") {
-							if (in_array($child,$locked)) { // || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						} else {
-							if (in_array($child,$locked)) {
-								echo "1,";
-							} else {
-								echo ",";
-							}
-							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
-							echo "]";
-						}
+						$thisjson[3] = in_array($child,$locked)?1:0;
+						$thisjson[4] = in_array($child,$checked)?1:0;
 					} else {
-						echo "-1,]";
+						$thisjson[3] = -1;
+						$thisjson[4] = 0;
 					}
-
+				}
+				$thisjson[5] = $federated[$child];
+				if ($isadmin && $parent==0 && $rights[$child]<5 && $ownerids[$child]!=$userid && ($rights[$child]==0 || $groupids[$child]!=$groupid)) {
+					if ($rights[$child]==0) {
+						$toplevelprivate[] = $thisjson;
+						$parents[$child] = -2;
+					} else {
+						$toplevelgroup[] = $thisjson;
+						$parents[$child] = -3;
+					}
+				} else {
+					$treearr[$parent][] = $thisjson;
 				}
 			}
 		}
-		echo "]";
+		if ($parent==0 && $isadmin) {
+			if (count($toplevelprivate)>0) {
+				$treearr[$parent][] = array(-2,0,_('Root Level Private Libraries'),-1,0,0);
+				$treearr[-2] = $toplevelprivate;
+				$parents[-2] = 0;
+			}
+			if (count($toplevelprivate)>0) {
+				$treearr[$parent][] = array(-3,2,_('Root Level Group Libraries'),-1,0,0);
+				$treearr[-3] = $toplevelgroup;
+				$parents[-3] = 0;
+			}
+		}
 		foreach ($newchildren as $newchild) {
-			$donefirst[$newchild] = false;
 			printlist($newchild);
 		}
 	}
 
-	echo "};";
+	echo "var tree = ".json_encode($treearr).";";
 	echo "</script>";  //end tree definition script
 	if (isset($_GET['base'])) {
 		$base = $_GET['base'];
@@ -230,7 +252,7 @@ END;
 	echo "<input type=button value=\"Uncheck all\" onclick=\"uncheckall(this.form)\"/><br>";
 
 	if (isset($base)) {
-		echo "<input type=hidden name=\"rootlib\" value=$base>{$names[$base]}</span>";
+		echo "<input type=hidden name=\"rootlib\" value=" . Sanitize::encodeStringForDisplay($base) . ">" . Sanitize::encodeStringForDisplay($names[$base]) . "</span>";
 	} else {
 		if ($select == "parent") {
 			echo "<input type=radio name=\"libs\" value=0 ";
@@ -268,6 +290,7 @@ END;
 				setshow($parents[$id]);
 			}
 		} else {
+			
 			if (isset($parents[$id]) && $parents[$id]!=0) {
 				setshow($parents[$id]);
 			}

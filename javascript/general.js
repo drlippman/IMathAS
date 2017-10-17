@@ -94,7 +94,7 @@ function tipshow(el,tip) {
 	tipobj.style.display = "block";
 	tipobj.setAttribute("aria-hidden","false");
 	el.setAttribute("aria-describedby", "hovertipsholder");
-	
+
 	if (typeof usingASCIIMath!='undefined' && typeof noMathRender != 'undefined') {
 		if (usingASCIIMath && !noMathRender) {
 			rendermathnode(tipobj);
@@ -253,7 +253,7 @@ function GB_show(caption,url,width,height) {
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><span class="pointer" onclick="GB_hide()" aria-label="Close">[X]</span></span>'+caption;
+		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span>'+caption;
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
 			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
@@ -275,7 +275,7 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
-	
+
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {
@@ -327,25 +327,26 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		selector: selectorstr,
 		inline: inlinemode,
 		plugins: [
-			"advlist autolink attach image charmap anchor",
-			"searchreplace code link textcolor",
-			"media table paste asciimath asciisvg rollups"
+			"lists advlist autolink attach image charmap anchor",
+			"searchreplace code link textcolor snippet",
+			"media table paste asciimath asciisvg rollups colorpicker"
 		],
 		menubar: false,//"edit insert format table tools ",
-		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code | saveclose",
+		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
 		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
 		file_picker_callback: filePickerCallBackFunc,
-		file_browser_types: 'file image',
+		file_picker_types: 'file image',
 		//imagetools_cors_hosts: ['s3.amazonaws.com'],
 		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
 		//images_upload_credentials: true,
 		paste_data_images: true,
 		default_link_target: "_blank",
 		browser_spellcheck: true,
+		branding: false,
 		resize: "both",
 		width: '100%',
 		content_style: "body {background-color: #ffffff !important;}",
@@ -353,6 +354,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
+		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
 		style_formats: [{
 			title: "Font Family",
 			items: [
@@ -372,12 +374,12 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			]
 			},
 			{title: "Font Size", items: [
-                                {title: '8pt', inline:'span', styles: { fontSize: '12px', 'font-size': '8px' } },
-                                {title: '10pt', inline:'span', styles: { fontSize: '12px', 'font-size': '10px' } },
-                                {title: '12pt', inline:'span', styles: { fontSize: '12px', 'font-size': '12px' } },
-                                {title: '14pt', inline:'span', styles: { fontSize: '12px', 'font-size': '14px' } },
-                                {title: '16pt', inline:'span', styles: { fontSize: '12px', 'font-size': '16px' } },
-                                {title: '20pt', inline:'span', styles: { fontSize: '12px', 'font-size': '20px' } }
+                                {title: 'x-small', inline:'span', styles: { fontSize: 'x-small', 'font-size': 'x-small' } },
+                                {title: 'small', inline:'span', styles: { fontSize: 'small', 'font-size': 'small' } },
+                                {title: 'medium', inline:'span', styles: { fontSize: 'medium', 'font-size': 'medium' } },
+                                {title: 'large', inline:'span', styles: { fontSize: 'large', 'font-size': 'large' } },
+                                {title: 'x-large', inline:'span', styles: { fontSize: 'x-large', 'font-size': 'x-large' } },
+                                {title: 'xx-large', inline:'span', styles: { fontSize: 'xx-large', 'font-size': 'xx-large' } }
                         ]
                 }]
         }
@@ -394,9 +396,10 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 	if (setupfunction) {
 		edsetup.setup = setupfunction;
 	}
-	for (var i in tinymce.editors) {
-		tinymce.editors[i].remove();
-	}
+	//for (var i in tinymce.editors) {
+	//	tinymce.editors[i].remove();
+	//}
+	tinymce.remove();
 	tinymce.init(edsetup);
 
 };
@@ -621,7 +624,7 @@ function hidefromcourselist(el,cid,type) {
 	if (confirm("Are you SURE you want to hide this course from your course list?")) {
 		jQuery.ajax({
 				type: "GET",
-				url: imasroot+'/admin/hidefromcourselist.php?cid='+cid+'&type='+type
+				url: imasroot+'/admin/hidefromcourselist.php?tohide='+cid+'&type='+type
 		}).done(function(msg) {
 			if (msg=='OK') {
 				jQuery(el).closest("ul.courselist > li").slideUp();
@@ -669,11 +672,6 @@ jQuery(document).ready(function($) {
 	$('a[href*="youtu"]').each(setupvideoembeds);
 	$('a[href*="vimeo"]').each(setupvideoembeds);
 	$('body').fitVids();
-	$('a[target="_blank"]').each(function() {
-		if (!this.href.match(/youtu/) && !this.href.match(/vimeo/)) {
-		   $(this).append(' <img src="'+imasroot+'/img/extlink.png" alt="External link"/>')
-		}
-	});
 });
 
 jQuery.fn.isolatedScroll = function() {
@@ -802,6 +800,35 @@ jQuery(document).ready(function($) {
 		$("#centercontent").attr("role","main");
 		$(".midwrapper").removeAttr("role");
 	}
+});
+
+//setup mobile nav menu, if exists
+jQuery(document).ready(function($) {
+	function toggleHeaderMobileMenuList(e) {
+		var list = $("#headermobilemenulist");
+		if (list.attr("aria-hidden")=="true") { //expand it
+			$("#headermobilemenulist").slideDown(50, function() {
+				$("#headermobilemenulist").addClass("menuexpanded").removeAttr("style");
+				list.attr("aria-hidden",false);
+				$("#topnavmenu").attr("aria-expanded",true);
+			});
+			$("#navlist").slideDown(100, function() {
+				$("#navlist").addClass("menuexpanded").removeAttr("style");
+			});
+		} else { //collapse it
+			$("#navlist").slideUp(100, function() {
+				$("#navlist").removeClass("menuexpanded").removeAttr("style");
+			});
+			$("#headermobilemenulist").slideUp(50, function() {
+				$("#headermobilemenulist").removeClass("menuexpanded").removeAttr("style");
+				list.attr("aria-hidden",true);
+				$("#topnavmenu").attr("aria-expanded",false);
+			});
+		}
+		e.preventDefault();
+	}
+	$("#topnavmenu").on("click", toggleHeaderMobileMenuList)
+	   .on("keydown", function(e) { if (e.which===13 || e.which==32) { toggleHeaderMobileMenuList(e);}});
 });
 
 /* ========================================================================

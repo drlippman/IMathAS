@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 
 /*** pre-html data manipulation, including function code *******/
@@ -18,8 +18,8 @@ $curBreadcrumb = "$breadcrumbbase Admin\n";
 
  if ($myrights>=75) {
 	 if (isset($_GET['showcourses'])) {
-		 setcookie('showcourses',$_GET['showcourses']);
-		 $showcourses = $_GET['showcourses'];
+     $showcourses = Sanitize::onlyInt($_GET['showcourses']);
+		 setcookie('showcourses', $showcourses);
 	 } else if (isset($_COOKIE['showcourses'])) {
 		 $showcourses = $_COOKIE['showcourses'];
 	 } else {
@@ -30,10 +30,10 @@ $curBreadcrumb = "$breadcrumbbase Admin\n";
  }
  if ($myrights==100) {
 	 if (isset($_GET['showusers'])) {
-		 setcookie('showusers',$_GET['showusers']);
-		 $showusers = $_GET['showusers'];
+     $showusers = Sanitize::onlyInt($_GET['showusers']);
+		 setcookie('showusers', $showusers);
 	 } else if (isset($_COOKIE['showusers'])) {
-		 $showusers = $_COOKIE['showusers'];
+		 $showusers = Sanitize::onlyInt($_COOKIE['showusers']);
 	 } else {
 		 $showusers = $groupid;
 	 }
@@ -85,8 +85,8 @@ if ($myrights < 40) {
 		} else {
 			$minrights = 40;
 		}
-		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\" class=\"artl\">Add/Remove</a>";
-		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\" class=\"trl\">Transfer</a>";
+		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id=".Sanitize::onlyInt($line['id'])."\" class=\"artl\">Add/Remove</a>";
+		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id=".Sanitize::onlyInt($line['id'])."\" class=\"trl\">Transfer</a>";
 		$i++;
 	}
 
@@ -104,7 +104,8 @@ if ($myrights < 40) {
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_teacherSelectVal[$i] = $row[0];
-		$page_teacherSelectLabel[$i] = $row[1] . ", " . $row[2]. ' ('.$row[3].')';
+		$page_teacherSelectLabel[$i] = sprintf("%s, %s (%s)", Sanitize::encodeStringForDisplay($row[1]),
+            Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[3]));
 		$i++;
 	}
 
@@ -258,7 +259,7 @@ $placeinhead .= '</script>';
 	for ($i=0;$i<count($page_courseList);$i++) {
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
-				<td><a href="../course/course.php?cid=<?php echo $page_courseList[$i]['id'] ?>">
+				<td><a href="../course/course.php?cid=<?php echo Sanitize::courseId($page_courseList[$i]['id']); ?>">
 				<?php
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '<i>';
@@ -270,7 +271,7 @@ $placeinhead .= '</script>';
 					echo '<span style="color:#faa;text-decoration: line-through;">';
 				}
 
-				echo $page_courseList[$i]['name'];
+				echo Sanitize::encodeStringForDisplay($page_courseList[$i]['name']);
 
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '</i>';
@@ -282,12 +283,12 @@ $placeinhead .= '</script>';
 				?>
 				</a>
 				</td>
-				<td class=c><?php echo $page_courseList[$i]['id'] ?></td>
-				<td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
-				<td class=c><a href="forms.php?action=modify&id=<?php echo $page_courseList[$i]['id'] ?>" class="sl">Settings</a></td>
-				<td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td>
-				<td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
-				<td class=c><a href="forms.php?action=delete&id=<?php echo $page_courseList[$i]['id'] ?>">Delete</a></td>
+				<td class=c><?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['LastName']) ?>, <?php echo Sanitize::encodeStringForDisplay($page_courseList[$i]['FirstName']) ?></td>
+				<td class=c><a href="forms.php?action=modify&id=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>" class="sl">Settings</a></td>
+				<td class=c><?php echo $page_courseList[$i]['addRemove']; ?></td>
+				<td class=c><?php echo $page_courseList[$i]['transfer']; ?></td>
+				<td class=c><a href="forms.php?action=delete&id=<?php echo Sanitize::onlyInt($page_courseList[$i]['id']); ?>">Delete</a></td>
 			</tr>
 <?php
 	}
@@ -328,19 +329,15 @@ $placeinhead .= '</script>';
 	<div class=cp>
 	<span class=column>
 	<a href="../course/manageqset.php?cid=admin">Manage Question Set</a><BR>
-	<a href="export.php?cid=admin">Export Question Set</a><BR>
-	<a href="import.php?cid=admin">Import Question Set</a><BR>
-	</span>
-	<span class=column>
-	<a href="../course/managelibs.php?cid=admin">Manage Libraries</a><br>
+	<a href="../course/managelibs.php?cid=admin">Manage Libraries</a><br/>
 	<a href="exportlib.php?cid=admin">Export Libraries</a><BR>
-	<a href="importlib.php?cid=admin">Import Libraries</a></span>
+	</span>
 <?php
-		if ($myrights == 100) {
+	if ($myrights == 100) {
 ?>
 	<span class=column>
 	<a href="forms.php?action=listgroups">Edit Groups</a><br/>
-	<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
+	<a href="importlib.php?cid=admin">Import Libraries</a><br/>
 	<a href="importstu.php?cid=admin">Import Students from File</a>
 	</span>
 	<?php if ($allowmacroinstall) {
@@ -354,7 +351,10 @@ $placeinhead .= '</script>';
 	if ($enablebasiclti) {
 		echo "<a href=\"forms.php?action=listltidomaincred\">LTI Provider Creds</a><br/>\n";
 	}
+	echo "<a href=\"forms.php?action=listfedpeers\">Federation Peers</a><br/>\n";
 	echo "<a href=\"externaltools.php?cid=admin\">External Tools</a><br/>\n";
+	echo '</span>';
+	echo '<span class="column">';
 	echo "<a href=\"../util/utils.php\">Admin Utilities</a><br/>\n";
 	echo '</span>';
 
@@ -383,13 +383,13 @@ $placeinhead .= '</script>';
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
 
-				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo $page_diagnosticsId[$i] ?>">
-				<?php echo $page_diagnosticsName[$i] ?></a></td>
-				<td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
-				<td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
-				<td><a href="diagsetup.php?id=<?php echo $page_diagnosticsId[$i] ?>">Modify</a></td>
-				<td><a href="forms.php?action=removediag&id=<?php echo $page_diagnosticsId[$i] ?>">Remove</a></td>
-				<td><a href="diagonetime.php?id=<?php echo $page_diagnosticsId[$i] ?>">One-time Passwords</a></td>
+				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">
+				<?php echo Sanitize::encodeStringForDisplay($page_diagnosticsName[$i]) ?></a></td>
+				<td class=c><?php echo Sanitize::encodeStringForDisplay($page_diagnosticsAvailable[$i]); ?></td>
+				<td class=c><?php echo Sanitize::encodeStringForDisplay($page_diagnosticsPublic[$i]); ?></td>
+				<td><a href="diagsetup.php?id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">Modify</a></td>
+				<td><a href="forms.php?action=removediag&id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">Remove</a></td>
+				<td><a href="diagonetime.php?id=<?php echo Sanitize::onlyInt($page_diagnosticsId[$i]); ?>">One-time Passwords</a></td>
 			</tr>
 <?php
 	}
@@ -410,21 +410,20 @@ $placeinhead .= '</script>';
 	<div class=item>
 		<table class=gb width="90%" id="myTable">
 		<thead>
-			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Password</th><th>Delete</th></tr>
+			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Delete</th></tr>
 		</thead>
 		<tbody>
 <?php
 		for ($i=0;$i<count($page_userDataId);$i++) {
 			if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
-				<td><?php echo $page_userDataLastName[$i] . ", " . $page_userDataFirstName[$i] ?></td>
-				<td><?php echo $page_userDataSid[$i] ?></td>
-				<td><?php echo $page_userDataEmail[$i] ?></td>
-				<td><?php echo $page_userDataType[$i] ?></td>
-				<td><?php echo $page_userDataLastAccess[$i] ?></td>
-				<td class=c><a href="forms.php?action=chgrights&id=<?php echo $page_userDataId[$i] ?>">Change</a></td>
-				<td class=c><a href="actions.php?action=resetpwd&id=<?php echo $page_userDataId[$i] ?>">Reset</a></td>
-				<td class=c><a href="forms.php?action=deladmin&id=<?php echo $page_userDataId[$i] ?>">Delete</a></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastName[$i]) . ", " . Sanitize::encodeStringForDisplay($page_userDataFirstName[$i]) ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataSid[$i]) ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataEmail[$i]) ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataType[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_userDataLastAccess[$i]); ?></td>
+				<td class=c><a href="forms.php?action=chgrights&id=<?php echo Sanitize::onlyInt($page_userDataId[$i]); ?>">Change</a></td>
+				<td class=c><a href="forms.php?action=deladmin&id=<?php echo Sanitize::onlyInt($page_userDataId[$i]); ?>">Delete</a></td>
 			</tr>
 <?php
 		}

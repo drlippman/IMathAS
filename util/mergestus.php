@@ -1,6 +1,6 @@
 <?php
 
-require("../validate.php");
+require("../init.php");
 
 if ($myrights<100 || empty($_GET['from']) || empty($_GET['to'])) {
 	exit;

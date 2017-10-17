@@ -3,10 +3,11 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("courseshowitems.php");
 require("../includes/htmlutil.php");
 require("../includes/calendardisp.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -18,7 +19,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$overwriteBody=1;
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas']) && $sessiondata['courseid']==$cid) {
 		//clean up coming out of an assessment
@@ -88,7 +89,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$_GET['cid']));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 	}
 
 	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
@@ -162,7 +163,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			$useleftnav = false;
 		}
 		$nocoursenav = true;
-		$usernameinheader = false;
 	}
 	//get exceptions
 	$now = time();
@@ -198,8 +198,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		}
 	}
 	//DEFAULT DISPLAY PROCESSING
-	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}";
-	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+	$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
+	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course";
 
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);
@@ -220,45 +220,45 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 					$sendcrumb .= " &gt; ";
 				}
 				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
+					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=" . Sanitize::encodeUrlParam($backtrack[$i][1]) . "\">";
 				}
 				//DB $sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
-				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".$backtrack[$i][0].'</a>';
+				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder=" . Sanitize::encodeUrlParam($backtrack[$i][1]) . "\">".Sanitize::encodeStringForDisplay($backtrack[$i][0]).'</a>';
 				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-				$curBreadcrumb .= $backtrack[$i][0];
+				$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}
 			}
 			$curname = $backtrack[count($backtrack)-1][0];
 			if (count($backtrack)>$depth) {
-				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[count($backtrack)-2][1])."\">" . _('Back') . "</a></span><br class=\"form\" />";
 			}
 			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
 
 		} else {
-			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
+			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			for ($i=0;$i<count($backtrack);$i++) {
 				$curBreadcrumb .= " &gt; ";
-				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
-				}
+			if ($i!=count($backtrack)-1) {
+				$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=" . Sanitize::encodeUrlParam($backtrack[$i][1]) . "\">";
+			}
 				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
-				$curBreadcrumb .= $backtrack[$i][0];
+				$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}
-			}
-			$curname = $backtrack[count($backtrack)-1][0];
-			if (count($backtrack)==1) {
-				$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
-			} else {
-				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
-			}
+            }
+            $curname = $backtrack[count($backtrack)-1][0];
+            if (count($backtrack)==1) {
+                $backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+            } else {
+                $backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[count($backtrack)-2][1])."\">" . _('Back') . "</a></span><br class=\"form\" />";
+            }
 		}
 	} else {
-		$curBreadcrumb .= $coursename;
-		$curname = $coursename;
+		$curBreadcrumb .= Sanitize::encodeStringForDisplay($coursename);
+		$curname = Sanitize::encodeStringForDisplay($coursename);
 	}
 
 
@@ -307,16 +307,16 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	}
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "WHERE imas_forum_threads.lastposttime<:now AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	if (!isset($teacherid)) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
 	}
 	$query .= "GROUP BY imas_forum_threads.forumid";
 	$stm = $DBH->prepare($query);
 	if (!isset($teacherid)) {
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid, ':userid2'=>$userid));
+		$stm->execute(array(':now'=>$now, ':courseid'=>$cid, ':userid'=>$userid, ':userid2'=>$userid));
 	} else {
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+		$stm->execute(array(':now'=>$now, ':courseid'=>$cid, ':userid'=>$userid));
 	}
 
 
@@ -378,7 +378,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=120516\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=072917\"></script>";
 if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -414,7 +414,7 @@ if ($overwriteBody==1) {
 			var type = document.getElementById('addtype'+blk+'-'+tb).value;
 			if (tb=='BB' || tb=='LB') { tb = 'b';}
 			if (type!='') {
-				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $_GET['cid'] ?>';
+				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo Sanitize::courseId($_GET['cid']); ?>';
 				window.location = toopen;
 			}
 		}
@@ -425,8 +425,8 @@ if ($overwriteBody==1) {
 ?>
 	<script type="text/javascript">
 		var getbiaddr = 'getblockitems.php?cid=<?php echo $cid ?>&folder=';
-		var oblist = '<?php echo $oblist ?>';
-		var plblist = '<?php echo $plblist ?>';
+		var oblist = '<?php echo Sanitize::encodeStringForJavascript($oblist); ?>';
+		var plblist = '<?php echo Sanitize::encodeStringForJavascript($plblist); ?>';
 		var cid = '<?php echo $cid ?>';
 	</script>
 
@@ -452,13 +452,17 @@ if ($overwriteBody==1) {
 		if (isset($instrPreviewId)) {
 			echo '<span class="noticetext">', _('Instructor Preview'), '</span> ';
 		}
-		if (!isset($usernameinheader)) {
-			echo $userfullname;
-		} else { echo '&nbsp;';}
+		if (isset($sessiondata['ltiitemtype'])) {
+			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
+			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
+			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
+		} else {
+			echo Sanitize::encodeStringForDisplay($userfullname);
+		}
 		?>
 		</span>
-		<?php 
-		
+		<?php
+
 		if ($useleftnav) {
 			if ($didnavlist && !isset($teacherid) && !$inInstrStuView) {
 				$incclass = 'class="hideifnavlist"';
@@ -467,7 +471,7 @@ if ($overwriteBody==1) {
 			}
 			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
 		}
-		echo $curBreadcrumb 
+		echo $curBreadcrumb;
 		?>
 		<div class=clear></div>
 	</div>
@@ -480,13 +484,13 @@ if ($overwriteBody==1) {
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=on"><?php echo _('Student View'); ?></a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick Rearrange'); ?></a>
 		</p>
-		
+
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
-			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
-			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
-			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
-			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?>
+			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>" class="essen">
+			<?php echo _('Messages'); ?></a> <?php echo $newmsgs; ?> <br/>
+			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>" class="essen">
+			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt; ?>
 		</p>
 	<?php
 	if (isset($CFG['CPS']['leftnavtools']) && $CFG['CPS']['leftnavtools']=='limited') {
@@ -563,22 +567,22 @@ if ($overwriteBody==1) {
 		  </p>
 <?php
 		}
-		
+
 		echo '<p>';
 		if ($msgset<4) {
-			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
-			echo _('Messages').'</a> '.$newmsgs .' <br/>';
-		}
-		if (($toolset&2)==0) {
-			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
-			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
-		}
+				echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder=' . Sanitize::encodeUrlParam($_GET['folder']) . '" class="essen"> ';
+				echo _('Messages').'</a> '.$newmsgs .' <br/>';
+			}
+			if (($toolset&2)==0) {
+				echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder=' . Sanitize::encodeUrlParam($_GET['folder']) . '" class="essen">';
+				echo _('Forums').'</a> '.$newpostscnt.'<br/>';
+			}
 		if (($toolset&1)==0) {
 			echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a><br/>';
 		}
 		echo '<a href="coursemap.php?cid='.$cid.'">'._('Course Map').'</a>';
 		echo '</p>';
-		
+
 	?>
 
 			<p>
@@ -602,7 +606,7 @@ if ($overwriteBody==1) {
 <?php
 	}
    makeTopMenu();
-   echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>$curname</h2></div>\n";
+   echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>".Sanitize::encodeStringForDisplay($curname)."</h2></div>\n";
 
    if (count($items)>0) {
 
@@ -633,6 +637,7 @@ if ($overwriteBody==1) {
 			echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
 			echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
 	   	   }
+	   	// $_GET['folder'] is sanitized in generateadditem()
 	   	echo generateadditem($_GET['folder'],'t');
 	   }
    }
@@ -641,7 +646,7 @@ if ($overwriteBody==1) {
    }
 
    echo "</div>"; //centercontent
-   
+
    if ($firstload) {
 		echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 		echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
@@ -689,15 +694,15 @@ function makeTopMenu() {
 		//echo '<br class="clear"/>';
 
 
-	} 
+	}
 
 	if (isset($teacherid) && $quickview=='on') {
 		echo '<div class="clear"></div>';
-		
+
 		echo '<div class="cpmid">';
-		
+
 		echo '<span class="showinmobile"><b>'._('Quick Rearrange.'), "</b> <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>.</span> ";
-		
+
 		if (isset($CFG['CPS']['miniicons'])) {
 			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 

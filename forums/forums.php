@@ -2,7 +2,7 @@
 	//Listing of all forums for a course - not being used
 	//(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -19,7 +19,7 @@
 		exit;
 	}
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['searchsubmit'])) {
 		if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
@@ -53,10 +53,10 @@
 	$pagetitle = "Forums";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
-	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if ($searchtype != 'none') {
 		echo "<a href=\"forums.php?cid=$cid&amp;clearsearch=true\">Forum List</a> &gt; ";
 	}
@@ -170,7 +170,7 @@
 	echo '<a href="newthreads.php?cid='.$cid.'">'._('New Forum Posts').'</a> | ';
 	echo '<a href="flaggedthreads.php?cid='.$cid.'">'._('Flagged Forum Posts').'</a>';
 	echo '</div>';
-	
+
 	if ($searchtype=='none') {
 		echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
 	} else {
@@ -182,7 +182,7 @@
 	<div id="forumsearch">
 	<form method="post" action="forums.php?cid=<?php echo $cid;?>">
 		<p>
-		Search: <input type=text name="search" value="<?php echo $searchstr;?>" />
+		Search: <input type=text name="search" value="<?php echo Sanitize::encodeStringForDisplay($searchstr);?>" />
 		<input type="radio" name="searchtype" value="thread" <?php if ($searchtype!='posts') {echo 'checked="checked"';}?>/>All thread subjects
 		<input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts.
 		<?php
@@ -203,10 +203,10 @@ if ($searchtype == 'thread') {
 	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
-	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
+	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid AND imas_forum_threads.lastposttime<? ";
 	$query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid=? ";
 	$query .= "WHERE imas_forums.courseid=? AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
-	$arr = array($userid, $cid );
+	$arr = array($now, $userid, $cid );
 	if ($searchstr != '') {
 		//DB $searchterms = explode(" ",addslashes($searchstr));
 		$searchterms = explode(" ", $searchstr);
@@ -269,28 +269,28 @@ if ($searchtype == 'thread') {
 				$posts = 0;
 				$lastpost = '';
 			}
-			echo "<tr id=\"tr{$line['id']}\" ";
+			echo "<tr id=\"tr" . Sanitize::onlyInt($line['id']) . "\" ";
 			if ($line['tagged']==1) {echo 'class="tagged"';}
 			echo "><td>";
 			echo "<span class=right>\n";
 			if ($line['tag']!='') { //category tags
-				echo '<span class="forumcattag">'.$line['tag'].'</span> ';
+				echo '<span class="forumcattag">' . Sanitize::encodeStringForDisplay($line['tag']) . '</span> ';
 			}
 
 			if ($line['tagged']==1) {
-				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Flagged\" />";
+				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
 			} else {
-				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Not flagged\"/>";
+				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Not flagged\"/>";
 			}
 
 			if ($isteacher) {
-				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
+				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&move=" . Sanitize::onlyInt($line['id']) . "\">Move</a> ";
 			}
 			if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
-				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
+				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&modify=" . Sanitize::onlyInt($line['id']) . "\">Modify</a> ";
 			}
 			if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
-				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a>";
+				echo "<a href=\"thread.php?page=" . Sanitize::encodeUrlParam($page) . "&cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&remove=" . Sanitize::onlyInt($line['id']) . "\">Remove</a>";
 			}
 			echo "</span>\n";
 			if ($line['isanon']==1) {
@@ -298,10 +298,10 @@ if ($searchtype == 'thread') {
 			} else {
 				$name = "{$line['LastName']}, {$line['FirstName']}";
 			}
-			echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}&page=-4\">{$line['subject']}</a></b>: $name";
+			echo "<b><a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($line['forumid']) . "&thread=" . Sanitize::encodeUrlParam($line['id']) . "&page=-4\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></b>: " . Sanitize::encodeStringForDisplay($name);
 			echo "</td>\n";
-			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">{$line['name']}</a></td>";
-			echo "<td class=c>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
+			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeStringForDisplay($line['forumid']) . "\">" . Sanitize::encodeStringForDisplay($line['name']) . "</a></td>";
+			echo "<td class=c>$posts</td><td class=c>" . Sanitize::encodeStringForDisplay($line['views']) . " </td><td class=c>$lastpost ";
 			echo "</td></tr>\n";
 		}
 	}
@@ -345,7 +345,8 @@ if ($searchtype == 'thread') {
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
 	$array = array();
 	if ($anyforumsgroup && !$isteacher) {
-		$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
+		$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid AND imas_forum_threads.lastposttime<?";
+		$array[] = $now;
 	}
 	$query .= "WHERE imas_forums.courseid=? ";
 	$array[]= $cid;
@@ -379,14 +380,14 @@ if ($searchtype == 'thread') {
 	}
 	foreach ($result as $line) {
 		echo "<div class=block>";
-		echo "<b>{$line['subject']}</b>";
-		echo ' (in '.$line['name'].')';
+		echo "<b>" . Sanitize::encodeStringForDisplay($line['subject']) ."</b>";
+		echo ' (in ' . Sanitize::encodeStringForDisplay($line['name']).')';
 		if ($line['isanon']==1) {
 			$name = "Anonymous";
 		} else {
 			$name = "{$line['LastName']}, {$line['FirstName']}";
 		}
-		echo "<br/>Posted by: $name, ";
+		echo "<br/>Posted by: " . Sanitize::encodeStringForDisplay($name) . ", ";
 		echo tzdate("F j, Y, g:i a",$line['postdate']);
 
 		echo "</div><div class=blockitems>";
@@ -402,18 +403,18 @@ if ($searchtype == 'thread') {
 				echo '<a href="'.getuserfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
 				$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
 				if (isset($itemicons[$extension])) {
-					echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+					echo "<img alt=\"".Sanitize::encodeStringForDisplay($extension)."\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
 				} else {
 					echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
 				}
-				echo $fl[2*$i].'</a> ';
+				echo Sanitize::encodeStringForDisplay($fl[2*$i]) . '</a> ';
 				//if (count($fl)>2) {echo '</li>';}
 			}
 			//if (count($fl)>2) {echo '</ul>';}
 			echo '</p>';
 		}
 		echo filter($line['message']);
-		echo "<p><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['threadid']}&page=-4\">Show full thread</a></p>";
+		echo "<p><a href=\"posts.php?cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&thread=" . Sanitize::onlyInt($line['threadid']) . "&page=-4\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
 
@@ -438,10 +439,11 @@ if ($searchtype == 'thread') {
 	//DB $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	//DB $query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-  $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
-	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid=:courseid GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
+  $query = "SELECT imas_forums.id,COUNT(imas_forum_threads.id) FROM imas_forums LEFT JOIN imas_forum_threads ON ";
+	$query .= "imas_forums.id=imas_forum_threads.forumid AND imas_forum_threads.lastposttime<:now ";
+	$query .= "WHERE imas_forums.courseid=:courseid GROUP BY imas_forum_threads.forumid ORDER BY imas_forums.id";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid));
+	$stm->execute(array(':now'=>$now, ':courseid'=>$cid));
 	$result=$stm->fetchALL(PDO::FETCH_NUM);
 	foreach ($result as $row) {
 		$threadcount[$row[0]] = $row[1];
@@ -486,8 +488,8 @@ if ($searchtype == 'thread') {
 	$query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid=:courseid ";
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-  $array = array(':courseid'=>$cid, ':userid'=>$userid);
+	$query .= "WHERE imas_forum_threads.lastposttime<:now  AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+  $array = array(':now'=>$now, ':courseid'=>$cid, ':userid'=>$userid);
 if (!isset($teacherid)) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
 		$array[':userid']=$userid;
@@ -545,9 +547,9 @@ if (!isset($teacherid)) {
 			echo "<a href=\"../course/addforum.php?cid=$cid&id={$line['id']}\">Modify</a> ";
 			echo '</span>';
 		}
-		echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> ";
+		echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> ";
 		if ($newcnt[$line['id']]>0) {
-			 echo "<a href=\"thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext >New Posts ({$newcnt[$line['id']]})</a>";
+			 echo "<a href=\"thread.php?cid=$cid&forum=" . Sanitize::onlyInt($line['id']) . "&page=-1\" class=noticetext >New Posts (" . Sanitize::encodeStringForDisplay($newcnt[$line['id']]) . ")</a>";
 		}
 		echo "</td>\n";
 		if (isset($threadcount[$line['id']])) {
@@ -559,7 +561,7 @@ if (!isset($teacherid)) {
 			$posts = 0;
 			$lastpost = '';
 		}
-		echo "<td class=c>$threads</td><td class=c>$posts</td><td class=c>$lastpost</td></tr>\n";
+		echo "<td class=c>" . Sanitize::onlyInt($threads) . "</td><td class=c>" . Sanitize::onlyInt($posts) . "</td><td class=c>" . Sanitize::encodeStringForDisplay($lastpost) . "</td></tr>\n";
 	}
 ?>
 	</tbody>

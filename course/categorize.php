@@ -2,9 +2,11 @@
 //IMathAS:  Categorize questions used in an assessment
 //(c) 2006 David Lippman
 
-	require("../validate.php");
-	$aid = $_GET['aid'];
-	$cid = $_GET['cid'];
+	require("../init.php");
+
+
+	$aid = Sanitize::onlyInt($_GET['aid']);
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['record'])) {
 
@@ -22,7 +24,7 @@
 				$upd_stm->execute(array(':category'=>$_POST[$row[0]], ':id'=>$row[0]));
 			}
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 
 		exit;
 	}
@@ -89,7 +91,7 @@ function getnextprev(formn,loc) {
 }
 </script>
 END;
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Categorize Questions</div>\n";
 
 	//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
@@ -137,7 +139,7 @@ END;
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT imas_questions.id,imas_libraries.id,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
 	$query .= "WHERE imas_questions.assessmentid=:assessmentid AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
-	$query .= "imas_library_items.libid=imas_libraries.id ORDER BY imas_questions.id";
+	$query .= "imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 AND imas_libraries.deleted=0 ORDER BY imas_questions.id";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':assessmentid'=>$aid));
 	$libnames = array();
@@ -222,10 +224,10 @@ END;
 	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
 
 	foreach($itemarr as $qid) {
-		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\" value=\"{$qsetids[$qid]}\"/></td>";
-		echo "<td>{$descriptions[$qid]}</td><td>";
-		echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$qid,{$qsetids[$qid]})\"/>";
-		echo "<select id=\"$qid\" name=\"$qid\" class=\"qsel\">";
+		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
+		echo "<td>" . Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td><td>";
+		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", $qid, $qsetids[$qid]);
+		echo "<select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
 		echo ">Uncategorized or Default</option>\n";
@@ -240,17 +242,17 @@ END;
 				echo '<optgroup label="'.htmlentities($oc[0]).'">';
 				$ingrp = true;
 			} else {
-				echo '<option value="'.$oc[0].'" ';
+				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '" ';
 				if ($category[$qid] == $oc[0]) { echo "selected=1"; $issel = true;}
-				echo '>'.$outcomenames[$oc[0]].'</option>';
+				echo '>' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';
 			}
 		}
 		if ($ingrp) { echo '</optgroup>';}
 		echo '<optgroup label="Libraries">';
 		foreach ($questionlibs[$qid] as $qlibid) {
-			echo "<option value=\"{$libnames[$qlibid]}\" ";
+			echo "<option value=\"" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "\" ";
 			if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
-			echo ">{$libnames[$qlibid]}</option>\n";
+			echo ">" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "</option>\n";
 		}
 		echo '</optgroup>\n';
 
@@ -267,9 +269,9 @@ END;
 
 		echo '<optgroup label="Custom">';
 		foreach ($extracats as $cat) {
-			echo "<option value=\"$cat\" ";
+			echo "<option value=\"" . Sanitize::encodeStringForDisplay($cat) . "\" ";
 			if ($category[$qid] == $cat && !$issel) { echo "selected=1";$issel = true;}
-			echo ">$cat</option>\n";
+			echo ">" . Sanitize::encodeStringForDisplay($cat) . "</option>\n";
 		}
 		echo '</optgroup>';
 		echo "</select></td></tr>\n";
@@ -285,7 +287,7 @@ END;
 				echo '<optgroup label="'.htmlentities($oc[0]).'">';
 				$ingrp = true;
 			} else {
-				echo '<option value="'.$oc[0].'">'.$outcomenames[$oc[0]].'</option>';
+				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '">' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';
 			}
 		}
 		if ($ingrp) { echo '</optgroup>';}
@@ -303,6 +305,6 @@ echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" o
 	echo '<p><input type=submit value="Record Categorizations"> and return to the Add/Remove Questions page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 
-
+	require("../footer.php");
 
 ?>

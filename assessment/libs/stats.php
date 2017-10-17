@@ -356,7 +356,7 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,20,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
@@ -392,6 +392,7 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 //  options['showgrid'] = false to hide the horizontal grid lines
 //  options['vertlabel'] = label for vertical axis. Defaults to none
 //  options['gap'] = gap (0 &le; gap &lt; 1) between bars
+//  options['toplabel'] = label for top of chart
 function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	if (!is_array($bl) || !is_array($freq)) {echo "barlabels and freqarray must be arrays"; return 0;}
 	if (count($bl) != count($freq)) { echo "barlabels and freqarray must have same length"; return 0;}
@@ -441,10 +442,11 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		return $alt;
 	}
 	$x++;
-	$topborder = ($valuelabels===false?10:25);
+	$topborder = ($valuelabels===false?10:25) + (isset($options['toplabel'])?20:0);
 	$leftborder = min(60, 9*strlen($maxfreq)+10) + ($usevertlabel?30:0);
 	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
-	$outst = "setBorder($leftborder,45,0,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	$bottomborder = 25+($label===''?0:20);
+	$outst = "setBorder($leftborder,$bottomborder,0,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
@@ -457,9 +459,15 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		$gdy = $step;
 	}
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"blue\"; ";
+	if ($label!=='') {
+		$outst .= "textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+	}
 	if ($usevertlabel) {
 		$outst .= "textabs([0,". ($height/2+20) . "],\"$vertlabel\",\"right\",90);";
+	}
+	if (isset($options['toplabel'])) {
+		$outst .= "textabs([". ($width/2+15)  .",$height],\"{$options['toplabel']}\",\"below\");";
 	}
 
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";

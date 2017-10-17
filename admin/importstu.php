@@ -3,11 +3,20 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 
-/*** pre-html data manipulation, including function code *******/
 
+/*** pre-html data manipulation, including function code *******/
+// Reads past the UTF-8 bom if it is there.
+function fopen_utf8 ($filename, $mode) {
+    $file = @fopen($filename, $mode);
+    $bom = fread($file, 3);
+    if ($bom != b"\xEF\xBB\xBF") {
+        rewind($file);
+    }
+    return $file;
+}
 function parsecsv($data) {
 	$fn = $data[$_POST['fncol']-1];
 	if ($_POST['fnloc']!=0) {
@@ -87,12 +96,12 @@ if (!(isset($teacherid)) && $myrights<100) {
 	$body = "You need to access this page from a menu link";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$isadmin = ($myrights==100 && $cid=="admin") ? true : false ;
 	if ($isadmin) {
-		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Import Students</div>\n";
+		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Import Students</div>\n";
 	} else {
-		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Students</div>\n";
+		$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Import Students</div>\n";
 	}
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
@@ -100,8 +109,8 @@ if (!(isset($teacherid)) && $myrights<100) {
 		if (isset($CFG['GEN']['newpasswords'])) {
 			require_once("../includes/password.php");
 		}
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
-		$handle = fopen($filename,'r');
+		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
+		$handle = fopen_utf8($filename,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
 		}
@@ -123,7 +132,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			$stm->execute(array(':SID'=>$arr[0]));
 			if ($stm->rowCount()>0) {
 				$id = $stm->fetchColumn(0);
-				echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
+				echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." already existed in system; using existing<br/>\n";
 			} else {
 				if (($_POST['pwtype']==0 || $_POST['pwtype']==1) && strlen($arr[0])<4) {
 					if (isset($CFG['GEN']['newpasswords'])) {
@@ -152,7 +161,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 						}
 					} else if ($_POST['pwtype']==3) {
 						if (trim($arr[6])=='') {
-							echo "Password for {$arr[0]} is blank; skipping import<br/>";
+							echo "Password for ".Sanitize::encodeStringForDisplay($arr[0])." is blank; skipping import<br/>";
 							continue;
 						}
 						if (isset($CFG['GEN']['newpasswords'])) {
@@ -171,7 +180,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
 				if ($isadmin) {
-					$ncid = $_POST['enrollcid'];
+					$ncid = Sanitize::onlyInt($_POST['enrollcid']);
 				} else {
 					$ncid = $cid;
 				}
@@ -182,7 +191,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid));
 				if ($stm->rowCount()>0) {
-					echo "Username {$arr[0]} already enrolled in course.  Skipping<br/>";
+					echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." already enrolled in course.  Skipping<br/>";
 					continue;
 				}
 
@@ -211,22 +220,23 @@ if (!(isset($teacherid)) && $myrights<100) {
 		$body = "Import Successful<br/>\n";
 		$body .= "<p>";
 		if ($isadmin) {
-			$body .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php\">Back to Admin Page";
+			$body .= "<a href=\"". $GLOBALS['basesiteurl'] . "/admin/admin2.php\">Back to Admin Page";
 		} else {
-			$body .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST']  . $imasroot . "/course/course.php?cid=$cid\">Back to Course Page";
+			$body .= "<a href=\"". $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid\">Back to Course Page";
 		}
 		$body .= "</a></p>\n";
 
 	} elseif (isset($_FILES['userfile'])) {  //STEP 2 DATA MANIPULATION
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadfile)."\" />\n";
+			$uploadfilename = basename($uploadfile);
+			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay($uploadfilename)."\" />\n";
 		} else {
 			$overwriteBody = 1;
 			$body = "<p>Error uploading file!</p>\n";
 		}
-		$handle = fopen($uploadfile,'r');
+		$handle = fopen_utf8($uploadfile,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
 		}
@@ -299,7 +309,7 @@ if ($overwriteBody==1) {
 			<thead>
 				<tr>
 					<th>Username</th><th>Firstname</th><th>Lastname</th><th>e-mail</th>
-					<th><?php echo $page_columnFiveLabel ?></th>
+					<th><?php echo Sanitize::encodeStringForDisplay($page_columnFiveLabel); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -308,11 +318,11 @@ if ($overwriteBody==1) {
 		for ($i=0; $i<count($page_sampleImport); $i++) {
 ?>
 				<tr>
-					<td><?php echo $page_sampleImport[$i]['col1'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col2'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col3'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col4'] ?></td>
-					<td><?php echo $page_sampleImport[$i]['col5'] ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col1']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col2']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col3']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col4']); ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col5']); ?></td>
 				</tr>
 
 <?php
@@ -323,7 +333,7 @@ if ($overwriteBody==1) {
 
 <?php
 		foreach($_POST as $k=>$v) {
-			echo "<input type=hidden name=\"$k\" value=\"$v\">\n";
+			echo "<input type=hidden name=\"" . Sanitize::encodeStringForDisplay($k) . "\" value=\"".Sanitize::encodeStringForDisplay($v)."\">\n";
 		}
 		echo "<p><input type=submit name=\"process\" value=\"Accept and Enroll\"></p>\n";
 	} else { //STEP 1 DISPLAY

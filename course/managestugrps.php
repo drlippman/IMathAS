@@ -3,22 +3,22 @@
 //(c) 2010 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/stugroups.php");
-require("../includes/filehandler.php");
+require_once("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 if ( isset($_GET['grpsetid'])) {
-	$grpsetid =  $_GET['grpsetid'];
+	$grpsetid =  Sanitize::onlyInt($_GET['grpsetid']);
 }
 
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Manage Student Groups";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -34,7 +34,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("INSERT INTO imas_stugroups (groupsetid,name) VALUES (:groupsetid, :name)");
 		$stm->execute(array(':groupsetid'=>$grpsetid, ':name'=>$_POST['grpname']));
 		if (!isset($_POST['stutoadd'])) { //if not adding students also
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']));
 			exit();
 		} else {
 			//DB $_POST['addtogrpid'] = mysql_insert_id();
@@ -53,16 +53,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_stugroupset (name,courseid) VALUES (:name, :courseid)");
 			$stm->execute(array(':name'=>$_POST['grpsetname'], ':courseid'=>$cid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Add Group Set";
 	} else if (isset($_GET['delgrpset'])) {
 		//deleting groupset
-		if (isset($_GET['confirm'])) {
+		if (isset($_POST['confirm'])) {
 			//if name is set
-			deletegroupset($_GET['delgrpset']);
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			deletegroupset(Sanitize::onlyInt($_GET['delgrpset']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['delgrpset']}'";
@@ -82,7 +82,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_stugroupset SET name=:name WHERE id=:id");
 			$stm->execute(array(':name'=>$_POST['grpsetname'], ':id'=>$_GET['rengrpset']));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['rengrpset']}'";
@@ -142,9 +142,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$ins_grpmem_stm->execute($toaddval);
 			}
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 		exit();
-	} else if (isset($_GET['addstutogrp'])) {
+	} else if (isset($_GET['addstutogrp']) && !empty($_POST['stutoadd'])) {
 		//submitting list of students to add to a group
 		$stustoadd = $_POST['stutoadd'];
 		if ($_POST['addtogrpid']=='--new--') {
@@ -152,7 +152,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_GET['addgrp'] = true;
 			$stulist = implode(',',$stustoadd);
 		} else {
-			$grpid = $_POST['addtogrpid'];
+			$grpid = Sanitize::onlyInt($_POST['addtogrpid']);
 			$loginfo = "instr adding stu to group $grpid. ";
 			if (!is_array($stustoadd)) {
 				$stustoadd = explode(',',$stustoadd);
@@ -300,16 +300,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require("../header.php");
 				echo '<p>Some students joined a group already and were skipped:</p><p>';
 				//DB $stulist = "'".implode("','",$alreadygroupedstu)."'";
-				$stulist = implode(',', array_map('intval', $alreadygroupedstu));
+				$stulist = array_map('Sanitize::onlyInt', $alreadygroupedstu);
 				//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id IN ($stulist) ORDER BY LastName, FirstName";
 				//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->query("SELECT FirstName,LastName FROM imas_users WHERE id IN ($stulist) ORDER BY LastName, FirstName");
+				$query_placeholders = Sanitize::generateQueryPlaceholders($stulist);
+				$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id IN ($query_placeholders) ORDER BY LastName, FirstName");
+				$stm->execute($stulist);
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					echo $row[1].', '.$row[0].'<br/>';
+					echo Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[0]).'<br/>';
 					$loginfo .= $row[1].', '.$row[0].' already in group.';
 				}
-				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}\">Continue</a></p>";
+				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']) . "\">Continue</a></p>";
 				require("../footer.php");
 				$now = time();
 				if (isset($GLOBALS['CFG']['log'])) {
@@ -326,7 +328,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 					$stm->execute(array(':time'=>$now, ':log'=>$loginfo));
 				}
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']));
 			}
 			exit();
 		}
@@ -338,13 +340,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
 		$stm->execute(array(':id'=>$grpsetid));
 		$page_grpsetname = $stm->fetchColumn(0);
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Add Group";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Add Group";
 	} else if (isset($_GET['delgrp'])) {
 		//deleting groupset
-		if (isset($_GET['confirm'])) {
+		if (isset($_GET['confirm']) && isset($_POST['delposts'])) {
 			//if name is set
 			deletegroup($_GET['delgrp'], $_POST['delposts']==1);
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['delgrp']}'";
@@ -361,7 +363,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
 
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Delete Group";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Delete Group";
 	} else if (isset($_GET['rengrp'])) {
 		//renaming groupset
 		if (isset($_POST['grpname'])) {
@@ -370,7 +372,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_stugroups SET name=:name WHERE id=:id");
 			$stm->execute(array(':name'=>$_POST['grpname'], ':id'=>$_GET['rengrp']));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['rengrp']}'";
@@ -386,13 +388,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$grpsetid));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Rename Group";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Rename Group";
 	} else if (isset($_GET['removeall'])) {
 		//removing all group members
-		if (isset($_GET['confirm'])) {
+		if (isset($_POST['confirm'])) {
 			//if name is set
 			removeallgroupmembers($_GET['removeall']);
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['removeall']}'";
@@ -408,14 +410,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$grpsetid));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove all group members";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove all group members";
 
 	} else if (isset($_GET['remove']) && isset($_GET['grpid'])) {
 		//removing one group member
-		if (isset($_GET['confirm'])) {
+		if (isset($_POST['confirm'])) {
 			//if name is set
 			removegroupmember($_GET['grpid'],$_GET['remove']);
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
 			//DB $query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$_GET['remove']}'";
@@ -437,7 +439,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$grpsetid));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove group member";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove group member";
 
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected, show groups
@@ -503,11 +505,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($sectionsort) {
-				$stunames[$row[0]] = '<span class="small">(Section '.$row[4].')</span> '.$row[2].', '.$row[1];
+				$stunames[$row[0]] = '<span class="small">(Section '.Sanitize::encodeStringForDisplay($row[4]).')</span> '.Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]);
 			} else if ($hassection) {
-				$stunames[$row[0]] = $row[2].', '.$row[1].' <span class="small">(Section '.$row[4].')</span>';
+				$stunames[$row[0]] = Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]).' <span class="small">(Section '.Sanitize::encodeStringForDisplay($row[4]).')</span>';
 			} else {
-				$stunames[$row[0]] = $row[2].', '.$row[1];
+				$stunames[$row[0]] = Sanitize::encodeStringForDisplay($row[2]).', '.Sanitize::encodeStringForDisplay($row[1]);
 			}
 			$hasuserimg[$row[0]] = $row[3];
 			$stulocked[$row[0]] = $row[5];
@@ -540,7 +542,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		natcasesort($page_ungrpstu);
 
-		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; $page_grpsetname";
+		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; " . Sanitize::encodeStringForDisplay($page_grpsetname);
 
 	} else {
 		//no groupset selected
@@ -584,7 +586,7 @@ if ($overwriteBody==1) {
 		echo '</form>';
 	} else if (isset($_GET['delgrpset'])) {
 		echo '<h4>Delete student group set</h4>';
-		echo "<p>Are you SURE you want to delete the set of student groups <b>$page_grpsetname</b> and all the groups contained within it? ";
+		echo "<p>Are you SURE you want to delete the set of student groups <b>" . Sanitize::encodeStringForDisplay($page_grpsetname) . "</b> and all the groups contained within it? ";
 		$used = '';
 		//DB $query = "SELECT name FROM imas_assessments WHERE isgroup>0 AND groupsetid='{$_GET['delgrpset']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -592,7 +594,7 @@ if ($overwriteBody==1) {
 		$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE isgroup>0 AND groupsetid=:groupsetid");
 		$stm->execute(array(':groupsetid'=>$_GET['delgrpset']));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$used .= "Assessment: {$row[0]}<br/>";
+			$used .= "Assessment: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
 		//DB $query = "SELECT name FROM imas_forums WHERE groupsetid='{$_GET['delgrpset']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -600,7 +602,7 @@ if ($overwriteBody==1) {
 		$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE groupsetid=:groupsetid");
 		$stm->execute(array(':groupsetid'=>$_GET['delgrpset']));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$used .= "Forum: {$row[0]}<br/>";
+			$used .= "Forum: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
 		//DB $query = "SELECT name FROM imas_wikis WHERE groupsetid='{$_GET['delgrpset']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -608,7 +610,7 @@ if ($overwriteBody==1) {
 		$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE groupsetid=:groupsetid");
 		$stm->execute(array(':groupsetid'=>$_GET['delgrpset']));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$used .= "Wiki: {$row[0]}<br/>";
+			$used .= "Wiki: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
 		if ($used != '') {
 			echo '<p>This set of groups is currently used in the assessments, wikis, and/or forums below.  These items will be set to non-group if this group set is deleted</p><p>';
@@ -616,56 +618,70 @@ if ($overwriteBody==1) {
 		} else {
 			echo '<p>This set of groups is not currently being used</p>';
 		}
-		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&delgrpset={$_GET['delgrpset']}&confirm=true'\" /> ";
+		$querystring = http_build_query(array('cid'=>$cid, 'delgrpset'=>$_GET['delgrpset']));
+		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
+		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Delete').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
+		echo '</form>';
 
 	} else if (isset($_GET['rengrpset'])) {
 		echo '<h4>Rename student group set</h4>';
-		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&rengrpset={$_GET['rengrpset']}\">";
-		echo '<p>New group set name: <input name="grpsetname" type="text" value="'.$page_grpsetname.'"/></p>';
+		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&rengrpset=" . Sanitize::encodeUrlParam($_GET['rengrpset']) . "\">";
+		echo '<p>New group set name: <input name="grpsetname" type="text" value="'.Sanitize::encodeStringForDisplay($page_grpsetname).'"/></p>';
 		echo '<p><input type="submit" value="Rename" />';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['addgrp'])) {
 		//add new group set
 		echo '<h4>Add new student group</h4>';
-		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addgrp=true\">";
+		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&addgrp=true\">";
 		if (isset($stulist)) {
-			echo "<input type=\"hidden\" name=\"stutoadd\" value=\"$stulist\" />";
+			echo "<input type=\"hidden\" name=\"stutoadd\" value=\"" . Sanitize::encodeStringForDisplay($stulist) . "\" />";
 		}
 		echo '<p>New group name: <input name="grpname" type="text" /></p>';
 		echo '<p><input type="submit" value="Create" />';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrp'])) {
 		echo '<h4>Delete student group</h4>';
-		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true\" >";
-		echo "<p>Are you SURE you want to delete the student group <b>$page_grpname</b>?</p>";
+		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&delgrp=" . Sanitize::encodeUrlParam($_GET['delgrp']) . "&confirm=true\" >";
+		echo "<p>Are you SURE you want to delete the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
 		echo "<p>Any wiki page content for this group will be deleted.</p>";
 		echo '<p><input type="radio" name="delposts" value="1" checked="checked" /> Delete group forum posts ';
 		echo '<input type="radio" name="delposts" value="0" /> Make group forum posts non-group-specific posts</p>';
 		echo '<p><input type="submit" value="Yes, Delete"> ';
 		//echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "'\" /></p>";
 		echo '</form>';
 
 	} else if (isset($_GET['rengrp'])) {
 		echo '<h4>Rename student group</h4>';
-		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp={$_GET['rengrp']}\">";
-		echo '<p>New group name: <input name="grpname" type="text" value="'.$page_grpname.'"/></p>';
+		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&rengrp=" . Sanitize::encodeUrlParam($_GET['rengrp']) . "\">";
+		echo '<p>New group name: <input name="grpname" type="text" value="'.Sanitize::encodeStringForDisplay($page_grpname).'"/></p>';
 		echo '<p><input type="submit" value="Rename" />';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['removeall'])) {
 		echo '<h4>Remove ALL group members</h4>';
-		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>$page_grpname</b>?</p>";
-		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall={$_GET['removeall']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
+		
+		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'removeall'=>$_GET['removeall']));
+		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
+		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
+		echo '</form>';
+		
 	} else if (isset($_GET['remove']) && $_GET['grpid']) {
 		echo '<h4>Remove group member</h4>';
-		echo "<p>Are you SURE you want to remove <b>$page_stuname</b> from the student group <b>$page_grpname</b>?</p>";
-		echo "<p><input type=button value=\"Yes, Remove\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&grpid={$_GET['grpid']}&remove={$_GET['remove']}&confirm=true'\" /> ";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
+		echo "<p>Are you SURE you want to remove <b>" . Sanitize::encodeStringForDisplay($page_stuname) . "</b> from the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
+		
+		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'grpid'=>$_GET['grpid'], 'remove'=>$_GET['remove']));
+		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
+		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
+		echo '</form>';
+		
+		
 	} else if (isset($_GET['grpsetid'])) {
 		?>
 		<script type="text/javascript">
@@ -706,9 +722,9 @@ if ($overwriteBody==1) {
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 
 		//groupset selected - list members
-		echo "<h3>Managing groups in set $page_grpsetname</h3>";
+		echo "<h3>Managing groups in set " . Sanitize::encodeStringForDisplay($page_grpsetname) . "</h3>";
 		echo '<div id="myTable">';
-		echo "<p><button type=\"button\" onclick=\"window.location.href='managestugrps.php?cid=$cid&grpsetid=$grpsetid&addgrp=true'\">"._('Add New Group').'</button> ';
+		echo "<p><button type=\"button\" onclick=\"window.location.href='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&addgrp=true'\">"._('Add New Group').'</button> ';
 		if (array_sum($hasuserimg)>0) {
 			echo ' <button type="button" onclick="rotatepics(this)" >'._('View Pictures').'</button><br/>';
 		}
@@ -718,10 +734,10 @@ if ($overwriteBody==1) {
 			echo '<p>No student groups have been created yet</p>';
 		}
 		foreach ($page_grps as $grpid=>$grpname) {
-			echo "<b>Group: $grpname</b> | ";
-			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp=$grpid\">Rename</a> | ";
-			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp=$grpid\">Delete</a> | ";
-			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall=$grpid&confirm=true\" onclick=\"return confirm('"._('Are you SURE you want to remove all students from this group?')."');\">Remove all members</a>";
+			echo "<b>Group: " . Sanitize::encodeStringForDisplay($grpname) . "</b> | ";
+			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&rengrp=" . Sanitize::encodeUrlParam($grpid) . "\">Rename</a> | ";
+			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&delgrp=" . Sanitize::encodeUrlParam($grpid) . "\">Delete</a> | ";
+			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&removeall=" . Sanitize::encodeUrlParam($grpid) . "\">Remove all members</a>";
 			echo '<ul>';
 			if (count($page_grpmembers[$grpid])==0) {
 				echo '<li>No group members</li>';
@@ -730,7 +746,7 @@ if ($overwriteBody==1) {
 					echo '<li>';
 					if ($hasuserimg[$uid]==1) {
 						if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-							echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
+							echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
 						} else {
 							echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
 						}
@@ -740,7 +756,7 @@ if ($overwriteBody==1) {
 					} else {
 						echo $name;
 					}
-					echo " | <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&remove=$uid&grpid=$grpid&confirm=true\"  onclick=\"return confirm('"._('Are you SURE you want to remove this student from this group?')."');\">Remove from group</a></li>";
+					echo " | <a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&remove=" . Sanitize::onlyInt($uid) . "&grpid=" . Sanitize::encodeUrlParam($grpid) . "\">Remove from group</a></li>";
 				}
 			}
 			echo '</ul>';
@@ -749,21 +765,21 @@ if ($overwriteBody==1) {
 
 		echo '<h3>Students not in a group yet</h3>';
 		if (count($page_ungrpstu)>0) {
-			echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addstutogrp=true\">";
+			echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($grpsetid) . "&addstutogrp=true\">";
 			echo 'With selected, add to group ';
 			echo '<select name="addtogrpid">';
 			echo "<option value=\"--new--\">New Group</option>";
 			foreach ($page_grps as $grpid=>$grpname) {
-				echo "<option value=\"$grpid\">$grpname</option>";
+				echo "<option value=\"" . Sanitize::encodeStringForDisplay($grpid) . "\">" . Sanitize::encodeStringForDisplay($grpname) . "</option>";
 			}
 			echo '</select>';
 			echo '<input type="submit" value="Add"/>';
 			echo '<ul class="nomark">';
 			foreach ($page_ungrpstu as $uid=>$name) {
-				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"$uid\" id=\"chk$uid\"/><label for=\"chk$uid\">";
+				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"".Sanitize::encodeStringForDisplay($uid)."\" id=\"chk".Sanitize::encodeStringForDisplay($uid)."\"/><label for=\"chk".Sanitize::encodeStringForDisplay($uid)."\">";
 				if ($hasuserimg[$uid]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-						echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
+						echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
 					} else {
 						echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\" alt=\"User picture\"/>";
 					}
@@ -791,10 +807,10 @@ if ($overwriteBody==1) {
 			echo '<p>Select a set of groups to modify the groups in that set</p>';
 			echo '<table><tbody><tr>';
 			foreach ($page_groupsets as $gs) {
-				echo "<td><a href=\"managestugrps.php?cid=$cid&grpsetid={$gs[0]}\">{$gs[1]}</a></td><td class=small>";
-				echo "<a href=\"managestugrps.php?cid=$cid&rengrpset={$gs[0]}\">Rename</a> | ";
-				echo "<a href=\"managestugrps.php?cid=$cid&copygrpset={$gs[0]}\">Copy</a> | ";
-				echo "<a href=\"managestugrps.php?cid=$cid&delgrpset={$gs[0]}\">Delete</a>";
+				echo "<td><a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($gs[0]) . "\">" . Sanitize::encodeStringForDisplay($gs[1]) . "</a></td><td class=small>";
+				echo "<a href=\"managestugrps.php?cid=$cid&rengrpset=" . Sanitize::encodeUrlParam($gs[0]) . "\">Rename</a> | ";
+				echo "<a href=\"managestugrps.php?cid=$cid&copygrpset=" . Sanitize::encodeUrlParam($gs[0]) . "\">Copy</a> | ";
+				echo "<a href=\"managestugrps.php?cid=$cid&delgrpset=" . Sanitize::encodeUrlParam($gs[0]) . "\">Delete</a>";
 
 				echo '</td></tr>';
 			}

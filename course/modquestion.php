@@ -3,8 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
+
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -18,9 +19,9 @@ if (!(isset($teacherid))) {
 	$body = "You need to log in as a teacher to access this page";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
-	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
 	$curBreadcrumb .= "Modify Question Settings";
 
@@ -120,7 +121,7 @@ if (!(isset($teacherid))) {
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
 		}
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 
@@ -159,14 +160,14 @@ if (!(isset($teacherid))) {
 			$line['showhints']=0;
 			$qsetid = $_GET['qsetid'];
 		}
-		
+
 		$stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
 		$stm->execute(array(':id'=>$qsetid));
 		$qdescrip = $stm->fetchColumn(0);
 		if (isset($_GET['loc'])) {
 			$qdescrip = $_GET['loc'].': '.$qdescrip;
 		}
-		
+
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		//DB $query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
@@ -196,7 +197,7 @@ if (!(isset($teacherid))) {
 		} else {
 			$beentaken = false;
 		}
-		
+
 		//get defaults
 		$query = "SELECT defpoints,defattempts,defpenalty,deffeedback,showhints,shuffle FROM imas_assessments ";
 		$query .= "WHERE id=:id";
@@ -227,7 +228,7 @@ if (!(isset($teacherid))) {
 		if ($defshowans=='F') {
 			$defaults['showans'] = _('After last attempt');
 		} else if (is_numeric($defshowans)) {
-			$defaults['showans'] = sprintf(_('After %d attempts'), $defshowans);	
+			$defaults['showans'] = sprintf(_('After %d attempts'), $defshowans);
 		} else {
 			$defaults['showans'] = _('Never during assessment');
 		}
@@ -253,22 +254,23 @@ if ($overwriteBody==1) {
 
 
 <div id="headermodquestion" class="pagetitle"><h2>Modify Question Settings</h2></div>
-<p><?php 
-	echo '<b>'.$qdescrip.'</b> ';
-	echo '<button type="button" onclick="previewq('.$qsetid.')">'._('Preview').'</button>';
+<p><?php
+	echo '<b>'.Sanitize::encodeStringForDisplay($qdescrip).'</b> ';
+	echo '<button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($qsetid).')">'._('Preview').'</button>';
 ?>
 </p>
-<form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=$aid"; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['qsetid'])) {echo "&qsetid={$_GET['qsetid']}";}?>">
-<p>Leave items blank to use the assessment's default values.</p>
+<form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
+<p>Leave items blank to use the assessment's default values.
+<input type="submit" value="<?php echo ('Save Settings');?>"></p>
 
 <span class=form>Points for this problem:</span>
-<span class=formright> <input type=text size=4 name=points value="<?php echo $line['points'];?>"><br/><i class="grey">Default: <?php echo $defaults['defpoints'];?></i></span><BR class=form>
+<span class=formright> <input type=text size=4 name=points value="<?php echo Sanitize::encodeStringForDisplay($line['points']);?>"><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defpoints']);?></i></span><BR class=form>
 
 <span class=form>Attempts allowed for this problem (0 for unlimited):</span>
-<span class=formright> <input type=text size=4 name=attempts value="<?php echo $line['attempts'];?>"><br/><i class="grey">Default: <?php echo $defaults['defattempts'];?></i></span><BR class=form>
+<span class=formright> <input type=text size=4 name=attempts value="<?php echo Sanitize::encodeStringForDisplay($line['attempts']);?>"><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defattempts']);?></i></span><BR class=form>
 
 <span class=form>Penalty for missed attempts:</span>
-<span class=formright><input type=text size=4 name=penalty value="<?php echo $line['penalty'];?>">%
+<span class=formright><input type=text size=4 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']);?>">%
    <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
      <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
      <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -278,7 +280,7 @@ if ($overwriteBody==1) {
      <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
      <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
      <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
-     </select><br/><i class="grey">Default: <?php echo $defaults['penalty'];?></i></span><BR class=form>
+     </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['penalty']);?></i></span><BR class=form>
 
 <span class=form>New version on reattempt?</span>
 <span class=formright>
@@ -308,7 +310,7 @@ if ($overwriteBody==1) {
      <option value="6" <?php if ($line['showans']=="6") {echo "SELECTED";} ?>>After 6 attempts</option>
      <option value="7" <?php if ($line['showans']=="7") {echo "SELECTED";} ?>>After 7 attempts</option>
 
-    </select><br/><i class="grey">Default: <?php echo $defaults['showans'];?></i></span><br class="form"/>
+    </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['showans']);?></i></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>
     <select name="showhints">
@@ -320,8 +322,8 @@ if ($overwriteBody==1) {
 <span class=form>Use Scoring Rubric</span><span class=formright>
 <?php
     writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
-    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=$aid&amp;qid={$_GET['id']}\">Add new rubric</a> ";
-    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=$aid&amp;qid={$_GET['id']}\">Edit rubrics</a> ";
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">Add new rubric</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">Edit rubrics</a> ";
 ?>
     </span><br class="form"/>
 <?php
@@ -345,7 +347,7 @@ if ($overwriteBody==1) {
 		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
 	}
 	if ($beentaken) {
-		echo '<div class="advanced" style="display:none">'; 
+		echo '<div class="advanced" style="display:none">';
 		echo '<span class="form">Replace this question with question ID: <br/>';
 		echo '<span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
 		echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';

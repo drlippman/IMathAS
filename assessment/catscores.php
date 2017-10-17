@@ -121,13 +121,13 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 			$assess_name_stm->execute(array(':id'=>$categoryaid, ':courseid'=>$cid));
 			$assessmentname = $assess_name_stm->fetchColumn(0);
 			//link to the other assessment
-			$catname="<a href='../assessment/showtest.php?cid=$cid&id=$categoryaid' >$assessmentname</a>";
+			$catname="<a href='../assessment/showtest.php?cid=$cid&id=$categoryaid' >".Sanitize::encodeStringForDisplay($assessmentname)."</a>";
 		} else {
-			$catname = $category;
+			$catname = Sanitize::encodeStringForDisplay($category);
 		}
 		if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 		$pc = round(100*$catscore[$category]/$catposs[$category],1);
-		echo "<td>$catname</td><td>{$catscore[$category]} / $catposs[$category] ($pc %)</td></tr>\n";
+		echo "<td>$catname</td><td>" . Sanitize::encodeStringForDisplay($catscore[$category]) . " / " . Sanitize::encodeStringForDisplay($catposs[$category]) . " (" . Sanitize::encodeStringForDisplay($pc) . " %)</td></tr>\n";
 	}
 	echo "</tbody></table>\n";
 

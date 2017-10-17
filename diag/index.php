@@ -1,5 +1,5 @@
 <?php
-	require("../config.php");
+	require("../init_without_validate.php");
 	require("../i18n/i18n.php");
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
@@ -34,13 +34,13 @@
 		}
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<li><a href=\"$imasroot/diag/index.php?id={$row[0]}\">{$row[1]}</a></li>";
+			echo "<li><a href=\"$imasroot/diag/index.php?id=" . Sanitize::onlyInt($row[0]) . "\">".Sanitize::encodeStringForDisplay($row[1])."</a></li>";
 		}
 		echo "</ul></div>";
 		require("../footer.php");
 		exit;
 	}
-	$diagid = $_GET['id'];
+	$diagid = Sanitize::onlyInt($_GET['id']);
 
 	//DB $query = "SELECT * from imas_diags WHERE id='$diagid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -58,6 +58,7 @@
 		$diagqtr = $line['term'];
 	}
 	$sel1 = explode(',',$line['sel1list']);
+	$entryformat = $line['entryformat'];
 
 	if (!($line['public']&1)) {
 		echo "<html><body>", _('This diagnostic is not currently available to be taken'), "</body></html>";
@@ -99,23 +100,16 @@
 		   setcookie(session_name(), '', time()-42000, '/');
 	   }
 	   session_destroy();
-	   header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php?id=$diagid");
+	   header('Location: ' . $GLOBALS['basesiteurl'] . "/diag/index.php?id=" . Sanitize::onlyInt($diagid));
 	   exit;
 	}
 
 if (isset($_POST['SID'])) {
 	$_POST['SID'] = trim(str_replace('-','',$_POST['SID']));
 	if (trim($_POST['SID'])=='' || trim($_POST['firstname'])=='' || trim($_POST['lastname'])=='') {
-		echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
+		echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
 			exit;
 	}
-	//DB $query = "SELECT entryformat,sel1list from imas_diags WHERE id='$diagid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $entryformat = mysql_result($result,0,0);
-	//DB $sel1 = explode(',',mysql_result($result,0,1));
-	$stm = $DBH->prepare("SELECT entryformat,sel1list from imas_diags WHERE id=:id");
-	$stm->execute(array(':id'=>$diagid));
-	list($entryformat, $sel1) = $stm->fetch(PDO::FETCH_NUM);
 
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
 	$entrydig = substr($entryformat,1); //$entryformat{1};
@@ -143,7 +137,7 @@ if (isset($_POST['SID'])) {
 	if (!preg_match($pattern,$_POST['SID'])) {
 		echo "<html><body>", _('Your ID is not valid.  It should contain'), " ";
 		if ($entrydig>0 && $entrytype!='E') {
-			echo $entrydig.' ';
+			echo Sanitize::encodeStringForDisplay($entrydig).' ';
 		}
 		if ($entrytype=='C') {
 			echo _('letters or numbers');
@@ -152,12 +146,12 @@ if (isset($_POST['SID'])) {
 		} else if ($entrytype=='E') {
 			echo _('an email address');
 		}
-		echo " <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
+		echo " <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
 		exit;
 	}
 
 	if ($_POST['course']==-1) {
-		echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
+		echo "<html><body>", Sanitize::encodeStringForDisplay(sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name'])), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
 			exit;
 	}
 	$pws = explode(';',$line['pws']);
@@ -232,7 +226,7 @@ if (isset($_POST['SID'])) {
 				if ($stm->rowCount()>0 && strtoupper($stm->fetchColumn(0))==strtoupper($_POST['passwd'])) {
 
 				} else {
-					echo "<html><body>", _('Error, password incorrect or expired.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
+					echo "<html><body>", _('Error, password incorrect or expired.'), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
 					exit;
 				}
 			}
@@ -260,14 +254,14 @@ if (isset($_POST['SID'])) {
 			$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
 			if ($stm2->rowCount()>0) {
 				if (!$allowreentry) {
-					echo _("You've already taken this diagnostic."), "  <a href=\"index.php?id=$diagid\">", _('Back'), "</a>\n";
+					echo _("You've already taken this diagnostic."), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Back'), "</a>\n";
 					exit;
 				} else {
 					//DB $d = mysql_fetch_row($r2);
 					$d = $stm2->fetch(PDO::FETCH_NUM);
 					$now = time();
 					if ($now - $d[1] > 60*$line['reentrytime']) {
-						echo _('Your window to complete this diagnostic has expired.'), "  <a href=\"index.php?id=$diagid\">", _('Back'), "</a>\n";
+						echo _('Your window to complete this diagnostic has expired.'), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Back'), "</a>\n";
 						exit;
 					}
 				}
@@ -305,7 +299,8 @@ if (isset($_POST['SID'])) {
 			$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 			$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
+		    header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
+                Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
 			exit;
 
 		//} else {
@@ -330,8 +325,11 @@ if (isset($_POST['SID'])) {
 	$userid = $DBH->lastInsertId();
 	//DB $query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$pcid','{$_POST['teachers']}');";
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
-	$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section) VALUES (:userid, :courseid, :section);");
-	$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers']));
+	if (!isset($_POST['timelimitmult'])) {
+		$_POST['timelimitmult'] = 1;
+	}
+	$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,timelimitmult) VALUES (:userid, :courseid, :section, :timelimitmult);");
+	$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 
 	$sessiondata['mathdisp'] = $_POST['mathdisp'];//1;
 	$sessiondata['graphdisp'] = $_POST['graphdisp'];//1;
@@ -350,7 +348,8 @@ if (isset($_POST['SID'])) {
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$pcid&id=$paid");
+	header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
+        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
 	exit;
 }
 
@@ -369,8 +368,8 @@ $pagetitle =$line['name'];
 require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
 ?>
 <div style="margin-left: 30px">
-<form method=post action="index.php?id=<?php echo $diagid; ?>">
-<span class=form><?php echo $line['idprompt']; ?></span> <input class=form type=text size=12 name=SID><BR class=form>
+<form method=post action="index.php?id=<?php echo Sanitize::onlyInt($diagid); ?>">
+<span class=form><?php echo Sanitize::encodeStringForDisplay($line['idprompt']); ?></span> <input class=form type=text size=12 name=SID><BR class=form>
 <span class=form><?php echo _('Enter First Name:'); ?></span> <input class=form type=text size=20 name=firstname><BR class=form>
 <span class=form><?php echo _('Enter Last Name:'); ?></span> <input class=form type=text size=20 name=lastname><BR class=form>
 
@@ -401,25 +400,28 @@ function getteach() {
 
 </script>
 
-<span class=form><?php printf(_('Select your %s'), $line['sel1name']); ?></span><span class=formright>
+<span class=form><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel1name'])); ?></span><span class=formright>
 <select name="course" id="course" onchange="getteach()">
-<option value="-1"><?php printf(_('Select a %s'), $line['sel1name']); ?></option>
+<option value="-1"><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select a %s'), $line['sel1name'])); ?></option>
 <?php
 for ($i=0;$i<count($sel1);$i++) {
-	echo "<option value=\"$i\">{$sel1[$i]}</option>\n";
+	echo "<option value=\"$i\">".Sanitize::encodeStringForDisplay($sel1[$i])."</option>\n";
 }
 ?>
 </select></span><br class=form>
 
-<span class=form><?php printf(_('Select your %s'), $line['sel2name']); ?></span><span class=formright>
+<span class=form><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select your %s'), $line['sel2name'])); ?></span><span class=formright>
 <select name="teachers" id="teachers">
-<option value="not selected"><?php printf(_('Select a %s first'), $line['sel1name']); ?></option>
+<option value="not selected"><?php echo Sanitize::encodeStringForDisplay(sprintf(_('Select a %s first'), $line['sel1name'])); ?></option>
 </select></span><br class=form>
 
 <?php
 	if (!$noproctor) {
 		echo "<b>", _('This test can only be accessed from this location with an access password'), "</b></br>\n";
 		echo "<span class=form>", _('Access password:'), "</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+		echo "<span class=form>", _('Time limit (if timed):'), "</span>  ";
+		echo '<select name=timelimitmult><option value="1">'._('Standard').'</option><option value="1.5">'._('1.5x standard').'</option>';
+		echo '<option value="2">'._('2x standard').'</option></select><BR class=form>';
 	}
 ?>
 <input type="hidden" id="tzoffset" name="tzoffset" value="">

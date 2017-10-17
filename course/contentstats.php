@@ -2,7 +2,8 @@
 //IMathAS: Content view statistics for an item
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../validate.php");
+require("../init.php");
+
 
 $overwritebody = false;
 
@@ -11,7 +12,7 @@ if (!isset($teacherid) && !isset($tutorid)) {
 	$body = 'You do not have authorization to view this page';
 }
 $stype = $_GET['type'];
-$typeid = intval($_GET['id']);
+$typeid = Sanitize::onlyInt($_GET['id']);
 
 if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 	$overwritebody = true;
@@ -95,7 +96,7 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 	$stm2->execute(array(':id'=>$typeid));
 	//DB $result = mysql_query($q2) or die("Query failed : " . mysql_error());
 	//DB $row = mysql_fetch_row($result);
-	$itemname = $stm2->fetchColumn(0);
+	$itemname = Sanitize::encodeStringForDisplay($stm2->fetchColumn(0));
 
 	$stus = array();
 	//DB $query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu ";
@@ -119,7 +120,7 @@ require("../header.php");
 if ($overwritebody) {
 	echo $body;
 } else {
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo " &gt; Content Stats</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';

@@ -20,3 +20,25 @@ AddType application/vnd.openxmlformats-officedocument.spreadsheetml.template xlt
 Options -Indexes
 php_value upload_max_filesize 10M
 php_value max_input_vars 5000
+
+<Files "composer.json">
+deny from all
+</Files>
+
+<Files "composer.lock">
+deny from all
+</Files>
+
+<Files "phpunit.xml">
+deny from all
+</Files>
+
+# Annoying vulnerability scans
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule (.*admin.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule (.*mysql.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^sql(.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^db(.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^php(.*) http://localhost/$1 [R=301,L,NC]
+RewriteRule ^pma(.*) http://localhost/$1 [R=301,L,NC]
+

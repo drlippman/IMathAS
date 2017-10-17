@@ -1,13 +1,13 @@
 <?php
 
-require("../validate.php");
+require("../init.php");
 require("../assessment/testutil.php");
 
 if ($myrights<100) {
 	exit;
 }
 
-$aid = intval($_GET['aid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 if ($aid==0) {exit;}
 
 //DB $query = "SELECT itemorder,defpoints,defpenalty,defattempts FROM imas_assessments WHERE id='$aid'";

@@ -3,7 +3,8 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -11,7 +12,7 @@ require("../validate.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Forum";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Delete Forum";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Forum";
 $useeditor = "description";
 
 if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missing go back to the index page
@@ -20,11 +21,11 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	$cid = $_GET['cid'];
-	$block = $_GET['block'];
+} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
+	$cid = Sanitize::courseId($_GET['cid']);
+	$block = Sanitize::stripHtmlTags($_GET['block']);
 
-	if ($_GET['remove']=="really") {
+	if ($_POST['remove']=="really") {
 		$forumid = $_GET['id'];
 		$DBH->beginTransaction();
 		//DB $query = "SELECT id FROM imas_items WHERE typeid='$forumid' AND itemtype='Forum' AND courseid='$cid'";
@@ -59,14 +60,15 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 			$key = array_search($itemid,$sub);
-			array_splice($sub,$key,1);
-			//DB $itemorder = addslashes(serialize($items));
-			$itemorder = serialize($items);
-			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-
+			if ($key!==false) {
+				array_splice($sub,$key,1);
+				//DB $itemorder = addslashes(serialize($items));
+				$itemorder = serialize($items);
+				//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+			}
 
 			//DB $query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$forumid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -106,7 +108,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 			$stm->execute(array(':forumid'=>$forumid));
 		}
 		$DBH->commit();
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 
 		exit;
 	} else {
@@ -132,11 +134,14 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-		<h3><?php echo $itemname; ?></h3>
-		Are you SURE you want to delete this forum and all associated postings?
-		<p><input type=button value="Yes, Delete" onClick="window.location='deleteforum.php?cid=<?php echo $_GET['cid'] ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-		<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $_GET['cid'] ?>'">
-		</p>
+	<h3><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h3>
+	Are you SURE you want to delete this forum and all associated postings?
+	<form method="POST" action="deleteforum.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
+	<p>
+	<button type=submit name="remove" value="really">Yes, Delete</button>		
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
+	</p>
+	</form>
 
 <?php
 }

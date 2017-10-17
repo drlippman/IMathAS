@@ -1,7 +1,8 @@
 <?php
 //IMathAS:  Drill Assess player (updated quickdrill)
 //(c) 2011 David Lippman
-require("../validate.php");
+require("../init.php");
+
 
 function stddev($array){
   //Don Knuth is the $deity of algorithms
@@ -109,14 +110,14 @@ $placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("l
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
 
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Drill Assessment Results</div>";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Drill Assessment Results</div>";
 echo "<h2>Drill Assessment Results</h2>";
 
 echo '<table id="myTable" class="gb">';
 echo '<thead><tr><th>Best (# tries)<br/>Last</th>';
 $sarr = "'S'";
 foreach ($itemdescr as $qn=>$v) {
-	echo '<th>'.$v.'</th>';
+	echo '<th>' . Sanitize::encodeStringForDisplay($v) . '</th>';
 	$sarr .= ",'N'";
 }
 echo '</tr></thead><tbody>';
@@ -127,7 +128,7 @@ foreach ($studata as $i=>$sturow) {
 		echo '<tr class="odd" onMouseOver="highlightrow(this)" onMouseOut="unhighlightrow(this)">';
 	}
 	foreach ($sturow as $stuval) {
-		echo '<td>'.$stuval.'</td>';
+		echo '<td>'.Sanitize::encodeStringForDisplay($stuval).'</td>';
 	}
 	echo '</tr>';
 }

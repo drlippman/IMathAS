@@ -2,7 +2,9 @@
 	//Displays Message list
 	//(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
+
+
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -17,14 +19,14 @@
 
 	$threadsperpage = intval($listperpage);
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
-		$page = $_GET['page'];
+		$page = Sanitize::onlyInt($_GET['page']);
 	}
 	if (isset($_GET['filtercid'])) {
-		$filtercid = $_GET['filtercid'];
+		$filtercid = Sanitize::onlyInt($_GET['filtercid']);
 	} else if ($cid!='admin' && $cid>0) {
 		$filtercid = $cid;
 	} else {
@@ -89,7 +91,7 @@ Read   Deleted   Deleted by Sender   Tagged
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Sent Message List</div>";
 	echo '<div id="headersentlist" class="pagetitle"><h2>Sent Messages</h2></div>';
@@ -182,7 +184,7 @@ Read   Deleted   Deleted by Sender   Tagged
 		}
 		echo "<div>$prevnext</div>\n";
 	}
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/sentlist.php?cid=$cid&filtercid=";
+	$address = $GLOBALS['basesiteurl'] . "/msgs/sentlist.php?cid=$cid&filtercid=";
 
 
 ?>
@@ -210,11 +212,11 @@ function chgfilter() {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':msgfrom'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<option value=\"{$row[0]}\" ";
+		echo "<option value=\"".Sanitize::onlyInt($row[0])."\" ";
 		if ($filtercid==$row[0]) {
 			echo 'selected=1';
 		}
-		echo " >{$row[1]}</option>";
+		printf(" >%s</option>", Sanitize::encodeStringForDisplay($row[1]));
 	}
 	echo "</select> ";
 	echo 'By recipient: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
@@ -243,11 +245,12 @@ function chgfilter() {
 		$stm->execute(array(':msgfrom'=>$userid));
 	}
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<option value=\"{$row[0]}\" ";
+		echo "<option value=\"".Sanitize::onlyInt($row[0])."\" ";
 		if ($filteruid==$row[0]) {
 			echo 'selected=1';
 		}
-		echo " >{$row[1]}, {$row[2]}</option>";
+		printf(" >%s, %s</option>", Sanitize::encodeStringForDisplay($row[1]),
+            Sanitize::encodeStringForDisplay($row[2]));
 	}
 	echo "</select></p>";
 ?>
@@ -306,16 +309,18 @@ function chgfilter() {
 			$line['title'] = substr($line['title'],4);
 			$n++;
 		}
+		$line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 		if ($n==1) {
 			$line['title'] = 'Re: '.$line['title'];
 		} else if ($n>1) {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
-		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid={$line['id']}\">";
+		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\"/></td><td>";
+		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid=".Sanitize::onlyInt($line['id'])."\">";
 		echo $line['title'];
 		echo "</a></td>";
-		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+		printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+            Sanitize::encodeStringForDisplay($line['FirstName']));
 		if (($line['isread']&1)==1) {
 			echo "<td>Yes</td>";
 		} else {

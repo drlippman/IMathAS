@@ -3,8 +3,16 @@
 //(c) 2009 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
+function fopen_utf8 ($filename, $mode) {
+    $file = @fopen($filename, $mode);
+    $bom = fread($file, 3);
+    if ($bom != b"\xEF\xBB\xBF") {
+        rewind($file);
+    }
+    return $file;
+}
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -16,11 +24,11 @@ if (!(isset($teacherid))) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$dir = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
 	if (isset($_POST['thefile'])) {
 		//already uploaded file, ready for official upload
-		$filename = basename($_POST['thefile']);
+		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['thefile']);
 		if (!file_exists($dir.$filename)) {
 			echo "File is missing!";
 			exit;
@@ -77,7 +85,7 @@ if (!(isset($teacherid))) {
 		$adds = array();
 		$addsvals = array();
 		if (count($gbitemid)>0) {
-			$handle = fopen($dir.$filename,'r');
+			$handle = fopen_utf8($dir.$filename,'r');
 			for ($i = 0; $i<$_POST['headerrows']; $i++) {
 				$line = fgetcsv($handle,4096);
 			}
@@ -139,7 +147,7 @@ if (!(isset($teacherid))) {
 			}
 		}
 		unlink($dir.$filename);
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/chgoffline.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/chgoffline.php?cid=$cid");
 		exit;
 	} else if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		//upload file
@@ -152,7 +160,7 @@ if (!(isset($teacherid))) {
 			if (move_uploaded_file($_FILES['userfile']['tmp_name'], $dir.$uploadfile)) {
 				//parse out header info
 				$page_fileHiddenInput = '<input type="hidden" name="thefile" value="'.$uploadfile.'" />';
-				$handle = fopen($dir.$uploadfile,'r');
+				$handle = fopen_utf8($dir.$uploadfile,'r');
 				$hrow = fgetcsv($handle,4096);
 				$columndata = array();
 				$names = array();
@@ -198,11 +206,11 @@ if (!(isset($teacherid))) {
 				//DB }
 				//DB $namelist = "'".implode("','",$names)."'";
 				if (count($names)>0) {
-					$in  = str_repeat('?,', count($names) - 1) . '?';
+					$query_placeholders = Sanitize::generateQueryPlaceholders($names);
 					//DB $query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {
-					$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($in) AND courseid=?");
+					$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($query_placeholders) AND courseid=?");
 					$stm->execute(array_merge($names, array($cid)));
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$loc = array_search($row[1],$names);
@@ -222,8 +230,9 @@ if (!(isset($teacherid))) {
 			$body = "File Upload error";
 		}
 	}
-	$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode={$_GET['gbmode']}&cid=$cid\">Gradebook</a> ";
+
+	$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
 	$curBreadcrumb .=" &gt; <a href=\"chgoffline.php?stu=0&cid=$cid\">Manage Offline Grades</a> &gt; Upload Multiple Grades";
 
 
@@ -242,7 +251,7 @@ if ($overwriteBody==1) {
 	if (isset($page_fileHiddenInput)) {
 		//file has been uploaded, need to know what to import
 		echo $page_fileHiddenInput;
-		echo '<input type="hidden" name="headerrows" value="'.$_POST['headerrows'].'" />';
+		echo '<input type="hidden" name="headerrows" value="'.Sanitize::encodeStringForDisplay($_POST['headerrows']).'" />';
 		$sdate = tzdate("m/d/Y",time());
 		$stime = tzdate("g:i a",time());
 	?>
@@ -271,7 +280,7 @@ if ($overwriteBody==1) {
 			//DB while ($row = mysql_fetch_row($result)) {
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$gbcatoptions .= "<option value=\"{$row[0]}\">{$row[1]}</option>\n";
+				$gbcatoptions .= "<option value=\"".Sanitize::onlyInt($row[0])."\">".Sanitize::encodeStringForDisplay($row[1])."</option>\n";
 			}
 		}
 		foreach ($columndata as $col=>$data) {
@@ -281,11 +290,11 @@ if ($overwriteBody==1) {
 			if ($data[3]==0) {echo 'selected="selected"';}
 			echo '>Add as new item</option>';
 			if ($data[3]>0) {
-				echo '<option value="'.$data[3].'" selected="selected">Overwrite existing scores</option>';
+				echo '<option value="'.Sanitize::encodeStringForDisplay($data[3]).'" selected="selected">Overwrite existing scores</option>';
 			}
 			echo '</select></td>';
 			echo '<td><input type="text" size="20" name="colname'.$col.'" value="'.htmlentities($data[0]).'" /></td>';
-			echo '<td><input type="text" size="3" name="colpts'.$col.'"  value="'.$data[1].'" /></td>';
+			echo '<td><input type="text" size="3" name="colpts'.$col.'"  value="'.Sanitize::encodeStringForDisplay($data[1]).'" /></td>';
 			echo '<td><select name="colcnt'.$col.'">';
 			echo '<option value="1" selected="selected">Count in gradebook</option>';
 			echo '<option value="0">Don\'t count and hide from students</option>';

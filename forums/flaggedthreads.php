@@ -1,14 +1,16 @@
 <?php
 //IMathAS:  Flagged threads list for a course
 //(c) 2017 David Lippman
-require("../validate.php");
-$cid = $_GET['cid'];
+require("../init.php");
+
+
+$cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'];
 
 $now = time();
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
-$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-$array = array();
+$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
+$array = array(':now'=>$now);
 if (!isset($teacherid)) {
   $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 }
@@ -42,23 +44,23 @@ if (isset($_GET['unflagall'])) {
 		$DBH->query("UPDATE imas_forum_views SET tagged=0 WHERE threadid IN ($threadids)");
 	}
 	if ($from=='home') {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
 	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../course/course.php?cid=$cid");
-	}	
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
+	}
 	exit;
-}	
+}
 
 
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
-$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/savetagged.php?cid=$cid';</script>";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js?v=011517"></script>';
 $pagetitle = _('Flagged Forum Posts');
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
 echo '<div id="headerflaggedthreads" class="pagetitle"><h2>'._('Flagged Forum Posts').'</h2></div>';
-echo "<p><button type=\"button\" onclick=\"window.location.href='flaggedthreads.php?from=$from&cid=$cid&unflagall=true'\">"._('Unflag All')."</button></p>";
+echo "<p><button type=\"button\" onclick=\"window.location.href='flaggedthreads.php?from=" . Sanitize::encodeUrlParam($from) . "&cid=$cid&unflagall=true'\">" . _('Unflag All') . "</button></p>";
 
 if (count($lastpost)>0) {
   echo '<table class="gb forum" id="newthreads"><thead><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
@@ -70,7 +72,7 @@ if (count($lastpost)>0) {
   //DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
   $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
-  $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
+  $query .= "imas_forum_posts.threadid IN ($threadids) imas_forum_threads.lastposttime<$now AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
   $stm = $DBH->query($query);
   $alt = 0;
   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -81,8 +83,8 @@ if (count($lastpost)>0) {
     }
     echo '<tr id="tr'.$line['threadid'].'" class="tagged">';
     echo "<td><span class=\"right\"><img class=\"pointer\" id=\"tag{$line['threadid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['threadid']});return false;\" alt=\"Flagged\" /></span>";
-    echo "<a href=\"posts.php?cid=$cid&forum={$forumids[$line['threadid']]}&thread={$line['threadid']}&page=-5\">{$line['subject']}</a></td><td>$name</td>";
-    echo "<td><a href=\"thread.php?cid=$cid&forum={$forumids[$line['threadid']]}\">".$forumname[$line['threadid']].'</a></td>';
+    echo "<a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "&thread=" . Sanitize::encodeUrlParam($line['threadid']) . "&page=-5\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></td><td>" . Sanitize::encodeStringForDisplay($name) . "</td>";
+    echo "<td><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "\">" . Sanitize::encodeStringForDisplay($forumname[$line['threadid']]) . '</a></td>';
     echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
   }
   echo '</tbody></table>';

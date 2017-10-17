@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *******************************************************
 
-Please send any useful modifications or improvements via 
+Please send any useful modifications or improvements via
 email to joekepley at yahoo (dot) com
 
 *******************************************************/
@@ -55,9 +55,9 @@ function AutoSuggest(elem, suggestions)
 	var KEYUP = 38;
 	var KEYDN = 40;
 	var ENTER = 13;
-	
 
-	//The browsers' own autocomplete feature can be problematic, since it will 
+
+	//The browsers' own autocomplete feature can be problematic, since it will
 	//be making suggestions from the users' past input.
 	//Setting this attribute should turn it off.
 	elem.setAttribute("autocomplete","off");
@@ -87,7 +87,7 @@ function AutoSuggest(elem, suggestions)
 			case TAB:
 			me.useSuggestion("tab");
 			break;
-			
+
 			case ENTER:
 			me.useSuggestion("enter");
 			return false;
@@ -117,10 +117,10 @@ function AutoSuggest(elem, suggestions)
 
 	/********************************************************
 	onkeyup handler for the elem
-	If the text is of sufficient length, and has been changed, 
+	If the text is of sufficient length, and has been changed,
 	then display a list of eligible suggestions.
 	********************************************************/
-	elem.onkeyup = function(ev) 
+	elem.onkeyup = function(ev)
 	{
 		var key = me.getKeyCode(ev);
 		switch(key)
@@ -133,7 +133,7 @@ function AutoSuggest(elem, suggestions)
 			return;
 		default:
 
-			if (this.value.length > 0) //this.value != me.inputText && 
+			if (this.value.length > 0) //this.value != me.inputText &&
 			{
 				me.inputText = this.value;
 				me.getEligible();
@@ -158,11 +158,11 @@ function AutoSuggest(elem, suggestions)
 	elem.onblur = function(ev) {
 		setTimeout(me.hideDiv,100);
 	}
-		
-		
-	
+
+
+
 	/********************************************************
-	Insert the highlighted suggestion into the input box, and 
+	Insert the highlighted suggestion into the input box, and
 	remove the suggestion dropdown.
 	********************************************************/
 	this.useSuggestion = function(how)
@@ -171,7 +171,7 @@ function AutoSuggest(elem, suggestions)
 		{
 			this.elem.value = this.eligible[this.highlighted];
 			this.hideDiv();
-			//It's impossible to cancel the Tab key's default behavior. 
+			//It's impossible to cancel the Tab key's default behavior.
 			//So this undoes it by moving the focus back to our field right after
 			//the event completes.
 			//setTimeout("document.getElementById('" + this.elem.id + "').focus()",0);
@@ -198,7 +198,7 @@ function AutoSuggest(elem, suggestions)
 	********************************************************/
 	this.showDiv = function()
 	{
-		this.div.style.display = 'block';
+		me.div.style.display = 'block';
 	};
 
 	/********************************************************
@@ -206,8 +206,8 @@ function AutoSuggest(elem, suggestions)
 	********************************************************/
 	this.hideDiv = function()
 	{
-		this.div.style.display = 'none';
-		this.highlighted = -1;
+		me.div.style.display = 'none';
+		me.highlighted = -1;
 	};
 
 	/********************************************************
@@ -227,7 +227,7 @@ function AutoSuggest(elem, suggestions)
 			{
 				li.className = "";
 			}
-			
+
 		}
 	};
 
@@ -250,29 +250,29 @@ function AutoSuggest(elem, suggestions)
 	this.createDiv = function()
 	{
 		var ul = document.createElement('ul');
-	
+
 		//Create an array of LI's for the words.
 		for (i in this.eligible)
 		{
 			var word = this.eligible[i];
-	
+
 			var li = document.createElement('li');
 			var a = document.createElement('a');
 			a.href="#";//javascript:false;";
 			a.onclick= function() {return false;}
 			a.innerHTML = word;
 			li.appendChild(a);
-	
+
 			if (me.highlighted == i)
 			{
 				li.className = "selected";
 			}
-	
+
 			ul.appendChild(li);
 		}
-	
+
 		this.div.replaceChild(ul,this.div.childNodes[0]);
-	
+
 
 		/********************************************************
 		mouseover handler for the dropdown ul
@@ -286,10 +286,10 @@ function AutoSuggest(elem, suggestions)
 			{
 				target = target.parentNode;
 			}
-		
+
 			var lis = me.div.getElementsByTagName('LI');
-			
-	
+
+
 			for (i in lis)
 			{
 				var li = lis[i];
@@ -309,11 +309,11 @@ function AutoSuggest(elem, suggestions)
 		ul.onclick = function(ev)
 		{
 			me.useSuggestion("click");
-			me.hideDiv();on
+			me.hideDiv();
 			me.cancelEvent(ev);
 			return false;
 		};
-	
+
 		this.div.className="suggestion_list";
 		this.div.style.position = 'absolute';
 
@@ -328,7 +328,7 @@ function AutoSuggest(elem, suggestions)
 		var added = ',';
 		if (this.inputText.indexOf(" ") == -1) {
 			var bndreg = new RegExp("\\b"+this.inputText.toLowerCase());
-			for (i in this.suggestions) 
+			for (i in this.suggestions)
 			{
 				var suggestion = this.suggestions[i];
 				if(suggestion.toLowerCase().match(bndreg))
@@ -336,12 +336,12 @@ function AutoSuggest(elem, suggestions)
 					this.eligible[this.eligible.length]=suggestion;
 					added += i+',';
 				}
-			}	
+			}
 		}
-		for (i in this.suggestions) 
+		for (i in this.suggestions)
 		{
 			var suggestion = this.suggestions[i];
-			
+
 			if(suggestion.toLowerCase().indexOf(this.inputText.toLowerCase()) >-1 && added.indexOf(','+i+',')<0)
 			{
 				this.eligible[this.eligible.length]=suggestion;
@@ -350,7 +350,7 @@ function AutoSuggest(elem, suggestions)
 	};
 
 	/********************************************************
-	Helper function to determine the keycode pressed in a 
+	Helper function to determine the keycode pressed in a
 	browser-independent manner.
 	********************************************************/
 	this.getKeyCode = function(ev)
@@ -366,7 +366,7 @@ function AutoSuggest(elem, suggestions)
 	};
 
 	/********************************************************
-	Helper function to determine the event source element in a 
+	Helper function to determine the event source element in a
 	browser-independent manner.
 	********************************************************/
 	this.getEventSource = function(ev)
@@ -375,7 +375,7 @@ function AutoSuggest(elem, suggestions)
 		{
 			return ev.target;
 		}
-	
+
 		if(window.event)	//IE
 		{
 			return window.event.srcElement;
@@ -383,7 +383,7 @@ function AutoSuggest(elem, suggestions)
 	};
 
 	/********************************************************
-	Helper function to cancel an event in a 
+	Helper function to cancel an event in a
 	browser-independent manner.
 	(Returning false helps too).
 	********************************************************/
@@ -417,8 +417,18 @@ function initsuggest() {
 	new AutoSuggest(document.getElementById("qaname"),names);
 }
 addLoadEvent(initsuggest);
+$(function() {
+	$("#qafeedback").on("keydown", function(event) {
+		var code = event.keyCode || event.which;
+		if (code === 9) { //tab
+			event.preventDefault();
+			addsuggest();
+			return false;
+		}
+	});
+})
 function addsuggest() {
-	
+
 	var namev = document.getElementById("qaname").value;
 	var scorev = document.getElementById("qascore").value;
 	var feedbv = document.getElementById("qafeedback").value;
@@ -486,13 +496,13 @@ function onarrow(e,field) {
 	} else if (e.which) {
 		var key = e.which;
 	}
-	
+
 	if (key==40 || key==38) {
 		var i;
                 for (i = 0; i < field.form.elements.length; i++)
                    if (field == field.form.elements[i])
                        break;
-		
+
 	      if (key==38) {
 		      i = i-2;
 		      if (i<0) { i=0;}
@@ -570,7 +580,7 @@ function sendtoall(w,type) {
 	}
 	document.getElementById("toallfeedback").value = '';
 	document.getElementById("toallgrade").value = '';
-} 
+}
 
 var quickaddshowing = false;
 function togglequickadd(el) {
@@ -584,5 +594,3 @@ function togglequickadd(el) {
 		quickaddshowing = false;
 	}
 }
-
-

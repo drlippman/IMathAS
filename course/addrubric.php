@@ -3,29 +3,33 @@
 //(c) 2011 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $from = $_GET['from'];
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=='modq') {
-	$fromstr = '&amp;from=modq&amp;aid='.$_GET['aid'].'&amp;qid='.$_GET['qid'];
-	$returnstr = 'modquestion.php?cid='.$cid.'&amp;aid='.$_GET['aid'].'&amp;id='.$_GET['qid'];
+	$fromstr = '&amp;' . Sanitize::generateQueryStringFromMap(array('from' => 'modq', 'aid' => $_GET['aid'],
+			'qid' => $_GET['qid']));
+	$returnstr = 'modquestion.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
+			'aid' => $_GET['aid'], 'id' => $_GET['qid']));
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Question Settings</a> ";
 } else if ($from=='addg') {
-	$fromstr = '&amp;from=addg&amp;gbitem='.$_GET['gbitem'];
-	$returnstr = 'addgrades.php?cid='.$cid.'&amp;gbitem='.$_GET['gbitem'].'&amp;grades=all';
+	$fromstr = '&amp;' . Sanitize::generateQueryStringFromMap(array('from' => 'addg', 'gbitem' => $_GET['gbitem']));
+	$returnstr = 'addgrades.php?'. Sanitize::generateQueryStringFromMap(array('cid' => $cid,
+			'gbitem' => $_GET['gbitem'], 'grades' => 'all'));
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Offline Grades</a> ";
 } else if ($from=='addf') {
-	$fromstr = '&amp;from=addf&amp;fid='.$_GET['fid'];
-	$returnstr = 'addforum.php?cid='.$cid.'&amp;id='.$_GET['fid'];
+	$fromstr = '&amp;' . Sanitize::generateQueryStringFromMap(array('from' => 'addf', 'fid' => $_GET['fid']));
+	$returnstr = 'addforum.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'id' => $_GET['fid']));
 	$curBreadcrumb .= "&gt; <a href=\"$returnstr\">Modify Forum</a> ";
 }
 
@@ -82,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':ownerid'=>$userid, ':name'=>$_POST['rubname'], ':rubrictype'=>$_POST['rubtype'], ':groupid'=>$rubgrp, ':rubric'=>$rubricstring));
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addrubric.php?cid=$cid$fromstr");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr");
 
 
 
@@ -132,7 +136,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	$stm = $DBH->prepare("SELECT id, name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
 	$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$groupid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "{$row[1]} <a href=\"addrubric.php?cid=$cid&amp;id={$row[0]}$fromstr\">Edit</a><br/>";
+		echo Sanitize::encodeStringForDisplay($row[1]) . " <a href=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::onlyInt($row[0]) . $fromstr . "\">Edit</a><br/>";
 	}
 	echo '</p>';
 } else {  //adding/editing a rubric
@@ -145,7 +149,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	*/
 	$rubtypeval = array(1,0,3,4,2);
 	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
-	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id={$_GET['id']}$fromstr\">";
+    echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
 	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></p>';
 
 	echo '<p>Rubric Type: ';
@@ -164,15 +168,15 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	} else {
 		echo '<p style="display:none;" id="scoretotalinstr">';
 	}
-	echo 'With this type of rubric, one rubric item will be selected, and "portion of score" associated with that item will be the 
+	echo 'With this type of rubric, one rubric item will be selected, and "portion of score" associated with that item will be the
 		total final score for the question.  Make sure one item is 100(%) or the expected point total for the question.';
 	echo '</p>';
-	
+
 	echo '<p>Share with Group: <input type="checkbox" name="rubisgroup" '.getHtmlChecked($rubgrp,-1,1).' /></p>';
 	echo '<table><thead><tr><th>Rubric Item<br/>Shows in feedback</th><th>Instructor Note<br/>Not in feedback</th><th><span id="pointsheader" ';
 	if ($rubtype==2) {echo 'style="display:none;" ';}
 	echo '>Portion of Score</span>';
-	
+
 	echo '</th></tr></thead><tbody>';
 	for ($i=0;$i<15; $i++) {
 		echo '<tr><td><input type="text" size="40" name="rubitem'.$i.'" value="';

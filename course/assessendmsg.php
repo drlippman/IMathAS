@@ -2,33 +2,36 @@
 //IMathAS:  Add end messages
 //(c) 2008 David Lippman
 
+
 if (!isset($imasroot)) {
-	require("../validate.php");
+	require("../init.php");
 	if (!(isset($teacherid))) { // loaded by a NON-teacher
 		echo "You must be a teacher to access this page";
 		exit;
 	}
 }
-	$cid = $_GET['cid'];
+require_once("../includes/sanitize.php");
+require_once("../includes/htmLawed.php");
+
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['record'])) {
 		$endmsg = array();
 		$endmsg['type'] = $_POST['type'];
 		//DB $endmsg['def'] = stripslashes($_POST['msg'][0]);
-		$endmsg['def'] = $_POST['msg'][0];
+		$endmsg['def'] = myhtmLawed($_POST['msg'][0]);
 		$i=1;
 		$msgarr = array();
 		while (isset($_POST['sc'][$i]) && !empty($_POST['sc'][$i]) ) {
 			$key = (int)$_POST['sc'][$i];
 			if ($key>0) {
 				//DB $msgarr[$key] = stripslashes($_POST['msg'][$i]);
-				$msgarr[$key] = $_POST['msg'][$i];
+				$msgarr[$key] = myhtmLawed($_POST['msg'][$i]);
 			}
 			$i++;
 		}
 		krsort($msgarr);
 		$endmsg['msgs'] = $msgarr;
-		require_once("../includes/htmLawed.php");
 		//DB $endmsg['commonmsg'] = myhtmLawed(stripslashes($_POST['commonmsg']));
 		$endmsg['commonmsg'] = myhtmLawed($_POST['commonmsg']);
 		//DB $msgstr = addslashes(serialize($endmsg));
@@ -37,7 +40,7 @@ if (!isset($imasroot)) {
 			//DB $query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id=:id");
-			$stm->execute(array(':endmsg'=>$msgstr, ':id'=>$_POST['aid']));
+			$stm->execute(array(':endmsg'=>$msgstr, ':id'=>Sanitize::onlyInt($_POST['aid'])));
 		} else if (isset($_POST['aidlist'])) {
 			//DB $aidlist = "'".implode("','",explode(',',$_POST['aidlist']))."'";
 			//DB $query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id IN ($aidlist)";
@@ -47,7 +50,7 @@ if (!isset($imasroot)) {
 			$stm->execute(array(':endmsg'=>$msgstr));
 
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
 		exit;
 	}
@@ -56,9 +59,9 @@ if (!isset($imasroot)) {
 	$useeditor = "commonmsg";
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	if (!isset($_POST['checked'])) {
-		echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid={$_GET['aid']}\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
+		echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid=" . Sanitize::onlyInt($_GET['aid']) . "\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
 	} else {
 		echo "&gt; <a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a> &gt; End of Assessment Msg</div>\n";
 	}
@@ -67,7 +70,7 @@ if (!isset($imasroot)) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $endmsg = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['aid']));
+		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['aid'])));
 		$endmsg = $stm->fetchColumn(0);
 	} else {
 		$endmsg = '';
@@ -89,9 +92,9 @@ if (!isset($imasroot)) {
 	echo '<div id="headerassessendmsg" class="pagetitle"><h2>End of Assessment Messages</h2></div>';
 	echo "<form method=\"post\" action=\"assessendmsg.php?cid=$cid&amp;record=true\" />";
 	if (isset($_POST['checked'])) {
-		echo '<input type="hidden" name="aidlist" value="'.implode(',',$_POST['checked']).'" />';
+		echo '<input type="hidden" name="aidlist" value="' . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . '" />';
 	} else {
-		echo '<input type="hidden" name="aid" value="'.$_GET['aid'].'" />';
+		echo '<input type="hidden" name="aid" value="'.Sanitize::onlyInt($_GET['aid']).'" />';
 	}
 	echo '<p>Base messages on: ';
 	echo '<input type="radio" name="type" value="0" ';
@@ -103,7 +106,7 @@ if (!isset($imasroot)) {
 	echo '<table class="gb"><thead><tr><th>If score is at least</th><th>Display this message</th></tr></thead><tbody>';
 	$i=1;
 	foreach($endmsg['msgs'] as $sc=>$msg) {
-		$msg = htmlspecialchars($msg);
+		$msg = Sanitize::encodeStringForDisplay($msg);
 		echo "<tr><td><input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"$sc\"/></td>";
 		echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
 		$i++;
@@ -114,7 +117,7 @@ if (!isset($imasroot)) {
 		$i++;
 	}
 	echo "<tr><td>Otherwise, show:</td>";
-	$endmsg['def'] = htmlspecialchars($endmsg['def']);
+	$endmsg['def'] = Sanitize::encodeStringForDisplay($endmsg['def']);
 	echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
 	echo '</tbody></table>';
 	echo '<p>After the score-specific message, display this text to everyone:</p>';

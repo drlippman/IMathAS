@@ -1,5 +1,5 @@
 <?php
-require("../validate.php");
+require("../init.php");
 if ($myrights<100) {
 	exit;
 }
@@ -77,7 +77,6 @@ if (count($recovereditems)>0) {
 	$block['items'] = $recovereditems;
 	array_push($items,$block);
 	echo "recovered ". count($recovereditems) . "items";
-	print_r($items);
 	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
 	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=blockcnt+1 WHERE id='{$_GET['cid']}'";

@@ -3,9 +3,9 @@
 //for Lumen's OEA embed
 //Based on work by @kdv24 and @AbeerKhakwani
 
-require("../validate.php");
+require("../init.php");
 if (isset($_GET['cid'])) {
-  $cid = intval($_GET['cid']);
+  $cid = Sanitize::courseId($_GET['cid']);
 
   //get assessment items and associated data
   $assessinfo = array();

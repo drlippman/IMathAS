@@ -6,7 +6,7 @@
 //qns:  array of or single question ids
 //testsettings: assoc array of assessment settings
 //Returns:  id,questionsetid,category,points,penalty,attempts
-function getquestioninfo($qns,$testsettings) {
+function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 	global $DBH;
 	if (!is_array($qns)) {
 		$qns = array($qns);
@@ -26,14 +26,24 @@ function getquestioninfo($qns,$testsettings) {
 		}
 		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control ";
 		//DB $query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
-		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control,iq.fixedseeds ";
+		if ($preloadqsdata) {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iq.fixedseeds,";
+			$query .= "iqs.qtype,iqs.control,iqs.qcontrol,iqs.qtext,iqs.answer,iqs.hasimg,iqs.extref,iqs.solution,iqs.solutionopts ";
+		} else {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control,iq.fixedseeds ";
+		}
 		$query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
 		$stm = $DBH->query($query);
 	} else {
 		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
 		//DB $query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
 		//DB $query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
-		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control,iq.fixedseeds ";
+		if ($preloadqsdata) {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iq.fixedseeds,";
+			$query .= "iqs.qtype,iqs.control,iqs.qcontrol,iqs.qtext,iqs.answer,iqs.hasimg,iqs.extref,iqs.solution,iqs.solutionopts ";
+		} else {
+			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control,iq.fixedseeds ";
+		}
 		$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
 		$query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
 		$stm = $DBH->query($query);
@@ -90,9 +100,11 @@ function getquestioninfo($qns,$testsettings) {
 		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
 		$line['regen'] = $line['regen']%3;
 		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] > 0);
-		unset($line['qtype']);
-		unset($line['control']);
-		$out[$line['id']] = $line;
+		if (!$preloadqsdata) {
+			unset($line['qtype']);
+			unset($line['control']);
+		}
+		$out[$line['qid']] = $line;
 	}
 	return $out;
 }
@@ -375,8 +387,8 @@ function printscore($sc,$qn) {
 			$hasmanual = true;
 			$sc = '*';
 		}
-		$out =  "$sc " . _("out of") . " $poss";
-		$pts = $sc;
+		$out = sprintf("%g %s %s", $sc, _("out of"), Sanitize::encodeStringForDisplay($poss));
+		$pts = Sanitize::onlyFloat($sc);
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
 		$ptposs = $qi[$questions[$qn]]['answeights'];
@@ -439,7 +451,8 @@ function printscore($sc,$qn) {
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs);
-		$out =  "$pts " . _("out of") . " $poss (parts: $sc)";
+		$out = sprintf("%s %s %s (parts: %g)", Sanitize::encodeStringForDisplay($pts), _("out of"),
+			Sanitize::encodeStringForDisplay($poss), $sc);
 	}
 	if ($hasmanual) {
 		$out .= _(' (* not auto-graded)');
@@ -771,14 +784,19 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single,$showqnum=0) {
-	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
+	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot,$CFG;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
 			echo '<div class="review clearfix">';
 		}
 		if ($sessiondata['isteacher']) {
-			echo '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'];
-			echo '<br/><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qi[$questions[$qn]]['questionsetid'].'">'._('License').'</a></span>';
+			echo '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').Sanitize::onlyInt($qi[$questions[$qn]]['questionsetid']);
+			echo '<br/><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.Sanitize::onlyInt($qi[$questions[$qn]]['questionsetid']).'">'._('License').'</a>';
+			if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+				echo "<br/><a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&";
+				echo "quoteq=".Sanitize::encodeUrlParam("0-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-reperr-{$GLOBALS['assessver']}")."\" target=\"reperr\">Report Problems</a>";
+			}
+			echo '</span>';
 		} else {
 			echo '<span style="float:right;font-size:70%"><a target="license" href="'.$imasroot.'/course/showlicense.php?id='.$qi[$questions[$qn]]['questionsetid'].'">'._('License').'</a></span>';
 		}
@@ -852,13 +870,15 @@ function showquestioncontactlinks($qn) {
 	global $testsettings,$imasroot,$qi,$seeds,$questions;
 	$out = '';
 	if ($testsettings['msgtoinstr']==1) {
-		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}&to=instr\">". _('Message instructor about this question'). "</a>";
+		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=".Sanitize::encodeUrlParam($testsettings['courseid']);
+		$out .= "&add=new&quoteq=".Sanitize::encodeUrlParam("$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}")."&to=instr\">". _('Message instructor about this question'). "</a>";
 	}
 	if ($testsettings['posttoforum']>0) {
 		if ($out != '') {
 			$out .= "<br/>";
 		}
-		$out .= "<a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}\">". _('Post this question to forum'). "</a>";
+		$out .= "<a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid=".Sanitize::encodeUrlParam($testsettings['courseid'])."&forum=".Sanitize::encodeUrlParam($testsettings['posttoforum']);
+		$out .= "&modify=new&quoteq=".Sanitize::encodeUrlParam("$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}")."\">". _('Post this question to forum'). "</a>";
 	}
 	return $out;
 }

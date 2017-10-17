@@ -1,5 +1,5 @@
 <?php
-	require("../../validate.php");
+	require("../../init.php");
 	$nologo = true;
 	$flexwidth = true;
 	require("../../header.php");

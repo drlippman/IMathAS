@@ -16,7 +16,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
-		$str = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$str);  //block function eval or backticks as way of generating variable name
+		$str = removeDisallowedVarsString($str,$anstype,$countcnt);
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -25,7 +25,6 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
 		$r =  interpretline($str.';',$anstype,$countcnt).';';
-		$r = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$r);
 		return $r;
 	}
 }
@@ -325,12 +324,16 @@ function tokenize($str,$anstype,$countcnt) {
 				$c = $str{$i};
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//if [ then array ref - read and connect as part of variable token
-			if ($c=='[') {
+			if ($c=='[' || $c=='{') {
 				$connecttolast = 1;
 			}
 			//check if allowed var
+			if ($out==='$' && $connecttolast==0) {
+				echo _('Variable missing a name');
+				return array(array('',9));
+			}
 			if (in_array($out,$disallowedvar)) {
-				echo sprintf(_('Eeek.. unallowed var %s!'), $out);
+				echo sprintf(_('Eeek.. unallowed var %s!'), Sanitize::encodeStringForDisplay($out));
 				return array(array('',9));
 			}
 
@@ -400,7 +403,7 @@ function tokenize($str,$anstype,$countcnt) {
 					} else {
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
-							echo sprintf(_('Eeek.. unallowed macro %s'), $out);
+							echo sprintf(_('Eeek.. unallowed macro %s'), Sanitize::encodeStringForDisplay($out));
 							return array(array('',9));
 						}
 					}
@@ -417,7 +420,7 @@ function tokenize($str,$anstype,$countcnt) {
 						//an unquoted string!  give a warning to instructor,
 						//but treat as a quoted string.
 						if (isset($GLOBALS['teacherid'])) {
-							echo sprintf(_('Warning... unquoted string %s.. treating as string'), $out);
+							echo sprintf(_('Warning... unquoted string %s.. treating as string'), Sanitize::encodeStringForDisplay($out));
 						}
 						$out = "'$out'";
 						$intype = 6;
@@ -544,7 +547,7 @@ function tokenize($str,$anstype,$countcnt) {
 			if ($c=='`') {
 				$out = _('"invalid - unquoted backticks"');
 			} else {
-				$out .= $strtext;
+				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt);
 			}
 			$i++;
 			$c = $str{$i};
@@ -616,6 +619,10 @@ function tokenize($str,$anstype,$countcnt) {
 					$syms[] = array('',7); //end of line;
 					$lastsym = array('',7);
 				}
+			} else if ($out{0}=='{' && $lastsym[0]=='$') { //var var
+				//conditional value based on if allowed
+				$syms[count($syms)-1][0] = '((checkvarvarisallowed('.substr($out,1,-1).'))?$'.$out.':0)';
+				$connecttolast = 0;
 			} else {
 				$syms[count($syms)-1][0] .= $out;
 				$connecttolast = 0;
@@ -635,6 +642,84 @@ function tokenize($str,$anstype,$countcnt) {
 	return $syms;
 }
 
+//handle braces and variable variables in strings and qtext
+function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
+	global $disallowedvar;
+	
+	//remove any blatent disallowed var
+	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str); 
+	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
+	
+	$startmarker = 0; $lastend = 0;
+	$invarvar = false;
+	$inbraces = false;
+	$outstr = '';
+	$depth = 0;
+	for ($c=0;$c<strlen($str);$c++) {
+		if ($str{$c}=='{') {
+			if ($invarvar || $inbraces) {
+				$depth++;
+			} else { //may be starting new brace or varvar item
+				if ($c>0 && $str{$c-1}=='$') { //might be varvar
+					if ($c>1 && $str{$c-2}=='\\' && ($c<3 || $str{$c-3}!='\\')) {
+						//it's braces with escaped $ sign
+					} else {
+						$invarvar = true;
+					}
+				}
+				if (!$invarvar) {
+					if ($c<strlen($str)-1 && $str{$c+1}!=='$') {	
+						continue; //skip {b and { $a since won't parse as brace 
+					} else {
+						$inbraces = true;
+					}
+				}
+				$startmarker = $c;
+				$depth++;
+				if ($invarvar) {
+					$outstr .= substr($str,$lastend,$c-$lastend-1);
+				} else {
+					$outstr .= substr($str,$lastend,$c-$lastend);
+				}
+			}		
+		} else if ($str{$c}=='}' && ($invarvar || $inbraces)) {
+			$depth--;
+			if ($depth==0) {
+				if ($inbraces) {
+					//interpret stuff in braces as code
+					$insidebrace = interpretline(substr($str,$startmarker+1,$c-$startmarker-1),$anstype,$countcnt+1);
+					if ($insidebrace!='error') {
+						$outstr .= '{'.$insidebrace.'}';
+					}
+				} else if ($invarvar) {
+					$insidebrace = substr($str,$startmarker+1,$c-$startmarker-2);
+					$outstr .= _('Invalid variable'); //eliminate var var
+				}
+				$lastend = $c+1;
+				$inbraces = false;
+				$invarvar = false;
+			}
+		}
+	}
+	if ($depth==0) { //if we aren't in a brace, include any remaining string
+		$outstr .= substr($str,$lastend);
+	}
+	return $outstr;
+}
+
+//for code, check inside of a variable variable to make sure the
+//result is a simple string or variable that is allowed
+function checkvarvarisallowed($inside) {
+	global $disallowedvar;
+	if (preg_match('/^(\w+)$/',$inside,$matches)) {
+		if (!in_array('$'.$matches[1], $disallowedvar)) {
+			return true;
+		}
+	}
+	echo _('Invalid variable: ').$inside;
+	return false;
+}		
+	
 //loads a macro library
 function loadlibrary($str) {
 	$str = str_replace(array("/",".",'"'),"",$str);
@@ -644,7 +729,7 @@ function loadlibrary($str) {
 		if (is_file($libdir . $lib.".php")) {
 			include_once($libdir.$lib.".php");
 		} else {
-			echo sprintf(_("Error loading library %s\n"), $lib);
+			echo sprintf(_("Error loading library %s\n"), Sanitize::encodeStringForDisplay($lib));
 		}
 	}
 }

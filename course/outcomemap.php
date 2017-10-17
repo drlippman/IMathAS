@@ -2,7 +2,9 @@
 //(c) 2013 David Lippman.  Part of IMathAS
 //Display outcome alignment table
 
-require("../validate.php");
+require("../init.php");
+
+
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
 
 //load outcomes
@@ -196,7 +198,7 @@ if (count($cats)>0) {
 natsort($catnames);
 $placeinhead .= '<style type="text/css"> td { line-height: 150%;} .icon {background-color: #0f0;}</style>';
 require("../header.php");
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Map").'</div>';
@@ -211,7 +213,7 @@ if ($outcomelinks==0) {
 
 echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th><th>'._('Not Graded').'</th>';
 foreach ($catnames as $cn) {
-	echo '<th>'.$cn.'</th>';
+	echo '<th>'.Sanitize::encodeStringForDisplay($cn).'</th>';
 }
 echo '</tr></thead><tbody>';
 $n = count($catnames)+2;
@@ -244,11 +246,11 @@ function printoutcome($arr,$ind) {
 		}
 		$cnt++;
 		if (is_array($oi)) { //is outcome group
-			echo '<tr class="'.$class.'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
+			echo '<tr class="'.Sanitize::encodeStringForDisplay($class).'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td></tr>';
 			printoutcome($oi['outcomes'],$ind+1);
 		} else {
 			echo '<tr class="'.$class.'">';
-			echo '<td><span class="ind'.$ind.'">'.$outcomeinfo[$oi].'</span></td><td>';
+			echo '<td><span class="ind'.$ind.'">'.Sanitize::encodeStringForDisplay($outcomeinfo[$oi]).'</span></td><td>';
 			if (isset($outcomeassoc[$oi]['UG'])) {
 				printitems($outcomeassoc[$oi]['UG']);
 			}

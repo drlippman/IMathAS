@@ -1,9 +1,10 @@
 <?php
 
-require("../validate.php");
-require("../includes/htmLawed.php");
-$cid = $_GET['cid'];
-$aid = $_GET['aid'];
+require("../init.php");
+require_once("../includes/htmLawed.php");
+
+$cid = Sanitize::courseId($_GET['cid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 
 if (!isset($teacherid)) {
 	echo "You are not authorized for this action";
@@ -109,7 +110,7 @@ function convertintro($current_intro) {
 	}
 }
 
-if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
+if (isset($_POST['convert']) && $_POST['convert']=='all') {
 	//DB $query = "SELECT intro,id,name FROM imas_assessments WHERE courseid='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT intro,id,name FROM imas_assessments WHERE courseid=:courseid");
@@ -121,9 +122,9 @@ if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
 		if ($introjson !== false) {
 			//DB $query = "UPDATE imas_assessments SET intro='".addslashes(json_encode($introjson))."' WHERE id='{$row[1]}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
-			$stm->execute(array(':id'=>$row[1], ':intro'=>json_encode($introjson)));
-			$converted[] = $row[2];
+			$stm2 = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
+			$stm2->execute(array(':id'=>$row[1], ':intro'=>json_encode($introjson)));
+			$converted[] = Sanitize::encodeStringForDisplay($row[2]);
 		}
 	}
 	require("../header.php");
@@ -148,15 +149,15 @@ if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
 		exit;
 	}
 
-	if (isset($_GET['confirm'])) {
+	if (isset($_POST['convert'])) {
 		//DB $query = "UPDATE imas_assessments SET intro='".addslashes(json_encode($introjson))."' WHERE id='$aid'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
 		$stm->execute(array(':id'=>$aid, ':intro'=>json_encode($introjson)));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?id=$aid&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?id=$aid&cid=$cid");
 	} else {
 		$qcnt = substr_count($qitemorder, ',')+1;
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> &gt; ";
+		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		$curBreadcrumb .= "<a href=\"addassessment.php?cid=$cid&id=$aid\">"._("Modify Assessment")."</a>";
 		require("../header.php");
 		echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt '._('Convert Intro').'</div>';
@@ -211,10 +212,16 @@ if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
 			}
 		}
 		echo '<p>'._('Do you want to convert this assessment?').'</p>';
-		echo '<p><button type="button" onClick="window.location=\'convertintro.php?cid='.$cid.'&aid='.$aid.'&confirm=true\'">'._('Convert').'</button> ';
-		echo '<button type="button" class="secondarybtn" onClick="window.location=\'addassessment.php?cid='.$cid.'&id='.$aid.'\'">'._('Nevermind').'</button></p>';
+		
+		echo '<form method="POST" action="'.sprintf('convertintro.php?cid=%d&aid=%d',$cid,$aid).'">';
+		echo '<p><button type=submit name="convert" value="one">'._('Convert').'</button>';
+		echo '<button type="button" class="secondarybtn" onClick="window.location=\''.sprintf('addassessment.php?cid=%d&aid=%d',$cid,$aid).'\'">'._('Nevermind').'</button></p>';
+		echo '</form>';
+		
 		echo '<p>&nbsp;</p>';
-		echo '<p><button type="button" class="secondarybtn" onClick="if(confirm(\'Are you SURE??? This is risky and can NOT be undone. Make sure you have a backup just in case something goes wrong.\')){window.location=\'convertintro.php?cid='.$cid.'&aid='.$aid.'&confirm=all\'}">'._('Convert All Assessments in Course').'</button> ';
+		echo '<form method="POST" action="'.sprintf('convertintro.php?cid=%d&aid=%d',$cid,$aid).'" onsubmit="return confirm(\'Are you SURE??? This is risky and can NOT be undone. Make sure you have a backup just in case something goes wrong.\');">';
+		echo '<p><button type="submit" name="convert" value="all">'._('Convert All Assessments in Course').'</button></p>';
+		echo '</form>';
 		require("../footer.php");
 	}
 }

@@ -67,6 +67,12 @@ var $strokewidth = 1, $xunitlength, $yunitlength, $dotradius=8, $ticklength=4;
 var $fontsize = 12, $fontfile, $fontfill='', $fontbackground='';
 
 var $AScom;
+
+function __construct() {
+	$this->usegd2 = function_exists('imagesetthickness');
+	$this->usettf = function_exists('imagettftext');
+}
+
 function AStoIMG($w=200, $h=200) {
 	$this->xmin = -5; $this->xmax = 5; $this->ymin = -5; $this->ymax = 5; $this->border = array(5,5,5,5);
 	$this->stroke = 'black'; $this->fill = 'none'; $this->curdash=''; $this->isdashed=false; $this->marker='none';
@@ -78,8 +84,7 @@ function AStoIMG($w=200, $h=200) {
 
 	if ($w<=0) {$w=200;}
 	if ($h<=0) {$h=200;}
-	$this->usegd2 = function_exists('imagesetthickness');
-	$this->usettf = function_exists('imagettftext');
+
 	if ($this->usegd2) {
 		$this->img = imagecreatetruecolor($w,$h);
 		$this->colors['transblue'] = imagecolorallocatealpha($this->img, 0,0,255,90);
@@ -276,7 +281,7 @@ function addcolor($origcolor) {
 		$r = hexdec(substr($color,1,2));
 		$g = hexdec(substr($color,3,2));
 		$b = hexdec(substr($color,5,2));
-		$this->colors[$origcolor] = imagecolorallocatealpha($this->img, $r, $g, $b, $alpha); 
+		$this->colors[$origcolor] = imagecolorallocatealpha($this->img, $r, $g, $b, $alpha);
 	}
 }
 function ASsetdash() {

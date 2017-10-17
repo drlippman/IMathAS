@@ -9,8 +9,8 @@ ul {
 </head>
 <body>
 <?php
-	require("../validate.php");
-	if ($myrights<40) {
+	require("../init.php");
+	if ($myrights<100 && ($myspecialrights&(32+64))==0) {
 		exit;
 	}
 	$now = time();
@@ -71,7 +71,7 @@ ul {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1].', '.$row[2]!=$lastuser) {
 			if ($lastuser != '') {
-				$grpdata .= '<li><b>'.$lastuser.'</b><ul>';
+				$grpdata .= '<li><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b><ul>';
 				$grpdata .= $userdata;
 				$grpdata .= '</ul></li>';
 			}
@@ -80,13 +80,13 @@ ul {
 		}
 		if ($row[0] != $lastgroup) {
 			if ($lastgroup != '') {
-				echo "<p><b>$lastgroup</b>: $grpcnt";
+				echo "<p><b>".Sanitize::encodeStringForDisplay($lastgroup)."</b>: ".Sanitize::encodeStringForDisplay($grpcnt);
 				echo '<ul>'.$grpdata.'</ul></p>';
 			}
 			$grpcnt = 0;  $grpdata = '';
 			$lastgroup = $row[0];
 		}
-		$userdata .= "<li>".$row[4].' ('.$row[3].'): <b>'.$row[5].'</b>';
+		$userdata .= "<li>".Sanitize::encodeStringForDisplay($row[4]).' ('.Sanitize::encodeStringForDisplay($row[3]).'): <b>'.Sanitize::encodeStringForDisplay($row[5]).'</b>';
 		if (!in_array($row[3],$seencid)) {
 			$grpcnt += $row[5];
 			$seencid[] = $row[3];
@@ -95,12 +95,12 @@ ul {
 		}
 		$userdata .= "</li>";
 	}
-	$grpdata .= '<li><b>'.$lastuser.'</b><ul>';
+	$grpdata .= '<li><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b><ul>';
 	$grpdata .= $userdata;
 	$grpdata .= '</ul></li>';
 	$userdata = '';
 	$lastuser = $row[1].', '.$row[2];
-	echo "<p><b>$lastgroup</b>: $grpcnt";
+	echo "<p><b>".Sanitize::encodeStringForDisplay($lastgroup)."</b>: ".Sanitize::encodeStringForDisplay($grpcnt);
 	echo '<ul>'.$grpdata.'</ul></p>';
 
 ?>

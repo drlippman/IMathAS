@@ -49,6 +49,12 @@
 	function svgfiltersscrcallback($arr) {
 		global $filterdir, $AS, $imasroot;
 		if (trim($arr[2])=='') {return $arr[0];}
+
+		if (!isset($AS) || $AS===null) {
+			include("$filterdir/graph/asciisvgimg.php");
+			$AS = new AStoIMG;
+		}
+
 		if (strpos($arr[0],'style')!==FALSE) {
 			$sty = preg_replace('/.*style\s*=\s*(.)(.+?)\1.*/',"$2",$arr[0]);
 		} else {
@@ -65,6 +71,11 @@
 	function svgfilterscriptcallback($arr) {
 		global $filterdir, $AS, $imasroot;
 		if (trim($arr[2])=='') {return $arr[0];}
+
+		if (!isset($AS) || $AS===null) {
+			include("$filterdir/graph/asciisvgimg.php");
+			$AS = new AStoIMG;
+		}
 
 		$w = preg_replace('/.*\bwidth\s*=\s*.?(\d+).*/',"$1",$arr[0]);
 		$h = preg_replace('/.*\bheight\s*=\s*.?(\d+).*/',"$1",$arr[0]);
@@ -155,7 +166,7 @@
 					if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
-						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".urlencode($url);
+						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".Sanitize::encodeUrlParam($url);
 						$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 
 					} else {
@@ -195,7 +206,7 @@
 					} else {
 						list ($junk,$url,$w,$h) = $resval;
 					}
-					$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=cdf&amp;url=".urlencode($url);
+					$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=cdf&amp;url=".Sanitize::encodeUrlParam($url);
 					$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 					$str = str_replace($resval[0], $tag, $str);
 				}

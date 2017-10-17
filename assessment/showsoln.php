@@ -1,20 +1,21 @@
 <?php
+require_once("../includes/sanitize.php");
 
 if ($_GET['cid']==="embedq") {
 	$sessiondata = array();
-	require("../config.php");
+	require("../init_without_validate.php");
 	require("../i18n/i18n.php");
 	$cid = "embedq";
 	$sessiondata['secsalt'] = "12345";
 	$sessiondata['graphdisp'] = 1;
 	$sessiondata['mathdisp'] = 1;
 } else {
-	require("../validate.php");
+	require("../init.php");
 }
 
-$id = intval($_GET['id']);
+$id = Sanitize::onlyInt($_GET['id']);
 $sig = $_GET['sig'];
-$t = intval($_GET['t']);
+$t = Sanitize::onlyInt($_GET['t']);
 $sessiondata['coursetheme'] = $coursetheme;
 
 $flexwidth = true;

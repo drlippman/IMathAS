@@ -2,7 +2,8 @@
 //IMathAS:  A greybox modal for sending a single message or email
 //(c) 2014 David Lippman for Lumen Learning
 
-require("../validate.php");
+require("../init.php");
+
 $flexwidth = true;
 $nologo = true;
 
@@ -34,16 +35,16 @@ if (isset($_POST['message'])) {
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$row[2] = trim($row[2]);
 		if ($row[2]!='' && $row[2]!='none@none.com') {
-			$addy = "{$row[0]} {$row[1]} <{$row[2]}>";
+			$addy = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1])." <".Sanitize::emailAddress($row[2]).">";
 			//DB $subject = stripslashes($_POST['subject']);
 			//DB $message = stripslashes($_POST['message']);
-			$subject = $_POST['subject'];
-			$message = $_POST['message'];
+			$subject = $_POST['subject']; // Sanitized by strip_tags near line 14.
+			$message = $_POST['message']; // Sanitized by myhtmLawed near line 14.
 			$sessiondata['mathdisp']=2;
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
 			$message = filter($message);
-			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode  . $_SERVER['HTTP_HOST'].'/',$message);
+			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
 			//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
@@ -52,7 +53,7 @@ if (isset($_POST['message'])) {
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
+			$self = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1]) ."<". Sanitize::emailAddress($row[2]).">";
 			$headers .= "From: $self\r\n";
 			mail($addy,$subject,$message,$headers);
 			$success = _('Email sent');
@@ -81,10 +82,10 @@ if (isset($_POST['message'])) {
 	require("../header.php");
 	if ($_GET['sendtype']=='msg') {
 		echo '<h2>New Message</h2>';
-		$to = "$lastname, $firstname";
+		$to = Sanitize::stripHtmlTags("$lastname, $firstname");
 	} else if ($_GET['sendtype']=='email') {
 		echo '<h2>New Email</h2>';
-		$to = "$lastname, $firstname ($email)";
+		$to = Sanitize::stripHtmlTags("$lastname, $firstname ($email)");
 	}
 
 	if (isset($_GET['quoteq'])) {
@@ -124,9 +125,9 @@ if (isset($_POST['message'])) {
 
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
-	echo '<input type="hidden" name="sendtype" value="'.$_GET['sendtype'].'"/>';
+	echo '<input type="hidden" name="sendtype" value="'.Sanitize::encodeStringForDisplay($_GET['sendtype']).'"/>';
 	echo "To: $to<br/>\n";
-	echo "Subject: <input type=text size=50 name=subject id=subject value=\"$title\"><br/>\n";
+	echo "Subject: <input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"><br/>\n";
 	echo "Message: <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 	echo htmlentities($message);
 	echo "</textarea></div><br/>\n";

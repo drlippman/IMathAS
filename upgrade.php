@@ -51,10 +51,13 @@ unset($dbpassword);
 			<p>Run upgrade.php again after making those changes</p>';
 			exit;
 	}
+	$use_local_sessions = true;
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
-		require("config.php");
+		$init_skip_csrfp = true;
+		require("init_without_validate.php");
 	} else {
-		require("validate.php");
+		$init_skip_csrfp = true;
+		require("init.php");
 		if ($myrights<100) {
 			echo "No rights, aborting";
 			exit;
@@ -210,7 +213,8 @@ unset($dbpassword);
 							$ops = '';
 							//DB while ($row = mysql_fetch_row($result)) {
 							while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-								$ops .= "<option value=\"{$row[0]}\">{$row[1]}, {$row[2]}</option>";
+								$ops .= sprintf('<option value="%d">%s, %s</option>', $row[0],
+									Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 							}
 							foreach ($owners[$ogrp] as $did) {
 								$out .= "Diag <b>".$dnames[$did]."</b> Owner: <select name=\"diag[$did]\">";
@@ -526,7 +530,7 @@ unset($dbpassword);
 				$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
 				$query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
 				$stm = $DBH->query($query);
-				require("./includes/filehandler.php");
+				require_once("./includes/filehandler.php");
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$doneagroups = array();
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET lastanswers=:lastanswers,bestlastanswers=:bestlastanswers,reviewlastanswers=:reviewlastanswers WHERE id=:id");
@@ -1193,7 +1197,7 @@ unset($dbpassword);
 			 }
 			 $hasimg = array();
 			 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				require("includes/filehandler.php");
+				require_once("includes/filehandler.php");
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$arr = $s3->getBucket($GLOBALS['AWSbucket'],"cfiles/");
 				if ($arr!=false) {

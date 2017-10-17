@@ -264,7 +264,12 @@ img.skipnav {
 	border: 0px;
 }
 .hidden {
-	display: none;
+	visibility: hidden;
+	position: absolute;
+	top:0;
+	left:0;
+	width:0;
+	height:0;
 }
 span.shown {
 	display: inline;
@@ -559,6 +564,8 @@ input[type=submit]:hover, button:hover,input[type=button]:hover {
 #GB_window {
   top: 10px;
   left: 0px;
+  right: 0px;
+  margin: 0 auto;
   position: fixed;
   background: #fff;
   border: 3px solid #369;
@@ -776,6 +783,21 @@ span.inlinebtn:hover {
 .videoembedbtn {
 	color: #999;
 	cursor: pointer;
+}
+
+a.attach {
+    background: url(../tinymce4/plugins/attach/ed_attach.gif) center left no-repeat;
+    padding-left: 20px;
+}
+a[target=_blank]:after {
+	content: "";
+	width:16px;
+	height:1em;
+	display: inline-block;
+	background: url(../img/extlink.png) center right no-repeat;
+}
+.mce-content-body a[target=_blank]:after {
+	display: none;
 }
 
 .clearfix:after {

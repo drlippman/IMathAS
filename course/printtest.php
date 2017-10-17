@@ -3,22 +3,22 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 
-	
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Print Test";
-	
+
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 }
 
 /******* begin html output ********/
@@ -26,9 +26,10 @@ require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
-} else {	
-	
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+} else {
+
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 	if (!isset($_POST['heights'])) {
 		echo '<div class="cpmid"><a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a>';
@@ -38,7 +39,7 @@ if ($overwriteBody==1) {
 		echo '</div>';
 	}
 	echo '<div id="headerprinttest" class="pagetitle"><h2>Print Test</h2></div>';
-	
+
 	if (!isset($_POST['heights'])) {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid\">\n";
 		echo "<h4>Header Setup</h4>\nPlease select the items you'd like in the test header:";
@@ -57,7 +58,7 @@ if ($overwriteBody==1) {
 		echo "Please check Page Setup under the File menu of your browser, and look up your print margin settings.<br/>\n";
 		echo "Left + Right:  <input type=text name=horiz size=5 value=\"1.0\"> inches<br/>\n";
 		echo "Top + Bottom:  <input type=text name=vert size=5 value=\"1.0\"> inches<br/>\n";
-		echo "<p>Browser: <input type=radio name=browser value=0 checked=1>Internet Explorer <input type=radio name=browser value=1>FireFox<sup>*</sup></p>\n"; 
+		echo "<p>Browser: <input type=radio name=browser value=0 checked=1>Internet Explorer <input type=radio name=browser value=1>FireFox<sup>*</sup></p>\n";
 		echo "<h4>Print Layout</h4>\n";
 		echo "<p>On the next page, you will see alternating blue and green rectangles indicating the size of pages.  Use the resizing ";
 		echo "buttons next to each question to increase or decrease the space after each question until the questions fall nicely onto ";
@@ -71,9 +72,9 @@ if ($overwriteBody==1) {
 		echo "</form>\n";
 	} else {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid&final=1\">\n";
-		echo "<input type=hidden name=heights value=\"{$_POST['heights']}\">\n";
-		echo "<input type=hidden name=pw value=\"{$_POST['pw']}\">\n";
-		echo "<input type=hidden name=ph value=\"{$_POST['ph']}\">\n";
+		echo "<input type=hidden name=heights value=\"".Sanitize::encodeStringForDisplay($_POST['heights'])."\">\n";
+		echo "<input type=hidden name=pw value=\"".Sanitize::encodeStringForDisplay($_POST['pw'])."\">\n";
+		echo "<input type=hidden name=ph value=\"".Sanitize::encodeStringForDisplay($_POST['ph'])."\">\n";
 		if (isset($_POST['points'])) {
 			echo "<input type=hidden name=points value=1>\n";
 		}
@@ -94,7 +95,7 @@ if ($overwriteBody==1) {
 		}
 		if (isset($_POST['otherheader'])) {
 			echo "<input type=hidden name=otherheader value=1>\n";
-			echo "<input type=hidden name=otherheadertext value=\"{$_POST['otherheadertext']}\">\n";
+			echo "<input type=hidden name=otherheadertext value=\"".Sanitize::encodeStringForDisplay($_POST['otherheadertext'])."\">\n";
 		}
 		echo "<h4>Final print settings</h4>\n";
 		echo "<p>Number of different versions to print: <input type=text name=versions value=\"1\"></p>\n";
@@ -104,6 +105,6 @@ if ($overwriteBody==1) {
 		echo "<p><input type=submit value=\"Continue\"></p>\n";
 	}
 }
-	
+
 	require("../footer.php");
 ?>

@@ -27,7 +27,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 
 
 
-function copyitem($itemid,$gbcats,$sethidden=false) {
+function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	global $DBH;
 	global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
 	global $posttoforumtrack, $forumtrack;
@@ -334,7 +334,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 
 		$row['courseid'] = $cid;
 
-		$fields = implode(",",array_keys($row));
+		$fields = implode(",", array_keys($row));
 		//$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";
 		$fieldplaceholders = ':'.implode(',:', array_keys($row));
 
@@ -554,7 +554,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	return ($DBH->lastInsertId());
 }
 
-function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
+function copysub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 	global $checked,$blockcnt;
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
@@ -657,7 +657,7 @@ function doaftercopy($sourcecid) {
 	}
 }
 
-function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
+function copyallsub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 	global $blockcnt,$reqscoretrack,$assessnewid;;
 	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];
@@ -703,7 +703,7 @@ function getiteminfo($itemid) {
 	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
 	$stm->execute(array(':id'=>$itemid));
 	if ($stm->rowCount()==0) {
-		echo "Uh oh, item #$itemid doesn't appear to exist";
+		echo "Uh oh, item #".Sanitize::onlyInt($itemid)." doesn't appear to exist";
 		return array(false,false,false,false);
 	}
 	//DB $itemtype = mysql_result($result,0,0);
@@ -747,7 +747,7 @@ function getiteminfo($itemid) {
 }
 
 function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nbsp;') {
-	global $ids,$types,$names,$sums,$parents,$gitypeids,$prespace,$CFG;
+	global $ids,$types,$names,$sums,$parents,$gitypeids,$prespace,$CFG,$itemshowdata;
 	if (!isset($gitypeids)) {
 		$gitypeids = array();
 	}
@@ -769,7 +769,24 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nb
 			if ($item==null || $item=='') {
 				continue;
 			}
-			$arr = getiteminfo($item);
+			if (!empty($itemshowdata)) {
+				array($itemtype,$name,$summary,$typeid);
+				if (isset($itemshowdata[$item]['name'])) {
+					$name = $itemshowdata[$item]['name'];
+				} else {
+					$name = $itemshowdata[$item]['title'];
+				}
+				if (isset($itemshowdata[$item]['summary'])) {
+					$summary = $itemshowdata[$item]['summary'];
+				} else if (isset($itemshowdata[$item]['text'])) {
+					$summary = $itemshowdata[$item]['text'];
+				} else {
+					$summary = $itemshowdata[$item]['description'];
+				}
+				$arr = array($itemshowdata[$item]['itemtype'], $name, $summary, $itemshowdata[$item]['id']);
+			} else {
+				$arr = getiteminfo($item);
+			}
 			if ($arr[0]===false || ($itemtypelimit!==false && $arr[0]!=$itemtypelimit)) {
 				continue;
 			}

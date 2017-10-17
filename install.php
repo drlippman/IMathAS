@@ -50,6 +50,12 @@ $contents .= "';
 //web path to install
 \$imasroot = \"{$_POST['imasroot']}\";
 
+//base site url - use when generating full URLs to site pages.
+\$httpmode = (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on')
+    || (isset(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+	? 'https://' : 'http://';
+\$GLOBALS['basesiteurl'] = \$httpmode . Sanitize::domainNameWithPort(\$_SERVER['HTTP_HOST']) . \$imasroot;
+
 //mimetex path
 \$mathimgurl = \"{$_POST['mathimgurl']}\";
 
@@ -115,7 +121,6 @@ $contents .= '
 	  unset($dbserver);
 	  unset($dbusername);
 	  unset($dbpassword);
-
 
 ?>';
 $file = fopen('config.php','w');
@@ -271,7 +276,7 @@ Color shift icons from green to red as deadlines approach?<br/>
 <p>
 Path to IMathAS install.  Blank if install is in web root directory.  Might be something like "/imathas" if in a
 subdirectory.<br/>
-<input type="text" name="imasroot" value="<?php echo rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); ?>" />
+<input type="text" name="imasroot" value="<?php echo rtrim(dirname($_SERVER['PHP_SELF'])); ?>" />
 </p>
 
 <p>

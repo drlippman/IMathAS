@@ -2,7 +2,8 @@
 //returns list of courses for switch-to menu
 //called via AJAX
 //IMathAS
-require("validate.php");
+$init_skip_csrfp = true;
+require("init.php");
 
 echo '<b>Switch to:</b><ul class="nomark">';
 $query = "SELECT imas_courses.name,imas_courses.id FROM imas_teachers,imas_courses ";
@@ -18,7 +19,8 @@ $query .= "ORDER BY name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':useridC'=>$userid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	echo "<li><a href=\"$imasroot/course/course.php?cid={$row[1]}&folder=0\">{$row[0]}</a></li>";
+	echo "<li><a href=\"$imasroot/course/course.php?cid=" . Sanitize::courseId($row[1])
+		. "&folder=0\">" . Sanitize::encodeStringForDisplay($row[0]) . "</a></li>";
 }
 echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 echo '</ul>';

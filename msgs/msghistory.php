@@ -2,7 +2,7 @@
 	//Displays message history as conversation
 	//(c) 2006 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -16,7 +16,7 @@
 	}
 
 	if (isset($_GET['filtercid'])) {
-		$filtercid = $_GET['filtercid'];
+		$filtercid = Sanitize::onlyInt($_GET['filtercid']);
 	} else if ($cid!='admin' && $cid>0) {
 		$filtercid = $cid;
 	} else {
@@ -24,10 +24,10 @@
 	}
 	$view = 0;
 
-	$cid = $_GET['cid'];
-	$msgid = $_GET['msgid'];
-	$page = $_GET['page'];
-	$type = $_GET['type'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$msgid = Sanitize::onlyInt($_GET['msgid']);
+	$page = Sanitize::onlyInt($_GET['page']);
+	$type =  Sanitize::encodeStringForDisplay($_GET['type']);
 
 	$pagetitle = "Message Conversation";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
@@ -90,6 +90,7 @@
 			$line['title'] = substr($line['title'],4);
 			$n++;
 		}
+		$line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 		if ($n==1) {
 			$line['title'] = 'Re: '.$line['title'];
 		} else if ($n>1) {
@@ -266,7 +267,7 @@
 			echo "<span class=right>";
 
 			if ($ownerid[$child]!=$userid && $cansendmsgs) {
-				echo "<a href=\"msglist.php?cid=$cid&filtercid=$filtercid&page=$page&type=$type&add=new&to={$ownerid[$child]}&toquote=$child\">Reply</a> ";
+				echo "<a href=\"msglist.php?cid=$cid&filtercid=" . Sanitize::encodeUrlParam($filtercid) . "&page=" . Sanitize::encodeUrlParam($page) . "&type=" . Sanitize::encodeUrlParam($type) . "&add=new&to=" . Sanitize::encodeUrlParam($ownerid[$child]) . "&toquote=" . Sanitize::encodeUrlParam($child) . "\">Reply</a> ";
 			}
 
 			echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
@@ -274,11 +275,11 @@
 			echo "</span>\n";
 			echo "<b>{$subject[$child]}</b><br/>Posted by: ";
 			if ($isteacher && $ownerid[$child]!=0) {
-				echo "<a href=\"mailto:{$email[$child]}\">";
+				echo "<a href=\"mailto:" . Sanitize::emailAddress($email[$child]) . "\">";
 			} else if ($allowmsg && $ownerid[$child]!=0) {
-				echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\">";
+				echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to=" . Sanitize::encodeUrlParam($ownerid[$child]) . "\">";
 			}
-			echo $poster[$child];
+			echo Sanitize::encodeStringForDisplay($poster[$child]); // This is a user's first and last name.
 			if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 				echo "</a>";
 			}

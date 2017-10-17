@@ -3,8 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -37,7 +38,8 @@ function buildExistBlocksArray($items,$parent) {
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Block Settings";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a>";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 $curBreadcrumb .= (isset($_GET['id'])) ? "&gt; Modify Block\n" : "&gt; Add Block\n";
 
 if (isset($_GET['id'])) {
@@ -51,8 +53,6 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-
-$cid = $_GET['cid'];
 
 /* page load loop, runs only one set of code based on how the page was loaded,
 current options are (in order of code blocks below):
@@ -176,7 +176,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+	header(sprintf('Location: %s/course/course.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
 
 	exit;
 } else { //it is a teacher but the form has not been posted
@@ -340,15 +340,15 @@ if ($overwriteBody==1) {
 
 <?php echo $formTitle; ?>
 
-<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id={$_GET['id']}";} if (isset($_GET['block'])) {echo "&block={$_GET['block']}";}?>&folder=<?php echo $_GET['folder'];?>&tb=<?php echo $totb;?>">
+<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::onlyInt($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
 	<span class=form>Title: </span>
 	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>"></span>
 	<BR class=form>
 	<span class=form>Show:</span>
 	<span class=formright>
-		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
-		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
-		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
+		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('availbhdiv').style.display='none';"/>Hide <span class=small>(this will hide all items in the block from the gradebook)</span><br/>
+		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="document.getElementById('datediv').style.display='block';document.getElementById('availbhdiv').style.display='block';"/>Show by Dates<br/>
+		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('availbhdiv').style.display='block';"/>Show Always<br/>
 	</span><br class="form"/>
 
 	<div id="datediv" style="display:<?php echo ($avail==1)?"block":"none"; ?>">
@@ -374,7 +374,7 @@ if ($overwriteBody==1) {
 	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
 	<BR class=form>
 	</div>
-
+	<div id="availbhdiv" style="display:<?php echo ($avail==0)?"none":"block"; ?>">
 	<span class=form>When available:</span>
 	<span class=formright>
 	<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
@@ -390,7 +390,7 @@ if ($overwriteBody==1) {
 
 	<span class="form">If expanded, limit height to:</span>
 	<span class="formright">
-	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo $fixedheight;};?>" />pixels (blank for no limit)
+	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo Sanitize::onlyInt($fixedheight);};?>" />pixels (blank for no limit)
 	</span><br class="form" />
 
 	<span class="form">Restrict access to students in section:</span>
@@ -402,6 +402,8 @@ if ($overwriteBody==1) {
 	<span class=formright>
 	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> />
 	</span><br class=form />
+	</div>
+
 	<span class=form>Block colors:</span>
 	<span class=formright>
 	<input type=radio name="colors" value="def" <?php  writeHtmlChecked($usedef,1) ?> />Use defaults<br/>
@@ -448,14 +450,14 @@ if ($overwriteBody==1) {
 	<div class=submit><input type=submit value="<?php echo $savetitle?>"></div>
 </form>
 <p class="small"><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>
-Items from publicly accessible blocks can viewed without logging in at <?php echo $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/public.php?cid=<?php echo $_GET['cid'];?>. </p>
+Items from publicly accessible blocks can viewed without logging in at <?php echo $GLOBALS['basesiteurl'] ?>/course/public.php?cid=<?php echo $cid; ?>. </p>
 
 
 
 <?php
 if (isset($blockitems)) {
-	echo '<input type="hidden" name="blockid" value="'.$blockitems[$existingid]['id'].'"/>';
-	echo '<p class="small">Block ID: '.$blockitems[$existingid]['id'].'</p>';
+	echo '<input type="hidden" name="blockid" value="'.Sanitize::encodeStringForDisplay($blockitems[$existingid]['id']).'"/>';
+	echo '<p class="small">Block ID: '.Sanitize::encodeStringForDisplay($blockitems[$existingid]['id']).'</p>';
 }
 echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
 }

@@ -1,6 +1,6 @@
 <?php
-require("../validate.php");
-require("../includes/filehandler.php");
+require("../init.php");
+require_once("../includes/filehandler.php");
 
 @set_time_limit(0);
 ini_set("max_input_time", "600");
@@ -34,10 +34,10 @@ if (isset($_REQUEST["action"]))
 	if ($_REQUEST["action"] == "upload_file")
 	{
 		//$filename = basename(stripslashes($_POST["uploaded_file_name"]));
-		$filename = basename($_FILES['uploaded_file']['name']);
-		$filename = str_replace(' ','_',$filename);
-		$filename = preg_replace('/[^\w\.\-_]/','',$filename);
-		//$filename = urlencode($filename);
+		$filename = str_replace(' ','_',$_FILES['uploaded_file']['name']);
+		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$filename)));
+
+		//$filename = Sanitize::encodeStringForUrl($filename);
 		//echo $filename;
 		//exit;
 		$extension = strtolower(strrchr($filename,"."));
@@ -56,7 +56,7 @@ if (isset($_REQUEST["action"]))
 				}
 			}
 			if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public")) {
-			
+
 			} else {
 				unset($_REQUEST["action"]);
 			}
@@ -89,7 +89,7 @@ if (isset($_REQUEST["action"]))
 var FileBrowserDialogue = {
     args : null,
     init : function () {
-    	    args = top.tinymce.activeEditor.windowManager.getParams(); 
+    	    args = parent.tinymce.activeEditor.windowManager.getParams();
         // Here goes your code for setting your custom things onLoad.
 <?php
 if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
@@ -100,10 +100,10 @@ if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
     mySubmit : function (filename) {
 
         // insert information now
-        top.tinymce.activeEditor.windowManager.getParams().oninsert(filename);
-    
+        parent.tinymce.activeEditor.windowManager.getParams().oninsert(filename);
+
         // close popup window
-        top.tinymce.activeEditor.windowManager.close();
+        parent.tinymce.activeEditor.windowManager.close();
     }
 }
 
@@ -120,7 +120,7 @@ function switchDivs() {
 <?php
 if ($type=="img") {
 ?>
-	
+
 	extension = ['.png','.gif','.jpg','.jpeg'];
 	isok = false;
 	var thisext = fieldvalue.substr(fieldvalue.lastIndexOf('.')).toLowerCase();
@@ -178,14 +178,14 @@ if (isset($_REQUEST['showfiles'])) {
 		echo "<img border=0 src='" . $delete_image . "' alt=\"Delete\"></a> ";
 		echo "<img src='" . $file_small_image . "' alt=\"File\"> ";
 		echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl($v['name']) . "\");'>" . basename($v['name']) . "</a><br></div>\n";
-	
+
 	}
 	if (count($files)==0) {
 		echo '<div>No files to show</div>';
 	}
 } else {
 	echo '<div class="upload">';
-	echo '<p><a href="file_manager.php?showfiles=true&amp;type='.$type.'">Show previously uploaded files</a></p>';	
+	echo '<p><a href="file_manager.php?showfiles=true&amp;type=' . Sanitize::encodeUrlParam($type) . '">Show previously uploaded files</a></p>';
 }
 ?>
 </div>
@@ -200,7 +200,7 @@ if (isset($_REQUEST['showfiles'])) {
 		if ($type=="img") {
 			echo '<input type="file" name="uploaded_file" id="uploaded_file" accept=".gif,.png,.jpg,.jpeg"><br/>';
 			echo $strings["imagetypes"].'<br/>';
-			
+
 		} else {
 			echo '<input type="file" name="uploaded_file" id="uploaded_file">';
 		}

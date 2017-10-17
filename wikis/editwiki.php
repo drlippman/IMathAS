@@ -4,8 +4,9 @@
 
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -35,7 +36,7 @@ if ($cid==0) {
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
 
-	$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">$coursename</a> &gt; ";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	$curBreadcrumb .= "<a href=\"$imasroot/wikis/viewwiki.php?cid=$cid&id=$id\">View Wiki</a> &gt; Edit Wiki";
 
 	//DB $query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
@@ -44,7 +45,7 @@ if ($cid==0) {
 	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
-	$wikiname = $row['id'];
+	$wikiname = $row['name'];
 	$now = time();
 	if (!isset($teacherid) && ($row['avail']==0 || ($row['avail']==1 && ($now<$row['startdate'] || $now>$row['enddate'])) || $now>$row['editbydate'])) {
 		$overwriteBody=1;
@@ -185,7 +186,7 @@ if ($cid==0) {
 
 			}
 			if (!$inconflict) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=" . Sanitize::onlyInt($id) . "&grp=" . Sanitize::onlyInt($groupid) . Sanitize::encodeStringForDisplay($framed));
 				exit;
 			}
 
@@ -226,7 +227,7 @@ if ($cid==0) {
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $pagetitle = "Edit Wiki: $wikiname";
+ $pagetitle = _("Edit Wiki").': '.Sanitize::encodeStringForDisplay($wikiname);
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -240,7 +241,7 @@ if ($overwriteBody==1) {
 
 <?php
 if ($groupid>0) {
-	echo "<p>Group: $groupname</p>";
+	echo "<p>Group: " . Sanitize::encodeStringForDisplay($groupname) . "</p>";
 }
 if ($inconflict) {
 ?>
@@ -252,10 +253,10 @@ if ($inconflict) {
 <?php
 }
 if (isset($lasteditedby)) {
-	echo "<p>Last Edited by $lasteditedby on $lastedittime</p>";
+	printf("<p>Last Edited by %s on %s</p>", Sanitize::encodeStringForDisplay($lasteditedby), $lastedittime);
 }
 ?>
-	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo $id;?>&grp=<?php echo $groupid.$framed;?>">
+	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo Sanitize::onlyInt($id); ?>&grp=<?php echo Sanitize::onlyInt($groupid) . Sanitize::encodeUrlParam($framed); ?>">
 	<input type="hidden" name="baserevision" value="<?php echo $revisionid;?>" />
 	<div class="editor">
 	<textarea cols=60 rows=30 id="wikicontent" name="wikicontent" style="width: 100%">

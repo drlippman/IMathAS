@@ -2,7 +2,7 @@
 //(c) 2013 David Lippman.  Part of IMathAS
 //Define course outcomes
 
-require("../validate.php");
+require("../init.php");
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
 
 if (isset($_POST['order'])) {
@@ -127,9 +127,12 @@ if (isset($_POST['order'])) {
 		$query = "UPDATE imas_gbitems SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		*/
-		//DB $query = "UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		$DBH->query("UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)");
+
+		//$DBH->query("UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)");
+		$query = "UPDATE imas_questions AS iq INNER JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
+		$query .= "SET iq.category='' WHERE ia.courseid=:courseid AND iq.category IN ($unusedlist)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$cid));
 	}
 	echo '1,h:';
 }
@@ -178,8 +181,8 @@ function printoutcome($arr) {
 			}
 			echo '</li>';
 		} else { //individual outcome
-			echo '<li id="'.$item.'"><span class=icon style="background-color:#0f0">O</span> ';
-			echo '<input class="outcome" type="text" size="60" id="o'.$item.'" value="'.htmlentities($outcomeinfo[$item]).'" onkeyup="txtchg()"> ';
+			echo '<li id="' . Sanitize::encodeStringForDisplay($item) . '"><span class=icon style="background-color:#0f0">O</span> ';
+			echo '<input class="outcome" type="text" size="60" id="o' . Sanitize::encodeStringForDisplay($item) . '" value="' . Sanitize::encodeStringForDisplay($outcomeinfo[$item]).'" onkeyup="txtchg()"> ';
 			echo '<a href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
 		}
 	}
@@ -192,7 +195,7 @@ if (isset($_POST['order'])) {
 }
 
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; var j=jQuery.noConflict();</script>";

@@ -3,16 +3,17 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
 //set some page specific variables and counters
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Inline Text";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= " &gt; Delete Inline Text\n";
 
 if (!(isset($teacherid))) {
@@ -21,11 +22,11 @@ if (!(isset($teacherid))) {
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
-} elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
-	$cid = $_GET['cid'];
-	$block = $_GET['block'];
-	if ($_GET['remove']=="really") {
-		require("../includes/filehandler.php");
+} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
+	$cid = Sanitize::courseId($_GET['cid']);
+	$block = Sanitize::stripHtmlTags($_GET['block']);
+	if ($_POST['remove']=="really") {
+		require_once("../includes/filehandler.php");
 		$textid = $_GET['id'];
 		$DBH->beginTransaction();
 		//DB $query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='InlineText' AND courseid='$cid'";
@@ -57,11 +58,13 @@ if (!(isset($teacherid))) {
 				//DB $query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
 				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if (mysql_num_rows($r2)==1) {
-				$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
-				$stm2->execute(array(':filename'=>$row[0]));
-				if ($stm2->rowCount()==1) {
-					//unlink($uploaddir . $row[0]);
-					deletecoursefile($row[0]);
+				if (substr($row[0],0,4)!='http') {
+					$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
+					$stm2->execute(array(':filename'=>$row[0]));
+					if ($stm2->rowCount()==1) {
+						//unlink($uploaddir . $row[0]);
+						deletecoursefile($row[0]);
+					}
 				}
 			}
 			//DB $query = "DELETE FROM imas_instr_files WHERE itemid='$textid'";
@@ -82,16 +85,18 @@ if (!(isset($teacherid))) {
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 			$key = array_search($itemid,$sub);
-			array_splice($sub,$key,1);
-			//DB $itemorder = addslashes(serialize($items));
-			$itemorder = serialize($items);
-			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+			if ($key!==false) {
+				array_splice($sub,$key,1);
+				//DB $itemorder = addslashes(serialize($items));
+				$itemorder = serialize($items);
+				//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+			}
 		}
 		$DBH->commit();
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 		exit;
 	} else {
 		//DB $query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";
@@ -117,10 +122,14 @@ if ($overwriteBody==1) {
 ?>
 
 <div class=breadcrumb><?php echo $curBreadcrumb; ?></div>
-<h3><?php echo $itemname; ?></h3>
+<h3><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h3>
 Are you SURE you want to delete this text item?
-	<p><input type=button value="Yes, Delete" onClick="window.location='deleteinlinetext.php?cid=<?php echo $cid ?>&block=<?php echo $block ?>&id=<?php echo $_GET['id'] ?>&remove=really'">
-	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $cid ?>'"></p>
+	<form method="POST" action="deleteinlinetext.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
+	<p>
+	<button type=submit name="remove" value="really">Yes, Delete</button>		
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
+	</p>
+	</form>
 
 <?php
 }

@@ -135,7 +135,6 @@ var normalizemathunicode = function(str) {
 	return str;
 }
 var renderMathInText = function(text, delimiters) {
-		text = normalizemathunicode(text);
     var data = splitWithDelimiters(text, delimiters);
 
     var fragment = document.createDocumentFragment();
@@ -145,7 +144,7 @@ var renderMathInText = function(text, delimiters) {
             fragment.appendChild(document.createTextNode(data[i].data.replace("\\`","`")));
         } else {
             var span = document.createElement("span");
-            var math = data[i].data;
+            var math = normalizemathunicode(data[i].data);
             if (data[i].format == "asciimath") {
             	    math = "\\displaystyle "+AMTparseAMtoTeX(math);
             } else if (math.indexOf("\\displaystyle")==-1) {
@@ -181,7 +180,7 @@ var renderMathInText = function(text, delimiters) {
     return fragment;
 };
 
-var renderElem = function(elem, delimiters, ignoredTags) {
+var renderElem = function(elem, delimiters, ignoredTags, ignoreClassRegex) {
     for (var i = 0; i < elem.childNodes.length; i++) {
         var childNode = elem.childNodes[i];
         if (childNode.nodeType === 3) {
@@ -194,8 +193,11 @@ var renderElem = function(elem, delimiters, ignoredTags) {
             var shouldRender = ignoredTags.indexOf(
                 childNode.nodeName.toLowerCase()) === -1;
 
+            if (ignoreClassRegex !== null) {
+            	    shouldRender = shouldRender && !ignoreClassRegex.test(childNode.getAttribute("class"));
+            }
             if (shouldRender) {
-                renderElem(childNode, delimiters, ignoredTags);
+                renderElem(childNode, delimiters, ignoredTags, ignoreClassRegex);
             }
         }
         // Otherwise, it's something else, and ignore it.
@@ -210,7 +212,9 @@ var defaultOptions = {
 
     ignoredTags: [
         "script", "noscript", "style", "textarea", "pre", "code"
-    ]
+    ], 
+    
+    ignoreClass: "skipmathrender"
 };
 
 var extend = function(obj) {
@@ -234,9 +238,14 @@ var renderMathInElement = function(elem, options) {
     }
 
     options = extend({}, defaultOptions, options);
-
+    if (options.ignoreClass.length>0) {
+    	    options.ignoreClassRegex = new RegExp("\\b("+options.ignoreClass+")\\b");
+    } else {
+    	    options.ignoreClassRegex = null;
+    }
     usedMathJax = false;
-    renderElem(elem, options.delimiters, options.ignoredTags);
+    
+    renderElem(elem, options.delimiters, options.ignoredTags, options.ignoreClassRegex);
     if (window.hasOwnProperty("katexDoneCallback")) {
     	    if (usedMathJax) {
     	    	    MathJax.Hub.Queue(window.katexDoneCallback);

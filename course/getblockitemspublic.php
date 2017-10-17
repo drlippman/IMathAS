@@ -1,11 +1,11 @@
 <?php
 //IMathAS:  Main course page
 //(c) 2006 David Lippman
-   require("../config.php");
+   require("../init_without_validate.php");
    require("courseshowitems.php");
    $ispublic = true;
 
-   $cid = $_GET['cid'];
+   $cid = Sanitize::courseId($_GET['cid']);
    require("../filter/filter.php");
 
    $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset FROM imas_courses WHERE id=:id");

@@ -2,9 +2,16 @@
 //IMathAS: Common Catridge v1.1 Export
 //(c) 2011 David Lippman
 
-require("../validate.php");
+require("../init.php");
+require("../includes/copyiteminc.php");
+require("../includes/loaditemshowdata.php");
 
-$cid = intval($_GET['cid']);
+if (!is_numeric($_GET['cid'])) {
+	echo 'Invalid course ID.';
+	exit;
+}
+
+$cid = Sanitize::courseId($_GET['cid']);
 if (!isset($teacherid)) {
 	echo 'You must be a teacher to access this page';
 	exit;
@@ -24,7 +31,8 @@ $placeinhead = '<script type="text/javascript">
  </script>';
 
 require("../header.php");
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Common Cartridge Export</div>\n";
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">"
+	. Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; Common Cartridge Export</div>\n";
 
 echo '<div class="cpmid">';
 if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
@@ -39,7 +47,7 @@ if (isset($_GET['delete'])) {
 	unlink($path.'/CCEXPORT'.$cid.'.imscc');
 	echo "export file deleted";
 } else if (isset($_GET['create'])) {
-	require("../includes/filehandler.php");
+	require_once("../includes/filehandler.php");
 	$usechecked = ($_POST['whichitems']=='select');
 	if ($usechecked) {
 		$checked = $_POST['checked'];
@@ -62,9 +70,10 @@ if (isset($_GET['delete'])) {
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
 	//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $items = unserialize(mysql_result($r,0,0));
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,name FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	$items = unserialize($stm->fetchColumn(0));
+	list($itemorder,$coursename) = $stm->fetch(PDO::FETCH_NUM);
+	$items = unserialize($itemorder);
 
 	$newdir = $path . '/CCEXPORT'.$cid;
 	mkdir($newdir);
@@ -81,11 +90,29 @@ if (isset($_GET['delete'])) {
 
 	$htmldir = '';
 	$filedir = '';
+	$gbcats = array();
+	$usedcats = array();
 	if ($linktype=='canvas') {
 		mkdir($newdir.'/wiki_content');
 		mkdir($newdir.'/web_resources');
 		$htmldir = 'wiki_content/';
 		$filedir = 'web_resources/';
+
+		$stm = $DBH->prepare("SELECT useweights,defaultcat FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		list($useweights,$defaultcat) = $stm->fetch(PDO::FETCH_NUM);
+		$r = explode(',',$defaultcat);
+		$row['name'] = 'Default';
+		$row['dropn'] = $r[3];
+		$row['weight'] = $r[4];
+		$gbcats[0] = $row;
+		$usedcats[0] = 0;
+		$stm = $DBH->prepare("SELECT id,name,dropn,weight FROM imas_gbcats WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$gbcats[$row['id']] = $row;
+			$usedcats[$row['id']] = 0;
+		}
 	}
 
 	function filtercapture($str,&$res) {
@@ -107,7 +134,7 @@ if (isset($_GET['delete'])) {
 			$str = str_replace($imasroot.'/filter/graph/imgs/','',$str);
 		}
 		if ($addmathabs) {
-			$str = str_replace($mathimgurl,'http://'. $_SERVER['HTTP_HOST']. $mathimgurl, $str);
+			$str = str_replace($mathimgurl,'http://'. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']). $mathimgurl, $str);
 		}
 		return $str;
 	}
@@ -120,7 +147,7 @@ if (isset($_GET['delete'])) {
 
 	function getorg($it,$parent,&$res,$ind) {
 		global $DBH,$iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
-		global $usechecked,$checked;
+		global $usechecked,$checked,$usedcats;
 
 		$out = '';
 
@@ -173,7 +200,9 @@ if (isset($_GET['delete'])) {
 						//DB while ($r = mysql_fetch_row($result)) {
 						while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 							//if s3 filehandler, do files as weblinks rather than including the file itself
-							if ($GLOBALS['filehandertypecfiles'] == 's3') {
+							if (substr($r[2],0,4)=='http') {
+								//do nothing
+							} else if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 								$r[2] = getcoursefileurl($r[2]);
 							} else {
 								//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
@@ -208,7 +237,7 @@ if (isset($_GET['delete'])) {
 					if ($row[2]!='') {
 						fwrite($fp,'<ul>');
 						foreach ($files as $f) {
-							if ($GLOBALS['filehandertypecfiles'] == 's3') {
+							if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 								fwrite($fp,'<li><a href="'.$filesout[$f][1].'">'.htmlentities($filesout[$f][0]).'</a></li>');
 							} else {
 								fwrite($fp,'<li><a href="'.$filedir.basename($filesout[$f][1]).'">'.htmlentities($filesout[$f][0]).'</a></li>');
@@ -231,7 +260,7 @@ if (isset($_GET['delete'])) {
 					$row = $stm->fetch(PDO::FETCH_NUM);
 
 					//if s3 filehandler, do files as weblinks rather than including the file itself
-					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
+					if (getfilehandlertype('filehandlertypecfiles') == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
 						$row[1] = getcoursefileurl(trim(substr(strip_tags($row[1]),5)));
 					}
 
@@ -352,7 +381,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
@@ -361,8 +390,8 @@ if (isset($_GET['delete'])) {
 					$out .= $ind.'</item>'."\n";
 					if ($linktype=='canvas') {
 						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
-						$canvout .= '<content_type>Assignment</content_type>';
-						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
+						$canvout .= '<content_type>Assignment</content_type>'."\n";
+						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>'."\n";
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
@@ -400,13 +429,15 @@ if (isset($_GET['delete'])) {
 						}
 						mkdir($newdir.'/assn'.$iteminfo[$item][1]);
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignment_settings.xml','w');
-						fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">');
-						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
-						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>');
-						fwrite($fp,'<grading_type>points</grading_type>');
-						fwrite($fp,'<assignment_group_identifierref>assngroup</assignment_group_identifierref>');
-						fwrite($fp,'<submission_types>external_tool</submission_types>');
-						fwrite($fp,'<external_tool_url>'. $urlmode . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>');
+						fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">'."\n");
+						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n");
+						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>'."\n");
+						fwrite($fp,'<grading_type>points</grading_type>'."\n");
+						fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>'."\n");
+						fwrite($fp,'<assignment_group_identifierref>GBCAT'.$row[5].'</assignment_group_identifierref>'."\n");
+						$usedcats[$row[5]]++;
+						fwrite($fp,'<submission_types>external_tool</submission_types>'."\n");
+						fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>'."\n");
 						fwrite($fp,'</assignment>');
 						fclose($fp);
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignmenthtml'.$iteminfo[$item][1].'.html','w');
@@ -428,8 +459,8 @@ if (isset($_GET['delete'])) {
 							fwrite($fp,'<blti:custom><lticm:property name="place_aid">'.$iteminfo[$item][1].'</lticm:property></blti:custom>');
 							$urladd = '';
 						}
-						fwrite($fp,'<blti:launch_url>http://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php'.$urladd.'</blti:launch_url>');
-						if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . $_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php'.$urladd.'</blti:secure_launch_url>');}
+						fwrite($fp,'<blti:launch_url>http://' . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php'.$urladd.'</blti:launch_url>');
+						if ($urlmode == 'https://') {fwrite($fp,'<blti:secure_launch_url>https://' . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php'.$urladd.'</blti:secure_launch_url>');}
 						fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 						fwrite($fp,'</cartridge_basiclti_link>');
 						fclose($fp);
@@ -517,42 +548,56 @@ if (isset($_GET['delete'])) {
 		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
 		'.$module_meta . '</items>  </module> </modules>';
 
-		$fp = fopen($newdir.'/bltiimathas.xml','w');
-		fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
-		fwrite($fp,'<blti:title>'.htmlentities($installname,ENT_XML1,'UTF-8',false).'</blti:title>');
-		fwrite($fp,'<blti:description>Math Assessment</blti:description>');
-		fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
-		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
-		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
-		fwrite($fp,' <lticm:property name="domain">'.$_SERVER['HTTP_HOST'].'</lticm:property>');
-		fwrite($fp,' <lticm:options name="resource_selection">
-			<lticm:property name="url">'.$urlmode.$_SERVER['HTTP_HOST'] . $imasroot . '/bltilaunch.php</lticm:property>
-			<lticm:property name="text">Pick an Assessment</lticm:property>
-			<lticm:property name="selection_width">500</lticm:property>
-			<lticm:property name="selection_height">300</lticm:property>
-		      </lticm:options>');
-		fwrite($fp,'</blti:extensions>');
-		fwrite($fp,'<blti:custom>');
-		fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');
-		fwrite($fp,'</blti:custom>');
-		fwrite($fp,'</cartridge_basiclti_link>');
-		fclose($fp);
-		$resitem =  '<resource identifier="RESbltiimathas" type="imsbasiclti_xmlv1p0">'."\n";
-		$resitem .= '  <file href="bltiimathas.xml" />'."\n";
-		$resitem .= '</resource>';
-		$manifestres[] = $resitem;
+		if ($_POST['includeappconfig']==1) {
+			$fp = fopen($newdir.'/bltiimathas.xml','w');
+			fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
+			fwrite($fp,'<blti:title>'.htmlentities($installname,ENT_XML1,'UTF-8',false).'</blti:title>');
+			fwrite($fp,'<blti:description>Math Assessment</blti:description>');
+			fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
+			fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
+			fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
+			fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
+			fwrite($fp,' <lticm:options name="resource_selection">
+				<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</lticm:property>
+				<lticm:property name="text">Pick an Assessment</lticm:property>
+				<lticm:property name="selection_width">500</lticm:property>
+				<lticm:property name="selection_height">300</lticm:property>
+			      </lticm:options>');
+			fwrite($fp,'</blti:extensions>');
+			fwrite($fp,'<blti:custom>');
+			fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');
+			fwrite($fp,'</blti:custom>');
+			fwrite($fp,'</cartridge_basiclti_link>');
+			fclose($fp);
+			$resitem =  '<resource identifier="RESbltiimathas" type="imsbasiclti_xmlv1p0">'."\n";
+			$resitem .= '  <file href="bltiimathas.xml" />'."\n";
+			$resitem .= '</resource>';
+			$manifestres[] = $resitem;
+		}
 		mkdir($newdir.'/non_cc_assessments');
     		mkdir($newdir.'/course_settings');
     		$fp = fopen($newdir.'/course_settings/syllabus.html','w');
     		fwrite($fp,'<html><body> </body></html>');
     		fclose($fp);
     		$fp = fopen($newdir.'/course_settings/assignment_groups.xml','w');
-    		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
-			<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
-			  <assignmentGroup identifier="assngroup">
-			    <title>Assignments</title>
-			  </assignmentGroup>
-			</assignmentGroups>');
+    		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>'."\n");
+    		fwrite($fp, '<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">'."\n");
+		$pcnt = 1;
+		foreach ($gbcats as $i=>$cat) {
+			if ($usedcats[$i]==0) {continue;}
+			fwrite($fp, ' <assignmentGroup identifier="GBCAT'.$i.'">'."\n");
+			fwrite($fp, '  <title>'.htmlentities($cat['name'],ENT_XML1,'UTF-8',false).'</title>'."\n");
+			fwrite($fp, '  <position>'.$pcnt.'</position>'."\n");
+			$pcnt++;
+			if ($useweights && $cat['weight']>-1) {
+				fwrite($fp, '  <group_weight>'.number_format($cat['weight'],1).'</group_weight>'."\n");
+			}
+			if ($cat['dropn']>0) {
+				fwrite($fp, '  <rules><rule><drop_type>drop_lowest</drop_type><drop_count>'.$cat['dropn'].'</drop_count></rule></rules>'."\n");
+			}
+			fwrite($fp, ' </assignmentGroup>'."\n");
+		}
+		fwrite($fp,'</assignmentGroups>');
 		fclose($fp);
 		$fp = fopen($newdir.'/course_settings/module_meta.xml','w');
 		fwrite($fp,$module_meta);
@@ -560,9 +605,11 @@ if (isset($_GET['delete'])) {
 		$fp = fopen($newdir.'/course_settings/course_settings.xml','w');
 		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
 <course xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" identifier="coursesettings1" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
-  <title>imp test</title>
-</course>
-');
+  <title>'.htmlentities($coursename,ENT_XML1,'UTF-8',false).'</title>'."\n");
+  		if ($useweights) {
+  			fwrite($fp, '<group_weighting_scheme>percent</group_weighting_scheme>'."\n");
+  		}
+  		fwrite($fp, '</course>');
 		fclose($fp);
 	}
 
@@ -573,10 +620,10 @@ if (isset($_GET['delete'])) {
 	fwrite($fp, '<lomimscc:lom>
 	      <lomimscc:general>
 		<lomimscc:title>
-		  <lomimscc:string language="en-US">Common Cartridge export of '.$cid.' from '.$installname.'</lomimscc:string>
+		  <lomimscc:string language="en-US">'.htmlentities($coursename,ENT_XML1,'UTF-8',false).'</lomimscc:string>
 		</lomimscc:title>
 		<lomimscc:description>
-		  <lomimscc:string language="en-US">Common Cartridge export of '.$cid.' from '.$installname.'</lomimscc:string>
+		  <lomimscc:string language="en-US">'.htmlentities($coursename,ENT_XML1,'UTF-8',false).'</lomimscc:string>
 		</lomimscc:description>
 		<lomimscc:keyword>
 		  <lomimscc:string language="en-US">IMathAS</lomimscc:string>
@@ -672,68 +719,20 @@ if (isset($_GET['delete'])) {
 	echo "Once downloaded, keep things clean and <a href=\"ccexport.php?cid=$cid&delete=true\">Delete</a> the export file off the server.";
 } else {
 
-	function getsubinfo($items,$parent,$pre) {
-		global $ids,$types,$names;
-		foreach($items as $k=>$item) {
-			if (is_array($item)) {
-				$ids[] = $parent.'-'.($k+1);
-				$types[] = $pre."Block";
-				//DB $names[] = stripslashes($item['name']);
-				$names[] = $item['name'];
-				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
-			} else {
-				$ids[] = $item;
-				$arr = getiteminfo($item);
-				$types[] = $pre.$arr[0];
-				$names[] = $arr[1];
-			}
-		}
-	}
-	function getiteminfo($itemid) {
-		global $DBH;
-		//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
-		$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
-		$stm->execute(array(':id'=>$itemid));
-		//DB $itemtype = mysql_result($result,0,0);
-		//DB $typeid = mysql_result($result,0,1);
-		list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
-		switch($itemtype) {
-			case ($itemtype==="InlineText"):
-				//DB $query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
-				break;
-			case ($itemtype==="LinkedText"):
-				//DB $query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
-				break;
-			case ($itemtype==="Forum"):
-				//DB $query = "SELECT name FROM imas_forums WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
-				break;
-			case ($itemtype==="Assessment"):
-				//DB $query = "SELECT name FROM imas_assessments WHERE id=$typeid";
-				$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-				break;
-		}
-		$stm->execute(array(':id'=>$typeid));
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $name = mysql_result($result,0,0);
-		$name = $stm->fetchColumn(0);
-		return array($itemtype,$name);
-	}
 
-	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $items = unserialize(mysql_result($result,0,0));
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$items = unserialize($stm->fetchColumn(0));
+
 	$ids = array();
 	$types = array();
 	$names = array();
-
-	getsubinfo($items,'0','');
+	$sums = array();
+	$parents = array();
+	$agbcats = array();
+	$prespace = array();
+	$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
+	getsubinfo($items,'0','',false,'|- ');
 
 
 	echo '<h2>Common Cartridge Export</h2>';
@@ -775,10 +774,10 @@ if (isset($_GET['delete'])) {
 		if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
 ?>
 				<td>
-				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>'>
+				<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($ids[$i]); ?>'>
 				</td>
-				<td><?php echo $types[$i] ?></td>
-				<td><?php echo $names[$i] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($prespace[$i].$types[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></td>
 			</tr>
 <?php
 	}
@@ -789,6 +788,10 @@ if (isset($_GET['delete'])) {
 	<?php
 	//echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>";
 	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in BlackBoard and Moodle)</button></p>";
+	echo '<p>If exporting for Canvas: <br/>';
+	echo '<input type=radio name=includeappconfig value=1 checked />Include App Configuration.<br/>';
+	echo '<input type=radio name=includeappconfig value=0 />Do not include App Configuration.  Select this option if you have site-wide credentials, ';
+	echo ' or if you are doing a second import into a course that already has a configuration</p>';
 	echo "<p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
 	echo '</form>';
 

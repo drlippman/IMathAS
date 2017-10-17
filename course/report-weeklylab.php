@@ -3,8 +3,9 @@
 //(c) 2016 David Cooper, David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -124,7 +125,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
 		writesessiondata();
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/report-weeklylab.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/report-weeklylab.php?cid=$cid");
 		exit;
 	}
 
@@ -278,7 +279,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 
 
 	$curBreadcrumb = $breadcrumbbase;
-	$curBreadcrumb .= "<a href=\"course.php?cid=$cid\">$coursename</a> ";
+	$curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
 
 	$placeinhead = '<script type="text/javascript">function toggleList(el) { $(el).find("ul").toggle();}
@@ -379,11 +380,11 @@ foreach ($st as $uid=>$stu) {
 		echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">";
 	}
 
-	echo '<td>'.$stu['stuname'].'</td>';
+	printf('<td>%s</td>', Sanitize::encodeStringForDisplay($stu['stuname']));
 
 	$stuattemptedCnt = count($stu['stuCreditAssessList'])+count($stu['stuNocreditAssessList']);
 	echo '<td class="c">'.$stuattemptedCnt.'</td>';
-	
+
 	echo '<td class="c">';
 	if ($stu['totalTimeOnTask']<180) {
 		echo round($stu['totalTimeOnTask']/60,1).' min';
@@ -393,7 +394,8 @@ foreach ($st as $uid=>$stu) {
 	echo '</td>';
 
 	if ($stu['totalPointsPossibleOnAttempted']>0) {
-		echo '<td>'.$stu['totalPointsOnAttempted'].'/'.$stu['totalPointsPossibleOnAttempted'];
+		printf('<td>%s/%s', Sanitize::encodeStringForDisplay($stu['totalPointsOnAttempted']),
+            Sanitize::encodeStringForDisplay($stu['totalPointsPossibleOnAttempted']));
 		echo ' ('. round(100*$stu['totalPointsOnAttempted']/$stu['totalPointsPossibleOnAttempted'],1) .'%)</td>';
 	} else {
 		echo '<td>N/A</td>';
@@ -405,7 +407,7 @@ foreach ($st as $uid=>$stu) {
 		echo count($stu['stuNocreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuNocreditAssessList'] as $aid) {
-			echo '<li>'.$assessmentInfo[$aid]['name'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($assessmentInfo[$aid]['name']));
 		}
 		echo '</ul>';
 	} else {
@@ -420,7 +422,7 @@ foreach ($st as $uid=>$stu) {
 		echo count($stu['stuCreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuCreditAssessList'] as $aid) {
-			echo '<li>'.$assessmentInfo[$aid]['name'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($assessmentInfo[$aid]['name']));
 		}
 		echo '</ul>';
 	} else {
@@ -479,7 +481,7 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 		echo count($ainfo['nocreditstulist']);
 		echo '<ul class="nomark asul" style="display:none">';
 		foreach ($ainfo['nocreditstulist'] as $uid) {
-			echo '<li>'.$st[$uid]['stuname'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($st[$uid]['stuname']));
 		}
 		echo '</ul>';
 	} else {
@@ -493,7 +495,7 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 		echo count($ainfo['gotcreditstulist']);
 		echo '<ul class="nomark asul" style="display:none">';
 		foreach ($ainfo['gotcreditstulist'] as $uid) {
-			echo '<li>'.$st[$uid]['stuname'].'</li>';
+			printf('<li>%s</li>', Sanitize::encodeStringForDisplay($st[$uid]['stuname']));
 		}
 		echo '</ul>';
 	} else {

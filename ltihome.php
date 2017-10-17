@@ -2,7 +2,7 @@
 //IMathAS: LTI instructor home page
 //(c) 2011 David Lippman
 
-require("validate.php");
+require("init.php");
 if (!isset($sessiondata['ltirole']) || $sessiondata['ltirole']!='instructor') {
 	echo "Not authorized to view this page";
 	exit;
@@ -141,7 +141,7 @@ if (isset($_POST['createcourse'])) {
 		$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :showlatepass, :itemorder, :available, :theme, :ltisecret, :blockcnt);";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':name'=>$sessiondata['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
-			':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
+			':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 			':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 		$cid = $DBH->lastInsertId();
 		//if ($myrights==40) {
@@ -249,8 +249,8 @@ if (isset($_POST['createcourse'])) {
 			$stm->execute(array(':id'=>$typeid));
 			$atitle = $stm->fetchColumn(0);
 
-			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_place_aid=$typeid";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($atitle).'&text='.urlencode($atitle));
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid";
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle));
 			exit;
 
 		} else {
@@ -261,8 +261,8 @@ if (isset($_POST['createcourse'])) {
 			$stm->execute(array(':id'=>$typeid));
 			$cname = $stm->fetchColumn(0);
 
-			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_open_folder=$typeid-0";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($cname).'&text='.urlencode($cname));
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0";
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname));
 			exit;
 		}
 	}
@@ -287,7 +287,7 @@ if (isset($_POST['createcourse'])) {
 
 if ($hasplacement && $placementtype=='course') {
 	if (!isset($_GET['showhome']) && !isset($_GET['chgplacement'])) {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($cid));
 		exit;
 	}
 }
@@ -320,7 +320,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Your Courses">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+			printf('<option value="%d">%s</option>', $row[0], Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</optgroup>';
 	}
@@ -333,15 +333,32 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Template Courses">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo '<option value="'.$row[0].'"';
+			echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
 			if ($row[3]!='') {
-				echo ' data-termsurl="'.$row[3].'"';
+				echo ' data-termsurl="'.Sanitize::encodeStringForDisplay($row[3]).'"';
+			}
+			echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
+		}
+		echo '</optgroup>';
+	}
+	
+	$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+	$query .= "iu.groupid=:groupid AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':groupid'=>$groupid));
+	if ($stm->rowCount()>0) {
+		echo '<optgroup label="Group Template Courses">';
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
+			if ($row[3]!='') {
+				echo ' data-termsurl="'.Sanitize::encodeStringForDisplay($row[3]).'"';
 			}
 			echo '>'.$row[1].'</option>';
 		}
 		echo '</optgroup>';
 	}
-
+	
 	echo '</select>';
 	echo '<p id="termsbox" style="display:none;">This course has special <a id="termsurl">Terms of Use</a>.  By copying this course, you agree to these terms.</p>';
 	echo '<input type="Submit" value="Create"/>';
@@ -371,7 +388,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Assessment">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+			printf('<option value="%d">%s</option>', $row[0], Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</optgroup>';
 	}
@@ -383,7 +400,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '</form>';
 } else if ($placementtype=='course') {
 	echo '<h3>LTI Placement of whole course</h3>';
-	echo "<p><a href=\"course/course.php?cid=$cid\">Enter course</a></p>";
+	echo "<p><a href=\"course/course.php?cid=" . Sanitize::courseId($cid) . "\">Enter course</a></p>";
 	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 } else if ($placementtype=='assess') {
 	//DB $query = "SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id='$typeid'";
@@ -392,11 +409,11 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-	echo "<h3>LTI Placement of {$line['name']}</h3>";
-	echo "<p><a href=\"assessment/showtest.php?cid=$cid&id=$typeid\">Preview assessment</a> | ";
-	echo "<a href=\"course/isolateassessgrade.php?cid=$cid&aid=$typeid\">Grade list</a> ";
+	echo "<h3>LTI Placement of " . Sanitize::encodeStringForDisplay($line['name']) . "</h3>";
+	echo "<p><a href=\"assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
+	echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
 	if ($role == 'teacher') {
-		echo "| <a href=\"course/gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">Item Analysis</a>";
+		echo "| <a href=\"course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Item Analysis</a>";
 	}
 	echo "</p>";
 
@@ -411,8 +428,8 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	}
 	echo '</p>';
 	if ($role == 'teacher') {
-		echo "<p><a href=\"course/addassessment.php?cid=$cid&id=$typeid&from=lti\">Settings</a> | ";
-		echo "<a href=\"course/addquestions.php?cid=$cid&aid=$typeid&from=lti\">Questions</a></p>";
+		echo "<p><a href=\"course/addassessment.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">Settings</a> | ";
+		echo "<a href=\"course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">Questions</a></p>";
 		if ($sessiondata['ltiitemtype']==-1) {
 			echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 		}

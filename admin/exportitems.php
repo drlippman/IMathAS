@@ -11,11 +11,13 @@ ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
 /*** master php includes *******/
-require("../validate.php");
-include("../includes/filehandler.php");
+require("../init.php");
+require_once("../includes/filehandler.php");
+require("../includes/copyiteminc.php");
+require("../includes/loaditemshowdata.php");
 
 /*** pre-html data manipulation, including function code *******/
-function copysub($items,$parent,&$addtoarr) {
+function exportcopysub($items,$parent,&$addtoarr) {
 	global $itemcnt,$toexport;
 	global $checked;
 	foreach ($items as $k=>$item) {
@@ -31,10 +33,10 @@ function copysub($items,$parent,&$addtoarr) {
 				$newblock['public'] = $item['public'];
 				$newblock['fixedheight'] = $item['fixedheight'];
 				$newblock['items'] = array();
-				copysub($item['items'],$parent.'-'.($k+1),$newblock['items']);
+				exportcopysub($item['items'],$parent.'-'.($k+1),$newblock['items']);
 				$addtoarr[] = $newblock;
 			} else {
-				copysub($item['items'],$parent.'-'.($k+1),$addtoarr);
+				exportcopysub($item['items'],$parent.'-'.($k+1),$addtoarr);
 			}
 		} else {
 			if (array_search($item,$checked)!==FALSE) {
@@ -46,64 +48,13 @@ function copysub($items,$parent,&$addtoarr) {
 	}
 }
 
-function getsubinfo($items,$parent,$pre) {
-	global $ids,$types,$names;
-	foreach($items as $k=>$item) {
-		if (is_array($item)) {
-			$ids[] = $parent.'-'.($k+1);
-			$types[] = $pre."Block";
-			//DB $names[] = stripslashes($item['name']);
-			$names[] = $item['name'];
-			getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
-		} else {
-			$ids[] = $item;
-			$arr = getiteminfo($item);
-			$types[] = $pre.$arr[0];
-			$names[] = $arr[1];
-		}
-	}
-}
-
-function getiteminfo($itemid) {
-  global $DBH;
-	//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
-	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
-	$stm->execute(array(':id'=>$itemid));
-  //DB $itemtype = mysql_result($result,0,0);
-  //DB $typeid = mysql_result($result,0,1);
-  list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
-  switch($itemtype) {
-    case ($itemtype==="InlineText"):
-      //DB $query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
-      break;
-    case ($itemtype==="LinkedText"):
-      //DB $query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
-      break;
-    case ($itemtype==="Forum"):
-      //DB $query = "SELECT name FROM imas_forums WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
-      break;
-    case ($itemtype==="Assessment"):
-      //DB $query = "SELECT name FROM imas_assessments WHERE id=$typeid";
-      $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-      break;
-  }
-  $stm->execute(array(':id'=>$typeid));
-  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-  //DB $name = mysql_result($result,0,0);
-  $name = $stm->fetchColumn(0);
-	return array($itemtype,$name);
-}
-
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Item Export";
-$cid = $_GET['cid'];
-$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Export Course Items</div>\n";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">"
+	. Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; Export Course Items</div>\n";
 
 
 if (!(isset($teacherid))) {   //NO PERMISSIONS
@@ -117,22 +68,27 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,ownerid FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 
 	$itemcnt = 0;
 	$toexport = array();
 	$qcnt = 0;
 	//DB $items = unserialize(mysql_result($result,0,0));
-	$items = unserialize($stm->fetchColumn(0));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	$items = unserialize($line['itemorder']);
 	$newitems = array();
 	$qtoexport = array();
 	$qsettoexport = array();
 
-	copysub($items,'0',$newitems);
+	exportcopysub($items,'0',$newitems);
 	//print_r($newitems);
 	echo "EXPORT DESCRIPTION\n";
 	echo $_POST['description']."\n";
+	echo "EXPORT OWNERID\n";
+	echo $line['ownerid']."\n";
+	echo "INSTALLNAME\n";
+	echo $installname."\n";
 	echo "ITEM LIST\n";
 	echo serialize($newitems)."\n";
 	$coursefiles = array();
@@ -161,12 +117,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					   //DB while ($frow = mysql_fetch_row($r2)) {
 					   while ($frow = $stm2->fetch(PDO::FETCH_NUM)) {
 						   $filedescr[$frow[0]] = $frow[1];
-						   if ($GLOBALS['filehandertypecfiles'] == 's3') {
-						   	   $filenames[$frow[0]] = getcoursefileurl($frow[2]);
-						   } else {
-						   	   $filenames[$frow[0]] = basename($frow[2]);
-						   	   $coursefiles[] = $frow[2];
-						   }
+						   $filenames[$frow[0]] = getcoursefileurl($frow[2],true);
 					   }
 				}
 				//DB $query = "SELECT * FROM imas_inlinetext WHERE id='{$row[1]}'";
@@ -178,13 +129,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
 				echo "TEXT\n";
-				if ($GLOBALS['filehandertypecfiles'] == 's3' && count($filenames)>0) {
-					$line['text'] .= '<ul>';
-					foreach (explode(',',$line['fileorder']) as $fid) {
-						$line['text'] .= '<li><a href="'.$filenames[$fid].'">'.$filedescr[$fid].'</a></li>';
-					}
-					$line['text'] .= '</ul>';
-				}
 				echo $line['text'] . "\n";
 				echo "AVAIL\n";
 				echo $line['avail'] . "\n";
@@ -196,13 +140,13 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['oncal'] . "\n";
 				echo "CALTAG\n";
 				echo $line['caltag'] . "\n";
-				if ((!isset($GLOBALS['filehandertypecfiles']) || $GLOBALS['filehandertypecfiles'] != 's3') && count($filenames)>0) {
-					   echo "INSTRFILES\n";
-					   foreach (explode(',',$line['fileorder']) as $fid) {
-						  echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
-					   }
+				if (trim($line['fileorder'])!='') {
+					echo "INSTRFILES\n";
+					foreach (explode(',',$line['fileorder']) as $fid) {
+						if (!isset($filenames[$fid])) {continue;}
+						echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
+					}
 				}
-
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="LinkedText"):
@@ -213,12 +157,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$stm2->execute(array(':id'=>$row[1]));
 				$line = $stm2->fetch(PDO::FETCH_ASSOC);
 				if (substr($line['text'],0,5)=='file:') {
-					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($line['text']),0,5)=="file:") {
-						$line['text'] = getcoursefileurl(trim(substr(strip_tags($line['text']),5)));
-					} else {
-						$coursefiles[] = substr($line['text'],5);
-						$line['text'] = 'file:'.basename(substr($line['text'],5));
-					}
+					$line['text'] = getcoursefileurl(trim(substr(strip_tags($line['text']),5)),true);
 				}
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
@@ -294,29 +233,31 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					echo "$setting=".$line[$setting]."\n";
 				}
 				echo "QUESTIONS\n";
-				unset($newqorder);
-				$qs = explode(',',$line['itemorder']);
-				foreach ($qs as $q) {
-					if (strpos($q,'~')===FALSE) {
-						$qtoexport[$qcnt] = $q;
-						$newqorder[] = $qcnt;
-						$qcnt++;
-					} else {
-						unset($newsub);
-						$subs = explode('~',$q);
-						if (strpos($subs[0],'|')!==false) {
-							$newsub[] = $subs[0];
-							array_shift($subs);
-						}
-						foreach($subs as $subq) {
-							$qtoexport[$qcnt] = $subq;
-							$newsub[] = $qcnt;
+				if (trim($line['itemorder'])!='') {
+					unset($newqorder);
+					$qs = explode(',',$line['itemorder']);
+					foreach ($qs as $q) {
+						if (strpos($q,'~')===FALSE) {
+							$qtoexport[$qcnt] = $q;
+							$newqorder[] = $qcnt;
 							$qcnt++;
+						} else {
+							unset($newsub);
+							$subs = explode('~',$q);
+							if (strpos($subs[0],'|')!==false) {
+								$newsub[] = $subs[0];
+								array_shift($subs);
+							}
+							foreach($subs as $subq) {
+								$qtoexport[$qcnt] = $subq;
+								$newsub[] = $qcnt;
+								$qcnt++;
+							}
+							$newqorder[] = implode('~',$newsub);
 						}
-						$newqorder[] = implode('~',$newsub);
 					}
+					echo implode(',',$newqorder) . "\n";
 				}
-				echo implode(',',$newqorder) . "\n";
 				echo "END ITEM\n";
 				break;
 		} //end item switch
@@ -386,14 +327,17 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 	*/
 	if (count($qsettoexport)>0) {
-		$qstoexportlist = implode(',', array_map('intval', $qsettoexport));
+		$qstoexportlist = array_map('Sanitize::onlyInt', $qsettoexport);
+		$qstoexportlist_query_placeholders = Sanitize::generateQueryPlaceholders($qstoexportlist);
+
 		//first, lets pull any questions that have include__from so we can lookup backrefs
 		//DB $query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 		//DB $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
 		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
+		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist_query_placeholders)";
 		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		$stm = $DBH->query($query);
+		$stm = $DBH->prepare($query);
+		$stm->execute($qstoexportlist);
 		$includedqs = array();
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -418,7 +362,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$imgfiles = array();
 		//DB $query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$stm = $DBH->query("SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)");
+		$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist_query_placeholders)");
+		$stm->execute($qstoexportlist);
 		$qcnt = 0;
 		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -439,6 +384,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			echo rtrim($line['description']) . "\n";
 			echo "\nAUTHOR\n";
 			echo rtrim($line['author']) . "\n";
+			echo "\nOWNERID\n";
+			echo rtrim($line['ownerid']) . "\n";
+			echo "\nUSERIGHTS\n";
+			echo rtrim($line['userights']) . "\n";
 			echo "\nCONTROL\n";
 			echo rtrim($line['control']) . "\n";
 			echo "\nQCONTROL\n";
@@ -467,10 +416,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				//DB $query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
 				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB while ($row = mysql_fetch_row($r2)) {
-				$stm2 = $DBH->prepare("SELECT var,filename FROM imas_qimages WHERE qsetid=:qsetid");
+				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo $row[0].','.$row[1]. "\n";
+					echo $row[0].','.getqimageurl($row[1],true).','.$row[2]. "\n";
 
 				}
 			}
@@ -478,54 +427,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		}
 
 
-
-		//DB $query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
-		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($r2)) {
-		$stm2 = $DBH->query("SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)");
-		while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-			if ($GLOBALS['filehandertypecfiles'] == 's3') {
-				if (!file_exists("../assessment/qimages".DIRECTORY_SEPARATOR.trim($row[0]))) {
-					copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
-				}
-			}
-			$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]);
-		}
 	}
-	// need to work on
-	/*include("../includes/tar.class.php");
-	if (file_exists("../course/files/qimages.tar.gz")) {
-		unlink("../course/files/qimages.tar.gz");
-	}
-	$tar = new tar();
-	$tar->addFiles($imgfiles);
-	$tar->toTar("../course/files/qimages.tar.gz",TRUE);
-	*/
-	if (class_exists('ZipArchive')) {
-		$zip = new ZipArchive();
-		if ($zip->open("../course/files/qimages.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
-			foreach ($imgfiles as $file) {
-				$zip->addFile($file,basename($file));
-			}
-		}
-		$zip->close();
-	}
-
-	if (class_exists('ZipArchive')) {
-		$zip = new ZipArchive();
-		if ($zip->open("../course/files/coursefilepack$cid.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
-			foreach ($coursefiles as $file) {
-				if ($GLOBALS['filehandertypecfiles'] == 's3') {
-					copycoursefile($file, realpath("../course/files").DIRECTORY_SEPARATOR.basename($file));
-					$zip->addFile("../course/files/".basename($file),basename($file));
-				} else {
-					$zip->addFile("../course/files/$file",basename($file));
-				}
-			}
-		}
-		$zip->close();
-	}
-
 
 	exit;
 
@@ -539,8 +441,12 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$ids = array();
 	$types = array();
 	$names = array();
-
-	getsubinfo($items,'0','');
+	$sums = array();
+	$parents = array();
+	$agbcats = array();
+	$prespace = array();
+	$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
+	getsubinfo($items,'0','',false,'|- ');
 }
 
 require("../header.php");
@@ -576,10 +482,10 @@ if ($overwriteBody==1) {
 		if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
 ?>
 				<td>
-				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>' checked=checked>
+				<input type=checkbox name='checked[]' value='<?php echo Sanitize::encodeStringForDisplay($ids[$i]); ?>' checked=checked>
 				</td>
-				<td><?php echo $types[$i] ?></td>
-				<td><?php echo $names[$i] ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($prespace[$i].$types[$i]); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($names[$i]); ?></td>
 			</tr>
 <?php
 	}
@@ -588,12 +494,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p><input type=submit name="export" value="Export Items"></p>
 	</form>
-	<p>Once exported, <a href="../course/files/qimages.zip">download image files</a> to be put in assessment/qimages</p>
-	<?php
-	if (class_exists('ZipArchive')) {
-		echo '<p>Once exported, <a href="../course/files/coursefilepack'.$cid.'.zip">download course files</a> to be put in course/files/</p>';
-	}
-	?>
+
 	<p>If you were wanting to export this course to a different Learning Management System, you can try the <a href="ccexport.php?cid=<?php echo $cid;?>">
 	Common Cartridge export</a></p>
 <?php

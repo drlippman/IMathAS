@@ -3,17 +3,24 @@
 //(c) 2009 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
+
 
 /*** pre-html data manipulation, including function code *******/
-$cid = $_GET['cid'];
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; <a href=\"listusers.php?cid=$cid\">List Students</a>\n";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"listusers.php?cid=$cid\">List Students</a>\n";
 
 if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	if (isset($_POST['process'])) {
+		//get deflatepass
+		$query = "SELECT deflatepass FROM imas_courses WHERE id=:cid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':cid'=>$cid));
+		$deflatepass = $stm->fetchColumn(0);
+
 		//know students.  Do work
 		$todo = array();
 		foreach ($_POST['checked'] as $stu) {
@@ -22,36 +29,38 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$todo[] = $stu;
 			}
 		}
-		$todolist = implode(',', $todo);
-		$dontdo = array();
-		//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid' AND userid IN ($todolist)";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
-		$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=:courseid AND userid IN ($todolist)");
-		$stm->execute(array(':courseid'=>$cid));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$dontdo[] = $row[0];
+		if (count($todo)>0) {
+			$todolist = implode(',', $todo);
+			$dontdo = array();
+			//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid' AND userid IN ($todolist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=:courseid AND userid IN ($todolist)");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$dontdo[] = $row[0];
+			}
+			$vals = array();
+			$qarr = array();
+			$_POST['section'] = trim($_POST['section']);
+			foreach ($todo as $stu) {
+				if (in_array($stu,$dontdo)) {continue;}
+				//DB $vals[] = "($stu,'$cid'$section)";
+				$vals[] = "(?,?,?,?)";
+				array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null, $deflatepass);
+			}
+			if (count($vals)>0) {
+				//DB $query = 'INSERT INTO imas_students (userid,courseid';
+				//DB if (trim($_POST['section'])!='') {
+				//DB 	$query .= ',section';
+				//DB }
+				//DB $query .= ') VALUES '.implode(',',$vals);
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section,latepass) VALUES '.implode(',', $vals));
+				$stm->execute($qarr);
+			}
 		}
-		$vals = array();
-		$qarr = array();
-		$_POST['section'] = trim($_POST['section']);
-		foreach ($todo as $stu) {
-			if (in_array($stu,$dontdo)) {continue;}
-			//DB $vals[] = "($stu,'$cid'$section)";
-			$vals[] = "(?,?,?)";
-			array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null);
-		}
-		if (count($vals)>0) {
-			//DB $query = 'INSERT INTO imas_students (userid,courseid';
-			//DB if (trim($_POST['section'])!='') {
-			//DB 	$query .= ',section';
-			//DB }
-			//DB $query .= ') VALUES '.implode(',',$vals);
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section) VALUES '.implode(',', $vals));
-			$stm->execute($qarr);
-		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 		exit;
 
 	} else if (isset($_POST['sourcecourse'])) {
@@ -95,9 +104,9 @@ if ($overwriteBody==1) {
 		$cnt = 0;
 		//DB while ($line=mysql_fetch_array($resultCourseList, MYSQL_ASSOC)) {
 		while ($line=$resultCourseList->fetch(PDO::FETCH_ASSOC)) {
-			echo '<input type="radio" name="sourcecourse" value="'.$line['id'].'" ';
+			echo '<input type="radio" name="sourcecourse" value="' . Sanitize::encodeStringForDisplay($line['id']) . '" ';
 			if ($cnt==0) {echo 'checked="checked"';}
-			echo '/> '.$line['name'].'<br/>';
+			echo '/> ' . Sanitize::encodeStringForDisplay($line['name']) . '<br/>';
 			$cnt++;
 		}
 		echo '<input type="submit" value="Choose Students" />';
@@ -109,8 +118,9 @@ if ($overwriteBody==1) {
 		echo '<p>';
 		//DB while ($line=mysql_fetch_array($resultStudentList, MYSQL_ASSOC)) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
-			echo '<input type=checkbox name="checked[]" value="'.$line['id'].'"/>';
-			echo $line['LastName'].', '.$line['FirstName'].'<br/>';
+			echo '<input type=checkbox name="checked[]" value="' . Sanitize::encodeStringForDisplay($line['id']) . '"/>';
+			printf('%s, %s<br/>', Sanitize::encodeStringForDisplay($line['LastName']),
+                Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		echo '</p><p>Assign to section: <input type="text" name="section" />  (optional)</p>';
 		echo '</p><p><input type="submit" value="Enroll These Students" /></p>';

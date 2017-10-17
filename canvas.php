@@ -1,17 +1,20 @@
 <?php
-require("config.php");
+$init_skip_csrfp = true;
+require("init_without_validate.php");
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https') || isset($CFG['GEN']['forcecanvashttps']))  {
 	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
  }
- 
- $host = $_SERVER['HTTP_HOST'];
+
+ $host = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
  if (isset($CFG['GEN']['addwww']) && substr($host,0,4)!='www.') {
  	$host = 'www.'.$host;
- } 
+ }
  if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match to higher domains.
  	 $shorthost = substr($host,4);
+ } else {
+ 	 $shorthost = $host;
  }
 header("Content-type: text/xml;");
 echo '<?xml version="1.0" encoding="UTF-8"?>';

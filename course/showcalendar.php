@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Display the calendar by itself
 //(c) 2008 David Lippman
-	require("../validate.php");
+	require("../init.php");
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -9,7 +9,7 @@
 	   exit;
 	}
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['editing'])) {
 		$editingon = $_GET['editing']=='on';
 		$sessiondata[$cid.'caledit'] = $editingon;
@@ -21,7 +21,7 @@
 	}
 
 	require("../includes/calendardisp.php");
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=091916\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=072917\"></script>";
 	if ($editingon) {
 		$placeinhead .= '<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 				<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
@@ -136,17 +136,18 @@
 	</script>
 	<?php
 	} //end $editingon block
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Calendar</div>";
 	echo '<div id="headercalendar" class="pagetitle"><h2>Calendar</h2></div>';
 
 	 if (isset($teacherid)) {
 		echo "<div class=\"cpmid\"><a id=\"mcelink\" href=\"managecalitems.php?from=cal&cid=$cid\">Manage Events</a> | ";
 		if ($editingon) {
-			echo '<a href="showcalendar.php?cid='.$cid.'&editing=off">'._('Disable Drag-and-drop Editing').'</a>';
+			echo '<a href="showcalendar.php?cid='.$cid.'&editing=off">'._('Disable Drag-and-drop Editing').'</a> | ';
 		} else {
-			echo '<a href="showcalendar.php?cid='.$cid.'&editing=on">'._('Enable Drag-and-drop Editing').'</a>';
+			echo '<a href="showcalendar.php?cid='.$cid.'&editing=on">'._('Enable Drag-and-drop Editing').'</a> | ';
 		}
+		echo '<a href="exportcalfeed.php?cid='.$cid.'">'._('Export Calendar Feed').'</a>';
 		echo "</div>";
 	 }
 	 if ($editingon) {

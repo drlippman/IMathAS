@@ -1,5 +1,6 @@
 <?php
-require("../validate.php");
+require("../init.php");
+
 
 if (!isset($teacherid)) {
 	echo "Must be a teacher to access this page";
@@ -55,7 +56,7 @@ if (isset($_POST['mergefrom'])) {
 		}
 		$thisintroraw = $curintro;
 		if (($introjson=json_decode($thisintroraw,true))!==null) { //is json intro
-			$thisintro .=  = $introjson[0];		
+			$thisintro .=  $introjson[0];
 		} else {
 			$thisintro .= $thisintroraw;
 		}
@@ -218,7 +219,7 @@ if (isset($_POST['mergefrom'])) {
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
 	$pagetitle = "Merge Assessments";
 
-	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Merge Assessments";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Merge Assessments";
 
 	require("../header.php");
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
@@ -269,8 +270,7 @@ if (isset($_POST['mergefrom'])) {
 	}
 
 	$pagetitle = "Merge Assessments";
-
-	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Merge Assessments";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Merge Assessments";
 
 	require("../header.php");
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
@@ -282,7 +282,7 @@ if (isset($_POST['mergefrom'])) {
 	foreach ($itemsimporder as $item) {
 		if (!isset($itemsassoc[$item])) { continue; }
 		$id = $itemsassoc[$item];
-		echo "<li><input type=\"text\" size=\"2\" name=\"mergefrom[$id]\" />{$assess[$id]}</li>";
+		echo "<li><input type=\"text\" size=\"2\" name=\"mergefrom[" . Sanitize::onlyInt($id) . "]\" />" . Sanitize::encodeStringForDisplay($assess[$id]) . "</li>";
 	}
 	echo '</ul>';
 	echo '<p>Include assessment name as headers in intro? <input type="checkbox" name="nameasheader" value="1"/></p>';

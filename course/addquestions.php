@@ -3,8 +3,9 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 include("../includes/htmlutil.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -13,9 +14,9 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Add/Remove Questions";
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . $_GET['cid'] . "\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid']) . "\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_GET['withdraw'])) {
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . $_GET['cid'] . "&aid=" . $_GET['aid'] . "\">Add/Remove Questions</a> &gt; Confirm\n";
+	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">Add/Remove Questions</a> &gt; Confirm\n";
 	//$pagetitle = "Modify Inline Text";
 } else {
 	$curBreadcrumb .= "&gt; Add/Remove Questions\n";
@@ -30,8 +31,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = $_GET['grp']; writesessiondata();}
 	if (isset($_GET['selfrom'])) {
 		$sessiondata['selfrom'.$aid] = $_GET['selfrom'];
@@ -50,7 +51,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if (isset($_POST['add'])) {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 				exit;
 			}
 		} else {
@@ -105,7 +106,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		}
 	}
@@ -116,13 +117,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 				exit;
 			}
 		}
 	}
-	if (isset($_GET['clearattempts'])) {
-		if ($_GET['clearattempts']=="confirmed") {
+	if (isset($_REQUEST['clearattempts'])) {
+		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
 			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
@@ -137,7 +138,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -145,13 +146,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $assessmentname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['aid']));
+			$stm->execute(array(':id'=>$aid));
 			$assessmentname = $stm->fetchColumn(0);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
-			$body .= "<h3>$assessmentname</h3>";
+			$body .= "<h3>".Sanitize::encodeStringForDisplay($assessmentname)."</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-			$body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=confirmed'\">\n";
+			$body .= '<form method="POST" action="'.sprintf('addquestions.php?cid=%s&aid=%d',$cid, $aid).'">';
+			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
 			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
+			$body .= '</form>';
 		}
 	}
 	/*
@@ -240,7 +243,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	*/
 	if (isset($_GET['withdraw'])) {
-		if (isset($_GET['confirmed'])) {
+		if (isset($_POST['withdrawtype'])) {
 			if (strpos($_GET['withdraw'],'-')!==false) {
 				$isingroup = true;
 				$loc = explode('-',$_GET['withdraw']);
@@ -257,7 +260,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $defpoints = mysql_result($result,0,1);
 			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			$itemorder = explode(',', $itemorder);
-
 
 			$qids = array();
 			if ($isingroup && $_POST['withdrawtype']!='full') { //is group remove
@@ -344,7 +346,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row[0]));
 			}
 
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 
 		} else {
@@ -356,7 +358,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h3>Withdraw Question</h3>";
-			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw={$_GET['withdraw']}&confirmed=true\">";
+			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw=".Sanitize::encodeStringForDisplay($_GET['withdraw'])."\">";
 			if ($isingroup) {
 				$body .= '<p><b>This question is part of a group of questions</b>.  </p>';
 				$body .= '<input type=radio name="withdrawtype" value="groupzero" > Set points possible and all student scores to zero <b>for all questions in group</b><br/>';
@@ -375,19 +377,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	}
 
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid";
+	$address = $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid";
 
 	$placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=012317\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=031617\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=100517\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
-	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=101016\" type=\"text/css\" />";
+	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
+	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/iconfonts/style.css?v=081316\" type=\"text/css\" />";
-	$useeditor = "textsegmenteditor";
+	$useeditor = "noinit";
 
 	//DEFAULT LOAD PROCESSING GOES HERE
 	//load filter.  Need earlier than usual header.php load
@@ -456,126 +458,126 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$grp0Selected = " selected";
 	}
 
-	$jsarr = '[';
+	$questionjsarr = array();
+	$existingq = array();
+	$query = "SELECT imas_questions.id,imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions ";
+	$query .= "JOIN imas_questionset ON imas_questionset.id=imas_questions.questionsetid JOIN imas_users ON imas_questionset.ownerid=imas_users.id ";
+	$query .= "WHERE imas_questions.assessmentid=:aid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':aid'=>$aid));
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($line===false) { continue; } //this should never happen, but avoid issues if it does
+		$existingq[] = $line['questionsetid'];
+		//output item array
+		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
+			$canedit = 1;
+		} else {
+			$canedit = 0;
+		}
+		$extrefval = 0;
+		if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
+			$extrefval += 1;
+		}
+		if ($line['extref']!='') {
+			$extref = explode('~~',$line['extref']);
+			$hasvid = false;  $hasother = false;  $hascap = false;
+			foreach ($extref as $v) {
+				if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
+					$hasvid = true;
+					if (strpos($v,'!!1')!==false) {
+						$hascap = true;
+					}
+				} else {
+					$hasother = true;
+				}
+			}
+			//$page_questionTable[$i]['extref'] = '';
+			if ($hasvid) {
+				$extrefval += 4;
+			}
+			if ($hasother) {
+				$extrefval += 2;
+			}
+			if ($hascap) {
+				$extrefval += 16;
+			}
+		}
+		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
+			$extrefval += 8;
+		}
+		$questionjsarr[$line['id']] = array((int)$line['id'],
+			(int)$line['questionsetid'],
+			Sanitize::encodeStringForDisplay($line['description']),
+			Sanitize::encodeStringForDisplay($line['qtype']),
+			(int)Sanitize::onlyInt($line['points']),
+			(int)$canedit,
+			(int)Sanitize::onlyInt($line['withdrawn']),
+			(int)$extrefval);
+
+	}
+
+	$apointstot = 0;
+	$qncnt = 0;
+
+	$jsarr = array();
 	if ($itemorder != '') {
 		$items = explode(",",$itemorder);
 	} else {
 		$items = array();
 	}
-	$existingq = array();
-	$apointstot = 0;
-	$qncnt = 0;
 	for ($i = 0; $i < count($items); $i++) {
-		if ($i>0) {
-			$jsarr .= ',';
-		}
 		if (isset($text_segments[$qncnt])) {
 			foreach ($text_segments[$qncnt] as $text_seg) {
 				//stupid hack: putting a couple extra unused entries in array so length>=5
-				$jsarr .= '["text", "'.str_replace(array("\\",'"'),array("\\\\",'\\"'),trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
+				$jsarr[] = array("text", $text_seg['text'],
+					Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
+					Sanitize::onlyInt($text_seg['ispage']),
+					$text_seg['pagetitle'], 1);
 			}
 		}
 		if (strpos($items[$i],'~')!==false) {
 			$subs = explode('~',$items[$i]);
-		} else {
-			$subs[] = $items[$i];
-		}
-
-		if (count($subs)>1) {
+			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid]))) {
+				$closegrp = 0;
+			} else {
+				$closegrp = 1;
+			}
+			$qsdata = array();
+			for ($j=(strpos($subs[0],'|')===false)?0:1;$j<count($subs);$j++) {
+				if (!isset($questionjsarr[$subs[$j]])) {continue;} //should never happen
+				$qsdata[] = $questionjsarr[$subs[$j]];
+			}
+			if (count($qsdata)==0) { continue; } //should never happen
 			if (strpos($subs[0],'|')===false) { //for backwards compat
-				$jsarr .= '[1,0,[';
+				$jsarr[] = array(1,0,$qsdata,$closegrp);
 				$qncnt++;
 			} else {
 				$grpparts = explode('|',$subs[0]);
-				$jsarr .= '['.$grpparts[0].','.$grpparts[1].',[';
-				array_shift($subs);
+				$jsarr[] = array((int)Sanitize::onlyInt($grpparts[0]),
+					(int)Sanitize::onlyInt($grpparts[1]),
+					$qsdata,
+					(int)$closegrp);
 				$qncnt += $grpparts[0];
 			}
 		} else {
+			if (!isset($questionjsarr[$items[$i]])) {continue;} //should never happen
+			$jsarr[] = $questionjsarr[$items[$i]];
 			$qncnt++;
 		}
-		
-		for ($j=0;$j<count($subs);$j++) {
-			//DB $query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
-			//DB $query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
-			$query .= "WHERE imas_questions.id=:id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id";
-			$stm = $DBH->prepare($query);
-			$stm->execute(array(':id'=>$subs[$j]));
-			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($line===false) { continue; } //this should never happen, but avoid issues if it does
-			$existingq[] = $line['questionsetid'];
-			if ($j>0) {
-				$jsarr .= ',';
-			}
-			//output item array
-			$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
-			if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
-				$jsarr .= '1';
-			} else {
-				$jsarr .= '0';
-			}
-			$jsarr .= ','.$line['withdrawn'];
-			$extrefval = 0;
-			if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
-				$extrefval += 1;
-			}
-			if ($line['extref']!='') {
-				$extref = explode('~~',$line['extref']);
-				$hasvid = false;  $hasother = false;  $hascap = false;
-				foreach ($extref as $v) {
-					if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
-						$hasvid = true;
-						if (strpos($v,'!!1')!==false) {
-							$hascap = true;
-						}
-					} else {
-						$hasother = true;
-					}
-				}
-				$page_questionTable[$i]['extref'] = '';
-				if ($hasvid) {
-					$extrefval += 4;
-				}
-				if ($hasother) {
-					$extrefval += 2;
-				}
-				if ($hascap) {
-					$extrefval += 16;
-				}
-			}
-			if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
-				$extrefval += 8;
-			}
-			$jsarr .= ','.$extrefval;
-			$jsarr .= ']';
-		}
-		if (count($subs)>1) {
-			$jsarr .= '],';
-			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid],true))) {
-				$jsarr .= '0';
-			} else {
-				$jsarr .= '1';
-			}
-			$jsarr .= ']';
-		}
+
 		$alt = 1-$alt;
-		unset($subs);
 	}
 	if (isset($text_segments[$qncnt])) {
 		foreach ($text_segments[$qncnt] as $j=>$text_seg) {
 			//stupid hack: putting a couple extra unused entries in array so length>=5
-			if ($i>0 || $j>0) {
-				$jsarr .= ',';
-			}
-			$jsarr .= '["text", "'.str_replace('"','\\"',trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1]';
+			$jsarr[] = array("text", $text_seg['text'],
+				Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
+				Sanitize::onlyInt($text_seg['ispage']),
+				$text_seg['pagetitle'], 1);
 		}
 	}
 
-	$jsarr .= ']';
-	$jsarr = str_replace("\n",'',$jsarr);
+	unset($questionjsarr);
 
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
@@ -692,7 +694,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$existingqlist = implode(',', $existingq);  //pulled from database, so no quotes needed
 				//DB $query = "SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$stm = $DBH->query("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid");
+				$stm = $DBH->query("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) AND deleted=0 GROUP BY libid");
 				$foundmaj = false;
 				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -740,7 +742,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				//DB $query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
 				//DB $query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
-				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
+				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
 				$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
 				$qarr[] = $userid;
@@ -843,13 +845,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_libqids[$line['libid']][] = $line['id'];
 						}
 						$i = $line['id'];
-						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 						if (in_array($i,$existingq)) {
-							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
 						} else {
-							$page_questionTable[$i]['desc'] = filter($line['description']);
+							$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
 						}
-						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
+						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
@@ -877,10 +879,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						*/
 						if ($searchall==1) {
-							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib={$line['libid']}\">List lib</a>";
+							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib=".Sanitize::encodeUrlParam($line['libid'])."\">List lib</a>";
 						} else {
-							$page_questionTable[$i]['junkflag'] = $line['junkflag'];
-							$page_questionTable[$i]['libitemid'] = $line['libitemid'];
+							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
+							$page_questionTable[$i]['libitemid'] = Sanitize::encodeStringForDisplay($line['libitemid']);
 						}
 						$page_questionTable[$i]['extref'] = '';
 						$page_questionTable[$i]['cap'] = 0;
@@ -928,15 +930,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 
 
-						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
+						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">Add</a>";
 
 						if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
-							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
+							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
 						} else {
-							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&aid=$aid&cid=$cid\">View</a>";
+							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">View</a>";
 						}
 
-						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";
+						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&template=true\">Template</a>";
 						//$i++;
 						$ln++;
 
@@ -1042,21 +1044,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
 					if (strpos($qid,'|')!==false) { continue;}
-					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . $qsetid[$qid] . "'>";
+					$page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . Sanitize::onlyFloat($qsetid[$qid]) . "'>";
 					if (in_array($qsetid[$qid],$existingq)) {
-						$page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.filter($descr[$qid]).'</span>';
+						$page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($descr[$qid])).'</span>';
 					} else {
-						$page_assessmentQuestions[$x]['desc'][$y] = filter($descr[$qid]);
+						$page_assessmentQuestions[$x]['desc'][$y] = Sanitize::encodeStringForDisplay(filter($descr[$qid]));
 					}
 					//$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
 					$page_assessmentQuestions[$x]['qsetid'][$y] = $qsetid[$qid];
-					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";
+					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyFloat($qsetid[$qid]).",true)\"/>";
 					$page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
 					$page_assessmentQuestions[$x]['times'][$y] = $qsetusecnts[$qsetid[$qid]];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;
-					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=$qsetid[$qid]&aid=$aid&cid=$cid\">Add</a>";
-					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=$qsetid[$qid]&aid=$aid&cid=$cid\">View</a>" ;
-					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&template=true\">Template</a>";
+					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">Add</a>";
+					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">View</a>" ;
+					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&template=true\">Template</a>";
 					$page_assessmentQuestions[$x]['extref'][$y] = '';
 					$page_assessmentQuestions[$x]['cap'][$y] = 0;
 					if ($extref[$qid]!='') {
@@ -1149,9 +1151,9 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 		var curcid = <?php echo $cid ?>;
 		var curaid = <?php echo $aid ?>;
-		var defpoints = <?php echo $defpoints ?>;
-		var AHAHsaveurl = '<?php echo $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
-		var curlibs = '<?php echo $searchlibs;?>';
+		var defpoints = <?php echo Sanitize::encodeStringForDisplay($defpoints); ?>;
+		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
+		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
 
@@ -1161,7 +1163,7 @@ if ($overwriteBody==1) {
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h2></div>
 <?php
-	echo '<div class="cp"><a href="addassessment.php?id='.$_GET['aid'].'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';
+	echo '<div class="cp"><a href="addassessment.php?id='.Sanitize::onlyInt($_GET['aid']).'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';
 	if ($beentaken) {
 ?>
 	<h3>Warning</h3>
@@ -1174,7 +1176,7 @@ if ($overwriteBody==1) {
 <?php
 	}
 ?>
-	<h3>Questions in Assessment - <?php echo $page_assessmentName ?></h3>
+	<h3>Questions in Assessment - <?php echo Sanitize::encodeStringForDisplay($page_assessmentName); ?></h3>
 
 <?php
 	if ($itemorder == '') {
@@ -1239,9 +1241,9 @@ if ($overwriteBody==1) {
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
-		var itemarray = <?php echo $jsarr ?>;
+		var itemarray = <?php echo json_encode($jsarr); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-		var displaymethod = "<?php echo $displaymethod;?>";
+		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
 		initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
 		tinymce.init({
@@ -1263,7 +1265,14 @@ if ($overwriteBody==1) {
 		<input type=button value="Done" title="Exit back to course page" onClick="window.location='course.php?cid=<?php echo $cid ?>'">
 		<input type=button value="Assessment Settings" title="Modify assessment settings" onClick="window.location='addassessment.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'">
 		<input type=button value="Categorize Questions" title="Categorize questions by outcome or other groupings" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
-		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
+		<input type=button value="Create Print Version" onClick="window.location='<?php
+		if (isset($CFG['GEN']['pandocserver'])) {
+			echo 'printlayoutword.php?cid='.$cid.'&aid='.$aid;
+		} else {
+			echo 'printtest.php?cid='.$cid.'&aid='.$aid;
+		}
+		?>'">
+
 		<input type=button value="Define End Messages" title="Customize messages to display based on the assessment score" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
 		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))">
 	</p>
@@ -1280,8 +1289,8 @@ if ($overwriteBody==1) {
 	<form method=post action="addquestions.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
 
 		In Libraries:
-		<span id="libnames"><?php echo $lnames ?></span>
-		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
+		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames); ?></span>
+		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>">
 		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
 		or <input type=button value="Select From Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'">
 		<br>
@@ -1334,7 +1343,7 @@ if ($overwriteBody==1) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 						echo '<td></td>';
 						echo '<td>';
-						echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
+						echo '<b>' . Sanitize::encodeStringForDisplay($lnamesarr[$page_libstouse[$j]]) . '</b>';
 						echo '</td>';
 						for ($k=0;$k<9;$k++) {echo '<td></td>';}
 						echo '</tr>';
@@ -1345,14 +1354,14 @@ if ($overwriteBody==1) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 
-					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
+					<td><?php echo $page_questionTable[$qid]['checkbox']; ?></td>
+					<td><?php echo $page_questionTable[$qid]['desc']; ?></td>
 					<td class="nowrap">
 					   <div <?php if ($page_questionTable[$qid]['cap']) {echo 'class="ccvid"';}?>><?php echo $page_questionTable[$qid]['extref'] ?></div>
 					</td>
-					<td><?php echo $qid ?></td>
-					<td><?php echo $page_questionTable[$qid]['preview'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($qid); ?></td>
+					<td><?php echo $page_questionTable[$qid]['preview']; ?></td>
+					<td><?php echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']); ?></td>
 <?php
 						if ($searchall==1) {
 ?>
@@ -1361,7 +1370,7 @@ if ($overwriteBody==1) {
 						}
 ?>
 					<td class=c><?php
-					echo $page_questionTable[$qid]['times']; ?>
+					echo Sanitize::encodeStringForDisplay($page_questionTable[$qid]['times']); ?>
 					</td>
 					<?php if ($page_useavgtimes) {?><td class="c"><?php
 					if (isset($page_questionTable[$qid]['qdata'])) {
@@ -1372,9 +1381,9 @@ if ($overwriteBody==1) {
 					}
 					echo $page_questionTable[$qid]['avgtime'].'</span>'; ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['add'] ?></td>
-					<td><?php echo $page_questionTable[$qid]['src'] ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['add']; ?></td>
+					<td><?php echo $page_questionTable[$qid]['src']; ?></td>
+					<td class=c><?php echo $page_questionTable[$qid]['templ']; ?></td>
 					<?php if ($searchall==0) {
 						if ($page_questionTable[$qid]['junkflag']==1) {
 							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Flagged\" /></td>";
@@ -1437,7 +1446,7 @@ if ($overwriteBody==1) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td></td>
-				<td><b><?php echo $page_assessmentQuestions['desc'][$i] ?></b></td>
+				<td><b><?php echo $page_assessmentQuestions['desc'][$i]; ?></b></td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1451,19 +1460,19 @@ if ($overwriteBody==1) {
 				for ($x=0;$x<count($page_assessmentQuestions[$i]['desc']);$x++) {
 					if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
-				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x] ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x]; ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x]; ?></td>
 				<td class="nowrap">
-				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></div>
+				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x]; ?></div>
 				</td>
-				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['type'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['times'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['mine'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['add'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['src'][$x] ?></td>
-				<td class=c><?php echo $page_assessmentQuestions[$i]['templ'][$x] ?></td>
+				<td><?php echo Sanitize::onlyInt($page_assessmentQuestions[$i]['qsetid'][$x]); ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x]; ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions[$i]['type'][$x]); ?></td>
+				<td class=c><?php echo Sanitize::onlyInt($page_assessmentQuestions[$i]['times'][$x]); ?></td>
+				<td><?php echo $page_assessmentQuestions[$i]['mine'][$x]; ?></td>
+				<td class=c><?php echo $page_assessmentQuestions[$i]['add'][$x]; ?></td>
+				<td class=c><?php echo $page_assessmentQuestions[$i]['src'][$x]; ?></td>
+				<td class=c><?php echo $page_assessmentQuestions[$i]['templ'][$x]; ?></td>
 			</tr>
 
 <?php

@@ -2,7 +2,7 @@
 	//Displays Message list of students
 	//(c) 2008 David Lippman
 
-	require("../validate.php");
+	require("../init.php");
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -20,14 +20,14 @@
 
 	$threadsperpage = intval($listperpage);
 
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
-		$page = $_GET['page'];
+		$page = Sanitize::onlyInt($_GET['page']);
 	}
 	if (isset($_GET['filterstu'])) {
-		$filterstu = $_GET['filterstu'];
+		$filterstu = Sanitize::onlyInt($_GET['filterstu']);
 	} else {
 		$filterstu = 0;
 	}
@@ -58,7 +58,7 @@
 
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
-		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
+		echo "&gt; <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 	echo "&gt; <a href=\"msglist.php?cid=$cid\">Message List</a> &gt; Student Messages</div>";
 	echo '<div id="headerallstumsglist" class="pagetitle"><h2>All Student Messages</h2></div>';
@@ -121,7 +121,7 @@
 		echo $prevnext;
 		echo "</span>\n";
 	}
-	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/allstumsglist.php?cid=$cid&filterstu=";
+	$address = $GLOBALS['basesiteurl'] . "/msgs/allstumsglist.php?cid=$cid&filterstu=";
 
 ?>
 <script type="text/javascript">
@@ -150,11 +150,11 @@ function chgfilter() {
 	$stulist = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$stulist[$row[0]] = "{$row[1]}, {$row[2]}";
-		echo "<option value=\"{$row[0]}\" ";
+		echo "<option value=\"" . Sanitize::encodeStringForDisplay($row[0]) . "\" ";
 		if ($filterstu==$row[0]) {
 			echo 'selected=1';
 		}
-		echo " >{$row[1]}, {$row[2]}</option>";
+		echo " >" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</option>";
 	}
 	echo "</select></p>";
 
@@ -223,12 +223,12 @@ function chgfilter() {
 		} else if ($n>1) {
 			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
 		}
-		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filterstu=$filterstu&type=msg&msgid={$line['id']}&type=allstu\">";
-		echo $line['title'];
+		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"" . Sanitize::onlyInt($line['id']) . "\"/></td><td>";
+		echo "<a href=\"viewmsg.php?page" . Sanitize::onlyInt($page) . "&cid=$cid&filterstu=" . Sanitize::encodeStringForDisplay($filterstu) . "&type=msg&msgid=" . Sanitize::onlyInt($line['id']) . "&type=allstu\">";
+		echo Sanitize::encodeStringForDisplay($line['title']);
 		echo "</a></td><td>";
-		echo $stulist[$line['msgfrom']];
-		echo "</td><td>{$stulist[$line['msgto']]}</td>";
+		echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
+		echo "</td><td>" . Sanitize::encodeStringForDisplay($stulist[$line['msgto']]) . "</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
 	}

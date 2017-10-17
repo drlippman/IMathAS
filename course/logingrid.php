@@ -2,9 +2,10 @@
 //IMathAS:  Grid view of login log
 //(c) 2013 David Lippman for Lumen Learning
 
-require("../validate.php");
+require("../init.php");
 
-$cid = $_GET['cid'];
+
+$cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['secfilter'])) {
 	$secfilter = $_GET['secfilter'];
 	$sessiondata[$cid.'secfilter'] = $secfilter;
@@ -15,7 +16,7 @@ if (isset($_GET['secfilter'])) {
 	$secfilter = -1;
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= "&gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Login Grid";
 
 $overwriteBody = 0;
@@ -126,7 +127,7 @@ if ($overwriteBody==1) {
 	$n = count($dates);
 	foreach ($stus as $stu) {
 		if ($alt==0) {echo '<tr class="even">'; $alt=1;} else {echo '<tr class="odd">'; $alt=0;}
-		echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.$stu[1].'">'.$stu[0].'</a></td>';
+		echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($stu[1]).'">'.Sanitize::encodeStringForDisplay($stu[0]).'</a></td>';
 		for ($i=0;$i<$n;$i++) {
 			echo '<td>';
 			if (isset($logins[$stu[1]][$i])) {

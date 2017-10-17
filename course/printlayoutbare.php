@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 
 
 
@@ -27,8 +27,8 @@ if (isset($_POST['versions'])) {
 }
 
 $nologo = true;
-$cid = $_GET['cid'];
-$aid = intval($_GET['aid']);
+$cid = Sanitize::courseId($_GET['cid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
 	$sessiondata['mathdisp'] = 0;
 } else {
@@ -50,7 +50,8 @@ if ($overwriteBody==1) {
 	echo $body;
 } if (!isset($_POST['versions'])) {
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a>';
@@ -126,11 +127,13 @@ if ($overwriteBody==1) {
 	$qn = array();
 	$fixedseeds = array();
 	//DB $qlist = "'".implode("','",$questions)."'";
-	$qlist = implode(',', array_map('intval', $questions));
+	$qlist = array_map('Sanitize::onlyInt', $questions);
 	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($qlist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
+	$stm = $DBH->prepare("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($query_placeholders)");
+	$stm->execute($qlist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
@@ -139,8 +142,8 @@ if ($overwriteBody==1) {
 		}
 		$qn[$row[0]] = $row[2];
 		if ($row[3]!==null && $row[3]!='') {
-			$fixedseeds[$row[0]] = explode(',',$row[3]);	
-		}
+			$fixedseeds[$row[0]] = explode(',',$row[3]);
+	}
 	}
 
 
@@ -201,8 +204,8 @@ if ($overwriteBody==1) {
 					if (isset($fixedseeds[$questions[$i]])) {
 						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
 					} else {
-						$seeds[$j][] = $aid + $i + $j;	
-					}
+					$seeds[$j][] = $aid + $i + $j;
+				}
 				}
 			} else {
 				for ($i = 0; $i<count($questions);$i++) {
@@ -216,26 +219,26 @@ if ($overwriteBody==1) {
 						}
 						$seeds[$j][] = $fixedseeds[$questions[$i]][($x+$j)%$n];
 					} else {
-						$seeds[$j][] = rand(1,9999);
-					}
+					$seeds[$j][] = rand(1,9999);
 				}
 			}
 		}
+	}
 	}
 
 	for ($pt=0;$pt<$printtwice;$pt++) {
 		if ($pt==1) {
 			$sessiondata['mathdisp'] = 0;
-			echo $_POST['vsep'].'<br/>';;
+			echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';;
 
 		}
 
 		if ($_POST['format']=='trad') {
 			for ($j=0; $j<$copies; $j++) {
-				if ($j>0) { echo $_POST['vsep'].'<br/>';}
+				if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';}
 
 				$headerleft = '';
-				$headerleft .= $line['name'];
+				$headerleft .= Sanitize::encodeStringForDisplay($line['name']);
 				if ($copies>1) {
 					$headerleft .= ' - Form ' . ($j+1);
 				}
@@ -247,13 +250,14 @@ if ($overwriteBody==1) {
 				echo "<div class=hdrm>\n";
 
 				echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-				echo "<div id=intro>{$line['intro']}</div>\n";
+				// $line['intro'] contains HTML.
+				printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 				echo "</div>\n";
 				echo "</div>\n";
 
 
 				for ($i=0; $i<$numq; $i++) {
-					if ($i>0) { echo $_POST['qsep'];}
+					if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
 					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
 
@@ -261,7 +265,7 @@ if ($overwriteBody==1) {
 
 			if ($_POST['keys']>0) { //print answer keys
 				for ($j=0; $j<$copies; $j++) {
-					echo $_POST['vsep'].'<br/>';
+					echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';
 					echo '<b>Key - Form ' . ($j+1) . "</b>\n";
 					echo "<ol>\n";
 					for ($i=0; $i<$numq; $i++) {
@@ -282,7 +286,7 @@ if ($overwriteBody==1) {
 		} else if ($_POST['format']=='inter') {
 
 			$headerleft = '';
-			$headerleft .= $line['name'];
+			$headerleft .= Sanitize::encodeStringForDisplay($line['name']);
 			if ((isset($_POST['iname']) || isset($_POST['cname'])) && isset($_POST['aname'])) {
 				$headerleft .= "<br/>";
 			}
@@ -291,18 +295,19 @@ if ($overwriteBody==1) {
 			echo "<div class=hdrm>\n";
 
 			echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
-			echo "<div id=intro>{$line['intro']}</div>\n";
+			// $line['intro'] contains HTML.
+			printf("<div id=intro>%s</div>\n", Sanitize::outgoingHtml($line['intro']));
 			echo "</div>\n";
 			echo "</div>\n";
 			for ($i=0; $i<$numq; $i++) {
-				if ($i>0) { echo $_POST['qsep'];}
+				if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
 				for ($j=0; $j<$copies;$j++) {
-					if ($j>0) { echo $_POST['qsep'];}
+					if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
 					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
 			}
 			if ($_POST['keys']>0) { //print answer keys
-				echo $_POST['vsep'].'<br/>';
+				echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';
 				echo "<b>Key</b>\n";
 				echo "<ol>\n";
 				for ($i=0; $i<count($sa); $i++) {
@@ -318,8 +323,8 @@ if ($overwriteBody==1) {
 			}
 		}
 	}
-	$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
-	echo '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
+	$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
+	echo '<hr/><p style="font-size:70%">License info at: <a href="'.Sanitize::url($licurl).'">'.Sanitize::encodeStringForDisplay($licurl).'</a></p>';
 
 	echo "<div class=cbutn><a href=\"course.php?cid=$cid\">Return to course page</a></div>\n";
 
@@ -348,8 +353,10 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 		$stm->execute(array(':qsetid'=>$qsetid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			if (substr($row[1],0,4)=='http') {
+				${$row[0]} = "<img src=\"{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			} else if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				${$row[0]} = "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
 			} else {
 				${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
 			}
@@ -414,7 +421,7 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 		echo "<div class=m id=\"trq$qn\">\n";
 	}
 	if ($showpts) {
-		echo ($qn+1).'. ('.$pts.' pts) ';
+		echo ($qn+1).'. ('.Sanitize::encodeStringForDisplay($pts).' pts) ';
 	}
 	echo "<div>\n";
 	//echo $toevalqtext;

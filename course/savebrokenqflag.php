@@ -2,7 +2,7 @@
 //IMathAS.  Records broken question flag
 //(c) 2010 David Lippman
 
-require("../validate.php");
+require("../init.php");
 
 if (!isset($_GET['qsetid']) || $myrights<20) {
 	exit;

@@ -1,10 +1,11 @@
 <?php
 //IMathAS:  Item Analysis (averages)
 //(c) 2007 David Lippman
-	require("../validate.php");
+	require("../init.php");
+
 	$isteacher = isset($teacherid);
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (!$isteacher) {
 		echo "This page not available to students";
 		exit;
@@ -60,7 +61,7 @@
 	$placeinhead .= "}\n</script>";
 	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	if ($stu==-1) {
 		echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> ";
@@ -91,24 +92,29 @@
 	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = $stm->fetch(PDO::FETCH_NUM);
-	echo $aname.'</h2></div>';
+	echo Sanitize::encodeStringForDisplay($aname) . '</h2></div>';
 
 
 	$itemarr = array();
 	$itemnum = array();
+	$curqnum = 1;
 	foreach (explode(',',$itemorder) as $k=>$itel) {
 		if (strpos($itel,'~')!==false) {
 			$sub = explode('~',$itel);
 			if (strpos($sub[0],'|')!==false) {
-				array_shift($sub);
+				$grppts = explode('|', array_shift($sub));
+			} else {
+				$grppts = array(1);
 			}
 			foreach ($sub as $j=>$itsub) {
 				$itemarr[] = $itsub;
-				$itemnum[$itsub] = ($k+1).'-'.($j+1);
+				$itemnum[$itsub] = $curqnum.'-'.($j+1);
 			}
+			$curqnum += $grppts[0];
 		} else {
 			$itemarr[] = $itel;
-			$itemnum[$itel] = ($k+1);
+			$itemnum[$itel] = $curqnum;
+			$curqnum++;
 		}
 	}
 
@@ -228,7 +234,7 @@
 	}
 	echo '</p>';
 	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=060417\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th>";
 	//echo "<th scope=\"col\">Average Score<br/>All</th>";
@@ -242,15 +248,17 @@
 	if (count($qtotal)>0) {
 		$i = 1;
 		//$qs = array_keys($qtotal);
-		$qslist = implode(',', array_map('intval',$itemarr));
+		$qslist = array_map('Sanitize::onlyInt',$itemarr);
 		//DB $query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		//DB $query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		//DB $query .= " AND imas_questions.id IN ($qslist)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$query_placeholders = Sanitize::generateQueryPlaceholders($qslist);
 		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		$query .= " AND imas_questions.id IN ($qslist)";
-		$stm = $DBH->query($query);
+		$query .= " AND imas_questions.id IN ($query_placeholders)";
+		$stm = $DBH->prepare($query);
+		$stm->execute($qslist);
 		$descrips = array();
 		$points = array();
 		$withdrawn = array();
@@ -343,25 +351,30 @@
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
-			echo "{$descrips[$qid]}</td>";
-			echo "<td><a href=\"gradeallq.php?stu=$stu&cid=$cid&asid=average&aid=$aid&qid=$qid\" ";
+			echo Sanitize::encodeStringForDisplay($descrips[$qid]) . "</td>";
+			echo "<td><a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&asid=average&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "\" ";
 			if (isset($needmanualgrade[$qid])) {
 				echo 'class="manualgrade" ';
 			}
 			echo ">Grade</a></td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo "<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\"><b>$pc2%</b></td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,500);return false;\">$avgatt ($avgreg)</td>";
-			echo "<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi%</td>";
-			echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,500);return false;\">$avgtot ($avgtota)</td>";
+			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></td>",
+                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
+			echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s (%s)</td>",
+                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
+			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s%%</td>",
+                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($pi));
+			echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</td>",
+                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot), Sanitize::encodeStringForDisplay($avgtota));
 			if ($showhints==1) {
 				if ($showextref[$qid]) {
-					echo "<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=help',500,500);return false;\">".round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])).'%</td>';
+					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
+                        $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
 					echo '<td class="c">N/A</td>';
 				}
 			}
-			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
+			echo sprintf("<td><input type=button value=\"Preview\" onClick=\"previewq(%d)\"/></td>\n", $qsetids[$qid]);
 
 			echo "</tr>\n";
 			$i++;

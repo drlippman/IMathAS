@@ -3,9 +3,10 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
+
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
@@ -20,8 +21,8 @@ $overwriteBody = 0;
 $body = "";
 $useeditor = "text,summary";
 
-
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Modify Link\n";
 	$pagetitle = "Modify Link";
@@ -30,7 +31,7 @@ if (isset($_GET['id'])) {
 	$pagetitle = "Add Link";
 }
 if (isset($_GET['tb'])) {
-	$totb = $_GET['tb'];
+	$totb = Sanitize::encodeStringForDisplay($_GET['tb']);
 } else {
 	$totb = 'b';
 }
@@ -42,10 +43,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
-	$page_formActionTag = "addlinkedtext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
-	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
+            'cid' => $cid, 'folder' => $_GET['folder']));
+	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::onlyInt($_GET['id']) : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
 	$caltag = $_POST['caltag'];
@@ -92,7 +94,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($_FILES['userfile']['name']!='') {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				//$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
-				$userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
+        $userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['userfile']['name'])));
 				$filename = $userfilename;
 				$extension = strtolower(strrchr($userfilename,"."));
 				$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
@@ -155,7 +157,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$processingerror = true;
 			}
 		} else if ($_POST['linktype']=='web') {
-			$_POST['text'] = trim(strip_tags($_POST['web']));
+			$_POST['text'] = Sanitize::url($_POST['web']);
 			if (substr($_POST['text'],0,4)!='http') {
 				$processingerror = true;
 			}
@@ -295,16 +297,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$body = "<p>Error with your submission</p>";
 			}
-			$body .= "<p><a href=\"addlinkedtext.php?cid={$_GET['cid']}";
+			$body .= "<p><a href=\"addlinkedtext.php?cid=" . Sanitize::courseId($_GET['cid']);
 			if (isset($_GET['id'])) {
-				$body .= "&id={$_GET['id']}";
+				$body .= "&id=" . Sanitize::onlyInt($_GET['id']);
 			} else {
 				$body .= "&id=$newtextid";
 			}
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 		}
 		exit;
 	} else {
@@ -564,9 +566,9 @@ if ($overwriteBody==1) {
 			<span class="formright">
 			<?php if ($filename != '') {
 				require_once("../includes/filehandler.php");
-				echo '<input type="hidden" name="curfile" value="'.$filename.'"/>';
+				echo '<input type="hidden" name="curfile" value="'.Sanitize::encodeStringForDisplay($filename).'"/>';
 				$alink = getcoursefileurl($filename);
-				echo 'Current file: <a href="'.$alink.'">'.basename($filename).'</a><br/>Replace ';
+				echo 'Current file: <a target="_blank" href="' . Sanitize::url($alink) . '">'.Sanitize::encodeStringForDisplay(basename($filename)).'</a><br/>Replace ';
 			} else {
 				echo 'Attach ';
 			}
@@ -586,7 +588,8 @@ if ($overwriteBody==1) {
 				echo 'No Tools defined yet<br/>';
 			}
 			if (!isset($CFG['GEN']['noInstrExternalTools'])) {
-				echo '<a href="../admin/externaltools.php?cid='.$cid.'&amp;ltfrom='.$_GET['id'].'">Add or edit an external tool</a>';
+				echo '<a href="../admin/externaltools.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
+                        'ltfrom' => Sanitize::onlyInt($_GET['id']))) .'">Add or edit an external tool</a>';
 			}
 			?>
 			</span><br class="form"/>
@@ -598,7 +601,7 @@ if ($overwriteBody==1) {
 			<div id="gbdetail" <?php if ($points==0) { echo 'style="display:none;"';}?>>
 			<span class="form">Points:</span>
 			<span class="formright">
-				<input type=text size=4 name="points" value="<?php echo $points;?>"/> points
+				<input type=text size=4 name="points" value="<?php echo Sanitize::encodeStringForDisplay($points); ?>"/> points
 			</span><br class="form"/>
 			<span class=form>Gradebook Category:</span>
 				<span class=formright>
@@ -618,7 +621,7 @@ if ($overwriteBody==1) {
 				<span class="formright">
 	<?php
 		writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
-		echo '<input type="hidden" name="gradesecret" value="'.$gradesecret.'"/>';
+		echo '<input type="hidden" name="gradesecret" value="'.Sanitize::encodeStringForDisplay($gradesecret).'"/>';
 	?>
 			</span><br class="form" />
 			</div>
@@ -663,7 +666,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No<br/>
 			<input type=radio name="oncal" value=1 <?php writeHtmlChecked($line['oncal'],1); ?> /> Yes, on Available after date (will only show after that date)<br/>
 			<input type=radio name="oncal" value=2 <?php writeHtmlChecked($line['oncal'],2); ?> /> Yes, on Available until date<br/>
-			With tag: <input name="caltag" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+			With tag: <input name="caltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']);?>"/>
 		</span><br class="form" />
 		</div>
 		<div id="altcaldiv" style="display:<?php echo ($line['avail']==2)?"block":"none"; ?>">
@@ -674,7 +677,7 @@ if ($overwriteBody==1) {
 			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></a> <br/>
-			With tag: <input name="altcaltag" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+			With tag: <input name="altcaltag" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']);?>"/>
 		</span><BR class=form>
 		</div>
 <?php

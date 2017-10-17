@@ -4,9 +4,10 @@
 
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/diff.php");
+
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -18,7 +19,7 @@ $body = "";
 $cid = intval($_GET['cid']);
 $id = intval($_GET['id']);
 $groupid = intval($_GET['grp']);
-$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">$coursename</a>";
+$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 
 if (isset($_GET['framed'])) {
 	$flexwidth = true;
@@ -49,21 +50,21 @@ if ($cid==0) {
 	if (!isset($teacherid) && ($row['avail']==0 || ($row['avail']==1 && ($now<$row['startdate'] || $now>$row['enddate'])))) {
 		$overwriteBody=1;
 		$body = "This wiki is not currently available for viewing";
-	} else if (isset($_GET['delall']) && isset($teacherid)) {
-		if ($_GET['delall']=='true') {
+	} else if (isset($_REQUEST['delall']) && isset($teacherid)) {
+		if (isset($_POST['delall']) && $_POST['delall']=='true') {
 			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid");
 			$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid));
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">View Wiki</a>";
 			$curBreadcrumb .= " &gt; Clear WikiPage Contents\n";
 			$pagetitle = "Confirm Page Contents Delete";
 		}
-	} else if (isset($_GET['delrev']) && isset($teacherid)) {
-		if ($_GET['delrev']=='true') {
+	} else if (isset($_REQUEST['delrev']) && isset($teacherid)) {
+		if (isset($_POST['delrev']) && $_POST['delrev']=='true') {
 			//DB $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
@@ -77,7 +78,7 @@ if ($cid==0) {
 				$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid AND id<:curid");
 				$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':curid'=>$curid));
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">View Wiki</a>";
@@ -85,8 +86,8 @@ if ($cid==0) {
 			$pagetitle = "Confirm History Delete";
 		}
 
-	} else if (isset($_GET['revert']) && isset($teacherid)) {
-		if ($_GET['revert']=='true') {
+	} else if (isset($_REQUEST['revert']) && isset($teacherid)) {
+		if (isset($_POST['revert']) && $_POST['revert']=='true') {
 			$revision = intval($_GET['torev']);
 			//DB $query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ";
 			//DB $query .= "AND id>=$revision ORDER BY id DESC";
@@ -115,7 +116,7 @@ if ($cid==0) {
 				$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid AND id>:id");
 				$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':id'=>$revision));
 			}
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id$framed");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id$framed");
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">View Wiki</a>";
@@ -219,7 +220,7 @@ if ($cid==0) {
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':stugroupid'=>$groupid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$grpmem .= "<li>{$row[0]}, {$row[1]}</li>";
+				$grpmem .= "<li>".Sanitize::encodeStringForDisplay($row[0]).", ". Sanitize::encodeStringForDisplay($row[1])."</li>";
 			}
 			$grpmem .= '</ul></p>';
 		}
@@ -275,11 +276,11 @@ if ($cid==0) {
 
  /******* begin html output ********/
  $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/viewwiki.js?v=051710"></script>';
- $addr = $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/wikirev.php?cid='.$cid.'&id='.$id.$framed;
+ $addr = $GLOBALS['basesiteurl'] . '/wikis/wikirev.php?cid=' . $cid . '&id=' . $id . $framed;
  if ($isgroup) {
 	 $addr .= '&grp='.$groupid;
  }
- $addr2 = $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/viewwiki.php?revert=ask&cid='.$cid.'&id='.$id.$framed;
+ $addr2 = $GLOBALS['basesiteurl'] . '/wikis/viewwiki.php?revert=ask&cid=' . $cid . '&id=' . $id . $framed;
  if ($isgroup) {
 	 $addr2 .= '&grp='.$groupid;
  }
@@ -318,26 +319,36 @@ if ($overwriteBody==1) {
 		$grpnote = 'this';
 	}
 	if (isset($_GET['delall']) && isset($teacherid)) {
-		echo '<p>Are you SURE you want to delete all contents and history for '.$grpnote.' Wiki page?</p>';
+		echo '<p>Are you SURE you want to delete all contents and history for '.Sanitize::encodeStringForDisplay($grpnote).' Wiki page?</p>';
 
-		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=true$framed'\">Yes, I'm Sure</button> | ";
-		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+		$querystring = http_build_query(array('cid'=>$cid,'id'=>$id,'grp'=>$groupid));
+		echo '<form method="post" action="viewwiki.php?'.$querystring.$framed.'">';
+		echo '<p><button type=submit name=delall value=true>'._("Yes, I'm Sure").'</button> ';
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
+		echo '</p>';
 
 	} else if (isset($_GET['delrev']) && isset($teacherid)) {
-		echo '<p>Are you SURE you want to delete all revision history for '.$grpnote.' Wiki page?  The current version will be retained.</p>';
+		echo '<p>Are you SURE you want to delete all revision history for '.Sanitize::encodeStringForDisplay($grpnote).' Wiki page?  The current version will be retained.</p>';
 
-		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=true$framed'\">Yes, I'm Sure</button> | ";
-		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+		$querystring = http_build_query(array('cid'=>$cid,'id'=>$id,'grp'=>$groupid));
+		echo '<form method="post" action="viewwiki.php?'.$querystring.$framed.'">';
+		echo '<p><button type=submit name=delrev value=true>'._("Yes, I'm Sure").'</button> ';
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
+		echo '</p>';
+
 	} else if (isset($_GET['revert'])) {
-		$torev = $_GET['torev'];
-		$disprev = $_GET['disprev'];
-		echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
+		$torev = Sanitize::onlyInt($_GET['torev']);
+		$disprev = Sanitize::onlyInt($_GET['disprev']);
+		echo '<p>Are you SURE you want to revert to revision '.Sanitize::onlyInt($disprev).' of '.Sanitize::encodeStringForDisplay($grpnote).' Wiki page?  All changes after that revision will be deleted.</p>';
 
-		echo "<p><button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&torev=$torev&revert=true$framed'\">Yes, I'm Sure</button> | ";
-		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+		$querystring = http_build_query(array('cid'=>$cid,'id'=>$id,'grp'=>$groupid,'torev'=>$torev));
+		echo '<form method="post" action="viewwiki.php?'.$querystring.$framed.'">';
+		echo '<p><button type=submit name=revert value=true>'._("Yes, I'm Sure").'</button> ';
+		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
+		echo '</p>';
 
 	} else if (isset($_GET['snapshot'])) {
-		echo "<p>Current Version Code.  <a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed\">Back</a></p>";
+		echo "<p>Current Version Code.  <a href=\"viewwiki.php?cid=".Sanitize::courseId($cid)."&id=". Sanitize::onlyInt($id)."&grp=".Sanitize::onlyInt($groupid).Sanitize::encodeStringForDisplay($framed)."\">Back</a></p>";
 		echo '<div class="editor" style="font-family:courier; padding: 10px;">';
 		echo str_replace('&gt; &lt;',"&gt;<br/>&lt;",htmlentities($text));
 		echo '</div>';
@@ -347,7 +358,7 @@ if ($overwriteBody==1) {
 			writeHtmlSelect('gfilter',$stugroup_ids,$stugroup_names,$groupid,null,null,'onchange="chgfilter()"');
 			echo '</p>';
 		} else if ($isgroup) {
-			echo "<p>Group: $curgroupname</p>";
+			echo "<p>Group:". Sanitize::encodeStringForDisplay($curgroupname)."</p>";
 		}
 ?>
 <?php
@@ -356,9 +367,9 @@ if (isset($teacherid)) {
 	if ($isgroup) {
 		$grpnote = "For this group's wiki: ";
 	}
-	echo "<button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delall=ask$framed'\">Clear Page Contents</button> | ";
-	echo "<button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid&delrev=ask$framed'\">Clear Page History</button> | ";
-	echo "<a href=\"viewwiki.php?cid=$cid&id=$id&grp=$groupid&snapshot=true$framed\">Current Version Snapshot</a></div>";
+	echo "<button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=".Sanitize::courseId($cid)."&id=".Sanitize::onlyInt($id)."&grp=".Sanitize::onlyInt($groupid)."&delall=ask".Sanitize::encodeStringForJavascript($framed)."'\">Clear Page Contents</button> | ";
+	echo "<button type=\"button\" onclick=\"window.location.href='viewwiki.php?cid=".Sanitize::courseId($cid)."&id=".Sanitize::onlyInt($id)."&grp=".Sanitize::onlyInt($groupid)."&delrev=ask".Sanitize::encodeStringForJavascript($framed)."'\">Clear Page History</button> | ";
+	echo "<a href=\"viewwiki.php?cid=".Sanitize::courseId($cid)."&id=".Sanitize::onlyInt($id)."&grp=".Sanitize::onlyInt($groupid)."&snapshot=true".Sanitize::encodeUrlParam($framed)."\">Current Version Snapshot</a></div>";
 }
 echo '<p><span id="revisioninfo">Revision '.$numrevisions;
 if ($numrevisions>0) {
@@ -381,13 +392,14 @@ if ($numrevisions>1) {
 	<div class="editor">
 <?php
 if ($canedit) {
-	echo "<button type=\"button\" onclick=\"window.location.href='editwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Edit this page</button>";
+	echo "<button type=\"button\" onclick=\"window.location.href='editwiki.php?cid=".Sanitize::courseId($cid)."&id=". Sanitize::onlyInt($id)."&grp=".Sanitize::onlyInt($groupid). Sanitize::encodeStringForJavascript($framed)."'\">Edit this page</button>";
 }
 ?>
 	<div class="wikicontent" id="wikicontent"><?php echo filter($text); ?></div></div>
 
 <?php
 if ($isgroup) {
+	//encoded when set on line  223
 	echo $grpmem;
 }
 }

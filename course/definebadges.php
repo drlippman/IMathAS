@@ -1,13 +1,14 @@
 <?php
 
-require("../validate.php");
+require("../init.php");
+
 
 if (!isset($teacherid)) {
 	echo "You are not authorized to view this page";
 	exit;
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 
 if (empty($_GET['badgeid'])) {
 	require("../header.php");
@@ -24,9 +25,9 @@ if (empty($_GET['badgeid'])) {
 		echo '<ul>';
 		//DB while ($row=mysql_fetch_row($result)) {
 		while ($row=$stm->fetch(PDO::FETCH_NUM)) {
-			echo '<li><a href="definebadges.php?cid='.$cid.'&amp;badgeid='.$row[0].'">'.$row[1].'</a> ';
-			echo '<a class="small" href="definebadges.php?cid='.$cid.'&amp;badgeid='.$row[0].'&amp;delete=true" onclick="return confirm(\'Are you sure you want to delete this badge definition and invalidate all awarded badges?\');">[Delete]</a> ';
-			echo '<br/><a href="claimbadge.php?cid='.$cid.'&amp;badgeid='.$row[0].'">Link to claim badge</a> (provide to students)';
+			echo '<li><a href="definebadges.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '">'.Sanitize::encodeStringForDisplay($row[1]).'</a> ';
+			echo '<a class="small" href="definebadges.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '&amp;delete=true" onclick="return confirm(\'Are you sure you want to delete this badge definition and invalidate all awarded badges?\');">[Delete]</a> ';
+			echo '<br/><a href="claimbadge.php?cid='.$cid.'&amp;badgeid=' . Sanitize::encodeUrlParam($row[0]) . '">Link to claim badge</a> (provide to students)';
 			echo '</li>';
 		}
 		echo '</ul>';
@@ -39,7 +40,7 @@ if (empty($_GET['badgeid'])) {
 
 } else {
 	if (!empty($_GET['delete'])) {
-		$badgeid = intval($_GET['badgeid']);
+		$badgeid = Sanitize::onlyInt($_GET['badgeid']);
 		if ($badgeid==0) { echo 'Can not delete - invalid badgeid'; exit;}
 		//DB $query = "SELECT courseid FROM imas_badgesettings WHERE id=$badgeid";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -56,7 +57,7 @@ if (empty($_GET['badgeid'])) {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_badgerecords WHERE badgeid=:badgeid");
 		$stm->execute(array(':badgeid'=>$badgeid));
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/definebadges.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/definebadges.php?cid=$cid");
 		exit;
 	}
 	if (!empty($_POST['badgename'])) { //postback
@@ -82,13 +83,13 @@ if (empty($_GET['badgeid'])) {
 			$stm = $DBH->prepare("INSERT INTO imas_badgesettings (name, badgetext, description, longdescription, courseid, requirements) VALUES (:name, :badgetext, :description, :longdescription, :courseid, :requirements)");
 			$stm->execute(array(':name'=>$badgename, ':badgetext'=>$badgetext, ':description'=>$descr, ':longdescription'=>$longdescr, ':courseid'=>$cid, ':requirements'=>$req));
 		} else {
-			$badgeid = intval($_GET['badgeid']);
+			$badgeid = Sanitize::onlyInt($_GET['badgeid']);
 			//DB $query = "UPDATE imas_badgesettings SET name='$badgename',badgetext='$badgetext',description='$descr', longdescription='$longdescr', requirements='$req' WHERE id='$badgeid' AND courseid='$cid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_badgesettings SET name=:name,badgetext=:badgetext,description=:description, longdescription=:longdescription, requirements=:requirements WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':name'=>$badgename, ':badgetext'=>$badgetext, ':description'=>$descr, ':longdescription'=>$longdescr, ':requirements'=>$req, ':id'=>$badgeid, ':courseid'=>$cid));
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/definebadges.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/definebadges.php?cid=$cid");
 		exit;
 
 	} else {  // create form
@@ -101,7 +102,7 @@ if (empty($_GET['badgeid'])) {
 			$badgeid = 'new';
 			$req = array('data'=>array());
 		} else {
-			$badgeid = intval($_GET['badgeid']);
+			$badgeid = Sanitize::onlyInt($_GET['badgeid']);
 			//DB $query = "SELECT name,badgetext,description,longdescription,requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)==0) { echo 'Invalid badge id for this course'; exit;}
@@ -136,14 +137,14 @@ if (empty($_GET['badgeid'])) {
 
 		echo '<form method="post" action="definebadges.php?cid='.$cid.'&amp;badgeid='.$badgeid.'">';
 
-		echo '<p>Badge Name: <input type="text" size="80" maxlength="128" name="badgename" value="'.$name.'"/><br/>Max 128 characters</p>';
-		echo '<p>Badge Short Name: <input type="text" size="30" maxlength="128" name="badgetext" value="'.$badgetext.'"/> <br/>';
+		echo '<p>Badge Name: <input type="text" size="80" maxlength="128" name="badgename" value="' . Sanitize::encodeStringForDisplay($name) . '"/><br/>Max 128 characters</p>';
+		echo '<p>Badge Short Name: <input type="text" size="30" maxlength="128" name="badgetext" value="' . Sanitize::encodeStringForDisplay($badgetext) . '"/> <br/>';
 		echo 'This text also displays on the badge image. <br/>Keep it under 24 characters, and not more than 12 characters in a single word.';
 		echo '<br>Alternatively, provide a URL for a 90x90 .png to use as the badge image</p>';
 
-		echo '<p>Badge Short Description: <input type="text" size="80" maxlength="128" name="description" value="'.$descr.'"/><br/>Max 128 characters</p>';
+		echo '<p>Badge Short Description: <input type="text" size="80" maxlength="128" name="description" value="' . Sanitize::encodeStringForDisplay($descr) . '"/><br/>Max 128 characters</p>';
 
-		echo '<p>Badge Long Description:<br/> <textarea name="longdescription" cols="80" rows="5">'.$longdescr.'</textarea></p>';
+		echo '<p>Badge Long Description:<br/> <textarea name="longdescription" cols="80" rows="5">' . Sanitize::encodeStringForDisplay($longdescr) . '</textarea></p>';
 
 		echo '<p>Select the badge requirements.  All conditions must be met for the badge to be earned</p>';
 
@@ -154,7 +155,7 @@ if (empty($_GET['badgeid'])) {
 			writeHtmlSelect("catselect$i",$gbvals,$gblabels,isset($req['data'][$i])?$req['data'][$i][0]:null,'Select...','NS');
 			echo '</td><td>';
 			writeHtmlSelect("cattype$i",$gtvals,$gtlabels,isset($req['data'][$i])?$req['data'][$i][1]:0);
-			echo '</td><td><input type="text" size="3" name="catscore'.$i.'" value="'.(isset($req['data'][$i])?$req['data'][$i][2]:'').'"/>%</td></tr>';
+			echo '</td><td><input type="text" size="3" name="catscore' . $i . '" value="' . (isset($req['data'][$i]) ? Sanitize::encodeStringForDisplay($req['data'][$i][2]) : '').'"/>%</td></tr>';
 		}
 		echo '</tbody></table>';
 		echo '<p><input type="submit" value="Save"/></p>';

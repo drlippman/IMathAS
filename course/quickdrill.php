@@ -2,6 +2,8 @@
 //IMathAS:  "Quick Drill" player
 //(c) 2009 David Lippman
 
+require_once(__DIR__ . "/../includes/sanitize.php");
+
 //options:  	id=questionsetid
 //		cid=courseid (not required)
 //		sa=show answer options:  0 - show score and answer if wrong
@@ -13,8 +15,9 @@
 //		nc=#  do until nc questions are correct then stop
 //		t=#  do as many questions as possible in t seconds
 
+
 if (isset($_GET['public'])) {
-	require("../config.php");
+	require("../init_without_validate.php");
 	if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
 	ini_set('session.gc_maxlifetime',86400);
 	ini_set('auto_detect_line_endings',true);
@@ -40,7 +43,7 @@ if (isset($_GET['public'])) {
 	$sessiondata['graphdisp'] = 1;
 	$sessiondata['mathdisp'] = 2;
 } else {
-	require("../validate.php");
+	require("../init.php");
 	$public = '';
 	$publica = '';
 }
@@ -62,15 +65,15 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	$out = '';
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$out .= "<p><b>{$row[1]}</b><ul>";
+		$out .= "<p><b>".Sanitize::encodeStringForDisplay($row[1])."</b><ul>";
 		foreach ($sessiondata['drillresults'][$row[0]] as $item) {
 			$out .= '<li>';
 			if ($item[0]=='n') {
-				$out .= $item[1].' questions completed in '.$item[2].', score: '.$item[3];
+				$out .= $item[1].' questions completed in '.Sanitize::encodeStringForDisplay($item[2]).', score: '.Sanitize::encodeStringForDisplay($item[3]);
 			} elseif ($item[0]=='nc') {
-				$out .= $item[1].' questions completed correctly in '.$item[2].', '.$item[3];
+				$out .= $item[1].' questions completed correctly in '.Sanitize::encodeStringForDisplay($item[2]).', '.Sanitize::encodeStringForDisplay($item[3]);
 			} elseif ($item[0]=='t') {
-				$out .= 'Score: '.$item[2].', in '.$item[1];
+				$out .= 'Score: '.Sanitize::encodeStringForDisplay($item[2]).', in '.Sanitize::encodeStringForDisplay($item[1]);
 			}
 			$out .= '</li>';
 		}
@@ -78,7 +81,7 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	}
 	echo $out;
 	if (isset($_GET['email']) && isset($_GET['public']) && !isset($_POST['stuname'])) {
-		$addy = 'quickdrill.php?public=true&showresults=true&email='.$_GET['email'];
+		$addy = 'quickdrill.php?public=true&showresults=true&email='.Sanitize::emailAddress($_GET['email']);
 		echo '<p><b>Send results to instructor</b><br/>';
 		echo "<form action=\"$addy\" method=\"post\">";
 		echo 'Your name: <input type="text" name="stuname" /></p>';
@@ -94,9 +97,9 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 		$headers .= "From: $sendfrom\r\n";
 		$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-		$message .= "<p>Quick Drill Results for $stuname</p>";
+		$message .= "<p>Quick Drill Results for ".Sanitize::encodeStringForDisplay($stuname)."</p>";
 		$message .= "<p>$out</p>";
-		mail($_GET['email'],'QuickDrill Results',$message,$headers);
+		mail(Sanitize::emailAddress($_GET['email']),'QuickDrill Results',$message,$headers);
 		echo "<p>Email Sent</p>";
 	}
 	exit;
@@ -139,7 +142,7 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 		$sessiondata['drill']['id'] = $_GET['id'];
 	}
 	if (!empty($_GET['cid'])) {
-		$sessiondata['drill']['cid'] = $_GET['cid'];
+		$sessiondata['drill']['cid'] = Sanitize::courseId($_GET['cid']);
 	}  else {
 		$sessiondata['drill']['cid'] = 0;
 	}
@@ -174,10 +177,10 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 
 	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
 		echo '<html><body>';
-		echo "<a href=\"" . $urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public\">Start</a>";
+		echo "<a href=\"" . $GLOBALS['basesiteurl'] . "/course/quickdrill.php$public\">Start</a>";
 		echo '</body></html>';
 	} else {
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/quickdrill.php$public");
 	}
 	exit;
 }
@@ -191,9 +194,9 @@ if (isset($_POST['seed'])) {
 	$page_scoreMsg =  printscore($score,$qsetid,$_POST['seed']);
 	if (getpts($score)<1 && $sa==0) {
 		$showans = true;
-		$seed = $_POST['seed'];
+		$seed = Sanitize::onlyInt($_POST['seed']);
 	} else if (getpts($score)<1 && $sa==4) {
-		$seed = $_POST['seed'];
+		$seed = Sanitize::onlyInt($_POST['seed']);
 		unset($lastanswers);
 	} else {
 		unset($lastanswers);
@@ -218,7 +221,7 @@ $placeinhead = '<style type="text/css">div.question {width: auto;} div.review {w
 $useeditor = 1;
 require("../assessment/header.php");
 if ($cid!=0) {
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Drill</div>";
 }
 
@@ -251,8 +254,8 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
-	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
-	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
+	echo "<p>Score:  ".Sanitize::onlyFloat($curscore)." out of ".count($scores)." possible</p>";
+	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
 		$sessiondata['drillresults'][$qsetid] = array();
@@ -272,7 +275,7 @@ if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questio
 	echo "$seconds seconds</p>";
 
 	echo "<p>".count($scores)." tries used</p>";
-	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
+	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
 		$sessiondata['drillresults'][$qsetid] = array();
@@ -295,12 +298,12 @@ if ($timesup == true) { //if time has expired
 		$cur = $cur - 60*$minutes;
 	} else {$minutes=0;}
 	$seconds = $cur;
-	echo "<p>Score:  $curscore out of ".count($scores)." possible</p>";
+	echo "<p>Score:  ".Sanitize::onlyFloat($curscore)." out of ".count($scores)." possible</p>";
 	echo "<p>In ";
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
-	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit$publica";
+	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
 	if (!isset($sessiondata['drillresults'][$qsetid])) {
 		$sessiondata['drillresults'][$qsetid] = array();
@@ -312,7 +315,7 @@ if ($timesup == true) { //if time has expired
 }
 
 if ($showscore) {
-	echo '<div class="review">Current score: '.$curscore." out of ".count($scores);
+	echo '<div class="review">Current score: '.Sanitize::onlyFloat($curscore)." out of ".count($scores);
 	echo '</div>';
 }
 if ($mode=='cntup' || $mode=='cntdown') {
@@ -377,7 +380,7 @@ initstack.push(focusfirst);
 <?php
 
 if ($page_scoreMsg != '' && $showscore) {
-	echo '<div class="review">Score on last question: '.$page_scoreMsg;
+	echo '<div class="review">Score on last question: '.Sanitize::encodeStringForDisplay($page_scoreMsg);
 	echo '</div>';
 }
 
@@ -393,7 +396,7 @@ if ($showans) {
 		$doshowans = 0;
 	}
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
-	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
+	echo "<input type=\"hidden\" name=\"seed\" value=\"".Sanitize::encodeStringForDisplay($seed)."\" />";
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
 	if ($sa==3) {
 		echo "<input type=submit name=\"next\" value=\"Next Question\">\n";
@@ -503,7 +506,7 @@ function printscore($sc,$qsetid,$seed) {
 	}
 
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;
+	return $bar . Sanitize::encodeStringForDisplay($out);
 }
 
 function getpts($sc) {
@@ -527,7 +530,7 @@ function getpts($sc) {
 
 function linkgenerator() {
 	global $urlmode;
-	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php";
+	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php";
 	?>
 <html>
 <head>

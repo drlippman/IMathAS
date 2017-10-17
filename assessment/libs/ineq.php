@@ -104,7 +104,7 @@ function ineqbetweenplot($funcs) {
 		} else {
 			$func = makepretty($function[0]);
 			$func = mathphp($func,"x");
-			$func = str_replace("x",'$x',$func);
+			$func = str_replace("(x)",'($x)',$func);
 			$xfunc = create_function('$x','return ('.$func.');');
 			for ($i = 0; $i<$stopat;$i++) {
 				$x = $xmin + $dx*$i;

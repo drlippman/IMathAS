@@ -1,20 +1,36 @@
 <?php
 //IMathAS:  Admin actions
 //(c) 2006 David Lippman
-require("../validate.php");
+require("../init.php");
 require_once("../includes/password.php");
 
 $from = 'admin';
 if (isset($_GET['from'])) {
 	if ($_GET['from']=='home') {
 		$from = 'home';
+	} else if ($_GET['from']=='admin2') {
+		$from = 'admin2';
+	} else if (substr($_GET['from'],0,2)=='ud') {
+		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
+		$from = 'ud'.$userdetailsuid;
+		$backloc = 'userdetails.php?id='.$userdetailsuid;
+	} else if (substr($_GET['from'],0,2)=='gd') {
+		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
+		$from = 'gd'.$groupdetailsgid;
+		$backloc = 'admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
 	}
 }
 if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
+} else if ($from == 'admin2') {
+	$breadcrumbbase .= '<a href="admin2.php">Admin</a> &gt; ';
+} else if (substr($_GET['from'],0,2)=='ud') {
+	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
+} else if (substr($_GET['from'],0,2)=='gd') {
+	echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
 }
 
-switch($_GET['action']) {
+switch($_POST['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
 		$be = $_REQUEST['uid'];
@@ -22,33 +38,118 @@ switch($_GET['action']) {
 		$stm->execute(array(':userid'=>$be, ':sessionid'=>$sessionid));
 		break;
 	case "chgrights":
-		if ($myrights < 100 && $_POST['newrights']>75) {echo "You don't have the authority for this action"; break;}
-		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($_POST['newrights']>$myrights) {
+			$_POST['newrights'] = $myrights;
+		}
+		$stm = $DBH->prepare("SELECT rights FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$oldrights = $stm->fetchColumn(0);
+		if ($row === false) {
+			echo "invalid id";
+			exit;
+		}
+
+		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+		$stm->execute(array(':SID'=>$_POST['adminname']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
+		$chgSID = true;
+		if ($row != null) {
+			$chgSID = false;
+		}
 
 		$specialrights = 0;
-		if (isset($_POST['specialrights1'])) {
+		if (isset($_POST['specialrights1']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&1)==1))) {
 			$specialrights += 1;
 		}
 		if (isset($_POST['specialrights2']) && $myrights==100) {
 			$specialrights += 2;
 		}
-		if (isset($_POST['specialrights4'])) {
+		if (isset($_POST['specialrights4']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&4)==4))) {
 			$specialrights += 4;
 		}
-		if (isset($_POST['specialrights8'])) {
+		if (isset($_POST['specialrights8']) && (($myrights==100 || ($myrights>=75 && ($myspecialrights&8)==8)) && !$allownongrouplibs)) {
 			$specialrights += 8;
 		}
+		if ((isset($_POST['specialrights16']) && $myrights>=75) || $_POST['newrights']>=75) {
+			$specialrights += 16;
+		}
+		if ((isset($_POST['specialrights32']) && $myrights==100) || $_POST['newrights']==100) {
+			$specialrights += 32;
+		}
+		if ((isset($_POST['specialrights64']) && $myrights==100) || $_POST['newrights']==100) {
+			$specialrights += 64;
+		}
+		if (isset($CFG['GEN']['newpasswords'])) {
+			$hashpw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
+		} else {
+			$hashpw = md5($_POST['newpassword']);
+		}
+		if ($_POST['newrights']>$myrights) { //checked above, but do it again
+			$_POST['newrights'] = $myrights;
+		}
 
-		if ($myrights == 100) { //update library groupids
-			$stm = $DBH->prepare("UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid WHERE id=:id");
-			$stm->execute(array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':groupid'=>$_POST['group'], ':id'=>$_GET['id']));
+		$arr = array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'],
+				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+				':email'=>Sanitize::stripHtmlTags($_POST['email']));
+		if ($chgSID) {
+			$arr[':SID'] = Sanitize::stripHtmlTags($_POST['SID']);
+		}
+		if (isset($_POST['doresetpw'])) {
+			$arr[':password'] = $hashpw;
+		}
+
+		if ($myrights == 100 || ($myspecialrights&32)==32) { //update library groupids
+			$arr[':groupid'] = $_POST['group'];
+
+			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid,FirstName=:FirstName,LastName=:LastName,email=:email";
+			if ($chgSID) {
+				$query .= ',SID=:SID';
+			}
+			if (isset($_POST['doresetpw'])) {
+				$query .= ',password=:password';
+			}
+			$query .= " WHERE id=:id";
+			$stm = $DBH->prepare($query);
+			$stm->execute($arr);
 			$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=:groupid WHERE ownerid=:ownerid");
 			$stm->execute(array(':groupid'=>$_POST['group'], ':ownerid'=>$_GET['id']));
 		} else {
-			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights";
+			$arr[':groupid'] = $groupid;
+
+			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,FirstName=:FirstName,LastName=:LastName,email=:email";
+			if ($chgSID) {
+				$query .= ',SID=:SID';
+			}
+			if (isset($_POST['doresetpw'])) {
+				$query .= ',password=:password';
+			}
 			$query .= " WHERE id=:id AND groupid=:groupid AND rights<100";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'], ':groupid'=>$groupid));
+			$stm->execute($arr);
+		}
+
+		//if student being promoted, enroll in teacher enroll courses
+		if ($oldrights<=10 && $_POST['newrights']>=20 && isset($CFG['GEN']['enrollonnewinstructor'])) {
+			$valbits = array();
+			$valvals = array();
+			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+				$valbits[] = "(?,?)";
+				array_push($valvals, $_GET['id'], $ncid);
+			}
+			$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
+			$stm->execute($valvals);
+		} else if ($oldrights>10 && $_POST['newrights']<=10 && isset($CFG['GEN']['enrollonnewinstructor'])) {
+			require_once("../includes/unenroll.php");
+			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+				unenrollstu($ncid, array($_GET['id']));
+			}
+		}
+
+		if ($chgSID==false && $row[0]!=$_GET['id']) {
+			echo "Username in use - left unchanged";
+			exit;
 		}
 		break;
 	case "resetpwd":
@@ -84,9 +185,13 @@ switch($_GET['action']) {
 			$stm->execute(array(':id'=>$_GET['id']));
 		}
 		if ($stm->rowCount()==0) { break;}
+		$stm = $DBH->prepare("DELETE FROM imas_user_prefs WHERE userid=:userid");
+		$stm->execute(array(':userid'=>$_GET['id']));
 		$stm = $DBH->prepare("DELETE FROM imas_students WHERE userid=:userid");
 		$stm->execute(array(':userid'=>$_GET['id']));
 		$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE userid=:userid");
+		$stm->execute(array(':userid'=>$_GET['id']));
+		$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE userid=:userid");
 		$stm->execute(array(':userid'=>$_GET['id']));
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid");
 		$stm->execute(array(':userid'=>$_GET['id']));
@@ -128,8 +233,10 @@ switch($_GET['action']) {
 		}
 		break;
 	case "newadmin":
-		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
-		if ($myrights < 100 && $_POST['newrights']>75) { break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($_POST['newrights']>$myrights) {
+			$_POST['newrights'] = $myrights;
+		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_POST['adminname']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -140,14 +247,14 @@ switch($_GET['action']) {
 			exit;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
-			$md5pw = password_hash($_POST['password'], PASSWORD_DEFAULT);
+			$md5pw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
 		} else {
-			$md5pw =md5($_POST['password']);
+			$md5pw =md5($_POST['newpassword']);
 		}
-		if ($myrights < 100) {
+		if ($myrights == 100 || ($myspecialrights&32)==32) {
+			$newgroup = Sanitize::onlyInt($_POST['group']);
+		} else {
 			$newgroup = $groupid;
-		} else if ($myrights == 100) {
-			$newgroup = $_POST['group'];
 		}
 		if (isset($CFG['GEN']['homelayout'])) {
 			$homelayout = $CFG['GEN']['homelayout'];
@@ -155,22 +262,31 @@ switch($_GET['action']) {
 			$homelayout = '|0,1,2||0,1';
 		}
 		$specialrights = 0;
-		if (isset($_POST['specialrights1'])) {
+		if (isset($_POST['specialrights1']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&1)==1))) {
 			$specialrights += 1;
 		}
 		if (isset($_POST['specialrights2']) && $myrights==100) {
 			$specialrights += 2;
 		}
-		if (isset($_POST['specialrights4'])) {
+		if (isset($_POST['specialrights4']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&4)==4))) {
 			$specialrights += 4;
 		}
-		if (isset($_POST['specialrights8'])) {
+		if (isset($_POST['specialrights8']) && (($myrights==100 || ($myrights>=75 && ($myspecialrights&8)==8)) && !$allownongrouplibs)) {
 			$specialrights += 8;
+		}
+		if (isset($_POST['specialrights16']) && ($myrights==100 || ($myrights>=75 && ($myspecialrights&16)==16))) {
+			$specialrights += 16;
+		}
+		if (isset($_POST['specialrights32']) && $myrights==100) {
+			$specialrights += 32;
+		}
+		if (isset($_POST['specialrights64']) && $myrights==100) {
+			$specialrights += 64;
 		}
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights);");
 		$stm->execute(array(':SID'=>$_POST['adminname'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
 		$newuserid = $DBH->lastInsertId();
-		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
 			$valbits = array();
 			$valvals = array();
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
@@ -318,7 +434,7 @@ switch($_GET['action']) {
 
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 
-		if ($_GET['action']=='modify') {
+		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,hideicons=:hideicons,available=:available,lockaid=:lockaid,picicons=:picicons,showlatepass=:showlatepass,";
 			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass WHERE id=:id";
 			$qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
@@ -621,13 +737,17 @@ switch($_GET['action']) {
 				$stm = $DBH->prepare("SELECT filename FROM imas_instr_files WHERE itemid=:itemid");
 				$stm->execute(array(':itemid'=>$ilid[0]));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
-					$stm2->execute(array(':filename'=>$row[0]));
-					if ($stm2->rowCount()==1) {
-						//unlink($uploaddir . $row[0]);
-						deletecoursefile($row[0]);
+					if (substr($row[0],0,4)!='http') {
+						$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
+						$stm2->execute(array(':filename'=>$row[0]));
+						if ($stm2->rowCount()==1) {
+							//unlink($uploaddir . $row[0]);
+							deletecoursefile($row[0]);
+						}
 					}
 				}
+				//DB $query = "DELETE FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_instr_files WHERE itemid=:itemid");
 				$stm->execute(array(':itemid'=>$ilid[0]));
 			}
@@ -733,7 +853,7 @@ switch($_GET['action']) {
 			}
 		}
 
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=". Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
 		exit;
 	case "addteacher":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
@@ -760,7 +880,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES ".implode(',',$ins));
 			$stm->execute($insval);
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forms.php?action=chgteachers&id={$_GET['cid']}");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=" .Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
 		exit;
 	case "importmacros":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
@@ -824,17 +944,17 @@ switch($_GET['action']) {
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.tar.gz')!==FALSE) {
 				include("../includes/tar.class.php");
-				include("../includes/filehandler.php");
+				require_once("../includes/filehandler.php");
 				$tar = new tar();
 				$tar->openTAR($uploadfile);
 				if ($tar->hasFiles()) {
-					if ($GLOBALS['filehandertypecfiles'] == 's3') {
+					if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 						$n = $tar->extractToS3("qimages","public");
 					} else {
 						$n = $tar->extractToDir("../assessment/qimages/");
 					}
 					require("../header.php");
-					echo "<p>Extracted $n files.  <a href=\"admin.php\">Continue</a></p>\n";
+					echo "<p>Extracted $n files.  <a href=\"admin2.php\">Continue</a></p>\n";
 					require("../footer.php");
 					exit;
 				} else {
@@ -859,7 +979,7 @@ switch($_GET['action']) {
 		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 			if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
-				require("../includes/filehandler.php");
+				require_once("../includes/filehandler.php");
 				$zip = new ZipArchive();
 				$res = $zip->open($uploadfile);
 				$ne = 0;  $ns = 0;
@@ -875,7 +995,7 @@ switch($_GET['action']) {
 						}
 					}
 					require("../header.php");
-					echo "<p>Extracted $ne files.  Skipped $ns files.  <a href=\"admin.php\">Continue</a></p>\n";
+					echo "<p>Extracted $ne files.  Skipped $ns files.  <a href=\"admin2.php\">Continue</a></p>\n";
 					require("../footer.php");
 					exit;
 				} else {
@@ -978,7 +1098,7 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT id FROM imas_groups WHERE name=:name AND id<>:id");
 		$stm->execute(array(':name'=>$_POST['gpname'], ':id'=>$_GET['id']));
 		if ($stm->rowCount()>0) {
-			echo "<html><body>Group name already exists.  <a href=\"forms.php?action=modgroup&id={$_GET['id']}\">Try again</a></body></html>\n";
+			echo "<html><body>Group name already exists.  <a href=\"forms.php?action=modgroup&id=".Sanitize::encodeUrlParam($_GET['id'])."\">Try again</a></body></html>\n";
 			exit;
 		}
 		$grptype = (isset($_POST['iscust'])?1:0);
@@ -1015,6 +1135,30 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("DELETE FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		break;
+	case "modfedpeers":
+		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		if ($_GET['id']=='new') {
+			$query = "INSERT INTO imas_federation_peers (peername,peerdescription,secret,url,lastpull) VALUES ";
+			$query .= "(:peername, :peerdescription, :secret, :url, 0)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'],
+				':secret'=>$_POST['secret'], ':url'=>$_POST['url']));
+		} else {
+			$query = "UPDATE imas_federation_peers SET peername=:peername,peerdescription=:peerdescription,secret=:secret,url=:url WHERE id=:id";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':peername'=>$_POST['peername'], ':peerdescription'=>$_POST['peerdescription'],
+				':secret'=>$_POST['secret'], ':url'=>$_POST['url'], ':id'=>$_GET['id']));
+		}
+		header('Location: ' . $GLOBALS['basesiteurl'] . '/admin/forms.php?action=listfedpeers&from='.Sanitize::encodeUrlParam($from));
+		exit;
+		break;
+	case "delfedpeers":
+		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		$stm = $DBH->prepare("DELETE FROM imas_federation_peers WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . '/admin/forms.php?action=listfedpeers&from='.Sanitize::encodeUrlParam($from));
+		exit;
+		break;
 	case "removediag";
 		if ($myrights <60) { echo "You don't have the authority for this action"; break;}
 		$stm = $DBH->prepare("SELECT imas_users.id,imas_users.groupid FROM imas_users JOIN imas_diags ON imas_users.id=imas_diags.ownerid AND imas_diags.id=:id");
@@ -1030,12 +1174,18 @@ switch($_GET['action']) {
 }
 
 session_write_close();
-if (isset($_GET['cid'])) {
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
-} else if ($from=='home') {
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/index.php");
+if ($myrights<75 || $from=='home') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+} else if (empty($from)) {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
+} else if (isset($_GET['cid'])) {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+} else if ($from=='admin2') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
+} else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/admin.php");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 }
 exit;
 ?>

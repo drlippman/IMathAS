@@ -3,7 +3,8 @@
 //(c) 2014 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
+
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -24,7 +25,7 @@ if (!(isset($teacherid))) {
 
 /******* begin html output ********/
 
-$aid = intval($_GET['aid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
 $sessiondata['texdisp'] = true;
 $sessiondata['texdoubleescape'] = true;
 $sessiondata['texalignformatrix'] = true;
@@ -42,7 +43,8 @@ if ($overwriteBody==1) {
 } if (!isset($_REQUEST['versions'])) {
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
@@ -83,7 +85,7 @@ if ($overwriteBody==1) {
 	if (($introjson=json_decode($line['intro']))!==null) { //is json intro
 		$line['intro'] = $introjson[0];
 	}
-	
+
 	$ioquestions = explode(",",$line['itemorder']);
 	$aname = $line['name'];
 	$questions = array();
@@ -122,11 +124,13 @@ if ($overwriteBody==1) {
 	$qn = array();
 	$fixedseeds = array();
 	//DB $qlist = "'".implode("','",$questions)."'";
-	$qlist = implode(',', array_map('intval', $questions));
+	$qlist = array_map('Sanitize::onlyInt', $questions);
 	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($qlist)");
+	$query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
+	$stm = $DBH->prepare("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($query_placeholders)");
+	$stm->execute($qlist);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
@@ -135,8 +139,8 @@ if ($overwriteBody==1) {
 		}
 		$qn[$row[0]] = $row[2];
 		if ($row[3]!==null && $row[3]!='') {
-			$fixedseeds[$row[0]] = explode(',',$row[3]);	
-		}
+			$fixedseeds[$row[0]] = explode(',',$row[3]);
+	}
 	}
 
 
@@ -168,8 +172,8 @@ if ($overwriteBody==1) {
 					if (isset($fixedseeds[$questions[$i]])) {
 						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
 					} else {
-						$seeds[$j][] = $aid + $i + $j;	
-					}
+					$seeds[$j][] = $aid + $i + $j;
+				}
 				}
 			} else {
 				for ($i = 0; $i<count($questions);$i++) {
@@ -183,11 +187,11 @@ if ($overwriteBody==1) {
 						}
 						$seeds[$j][] = $fixedseeds[$questions[$i]][($x+$j)%$n];
 					} else {
-						$seeds[$j][] = rand(1,9999);
-					}
+					$seeds[$j][] = rand(1,9999);
 				}
 			}
 		}
+	}
 	}
 
 
@@ -280,14 +284,14 @@ if ($overwriteBody==1) {
 			$out .= "</ol>\n";
 		}
 	}
-	$licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
+	$licurl = $GLOBALS['basesiteurl'] . '/course/showlicense.php?id=' . implode('-',$qn);
 	$out .= '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
 	$out .= '</body></html>';
 
-	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.$_SERVER['HTTP_HOST'].'/', $out);
+	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'/', $out);
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
@@ -304,7 +308,7 @@ if ($overwriteBody==1) {
 
 	/*
 
-	$data = 'html='.urlencode($out);
+	$data = 'html='.Sanitize::encodeUrlParam($out);
 
 	$params = array (
             'http' => array (
@@ -359,8 +363,10 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 		$stm->execute(array(':qsetid'=>$qsetid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			if (substr($row[1],0,4)=='http') {
+				${$row[0]} = "<img src=\"{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
+			} else if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				${$row[0]} = "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
 			} else {
 				${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
 			}

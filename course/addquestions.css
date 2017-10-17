@@ -101,3 +101,7 @@ tr.textsegmentrow td {
 	vertical-align: top;
 	padding-top:5px;
 }
+.noticehighlight {
+	background-color: #ffaaaa;
+	padding: 0px 5px;
+}

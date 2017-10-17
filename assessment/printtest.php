@@ -1,5 +1,5 @@
 <?php
-	require("../validate.php");
+	require("../init.php");
 	$isteacher = (isset($teacherid) || $sessiondata['isteacher']==true);
 	if (!isset($sessiondata['sessiontestid']) && !$isteacher) {
 		echo "<html><body>Error. </body></html>\n";
@@ -52,7 +52,7 @@
 			</script>';
 
 	if ($isteacher && isset($_GET['asid'])) {
-		$testid = $_GET['asid'];
+		$testid = Sanitize::onlyInt($_GET['asid']);
 	} else {
 		//DB $testid = addslashes($sessiondata['sessiontestid']);
 		$testid = $sessiondata['sessiontestid'];
@@ -112,9 +112,6 @@
 	$testsettings = $stm->fetch(PDO::FETCH_ASSOC);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 
-	$qi = getquestioninfo($questions,$testsettings);
-
-
 	$now = time();
 	$isreview = false;
 	if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
@@ -126,7 +123,7 @@
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
 			require("../includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($row, $testsettings, true);	
+			$useexception = getCanUseAssessException($row, $testsettings, true);
 		}
 		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -159,8 +156,10 @@
 		$lastanswers = explode("~",$line['reviewlastanswers']);
 	}
 
-	echo "<h4 style=\"float:right;\">Name: $userfullname </h4>\n";
-	echo "<h3>".$testsettings['name']."</h3>\n";
+	$qi = getquestioninfo($questions,$testsettings,true);
+
+	echo "<h4 style=\"float:right;\">Name: " . Sanitize::encodeStringForDisplay($userfullname) . " </h4>\n";
+	echo "<h3>".Sanitize::encodeStringForDisplay($testsettings['name'])."</h3>\n";
 
 
 	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
@@ -259,17 +258,17 @@
 			//DB echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
 			$stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
 			$stm->execute(array(':id'=>$qsetid));
-			echo '<div>ID:'.$qsetid.', '.$stm->fetchColumn(0).'</div>';
+			echo '<div>ID:'.Sanitize::onlyInt($qsetid).', '.Sanitize::encodeStringForDisplay($stm->fetchColumn(0)).'</div>';
 		} else {
 			//list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
 			$points = $qi[$questions[$i]]['points'];
 			$qattempts = $qi[$questions[$i]]['attempts'];
 			if ($scoredview) {
 				echo "<div>#".($i+1)." ";
-				echo printscore($scores[$i], $i);
+				echo printscore(Sanitize::encodeStringForDisplay($scores[$i]), $i);
 				echo "</div>";
 			} else {
-				echo "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";
+				echo "<div>#".($i+1)." Points possible: ".Sanitize::encodeStringForDisplay($points).".  Total attempts: ".Sanitize::encodeStringForDisplay($qattempts)."</div>";
 			}
 		}
 		if ($scoredview) {
@@ -347,7 +346,7 @@
 								}
 							}
 
-							echo str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+							echo Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),$laarr[$k]));
 						}
 						$cnt++;
 					}
@@ -378,4 +377,6 @@
 	if ($endtext != '') {
 		echo '<div class="intro">'.filter($endtext).'</div>';
 	}
+
+	require("../footer.php");
 ?>

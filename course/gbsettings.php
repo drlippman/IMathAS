@@ -1,8 +1,9 @@
 <?php
 //IMathAS:  Add/modify gradebook categories
 //(c) 2006 David Lippman
-	require("../validate.php");
+	require("../init.php");
 	require("../includes/htmlutil.php");
+
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -10,46 +11,35 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 
 	/*if (isset($_POST['addnew'])) {
 		$query = "INSERT INTO imas_gbcats (courseid) VALUES ('$cid')";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}*/
-	if (isset($_GET['remove'])) {  //LEGACY
+	if (isset($_POST['remove'])) {  //via ajax post
 		//DB $query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory=:gbcategory");
-		$stm->execute(array(':gbcategory'=>$_GET['remove']));
+		$stm->execute(array(':gbcategory'=>$_POST['remove']));
 		//DB $query = "UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory='{$_GET['remove']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory=:gbcategory");
-		$stm->execute(array(':gbcategory'=>$_GET['remove']));
+		$stm->execute(array(':gbcategory'=>$_POST['remove']));
 		//DB $query = "DELETE FROM imas_gbcats WHERE id='{$_GET['remove']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['remove']));
-	}
-	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
-		if (isset($_POST['deletecatonsubmit'])) {
-			//DB foreach ($_POST['deletecatonsubmit'] as $i=>$cattodel) {
-			//DB 	$_POST['deletecatonsubmit'][$i] = intval($cattodel);
-			//DB }
-			$catlist = implode(',', array_map('intval',$_POST['deletecatonsubmit']));
-
-			//DB $query = "UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory IN ($catlist)");
-			//DB $query = "UPDATE imas_forums SET gbcategory=0 WHERE gbcategory IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("UPDATE imas_forums SET gbcategory=0 WHERE gbcategory IN ($catlist)");
-			//DB $query = "UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory IN ($catlist)");
-			//DB $query = "DELETE FROM imas_gbcats WHERE id IN ($catlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("DELETE FROM imas_gbcats WHERE id IN ($catlist)");
+		$stm->execute(array(':id'=>$_POST['remove']));
+		if ($stm->rowCount()>0) {
+			echo "OK";
+		} else {
+			echo "ERROR";
 		}
+		exit;
+	}
+
+	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
+
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
 		$orderby = $_POST['orderby'];
@@ -118,13 +108,15 @@
 		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
 		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
 		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
+		if (!isset($_POST['gbmode100000'])) {$defgbmode += 100000;}
+		if (!isset($_POST['gbmode200000'])) {$defgbmode += 200000;}
 		$stugbmode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
 		//DB $query = "UPDATE imas_gbscheme SET useweights='$useweights',orderby='$orderby',usersort='$usersort',defaultcat='$defaultcat',defgbmode='$defgbmode',stugbmode='$stugbmode',colorize='{$_POST['colorize']}' WHERE courseid='$cid'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,usersort=:usersort,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode,colorize=:colorize WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$useweights, ':orderby'=>$orderby, ':usersort'=>$usersort, ':defaultcat'=>$defaultcat, ':defgbmode'=>$defgbmode, ':stugbmode'=>$stugbmode, ':colorize'=>$_POST['colorize'], ':courseid'=>$cid));
 		if (isset($_POST['submit'])) {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}&refreshdef=true");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($_GET['cid'])."&refreshdef=true");
 			exit;
 		}
 	}
@@ -187,9 +179,19 @@
 	}
 	function removeexistcat(id) {
 		if (confirm("Are you SURE you want to delete this category?")) {
-			$("#theform").append(\'<input type="hidden" name="deletecatonsubmit[]" value="\'+id+\'"/>\');
-			var torem = document.getElementById("catrow"+id);
-			document.getElementById("cattbody").removeChild(torem);
+			$.ajax({
+				type: "POST",
+				url: "gbsettings.php?cid='.$cid.'",
+				data: "remove="+id
+			}).done(function(msg) {
+				if (msg=="OK") {
+					var torem = document.getElementById("catrow"+id);
+					document.getElementById("cattbody").removeChild(torem);
+				} else {
+					alert("Error removing category");
+				}
+			});
+			return false;
 		}
 	}
 	function removecat(n) {
@@ -220,7 +222,7 @@
 
 	$placeinhead = $sc;
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; Settings</div>";
 	echo "<div id=\"headergbsettings\" class=\"pagetitle\"><h2>Grade Book Settings <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=gradebooksettings','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
 
@@ -231,6 +233,8 @@
 	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = $stm->fetch(PDO::FETCH_NUM);
+	$hidesection = (((floor($defgbmode/100000)%10)&1)==1);
+	$hidecode = (((floor($defgbmode/100000)%10)&2)==2);
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
@@ -342,6 +346,8 @@
 
 	<span class=form>Include details:</span>
 	<span class=formright>
+		<input type="checkbox" name="gbmode100000" value="1" id="secshow" <?php writeHtmlChecked($hidesection,false);?>/><label for="secshow">Section column (if used)</label><br/>
+		<input type="checkbox" name="gbmode200000" value="2" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow">Code column (if used)</label><br/>
 		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
 		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers, and column in single-student view</label><br/>
 		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label>
@@ -410,9 +416,9 @@
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
-			echo "<input type=text name=\"name[$id]\" value=\"{$row['name']}\"/>";
+			echo "<input type=text name=\"name[$id]\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\"/>";
 		} else {
-			echo $row['name'];
+			echo Sanitize::encodeStringForDisplay($row['name']);
 		}
 		"</td>";
 
@@ -424,7 +430,7 @@
 		//echo "/></td>";
 		echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
 		if ($row['scale']>0) {
-			echo $row['scale'];
+			echo Sanitize::encodeStringForDisplay($row['scale']);
 		}
 		echo "\"/> (<input type=radio name=\"st[$id]\" value=0 ";
 		if ($row['scaletype']==0) {
@@ -465,14 +471,14 @@
 			echo "checked=1 ";
 		}
 		$absr4=abs($row['dropn']);
-		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"$absr4\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 onclick=\"calctypechange($id,1)\" ";
+		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 onclick=\"calctypechange($id,1)\" ";
 		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"$absr4\"/> scores</td>";
+		echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</td>";
 		echo "<td><input type=text size=3 name=\"weight[$id]\" value=\"";
 		if ($row['weight']>-1) {
-			echo $row['weight'];
+			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
 		echo "\"/></td>";
 		if ($id!=0) {
@@ -482,5 +488,5 @@
 		}
 
 	}
-
+	require("../footer.php");
 ?>

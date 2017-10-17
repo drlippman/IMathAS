@@ -1,7 +1,8 @@
 <?php
 //IMathAS:  Display grade list for one online assessment
 //(c) 2007 David Lippman
-	require("../validate.php");
+	require("../init.php");
+	
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 
@@ -12,8 +13,8 @@
 		require("../footer.php");
 		exit;
 	}
-	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];
+	$cid = Sanitize::courseId($_GET['cid']);
+	$aid = Sanitize::onlyInt($_GET['aid']);
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
@@ -44,8 +45,8 @@
 	}
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
 
 	echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
 
@@ -130,7 +131,7 @@
 
 
 	echo '<div id="headerisolateassessgrade" class="pagetitle"><h2>';
-	echo "Grades for $name</h2></div>";
+	echo "Grades for " . Sanitize::encodeStringForDisplay($name) . "</h2></div>";
 	echo "<p>$totalpossible points possible</p>";
 
 //	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
@@ -207,16 +208,18 @@
 		$lc++;
 		if ($line['locked']>0) {
 			echo '<td><span style="text-decoration: line-through;">';
-			echo "{$line['LastName']}, {$line['FirstName']}</span></td>";
+			printf("%s, %s</span></td>", Sanitize::encodeStringForDisplay($line['LastName']),
+				Sanitize::encodeStringForDisplay($line['FirstName']));
 		} else {
-			echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+				Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
 		if ($hassection) {
-			echo "<td>{$line['section']}</td>";
+			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['section']));
 		}
 		if ($hascodes) {
 			if ($line['code']==null) {$line['code']='';}
-			echo "<td>{$line['code']}</td>";
+			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['code']));
 		}
 		$total = 0;
 		$sp = explode(';',$line['bestscores']);
@@ -227,7 +230,7 @@
 		}
 		$timeused = $line['endtime']-$line['starttime'];
 		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
-		$useexception = false; 
+		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
 			$useexception = getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate), true);
 			if ($useexception) {
@@ -237,7 +240,16 @@
 			$thisenddate = $enddate;
 		}
 		if ($line['id']==null) {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a>";
+			$querymap = array(
+				'gbmode' => $gbmode,
+				'cid' => $cid,
+				'asid' => 'new',
+				'uid' => $line['userid'],
+				'from' => 'isolate',
+				'aid' => $aid
+			);
+
+			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
 			if ($useexception) {
 				if ($exceptions[$line['userid']][2]>0) {
 					echo '<sup>LP</sup>';
@@ -247,11 +259,20 @@
 			}
 			echo "</td><td>-</td><td></td><td></td><td></td>";
 		} else {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
+			$querymap = array(
+				'gbmode' => $gbmode,
+				'cid' => $cid,
+				'asid' => $line['id'],
+				'uid' => $line['userid'],
+				'from' => 'isolate',
+				'aid' => $aid
+			);
+
+			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
 			if ($thisenddate>$now) {
-				echo '<i>'.$total;
+				echo '<i>'.Sanitize::onlyFloat($total);
 			} else {
-				echo $total;
+				echo Sanitize::onlyFloat($total);
 			}
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {

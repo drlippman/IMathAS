@@ -270,8 +270,8 @@ function graphdijkstra($g,$dest=-1) {
 		}
 		$eaten[$cur] = 1; //remove vertex
 		for ($i=0; $i<$n; $i++) {
-			if (!isset($eaten[$i]) && $g[$i][$cur]>0) { //vertices leading to $cur
-				$alt = $dist[$cur] + $g[$i][$cur];
+			if (!isset($eaten[$i]) && (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i])>0) { //vertices leading to $cur
+				$alt = $dist[$cur] + (($op['digraph'] || $i<$cur)?$g[$i][$cur]:$g[$cur][$i]);
 				if ($alt<$dist[$i]) {
 					$dist[$i] = $alt;
 					$next[$i] = $cur;
@@ -524,7 +524,6 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	}
 	if (array_sum($notvis)>0) {
 		//some vertex not visisted.  Should have already been caught
-		echo "sum";
 		return false;
 	}
 	return true;
@@ -1224,7 +1223,7 @@ function graphcomparecircuits($a,$b) {
 	$newb = substr($b,$loc).substr($b,0,$loc);
 	$a = $a.$a[0];
 	$newb = $newb.$newb[0];
-	echo "$a, $newb";
+	//echo "$a, $newb";
 	if ($a==$newb || $a==strrev($newb)) {
 		return true;
 	} else {

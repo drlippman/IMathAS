@@ -1,9 +1,10 @@
 <?php
 //IMathAS:  Export or email Gradebook
 //(c) 2007 David Lippman
-	require("../validate.php");
+	require("../init.php");
+
 	$isteacher = isset($teacherid);
-	$cid = $_GET['cid'];
+	$cid = Sanitize::courseId($_GET['cid']);
 	if (!$isteacher) {
 		echo "This page not available to students";
 		exit;
@@ -27,15 +28,15 @@
 
 	if (!isset($_POST['commentloc'])) {
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
 		echo '<div id="headergb-export" class="pagetitle"><h2>Export Gradebook</h2></div>';
 
-		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=$stu&gbmode=$gbmode";
+		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode);
 		if (isset($_GET['export'])) {
-			echo "&export={$_GET['export']}";
+			echo "&export=" . Sanitize::encodeUrlParam($_GET['export']);
 		} else if (isset($_GET['emailgb'])) {
-			echo "&emailgb={$_GET['emailgb']}";
+			echo "&emailgb=" . Sanitize::encodeUrlParam($_GET['emailgb']);
 		}
 		echo '" class="nolimit">';
 		if ($_GET['emailgb']=="ask") {
@@ -174,7 +175,7 @@
 				$_GET['emailgb'] = $stm->fetchColumn(0);
 			}
 			if ($_GET['emailgb']!='') {
-				mail($_GET['emailgb'], "Gradebook for $coursename", $message, $headers);
+				mail(Sanitize::emailAddress($_GET['emailgb']), "Gradebook for $coursename", $message, $headers);
 				require("../header.php");
 				echo "Gradebook Emailed.  <a href=\"gradebook.php?cid=$cid\">Return to Gradebook</a>";
 				require("../footer.php");
@@ -400,7 +401,7 @@ function gbinstrexport() {
 								}
 							}
 						}
-						
+
 					}
 					$n++;
 				}
@@ -497,7 +498,7 @@ function gbinstrexport() {
 								}
 							}
 						}
-						
+
 					}
 					$n++;
 				}
@@ -996,8 +997,8 @@ function gbinstrdisp() {
 			}
 		}
 		if (isset($gbcomments[$gbt[$i][4][0]])) {
-			echo '<td>'.$gbcomments[$gbt[$i][4][0]][0].'</td>';
-			echo '<td>'. $gbcomments[$gbt[$i][4][0]][1].'</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][0]) . '</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][1]) . '</td>';
 		} else {
 			echo '<td></td>';
 			echo '<td></td>';

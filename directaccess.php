@@ -2,11 +2,13 @@
 //IMathAS:  Course direct access - redirects to course page or presents
 //login / new student page specific for course
 //(c) 2007 David Lippman
+
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	 if (!file_exists("$curdir/config.php")) {
-		 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
+		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php");
 	 }
- 	require_once("$curdir/config.php");
+ 	require_once(__DIR__ . "/init_without_validate.php");
+	$cid = Sanitize::courseId($_GET['cid']);
 
  	if (!isset($_GET['cid'])) {
 		echo "Invalid address.  Address must be directaccess.php?cid=###, where ### is your courseid";
@@ -18,7 +20,7 @@
 		 $urlmode = 'http://';
 	 }
 	if (isset($_SERVER['QUERY_STRING'])) {
-		 $querys = '?'.$_SERVER['QUERY_STRING'];
+		 $querys = '?'.Sanitize::fullQueryString($_SERVER['QUERY_STRING']);
 	 } else {
 		 $querys = '';
 	 }
@@ -26,7 +28,7 @@
 	 if (isset($_POST['submit']) && $_POST['submit']=="Sign Up") {
 		unset($_POST['username']);
 		unset($_POST['password']);
-		require_once("config.php");
+		require_once("init_without_validate.php");
 		if ($_POST['SID']=="" || $_POST['firstname']=="" || $_POST['lastname']=="" || $_POST['email']=="" || $_POST['pw1']=="") {
 			$page_newaccounterror .= "Please include all information. ";
 		}
@@ -39,7 +41,7 @@
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 			$stm->execute(array(':SID'=>$_POST['SID']));
 			if ($stm->rowCount()>0) {
-				$page_newaccounterror .= "$loginprompt '{$_POST['SID']}' is already used. ";
+				$page_newaccounterror .= "$loginprompt '" . Sanitize::encodeStringForDisplay($_POST['SID']) . "' is already used. ";
 			}
 		}
 		if (!preg_match('/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',$_POST['email'])) {
@@ -51,7 +53,7 @@
 			unset($_POST['pw2']);
 		}
 
-		//DB $query = "SELECT enrollkey,deflatepass FROM imas_courses WHERE id = '{$_GET['cid']}'";
+		//DB $query = "SELECT enrollkey,deflatepass FROM imas_courses WHERE id = '$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB list($enrollkey,$deflatepass) = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT enrollkey,deflatepass FROM imas_courses WHERE id=:id");
@@ -101,12 +103,12 @@
 			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
 			$newuserid = $DBH->lastInsertId();
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
-				//DB $query = "INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES ('$userid','{$_GET['cid']}','{$_POST['ekey2']}','$code','$deflatepass');";
+				//DB $query = "INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES ('$userid','$cid','{$_POST['ekey2']}','$code','$deflatepass');";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
 				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$_GET['cid'], ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
 			} else {
-				//DB $query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','{$_GET['cid']}','$code','$deflatepass');";
+				//DB $query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','$cid','$code','$deflatepass');";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES (:userid, :courseid, :gbcomment, :latepass)");
 				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$_GET['cid'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
@@ -121,12 +123,12 @@
 				$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 				$message .= "and paste it into your webbrowser:</p>\r\n";
-				$message .= "<a href=\"". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id\">";
-				$message .= $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=confirm&id=$id</a>\r\n";
-				mail($_POST['email'],'IMathAS Confirmation',$message,$headers);
+				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
+				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
+				mail(Sanitize::emailAddress($_POST['email']),'IMathAS Confirmation',$message,$headers);
 				echo "<html><body>\n";
 				echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
-				echo "<a href=\"$imasroot/directaccess.php?cid={$_GET['cid']}\">Back to login page</a>\n";
+				echo "<a href=\"$imasroot/directaccess.php?cid=$cid\">Back to login page</a>\n";
 				echo "</body></html>\n";
 				exit;
 			} else {
@@ -138,13 +140,13 @@
 	//check for session
 	$origquerys = $querys;
 	if ($_POST['ekey']!='') {
-		$addtoquerystring = "ekey=".urlencode($_POST['ekey']);
+		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
-	require("validate.php");
+	require("init.php");
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
-			//DB $query = "SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id='{$_GET['cid']}'";
+			//DB $query = "SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB list($coursename,$enrollkey,$deflatepass) = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id=:id");
@@ -153,23 +155,23 @@
 			$keylist = array_map('trim',explode(';',$enrollkey));
 			if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
 				if (count($keylist)>1) {
-					//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_GET['cid']}','{$_REQUEST['ekey']}','$deflatepass')";
+					//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','$cid','{$_REQUEST['ekey']}','$deflatepass')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
 				} else {
-					//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_GET['cid']}','$deflatepass')";
+					//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','$cid','$deflatepass')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,latepass) VALUES (:userid, :courseid, :latepass)");
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':latepass'=>$deflatepass));
 				}
 
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid);
 				exit;
 			} else {
 				require("header.php");
-				echo "<h2>$coursename</h2>";
-				echo '<form method="post" action="directaccess.php?cid='.$_GET['cid'].'">';
+				echo "<h2>" . Sanitize::encodeStringForDisplay($coursename) . "</h2>";
+				echo '<form method="post" action="directaccess.php?cid='.$cid.'">';
 				echo '<p>Incorrect enrollment key.  Try again.</p>';
 				echo "<p>Course Enrollment Key:  <input type=text name=\"ekey\"></p>";
 				echo "<p><input type=\"submit\" value=\"Submit\"></p>";
@@ -178,25 +180,13 @@
 				exit;
 			}
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid);
 			exit;
 		}
 	} else { //not verified
 		//$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\" />\n";
-		$pref = 0;
-		 if (isset($_COOKIE['mathgraphprefs'])) {
-			 $prefparts = explode('-',$_COOKIE['mathgraphprefs']);
-			 if ($prefparts[0]==2 && $prefparts[1]==2) { //img all
-				$pref = 3;
-			 } else if ($prefparts[0]==2) { //img math
-				 $pref = 4;
-			 } else if ($prefparts[1]==2) { //img graph
-				 $pref = 2;
-			 }
 
-		 }
-
-		//DB $query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
+		//DB $query = "SELECT name FROM imas_courses WHERE id='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $coursename = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
@@ -223,7 +213,7 @@
 		}
 		require("header.php");
 		//echo "<div class=\"breadcrumb\">$breadcrumbbase $coursename Access</div>";
-		echo "<div id=\"header\"><div class=\"vcenter\">$coursename</div></div>";
+		echo "<div id=\"header\"><div class=\"vcenter\">" . Sanitize::encodeStringForDisplay($coursename) . "</div></div>";
 		//echo '<span style="float:right;margin-top:10px;">'.$smallheaderlogo.'</span>';
 
 		$cid = intval($_GET['cid']);
@@ -232,7 +222,7 @@
 			require("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html");
 		}
 
-		//DB $query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
+		//DB $query = "SELECT enrollkey FROM imas_courses WHERE id='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $enrollkey = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT enrollkey FROM imas_courses WHERE id=:id");
@@ -240,9 +230,9 @@
 		$enrollkey = $stm->fetchColumn(0);
 
 ?>
-<form id="pageform" method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
+<form id="pageform" method="post" action="directaccess.php<?php echo $querys; ?>">
 
-<?php 
+<?php
 if ($enrollkey!='closed') {
 ?>
 <h3>Do you already have an account on <?php echo $installname;?>?</h3>
@@ -251,7 +241,7 @@ if ($enrollkey!='closed') {
 <input type=radio name="curornew" value="1" onclick="setlogintype(1)" <?php if ($page_newaccounterror!='') {echo 'checked';}?> /> I need to create a new account
 </p>
 <?php
-} 
+}
 ?>
 
 <fieldset id="curuser" <?php if ($page_newaccounterror!='') {echo 'style="display:none"';}?>>
@@ -264,66 +254,33 @@ if ($enrollkey!='closed') {
 <span class=form>Password:</span><input class="form" type="password" size="15" id="password" name="password"><br class="form">
 <?php
 if (strlen($enrollkey)>0) {
-	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="'.(isset($_POST['ekey'])?$_POST['ekey']:"").'"/><BR class=form>';
+	echo '<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="' . (isset($_REQUEST['ekey']) ? Sanitize::encodeStringForDisplay($_REQUEST['ekey']) : "") . '"/><BR class=form>';
 }
 ?>
+<div class=submit><input type="submit" value="Login and Enroll"></div>
 <span class=form> </span><span class=formright><a href="<?php echo $imasroot; ?>/forms.php?action=resetpw">Forgot Password</a></span><br class="form">
 </table>
-<div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
+<div><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</noscript></div>
 
 <input type="hidden" id="tzoffset" name="tzoffset" value="">
 <input type="hidden" id="tzname" name="tzname" value="">
 <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
 <script type="text/javascript">
+$(function() {
         var thedate = new Date();
         document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
         var tz = jstz.determine();
         document.getElementById("tzname").value = tz.name();
+				<?php
+					if ($page_newaccounterror!='') {
+						echo 'document.getElementById("SID").focus();';
+					} else {
+						echo 'document.getElementById("username").focus();';
+					}
+				?>
+});
 </script>
 
-
-<script type="text/javascript">
-	function updateloginarea() {
-		setnode = document.getElementById("settings");
-		var html = "";
-		html += '<span class=form>Accessibility:</span><span class=formright> ';
-		//html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help</a>";
-		html += '<input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Use visual display<br/>';
-		html += '<input type="radio" name="access" value="2" <?php if ($pref==2) {echo "checked=1";} ?> />Force image-based graphs<br/>';
-		html += '<input type="radio" name="access" value="4" <?php if ($pref==4) {echo "checked=1";} ?> />Force image-based math<br/>';
-		html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
-		html += '<input type="radio" name="access" value="1">Use text-based display</span><br class=form>';
-
-		if (!MathJaxCompatible) {
-			html += '<input type=hidden name="mathdisp" value="0">';
-		} else {
-			html += '<input type=hidden name="mathdisp" value="1">';
-		}
-		if (ASnoSVG) {
-			html += '<input type=hidden name="graphdisp" value="2">';
-		} else {
-			html += '<input type=hidden name="graphdisp" value="1">';
-		}
-		if (MathJaxCompatible && !ASnoSVG) {
-			html += '<input type=hidden name="isok" value=1>';
-		}
-		html += '<div class=submit><input name="submit" type="submit" value="Login"></div>';
-		setnode.innerHTML = html;
-<?php
-	if ($page_newaccounterror!='') {
-		echo 'document.getElementById("SID").focus();';
-	} else {
-		echo 'document.getElementById("username").focus();';
-	}
-?>
-	}
-	var existingonload = window.onload;
-	if (existingonload) {
-		window.onload = function() {existingonload(); updateloginarea();}
-	} else {
-		window.onload = updateloginarea;
-	}
-</script>
 <?php
 	if ($enrollkey!='closed') {
 ?>
@@ -347,15 +304,15 @@ function setlogintype(n) {
 <p><b>New Student Enrollment</b></p>
 <?php
 if ($page_newaccounterror!='') {
-	echo '<p class=noticetext>'.$page_newaccounterror.'</p>';
+	echo '<p class=noticetext>' . Sanitize::encodeStringForDisplay($page_newaccounterror) . '</p>';
 }
 ?>
-<span class=form><label for="SID"><?php echo $longloginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID <?php if (isset($_POST['SID'])) {echo "value=\"{$_POST['SID']}\"";}?>><BR class=form>
-<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1 <?php if (isset($_POST['pw1'])) {echo "value=\"{$_POST['pw1']}\"";}?>><BR class=form>
-<span class=form><label for="pw2">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2 <?php if (isset($_POST['pw2'])) {echo "value=\"{$_POST['pw2']}\"";}?>><BR class=form>
-<span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname <?php if (isset($_POST['firstname'])) {echo "value=\"{$_POST['firstname']}\"";}?>><BR class=form>
-<span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname <?php if (isset($_POST['lastname'])) {echo "value=\"{$_POST['lastname']}\"";}?>><BR class=form>
-<span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email <?php if (isset($_POST['email'])) {echo "value=\"{$_POST['email']}\"";}?>><BR class=form>
+<span class=form><label for="SID"><?php echo $longloginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID <?php if (isset($_POST['SID'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['SID'])); } ?>><BR class=form>
+<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1 <?php if (isset($_POST['pw1'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['pw1'])); } ?>><BR class=form>
+<span class=form><label for="pw2">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2 <?php if (isset($_POST['pw2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['pw2'])); } ?>><BR class=form>
+<span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname <?php if (isset($_POST['firstname'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['firstname'])); } ?>><BR class=form>
+<span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname <?php if (isset($_POST['lastname'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['lastname'])); } ?>><BR class=form>
+<span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email <?php if (isset($_POST['email'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['email'])); } ?>><BR class=form>
 <?php
 if (isset($_GET['getsid'])) {
 	echo '<span class="form"><label for="code">If you are registered at a Washington Community College, enter your Student ID Number:</label></span><input class="form" type="text" size="20" id="code" name="code"><BR class=form>';
@@ -365,7 +322,7 @@ if (isset($_GET['getsid'])) {
 <?php
 	if (strlen($enrollkey)>0) {
 ?>
-<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) {echo "value=\"{$_POST['ekey2']}\"";}?>/><BR class=form>
+<span class=form><label for="ekey">Course Enrollment Key:</label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['ekey2'])); } ?>/><BR class=form>
 <?php
 	}
 ?>
@@ -397,14 +354,14 @@ if (isset($_GET['getsid'])) {
 					pattern: '.$loginformat.',
 					remote: imasroot+"/actions.php?action=checkusername"
 				},
-				pw1: { 
+				pw1: {
 					required: {depends: function(element) {return logintype==1}},
 					minlength: 6},
 				pw2: {
 					required: {depends: function(element) {return logintype==1}},
 					equalTo: "#pw1"
 				},
-				firstname: { 
+				firstname: {
 					required: {depends: function(element) {return logintype==1}}
 				},
 				lastname: {
@@ -420,7 +377,7 @@ if (isset($_GET['getsid'])) {
 					required: {depends: function(element) {return logintype==1}},
 					email: true
 				}
-				
+
 			},
 			messages: {
 				SID: {

@@ -7,7 +7,7 @@ ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
-require("../validate.php");
+require("../init.php");
 if ($myrights<100) {exit;}
 
 require("../header.php");
@@ -25,11 +25,11 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		$ni = $stm->rowCount();
 
 		$stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE text LIKE :from OR summary LIKE :from4");
-		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
+		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>"%$from%", ':to'=>$to, ':to2'=>$to));
 		$nlt = $stm->rowCount();
 
 		$stm = $DBH->prepare("UPDATE imas_assessments SET intro=REPLACE(intro,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE intro LIKE :from OR summary LIKE :from4");
-		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
+		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>"%$from%", ':to'=>$to, ':to2'=>$to));
 		$nas = $stm->rowCount();
 
 		echo "<p>Inline Texts changed: $ni<br/>Linked texts changed: $nlt";
@@ -49,11 +49,11 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		$nas = $stm->fetchColumn(0);
 
 		echo "<p>This action will change: </p>";
-		echo "<p>Inline Texts changed: $ni<br/>Linked texts changed: $nlt";
-		echo "<br/>Assessments changed: $nas</p>";
+		echo "<p>Inline Texts changed: ".Sanitize::onlyInt($ni)."<br/>Linked texts changed: ".Sanitize::onlyInt($nlt);
+		echo "<br/>Assessments changed: ".Sanitize::onlyInt($nas)."</p>";
 		echo '<form method="post">';
-		echo '<input type="hidden" name="from" value="'.$_POST['from'].'">';
-		echo '<input type="hidden" name="to" value="'.$_POST['to'].'">';
+		echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($_POST['from']).'">';
+		echo '<input type="hidden" name="to" value="'.Sanitize::encodeStringForDisplay($_POST['to']).'">';
 		echo '<input type="submit" name="confirm" value="Make Changes"/> (this will be slow)';
 		echo '</form>';
 	}
@@ -74,38 +74,38 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		foreach ($torep as $rep) {
 			$from = $rep[0];
 			$to = $rep[1];
-		
+
 			$stm = $DBH->prepare("UPDATE imas_inlinetext SET text=REPLACE(text,:from2,:to) WHERE text LIKE :from");
 			$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':to'=>$to));
 			$ni += $stm->rowCount();
-	
+
 			$stm = $DBH->prepare("UPDATE imas_linkedtext SET text=REPLACE(text,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE text LIKE :from OR summary LIKE :from4");
 			$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
 			$nlt += $stm->rowCount();
-	
+
 			$stm = $DBH->prepare("UPDATE imas_assessments SET intro=REPLACE(intro,:from2,:to),summary=REPLACE(summary,:from3,:to2) WHERE intro LIKE :from OR summary LIKE :from4");
 			$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':from3'=>$from, ':from4'=>$from, ':to'=>$to, ':to2'=>$to));
 			$nas += $stm->rowCount();
 		}
-		echo "<p>Inline Texts changed: $ni<br/>Linked texts changed: $nlt";
-		echo "<br/>Assessments changed: $nas</p>";
+		echo "<p>Inline Texts changed: ".Sanitize::onlyInt($ni)."<br/>Linked texts changed: ".Sanitize::onlyInt($nlt);
+		echo "<br/>Assessments changed: ".Sanitize::onlyInt($nas)."</p>";
 		echo '<p><a href="utils.php">Done</p>';
 	} else {
 		echo '<p>Verify the URLs were identified correctly</p>';
 		echo '<table><tr><th>Current</th><th>Replacement</th></tr>';
 		$out = '';
 		foreach ($torep as $rep) {
-			echo '<tr><td>'.htmlspecialchars($rep[0]).'</td><td>'.htmlspecialchars($rep[1]).'</td></tr>';
+			echo '<tr><td>'.Sanitize::encodeStringForDisplay($rep[0]).'</td><td>'.Sanitize::encodeStringForDisplay($rep[1]).'</td></tr>';
 			$out .= $rep[0].','.$rep[1]."\n";
 		}
 		echo '</table>';
 		echo '<form method="post">';
-		echo '<input type="hidden" name="list" value="'.htmlspecialchars($out).'">';
+		echo '<input type="hidden" name="list" value="'.Sanitize::encodeStringForDisplay($out).'">';
 		echo '<input type="submit" name="confirm" value="Make Changes"/> (this will be slow)';
 		echo '</form>';
 	}
 	exit;
-	
+
 }
 echo '<h3>Replace URL links</h3>';
 echo '<p>This will replace URLS in linkedtext summaries and text, inlinetext summaries, and assessment summaries and intros across ALL courses.</p>';
@@ -114,5 +114,5 @@ echo '<p>Replace URL: <input type="text" name="from" size="50"/><br/>with URL: <
 echo '<p>Or, paste from a spreadsheet (current URL in first column, replacement in second column)<br/><textarea cols=80 rows=6 name="list"></textarea></p>';
 echo '<p><input type="submit" value="Replace"/></p>';
 echo '</form>';
-
+require("../footer.php");
 ?>

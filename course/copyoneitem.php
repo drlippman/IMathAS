@@ -3,11 +3,11 @@
 //(c) 2006 David Lippman
 
 /*** master php includes *******/
-require("../validate.php");
+require("../init.php");
 require("../includes/copyiteminc.php");
 require("../includes/htmlutil.php");
 
-$cid = $_GET['cid'];
+$cid = Sanitize::courseId($_GET['cid']);
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";
@@ -114,5 +114,5 @@ $stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$ci
 //DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 $DBH->commit();
 
-header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 ?>

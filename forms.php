@@ -1,14 +1,15 @@
 <?php
 //IMathAS:  Basic forms
 //(c) 2006 David Lippman
-require("config.php");
+require("init_without_validate.php");
+require("includes/htmlutil.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
-	require("validate.php");
+	require("init.php");
 } else {
 	if (isset($CFG['CPS']['theme'])) {
 		$defaultcoursetheme = $CFG['CPS']['theme'][0];
 	} else if (!isset($defaultcoursetheme)) {
-		 $defaultcoursetheme = "default.css";
+		$defaultcoursetheme = "default.css";
 	}
 	$coursetheme = $defaultcoursetheme;
 }
@@ -23,8 +24,10 @@ $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jqu
 if (isset($CFG['locale'])) {
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.$CFG['locale'].'.min.js"></script>';
 }
+if ($_GET['action']=='chguserinfo') {
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+}
 require("header.php");
-
 switch($_GET['action']) {
 	case "newuser":
 		if ($gb == '') {
@@ -88,7 +91,7 @@ switch($_GET['action']) {
 				echo '<optgroup label="Self-study courses">';
 				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+					echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 				}
 				echo '</optgroup>';
 				echo '</select></p>';
@@ -152,8 +155,8 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>User Profile</h2></div>';
 		echo "<form id=\"pageform\" enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
-		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /><br class=\"form\" />\n";
-		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"><BR class=form>\n";
+		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
+		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
 		if ($myrights>10 && $groupid>0) {
 			//DB $query = "SELECT name FROM imas_groups WHERE id=".intval($groupid);
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -161,7 +164,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
 			$stm->execute(array(':id'=>$groupid));
 			$r = $stm->fetch(PDO::FETCH_NUM);
-			echo '<span class="form">'._('Group').':</span><span class="formright">'.$r[0].'</span><br class="form"/>';
+			echo '<span class="form">'._('Group').':</span><span class="formright">'.Sanitize::encodeStringForDisplay($r[0]).'</span><br class="form"/>';
 		}
 		echo '<span class="form"><label for="dochgpw">Change Password?</label></span> <span class="formright"><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
 		echo '<div style="display:none" id="pwinfo">';
@@ -169,16 +172,20 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"newpw1\">Verify new password:</label></span>  <input class=form type=password id=newpw2 name=newpw2 size=40> <BR class=form>\n";
 		echo '</div>';
-		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"><BR class=form>\n";
+		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"".Sanitize::emailAddress($line['email'])."\"><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
 		echo " /></span><BR class=form>\n";
+		if (isset($CFG['FCM']) && isset($CFG['FCM']['webApiKey']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
+			echo '<span class=form>'._('Push notifications:').'</span><span class=formright>';
+			echo '<a href="'.$imasroot.'/admin/FCMsetup.php">'.('Setup push notifications on this device').'</a></span><br class=form>';
+		}
 
 		echo "<span class=form><label for=\"stupic\">Picture:</label></span>";
 		echo "<span class=\"formright\">";
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" id=removepic value=\"1\" /> <label for=removepic>Remove</label> ";
+				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_$userid.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" id=removepic value=\"1\" /> <label for=removepic>Remove</label> ";
 			} else {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				$galleryPath = "$curdir/course/files/";
@@ -231,6 +238,7 @@ switch($_GET['action']) {
 			echo '</span><br class="form" />';
 
 		}
+		/*  moved to user prefs
 		echo '<span class="form"><label for="theme">'._('Overwrite default course theme on all pages:').'</label></span><span class="formright">';
 		echo '<select name="theme" id="theme">';
 		echo '<option value="" '.($line['theme']==''?'selected':'').'>'._('Use course default theme').'</option>';
@@ -243,6 +251,7 @@ switch($_GET['action']) {
 			echo '<option value="highcontrast_dark.css" '.($line['theme']=='highcontrast_dark.css'?'selected':'').'>'._('High contrast, light on dark').'</option>';
 		}
 		echo '</select><br class="form" />';
+		*/
 
 		if (isset($CFG['GEN']['translatewidgetID'])) {
 			echo '<span class="form">Attempt to translate pages into another language:</span>';
@@ -255,6 +264,11 @@ switch($_GET['action']) {
 			unset($CFG['GEN']['translatewidgetID']);
 		}
 		echo '</fieldset>';
+
+		//show accessibilty and display prefs form
+		require("includes/userprefs.php");
+		showUserPrefsForm();
+
 
 		if ($myrights>19) {
 			echo '<fieldset id="userinfoinstructor"><legend>Instructor Options</legend>';
@@ -285,7 +299,7 @@ switch($_GET['action']) {
 			echo "  document.getElementById(\"libnames\").innerHTML = libn;";
 			echo "}";
 			echo "</script>";
-			echo "<span class=form>Default question library:</span><span class=formright> <span id=\"libnames\">$lname</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"{$line['deflib']}\">\n";
+			echo "<span class=form>Default question library:</span><span class=formright> <span id=\"libnames\">".Sanitize::encodeStringForDisplay($lname)."</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"".Sanitize::encodeStringForDisplay($line['deflib'])."\">\n";
 			echo " <input type=button value=\"Select Library\" onClick=\"libselect()\"></span><br class=form> ";
 
 			echo "<span class=form><label for=usedeflib>Use default question library for all templated questions?</label></span>";
@@ -299,27 +313,14 @@ switch($_GET['action']) {
 			echo '</fieldset>';
 
 		}
-		if ($tzname!='') {
-			echo '<fieldset><legend>Timezone</legend>';
-			echo '<p>Due Dates and other times are being shown to you correct for the <b>'.$tzname.'</b> timezone.</p>';
-			echo '<p>You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.</p>';
-			echo '<p>Set timezone to: <select name="settimezone" id="settimezone">';
-			$timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
-			foreach ($timezones as $tz) {
-				echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';
-			}
-			echo '</select></p>';
-			echo '</fieldset>';
 
-
-		}
 		echo '<script type="text/javascript">
 		$("#pageform").validate({
 			rules: {
-				oldpw: { 
+				oldpw: {
 					required: {depends: function(element) {return $("#dochgpw").is(":checked")}}
 				},
-				newpw1: { 
+				newpw1: {
 					required: {depends: function(element) {return $("#dochgpw").is(":checked")}},
 					minlength: 6
 				},
@@ -361,7 +362,7 @@ switch($_GET['action']) {
 			echo '<optgroup label="Self-study courses">';
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+				echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 			}
 			echo '</optgroup>';
 			echo '</select></p>';
@@ -384,7 +385,7 @@ switch($_GET['action']) {
 		echo '<script type="text/javascript">
 		$("#pageform").validate({
 			rules: {
-				cid: { 
+				cid: {
 					required: {depends: function(element) {return $("#courseselect").val()==0}}
 				}
 			},
@@ -401,8 +402,9 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
 
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
-		echo "<p><input type=button onclick=\"window.location='actions.php?action=unenroll&cid={$_GET['cid']}'\" value=\"Really Unenroll\">\n";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid={$_GET['cid']}'\"></p>\n";
+		echo '<form method="post" action="actions.php?cid='.Sanitize::courseId($_GET['cid']).'">';
+		echo '<p><button name="action" value="unenroll">'._('Really Unenroll').'</button>';
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid=".Sanitize::courseId($_GET['cid'])."'\"></p>\n";
 		break;
 	case "resetpw":
 		if ($gb == '') {
@@ -420,7 +422,7 @@ switch($_GET['action']) {
 			},
 			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 		);
-		</script>';   
+		</script>';
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "lookupusername":
@@ -465,9 +467,9 @@ switch($_GET['action']) {
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = $row[0];
-				echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.$row[0].'" id="c'.$row[0].'"';
+				echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.Sanitize::encodeStringForDisplay($row[0]).'" id="c'.Sanitize::encodeStringForDisplay($row[0]).'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
+				echo '/> <label for="c'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</label>';
 			}
 			echo '</p>';
 		}
@@ -480,10 +482,10 @@ switch($_GET['action']) {
 			echo '<p><b>Courses you\'re tutoring:</b> Check: <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',false);return false;">None</a>';
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$allcourses[] = $row[0];
-				echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.$row[0].'" id="c'.$row[0].'"';
+				$allcourses[] = Sanitize::encodeStringForDisplay($row[0]);
+				echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.Sanitize::encodeStringForDisplay($row[0]).'" id="c'.Sanitize::encodeStringForDisplay($row[0]).'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
+				echo '/> <label for="c'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</label>';
 			}
 			echo '</p>';
 		}
@@ -497,13 +499,13 @@ switch($_GET['action']) {
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = $row[0];
-				echo '<br/><input type="checkbox" name="checked[]" class="taking" value="'.$row[0].'" id="c'.$row[0].'"';
+				echo '<br/><input type="checkbox" name="checked[]" class="taking" value="'.Sanitize::encodeStringForDisplay($row[0]).'" id="c'.Sanitize::encodeStringForDisplay($row[0]).'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
+				echo '/> <label for="c'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</label>';
 			}
 			echo '</p>';
 		}
-		echo '<input type="hidden" name="allcourses" value="'.implode(',',$allcourses).'"/>';
+		echo '<input type="hidden" name="allcourses" value="'.Sanitize::encodeStringForDisplay(implode(',',$allcourses)).'"/>';
 		echo '<input type="submit" value="Save Changes"/>';
 		echo '</form>';
 		break;
@@ -539,12 +541,11 @@ switch($_GET['action']) {
 		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";
 		echo "to gain access to your data</p>";
 
-		echo '<p>Add to iGoogle: <a href="http://fusion.google.com/add?source=atgs&moduleurl=http%3A//'.$_SERVER['HTTP_HOST'].$imasroot.'/google-postreader.php"><img src="http://gmodules.com/ig/images/plus_google.gif" border="0" alt="Add to Google"></a></p>';
-		echo "<p>Access Code: $code</p>";
+		echo "<p>Access Code: ".Sanitize::encodeStringForDisplay($code)."</p>";
 		echo "<p><a href=\"forms.php?action=googlegadget&regen=true$gb\">Generate a new Access code<a/><br/>";
 		echo "<p><a href=\"actions.php?action=googlegadget&clear=true$gb\">Clear Access code</a></p>";
 		echo "<p>Note: This access code only allows Google to access a list of new posts and messages, and does not provide access to grades or any other data stored at $installname.  Be aware that this form of access is insecure and could be intercepted by a third party.</p>";
-		echo "<p>You can also bookmark <a href=\"getpostlist.php?key=$code\">this page</a> to be able to access your post list without needing to log in.</p>";
+		echo "<p>You can also bookmark <a href=\"getpostlist.php?key=".Sanitize::encodeStringForDisplay($code)."\">this page</a> to be able to access your post list without needing to log in.</p>";
 		break;
 }
 	require("footer.php");

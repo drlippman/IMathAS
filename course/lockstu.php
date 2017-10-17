@@ -5,13 +5,15 @@
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 
+require_once(__DIR__ . "/../includes/sanitize.php");
+
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
 		require("../footer.php");
 		exit;
 	}
-	if (isset($_GET['confirmed'])) { //do unenroll
+	if (isset($_POST['dolockstu']) || isset($_POST['lockinstead'])) { //do lockout - postback
 		if ($_GET['uid']=="selected") {
 			$tolock = explode(",",$_POST['tolock']);
 		} else if ($_GET['uid']=="all") {
@@ -26,6 +28,7 @@ ini_set("max_execution_time", "600");
 		} else {
 			$tolock[] = $_GET['uid'];
 		}
+
 		$locklist = implode(',', array_map('intval',$tolock));
 		$now = time();
 		//DB $query = "UPDATE imas_students SET locked='$now' WHERE courseid='$cid' AND userid IN ($locklist)";
@@ -34,10 +37,10 @@ ini_set("max_execution_time", "600");
 		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid));
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']));
 			exit;
 		}
 	} else { //get confirm
@@ -71,9 +74,9 @@ ini_set("max_execution_time", "600");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($_GET['uid']) . "&confirmed=true\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid={$_GET['uid']}&confirmed=true\">";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($_GET['uid']) . "&confirmed=true\">";
 		}
 
 
@@ -90,25 +93,27 @@ ini_set("max_execution_time", "600");
 <?php
 					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
-						echo "			<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
+						printf("			<li>%s, %s (%s)</li>",
+                            Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
+                            Sanitize::encodeStringForDisplay($row[2]));
 					}
 ?>
 		</ul>
-		<input type=hidden name="tolock" value="<?php echo implode(",",$_POST['checked']) ?>">
+		<input type=hidden name="tolock" value="<?php echo Sanitize::encodeStringForDisplay(implode(",",$_POST['checked'])); ?>">
 <?php
 				}
 			} else {
-				echo $lockConfirm;
+				echo Sanitize::encodeStringForDisplay($lockConfirm);
 			}
 ?>
 
 		<p>
-			<input type=submit value="Yes, Lock Out Student">
+			<input type=submit name="dolockstu" value="Yes, Lock Out Student">
 <?php
 			if ($calledfrom=='lu') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
 			} else if ($calledfrom=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "'\">";
 			}
 ?>
 		</p>

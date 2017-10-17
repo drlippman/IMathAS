@@ -2,9 +2,11 @@
 //IMathAS:  Redeem latepasses
 //(c) 2007 David Lippman
 
-	require("../validate.php");
-	$cid = $_GET['cid'];
-	$fid = $_GET['fid'];
+	require("../init.php");
+
+
+	$cid = Sanitize::courseId($_GET['cid']);
+	$fid = Sanitize::onlyInt($_GET['fid']);
 	$from = $_GET['from'];
 
 	//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
@@ -19,7 +21,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Un-use LatePass</div>";
 		//DB $query = "SELECT startdate,enddate,islatepass,itemtype FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$fid' AND (itemtype='F' OR itemtype='R' OR itemtype='P')";
@@ -98,7 +100,7 @@
 						$stm = $DBH->prepare("UPDATE imas_exceptions SET islatepass=islatepass-:toreturn,startdate=:startdate,enddate=:enddate WHERE userid=:userid AND assessmentid=:assessmentid AND (itemtype='F' OR itemtype='R' OR itemtype='P')");
 						$stm->execute(array(':startdate'=>$newpostend, ':enddate'=>$newreplyend, ':userid'=>$userid, ':assessmentid'=>$fid, ':toreturn'=>$toreturn));
 					}
-					echo "<p>Returning $toreturn LatePass".($toreturn>1?"es":"")."</p>";
+					echo "<p>Returning ".Sanitize::encodeStringForDisplay($toreturn)." LatePass".($toreturn>1?"es":"")."</p>";
 					//DB $query = "UPDATE imas_students SET latepass=latepass+$toreturn WHERE userid='$userid' AND courseid='$cid'";
 					//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass+:toreturn WHERE userid=:userid AND courseid=:courseid");
@@ -107,14 +109,14 @@
 			}
 		}
 		if ($from=='forum') {
-			echo "<p><a href=\"../forums/thread.php?cid=$cid&forum=$fid\">Continue</a></p>";
+			echo "<p><a href=\"../forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid)."\">Continue</a></p>";
 		} else {
-			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
+			echo "<p><a href=\"course.php?cid=".Sanitize::courseId($cid)."\">Continue</a></p>";
 		}
 
 		require("../footer.php");
 
-	} else if (isset($_GET['confirm'])) {
+	} else if (isset($_POST['confirm'])) {
 		$addtime = $hours*60*60;
 		//DB $query = "SELECT allowlate,postby,replyby FROM imas_forums WHERE id='$fid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -153,12 +155,12 @@
 			$itemtype = $r[3];
 		}
 
-		$addtimepost = 0; $addtimereply = 0; $startdate = 0; $enddate = 0;
-		if (($itemtype=='F' || $itemtype=='P') && ($allowlaten==1 || $allowlaten-1>$usedlatepassespost) && ($now<$thispostby || ($allowlate>100 && ($now-$thispostby)<$hours*3600))) {
+		$addtimepost = 0; $addtimereply = 0; $startdate = $postby; $enddate = $replyby;
+		if (($itemtype=='F' || $itemtype=='P') && $postby<2000000000 && $postby>0 && ($allowlaten==1 || $allowlaten-1>$usedlatepassespost) && ($now<$thispostby || ($allowlate>100 && ($now-$thispostby)<$hours*3600))) {
 			$addtimepost = $addtime;
 			$startdate = $postby + $addtimepost;
 		}
-		if (($itemtype=='F' || $itemtype=='R') && ($allowlaten==1 || $allowlaten-1>$usedlatepassesreply) && ($now<$thisreplyby || ($allowlate>100 && ($now-$thisreplyby)<$hours*3600))) {
+		if (($itemtype=='F' || $itemtype=='R') && $replyby<2000000000 && $replyby>0 && ($allowlaten==1 || $allowlaten-1>$usedlatepassesreply) && ($now<$thisreplyby || ($allowlate>100 && ($now-$thisreplyby)<$hours*3600))) {
 			$addtimereply = $addtime;
 			$enddate = $replyby + $addtimereply;
 		}
@@ -176,9 +178,9 @@
 			}
 		}
 		if ($from=='forum') {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/forums/thread.php?cid=$cid&forum=$fid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid));
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($cid));
 		}
 
 	} else {
@@ -186,7 +188,7 @@
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Redeem LatePass</div>\n";
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
@@ -248,12 +250,12 @@
 			echo "<p>You have no late passes remaining.</p>";
 		} else if ($canuselatepasspost || $canuselatepassreply) {
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
-			echo "<form method=post action=\"redeemlatepassforum.php?cid=$cid&fid=$fid&from=$from&confirm=true\">";
+			echo "<form method=post action=\"redeemlatepassforum.php?cid=".Sanitize::courseId($cid)."&fid=".Sanitize::onlyInt($fid)."&from=".Sanitize::encodeUrlParam($from)."\">";
 			if ($allowlaten>1) {
 				echo '<p>You may use up to '.($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>';
 			}
-			echo "<p>You have $numlatepass LatePass(es) remaining.</p>";
-			echo "<p>You can redeem one LatePass for a $hours hour extension on ";
+			echo "<p>You have ".Sanitize::onlyInt($numlatepass)." LatePass(es) remaining.</p>";
+			echo "<p>You can redeem one LatePass for a ".Sanitize::onlyInt($hours)." hour extension on ";
 			if ($canuselatepasspost) {
 				echo " the <b>New Threads</b> due date ";
 				if ($canuselatepassreply) {
@@ -264,11 +266,12 @@
 				echo " the <b>Replies</b> due date ";
 			}
 			echo "for this forum assignment.</p><p>Are you sure you want to redeem a LatePass?</p>";
+			echo '<input type="hidden" name="confirm" value="true" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/> ";
 			if ($from=='forum') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../forums/thread.php?cid=$cid&forum=$fid'\"/>";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid)."'\"/>";
 			} else {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=".Sanitize::courseId($cid)."'\"/>";
 
 			}
 

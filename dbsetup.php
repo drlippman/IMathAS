@@ -16,7 +16,8 @@ Because of this, this file does NOT contain the full up-to-date database schema.
 ***************/
 
 $dbsetup = true;
-include("config.php");
+$use_local_sessions = true;
+include("init_without_validate.php");
 
 //DB $query = "SELECT ver FROM imas_dbschema WHERE id=1";
 //DB $result = mysql_query($query);
@@ -1111,6 +1112,17 @@ $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest ac
 $DBH->query($sql);
 echo 'imas_dbschema created<br/>';
 
+$sql = 'CREATE TABLE `php_sessions` (
+	`id` VARCHAR(32) NOT NULL,
+	`access` INT(10) unsigned DEFAULT NULL,
+	`data` TEXT,
+	PRIMARY KEY (`id`),
+	INDEX (`access`)
+	) ENGINE=InnoDB';
+//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+$DBH->query($sql);
+echo 'php_sessions created<br/>';
+
 if (isset($CFG['GEN']['newpasswords'])) {
 	require_once("includes/password.php");
 	$md5pw = password_hash($password, PASSWORD_DEFAULT);
@@ -1123,7 +1135,7 @@ $now = time();
 $stm = $DBH->prepare("INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES (:SID, :password, :rights, :FirstName, :LastName, :email)");
 $stm->execute(array(':SID'=>$username, ':password'=>$md5pw, ':rights'=>100, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email));
 
-echo "user $username created<br/>";
+echo "user " . Sanitize::encodeStringForDisplay($username) . " created<br/>";
 
 //write upgradecounter
 require("upgrade.php");

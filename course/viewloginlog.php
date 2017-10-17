@@ -2,7 +2,9 @@
 //IMathAS:  View login record
 //(c) 2011 David Lippman
 
-require("../validate.php");
+require("../init.php");
+
+
 $cid = intval($_GET['cid']);
 if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = $userid;
@@ -10,7 +12,7 @@ if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = intval($_GET['uid']);
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 if (isset($teacherid)) {
 	if (isset($_GET['from']) && $_GET['from']=='gb') {
 		$curBreadcrumb .= " &gt; <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> ";
@@ -35,7 +37,7 @@ echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.'">V
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);
-echo '<h3>Login Log for '.$row[0].', '.$row[1].'</h3>';
+printf('<h3>Login Log for %s, %s</h3>', Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 echo '<ul class="nomark">';
 
 //DB $query = "SELECT logintime,lastaction FROM imas_login_log WHERE userid='$uid' AND courseid='$cid' ORDER BY logintime DESC";
