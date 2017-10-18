@@ -1128,7 +1128,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		$viddata = unserialize($testsettings['viddata']);
 		$vidid = array_shift($viddata);
 		$vidar = is_array($viddata[0]) ? "16:9" : array_shift($viddata);
-		
+
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
 		$placeinhead = "<script>var vidAspectRatio = '$vidar'</script>";
 		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
@@ -2228,10 +2228,6 @@ if (!isset($_REQUEST['embedpostback'])) {
 				//is it video question?
 				if ($testsettings['displaymethod'] == "VideoCue") {
 
-					$viddata = unserialize($testsettings['viddata']);
-					$vidid = array_shift($viddata);
-					$vidar = is_array($viddata[0]) ? "16:9" : array_shift($viddata);
-
 					foreach ($viddata as $i=>$v) {
 						if (isset($v[2]) && $v[2]==$qn) {
 							echo '<div>';
@@ -2897,9 +2893,6 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<div class=inset>\n";
 				echo "<a name=\"beginquestions\"></a>\n";
 			} else if ($testsettings['displaymethod'] == "VideoCue") {
-				$viddata = unserialize($testsettings['viddata']);
-				$vidid = array_shift($viddata);
-				$vidar = is_array($viddata[0]) ? "16:9" : array_shift($viddata);
 
 				//asychronously load YouTube API
 				//echo '<script type="text/javascript">var tag = document.createElement(\'script\');tag.src = "//www.youtube.com/player_api";var firstScriptTag = document.getElementsByTagName(\'script\')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);</script>';
