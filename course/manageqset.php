@@ -279,7 +279,7 @@ if ($myrights<20) {
 							$del_stm->execute(array(':qsetid'=>$qsetid, ':now'=>$now));
 						}
 					}
-				} else if ($_POST['action']==1) { //add, remove existing
+				} else if ($_POST['action']==1 || $_POST['action']==3) { //add, remove existing
 					/*
 					get list of existing library assignments
 					rework existing to new libs
@@ -319,8 +319,17 @@ if ($myrights<20) {
 							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 						}
 						//determine which libraries to remove from; my lib assignments - newlibs
+						if ($sessiondata['lastsearchlibs'.$cid]!='') {
+							$listedlibs = explode(',', $sessiondata['lastsearchlibs'.$cid]);
+						} else {
+							$listedlibs = array();
+						}
 						if (isset($mylibs[$qsetid])) {
-							$toremove = array_diff($mylibs[$qsetid],$newlibs);
+							if ($_POST['action']==1) { //remove: my lib assignments - newlibs
+								$toremove = array_diff($mylibs[$qsetid],$newlibs);
+							} else if ($_POST['action']==3) { //remove:  listed libs that are my libs - newlibs
+								$toremove = array_diff(array_intersect($listedlibs, $mylibs[$qsetid]), $newlibs);
+							}
 							foreach($toremove as $libid) {
 								$del_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':now'=>$now));
 							}
@@ -707,7 +716,7 @@ if ($myrights<20) {
 			$search = '';
 			$searchall = 0;
 			$searchmine = 0;
-			$hidepriv = 0; 
+			$hidepriv = 0;
 			$skipfederated = 0;
 			$safesearch = '';
 		}
@@ -1122,14 +1131,14 @@ function getnextprev(formn,loc) {
 				if (chgliblaststate==2) {
 					initlibtree(false);
 				}
-			} else if (val==1) {
+			} else if (val==1 || val==3) {
 				help.innerHTML = "Select libraries to add these questions to.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
 				if (chgliblaststate==2) {
 					initlibtree(false);
 				}
 			} else if (val==2) {
 				help.innerHTML = "Unselect the libraries you want to remove questions from.  The questions will not be deleted; they will be moved to Unassigned if no other library assignments exist.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
-				if (chgliblaststate==0 || chgliblaststate==1) {
+				if (chgliblaststate==0 || chgliblaststate==1 || chgliblaststate==3) {
 					initlibtree(true);
 				}
 			}
@@ -1142,6 +1151,11 @@ function getnextprev(formn,loc) {
 			What do you want to do with these questions?<br/>
 			<input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments<br/>
 			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
+			<?php
+			if ($sessiondata['searchall'.$cid]==0 && $sessiondata['lastsearchlibs'.$cid]!='0') {
+				echo '<input type=radio name="action" value="3" onclick="chglibtoggle(this)"/> Add to libraries, removing library assignment in currently listed libraries<br/>';
+			}
+			?>
 			<input type=radio name="action" value="2" onclick="chglibtoggle(this)"/> Remove library assignments
 			<p id="chglibhelp" style="font-weight: bold;">
 			Select libraries to add these questions to.
