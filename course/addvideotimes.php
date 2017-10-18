@@ -15,6 +15,7 @@ $aid = Sanitize::onlyInt($_GET['aid']);
 if (isset($_POST['vidid'])) {
 	//DB $_POST = stripslashes_deep($_POST);
 	$vidid = $_POST['vidid'];
+	$vidar = $_POST['vidar'];
 	$data = array();
 	$i = 0;
 	while (isset($_POST['segtitle'.$i])) {
@@ -40,7 +41,7 @@ if (isset($_POST['vidid'])) {
 	}
 	ksort($data);
 	$data = array_values($data);
-	array_unshift($data, $vidid);
+	array_unshift($data, array($vidid, $vidar));
 	if (trim($_POST['finalseg'])!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
@@ -131,6 +132,11 @@ if ($viddata != '') {
 	$data = unserialize($viddata);
 	//load existing data
 	$vidid = array_shift($data);
+	if (is_array($vidid)) { 
+	  list($vidid,$vidar) = $vidid;
+	} else {
+	  $vidar = "16:9";
+	}
 	$n = count($data);
 	$title = array(); $endtime = array();
 	$qn = array();
@@ -369,7 +375,17 @@ then start from the end of this followup.</p>
 
 <p>YouTube video ID: <input type="text" name="vidid" id="vidid" value="<?php echo Sanitize::encodeStringForDisplay($vidid); ?>"/>
 <input type="button" value="Load Video" onclick="loadnewvideo()"/></p>
-
+<p>
+	Video Aspect Ratio:
+	<select name="vidar" id="vidar">
+<?php 
+	$ratios = array("16:9", "4:3", "3:2");
+	foreach ($ratios as $ratio) {
+		echo "<option ".($ratio==$vidar ? "selected" : "").">$ratio</option>";
+	}
+?>
+	</select>
+</p>
 
 <?php
 
