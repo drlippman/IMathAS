@@ -1127,7 +1127,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['displaymethod'] == "VideoCue") {
 		$viddata = unserialize($testsettings['viddata']);
 		$vidid = array_shift($viddata);
-		$vidar = is_array($viddata[0]) ? "16:9" : array_shift($viddata);
+		if (is_array($vidid)) { 
+		  list($vidid,$vidar) = $vidid;
+		} else {
+		  $vidar = "16:9";
+		}
 
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
 		$placeinhead = "<script>var vidAspectRatio = '$vidar'</script>";

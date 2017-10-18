@@ -41,8 +41,7 @@ if (isset($_POST['vidid'])) {
 	}
 	ksort($data);
 	$data = array_values($data);
-	array_unshift($data, $vidar);
-	array_unshift($data, $vidid);
+	array_unshift($data, [$vidid, $vidar]);
 	if (trim($_POST['finalseg'])!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
@@ -133,7 +132,11 @@ if ($viddata != '') {
 	$data = unserialize($viddata);
 	//load existing data
 	$vidid = array_shift($data);
-	$vidar = is_array($data[0]) ? "16:9" : array_shift($data); // Get video aspect ratio
+	if (is_array($vidid)) { 
+	  list($vidid,$vidar) = $vidid;
+	} else {
+	  $vidar = "16:9";
+	}
 	$n = count($data);
 	$title = array(); $endtime = array();
 	$qn = array();
