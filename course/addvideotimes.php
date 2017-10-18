@@ -41,7 +41,7 @@ if (isset($_POST['vidid'])) {
 	}
 	ksort($data);
 	$data = array_values($data);
-	array_unshift($data, [$vidid, $vidar]);
+	array_unshift($data, array($vidid, $vidar));
 	if (trim($_POST['finalseg'])!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
