@@ -274,7 +274,7 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_window").style.width = width + "px";
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-	document.getElementById("GB_frame").style.height = (h - 30 -34)+"px";
+	document.getElementById("GB_frame").style.height = (h - 30 -36)+"px";
 
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
@@ -673,19 +673,20 @@ jQuery(document).ready(function($) {
 	$('a[href*="vimeo"]').each(setupvideoembeds);
 	$('body').fitVids();
 });
-
-jQuery.fn.isolatedScroll = function() {
-    this.bind('mousewheel DOMMouseScroll', function (e) {
-        var delta = e.wheelDelta || (e.originalEvent && e.originalEvent.wheelDelta) || -e.detail,
-            bottomOverflow = this.scrollTop + jQuery(this).outerHeight() - this.scrollHeight >= 0,
-            topOverflow = this.scrollTop <= 0;
-
-        if ((delta < 0 && bottomOverflow) || (delta > 0 && topOverflow)) {
-            e.preventDefault();
-        }
-    });
-    return this;
-};
+jQuery(document).ready(function() {
+	jQuery.fn.isolatedScroll = function() {
+	    this.bind('mousewheel DOMMouseScroll', function (e) {
+		var delta = e.wheelDelta || (e.originalEvent && e.originalEvent.wheelDelta) || -e.detail,
+		    bottomOverflow = this.scrollTop + jQuery(this).outerHeight() - this.scrollHeight >= 0,
+		    topOverflow = this.scrollTop <= 0;
+	
+		if ((delta < 0 && bottomOverflow) || (delta > 0 && topOverflow)) {
+		    e.preventDefault();
+		}
+	    });
+	    return this;
+	};
+});
 
 jQuery(document).ready(function($) {
 	var fixedonscrollel = $('.fixedonscroll');

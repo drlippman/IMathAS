@@ -18,7 +18,7 @@ function onYouTubePlayerAPIReady() {
 
 function onPlayerReady(event) {
 	//called when youtube video is loaded
-	
+	$("iframe#player").removeAttr('height').removeAttr('width').css('height','').css('width','');
 }
 
 function onPlayerError(event) {
@@ -72,7 +72,9 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':2, 'rel':0, 'modestbranding':1, 'showinfo':0}; 
 		  
 		    //console.log(pVarsInternal);
-	
+		    var aspectRatioPercent = Math.round(100*vidPlayerHeight/vidPlayerWidth);
+		    $("#player").wrap('<div class="fluid-width-video-wrapper"></div>').parent('.fluid-width-video-wrapper').css('padding-top', (aspectRatioPercent)+"%")
+		   	.wrap('<div class="video-wrapper-wrapper"></div>').parent('.video-wrapper-wrapper').css('max-width',vidPlayerWidth+'px');
 		    ytplayer = new YT.Player('player', {
 			height: vidPlayerHeight,
 			width: vidPlayerWidth,

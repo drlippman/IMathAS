@@ -130,7 +130,7 @@ function setlib() {
 	for (i = 0; i <= frm.elements.length; i++) {
 		try{
 			if(frm.elements[i].name == 'libs[]' || frm.elements[i].name=='libs') {
-				if (frm.elements[i].checked == true) {
+				if (frm.elements[i].checked == true && frm.elements[i].disabled == false) {
 					chlibs[cnt] = frm.elements[i].value;
 					chlibsn[cnt] = document.getElementById('n'+chlibs[cnt]).innerHTML;
 					cnt++;
