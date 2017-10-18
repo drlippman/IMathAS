@@ -1125,8 +1125,13 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 	$cid = $testsettings['courseid'];
 	if ($testsettings['displaymethod'] == "VideoCue") {
+		$viddata = unserialize($testsettings['viddata']);
+		$vidid = array_shift($viddata);
+		$vidar = is_array($viddata[0]) ? "16:9" : array_shift($viddata);
+		
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
-		$placeinhead = '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
+		$placeinhead = "<script>var vidAspectRatio = '$vidar'</script>";
+		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
 	}
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead = '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
@@ -2224,9 +2229,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 				if ($testsettings['displaymethod'] == "VideoCue") {
 
 					$viddata = unserialize($testsettings['viddata']);
+					$vidid = array_shift($viddata);
+					$vidar = is_array($viddata[0]) ? "16:9" : array_shift($viddata);
 
 					foreach ($viddata as $i=>$v) {
-						if ($i>0 && isset($v[2]) && $v[2]==$qn) {
+						if (isset($v[2]) && $v[2]==$qn) {
 							echo '<div>';
 							$hascontinue = true;
 							if (isset($v[3]) && getpts($rawscore)>.99) {
@@ -2891,6 +2898,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<a name=\"beginquestions\"></a>\n";
 			} else if ($testsettings['displaymethod'] == "VideoCue") {
 				$viddata = unserialize($testsettings['viddata']);
+				$vidid = array_shift($viddata);
+				$vidar = is_array($viddata[0]) ? "16:9" : array_shift($viddata);
 
 				//asychronously load YouTube API
 				//echo '<script type="text/javascript">var tag = document.createElement(\'script\');tag.src = "//www.youtube.com/player_api";var firstScriptTag = document.getElementsByTagName(\'script\')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);</script>';
@@ -2904,12 +2913,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<a name=\"beginquestions\"></a>\n";
 				echo '<div id="playerwrapper"><div id="player"></div></div>';
 				$outarr = array();
-				for ($i=1;$i<count($viddata);$i++) {
+				for ($i=0;$i<count($viddata);$i++) {
 					if (isset($viddata[$i][2])) {
 						$outarr[] = $viddata[$i][1].':{qn:'.$viddata[$i][2].'}';
 					}
 				}
-				echo '<script type="text/javascript">var thumbSet = initVideoObject("'.$viddata[0].'",{'.implode(',',$outarr).'}); </script>';
+				echo '<script type="text/javascript">var thumbSet = initVideoObject("'.$vidid.'",{'.implode(',',$outarr).'}); </script>';
 
 				$qmin = 0;
 				$qmax = count($questions);
@@ -3195,7 +3204,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		echo '<div class="navbar" style="width:175px" role="navigation" aria-label="'._("Video and question navigation").'">';
 		echo '<ul class="qlist" style="margin-left:-10px">';
 		$timetoshow = 0;
-		for ($i=1; $i<count($viddata); $i++) {
+		for ($i=0; $i<count($viddata); $i++) {
 			echo '<li style="margin-bottom:7px;">';
 			echo '<a href="#" onclick="thumbSet.jumpToTime('.$timetoshow.',true);return false;">'.$viddata[$i][0].'</a>';
 			if (isset($viddata[$i][2])) {

@@ -4,10 +4,15 @@
 
 
 //Global settings for video player height and width
-var vidPlayerHeight = 430;
-var videoHeight = vidPlayerHeight - 30;
-var vidPlayerWidth = 710;
-var videoWidth = vidPlayerWidth; 
+var vidPlayerWidth, videoWidth, vidPlayerHeight, vidPlayerHeight;
+(function(){
+	var ar = vidAspectRatio.split(":");
+	videoWidth = 710;
+	videoHeight = ar[1]/ar[0] * videoWidth;
+})();
+vidPlayerWidth = videoWidth; 
+vidPlayerHeight = videoHeight;
+
 
 function onYouTubePlayerAPIReady() {
 	//called automatically by youtube API when the API is loaded
