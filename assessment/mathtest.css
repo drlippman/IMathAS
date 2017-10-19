@@ -177,6 +177,8 @@ div.right {
 
 ul.qlist {list-style-type: none; margin: 0px; padding: 0px;}
 ul.qlist li {margin-top: .2em; margin-left: 10px; padding: 0px;}
+ul.navlist {list-style-type: none; margin: 0px; margin-left: -10px; padding: 0px;}
+ul.navlist li {margin-top: .2em; margin-left: 10px; margin-bottom: 7px; padding: 0px;}
 
 ul.nomark {list-style-type: none;}
 ul.nomark li { margin-top: .7em;}
@@ -815,7 +817,9 @@ a[target=_blank]:after {
 .altContentOff {
 	display:none;
 }
-
+.midwrapper {
+	position: relative;
+}
 .fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper {
 	max-width: 1000px;
 	margin: auto;
@@ -833,4 +837,36 @@ a[target=_blank]:after {
 	margin:auto;
 	padding: 0px 10px;
 	max-width:1900px;
+}
+
+#videocuedmenubtn {
+	display: none;
+}
+.inset.videocued {
+	margin-left: 215px;
+	margin-right: 0px;
+	padding-left: 0px;
+	overflow: visible;
+	position: relative;
+}
+.navbar.videocued {
+	width: 175px;
+}
+@media only screen and (max-width: 760px) {
+	#videocuedmenubtn {
+		display: block;
+	}
+	.navbar.videocued {
+		position: absolute;
+		left: -250px;
+		display: none;
+		z-index: 100;
+	}
+	.inset.videocued {
+		margin-left: 0px;
+		padding-left: 0px;
+	}
+	.navbar.videocued.shownav {
+		display: block;
+	}
 }

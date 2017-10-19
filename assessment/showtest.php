@@ -1127,7 +1127,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['displaymethod'] == "VideoCue") {
 		$viddata = unserialize($testsettings['viddata']);
 		$vidid = array_shift($viddata);
-		if (is_array($vidid)) { 
+		if (is_array($vidid)) {
 		  list($vidid,$vidar) = $vidid;
 		} else {
 		  $vidar = "16:9";
@@ -1135,7 +1135,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
 		$placeinhead = "<script>var vidAspectRatio = '$vidar'</script>";
-		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
+		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js?v=101817"></script>';
 	}
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead = '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
@@ -2231,9 +2231,10 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 				//is it video question?
 				if ($testsettings['displaymethod'] == "VideoCue") {
+					$viddata = unserialize($testsettings['viddata']);
 
 					foreach ($viddata as $i=>$v) {
-						if (isset($v[2]) && $v[2]==$qn) {
+						if ($i>0 && isset($v[2]) && $v[2]==$qn) {
 							echo '<div>';
 							$hascontinue = true;
 							if (isset($v[3]) && getpts($rawscore)>.99) {
@@ -2265,8 +2266,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 						}
 					}
 				}
-
-				embedshowicon($qn);
+				if ($testsettings['displaymethod'] != "VideoCue") {
+					embedshowicon($qn);
+				}
 				if (!$sessiondata['istutorial']) {
 					echo '<div class="prequestion">';
 					$divopen = true;
@@ -2828,6 +2830,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 				}
 				echo '</div>';
+				echo '<div><img src="../img/menu.png" alt="Show Video Navigation" id="videocuedmenubtn" aria-hidden="true" aria-expanded="false" aria-controls="videonav"/></div>';
 				$intro = '';
 			}
 			echo '<script type="text/javascript">var assesspostbackurl="' . $GLOBALS['basesiteurl'] . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.Sanitize::encodeUrlParam($_GET['page']).'";</script>';
@@ -2906,7 +2909,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				  //tag.src = "//www.youtube.com/iframe_api";
 				showvideoembednavbar($viddata);
 				$dovidcontrol = true;
-				echo '<div class="inset" style="position: relative; margin-left: 225px; overflow: visible;">';
+				echo '<div class="inset videocued">';
 				echo "<a name=\"beginquestions\"></a>\n";
 				echo '<div id="playerwrapper"><div id="player"></div></div>';
 				$outarr = array();
@@ -2937,7 +2940,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 				if ($dovidcontrol) { $quesout .= ' style="position: absolute; width:100%; visibility:hidden; top:0px;left:-1000px;" ';}
 				$quesout .= '>';
 				ob_start();
-				embedshowicon($i);
+				if ($testsettings['displaymethod'] != "VideoCue") {
+					embedshowicon($i);
+				}
 				if (hasreattempts($i)) {
 
 					basicshowq($i,false);
@@ -3198,11 +3203,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 		5: title for the part immediately following the Q]
 		*/
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
-		echo '<div class="navbar" style="width:175px" role="navigation" aria-label="'._("Video and question navigation").'">';
-		echo '<ul class="qlist" style="margin-left:-10px">';
+		echo '<div id="videonav" class="navbar videocued" role="navigation" aria-label="'._("Video and question navigation").'">';
+		echo '<ul class="navlist">';
 		$timetoshow = 0;
 		for ($i=0; $i<count($viddata); $i++) {
-			echo '<li style="margin-bottom:7px;">';
+			echo '<li>';
 			echo '<a href="#" onclick="thumbSet.jumpToTime('.$timetoshow.',true);return false;">'.$viddata[$i][0].'</a>';
 			if (isset($viddata[$i][2])) {
 				echo '<br/>&nbsp;&nbsp;<a style="font-size:75%;" href="#" onclick="thumbSet.jumpToQ('.$viddata[$i][1].',false);return false;">', _('Jump to Question'), '</a>';
@@ -3228,12 +3233,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 		echo '<div class="navbar fixedonscroll" role="navigation" aria-label="'._("Page and question navigation").'">';
 		echo "<h4>", _('Pages'), "</h4>\n";
-		echo '<ul class="qlist" style="margin-left:-10px">';
+		echo '<ul class="navlist">';
 		$jsonbits = array();
 		$max = (count($pginfo)-1)/2;
 		$totposs = 0;
 		for ($i = 0; $i < $max; $i++) {
-			echo '<li style="margin-bottom:7px;">';
+			echo '<li>';
 			if ($curpg == $i) { echo "<span class=current>";}
 			if (trim($pginfo[2*$i+1])=='') {
 				$pginfo[2*$i+1] =  $i+1;
