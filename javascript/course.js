@@ -217,7 +217,6 @@ function showcalcontentsid(elid) {
 						html += 'href="'+caleventsarr[elid].data[i].link+'">';
 					}
 					html += caleventsarr[elid].data[i].name;
-					if (caleventsarr[elid].data[i].target==1) {html += ' <img src="'+imasroot+'/img/extlink.png" alt="External link"/>';}
 					html += '</a>';
 
 				} else {
@@ -389,11 +388,13 @@ function playliststart(id,vidk,el) {
 	} else {
 		wrap.find('iframe').attr('src',url);
 	}
-	if (playlist[id][vidk].isGdrive) {
-		bar.find('.playlisttitle').html(playlist[id][vidk].name+' <a target="_blank" href="https://drive.google.com/file/d/'+playlist[id][vidk].vidid+'/view"><img src="'+imasroot+'/img/extlink.png" alt="External link"/></a>');
+	bar.find('.playlisttitle').html(playlist[id][vidk].name);
+	/*if (playlist[id][vidk].isGdrive) {
+		bar.find('.playlisttitle').html('<a target="_blank" href="https://drive.google.com/file/d/'+playlist[id][vidk].vidid+'/view">'+playlist[id][vidk].name+'</a>');
 	} else {
-		bar.find('.playlisttitle').html(playlist[id][vidk].name+' <a target="_blank" href="http://www.youtube.com/watch?v='+playlist[id][vidk].vidid+'"><img src="'+imasroot+'/img/extlink.png" alt="External link"/></a>');
+		bar.find('.playlisttitle').html('<a target="_blank" href="http://www.youtube.com/watch?v='+playlist[id][vidk].vidid+'">'+playlist[id][vidk].name+'</a>');
 	}
+	*/
 	if (vidk==0) {
 		bar.find('.vidrew,.vidrewI').removeClass("vidrew").addClass("vidrewI");
 	} else {
