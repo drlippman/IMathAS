@@ -61,7 +61,7 @@ function showitemtree($items,$parent) {
 			if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 						($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
 				if ($item['SH'][1]=='T') { //just link to treereader item
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#B'.$item['id']).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#B'.Sanitize::encodeUrlParam($item['id']).'">';
 					showicon('tree', 'treereader');
 					echo Sanitize::encodeStringForDisplay($item['name']);
 					echo '</a></li>';
@@ -110,7 +110,7 @@ function showitemtree($items,$parent) {
 				if (($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && ($nothidden || $showgreyedout)) ||
 					($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) || $viewall) {
 
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#'.Sanitize::encodeUrlParam($item).'">';
 					showicon('assess', 'Assessment');
 					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
@@ -118,7 +118,7 @@ function showitemtree($items,$parent) {
 
 			} else if ($line['itemtype']=='InlineText') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#inline'.$line['id']).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#inline'.Sanitize::encodeUrlParam($line['id']).'">';
 					showicon('inline', 'Inline Text');
 					if ($line['title']!='##hidden##') {
 						echo Sanitize::encodeStringForDisplay($line['title']);
@@ -129,14 +129,14 @@ function showitemtree($items,$parent) {
 				}
 			} else if ($line['itemtype']=='LinkedText') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#'.Sanitize::encodeUrlParam($item).'">';
 					showicon('linked', 'Link');
 					echo Sanitize::encodeStringForDisplay($line['title']);
 					echo '</a></li>';
 				}
 			} else if ($line['itemtype']=='Drill') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#'.Sanitize::encodeUrlParam($item).'">';
 					showicon('drill', 'Drill');
 					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
@@ -148,14 +148,14 @@ function showitemtree($items,$parent) {
 				}
 
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#'.Sanitize::encodeUrlParam($item).'">';
 					showicon('forum', 'Forum');
 					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
 				}
 			} else if ($line['itemtype']=='Wiki') {
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent.'#'.$item).'">';
+					echo '<li><a href="course.php?cid='.$cid.'&folder='.Sanitize::encodeUrlParam($parent).'#'.Sanitize::encodeUrlParam($item).'">';
 					showicon('wiki', 'Wiki');
 					echo Sanitize::encodeStringForDisplay($line['name']);
 					echo '</a></li>';
