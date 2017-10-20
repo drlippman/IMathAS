@@ -2830,7 +2830,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 				}
 				echo '</div>';
-				echo '<div><img src="../img/menu.png" alt="Show Video Navigation" id="videocuedmenubtn" aria-hidden="true" aria-expanded="false" aria-controls="videonav"/></div>';
+				echo '<div><button class="hamburger" id="videocuedmenubtn" aria-label="Video Navigation Menu" aria-hidden="true" aria-expanded="false" aria-controls="videonav"><span class="hamburger-box"><span class="hamburger-inner"></span></span></button></div>';
 				$intro = '';
 			}
 			echo '<script type="text/javascript">var assesspostbackurl="' . $GLOBALS['basesiteurl'] . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.Sanitize::encodeUrlParam($_GET['page']).'";</script>';

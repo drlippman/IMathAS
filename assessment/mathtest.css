@@ -839,9 +839,52 @@ a[target=_blank]:after {
 	max-width:1900px;
 }
 
+button.hamburger {
+	border: 0;
+	background-color: transparent;
+	margin: 0;
+	padding: 2px;
+	width: 28px;
+	height: 28px;
+	cursor: pointer;
+}
+.hamburger-box {
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	width: 24px;
+	height: 24px;
+}
+.hamburger-inner {
+	display: block;
+	top: auto;
+	bottom: 3px;
+}
+.hamburger-inner, .hamburger-inner:before, .hamburger-inner:after {
+	width: 24px;
+ 	height: 4px;
+ 	border-radius: 4px;
+ 	position: absolute;
+	background-color: #000;
+ }
+ #videocuedmenubtn:hover {
+ 	opacity: .7;
+ }
+.hamburger-inner:before, .hamburger-inner:after {
+	display: block;
+	content: "";
+}
+.hamburger-inner:before {
+	top: -7px;
+}
+.hamburger-inner:after {
+	top: -14px;
+}
+
 #videocuedmenubtn {
 	display: none;
 }
+
 .inset.videocued {
 	margin-left: 215px;
 	margin-right: 0px;
@@ -861,6 +904,7 @@ a[target=_blank]:after {
 		left: -250px;
 		display: none;
 		z-index: 100;
+		box-shadow: 5px 2px 10px rgba(0,0,0,.175);
 	}
 	.inset.videocued {
 		margin-left: 0px;
