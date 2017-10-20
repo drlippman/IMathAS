@@ -176,7 +176,7 @@
 
 		//check for password
 
-		if (trim($adata['password'])!='' && preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.[\d\*\-]+/',$adata['password'])) {
+		if (trim($adata['password'])!='' && preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/',$adata['password'])) {
 			//if PW is an IP address, compare against user's
 			$userip = explode('.', $_SERVER['REMOTE_ADDR']);
 			$pwips = explode(',', $adata['password']);
@@ -185,7 +185,7 @@
 				$pwip = explode('.', $pwip);
 				$thisIPok = true;
 				for ($i=0;$i<3;$i++) {
-					if ($pwip[$i]!=$userip[$i]) {
+					if ($pwip[$i]!=$userip[$i] && $pwip[$i]!='*') {
 						$thisIPok = false;
 					}
 				}
