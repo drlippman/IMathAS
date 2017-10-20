@@ -15,6 +15,7 @@ $aid = Sanitize::onlyInt($_GET['aid']);
 if (isset($_POST['vidid'])) {
 	//DB $_POST = stripslashes_deep($_POST);
 	$vidid = $_POST['vidid'];
+	$vidar = $_POST['vidar'];
 	$data = array();
 	$i = 0;
 	while (isset($_POST['segtitle'.$i])) {
@@ -40,7 +41,7 @@ if (isset($_POST['vidid'])) {
 	}
 	ksort($data);
 	$data = array_values($data);
-	array_unshift($data, $vidid);
+	array_unshift($data, array($vidid, $vidar));
 	if (trim($_POST['finalseg'])!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
@@ -131,6 +132,13 @@ if ($viddata != '') {
 	$data = unserialize($viddata);
 	//load existing data
 	$vidid = array_shift($data);
+	if (is_array($vidid)) {
+	  list($vidid,$vidar) = $vidid;
+	} else {
+	  $vidar = "16:9";
+	}
+	$vidarpts = explode(':',$vidar);
+	$aspectRatio = $vidarpts[0]/$vidarpts[1];
 	$n = count($data);
 	$title = array(); $endtime = array();
 	$qn = array();
@@ -260,8 +268,8 @@ function onYouTubePlayerAPIReady() {
 
 function loadPlayer() {
 	player = new YT.Player('player', {
-		height: 270,
-		width: 443,
+		height: <?php echo ceil(453/$aspectRatio);?>,
+		width: 453,
 		videoId: vidid,
 		playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0}
 	});
@@ -275,6 +283,11 @@ function loadnewvideo() {
 		vidid = document.getElementById("vidid").value;
 		player.cueVideoById(vidid);
 	}
+}
+function updateAR() {
+	var arpts = $("#vidar").val().split(":");
+	var newheight = Math.ceil(453*arpts[1]/arpts[0]);
+	$("#player").css("height",newheight+"px").attr("height",newheight);
 }
 function grabcurvidtime(n,type) {
 	//do youtube video logic here
@@ -354,7 +367,7 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
 ?>
 
 <h2>Video Navigation and Question Cues</h2>
-<div style="float:right; width: 453px; height: 275px;"><div id="player"></div></div>
+<div style="float:right;"><div id="player" style="width: 453px; height: <?php echo ceil(453/$aspectRatio);?>px;"></div></div>
 <p>This page allows you to setup your assessment to be cued to a video.  For each
 question, give a title to the video segment that leads up to that question, and select
 the time when that segment ends and the question should show.  You can grab this
@@ -369,7 +382,17 @@ then start from the end of this followup.</p>
 
 <p>YouTube video ID: <input type="text" name="vidid" id="vidid" value="<?php echo Sanitize::encodeStringForDisplay($vidid); ?>"/>
 <input type="button" value="Load Video" onclick="loadnewvideo()"/></p>
-
+<p>
+	Video Aspect Ratio:
+	<select name="vidar" id="vidar" onchange="updateAR()">
+<?php
+	$ratios = array("16:9", "4:3", "3:2");
+	foreach ($ratios as $ratio) {
+		echo "<option ".($ratio==$vidar ? "selected" : "").">$ratio</option>";
+	}
+?>
+	</select>
+</p>
 
 <?php
 
