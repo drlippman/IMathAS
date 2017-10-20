@@ -45,7 +45,7 @@
 		$msg = Sanitize::onlyInt($_GET['msgid']);
 		//DB $query = "UPDATE imas_msgs SET isread=isread-1 WHERE id='$msg'";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread-1 WHERE id=:id");
+		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread-1 WHERE id=:id and isread>0");
 		$stm->execute(array(':id'=>$msg));
 		if ($type=='new') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
