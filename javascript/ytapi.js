@@ -4,17 +4,22 @@
 
 
 //Global settings for video player height and width
-var vidPlayerHeight = 430;
-var videoHeight = vidPlayerHeight - 30;
-var vidPlayerWidth = 710;
-var videoWidth = vidPlayerWidth; 
+var vidPlayerWidth, videoWidth, vidPlayerHeight, vidPlayerHeight;
+(function(){
+	var ar = vidAspectRatio.split(":");
+	videoWidth = 710;
+	videoHeight = ar[1]/ar[0] * videoWidth;
+})();
+vidPlayerWidth = videoWidth;
+vidPlayerHeight = videoHeight;
+
 
 function onYouTubePlayerAPIReady() {
 	//called automatically by youtube API when the API is loaded
 	//console.log(document.readyState);
 	thumbSet.getVidID();
-	
-} 
+
+}
 
 function onPlayerReady(event) {
 	//called when youtube video is loaded
@@ -41,12 +46,12 @@ function onPlayerStateChange(event) {
 }
 
 //VidID is string containing YouTube video ID
-//breaktimesarray is an object of objects:  
-//  {curTime:{qn:qn}} 
+//breaktimesarray is an object of objects:
+//  {curTime:{qn:qn}}
 var ytplayer;
 var skipSecQ = -1;
 var initVideoObject = function (VidId, breaktimesarray) {
-	
+
 	var thumbSet = {
 
 		// Set up global vars
@@ -57,22 +62,22 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		//skipSecQ: -1,
 		lastTime: -1,
 		curQ: -1,
-	
+
 		getVidID: function() {
 		    vidName = VidId;
 		    questions = breaktimesarray;
-		    
+
 		    setTimeout(function () { thumbSet.createPlayer(); }, 200);
 		    // add stuff here that happens after video is loaded
 		},
-		
+
 		// add player to the page
 		createPlayer: function () {
-			
-		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':2, 'rel':0, 'modestbranding':1, 'showinfo':0}; 
-		  
+
+		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':2, 'rel':0, 'modestbranding':1, 'showinfo':0};
+
 		    //console.log(pVarsInternal);
-		    var aspectRatioPercent = Math.round(100*vidPlayerHeight/vidPlayerWidth);
+		    var aspectRatioPercent = Math.round(1000*vidPlayerHeight/vidPlayerWidth)/10;
 		    $("#player").wrap('<div class="fluid-width-video-wrapper"></div>').parent('.fluid-width-video-wrapper').css('padding-top', (aspectRatioPercent)+"%")
 		   	.wrap('<div class="video-wrapper-wrapper"></div>').parent('.video-wrapper-wrapper').css('max-width',vidPlayerWidth+'px');
 		    ytplayer = new YT.Player('player', {
@@ -86,15 +91,15 @@ var initVideoObject = function (VidId, breaktimesarray) {
 			    'onError': onPlayerError,
 			}
 		    });
-		    
+
 		    //document.getElementById('playerwrapper').style['z-index']=-10;
 		   // document.getElementById('playerwrapper').style['-webkit-transform']='translateZ(0)';
 		},
-	
+
 		stripPx: function (sizeWithPx) {
 		    return parseInt(sizeWithPx.substr(0,sizeWithPx.search('px')));
 		},
-	
+
 		setupQPane: function (qTime) {
 			thumbSet.curQ = questions[qTime];
 			//document.getElementById("player").style.visibility = "hidden";
@@ -102,14 +107,14 @@ var initVideoObject = function (VidId, breaktimesarray) {
 			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "visible";
 			document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "0px";
 		},
-		
+
 		closeQPane: function (skipahead) {
 		    //hide questions
 		    if (thumbSet.curQ != -1) {
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.left = "-5000px";
 			    document.getElementById('playerwrapper').style.left = "0px";
-			    
+
 			    //are we skipping a section of video?
 			    if (skipahead && thumbSet.curQ.hasOwnProperty("showAfter")) {
 				    skipSecQ = thumbSet.curQ.showAfter;
@@ -120,20 +125,20 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		    //resume playing video
 		    ytplayer.playVideo();
 		},
-	
+
 		timeDisplay: function(timeInSec) {
 		    var min = Math.floor(timeInSec/60);
 		    var sec = timeInSec - 60*min;
 		    if (sec<10) sec = '0'+sec;
 		    return ("" + min + ":" + sec);
 		},
-	
-		// called on setTimeout, this watches the time and launches 
+
+		// called on setTimeout, this watches the time and launches
 		// the questions when called for
-		checkTime: function () {    
+		checkTime: function () {
 		    var curTime = Math.floor(ytplayer.getCurrentTime());
 		    //console.log(curTime+","+skipSecQ);
-		    if (questions.hasOwnProperty(curTime) && skipSecQ!=curTime && 
+		    if (questions.hasOwnProperty(curTime) && skipSecQ!=curTime &&
 			    ytplayer.getPlayerState() == YT.PlayerState.PLAYING) {
 		    		thumbSet.showQuestion(curTime);
 		    } else if (ytplayer.getPlayerState() == YT.PlayerState.PLAYING) {
@@ -142,26 +147,26 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		     if (!questions.hasOwnProperty(curTime)) {
 			skipSecQ=-1;
 		    }
-	
+
 		    thumbSet.lastTime=curTime;
 		},
-	
+
 		showQuestion: function (curTime) {
 		    if (ytplayer && ytplayer.pauseVideo) {
 		    	    ytplayer.pauseVideo();
 		    }
-	
+
 		    skipSecQ = curTime;
-	
+
 		    if (questions.hasOwnProperty(curTime)) {
 			questions[curTime].done=true;
 			thumbSet.setupQPane(curTime);
 		    } else {
 			ytplayer.playVideo();
 		    }
-		    
+
 		},
-		
+
 		jumpToTime: function (idxTime, skipQ) {
 			if (skipQ) {
 				skipSecQ = idxTime; //skip the question at this time
@@ -170,10 +175,11 @@ var initVideoObject = function (VidId, breaktimesarray) {
 				skipSecQ = -1;
 				ytplayer.seekTo(idxTime-0.5, true);
 			}
-			
+
 			thumbSet.closeQPane(false);
+			hideMobileVideoNav();
 		},
-		
+
 		jumpToQ:  function (idxTime) {
 			if (this.curQ != -1) {
 			    document.getElementById("embedqwrapper"+thumbSet.curQ.qn).style.visibility = "hidden";
@@ -183,6 +189,7 @@ var initVideoObject = function (VidId, breaktimesarray) {
 			ytplayer.pauseVideo();
 			ytplayer.seekTo(idxTime-0.5, true);
 			thumbSet.showQuestion(idxTime);
+			hideMobileVideoNav();
 		}
 
     };  // end of thumbSet object definition
@@ -190,3 +197,29 @@ var initVideoObject = function (VidId, breaktimesarray) {
     return thumbSet;
 
 };  // end of initVideoObject definition
+
+//this is some additional stuff for controlling the video navigation menubar
+var videoNavState = "hidden";
+$(function() {
+	$("#videocuedmenubtn").on("click",function() {
+		if (videoNavState=="hidden") {
+			showMobileVideoNav();
+		} else {
+			hideMobileVideoNav();
+		}
+	})
+});
+function showMobileVideoNav() {
+	videoNavState = "shown";
+	$("#videocuedmenubtn").attr("aria-expanded", true);
+	$("#videonav").attr("aria-expanded", true)
+		.addClass("shownav").animate({left:0}, 300);
+}
+function hideMobileVideoNav() {
+	if ($("#videocuedmenubtn").is(":visible")) {
+		videoNavState = "hidden";
+		$("#videocuedmenubtn").attr("aria-expanded", false);
+		$("#videonav").attr("aria-expanded", false)
+			.animate({left:-250}, 300, function() {$("#videonav").removeClass("shownav");});
+	}
+}

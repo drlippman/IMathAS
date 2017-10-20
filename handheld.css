@@ -56,13 +56,16 @@ div.navbar p {
 	display: inline;
 	padding-right: 2em;
 }
+ul.navlist li {
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
 ul.qlist li {
 	display: inline;
 	white-space: nowrap;
 	margin-left: 0px;
 	margin-top: 0px;
 }
-
 div.navbar.fixedonscroll {
 	padding-left: 20px;
 }
