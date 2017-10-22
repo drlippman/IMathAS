@@ -242,7 +242,7 @@ if (isset($_POST['snippets'])) {
 			echo '<input type="text" class="sniptitle" oninput="markDirty()" ';
 			echo 'value="'.Sanitize::encodeStringForDisplay($snip['text']).'" size=50 /> ';
 			echo '<button type="button" onclick="deletesnip(event)">'._('Delete').'</button>';
-			echo '<div id="snip'.$snipcnt.'" class="snipcont">';
+			echo '<div id="snip'.$snipcnt.'" class="snipcont skipmathrender">';
 			//presanitized HTML
 			echo $snip['content'].'</div></li>';
 			$snipcnt++;
