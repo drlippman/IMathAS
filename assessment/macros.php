@@ -651,9 +651,13 @@ function showarrays() {
 	}
 	$out = '<table class=stats>';
 	$hashdr = false;
+	$maxlength = 0;
 	for ($i = 0; $i<floor(count($alist)/2); $i++) {
 		if ($alist[2*$i]!='') {
-			$hashdr = true; break;
+			$hashdr = true;
+		}
+		if (count($alist[2*$i+1])>$maxlength) {
+			$maxlength = count($alist[2*$i+1]);
 		}
 	}
 	if ($hashdr) {
@@ -664,7 +668,7 @@ function showarrays() {
 		$out .= "</tr></thead>";
 	}
 	$out .= "<tbody>";
-	for ($j = 0; $j<count($alist[1]); $j++) {
+	for ($j = 0; $j<$maxlength; $j++) {
 		$out .="<tr>";
 		for ($i = 0; $i<floor(count($alist)/2); $i++) {
 			if ($format=='c' || $format=='C') {
@@ -676,7 +680,11 @@ function showarrays() {
 			} else {
 				$out .= '<td>';
 			}
-			$out .= "{$alist[2*$i+1][$j]}</td>";
+			if (isset($alist[2*$i+1][$j])) {
+				$out .= $alist[2*$i+1][$j];
+			}
+
+			$out .= "</td>";
 		}
 		$out .="</tr>";
 	}
@@ -717,11 +725,20 @@ function horizshowarrays() {
 	$alist = func_get_args();
 	if (count($alist)<2) {return false;}
 
-
-	$out = '<table class=stats>';
+	$maxlength = 0;
+	for ($i=0; $i<count($alist)/2; $i++) {
+		if (count($alist[2*$i+1])>$maxlength) {
+			$maxlength = count($alist[2*$i+1]);
+		}
+	}
+		$out = '<table class=stats>';
 	for ($i=0; $i<count($alist)/2; $i++) {
 		$out .= "<tr><th scope=\"row\"><b>{$alist[2*$i]}</b></th>";
-		$out .= "<td>" . implode("</td><td>",$alist[2*$i+1]) . "</td></tr>\n";
+		$out .= "<td>" . implode("</td><td>",$alist[2*$i+1]) . "</td>";
+		if (count($alist[2*$i+1])<$maxlength) {
+			$out .= str_repeat('<td></td>', $maxlength - count($alist[2*$i+1]));
+		}
+		$out .= "</tr>\n";
 	}
 	$out .= "</tbody></table>\n";
 	return $out;
