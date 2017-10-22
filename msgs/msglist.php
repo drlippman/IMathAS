@@ -38,7 +38,6 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	} else {
 		$isteacher = false;
 	}
-  $to = ($_GET['to']) ? Sanitize::onlyInt($_GET['to']) : NULL;
 
 	$cansendmsgs = false;
 	$threadsperpage = intval($listperpage);
@@ -422,6 +421,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo ">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
+				$to = Sanitize::onlyInt($_GET['to']);
 				//DB $query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg FROM imas_users AS iu ";
 				//DB $query .= "LEFT JOIN imas_students AS i_s ON iu.id=i_s.userid AND i_s.courseid='$courseid' WHERE iu.id='$to'";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
