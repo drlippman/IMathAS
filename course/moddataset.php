@@ -1242,7 +1242,7 @@ Display with the "Show Answer"<br/>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['solution']);?></textarea>
 </div>
 <div id=imgbox>
-<input type="hidden" name="MAX_FILE_SIZE" value="500000" />
+<input type="hidden" name="MAX_FILE_SIZE" value="5000000" />
 Image file: <input type="file" name="imgfile"/> assign to variable: <input type="text" name="newimgvar" size="6"/> Description: <input type="text" size="20" name="newimgalt" value=""/><br/>
 <div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
 	Images:
