@@ -166,13 +166,13 @@ if (isset($_POST['text'])) {
 			$code .= '$feedbacktxtdef = "'.str_replace('"','\\"',$feedbacktxtdef[0]).'"'."\n";
 			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
 			$code .= (($_POST['qtol0']=='abs')?'$abstolerance':'$reltolerance').' = '.$_POST['tol0']."\n";
-			if ($qtypes[$n] == 'numfunc') {
+			if ($qtypes[0] == 'numfunc') {
 				$code .= '$variables = "'.$variables[0].'"'."\n";
 				$code .= '$requiretimes = ""'."\n";
 				if (strpos($answer[0],'=')!==false) {//is an equation answer
 					$code .= '$answerformat = "equation"'."\n";
 				}
-			} else if ($qtypes[$n] == 'calculated') {
+			} else if ($qtypes[0] == 'calculated') {
 				$code .= '$requiretimes = ""'."\n";
 				$code .= '$answerformat = "'.$answerformat[0].'"'."\n";
 			}
@@ -390,7 +390,7 @@ if (isset($_POST['text'])) {
 		}
 		$editmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 	}
-	
+
 	//update libraries
 	$newlibs = explode(",",$_POST['libs']);
 
@@ -401,7 +401,7 @@ if (isset($_POST['text'])) {
 	if ($_POST['libs']=='') {
 		$newlibs = array();
 	}
-	
+
 	$allcurrentlibs = array();
 	$alldeletedlibs = array();
 	//$query = "SELECT ili.libid,ili.deleted FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
@@ -439,22 +439,22 @@ if (isset($_POST['text'])) {
 			$haverightslibs[] = $row[0];
 		}
 	}
-	
+
 	if (count($newlibs)==0 && $allcurrentlibs[0]!=0 && count($haverightslibs)==count($allcurrentlibs)) {
-		//if we have no selected libs, 
+		//if we have no selected libs,
 		// and not currently unassigned
 		// and we have rights to remove all current items
 		// then undelete or add Unassigned
 		$newlibs[] = 0;
 	}
-	
+
 	//remove any that we have the rights to but are not in newlibs
 	$toremove = array_values(array_diff($haverightslibs,$newlibs));
 	//undelete any libs that are new and in deleted libs
 	$toundelete = array_values(array_intersect($newlibs,$alldeletedlibs));
 	//add any new librarys that are not current and aren't being undeleted
 	$toadd = array_values(array_diff($newlibs,$allcurrentlibs,$toundelete));
-	
+
 
 	$now = time();
 	if (count($toundelete)>0) {
@@ -468,7 +468,7 @@ if (isset($_POST['text'])) {
 			$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
 			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$id, ':ownerid'=>$userid, ':now'=>$now));
 		}
-	} 
+	}
 	if (count($toremove)>0) {
 		foreach($toremove as $libid) {
 			$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=:now WHERE libid=:libid AND qsetid=:qsetid");
