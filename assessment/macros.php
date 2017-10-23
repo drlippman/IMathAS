@@ -638,9 +638,21 @@ function showasciisvg($script) {
 
 function showarrays() {
 	$alist = func_get_args();
+	$format = "default";
+	$caption = "";
 	if (count($alist)<2) {return false;}
 	if (count($alist)%2==1) {
-		$format = substr($alist[count($alist)-1],0,1);
+		if (is_array($alist[count($alist)-1])) {
+		 	$opts = $alist[count($alist)-1];
+			if (isset($opts['align'])) {
+				$format = $opts['align'];
+			}
+			if (isset($opts['caption'])) {
+				$caption = $opts['caption'];
+			}
+		} else {
+			$format = substr($alist[count($alist)-1],0,1);
+		}
 	}
 	if (count($alist)<4 && is_array($alist[0])) {
 		for ($i=0;$i<count($alist[0]);$i++) {
@@ -650,6 +662,9 @@ function showarrays() {
 		$alist = $newalist;
 	}
 	$out = '<table class=stats>';
+	if ($caption != '') {
+		$out .= '<caption>'.Sanitize::encodeStringForDisplay($caption).'</caption>';
+	}
 	$hashdr = false;
 	$maxlength = 0;
 	for ($i = 0; $i<floor(count($alist)/2); $i++) {
