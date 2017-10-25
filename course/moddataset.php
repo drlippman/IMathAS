@@ -869,6 +869,7 @@
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
+	$placeinhead .= '<script src="'.$imasroot.'/javascript/codemirror/emmet-codemirror.js"></script>';
 
 	$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
@@ -946,8 +947,10 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
-			styleSelectedText:true
+			styleSelectedText:true,
+			profile: "html"
 		      });
+		  emmetCodeMirror(qEditor);
 		//qEditor.setSize("100%",6+14*qtextbox.rows);
 	   }
 
