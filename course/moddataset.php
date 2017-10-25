@@ -939,6 +939,7 @@
 
 	   function setupQtextEditor() {
 	   	var qtextbox = document.getElementById("qtext");
+			qtextbox.value = qtextbox.value.replace(/<br\s*\/>\s*<br\s*\/>/g, "\n<br /><br />\n");
 	   	qEditor = CodeMirror.fromTextArea(qtextbox, {
 			matchTags: true,
 			mode: "imathasqtext",
@@ -948,6 +949,7 @@
 			tabSize: 2,
 			styleSelectedText:true
 		      });
+			for (var i=0;i<qEditor.lineCount();i++) { qEditor.indentLine(i); }
 		//qEditor.setSize("100%",6+14*qtextbox.rows);
 	   }
 
