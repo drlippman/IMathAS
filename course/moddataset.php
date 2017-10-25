@@ -889,6 +889,7 @@
 	$placeinhead .= '
 	   var controlEditor;
 	   var qEditor;
+	   var emmetEnabled = false;
 
 	  function toggleeditor(el) {
 	     var qtextbox =  document.getElementById(el);
@@ -946,8 +947,10 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
-			styleSelectedText:true
+			styleSelectedText:true,
+			profile: "html"
 		      });
+		  if(emmetEnabled) {emmetCodeMirror(qEditor);}
 		//qEditor.setSize("100%",6+14*qtextbox.rows);
 	   }
 
@@ -1223,6 +1226,7 @@ Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize(
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
 <button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
 <span class="noticetext quickSaveNotice"></span>
+<button type="button" id="enableEmmet">Enable Emmet</button>
 <BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+3));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
 </div>
@@ -1334,6 +1338,15 @@ $("input[name=imgfile]").on("change", function(event) {
 		alert("Your image is too large. Size cannot exceed "+maxsize+" btyes");
 		$(this).val("");
 	}
+});
+
+$("#enableEmmet").on('click', function(){
+	var that = $(this);
+	$.getScript("<?php echo $imasroot; ?>/javascript/codemirror/emmet-codemirror", function(){
+			emmetEnabled = true;
+			emmetCodeMirror(qEditor);
+			that.remove();
+	});
 });
 
 if (FormData){ // Only allow quicksave if FormData object exists
