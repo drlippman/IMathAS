@@ -20,7 +20,7 @@ function printrubrics($rubricarray) {
 			}
 			$out .= '["'.Sanitize::encodeStringForJavascript($rubline[0]).'",';
 			$out .= '"'.Sanitize::encodeStringForJavascript($rubline[1]).'"';
-			$out .= ','.Sanitize::encodeStringForJavascript($rubline[2]);
+			$out .= ','.Sanitize::onlyFloat($rubline[2]);
 			$out .= ']';
 		}
 		$out .= ']};';
@@ -44,4 +44,3 @@ function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$wi
 	$out .= "<img border=0 src=\"$imasroot/img/assess.png\" alt=\"rubric\"></a>";
 	return $out;
 }
-
