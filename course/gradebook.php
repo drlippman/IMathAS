@@ -131,7 +131,7 @@ if ($canviewall) {
 	$includelastchange = false;
 }
 
-if ($canviewall && isset($_GET['stu'])) {
+if ($canviewall && !empty($_GET['stu'])) {
 	$stu = $_GET['stu'];
 } else {
 	$stu = 0;
