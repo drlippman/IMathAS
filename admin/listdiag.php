@@ -2,7 +2,7 @@
 //IMathAS - User Details page
 //(c) 2017 David Lippman
 
-//TODO:  fix diag delete breadcrumbs 
+//TODO:  fix diag delete breadcrumbs
 
 require("../init.php");
 
@@ -110,6 +110,9 @@ if ($overwriteBody==1) {
     echo ': '.Sanitize::encodeStringForDisplay($groupname);
   }
   echo '</h2></div>';
+	echo '<div class="cpmid">';
+	echo '<a href="diagsetup.php">'._('Add New Diagnostic').'</a>';
+	echo '</div>';
   if (count($diags)==0) {
     echo '<p>'._('No Diagnostics to display').'</p>';
   } else {
