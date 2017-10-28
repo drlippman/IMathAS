@@ -123,10 +123,10 @@
 					$tolist[] = $row[0];
 				}
 			}
-			$sentto = implode('<br/>',$fullnames);
+			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
 			//DB $message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
 			// $_POST['message'] is sanitized by htmlLawed near line 40.
-			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".Sanitize::emailAddress($sentto)." </p>\n";
+			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".$sentto." </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_tutors,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ");
@@ -155,20 +155,17 @@
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)");
 			$emailaddys = array();
+			$fullnames = array();
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!in_array($row[3],$toignore) && $row[2]!='' && $row[2]!='none@none.com') {
 					$emailaddys[] = Sanitize::simpleASCII("{$row[0]} {$row[1]}"). ' <'. Sanitize::emailAddress($row[2]) .'>';
 					$firstnames[] = $row[0];
 					$lastnames[] = $row[1];
+					$fullnames[] = $row[1].', '.$row[0];
 				}
 			}
 
-			//if (isset($_POST['limit']) && $_POST['aidselect']!=0) {
-				$sentto = implode('<br/>',$emailaddys);
-			//} else {
-			//	$sentto = "All students";
-			//}
 			//DB $subject = stripslashes($_POST['subject']);
 			//DB $message = stripslashes($_POST['message']);
 			$subject = $_POST['subject']; // Sanitized by strip_tags near line 40.
@@ -201,8 +198,8 @@
 				mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
 			}
 
-
-			$message .= "<p>Instructor note: Email sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".Sanitize::emailAddress($sentto)." </p>\n";
+			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
+			$message .= "<p>Instructor note: Email sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".$sentto." </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 			}
