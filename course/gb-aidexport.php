@@ -133,9 +133,9 @@ if (isset($_POST['options'])) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 
-		$query_placeholders = Sanitize::generateQueryPlaceholders($qsetids);
+		$query_placeholders = Sanitize::generateQueryPlaceholders(array_values($qsetids));
 		$stm = $DBH->prepare("SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($query_placeholders)"); //INT vals from DB
-    	$stm->execute($qsetids);
+    $stm->execute(array_values($qsetids));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$qcontrols[$row[0]] = interpret('control',$row[1],$row[2]);
 			$qanswers[$row[0]] = interpret('answer',$row[1],$row[3]);

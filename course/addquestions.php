@@ -717,6 +717,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		if (!$beentaken) {
 			//potential questions
+			$lnamesarr = array();
 			$libsortorder = array();
 			if (substr($searchlibs,0,1)=="0") {
 				$lnamesarr[0] = "Unassigned";
