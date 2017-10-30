@@ -247,7 +247,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					*/
 				if (($filename=storeuploadedcoursefile('userfile',$cid.'/'.$filename))!==false) {
 					if (trim($_POST['newfiledescr'])=='') {
-						$_POST['newfiledescr'] = $filename;
+						$_POST['newfiledescr'] = basename($filename);
 					}
 					//DB $query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ('{$_POST['newfiledescr']}','$filename','$newtextid')";
 					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());

@@ -95,6 +95,51 @@ function relocatefileifneeded($file, $key, $sec="public") {
 	}
 }
 
+//copies file at URL
+function rehostfile($url, $keydir, $sec="public", $prependToFilename="") {
+	if (substr($url,0,4)!=='http') {return false;}
+
+	$tmpdir = __dir__.'/../admin/import/tmp';
+	if (!is_dir($tmpdir)) {
+		mkdir($tmpdir);
+	}
+	//TODO: $url = Sanitize::url($url);
+	$parseurl = parse_url($url);
+	$fn =  Sanitize::sanitizeFilenameAndCheckBlacklist($prependToFilename.basename($parseurl['path']));
+	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
+		copy($url, $tmpdir.'/'.$fn);
+		if ($sec=="public" || $sec=="public-read") {
+			$sec = "public-read";
+		} else {
+			$sec = "private";
+		}
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		if ($s3->putObjectFile($tmpdir.'/'.$fn,$GLOBALS['AWSbucket'],$keydir.'/'.$fn,$sec)) {
+			unlink($tmpdir.'/'.$fn);
+			return $fn;
+		} else {
+			unlink($tmpdir.'/'.$fn);
+			return false;
+		}
+	} else {
+		if (substr($keydir,0,7)=='cfiles/') {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+			$dir = $base.Sanitize::onlyInt(substr($keydir,7));
+		} else if ($keydir=='qimages') {
+			$dir = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages';
+		} else {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+			$dir = $base.$keydir;
+		}
+
+		if (!is_dir($dir)) {
+			mkdir_recursive($dir);
+		}
+		copy($url, $dir.'/'.$fn);
+		return $fn;
+	}
+}
+
 function storeuploadedfile($id,$key,$sec="private") {
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
@@ -763,7 +808,7 @@ function getqimageurl($key,$abs=false) {
 	global $urlmode,$imasroot;
 	$key = Sanitize::rawurlencodePath($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
-		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/$key";
+		return 'https://'.$GLOBALS['AWSbucket'].".s3.amazonaws.com/qimages/$key";
 	} else {
 		if ($abs==true) {
 			return $GLOBALS['basesiteurl'] . "/assessment/qimages/$key";

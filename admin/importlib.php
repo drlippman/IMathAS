@@ -12,6 +12,7 @@ ini_set("post_max_size", "10485760");
 
 /*** master php includes *******/
 require("../init.php");
+require("../includes/filehandler.php");
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -90,12 +91,12 @@ function parseqs($file,$touse,$rights) {
 								//skip if not actually used in question
 								continue;
 							}
-							//strip out any HTML-like stuff from
-							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
-							//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ($qsetid,'{$p[0]}','{$p[1]}')";
-							//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
-							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
-							$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+							//rehost image
+							$newfn = rehostfile($p[1], 'qimages', $qsetid.'-');
+							if ($newfn!==false) {
+								$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
+								$stm->execute(array(':qsetid'=>$qsetid, ':var'=>$p[0], ':filename'=>$newfn, ':alt'=>$alttext));
+							}
 						}
 					}
 				}
