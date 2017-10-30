@@ -25,38 +25,21 @@ require_once("includes/sanitize.php");
 
 	if ($_GET['action']=="newuser") {
 		require_once("init_without_validate.php");
+		require_once("includes/newusercommon.php");
 		$error = '';
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
 			$error = "<p>You must agree to the Terms and Conditions to set up an account</p>";
 		}
 
 		// Sanitize form data
+
 		$_POST['SID'] = Sanitize::stripHtmlTags(trim($_POST['SID']));
 		$_POST['email'] = Sanitize::emailAddress(trim($_POST['email']));
 		$_POST['firstname'] = Sanitize::stripHtmlTags(trim($_POST['firstname']));
 		$_POST['lastname'] = Sanitize::stripHtmlTags(trim($_POST['lastname']));
 
-		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
-			$error .= "<p>$loginprompt is invalid.</p>";
-		}
-		//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
-		$stm = $DBH->prepare('SELECT id FROM imas_users WHERE SID=:sid');
-		$stm->execute(array(':sid'=>$_POST['SID']));
-		if ($stm->rowCount()>0) {
-			$error .= "<p>$loginprompt '" . Sanitize::encodeStringForDisplay($_POST['SID']) . "' is used. </p>";
-		}
-		//
-		if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
-			$error .= "<p>Invalid email address.</p>";
-		}
-		if ($_POST['pw1'] != $_POST['pw2']) {
-			$error .= "<p>Passwords don't match. </p>";
-		}
-		if ($_POST['SID']=="" || $_POST['firstname']=="" || $_POST['lastname']=="" || $_POST['email']=="" || $_POST['pw1']=="") {
-			$error .= "<p>Please include all information.</p>";
-		}
+		$error .= checkNewUserValidation();
+
 		if ($error != '') {
 			require("header.php");
 			if ($gb == '') {
@@ -291,8 +274,9 @@ require_once("includes/sanitize.php");
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
 				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
 				$message .= "will then be prompted to choose a new password.</p>";
-				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=resetpw&id=$id&code=$code\">";
-				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
+				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code\">";
+				$message .= $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code</a>\r\n";
+
 				if (isset($CFG['GEN']['useSESmail'])) {
 					SESmail(Sanitize::emailAddress($email), $sendfrom, 'Password Reset Request',$message);
 				} else {
@@ -313,7 +297,7 @@ require_once("includes/sanitize.php");
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 		} else if (isset($_POST['pw1'])) {
 			if ($_POST['pw1']!=$_POST['pw2']) {
-				echo 'Passwords do not match.  <a href="actions.php?action=resetpw&code='.Sanitize::encodeUrlParam($_POST['code'])
+				echo 'Passwords do not match.  <a href="forms.php?action=resetpw&code='.Sanitize::encodeUrlParam($_POST['code'])
 					.'&id='.Sanitize::encodeUrlParam($_POST['id']).'">Try again</a>';
 				exit;
 			}
@@ -349,31 +333,8 @@ require_once("includes/sanitize.php");
 			}
 			exit;
 		} else if (isset($_GET['code'])) {
-			//DB $query = "SELECT remoteaccess FROM imas_users WHERE id='{$_GET['id']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $realcode = mysql_result($result,0,0);
-			//DB if (mysql_num_rows($result)>0 && $_GET['code']===$realcode && $realcode!='') {
-
-			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
-			$row = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($row !== false && $row['remoteaccess']!='' && $row['remoteaccess']===$_GET['code']) {
-				echo '<html><body><form method="post" action="actions.php?action=resetpw">';
-				echo '<input type="hidden" name="code" value="'.Sanitize::encodeStringForDisplay($_GET['code']).'"/>';
-				echo '<input type="hidden" name="id" value="'.Sanitize::encodeStringForDisplay($_GET['id']).'"/>';
-				echo '<p>Please select a new password:</p>';
-				echo '<p>Enter new password:  <input type="password" size="25" name="pw1"/><br/>';
-				echo '<p>Verify new password:  <input type="password" size="25" name="pw2"/></p>';
-				echo '<p><input type="submit" value="Submit"/></p>';
-				echo '</form>';
-				echo '</body></html>';
-				exit;
-			} else {
-				echo '<html><body>Invalid reset code.  If you have requested a password reset multiple times, you need the link from ';
-				echo 'the most recent email.</body></html>';
-				exit;
-			}
-
+			//moved to forms.php - keep redirect for to keep old links working for now.
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($code));
 		}
 	} else if ($_GET['action']=="lookupusername") {
 		require_once("init_without_validate.php");
@@ -427,7 +388,10 @@ require_once("includes/sanitize.php");
 		}
 	} else if ($_GET['action']=="checkusername") {
 		require_once("init_without_validate.php");
-		
+		if (isset($_GET['originalSID']) && $_GET['originalSID']==$_GET['SID']) {
+			echo "true";
+			exit;
+		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>$_GET['SID']));
 		if ($stm->rowCount()>0) {
@@ -457,11 +421,11 @@ require_once("includes/sanitize.php");
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
+		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
 			if (isset($CFG['GEN']['newpasswords'])) {
-				$newpw = password_hash($_POST['newpw1'], PASSWORD_DEFAULT);
+				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			} else {
-				$newpw =md5($_POST['newpw1']);
+				$newpw =md5($_POST['pw1']);
 			}
 			//DB $query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -772,11 +736,11 @@ require_once("includes/sanitize.php");
 			$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['newpw1'] == $_POST['newpw2']) && $myrights>5) {
+			if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
 				if (isset($CFG['GEN']['newpasswords'])) {
-					$newpw = password_hash($_POST['newpw1'], PASSWORD_DEFAULT);
+					$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 				} else {
-					$newpw =md5($_POST['newpw1']);
+					$newpw =md5($_POST['pw1']);
 				}
 				//DB $query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -793,8 +757,8 @@ require_once("includes/sanitize.php");
 
 		require("includes/userprefs.php");
 		storeUserPrefs();
-		
-		
+
+
 		/* moved above
 		if (isset($_POST['settimezone'])) {
 			if (date_default_timezone_set($_POST['settimezone'])) {
@@ -824,7 +788,7 @@ require_once("includes/sanitize.php");
 			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess='' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 		}
-	} 
+	}
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="parent.GB_hide()" value="Done" /></body></html>';
 	} else {

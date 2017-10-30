@@ -51,11 +51,18 @@ span.iteminfo {
 label.error {
 	color: #db0000;
 	font-style: italic;
+	display: block;
+}
+input.form + label.error {
 	float: left;
+	display: inline;
 	margin-left: 10px;
 }
+
 input[type=checkbox] + label.error {
 	float:none;
+	display: inline;
+	margin-left: 10px;
 }
 div.title {
 	/*display: inline;*/

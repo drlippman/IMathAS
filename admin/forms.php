@@ -2,6 +2,7 @@
 //IMathAS:  Admin forms
 //(c) 2006 David Lippman
 require("../init.php");
+$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
 require("../header.php");
 
 $from = 'admin2';
@@ -77,7 +78,7 @@ switch($_GET['action']) {
 
 	case "chgrights":
 	case "newadmin":
-		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
+		echo "<form method=post id=userform class=limitaftervalidate action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
 		if ($_GET['action']=="chgrights") { echo "&id=".Sanitize::encodeUrlParam($_GET['id']); }
 		echo "\">\n";
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
@@ -114,7 +115,7 @@ switch($_GET['action']) {
 				$("input[name=newrights]").on("change", onrightschg);
 				});
 			</script>';
-		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=adminname ";
+		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=SID ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
 		}
@@ -135,7 +136,7 @@ switch($_GET['action']) {
 		}
 		echo "><BR class=form>\n";
 		if ($_GET['action'] == "newadmin") {
-			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="newpassword"/><br class="form"/>';
+			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="pw1"/><br class="form"/>';
 		} else {
 			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" /> ';
 			echo 'Reset to: <input type=text size=20 name="newpassword" /></span><br class=form />';
@@ -199,7 +200,7 @@ switch($_GET['action']) {
 			echo '<input type="checkbox" name="specialrights32" id="specialrights32" ';
 			if (($oldspecialrights&32)==32) { echo 'checked';}
 			echo '><label for="specialrights32">Create new instructor accounts (any group)</label><br/>';
-			
+
 			echo '<input type="checkbox" name="specialrights64" id="specialrights64" ';
 			if (($oldspecialrights&64)==64) { echo 'checked';}
 			echo '><label for="specialrights64">Approve instructor account requests</label><br/>';
@@ -221,11 +222,13 @@ switch($_GET['action']) {
 				}
 				printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 			}
-			echo "</select><br class=form />\n";
+			echo "</select></span><br class=form />\n";
 		}
-
-
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
+		if ($_GET['action'] == "newadmin") {
+			require_once("../includes/newusercommon.php");
+			showNewUserValidation("userform");
+		}
 		break;
 	case "modify":
 	case "addcourse":

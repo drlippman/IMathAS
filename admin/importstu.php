@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
-
+require("../includes/newusercommon.php");
 
 /*** pre-html data manipulation, including function code *******/
 // Reads past the UTF-8 bom if it is there.
@@ -46,7 +46,7 @@ function parsecsv($data) {
 		$un = strtolower($fn.'_'.$ln);
 	} else {
 		$un = $data[$_POST['unloc']-1];
-		$un = preg_replace('/\W/','',$un);
+		//$un = preg_replace('/\W/','',$un);
 	}
 	if ($_POST['emailloc']>0) {
 		$email = $data[$_POST['emailloc']-1];
@@ -124,6 +124,26 @@ if (!(isset($teacherid)) && $myrights<100) {
 			if (trim($arr[0])=='' || trim($arr[0])=='_') {
 				continue;
 			}
+			if (isset($CFG['acct']['importLoginformat'])) {
+				if (!checkFormatAgainstRegex($arr[0], $CFG['acct']['importLoginformat'])) {
+					echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." is invalid; skipping<br/>\n";
+					continue;
+				}
+			} else if (isset($loginformat) && !checkFormatAgainstRegex($arr[0], $loginformat)) {
+				echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." is invalid; skipping<br/>\n";
+				continue;
+			}
+			if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$arr[3]) ||
+					(isset($CFG['acct']['emailFormat']) && !checkFormatAgainstRegex($arr[3], $CFG['acct']['emailFormat']))) {
+				echo "Email ".Sanitize::encodeStringForDisplay($arr[3])." is invalid; skipping<br/>\n";
+				continue;
+			}
+			if ((isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($arr[6], $CFG['acct']['passwordFormat'])) ||
+						strlen($arr[6]) < isset($CFG['acct']['passwordMinlength'])?$CFG['acct']['passwordMinlength']:6) {
+				echo "Password for username ".Sanitize::encodeStringForDisplay($arr[0])." is invalid; skipping<br/>\n";
+				continue;
+			}
+
 			//DB $query = "SELECT id FROM imas_users WHERE SID='$arr[0]'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
@@ -381,7 +401,7 @@ if ($overwriteBody==1) {
 		<span class=form>Email address is in column:<br/>Enter 0 if no email column</span>
 		<span class=formright><input type=text name=emailloc size=4 value="7"></span><br class=form>
 <?php
-if (isset($CFG['GEN']['allowInstrImportStuByName']) && $CFG['GEN']['allowInstrImportStuByName']==false) {
+if (!isset($CFG['GEN']['allowInstrImportStuByName']) || $CFG['GEN']['allowInstrImportStuByName']==false) {
 ?>
 
 		<span class=form>Unique username is in column:</span>
@@ -403,8 +423,6 @@ if (isset($CFG['GEN']['allowInstrImportStuByName']) && $CFG['GEN']['allowInstrIm
 ?>
 		<span class=form>Set password to:</span>
 		<span class=formright>
-			<input type=radio name=pwtype value="0">First 4 characters of username<br/>
-			<input type=radio name=pwtype value="1" CHECKED>Last 4 characters of username<br/>
 			<input type=radio name=pwtype value="3">Use value in column
 			<input type=text name="pwcol" size=4 value="1"/><br/>
 			<input type=radio name=pwtype value="2">Set to:

@@ -185,16 +185,14 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
 
 		if (isset($_POST['SID'])) {
-			//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-			$stm->execute(array(':SID'=>$_POST['SID']));
-			if ($stm->rowCount()>0) {
+			require_once("../includes/newusercommon.php");
+			$errors = checkNewUserValidation(array('SID','firstname','lastname','email','pw1'));
+			if ($errors != '') {
 				$overwriteBody = 1;
-				$body = "$loginprompt '" . Sanitize::encodeStringForDisplay($_POST['SID']) . "' is used.  <a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
+				$body = $errors . "<br/><a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
 			} else {
 				if (isset($CFG['GEN']['newpasswords'])) {
 					require_once("../includes/password.php");
@@ -271,10 +269,18 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['chgstuinfo'])) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+		require_once("../includes/newusercommon.php");
 
 		if (isset($_POST['firstname'])) {
-			$un = preg_replace('/[^\w\.@]*/','',$_POST['username']);
-			$updateusername = true;
+			$msgout = '';
+			if (checkFormatAgainstRegex($_POST['SID'], $loginformat)) {
+				$un = $_POST['SID'];
+				$updateusername = true;
+			} else {
+				$updateusername = false;
+			}
+
 			//DB $query = "SELECT id FROM imas_users WHERE SID='$un'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
@@ -283,25 +289,42 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			if ($stm->rowCount()>0) {
 				$updateusername = false;
 			}
+			if ($updateusername) {
+				$msgout .= '<p>Username changed to '.Sanitize::encodeStringForDisplay($un).'</p>';
+			} else {
+				$msgout .= '<p>Username left unchanged</p>';
+			}
 			//DB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}'";
-			$query = "UPDATE imas_users SET FirstName=:FirstName,LastName=:LastName,email=:email";
+			$query = "UPDATE imas_users SET FirstName=:FirstName,LastName=:LastName";
 
-			$qarr = array(':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email']);
+			$qarr = array(':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname']);
 			if ($updateusername) {
 				//DB $query .= ",SID='$un'";
 				$query .= ",SID=:SID";
 				$qarr[':SID'] = $un;
 			}
+			if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email']) ||
+		    (isset($CFG['acct']['emailFormat']) && !checkFormatAgainstRegex($_POST['email'], $CFG['acct']['emailFormat']))) {
+		    $msgout .= '<p>Invalid email address - left unchanged</p>';
+		  } else {
+				$query .= ",email=:email";
+				$qarr[':email'] = $_POST['email'];
+			}
 			if (isset($_POST['doresetpw'])) {
-				if (isset($CFG['GEN']['newpasswords'])) {
-					require_once("../includes/password.php");
-					$newpw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
+				if (isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($_POST['pw1'], $CFG['acct']['passwordFormat'])) {
+					$msgout .= '<p>Invalid password - left unchanged</p>';
 				} else {
-					$newpw = md5($_POST['newpassword']);
+					if (isset($CFG['GEN']['newpasswords'])) {
+						require_once("../includes/password.php");
+						$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+					} else {
+						$newpw = md5($_POST['pw1']);
+					}
+					//DB $query .= ",password='$newpw'";
+					$query .= ",password=:password";
+					$qarr[':password'] = $newpw;
+					$msgout .= '<p>Password updated</p>';
 				}
-				//DB $query .= ",password='$newpw'";
-				$query .= ",password=:password";
-				$qarr[':password'] = $newpw;
 			}
 
 			//DB $query .= " WHERE id='{$_GET['uid']}'";
@@ -383,14 +406,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 			echo '<div id="headerlistusers" class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
 			echo "<p>User info updated. ";
-			if ($updateusername) {
-				echo "User login changed to $un.";
-			} else {
-				echo "User login left unchanged.";
-			}
-			if (isset($_POST['doresetpw'])) {
-				echo "  Password changed.";
-			}
+			echo $msgout;
 			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
 			require("../footer.php");
 
@@ -653,12 +669,12 @@ if ($overwriteBody==1) {
 		<div class=submit><input type="submit" value="Enroll"></div>
 	</form>
 <?php
-	} elseif (isset($_GET['newstu'])) {
+	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 ?>
 
-	<form method=post action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
+	<form method=post id=pageform class=limitaftervalidate action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
 		<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>
-	<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>
+	<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=text size=20 id=pw1 name=pw1><BR class=form>
 	<span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>
 	<span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>
 	<span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email><BR class=form>
@@ -670,6 +686,8 @@ if ($overwriteBody==1) {
 	</form>
 
 <?php
+		require_once("../includes/newusercommon.php");
+		showNewUserValidation("pageform");
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
 		if (count($_POST['checked'])==0) {
 			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
@@ -680,9 +698,9 @@ if ($overwriteBody==1) {
 
 	}elseif (isset($_GET['chgstuinfo'])) {
 ?>
-		<form enctype="multipart/form-data" method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo Sanitize::onlyInt($_GET['uid']) ?>"/>
-			<span class=form><label for="username">Enter User Name (login name):</label></span>
-			<input class=form type=text size=20 id=username name=username value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
+		<form enctype="multipart/form-data" id=pageform method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo Sanitize::onlyInt($_GET['uid']) ?>" class="limitaftervalidate"/>
+			<span class=form><label for="SID">Enter User Name (login name):</label></span>
+			<input class=form type=text size=20 id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
 			<span class=form><label for="firstname">Enter First Name:</label></span>
 			<input class=form type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
 			<span class=form><label for="lastname">Enter Last Name:</label></span>
@@ -710,22 +728,25 @@ if ($overwriteBody==1) {
 			<span class=form>Code (optional):</span>
 			<span class=formright><input type="text" name="code" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['code']); ?>"/></span><br class=form>
 			<span class=form>Time Limit Multiplier:</span>
-			<span class=formright><input type="text" name="timelimitmult" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['timelimitmult']); ?>"/></span><br class=form>
+			<span class=formright><input type="number" min="0.01" step="0.01" name="timelimitmult" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['timelimitmult']); ?>"/></span><br class=form>
 			<span class=form>LatePasses:</span>
-			<span class=formright><input type="text" name="latepasses" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['latepass']); ?>"/></span><br class=form>
+			<span class=formright><input type="number" min="0" name="latepasses" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['latepass']); ?>"/></span><br class=form>
 			<span class=form>Lock out of course?:</span>
 			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class="form">Student has course hidden from course list?:</span>
 			<span class="formright"><input type="checkbox" name="hidefromcourselist" value="1" <?php if ($lineStudent['hidefromcourselist']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
-			<span class=form>Reset password?</span>
+			<span class=form><label for="doresetpw">Reset password?</label></span>
 			<span class=formright>
-				<input type=checkbox name="doresetpw" value="1" /> Reset to:
-				<input type=text size=20 name="newpassword" />
+				<input type=checkbox name="doresetpw" id="doresetpw" value="1" /> <label for="pw1">Reset to:</label>
+				<input type=text size=20 name="pw1" id="pw1" />
 			</span><br class=form />
 			<div class=submit><input type=submit value="Update Info"></div>
 		</form>
 
 <?php
+		$requiredrules = array('pw1'=>'{depends: function(element) {return $("#doresetpw").is(":checked")}}');
+		require_once("../includes/newusercommon.php");
+		showNewUserValidation("pageform", array(), $requiredrules, array('originalSID'=>$lineStudent['SID']));
 	} else {
 ?>
 

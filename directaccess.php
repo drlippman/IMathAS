@@ -8,6 +8,7 @@
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php");
 	 }
  	require_once(__DIR__ . "/init_without_validate.php");
+	require_once(__DIR__ ."/includes/newusercommon.php");
 	$cid = Sanitize::courseId($_GET['cid']);
 
  	if (!isset($_GET['cid'])) {
@@ -28,30 +29,7 @@
 	 if (isset($_POST['submit']) && $_POST['submit']=="Sign Up") {
 		unset($_POST['username']);
 		unset($_POST['password']);
-		require_once("init_without_validate.php");
-		if ($_POST['SID']=="" || $_POST['firstname']=="" || $_POST['lastname']=="" || $_POST['email']=="" || $_POST['pw1']=="") {
-			$page_newaccounterror .= "Please include all information. ";
-		}
-		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
-			$page_newaccounterror .= "$loginprompt is invalid. ";
-		} else {
-			//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-			$stm->execute(array(':SID'=>$_POST['SID']));
-			if ($stm->rowCount()>0) {
-				$page_newaccounterror .= "$loginprompt '" . Sanitize::encodeStringForDisplay($_POST['SID']) . "' is already used. ";
-			}
-		}
-		if (!preg_match('/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',$_POST['email'])) {
-			$page_newaccounterror .= "Invalid email address. ";
-		}
-		if ($_POST['pw1'] != $_POST['pw2']) {
-			$page_newaccounterror .= "Passwords don't match. ";
-			unset($_POST['pw1']);
-			unset($_POST['pw2']);
-		}
+		$page_newaccounterror = checkNewUserValidation();
 
 		//DB $query = "SELECT enrollkey,deflatepass FROM imas_courses WHERE id = '$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -230,7 +208,7 @@
 		$enrollkey = $stm->fetchColumn(0);
 
 ?>
-<form id="pageform" method="post" action="directaccess.php<?php echo $querys; ?>">
+<form id="pageform" class=limitaftervalidate method="post" action="directaccess.php<?php echo $querys; ?>">
 
 <?php
 if ($enrollkey!='closed') {
@@ -334,60 +312,20 @@ if (isset($_GET['getsid'])) {
 </form>
 
 <?php
-	echo '<script type="text/javascript">
-		$("#pageform").validate({
-			rules: {
-				username: {
-					required: {depends: function(element) {return logintype==0}}
-				},
-				password: {
-					required: {depends: function(element) {return logintype==0}}
-				},';
-	if (strlen($enrollkey)>0) {
-		echo '		ekey: {
-					required: {depends: function(element) {return logintype==0}}
-				},';
-	}
-	echo '
-				SID: {
-					required: {depends: function(element) {return logintype==1}},
-					pattern: '.$loginformat.',
-					remote: imasroot+"/actions.php?action=checkusername"
-				},
-				pw1: {
-					required: {depends: function(element) {return logintype==1}},
-					minlength: 6},
-				pw2: {
-					required: {depends: function(element) {return logintype==1}},
-					equalTo: "#pw1"
-				},
-				firstname: {
-					required: {depends: function(element) {return logintype==1}}
-				},
-				lastname: {
-					required: {depends: function(element) {return logintype==1}}
-				},';
-	if (strlen($enrollkey)>0) {
-		echo '		ekey2: {
-					required: {depends: function(element) {return logintype==1}}
-				},';
-	}
-	echo '
-				email: {
-					required: {depends: function(element) {return logintype==1}},
-					email: true
-				}
+	$requiredrules = array(
+		'username'=>'{depends: function(element) {return logintype==0}}',
+		'password'=>'{depends: function(element) {return logintype==0}}',
+		'ekey'=>'{depends: function(element) {return logintype==0}}',
+		'SID'=>'{depends: function(element) {return logintype==1}}',
+		'pw1'=>'{depends: function(element) {return logintype==1}}',
+		'pw2'=>'{depends: function(element) {return logintype==1}}',
+		'firstname'=>'{depends: function(element) {return logintype==1}}',
+		'lastname'=>'{depends: function(element) {return logintype==1}}',
+		'email'=>'{depends: function(element) {return logintype==1}}',
+		'ekey2'=>'{depends: function(element) {return logintype==1}}'
+	);
+	showNewUserValidation('pageform', (strlen($enrollkey)>0)?array('ekey','ekey2'):array(), $requiredrules);
 
-			},
-			messages: {
-				SID: {
-					remote: _("That username is already taken. Try another.")
-				}
-			},
-			invalidHandler: function() {
-				setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}
-		});
-		</script>';
 	require("footer.php");
 	}
 

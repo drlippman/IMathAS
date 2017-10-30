@@ -258,35 +258,20 @@ if (isset($_GET['launch'])) {
 			} else {
 				if (!$allow_acctcreation) {
 					$infoerr = 'Must link to an existing account';
-				}
-				//new info
-				if (empty($_POST['SID']) || empty($_POST['pw1']) || empty($_POST['pw2']) || empty($_POST['firstname']) || empty($_POST['lastname']) || empty($_POST['email'])) {
-					$infoerr = 'Be sure to leave no requested information empty';
-				} else if ($_POST['pw1'] != $_POST['pw2']) {
-					$infoerr = 'Passwords don\'t match';
-				} else if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
-					$infoerr = "$loginprompt is invalid";
-				} else if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
-					$infoerr = 'Invalid email address';
 				} else {
-					//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare('SELECT id FROM imas_users WHERE SID=:sid');
-					$stm->execute(array(':sid'=>$_POST['SID']));
-					//DB if (mysql_num_rows($result)>0) {
-					if ($stm->rowCount()>0) {
-						$infoerr = "$loginprompt '{$_POST['SID']}' already used.  Please select another.";
+					require_once(__DIR__.'/includes/newusercommon.php');
+					$infoerr = checkNewUserValidation();
+					//new info
+					if (isset($_POST['msgnot'])) {
+						$msgnot = 1;
+					} else {
+						$msgnot = 0;
 					}
-				}
-				if (isset($_POST['msgnot'])) {
-					$msgnot = 1;
-				} else {
-					$msgnot = 0;
-				}
-				if (isset($CFG['GEN']['newpasswords'])) {
-					$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-				} else {
-					$md5pw = md5($_POST['pw1']);
+					if (isset($CFG['GEN']['newpasswords'])) {
+						$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+					} else {
+						$md5pw = md5($_POST['pw1']);
+					}
 				}
 			}
 		}
@@ -343,20 +328,29 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$flexwidth = true;
 		$nologo = true;
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
 		}
 
-		echo "<form method=\"post\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
+		echo "<form method=\"post\" id=\"pageform\" class=\"limitaftervalidate\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
 		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
 			echo "<p>Please provide a little information about yourself:</p>";
-			echo "<span class=form><label for=\"firstname\">Enter First Name (given name):</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>\n";
+			echo "<span class=form><label for=\"firstname\">Enter First Name (given name):</label></span> <input class=form type=text size=20 id=firstname name=firstname><BR class=form>\n";
 			echo "<span class=form><label for=\"lastname\">Enter Last Name (surname):</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
-
+			echo '<script type="text/javascript"> $(function() {
+				$("#pageform").validate({
+					rules: {
+						firstname: {required: true},
+						lastname: {required: true}
+					},
+					submitHandler: function(el,evt) {return submitlimiter(evt);}
+				});
+			});</script>';
 		} else {
 			$deffirst = '';
 			$deflast = '';
@@ -409,8 +403,30 @@ if (isset($_GET['launch'])) {
 				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
 				echo "<div class=submit><input type=submit value='Create Account'></div>\n";
+				require_once(__DIR__.'/includes/newusercommon.php');
+				$requiredrules = array(
+					'curSID'=>'{depends: function(element) {return $("#SID").val()==""}}',
+					'curPW'=>'{depends: function(element) {return $("#SID").val()==""}}',
+					'SID'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'pw1'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'pw2'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'firstname'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'lastname'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'email'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+				);
+				showNewUserValidation('pageform',array('curSID','curPW'), $requiredrules);
+
 			} else {
 				echo "<p>If you do not already have an account on $installname, please visit the site to request an account.</p>";
+				echo '<script type="text/javascript"> $(function() {
+					$("#pageform").validate({
+						rules: {
+							curSID: {required: true},
+							curPW: {required: true}
+						},
+						submitHandler: function(el,evt) {return submitlimiter(evt);}
+					});
+				});</script>';
 			}
 		}
 		echo "</form>\n";
@@ -1691,35 +1707,24 @@ if (isset($_GET['launch'])) {
 			} else {
 				if (!$allow_acctcreation) {
 					$infoerr = 'Must link to an existing account';
-				}
-				//new info
-				if (empty($_POST['SID']) || empty($_POST['pw1']) || empty($_POST['pw2']) || empty($_POST['firstname']) || empty($_POST['lastname']) || empty($_POST['email'])) {
-					$infoerr = 'Be sure to leave no requested information empty';
-				} else if ($_POST['pw1'] != $_POST['pw2']) {
-					$infoerr = 'Passwords don\'t match';
-				} else if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
-					$infoerr = "$loginprompt is invalid";
-				} else if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email'])) {
-					$infoerr = 'Invalid email address';
 				} else {
-					//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB if (mysql_num_rows($result)>0) {
-					$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-					$stm->execute(array(':SID'=>$_POST['SID']));
-					if ($stm->rowCount()>0) {
-						$infoerr = "$loginprompt '{$_POST['SID']}' already used.  Please select another.";
+					if (!$allow_acctcreation) {
+						$infoerr = 'Must link to an existing account';
+					} else {
+						require_once(__DIR__.'/includes/newusercommon.php');
+						$infoerr = checkNewUserValidation();
+						//new info
+						if (isset($_POST['msgnot'])) {
+							$msgnot = 1;
+						} else {
+							$msgnot = 0;
+						}
+						if (isset($CFG['GEN']['newpasswords'])) {
+							$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+						} else {
+							$md5pw = md5($_POST['pw1']);
+						}
 					}
-				}
-				if (isset($_POST['msgnot'])) {
-					$msgnot = 1;
-				} else {
-					$msgnot = 0;
-				}
-				if (isset($CFG['GEN']['newpasswords'])) {
-					$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
-				} else {
-					$md5pw = md5($_POST['pw1']);
 				}
 			}
 		}
@@ -1776,20 +1781,29 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$nologo = true;
 		$flexwidth = true;
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
 		}
 
-		echo "<form method=\"post\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
+		echo "<form method=\"post\" id=\"pageform\" class=\"limitaftervalidate\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
 		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
 			echo "<p>Please provide a little information about yourself:</p>";
-			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstnam name=firstname><BR class=form>\n";
+			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname><BR class=form>\n";
 			echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
-
+			echo '<script type="text/javascript"> $(function() {
+				$("#pageform").validate({
+					rules: {
+						firstname: {required: true},
+						lastname: {required: true}
+					},
+					submitHandler: function(el,evt) {return submitlimiter(evt);}
+				});
+			});</script>';
 		} else {
 			$deffirst = '';
 			$deflast = '';
@@ -1842,8 +1856,29 @@ if (isset($_GET['launch'])) {
 				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
 				echo "<div class=submit><input type=submit value='Create Account'></div>\n";
+				require_once(__DIR__.'/includes/newusercommon.php');
+				$requiredrules = array(
+					'curSID'=>'{depends: function(element) {return $("#SID").val()==""}}',
+					'curPW'=>'{depends: function(element) {return $("#SID").val()==""}}',
+					'SID'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'pw1'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'pw2'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'firstname'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'lastname'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+					'email'=>'{depends: function(element) {return $("#SID").val()!=""}}',
+				);
+				showNewUserValidation('pageform',array('curSID','curPW'), $requiredrules);
 			} else {
 				echo "<p>If you do not already have an account on $installname, please visit the site to request an account.</p>";
+				echo '<script type="text/javascript"> $(function() {
+					$("#pageform").validate({
+						rules: {
+							curSID: {required: true},
+							curPW: {required: true}
+						},
+						submitHandler: function(el,evt) {return submitlimiter(evt);}
+					});
+				});</script>';
 			}
 		}
 		echo "</form>\n";

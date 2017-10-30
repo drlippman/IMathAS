@@ -2,6 +2,8 @@
 //IMathAS:  Basic forms
 //(c) 2006 David Lippman
 
+require_once("includes/newusercommon.php");
+
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("init.php");
 } else {
@@ -36,7 +38,7 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New Student Signup</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>New Student Signup</h2></div>';
-		echo "<form id=\"newuserform\" method=post action=\"actions.php?action=newuser$gb\">\n";
+		echo "<form id=\"newuserform\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">Choose a password:</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">Confirm password:</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
@@ -49,36 +51,9 @@ switch($_GET['action']) {
 		} else if (isset($CFG['GEN']['TOSpage'])) {
 			echo "<span class=form><label for=\"agree\">I have read and agree to the <a href=\"#\" onclick=\"GB_show('Terms of Use','".$CFG['GEN']['TOSpage']."',700,500);return false;\">Terms of Use</a></label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
 		}
-		echo '<script type="text/javascript">
-		$("#newuserform").validate({
-			rules: {
-				SID: {
-					required: true,
-					pattern: '.$loginformat.',
-					remote: imasroot+"/actions.php?action=checkusername"
-				},
-				pw1: { required: true, minlength: 6},
-				pw2: {
-					required: true,
-					equalTo: "#pw1"
-				},
-				firstname: { required: true},
-				lastname: {required: true},
-				email: {
-					required: true,
-					email: true
-				},
-				agree: { required: true}
-			},
-			messages: {
-				SID: {
-					remote: _("That username is already taken. Try another.")
-				}
-			},
-			invalidHandler: function() {
-				setTimeout(function(){$("#newuserform").removeClass("submitted").removeClass("submitted2");}, 100)}
-		});
-		</script>';
+
+		showNewUserValidation('newuserform', (isset($studentTOS) || isset($CFG['GEN']['TOSpage']))?array('agree'):array());
+
 		if (!$emailconfirmation) {
 			$doselfenroll = false;
 			//DB $query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
@@ -124,23 +99,13 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Change Password</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
-		echo "<form id=\"pageform\" method=post action=\"actions.php?action=chgpwd$gb\">\n";
+		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=chgpwd$gb\">\n";
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
-		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
-		echo "<span class=form><label for=\"newpw2\">Verify new password:</label></span>  <input class=form type=password id=newpw2 name=newpw2 size=40> <BR class=form>\n";
-		echo '<script type="text/javascript">
-		$("#pageform").validate({
-			rules: {
-				oldpw: { required: true},
-				newpw1: { required: true, minlength: 6},
-				newpw2: {
-					required: true,
-					equalTo: "#newpw1"
-				}
-			},
-			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
-		);
-		</script>';
+		echo "<span class=form><label for=\"pw1\">Enter new password:</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
+		echo "<span class=form><label for=\"pw2\">Verify new password:</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
+
+		showNewUserValidation("pageform",array("oldpw"));
+
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
 		break;
 	case "chguserinfo":
@@ -155,7 +120,7 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>User Profile</h2></div>';
-		echo "<form id=\"pageform\" enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
+		echo "<form id=\"pageform\" class=limitaftervalidate enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
@@ -171,8 +136,8 @@ switch($_GET['action']) {
 		echo '<span class="form"><label for="dochgpw">Change Password?</label></span> <span class="formright"><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
 		echo '<div style="display:none" id="pwinfo">';
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
-		echo "<span class=form><label for=\"newpw1\">Enter new password:</label></span>  <input class=form type=password id=newpw1 name=newpw1 size=40> <BR class=form>\n";
-		echo "<span class=form><label for=\"newpw1\">Verify new password:</label></span>  <input class=form type=password id=newpw2 name=newpw2 size=40> <BR class=form>\n";
+		echo "<span class=form><label for=\"pw1\">Enter new password:</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
+		echo "<span class=form><label for=\"pw2\">Verify new password:</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
 		echo '</div>';
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"".Sanitize::emailAddress($line['email'])."\"><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
@@ -315,31 +280,13 @@ switch($_GET['action']) {
 			echo '</fieldset>';
 
 		}
-
-		echo '<script type="text/javascript">
-		$("#pageform").validate({
-			rules: {
-				oldpw: {
-					required: {depends: function(element) {return $("#dochgpw").is(":checked")}}
-				},
-				newpw1: {
-					required: {depends: function(element) {return $("#dochgpw").is(":checked")}},
-					minlength: 6
-				},
-				newpw2: {
-					required: {depends: function(element) {return $("#dochgpw").is(":checked")}},
-					equalTo: "#newpw1"
-				},
-				firstname: { required: true},
-				lastname: {required: true},
-				email: {
-					required: true,
-					email: true
-				},
-			},
-			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+		$requiredrules = array(
+			'oldpw'=>'{depends: function(element) {return $("#dochgpw").is(":checked")}}',
+			'pw1'=>'{depends: function(element) {return $("#dochgpw").is(":checked")}}',
+			'pw2'=>'{depends: function(element) {return $("#dochgpw").is(":checked")}}'
 		);
-		</script>';
+		showNewUserValidation("pageform", array('oldpw'), $requiredrules);
+
 		echo "<div class=submit><input type=submit value='Update Info'></div>\n";
 
 		//echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
@@ -413,19 +360,38 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Password Reset</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
-		echo "<form id=\"pageform\" method=post action=\"actions.php?action=resetpw$gb\">\n";
-		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
-		echo "reset your password.</p>";
-		echo "<p><label for=username>User Name</label>: <input type=text name=\"username\" id=username /></p>";
-		echo '<script type="text/javascript">
-		$("#pageform").validate({
-			rules: {
-				username: { required: true}
-			},
-			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
-		);
-		</script>';
-		echo "<p><input type=submit value=\"Submit\" /></p></form>";
+		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=resetpw$gb\">\n";
+		if (isset($_GET['code'])) {
+			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$row = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($row !== false && $row['remoteaccess']!='' && $row['remoteaccess']===$_GET['code']) {
+				echo '<input type="hidden" name="code" value="'.Sanitize::encodeStringForDisplay($_GET['code']).'"/>';
+				echo '<input type="hidden" name="id" value="'.Sanitize::encodeStringForDisplay($_GET['id']).'"/>';
+				echo '<p>Please select a new password:</p>';
+				echo '<p>Enter new password:  <input type="password" size="25" id=pw1 name="pw1"/><br/>';
+				echo '<p>Verify new password:  <input type="password" size="25" id=pw2 name="pw2"/></p>';
+				echo "<p><input type=submit value=\"Submit\" /></p></form>";
+				showNewUserValidation("pageform");
+			} else {
+				echo '<p>Invalid reset code.  If you have requested a password reset multiple times, you need the link from ';
+				echo 'the most recent email.</p>';
+			}
+		} else {
+			echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
+			echo "reset your password.</p>";
+			echo "<p><label for=username>User Name</label>: <input type=text name=\"username\" id=username /></p>";
+			echo '<script type="text/javascript">
+			$("#pageform").validate({
+				rules: {
+					username: { required: true}
+				},
+				invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+			);
+			</script>';
+			echo "<p><input type=submit value=\"Submit\" /></p></form>";
+		}
+
 		break;
 	case "lookupusername":
 		if ($gb == '') {

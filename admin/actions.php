@@ -238,7 +238,7 @@ switch($_POST['action']) {
 			$_POST['newrights'] = $myrights;
 		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$_POST['adminname']));
+		$stm->execute(array(':SID'=>$_POST['SID']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
 			echo "<html><body>Username is already used.\n";
@@ -247,9 +247,9 @@ switch($_POST['action']) {
 			exit;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
-			$md5pw = password_hash($_POST['newpassword'], PASSWORD_DEFAULT);
+			$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 		} else {
-			$md5pw =md5($_POST['newpassword']);
+			$md5pw =md5($_POST['pw1']);
 		}
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
 			$newgroup = Sanitize::onlyInt($_POST['group']);
@@ -284,7 +284,7 @@ switch($_POST['action']) {
 			$specialrights += 64;
 		}
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights);");
-		$stm->execute(array(':SID'=>$_POST['adminname'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
+		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
 		$newuserid = $DBH->lastInsertId();
 		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
 			$valbits = array();
