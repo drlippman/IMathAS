@@ -561,7 +561,9 @@ private function insertInline() {
 
 	//resolve any fileorders
 	$exarr = array();
+	$inlinefilecnt = array();
 	foreach ($toresolve as $tohandle) {
+		$inlinefilecnt[$tohandle] = 0;
 		foreach($this->data['items'][$tohandle]['data']['fileorder'] as $filearr) {
 			//rehost file
 			$newfn = rehostfile($filearr[1], 'cfiles/'.$this->cid);
@@ -569,19 +571,20 @@ private function insertInline() {
 				$exarr[] = $filearr[0]; //description
 				$exarr[] = $this->cid.'/'.$newfn; //filename
 				$exarr[] = $this->typemap['InlineText'][$tohandle];
+				$inlinefilecnt[$tohandle]++;
 			}
 		}
 	}
 	if (count($exarr)>0) {
 		$ph = Sanitize::generateQueryPlaceholdersGrouped($exarr,3);
-		$stm = $DBH->prepare("INSERT INTO imas_inlinetext (description,filename,itemid) VALUES $ph");
+		$stm = $DBH->prepare("INSERT INTO imas_instr_files (description,filename,itemid) VALUES $ph");
 		$stm->execute($exarr);
 		$firstinsid = $DBH->lastInsertId();
 		$fcnt = 0;
 		$inline_file_upd_stm = $DBH->prepare("UPDATE imas_inlinetext SET fileorder=? WHERE id=?");
 		foreach ($toresolve as $tohandle) {
 			$thisfileorder = array();
-			for ($i=0;$i<count($this->data['items'][$tohandle]['data']['fileorder']);$i++) {
+			for ($i=0;$i<$inlinefilecnt[$tohandle];$i++) {
 				$thisfileorder[] = $firstinsid+$fcnt;
 				$fcnt++;
 			}

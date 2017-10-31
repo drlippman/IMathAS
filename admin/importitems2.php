@@ -150,6 +150,11 @@ function chkgrp(frm, arr, mark) {
 		  }
 	  }
 	}
+$(function() {
+	$("#importasteacher").on("change", function() {
+		$("#allowforceupdate").toggle(!$(this).is(":checked"));
+	})
+});
 </script>
 <?php
 echo $curBreadcrumb;
@@ -172,14 +177,18 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 } else {
 	echo $page_fileHiddenInput;
 	echo '<h3>'._('Course').': '.$data['course']['name'].'</h3>';
+
+	if ($myrights==100) {
+		echo '<p><input type="checkbox" name="importasteacher" id="importasteacher" checked /> Import as course owner (for ownership when updating or adding questions).</p>';
+	}
 ?>
 
 	<p>Some questions (possibly older or different versions) may already exist on the system.
 	With these questions, do you want to:<br/>
-		<input type=radio name=merge value="1" CHECKED>Update existing questions (if allowed),
-		<input type=radio name=merge value="-1">Keep existing questions
+		<label><input type=radio name=merge value="1" CHECKED>Update existing questions (if allowed)</label>
+		<label><input type=radio name=merge value="-1">Keep existing questions</label>
 		<?php if ($myrights==100) {
-			echo '<input type=radio name=merge value="2">Force update';
+			echo '<span style="display:none" id="allowforceupdate"><label><input type=radio name=merge value="2">Force update</label></span>';
 		}?>
 	</p>
 	<p>
@@ -192,13 +201,7 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 		</select>
 		<br/><input type="checkbox" name="reuseqrights" checked /> Use rights in import, if available.
 	</p>
-	<?php
-		if ($myrights==100) {
-			echo '<p><input type="checkbox" name="importasteacher" checked /> Import as course owner (for ownership when updating or adding questions).</p>';
-		}
-	?>
 	<p>
-
 	Assign Added Questions to library:
 	<span id="libnames">Unassigned</span>
 	<input type=hidden name="libs" id="libs"  value="0">
