@@ -13,7 +13,7 @@ ini_set("post_max_size", "10485760");
 
 /*** master php includes *******/
 require("../init.php");
-include("../includes/filehandler.php");
+require_once("../includes/filehandler.php");
 require("itemexportfields.php");
 require("importitemsfuncs.php");
 /*** pre-html data manipulation, including function code *******/
