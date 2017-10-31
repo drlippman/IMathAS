@@ -36,7 +36,7 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$
 
 echo '<div class="cpmid">';
 if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
-	echo '<a href="exportitems.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a> | ';
+	echo '<a href="exportitems2.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a> | ';
 }
 echo '<a href="jsonexport.php?cid='. $cid.'" name="button">Export OEA JSON</a>';
 echo '</div>';

@@ -535,7 +535,7 @@ if ($overwriteBody==1) {
 			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy'); ?></a><br/>
 			<a href="../admin/ccexport.php?cid=<?php echo $cid ?>"><?php echo _('Export'); ?></a>
 		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=75) { ?>
-			<br/><a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
+			<br/><a href="../admin/importitems2.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
 		<?php } ?>
 		</p>
 
