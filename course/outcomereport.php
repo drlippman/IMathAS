@@ -434,7 +434,7 @@ if ($report=='overview') {
 					$html = array_merge($html, $subhtml);
 				} else {
 					list($subhtml,$subtots) = getOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
-					$tots = $tots + $subtots;
+					$tots = array_merge($tots, $subtots);
 					if (count($subtots)>0) {
 						$html[] = round(array_sum($subtots)/count($subtots),1).'%';
 					} else {
