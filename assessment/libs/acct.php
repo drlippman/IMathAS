@@ -291,15 +291,29 @@ function scorestatement($stua, $answer, $s, $sn) {
 		if (isset($sg['elements'])) {
 			$n = count($sg['elements'])/2;
 			$usedans = array();
-			for ($i=$sn;$i<$sn+2*$n;$i+=2) {
+			$i = $sn;
+			//for ($i=$sn;$i<$sn+2*$n;$i+=2) {
+			for ($iidx=0;$iidx<count($sg['elements']);$iidx+=2) {
+				if (isset($sg['fixed']) && in_array($iidx, $sg['fixed'])) {
+					$i += 1;
+					continue; //don't need to swap since only one answer
+				}
 				$matchtype = -1;  $matchval = -1;
-				for ($k=$sn;$k<$sn+2*$n;$k+=2) {
+				$stua[$i+1] = floatval(str_replace(array('$',',',' '), '', $stua[$i+1]));
+				//for ($k=$sn;$k<$sn+2*$n;$k+=2) {
+				$k = $sn;
+				for ($kidx=0;$kidx<count($sg['elements']);$kidx+=2) {
+					if (isset($sg['fixed']) && in_array($kidx, $sg['fixed'])) {
+						$k += 1;
+						continue; //don't need to swap since only one answer
+					}
 					if (trim(strtolower($stua[$i]))==trim(strtolower($answer[$k]))) {
 						$matchtype = $k;
 						break;
 					} else if (abs($stua[$i+1]-$answer[$k+1])<.01) {
 						$matchval = $k;
 					}
+					$k += 2;
 				}
 				if ($matchtype > -1 && !in_array($matchtype,$usedans)) {
 					$tmp = array();
@@ -325,8 +339,10 @@ function scorestatement($stua, $answer, $s, $sn) {
 						$answer[$matchval+$k] = $tmp[$k];
 					}
 				}
+				$i += 2;
 			}
-			$sn += 2*count($sg['elements'])/2;
+			//$sn += 2*count($sg['elements'])/2;
+			$sn = $i;
 		}
 		if (isset($sg['totrows'])) {
 			$sn += 2*($sg['totrows'] - $n);
