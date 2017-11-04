@@ -1,19 +1,19 @@
 	/************************************************************************************************************
 	(C) www.dhtmlgoodies.com, November 2005
-	
-	This is a script from www.dhtmlgoodies.com. You will find this and a lot of other scripts at our website.	
-	
+
+	This is a script from www.dhtmlgoodies.com. You will find this and a lot of other scripts at our website.
+
 	Terms of use:
 	You are free to use this script as long as the copyright message is kept intact. However, you may not
 	redistribute, sell or repost it without our permission.
-	
+
 	Thank you!
-	
+
 	www.dhtmlgoodies.com
 	Alf Magne Kalleland
-	
+
 	************************************************************************************************************/
-		
+
 	var tableWidget_okToSort = true;
 	var tableWidget_arraySort = new Array();
 	tableWidget_tableCounter = 1;
@@ -22,14 +22,14 @@
 	var dosortlast = true;
 	var skiplast = 0;
 	var skipfirst = 0;
-	
+
 	function sortNumeric(a,b){
 		var p;
 		try {
 		//reRowText = /(\< *[^\>]*\>|\&nbsp\;|\,|[^\d\.\/])/g;
 		//a = a.replace(reRowText,"");
 		//b = b.replace(reRowText,"");
-		
+
 		//a = a.replace(/,/,'.');
 		//b = b.replace(/,/,'.');
 		//a = a.replace(/[^\d\.\/]/g,'');
@@ -38,24 +38,20 @@
 		//if(b.indexOf('/')>=0) b = eval(b);
 		a = a.replace(/\<\s*[^\>]*\>/g,'');
 		b = b.replace(/\<\s*[^\>]*\>/g,'');
-		if (p = a.match(/[\d\.]+\s*%/)) {
-			a = parseFloat(p);
-		} else if (p = a.match(/[\d\.]+\s*min/)) {
-			a = 60*parseFloat(p);
+		if (p = a.match(/([\d\.]+)\s*(%|min)/)) {
+			a = parseFloat(p[1]);
 		} else {
-			a = parseFloat(a.match(/[\d\.]+/));
+			a = parseFloat(a);
 		}
-		if (p = b.match(/[\d\.]+\s*%/)) {
-			b = parseFloat(p);
-		} else if (p = b.match(/[\d\.]+\s*min/)) {
-			b = 60*parseFloat(p);
+		if (p = b.match(/([\d\.]+)\s*(%|min)/)) {
+			b = parseFloat(p[1]);
 		} else {
-			b = parseFloat(b.match(/[\d\.]+/));
+			b = parseFloat(b);
 		}
-		
-		if (isNaN(a)) { a=0; }
-		if (isNaN(b)) { b=0; }
-		
+
+		if (isNaN(a)) { a=-1; }
+		if (isNaN(b)) { b=-1; }
+
 		return a/1 - b/1;
 		} catch(e) {
 			return 0;
@@ -65,10 +61,10 @@
 		try {
 			a = parseFloat(a.match(/[\d\.]+\s*%/));
 			b = parseFloat(b.match(/[\d\.]+\s*%/));
-			
-			if (isNaN(a)) { a=0; }
-			if (isNaN(b)) { b=0; }
-			
+
+			if (isNaN(a)) { a=-1; }
+			if (isNaN(b)) { b=-1; }
+
 			return a/1 - b/1;
 		} catch(e) {
 			return 0;
@@ -101,15 +97,15 @@
 		try {
 			a+='';
 			b+='';
-			
+
 			reRowText = /(\< *[^\>]*\>|\&nbsp\;)/g;
 			a = a.replace(reRowText,"");
 			b = b.replace(reRowText,"");
-			
+
 			if (!isNaN(a/1) && !isNaN(b/1)) {
 				return a/1 - b/1;
 			}
-			
+
 			if ( a.toUpperCase() < b.toUpperCase() ) return -1;
 			if ( a.toUpperCase() > b.toUpperCase() ) return 1;
 			return 0;
@@ -121,14 +117,14 @@
 		try {
 			a+='';
 			b+='';
-			
+
 			reRowText = /.*sortby([\d\.]+).*/;
 			a = a.replace(reRowText,"$1");
 			b = b.replace(reRowText,"$1");
 			if (!isNaN(a/1) && !isNaN(b/1)) {
 				return a/1 - b/1;
 			}
-			
+
 			if ( a.toUpperCase() < b.toUpperCase() ) return -1;
 			if ( a.toUpperCase() > b.toUpperCase() ) return 1;
 			return 0;
@@ -136,7 +132,7 @@
 			return 0;
 		}
 	}
-		
+
 	function sortTable()
 	{
 		if(!tableWidget_okToSort)return;
@@ -146,39 +142,39 @@
 		var indexThis = 0;
 		while(obj.previousSibling){
 			obj = obj.previousSibling;
-			if(obj.tagName=='TH')indexThis++;		
+			if(obj.tagName=='TH')indexThis++;
 		}
-		
+
 		if(this.getAttribute('direction') || this.direction){
 			direction = this.getAttribute('direction');
 			if(navigator.userAgent.indexOf('Opera')>=0)direction = this.direction;
 			if(direction=='ascending'){
 				direction = 'descending';
 				this.setAttribute('direction','descending');
-				this.direction = 'descending';	
+				this.direction = 'descending';
 			}else{
 				direction = 'ascending';
-				this.setAttribute('direction','ascending');		
-				this.direction = 'ascending';		
+				this.setAttribute('direction','ascending');
+				this.direction = 'ascending';
 			}
 		}else{
 			direction = 'ascending';
 			this.setAttribute('direction','ascending');
 			this.direction = 'ascending';
 		}
-		
+
 		var tableObj = this.parentNode.parentNode.parentNode;
 		var tBody = tableObj.getElementsByTagName('TBODY')[0];
 		var widgetIndex = tableObj.getAttribute('tableIndex');
 		if(!widgetIndex)widgetIndex = tableObj.tableIndex;
-		
+
 		var sortMethod = tableWidget_arraySort[widgetIndex][indexThis]; // N = numeric, S = String
 		if(activeColumn[widgetIndex] && activeColumn[widgetIndex]!=this){
-			if(activeColumn[widgetIndex])activeColumn[widgetIndex].removeAttribute('direction');			
+			if(activeColumn[widgetIndex])activeColumn[widgetIndex].removeAttribute('direction');
 		}
 
 		activeColumn[widgetIndex] = this;
-		
+
 		var cellArray = new Array();
 		var cellObjArray = new Array();
 		var cellStartObjArray = new Array();
@@ -195,7 +191,7 @@
 		for (var no=tableObj.rows.length-skiplast; no<tableObj.rows.length; no++) {
 			cellEndObjArray.push(tableObj.rows[no].cells[indexThis]);
 		}
-		
+
 		if(sortMethod=='N'){
 			cellArray = cellArray.sort(sortNumeric);
 		} else if (sortMethod=='D') {
@@ -207,7 +203,7 @@
 		} else{
 			cellArray = cellArray.sort(sortString);
 		}
-		
+
 		if (skipfirst>0) {
 			for (var no=0; no<skipfirst; no++) {
 				tBody.appendChild(cellStartObjArray[no].parentNode);
@@ -217,29 +213,29 @@
 			for(var no=cellArray.length;no>=0;no--){
 				for(var no2=0;no2<cellObjArray.length;no2++){
 					if(cellObjArray[no2].innerHTML == cellArray[no] && !cellObjArray[no2].getAttribute('allreadySorted')){
-						cellObjArray[no2].setAttribute('allreadySorted','1');	
-						tBody.appendChild(cellObjArray[no2].parentNode);				
-					}				
-				}			
+						cellObjArray[no2].setAttribute('allreadySorted','1');
+						tBody.appendChild(cellObjArray[no2].parentNode);
+					}
+				}
 			}
 		}else{
 			for(var no=0;no<cellArray.length;no++){
 				for(var no2=0;no2<cellObjArray.length;no2++){
 					if(cellObjArray[no2].innerHTML == cellArray[no] && !cellObjArray[no2].getAttribute('allreadySorted')){
 						cellObjArray[no2].setAttribute('allreadySorted','1');
-						tBody.appendChild(cellObjArray[no2].parentNode);				
-					}				
-				}			
-			}				
+						tBody.appendChild(cellObjArray[no2].parentNode);
+					}
+				}
+			}
 		}
 		if (skiplast>0) {
 			for (var no=0; no<skiplast; no++) {
 				tBody.appendChild(cellEndObjArray[no].parentNode);
 			}
 		}
-		
-		
-		
+
+
+
 		if (evenodd) {
 			for(var no=1;no<tableObj.rows.length;no++){
 				if (no%2==0) {
@@ -249,14 +245,14 @@
 				}
 			}
 		}
-		
+
 		for(var no2=0;no2<cellObjArray.length;no2++){
-			cellObjArray[no2].removeAttribute('allreadySorted');		
+			cellObjArray[no2].removeAttribute('allreadySorted');
 		}
 
 		tableWidget_okToSort = true;
-		
-		
+
+
 	}
 	//sortlast:  true to sort last, false to not sort last, -n to not
 	//sort last n rows.  undef sorts all
@@ -270,18 +266,18 @@
 		var cells = tHead.getElementsByTagName('TH');
 		for(var no=0;no<cells.length;no++){
 			if(sortArray[no]){
-				cells[no].onclick = sortTable;	
+				cells[no].onclick = sortTable;
 			}else{
-				cells[no].style.cursor = 'default';	
+				cells[no].style.cursor = 'default';
 			}
 		}
-				
+
 		//for(var no2=0;no2<sortArray.length;no2++){	/* Right align numeric cells */
 		//	if(sortArray[no2] && sortArray[no2]=='N')obj.rows[0].cells[no2].style.textAlign='right';
-		//}		
-		
+		//}
+
 		tableWidget_tableCounter++;
-		
+
 		if (switchit==true) {
 			evenodd= true;
 		}
@@ -301,5 +297,3 @@
 			skipfirst = -1*sortfirst;
 		}
 	}
-
-
