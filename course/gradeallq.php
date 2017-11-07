@@ -132,7 +132,7 @@
 				//$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id");
 				//$stm2->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$line['id']));
 				array_push($updatedata, $line['id'], $scorelist, $feedback);
-				
+
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
@@ -327,7 +327,12 @@
 		$("span[id^=\'ans\']").removeClass("hidden");
 		$(".sabtn").replaceWith("<span>Answer: </span>");
 	}
-
+	function allvisfullcred() {
+		$(".fullcredlink").not(function() {return $(this).closest(".pseudohidden").length}).trigger("click");
+	}
+	function allvisnocred() {
+		$("input[name^=ud]").not(function() {return $(this).closest(".pseudohidden").length}).val("0");
+	}
 	function quicksave() {
 		var url = $("#mainform").attr("action")+"&quick=true";
 		$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
@@ -371,6 +376,8 @@
 	if ($deffbtext != '') {
 		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
 	}
+	echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
+	echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
 	if ($page==-1) {
 		echo '<div class="fixedbottomright">';
 		echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
@@ -597,13 +604,13 @@
 						$togr[] = $k;
 					}
 				}
-				echo '<br/>Quick grade: <a href="#" onclick="quickgrade('.Sanitize::onlyFloat($loc).',0,\'ud-' . Sanitize::onlyInt($line['id']) . '-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
+				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.Sanitize::onlyFloat($loc).',0,\'ud-' . Sanitize::onlyInt($line['id']) . '-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
 				if (count($togr)>0) {
 					$togr = implode(',',$togr);
 					echo ' | <a href="#" onclick="quickgrade('.Sanitize::onlyFloat($loc).',1,\'ud-' . Sanitize::onlyInt($line['id']) . '-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
 			} else {
-				echo '<br/>Quick grade: <a href="#" onclick="quicksetscore(\'ud-' . Sanitize::onlyInt($line['id']) . '-'.Sanitize::onlyFloat($loc).'\','.Sanitize::onlyInt($points).');return false;">Full credit</a>';
+				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'ud-' . Sanitize::onlyInt($line['id']) . '-'.Sanitize::onlyFloat($loc).'\','.Sanitize::onlyInt($points).');return false;">Full credit</a>';
 			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {
