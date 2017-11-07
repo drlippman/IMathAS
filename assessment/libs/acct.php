@@ -1136,6 +1136,8 @@ function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 	$cntright = count($rightentries);
 	//change blanks to zeros
 	for ($i=0;$i<$numrows;$i++) {
+		$stua[$sn+2*$i] = str_replace(array('$',','),'',$stua[$sn+2*$i]);
+		$stua[$sn+2*$i+1] = str_replace(array('$',','),'',$stua[$sn+2*$i+1]);
 		if (trim($stua[$sn+2*$i])=='') {
 			$stua[$sn+2*$i] = 0;
 		}
