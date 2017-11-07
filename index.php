@@ -500,7 +500,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			echo ' <em style="color:green;">', _('Lockdown'), '</em>';
 		}
 		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
-			echo ' <a class="noticetext" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
+			echo ' <a class="noticetext" href="msgs/msglist.php?page=-1&cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
 			printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data[$i]['id'],

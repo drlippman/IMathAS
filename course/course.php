@@ -270,7 +270,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	   $stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 	   $msgcnt = $stm->fetchColumn(0);
 	   if ($msgcnt>0) {
-		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" class=noticetext>" . sprintf(_('New (%d)'), $msgcnt) . "</a>";
+		   $newmsgs = " <a href=\"$imasroot/msgs/msglist.php?page=-1&cid=$cid\" class=noticetext>" . sprintf(_('New (%d)'), $msgcnt) . "</a>";
 	   } else {
 		   $newmsgs = '';
 	   }

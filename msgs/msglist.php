@@ -48,6 +48,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	} else {
 		$page = Sanitize::onlyInt($_GET['page']);
 	}
+	if ($page==-1) {
+		$limittonew = 1;
+	} else {
+		$limittonew = 0;
+	}
 	if ($page==-2) {
 		$limittotagged = 1;
 	} else {
@@ -629,7 +634,15 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Message List</div>";
-	echo '<div id="headermsglist" class="pagetitle"><h2>Messages</h2></div>';
+	echo '<div id="headermsglist" class="pagetitle"><h2>';
+	if ($limittotagged) {
+		echo _('Tagged Messages');
+	} else if ($limittonew) {
+		echo _('New Messages');
+	} else {
+		echo _('Messages');
+	}
+	echo '</h2></div>';
 
 	if ($myrights > 5 && $filtercid>0) {
 		//DB $query = "SELECT msgset FROM imas_courses WHERE id='$filtercid'";
@@ -654,8 +667,13 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	if ($page==-2) {
 		$actbar[] = "<a href=\"msglist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Show All</a>";
+		$actbar[] = "<a href=\"msglist.php?page=-1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to New</a>";
+	} else if ($page==-1) {
+		$actbar[] = "<a href=\"msglist.php?page=1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Show All</a>";
+		$actbar[] = "<a href=\"msglist.php?page=-2&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to Tagged</a>";
 	} else {
 		$actbar[] = "<a href=\"msglist.php?page=-2&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to Tagged</a>";
+		$actbar[] = "<a href=\"msglist.php?page=-1&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to New</a>";
 	}
 	$actbar[] = "<a href=\"sentlist.php?cid=$cid\">Sent Messages</a>";
 
@@ -689,6 +707,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	if ($limittotagged==1) {
 		$query .= " AND (isread&8)=8";
 	}
+	if ($limittonew) {
+		$query .= " AND (isread&1)=0";
+	}
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
   $stm = $DBH->prepare($query);
   $stm->execute($qarr);
@@ -713,6 +734,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		if ($limittotagged==1) {
 			$query .= " AND (isread&8)=8";
 		}
+		if ($limittonew) {
+			$query .= " AND (isread&1)=0";
+		}
     $stm = $DBH->prepare($query);
     if ($filtercid>0) {
       $stm->execute(array(':msgto'=>$userid, ':courseid'=>$filtercid));
@@ -724,7 +748,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$numpages = ceil($stm->fetchColumn(0)/$threadsperpage);
 	}
 	$prevnext = '';
-	if ($numpages > 1 && !$limittotagged) {
+	if ($numpages > 1 && !$limittotagged && !$limittonew) {
 		$prevnext .= "Page: ";
 		if ($page < $numpages/2) {
 			$min = max(2,$page-4);
@@ -888,8 +912,11 @@ function chgfilter() {
 	if ($limittotagged) {
 		$query .= "AND (imas_msgs.isread&8)=8 ";
 	}
+	if ($limittonew) {
+		$query .= " AND (isread&1)=0 ";
+	}
 	$query .= "ORDER BY senddate DESC ";
-	if (!$limittotagged) {
+	if (!$limittotagged && !$limittonew) {
 		$query .= "LIMIT $offset,$threadsperpage";// INT values
 	}
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
