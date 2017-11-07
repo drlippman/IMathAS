@@ -109,6 +109,7 @@
 	$stm->execute(array(':groupsetid'=>$groupsetid));
 	$grpnums = 1;
 	$stu_name = null;
+	$groupnames = array();
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1] == 'Unnamed group') {
@@ -142,7 +143,7 @@
 		$lc++;
 		echo "<td>" . Sanitize::encodeStringForDisplay($gname) . "</td>";
 		if (!isset($scoredata[$gid])) {
-			echo "<td>-</td><td>-</td><td></td>";
+			echo "<td>-</td><td>-</td><td></td></tr>";
 			continue;
 		} else {
 			$line = $scoredata[$gid];
@@ -177,7 +178,7 @@
 				'aid' => $aid
 			);
 
-            echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+      echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(NC)";
@@ -210,7 +211,7 @@
 	} else {
 		echo '-';
 	}
-	if ($totalpossible > 0 ) {
+	if ($totalpossible > 0 && $n > 0) {
 		$pct = round(100*($tot/$n)/$totalpossible,1).'%';
 	} else {
 		$pct = '';
