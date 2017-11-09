@@ -2150,7 +2150,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
-		if (in_array('list',$ansformats)) {
+		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats)) {
 			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
 			$shorttip = _('Enter a list of complex numbers');
 		} else {
@@ -4085,13 +4085,28 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		$gaarr = array_map('trim',explode(',',$givenans));
-		$anarr = array_map('trim',explode(',',$answer));
-
-		if (count($gaarr)==0) {
-			return 0;
+		$ganumarr = array();
+		foreach ($gaarr as $j=>$givenans) {
+			$cparts = parsecomplex($givenans);
+			$gaparts = array();
+			if (!is_array($cparts)) {
+				return 0;
+			} else {
+				$gaparts[0] = floatval($cparts[0]);
+				$gaparts[1] = floatval($cparts[1]);
+			}
+			if (!in_array('exactlist',$ansformats)) {
+				foreach ($ganumarr as $prevvals) {
+					if (abs($gaparts[0]-$prevvals[0])<1e-12 && abs($gaparts[1]-$prevvals[1])<1e-12) {
+						continue 2; //skip adding it to the list
+					}
+				}
+			}
+			$ganumarr[] = $gaparts;
 		}
-		$extrapennum = count($gaarr)+count($anarr);
-		$correct = 0;
+
+		$anarr = array_map('trim',explode(',',$answer));
+		$annumarr = array();
 		foreach ($anarr as $i=>$answer) {
 			$cparts = parsecomplex($answer);
 			if (!is_array($cparts)) {
@@ -4103,16 +4118,25 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$ansparts[0] = evalMathPHP($cparts[0],null);//eval('return ('.mathphp($cparts[0],null).');');
 				$ansparts[1] = evalMathPHP($cparts[1],null);//eval('return ('.mathphp($cparts[1],null).');');
 			}
+			if (!in_array('exactlist',$ansformats)) {
+				foreach ($annumarr as $prevvals) {
+					if (abs($ansparts[0]-$prevvals[0])<1e-12 && abs($ansparts[1]-$prevvals[1])<1e-12) {
+						continue 2; //skip adding it to the list
+					}
+				}
+			}
+			$annumarr[] = $ansparts;
+		}
+
+		if (count($ganumarr)==0) {
+			return 0;
+		}
+		$extrapennum = count($ganumarr)+count($annumarr);
+		$correct = 0;
+		foreach ($annumarr as $i=>$ansparts) {
 			$foundloc = -1;
 
-			foreach ($gaarr as $j=>$givenans) {
-				$cparts = parsecomplex($givenans);
-				if (!is_array($cparts)) {
-					return 0;
-				} else {
-					$gaparts[0] = floatval($cparts[0]);
-					$gaparts[1] = floatval($cparts[1]);
-				}
+			foreach ($ganumarr as $j=>$gaparts) {
 				if (count($ansparts)!=count($gaparts)) {
 					break;
 				}
@@ -4130,13 +4154,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 			if ($foundloc>-1) {
-				array_splice($gaarr,$foundloc,1); // remove from list
-				if (count($gaarr)==0) {
+				array_splice($ganumarr,$foundloc,1); // remove from list
+				if (count($ganumarr)==0) {
 					break;
 				}
 			}
 		}
-		$score = $correct/count($anarr) - count($gaarr)/$extrapennum;
+		$score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
 		if ($score<0) { $score = 0; }
 		return ($score);
 
@@ -4251,7 +4275,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$gaarr[] = $tmp[$i];
 					$orarr[] = $tmpor[$i];
 				} else {
-					if ($v-$lastval>1E-12) {
+					if (abs($v-$lastval)>1E-12) {
 						$gaarr[] = $tmp[$i];
 						$orarr[] = $tmpor[$i];
 					}
