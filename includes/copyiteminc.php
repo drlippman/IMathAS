@@ -303,7 +303,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		//DB $query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors,defoutcome,posttoforum FROM imas_assessments WHERE id='$typeid'";
 		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		//DB $row = mysql_fetch_assoc($result);
-		$stm = $DBH->prepare("SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors,defoutcome,posttoforum FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,ancestors,defoutcome,posttoforum FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$typeid));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($sethidden) {$row['avail'] = 0;}
@@ -325,6 +325,25 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		if ($_POST['ctc']!=$cid) {
 			$forumtopostto = $row['posttoforum'];
 			unset($row['posttoforum']);
+			if ($row['isgroup']>0) {
+				//assessment was a group assessment, but we're copying into another
+				//course.  Either need to create a new groupset, or make it not groups
+				//we'll create a new group if the existing one was an auto-created group
+				$stm2 = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=?");
+				$stm2->execute(array($row['groupsetid']));
+				$existingGroupsetName = $stm2->fetchColumn(0);
+				if ($existingGroupsetName != _('Group set for').' '.$row['name']) {
+					//not an autocreated group - make it not group so teacher can attach
+					//a group later
+					$row['isgroup'] = 0;
+					$row['groupsetid'] = 0;
+				} else {
+					//create a new groupset
+					$stm2 = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
+					$stm2->execute(array(':courseid'=>$cid, ':name'=>$existingGroupsetName));
+					$row['groupsetid'] = $DBH->lastInsertId();
+				}
+			}
 		}
 
 		$reqscoreaid = $row['reqscoreaid'];
