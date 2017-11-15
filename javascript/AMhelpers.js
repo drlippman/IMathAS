@@ -580,21 +580,28 @@ function complexcalc(inputId,outputId,format) {
 			var prep = mathjs(prep,'i');
 			if (format.indexOf("sloppycomplex")==-1) {
 				var cparts = parsecomplex(arr[cnt]);
-				err += singlevalsyntaxcheck(cparts[0], format);
-				err += singlevalsyntaxcheck(cparts[1], format);
+				if (typeof cparts == 'string') {
+					err += cparts;
+				} else {
+					err += singlevalsyntaxcheck(cparts[0], format);
+					err += singlevalsyntaxcheck(cparts[1], format);
+				}
 			}
 			err += syntaxcheckexpr(arr[cnt], format);
-			try {
-			    var real = scopedeval('var i=0;'+prepWithMath(prep));
-			    var imag = scopedeval('var i=1;'+prepWithMath(prep));
-			} catch(e) {
-			    err += _("syntax incomplete");
+			if (err == '') {
+				try {
+				    var real = scopedeval('var i=0;'+prepWithMath(prep));
+				    var imag = scopedeval('var i=1;'+prepWithMath(prep));
+						var imag2 = scopedeval('var i=-1;'+prepWithMath(prep));
+				} catch(e) {
+				    err += _("syntax incomplete");
+				}
 			}
 			if (real=="synerr" || imag=="synerr") {
 			    err += _("syntax incomplete");
 			    real = NaN;
 			}
-			if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && imag!="Infinity") {
+			if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
 				imag -= real;
 				if (cnt!=0) {
 					outcalced += ',';
@@ -658,6 +665,9 @@ function parsecomplex(v) {
 				}
 			}
 			if (L<0) {L=0;}
+			if (nd != 0) {
+				return _('error - invalid form');
+			}
 			//look right
 			nd = 0;
 
@@ -670,6 +680,9 @@ function parsecomplex(v) {
 				} else if ((c=='+' || c=='-') && nd==0) {
 					break;
 				}
+			}
+			if (nd != 0) {
+				return _('error - invalid form');
 			}
 			//which is bigger?
 			if (p-L>0 && R-p>0 && (R==len || L==0)) {
@@ -1382,7 +1395,7 @@ function toggleinlinebtn(n,p){ //n: target, p: click el
 	}
 	var k=btn.innerHTML;
 	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
-	
+
 }
 function assessbackgsubmit(qn,noticetgt) {
 	if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
@@ -1392,7 +1405,7 @@ function assessbackgsubmit(qn,noticetgt) {
 	if (useFormData) {
 		var tosubFormData = new FormData();
 	}
-	
+
 	var els = new Array();
 	var tags = document.getElementsByTagName("input");
 	for (var i=0;i<tags.length;i++) {
@@ -1431,7 +1444,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		}
 	}
 	if (qn !== null) {
-		if (useFormData) { 
+		if (useFormData) {
 			tosubFormData.append('toscore', qn);
 			tosubFormData.append('verattempts', document.getElementById("verattempts"+qn).value);
 		} else {
@@ -1439,7 +1452,7 @@ function assessbackgsubmit(qn,noticetgt) {
 			params['verattempts'] = document.getElementById("verattempts"+qn).value;
 		}
 	} else {
-		if (useFormData) { 
+		if (useFormData) {
 			tosubFormData.append('verattempts', document.getElementById("verattempts").value);
 		} else {
 			params['verattempts'] = document.getElementById("verattempts").value;
@@ -1552,8 +1565,8 @@ function assessbackgsubmit(qn,noticetgt) {
 		    document.getElementById(this.noticetgt).innerHTML = _("Submission Error");
 		}
 	});
-		
-	
+
+
 }
 
 
@@ -2116,4 +2129,3 @@ function prepWithMath(str) {
 	str = str.replace(/\((E|PI)\)/g,'(Math.$1)');
 	return str;
 }
-

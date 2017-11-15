@@ -10,7 +10,7 @@ error_reporting(E_ALL);
 function minify($c) {
 	//$min = httpPost('https://javascript-minifier.com/raw', array('input'=>$c));
 	//alt:
-	$min = httpPost('http://closure-compiler.appspot.com/compile', array('js_code'=>$c, 'compilation_level'=>'SIMPLE_OPTIMIZATIONS', 'output_info'=>'compiled_code', 'output_format'=>'text'));
+	$min = httpPost('https://closure-compiler.appspot.com/compile', array('js_code'=>$c, 'compilation_level'=>'SIMPLE_OPTIMIZATIONS', 'output_info'=>'compiled_code', 'output_format'=>'text'));
 
 	return $min;
 }
@@ -45,7 +45,7 @@ $e = minify(file_get_contents("../javascript/eqntips.js"));
 
 if (trim($g)=='' || trim($m)=='' || trim($a)=='' || trim($c)=='' || trim($d)=='' || trim($e)=='') {
 	echo "One or minimizations failed";
-	exit;	
+	exit;
 }
 $c = $g."\n".$m."\n".$a."\n".$c."\n".$d."\n".$e;
 file_put_contents("../javascript/assessment_min.js", $c);
@@ -57,7 +57,7 @@ $ma = file_get_contents("../javascript/AMtoMQ.js")."\n";
 
 if (trim($mc)=='' || trim($me)=='' || trim($ma)=='') {
 	echo "One or minimizations failed";
-	exit;	
+	exit;
 }
 $c = $mc."\n".$me."\n".$ma;
 file_put_contents("../javascript/MQbundle_min.js", minify($c));

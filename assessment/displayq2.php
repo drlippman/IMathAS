@@ -7050,6 +7050,9 @@ function parsecomplex($v) {
 				}
 			}
 			if ($L<0) {$L=0;}
+			if ($nd != 0) {
+				return _('error - invalid form');
+			}
 			//look right
 			$nd = 0;
 
@@ -7062,6 +7065,9 @@ function parsecomplex($v) {
 				} else if (($c=='+' || $c=='-') && $nd==0) {
 					break;
 				}
+			}
+			if ($nd != 0) {
+				return _('error - invalid form');
 			}
 			//which is bigger?
 			if ($p-$L>0 && $R-$p>0 && ($R==$len || $L==0)) {
