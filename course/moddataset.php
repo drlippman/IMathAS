@@ -157,8 +157,8 @@
 					'timeout' => 1
 				    )
 				));
-				$t = @file_get_contents('http://video.google.com/timedtext?lang=en&v='.$vidid, false, $ctx);
-				$captioned = ($t=='')?0:1;
+				$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
+				$captioned = (strpos($t, '<track')===false)?0:1;
 			}
 			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned;
 		}
