@@ -16,7 +16,7 @@ if ($myrights<100) {exit;}
 function minify($c) {
 	//$min = httpPost('https://javascript-minifier.com/raw', array('input'=>$c));
 	//alt:
-	$min = httpPost('http://closure-compiler.appspot.com/compile', array('js_code'=>$c, 'compilation_level'=>'SIMPLE_OPTIMIZATIONS', 'output_info'=>'compiled_code', 'output_format'=>'text'));
+	$min = httpPost('https://closure-compiler.appspot.com/compile', array('js_code'=>$c, 'compilation_level'=>'SIMPLE_OPTIMIZATIONS', 'output_info'=>'compiled_code', 'output_format'=>'text'));
 
 	return $min;
 }
@@ -34,6 +34,8 @@ function httpPost($url, $data)
 	        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 	        'method'  => 'POST',
 	        'content' => http_build_query($data)
+	    ), 'ssl' => array(
+	    	    'verify_peer' => false,
 	    )
 		);
 		$context  = stream_context_create($options);
@@ -180,7 +182,7 @@ class TinyMCE_Compressor {
 		if (substr($content, 0, 3) === pack("CCC", 0xef, 0xbb, 0xbf)) {
 			$content = substr($content, 3);
 		}
-		if (substr_count($content,"\n")>5) {
+		if (substr_count($content,"\n")>10 && strpos($file,'tinymce.min.js')===false) {
 			$content = minify($content);
 			echo "Minifying $file<br/>";
 			if (trim($content)=='') {

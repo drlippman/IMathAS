@@ -28,7 +28,10 @@ function httpPost($url, $data)
 	        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 	        'method'  => 'POST',
 	        'content' => http_build_query($data)
-	    )
+	    ), 
+	    'ssl' => array(
+	    	    'verify_peer' => false,
+	    ),
 		);
 		$context  = stream_context_create($options);
 		$response = file_get_contents($url, false, $context);
