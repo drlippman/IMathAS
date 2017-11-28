@@ -2093,6 +2093,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
+			if ($displayformat == 'vector') {
+				$sa = str_replace(array('<','>'), array('(:',':)'), $sa);
+			}
 		}
 	} else if ($anstype == "complex") {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
