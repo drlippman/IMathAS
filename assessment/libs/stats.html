@@ -14,6 +14,7 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#TIquartile">TIquartile</a></li>
 <li><a href="#Excelquartile">Excelquartile</a></li>
 <li><a href="#Nplus1quartile">Nplus1quartile</a></li>
+<li><a href="#allquartile">allquartile</a></li>
 <li><a href="#median">median</a></li>
 <li><a href="#freqdist">freqdist</a></li>
 <li><a href="#frequency">frequency</a></li>
@@ -84,6 +85,11 @@ Nplus1quartile(array,quartile)
 <BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 <BR>array of numbers.  Calculates using the N+1 method, which is like
 <BR>percentiles, but calculated using N+1 (OpenStax).
+<BR><h3><a name="allquartile">allquartile</a></h3>
+allquartile(array,quartile)
+<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+<BR>array of numbers.  Uses all the quartile methods, and returns an "or" joined
+<BR>string of all unique answers.
 <BR><h3><a name="median">median</a></h3>
 median(array)
 <BR>returns the median of an array of numbers

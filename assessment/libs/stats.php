@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.10, Nov 17, 2017
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -192,6 +192,45 @@ function Nplus1quartile($a,$q) {
 	return Nplus1percentile($a,$q*25);
 }
 
+//allquartile(array,quartile)
+//finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+//array of numbers.  Uses all the quartile methods, and returns an "or" joined
+//string of all unique answers.
+function allquartile($a,$q) {
+	sort($a, SORT_NUMERIC);
+	$n = count($a);
+	if ($q==0) {
+		return $a[0];
+	} else if ($q==4) {
+		return $a[count($a)-1];
+	}
+	if ($q==2) {
+		if ($n%2==0) { //even
+			$m = $n/2;
+			return (($a[$m-1] + $a[$m])/2);
+		} else {
+			return ($a[floor($n/2)]);
+		}
+	}
+	
+	//%4==0, all same except Excel
+	//%4==1, q and Excel same, TI and Nplus1 same
+	//%4==2, q and TI same, Excel and Nplus1 diff
+	//%4==3, all same except Excel
+	$qs = array();
+	if ($n%4==1) {
+		$qs[] = percentile($a,$q*25);
+		$qs[] = Nplus1percentile($a,$q*25);
+	} else if ($n%4==2) {
+		$qs[] = percentile($a,$q*25);
+		$qs[] = Nplus1percentile($a,$q*25);
+		$qs[] = Excelquartile($a,$q);
+	} else {
+		$qs[] = percentile($a,$q*25);
+		$qs[] = Excelquartile($a,$q);
+	}
+	return implode(' or ',array_unique($qs));
+}
 
 //median(array)
 //returns the median of an array of numbers
