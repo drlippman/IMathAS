@@ -1,10 +1,11 @@
 <html><body>
 <h1>Macro Library radicals</h1>
 A collection of functions for working with radicals
-<BR>Version 2 July 27, 2011
+<BR>Version 3 Nov 27 2017
 <BR><ul>
 <li><a href="#reduceradical">reduceradical</a></li>
 <li><a href="#reduceradicalfrac">reduceradicalfrac</a></li>
+<li><a href="#reduceradicalfrac2">reduceradicalfrac</a></li>
 <li><a href="#reducequadraticform">reducequadraticform</a></li>
 </ul>
 <h3><a name="reduceradical">reduceradical</a></h3>
@@ -22,6 +23,14 @@ reduceradicalfrac(wholenum,rootnum,denom,[root,format])
 <BR>format: default is "string", which returns "4sqrt(5)/2"
 <BR>                   "disp", returns the string wrapped in backticks for display
 <BR>                   "parts", returns an array of the parts:  array(4,5,2)
+<BR><h3><a name="reduceradicalfrac2">reduceradicalfrac2</a></h3>
+reduceradicalfrac2(num,wholedenom,rootnum,[rationalize,root,format])
+<BR>given num/(wholedenom*root(rootnum)), reduces the root then the fraction
+<BR>rationalize: rationalize the denominator. Default is false.
+<BR>root: root of radical.  Default is 2 (sqrt)
+<BR>format: default is "string", which returns "2/(3sqrt(5))"
+<BR>                   "disp", returns the string wrapped in backticks for display
+<BR>                   "parts", returns an array of the parts:  array(2,3,5)
 <BR><h3><a name="reducequadraticform">reducequadraticform</a></h3>
 reducequadraticform(a,b,c,d,[format])
 <BR>given (a+bsqrt(c))/d, reduces the root then the fraction

@@ -1,5 +1,5 @@
 <?php
-//A library of Stats functions.  Version 1.9, March 30, 2008
+//A library of Stats functions.  Version 1.10, Nov 17, 2017
 
 global $allowedmacros;
 array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
