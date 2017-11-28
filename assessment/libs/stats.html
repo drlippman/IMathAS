@@ -7,10 +7,13 @@ A library of Stats functions.  Version 1.9, March 30, 2008
 <li><a href="#mean">mean</a></li>
 <li><a href="#variance">variance</a></li>
 <li><a href="#stdev">stdev</a></li>
+<li><a href="#absmeandev">absmeandev</a></li>
 <li><a href="#percentile">percentile</a></li>
+<li><a href="#Nplus1percentile">Nplus1percentile</a></li>
 <li><a href="#quartile">quartile</a></li>
 <li><a href="#TIquartile">TIquartile</a></li>
 <li><a href="#Excelquartile">Excelquartile</a></li>
+<li><a href="#Nplus1quartile">Nplus1quartile</a></li>
 <li><a href="#median">median</a></li>
 <li><a href="#freqdist">freqdist</a></li>
 <li><a href="#frequency">frequency</a></li>
@@ -53,10 +56,17 @@ variance(array)
 <BR><h3><a name="stdev">stdev</a></h3>
 stdev(array)
 <BR>the (sample) standard deviation of an array of numbers
+<BR><h3><a name="absmeandev">absmeandev</a></h3>
+absmeandev(array)
+<BR>the absolute mean deviation of an array of numbers
 <BR><h3><a name="percentile">percentile</a></h3>
 percentile(array,percentile)
 <BR>example: percentile($a,30) would find the 30th percentile of the data
-<BR>method based on Triola
+<BR>Calculates using the p/100*(N) method (e.g. Triola)
+<BR><h3><a name="Nplus1percentile">Nplus1percentile</a></h3>
+Nplus1percentile(array,percentile)
+<BR>example: percentile($a,30) would find the 30th percentile of the data
+<BR>Calculates using the p/100*(N+1) method (e.g. OpenStax).
 <BR><h3><a name="quartile">quartile</a></h3>
 quartile(array,quartile)
 <BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
@@ -69,6 +79,11 @@ TIquartile(array,quartile)
 Excelquartile(array,quartile)
 <BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 <BR>array of numbers.  Calculates using the Excel method.
+<BR><h3><a name="Nplus1quartile">Nplus1quartile</a></h3>
+Nplus1quartile(array,quartile)
+<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+<BR>array of numbers.  Calculates using the N+1 method, which is like
+<BR>percentiles, but calculated using N+1 (OpenStax).
 <BR><h3><a name="median">median</a></h3>
 median(array)
 <BR>returns the median of an array of numbers
@@ -131,16 +146,25 @@ piechart(percents, labels, {width, height})
 <BR>labels: array of labels for each pie piece
 <BR>uses Google Charts API
 <BR><h3><a name="normrand">normrand</a></h3>
-normrand(mu,sigma,n,[rnd])
+normrand(mu,sigma,n, [rnd])
 <BR>returns an array of n random numbers that are normally distributed with given
 <BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 <BR>specify rnd to round to that many digits
 <BR><h3><a name="boxplot">boxplot</a></h3>
-boxplot(array,axislabel,[datalabel])
+boxplot(array,axislabel,[options])
 <BR>draws a boxplot based on the data in array, with given axislabel
 <BR>and optionally a datalabel (to topleft of boxplot)
-<BR>array and datalabel can also be an array of dataarrays and
-<BR>array of datalabels to do comparative boxplots
+<BR>array also be an array of dataarrays to do comparative boxplots
+<BR>opts is an array of options:
+<BR>&nbsp;&nbsp;&nbsp;"datalabels" = array of data labels for comparative boxplots
+<BR>&nbsp;&nbsp;&nbsp;"showvals" = true to show 5 number summary above boxplot
+<BR>&nbsp;&nbsp;&nbsp;"showoutliers" = true to put whiskers at 1.5IQR and show outliers
+<BR>&nbsp;&nbsp;&nbsp;"qmethod" = quartile method: "N", "TI", "Excel" or "Nplus1"
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N: percentile method, using .25*n
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nplus1: percentile method, using .25*(n+1)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TI: TI calculator method, a mix of n and nplus1 methods
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Excel: A method based on (n-1), with some linear interpolation
+<BR>For backwards compatability, options can also just be an array of datalabels
 <BR><h3><a name="normalcdf">normalcdf</a></h3>
 normalcdf(z,[dec])
 <BR>calculates the area under the standard normal distribution to the left of the
