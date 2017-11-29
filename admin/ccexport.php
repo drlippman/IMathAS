@@ -433,7 +433,9 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n");
 						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>'."\n");
 						fwrite($fp,'<grading_type>points</grading_type>'."\n");
-						fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>'."\n");
+						if (isset($_POST['includeduedates'])) {
+							fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>'."\n");
+						}
 						fwrite($fp,'<assignment_group_identifierref>GBCAT'.$row[5].'</assignment_group_identifierref>'."\n");
 						$usedcats[$row[5]]++;
 						fwrite($fp,'<submission_types>external_tool</submission_types>'."\n");
@@ -791,7 +793,8 @@ if (isset($_GET['delete'])) {
 	echo '<p>If exporting for Canvas: <br/>';
 	echo '<input type=radio name=includeappconfig value=1 checked />Include App Configuration.<br/>';
 	echo '<input type=radio name=includeappconfig value=0 />Do not include App Configuration.  Select this option if you have site-wide credentials, ';
-	echo ' or if you are doing a second import into a course that already has a configuration</p>';
+	echo ' or if you are doing a second import into a course that already has a configuration<br/>';
+	echo '<input type=checkbox name=includeduedates value=1 checked /> Include '.Sanitize::encodeStringForDisplay($installname).' due dates</p>';
 	echo "<p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
 	echo '</form>';
 
