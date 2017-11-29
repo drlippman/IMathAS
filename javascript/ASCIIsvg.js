@@ -67,6 +67,7 @@ var xmin, xmax, ymin, ymax, xscl, yscl,
     xgrid, ygrid, xtick, ytick, initialized;
 var isOldIE = document.createElementNS==null;
 var picture, svgpicture, doc, width, height, a, b, c, d, i, n, p, t, x, y;
+var ASgraphidcnt = 0;
 
 function chop(x,n) {
   if (n==null) n=0;
@@ -190,8 +191,6 @@ function switchTo(id) {
     svgpicture = picture.getSVGDocument().getElementById("root");
     doc = picture.getSVGDocument();
   } else {
-    picture.setAttribute("onmousemove","updateCoords"+(id.slice(id.length-1)-1)+"()");
-//alert(picture.getAttribute("onmousemove")+"***");
     svgpicture = picture;
     doc = document;
   }
@@ -985,7 +984,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 function slopefield(fun,dx,dy) {
   var g = fun;
   if (typeof fun=="string")
-    eval("g = function(x,y){ with(Math) return "+mathjs(fun)+" }");
+    eval("g = function(x,y){ with(Math) return "+mathjs(fun,"x|y")+" }");
   var gxy,x,y,u,v,dz;
   if (dx==null) dx=1;
   if (dy==null) dy=1;
@@ -1112,9 +1111,18 @@ function parseShortScript(sscript,gw,gh) {
 		try {
 			eval(commands);
 		} catch (e) {
-			setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
-			//console.log("Graph not ready");
-			//alert("Graph not ready");
+			if (picture.hasAttribute("data-failedrenders")) {
+				var fails = picture.getAttribute("data-failedrenders");
+				if (fails>3) {
+					return commands;
+				} else {
+					picture.setAttribute("data-failedrenders",fails+1);
+				}
+			} else {
+				picture.setAttribute("data-failedrenders",1);
+			}
+			var tofixid = picture.getAttribute("id");
+			setTimeout(function() {switchTo(tofixid);parseShortScript(sscript,gw,gh)},100);
 		}
 
 
@@ -1156,6 +1164,10 @@ function drawPics() {
 	var sscr, src;
   for (index = len-1; index >=0; index--) {
 	  picture = pictures[index];
+	  if (!picture.hasAttribute("id") || picture.getAttribute("id")=="") {
+	  	  picture.setAttribute("id", "ASnewid"+ASgraphidcnt);
+	  	  ASgraphidcnt++;
+	  }
 	  if (!ASnoSVG) {
 		  initialized = false;
 		  sscr = picture.hasAttribute("data-sscr")?picture.getAttribute("data-sscr"):picture.getAttribute("sscr");
@@ -1191,10 +1203,10 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
   var f = function(x) { return x }, g = fun;
   var name = null;
   if (typeof fun=="string")
-    eval("g = function(x){ with(Math) return "+mathjs(fun)+" }");
+    eval("g = function(x){ with(Math) return "+mathjs(fun,"x")+" }");
   else if (typeof fun=="object") {
-    eval("f = function(t){ with(Math) return "+mathjs(fun[0])+" }");
-    eval("g = function(t){ with(Math) return "+mathjs(fun[1])+" }");
+    eval("f = function(t){ with(Math) return "+mathjs(fun[0],"t")+" }");
+    eval("g = function(t){ with(Math) return "+mathjs(fun[1],"t")+" }");
   }
   if (typeof x_min=="string") { name = x_min; x_min = xmin }
   else name = id;
@@ -1238,49 +1250,6 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
 }
 
 //end ASCIIsvgAddon.js dump
-
-
-function updateCoords(ind) {
-  switchTo("picture"+(ind+1));
-  var gx=getX(), gy=getY();
-  if ((xmax-gx)*xunitlength > 6*fontsize || (gy-ymin)*yunitlength > 2*fontsize)
-    text([xmax,ymin],"("+gx.toFixed(2)+", "+gy.toFixed(2)+")",
-         "aboveleft","AScoord"+ind,"");
-  else text([xmax,ymin]," ","aboveleft","AScoord"+ind,"");
-}
-
-
-function updateCoords0() {updateCoords(0)}
-function updateCoords1() {updateCoords(1)}
-function updateCoords2() {updateCoords(2)}
-function updateCoords3() {updateCoords(3)}
-function updateCoords4() {updateCoords(4)}
-function updateCoords5() {updateCoords(5)}
-function updateCoords6() {updateCoords(6)}
-function updateCoords7() {updateCoords(7)}
-function updateCoords8() {updateCoords(8)}
-function updateCoords9() {updateCoords(9)}
-ASfn = [function() {updatePicture(0)},
-  function() {updatePicture(1)},
-  function() {updatePicture(2)},
-  function() {updatePicture(3)},
-  function() {updatePicture(4)},
-  function() {updatePicture(5)},
-  function() {updatePicture(6)},
-  function() {updatePicture(7)},
-
-  function() {updatePicture(8)},
-  function() {updatePicture(9)}];
-ASupdateCoords = [function() {updateCoords(0)},
-  function() {updateCoords(1)},
-  function() {updateCoords(2)},
-  function() {updateCoords(3)},
-  function() {updateCoords(4)},
-  function() {updateCoords(5)},
-  function() {updateCoords(6)},
-  function() {updateCoords(7)},
-  function() {updateCoords(8)},
-  function() {updateCoords(9)}];
 
 
 $(function() {
