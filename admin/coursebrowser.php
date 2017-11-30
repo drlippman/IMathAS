@@ -32,21 +32,23 @@ if (isset($_GET['embedded'])) {
 /*** Utility functions ***/
 function getCourseBrowserJSON() {
   global $DBH, $browserprops, $groupid;
-  $stm = $DBH->query("SELECT ic.id,ic.jsondata,iu.FirstName,iu.LastName,ig.name,ic.istemplate,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE (ic.istemplate&16)=16");
+  $stm = $DBH->query("SELECT ic.id,ic.name,ic.jsondata,iu.FirstName,iu.LastName,ig.name AS groupname,ic.istemplate,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE (ic.istemplate&19)>0");
   $courseinfo = array();
   while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $jsondata = json_decode($row['jsondata'], true);
     if (!isset($jsondata['browser'])) {
-      continue;
+      $jsondata['browser'] = array();
     }
     
     $jsondata['browser']['id'] = $row['id'];
-    $jsondata['browser']['owner'] = $row['FirstName'].' '. $row['LastName']. ' ('.$row['name'].')';
-    //TODO:  Add termsurl if set
-    
-    if (($row['istemplate']&1)==1 && $row['groupid']==$groupid) { //group template for user's group
+    $jsondata['browser']['owner'] = $row['FirstName'].' '. $row['LastName']. ' ('.$row['groupname'].')';
+     if (!isset($jsondata['browser']['name'])) {
+    	    $jsondata['browser']['name'] = $row['name'];
+    }
+   
+    if (($row['istemplate']&2)==2 && $row['groupid']==$groupid) { //group template for user's group
     	$jsondata['browser']['coursetype'] = 0;	    
-    } else if (($row['istemplate']&2)==2) { //global template
+    } else if (($row['istemplate']&1)==1) { //global template
     	$jsondata['browser']['coursetype'] = 1;	        
     } else {
     	$jsondata['browser']['coursetype'] = 2;	        
