@@ -84,6 +84,13 @@ function getCourseBrowserJSON() {
   ksort($sortby);
   usort($courseinfo, function($a,$b) use ($sortby) {
   	foreach ($sortby as $sortinf) {
+  		if ($sortinf['prop']=='id' && $a['coursetype']<2) {
+  			$sortinf['prop'] = 'name';
+  			$sortinf['asc'] = 1;
+  		}
+  		if (!isset($a[$sortinf['prop']]) || !isset($b[$sortinf['prop']])) {
+  			continue;
+  		}
   		$aval = $a[$sortinf['prop']];
   		$bval = $b[$sortinf['prop']];
   		if (isset($sortinf['ref'])) {
