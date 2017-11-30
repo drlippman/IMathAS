@@ -1,0 +1,171 @@
+body {
+	font-family: "Trebuchet MS", "Arial", "Helvetica", sans-serif;
+	font-size: 90%;
+}
+.fade-enter-active {
+  transition: all 0.2s ease-out;
+}
+.fade-leave-active {
+  transition: all 0.1s ease-out;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+.fade-leave-active {
+	position: absolute;
+	z-index: 0;
+}
+.fade-move {
+	transition: transform .2s;
+}
+.card-deck {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+.card {
+   display: inline-block;
+   display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 1200px) {
+	.card {
+		width: 50%;
+	}
+}
+.card-body {
+	display: flex;
+	flex-direction: column;
+	margin: 0px 5px;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+}
+.card-main {
+	padding: .7rem;
+	flex: 1 1 auto;
+}
+.card-header {
+	border-radius: .25rem .25rem 0 0;
+	padding: .5rem;
+	color: #fff;
+}
+.course-type-marker {
+	float: right;
+	color: #fffecc;
+	font-size: 90%;
+	margin-left: 1rem;
+}
+.card-footer {
+	text-align: right;
+}
+.card-footer button {
+	padding: 5px 8px;
+	min-width: 30%;
+	height: auto;
+}
+.card-header.coursetype0 {
+	background-color: #060;	
+}
+.card-header.coursetype2 {
+	background-color: #680082; 	
+}
+.card-header.coursetype2 {
+	background-color: #006;
+}
+.card-body h4 {
+	margin-top: 0;
+	margin-bottom: .7em;
+}
+.filterwrap {
+	position: absolute;
+	top: 120%;
+	left: 0;
+	z-index: 2;
+	float: left;
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	border: 1px solid #ccc;
+	background-color: #f3f3f3;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+	padding: 5px 0;
+}
+.filterwrap li {
+	margin: 0;
+	padding: 0;
+	
+}
+.filterwrap label, .filterwrap span {
+	display: block;
+	clear: both;
+	line-height: 1.4;
+	white-space: nowrap;
+	padding: 1px 8px;
+}
+.filterwrap span.optgrplabel {
+	background-color: #ddd;	
+}
+.filterwrap label:hover {
+	background-color: #fefefe;
+}
+.dropdown-wrap {
+	position: relative;
+}
+
+.arrow-down {
+	display: inline-block;
+	margin-bottom: 2px;
+	width: 0; 
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	transition: transform .2s;
+	border-top: 5px solid black;
+}
+
+.rotated {
+	transform: rotate(-180deg);
+}
+.pre-line {
+	white-space: pre-line;
+	background-color: #f7f7f7;
+	border: 1px solid #eee;
+	border-radius: .25rem;
+	margin: 5px 0px;
+	padding: 5px;
+}
+table.proplist {
+	border-collapse: collapse;
+	font-size: 90%;
+}
+table.proplist th {
+	text-align: right;
+	font-weight: normal;
+	vertical-align: top;
+	padding-right: 10px;
+	padding-bottom: 5px;
+}
+table.proplist td {
+	text-align: left
+	font-weight: normal;
+	vertical-align: top;
+}
+ul.nomark {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+ul.nomark {
+	text-indent: -1em;
+	padding-left: 1em;
+}
+[v-cloak] {
+	display:none;
+}

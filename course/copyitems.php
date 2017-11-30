@@ -488,12 +488,13 @@ if (!(isset($teacherid))) {
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 			$items = false;
 
-			$stm = $DBH->prepare("SELECT id,itemorder,picicons FROM imas_courses WHERE id IN (?,?)");
+			$stm = $DBH->prepare("SELECT id,itemorder,picicons,name FROM imas_courses WHERE id IN (?,?)");
 			$stm->execute(array($_POST['ctc'], $cid));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['id']==$_POST['ctc']) {
 					$items = unserialize($row['itemorder']);
 					$picicons = $row['picicons'];
+					$ctcname = $row['name'];
 				}
 				if ($row['id']==$cid) {
 					$existblocks = array();
@@ -504,7 +505,7 @@ if (!(isset($teacherid))) {
 				echo 'Error with course to copy';
 				exit;
 			}
-
+			
 			$ids = array();
 			$types = array();
 			$names = array();
@@ -664,6 +665,9 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	$(function() {
 		$("input:radio").change(function() {
+			if ($(this).attr("id")!="coursebrowserctc") {
+				$("#coursebrowserout").hide();
+			}
 			if ($(this).hasClass("copyr")) {
 				$("#ekeybox").show();
 			} else {
@@ -678,6 +682,21 @@ $placeinhead .= '<script type="text/javascript">
 			}
 		});
 	});
+	function showCourseBrowser() {
+		GB_show("Course Browser","../admin/coursebrowser.php?embedded=true",800,"auto");
+	}
+	function setCourse(course) {
+		$("#coursebrowserctc").val(course.id).prop("checked",true);
+		$("#templatename").text(course.name);
+		$("#coursebrowserout").show();
+		if (course.termsurl && course.termsurl != "") {
+			$("#termsbox").show(); $("#termsurl").attr("href",course.termsurl);
+		} else {
+			$("#termsbox").hide();
+			$("form").submit();
+		}
+		GB_hide();
+	}
 		</script>';
 require("../header.php");
 }
@@ -745,7 +764,8 @@ if ($overwriteBody==1) {
 	  }
 	}
 	</script>
-
+	<p>Copying course: <b><?php echo Sanitize::encodeStringForDisplay($ctcname);?></b></p>
+	
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
 	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($_POST['ctc']); ?>">
@@ -972,7 +992,26 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	<h4>Select a course to copy items from</h4>
 
 	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=select">
-		Course List
+<?php
+	if (isset($CFG['coursebrowser'])) {
+		//use the course browser
+		echo '<p>';
+		if (isset($CFG['coursebrowsermsg'])) {
+			echo $CFG['coursebrowsermsg'];
+		} else {
+			echo _('Copy a template or promoted course');
+		}
+		echo ' <button type="button" onclick="showCourseBrowser()">'._('Browse Courses').'</button>';
+		echo '<span id="coursebrowserout" style="display:none"><br/>';
+		echo '<input type=radio name=ctc value=0 id=coursebrowserctc /> ';
+		echo '<span id=templatename></span>';
+		echo '</span>';
+		echo '</p>';
+		echo '<p>'._('Or, select from the course list below').'</p>';		
+	} else {
+		echo '<p>'._('Course List').'</p>';
+	}
+?>	
 		<ul class=base>
 			<li><span class=dd>-</span>
 				<input type=radio name=ctc value="<?php echo $cid ?>" checked=1>This Course</li>
@@ -1065,7 +1104,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 
 //template courses
 		//DB if (mysql_num_rows($courseTemplateResults)>0) {
-		if ($courseTemplateResults->rowCount()>0) {
+		if ($courseTemplateResults->rowCount()>0 && !isset($CFG['coursebrowser'])) {
 ?>
 		<li class=lihdr>
 			<span class=dd>-</span>
@@ -1093,7 +1132,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 			echo "			</ul>\n		</li>\n";
 		}
 		//DB if (mysql_num_rows($groupTemplateResults)>0) {
-		if ($groupTemplateResults->rowCount()>0) {
+		if ($groupTemplateResults->rowCount()>0 && !isset($CFG['coursebrowser'])) {
 ?>
 		<li class=lihdr>
 			<span class=dd>-</span>

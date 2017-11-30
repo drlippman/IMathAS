@@ -1,0 +1,125 @@
+var courseBrowserProps = {
+	"meta": {
+		"fixed": true,
+		"courseTypes": {
+			"0": "Group Template Course",
+			"1": "Template Course",
+			"2": "Contributed Course"
+		}
+	},
+	"id": {
+		"fixed": true,
+		"sortby": -2
+	}, 
+	"name": {
+		"name": "Display Name",
+		"type": "string",
+		"required": true
+	},
+	"owner": {
+		"name": "Contributed by",
+		"type": "string",
+		"fixed": true
+	},
+	"level": {
+		"name": "Level",
+		"options": {
+			"arith": "Arithmetic",
+			"prealg": "Prealgebra",
+			"elemalg": "Elementary Algebra",
+			"intalg": "Intermediate Algebra",
+			"mathlit": "Non-STEM Algebra / Math Literacy",
+			"colalg": "College Algebra",
+			"trig": "Trigonometry",
+			"precalc": "Precalculus",
+			"calc": "Calculus",
+			"qr": "Math for Liberal Arts / Quantitative Reasoning",
+			"stats": "Statistics",
+			"linalg": "Linear Algebra",
+			"diffeq": "Differential Equations",
+			"other": "Other"
+		},
+		"sortby": 1
+	},
+	"book": {
+		"name": "Primary textbook",
+		"options": {
+			"group1": "Arithmetic / Prealgebra",
+			"lmarith": "Arithmetic, MITE/Lippman",
+			"sccarith": "Basic Arithmetic Student Workbook, Scottsdale CC",
+			"crprea": "Prealgebra, College of the Redwoods",
+			"milprea": "Prealgebra, Milano",
+			"osprea": "Prealgebra, OpenStax/Marecek/Anthony-Smith",
+			"group2": "Intro / Intermediate Algebra",
+			"sccbega": "Introductory Algebra, Scottsdale CC",
+			"ckbega": "Beginning Algebra, CK12/Sousa",
+			"osbega": "Elementary Algebra, OpenStax/Marecek/Anthony-Smith",
+			"crbega": "Elementary Algebra, College of the Redwoods",
+			"wa": "Beginning and Intermediate Algebra, Wallace",
+			"osia": "Intermediate Algebra, OpenStax/Maracek",
+			"sccia": "Intermediate Algebra, Scottsdale CC",
+			"cria": "Intermediate Algebra, College of the Redwoods",
+			"group3": "College Algebra / Precalc / Trig",
+			"szcola": "College Algebra, Stitz/Zeager",
+			"oscola": "College Algebra, OpenStax",
+			"oscolat": "College Algebra + Trig, OpenStax",
+			"lrprec": "Precalculus, Lippman/Rasmussen",
+			"szprec": "Precalculus, Stitz/Zeager",
+			"osprec": "Precalculus, OpenStax",
+			"group4": "Calculus",
+			"dhcalc": "Contemporary Calculus, Hoffman",
+			"dgcalc": "Community Calculus, Guichard/et al",
+			"apcalc": "APEX Calculus, Hartman/et al",
+			"accalc": "Active Calculus, Boalkins",
+			"oscalc": "Calculus, OpenStax/Strang/Herman",
+			"group5": "Math for Liberal Arts / QR",
+			"lqr": "Math in Society, Lippman",
+			"iqr": "College Mathematics for Everyday Life, Inigo/et al",
+			"group6": "Statistics",
+			"oist": "OpenIntro Statistics, Diaz/Barr/Cetinkaya-Rundel", 
+			"kkst": "Statistics Using Technology, Kozak",
+			"pkst": "Foundations in Statistical Reasoning, Kaslik",
+			"osst": "Introductory Statistics, OpenStax",
+			"group7": "Business Math",
+			"lbusprec": "Business Precalculus, Lippman", 
+			"chlbuscalc": "Applied Calculus, Calaway/Hoffman/Lippman",
+			"group8": "After Calculus",
+			"jflina": "Linear Algebra, Hefferon",
+			"rblina": "First Course in Linear Algebra, Beezer",
+			"wtdiff": "Elementary Differential Equations, Trench",
+			"group9": "Other",
+			"other": "Other"
+		}
+	},
+	"mode": {
+		"name": "Modality",
+		"options": {
+			"generic": "Generic, nonspecific",
+			"f2f": "Classroom instruction",
+			"hybrid": "Hybrid",
+			"online": "Fully online",
+			"lab": "Emporium"
+		}
+	},
+	"contents": {
+		"name": "Contents",
+		"options": {
+			"FA1": "Formative Assessments (homework, ~1 per week or chapter)",
+			"FA2": "Formative Assessments (homework, ~1 per day or section)",
+			"SA": "Summative Assessments (online quizzes or exams)",
+			"V": "Video lists or video lessons",
+			"B": "Textbook files or links",
+			"PP": "PowerPoint slides",
+			"WS": "Worksheets or activities",
+			"PA": "Sample paper assessments",
+			"I": "Instructor planning resources"
+		},
+		"multi": true
+	},
+	"descrip": {
+		"name": "Description",
+		"subname": "Describe the topics covered, the approach, and what makes this course unique",
+		"type": "textarea",
+		"required": true
+	}
+}

@@ -432,10 +432,50 @@ switch($_POST['action']) {
 			}
 		}
 
+		if (isset($_POST['promote']) && isset($_GET['id'])) {
+			$browserprops = json_decode(file_get_contents(__DIR__.'/../javascript/'.$CFG['coursebrowser'], false, null, 25), true);
+
+			$isok = ($copyrights>1);
+			$stm = $DBH->prepare("SELECT jsondata FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$jsondata = json_decode($stm->fetchColumn(0), true);
+			if ($jsondata===null) {
+				$jsondata = array();
+			}
+
+			$browserdata = array();
+			foreach ($browserprops as $propname=>$propvals) {
+				if (!empty($propvals['required']) && trim($_POST['browser'.$propname]) == '') {
+					$isok = false;
+					break;
+				}
+				if (!empty($propvals['multi'])) { //multiple values
+					if (isset($_POST['browser'.$propname])) {
+						$browserdata[$propname] = array_map('Sanitize::simpleString', $_POST['browser'.$propname]);
+					} else {
+						$browserdata[$propname] = array();
+					}
+				} else { //single val
+					$browserdata[$propname] = Sanitize::stripHtmlTags($_POST['browser'.$propname]);
+				}
+				if ($_POST['browser'.$propname]=='other') {
+					$browserdata[$propname.'other'] = Sanitize::stripHtmlTags($_POST['browser'.$propname.'other']);
+				}
+			}
+
+			if ($isok) {
+				$istemplate += 16;
+				$jsondata['browser'] = $browserdata;
+			}
+		}
+
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 
 		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,hideicons=:hideicons,available=:available,lockaid=:lockaid,picicons=:picicons,showlatepass=:showlatepass,";
+			if (($istemplate&16)==16) {
+				$query .= "jsondata=:jsondata,";
+			}
 			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass WHERE id=:id";
 			$qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
 				':picicons'=>$picicons, ':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset,
@@ -444,6 +484,9 @@ switch($_POST['action']) {
 			if ($myrights<75) {
 				$query .= " AND ownerid=:ownerid";
 				$qarr[':ownerid']=$userid;
+			}
+			if (($istemplate&16)==16) {
+				$qarr[':jsondata'] = json_encode($jsondata);
 			}
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);

@@ -657,7 +657,7 @@ function rotateimg(el) {
 
 jQuery(document).ready(function($) {
 	$(window).on("message", function(e) {
-		if (e.originalEvent.data.match(/lti\.frameResize/)) {
+		if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/lti\.frameResize/)) {
 			var edata = JSON.parse(e.originalEvent.data);
 			var frames = document.getElementsByTagName('iframe');
 			for (var i = 0; i < frames.length; i++) {
