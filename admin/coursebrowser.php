@@ -32,7 +32,11 @@ if (isset($_GET['embedded'])) {
 /*** Utility functions ***/
 function getCourseBrowserJSON() {
   global $DBH, $browserprops, $groupid;
-  $stm = $DBH->query("SELECT ic.id,ic.name,ic.jsondata,iu.FirstName,iu.LastName,ig.name AS groupname,ic.istemplate,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE (ic.istemplate&19)>0");
+  $query = "SELECT ic.id,ic.name,ic.jsondata,iu.FirstName,iu.LastName,ig.name AS groupname,ic.istemplate,iu.groupid ";
+  $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id ";
+  $query .= "WHERE ((ic.istemplate&17)>0 OR ((ic.istemplate&2)>0 AND iu.groupid=?))";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array($groupid));
   $courseinfo = array();
   while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $jsondata = json_decode($row['jsondata'], true);
