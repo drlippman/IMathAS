@@ -923,8 +923,11 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES ".implode(',',$ins));
 			$stm->execute($insval);
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=" .Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
-		exit;
+		if (!isset($_POST['addandclose'])) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=" .Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
+			exit;
+		}
+		break;
 	case "importmacros":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
 		$uploaddir = rtrim(dirname("../config.php"), '/\\') .'/assessment/libs/';

@@ -835,8 +835,9 @@ switch($_GET['action']) {
 			}
 		}
 		echo "</table>\n";
-		echo '<p>With Selected: <input type="submit" value="Add as Teacher"/></p></form>';
-		echo '<p><a href="'.$backloc.'">Done</a></p>';
+		echo '<p>With Selected: <button type="submit" name="addandclose" value="close">Add as Teacher and Close</button> ';
+		echo "<input type=button class=\"secondarybtn\" value=\"Nevermind\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\" />";
+		echo '</p></form>';
 		break;
 	case "importmacros":
 		echo "<h3>Install Macro File</h3>\n";
