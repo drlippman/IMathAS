@@ -234,28 +234,28 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	//pack options
 
-	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
-	if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
-	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $options['answerformat'] = $answerformat;}
-	if (isset($questions)) {$options['questions'] = $questions;}
-	if (isset($answers)) {$options['answers'] = $answers;}
-	if (isset($answer)) {$options['answer'] = $answer;}
-	if (isset($questiontitle)) {$options['questiontitle'] = $questiontitle;}
-	if (isset($answertitle)) {$options['answertitle'] = $answertitle;}
-	if (isset($answersize)) {$options['answersize'] = $answersize;}
-	if (isset($variables)) {$options['variables'] = $variables;}
-	if (isset($strflags)) {$options['strflags'] = $strflags;}
-	if (isset($domain)) {$options['domain'] = $domain;}
-	if (isset($answerboxsize)) {$options['answerboxsize'] = $answerboxsize;}
-	if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
-	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
-	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
-	if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
-	if (isset($reqsigfigs)) {$options['reqsigfigs'] = $reqsigfigs;}
-	if (isset($grid)) {$options['grid'] = $grid;}
-	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
-	if (isset($background)) {$options['background'] = $background;}
-	if (isset($scoremethod)) {$options['scoremethod'] = $scoremethod;}
+	if (isset($ansprompt)) {$optionsPack['ansprompt'] = $ansprompt;}
+	if (isset($displayformat)) {$optionsPack['displayformat'] = $displayformat;}
+	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $optionsPack['answerformat'] = $answerformat;}
+	if (isset($questions)) {$optionsPack['questions'] = $questions;}
+	if (isset($answers)) {$optionsPack['answers'] = $answers;}
+	if (isset($answer)) {$optionsPack['answer'] = $answer;}
+	if (isset($questiontitle)) {$optionsPack['questiontitle'] = $questiontitle;}
+	if (isset($answertitle)) {$optionsPack['answertitle'] = $answertitle;}
+	if (isset($answersize)) {$optionsPack['answersize'] = $answersize;}
+	if (isset($variables)) {$optionsPack['variables'] = $variables;}
+	if (isset($strflags)) {$optionsPack['strflags'] = $strflags;}
+	if (isset($domain)) {$optionsPack['domain'] = $domain;}
+	if (isset($answerboxsize)) {$optionsPack['answerboxsize'] = $answerboxsize;}
+	if (isset($hidepreview)) {$optionsPack['hidepreview'] = $hidepreview;}
+	if (isset($matchlist)) {$optionsPack['matchlist'] = $matchlist;}
+	if (isset($noshuffle)) {$optionsPack['noshuffle'] = $noshuffle;}
+	if (isset($reqdecimals)) {$optionsPack['reqdecimals'] = $reqdecimals;}
+	if (isset($reqsigfigs)) {$optionsPack['reqsigfigs'] = $reqsigfigs;}
+	if (isset($grid)) {$optionsPack['grid'] = $grid;}
+	if (isset($snaptogrid)) {$optionsPack['snaptogrid'] = $snaptogrid;}
+	if (isset($background)) {$optionsPack['background'] = $background;}
+	if (isset($scoremethod)) {$optionsPack['scoremethod'] = $scoremethod;}
 
 	if (isset($GLOBALS['nocolormark'])) {  //no colors
 		$qcolors = array();
@@ -289,11 +289,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 		foreach ($anstypes as $kidx=>$anstype) {
 			$qcol = ($qdata['qtype']=="multipart" && isset($qcolors[$kidx]))?(is_numeric($qcolors[$kidx])?rawscoretocolor(Sanitize::encodeStringForDisplay($qcolors[$kidx]),$answeights[$kidx]):Sanitize::encodeStringForDisplay($qcolors[$kidx])):'';
-			list($answerbox[$kidx],$entryTips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
+			list($answerbox[$kidx],$entryTips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$optionsPack,$qnidx+1,$qcol);
 		}
 	} else {
 		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor(Sanitize::encodeStringForDisplay($qcolors[0]),1):Sanitize::encodeStringForDisplay($qcolors[0])):'';
-		list($answerbox,$entryTips[0],$shanspt[0],$previewloc) = makeanswerbox(Sanitize::simpleString($qdata['qtype']),$qnidx,$la,$options,0,$qcol);
+		list($answerbox,$entryTips[0],$shanspt[0],$previewloc) = makeanswerbox(Sanitize::simpleString($qdata['qtype']),$qnidx,$la,$optionsPack,0,$qcol);
 	}
 	if ($qdata['qtype']=='conditional') {
 		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor(Sanitize::encodeStringForDisplay($qcolors[0]),1):Sanitize::encodeStringForDisplay($qcolors[0])):'';
@@ -899,28 +899,28 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 
 	$RND->srand($seed+2);
 	//pack options from eval
-	if (isset($answer)) {$options['answer'] = $answer;}
-	if (isset($reltolerance)) {$options['reltolerance'] = $reltolerance;}
-	if (isset($abstolerance)) {$options['abstolerance'] = $abstolerance;}
-	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $options['answerformat'] = $answerformat;}
-	if (isset($questions)) {$options['questions'] = $questions;}
-	if (isset($answers)) {$options['answers'] = $answers;}
-	if (isset($answersize)) {$options['answersize'] = $answersize;}
-	if (isset($variables)) {$options['variables'] = $variables;}
-	if (isset($domain)) {$options['domain'] = $domain;}
-	if (isset($requiretimes)) {$options['requiretimes'] = $requiretimes;}
-	if (isset($requiretimeslistpart)) {$options['requiretimeslistpart'] = $requiretimeslistpart;}
-	if (isset($scoremethod)) {$options['scoremethod'] = $scoremethod;}
-	if (isset($strflags)) {$options['strflags'] = $strflags;}
-	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
-	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
-	if (isset($reqsigfigs)) {$options['reqsigfigs'] = $reqsigfigs;}
-	if (isset($grid)) {$options['grid'] = $grid;}
-	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
-	if (isset($partweights)) {$options['partweights'] = $partweights;}
-	if (isset($partialcredit)) {$options['partialcredit'] = $partialcredit;}
-	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
-	if (isset($anstypes)) {$options['anstypes'] = $anstypes;}
+	if (isset($answer)) {$optionsPack['answer'] = $answer;}
+	if (isset($reltolerance)) {$optionsPack['reltolerance'] = $reltolerance;}
+	if (isset($abstolerance)) {$optionsPack['abstolerance'] = $abstolerance;}
+	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $optionsPack['answerformat'] = $answerformat;}
+	if (isset($questions)) {$optionsPack['questions'] = $questions;}
+	if (isset($answers)) {$optionsPack['answers'] = $answers;}
+	if (isset($answersize)) {$optionsPack['answersize'] = $answersize;}
+	if (isset($variables)) {$optionsPack['variables'] = $variables;}
+	if (isset($domain)) {$optionsPack['domain'] = $domain;}
+	if (isset($requiretimes)) {$optionsPack['requiretimes'] = $requiretimes;}
+	if (isset($requiretimeslistpart)) {$optionsPack['requiretimeslistpart'] = $requiretimeslistpart;}
+	if (isset($scoremethod)) {$optionsPack['scoremethod'] = $scoremethod;}
+	if (isset($strflags)) {$optionsPack['strflags'] = $strflags;}
+	if (isset($matchlist)) {$optionsPack['matchlist'] = $matchlist;}
+	if (isset($noshuffle)) {$optionsPack['noshuffle'] = $noshuffle;}
+	if (isset($reqsigfigs)) {$optionsPack['reqsigfigs'] = $reqsigfigs;}
+	if (isset($grid)) {$optionsPack['grid'] = $grid;}
+	if (isset($snaptogrid)) {$optionsPack['snaptogrid'] = $snaptogrid;}
+	if (isset($partweights)) {$optionsPack['partweights'] = $partweights;}
+	if (isset($partialcredit)) {$optionsPack['partialcredit'] = $partialcredit;}
+	if (isset($ansprompt)) {$optionsPack['ansprompt'] = $ansprompt;}
+	if (isset($anstypes)) {$optionsPack['anstypes'] = $anstypes;}
 
 	$score = 0;
 	if ($qdata['qtype']=="multipart") {
@@ -950,7 +950,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		$scores = array();  $raw = array(); $accpts = 0;
 		foreach ($anstypes as $kidx=>$anstype) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
-			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn".Sanitize::onlyInt($partnum)],$options,$qnidx+1);
+			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn".Sanitize::onlyInt($partnum)],$optionsPack,$qnidx+1);
 			if (isset($scoremethod) && $scoremethod=='acct') {
 				if (($anstype=='string' || $anstype=='number') && $answer[$kidx]==='') {
 					$scores[$kidx] = $raw[$kidx]-1;  //0 if correct, -1 if wrong
@@ -985,7 +985,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			return array(implode('~',$scores),implode('~',$raw));
 		}
 	} else {
-		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$options,0);
+		$score = scorepart($qdata['qtype'],$qnidx,$givenans,$optionsPack,0);
 		if (isset($scoremethod) && $scoremethod == "allornothing") {
 			if ($score<.98) {$score=0;}
 		}
