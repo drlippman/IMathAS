@@ -588,6 +588,12 @@ switch($_GET['action']) {
 			if (empty($browser['name'])) {
 				$browser['name'] = trim($name);
 			}
+			if (empty($browser['owner'])) {
+				$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
+				$stm->execute(array(':id'=>$userid));
+				$uinf = $stm->fetch(PDO::FETCH_ASSOC);
+				$browser['owner'] = $uinf['FirstName'].' '.$uinf['LastName'].' ('.$uinf['name'].')'; 
+			}
 
 			foreach ($browserprops as $propname=>$propvals) {
 				if (!empty($propvals['fixed'])) { continue; }
@@ -599,6 +605,9 @@ switch($_GET['action']) {
 				echo '<span class=formright>';
 				if (isset($propvals['options'])) {  //is select
 					if (!empty($propvals['multi'])) { //checkboxes
+						if (isset($browser[$propname]) && !is_array($browser[$propname])) {
+							$browser[$propname] = array($browser[$propname]);
+						}
 						foreach ($propvals['options'] as $k=>$v) {
 							echo '<label><input type=checkbox name="browser'.$propname.'[]" value="'. Sanitize::encodeStringForDisplay($k).'" ';
 							echo ((isset($browser[$propname]) && in_array($k,$browser[$propname]))?'checked':'').' /> '.Sanitize::encodeStringForDisplay($v).'</label><br/>';

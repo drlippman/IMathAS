@@ -45,7 +45,9 @@ function getCourseBrowserJSON() {
     }
     
     $jsondata['browser']['id'] = $row['id'];
-    $jsondata['browser']['owner'] = $row['FirstName'].' '. $row['LastName']. ' ('.$row['groupname'].')';
+    if (empty($jsondata['browser']['owner'])) {
+    	    $jsondata['browser']['owner'] = $row['FirstName'].' '. $row['LastName']. ' ('.$row['groupname'].')';
+    }
      if (!isset($jsondata['browser']['name'])) {
     	    $jsondata['browser']['name'] = $row['name'];
     }
@@ -92,7 +94,9 @@ function getCourseBrowserJSON() {
   			continue;
   		}
   		$aval = $a[$sortinf['prop']];
+  		if (is_array($aval)) { $aval = $aval[0];}
   		$bval = $b[$sortinf['prop']];
+  		if (is_array($bval)) { $bval = $bval[0];}
   		if (isset($sortinf['ref'])) {
   			if ($sortinf['ref'][$aval] != $sortinf['ref'][$bval]) {
   				return (($sortinf['ref'][$aval] < $sortinf['ref'][$bval])? -1 : 1)*($sortinf['asc']?1:-1);
@@ -114,7 +118,7 @@ $placeinhead = '<script type="text/javascript">';
 $placeinhead .= 'var courses = '.getCourseBrowserJSON().';';
 $placeinhead .= 'var courseBrowserAction = "'.Sanitize::simpleString($action).'";';
 $placeinhead .= '</script>';
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.js"></script>
+$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>
 <script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
 <link rel="stylesheet" href="coursebrowser.css" type="text/css" />';
 
@@ -128,7 +132,7 @@ if (!isset($_GET['embedded'])) {
 }
 ?>
 <div id="app" v-cloak>
-<div>Filter results: 
+<div <?php if (isset($_GET['embedded'])) {echo 'id="fixedfilters"';}?>>Filter results: 
 <span v-for="propname in propsToFilter" class="dropdown-wrap">
 	<button @click="showFilter = (showFilter==propname)?'':propname">
 		{{ courseBrowserProps[propname].name }} {{ catprops[propname].length > 0 ? '('+catprops[propname].length+')': '' }}
@@ -136,10 +140,10 @@ if (!isset($_GET['embedded'])) {
 	</button>
 	<transition name="fade" @enter="adjustpos">
 		<ul v-if="showFilter == propname" class="filterwrap">
-			<li v-if="courseBrowserProps[propname].multi">
+			<li v-if="courseBrowserProps[propname].hasall">
 				<span>Show courses that contain <i>all</i> of:</span>
 			</li>
-			<li v-if="!courseBrowserProps[propname].multi">
+			<li v-if="!courseBrowserProps[propname].hasall">
 				<span>Show courses that contain <i>any</i> of:</span>
 			</li>
 			<li v-for="(longname,propval) in courseBrowserProps[propname].options">
@@ -152,8 +156,7 @@ if (!isset($_GET['embedded'])) {
 </span>
 <a href="#" @click.prevent="selectedItems = []" v-if="selectedItems.length>0">Clear Filters</a>
 </div>
-<br/>
-<div style="position: relative">
+<div style="position: relative" id="card-deck-wrap">
 <transition-group name="fade" tag="div" class="card-deck">
 <div v-if="filteredCourses.length==0" key="none">No matches found</div>
 <div v-for="(course,index) in filteredCourses" :key="course.id" class="card">
@@ -290,16 +293,35 @@ new Vue({
 			for (var i=0; i<courses.length; i++) {
 				includeCourse = true;
 				for (prop in this.courseBrowserProps) {
-					if (!this.courseBrowserProps[prop].many && this.catprops[prop].length>0 &&
-					    this.catprops[prop].indexOf(courses[i][prop])==-1) {
+					if (this.catprops[prop].length==0) {
+						//no filters selected, skip it
+						continue;
+					} else if (!courses[i][prop]) {
+						//if prop selected, but course doesn't contain it
 						includeCourse = false;
 						break;
-					} else if (this.courseBrowserProps[prop].many && this.catprops[prop].length>0 &&
-					   !this.catprops[prop].every(function(v) {
-						return courses[i][prop].indexOf(v) >= 0;	
-					   })) {
-						includeCourse = false;
-						break;
+					} else if (this.courseBrowserProps[prop].hasall) {
+						//only include if ALL selected filters are included
+						if (!this.catprops[prop].every(function(v) {
+							return courses[i][prop].indexOf(v) >= 0;	
+						})) {
+							includeCourse = false;
+							break;
+						}
+					} else if (typeof courses[i][prop] == 'object') {
+						//only include if ONE of the filter items is in course
+						if (!this.catprops[prop].some(function(v) {
+							return courses[i][prop].indexOf(v) >= 0;	
+						})) {
+							includeCourse = false;
+							break;
+						}
+					} else {
+						//only include if filter is in course
+						if (this.catprops[prop].indexOf(courses[i][prop])==-1) {
+							includeCourse = false;
+							break;
+						}
 					}
 				}
 				if (includeCourse) {

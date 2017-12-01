@@ -83,6 +83,22 @@ body {
 	margin-top: 0;
 	margin-bottom: .7em;
 }
+#fixedfilters {
+	position: fixed; 
+	top: 0; 
+	left: 0; 
+	width: 100%; 
+	z-index: 10;
+	background-color: #fff;
+	padding: 5px;
+	border-bottom: 1px solid #ccc;
+}
+#card-deck-wrap {
+	margin-top: 5px;
+}
+#fixedfilters + #card-deck-wrap {
+	margin-top: 45px;
+}
 .filterwrap {
 	position: absolute;
 	top: 120%;

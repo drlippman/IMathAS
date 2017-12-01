@@ -18,8 +18,7 @@ var courseBrowserProps = {
 	},
 	"owner": {
 		"name": "Contributed by",
-		"type": "string",
-		"fixed": true
+		"type": "string"
 	},
 	"level": {
 		"name": "Level",
@@ -39,6 +38,7 @@ var courseBrowserProps = {
 			"diffeq": "Differential Equations",
 			"other": "Other"
 		},
+		"multi": true,
 		"sortby": 1
 	},
 	"book": {
@@ -114,7 +114,8 @@ var courseBrowserProps = {
 			"PA": "Sample paper assessments",
 			"I": "Instructor planning resources"
 		},
-		"multi": true
+		"multi": true,
+		"hasall": true
 	},
 	"descrip": {
 		"name": "Description",
