@@ -1117,7 +1117,8 @@ function ASplot($function) {
 		$dx = ($xmax - $xmin)/100;
 		$stopat = 101;
 	}
-
+	$yymax = $this->ymax + $this->border[3]/$this->yunitlength;
+	$yymin = $this->ymin - $this->border[1]/$this->yunitlength;
 	$px = null;
 	$py = null;
 	$lasty = 0;
@@ -1158,24 +1159,30 @@ function ASplot($function) {
 		}*/
 		if ($py===null) { //starting line
 
-		} else if ($y>$this->ymax || $y<$this->ymin) { //going or still out of bounds
-			if ($py<=$this->ymax && $py>=$this->ymin) { //going out
-				if ($y>$this->ymax) { //going up
-					$iy = $this->ymax + min($this->border[3],5)/$this->yunitlength;
+		} else if ($y>$yymax || $y<$yymin) { //going or still out of bounds
+			if ($py <= $yymax && $py >= $yymin) { //going out
+				if ($yymax-$py < .5*($yymax-$yymin)) { //closer to top
+					$iy = $yymax;
+					//if jumping from top of graph to bottom, change value
+					//for interpolation purposes
+					if ($y<$yymin) { $y = $yymax+.5*($ymax-$ymin);}
 				} else { //going down
-					$iy = $this->ymin - min($this->border[1],5)/$this->yunitlength;
+					$iy = $yymin;
+					if ($y>$yymax) { $y = $yymin-.5*($ymax-$ymin);}
 				}
 				$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
 				$this->ASline(array("[$px,$py]","[$ix,$iy]"));
 			} else { //still out
 
 			}
-		} else if ($py>$this->ymax || $py<$this->ymin) { //coming or staying in bounds
-			if ($y<=$this->ymax && $y>=$this->ymin) { //comin in
-				if ($py>$this->ymax) { //comin from top
-					$iy = $this->ymax + min($this->border[3],5)/$this->yunitlength;
+		} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
+			if ($y <= $yymax && $y >= $yymin) { //coming in
+				if ($yymax-$y < .5*($yymax-$yymin)) { //closer to top
+					$iy = $yymax;
+					if ($py<$yymin) { $py = $yymax+.5*($ymax-$ymin);}
 				} else { //coming from bottom
-					$iy = $this->ymin - min($this->border[1],5)/$this->yunitlength;
+					$iy = $yymin;
+					if ($py>$yymax) { $py = $yymin-.5*($ymax-$ymin);}
 				}
 				$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
 				$this->ASline(array("[$ix,$iy]","[$x,$y]"));

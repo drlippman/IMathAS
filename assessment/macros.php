@@ -361,12 +361,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			if ($py===null) { //starting line
 
-			} else if ($y>$ymax || $y<$ymin) { //going or still out of bounds
-				if ($py <= $ymax && $py >= $ymin) { //going out
-					if ($y>$ymax) { //going up
-						$iy = round($ymax + 5*($ymax-$ymin)/$settings[7],$yrnd);
+			} else if ($y>$yymax || $y<$yymin) { //going or still out of bounds
+				if ($py <= $yymax && $py >= $yymin) { //going out
+					if ($yymax-$py < .5*($yymax-$yymin)) { //closer to top
+						$iy = $yymax;
+						//if jumping from top of graph to bottom, change value
+						//for interpolation purposes
+						if ($y<$yymin) { $y = $yymax+.5*($ymax-$ymin);}
 					} else { //going down
-						$iy = round($ymin - 5*($ymax-$ymin)/$settings[7],$yrnd);
+						$iy = $yymin;
+						if ($y>$yymax) { $y = $yymin-.5*($ymax-$ymin);}
 					}
 					$ix = round(($x-$px)*($iy - $py)/($y-$py) + $px,$xrnd);
 					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
@@ -375,12 +379,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				} else { //still out
 
 				}
-			} else if ($py>$ymax || $py<$ymin) { //coming or staying in bounds?
-				if ($y <= $ymax && $y >= $ymin) { //coming in
-					if ($py>$ymax) { //going up
-						$iy = round($ymax + 5*($ymax-$ymin)/$settings[7],$yrnd);
-					} else { //going down
-						$iy = round($ymin - 5*($ymax-$ymin)/$settings[7],$yrnd);
+			} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
+				if ($y <= $yymax && $y >= $yymin) { //coming in
+					if ($yymax-$y < .5*($yymax-$yymin)) { //closer to top
+						$iy = $yymax;
+						if ($py<$yymin) { $py = $yymax+.5*($ymax-$ymin);}
+					} else { //coming from bottom
+						$iy = $yymin;
+						if ($py>$yymax) { $py = $yymin-.5*($ymax-$ymin);}
 					}
 					$ix = round(($x-$px)*($iy - $py)/($y-$py) + $px,$xrnd);
 					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
