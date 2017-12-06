@@ -1634,6 +1634,7 @@ function prettysmallnumber($n) {
 }
 
 function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
+	$a = str_replace(',','',$a);
 	if ($a==0) { return 0;}
 	if ($a < 0 ) {
 		$sign = '-';
