@@ -1,11 +1,11 @@
 function chgfilter() {
 	var cat = document.getElementById("filtersel").value;
-	var toopen = basesite+"?cid="+cid+"&stu="+stu+"&catfilter=" + cat;
+	var toopen = basesite+"?cid="+cid+"&stu="+stu+"&catfilter=" + encodeURIComponent(cat);
 	window.location = toopen;
 }
 function chgsecfilter() {
 	var sec = document.getElementById("secfiltersel").value;
-	var toopen = basesite+"?cid="+cid+"&stu="+stu+"&secfilter=" + sec;
+	var toopen = basesite+"?cid="+cid+"&stu="+stu+"&secfilter=" + encodeURIComponent(sec);
 	window.location = toopen;
 }
 function chgnewflag() {
@@ -65,8 +65,8 @@ $(function() {
 	});
 	$(".gbtoggle a").attr("href","#");
 });
-$(function() { 
-	$("th a, th select").bind("click", function(e) { e.stopPropagation(); }); 
+$(function() {
+	$("th a, th select").bind("click", function(e) { e.stopPropagation(); });
 });
 function makeofflineeditable(el) {
 	var anchors = document.getElementsByTagName("a");
@@ -203,10 +203,10 @@ function lockcol() {
 function cancellockcol() {
 	document.cookie = 'gblhdr-'+cid+'=0';
 }
-function highlightrow(el) { 
+function highlightrow(el) {
 	$(el).addClass("highlight");
 }
-function unhighlightrow(el) { 
+function unhighlightrow(el) {
 	$(el).removeClass("highlight");
 }
 function postGBform(val) {

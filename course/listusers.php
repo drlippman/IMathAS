@@ -532,7 +532,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,";
 		$query .= "imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult,imas_students.latepass ";
 		$query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseid AND imas_students.userid=imas_users.id ";
-		if ($secfilter>-1) {
+		if ($secfilter!=-1) {
 			$query .= "AND imas_students.section=:section ";
 		}
 		if ($sectionsort) {
@@ -541,7 +541,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		}
 		$resultDefaultUserList = $DBH->prepare($query);
-		if ($secfilter>-1) {
+		if ($secfilter!=-1) {
 			$resultDefaultUserList->execute(array(':courseid'=>$cid, ':section'=>$secfilter));
 		} else {
 			$resultDefaultUserList->execute(array(':courseid'=>$cid));
@@ -572,7 +572,7 @@ $placeinhead .= "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgsecfilter() { ';
 $placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
 $address = $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid";
-$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
+$placeinhead .= "       var toopen = '$address&secfilter=' + encodeURIComponent(sec);\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";
 $placeinhead .= '$(function() { $(".lal").attr("title","View login log");
