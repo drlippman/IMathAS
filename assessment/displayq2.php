@@ -444,7 +444,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$showanswerloc[$iidx] .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
 		}
 		if (!is_array($answerbox) && count($showanswerloc)==1) { //not a multipart question
-			$showanswerloc = $showanswerloc[0];
+			$showanswerloc = str_replace($qnidx.'-0"',$qnidx.'"', $showanswerloc[0]);
 		}
 	}
 

@@ -210,6 +210,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=120617"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
@@ -217,6 +218,7 @@
 	$placeinhead .= "       var toopen = '$address&page=' + stun;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
+	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForDisplay($deffbtext).'";';
 	$placeinhead .= '</script>';
 	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px;}</style>';
 	require("../includes/rubric.php");
@@ -237,122 +239,7 @@
 	}
 	echo '</div>';
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
-	echo '
-	<script type="text/javascript">
-	function hidecorrect() {
-		var butn = $("#hctoggle");
-		if (!butn.hasClass("hchidden")) {
-			butn.html("'._('Show Questions with Perfect Scores').'");
-			butn.addClass("hchidden");
-		} else {
-			butn.html("'._('Hide Questions with Perfect Scores').'");
-			butn.removeClass("hchidden");
-		}
-		$(".iscorrect").toggleClass("pseudohidden");
-	}
-	function hidenonzero() {
-		var butn = $("#nztoggle");
-		if (!butn.hasClass("nzhidden")) {
-			if (!$("#hctoggle").hasClass("hchidden")) { hidecorrect();}
-			butn.html("'._('Show Nonzero Score Questions').'");
-			butn.addClass("nzhidden");
-		} else {
-			if ($("#hctoggle").hasClass("hchidden")) { hidecorrect();}
-			butn.html("'._('Hide Nonzero Score Questions').'");
-			butn.removeClass("nzhidden");
-		}
-		$(".isnonzero").toggleClass("pseudohidden");
-	}
-	function hideNA() {
-		var butn = $("#hnatoggle");
-		if (!butn.hasClass("hnahidden")) {
-			butn.html("'._('Show Unanswered Questions').'");
-			butn.addClass("hnahidden");
-		} else {
-			butn.html("'._('Hide Unanswered Questions').'");
-			butn.removeClass("hnahidden");
-		}
-		$(".notanswered").toggleClass("pseudohidden");
-	}';
-?>
-	function preprint() {
-		$("span[id^='ans']").removeClass("hidden");
-		$(".sabtn").replaceWith("<span>Answer: </span>");
-		$('input[value="Preview"]').trigger('click').remove();
-		document.getElementById("preprint").style.display = "none";
-	}
-	function hidegroupdup(el) {  //el.checked = one per group
-	   var divs = document.getElementsByTagName("div");
-	   for (var i=0;i<divs.length;i++) {
-	     if (divs[i].className=="groupdup") {
-	         if (el.checked) {
-	               divs[i].style.display = "none";
-	         } else { divs[i].style.display = "block"; }
-	     }
-	    }
-	    var hfours = document.getElementsByTagName("h4");
-	   for (var i=0;i<hfours.length;i++) {
-	     if (hfours[i].className=="person") {
-	     	hfours[i].style.display = el.checked?"none":"";
-	     } else if (hfours[i].className=="group") {
-	     	hfours[i].style.display = el.checked?"":"none";
-	     }
-	    }
-	    var spans = document.getElementsByTagName("span");
-	   for (var i=0;i<spans.length;i++) {
-	     if (spans[i].className=="person") {
-	     	spans[i].style.display = el.checked?"none":"";
-	     } else if (spans[i].className=="group") {
-	     	spans[i].style.display = el.checked?"":"none";
-	     }
-	    }
-	}
-	function clearfeedback() {
-		var els=document.getElementsByTagName("textarea");
-		for (var i=0;i<els.length;i++) {
-			if (els[i].id.match(/feedback/)) {
-				els[i].value = '';
-			}
-		}
-	}
-	function cleardeffeedback() {
-		var els=document.getElementsByTagName("textarea");
-		for (var i=0;i<els.length;i++) {
-			if (els[i].value=='<?php echo str_replace("'","\\'",$deffbtext); ?>') {
-				els[i].value = '';
-			}
-		}
-	}
-	function showallans() {
-		$("span[id^=\'ans\']").removeClass("hidden");
-		$(".sabtn").replaceWith("<span>Answer: </span>");
-	}
-	function allvisfullcred() {
-		$(".fullcredlink").not(function() {return $(this).closest(".pseudohidden").length}).trigger("click");
-	}
-	function allvisnocred() {
-		$("input[name^=ud]").not(function() {return $(this).closest(".pseudohidden").length}).val("0");
-	}
-	function quicksave() {
-		var url = $("#mainform").attr("action")+"&quick=true";
-		$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
-		$.ajax({
-			url: url,
-			type: "POST",
-			data: $("#mainform").serialize()
-		}).done(function(msg) {
-			if (msg=="saved") {
-				$("#quicksavenotice").html(_("Saved"));
-				setTimeout(function() {$("#quicksavenotice").html("&nbsp;");}, 2000);
-			} else {
-				$("#quicksavenotice").html(msg);
-			}
-		}).fail(function(jqXHR, textStatus) {
-			$("#quicksavenotice").html(textStatus);
-		});
-	}
-	</script>
-<?php
+
 	//DB $query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	//DB $query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id='$qid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -549,9 +436,9 @@
 			}
 
 			if ($qtype=='multipart') {
-				$GLOBALS['questionscoreref'] = array("ud-{$line['id']}-$loc",$answeights);
+				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$answeights);
 			} else {
-				$GLOBALS['questionscoreref'] = array("ud-{$line['id']}-$loc",$points);
+				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
 			}
 			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
 
@@ -570,9 +457,9 @@
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
-				echo "<input type=text size=4 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
+				echo "<input type=text size=4 id=\"scorebox$cnt\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
 				if ($rubric != 0) {
-					echo printrubriclink($rubric,$points,"ud-" . Sanitize::onlyInt($line['id']) . "-$loc","feedback-" . Sanitize::onlyInt($line['id']),($loc+1));
+					echo printrubriclink($rubric,$points,"scorebox$cnt","feedback-" . Sanitize::onlyInt($line['id']),($loc+1));
 				}
 			}
 			if ($parts!='') {
@@ -582,9 +469,9 @@
 					if ($prts[$j]==-1) {
 						$prts[$j] = 'N/A';
 					}
-					echo "<input type=text size=2 id=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
+					echo "<input type=text size=2 id=\"scorebox$cnt-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
 					if ($rubric != 0) {
-						echo printrubriclink($rubric,$answeights[$j],"ud-" . Sanitize::onlyInt($line['id']) . "-$loc-$j","feedback-" . Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
+						echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","feedback-" . Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
 					}
 					echo ' ';
 				}
@@ -604,13 +491,13 @@
 						$togr[] = $k;
 					}
 				}
-				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.Sanitize::onlyFloat($loc).',0,\'ud-' . Sanitize::onlyInt($line['id']) . '-\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
+				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
 				if (count($togr)>0) {
 					$togr = implode(',',$togr);
-					echo ' | <a href="#" onclick="quickgrade('.Sanitize::onlyFloat($loc).',1,\'ud-' . Sanitize::onlyInt($line['id']) . '-\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
+					echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
 			} else {
-				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'ud-' . Sanitize::onlyInt($line['id']) . '-'.Sanitize::onlyFloat($loc).'\','.Sanitize::onlyInt($points).');return false;">Full credit</a>';
+				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($points).');return false;">Full credit</a>';
 			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {

@@ -433,14 +433,14 @@
 
 				$scores = array();
 				$i = 0;
-				while (isset($_POST[$i]) || isset($_POST["$i-0"])) {
+				while (isset($_POST['sb-'.$i]) || isset($_POST["sb-$i-0"])) {
 					$j=0;
 					$scpt = array();
-					if (isset($_POST["$i-0"])) {
+					if (isset($_POST["sb-$i-0"])) {
 
-						while (isset($_POST["$i-$j"])) {
-							if ($_POST["$i-$j"]!='N/A' && $_POST["$i-$j"]!='NA') {
-								$scpt[$j] = $_POST["$i-$j"];
+						while (isset($_POST["sb-$i-$j"])) {
+							if ($_POST["sb-$i-$j"]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
+								$scpt[$j] = $_POST["sb-$i-$j"];
 							} else {
 								$scpt[$j] = -1;
 							}
@@ -448,8 +448,8 @@
 						}
 						$scores[$i] = implode('~',$scpt);
 					} else {
-						if ($_POST[$i]!='N/A' && $_POST["$i-$j"]!='NA') {
-							$scores[$i] = $_POST[$i];
+						if ($_POST['sb-'.$i]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
+							$scores[$i] = $_POST['sb-'.$i];
 						} else {
 							$scores[$i] = -1;
 						}
@@ -514,9 +514,10 @@
 		if ($isteacher || $istutor) {
 			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=031417"></script>';
 			require("../includes/rubric.php");
+			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=120617"></script>';
 		}
 		require("../assessment/header.php");
-		echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
+		echo "<style type=\"text/css\">p.tips {	display: none;} .pseudohidden {visibility:hidden;position:absolute;}\n</style>\n";
 
 
 		if (isset($_GET['starttime']) && $isteacher) {
@@ -877,101 +878,6 @@
 			$owners[$r['qid']] = $r['ownerid'];
 			$qsdata[$r['qid']] = $r;
 		}
-		echo '<script type="text/javascript">
-			function hidecorrect() {
-				var butn = $("#hctoggle");
-				if (!butn.hasClass("hchidden")) {
-					butn.html("'._('Show Correct Questions').'");
-					butn.addClass("hchidden");
-					$(".iscorrect").hide();
-				} else {
-					butn.html("'._('Hide Correct Questions').'");
-					butn.removeClass("hchidden");
-					$(".iscorrect").show();
-				}
-			}
-			function hideperfect() {
-				var butn = $("#hptoggle");
-				if (!butn.hasClass("hphidden")) {
-					butn.html("'._('Show Perfect Questions').'");
-					butn.addClass("hphidden");
-					$(".isperfect").hide();
-				} else {
-					butn.html("'._('Hide Perfect Questions').'");
-					butn.removeClass("hphidden");
-					$(".isperfect").show();
-				}
-			}
-			function hideNA() {
-				var butn = $("#hnatoggle");
-				if (!butn.hasClass("hnahidden")) {
-					butn.html("'._('Show Unanswered Questions').'");
-					butn.addClass("hnahidden");
-				} else {
-					butn.html("'._('Hide Unanswered Questions').'");
-					butn.removeClass("hnahidden");
-				}
-				$(".notanswered").toggle();
-			}
-			function showallans() {
-				$("span[id^=\'ans\']").removeClass("hidden");
-				$(".sabtn").replaceWith("<span>Answer: </span>");
-			}
-			function previewall() {
-				$(\'input[value="Preview"]\').trigger(\'click\').remove();
-			}
-			var focuscolorlock = false;
-			$(function() {
-				$(".review input[name*=\'-\']").each(function(i, el) {
-					var partname = $(el).attr("name");
-					var idparts = partname.split("-");
-					var qn = (idparts[0]*1+1)*1000+idparts[1]*1;
-					$(el).on("mouseover", function () {
-						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","yellow")};
-					}).on("mouseout", function () {
-						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","")};
-					}).on("focus", function () {
-						focuscolorlock = true;
-						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","yellow");
-					}).on("blur", function () {
-						focuscolorlock = false;
-						$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","");
-					});
-				});
-				$("input[id^=\'showansbtn\']").each(function(i, el) {
-					var partname = $(el).attr("id").substring(10);
-					var idparts = partname.split("-");
-					var qn = (idparts[0]*1+1)*1000+idparts[1]*1;
-					$(el).on("mouseover", function () {
-						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","yellow")};
-					}).on("mouseout", function () {
-						if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","")};
-					});
-				});
-				$("input[id^=\'qn\'], input[id^=\'tc\'], select[id^=\'qn\'], div[id^=\'qnwrap\'], span[id^=\'qnwrap\']").each(function(i,el) {
-					var qn = $(el).attr("id");
-					if (qn.length>6 && qn.substring(0,6)=="qnwrap") {
-						qn = qn.substring(6)*1;
-					} else {
-						qn = qn.substring(2)*1;
-					}
-					if (qn>999) {
-						var partname = (Math.floor(qn/1000)-1)+"-"+(qn%1000);
-						$(el).on("mouseover", function () {
-							if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","yellow")};
-						}).on("mouseout", function () {
-							if (!focuscolorlock) {$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","")};
-						}).on("focus", function () {
-							focuscolorlock = true;
-							$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","yellow");
-						}).on("blur", function () {
-							focuscolorlock = false;
-							$("#qn"+qn+", #tc"+qn+", #qnwrap"+qn+", #showansbtn"+partname+", #scorebox"+partname+", #ptpos"+partname).css("background-color","");
-						});
-					}
-				});
-			});
-			</script>';
 
 		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Correct Questions').'</button>';
 		echo ' <button type="button" id="hptoggle" onclick="hideperfect()">'._('Hide Perfect Questions').'</button>';
@@ -1027,7 +933,7 @@
 			}
 			list($pt,$parts) = printscore($scores[$i]);
 			if ($canedit && $parts=='') {
-				echo "<input type=text size=4 id=\"scorebox$i\" name=\"$i\" value=\"$pt\">";
+				echo "<input type=text size=4 id=\"scorebox$i\" name=\"sb-$i\" value=\"$pt\">";
 				if ($rubric[$questions[$i]]!=0) {
 					echo printrubriclink($rubric[$questions[$i]],$pts[$questions[$i]],"scorebox$i","feedback",($i+1));
 				}
@@ -1040,7 +946,7 @@
 					echo " (parts: ";
 					$prts = explode(', ',$parts);
 					for ($j=0;$j<count($prts);$j++) {
-						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"$i-$j\" value=\"{$prts[$j]}\">";
+						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"sb-$i-$j\" value=\"{$prts[$j]}\">";
 						if ($rubric[$questions[$i]]!=0) {
 							echo printrubriclink($rubric[$questions[$i]],$answeights[$questions[$i]][$j],"scorebox$i-$j","feedback",($i+1).' pt '.($j+1));
 						}
