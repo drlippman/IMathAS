@@ -330,6 +330,13 @@ switch($_POST['action']) {
 				}
 			}
 		}
+		if (isset($_GET['id'])) {
+			$stm = $DBH->prepare("SELECT istemplate,jsondata FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			list($old_istemplate, $old_jsondata) = $stm->fetch(PDO::FETCH_NUM);
+		} else {
+			$old_istemplate = 0;
+		}
 		if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
 			$theme = $CFG['CPS']['theme'][0];
 		} else {
@@ -415,30 +422,38 @@ switch($_POST['action']) {
 		$istemplate = 0;
 		if (($myspecialrights&1)==1 || $myrights==100) {
 			if (isset($_POST['isgrptemplate'])) {
-				$istemplate += 2;
+				$istemplate |= 2;
 			}
+		} else if (($old_istemplate&2)==2) {
+			$istemplate |= 2;
 		}
 		if (($myspecialrights&2)==2 || $myrights==100) {
 			if (isset($_POST['istemplate'])) {
-				$istemplate += 1;
+				$istemplate |= 1;
 			}
+		} else if (($old_istemplate&1)==1) {
+			$istemplate |= 1;
 		}
 		if ($myrights==100) {
 			if (isset($_POST['isselfenroll'])) {
-				$istemplate += 4;
+				$istemplate |= 4;
 			}
 			if (isset($_POST['isguest'])) {
-				$istemplate += 8;
+				$istemplate |= 8;
 			}
 		}
-
-		if (isset($_POST['promote']) && isset($_GET['id'])) {
+		if (!isset($CFG['coursebrowserRightsToPromote'])) {
+			$CFG['coursebrowserRightsToPromote'] = 40;
+		}
+		$updateJsonData = false;
+		if ($CFG['coursebrowserRightsToPromote']>$myrights && ($old_istemplate&16)==16) {
+			$istemplate |= 16;
+		} else if (isset($_POST['promote']) && isset($_GET['id']) && $CFG['coursebrowserRightsToPromote']<=$myrights) {
 			$browserprops = json_decode(file_get_contents(__DIR__.'/../javascript/'.$CFG['coursebrowser'], false, null, 25), true);
 
 			$isok = ($copyrights>1);
-			$stm = $DBH->prepare("SELECT jsondata FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
-			$jsondata = json_decode($stm->fetchColumn(0), true);
+
+			$jsondata = json_decode($old_jsondata, true);
 			if ($jsondata===null) {
 				$jsondata = array();
 			}
@@ -464,8 +479,9 @@ switch($_POST['action']) {
 			}
 
 			if ($isok) {
-				$istemplate += 16;
+				$istemplate |= 16;
 				$jsondata['browser'] = $browserdata;
+				$updateJsonData = true;
 			}
 		}
 
@@ -473,7 +489,7 @@ switch($_POST['action']) {
 
 		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,hideicons=:hideicons,available=:available,lockaid=:lockaid,picicons=:picicons,showlatepass=:showlatepass,";
-			if (($istemplate&16)==16) {
+			if ($updateJsonData) {
 				$query .= "jsondata=:jsondata,";
 			}
 			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass WHERE id=:id";
@@ -485,7 +501,7 @@ switch($_POST['action']) {
 				$query .= " AND ownerid=:ownerid";
 				$qarr[':ownerid']=$userid;
 			}
-			if (($istemplate&16)==16) {
+			if ($updateJsonData) {
 				$qarr[':jsondata'] = json_encode($jsondata);
 			}
 			$stm = $DBH->prepare($query);
