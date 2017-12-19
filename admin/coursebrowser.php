@@ -120,7 +120,7 @@ $placeinhead .= 'var courseBrowserAction = "'.Sanitize::simpleString($action).'"
 $placeinhead .= '</script>';
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>
 <script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
-<link rel="stylesheet" href="coursebrowser.css" type="text/css" />';
+<link rel="stylesheet" href="coursebrowser.css?v=121817" type="text/css" />';
 
 $pagetitle = _('Course Browser');
 require("../header.php");
@@ -254,10 +254,17 @@ new Vue({
 		},
 		adjustpos: function(tgt) {
 			var rect = tgt.parentNode.getBoundingClientRect();
-			var width = window.innerWidth || document.body.clientWidth
+			var width = window.innerWidth || document.body.clientWidth;
+			var height = window.innerHeight || document.body.clientHeight;
+			tgt.style.maxHeight = (height - rect.bottom - 30) + "px";
 			if (rect.left + tgt.offsetWidth > width) {
-				tgt.style.left = "auto";
-				tgt.style.right = "0px";
+				if (rect.right < tgt.offsetWidth) {
+					tgt.style.left = "auto";
+					tgt.style.right = "auto";
+				} else {
+					tgt.style.left = "auto";
+					tgt.style.right = "0px";
+				}
 			} else {
 				tgt.style.right = "auto";
 				tgt.style.left = "0px";
@@ -333,6 +340,9 @@ new Vue({
 	}, 
 	created: function() {
 		document.addEventListener('click', this.clickaway);
+	},
+	mounted: function() {
+		$("#fixedfilters + #card-deck-wrap").css("margin-top", $("#fixedfilters").outerHeight() + 10);
 	}
 	
 });
