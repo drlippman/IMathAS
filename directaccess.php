@@ -103,7 +103,7 @@
 				$message .= "and paste it into your webbrowser:</p>\r\n";
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
-				mail(Sanitize::emailAddress($_POST['email']),'IMathAS Confirmation',$message,$headers);
+				mail(Sanitize::emailAddress($_POST['email']), $installname.' Confirmation',$message,$headers);
 				echo "<html><body>\n";
 				echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
 				echo "<a href=\"$imasroot/directaccess.php?cid=$cid\">Back to login page</a>\n";
