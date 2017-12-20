@@ -3,7 +3,13 @@
 //(c) 2007 David Lippman
 
 require_once('../includes/loaditemshowdata.php');
+require_once("../includes/exceptionfuncs.php");
 
+if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+} else {
+	$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+}
 function beginitem($canedit,$aname='') {
 	 if ($aname != '') {
 		 echo "<div class=\"item\" id=\"$aname\">\n";
@@ -141,8 +147,8 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights;
-	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
-	   global $itemshowdata;
+	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
+	   global $itemshowdata, $exceptionfuncs;
 
 	   require_once("../includes/filehandler.php");
 
@@ -638,27 +644,14 @@ function showitems($items,$parent,$inpublic=false) {
 			   //check for exception
 			   $canundolatepass = false;
 			   $canuselatepass = false;
-			   require_once("../includes/exceptionfuncs.php");
-			   if (!$havecalcedviewedassess && $line['avail']>0 && $line['allowlate']>0) {
-			   	   $havecalcedviewedassess = true;
-			   	   $viewedassess = array();
-			   	   //DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
-			   	   //DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			   	   //DB while ($r = mysql_fetch_row($r2)) {
-			   	   $stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
-			   	   $stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
-			   	   while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-			   	   	   $viewedassess[] = $r[0];
-				   }
-			   }
 			   if (isset($exceptions[$items[$i]])) {
-			   	   list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptions[$items[$i]], $line);
+			   	   list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$items[$i]], $line);
 			   	   if ($useexception) {
 			   	   	   $line['startdate'] = $exceptions[$items[$i]][0];
 			   	   	   $line['enddate'] = $exceptions[$items[$i]][1];
 			   	   }
 			   } else {
-			   	   $canuselatepass = getCanUseAssessLatePass($line);
+			   	   $canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($line);
 			   }
 
 			   if ($line['startdate']==0) {
@@ -1274,8 +1267,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   if ($ispublic) { continue;}
 
 			   //check for exception
-			   require_once("../includes/exceptionfuncs.php");
-			   list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']) = getCanUseLatePassForums(isset($exceptions[$items[$i]])?$exceptions[$items[$i]]:null, $line);
+			  list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']) = $exceptionfuncs->getCanUseLatePassForums(isset($exceptions[$items[$i]])?$exceptions[$items[$i]]:null, $line);
 
 			   if (strpos($line['description'],'<p')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';

@@ -2,7 +2,7 @@
 //IMathAS:  Display grade list for one online assessment
 //(c) 2007 David Lippman
 	require("../init.php");
-	
+
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
 
@@ -150,6 +150,7 @@
 	}
 	if (count($exceptions)>0) {
 		require_once("../includes/exceptionfuncs.php");
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher && !$istutor);
 	}
 
 	//DB $query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
@@ -232,7 +233,7 @@
 		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
-			$useexception = getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate), true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate), true);
 			if ($useexception) {
 				$thisenddate = $exceptions[$line['userid']][1];
 			}

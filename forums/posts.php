@@ -80,8 +80,13 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 		$exception = null;
 	}
 	require_once("../includes/exceptionfuncs.php");
+	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+	} else {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+	}
 	$infoline = array('replyby'=>$replyby, 'postby'=>$postby, 'enddate'=>$enddate, 'allowlate'=>$allowlate);
-	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = getCanUseLatePassForums($exception, $infoline);
+	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = $exceptionfuncs->getCanUseLatePassForums($exception, $infoline);
 }
 if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
 	require("../header.php");

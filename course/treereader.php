@@ -3,7 +3,7 @@
 //(c) 2011 David Lippman
 
 require("../init.php");
-
+require_once("../includes/exceptionfuncs.php");
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
 	echo "You are not enrolled in this course. Please return to the <a href=\"../index.php\">Home Page</a> and enroll";
@@ -290,16 +290,18 @@ if (!$viewall) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore'],$line['itemtype']);
 		}
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+	} else {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
 	}
 	//update block start/end dates to show blocks containing items with exceptions
 	if (count($exceptions)>0) {
-		require_once("../includes/exceptionfuncs.php");
 		upsendexceptions($items);
 	}
 }
 
 function printlist($items) {
-	global $DBH,$cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions;
+	global $DBH,$cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions, $exceptionfuncs;
 	$out = '';
 	$isopen = false;
 	foreach ($items as $item) {
@@ -349,7 +351,7 @@ function printlist($items) {
 				 $stm->execute(array(':id'=>$typeid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if (isset($exceptions[$item])) {
-				 	 $useexception = getCanUseAssessException($exceptions[$item], $line, true);
+				 	 $useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$item], $line, true);
 				 	 if ($useexception) {
 				 	 	 $line['startdate'] = $exceptions[$item][0];
 				 	 	 $line['enddate'] = $exceptions[$item][1];

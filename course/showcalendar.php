@@ -20,6 +20,14 @@
 		$editington = false;
 	}
 
+	require_once("../includes/exceptionfuncs.php");
+
+	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+	} else {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+	}
+
 	require("../includes/calendardisp.php");
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=072917\"></script>";
 	if ($editingon) {

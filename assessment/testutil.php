@@ -1107,6 +1107,17 @@ function embedshowicon($qn) {
 	}
 }
 
+//output appropriate breadcrumbs for entering an assessment
+// like on the password entry page, latepass confirmation, etc.
+// this is light breadcrumbs rather than full
+function showEnterAssessmentBreadcrumbs($aname) {
+	global $isdiag, $sessiondata, $breadcrumbbase, $coursename;
+	if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
+		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo '&gt; ', Sanitize::encodeStringForDisplay($aname), '</div>';
+	}
+}
+
 //pull a new question from a question group on regen, if not in review mode
 function newqfromgroup($qn) {
 	global $testsettings, $questions;

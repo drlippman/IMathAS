@@ -1218,7 +1218,8 @@ if ($linkparts[0]=='cid') {
 		$useexception = false;
 		if ($exceptionrow!=null) {
 			require_once("./includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($exceptionrow, $line, true);
+			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
 		}
 		if ($exceptionrow!=null && $useexception) {
 			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
@@ -1428,8 +1429,8 @@ if ($linkparts[0]=='aid') {
 		$stm->execute(array(':id'=>$cid));
 		$latepasshrs = $stm->fetchColumn(0);
 		require_once("./includes/exceptionfuncs.php");
-		$viewedassess = getViewedAssess($cid, $userid);
-		list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptionrow, $line);
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $latepasses, $latepasshrs);
+		list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line);
 		$sessiondata['lticanuselatepass'] = $canuselatepass;
 	}
 
@@ -2428,7 +2429,8 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		$useexception = false;
 		if ($row!=null) {
 			require_once("./includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($row, $line, true);
+			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($row, $line, true);
 		}
 		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates

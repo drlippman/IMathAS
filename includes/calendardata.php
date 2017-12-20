@@ -1,19 +1,23 @@
 <?php
 
+require_once(__DIR__.'/exceptionfuncs.php');
+
 //light calendar data collection function
 
 function getCalendarEventData($cid, $userid, $stuview = false) {
 	global $DBH;
 
 	$studentinfo = array();
-	$stm = $DBH->prepare("SELECT id,section FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+	$stm = $DBH->prepare("SELECT id,section,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 	$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line != null) {
 		$studentid = $line['id'];
 		$studentinfo['timelimitmult'] = $line['timelimitmult'];
 		$studentinfo['section'] = $line['section'];
+		$latepasses = $line['latepass'];
 	} else {
+		$latepasses = 0;
 		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -53,20 +57,15 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 			}
 		}
 	}
-	$viewedassess = array();
-	$stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
-	$stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
-	while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-		$viewedassess[] = $r[0];
-	}
 
-
-	$stm = $DBH->prepare("SELECT name,itemorder FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,itemorder,latepasshrs FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
 	$coursename = trim($row[0]);
 	$itemorder = unserialize($row[1]);
 	$itemsimporder = array();
+
+	$exceptionfuncs = new ExceptionFuncs($userid, $cid, !empty($studentid), $latepasses, $row[2]);
 
 	flattenitems($itemorder,$itemsimporder,(isset($teacherid)||isset($tutorid))&&!$stuview, $studentinfo);
 
@@ -93,7 +92,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			require_once("../includes/exceptionfuncs.php");
 			if (isset($exceptions[$row['id']])) {
-				$useexception = getCanUseAssessException($exceptions[$row['id']], $row, true);
+				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row, true);
 				if ($useexception) {
 					$row['startdate'] = $exceptions[$row['id']][0];
 					$row['enddate'] = $exceptions[$row['id']][1];
@@ -213,7 +212,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 				continue;
 			}
 			require_once("../includes/exceptionfuncs.php");
-			list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
+			list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = $exceptionfuncs->getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
 
 			if ($row['postby']!=2000000000) {
 				$calevents[] = array('FP'.$row['id'],$row['postby'], $row['name'], _('Posts Due: ').$row['name']);

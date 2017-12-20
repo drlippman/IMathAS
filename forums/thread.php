@@ -372,7 +372,8 @@ if (isset($_GET['markallread'])) {
 $duedates = '';
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$exception = null; $latepasses = 0;
-	if (isset($studentid)) {
+	require_once("../includes/exceptionfuncs.php");
+	if (isset($studentid) && !isset($sessiondata['stuview'])) {
 		//DB $query = "SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid='$forumid' AND userid='$userid' AND (itemtype='F' OR itemtype='P' OR itemtype='R')";
 		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		//DB if (mysql_num_rows($result)>0) {
@@ -383,11 +384,13 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 			$exception = $stm->fetch(PDO::FETCH_NUM);
 		}
 		$latepasses = $studentinfo['latepasses'];
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+	} else {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
 	}
 
-	require_once("../includes/exceptionfuncs.php");
 	$infoline = array('replyby'=>$replyby, 'postby'=>$postby, 'enddate'=>$enddate, 'allowlate'=>$allowlate);
-	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = getCanUseLatePassForums($exception, $infoline);
+	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = $exceptionfuncs->getCanUseLatePassForums($exception, $infoline);
 	if ($postby>0 && $postby<2000000000) {
 		if ($postby>$now) {
 			$duedates .= sprintf(_('New Threads due %s. '), tzdate("D n/j/y, g:i a",$postby));
@@ -433,7 +436,8 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$
 echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h2></div>';
 
 if ($duedates!='') {
-	echo '<p id="forumduedates">'.Sanitize::encodeStringForDisplay($duedates).'</p>';
+	//$duedates contains HTML from above
+	echo '<p id="forumduedates">'.$duedates.'</p>';
 }
 
 if ($postinstr != '' || $replyinstr != '') {

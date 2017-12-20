@@ -123,7 +123,8 @@
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
 			require("../includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($row, $testsettings, true);
+			$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher);
+			$useexception = $exceptionfuncs->getCanUseAssessException($row, $testsettings, true);
 		}
 		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates

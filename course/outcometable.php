@@ -16,7 +16,7 @@ Will only included items that are counted in gradebook.  No EC. No PT
 row[0][1] scores
 row[0][1][#][0] = name
 row[0][1][#][1] = category color number
-row[0][1][#][2] = 0 past, 1 current
+row[0][1][#][2] = 0 past, 1 current, 2 future
 row[0][1][#][3] = 1 count, 2 EC
 row[0][1][#][4] = 0 online, 1 offline, 2 discussion
 row[0][1][#][5] = assessmentid, gbitems.id, forumid
@@ -71,13 +71,17 @@ function getpts($sc) {
 }
 
 function outcometable() {
-	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
+	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter;
+	global $timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
+		$exceptionfuncs = new ExceptionFuncs($limuser, $cid, false);
 	} else if (!$canviewall) {
 		$limuser = $userid;
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 	} else {
 		$limuser = 0;
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
 	}
 
 	$category = array();
@@ -166,7 +170,7 @@ function outcometable() {
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
 		$allowlate[$kcnt] = $line['allowlate'];
-		
+
 		$timelimits[$kcnt] = $line['timelimit'];
 
 		$assessments[$kcnt] = $line['id'];
@@ -607,22 +611,24 @@ function outcometable() {
 		} else {
 			$IP=0;
 		}
-		$useexception = false; 
+		$useexception = false;
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
-			$useexception = getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i]), true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i]), true);
 		}
-		
-		if ($useexception) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
+
+		if ($useexception) {
 			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
 				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
-				if ($limuser>0 && $gb[0][1][$col][2]==2) {  //change $avail past/cur/future
-					if ($now<$thised) {
+				if ($limuser>0) {  //change $avail past/cur/future
+					if ($now<$thised && $now>$exceptions[$l['assessmentid']][$l['userid']][0]) { //inside exception window
 						$gb[0][1][$col][2] = 1;
-					} else {
+					} else if ($now>$thised) { //past exception due date
 						$gb[0][1][$col][2] = 0;
+					} else {
+						$gb[0][1][$col][2] = 2;
 					}
 				}
 			}

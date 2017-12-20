@@ -169,7 +169,8 @@
 				if ($stm->rowCount()>0) {
 					$exception = $stm->fetch(PDO::FETCH_NUM);
 					require_once("../includes/exceptionfuncs.php");
-					$useexception = getCanUseAssessException($exception, $adata, true);
+					$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
+					$useexception = $exceptionfuncs->getCanUseAssessException($exception, $adata, true);
 					if ($useexception) {
 						$due = $exception[1];
 					}

@@ -25,6 +25,8 @@ $items = unserialize($stm->fetchColumn(0));
 
 if (!$viewall) {
 	$exceptions = loadExceptions($cid, $userid);
+	require_once("../includes/exceptionfuncs.php");
+	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 }
 //update block start/end dates to show blocks containing items with exceptions
 if (count($exceptions)>0) {
@@ -37,7 +39,6 @@ $itemshowdata = loadItemShowData($items, -1, $viewall, false, false);
 //print_r($itemshowdata);
 //echo '</pre>';
 
-$havecalcedviewedassess = false;
 $now = time();
 
 function showicon($type,$alt='') {
@@ -49,7 +50,7 @@ function showicon($type,$alt='') {
 }
 
 function showitemtree($items,$parent) {
-	 global $DBH, $CFG, $itemshowdata, $typelookups, $imasroot, $cid, $userid, $exceptions, $viewedassess, $havecalcedviewedassess, $now, $viewall, $studentinfo;
+	 global $DBH, $CFG, $itemshowdata, $typelookups, $imasroot, $cid, $userid, $exceptions, $exceptionfuncs, $now, $viewall, $studentinfo;
 
 	 foreach ($items as $k=>$item) {
 		if (is_array($item)) {
@@ -82,8 +83,7 @@ function showitemtree($items,$parent) {
 			$line = $itemshowdata[$item];
 			if ($line['itemtype']=='Assessment') {
 				if (!$viewall && isset($exceptions[$item])) {
-					require_once("../includes/exceptionfuncs.php");
-					$useexception = getCanUseAssessException($exceptions[$item], $line, true);
+					$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$item], $line, true);
 					if ($useexception) {
 						$line['startdate'] = $exceptions[$item][0];
 						$line['enddate'] = $exceptions[$item][1];
@@ -143,8 +143,7 @@ function showitemtree($items,$parent) {
 				}
 			} else if ($line['itemtype']=='Forum') {
 				if (!$viewall && isset($exceptions[$item])) {
-					require_once("../includes/exceptionfuncs.php");
-					list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']) = getCanUseLatePassForums($exceptions[$item], $line);
+					list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']) = $exceptionfuncs->getCanUseLatePassForums($exceptions[$item], $line);
 				}
 
 				if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {

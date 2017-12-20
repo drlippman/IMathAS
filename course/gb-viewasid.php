@@ -723,7 +723,8 @@
 				$saenddate = $exped;
 			}
 			require("../includes/exceptionfuncs.php");
-			$useexception = getCanUseAssessException($exception, $line, true);
+			$exceptionfuncs = new ExceptionFuncs($userid, $cid, !($isteacher || $istutor));
+			$useexception = $exceptionfuncs->getCanUseAssessException($exception, $line, true);
 		}
 
 		if ($isteacher) {

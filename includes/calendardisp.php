@@ -1,6 +1,7 @@
 <?php
 $cid = Sanitize::courseId($_GET['cid']);
 
+
 if (isset($_GET['calstart'])) {
 	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']));
 	$_COOKIE["calstart".$cid] = Sanitize::onlyInt($_GET['calstart']);
@@ -12,12 +13,10 @@ if (isset($_GET['callength'])) {
 
 require_once("filehandler.php");
 
-$havecalcedviewedassess = false;
-$viewedassess = array();
-
 function showcalendar($refpage) {
 global $DBH;
-global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess, $editingon;
+global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
+global $tzoffset, $tzname, $editingon, $exceptionfuncs;
 
 $now= time();
 
@@ -138,27 +137,15 @@ $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
 	$canuselatepass = false;
-	if (!$havecalcedviewedassess && $row['allowlate']>0) {
-		$havecalcedviewedassess = true;
-		$viewedassess = array();
-		//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
-		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($r = mysql_fetch_row($r2)) {
-		$stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
-		$stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
-		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-			$viewedassess[] = $r[0];
-		}
-	}
-	require_once("exceptionfuncs.php");
+
 	if (isset($exceptions[$row['id']])) {
-		list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptions[$row['id']], $row);
+		list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row);
 		if ($useexception) {
 			$row['startdate'] = $exceptions[$row['id']][0];
 			$row['enddate'] = $exceptions[$row['id']][1];
 		}
 	} else {
-		$canuselatepass = getCanUseAssessLatePass($row);
+		$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($row);
 	}
 	//2: start, 3: end, 4: review
 	//if enddate past end of calendar
@@ -418,7 +405,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($editingon) {$colors='';}
 	$tag = htmlentities($row[6], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$alink = htmlentities($alink, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	
+
 	$json = array(
 		"type"=>"L".$datefield,
 		"typeref"=>$row[0],
@@ -514,8 +501,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		continue;
 	}
 	//check for exception
-	require_once("exceptionfuncs.php");
-	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
+	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = $exceptionfuncs->getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
 
 	list($posttag,$replytag) = explode('--',$row['caltag']);
 	$posttag = htmlentities($posttag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
@@ -525,7 +511,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['postby']));
 		$colors = makecolor2($row['startdate'],$row['postby'],$now);
 		if ($editingon) {$colors='';}
-		
+
 		$json = array(
 			"type"=>"FP",
 			"typeref"=>$row['id'],
@@ -546,7 +532,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['replyby']));
 		$colors = makecolor2($row['startdate'],$row['replyby'],$now);
 		if ($editingon) {$colors='';}
-		
+
 		$json = array(
 			"type"=>"FR",
 			"typeref"=>$row['id'],
@@ -700,7 +686,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		"tag"=>$row[1],
 		"name"=> $row[0]
 	);
-	
+
 	$tags[$k] = $row[1];
 	$names[$k] = $row[0];
 	$colors[$k]='';
