@@ -1007,6 +1007,7 @@ if ($overwriteBody==1) {
 					<option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
 					<option value="I" <?php if ($showans=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
 					<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
+					<option value="R" <?php if ($showans=="R") {echo "SELECTED";} ?>>After last attempt on a version</option>
 					<option value="A" <?php if ($showans=="A") {echo "SELECTED";} ?>>After due date (in gradebook)</option>
 					<option value="1" <?php if ($showans=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
 					<option value="2" <?php if ($showans=="2") {echo "SELECTED";} ?>>After 2 attempts</option>

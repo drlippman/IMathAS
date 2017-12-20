@@ -99,7 +99,11 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 		}
 		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
 		$line['regen'] = $line['regen']%3;
+		if ($line['showans']=='0') {
+			$line['showans'] = $testsettings['showans'];
+		}
 		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] > 0);
+		$line['showansafterlast'] = ($line['showans']==='F' || $line['showans']==='R' || $line['showans']==='J');
 		if (!$preloadqsdata) {
 			unset($line['qtype']);
 			unset($line['control']);
