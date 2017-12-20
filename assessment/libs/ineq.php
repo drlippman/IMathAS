@@ -72,9 +72,11 @@ function ineqbetweenplot($funcs) {
 	$newfuncstr = array();
 	$skipi = array();
 	$fillcolor = 'blue';
+	$shadedir = array();
 	foreach ($funcs as $k=>$function) {
 		$function = explode(",",$function);
 		$filltype = $function[1];
+		$shadedir[$k] = $filltype;
 		if (!isset($function[2])) {$function[2] = '';}
 		if (!isset($function[4])) {$function[4] = 1;}
 		if (!isset($function[3])) {$function[3] = '';}
@@ -205,7 +207,15 @@ function ineqbetweenplot($funcs) {
 	$path .= '])';
 	
 	$p = showplot($newfuncstr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
-	$p = str_replace("' />","fill=\"trans$fillcolor\";strokewidth=0;$path;' />",$p);
+	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		$parts = explode('<table', $p);
+		for ($i=0;$i<count($parts)-1;$i++) {
+			$parts[$i] .= ', Shaded '.$shadedir[$i];
+		}
+		$p = implode('<table', $parts);
+	} else {
+		$p = str_replace("' />","fill=\"trans$fillcolor\";strokewidth=0;$path;' />",$p);
+	}
 	return $p;		
 }
 
