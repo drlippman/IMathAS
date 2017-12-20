@@ -954,7 +954,7 @@ function gbtable() {
 					} else {
 						$avail[$assessidx[$r['typeid']]] = 0;
 					}
-
+					$gb[0][1][$assesscol[$r['typeid']]][3] = $avail[$assessidx[$r['typeid']]];
 				}
 			}
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
@@ -1057,6 +1057,7 @@ function gbtable() {
 					} else {
 						$avail[$assessidx[$l['assessmentid']]] = 0;
 					}
+					$gb[0][1][$col][3] = $avail[$assessidx[$l['assessmentid']]];
 				}
 			}
 			if ($limuser>0) { //override due date header if one stu display

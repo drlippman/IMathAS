@@ -786,7 +786,14 @@ function gbstudisp($stu) {
 				}
 			}
 
-			echo '<td class="cat'.Sanitize::onlyInt($gbt[0][1][$i][1]).'">'.Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
+			echo '<td class="cat'.Sanitize::onlyInt($gbt[0][1][$i][1]).'">';
+			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1) {
+				echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'">';
+			}
+			echo Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
+			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1) {
+				echo '</a>';
+			}
 			$afterduelatepass = false;
 			if (!$isteacher && !$istutor && $latepasses>0 && !isset($gbt[1][1][$i][10])) {
 				//not started, so no canuselatepass record
@@ -800,7 +807,7 @@ function gbstudisp($stu) {
 				(!isset($gbt[1][1][$i][10]) && $gbt[0][1][$i][12]>10 && $now-$gbt[0][1][$i][11]<$latepasshrs*3600 && !in_array($gbt[0][1][$i][7],$viewedassess)) //not started, within one latepass
 			    )) {*/
 			if (!$isteacher && !$istutor && $latepasses>0 && $gbt[1][1][$i][10]==true) { //if canuselatepass
-				echo ' <span class="small"><a href="redeemlatepass.php?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'">[';
+				echo ' <span class="small"><a href="redeemlatepass.php?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'&from=gb">[';
 				echo _('Use LatePass').']</a></span>';
 				if ($now>$gbt[0][1][$i][11]) {
 					$afterduelatepass = true;

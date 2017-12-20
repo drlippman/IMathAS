@@ -49,6 +49,9 @@
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
+		if ($from == 'gb') {
+			echo ' <a href="gradebook.php?cid='.$cid.'">'._('Gradebook').'</a> &gt; ';
+		}
 		echo "Un-use LatePass</div>";
 		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -107,10 +110,12 @@
 			}
 		}
 
-		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
-		} else if ($from=='ltitimelimit') {
+		if ($from=='ltitimelimit') {
 			echo "<p><a href=\"../bltilaunch.php?accessibility=ask'\">Continue</a></p>";
+		} else if ($from=='gb') {
+			echo "<p><a href=\"gradebook.php?cid=$cid\">Continue</a></p>";
+		} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
 		} else {
 			echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Continue</a></p>";
 		}
@@ -172,10 +177,12 @@
 				}
 			}
 		}
-		if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
-		} else if ($from=='ltitimelimit') {
+		if ($from=='ltitimelimit') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask");
+		} else if ($from=='gb') {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid");
+		} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 		}
@@ -187,6 +194,9 @@
 		}
 		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+		}
+		if ($from == 'gb') {
+			echo ' <a href="gradebook.php?cid='.$cid.'">'._('Gradebook').'</a> &gt; ';
 		}
 		echo "Redeem LatePass</div>\n";
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
@@ -237,10 +247,12 @@
 			echo '<input type="hidden" name="confirm" value="true" />';
 			echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($from).'" />';
 			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
-			if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
-			} else if ($from=='ltitimelimit') {
+			if ($from=='ltitimelimit') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../bltilaunch.php?accessibility=ask'\"/>";
+			} else if ($from=='gb') {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid'\"/>";	
+			} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
 			} else {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
 			}
