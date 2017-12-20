@@ -674,14 +674,14 @@ private function insertWiki() {
 
 	$this->typemap['Wiki'] = array();
 	$exarr = array();
-	$db_fields['Wiki'] = array_values(array_intersect(explode(',', $db_fields['wiki']), array_keys($this->data['items'][$this->toimportbytype['Wiki'][0]]['data'])));
+	$db_fields['wiki'] = array_values(array_intersect(explode(',', $db_fields['wiki']), array_keys($this->data['items'][$this->toimportbytype['Wiki'][0]]['data'])));
 	foreach ($this->toimportbytype['Wiki'] as $toimport) {
 		$exarr[] = $this->cid;
 		//sanitize html fields
 		foreach ($db_fields['html']['wiki'] as $field) {
 			$this->data['items'][$toimport]['data'][$field] = myhtmlawed($this->data['items'][$toimport]['data'][$field]);
 		}
-		foreach ($db_fields['Wiki'] as $field) {
+		foreach ($db_fields['wiki'] as $field) {
 			$exarr[] = $this->data['items'][$toimport]['data'][$field];
 		}
 	}
