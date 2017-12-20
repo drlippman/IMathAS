@@ -76,7 +76,7 @@ var courseBrowserProps = {
 			"lqr": "Math in Society, Lippman",
 			"iqr": "College Mathematics for Everyday Life, Inigo/et al",
 			"group6": "Statistics",
-			"oist": "OpenIntro Statistics, Diaz/Barr/Cetinkaya-Rundel", 
+			"oist": "OpenIntro Statistics, Diez/Barr/Cetinkaya-Rundel", 
 			"kkst": "Statistics Using Technology, Kozak",
 			"pkst": "Foundations in Statistical Reasoning, Kaslik",
 			"osst": "Introductory Statistics, OpenStax",
