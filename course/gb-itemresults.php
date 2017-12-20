@@ -121,7 +121,7 @@ $placeinhead = ' <style type="text/css">
 
 .scorebarinner {
 	height:10px;
-	font-size:1px;
+	font-size:80%;
 	display:-moz-inline-box;
 	display:inline-block;
 	position:relative;
@@ -184,14 +184,21 @@ require("../footer.php");
 function showresults($q,$qtype) {
 	global $qdata,$qsids,$qsdata;
 	eval(interpret('control',$qtype,$qsdata[$qsids[$q]][1]));
+	if ($qtype=='multipart' && !is_array($anstypes)) {
+		$anstypes = explode(',',$anstypes);
+	}
+	if ($qtype=='multipart' && count($anstypes)==1) {
+		//if it's multipart but only one part, treat like it was
+		//just a singlepart question of that type
+		//matches handling of stuanswers.
+		$qtype = $anstypes[0];
+		$answer = $answer[0];
+	}
 	if ($qtype=='choices' || $qtype=='multans' || $qtype=='multipart') {
 		if (isset($choices) && !isset($questions)) {
 			$questions =& $choices;
 		}
 		if ($qtype=='multipart') {
-			if (!is_array($anstypes)) {
-				$anstypes = explode(',',$anstypes);
-			}
 			foreach ($anstypes as $i=>$type) {
 				if ($type=='choices' || $type=='multans') {
 					if (isset($questions[$i])) {
