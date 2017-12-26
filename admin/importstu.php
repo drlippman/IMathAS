@@ -39,7 +39,7 @@ function parsecsv($data) {
 		}
 	}
 	$fn = preg_replace('/[^\w\'-]/','',$fn);
-	$ln = preg_replace('/[^\w\'-]','',$ln);
+	$ln = preg_replace('/[^\w\'-]/','',$ln);
 	$fn = ucfirst(strtolower($fn));
 	$ln = ucfirst(strtolower($ln));
 	if (empty($_POST['unloc'])) {
