@@ -512,6 +512,11 @@ $placeinhead .= '<script type="text/javascript">
 		}
 		document.getElementById(tochg[i]+"input").style.display = disp;
 	}
+	if (el.value=="web" || el.value=="file") {
+		$("input:radio[name=target][value=1]").prop("checked",true);
+	} else {
+		$("input:radio[name=target][value=0]").prop("checked",true);
+	}
  }
  </script>';
  $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { document.getElementById("gbdetail").style.display = v?"block":"none";}</script>';
