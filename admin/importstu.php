@@ -108,6 +108,15 @@ if (!(isset($teacherid)) && $myrights<100) {
 		if (isset($CFG['GEN']['newpasswords'])) {
 			require_once("../includes/password.php");
 		}
+		if ($isadmin) {
+			$ncid = Sanitize::onlyInt($_POST['enrollcid']);
+		} else {
+			$ncid = $cid;
+		}
+		$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:cid");
+		$stm->execute(array(':cid'=>$ncid));
+		$deflatepass = $stm->fetchColumn(0);
+		
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
 		$handle = fopen_utf8($filename,'r');
 		if ($_POST['hdr']==1) {
@@ -119,7 +128,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 			for ($i=0;$i<count($arr);$i++) {
 				$arr[$i] = trim($arr[$i]);
 			}
-			print_r($arr);
+
 			//DB addslashes_deep($arr);
 			if (trim($arr[0])=='' || trim($arr[0])=='_') {
 				continue;
@@ -171,11 +180,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				$id = $DBH->lastInsertId();
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
-				if ($isadmin) {
-					$ncid = Sanitize::onlyInt($_POST['enrollcid']);
-				} else {
-					$ncid = $cid;
-				}
+
 				//DB $vals = "'$id','$ncid'";
 				//DB $query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$ncid'";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -198,10 +203,11 @@ if (!(isset($teacherid)) && $myrights<100) {
 				//DB }
 				//DB $query .= ") VALUES ($vals)";
 
-				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,code,section) VALUES (:userid, :courseid, :code, :section)");
+				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,code,section,latepass) VALUES (:userid, :courseid, :code, :section, :latepass)");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid,
 					':code'=>($_POST['codetype']==1)?$arr[4]:null,
-					':section'=>($_POST['sectype']>0)?$arr[5]:null));
+					':section'=>($_POST['sectype']>0)?$arr[5]:null,
+					':latepass'=>$deflatepass));
 			}
 
 		}
