@@ -58,6 +58,11 @@ if (isset($_GET['fixorphanqs'])) {
 if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid']));
+	} else if (!empty($_POST['aid'])) {
+		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+		$stm->execute(array($_POST['aid']));
+		$destcid = $stm->fetchColumn(0);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".Sanitize::onlyInt($_POST['aid']));
 	} else if (!empty($_POST['pqid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".Sanitize::onlyInt($_POST['pqid']));
 	} else if (!empty($_POST['eqid'])) {
@@ -84,6 +89,7 @@ if (isset($_GET['form'])) {
 		echo '<input type=hidden name=action value="jumptoitem" />';
 		echo '<p>Jump to:<br/>';
 		echo 'Course ID: <input type="text" size="8" name="cid"/><br/>';
+		echo 'Assessment ID: <input type="text" size="8" name="aid"/><br/>';
 		echo 'Preview Question ID: <input type="text" size="8" name="pqid"/><br/>';
 		echo 'Edit Question ID: <input type="text" size="8" name="eqid"/><br/>';
 		echo '<input type="submit" value="Go"/>';
