@@ -234,9 +234,12 @@ if ($overwriteBody==1) {
       echo '<a href="exportlib.php?cid=admin">',_('Export Libraries'),'</a><br/>';
       echo '<a href="listdiag.php">',_('Diagnostics'),'</a> ';
       echo '</span>';
-
+      
       echo '<span class="column">';
       echo '<a href="forms.php?from=admin2&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
+      if (($myspecialrights&16)==16 || ($myspecialrights&32)==32) {
+      	      echo '<br/><a href="../util/batchcreateinstr.php?from=admin">'._('Batch Add Instructors').'</a>';    
+      }
       echo '</span>';
 
       echo '<div class=clear></div></div>';

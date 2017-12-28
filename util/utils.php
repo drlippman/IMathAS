@@ -9,6 +9,23 @@ if (isset($sessiondata['emulateuseroriginaluser']) && isset($_GET['unemulateuser
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 	exit;
 }
+
+if ($myrights >= 75 && isset($_GET['emulateuser'])) {
+	if ($myrights<100) {
+		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+		$stm->execute(array($_GET['emulateuser']));
+		if ($stm->fetchColumn(0) != $groupid) {
+			echo "You can only emulate teachers from your own group";
+			exit;
+		}
+	}
+	$sessiondata['emulateuseroriginaluser'] = $userid;
+	writesessiondata();
+	$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
+	$stm->execute(array(':userid'=>$_GET['emulateuser'], ':sessionid'=>$sessionid));
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+	exit;
+}
 if ($myrights<100) {
 	echo "You are not authorized to view this page";
 	exit;
@@ -22,14 +39,6 @@ if (isset($_GET['removelti'])) {
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
-}
-if (isset($_GET['emulateuser'])) {
-	$sessiondata['emulateuseroriginaluser'] = $userid;
-	writesessiondata();
-	$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
-	$stm->execute(array(':userid'=>$_GET['emulateuser'], ':sessionid'=>$sessionid));
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
-	exit;
 }
 if (isset($_GET['removecourselti'])) {
 	$id = intval($_GET['removecourselti']);

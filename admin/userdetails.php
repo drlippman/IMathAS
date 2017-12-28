@@ -170,8 +170,8 @@ if ($overwriteBody==1) {
 
   //sub nav links
   echo '<div class="cpmid"><a href="forms.php?from=ud'.$uid.'&action=chgrights&id='.$uid.'">'._('Edit User').'</a>';
+  echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
   if ($myrights==100) {
-    echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
     echo ' | <a href="userlti.php?id='.$uid.'">'. _('LTI Connections').'</a>';
   }
   if ($userinfo['rights']==100 || ($userinfo['specialrights']&4)==4) {

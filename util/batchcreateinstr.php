@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Batch create instructors
 //(c) 2017 David Lippman for Lumen Learning
-
+ 
 @set_time_limit(0);
 ini_set("max_input_time", "1600");
 ini_set("max_execution_time", "1600");
@@ -12,16 +12,22 @@ ini_set("post_max_size", "10485760");
 require("../init.php");
 require_once("../includes/copyiteminc.php");
 
-if ($myrights<100) {
+if ($myrights < 100 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
   echo "You're not authorized for this page";
   exit;
 }
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Batch Create Instructors</div>\n";
 
 if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_name'])) {
-  if ($_POST['groupid']<1) {
-    echo "Invalid group selection";
-    exit;
+  if ($myrights == 100 || ($myspecialrights&32)==32) {
+  	  if ($_POST['groupid']<1) {
+  	  	  echo "Invalid group selection";
+  	  	  exit;
+  	  } else {
+  	  	  $newusergroupid = $_POST['groupid'];
+  	  }
+  } else {
+  	  $newusergroupid = $groupid;
   }
   if (isset($CFG['GEN']['newpasswords'])) {
     require_once("../includes/password.php");
@@ -54,7 +60,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     $query = 'INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout)';
     $stm = $DBH->prepare($query);
     $stm->execute(array(':SID'=>$data[0], ':password'=>$hashpw, ':FirstName'=>$data[2], ':LastName'=>$data[3],
-            ':rights'=>40, ':email'=>$data[4], ':groupid'=>$_POST['groupid'], ':homelayout'=>$homelayout));
+            ':rights'=>40, ':email'=>$data[4], ':groupid'=>$newusergroupid, ':homelayout'=>$homelayout));
 
     $newuserid = $DBH->lastInsertId();
 
@@ -205,7 +211,9 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
 } else {
   require("../header.php");
   $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</a>\n";
-  $curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
+  if ($_GET['from'] != 'admin') {
+  	  $curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
+  }
   echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Batch Create Instructors</div>';
   echo '<form enctype="multipart/form-data" method="post" action="'.$imasroot.'/util/batchcreateinstr.php">';
   echo '<p>This page lets you create instructor accounts from a CSV, and copy courses for them if desired</p>';
@@ -213,12 +221,14 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   echo '<li>1) username</li><li>2) password</li><li>3) First Name</li>';
   echo '<li>4) Last Name</li><li>5) email</li>';
   echo '<li>Columns 6,7,etc. can be course IDs to create copies of for that instructor</li></ul>';
-  echo '<p>Group: <select name="groupid"><option value="-1">Select...</option>';
-	$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo '<option value="'.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
-	}
-  echo '</select><br/>';
+  if ($myrights == 100 || ($myspecialrights&32)==32) {
+	  echo '<p>Group: <select name="groupid"><option value="-1">Select...</option>';
+		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			echo '<option value="'.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
+		}
+	  echo '</select><br/>';
+  }
   echo 'CSV file: <input type=file name=uploadedfile /><br/>';
   echo '<input type="submit" value="Go"/>';
   echo '</form>';
