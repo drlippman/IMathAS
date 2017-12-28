@@ -126,7 +126,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if ($data[3] != 'NA' && $data[4] != 'NA') {
 						//$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,postby=:postby,replyby=:replyby,avail=:avail WHERE id=:id");
 						//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':postby'=>$fpdate, ':replyby'=>$frdate, ':avail'=>$avail, ':id'=>$id));
-						array_push($forumfulltoupdate, $id, $startdate, $enddate, $avail, $postby, $replyby);
+						array_push($forumfulltoupdate, $id, $startdate, $enddate, $avail, $fpdate, $frdate);
 					} else {
 						//$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
 						//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
