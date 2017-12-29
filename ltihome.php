@@ -235,6 +235,9 @@ if (isset($_POST['createcourse'])) {
 	if ($_POST['setplacement']=='course') {
 		$placementtype = 'course';
 		$typeid = $cid;
+	} else if ($_POST['setplacement']=='msgs') {
+		$placementtype = 'msgs';
+		$typeid = $cid;
 	} else {
 		$placementtype = 'assess';
 		$typeid = $_POST['setplacement'];
@@ -253,6 +256,14 @@ if (isset($_POST['createcourse'])) {
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle));
 			exit;
 
+		} else if ($placementtype=='msgs') {
+			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$typeid));
+			$cname = $stm->fetchColumn(0) . ' - ' . _('Messages');
+			
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_view_msgs=1";
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname));
+			exit;
 		} else {
 			//DB $query = "SELECT name FROM imas_courses WHERE id='$typeid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -265,6 +276,9 @@ if (isset($_POST['createcourse'])) {
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname));
 			exit;
 		}
+		unset($sessiondata['lti_selection_return']);
+		writesessiondata();
+		exit;
 	}
 	if ($hasplacement) {
 		//DB $query = "UPDATE imas_lti_placements SET placementtype='$placementtype',typeid='$typeid' WHERE id='$placementid'";
@@ -378,6 +392,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '<br/> <select name="setplacement"> ';
 	//if (!isset($sessiondata['lti_selection_return'])) {
 		echo '<option value="course">Whole course Placement</option>';
+		echo '<option value="msgs">Message list Placement</option>';
 	//}
 	//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());

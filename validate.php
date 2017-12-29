@@ -420,7 +420,7 @@
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
 				exit;
 			}
-		} else if ($sessiondata['ltirole']=='instructor') {
+		} else if ($sessiondata['ltirole']=='instructor' && $sessiondata['ltiitemtype']!=4) {
 			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
 		} else {
 			$breadcrumbbase = '';

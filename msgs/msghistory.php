@@ -150,7 +150,7 @@
 
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
-	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || ($sessiondata['ltiitemtype']!=0 && $sessiondata['ltiitemtype']!=4))) {
 		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	}
 	if ($type=='sent') {

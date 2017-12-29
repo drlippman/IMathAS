@@ -272,7 +272,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				</script>';
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
-			if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || ($sessiondata['ltiitemtype']!=0 && $sessiondata['ltiitemtype']!=4))) {
 				echo "<a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 			}
 			if ($type=='sent') {
@@ -630,7 +630,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
-	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || ($sessiondata['ltiitemtype']!=0 && $sessiondata['ltiitemtype']!=4))) {
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Message List</div>";

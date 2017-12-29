@@ -554,6 +554,11 @@ if (isset($_GET['launch'])) {
 	$store->mark_nonce_used($request);
 
 	$keyparts = explode('_',$ltikey);
+	
+	unset($_SESSION['place_aid']);
+	unset($_SESSION['view_folder']);
+	unset($_SESSION['view_msgs']);
+	
 	$_SESSION['ltiorigkey'] = $ltikey;
 
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
@@ -601,6 +606,8 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
+	} else {
+		unset($_SESSION['selection_return']);
 	}
 
 	//look if we know this user
@@ -1457,6 +1464,8 @@ $sessiondata['lti_keylookup'] = $SESS['ltilookup'];
 $sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
 if (isset($SESS['selection_return'])) {
 	$sessiondata['lti_selection_return'] = $SESS['selection_return'];
+} else {
+	unset($sessiondata['lti_selection_return']);
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {
@@ -1969,6 +1978,10 @@ if (isset($_GET['launch'])) {
 	$keyparts = explode('_',$ltikey);
 	$_SESSION['ltiorigkey'] = $ltikey;
 
+	unset($_SESSION['place_aid']);
+	unset($_SESSION['view_folder']);
+	unset($_SESSION['view_msgs']);
+	
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking
 	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {  //cid:org
 		$_SESSION['ltilookup'] = 'c';
@@ -2047,7 +2060,10 @@ if (isset($_GET['launch'])) {
 			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
 		}
 	}
-
+	if (isset($_REQUEST['custom_view_msgs'])) {
+		$_SESSION['view_msgs'] = 1;
+		$keytype = 'cc-g';
+	}
 
 	//Store all LTI request data in session variable for reuse on submit
 	//if we got this far, secret has already been verified
@@ -2072,7 +2088,10 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
+	} else {
+		unset($_SESSION['selection_return']);
 	}
+	
 
 	//look if we know this student
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when GUID change, while still storing it
@@ -2207,6 +2226,7 @@ $now = time();
 //general placement or common catridge placement - look for placement, or create if know info
 $orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
 $shortorg = $orgparts[0];
+
 if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf' && $_SESSION['lti_keytype']!='cc-of') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') {
 	//DB $query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 	//DB $query .= "contextid='{$_SESSION['lti_context_id']}' AND linkid='{$_SESSION['lti_resource_link_id']}' ";
@@ -2218,7 +2238,22 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>"$shortorg:%"));
 	if ($stm->rowCount()==0) {
-		if (isset($_SESSION['place_aid'])) {
+		if (isset($_SESSION['view_msgs'])) {
+			$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
+			$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+			if ($stm->rowCount()==0) {
+				reporterror("Course link not established yet - click an assessment to establish the link");
+			} else {
+				$cid = $stm->fetchColumn(0);
+				$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
+				$query .= "(:org, :contextid, :linkid, :placementtype, :typeid)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], 
+					':linkid'=>$_SESSION['lti_resource_link_id'], ':placementtype'=>'msgs', ':typeid'=>$cid));
+				$keyparts = array('msgs',$cid);
+			
+			}
+		} else if (isset($_SESSION['place_aid'])) {
 			//look to see if we've already linked this context_id with a course
 			//DB $query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$_SESSION['lti_context_id']}' ";
 			//DB $query .= "AND org LIKE '$shortorg:%'";
@@ -2378,6 +2413,8 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 			$keyparts = array('cid',$row[1]);
 		} else if ($row[0]=='assess') {
 			$keyparts = array('aid',$row[1]);
+		} else if ($row[0]=='msgs') {
+			$keyparts = array('msgs',$row[1]);
 		} else {
 			reporterror("Invalid placement type");
 		}
@@ -2388,7 +2425,7 @@ if ($_SESSION['lti_keytype']=='cc-vf' || $_SESSION['lti_keytype']=='cc-of') {
 	$keyparts = array('folder',$_SESSION['view_folder'][0],$_SESSION['view_folder'][1]);
 }
 //is course level placement
-if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
+if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey' || $keyparts[0]=='msgs') {
 	$cid = intval($keyparts[1]);
 	//DB $query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -2513,7 +2550,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 }
 
 //see if student is enrolled, if appropriate to action type
-if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $keyparts[0]=='folder' || $keyparts[0]=='LTIkey') {
+if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $keyparts[0]=='folder' || $keyparts[0]=='LTIkey' || $keyparts[0]=='msgs') {
 	if ($_SESSION['ltirole']=='instructor') {
 		//DB $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -2658,6 +2695,9 @@ if ($keyparts[0]=='aid') {
 } else if ($keyparts[0]=='folder') { //is folder content view
 	$sessiondata['ltiitemtype']=3;
 	$sessiondata['ltiitemid'] = array($keyparts[2],$keyparts[3],$cid);
+} else if ($keyparts[0]=='msgs') { //is msg link
+	$sessiondata['ltiitemtype']=4;
+	$sessiondata['ltiitemid'] = $cid;
 } else {
 	$sessiondata['ltiitemtype']=-1;
 }
@@ -2675,6 +2715,8 @@ $sessiondata['lti_keylookup'] = $SESS['ltilookup'];
 $sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
 if (isset($SESS['selection_return'])) {
 	$sessiondata['lti_selection_return'] = $SESS['selection_return'];
+} else {
+	unset($sessiondata['lti_selection_return']);
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {
@@ -2726,6 +2768,8 @@ if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsess
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 	} else if ($keyparts[0]=='sso') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+	} else if ($keyparts[0]=='msgs') {
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?cid=$cid");
 	} else if ($keyparts[0]=='folder') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?checksess=true&cid=$cid&folder=".$keyparts[3]);
 	} else { //will only be instructors hitting this option
