@@ -514,8 +514,13 @@
 				if ($line != null) {
 					$tutorid = $line['id'];
 					$tutorsection = trim($line['section']);
-				}
-
+				} else if ($myrights==5 && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
+					//guest user not enrolled, but trying via guestaccess; enroll	
+					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES (?,?)");
+					$stm->execute(array($userid, $cid));
+					$studentid = $DBH->lastInsertId();
+					$studentinfo = array('latepasses'=>0, 'timelimitmult'=>1, 'section'=>null);
+				} 
 			}
 		}
 		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs ";
