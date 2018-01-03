@@ -460,7 +460,8 @@ switch($_POST['action']) {
 
 			$browserdata = array();
 			foreach ($browserprops as $propname=>$propvals) {
-				if (!empty($propvals['required']) && trim($_POST['browser'.$propname]) == '') {
+				if (!empty($propvals['required']) && trim($_POST['browser'.$propname]) == '' &&
+					!($propvals['required']==2 && ($istemplate&3)>0)) {
 					$isok = false;
 					break;
 				}

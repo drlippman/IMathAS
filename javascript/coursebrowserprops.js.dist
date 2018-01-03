@@ -14,7 +14,7 @@ var courseBrowserProps = {
 	"name": {
 		"name": "Display Name",
 		"type": "string",
-		"required": true
+		"required": 1
 	},
 	"owner": {
 		"name": "Contributed by",
@@ -121,6 +121,6 @@ var courseBrowserProps = {
 		"name": "Description",
 		"subname": "Describe the topics covered, the approach, and what makes this course unique",
 		"type": "textarea",
-		"required": true
+		"required": 2
 	}
 }
