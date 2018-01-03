@@ -252,9 +252,12 @@ switch($_GET['action']) {
 				//DB $query = "SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id={$line['ownerid']}";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				//DB $udat = mysql_fetch_array($result, MYSQL_ASSOC);
-				$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
+				$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
 				$stm->execute(array(':id'=>$line['ownerid']));
 				$udat = $stm->fetch(PDO::FETCH_ASSOC);
+				if ($udat['groupid']==0) {
+					$udat['name'] = _('Default Group');
+				}
 				if ($myrights===75 && $udat['groupid']!=$groupid) {
 					echo "You don't have the authority for this action"; break;
 				}
@@ -1104,11 +1107,14 @@ switch($_GET['action']) {
 		echo "<h3>Modify Groups</h3>\n";
 		echo '</div>';
 		echo "<table class=gb><thead><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr></thead><tbody>\n";
+		if ($from=='admin2') {
+			echo '<tr class="even"><td><a href="admin2.php?groupdetails=0">'._('Default Group').'</a></td><td></td><td></td></tr>';
+		}
 		//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
-		$alt = 0;
+		$alt = 1;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($alt==0) {echo "<tr class=\"even\">"; $alt=1;} else {echo "<tr class=\"odd\">"; $alt=0;}
 			if ($from=='admin2') {

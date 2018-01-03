@@ -35,12 +35,14 @@ if ($myrights < 75) {
     $curBreadcrumb = $curBreadcrumb  . _('Admin');
     $showgroup = $groupid;
 
-  } else if (!empty($_GET['groupdetails'])) {
+  } else if (isset($_GET['groupdetails'])) {
     //show the list of group users page
     $showgroup = Sanitize::onlyInt($_GET['groupdetails']);
     if ($showgroup==-1) {
       $groupname = _('Pending Users');
-    }  else {
+    } else if ($showgroup==0) {
+      $groupname = _('Default Group');    
+    } else {
       $stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
       $stm->execute(array(':id'=>$showgroup));
       $groupname = $stm->fetchColumn(0);
