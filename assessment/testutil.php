@@ -102,7 +102,7 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 		if ($line['showans']=='0') {
 			$line['showans'] = $testsettings['showans'];
 		}
-		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] > 0);
+		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] >= 0);
 		$line['showansafterlast'] = ($line['showans']==='F' || $line['showans']==='R' || $line['showans']==='J');
 		if (!$preloadqsdata) {
 			unset($line['qtype']);

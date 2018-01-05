@@ -1856,7 +1856,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					unset($GLOBALS['nocolormark']);
 					echo "<p>" . _("This question, with your last answer");
 					if (($qi[$questions[$qn]]['showansafterlast'] && !$reattemptsremain) ||
-							($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn]) ||
+							($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']<=$attempts[$qn]) ||
 							($qi[$questions[$qn]]['showans']=='R' && $regenonreattempt)) {
 						echo _(" and correct answer");
 						$showcorrectnow = true;
@@ -2510,7 +2510,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				//TODO i18n
 				$msg =  "<p>" . _("This question, with your last answer");
 				if (($qi[$questions[$qn]]['showansafterlast'] && !hasreattempts($qn)) ||
-						($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn]) ||
+						($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']<=$attempts[$qn]) ||
 						($qi[$questions[$qn]]['showans']=='R' && $regenonreattempt)) {
 					$msg .= _(" and correct answer");
 					$showcorrectnow = true;
@@ -2902,7 +2902,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 				} else {
 					if (($qi[$questions[$i]]['showansafterlast']) ||
-							($qi[$questions[$i]]['showansduring'] && $qi[$questions[$i]]['showans']==$attempts[$i]) ||
+							($qi[$questions[$i]]['showansduring'] && $qi[$questions[$i]]['showans']<=$attempts[$i]) ||
 							($qi[$questions[$i]]['showans']=='R' && $regenonreattempt)) {
 						$showcorrectnow = true;
 					} else {
