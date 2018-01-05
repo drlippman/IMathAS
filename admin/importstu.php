@@ -175,7 +175,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				//DB $query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB $id = mysql_insert_id();
-				$stm = $DBH->prepare("INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES (:SID, :FirstName, :LastName, :email, :rights, :password)");
+				$stm = $DBH->prepare("INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password,forcepwreset) VALUES (:SID, :FirstName, :LastName, :email, :rights, :password, 1)");
 				$stm->execute(array(':SID'=>$arr[0], ':FirstName'=>$arr[1], ':LastName'=>$arr[2], ':email'=>$arr[3], ':rights'=>10, ':password'=>$pw));
 				$id = $DBH->lastInsertId();
 			}
@@ -328,7 +328,7 @@ if ($overwriteBody==1) {
 ?>
 			</tbody>
 			</table>
-
+ 
 <?php
 		foreach($_POST as $k=>$v) {
 			echo "<input type=hidden name=\"" . Sanitize::encodeStringForDisplay($k) . "\" value=\"".Sanitize::encodeStringForDisplay($v)."\">\n";
@@ -384,7 +384,7 @@ if ($overwriteBody==1) {
 			<input type=text name=unloc size=4 value="2"/>
 		</span><br class=form>
 
-		<span class=form>Password is in column:</span>
+		<span class=form>Temporary password is in column:</span>
 		<span class=formright>
 			<input type=text name="pwcol" size=4 value="1"/>
 		</span><br class=form>

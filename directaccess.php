@@ -185,7 +185,7 @@
 			 $challenge = base64_encode(microtime() . rand(0,9999));
 			 $_SESSION['challenge'] = $challenge;
 		 }
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		if (isset($CFG['locale'])) {
 			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.$CFG['locale'].'.min.js"></script>';
 		}

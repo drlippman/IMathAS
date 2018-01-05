@@ -185,7 +185,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
 			require_once("../includes/newusercommon.php");
@@ -204,8 +204,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				//DB $query .= "VALUES ('{$_POST['SID']}','$md5pw',10,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',0);";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB $newuserid = mysql_insert_id();
-				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify) ";
-				$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify);";
+				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, forcepwreset) ";
+				$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, 1);";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>10,
 					':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>0));
@@ -269,7 +269,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['chgstuinfo'])) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once("../includes/newusercommon.php");
 
 		if (isset($_POST['firstname'])) {
@@ -321,7 +321,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 						$newpw = md5($_POST['pw1']);
 					}
 					//DB $query .= ",password='$newpw'";
-					$query .= ",password=:password";
+					$query .= ",password=:password,forcepwreset=1";
 					$qarr[':password'] = $newpw;
 					$msgout .= '<p>Password updated</p>';
 				}
@@ -731,14 +731,15 @@ if ($overwriteBody==1) {
 			<span class=formright><input type="number" min="0.01" step="0.01" name="timelimitmult" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['timelimitmult']); ?>"/></span><br class=form>
 			<span class=form>LatePasses:</span>
 			<span class=formright><input type="number" min="0" name="latepasses" value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['latepass']); ?>"/></span><br class=form>
-			<span class=form>Lock out of course?:</span>
+			<span class=form>Lock out of course?</span>
 			<span class=formright><input type="checkbox" name="locked" value="1" <?php if ($lineStudent['locked']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
-			<span class="form">Student has course hidden from course list?:</span>
+			<span class="form">Student has course hidden from course list?</span>
 			<span class="formright"><input type="checkbox" name="hidefromcourselist" value="1" <?php if ($lineStudent['hidefromcourselist']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class=form><label for="doresetpw">Reset password?</label></span>
 			<span class=formright>
-				<input type=checkbox name="doresetpw" id="doresetpw" value="1" /> <label for="pw1">Reset to:</label>
-				<input type=text size=20 name="pw1" id="pw1" />
+				<input type=checkbox name="doresetpw" id="doresetpw" value="1" onclick="$('#newpwwrap').toggle(this.checked)" /> 
+				<span id="newpwwrap" style="display:none"><label for="pw1">Set temporary password to:</label> 
+				<input type=text size=20 name="pw1" id="pw1" /></span>
 			</span><br class=form />
 			<div class=submit><input type=submit value="Update Info"></div>
 		</form>

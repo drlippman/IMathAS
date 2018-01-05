@@ -24,7 +24,7 @@ if (isset($_GET['greybox'])) {
 } else {
 	$gb = '';
 }
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 if (isset($CFG['locale'])) {
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.$CFG['locale'].'.min.js"></script>';
 }
@@ -94,12 +94,18 @@ switch($_GET['action']) {
 			include($studentTOS);
 		}
 		break;
+	case "forcechgpwd":
 	case "chgpwd":
-		if ($gb == '') {
+		if ($gb == '' && $_GET['action']!='forcechgpwd') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Change Password</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
-		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=chgpwd$gb\">\n";
+		if ($_GET['action']=='forcechgpwd') {
+			echo '<p>'._('To ensure the security of your account, we are requiring a password change. Please select a new password.').'</p>';
+			echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=forcechgpwd$gb\">\n";
+		} else {
+			echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=chgpwd$gb\">\n";
+		}
 		echo "<span class=form><label for=\"oldpw\">Enter old password:</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw1\">Enter new password:</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">Verify new password:</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";

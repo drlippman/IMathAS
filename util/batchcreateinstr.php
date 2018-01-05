@@ -57,7 +57,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
 			$hashpw = md5($data[1]);
 		}
     echo "Importing ".Sanitize::encodeStringForDisplay($data[0])."<br/>";
-    $query = 'INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout)';
+    $query = 'INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,forcepwreset) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, 1)';
     $stm = $DBH->prepare($query);
     $stm->execute(array(':SID'=>$data[0], ':password'=>$hashpw, ':FirstName'=>$data[2], ':LastName'=>$data[3],
             ':rights'=>40, ':email'=>$data[4], ':groupid'=>$newusergroupid, ':homelayout'=>$homelayout));
@@ -218,7 +218,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   echo '<form enctype="multipart/form-data" method="post" action="'.$imasroot.'/util/batchcreateinstr.php">';
   echo '<p>This page lets you create instructor accounts from a CSV, and copy courses for them if desired</p>';
   echo '<p>Column Format:</p><ul>';
-  echo '<li>1) username</li><li>2) password</li><li>3) First Name</li>';
+  echo '<li>1) username</li><li>2) temporary password</li><li>3) First Name</li>';
   echo '<li>4) Last Name</li><li>5) email</li>';
   echo '<li>Columns 6,7,etc. can be course IDs to create copies of for that instructor</li></ul>';
   if ($myrights == 100 || ($myspecialrights&32)==32) {

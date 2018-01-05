@@ -28,9 +28,12 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
         echo '"
       },
       pw1: {
-        required: '.(isset($requiredrules['pw1'])?$requiredrules['pw1']:'true').',';
+      	required: '.(isset($requiredrules['pw1'])?$requiredrules['pw1']:'true').',';
         if (isset($CFG['acct']['passwordFormat'])) {
           echo 'pattern: '.$CFG['acct']['passwordFormat'].',';
+        }
+        if (in_array('oldpw', $extrarequired)) {
+        	echo 'notEqual: "#oldpw",';
         }
         echo 'minlength: '.(isset($CFG['acct']['passwordMinlength'])?$CFG['acct']['passwordMinlength']:6).'
       },

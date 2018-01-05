@@ -414,7 +414,7 @@ require_once("includes/sanitize.php");
 			setcookie(session_name(), '', time()-42000, '/');
 		}
 		session_destroy();
-	} else if ($_GET['action']=="chgpwd") {
+	} else if ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd") {
 		//DB $query = "SELECT password FROM imas_users WHERE id = '$userid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -427,12 +427,10 @@ require_once("includes/sanitize.php");
 			} else {
 				$newpw =md5($_POST['pw1']);
 			}
-			//DB $query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw WHERE id=:uid LIMIT 1");
+			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 		} else {
-			echo "<html><body>Password change failed.  <A HREF=\"forms.php?action=chgpwd$gb\">Try Again</a>\n";
+			echo "<html><body>Password change failed.  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">Try Again</a>\n";
 			echo "</body></html>\n";
 			exit;
 		}

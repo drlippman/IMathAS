@@ -2,7 +2,7 @@
 //IMathAS:  Admin forms
 //(c) 2006 David Lippman
 require("../init.php");
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 require("../header.php");
 require("../includes/htmlutil.php");
 
@@ -68,16 +68,6 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
-	case "chgpwd":
-		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
-		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
-		echo '<input type=hidden name=action value="chgpwd" />';
-		echo "<span class=form>Enter old password:</span>  <input class=form type=password name=oldpw size=40> <BR class=form>\n";
-		echo "<span class=form>Enter new password:</span> <input class=form type=password name=newpw1 size=40> <BR class=form>\n";
-		echo "<span class=form>Verify new password:</span>  <input class=form type=password name=newpw2 size=40> <BR class=form>\n";
-		echo '<div class=submit><button type=submit name="action" value="chgpwd">'._('Save').'</button></div></form>';
-		break;
-
 	case "chgrights":
 	case "newadmin":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
@@ -141,8 +131,8 @@ switch($_GET['action']) {
 		if ($_GET['action'] == "newadmin") {
 			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="pw1"/><br class="form"/>';
 		} else {
-			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" /> ';
-			echo 'Reset to: <input type=text size=20 name="newpassword" /></span><br class=form />';
+			echo '<span class=form>Reset password?</span><span class=formright><input type=checkbox name="doresetpw" value="1" onclick="$(\'#newpwwrap\').toggle(this.checked)"/> ';
+			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
 		}
 
 		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";

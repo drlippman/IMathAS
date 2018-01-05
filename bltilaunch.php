@@ -328,7 +328,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$flexwidth = true;
 		$nologo = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
@@ -1782,7 +1782,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$nologo = true;
 		$flexwidth = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';

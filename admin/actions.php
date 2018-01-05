@@ -108,7 +108,7 @@ switch($_POST['action']) {
 				$query .= ',SID=:SID';
 			}
 			if (isset($_POST['doresetpw'])) {
-				$query .= ',password=:password';
+				$query .= ',password=:password,forcepwreset=1';
 			}
 			$query .= " WHERE id=:id";
 			$stm = $DBH->prepare($query);
@@ -211,26 +211,6 @@ switch($_POST['action']) {
 		require_once("../includes/filehandler.php");
 		deletealluserfiles($_GET['id']);
 		//todo: delete courses if any
-		break;
-	case "chgpwd":
-		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$userid));
-		$line = $stm->fetch(PDO::FETCH_ASSOC);
-
-		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'], $line['password'])) ) && ($_POST['newpw1'] == $_POST['newpw2'])) {
-			$md5pw =md5($_POST['newpw1']);
-			if (isset($CFG['GEN']['newpasswords'])) {
-				$md5pw = password_hash($_POST['newpw1'], PASSWORD_DEFAULT);
-			} else {
-				$md5pw = md5($_POST['newpw1']);
-			}
-			$stm = $DBH->prepare("UPDATE imas_users SET password=:password WHERE id=:id");
-			$stm->execute(array(':password'=>$md5pw, ':id'=>$userid));
-		} else {
-			echo "<HTML><body>Password change failed.  <A HREF=\"forms.php?action=chgpwd\">Try Again</a>\n";
-			echo "</body></html>\n";
-			exit;
-		}
 		break;
 	case "newadmin":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
