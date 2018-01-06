@@ -433,6 +433,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		if ($sessiondata['ltiitemtype']==-1) {
 			echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 		}
+		echo '<p>&nbsp;</p><p class=small>This assessment is housed in course ID '.Sanitize::courseId($cid).'</p>';
 	}
 }
 require("footer.php");
