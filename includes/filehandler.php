@@ -148,6 +148,8 @@ function storeuploadedfile($id,$key,$sec="private") {
 			$sec = "private";
 		}
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
+			correctimageorientation($_FILES[$id]);
+			downsizeimage($_FILES[$id]);
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
 			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],$key,$sec)) {
@@ -160,6 +162,8 @@ function storeuploadedfile($id,$key,$sec="private") {
 		}
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
+			correctimageorientation($_FILES[$id]);
+			downsizeimage($_FILES[$id]);
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
 			$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 			$dir = $base.dirname($key);
@@ -174,6 +178,49 @@ function storeuploadedfile($id,$key,$sec="private") {
 			}
 		} else {
 			return false;
+		}
+	}
+}
+
+function correctimageorientation($fileinfo) {
+	if (preg_match('/\.(jpg|jpeg)/', $fileinfo['name'])) {
+		$imgdata = getimagesize($fileinfo['tmp_name']);
+		if ($imgdata!==false && $imgdata['mime'] == 'image/jpeg') {
+			$exif = exif_read_data($fileinfo['tmp_name']);
+			if (isset($exif['Orientation']) && $exif['Orientation']>1) {
+				$image = imagecreatefromjpeg($fileinfo['tmp_name']);
+				switch($exif['Orientation']) {
+					case 3:
+					    $image = imagerotate($image, 180, 0);
+					    break;
+					case 6:
+					    $image = imagerotate($image, -90, 0);
+					    break;
+					case 8:
+					    $image = imagerotate($image, 90, 0);
+					    break;
+				}
+				imagejpeg($image, $fileinfo['tmp_name'], 90);
+			}
+		}
+	}
+}
+function downsizeimage($fileinfo) {
+	if (preg_match('/\.(jpg|jpeg)/', $fileinfo['name'])) {
+		$imgdata = getimagesize($fileinfo['tmp_name']);
+		if ($imgdata!==false && $imgdata['mime'] == 'image/jpeg' && min($imgdata[0],$imgdata[1])>1000) {
+			$r = $imgdata[0]/$imgdata[1]; // width/height
+			$image = imagecreatefromjpeg($fileinfo['tmp_name']);
+			if ($imgdata[0]>$imgdata[1]) { //width bigger than height
+				$newh = 1000;
+				$neww = round($r*$newh);
+			} else {
+				$neww = 1000;
+				$newh = round($neww/$r);
+			}
+			$dst = imagecreatetruecolor($neww, $newh);
+			imagecopyresampled($dst, $image, 0, 0, 0, 0, $neww, $newh, $imgdata[0], $imgdata[1]);
+			imagejpeg($dst, $fileinfo['tmp_name'], 90);
 		}
 	}
 }
