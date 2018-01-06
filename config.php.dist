@@ -24,9 +24,9 @@
 
   //Require the username to meet a specific format.  Choose one of the following,
   //or write your own.
-  $loginformat = '/^\w+$/';  //A-Z, a-z, 0-9, _ are the only allowed characters
-  //$loginformat = '/^\d{9}$/';  //Requires a 9 digit number
-  //$loginformat = '/^\d{3}-\d{2}-\d{4}$/';  //SSN type format: 555-55-5555
+  $loginformat = '/^[\w\-]+$/';  //A-Z, a-z, 0-9, _ are the only allowed characters
+  //$loginformat = '/^(\d{9}|lti-\d+)$/';  //Requires a 9 digit number
+  //$loginformat = '/^(\d{3}-\d{2}-\d{4}|lti-\d+)$/';  //SSN type format: 555-55-5555
 
 	/* Additional options available for restricting login format and related:
 	$loginformat can be an array of regexs instead of a single one to impose

@@ -27,11 +27,11 @@ error_reporting(E_ALL & ~E_NOTICE);
 \$loginformat = '";
 
 if ($_POST['loginformat']==0) {
-	$contents .= '/^\w+$/';
+	$contents .= '/^[\w+\-]$/';
 } else if ($_POST['loginformat']==1) {
-	$contents .= '/^\d{9}$/';
+	$contents .= '/^(\d{9}|lti-\d+)$/';
 } else if ($_POST['loginformat']==2) {
-	$contents .= '/^\d{3}-\d{2}-\d{4}$/';
+	$contents .= '/^(\d{3}-\d{2}-\d{4}|lti-\d+)$/';
 } else if ($_POST['loginformat']==3) {
 	$contents .= $_POST['loginformatother'];
 }
