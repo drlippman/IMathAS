@@ -103,7 +103,7 @@ row[1][1] scores (all types - type is determined from header row)
 row[1][1][0] first score - assessment
 row[1][1][0][0] = score
 row[1][1][0][1] = 0 no comment, 1 has comment - is comment in stu view
-row[1][1][0][2] = show link: 0 no, 1 yes
+row[1][1][0][2] = show gbviewasid link: 0 no, 1 yes,
 row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT  + 10 if still active
 row[1][1][0][4] = asid, or 'new'
 row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 attempted
@@ -113,6 +113,7 @@ row[1][1][0][8] = time on task (time displayed)
 row[1][1][0][9] = last change time (if $includelastchange is set)
 row[1][1][0][10] = allow latepass use on this item
 row[1][1][0][11] = endmsg if requested through $includeendmsg
+row[1][1][0][12] = timelimit if requested through $includetimelimit
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -1075,7 +1076,9 @@ function gbtable() {
 			$inexception = false;
 		}
 		$gb[$row][1][$col][10] = $canuselatepass;
-
+		if (!empty($GLOBALS['includetimelimit'])) {
+			$gb[$row][1][$col][12] = $timelimits[$i]*$timelimitmult[$l['userid']];
+		}
 		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice"
 			$gb[$row][1][$col][2] = 1; //show link
 		} /*else if ($l['timelimit']<0 && (($now - $l['starttime'])>abs($l['timelimit'])) && $sa[$i]!='N' && ($assessmenttype[$k]=='EachAtEnd' || $assessmenttype[$k]=='EndReview' || $assessmenttype[$k]=='AsGo' || $assessmenttype[$k]=='Homework'))  ) {

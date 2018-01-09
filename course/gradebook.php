@@ -280,6 +280,8 @@ if ($canviewall) {
 if (isset($studentid) || $stu!=0) { //show student view
 	if (isset($studentid)) {
 		$stu = $userid;
+		$includetimelimit = true;
+		$includeduedate = true;
 	}
 	$pagetitle = _('Gradebook');
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
@@ -572,6 +574,7 @@ function gbstudisp($stu) {
 		$availshow=1;
 		$hidepast = true;
 	}
+	$now = time();
 	$hasoutcomes = false;
 	if ($stu>0) {
 		//DB $query = "SELECT showlatepass,latepasshrs FROM imas_courses WHERE id='$cid'";
@@ -604,6 +607,7 @@ function gbstudisp($stu) {
 		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
+
 	$gbt = gbtable($stu);
 
 	if ($stu>0) {
@@ -774,10 +778,40 @@ function gbstudisp($stu) {
 					echo '<td></td>';
 				}
 			}
-
 			echo '<td class="cat'.Sanitize::onlyInt($gbt[0][1][$i][1]).'">';
-			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1) {
-				echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'">';
+			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && !$isteacher && !$istutor) {
+				echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
+				if (abs($gbt[1][1][$i][12])>0) {
+					$tlwrds = '';
+					$timelimit = abs($gbt[1][1][$i][12]);
+					if ($timelimit>3600) {
+						$tlhrs = floor($timelimit/3600);
+						$tlrem = $timelimit % 3600;
+						$tlmin = floor($tlrem/60);
+						$tlsec = $tlrem % 60;
+						$tlwrds = "$tlhrs " . _('hour');
+						if ($tlhrs > 1) { $tlwrds .= "s";}
+						if ($tlmin > 0) { $tlwrds .= ", $tlmin " . _('minute');}
+						if ($tlmin > 1) { $tlwrds .= "s";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
+						if ($tlsec > 1) { $tlwrds .= "s";}
+					} else if ($timelimit>60) {
+						$tlmin = floor($timelimit/60);
+						$tlsec = $timelimit % 60;
+						$tlwrds = "$tlmin " . _('minute');
+						if ($tlmin > 1) { $tlwrds .= "s";}
+						if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
+						if ($tlsec > 1) { $tlwrds .= "s";}
+					} else {
+						$tlwrds = $timelimit . _(' second(s)');
+					}
+					if ($timelimit > $gbt[0][1][$i][11] - $now) {
+						echo " onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s, but that will be restricted by the upcoming due date. Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
+					} else {
+						echo " onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
+					}
+				}
+				echo '>';
 			}
 			echo Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1) {
