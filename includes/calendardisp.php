@@ -636,8 +636,6 @@ foreach ($itemsimporder as $item) {
 				$colors[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][2];
 				if (isset($itemfolder[$item])) {
 					$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'] = str_replace('@@@',$itemfolder[$item],$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder']);
-				} else {
-					$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder'] = str_replace('"@@@"','null',$byid['I'.$datetype.$itemsassoc[$item][1]][3]['folder']);
 				}
 				$assess[$moday][$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][4];
@@ -788,9 +786,7 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,$folder,$avai
 			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$folder.'-'.($k+1),$thisavail,$thisishidden);
 		} else {
 			$addto[] = $item;
-			if ($avail) {
-				$folderholder[$item] = $folder;
-			}
+			$folderholder[$item] = $folder;
 			if ($ishidden) {
 				$hiddenholder[$item] = true;
 			}
