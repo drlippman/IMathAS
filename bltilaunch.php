@@ -1300,7 +1300,9 @@ if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || 
 			$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->rowCount() == 0) {
-				reporterror("error - you are not an instructor or tutor on the $installname course this link is associated with.  If you are team-teaching this course, have the other instructor add you as a teacher or tutor on $installname then try again.");
+				//reporterror("error - you are not an instructor or tutor on the $installname course this link is associated with.  If you are team-teaching this course, have the other instructor add you as a teacher or tutor on $installname then try again.");
+				$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
+				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 			}
 		}
 		$timelimitmult = 1;
