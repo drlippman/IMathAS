@@ -3,10 +3,10 @@
 //(c) 2007 David Lippman
 
 require_once("../includes/exceptionfuncs.php");
-if ($canviewall) {
-	$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+if ($GLOBALS['canviewall']) {
+	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, false);
 } else {
-	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 }
 
 require_once("../includes/sanitize.php");
@@ -63,7 +63,7 @@ row[0][0][1] = "SID"
 row[0][1] scores
 row[0][1][0] first score
 row[0][1][0][0] = "Assessment name"
-row[0][1][0][1] = category color #
+row[0][1][0][1] = category color #  (or gbcat ID if $includecategoryID is set)
 row[0][1][0][2] = points possible
 row[0][1][0][3] = 0 past, 1 current, 2 future
 row[0][1][0][4] = 0 no count and hide, 1 count, 2 EC, 3 no count
@@ -712,7 +712,11 @@ function gbtable() {
 			if (($orderby&1)==1) {  //display item header if displaying by category
 				//$cathdr[$pos] = $cats[$cat][6];
 				$gb[0][1][$pos][0] = $name[$k]; //item name
-				$gb[0][1][$pos][1] = $cats[$cat][8]; //item category number
+				if (!empty($GLOBALS['includecategoryID'])) {
+					$gb[0][1][$pos][1] = $cat;
+				} else {
+					$gb[0][1][$pos][1] = $cats[$cat][8]; //item category number
+				}
 				$gb[0][1][$pos][2] = $possible[$k]; //points possible
 				$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 				$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
@@ -791,7 +795,11 @@ function gbtable() {
 
 		foreach ($itemorder as $k) {
 			$gb[0][1][$pos][0] = $name[$k]; //item name
-			$gb[0][1][$pos][1] = $cats[$category[$k]][8]; //item category name
+			if (!empty($GLOBALS['includecategoryID'])) {
+				$gb[0][1][$pos][1] = $category[$k];
+			} else {
+				$gb[0][1][$pos][1] = $cats[$category[$k]][8]; //item category color #
+			}
 			$gb[0][1][$pos][2] = $possible[$k]; //points possible
 			$gb[0][1][$pos][3] = $avail[$k]; //0 past, 1 current, 2 future
 			$gb[0][1][$pos][4] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
@@ -1102,7 +1110,7 @@ function gbtable() {
 				$gb[$row][1][$col][3] = 1;  //no credit
 				$pts = 0;
 			}
-		} else 	if ($IP==1 && $thised>$now && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
+		} else 	if ($IP==1 && ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;

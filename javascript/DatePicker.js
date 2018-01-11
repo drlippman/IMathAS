@@ -320,9 +320,12 @@ function splitDateString(dateString)
 function updateDateField(dateFieldName, dateString)
 {
   var targetDateField = document.getElementsByName (dateFieldName).item(0);
-  if (dateString)
+  if (dateString) {
     targetDateField.value = dateString;
- 
+    if (targetDateField.dispatchEvent) {
+    	targetDateField.dispatchEvent(new Event('input'));	    
+    }
+  }
   var pickerDiv = document.getElementById(datePickerDivID);
   pickerDiv.style.visibility = "hidden";
   pickerDiv.style.display = "none";

@@ -2,6 +2,16 @@
 //IMathAS:  Mass send email or message to students; called from List Users or Gradebook
 //(c) 2006 David Lippman
 
+	if (!isset($DBH)) {
+		require("../init.php");
+		if (isset($_GET['embed'])) {
+			$calledfrom='embed';
+			$_POST['submit'] = "Message";
+			$flexwidth = true;
+			$nologo = true;
+		}
+	}
+	
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
@@ -246,6 +256,11 @@
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid");
 		} else if ($calledfrom=='itemsearch') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin2.php");
+		} else if ($calledfrom=='embed') {
+			require("../header.php");
+			echo '<p>'._('Messages Sent').'.';
+			echo ' <button type="button" onclick="top.GB_hide()">'._('Close').'</button>';
+			require("../footer.php");
 		}
 		exit;
 	} else {
@@ -257,13 +272,17 @@
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		if ($calledfrom=='lu') {
-			echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
-		} else if ($calledfrom=='gb') {
-			echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
-		} else if ($calledfrom=='itemsearch') {
-			echo "&gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+		if ($calledfrom=='embed') {
+			$_POST['checked'] = explode('-', $_GET['to']);
+		} else {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			if ($calledfrom=='lu') {
+				echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+			} else if ($calledfrom=='gb') {
+				echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+			} else if ($calledfrom=='itemsearch') {
+				echo "&gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+			}
 		}
 		if (count($_POST['checked'])==0) {
 			echo "No users selected.  ";
@@ -284,6 +303,12 @@
 			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
 		} else if ($calledfrom=='itemsearch') {
 			echo "<form method=post action=\"itemsearch.php?masssend=".Sanitize::encodeUrlParam($sendtype)."\">\n";
+		} else if ($calledfrom=='embed') {
+			echo "<form method=post action=\"masssend.php?embed=true&cid=".Sanitize::courseId($cid)."&masssend=".Sanitize::encodeUrlParam($sendtype);
+			if (isset($_GET['nolimit'])) {
+				echo '&nolimit=true';
+			}
+			echo "\">\n";
 		}
 		echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 		echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($line['subject'])."\"></span><br class=form>\n";
@@ -291,8 +316,8 @@
 		echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70> </textarea></div></span><br class=form>\n";
 		echo "<p><i>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each students' first/last name</p>";
 		echo "<span class=form><label for=\"self\">Send copy to:</label></span>";
-		echo "<span class=formright><input type=radio name=self id=self value=\"none\">Only Students<br/> ";
-		echo "<input type=radio name=self id=self value=\"self\" checked=checked>Students and you<br/> ";
+		echo "<span class=formright><input type=radio name=self id=self value=\"none\" checked=checked>Only Students<br/> ";
+		echo "<input type=radio name=self id=self value=\"self\">Students and you<br/> ";
 		echo "<input type=radio name=self id=self value=\"allt\">Students and all instructors of this course";
 		if ($hastutors) {
 			echo '<br/><input type="checkbox" name="tutorcopy" id="tutorcopy" value="tutorcopy">Also send a copy to tutors';
@@ -303,26 +328,27 @@
 			echo '<span class="formright"><input type="checkbox" name="savesent" checked="checked" /></span><br class="form" />';
 		}
 
-
-		echo "<span class=form><label for=\"limit\">Limit send: </label></span>";
-		echo "<span class=formright>";
-		echo 'Only send to students who haven\'t <select name="limittype">';
-		echo ' <option value="start" selected>started</option>';
-		echo ' <option value="comp">tried every problem in</option>';
-		echo '</select> this assessment: ';
-		echo "<select name=\"aidselect\" id=\"aidselect\">\n";
-		echo "<option value=\"0\">Don't limit - send to all</option>\n";
-		//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
-		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
-		$stm->execute(array(':courseid'=>$cid));
-		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
-			printf("<option value=\"%d\" ", Sanitize::onlyInt($line['id']));
-			if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
-			echo ">".Sanitize::encodeStringForDisplay($line['name'])."</option>\n";
+		if (!isset($_GET['nolimit'])) {
+			echo "<span class=form><label for=\"limit\">Limit send: </label></span>";
+			echo "<span class=formright>";
+			echo 'Only send to students who haven\'t <select name="limittype">';
+			echo ' <option value="start" selected>started</option>';
+			echo ' <option value="comp">tried every problem in</option>';
+			echo '</select> this assessment: ';
+			echo "<select name=\"aidselect\" id=\"aidselect\">\n";
+			echo "<option value=\"0\">Don't limit - send to all</option>\n";
+			//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+				printf("<option value=\"%d\" ", Sanitize::onlyInt($line['id']));
+				if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
+				echo ">".Sanitize::encodeStringForDisplay($line['name'])."</option>\n";
+			}
+			echo "</select>\n";
 		}
-		echo "</select>\n";
 		echo "<input type=hidden name=\"tolist\" value=\""
 	. Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
 		echo "</span><br class=form />\n";
@@ -333,7 +359,11 @@
 		//DB $query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");
-		echo '<p>Unless limited, message will be sent to:<ul>';
+		if (isset($_GET['nolimit'])) {
+			echo '<p>Message will be sent to:<ul>';
+		} else {
+			echo '<p>Unless limited, message will be sent to:<ul>';
+		}
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf("<li>%s, %s (%s)</li>", Sanitize::encodeStringForDisplay($row[0]),

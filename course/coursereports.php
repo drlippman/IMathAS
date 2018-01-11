@@ -39,6 +39,7 @@ if ($overwriteBody==1) {
 	echo '<div class="pagetitle"><h2>Course Reports</h2></div>';
 	echo '<ul class="nomark">';
 	echo '<li><a href="report-weeklylab.php?cid='.$cid.'">Activity Report - Lab Style Courses</a></li>';
+	echo '<li><a href="report-commonstu.php?cid='.$cid.'">Activity Report - Sort Students by Activity</a></li>';
 	echo '<li><a href="outcomereport.php?cid='.$cid.'">Outcome Report</a></li>';
 	echo '<li><a href="logingrid.php?cid='.$cid.'">Login Grid</a></li>';
 	echo '</ul>';
