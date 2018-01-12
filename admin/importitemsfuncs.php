@@ -756,7 +756,7 @@ private function insertAssessment() {
 		}
 		//sanitize intro field, which may be json
 		$introjson = json_decode($thisitemdata['intro'], true);
-		if ($introjson===false) {
+		if ($introjson===null) {
 			//regular intro
 			$thisitemdata['intro'] = myhtmlawed($thisitemdata['intro']);
 		} else {
