@@ -114,6 +114,7 @@ row[1][1][0][9] = last change time (if $includelastchange is set)
 row[1][1][0][10] = allow latepass use on this item
 row[1][1][0][11] = endmsg if requested through $includeendmsg
 row[1][1][0][12] = timelimit if requested through $includetimelimit
+row[1][1][0][13] = 1 if no reqscore or has been met, 0 if unmet reqscore; only in single stu view ($limuser>0)
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -281,6 +282,9 @@ function gbtable() {
 	$now = time();
 	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
 	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate";
+	if ($limuser>0) {
+		$query .= ',reqscoreaid,reqscore';
+	}
 	if (isset($includeendmsg) && $includeendmsg) {
 		$query .= ',endmsg';
 	}
@@ -332,6 +336,7 @@ function gbtable() {
 	$courseorder = array();
 	$allowlate = array();
 	$endmsgs = array();
+	$reqscores = array();
 	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($courseitemsassoc['Assessment'.$line['id']])) {
@@ -371,6 +376,9 @@ function gbtable() {
 
 		if (isset($line['endmsg']) && $line['endmsg']!='') {
 			$endmsgs[$kcnt] = unserialize($line['endmsg']);
+		}
+		if ($limuser>0) {
+			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>$line['reqscore']);
 		}
 		$k = 0;
 		$atofind = array();
@@ -2172,7 +2180,20 @@ function gbtable() {
 		}
 		$gb[$ln][4][0] = -1;
 	}
-
+	if ($limuser>0) { //mark reqscoreaid
+		foreach ($gb[0][1] as $col=>$gbitem) {
+			if ($gbitem[6]==0) {
+				$k = $assessidx[$gbitem[7]];
+				$gb[1][1][$col][13] = 1;
+				if (isset($reqscores[$k]) && $reqscores[$k]['aid']>0) {
+					$colofprereq = $assesscol[$reqscores[$k]['aid']];
+					if (!isset($gb[1][1][$colofprereq][0]) || $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) {
+						$gb[1][1][$col][13] = 0;
+					}
+				}
+			}
+		}
+	}
 	if ($limuser==-1) {
 		$gb[1] = $gb[$ln];
 	}

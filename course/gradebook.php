@@ -779,7 +779,10 @@ function gbstudisp($stu) {
 				}
 			}
 			echo '<td class="cat'.Sanitize::onlyInt($gbt[0][1][$i][1]).'">';
-			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && !$isteacher && !$istutor) {
+			
+			$showlink = false;
+			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
+				$showlink = true;
 				echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
 				if (abs($gbt[1][1][$i][12])>0) {
 					$tlwrds = '';
@@ -814,7 +817,7 @@ function gbstudisp($stu) {
 				echo '>';
 			}
 			echo Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
-			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1) {
+			if ($showlink) {
 				echo '</a>';
 			}
 			$afterduelatepass = false;
