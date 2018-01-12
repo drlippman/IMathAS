@@ -1609,6 +1609,13 @@ function gbtable() {
 							$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
+					foreach($cattotpastec[$ln][$cat] as $col=>$v) {
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotpastec[$ln][$cat][$col] = 0;
+						} else {
+							$cattotpastec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
+					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotpast[$ln][$cat])) {
 						asort($cattotpast[$ln][$cat],SORT_NUMERIC);
 						if ($cats[$cat][4]<0) {  //doing keep n
@@ -1631,12 +1638,19 @@ function gbtable() {
 						}
 						$cattotpast[$ln][$cat] = array_slice($cattotpast[$ln][$cat],$cats[$cat][4]);
 						$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntpast[$cat] - $cats[$cat][4]);
-						$cattotpast[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/($tokeep),1);
+						
 					} else {
-						$cattotpast[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/count($cattotpast[$ln][$cat]),2);
+						$tokeep = count($cattotpast[$ln][$cat]);
+					}
+					$cattotpast[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/($tokeep),1);
+					if (isset($cattotpastec[$ln][$cat])) {
+						$cattotpastec[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpastec[$ln][$cat])/$tokeep,1);
 					}
 				} else {
 					$cattotpast[$ln][$cat] = array_sum($cattotpast[$ln][$cat]);
+					if (isset($cattotpastec[$ln][$cat])) {
+						$cattotpastec[$ln][$cat] = array_sum($cattotpastec[$ln][$cat]);
+					}
 				}
 
 				if ($cats[$cat][1]!=0) { //scale is set
@@ -1647,7 +1661,7 @@ function gbtable() {
 					}
 				}
 				if (isset($cattotpastec[$ln][$cat])) { //add in EC
-					$cattotpast[$ln][$cat] += array_sum($cattotpastec[$ln][$cat]);
+					$cattotpast[$ln][$cat] += $cattotpastec[$ln][$cat]; //already summed above //array_sum($cattotpastec[$ln][$cat]);
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catposspast[$cat]>0) {//use fixed pt value for cat
 					$cattotpast[$ln][$cat] = ($catposspast[$cat]==0)?0:round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
@@ -1687,6 +1701,13 @@ function gbtable() {
 							$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
+					foreach($cattotcurec[$ln][$cat] as $col=>$v) {
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotcurec[$ln][$cat][$col] = 0;
+						} else {
+							$cattotcurec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
+					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) {
 						asort($cattotcur[$ln][$cat],SORT_NUMERIC);
 
@@ -1711,12 +1732,18 @@ function gbtable() {
 
 						$cattotcur[$ln][$cat] = array_slice($cattotcur[$ln][$cat],$cats[$cat][4]);
 						$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntcur[$cat] - $cats[$cat][4]);
-						$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep),1);
 					} else {
-						$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/count($cattotcur[$ln][$cat]),2);
+						$tokeep = count($cattotcur[$ln][$cat]);
+					}
+					$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep),1);
+					if (isset($cattotcurec[$ln][$cat])) {
+						$cattotcurec[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcurec[$ln][$cat])/$tokeep,1);
 					}
 				} else {
 					$cattotcur[$ln][$cat] = array_sum($cattotcur[$ln][$cat]);
+					if (isset($cattotcurec[$ln][$cat])) {
+						$cattotcurec[$ln][$cat] = array_sum($cattotcurec[$ln][$cat]);
+					}
 				}
 
 				if ($cats[$cat][1]!=0) { //scale is set
@@ -1727,7 +1754,7 @@ function gbtable() {
 					}
 				}
 				if (isset($cattotcurec[$ln][$cat])) {
-					$cattotcur[$ln][$cat] += array_sum($cattotcurec[$ln][$cat]);
+					$cattotcur[$ln][$cat] += $cattotcurec[$ln][$cat];
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catposscur[$cat]>0) {//use fixed pt value for cat
 					$cattotcur[$ln][$cat] = ($catposscur[$cat]==0)?0:round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
@@ -1768,6 +1795,13 @@ function gbtable() {
 							$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
+					foreach($cattotfutureec[$ln][$cat] as $col=>$v) {
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotfutureec[$ln][$cat][$col] = 0;
+						} else {
+							$cattotfutureec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
+					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) {
 						asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
 
@@ -1791,12 +1825,18 @@ function gbtable() {
 						}
 						$cattotfuture[$ln][$cat] = array_slice($cattotfuture[$ln][$cat],$cats[$cat][4]);
 						$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntfuture[$cat] - $cats[$cat][4]);
-						$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/($tokeep),1);
 					} else {
-						$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/count($cattotfuture[$ln][$cat]),2);
+						$tokeep = count($cattotfuture[$ln][$cat]);
+					}
+					$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/($tokeep),1);
+					if (isset($cattotfutureec[$ln][$cat])) {
+						$cattotfutureec[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfutureec[$ln][$cat])/$tokeep,1);
 					}
 				} else {
 					$cattotfuture[$ln][$cat] = array_sum($cattotfuture[$ln][$cat]);
+					if (isset($cattotfutureec[$ln][$cat])) {
+						$cattotfutureec[$ln][$cat] = array_sum($cattotfutureec[$ln][$cat]);
+					}
 				}
 
 				if ($cats[$cat][1]!=0) { //scale is set
@@ -1807,7 +1847,7 @@ function gbtable() {
 					}
 				}
 				if (isset($cattotfutureec[$ln][$cat])) {
-					$cattotfuture[$ln][$cat] += array_sum($cattotfutureec[$ln][$cat]);
+					$cattotfuture[$ln][$cat] += $cattotfutureec[$ln][$cat];
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catpossfuture[$cat]>0) {//use fixed pt value for cat
 					$cattotfuture[$ln][$cat] = round($cats[$cat][5]*($cattotfuture[$ln][$cat]/$catpossfuture[$cat]),1);
@@ -1856,6 +1896,13 @@ function gbtable() {
 							$cattotattempted[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
+					foreach($cattotattemptedec[$ln][$cat] as $col=>$v) {
+						if ($gb[0][1][$col][2] == 0) {
+							$cattotattemptedec[$ln][$cat][$col] = 0;
+						} else {
+							$cattotattemptedec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+						}
+					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotattempted[$ln][$cat])) { //if drop is set and have enough items
 						asort($cattotattempted[$ln][$cat],SORT_NUMERIC);
 
@@ -1880,12 +1927,19 @@ function gbtable() {
 						$cattotattempted[$ln][$cat] = array_slice($cattotattempted[$ln][$cat],$cats[$cat][4]);
 						//$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntattempted[$cat] - $cats[$cat][4]);
 						$tokeep = $catitemcntattempted[$cat];
-						$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/($tokeep),1);
+						
 					} else {
-						$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/count($cattotattempted[$ln][$cat]),2);
+						$tokeep = count($cattotattempted[$ln][$cat]);
+					}
+					$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/($tokeep),1);
+					if (isset($cattotattemptedec[$ln][$cat])) {
+						$cattotattemptedec[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattemptedec[$ln][$cat])/$tokeep,1);
 					}
 				} else {
 					$cattotattempted[$ln][$cat] = array_sum($cattotattempted[$ln][$cat]);
+					if (isset($cattotattemptedec[$ln][$cat])) {
+						$cattotattemptedec[$ln][$cat] = array_sum($cattotattemptedec[$ln][$cat]);
+					}
 				}
 
 				if ($cats[$cat][1]!=0) { //scale is set
@@ -1896,7 +1950,7 @@ function gbtable() {
 					}
 				}
 				if (isset($cattotattemptedec[$ln][$cat])) { //add in EC
-					$cattotattempted[$ln][$cat] += array_sum($cattotattemptedec[$ln][$cat]);
+					$cattotattempted[$ln][$cat] += $cattotattemptedec[$ln][$cat];
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
 					$cattotattempted[$ln][$cat] = ($catpossattemptedstu[$cat]==0)?0:round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
