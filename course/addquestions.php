@@ -384,7 +384,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=012317\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=100517\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=011118\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -532,7 +532,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$jsarr[] = array("text", $text_seg['text'],
 					Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
 					Sanitize::onlyInt($text_seg['ispage']),
-					$text_seg['pagetitle'], 1);
+					$text_seg['pagetitle'], 
+					isset($text_seg['forntype'])?$text_seg['forntype']:0);
 			}
 		}
 		if (strpos($items[$i],'~')!==false) {
