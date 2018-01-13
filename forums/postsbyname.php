@@ -311,7 +311,7 @@
 			$content .= '<span style="color:green;">';
 			$replycnt++;
 		} else {
-			$content .= '<div class="initialcontent"><div class="block">';
+			$content .= '<div class="initialpost"><div class="block">';
 			$postcnt++;
 		}
 
