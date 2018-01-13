@@ -82,11 +82,11 @@ function runRuleSet($ruleset) {
 			}
 		} else if ($rule['timeframe']=='week') {
 			if ($todayday==$rule['dayofweek']) {
-				$rule['sdate'] = strtotime("midnight +1day -1sec", $now);
+				$rule['edate'] = strtotime("midnight +1day -1sec", $now);
 			} else {
-				$rule['sdate'] = strtotime("last ".$daysofweek[$rule['dayofweek']].' +1day -1sec', $now);
+				$rule['edate'] = strtotime("last ".$daysofweek[$rule['dayofweek']].' +1day -1sec', $now);
 			}
-			$rule['edate'] = strtotime("-1week +1sec", $sdate);
+			$rule['sdate'] = strtotime("-1week +1sec", $rule['edate']);
 		} else if ($rule['timeframe']=='due') {
 			$rule['sdate'] = $now;
 			$rule['edate'] = strtotime("midnight +".$rule['innextDays']."days", $now);	
