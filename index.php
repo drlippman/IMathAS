@@ -422,15 +422,26 @@ if (isset($sessiondata['emulateuseroriginaluser'])) {
 if ($myrights==100 && count($brokencnt)>0) {
 	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
 }
-if ($myrights<75 && ($myspecialrights&(16+32+64))!=0) {
+if ($myrights<75 && ($myspecialrights&(16+32))!=0) {
 	echo '<div>';
 	if (($myspecialrights&(16+32))!=0) {
 		echo '<a href="admin/forms.php?from=home&action=newadmin">'._('Add New User').'</a> ';
 	}
-	if (($myspecialrights&64)!=0) {
-		echo '<a href="admin/approvepending.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
-	}
 	echo '</div>';
+}
+if ($myrights==100 || ($myspecialrights&64)!=0) {
+	$stm = $DBH->query("SELECT status,count(userid) FROM imas_instr_acct_reqs WHERE status<10 GROUP BY status ORDER BY status");
+	$newreqs = array();
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$newreqs[$row[0]] = $row[1];
+	}
+	if (count($newreqs)>0) {
+		echo '<div> There are <span class=noticetext>'.(isset($newreqs[0])?$newreqs[0]:0).'</span> new account requests';
+		if (count($newreqs)>1 || !isset($newreqs[0])) {
+			echo ' and <span class=noticetext>'.array_sum($newreqs).'</span> pending requests';
+		}
+		echo '. <a href="admin/approvepending2.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
+	}
 }
 if (isset($tzname) && isset($sessiondata['logintzname']) && $tzname!=$sessiondata['logintzname']) {
 	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';

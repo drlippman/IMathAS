@@ -71,6 +71,9 @@
 			$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
 			$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $newuserid:: School: {$_POST['school']} <br/> Phone: {$_POST['phone']} <br/>"));
 
+			$reqdata = array('reqmade'=>$now, 'school'=>$_POST['school'], 'phone'=>$_POST['phone']);
+			$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,0,?,?)");
+			$stm->execute(array($newuserid, $now, json_encode($reqdata)));
 
 			$message = "<p>Your new account request has been sent.</p>  ";
 			$message .= "<p>This request is processed by hand, so please be patient.</p>";

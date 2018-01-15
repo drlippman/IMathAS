@@ -24,6 +24,8 @@ if (isset($_GET['go'])) {
 				unenrollstu($rcid, array(intval($_POST['id'])));
 			}
 		}
+		$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=10 WHERE userid=:id");
+		$stm->execute(array(':id'=>$_POST['id']));
 	} else 	if (isset($_POST['approve'])) {
 		if ($_POST['group']>-1) {
 			$group = intval($_POST['group']);
@@ -42,6 +44,9 @@ if (isset($_GET['go'])) {
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
 		$stm->execute(array(':groupid'=>$group, ':id'=>$_POST['id']));
 
+		$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=11 WHERE userid=:id");
+		$stm->execute(array(':id'=>$_POST['id']));
+		
 		//DB $query = "SELECT FirstName,SID,email FROM imas_users WHERE id='{$_POST['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
