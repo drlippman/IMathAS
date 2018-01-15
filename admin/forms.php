@@ -104,6 +104,9 @@ switch($_GET['action']) {
 					$("input[name^=specialrights]").prop("checked",true);
 				}
 			}
+			function chknewgroup(el) {
+				$("#newgroup").toggle(el.value==-1);
+			}
 			$(function() {
 				$("input[name=newrights]").on("change", onrightschg);
 				});
@@ -202,8 +205,13 @@ switch($_GET['action']) {
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
 			echo "<span class=form>Assign to group: </span>";
-			echo "<span class=formright><select name=\"group\" id=\"group\">";
-			echo "<option value=0>Default</option>\n";
+			echo "<span class=formright><select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
+			echo '<option value="-1">New Group</option>';
+			echo "<option value=0 ";
+			if ($oldgroup==0) {
+				echo "selected=1";
+			}
+			echo ">Default</option>\n";
 			//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -215,7 +223,10 @@ switch($_GET['action']) {
 				}
 				printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 			}
-			echo "</select></span><br class=form />\n";
+			echo "</select>";
+			echo '<span id="newgroup" style="display:none"><br/>New group name: ';
+			echo ' <input name=newgroupname size=20 /></span>';
+			echo "</span><br class=form />\n";
 		}
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		if ($_GET['action'] == "newadmin") {

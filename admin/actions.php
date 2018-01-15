@@ -101,7 +101,18 @@ switch($_POST['action']) {
 		}
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) { //update library groupids
-			$arr[':groupid'] = $_POST['group'];
+			if ($_POST['group']==-1) {
+				if (trim($_POST['newgroupname'])!='') {
+					$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
+					$stm->execute(array(':name'=>$_POST['newgroupname']));
+					$newgroup = $DBH->lastInsertId();
+				} else {
+					$newgroup = 0;
+				}
+			} else {
+				$newgroup = Sanitize::onlyInt($_POST['group']);
+			}
+			$arr[':groupid'] = $newgroup;
 
 			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid,FirstName=:FirstName,LastName=:LastName,email=:email";
 			if ($chgSID) {
@@ -232,7 +243,17 @@ switch($_POST['action']) {
 			$md5pw =md5($_POST['pw1']);
 		}
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
-			$newgroup = Sanitize::onlyInt($_POST['group']);
+			if ($_POST['group']==-1) {
+				if (trim($_POST['newgroupname'])!='') {
+					$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
+					$stm->execute(array(':name'=>$_POST['newgroupname']));
+					$newgroup = $DBH->lastInsertId();
+				} else {
+					$newgroup = 0;
+				}
+			} else {
+				$newgroup = Sanitize::onlyInt($_POST['group']);
+			}
 		} else {
 			$newgroup = $groupid;
 		}
