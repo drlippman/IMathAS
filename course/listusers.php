@@ -386,18 +386,18 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
 				processImage($_FILES['stupic'],Sanitize::onlyInt($_GET['uid']),200,200);
 				processImage($_FILES['stupic'],'sm'.Sanitize::onlyInt($_GET['uid']),40,40);
-				$chguserimg = "hasuserimg=1";
+				$chguserimg = 1;
 			} else if (isset($_POST['removepic'])) {
 				deletecoursefile('userimg_'.Sanitize::onlyInt($_GET['uid']).'.jpg');
 				deletecoursefile('userimg_sm'.Sanitize::onlyInt($_GET['uid']).'.jpg');
-				$chguserimg = "hasuserimg=0";
+				$chguserimg = 0;
 			} else {
-				$chguserimg = '';
+				$chguserimg = -1;
 			}
-			if ($chguserimg != '') {
+			if ($chguserimg != -1) {
 				//DB $query = "UPDATE imas_users SET $chguserimg WHERE id='{$_GET['uid']}'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("UPDATE imas_users SET :chguserimg WHERE id=:id");
+				$stm = $DBH->prepare("UPDATE imas_users SET hasuserimg=:chguserimg WHERE id=:id");
 				$stm->execute(array(':id'=>$_GET['uid'], ':chguserimg'=>$chguserimg));
 			}
 
