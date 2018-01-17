@@ -1353,9 +1353,11 @@ function drawMouseDown(ev) {
 						mouseisdown = false;
 					} else {//in existing line
 						ineqlines[curTarget][curIneqcurve].push([mouseOff.x,mouseOff.y]);
-						if (ineqlines[curTarget][curIneqcurve].length==3) {
-							//second point is set.  switch to drag and end line
+						if (ineqlines[curTarget][curIneqcurve].length==2) {
 							dragObj = {mode: targets[curTarget].mode, num: curIneqcurve, subnum: 1};
+						} else if (ineqlines[curTarget][curIneqcurve].length==3) {
+							//second point is set.  switch to drag and end line
+							dragObj = {mode: targets[curTarget].mode, num: curIneqcurve, subnum: 2};
 							curIneqcurve = null;
 						}
 					}
