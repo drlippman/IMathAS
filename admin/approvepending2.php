@@ -119,7 +119,7 @@ function getGroups() {
 	$stm = $DBH->query($query);
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		if (preg_match('/(gmail|yahoo|hotmail)/', $row['domain'])) {
+		if (preg_match('/(gmail|yahoo|hotmail|me\.com)/', $row['domain'])) {
 			$row['domain'] = '';
 		}
 		$out[] = array('id'=>$row['groupid'], 'name'=>$row['name'], 'domain'=>strtolower($row['domain']));
@@ -137,7 +137,7 @@ $reqFields = array(
 
 
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.js"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/fuse.min.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .userdata, .userlist {
@@ -233,10 +233,35 @@ echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
 </div>
 
 <script type="text/javascript">
+var groups = <?php echo json_encode(getGroups()); ?>;
+function normalizeGroupName(grpname) {
+	grpname = grpname.toLowerCase();
+	grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.|a|the)\b/g, "");
+	grpname = grpname.replace(/\bmt(\.|\b)/, "mount");
+	grpname = grpname.replace(/\bst(\.|\b)/, "saint");
+	return grpname;
+}
+var fuseoptions = {
+  shouldSort: true,
+  tokenize: false,
+  includeScore: true,
+  threshold: 0.3,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: ["normname"]
+};
+var normgroups = [];
+for (i in groups) {
+	normgroups.push({"id": groups[i].id, "name": groups[i].name, "normname":normalizeGroupName(groups[i].name)});
+}
+var fuse = new Fuse(normgroups, fuseoptions);
+
 var app = new Vue({
 	el: '#app',
 	data: {
-		groups: <?php echo json_encode(getGroups()); ?>,
+		groups: groups,
 		toApprove: <?php echo json_encode(getReqData()); ?>,
 		fieldTitles: <?php echo json_encode($reqFields);?>,
 		activeUser: -1,
@@ -253,13 +278,6 @@ var app = new Vue({
 		newgroup: ""
 	}, 
 	computed: {
-		normalizedGroups: function() {
-			var out = {}; var grpname;
-			for (var i in this.groups) {
-				out[this.groups[i].id] = this.normalizeGroupName(this.groups[i].name);
-			}
-			return out;
-		},
 		suggestedGroups: function() {
 			if (this.activeUser==-1) {
 				return [];
@@ -270,41 +288,22 @@ var app = new Vue({
 				var userEmailDomain = user.email.substr(user.email.indexOf("@")+1).toLowerCase();
 				for (i in this.groups) {
 					if (userEmailDomain == this.groups[i].domain) {
-						out.push({"id": this.groups[i].id, "dist":0, "name": this.groups[i].name});
+						out.push({"id": this.groups[i].id, "name": this.groups[i].name});
 						matchedIDs.push(this.groups[i].id);
 					}
 				}
 			}
 			if (user.school && user.school != "") {
-				var userGroup = this.normalizeGroupName(user.school);
-				var breakdist = .5
-				if (userGroup.length>4) {
-					breakdist = Math.min(5, .5*userGroup.length);
-				}
-				var dist; var grpsuggestions = [];
-				for (i in this.groups) {
-					if (this.groups[i].id in matchedIDs) {continue;}
-					dist = levenshtein(userGroup, this.normalizedGroups[this.groups[i].id]);
-					if (dist<breakdist) {
-						out.push({"id": this.groups[i].id, "dist":dist, "name": this.groups[i].name});
-					}
+				var userGroup = normalizeGroupName(user.school);
+				var results = fuse.search(userGroup);
+				console.log(results);
+				for (i in results) {
+					if (results[i].score>.8) {break;}
+					if (matchedIDs.indexOf(results[i].item.id)!=-1) { continue; }
+					out.push({"id":results[i].item.id, "name": results[i].item.name});
+					if (out.length>12) { break;}
 				}
 			}
-			out.sort(function(a,b) {
-				if (a.dist==b.dist) {
-					var nameA = a.name.toLowerCase();
-					var nameB = b.name.toLowerCase();
-					if (nameA < nameB) {
-						return -1;
-					} else if (nameA>nameB) {
-						return 1;
-					} else {
-						return 0;
-					}
-				} else {
-					return (a.dist - b.dist);
-				}
-			});
 			return out;
 		},
 		suggestedGroupIds: function() {
@@ -316,13 +315,6 @@ var app = new Vue({
 		}
 	},
 	methods: {
-		normalizeGroupName: function(grpname) {
-			grpname = grpname.toLowerCase();
-			grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.)\b/, "");
-			grpname = grpname.replace(/\bmt(\.|\b)/, "mount");
-			grpname = grpname.replace(/\bst(\.|\b)/, "saint");
-			return grpname;
-		},
 		toggleActiveUser: function(userid, status, userindex) {
 			if (userid==this.activeUser) {
 				this.activeUser = -1;
@@ -380,38 +372,6 @@ var app = new Vue({
 		}
 	}
 });
-
-//from https://stackoverflow.com/questions/18516942/fastest-general-purpose-levenshtein-javascript-implementation
-var levenshtein = (function() {
-    var row2 = [];
-    return function(s1, s2) {
-        if (s1 === s2) {
-            return 0;
-        } else {
-            var s1_len = s1.length, s2_len = s2.length;
-            if (s1_len && s2_len) {
-                var i1 = 0, i2 = 0, a, b, c, c2, row = row2;
-                while (i1 < s1_len)
-                    row[i1] = ++i1;
-                while (i2 < s2_len) {
-                    c2 = s2.charCodeAt(i2);
-                    a = i2;
-                    ++i2;
-                    b = i2;
-                    for (i1 = 0; i1 < s1_len; ++i1) {
-                        c = a + (s1.charCodeAt(i1) === c2 ? 0 : 1);
-                        a = row[i1];
-                        b = b < a ? (b < c ? b + 1 : c) : (a < c ? a + 1 : c);
-                        row[i1] = b;
-                    }
-                }
-                return b;
-            } else {
-                return s1_len + s2_len;
-            }
-        }
-    };
-})();
 
 </script>
 
