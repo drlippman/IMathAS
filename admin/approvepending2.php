@@ -136,8 +136,9 @@ $reqFields = array(
 );
 
 
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.js"></script>';
+$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/fuse.min.js\"></script>";
+//$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .userdata, .userlist {
@@ -216,7 +217,7 @@ echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
       	  	<optgroup label="groups">
       	  		<option value="-1">New group</option>
       	  		<option value=0>Default</option>
-      	  		<option v-for="group in groups" v-if="!(group.id in suggestedGroupIds)" :value="group.id">{{group.name}}</option>
+      	  		<option v-for="group in groups" :value="group.id">{{group.name}}</option>
       	  	</optgroup>
       	  	</select>
       	  	<span v-if="group==-1">New group name: <input size=30 v-model="newgroup"></span>
@@ -286,17 +287,16 @@ var app = new Vue({
 			var user = this.toApprove[this.activeUserStatus][this.activeUserIndex];
 			if (user.email.indexOf("@")>-1) {
 				var userEmailDomain = user.email.substr(user.email.indexOf("@")+1).toLowerCase();
-				for (i in this.groups) {
-					if (userEmailDomain == this.groups[i].domain) {
-						out.push({"id": this.groups[i].id, "name": this.groups[i].name});
-						matchedIDs.push(this.groups[i].id);
+				for (i in groups) {
+					if (userEmailDomain == groups[i].domain) {
+						out.push({"id": groups[i].id, "name": groups[i].name});
+						matchedIDs.push(groups[i].id);
 					}
 				}
 			}
 			if (user.school && user.school != "") {
 				var userGroup = normalizeGroupName(user.school);
 				var results = fuse.search(userGroup);
-				console.log(results);
 				for (i in results) {
 					if (results[i].score>.8) {break;}
 					if (matchedIDs.indexOf(results[i].item.id)!=-1) { continue; }
@@ -309,7 +309,7 @@ var app = new Vue({
 		suggestedGroupIds: function() {
 			var ids = [];
 			for (i in this.suggestedGroups) {
-				ids.push(this.suggestedGroups[i].groupid);
+				ids.push(this.suggestedGroups[i].id);
 			}
 			return ids;
 		}
