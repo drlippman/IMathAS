@@ -626,6 +626,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js?v=072217\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $GLOBALS['basesiteurl'] . "/msgs/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
+	if (isset($sessiondata['ltiitemtype'])) {
+		$nologo = true;
+	}
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 
