@@ -269,7 +269,7 @@ require_once("includes/sanitize.php");
 
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From:".Sanitize::emailAddress($sendfrom)."\r\n";
+				$headers .= "From:".$sendfrom."\r\n";
 				$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
 				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
@@ -286,7 +286,7 @@ require_once("includes/sanitize.php");
 				require("header.php");
 				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.Sanitize::emailAddress($email).'.</b><br/> ';
 				echo 'If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.<br/>';
-				echo 'It may help to add <b>'.Sanitize::emailAddress($sendfrom).'</b> to your contacts list.</p>';
+				echo 'It may help to add <b>'.Sanitize::encodeStringForDisplay($sendfrom).'</b> to your contacts list.</p>';
 				echo '<p>If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.</p>';
 				require("footer.php");
 				exit;
