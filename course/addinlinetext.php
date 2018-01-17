@@ -458,6 +458,26 @@ function movefile(from) {
   	window.location = toopen;
   }
 }
+function chghidetitle() {
+	var titleinput = $("input[name=title]");
+	var hidetitle = $("input[name=hidetitle]").prop("checked");
+	if (hidetitle) {
+		$("#titlewrap").hide();
+		console.log(titleinput.prop("required"));
+		if (!!titleinput.prop("required")) {
+			titleinput.data("hasrequired",true);
+			titleinput.prop("required", false);
+		}
+	} else {
+		$("#titlewrap").show();
+		if (!!titleinput.data("hasrequired")) {
+			titleinput.prop("required", true);
+		}
+	}	
+}
+$(function() { chghidetitle(); });
+
+
 </script>
 
 
@@ -467,8 +487,10 @@ function movefile(from) {
 	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
 	<span class=form>Title: </span>
 	<span class=formright>
+		<span id="titlewrap" <?php if ($hidetitle==true) {echo 'style="display:none;"';} ?>>
 		<input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>"><br/>
-		<input type="checkbox" name="hidetitle" value="1" <?php writeHtmlChecked($hidetitle,true) ?>/>
+		</span>
+		<input type="checkbox" name="hidetitle" value="1" onclick="chghidetitle()" <?php writeHtmlChecked($hidetitle,true) ?>/>
 		Hide title and icon
 	</span><BR class=form>
 
