@@ -378,7 +378,7 @@ function gbtable() {
 			$endmsgs[$kcnt] = unserialize($line['endmsg']);
 		}
 		if ($limuser>0) {
-			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>$line['reqscore']);
+			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']));
 		}
 		$k = 0;
 		$atofind = array();
