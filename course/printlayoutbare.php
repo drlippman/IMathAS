@@ -151,14 +151,7 @@ if ($overwriteBody==1) {
 
 ?>
 	<style type="text/css">
-	body {
-			padding: 0px;
-			margin: 0px;
-		}
-		form {
-			padding: 0px;
-			margin: 0px;
-		}
+	
 		div.maintest {
 			position: absolute;
 			top: 0px;
@@ -171,10 +164,7 @@ if ($overwriteBody==1) {
 				page-break-after: always;
 				border-bottom: 1px dashed #aaa;
 			}
-		div.mainbody {
-			margin: 0px;
-			padding: 0px;
-		}
+
 	</style>
 
 <?php
