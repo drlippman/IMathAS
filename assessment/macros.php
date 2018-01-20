@@ -1026,8 +1026,10 @@ function rrand($min,$max,$p=0) {
 	$rn = 0;
 	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
 	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
-
-	return( round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn));
+	
+	$out = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
+	if ($rn==0) { $out = (int) $out;}
+	return( $out );
 }
 
 
@@ -1060,6 +1062,7 @@ function rrands($min,$max,$p=0,$n=0) {
 
 	for ($i = 0; $i < $n; $i++) {
 		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
+		if ($rn==0) { $r[$i] = (int) $r[$i];}
 	}
 	return $r;
 }
@@ -1146,6 +1149,7 @@ function nonzerorrand($min,$max,$p=0) {
 	do {
 		$ret = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
 	} while (abs($ret)< 1e-14);
+	if ($rn==0) { $ret = (int) $ret;}
 	return $ret;
 }
 
@@ -1192,6 +1196,7 @@ function nonzerorrands($min,$max,$p=0,$n=0) {
 	for ($i = 0; $i < $n; $i++) {
 		do {
 			$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,($max-$min)/$p), $rn);
+			if ($rn==0) { $r[$i] = (int) $r[$i];}
 		} while (abs($r[$i]) <1e-14);
 	}
 	return $r;
@@ -1253,6 +1258,7 @@ function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 
 		while (count($out)<$n) {
 			$x = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
+			if ($rn==0) { $x = (int) $x;}
 			if (!in_array($x,$out) && (!$nonzero || abs($x)>1e-14)) {
 				$out[] = $x;
 			}
@@ -1272,6 +1278,7 @@ function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 		$r = array_slice($r,0,$n);
 		for ($i=0;$i<$n;$i++) {
 			$r[$i] = round($min+$p*$r[$i], $rn);
+			if ($rn==0) { $r[$i] = (int) $r[$i];}
 		}
 		return $r;
 	}
