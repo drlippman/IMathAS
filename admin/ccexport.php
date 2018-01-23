@@ -159,6 +159,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
 						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
+						$canvout .= '<workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$module_meta .= $canvout;
@@ -187,7 +188,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT title,text,fileorder FROM imas_inlinetext WHERE id=:id");
+					$stm = $DBH->prepare("SELECT title,text,fileorder,avail FROM imas_inlinetext WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					if ($row[2]!='') {
@@ -222,6 +223,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<content_type>WikiPage</content_type>';
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
+					$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 
@@ -255,7 +257,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT title,text,summary FROM imas_linkedtext WHERE id=:id");
+					$stm = $DBH->prepare("SELECT title,text,summary,avail FROM imas_linkedtext WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 
@@ -280,6 +282,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 						$canvout .= '<url>'.htmlentities($alink,ENT_XML1,'UTF-8',false).'</url>';
+						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imswl_xmlv1p1">'."\n";
@@ -298,6 +301,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<content_type>Attachment</content_type>';
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
+						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource href="'.$filedir.basename($filename).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
@@ -312,6 +316,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<content_type>WikiPage</content_type>';
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
+						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$fp = fopen($newdir.'/'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html','w');
@@ -334,7 +339,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name,description FROM imas_forums WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,description,avail FROM imas_forums WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
@@ -344,6 +349,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<content_type>DiscussionTopic</content_type>';
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
+					$canvout .= '<workflow_state>'.($row[2]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 					$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
@@ -381,7 +387,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory FROM imas_assessments WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
@@ -393,6 +399,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<content_type>Assignment</content_type>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>'."\n";
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
+						$canvout .= '<workflow_state>'.($row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$aitems = explode(',',$row[3]);
@@ -431,6 +438,7 @@ if (isset($_GET['delete'])) {
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignment_settings.xml','w');
 						fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">'."\n");
 						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n");
+						fwrite($fp,'<workflow_state>'.($row[6]==0?'unpublished':'published').'</workflow_state>'."\n");
 						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>'."\n");
 						fwrite($fp,'<grading_type>points</grading_type>'."\n");
 						if (isset($_POST['includeduedates'])) {
@@ -475,7 +483,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name FROM imas_wikis WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,avail FROM imas_wikis WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
@@ -485,6 +493,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<content_type>WikiPage</content_type>';
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
+					$canvout .= '<workflow_state>'.($row[1]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 
