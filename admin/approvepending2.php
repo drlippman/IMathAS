@@ -102,7 +102,7 @@ function getReqData() {
 
 function getGroups() {
 	global $DBH;
-	$query = "SELECT s.groupid, ig.name, s.domain
+	$query = "SELECT s.groupid, ig.name, MAX(s.domain)
 	  FROM (SELECT groupid, SUBSTRING_INDEX(email, '@', -1) AS domain, COUNT(*) AS domainCount
 		  FROM imas_users WHERE rights>10 AND groupid>0
 		  GROUP BY groupid, domain
@@ -115,7 +115,7 @@ function getGroups() {
 		 GROUP BY s.groupid
 	       ) AS m
 	    ON s.groupid = m.groupid AND s.domainCount = m.MaxdomainCount
-	  JOIN imas_groups AS ig ON s.groupid=ig.id ORDER BY ig.name";
+	  JOIN imas_groups AS ig ON s.groupid=ig.id GROUP BY s.groupid ORDER BY ig.name";
 	$stm = $DBH->query($query);
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
