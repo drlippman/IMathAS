@@ -127,6 +127,7 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=:groupid WHERE ownerid=:ownerid");
 			$stm->execute(array(':groupid'=>$_POST['group'], ':ownerid'=>$_GET['id']));
 		} else {
+			$newgroup = $groupid;
 			$arr[':groupid'] = $groupid;
 
 			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,FirstName=:FirstName,LastName=:LastName,email=:email";
@@ -151,6 +152,31 @@ switch($_POST['action']) {
 			}
 			$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
 			$stm->execute($valvals);
+			
+			
+			//log new account
+			$now = time();
+			$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
+			$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $userid:: Group: $newgroup, upgraded by $userid"));
+			
+			$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
+			$stm->execute(array($_GET['id']));
+			$reqdata = $stm->fetchColumn(0);
+
+			if ($reqdata === false) {
+				$reqdata = array('upgraded'=>$now, 'actions'=>array(array('on'=>$now, 'by'=>$userid, 'status'=>11, 'via'=>'chgrights')));
+				$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
+				$stm->execute(array($_GET['id'], $now, json_encode($reqdata)));
+			} else {
+				$reqdata = json_decode($reqdata, true);
+				if (!isset($reqdata['actions'])) {
+					$reqdata['actions'] = array();
+				}
+				$reqdata['actions'][] = array('on'=>$now, 'by'=>$userid, 'status'=>11, 'via'=>'chgrights');
+				$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET reqdata=? where userid=?");
+				$stm->execute(array(json_encode($reqdata), $_GET['id']));
+			}
+				
 		} else if ($oldrights>10 && $_POST['newrights']<=10 && isset($CFG['GEN']['enrollonnewinstructor'])) {
 			require_once("../includes/unenroll.php");
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
@@ -162,6 +188,7 @@ switch($_POST['action']) {
 			echo "Username in use - left unchanged";
 			exit;
 		}
+
 		break;
 	case "resetpwd":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
@@ -296,6 +323,16 @@ switch($_POST['action']) {
 			}
 			$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
 			$stm->execute($valvals);
+		}
+		if ($_POST['newrights']>=20) {
+			//log new account
+			$now = time();
+			$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
+			$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $newuserid:: Group: $newgroup, manually added by $userid"));
+
+			$reqdata = array('added'=>$now, 'actions'=>array(array('by'=>$userid, 'on'=>$now, 'status'=>11, 'via'=>'addadmin')));
+			$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
+			$stm->execute(array($newuserid, $now, json_encode($reqdata)));
 		}
 		break;
 	case "logout":

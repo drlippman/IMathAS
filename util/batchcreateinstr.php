@@ -37,6 +37,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   } else {
     $homelayout = '|0,1,2||0,1';
   }
+  $now = time();
   $handle = fopen_utf8($_FILES['uploadedfile']['tmp_name'],'r');
   while (($data = fgetcsv($handle,2096))!==false) {
     if (trim($data[0])=='') {continue;}
@@ -76,6 +77,14 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
 			$stm->execute($valvals);
 		}
 
+    //log new account
+	$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
+	$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $newuserid:: Group: $newusergroupid, manually added by $userid"));
+	
+	$reqdata = array('added'=>$now, 'actions'=>array(array('by'=>$userid, 'on'=>$now, 'status'=>11, 'via'=>'batchcreate')));
+	$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
+	$stm->execute(array($newuserid, $now, json_encode($reqdata)));
+	
     //copy courses
     $i = 5;
     while (isset($data[$i]) && $data[$i]!='' && intval($data[$i])>0) {

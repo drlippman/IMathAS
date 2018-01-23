@@ -315,6 +315,16 @@ if (isset($_GET['launch'])) {
 
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = $DBH->lastInsertId(); //DB mysql_insert_id();
+				
+				if ($rights>=20) {
+					//log new account
+					$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
+					$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $userid:: Group: $newgroupid, added via LTI"));
+					
+					$reqdata = array('added'=>$now, 'actions'=>array(array('on'=>$now, 'status'=>11, 'via'=>'LTI')));
+					$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
+					$stm->execute(array($newuserid, $now, json_encode($reqdata)));	
+				}
 			}
 			//DB $query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -684,6 +694,15 @@ if (isset($_GET['launch'])) {
 
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$userid = $DBH->lastInsertId(); //DB $userid = mysql_insert_id();
+				if ($rights>=20) {
+					//log new account
+					$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
+					$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $userid:: Group: $newgroupid, added via LTI"));
+					
+					$reqdata = array('added'=>$now, 'actions'=>array(array('on'=>$now, 'status'=>11, 'via'=>'LTI')));
+					$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
+					$stm->execute(array($newuserid, $now, json_encode($reqdata)));	
+				}
 			}
 			//DB $query = "UPDATE imas_ltiusers SET userid='$userid' WHERE id='$localltiuser'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
