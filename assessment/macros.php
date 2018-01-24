@@ -3559,6 +3559,52 @@ function lensort($a,$b) {
 	return strlen($b)-strlen($a);
 }
 
+function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) {
+	if ($givenans*$anans < 0) { return false;} //move on if opposite signs
+	if ($anans!=0) {
+		$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
+	}
+	$epsilon = (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12));
+	if ($sigfigscoretype[0]=='abs' && $sigfigscoretype[1]==0) {
+		$sigfigscoretype[1] = pow(10,$v)/2;
+	}
+	if (strpos($givenans,'E')!==false) {  //handle computer-style scientific notation
+		preg_match('/^-?[1-9]\.?(\d*)E/', $givenans, $matches);
+		$gasigfig = 1+strlen($matches[1]);
+		if ($exactsigfig) {
+			if ($gasigfig != $reqsigfigs) {return false;}
+		} else {
+			if ($gasigfig < $reqsigfigs) {return false;}
+			if ($reqsigfigoffset>0 && $gasigfig-$reqsigfigs>$reqsigfigoffset) {return false;}
+		}
+	} else {
+		if (!$exactsigfig) {
+			$gadploc = strpos($givenans,'.');
+			if ($gadploc===false) {$gadploc = strlen($givenans);}
+			if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
+			if ($anans != 0 && $reqsigfigoffset>0 && $v<0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
+		} else {
+			$gadploc = strpos($givenans,'.');
+			if ($gadploc===false) { //no decimal place
+				if (strlen(rtrim($givenans,'0')) != $reqsigfigs) { return false;}
+			} else {
+				if (strlen(ltrim($givenans,'0'))-1 != $reqsigfigs) { return false;}
+			}
+		}
+	}
+	//checked format, now check value
+	if ($sigfigscoretype[0]=='abs') {
+		if (abs($anans-$givenans)< $sigfigscoretype[1]+$epsilon) {return true;}
+	} else if ($sigfigscoretype[0]=='rel') {
+		if ($anans==0) {
+			if (abs($anans - $givenans) < $sigfigscoretype[1]+$epsilon) {return true;}
+		} else {
+			if (abs($anans - $givenans)/(abs($anans)+$epsilon) < $sigfigscoretype[1]/100+$epsilon) {return true;}
+		}
+	}
+	return false;
+}
+
 class Rand {
 	private $seed;
 	private $randmax;

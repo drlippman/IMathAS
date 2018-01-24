@@ -2211,8 +2211,11 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 <dt>$reqsigfigs = a number </dt>
 	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
-	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also
-	round your $answer if needed for the $showanswer.</dd>
+	significant figures required.  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
+	<br/>This setting overrides both $reltolerance and $abstolerance, and by default tests that the student answer rounded to the specified sigfigs matches
+	the correct answer.  To override the tolerance use +- in the setting, like this:
+	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
+	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $relatolerance = .01)</dd>
 <dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "nosoln", or "nosolninf"</dt>
 	<dd>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
 	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.
