@@ -381,7 +381,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
 			} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
 				if ($y <= $yymax && $y >= $yymin) { //coming in
-					if ($yymax-$y < .5*($yymax-$yymin)) { //closer to top
+					//need to determine which direction.  Let's calculate an extra value
+					if ($isparametric) {
+						$tempy = round($evalyfunc($t-$dx/10),$yrnd);
+					} else {
+						$tempy = round($evalfunc($x-$dx/10),$yrnd);
+					}
+					if ($tempy>$y) { //seems to be coming down
 						$iy = $yymax;
 						if ($py<$yymin) { $py = $yymax+.5*($ymax-$ymin);}
 					} else { //coming from bottom
