@@ -659,13 +659,22 @@ jQuery(document).ready(function($) {
 	$(window).on("message", function(e) {
 		if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/lti\.frameResize/)) {
 			var edata = JSON.parse(e.originalEvent.data);
-			var frames = document.getElementsByTagName('iframe');
-			for (var i = 0; i < frames.length; i++) {
-			    if (frames[i].contentWindow === e.originalEvent.source) {
-				$(frames[i]).height(edata.height); //the height sent from iframe
-				break;
-			    }
+			if ("frame_id" in edata) {
+				$("#"+edata["frame_id"]).height(edata.height);
+			} else if ("iframe_resize_id" in edata) {
+				$("#"+edata["iframe_resize_id"]).height(edata.height);
+			} else {
+				var frames = document.getElementsByTagName('iframe');
+				for (var i = 0; i < frames.length; i++) {
+				    if (frames[i].contentWindow === e.originalEvent.source) {
+					$(frames[i]).height(edata.height); //the height sent from iframe
+					break;
+				    }
+				}
 			}
+		} else if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/\[iFrameSizer\]/)) {
+			var edata = e.originalEvent.data.substr("[iFrameSizer]".length).split(":");
+			$("#"+edata[0]).height(edata[1]);
 		}
 	});
 });
