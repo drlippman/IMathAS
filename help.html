@@ -2116,13 +2116,16 @@ students' previous answers in your question code.  You will only be able to refe
 Notes (important!):
 </p>
 <p>
-1) If the student has not answered the question, then $stuanswers[N] == null.  If used in an equation, it will take on the value 0.  To prevent divide-by-zero errors and to prevent students from exploiting this, it is highly recommended that you do something like:
+1) If the student has not answered the question, then $stuanswers[N] === null, with the exception of drop-down select
+questions, where $stuanswers[N] == "NA" if no selection is made.  
+If used in an equation, it will take on the value 0.  
+To prevent divide-by-zero errors and to prevent students from exploiting this, it is highly recommended that you do something like:
 <pre>
 $a = $stuanswers[$thisq][0]
-$a = rand(1,100) if ($a==null)
+$a = rand(1,100) if ($a===null)
 </pre>
 Perhaps also include:
-$warning = "You MUST answer question 1 before this question" if ($a==null), then put $warning in the question text.
+$warning = "You MUST answer question 1 before this question" if ($a===null), then put $warning in the question text.
 </p>
 <p>
 2) If you use $stuanswers in your $answer, $showanswer will generally not be defined.  If you follow the advice in #1 above, then your
@@ -2137,7 +2140,7 @@ Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enc
 </p>
 <p>
 5) You can use the function getstuans($stuanswers,N,P) to retreive a student answer value.  This method bypasses some strange things that happen
-when there is a multipart question with only one part.
+when there is a multipart question with only one part, so is recommended.
 </p>
 
 <h4>Other Reference Variables</h4>
