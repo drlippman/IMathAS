@@ -1,46 +1,32 @@
 //Modified from version by By Martin Honnen
 //taken from http://www.faqts.com/knowledge_base/view.phtml/aid/1756/fid/129
-function checkComplete (form) {
+function checkComplete(baseel) {
 	if (typeof tinyMCE != "undefined") {
 		try{tinyMCE.triggerSave();}catch(err1){};
 	}
-	if (!form.elements) { return true;} //temp fix for editor preventing this from working right
-  for (var e = 0; e < form.elements.length; e++) {
-    var el = form.elements[e];
-    if (typeof el.type == "undefined" || typeof el.name == "undefined" || el.name == "") {
-	    continue;
-    }
-    if ($(el).is(":not(:visible)")) {
-    	    continue;
-    }
-    if (el.type == 'text' || el.type == 'textarea' ||
-        el.type == 'password' || el.type == 'file' ) {
-      if (el.value == '') {
-      	      if ($("#qs"+el.id.substr(2)+"-d:checked,#qs"+el.id.substr(2)+"-i:checked").length==0) {
-      	      	      return false;
-      	      }
-      }
-    }
-    else if (el.type.indexOf('select') != -1) {
-      if (el.selectedIndex == -1) {
-        return false;
-      }
-    }
-    else if (el.type == 'radio') {
-      var group = form[el.name];
-      var checked = false;
-      if (!group.length)
-        checked = el.checked;
-      else
-        for (var r = 0; r < group.length; r++)
-          if ((checked = group[r].checked))
-            break;
-      if (!checked) {
-        return false;
-      }
-    }
-  }
-  return true;
+	var complete = true;
+	$(baseel).find("input:visible,textarea:visible,select:visible").each(function(i,el) {
+		if (typeof el.type == "undefined" || typeof el.name == "undefined" || el.name == "") {
+			return false;
+		}
+		if (el.type == 'text' || el.type == 'textarea' ||
+		    el.type == 'password' || el.type == 'file' ) {
+			if (el.value == '') {
+				if ($("#qs"+el.id.substr(2)+"-d:checked,#qs"+el.id.substr(2)+"-i:checked").length==0) {
+					complete = false;
+			      	}
+		      	}
+		} else if (el.type.indexOf('select') != -1) {
+			if (el.selectedIndex == -1 || (el.name.substr(0,2)=="qn" && el.selectedIndex ==0)) {
+				complete = false;
+			}
+		} else if (el.type == 'radio') {
+			if ($("input[name="+el.name+"]:checked").length==0) {
+				complete = false;
+			}
+		}
+	});
+	return complete;
 }
 
 function confirmSubmit (form) {

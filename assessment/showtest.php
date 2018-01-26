@@ -2810,6 +2810,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$intro = '';
 			}
 			echo '<script type="text/javascript">var assesspostbackurl="' . $GLOBALS['basesiteurl'] . '/assessment/showtest.php?embedpostback=true&action=scoreembed&page='.Sanitize::encodeUrlParam($_GET['page']).'";</script>';
+			echo '<script type="text/javascript">$(function() { embedEnterHandler("qform");});</script>';
 			//using the full test scoreall action for timelimit auto-submits
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 			if (!$introhaspages && $testsettings['displaymethod'] != "VideoCue") {
