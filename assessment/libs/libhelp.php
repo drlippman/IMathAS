@@ -19,15 +19,19 @@
 	$path = ".";
 
 	$dir = opendir($path);
+	$filearray = array();
 	while (($file = readdir($dir)) !== false) {
-		if (($pos=strpos($file,".html")) !== false) {
-			$filearray[] = $file;
+		$parts = explode('.', $file);
+		if ($parts[1] == "html") {
+			if (file_exists($parts[0].'.php')) {
+				$filearray[] = $parts[0];
+			}
 			
 		}
 	}
 	natsort($filearray);
 	foreach ($filearray as $file) {
-		echo "<li><a href=\"$file\">" . substr($file, 0, strpos($file,".html")) . "</a></li>\n";
+		echo "<li><a href=\"$file.html\">" . $file . "</a></li>\n";
 	}
 	echo "</ul>\n";
 	
