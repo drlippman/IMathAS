@@ -675,6 +675,19 @@ jQuery(document).ready(function($) {
 		} else if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/\[iFrameSizer\]/)) {
 			var edata = e.originalEvent.data.substr("[iFrameSizer]".length).split(":");
 			$("#"+edata[0]).height(edata[1]);
+		} else if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/imathas\.update/)) {
+			var edata = JSON.parse(e.originalEvent.data);
+			if ("qn" in edata) {
+				var qn = edata['qn'].replace(/[^\d]/, "");
+				if (qn != "") {
+					$("#qn"+qn).val(edata['value']);
+				}
+			} else {
+				var id = edata['id'].replace(/[^\w\-]/, "");
+				if ($("#"+id).hasClass("allowupdate")) {
+					$("#"+id).val(edata['value']);
+				}
+			}
 		}
 	});
 });
@@ -842,6 +855,59 @@ jQuery(document).ready(function($) {
 	}
 	$("#topnavmenu").on("click", toggleHeaderMobileMenuList)
 	   .on("keydown", function(e) { if (e.which===13 || e.which==32) { toggleHeaderMobileMenuList(e);}});
+});
+var sagecellcounter = 0;
+function initSageCell(base) {
+	jQuery(base).find(".converttosagecell").each(function() {
+		var ta, code;
+		var $this = jQuery(this);
+		if ($this.is("pre")) {
+			ta = this;
+			code = jQuery(ta).val();
+		} else {
+			ta = $this.find("textarea");
+			if (ta.length==0 || jQuery(ta[0]).val()=="") {
+				if ($this.find("pre").length>0) {
+					code = $this.find("pre").text();
+					if (ta.length==0) {
+						ta = $this.find("pre")[0];
+					} else {
+						ta = ta[0];
+					}
+				} else {
+					return false;
+				}
+			} else {
+				code = jQuery(ta[0]).val();
+				ta = ta[0];
+			}
+		}
+		if (m = code.match(/^\s+/)) {
+			var chop = m[0].length;
+			var re = new RegExp('\\n\\s{'+chop+'}',"g");
+			code = code.substr(chop).replace(re, "\n").replace(/\s+$/,'');
+		}
+		var frame_id = "sagecell-"+sagecellcounter;
+		sagecellcounter++;
+		var url = imasroot+'/assessment/libs/sagecellframe.html?frame_id='+frame_id;
+		url += '&code='+encodeURIComponent(code);
+		var returnid = null;
+		if (typeof jQuery(ta).attr("id") != "undefined") {
+				url += '&update_id='+jQuery(ta).attr("id");
+		}
+		jQuery(ta).addClass("allowupdate").hide()
+		.after(jQuery("<iframe/>", {
+				id: frame_id,
+				class: "sagecellframe",
+				style: "border:0",
+				width: "100%",
+				height: 100,
+				src: url
+		}));
+	});
+}
+jQuery(function() {
+	initSageCell("body");
 });
 
 /* ========================================================================

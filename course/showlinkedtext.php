@@ -43,8 +43,6 @@
 			$param .= '&target=iframe';
 			$text = '<iframe id="exttoolframe" src="'.$imasroot.'/filter/basiclti/post.php?'.$param.'" height="'.$height.'" width="'.$width.'" ';
 			$text .= 'scrolling="auto" frameborder="1" transparency>   <p>Error</p> </iframe>';
-			$text .= '<script type="text/javascript">$(function() {$("#exttoolframe").css("height",$(window).height() - $(".midwrapper").position().top - ($(".midwrapper").height()-500) - ($("body").outerHeight(true) - $("body").innerHeight()));});</script>';
-
 		} else {
 			//redirect to post page
 			$param .= '&target=new';
@@ -84,6 +82,7 @@
 		$(el).attr("title",$(el).next(".im_glossdef").text());
 	   });
 	});
+	$(function() {$("#exttoolframe").css("height",$(window).height() - $(".midwrapper").position().top - ($(".midwrapper").height()-500) - ($("body").outerHeight(true) - $("body").innerHeight()));});
 	</script>';
 	require("../header.php");
 	if ((isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3)) {

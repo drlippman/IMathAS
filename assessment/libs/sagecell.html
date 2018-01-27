@@ -1,16 +1,49 @@
 <html><body>
 <h1>Macro Library sagecell</h1>
-Sagecell integration functions, Version 1.0, Jan 2018
-<BR>
-<BR>BE AWARE: whatever your students type in the sagecell box is NOT saved or
-<BR>retained after they submit the question.
-<BR><ul>
-<li><a href="#setupsagecell">setupsagecell</a></li>
-</ul>
-<h3><a name="setupsagecell">setupsagecell</a></h3>
-setupsagecell(inital code)
-<BR>Generates the code necessary to insert a SageCell into your question
-<BR>You can optionally provide code to initalize the cell
-<BR>
+<p>Sagecell integration documentation, Version 1.0, Jan 2018</p>
+
+<p>There is not need to actually load this macro library. This documentation
+describes how to set up your HTML to enable SageCell integration.</p>
+
+<p>For a basic SageCell that students can use for calculations, but for which
+their work is NOT retained when they submit the question, you can put in your HTML
+a <code>pre</code> tag with class <code>converttosagecell</code>, and put your
+starting/default Sage code inside of it. Like this:</p>
+
+<pre>
+&lt;pre class="converttosagecell"&gt;
+  x = var('x')
+  integral(sin(x), x)
+&lt;/pre&gt;
+</pre>
+
+<p>If you want to store the student's code so they can modify it and you can
+view it, then you'll need to add an <code>essay</code> part to your question.
+See the example below for an example of how you could set it up, 
+including providing default Sage code</p>
+
+<p>Question Type: Multipart.  Question Code:</p>
+<pre>
+$anstypes = "essay,numfunc"
+$answeights = "0,1"
+$scoremethod = "singlescore"
+$a = rand(2,8)
+
+$answer[1]= "-$a cos(x)"
+</pre>
+
+<p>Question text:</p>
+<pre>
+&lt;p&gt;Modify the Sagecell below to find the integral of `$a sin(x)`&lt;/p&gt;
+&lt;div class="converttosagecell"&gt;
+  $answerbox[0]
+  &lt;pre class="hidden"&gt;
+    x = var('x')
+    integral(sin(x), x)
+  &lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Answer: $answerbox[1]&lt;/p&gt;
+</pre>
 </body>
 </html>
+   
