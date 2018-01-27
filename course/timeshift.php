@@ -2,50 +2,29 @@
 //IMathAS:  Shift Course dates; made obsolete by mass change dates
 //(c) 2006 David Lippman
 
+//boost operation time
+@set_time_limit(0);
+ini_set("max_input_time", "3600");
+ini_set("max_execution_time", "3600");
+
 /*** master php includes *******/
 require("../init.php");
-
-function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
-	//$name is the html name for the select list
-	//$valList is an array of strings for the html value tag
-	//$labelList is an array of strings that are displayed as the select list
-	//$selectVal is optional, if passed the item in $valList that matches will be output as selected
-
-	echo "<select name=\"$name\" ";
-	echo (isset($actions)) ? $actions : "" ;
-	echo ">\n";
-	if (isset($defaultLabel) && isset($defaultVal)) {
-		printf("		<option value=\"%s\" selected>%s</option>\n", Sanitize::encodeStringForDisplay($defaultVal),
-            Sanitize::encodeStringForDisplay($defaultLabel));
-	}
-	for ($i=0;$i<count($valList);$i++) {
-		if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
-			printf("		<option value=\"%s\" selected>%s</option>\n",
-                Sanitize::encodeStringForDisplay($valList[$i]), Sanitize::encodeStringForDisplay($labelList[$i]));
-		} else {
-			printf("		<option value=\"%s\">%s</option>\n",
-                Sanitize::encodeStringForDisplay($valList[$i]), Sanitize::encodeStringForDisplay($labelList[$i]));
-		}
-	}
-	echo "</select>\n";
-
-}
+include("../includes/htmlutil.php");
 
 function shiftsub(&$itema) {
-	global $shift;
+	global $shiftstring;
 	foreach ($itema as $k=>$item) {
 		if (is_array($item)) {
 			if ($itema[$k]['startdate'] > 0) {
-				$itema[$k]['startdate'] += $shift;
+				$itema[$k]['startdate'] = strtotime($shiftstring, $itema[$k]['startdate']);
 			}
 			if ($itema[$k]['enddate'] < 2000000000) {
-				$itema[$k]['enddate'] += $shift;
+				$itema[$k]['enddate'] = strtotime($shiftstring, $itema[$k]['enddate']);
 			}
 			shiftsub($itema[$k]['items']);
 		}
 	}
 }
-
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -63,82 +42,110 @@ if (!(isset($teacherid))) {
 
 	if (isset($_POST['sdate'])) {
 
-		//DB $query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_POST['aid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $basedate = mysql_result($result,0,intval($_POST['base']));
 		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['aid'])));
 		$basedate = $stm->fetchColumn(intval($_POST['base']));
 		preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$_POST['sdate'],$dmatches);
 		$newstamp = mktime(date('G',$basedate),date('i',$basedate),0,$dmatches[1],$dmatches[2],$dmatches[3]);
 		$shift = $newstamp-$basedate;
-
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB $items = unserialize(mysql_result($result,0,0));
+		$shiftdays = round($shift/(24*60*60));
+		if ($shiftdays>0) {
+			$shiftstring = "+$shiftdays days";
+		} else {
+			$shiftstring = "-".abs($shiftdays)." days";
+		}
+		
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
 
 		shiftsub($items);
-		//DB $itemorder = addslashes(serialize($items));
 		$itemorder = serialize($items);
-		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 
-		//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB while ($row=mysql_fetch_row($result)) {
-		$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		while ($row=$stm->fetch(PDO::FETCH_NUM)) {
-			if ($row[0]=="InlineText") {
-				$table = "imas_inlinetext";
-			} else if ($row[0]=="LinkedText") {
-				$table = "imas_linkedtext";
-			} else if ($row[0]=="Forum") {
-				$table = "imas_forums";
-			} else if ($row[0]=="Assessment") {
-				$table = "imas_assessments";
-			} else if ($row[0]=="Calendar") {
-				continue;
-			} else if ($row[0]=="Wiki") {
-				$table = "imas_wikis";
-			}
-			//DB $query = "UPDATE $table SET startdate=startdate+$shift WHERE id='{$row[1]}' AND startdate>0";
-			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$stm2 = $DBH->prepare("UPDATE $table SET startdate=startdate+:shift WHERE id=:id AND startdate>0");
-			$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
-			//DB $query = "UPDATE $table SET enddate=enddate+$shift WHERE id='{$row[1]}' AND enddate<2000000000";
-			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$stm2 = $DBH->prepare("UPDATE $table SET enddate=enddate+:shift WHERE id=:id AND enddate<2000000000");
-			$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
-
-			if ($row[0]=="Wiki") {
-				//DB $query = "UPDATE $table SET editbydate=editbydate+$shift WHERE id='{$row[1]}' AND editbydate>0 AND editbydate<2000000000";
-				//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$stm2 = $DBH->prepare("UPDATE $table SET editbydate=editbydate+:shift WHERE id=:id AND editbydate>0 AND editbydate<2000000000");
-				$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
-			} else if ($row[0]=="Forum") {
-				//DB $query = "UPDATE $table SET replyby=replyby+$shift WHERE id='{$row[1]}' AND replyby>0 AND replyby<2000000000";
-				//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$stm2 = $DBH->prepare("UPDATE $table SET replyby=replyby+:shift WHERE id=:id AND replyby>0 AND replyby<2000000000");
-				$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
-
-				//DB $query = "UPDATE $table SET postby=postby+$shift WHERE id='{$row[1]}' AND postby>0 AND postby<2000000000";
-				//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$stm2 = $DBH->prepare("UPDATE $table SET postby=postby+:shift WHERE id=:id AND postby>0 AND postby<2000000000");
-				$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
+		//update items
+		foreach (array("inlinetext","linkedtext","drillassess") as $table) {
+			$upd = $DBH->prepare("UPDATE imas_$table SET startdate=?,enddate=? WHERE id=?");
+			$stm = $DBH->prepare("SELECT id,startdate,enddate FROM imas_$table WHERE courseid=?");
+			$stm->execute(array($cid));
+			while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
+				if ($row['startdate']>0) {
+					$row['startdate'] = strtotime($shiftstring, $row['startdate']);
+				} 
+				if ($row['enddate']<2000000000) {
+					$row['enddate'] = strtotime($shiftstring, $row['enddate']);
+				}
+				$upd->execute(array($row['startdate'], $row['enddate'], $row['id']));
 			}
 		}
+		$upd = $DBH->prepare("UPDATE imas_assessments SET startdate=?,enddate=?,reviewdate=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,reviewdate FROM imas_assessments WHERE courseid=?");
+		$stm->execute(array($cid));
+		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['startdate']>0) {
+				$row['startdate'] = strtotime($shiftstring, $row['startdate']);
+			} 
+			if ($row['enddate']<2000000000) {
+				$row['enddate'] = strtotime($shiftstring, $row['enddate']);
+			}
+			if ($row['reviewdate']>0 && $row['reviewdate']<2000000000) {
+				$row['reviewdate'] = strtotime($shiftstring, $row['reviewdate']);
+			}
+			$upd->execute(array($row['startdate'], $row['enddate'], $row['reviewdate'], $row['id']));
+		}
+		$upd = $DBH->prepare("UPDATE imas_wikis SET startdate=?,enddate=?,editbydate=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,editbydate FROM imas_wikis WHERE courseid=?");
+		$stm->execute(array($cid));
+		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['startdate']>0) {
+				$row['startdate'] = strtotime($shiftstring, $row['startdate']);
+			} 
+			if ($row['enddate']<2000000000) {
+				$row['enddate'] = strtotime($shiftstring, $row['enddate']);
+			}
+			if ($row['editbydate']>0 && $row['editbydate']<2000000000) {
+				$row['editbydate'] = strtotime($shiftstring, $row['editbydate']);
+			}
+			$upd->execute(array($row['startdate'], $row['enddate'], $row['editbydate'], $row['id']));
+		}
+		$upd = $DBH->prepare("UPDATE imas_forums SET startdate=?,enddate=?,postby=?,replyby=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,postby,replyby FROM imas_forums WHERE courseid=?");
+		$stm->execute(array($cid));
+		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['startdate']>0) {
+				$row['startdate'] = strtotime($shiftstring, $row['startdate']);
+			} 
+			if ($row['enddate']<2000000000) {
+				$row['enddate'] = strtotime($shiftstring, $row['enddate']);
+			}
+			if ($row['postby']>0 && $row['postby']<2000000000) {
+				$row['postby'] = strtotime($shiftstring, $row['postby']);
+			}
+			if ($row['replyby']>0 && $row['replyby']<2000000000) {
+				$row['replyby'] = strtotime($shiftstring, $row['replyby']);
+			}
+			$upd->execute(array($row['startdate'], $row['enddate'], $row['postby'], $row['replyby'], $row['id']));
+		}
+		
 
 		//update Calendar items
-		//DB $query = "UPDATE imas_calitems SET date=date+$shift WHERE courseid='$cid'";
-		//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$stm = $DBH->prepare("UPDATE imas_calitems SET date=date+:shift WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid, ':shift'=>$shift));
+		$upd = $DBH->prepare("UPDATE imas_calitems SET date=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,date FROM imas_calitems WHERE courseid=?");
+		$stm->execute(array($cid));
+		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
+			$row['date'] = strtotime($shiftstring, $row['date']);
+			$upd->execute(array($row['date'], $row['id']));
+		}
+		
+		//update offline items
+		$upd = $DBH->prepare("UPDATE imas_gbitems SET showdate=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,showdate FROM imas_gbitems WHERE courseid=?");
+		$stm->execute(array($cid));
+		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
+			$row['showdate'] = strtotime($shiftstring, $row['showdate']);
+			$upd->execute(array($row['showdate'], $row['id']));
+		}
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 
