@@ -29,7 +29,9 @@ $placeinhead = '<script type="text/javascript">
    else {$("#itemselectwrap").hide()};
  }
  </script>';
-
+$placeinhead .= '<style type="text/css">
+ .nomark.canvasoptlist li { text-indent: -25px; margin-left: 25px;}
+ </style>';
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">"
 	. Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; Common Cartridge Export</div>\n";
@@ -156,10 +158,10 @@ if (isset($_GET['delete'])) {
 			if (is_array($item)) {
 				if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
 					if (strlen($ind)>2) {
+						print_r($item);
 						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
 						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= '<workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$module_meta .= $canvout;
@@ -168,10 +170,14 @@ if (isset($_GET['delete'])) {
 							$module_meta .= '</items></module>';
 						}
 						$inmodule = true;
-						$module_meta .= '<module identifier="BLOCK'.$item['id'].'">
-							<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>
-							<items>';
+						$module_meta .= '<module identifier="BLOCK'.$item['id'].'">'."\n";
+						$module_meta .= '  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
+						$module_meta .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
+						if ($item['avail'] == 1 && $item['SH']{0} == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
+							$module_meta .= '  <unlock_at>'.gmdate("Y-m-d\TH:i:s", $item['startdate']).'</unlock_at>'."\n";
 						}
+						$module_meta .= '  <items>';
+					}
 					$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
@@ -387,7 +393,7 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail FROM imas_assessments WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail,startdate FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
@@ -444,7 +450,12 @@ if (isset($_GET['delete'])) {
 						if (isset($_POST['includeduedates'])) {
 							fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>'."\n");
 						}
-						fwrite($fp,'<assignment_group_identifierref>GBCAT'.$row[5].'</assignment_group_identifierref>'."\n");
+						if ($row[7] > 0 && isset($_POST['includestartdates'])) {
+							fwrite($fp,'<unlock_at>'.gmdate("Y-m-d\TH:i:s", $row[7]).'</unlock_at>'."\n");
+						}
+						if (isset($_POST['includegbcats'])) {
+							fwrite($fp,'<assignment_group_identifierref>GBCAT'.$row[5].'</assignment_group_identifierref>'."\n");
+						}
 						$usedcats[$row[5]]++;
 						fwrite($fp,'<submission_types>external_tool</submission_types>'."\n");
 						fwrite($fp,'<external_tool_url>'. $GLOBALS['basesiteurl'] . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</external_tool_url>'."\n");
@@ -559,7 +570,7 @@ if (isset($_GET['delete'])) {
 		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
 		'.$module_meta . '</items>  </module> </modules>';
 
-		if ($_POST['includeappconfig']==1) {
+		if (isset($_POST['includeappconfig']) && $_POST['includeappconfig']==1) {
 			$fp = fopen($newdir.'/bltiimathas.xml','w');
 			fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 			fwrite($fp,'<blti:title>'.htmlentities($installname,ENT_XML1,'UTF-8',false).'</blti:title>');
@@ -594,19 +605,21 @@ if (isset($_GET['delete'])) {
     		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>'."\n");
     		fwrite($fp, '<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">'."\n");
 		$pcnt = 1;
-		foreach ($gbcats as $i=>$cat) {
-			if ($usedcats[$i]==0) {continue;}
-			fwrite($fp, ' <assignmentGroup identifier="GBCAT'.$i.'">'."\n");
-			fwrite($fp, '  <title>'.htmlentities($cat['name'],ENT_XML1,'UTF-8',false).'</title>'."\n");
-			fwrite($fp, '  <position>'.$pcnt.'</position>'."\n");
-			$pcnt++;
-			if ($useweights && $cat['weight']>-1) {
-				fwrite($fp, '  <group_weight>'.number_format($cat['weight'],1).'</group_weight>'."\n");
+		if (isset($_POST['includegbcats'])) {
+			foreach ($gbcats as $i=>$cat) {
+				if ($usedcats[$i]==0) {continue;}
+				fwrite($fp, ' <assignmentGroup identifier="GBCAT'.$i.'">'."\n");
+				fwrite($fp, '  <title>'.htmlentities($cat['name'],ENT_XML1,'UTF-8',false).'</title>'."\n");
+				fwrite($fp, '  <position>'.$pcnt.'</position>'."\n");
+				$pcnt++;
+				if ($useweights && $cat['weight']>-1) {
+					fwrite($fp, '  <group_weight>'.number_format($cat['weight'],1).'</group_weight>'."\n");
+				}
+				if ($cat['dropn']>0) {
+					fwrite($fp, '  <rules><rule><drop_type>drop_lowest</drop_type><drop_count>'.$cat['dropn'].'</drop_count></rule></rules>'."\n");
+				}
+				fwrite($fp, ' </assignmentGroup>'."\n");
 			}
-			if ($cat['dropn']>0) {
-				fwrite($fp, '  <rules><rule><drop_type>drop_lowest</drop_type><drop_count>'.$cat['dropn'].'</drop_count></rule></rules>'."\n");
-			}
-			fwrite($fp, ' </assignmentGroup>'."\n");
 		}
 		fwrite($fp,'</assignmentGroups>');
 		fclose($fp);
@@ -799,12 +812,15 @@ if (isset($_GET['delete'])) {
 	<?php
 	//echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>";
 	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in BlackBoard and Moodle)</button></p>";
-	echo '<p>If exporting for Canvas: <br/>';
-	echo '<input type=radio name=includeappconfig value=1 checked />Include App Configuration.<br/>';
-	echo '<input type=radio name=includeappconfig value=0 />Do not include App Configuration.  Select this option if you have site-wide credentials, ';
-	echo ' or if you are doing a second import into a course that already has a configuration<br/>';
-	echo '<input type=checkbox name=includeduedates value=1 checked /> Include '.Sanitize::encodeStringForDisplay($installname).' due dates</p>';
-	echo "<p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
+	echo '<p>If exporting for Canvas: </p>';
+	echo '<ul class="nomark canvasoptlist">';
+	echo '<li><input type=checkbox name=includeappconfig value=1 checked /> Include App Config? Do not include it if you have site-wide credentials, ';
+	echo ' or if you are doing a second import into a course that already has a configuration.</li>';
+	echo '<li><input type=checkbox name=includegbcats value=1 checked /> Include '.Sanitize::encodeStringForDisplay($installname).' gradebook setup and categories</li>';
+	echo '<li><input type=checkbox name=includeduedates value=1 checked /> Include '.Sanitize::encodeStringForDisplay($installname).' due dates for assessments</li>';
+	echo '<li><input type=checkbox name=includestartdates value=1 /> Include '.Sanitize::encodeStringForDisplay($installname).' start dates for assessments and blocks<br/>';
+	echo ' <span class="small">Blocks will only include the start date if they are set to hide contents from students when not available.</span></li>';
+	echo "</ul><p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
 	echo '</form>';
 
 }
