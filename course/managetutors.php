@@ -39,31 +39,49 @@
 			}
 		}
 		//add new tutors
+		if (isset($_POST['promotetotutor'])) {
+			require_once("../includes/unenroll.php");
+			$ph = Sanitize::generateQueryPlaceholders($_POST['promotetotutor']);
+			$stm = $DBH->prepare("SELECT u.id,u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid=? AND u.id IN ($ph)");
+			$stm->execute(array_merge(array($cid), $_POST['promotetotutor']));
+			$toaddSID = array();
+			$tounenroll = array();
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$tounenroll[] = $row[0];
+				$toaddSID[] = $row[1];
+			}
+
+			unenrollstu($cid, $tounenroll);
+			$_POST['newtutors'] = implode(',', $toaddSID);
+		}
 		if (trim($_POST['newtutors'])!='') {
 			//gotta check if they're already a tutor
-			$existingsids = array();
+			$existingtutorsids = array();
+			$existingstusids = array();
 			//DB $query = "SELECT u.SID FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT u.SID FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$existingsids[] = $row[0];
+				$existingtutorsids[] = $row[0];
 			}
 			//also don't want students enrolled as tutors
 			//DB $query = "SELECT u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
-			$stm = $DBH->prepare("SELECT u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid=:courseid");
+			$stm = $DBH->prepare("SELECT u.SID,u.id,u.FirstName,u.LastName FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
+			$stuinfo = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$existingsids[] = $row[0];
+				$existingstusids[] = $row[0];
+				$stuinfo[$row[0]] = array($row[1], $row[3].', '.$row[2]);
 			}
 			$sids = explode(',',$_POST['newtutors']);
 			for ($i=0;$i<count($sids);$i++) {
 				$sids[$i] = trim($sids[$i]);
 			}
-			$sidstouse = array_diff($sids,$existingsids);
+			$sidstouse = array_diff($sids,$existingtutorsids,$existingstusids);
 			if (count($sidstouse)>0) {
 				//check if SID exists
 				//DB $tutsids = "'".implode("','",$sidstouse)."'";
@@ -99,6 +117,23 @@
 				} else {
 					$err .= "<p>No usernames provided were found</p>";
 				}
+			}
+			$promoteable = array_intersect($existingstusids, $sids);
+			if (count($promoteable)>0) {
+				$err .= '<form id="curform2" method=post action="managetutors.php?cid='.$cid.'">';
+				$err .= '<h3>Warning</h3>';
+				$err .= '<p>At least one of your potential tutors is currently enrolled in the course as a student.</p>';
+				$err .= '<p>To promote them to a tutor, they will have to be un-enrolled as a student, ';
+				$err .= '<span class="noticetext">which will DELETE ALL their student data</span>, including assessment scores. ';
+				$err .= 'If you are SURE you want to do this, check the boxes next to each student.</p>';
+				$err .= '<p>Un-enroll as a student and add as a tutor:</p>';
+				$err .= '<ul class="nomark">';
+				foreach ($promoteable as $sid) {
+					$err .= '<li><input type="checkbox" name="promotetotutor[]" value="'.Sanitize::encodeStringForDisplay($stuinfo[$sid][0]).'" /> ';
+					$err .= Sanitize::encodeStringForDisplay($stuinfo[$sid][1]).'</li>';
+				}
+				$err .= '</ul>';
+				$err .= '<p><input type="submit" name="submit" value="Un-Enroll and Add as Tutor"/></p></form><p>&nbsp;</p>';
 			}
 		} else {
 			//if not adding new, redirect back to listusers
@@ -166,11 +201,12 @@
 ?>
 
 	<div id="headermanagetutors" class="pagetitle"><h2>Manage Tutors</h2></div>
+	
 <?php
 	echo $err;
 ?>
 	<form id="curform" method=post action="managetutors.php?cid=<?php echo $cid ?>">
-
+	
 	<table class="gb">
 	<thead>
 		<tr>
