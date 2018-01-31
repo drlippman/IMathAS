@@ -3609,7 +3609,11 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			if ($gadploc===false) { //no decimal place
 				if (strlen(rtrim($givenans,'0')) != $reqsigfigs) { return false;}
 			} else {
-				if (strlen(ltrim($givenans,'0'))-1 != $reqsigfigs) { return false;}
+				if (abs($givenans)<1) {
+					if (strlen(ltrim(substr($givenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
+				} else {
+					if (strlen(ltrim($givenans,'0'))-1 != $reqsigfigs) { return false;}
+				}
 			}
 		}
 	}
