@@ -160,7 +160,7 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($useeditor) && $sessiondata['useed']==1) {
-	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=011018"></script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=013118"></script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
@@ -177,8 +177,8 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo '</script>';
 }
 if ((isset($useeditor) && $sessiondata['useed']==1) || isset($loadiconfont)) {
-	echo '<link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfont.css?v=042217" type="text/css" />';
-	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfontie7.css?v=042217" type="text/css" /><![endif]-->';
+	echo '<link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
+	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
