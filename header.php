@@ -176,8 +176,10 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	}
 	echo '</script>';
 }
-
-
+if ((isset($useeditor) && $sessiondata['useed']==1) || isset($loadiconfont)) {
+	echo '<link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfont.css?v=042217" type="text/css" />';
+	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfontie7.css?v=042217" type="text/css" /><![endif]-->';
+}
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {

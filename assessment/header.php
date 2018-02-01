@@ -199,6 +199,10 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 } else {
 	echo '<script type="text/javascript">var usingTinymceEditor = false;</script>';
 }
+if ((isset($useeditor) && $sessiondata['useed']==1) || isset($loadiconfont)) {
+	echo '<link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfont.css?v=042217" type="text/css" />';
+	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfontie7.css?v=042217" type="text/css" /><![endif]-->';
+}
 if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<script type="text/javascript">var eetype='.$useeqnhelper.'</script>';
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=062216\"></script>";

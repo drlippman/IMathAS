@@ -802,35 +802,6 @@ a[target=_blank]:after {
 	display: none;
 }
 
-/*tinymce rules, to supplement skin.css and content.css*/
-.mce-toolbar .mce-btn button {
-  	line-height: 18px;
-  	padding: 2px 6px;
-}
-.mce-toolbar .mce-btn .mce-caret {
-	margin-top: 6px;
-}
-.mce-toolbar .mce-colorbutton .mce-open, .mce-toolbar .mce-splitbtn .mce-open {
-	padding-left: 2px;
-	padding-right: 2px;
-}
-.mce-toolbar .mce-colorbutton button, .mce-toolbar .mce-splitbtn button {
-	padding-right: 4px;
-}
-.mce-toolbar .mce-colorbutton .mce-preview {
-	margin-left: -14px;
-}
-.mce-path {
-	padding: 2px 8px;
-}
-.mce-i-attach:before{content:"\e9cd"}
-.mce-i-math:before{content:"\e901"}
-.mce-i-mathadd:before{content:"\e902"}
-.mce-i-graph:before{content:"\e900"}
-.mce-i-snippet:before{content:"\e026"}
-.mce-content-body span.AMedit {border: 1px solid #ff0000;} 
-
-
 .clearfix:after {
     content: " ";
     display: block;
