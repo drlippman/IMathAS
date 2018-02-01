@@ -1924,7 +1924,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					basicshowq($next);
 					showqinfobar($next,true,true);
 					echo '<input type="submit" class="btn" value="'. _('Submit'). '" />';
-					if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+					if ((($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') && $qi[$questions[$next]]['attempts']>0) {
 						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
 					}
 					echo "</form>\n";
@@ -1967,7 +1967,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					basicshowq($next);
 					showqinfobar($next,true,true);
 					echo '<input type="submit" class="btn" value="'. _('Submit'). '" />';
-					if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+					if ((($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') && $qi[$questions[$next]]['attempts']>0) {
 						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
 					}
 					echo "</form>\n";
@@ -1975,7 +1975,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 				} else {
 					echo "<div class=inset>\n";
 					echo "<a name=\"beginquestions\"></a>\n";
-					echo _("You've already done this problem."), "\n";
+					if (!isset($_GET['jumptoans'])) {
+						echo _("You've already done this problem."), "\n";
+					}
 					$reattemptsremain = false;
 					if ($showeachscore) {
 						$possible = $qi[$questions[$next]]['points'];
@@ -2733,9 +2735,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 				basicshowq($i);
 				showqinfobar($i,true,true);
 				echo '<input type="submit" class="btn" value="', _('Submit'), '" />';
-				if (($testsettings['showans']=='J' && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='J') {
-						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$i.'&amp;to='.$i.'\'}"/>';
-					}
+				if ((($testsettings['showans']=='J' && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='J') && $qi[$questions[$i]]['attempts']>0) {
+					echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$i.'&amp;to='.$i.'\'}"/>';
+				}
 				echo "</form>\n";
 				echo "</div>\n";
 
