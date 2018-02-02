@@ -18,9 +18,6 @@ if (!isset($teacherid) && !isset($tutorid)) {
 
 $cid = intval($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']); //imas_assessments id
-$att = $_GET['att'];
-
-
 
 //pull questionset ids
 $qsids = array();
@@ -56,7 +53,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 //DB $query = "SELECT questions,seeds,lastanswers,scores FROM imas_assessment_sessions ";
 //DB $query .= "WHERE assessmentid='$aid'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-$query = "SELECT questions,seeds,lastanswers,scores,ver FROM imas_assessment_sessions ";
+$query = "SELECT questions,bestseeds,bestlastanswers,bestscores,ver FROM imas_assessment_sessions ";
 $query .= "WHERE assessmentid=:assessmentid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':assessmentid'=>$aid));
@@ -67,14 +64,18 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$GLOBALS['assessver'] = $row[4];
 	if (strpos($row[0],';')===false) {
 		$questions = explode(",",$row[0]);
-		//$bestquestions = $questions;
 	} else {
 		list($questions,$bestquestions) = explode(";",$row[0]);
-		$questions = explode(",",$questions);
-		//$bestquestions = explode(",",$bestquestions);
+		$questions = explode(",",$bestquestions);
 	}
-	$scores = explode(',',$row[3]);
-	$seeds = explode(',',$row[1]);
+	$scores = explode(';', $row[3]);
+	if (count($scores)>1) {
+		$scores = $scores[1]; //grab the raw scores
+	} else {
+		$scores = $scores[0];
+	}
+	$scores = explode(',', $scores);
+	$seeds = explode(',', $row[1]);
 	$attempts = explode('~',$row[2]);
 	$sessioncnt++;
 	foreach($questions as $k=>$q) {
@@ -82,15 +83,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$qdata[$q] = array();
 		}
 		$qatt = explode('##',$attempts[$k]);
-		if ($att=='first') { //doesn't work with scores yet
-			$i=0;
-			while($qatt[$i]=='ReGen') {
-				$i++;
-			}
-			$qatt = $qatt[$i];
-		} else {
-			$qatt = $qatt[count($qatt)-1];
-		}
+		$qatt = $qatt[count($qatt)-1];
 		$qatt = explode('&',$qatt);
 		$qscore = explode('~',$scores[$k]);
 		foreach ($qatt as $kp=>$lav) {
@@ -181,9 +174,8 @@ foreach ($itemarr as $k=>$q) {
 }
 require("../footer.php");
 
-function showresults($q,$qtype) {
-	global $qdata,$qsids,$qsdata;
-	eval(interpret('control',$qtype,$qsdata[$qsids[$q]][1]));
+function sandboxeval($control, $qtype) {
+	eval(interpret('control', $qtype, $control));
 	if ($qtype=='multipart' && !is_array($anstypes)) {
 		$anstypes = explode(',',$anstypes);
 	}
@@ -192,16 +184,36 @@ function showresults($q,$qtype) {
 		//just a singlepart question of that type
 		//matches handling of stuanswers.
 		$qtype = $anstypes[0];
-		$answer = $answer[0];
+		if (isset($answer) && is_array($answer)) {
+			$answer = $answer[0];
+		}
+		if (isset($answers) && is_array($answers)) {
+			$answers = $answers[0];
+		}
 	}
 	if ($qtype=='choices' || $qtype=='multans' || $qtype=='multipart') {
 		if (isset($choices) && !isset($questions)) {
 			$questions =& $choices;
 		}
+	}
+	return array(
+		isset($anstypes)?$anstypes:array(),
+		isset($questions)?$questions:array(),
+		isset($answer)?$answer:"",
+		isset($answers)?$answers:""
+	);
+}
+
+function showresults($q,$qtype) {
+	global $qdata,$qsids,$qsdata;
+	//eval(interpret('control',$qtype,$qsdata[$qsids[$q]][1]));
+	list($anstypes, $questions, $answer, $answers) = sandboxeval($qsdata[$qsids[$q]][1], $qtype);
+
+	if ($qtype=='choices' || $qtype=='multans' || $qtype=='multipart') {
 		if ($qtype=='multipart') {
 			foreach ($anstypes as $i=>$type) {
 				if ($type=='choices' || $type=='multans') {
-					if (isset($questions[$i])) {
+					if (isset($questions[$i]) && is_array($questions[$i])) {
 						$ql = $questions[$i];
 					} else {
 						$ql = $questions;
