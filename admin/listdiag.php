@@ -57,7 +57,7 @@ if (($myspecialrights&4)!=4 && $myrights < 100) {
     $query = "SELECT d.id,d.name,d.public,d.cid,ic.name AS cname,u.FirstName,u.LastName,u.id AS uid,g.name AS gname FROM imas_diags as d ";
     $query .= "JOIN imas_courses AS ic ON d.cid=ic.id ";
     $query .= "JOIN imas_users AS u ON u.id=d.ownerid ";
-    $query .= "JOIN imas_groups AS g ON u.groupid=g.id ";
+    $query .= "LEFT JOIN imas_groups AS g ON u.groupid=g.id ";
     $query .= "ORDER BY d.name";
     $stm = $DBH->query($query);
     $diags = $stm->fetchAll(PDO::FETCH_ASSOC);
@@ -141,6 +141,9 @@ if ($overwriteBody==1) {
         echo '<td>',Sanitize::encodeStringForDisplay($diag['LastName'].', '.$diag['FirstName']),'</td>';
       }
       if ($list=='all') {
+      	if ($diag['gname']===null) {
+      		$diag['gname'] = _('Default');
+      	}
         echo '<td>',Sanitize::encodeStringForDisplay($diag['gname']),'</td>';
       }
     }
