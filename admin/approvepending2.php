@@ -34,9 +34,14 @@ if (isset($_POST['newstatus'])) {
 		if ($_POST['group']>-1) {
 			$group = intval($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
-			$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-			$stm->execute(array(':name'=>$_POST['newgroup']));
-			$group = $DBH->lastInsertId();
+			$stm = $DBH->prepare("SELECT id FROM imas_groups WHERE name REGEXP ?");
+			$stm->execute(array('^[[:space:]]*'.preg_replace('/\s+/', '[[:space:]]+', trim($_POST['newgroup'])).'[[:space:]]*$'));
+			$group = $stm->fetchColumn(0);
+			if ($group === false) {
+				$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
+				$stm->execute(array(':name'=>$_POST['newgroup']));
+				$group = $DBH->lastInsertId();
+			}
 		} else {
 			$group = 0;
 		}

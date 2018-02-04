@@ -103,9 +103,15 @@ switch($_POST['action']) {
 		if ($myrights == 100 || ($myspecialrights&32)==32) { //update library groupids
 			if ($_POST['group']==-1) {
 				if (trim($_POST['newgroupname'])!='') {
-					$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-					$stm->execute(array(':name'=>$_POST['newgroupname']));
-					$newgroup = $DBH->lastInsertId();
+					//check for existing with same name
+					$stm = $DBH->prepare("SELECT id FROM imas_groups WHERE name REGEXP ?");
+					$stm->execute(array('^[[:space:]]*'.preg_replace('/\s+/', '[[:space:]]+', trim($_POST['newgroupname'])).'[[:space:]]*$'));
+					$newgroup = $stm->fetchColumn(0);
+					if ($newgroup === false) {
+						$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
+						$stm->execute(array(':name'=>$_POST['newgroupname']));
+						$newgroup = $DBH->lastInsertId();
+					}
 				} else {
 					$newgroup = 0;
 				}
@@ -272,9 +278,15 @@ switch($_POST['action']) {
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
 			if ($_POST['group']==-1) {
 				if (trim($_POST['newgroupname'])!='') {
-					$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-					$stm->execute(array(':name'=>$_POST['newgroupname']));
-					$newgroup = $DBH->lastInsertId();
+					//check for existing with same name
+					$stm = $DBH->prepare("SELECT id FROM imas_groups WHERE name REGEXP ?");
+					$stm->execute(array('^[[:space:]]*'.preg_replace('/\s+/', '[[:space:]]+', trim($_POST['newgroupname'])).'[[:space:]]*$'));
+					$newgroup = $stm->fetchColumn(0);
+					if ($newgroup === false) {
+						$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
+						$stm->execute(array(':name'=>$_POST['newgroupname']));
+						$newgroup = $DBH->lastInsertId();
+					}
 				} else {
 					$newgroup = 0;
 				}
