@@ -34,7 +34,7 @@ if ($stm->rowCount()>0) {
 //(c) 2006 David Lippman
 if (isset($_POST['dbsetup'])) { //called from install script
 	echo "<h3>This step will set up the database required for IMathAS</h3>\n";
-	echo "<form method=post action=\"dbsetup.php\">\n";
+	echo "<form method=post action=\"setupdb.php\">\n";
 
 	echo "<fieldset><legend>Initial IMathAS User Information</legend>\n";
 	echo "<span class=form>First Name</span>";
@@ -53,7 +53,7 @@ if (isset($_POST['dbsetup'])) { //called from install script
 	echo "</body></html>\n";
 	exit;
 } else if (!isset($_POST['username'])) {
-	echo "<form method=post action=\"dbsetup.php\">\n";
+	echo "<form method=post action=\"setupdb.php\">\n";
 	echo "<h3>This script will set up the database required for IMathAS</h3>\n";
 	echo "<p><b>Before submitting this form</b> be sure you have edited the config.php file to match the settings for your server, and the database has been created.</p>\n";
 	echo "<fieldset><legend>Initial IMathAS User Information</legend>\n";

@@ -159,7 +159,7 @@ if ($c6 && $c7 && $c8) {
 	echo 'Couldn\'t make copies of infoheader.php, loginpage,php, and newinstructor.php.  Please copy the .dist files as described in readme.html<br/>';
 }
 ?>
-<form method="post" action="dbsetup.php">
+<form method="post" action="setupdb.php">
 <input type="hidden" name="dbsetup" value="true" />
 
 <input type="submit" value="Continue to creating database tables"/>

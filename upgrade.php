@@ -13,7 +13,7 @@ ini_set("max_input_time", "6000");
 ini_set("max_execution_time", "6000");
 ini_set("memory_limit", "104857600");
 
-if (isset($dbsetup) && $dbsetup==true) {  //initial setup run from dbsetup.php
+if (isset($dbsetup) && $dbsetup==true) {  //initial setup run from setupdb.php
 
 	//create dbscheme entry for DB ver
 	//store in the $latest_oldstyle, which matches the version in dbsetup

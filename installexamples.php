@@ -98,7 +98,7 @@ $DBH->query($query);
 ?>
 <html>
 <body>
-<p>Example library installed.  You can now delete dbsetup.php, install.php, and installexamples.php if you want.</p>
+<p>Example library installed.  You can now delete setupdb.php, install.php, and installexamples.php if you want.</p>
 
 <p>Install is <a href="index.php">Done</a>.</p>
 
