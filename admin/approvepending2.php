@@ -127,6 +127,7 @@ function getGroups() {
 		if (preg_match('/(gmail|yahoo|hotmail|me\.com)/', $row['domain'])) {
 			$row['domain'] = '';
 		}
+		$row['name'] = preg_replace('/\s+/', ' ', trim($row['name']));
 		$out[] = array('id'=>$row['groupid'], 'name'=>$row['name'], 'domain'=>strtolower($row['domain']));
 	}
 	return $out;
@@ -225,7 +226,7 @@ echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
       	  		<option v-for="group in groups" :value="group.id">{{group.name}}</option>
       	  	</optgroup>
       	  	</select>
-      	  	<span v-if="group==-1">New group name: <input size=30 v-model="newgroup"></span>
+      	  	<span v-if="group==-1">New group name: <input size=30 v-model="newgroup" @blur="checkgroupname"></span>
       	  </li>
       	  <li>
       	    <button @click="chgStatus(status, userindex, 11)">Approve Request</button>
@@ -339,6 +340,9 @@ var app = new Vue({
 			}
 		},
 		chgStatus: function(status, userindex, newstatus) {
+			if (newstatus==11 && !this.checkgroupname()) {
+				return false;
+			}
 			this.statusMsg = _("Saving...");
 			var self = this;
 			$.ajax({
@@ -374,6 +378,17 @@ var app = new Vue({
 		},
 		clone: function(obj) {
 			return JSON.parse(JSON.stringify(obj)); //crude
+		},
+		checkgroupname: function() {
+			var proposedgroup = this.newgroup.replace(/^\s+/,"").replace(/\s+$/,"").replace(/\s+/g," ").toLowerCase();
+			for (i in groups) {
+				if (groups[i].name.toLowerCase()==proposedgroup) {
+					alert("That group name already exists!");
+					this.group = groups[i].id;
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 });

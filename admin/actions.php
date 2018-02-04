@@ -42,9 +42,9 @@ switch($_POST['action']) {
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
-		$stm = $DBH->prepare("SELECT rights FROM imas_users WHERE id=:id");
+		$stm = $DBH->prepare("SELECT rights,groupid FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
-		$oldrights = $stm->fetchColumn(0);
+		list($oldrights,$oldgroupid) = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
 			echo "invalid id";
 			exit;
@@ -113,7 +113,7 @@ switch($_POST['action']) {
 						$newgroup = $DBH->lastInsertId();
 					}
 				} else {
-					$newgroup = 0;
+					$newgroup = $oldgroupid;
 				}
 			} else {
 				$newgroup = Sanitize::onlyInt($_POST['group']);

@@ -110,6 +110,16 @@ switch($_GET['action']) {
 			$(function() {
 				$("input[name=newrights]").on("change", onrightschg);
 				});
+			function checkgroupisnew() {
+				var proposedgroup = $("input[name=newgroupname]").val().replace(/^\s+/,"").replace(/\s+$/,"").replace(/\s+/g," ").toLowerCase();
+				$("#group").find("option").each(function(i) {
+					if ($(this).text().toLowerCase()==proposedgroup) {
+						alert("That group name already exists!");
+						$("#group").val(this.value).trigger("change");
+						break;
+					}
+				});
+			}
 			</script>';
 		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=SID ";
 		if ($_GET['action'] != "newadmin") {
@@ -221,11 +231,12 @@ switch($_GET['action']) {
 				if ($oldgroup==$row[0]) {
 					echo "selected=1";
 				}
+				$row[1] = preg_replace('/\s+/', ' ', trim($row[1]));
 				printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 			}
 			echo "</select>";
 			echo '<span id="newgroup" style="display:none"><br/>New group name: ';
-			echo ' <input name=newgroupname size=20 /></span>';
+			echo ' <input name=newgroupname size=20 onblur="checkgroupisnew()"/></span>';
 			echo "</span><br class=form />\n";
 		}
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
