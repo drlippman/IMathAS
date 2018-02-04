@@ -76,8 +76,7 @@ class SessionDBHandler implements SessionHandlerInterface
 		$stm = $this->db->prepare('SELECT `data` FROM php_sessions WHERE id = :id');
 		$stm->bindParam(':id', $sessionId);
 
-		if ($stm->execute()) {
-			$row = $stm->fetch();
+		if ($stm->execute() && ($row = $stm->fetch())) {
 			return $row['data'];
 		} else {
 			return '';
