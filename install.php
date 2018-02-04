@@ -27,7 +27,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 \$loginformat = '";
 
 if ($_POST['loginformat']==0) {
-	$contents .= '/^[\w+\-]$/';
+	$contents .= '/^[\w+\-]+$/';
 } else if ($_POST['loginformat']==1) {
 	$contents .= '/^(\d{9}|lti-\d+)$/';
 } else if ($_POST['loginformat']==2) {
