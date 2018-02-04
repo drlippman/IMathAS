@@ -24,15 +24,19 @@ if ($myrights < 100) {
   exit;
 } else if (isset($_POST['removecourselti'])) {
   $id = intval($_POST['removecourselti']);
-  //DB $query = "DELETE FROM imas_lti_courses WHERE id=$id";
-  //DB mysql_query($query) or die("Query failed : " . mysql_error());
+  $stm = $DBH->prepare("SELECT org,contextid FROM imas_lti_courses WHERE id=:id");
+  $stm->execute(array(':id'=>$id));
+  $row = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($row===false) {
+  	  echo "ERROR";
+  	  exit;
+  }
+  $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE org=:org AND contextid=:contextid");
+  $stm->execute(array(':org'=>$row['org'], ':contextid'=>$row['contextid']));
+  
   $stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
   $stm->execute(array(':id'=>$id));
-  if ($stm->rowCount()>0) {
-    echo "OK";
-  } else {
-    echo "ERROR";
-  }
+  echo "OK";
   exit;
 } else if (empty($_GET['id'])) {
   $overwriteBody = 1;
