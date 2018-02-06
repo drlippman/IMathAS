@@ -1901,16 +1901,21 @@ function numtowords($num,$doth=false,$addcontractiontonum=false) {
 	if ($num==0) {
 		return "zero";
 	}
+	$out = '';
+	if ($num<0) {
+		$out .= 'negative ';
+		$num = abs($num);
+	}
 	$int = floor($num);
 	$dec = 	$num-$int;
-	$out = '';
+	
 	if ($int>0) {
 		$out .= convertTri($int,0,$doth);
-		if ($dec>0) {
+		if (abs($dec)>1e-9) {
 			$out .= " and ";
 		}
 	}
-	if ($dec>0) {
+	if (abs($dec)>1e-9) {
 		$cnt = 0;
 		while (abs($dec-round($dec))>1e-9 && $cnt<9) {
 			$dec *= 10;
