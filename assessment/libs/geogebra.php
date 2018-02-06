@@ -23,17 +23,18 @@ array_push($allowedmacros,"addGeogebra","addGeogebraJava");
 function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array(),$callback=null,$qn=null,$part=null) {
 	$out = '';
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
+	$ggbid = uniqid();
 	if (!isset($GLOBALS['geogebracount'])) {
 		$GLOBALS['geogebracount'] = 0;
-		$out .= '<script type="text/javascript" src="https://www.geogebratube.org/scripts/deployggb.js"></script>';
+		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
 	}
 	$out .= '<script type="text/javascript">';
 	if (strlen($url)>10) {
-		$out .= 'var applet'.$GLOBALS['geogebracount'].' = new GGBApplet({"ggbBase64":"'.$url.'",';
+		$out .= 'var applet'.$ggbid.' = new GGBApplet({"ggbBase64":"'.$url.'",';
 	} else {
-		$out .= 'var applet'.$GLOBALS['geogebracount'].' = new GGBApplet({"material_id":"'.$url.'",';
+		$out .= 'var applet'.$ggbid.' = new GGBApplet({"material_id":"'.$url.'",';
 	}
-	$out .= '"ggbOnInitParam":'.$GLOBALS['geogebracount'].',"id":"ggbApplet'.$GLOBALS['geogebracount'].'"';
+	$out .= '"ggbOnInitParam":"ggb'.$ggbid.'","id":"ggb'.$ggbid.'","useBrowserForJS":true';
 	foreach ($params as $k=>$v) {
 		$out .= ",\"$k\":\"$v\"";
 	}
@@ -41,25 +42,24 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 		$out .= ",height:\"$height\",width:\"$width\"";
 	}
 	$out .= '});';
-	$out .= '$(function() { applet'.$GLOBALS['geogebracount'].'.inject("geogebra_container'.$GLOBALS['geogebracount'].'","preferHTML5");});';
+	$out .= '$(function() { applet'.$ggbid.'.inject("geogebra_container'.$ggbid.'","preferHTML5");});';
 	$out .= '</script>';
-	$out .= '<div id="geogebra_container'.$GLOBALS['geogebracount'].'"><span id="ggbloadimg'.$GLOBALS['geogebracount'].'">Loading Geogebra...</span></div>';
+	$out .= '<div id="geogebra_container'.$ggbid.'"><span id="ggbloadimg'.$ggbid.'">Loading Geogebra...</span></div>';
 	
 	//if (count($commands)>0) {
 		$out .= '<script type="text/javascript">';
 		
 		$out .= 'if (typeof gbbOnInit == "undefined") {';
 		$out .= '  var ggbInitStack = []; ';
-		$out .= '  function ggbOnInit() {';
-		$out .= '      for (i in ggbInitStack) {setTimeout(ggbInitStack[i],50);}';
+		$out .= '  function ggbOnInit(param) {';
+		$out .= '      if (param in ggbInitStack) {ggbInitStack[param]();}';
 		$out .= '  } } ;';
-		$out .= 'ggbInitStack.push(function () {';
-		$out .= '   $("#ggbloadimg'.$GLOBALS['geogebracount'].'").remove(); ';
-		$out .= "   var applet=document.ggbApplet{$GLOBALS['geogebracount']};";
+		$out .= 'ggbInitStack["ggb'.$ggbid.'"] = function () {';
+		$out .= '   $("#ggbloadimg'.$ggbid.'").remove(); ';
 		foreach ($commands as $com) {
-			$out .= 'applet.'.$com.';';
+			$out .= 'ggb'.$ggbid.'.'.$com.';';
 		}
-		$out .= '});';
+		$out .= '};';
 		$out .= '</script>';
 	//}
 	if ($callback!=null & $qn != null) {
@@ -67,10 +67,9 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 		
 		$out .= '<script type="text/javascript">';
 		$out .= ' callbackstack['.$qn.'] = function () {';
-		$out .= "   var applet=document.ggbApplet{$GLOBALS['geogebracount']};";  
 		$out .= '   var ansparts = [];';
 		foreach ($callback as $com) {
-			$out .= '  ansparts.push(applet.'.$com.');';
+			$out .= '  ansparts.push(ggb'.$ggbid.'.'.$com.');';
 		}
 		$out .= '   document.getElementById("qn"+'.$qn.').value = ansparts.join(",");';
 		$out .= '};</script>';
