@@ -1,6 +1,17 @@
-<html><body>
+<html>
+
+<head>
+<style type="text/css">
+.auto-style1 {
+	font-weight: normal;
+}
+</style>
+</head>
+
+<body>
 <h1>Macro Library matrix</h1>
-Matrix functions.  Version 1.5, Oct 8, 2014
+Matrix functions.  Version 1.5, Dec 2017
+<br>Contributors: David Lippman, Larry Green
 <BR><ul>
 <li><a href="#matrix">matrix</a></li>
 <li><a href="#matrixformat">matrixformat</a></li>
@@ -31,6 +42,24 @@ Matrix functions.  Version 1.5, Oct 8, 2014
 <li><a href="#matrixnumsolutions">matrixnumsolutions</a></li>
 <li><a href="#matrixround">matrixround</a></li>
 <li><a href="#polyregression">polyregression</a></li>
+<li><a href="#matrixGetRank">matrixGetRank</a></li>
+<li><a href="#arrayIsZeroVector">arrayIsZeroVector</a></li>
+<li><a href="#matrixFormMatrixFromEigValEigVec">matrixFormMatrixFromEigValEigVec</a></li>
+<li><a href="#matrixIsRowsLinInd">matrixIsRowsLinInd</a></li>
+<li><a href="#matrixIsColsLinInd">matrixIsColsLinInd</a></li>
+<li><a href="#matrixIsEigVec">matrixIsEigVec</a></li>
+<li><a href="#matrixIsEigVal">matrixIsEigVal</a></li>
+<li><a href="#matrixGetRowSpace">matrixGetRowSpace</a></li>
+<li><a href="#matrixGetColumnSpace">matrixGetColumnSpace</a></li>
+<li><a href="#matrixAxbHasSolution">matrixAxbHasSolution</a></li>
+<li><a href="#matrixAspansB">matrixAspansB</a></li>
+<li><a href="#matrixAbasisForB">matrixAbasisForB</a></li>
+<li><a href="#matrixGetMinor">matrixGetMinor</a></li>
+<li><a href="#matrixDet">matrixDet</a></li>
+<li><a href="#matrixRandomMatrix">matrixRandomMatrix</a></li>
+<li><a href="#matrixRandomSpan">matrixRandomSpan</a></li>
+<li><a href="#matrixNumberOfRows">matrixNumberOfRows</a></li>
+<li><a href="#matrixNumberOfColumns">matrixNumberOfColumns</a></li>
 </ul>
 <h3><a name="matrix">matrix</a></h3>
 matrix(vals,rows,cols)
@@ -172,4 +201,94 @@ polyregression(x,y,n)
 <BR>find a nth degree polynomial that best fits the data 
 <BR>x,y arrays of data
 <BR>returns an array (intercept, linear coeff, quad coeff, ...)
-<BR>
+<BR><br>
+<h3><a name="matrixGetRank">matrixGetRank</a></h3>
+<p>&nbsp;matrixGetRank(matrix)<br>
+&nbsp;returns the rank of a matrix<br>
+</p>
+<h3><a name="arrayIsZeroVector">arrayIsZeroVector</a></h3>
+<p>arrayIsZeroVector(vector)<br>vector is an array, not a matrix.<br>
+determines if a vector is the 0 vector<br>
+</p>
+<h3><a name="matrixFormMatrixFromEigValEigVec">matrixFormMatrixFromEigValEigVec</a></h3>
+<p>matrixFormMatrixFromEigValEigVec(eigenvalues,matrix of eigenvectors)<br>
+eigenvalues: The eigenvalues of the matrix include multiple times if 
+multiplicity &gt; 0<br>
+matrix of eigenvectors: imput a matrix that consists of the eigenvectors of the 
+original matrix<br>
+returns the matrix PAP^-1<br>
+</p>
+<h3><a name="matrixIsRowsLinInd">matrixIsRowsLinInd</a></h3>
+<p>matrixIsRowsLinInd(matrix)<br>
+matrix: matrix's row vectors are the vectors we are looking at seeing if they 
+are linearly independent<br>
+&nbsp;returns true if they are LI and false if they are LD<br>
+</p>
+<h3><a name="matrixIsColsLinInd">matrixIsColsLinInd</a></h3>
+<p>matrixIsColsLinInd(matrix)<br>
+matrix: matrix's column vectors are the vectors we are looking at seeing if they 
+are linearly independent<br>
+&nbsp;returns true if they are LI and false if they are LD<br>
+</p>
+<h3><a name="matrixIsEigVec">matrixIsEigVec</a></h3>
+<p>matrixIsEigVec(matrix,eigenvector)<br>
+matrix: the matrix that we are testing<br>
+eigenvector: the possible eigenvector that we are checking.&nbsp; It is an 
+array, not a matrix.<br>
+&nbsp;returns true is eigenvector is an eigenvector of matrix. Otherwise it 
+returns false<br>
+</p>
+<h3><a name="matrixIsEigVal">matrixIsEigVal</a></h3>
+<p>matrixIsEigVal(matrix,eigenvalue)<br>
+matrix: the matrix that we are testing<br>
+eigenvalue a real number that we are testing to see if it is an eigenvalue of 
+matrix.<br>
+</p>
+<h3><a name="matrixGetRowSpace">matrixGetRowSpace</a></h3>
+<p>matrixGetRowSpace(matrix)<br>
+matrix: the matrix that we are finding the row space<br>
+returns a matrix whose rows are a basis of the row space of matrix<br>
+</p>
+<h3><a name="matrixGetColumnSpace">matrixGetColumnSpace</a></h3>
+<p>matrixGetColumnSpace(matrix)<br>
+matrix: the matrix that we are finding the column space<br>
+returns a matrix whose columns are a basis of the column space of matrix<br>
+</p>
+<h3><a name="matrixAxbHasSolution">matrixAxbHasSolution</a></h3>
+<p>matrixAxbHasSolution(matrix A,matrix b)<br>
+A is a marix and b is a mx1 matrix.<br>
+returns true if there is a solution and false if there isn't one<br>
+</p>
+<h3><a name="matrixAspansB">matrixAspansB</a></h3>
+<p>matrixAspansB(matrix A,matrix B)<br>
+A is the possible spanning set<br>
+This tests if the rows of A span the row space of B<br>
+</p>
+<h3><a name="matrixAbasisForB">matrixAbasisForB</a></h3>
+<p>matrixAbasisForB(matrix A, matrix B)<br>
+tests if the rows of A are a basis for the row space of B<br>
+</p>
+<h3><a name="matrixGetMinor">matrixGetMinor</a></h3>
+<p>matrixGetMinor(matrix,rowNo,colNo)<br>
+returns the n-1 by n-1 matrix minor obtained by removing the rowNo row and colNo 
+column. Only works for a square matrix.<br>
+</p>
+<h3><a name="matrixDet">matrixDet</a></h3>
+<p>det(matrix)<br>
+returns the determinant of a matrix<br>
+</p>
+<h3><a name="matrixRandomMarix">matrixRandomMatrix</a></h3>
+<p>matrixRandomMatrix(max values,minimum,number of rows,number of columns)<br>
+returns matrix with random integer entries where the integers are between max and min values.<br>
+For cases where you'll want to solve Ax=b, use matrixrandinvertible instead</p>
+<h3><a name="matrixRandomSpan">matrixRandomSpan</a></h3>
+<p>matrixRandomSpan(matrix)<br>returns a matrix of rows that span the row space 
+of matrix<br>the number of rows of the spanning matrix will either be the same 
+or one larger than the original matrix's number of rows.</p>
+<h3><a name="matrixNumberOfRows">matrixNumberOfRows</a></h3>
+<p>matrixNumberOfRows(matrix)<br>&nbsp;returns the number of rows of a matrix</p>
+<h3><a name="matrixNumberOfColumns">matrixNumberOfColumns</a></h3>
+<p>matrixNumberOfColumns(matrix)<br>/returns the number of columns of a matrix</p>
+<p>&nbsp;</p>
+<p><br>
+</p>

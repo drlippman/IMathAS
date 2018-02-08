@@ -1,8 +1,22 @@
 <?php
-//Matrix functions.  Version 1.5, Oct 8, 2014
+//Matrix functions.  Version 1.5, Dec, 2017
+//
+//Contributors:  David Lippman, Larry Green
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum","matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale","matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity","matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse","matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry","matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce","matrixnumsolutions","matrixround");
+array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum",
+	"matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale",
+	"matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity",
+	"matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse",
+	"matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry",
+	"matrixRandomSpan","matrixNumberOfRows","matrixNumberOfColumns",
+	"matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce",
+	"matrixnumsolutions","matrixround",
+	"matrixGetRank","arrayIsZeroVector","matrixFormMatrixFromEigValEigVec",
+	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
+	"matrixGetRowSpace","matrixGetColumnSpace",
+	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
+	"matrixGetMinor","matrixDet","matrixRandomMatrix");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -762,16 +776,15 @@ function matrixreduce($A, $rref = false, $frac = false) {
     }
    
     $r = 0;  $c = 0;
-    
     while ($r < $N && $c < $M) {
     	    if ($A[$r][$c][0]==0) { //swap only if there's a 0 entry
-		    $max = $p;
+		    $max = $r;
 		    for ($i = $r+1; $i < $N; $i++) {
 			    if (abs($A[$i][$c][0]/$A[$i][$c][1]) > abs($A[$max][$c][0]/$A[$max][$c][1])) {
 				$max = $i;
 			    }
 		    }
-		    if ($max != $p) { 
+		    if ($max != $r) { 
 			$temp = $A[$r]; $A[$r] = $A[$max]; $A[$max] = $temp;
 		    }
     	    }
@@ -870,6 +883,278 @@ function polyregression($x,$y,$n) {
 }
 
 
+//The following functions are added in order to evaluate questions that ask for the rank,
+//null space, column space and other matrix qualities that are used in linear algebra.
+
+//arrayIsZeroVector(vector) vector is an array, mot a matrix
+//determines if a vector is the 0 vector
+function arrayIsZeroVector($v){
+	for($i=0;$i<count($v);$i++){
+		if($v[$i]!=0){
+			return(false);
+		}
+	}
+	return(true);	
+}
 
 
+
+//matrixGetRank(matrix)
+//returns the rank of a matrix
+//column rank = row rank (https://www.maa.org/sites/default/files/3004418139737.pdf.bannered.pdf)
+function matrixGetRank($m){
+	$rowRank = 0;
+	$refM = matrixreduce($m,false,false);
+	for($i=0;$i<count($refM);$i++){
+		if(arrayIsZeroVector($refM[$i])==true){
+			return($rowRank);
+		}
+		else{
+			$rowRank++;
+		}
+	}
+	return($rowRank);
+}
+
+//matrixFormMatrixFromEigValEigVec(eigenvalues,matrix of eigenvectors)
+//eigenvalues:  The eigenvalues of the matrix include multiple times if multiplicity > 0
+//matrix of eigenvectors:  imput a matrix that consists of the eigenvectors of the original matrix
+//returns the matrix PAP^-1
+function matrixFormMatrixFromEigValEigVec($eigVal,$eigVec){
+	if(count($eigVec)!=count($eigVec[0])){
+			echo("The matrix of eigenvectors must be a square matrix");
+	}
+	$A = array();
+	$n = count($eigVec);
+	for($i=0;$i<$n;$i++){
+		$A[$i] = array_fill(0,$n,0);
+		$A[$i][$i] = $eigVal[$i];
+	}
+	return(matrixprod($eigVec,matrixprod($A, matrixinverse($eigVec))));
+}
+//matrixIsRowsLinInd(matrix)
+//matrix: returns true if the rows of the matrix are linearly independent
+function matrixIsRowsLinInd($m){
+	if(matrixGetRank($m) == count($m)){
+		return (true);
+	}
+	else{
+		return(false);
+	}
+}
+
+//matrixIsColsLinInd(matrix)
+//matrix: returns true if the columns of the matrix are linearly independent
+function matrixIsColsLinInd($m){
+	if(matrixGetRank($m) == count($m[0])){
+		return (true);
+	}
+	else{
+		return(false);
+	}
+}
+
+//matrixIsEigVec(matrix,eigenvector)
+//matrix:  the matrix that we are testing
+//eigenvector:  the possible eigenvector that we are checking.  It is an array, not a matrix.
+// returns true is eigenvector is an eigenvector of matrix.  Otherwise it returns false
+function matrixIsEigVec($m,$v){
+	if(count($m)!=count($m[0])){
+			echo("The matrix must be a square matrix");
+	}
+
+	$product = matrixprod($m,matrix($v,count($v),1));
+	
+	$mv = array($v); //make $v the first row of $mv
+	$mv[1] = array();
+	for ($i=0;$i<count($v);$i++) {
+		$mv[1][$i] = $product[$i][0]; //put product as second row
+	}
+	if(matrixGetRank($mv) == 1){
+		return(true);
+	}
+	else{
+		return(false);
+	}
+}
+//matrixIsEigVal(matrix,eigenvalue)
+//matrix:  the matrix that we are testing
+//eigenvalue a real number that we are testing to see if it is an eigenvalue of matrix.
+function matrixIsEigVal($m,$L){
+	if(count($m)!=count($m[0])){
+			echo("The matrix must be a square matrix");
+	}
+
+	//this gives A - LI
+	$AMinusLI = matrixdiff($m,matrixscalar(matrixidentity(count($m)),$L));
+	if(matrixGetRank($AMinusLI) == count($m)){
+		return(false);
+	}
+	else{
+		return(true);
+	}
+	//return($AMinusLI);
+}
+
+//matrixGetRowSpace(matrix)
+//matrix:  the matrix that we are finding the row space
+//returns a matrix whose rows are a basis of the row space of matrix
+function matrixGetRowSpace($m){
+	$m = matrixreduce($m,true,false);
+	
+	$retMatrix = array();
+	for ($i=0;$i<count($m);$i++) {
+		if(!arrayIsZeroVector($m[$i])){
+			$retMatrix[] = $m[$i];
+		} else {
+			break;
+		}
+	}
+	return $retMatrix;
+	
+}
+//matrixGetColumnSpace(matrix)
+//matrix:  the matrix that we are finding the column space
+//returns a matrix whose columns are a basis of the column space of matrix
+function matrixGetColumnSpace($m){
+	return(matrixtranspose(matrixGetRowSpace(matrixtranspose($m))));
+}
+
+//matrixAxbHasSolution(matrix A,matrix b)
+//A is a marix and b is a mx1 matrix.
+//returns true if there is a solution and false if there isn't one
+function matrixAxbHasSolution($A,$b){
+	if(count($A)!=count($b)){
+		echo("The number of entries of b must equal the number of rows of A.  A not b:  ".count($A). " not ".count($b));
+	}
+	$AB = matrixaugment($A,$b);
+	$testMatrix = matrixreduce($AB,false,false);
+	$lastCol = count($testMatrix[0])-1;
+	for ($r=0;$r<count($testMatrix);$r++) {  //for each row
+		if ($testmatrix[$r][$lastCol] != 0) { //if right hand side is non-zero
+			$hasnonzero = false;
+			for ($c=0;$c<$lastCol;$c++) { //for each column other than last
+				if ($testMatrix[$r][$c] != 0) {
+					$hasnonzero = true;  //found one	
+					break; //don't need to keep looking
+				}
+			}
+			if (!$hasnonzero) { //no non-zero on left, right was non-zero
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+//matrixAspansB(matrix A,matrix B)
+//A is the possible spanning set
+//This tests if the rows of A span the row space of B
+function matrixAspansB($A,$B){
+	$C = matrixaugment(matrixtranspose($A),matrixtranspose($B));
+
+	if(matrixGetRank($A) != matrixGetRank($B) || matrixGetRank($A) != matrixGetRank($C)){
+		return false;
+	}
+	return true;
+}
+//matrixAbasisForB(matrix A, matrix B)
+//tests if the rows of A are a basis for the row space of B
+function matrixAbasisForB($A,$B){
+	if(count($A[0]!=$B[0])){
+		echo("The number of columns of A must equal to the number of columns of B");
+	}
+	$retVal = true;
+	if(matrixAspansB($A,$B)==false){
+		$retVal = false;
+	}
+	if(matrixIsLinInd($A)==false){
+		$retVal = false;
+	}
+	return($retVal);
+}
+//matrixGetMinor(matrix,rowNo,colNo)
+//returns the n-1 by n-1 matrix minor obtained by removing the rowNo row and colNo column.  Only works for a square matrix.
+function matrixGetMinor($A,$rowNo,$colNo){
+	if(count($A[0])<$colNo){
+		echo("The number of columns of A must at least as large as the column selected");
+	}
+	if(count($A)<$rowNo){
+		echo("The number of rows of A must at least as large as the row selected");
+	}
+
+	$retVal = array();
+	$m = 0;
+	$n = 0;
+	for($i=0;$i<count($A);$i++){
+		$n = 0;
+		if($i!=$rowNo){
+			$retVal[$m] = array();
+		}
+		for($j=0;$j<count($A);$j++){
+			if($i!=$rowNo&&$j!=$colNo){
+				$retVal[$m][$n] = $A[$i][$j];
+				$n++;
+			}		
+		}
+		if($i!=$rowNo){
+			$m++;
+		}
+	}
+	return($retVal);
+}
+//det(matrix)
+//returns the determinant of a matrix
+function matrixDet($A){
+	if(count($A)!=count($A[0])){
+		echo("A must be a square matrix");
+	}
+	//return(matrixDetMinor($A[0][0]));
+	if(count($A)==1){
+		return($A[0][0]);
+	} else if (count($A)==2) {
+		return ($A[0][0]*$A[1][1] - $A[0][1]*$A[1][0]);
+	}
+	else{
+		for($i=0;$i<count($A);$i++){
+			if ($A[0][$i]!=0) {
+				$retVal += pow(-1,$i)*$A[0][$i]*matrixDet(matrixGetMinor($A,0,$i));
+			}
+		}
+		return($retVal);
+	}
+}
+//matrixRandomMatrix(max values,minimum,number of rows,number of columns)
+//returns matrix with random integer entries where the integers are between max and min values.
+//For cases where you'll want to solve Ax=b, use matrixrandinvertible instead
+function matrixRandomMatrix($min,$max,$rows,$cols){
+	$ranList = rands($min,$max,$rows*$cols);
+	return(matrix($ranList,$rows,$cols));
+}
+//matrixRandomSpan(matrix)
+//returns a matrix of rows that span the row space of matrix
+//the number of rows of the spanning matrix will either be the same or one larger than the original matrix's number of rows.
+function matrixRandomSpan($m){
+	$ranCols = $GLOBALS['RND']->rand(count($m),count($m)+1);
+	if($ranCols == count($m)){
+		return matrixrandunreduce($m,5);
+	}
+	else{
+		//add a new row copied from a random row, then unreduce
+		$m[] = $m[$GLOBALS['RND']->rand(0,count($m)-1)];
+		return matrixrandunreduce($m,5); 
+	}
+
+}
+
+//matrixNumberOfRows(matrix)
+// returns the number of rows of a matrix
+function matrixNumberOfRows($m){
+	return(count($m));
+}
+//matrixNumberOfColumns(matrix)
+// returns the number of columns of a matrix
+function matrixNumberOfColumns($m){
+	return(count($m[0]));
+}
 ?>
