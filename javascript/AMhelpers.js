@@ -1054,7 +1054,7 @@ function singlevalsyntaxcheck(str,format) {
 			return (_("not a valid fraction")+". ");
 		  }
 	} else if (format.indexOf('mixednumber')!=-1) {
-		  if (!str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\d+\s*$/) && !str.match(/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/)) {
+		  if (!str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\s*\d+\s*$/) && !str.match(/^\s*\-?\s*\d+\s*\/\s*\-?\d+\s*$/)) {
 			return (_("not a valid mixed number")+". ");
 		  }
 		  str = str.replace(/_/,' ');

@@ -7116,7 +7116,7 @@ function checkanswerformat($tocheck,$ansformats) {
 
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
 		$tocheck = preg_replace('/\s/','',$tocheck);
-		if (!preg_match('/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
+		if (!preg_match('/^\(?\-?\s*\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\s*\d*?\.\d*?\s*$/',$tocheck))) {
 			return false;
 		} else {
 			if (in_array("reducedfraction",$ansformats) && strpos($tocheck,'/')!==false) {
@@ -7146,12 +7146,12 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 
 	if (in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats)) {
-		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
+		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\s*\d+\s*\/\s*\-?\s*\d+\s*$/',$tocheck)) {
 			//if doesn't match any format, exit
 			return false;
 		} else {
-			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {   //if a fraction
-				$tmpa = explode("/",$tocheck);
+			if (preg_match('/^\s*\-?\s*\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {   //if a fraction
+				$tmpa = explode("/",str_replace(' ','',$tocheck));
 				if (in_array("mixednumber",$ansformats)) {
 					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || abs($tmpa[0])>=abs($tmpa[1])) {
 						return false;
@@ -7161,7 +7161,7 @@ function checkanswerformat($tocheck,$ansformats) {
 						return false;
 					}
 				}
-			} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$tocheck)) {  //is in mixed number format
+			} else	if (!preg_match('/^\s*?\-\s*?\d+\s*$/',$tocheck)) {  //is in mixed number format
 				if (in_array("mixednumber",$ansformats)) {
 					if ($mnmatches[2]>=$mnmatches[3] || gcd($mnmatches[2],$mnmatches[3])!=1) {
 						return false;
