@@ -87,7 +87,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$score .= ' ; '.count($scorerec[$qn]).' ; ';
 			} else {
 				$score .= '('.count($scorerec[$qn]).')';
-				$score .= '<br/>';
+				$score .= ' -br- '; //replaced later
 			}
 			$score .= dispscore($scorerec[$qn][count($scorerec[$qn])-1]);
 			if (isset($_GET['details'])) {
@@ -128,7 +128,7 @@ foreach ($studata as $i=>$sturow) {
 		echo '<tr class="odd" onMouseOver="highlightrow(this)" onMouseOut="unhighlightrow(this)">';
 	}
 	foreach ($sturow as $stuval) {
-		echo '<td>'.Sanitize::encodeStringForDisplay($stuval).'</td>';
+		echo '<td>'.str_replace(' -br- ','<br/>',Sanitize::encodeStringForDisplay($stuval)).'</td>';
 	}
 	echo '</tr>';
 }
