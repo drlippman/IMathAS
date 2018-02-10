@@ -545,6 +545,9 @@ function togglevideoembed() {
 				var vidid = href.split('list=')[1].split(/[#&]/)[0];
 				var vidsrc = 'www.youtube.com/embed/videoseries?list=';
 				qsconn = '&'
+			} else if (href.match(/\/embed\//)) {
+				var vidid = href.split("/embed/")[1].split(/[#&\?]/)[0];
+				var vidsrc = 'www.youtube.com/embed/';
 			} else {
 				var vidid = href.split('v=')[1].split(/[#&]/)[0];
 				var vidsrc = 'www.youtube.com/embed/';
