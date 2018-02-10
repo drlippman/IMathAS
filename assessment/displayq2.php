@@ -4,7 +4,7 @@
 //(c) 2006 David Lippman
 //quadratic inequalities contributed by Cam Joyce
 $GLOBALS['noformatfeedback'] = true;
-$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
 //require_once("mathphp.php");
 require_once("mathphp2.php");
