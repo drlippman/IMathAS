@@ -163,7 +163,7 @@ switch($_POST['action']) {
 			//log new account
 			$now = time();
 			$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
-			$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $userid:: Group: $newgroup, upgraded by $userid"));
+			$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: ".Sanitize::onlyInt($_GET['id']).":: Group: $newgroup, upgraded by $userid"));
 			
 			$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
 			$stm->execute(array($_GET['id']));
