@@ -158,7 +158,6 @@ if (isset($_GET['delete'])) {
 			if (is_array($item)) {
 				if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
 					if (strlen($ind)>2) {
-						print_r($item);
 						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
 						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
