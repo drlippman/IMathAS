@@ -1931,7 +1931,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
 		}
-		if (isset($answer)) {
+		if (isset($answer) && !is_array($answer)) {
 			if ($GLOBALS['myrights']>10 && strpos($answer,'|')!==false) {
 				echo 'Warning: use abs(x) not |x| in $answer';
 			}
