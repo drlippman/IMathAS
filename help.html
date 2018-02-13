@@ -2308,7 +2308,11 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
 	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times. <br/>
 	You can	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
-	You can use a regular expression by putting in the symbol location "regex:expression"</dd>
+	You can match either of two symbols by putting || between them, like ".5||1/2,>0"<br/>
+	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
+	You can put "ignore_commas,true" at the beginning of the $requiretimes to ignore commas in the answer<br/>
+	You can put "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer
+	</dd>
 <dt>$requiretimeslistpart = a list, in the same format as $requiretimes </dt>
 	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used,
 	where $requiretimes would be applied to the entire list of answers.  To apply different $requiretimes to each element of the $answer list, separate
@@ -2480,7 +2484,10 @@ A student is asked to enter a function
 	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times.  You can
 	use "#" in the symbol location to match any number (including decimal values); 3.2x+42y would match twice.<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
-	Include "ignore_case,false" to make the search case sensitive.</dd>
+	You can match either of two symbols by putting || between them, like "x^-3||/x^3,>0"<br/>
+	Include "ignore_case,false" to make the search case sensitive.
+	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
+	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
 <dt>$answerformat = "equation" or "toconst" </dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>

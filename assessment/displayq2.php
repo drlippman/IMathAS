@@ -6922,9 +6922,12 @@ function checkreqtimes($tocheck,$rtimes) {
 		return 1;
 	}
 	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=]+/','',$tocheck);
+
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);
 	$cleanans = str_replace("exp","e",$cleanans);
+	$cleanans = preg_replace('/\^\((-?[\d\.]+)\)([^\d]|$)/','^$1$2', $cleanans);
+
 	if (is_numeric($cleanans) && $cleanans>0 && $cleanans<1) {
 		$cleanans = ltrim($cleanans,'0');
 	}
@@ -6937,39 +6940,55 @@ function checkreqtimes($tocheck,$rtimes) {
 			if ($list[$i]=='ignore_case') {
 				$ignore_case = ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1');
 				continue;
+			} else if ($list[$i]=='ignore_commas' && ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1')) {
+				$cleanans = str_replace(',','',$cleanans);
+				continue;
+			} else if ($list[$i]=='ignore_symbol') {
+				$cleanans = str_replace($list[$i+1],'',$cleanans);
+				continue;
 			}
 			$comp = substr($list[$i+1],0,1);
 			$num = intval(substr($list[$i+1],1));
-
-			if ($list[$i]=='#') {
-				$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
-			} else if (strlen($list[$i])>6 && substr($list[$i],0,6)=='regex:') {
-				$regex = str_replace('/','\\/',substr($list[$i],6));
-				$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
-			} else {
-				if ($ignore_case || in_array($list[$i], $mathfuncs)) {
-					$nummatch = substr_count(strtolower($cleanans),strtolower($list[$i]));
+			$grouptocheck = array_map('trim', explode('||',$list[$i]));
+			$okingroup = false;
+			foreach ($grouptocheck as $lookfor) {
+				if ($lookfor=='#') {
+					$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
+				} else if (strlen($lookfor)>6 && substr($lookfor,0,6)=='regex:') {
+					$regex = str_replace('/','\\/',substr($lookfor,6));
+					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
 				} else {
-					$nummatch = substr_count($cleanans,$list[$i]);
+					if ($ignore_case || in_array($lookfor, $mathfuncs)) {
+						$nummatch = substr_count(strtolower($cleanans),strtolower($lookfor));
+					} else {
+						$nummatch = substr_count($cleanans,$lookfor);
+					}
+				}
+	
+				if ($comp == "=") {
+					if ($nummatch==$num) {
+						$okingroup = true;
+						break;
+					}
+				} else if ($comp == "<") {
+					if ($nummatch<$num) {
+						$okingroup = true;
+						break;
+					}
+				} else if ($comp == ">") {
+					if ($nummatch>$num) {
+						$okingroup = true;
+						break;
+					}
+				} else if ($comp == "!") {
+					if ($nummatch!=$num) {
+						$okingroup = true;
+						break;
+					}
 				}
 			}
-
-			if ($comp == "=") {
-				if ($nummatch!=$num) {
-					return 0;
-				}
-			} else if ($comp == "<") {
-				if ($nummatch>=$num) {
-					return 0;
-				}
-			} else if ($comp == ">") {
-				if ($nummatch<=$num) {
-					return 0;
-				}
-			} else if ($comp == "!") {
-				if ($nummatch==$num) {
-					return 0;
-				}
+			if (!$okingroup) {
+				return 0;
 			}
 		}
 	}
