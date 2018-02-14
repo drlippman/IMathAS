@@ -84,6 +84,15 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 } else {
  	 $urlmode = 'http://';
 }
+//settings option:
+//  0: never show answer
+//  1: show answer button after an attempt
+//  2: always show answer button
+if (isset($CFG['multiembed-showans'])) {
+	$showanstype = $CFG['multiembed-showans'];
+} else {
+	$showanstype = 1;
+}
 
 
 function saveAssessData() {
@@ -173,7 +182,7 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	}
 	$quesout = '';
 	ob_start();
-	displayq($qn,$qids[$qn],$seeds[$qn],false,$showhints,$attempts[$qn],false,false,false,$colors);
+	displayq($qn,$qids[$qn],$seeds[$qn],($showanstype>0),$showhints,$attempts[$qn],false,false,false,$colors);
 	$quesout .= ob_get_clean();
 	$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
 	echo '<input type="hidden" id="verattempts'.$qn.'" value="'.$attempts[$qn].'"/>';
@@ -263,7 +272,7 @@ foreach ($qids as $i=>$qid) {
 	$quesout = '';
 	ob_start();
 	$qdatafordisplayq = $qsdata[$qid];
-	displayq($i,$qid,$seeds[$i],false,$showhints,$attempts[$i]);
+	displayq($i,$qid,$seeds[$i],($showanstype==2),$showhints,$attempts[$i]);
 	$quesout .= ob_get_clean();
 	$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 	echo $quesout;

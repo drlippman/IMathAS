@@ -61,6 +61,19 @@ if (isset($_GET['theme'])) {
 if (isset($_GET['noscores'])) {
 	$page_formAction .= '&noscores=true';
 }
+if (isset($_GET['showans'])) {
+	//options:
+	//  0: never
+	//  1: after wrong attempts
+	//  2: after all attempts    *default
+	//  3: always
+	$page_formAction .= '&showans='.Sanitize::onlyInt($_GET['showans']);
+} else {
+	$_GET['showans'] = 2;
+}
+if (isset($_GET['noresults'])) {
+	$page_formAction .= '&noresults=true';
+}
 if (isset($_GET['noregen'])) {
 	$page_formAction .= '&noregen=true';
 }
@@ -68,8 +81,13 @@ if (isset($_GET['resizer'])) {
 	$page_formAction .= '&resizer=true';
 }
 
-$showans = false;
-if (isset($_POST['seed'])) {
+if ($_GET['showans']==3) {//show always
+	$showans = 1;
+} else {
+	$showans = 0;
+}
+$qcol = array();
+if (isset($_POST['seed']) && isset($_POST['check'])) {
 	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
 	if (strpos($score,'~')===false) {
 		$after = round($score,1);
@@ -82,6 +100,9 @@ if (isset($_POST['seed'])) {
 			if ($after[$k]<0) {$after[$k]=0;}
 		}
 		$after = implode('~',$after);
+	}
+	if (empty($_GET['noresults'])) {
+		$qcol = explode('~',$rawscores);
 	}
 	$lastanswers[0] = $lastanswers[0];
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
@@ -98,18 +119,16 @@ if (isset($_POST['seed'])) {
 		window.parent.postMessage('.$pts.',"*");
 	}
 	</script>';
-	if (isset($_GET['noregen'])) {
-		$seed = $_POST['seed'];
-	} else if (getpts($score)<1) {
-		$showans = true;
-		$seed = $_POST['seed'];
-	} else {
-		unset($lastanswers);
-		$seed = rand(1,9999);
+	$seed = $_POST['seed'];
+	if ($_GET['showans']==2) {
+		$showans = 1;
+	} else if ($_GET['showans']==1 && getpts($after)<1) {
+		$showans = 1;
 	}
 } else {
 	$page_scoreMsg = '';
 	$seed = rand(1,9999);
+	$lastanswers = array();
 }
 
 $flexwidth = true; //tells header to use non _fw stylesheet
@@ -164,20 +183,30 @@ if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
 	echo '</div>';
 }
 
+echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
+echo "<input type=\"hidden\" name=\"seed\" value=\"" . Sanitize::encodeStringForDisplay($seed) . "\" />";
+displayq(0,$qsetid,$seed,$showans,true,0,false,false,false,$qcol);
+echo "<p><input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";
+if (empty($_GET['noregen'])) {
+	echo " <input type=submit name=\"next\" value=\"" . _('New Question') . "\"/>\n";
+}
+echo '</p>';
+/*
 if ($showans) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
 	echo "<p>" . _('Displaying last question with solution') . " <input type=submit name=\"next\" value=\"" . _('New Question') . "\"/></p>\n";
-	displayq(0,$qsetid,$seed,2,true,0);
+	displayq(0,$qsetid,$seed,2,true,0,false,false,false,$qcol);
 	echo "</form>\n";
 } else {
 	$doshowans = 0;
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"" . Sanitize::encodeStringForDisplay($seed) . "\" />";
 	$lastanswers = array();
-	displayq(0,$qsetid,$seed,$doshowans,true,0);
+	displayq(0,$qsetid,$seed,$doshowans,true,0,false,false,false,$qcol);
 	echo "<input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";
 	echo "</form>\n";
 }
+*/
 
 require("./footer.php");
 
