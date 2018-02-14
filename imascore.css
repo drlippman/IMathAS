@@ -621,6 +621,7 @@ input[type=submit],input[type=button], button, a.abutton {
 	border: 1px solid #ccc;
 	font: inherit;
 	height:1.5em;
+	line-height: 1.5em;
 	padding: 0 8px;
 	margin: 2px 3px;
 }
@@ -855,6 +856,8 @@ pre {
 	left: 0;
 	background: transparent url("img/cc.png") no-repeat right bottom;
 }
+
+
 /*dropdown CSS from bootstrap */
 .dropup,
 .dropdown {
