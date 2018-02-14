@@ -49,7 +49,7 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	//if (count($commands)>0) {
 		$out .= '<script type="text/javascript">';
 		
-		$out .= 'if (typeof gbbOnInit == "undefined") {';
+		$out .= 'if (typeof ggbOnInit == "undefined") {';
 		$out .= '  var ggbInitStack = []; ';
 		$out .= '  function ggbOnInit(param) {';
 		$out .= '      if (param in ggbInitStack) {ggbInitStack[param]();}';
@@ -117,7 +117,7 @@ function addGeogebraJava($url,$width=400,$height=200,$commands=array(),$params=a
 			$out .= 'applet.'.$com.';';
 		}
 		$out .= '}';
-		$out .= 'if (typeof gbbOnInit == "undefined") {';
+		$out .= 'if (typeof ggbOnInit == "undefined") {';
 		$out .= 'function ggbOnInit(val) {';
 		$out .= '  setTimeout(window["ggbOnInit"+val],50);';
 		$out .= '} } ;';
