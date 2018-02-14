@@ -7180,7 +7180,7 @@ function checkanswerformat($tocheck,$ansformats) {
 						return false;
 					}
 				}
-			} else	if (!preg_match('/^\s*?\-\s*?\d+\s*$/',$tocheck)) {  //is in mixed number format
+			} else	if (!preg_match('/^\s*\-?\s*\d+\s*$/',$tocheck)) {  //is in mixed number format
 				if (in_array("mixednumber",$ansformats)) {
 					if ($mnmatches[2]>=$mnmatches[3] || gcd($mnmatches[2],$mnmatches[3])!=1) {
 						return false;
