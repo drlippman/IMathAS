@@ -273,6 +273,15 @@ img.skipnav {
 	width:0;
 	height:0;
 }
+.screenreader {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	color: transparent;
+}
 span.shown {
 	display: inline;
 }

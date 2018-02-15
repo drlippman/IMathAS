@@ -453,9 +453,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	eval("\$evaledsoln = \"$toevalsoln\";");
 
 	if ($returnqtxt===2) {
-		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+		return '<div id="writtenexample" class="review" role=region aria-label="'._('Writen Example').'">'.$evaledsoln.'</div>';
 	} else if ($returnqtxt===3) {
-		return '<div class="question">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Writen Example').'">'.$evaledsoln.'</div>';
 	}
 	if (($qdata['solutionopts']&1)==0) {
 		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
@@ -492,10 +492,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
 	} else if ($seqinactive) {
-		echo "<div class=inactive>";
+		echo "<div class=inactive role=region aria-label=\""._('Inactive Question')."\">";
 		echo filter($evaledqtext);
 	} else {
-		echo "<div class=\"question\"><div>\n";
+		echo "<div class=\"question\" role=region aria-label=\""._('Question')."\"><div>\n";
 		echo filter($evaledqtext);
 		echo "</div>\n";
 	}

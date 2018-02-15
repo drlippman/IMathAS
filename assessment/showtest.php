@@ -1805,7 +1805,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat']);
 
 				echo "<div class=inset>\n";
-				echo "<a name=\"beginquestions\"></a>\n";
+				echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 				if ($GLOBALS['scoremessages'] != '') {
 					echo '<p>'.$GLOBALS['scoremessages'].'</p>';
 				}
@@ -1920,7 +1920,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 					echo '<input type="hidden" name="disptime" value="'.time().'" />';
 					echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-					echo "<a name=\"beginquestions\"></a>\n";
+					echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
 					echo '<input type="submit" class="btn" value="'. _('Submit'). '" />';
@@ -1963,7 +1963,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 					echo '<input type="hidden" name="disptime" value="'.time().'" />';
 					echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-					echo "<a name=\"beginquestions\"></a>\n";
+					echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 					basicshowq($next);
 					showqinfobar($next,true,true);
 					echo '<input type="submit" class="btn" value="'. _('Submit'). '" />';
@@ -1974,7 +1974,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					echo "</div>\n";
 				} else {
 					echo "<div class=inset>\n";
-					echo "<a name=\"beginquestions\"></a>\n";
+					echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 					if (!isset($_GET['jumptoans'])) {
 						echo _("You've already done this problem."), "\n";
 					}
@@ -2709,7 +2709,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			shownavbar($questions,$scores,$i,$testsettings['showcat']);
 			if ($i == count($questions)) {
 				echo "<div class=inset><br/>\n";
-				echo "<a name=\"beginquestions\"></a>\n";
+				echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 
@@ -2731,7 +2731,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-				echo "<a name=\"beginquestions\"></a>\n";
+				echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 				basicshowq($i);
 				showqinfobar($i,true,true);
 				echo '<input type="submit" class="btn" value="', _('Submit'), '" />';
@@ -2877,7 +2877,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$dovidcontrol = false;
 				showembednavbar($intropages,$_GET['page']);
 				echo "<div class=inset>\n";
-				echo "<a name=\"beginquestions\"></a>\n";
+				echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 			} else if ($testsettings['displaymethod'] == "VideoCue") {
 
 				//asychronously load YouTube API
@@ -2889,7 +2889,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				showvideoembednavbar($viddata);
 				$dovidcontrol = true;
 				echo '<div class="inset videocued">';
-				echo "<a name=\"beginquestions\"></a>\n";
+				echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
 				echo '<div id="playerwrapper"><div id="player"></div></div>';
 				$outarr = array();
 				for ($i=0;$i<count($viddata);$i++) {
@@ -3180,8 +3180,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 		4: provide a link to watch directly after Q (T/F),
 		5: title for the part immediately following the Q]
 		*/
-		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
 		echo '<div id="videonav" class="navbar videocued" role="navigation" aria-label="'._("Video and question navigation").'">';
+		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";
 		echo '<ul class="navlist">';
 		$timetoshow = 0;
 		for ($i=0; $i<count($viddata); $i++) {
@@ -3207,9 +3207,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 	function showembednavbar($pginfo,$curpg) {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
-		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
-
+		
 		echo '<div class="navbar fixedonscroll" role="navigation" aria-label="'._("Page and question navigation").'">';
+		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";		
 		echo "<h4>", _('Pages'), "</h4>\n";
 		echo '<ul class="navlist">';
 		$jsonbits = array();
@@ -3343,8 +3343,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
-		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
+		
 		echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
+		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";
 		echo "<h4>", _('Questions'), "</h4>\n";
 		echo "<ul class=qlist>\n";
 		for ($i = 0; $i < count($questions); $i++) {
