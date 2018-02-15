@@ -271,8 +271,16 @@
 .mce-path {
 	padding: 2px 8px;
 }
+/*
+.mce-container .mce-toolbar, .mce-toolbar .mce-btn, .mce-container .mce-statusbar {
+	background-color: #f0f0f0;
+}
+.mce-toolbar .mce-btn:hover, .mce-toolbar .mce-btn:active {
+	background-color: #f6f6f6;
+}
+*/
 .mce-toolbar .mce-btn button:hover {
-	background-color: inherit;
+	background-color: transparent;
 }
 
 .mce-i-attach:before{content:"\e9cd"}
