@@ -1,0 +1,292 @@
+@font-face {
+  font-family: 'imathas';
+  src:  url('fonts/imathas.eot?2wd59u');
+  src:  url('fonts/imathas.eot?2wd59u#iefix') format('embedded-opentype'),
+    url('fonts/imathas.ttf?2wd59u') format('truetype'),
+    url('fonts/imathas.woff?2wd59u') format('woff'),
+    url('fonts/imathas.svg?2wd59u#imathas') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"], .mce-i-attach, .mce-i-math, .mce-i-mathadd, .mce-i-graph {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'imathas' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* addquestions */
+.icon-pencil:before {
+  content: "\e905";
+}
+.icon-enlarge2:before {
+  content: "\e98b";
+}
+.icon-shrink2:before {
+  content: "\e98c";
+}
+.icon-plus:before {
+  content: "\ea0a";
+}
+
+/* Calendar editing icons */
+.icon-enddate {
+	padding-left:4px;
+}
+.icon-startdatealt, .icon-eye2, .icon-startdate, .icon-assessreview, .icon-forumreply, .icon-forumpost {
+	padding-right: 4px;
+}
+.icon-startdatealt:before {
+  content: "\e903";
+}
+.icon-eye2:before {
+  content: "\e904";
+}
+.icon-startdate:before {
+  content: "\e906";
+}
+.icon-enddate:before {
+  content: "\e907";
+}
+.icon-assessreview:before {
+  content: "\e908";
+}
+.icon-forumreply:before {
+  content: "\e909";
+}
+.icon-forumpost:before {
+  content: "\e90a";
+}
+
+/* duplicates of the tinymce icons */
+.icon-graph:before {
+  content: "\e900";
+}
+.icon-sigma:before {
+  content: "\e901";
+}
+.icon-sigma2:before {
+  content: "\e902";
+}
+.icon-attachment:before {
+  content: "\e9cd";
+}
+
+/* others */
+
+.icon-cog2:before {
+  content: "\f013";
+}
+.icon-gear:before {
+  content: "\f013";
+}
+.icon-repeat:before {
+  content: "\f01e";
+}
+.icon-rotate-right:before {
+  content: "\f01e";
+}
+.icon-flag:before {
+  content: "\f024";
+}
+.icon-flag-o:before {
+  content: "\f11d";
+}
+.icon-cc:before {
+  content: "\f20a";
+}
+
+.icon-copy:before {
+  content: "\e92c";
+}
+.icon-drawer:before {
+  content: "\e95c";
+}
+.icon-enlarge:before {
+  content: "\e989";
+}
+.icon-shrink:before {
+  content: "\e98a";
+}
+.icon-equalizer:before {
+  content: "\e992";
+}
+.icon-equalizer2:before {
+  content: "\e993";
+}
+.icon-cogs:before {
+  content: "\e995";
+}
+.icon-bin:before {
+  content: "\e9ac";
+}
+.icon-tree:before {
+  content: "\e9bc";
+}
+.icon-minus:before {
+  content: "\ea0b";
+}
+.icon-cancel-circle:before {
+  content: "\ea0d";
+}
+.icon-cross2:before {
+  content: "\ea0f";
+}
+.icon-insert-template:before {
+  content: "\ea72";
+}
+.icon-embed:before {
+  content: "\ea7f";
+}
+.icon-libreoffice:before {
+  content: "\eae3";
+}
+.icon-home3:before {
+  content: "\e90b";
+}
+.icon-film:before {
+  content: "\e913";
+}
+.icon-clock:before {
+  content: "\e94e";
+}
+.icon-calendar:before {
+  content: "\e953";
+}
+.icon-menu:before {
+  content: "\e9bd";
+}
+.icon-menu3:before {
+  content: "\e9bf";
+}
+.icon-menu4:before {
+  content: "\e9c0";
+}
+.icon-eye:before {
+  content: "\e9ce";
+}
+.icon-eye-blocked:before {
+  content: "\e9d1";
+}
+.icon-star-empty:before {
+  content: "\e9d7";
+}
+.icon-star-full:before {
+  content: "\e9d9";
+}
+.icon-cross:before {
+  content: "\ea10";
+}
+.icon-checkmark:before {
+  content: "\ea11";
+}
+.icon-checkmark2:before {
+  content: "\ea12";
+}
+.icon-play3:before {
+  content: "\ea1c";
+}
+.icon-pause2:before {
+  content: "\ea1d";
+}
+.icon-stop2:before {
+  content: "\ea1e";
+}
+.icon-backward2:before {
+  content: "\ea1f";
+}
+.icon-forward3:before {
+  content: "\ea20";
+}
+.icon-first:before {
+  content: "\ea21";
+}
+.icon-last:before {
+  content: "\ea22";
+}
+.icon-previous2:before {
+  content: "\ea23";
+}
+.icon-next2:before {
+  content: "\ea24";
+}
+.icon-arrow-up2:before {
+  content: "\ea3a";
+}
+.icon-arrow-right2:before {
+  content: "\ea3c";
+}
+.icon-arrow-down2:before {
+  content: "\ea3e";
+}
+.icon-arrow-left2:before {
+  content: "\ea40";
+}
+.icon-new-tab:before {
+  content: "\ea7e";
+}
+
+
+
+/*tinymce rules, to supplement skin.css and content.css*/
+.mce-toolbar .mce-btn button {
+  	line-height: 18px;
+  	padding: 2px 6px;
+}
+.mce-toolbar .mce-btn .mce-caret {
+	margin-top: 6px;
+	border-top-color: #666;
+}
+.mce-toolbar .mce-btn:hover .mce-ico {
+	color: #000;
+}
+.mce-toolbar .mce-btn.mce-active:hover .mce-ico {
+	color: #fff;
+}
+.mce-toolbar .mce-btn:hover .mce-caret {
+	border-top-color: #000;
+}
+.mce-toolbar .mce-colorbutton .mce-preview {
+	height: 3px;
+}
+.mce-toolbar .mce-colorbutton .mce-open, .mce-toolbar .mce-splitbtn .mce-open {
+	padding-left: 2px;
+	padding-right: 2px;
+}
+.mce-toolbar .mce-colorbutton button, .mce-toolbar .mce-splitbtn button {
+	padding-right: 4px;
+}
+.mce-toolbar .mce-colorbutton .mce-preview {
+	margin-left: -14px;
+}
+.mce-path {
+	padding: 2px 8px;
+}
+/*
+.mce-container .mce-toolbar, .mce-toolbar .mce-btn, .mce-container .mce-statusbar {
+	background-color: #f0f0f0;
+}
+.mce-toolbar .mce-btn:hover, .mce-toolbar .mce-btn:active {
+	background-color: #f6f6f6;
+}
+*/
+.mce-toolbar .mce-btn button:hover {
+	background-color: transparent;
+}
+
+.mce-i-attach:before{content:"\e9cd"}
+.mce-i-math:before{content:"\e901"}
+.mce-i-mathadd:before{content:"\e902"}
+.mce-i-graph:before{content:"\e900"}
+.mce-i-snippet:before{content:"\e026"}
+.mce-content-body span.AMedit {border: 1px solid #ff0000;} 
+
