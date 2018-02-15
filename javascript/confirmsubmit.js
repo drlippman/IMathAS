@@ -7,7 +7,7 @@ function checkComplete(baseel) {
 	var complete = true;
 	$(baseel).find("input:visible,textarea:visible,select:visible").each(function(i,el) {
 		if (typeof el.type == "undefined" || typeof el.name == "undefined" || el.name == "") {
-			return false;
+			return 1; //continue
 		}
 		if (el.type == 'text' || el.type == 'textarea' ||
 		    el.type == 'password' || el.type == 'file' ) {
