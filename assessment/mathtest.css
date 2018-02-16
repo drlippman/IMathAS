@@ -810,7 +810,7 @@ a[target=_blank]:after {
 .mce-content-body a[target=_blank]:after {
 	display: none;
 }
-
+.mce-content-body span.AMedit {border: 1px solid #ff0000;} 
 .clearfix:after {
     content: " ";
     display: block;

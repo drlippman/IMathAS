@@ -283,10 +283,10 @@
 	background-color: transparent;
 }
 
-.mce-i-attach:before{content:"\e9cd"}
-.mce-i-math:before{content:"\e901"}
-.mce-i-mathadd:before{content:"\e902"}
-.mce-i-graph:before{content:"\e900"}
-.mce-i-snippet:before{content:"\e026"}
-.mce-content-body span.AMedit {border: 1px solid #ff0000;} 
+.mce-i-attach:before {content:"\e9cd"}
+.mce-i-math:before {content:"\e901"}
+.mce-i-mathadd:before {content:"\e902"}
+.mce-i-graph:before {content:"\e900"}
+.mce-i-snippet:before {content:"\e026"}
+
 
