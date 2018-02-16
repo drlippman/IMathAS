@@ -1878,23 +1878,37 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 
 		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
-		if (count($variables)>1 && count($fromto)>2) {
-			uasort($variables,'lensort');
-			$newdomain = array();
-			foreach($variables as $i=>$v) {
-				if (isset($fromto[$i*2+1])) {
-					$newdomain[] = $fromto[2*$i];
-					$newdomain[] = $fromto[2*$i+1];
-				} else {
-					$newdomain[] = $fromto[0];
-					$newdomain[] = $fromto[1];
-				}
+		$domaingroups = array();
+		$i=0;
+		while ($i<count($fromto)) {
+			if (isset($fromto[$i+2]) && $fromto[$i+2]=='integers') {
+				$domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
+				$i += 3;
+			} else if (isset($fromto[$i+1])) {
+				$domaingroups[] = array($fromto[$i], $fromto[$i+1], false);
+				$i += 2;
+			} else {
+				break;
 			}
-			$fromto = $newdomain;
-			$variables = array_values($variables);
-		} else {
-		usort($variables,'lensort');
 		}
+		
+		uasort($variables,'lensort');
+		$newdomain = array();
+		$restrictvartoint = array();
+		foreach($variables as $i=>$v) {
+			if (isset($domaingroups[$i])) {
+				$touse = $i;
+			} else {
+				$touse = 0;
+			}
+			$newdomain[] = $domaingroups[$touse][0];
+			$newdomain[] = $domaingroups[$touse][1];
+			$restrictvartoint[] = $domaingroups[$touse][2];
+		}
+		$fromto = $newdomain;
+		$variables = array_values($variables);
+		
+		
 		usort($ofunc,'lensort');
 		$vlist = implode("|",$variables);
 		$flist = implode('|',$ofunc);
@@ -1902,24 +1916,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
-				if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tp[$j] = $RND->rand($fromto[0],$fromto[1]);
-				} else if (isset($fromto[2*$j+1])) {
-					if ($fromto[2*$j+1]==$fromto[2*$j]) {
-						$tp[$j] = $fromto[2*$j];
-					} else {
-						$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
-					}
+				if ($fromto[2*$j+1]==$fromto[2*$j]) {
+					$tp[$j] = $fromto[2*$j];
+				} else if ($restrictvartoint[$j]) {
+					$tp[$j] = $RND->rand($fromto[2*$j],$fromto[2*$j+1]);
 				} else {
-					if ($fromto[1]==$fromto[0]) {
-						$tp[$j] = $fromto[0];
-					} else {
-						$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
-					}
+					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
 				}
 			}
 			$pts[$i] = implode("~",$tp);
 		}
+
 		$points = implode(",",$pts);
 		$out .= "<script type=\"text/javascript\">pts[$qn]=\"$points\";</script>\n";
 		if (in_array('equation',$ansformats)) {
@@ -4445,24 +4452,35 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = str_replace('E','varE',$answer);
 		}
 		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
-
-		if (count($variables)>1 && count($fromto)>2) {
-			uasort($variables,'lensort');
-			$newdomain = array();
-			foreach($variables as $i=>$v) {
-				if (isset($fromto[$i*2+1])) {
-					$newdomain[] = $fromto[2*$i];
-					$newdomain[] = $fromto[2*$i+1];
-				} else {
-					$newdomain[] = $fromto[0];
-					$newdomain[] = $fromto[1];
-				}
+		$domaingroups = array();
+		$i=0;
+		while ($i<count($fromto)) {
+			if (isset($fromto[$i+2]) && $fromto[$i+2]=='integers') {
+				$domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
+				$i += 3;
+			} else if (isset($fromto[$i+1])) {
+				$domaingroups[] = array($fromto[$i], $fromto[$i+1], false);
+				$i += 2;
+			} else {
+				break;
 			}
-			$fromto = $newdomain;
-			$variables = array_values($variables);
-		} else {
-		usort($variables,'lensort');
 		}
+		
+		uasort($variables,'lensort');
+		$newdomain = array();
+		$restrictvartoint = array();
+		foreach($variables as $i=>$v) {
+			if (isset($domaingroups[$i])) {
+				$touse = $i;
+			} else {
+				$touse = 0;
+			}
+			$newdomain[] = $domaingroups[$touse][0];
+			$newdomain[] = $domaingroups[$touse][1];
+			$restrictvartoint[] = $domaingroups[$touse][2];
+		}
+		$fromto = $newdomain;
+		$variables = array_values($variables);
 
 		if (count($ofunc)>0) {
 			usort($ofunc,'lensort');
@@ -4474,12 +4492,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
-				if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tps[$i][$j] = $RND->rand($fromto[0],$fromto[1]);
-				} else if (isset($fromto[2*$j+1])) {
-					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
+				if ($fromto[2*$j+1]==$fromto[2*$j]) {
+					$tps[$i][$j] = $fromto[2*$j];
+				} else if ($restrictvartoint[$j]) {
+					$tps[$i][$j] = $RND->rand($fromto[2*$j],$fromto[2*$j+1]);
 				} else {
-					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
+					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
 				}
 			}
 		}
