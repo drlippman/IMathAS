@@ -1263,11 +1263,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 				$out .= "<li><input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}<label></li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			} else {
 				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
-				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}<label></li> \n";
+				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			}
 		}
 		if ($displayformat == "horiz") {

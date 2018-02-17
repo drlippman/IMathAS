@@ -1889,10 +1889,16 @@ function getPosition(e){
                 var scrollLeft = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
                 return {x: box.left + scrollLeft, y: box.top + scrollTop};
 	}*/
+	if (e.className.match(/hidden/)) {
+		return {x:-10000, y:-10000};
+	}
 	while (e.offsetParent){
 		left += e.offsetLeft;
 		top  += e.offsetTop;
 		e     = e.offsetParent;
+		if (e.className.match(/hidden/)) {
+			return {x:-10000, y:-10000};
+		}
 	}
 
 	left += e.offsetLeft;
