@@ -122,8 +122,8 @@ var AMsymbols = [
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
 {input:":=",  tag:"mo", output:":=",     tex:null, ttype:CONST},
-{input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
-{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
+{input:"lt",  tag:"mo", output:"<",      tex:"<", ttype:CONST, val:true, notexcopy:true},
+{input:"gt",  tag:"mo", output:">",      tex:">", ttype:CONST, val:true, notexcopy:true},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
 {input:"gt=",  tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
