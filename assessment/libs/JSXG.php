@@ -36,7 +36,7 @@ function getJSXscript () {
 		//return '<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>'
 		return '<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
 			var jsxgloadscript = document.createElement("script");
-			jsxgloadscript.src = "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js";
+			jsxgloadscript.src = "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore.js";
 			document.getElementsByTagName("head")[0].appendChild(jsxgloadscript);
 			JXGscriptloaded = true;
 		}</script>';
@@ -57,6 +57,7 @@ function JSXG_setUpBoard($label, $width=350, $height=350, $centered=true){
   $out .= "function makeBoard{$label}(){
            try{";
   $out .= "JXG.Options.text.fontSize = 16;";
+  $out .= "JXG.Options.text.cssDefaultStyle = 'font-family:Serif;';";
    // This is where new content gets inserted
    $out .= "/*INSERTHERE*/";
    // End of construction function. Push it to initstack
