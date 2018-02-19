@@ -1572,7 +1572,7 @@ function multicalconarray() {
 	for ($i=0;$i<count($vars);$i++) {
 		$todo = str_replace('('.$vars[$i].')','($'.$vars[$i].')',$todo);
 	}
-
+	$todo = str_replace("'","\'",$todo);
 	$varlist = '$'.implode(',$',$vars);
 	$evalstr = "return(array_map(create_function('$varlist','return($todo);')";
 	$cnt = count($args[0]);
