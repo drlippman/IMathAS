@@ -144,7 +144,8 @@
   $CFG['GEN']['fixedhomelayout'] = array(3);  //prevent changing of home layout sections
   $CFG['GEN']['hometitle'] = "Home";	//title for course list page
   $CFG['GEN']['headerinclude'] = "headercontent.php";  //page to include in all headers
-  $CGF['GEN']['MathJax-config'] = "TeX-MML-AM_CHTML"; //Change MathJax config file
+  $CFG['GEN']['MathJax-config'] = "TeX-MML-AM_CHTML"; //Change MathJax config file
+  $CFG['GEN']['enable-emmet'] = true; //enable emmet in question editor
 
   //$CFG['GEN']['noFileBrowser'] = true;  //disallow file uploads through the tinyMCE editor.
 

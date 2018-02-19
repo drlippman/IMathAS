@@ -83,7 +83,7 @@ if (isset($CFG['GEN']['favicon'])) {
 	echo '<link rel="shortcut icon" href="/favicon.ico" />';
 }
 //$sessiondata['mathdisp'] = 3;
-$mathJaxConfig = isset($CGF['GEN']['MathJax-config']) ? $CGF['GEN']['MathJax-config'] : "AM_CHTML-full";
+$mathJaxConfig = isset($CFG['GEN']['MathJax-config']) ? $CFG['GEN']['MathJax-config'] : "AM_CHTML-full";
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; var mathRenderer = "none"; function rendermathnode(el) {AMprocessNode(el);};</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';

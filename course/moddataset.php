@@ -855,6 +855,7 @@
 
 	/// Start display ///
 	$pagetitle = "Question Editor";
+	$emmet = isset($CFG['GEN']['enable-emmet']) && $CFG['GEN']['enable-emmet'];
 	$placeinhead = '';
 	/*if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2 || $sessiondata['mathdisp']==3) {
 		//these scripts are used by the editor to make image-based math work in the editor
@@ -867,6 +868,7 @@
 	*/
 	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+	if ($emmet) { $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/emmet-codemirror.js"></script>'; }
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
 
@@ -947,9 +949,11 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
+			profile: "html",
 			styleSelectedText:true
 		      });
 			for (var i=0;i<qEditor.lineCount();i++) { qEditor.indentLine(i); }
+			'.($emmet ? 'emmetCodeMirror(qEditor);' : '').'
 		//qEditor.setSize("100%",6+14*qtextbox.rows);
 	   }
 

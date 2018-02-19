@@ -76,7 +76,7 @@ if (isset($ispublic) && $ispublic && !isset($sessiondata['mathdisp'])) {
 	$sessiondata['mathdisp'] = 1;
 	$sessiondata['graphdisp'] = 1;
 }
-$mathJaxConfig = isset($CGF['GEN']['MathJax-config']) ? $CGF['GEN']['MathJax-config'] : "AM_CHTML-full";
+$mathJaxConfig = isset($CFG['GEN']['MathJax-config']) ? $CFG['GEN']['MathJax-config'] : "AM_CHTML-full";
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
