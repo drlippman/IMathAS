@@ -3228,7 +3228,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$out .= " <span aria-expanded=\"false\" aria-controls=\"fileprev$qn\" class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
-						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeUrlParam($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".rawurlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
 
 				}
