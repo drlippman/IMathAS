@@ -1738,7 +1738,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 			if (!$done) { //can show next
 				echo '<div class="right"><a href="#" aria-controls="intro" aria-expanded="false" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
-				echo filter("<div id=\"intro\" class=\"hidden\" aria-hidden=\"true\" aria-expanded=\"false\">{$testsettings['intro']}</div>\n");
+				echo filter("<div id=\"intro\" role=region aria-label=\""._('Intro or instructions')."\" class=\"hidden\" aria-hidden=\"true\" aria-expanded=\"false\">{$testsettings['intro']}</div>\n");
 
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
@@ -1754,11 +1754,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 							if ($toshow+1==$v[1] || !empty($v[3])) {
 								echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
 								echo _('Hide Question Information'), '</a></div>';
-								echo '<div class="intro" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							} else {
 								echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="false">';
 								echo _('Show Question Information'), '</a></div>';
-								echo '<div class="intro" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							}
 							break;
 						}
@@ -1801,7 +1801,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					recordtestdata();
 				}
 			   if (!$superdone) {
-				echo filter("<div id=intro class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
+				echo filter("<div id=intro role=region aria-label=\""._('Intro or instructions')."\" class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
 				$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat']);
 
 				echo "<div class=inset>\n";
@@ -1906,11 +1906,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 								if ($next+1==$v[1] || !empty($v[3])) {
 									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
 									echo _('Hide Question Information'), '</a></div>';
-									echo '<div class="intro" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+									echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								} else {
 									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="false">';
 									echo _('Show Question Information'), '</a></div>';
-									echo '<div class="intro" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+									echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								}
 								break;
 							}
@@ -1938,7 +1938,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			    }
 			} else if (isset($_GET['to'])) { //jump to a problem
 				$next = $_GET['to'];
-				echo filter("<div id=intro class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
+				echo filter("<div id=intro role=region aria-label=\""._('Intro or instructions')."\"  class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
 
 				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat']);
 				if (unans($scores[$next]) || amreattempting($next)) {
@@ -1949,11 +1949,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 								if ($next+1==$v[1] || !empty($v[3])) {
 									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
 									echo _('Hide Question Information'), '</a></div>';
-									echo '<div class="intro" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+									echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								} else {
 									echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="false">';
 									echo _('Show Question Information'), '</a></div>';
-									echo '<div class="intro" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+									echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								}
 								break;
 							}
@@ -2129,7 +2129,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				endtest($testsettings);
 				if ($shown) {leavetestmsg();}
 			} else { //show more test
-				echo filter("<div id=intro class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
+				echo filter("<div id=intro role=region aria-label=\""._('Intro or instructions')."\"  class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
 
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
@@ -2141,7 +2141,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					if (isset($intropieces)) {
 						foreach ($introdividers as $k=>$v) {
 							if ($v[1]==$i+1) {//right divider
-								echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								break;
 							}
 						}
@@ -2168,7 +2168,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				if (isset($intropieces)) {
 					foreach ($introdividers as $k=>$v) {
 						if ($v[1]==$i+1) {//right divider
-							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							echo '<div class="intro" role=region aria-label="'._('Post-question text').'" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							break;
 						}
 					}
@@ -2614,7 +2614,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$perfectscore = true;
 		}
 		if ($testsettings['displaymethod'] == "AllAtOnce") {
-			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
+			echo filter("<div class=intro role=region aria-label=\""._('Intro or instructions')."\">{$testsettings['intro']}</div>\n");
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
 			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 			echo '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -2625,7 +2625,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				if (isset($intropieces)) {
 					foreach ($introdividers as $k=>$v) {
 						if ($v[1]==$i+1) {//right divider
-							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							break;
 						}
 					}
@@ -2639,7 +2639,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if (isset($intropieces)) {
 				foreach ($introdividers as $k=>$v) {
 					if ($v[1]==$i+1) {//right divider
-						echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+						echo '<div class="intro" role=region aria-label="'._('Post-question text').'" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 						break;
 					}
 				}
@@ -2668,7 +2668,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				leavetestmsg();
 
 			} else {
-				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
+				echo filter("<div class=intro role=region aria-label=\""._('Intro or instructions')."\">{$testsettings['intro']}</div>\n");
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -2683,11 +2683,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 							if ($i+1==$v[1] || !empty($v[3])) {
 								echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
 								echo _('Hide Question Information'), '</a></div>';
-								echo '<div class="intro" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							} else {
 								echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="false">';
 								echo _('Show Question Information'), '</a></div>';
-								echo '<div class="intro" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="false" aria-hidden="true" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							}
 							break;
 						}
@@ -2699,7 +2699,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "</form>\n";
 			}
 		} else if ($testsettings['displaymethod'] == "SkipAround") {
-			echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
+			echo filter("<div class=intro role=region aria-label=\""._('Intro or instructions')."\">{$testsettings['intro']}</div>\n");
 
 			for ($i = 0; $i<count($questions);$i++) {
 				if (unans($scores[$i]) || amreattempting($i)) {
@@ -2722,7 +2722,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 						if ($v[1]<=$i+1 && $i+1<=$v[2]) {//right divider
 							echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
 							echo _('Hide Question Information'), '</a></div>';
-							echo '<div class="intro" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							break;
 						}
 					}
@@ -2755,7 +2755,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 			} else {
 				$curq = $i;
-				echo filter("<div class=intro>{$testsettings['intro']}</div>\n");
+				echo filter("<div class=intro role=region aria-label=\""._('Intro or instructions')."\">{$testsettings['intro']}</div>\n");
 				echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -2765,7 +2765,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					if (isset($intropieces)) {
 						foreach ($introdividers as $k=>$v) {
 							if ($v[1]==$i+1) {//right divider
-								echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 								break;
 							}
 						}
@@ -2792,7 +2792,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				if (isset($intropieces)) {
 					foreach ($introdividers as $k=>$v) {
 						if ($v[1]==$i+1) {//right divider
-							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							echo '<div class="intro" role=region aria-label="'._('Post-question text').'" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							break;
 						}
 					}
@@ -2801,7 +2801,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			}
 		} else if ($testsettings['displaymethod'] == "Embed" || $testsettings['displaymethod'] == "VideoCue") {
 			if (!isset($_GET['page'])) { $_GET['page'] = 0;}
-			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
+			$intro = filter("<div class=\"intro\" role=region aria-label=\""._('Intro or instructions')."\">{$testsettings['intro']}</div>\n");
 			if ($testsettings['displaymethod'] == "VideoCue") {
 				echo substr(trim($intro),0,-6);
 				if (!$sessiondata['istutorial'] && $testsettings['testtype']!="NoScores") {
@@ -2833,7 +2833,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 								$last = $j;
 							}
 						}
-						$intro .= '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
+						$intro .= '<div class="intro" role=region aria-label="'._('Pre-question text').'" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
 						for ($j=$v[1];$j<=$v[2] && $j<count($questions);$j++) {
 							$intro .= '[QUESTION '.$j.']';
 							$last = $j;
