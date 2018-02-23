@@ -711,9 +711,11 @@ function boxplot($arr,$label="",$options = array()) {
 
 //normalcdf(z,[dec])
 //calculates the area under the standard normal distribution to the left of the
-//z-value z, to dec decimals (defaults to 4)
+//z-value z, to dec decimals (defaults to 4, max of 10)
 //based on someone else's code - can't remember whose!
 function normalcdf($ztest,$dec=4) {
+	if ($dec>10) { $dec = 10;}
+
 	$eps = pow(.1,$dec);
 	$eps2 = pow(.1,$dec+3);
 
@@ -721,6 +723,26 @@ function normalcdf($ztest,$dec=4) {
 	$s = 0;
 	$i = 0;
 	$z = abs($ztest);
+	if ($z>5) { //alternate code, less accuracy; around 10^-8 vs 10^-10 w above
+		$b1 =  0.319381530;
+		$b2 = -0.356563782;
+		$b3 =  1.781477937;
+		$b4 = -1.821255978;
+		$b5 =  1.330274429;
+		$p  =  0.2316419;
+		$c  =  0.39894228;
+		
+		$x = $ztest;
+		if($x >= 0.0) {
+		     $t = 1.0 / ( 1.0 + $p * $x );
+		      return round((1.0 - $c * exp( -$x * $x / 2.0 ) * $t *
+		      ( $t *( $t * ( $t * ( $t * $b5 + $b4 ) + $b3 ) + $b2 ) + $b1 )), $dec);
+		} else {
+		      $t = 1.0 / ( 1.0 - $p * $x );
+		      return round(( $c * exp( -$x * $x / 2.0 ) * $t *
+		       ( $t *( $t * ( $t * ( $t * $b5 + $b4 ) + $b3 ) + $b2 ) + $b1 )), $dec);
+		}
+	}
 	$fact = 1;
 	while (abs($ds)>$eps2) {
 		$ds = pow(-1,$i)*pow($z,2.0*$i+1.0)/(pow(2.0,$i)*$fact*(2.0*$i+1.0));
@@ -731,28 +753,7 @@ function normalcdf($ztest,$dec=4) {
 			break;
 		}
 	}
-/* alternate code, less accuracy; around 10^-8 vs 10^-10 w above
-	$b1 =  0.319381530;
- $b2 = -0.356563782;
-  $b3 =  1.781477937;
-  $b4 = -1.821255978;
- $b5 =  1.330274429;
-  $p  =  0.2316419;
- $c  =  0.39894228;
-
-$x = $ztest;
-	if($x >= 0.0) {
-     $t = 1.0 / ( 1.0 + $p * $x );
-      return (1.0 - $c * exp( -$x * $x / 2.0 ) * $t *
-      ( $t *( $t * ( $t * ( $t * $b5 + $b4 ) + $b3 ) + $b2 ) + $b1 ));
-  }
-  else {
-      $t = 1.0 / ( 1.0 - $p * $x );
-      return ( $c * exp( -$x * $x / 2.0 ) * $t *
-       ( $t *( $t * ( $t * ( $t * $b5 + $b4 ) + $b3 ) + $b2 ) + $b1 ));
-    }
-*/
-	$s *= 0.3989422804;
+	$s *= 0.3989422804014327;
 	$s = round($s,$dec);
 	if ($ztest > 0) {
 		$pval = .5 + $s;
