@@ -792,86 +792,6 @@ switch($_GET['action']) {
 
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
 		break;
-	case "chgteachers":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		
-		//DB $query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-		$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
-		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		echo '<div id="headerforms" class="pagetitle">';
-		printf("<h2>%s</h2>\n", Sanitize::encodeStringForDisplay($line['name']));
-		echo '</div>';
-
-		echo "<h4>Current Teachers:</h4>\n";
-		//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid ";
-		//DB $query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND " ;
-		//DB $query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $num = mysql_num_rows($result);
-		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid ";
-		$query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid=:courseid AND " ;
-		$query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':courseid'=>$_GET['id']));
-		$num = $stm->rowCount();
-		echo '<form method="post" action="actions.php?' . Sanitize::generateQueryStringFromMap(array(
-				'from' => $from, 'cid' => $_GET['id'], 'tot' => $num)) . '">';
-		echo '<input type=hidden name=action value="remteacher" />';
-		echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
-		echo "<table cellpadding=5>\n";
-		$onlyone = ($num==1);
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-
-				printf('<tr><td><input type="checkbox" name="tid[]" value="%d"/></td>', Sanitize::onlyInt($line['id']));
-
-			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
-				Sanitize::encodeStringForDisplay($line['FirstName']));
-			/*if ($onlyone) {
-				echo "<td></td></tr>";
-			} else {
-				echo "<td><A href=\"actions.php?from=$from&action=remteacher&cid=".Sanitize::onlyInt($_GET['id'])."&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
-			}
-			*/
-			echo '</tr>';
-			$used[$line['userid']] = true;
-		}
-		echo "</table></form>\n";
-
-		echo "<h4>Potential Teachers:</h4>\n";
-		if ($myrights<100) {
-			//DB $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) AND groupid='$groupid' ORDER BY LastName;";
-			$stm = $DBH->prepare("SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) AND groupid=:groupid ORDER BY LastName;");
-			$stm->execute(array(':groupid'=>$groupid));
-		} else if ($myrights==100) {
-			//DB $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;";
-			$stm = $DBH->query("SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;");
-		}
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		echo '<form method="post" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&cid='.Sanitize::onlyInt($_GET['id']).'">';
-		echo '<input type=hidden name=action value="addteacher" />';
-		echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
-		echo "<table cellpadding=5>\n";
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
-			if ($used[$line['id']]!=true) {
-				//if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
-				printf('<tr><td><input type="checkbox" name="atid[]" value="%d"/></td>', Sanitize::onlyInt($line['id']));
-				printf("<td>%s, %s </td> ", Sanitize::encodeStringForDisplay($line['LastName']),
-					Sanitize::encodeStringForDisplay($line['FirstName']));
-				//echo "<td><a href=\"actions.php?from=$from&action=addteacher&cid=".Sanitize::onlyInt($_GET['id'])."&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
-				echo '</tr>';
-			}
-		}
-		echo "</table>\n";
-		echo '<p>With Selected: <button type="submit" name="addandclose" value="close">Add as Teacher and Close</button> ';
-		echo "<input type=button class=\"secondarybtn\" value=\"Nevermind\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\" />";
-		echo '</p></form>';
-		break;
 	case "importmacros":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		
@@ -908,33 +828,6 @@ switch($_GET['action']) {
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\" />\n";
 		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
 		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-		echo "</form>\n";
-		break;
-	case "transfer":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>Transfer Course Ownership</h3>\n";
-		echo '</div>';
-		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."&id=".Sanitize::encodeUrlParam($_GET['id'])."\">\n";
-		echo '<input type=hidden name=action value="transfer" />';
-		echo "Transfer course ownership to: <select name=newowner>\n";
-		if ($myrights < 100) {
-			//DB $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND groupid='$groupid' ORDER BY LastName";
-			$stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 AND groupid=:groupid ORDER BY LastName");
-			$stm->execute(array(':groupid'=>$groupid));
-		} else {
-			//DB $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName";
-			$stm = $DBH->query("SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName");
-		}
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf("<option value=\"%d\">%s, %s</option>\n",Sanitize::onlyInt($row[0]), Sanitize::encodeStringForDisplay($row[2]),
-				Sanitize::encodeStringForDisplay($row[1]));
-		}
-		echo "</select>\n";
-		echo "<p><input type=submit value=\"Transfer\">\n";
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo "</form>\n";
 		break;
 	case "deloldusers":

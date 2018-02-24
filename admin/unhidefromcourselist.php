@@ -66,7 +66,7 @@ if ($type=='take') {
 $query .= "ORDER BY ic.name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid));
-echo '<ul class="nomark">';
+echo '<ul class="nomark courselist">';
 //DB if (mysql_num_rows($result)==0) {
 if ($stm->rowCount()==0) {
 	echo '<li>No hidden courses</li>';
@@ -80,11 +80,13 @@ if ($stm->rowCount()==0) {
 			echo '<img src="../img/gears.png" alt="Options" class="mida"/></a>';
 			echo '<ul role="menu" class="dropdown-menu">';
 			echo ' <li><a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&tohide='.$row['id'].'">'._('Un-hide from course list').'</a></li>';
-			if ($row['ownerid']==$userid) {
+			if ($row['ownerid']==$userid && $myrights>20) {
 				echo ' <li><a href="forms.php?from=home&action=modify&id='.$row['id'].'">'._('Settings').'</a></li>';
-				echo '<li><a href="forms.php?from=home&action=chgteachers&id='.$row['id'].'">'._('Add/remove teachers').'</a></li>';
-				echo ' <li><a href="forms.php?from=home&action=transfer&id='.$row['id'].'">'._('Transfer ownership').'</a></li>';
+				echo '<li><a href="addremoveteachers.php?from=home&id='.$row['id'].'">'._('Add/remove teachers').'</a></li>';
+				echo ' <li><a href="transfercourse.php?from=home&id='.$row['id'].'">'._('Transfer ownership').'</a></li>';
 				echo ' <li><a href="forms.php?from=home&action=delete&id='.$row['id'].'">'._('Delete').'</a></li>';
+			} else if ($row['ownerid']!==$userid) {
+				echo '<li><a href="#" onclick="removeSelfAsCoteacher(this,'.$row['id'].');return false;">'._('Remove yourself as a co-teacher').'</a></li>';
 			}
 			echo '</ul></span> ';
 			echo '<a href="../course/course.php?cid='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['name']).'</a> ';

@@ -85,8 +85,8 @@ if ($myrights < 40) {
 		} else {
 			$minrights = 40;
 		}
-		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id=".Sanitize::onlyInt($line['id'])."\" class=\"artl\">Add/Remove</a>";
-		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id=".Sanitize::onlyInt($line['id'])."\" class=\"trl\">Transfer</a>";
+		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"addremoveteachers.php?id=".Sanitize::onlyInt($line['id'])."\" class=\"artl\">Add/Remove</a>";
+		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"transfercourse.php?id=".Sanitize::onlyInt($line['id'])."\" class=\"trl\">Transfer</a>";
 		$i++;
 	}
 

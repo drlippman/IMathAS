@@ -65,13 +65,19 @@ if ($myrights>15) {
   var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
   $(".courselist-teach li").css("clear","both").each(function (i,el) {
-  	if ($(el).attr("data-isowner")=="true") {
+  	if ($(el).attr("data-isowner")=="true" && '.($myrights>39?'true':'false').') {
   		var cid = $(el).attr("data-cid");
   		var thishtml = html + \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
   		thishtml += \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');return false;">'._('Hide from course list').'</a></li>\';
-  		thishtml += \' <li><a href="admin/forms.php?from=home&action=chgteachers&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
-  		thishtml += \' <li><a href="admin/forms.php?from=home&action=transfer&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
+  		thishtml += \' <li><a href="admin/addremoveteachers.php?from=home&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
+  		thishtml += \' <li><a href="admin/transfercourse.php?from=home&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
   		thishtml += \' <li><a href="admin/forms.php?from=home&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
+  		thishtml += \'</ul></div>\';
+  		$(el).append(thishtml);
+  	} else if ($(el).attr("data-isowner")!="true") {
+  		var cid = $(el).attr("data-cid");
+  		var thishtml = html + \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');return false;">'._('Hide from course list').'</a></li>\';
+  		thishtml += \' <li><a href="#" onclick="removeSelfAsCoteacher(this,\'+cid+\');return false;">'._('Remove yourself as a co-teacher').'</a></li>\';
   		thishtml += \'</ul></div>\';
   		$(el).append(thishtml);
   	}
@@ -497,7 +503,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	echo '<div class="blockitems"><ul class="nomark courselist courselist-'.$type.'">';
 	for ($i=0; $i<count($data); $i++) {
 		echo '<li';
-		if ($type=='teach' && $myrights>39) {
+		if ($type=='teach' && $myrights>19) {
 			echo ' data-isowner="'.($data[$i]['ownerid']==$userid?'true':'false').'"';
 			echo ' data-cid="'.$data[$i]['id'].'"';
 		}
@@ -518,7 +524,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			_('Posts ('.Sanitize::onlyInt($newpostcnt[$data[$i]['id']]).')'));
 			// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data[$i]['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
-		if ($type != 'teach' || $data[$i]['ownerid']!=$userid || $myrights<40) {
+		if ($type != 'teach' || ($data[$i]['ownerid']==$userid && $myrights<40) || $myrights<20) {
 			echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';
 		}
 		echo '</li>';

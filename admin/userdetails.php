@@ -61,7 +61,7 @@ if ($myrights < 75) {
     $body = 'Invalid id provided';
   } else {
     //courses teaching list
-    $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_teachers.hidefromcourselist ";
+    $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_teachers.hidefromcourselist ";
     $query .= "FROM imas_courses JOIN imas_users ON imas_courses.ownerid=imas_users.id ";
     $query .= "JOIN imas_teachers ON imas_teachers.courseid=imas_courses.id WHERE imas_teachers.userid=:uid ";
     $query .= " ORDER BY imas_courses.name";
@@ -74,6 +74,7 @@ if ($myrights < 75) {
       $newrow['id'] = $row['id'];
       $newrow['available'] = $row['available'];
       $newrow['owner'] = ($row['ownerid']!=$uid)?$row['LastName'].', '.$row['FirstName']:'';
+      $newrow['canedit'] = ($row['ownerid']==$uid || $myrights==100 || $row['groupid']==$groupid);
       $newrow['deleted'] = ($row['available']==4);
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       if ($row['available']==4) {
@@ -218,6 +219,9 @@ if ($overwriteBody==1) {
       if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
       echo '<td ';
       echo 'data-cid='.Sanitize::onlyInt($course['id']).' ';
+      if (!$course['canedit']) {
+      	  echo 'data-noedit=1 ';    
+      }
       if ($course['hidden']) {
         echo 'class="hocptd" ';
       }
@@ -266,7 +270,9 @@ if ($overwriteBody==1) {
         echo 'class="hocptd" ';
       }
       echo '>';
-      echo '<img src="../img/gears.png"/> ';
+      if ($course['canedit']) {
+      	      echo '<img src="../img/gears.png"/> ';
+      }
       echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
       if ($course['available']!=0) {
         echo '<i>';
@@ -305,7 +311,9 @@ if ($overwriteBody==1) {
         echo 'class="hocptd" ';
       }
       echo '>';
-      echo '<img src="../img/gears.png"/> ';
+      if ($course['canedit']) {
+      	      echo '<img src="../img/gears.png"/> ';
+      }
       echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
       if ($course['available']!=0) {
         echo '<i>';
@@ -386,13 +394,17 @@ if ($overwriteBody==1) {
       var thishtml = html + \' <li class="unhide"><a href="#" onclick="unhidecourse(this);return false;">'._('Return to home page course list').'</a></li>\';
       thishtml += \' <li class="hide"><a href="#" onclick="hidecourse(this);return false;">'._('Hide from home page course list').'</a></li>\';
 
-      if ($(el).attr("data-noedit")!=1) {
+      if ($(el).attr("data-noedit")!=1) {  
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
-        thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=chgteachers&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
-        thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=transfer&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
+        thishtml += \' <li><a href="addremoveteachers.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
+        thishtml += \' <li><a href="transfercourse.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
         thishtml += \'</ul></span> \';
         $(el).find("img").replaceWith(thishtml);
+      } else {
+      	thishtml += \' <li><a href="#" onclick="removeSelfAsCoteacher(this,\'+cid+\',\\\'tr\\\','.$uid.');return false;">'._('Remove as a co-teacher').'</a></li>\';
+      	thishtml += \'</ul></span> \';
+      	$(el).find("img").replaceWith(thishtml);
       }
     });
     $(".dropdown-toggle").dropdown();

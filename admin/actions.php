@@ -933,68 +933,6 @@ switch($_POST['action']) {
 			$DBH->commit();
 		}
 		break;
-	case "remteacher":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$tids = array();
-		if (isset($_GET['tid'])) {
-			$tids = array($_GET['tid']);
-		} else if (isset($_POST['tid'])) {
-			$tids = $_POST['tid'];
-			if (count($tids)==$_GET['tot']) {
-				array_shift($tids);
-			}
-		}
-		foreach ($tids as $tid) {
-			if ($myrights < 100) {
-				$stm = $DBH->prepare("SELECT imas_teachers.id FROM imas_teachers,imas_users WHERE imas_teachers.id=:id AND imas_teachers.userid=imas_users.id AND imas_users.groupid=:groupid");
-				$stm->execute(array(':id'=>$tid, ':groupid'=>$groupid));
-				if ($stm->rowCount()>0) {
-					$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE id=:id");
-					$stm->execute(array(':id'=>$tid));
-				} else {
-					//break;
-				}
-
-				//$query = "DELETE imas_teachers FROM imas_users,imas_teachers WHERE imas_teachers.id='{$_GET['tid']}' ";
-				//$query .= "AND imas_teachers.userid=imas_users.id AND imas_users.groupid='$groupid'";
-			} else {
-				$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE id=:id");
-				$stm->execute(array(':id'=>$tid));
-			}
-		}
-
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=". Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
-		exit;
-	case "addteacher":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		if ($myrights < 100) {
-			$stm = $DBH->prepare("SELECT imas_users.groupid FROM imas_users,imas_courses WHERE imas_courses.ownerid=imas_users.id AND imas_courses.id=:id");
-			$stm->execute(array(':id'=>$_GET['cid']));
-			if ($stm->fetchColumn(0) != $groupid) {
-				break;
-			}
-		}
-		$tids = array();
-		if (isset($_GET['tid'])) {
-			$tids = array($_GET['tid']);
-		} else if (isset($_POST['atid'])) {
-			$tids = $_POST['atid'];
-		}
-		$ins = array();
-		$insval = array();
-		foreach ($tids as $tid) {
-			$ins[] = "(?,?)";
-			array_push($insval, $tid, $_GET['cid']);
-		}
-		if (count($ins)>0) {
-			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES ".implode(',',$ins));
-			$stm->execute($insval);
-		}
-		if (!isset($_POST['addandclose'])) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=chgteachers&id=" .Sanitize::courseId($_GET['cid']).'&from='.Sanitize::encodeUrlParam($from));
-			exit;
-		}
-		break;
 	case "importmacros":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
 		$uploaddir = rtrim(dirname("../config.php"), '/\\') .'/assessment/libs/';
@@ -1127,41 +1065,42 @@ switch($_POST['action']) {
 			require("../footer.php");
 			exit;
 		}
-	case "transfer":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		$exec = false;
-
-		if ($myrights==75) {
-			$stm = $DBH->prepare("SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id=:id AND imas_courses.ownerid=imas_users.id AND imas_users.groupid=:groupid");
-			$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
-			if ($stm->rowCount()>0) {
-				$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
-				$stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$_GET['id']));
-				$exec = true;
+	case "removeself":
+		if ($myrights < 20) {
+			echo 'Error: Unauthorized';
+			exit;
+		}
+		if ($_POST['uid']!== null && intval($_POST['uid'])>0) {
+			$uid = Sanitize::onlyInt($_POST['uid']);
+			if ($myrights < 75 && $uid != $userid) {
+				echo 'Error: Unauthorized';
+				exit;
+			} else if ($myrights<100) {
+				$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+				$stm->execute(array($uid));
+				if ($groupid != $stm->fetchColumn(0)) {
+					echo 'Error: Unauthorized';
+					exit;
+				}
 			}
-			//$query = "UPDATE imas_courses,imas_users SET imas_courses.ownerid='{$_POST['newowner']}' WHERE ";
-			//$query .= "imas_courses.id='{$_GET['id']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
-		} else if ($myrights==100) {
-			$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
-			$stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$_GET['id']));
-			$exec = true;
 		} else {
-			$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id AND ownerid=:ownerid2");
-			$stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$_GET['id'], ':ownerid2'=>$userid));
-			$exec = true;
+			$uid = $userid;
 		}
-		if ($exec && $stm->rowCount()>0) {
-			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
-			$stm->execute(array(':courseid'=>$_GET['id'], ':userid'=>$_POST['newowner']));
-			if ($stm->rowCount()==0) {
-				$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
-				$stm->execute(array(':userid'=>$_POST['newowner'], ':courseid'=>$_GET['id']));
+		$stm = $DBH->prepare("SELECT ownerid FROM imas_courses WHERE id=?");
+		$stm->execute(array($_POST['id']));
+		$courseownerid = $stm->fetchColumn(0);
+		if ($courseownerid==$uid) {
+			echo 'Error: Can not remove yourself as a teacher from a course you own';
+		} else {
+			$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE userid=? AND courseid=?");
+			$stm->execute(array($uid, $_POST['id']));
+			if ($stm->rowCount()>0) {
+				echo 'OK';
+			} else {
+				echo 'Error: it does not appear you were a teacher on that course';
 			}
-			$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
-			$stm->execute(array(':courseid'=>$_GET['id'], ':userid'=>$userid));
 		}
-
-		break;
+		exit;
 	case "deloldusers":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$old = time() - 60*60*24*30*$_POST['months'];

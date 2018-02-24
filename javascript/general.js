@@ -640,6 +640,22 @@ function hidefromcourselist(el,cid,type) {
 	}
 	return false;
 }
+function removeSelfAsCoteacher(el,cid,selector,uid) {
+	selector = selector || "ul.courselist > li";
+	uid = uid || null;
+	if (confirm("Are you SURE you want to remove yourself as a co-teacher on this course?")) {
+		jQuery.ajax({
+			type: "POST",
+			url: imasroot+'/admin/actions.php',
+			data: {action: "removeself", id: cid, uid: uid}
+		}).done(function(msg) {
+			if (msg=='OK') {
+				jQuery(el).closest(selector).slideUp();
+			}
+		});
+	}
+	return false;
+}
 
 function rotateimg(el) {
 	if ($(el).data('rotation')) {
