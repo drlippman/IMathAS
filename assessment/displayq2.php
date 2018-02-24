@@ -2024,6 +2024,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if (isset($answer)) {
 			$sa = $answer;
+			if ($displayformat == 'vectorlist' || $displayformat == 'vector') {
+				$sa = str_replace(array('<','>'),array('(:',':)'),$sa);
+			}
+			$sa = '`'.$sa.'`';
 		}
 	} else if ($anstype == "calcntuple") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
