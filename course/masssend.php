@@ -233,7 +233,7 @@
 			}
 			if (isset($_POST['tutorcopy'])) {
 				$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
-				$query .= "FROM imas_teachers,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ";
+				$query .= "FROM imas_tutors JOIN imas_users ON imas_tutors.userid=imas_users.id WHERE imas_tutors.courseid=:courseid";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':courseid'=>$cid));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
