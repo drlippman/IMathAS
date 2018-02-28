@@ -61,7 +61,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=022218"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=022718"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();

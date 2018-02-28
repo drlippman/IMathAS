@@ -882,7 +882,7 @@ function initSageCell(base) {
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
-			code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n");
+			code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'');
 		} else {
 			ta = $this.find("textarea");
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
