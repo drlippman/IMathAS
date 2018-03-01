@@ -1115,15 +1115,33 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Find Student</h2></div>';
 		echo '<form method="post" action="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">';
 		echo '<p>Enter all or part of the name, email, or username: ';
-		echo '<input type=text size=20 name=userinfo /></p>';
+		echo '<input type=text size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo']).'"/></p>';
 		echo '<input type="submit">';
 		echo '</form>';
 		if (!empty($_POST['userinfo'])) {
 			$words = preg_split('/\s+/', str_replace(',',' ',trim($_POST['userinfo'])));
-			$query = "SELECT iu.id,LastName,iu.FirstName,iu.SID,ic.name,ic.id AS cid FROM imas_users AS iu JOIN ";
+			$query = "SELECT iu.id,iu.LastName,iu.FirstName,iu.SID,ic.name,ic.id AS cid";
+			if ($from!='home' && $myrights>=75) {
+				$query .= ",iut.LastName AS teacherfirst,iut.FirstName AS teacherlast";
+			}
+			$query .= " FROM imas_users AS iu JOIN ";
 			$query .= "imas_students AS i_s ON iu.id=i_s.userid JOIN imas_courses AS ic ON ic.id=i_s.courseid ";
-			$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid WHERE i_t.userid=? AND ";
-			$qarr = array($userid);
+			$myrights = 75;
+			if ($from=='home' || $myrights<75) {
+				$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid ";
+				$query .= "WHERE i_t.userid=? AND ";
+				$qarr = array($userid);
+			} else { 
+				$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid ";
+				$query .= "JOIN imas_users AS iut ON i_t.userid=iut.id ";
+				if ($myrights<100) {
+					$query .= "WHERE iut.groupid=? AND ";
+					$qarr = array($groupid);
+				} else {
+					$query .= "WHERE ";	
+					$qarr = array();
+				}
+			}
 			if (count($words)==1 && strpos($words[0],'@')!==false) {
 				$query .= "(iu.email=? OR iu.SID=?)";
 				array_push($qarr, $words[0], $words[0]);
@@ -1134,19 +1152,31 @@ switch($_GET['action']) {
 				$query .= "((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
 				array_push($qarr, $words[0].'%', $words[1].'%', $words[1].'%', $words[0].'%');
 			}
+			$query .= " ORDER BY LastName, FirstName LIMIT 200";
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 			if ($stm->rowCount()==0) {
 				echo '<p>No matches <a href="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">Try again</a></p>';
 			} else {
-				echo '<ul>';
-				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					echo '<li>';
-					echo '<a href="../course/gradebook.php?cid='.Sanitize::onlyInt($row['cid']).'&stu='.Sanitize::onlyInt($row['id']).'">';
-					echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName'].' ('.$row['SID'].'): '.$row['name']);
-					echo '</a></li>';
+				echo '<table class="gb"><thead><th>Student</th><th>Username</th><th>Course</th>';
+				if ($from!='home' && $myrights>=75) {
+					echo '<th>Instructor</th>';
 				}
-				echo '</ul>';
+				echo '</thead><tbody>';
+				$i = 0;
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+					echo ($i==0)?'<tr class=even>':'<tr class=odd>'; $i = 1-$i;
+					echo '<td>';
+					echo '<a href="../course/gradebook.php?cid='.Sanitize::onlyInt($row['cid']).'&stu='.Sanitize::onlyInt($row['id']).'">';
+					echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</td>';
+					echo '</a><td>'.Sanitize::encodeStringForDisplay($row['SID']).'</td>'; 
+					echo '<td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
+					if ($from!='home' && $myrights>=75) {
+						echo '<td>'.Sanitize::encodeStringForDisplay($row['teacherlast'].', '.$row['teacherfirst']).'</td>';
+					}
+					echo '</td></tr>';
+				}
+				echo '</tbody></table>';
 			}		
 		} 
 		

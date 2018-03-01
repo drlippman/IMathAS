@@ -174,6 +174,9 @@ if ($overwriteBody==1) {
       	      echo '<br/><a href="../util/batchcreateinstr.php?from=admin">'._('Batch Add Instructors').'</a>';    
       }
       echo '</span>';
+      echo '<span class="column">';
+      echo '<a href="forms.php?action=findstudent">',_('Find Student'),'</a>';
+      echo '</span>';
 
       echo '<div class=clear></div></div>';
     }
