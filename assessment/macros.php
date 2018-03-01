@@ -3427,11 +3427,11 @@ function getsnapwidthheight($xmin,$xmax,$ymin,$ymax,$width,$height,$snaptogrid) 
 function getscorenonzero() {
 	global $scores;
 	$out = array();
-	for ($i=0;$i<count($scores);$i++) {
-		if (strpos($scores[$i],'~')===false) {
-			$out[$i+1] = ($scores[$i]<0)?-1:(($scores[$i]>0)?1:0);
+	foreach ($scores as $i=>$v) {
+		if (strpos($v,'~')===false) {
+			$out[$i+1] = ($v<0)?-1:(($v>0)?1:0);
 		} else {
-			$sp = explode('~',$scores[$i]);
+			$sp = explode('~',$v);
 			$out[$i+1] = array();
 			for ($j=0;$j<count($sp);$j++) {
 				$out[$i+1][$j] = ($sp[$j]>0)?1:0;
@@ -3444,11 +3444,11 @@ function getscorenonzero() {
 function getiscorrect() {
 	global $rawscores;
 	$out = array();
-	for ($i=0;$i<count($rawscores);$i++) {
-		if (strpos($rawscores[$i],'~')===false) {
-			$out[$i+1] = ($rawscores[$i]<0)?-1:(($rawscores[$i]==1)?1:0);
+	foreach ($rawscores as $i=>$v) {
+		if (strpos($v,'~')===false) {
+			$out[$i+1] = ($v<0)?-1:(($v==1)?1:0);
 		} else {
-			$sp = explode('~',$rawscores[$i]);
+			$sp = explode('~',$v);
 			$out[$i+1] = array();
 			for ($j=0;$j<count($sp);$j++) {
 				$out[$i+1][$j] = ($sp[$j]==1)?1:0;

@@ -57,6 +57,8 @@ if ($myrights<20) {
 	$rawscores = array();
 	$qn = 27;  //question number to use during testing
 	$lastanswers[$qn] = '';
+	$rawscores[$qn] = -1;
+	$scores[$qn] = -1;
 
 	if (isset($_POST['seed'])) {
 		list($score,$rawscores[$qn]) = scoreq($qn,$_GET['qsetid'],$_POST['seed'],$_POST['qn'.$qn],$attempt-1);
@@ -65,8 +67,6 @@ if ($myrights<20) {
 		$page_scoreMsg =  "<p>Score on last answer: ".Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
-		$scores = array(-1);
-		$rawscores = array(-1);
 		$_SESSION['choicemap'] = array();
 	}
   $cid = Sanitize::courseId($_GET['cid']);
