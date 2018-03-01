@@ -400,8 +400,25 @@
 	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
+		exit;
 	}
 
+	if (isset($sessiondata['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
+		if ($myrights>18) {
+			foreach ($sessiondata as $k=>$v) {
+				if (substr($k,0,3)=='lti') {
+					unset($sessiondata[$k]);
+				}
+			}
+			writesessiondata();
+		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
+			require(__DIR__.'/includes/userutils.php');
+			logout();
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php');
+			exit;
+		}
+	}
+	
 	if (isset($sessiondata['ltiitemtype'])) {
 		$flexwidth = true;
 		if ($sessiondata['ltiitemtype']==1) {

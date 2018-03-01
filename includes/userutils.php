@@ -1,5 +1,5 @@
 <?php
-// User search utilities
+// User search and other utilities
 // IMathAS (c) 2018 David Lippman
 
 function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
@@ -78,4 +78,17 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
       }
     });
     return $possible_users;
+}
+
+function logout() {
+	global $DBH;
+	
+	$sessionid = session_id();
+	$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=?");
+	$stm->execute(array($sessionid));
+	$_SESSION = array();
+	if (isset($_COOKIE[session_name()])) {
+		setcookie(session_name(), '', time()-42000, '/');
+	}
+	session_destroy();
 }
