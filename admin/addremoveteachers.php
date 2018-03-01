@@ -71,11 +71,12 @@ if (isset($_POST['remove'])) {
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
 	$ph = Sanitize::generateQueryPlaceholders($existing);
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id NOT IN ($ph) AND groupid=? ORDER BY LastName,FirstName");
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id NOT IN ($ph) AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
 	$existing[] = $coursegroupid;
 	$stm->execute($existing);
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
 	echo json_encode($out);

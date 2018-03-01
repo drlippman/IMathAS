@@ -65,10 +65,11 @@ if (isset($_POST['newowner']) && intval($_POST['newowner'])>0) {
 
 //process AJAX post-backs
 if (isset($_POST['loadgroup'])) {
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id<>? AND groupid=? ORDER BY LastName,FirstName");
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
 	$stm->execute(array($courseownerid, $coursegroupid));
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
 	echo json_encode($out);
