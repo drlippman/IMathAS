@@ -3616,8 +3616,7 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			$gadploc = strpos($givenans,'.');
 			$absgivenans = str_replace('-','',$givenans);
 			if ($gadploc===false) { //no decimal place
-				//with sigfigs of =3 and answer of 3400, want to mark it right
-				if (strlen(rtrim($absgivenans,'0')) > $reqsigfigs) { return false;}
+				if (strlen(rtrim($absgivenans,'0')) != $reqsigfigs) { return false;}
 			} else {
 				if (abs($givenans)<1) {
 					if (strlen(ltrim(substr($absgivenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
