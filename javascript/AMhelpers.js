@@ -1399,6 +1399,50 @@ function toggleinlinebtn(n,p){ //n: target, p: click el
 	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
 
 }
+//triggered by blur, this saves the one question without scoring
+function assessbackgsave() {
+	var m = $(this).attr("name").match(/^(qs|qn|tc)(\d+)/);
+	if (m !== null && !!window.FormData) {
+		var qn = m[2]*1;
+		if (qn>1000) {
+			qn = Math.floor(qn/1000 + .001)-1;
+		}
+		if (typeof tinyMCE != "undefined") {tinyMCE.triggerSave();}
+		doonsubmit();
+		var tosubFormData = new FormData();
+		var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
+		$("input,select,textarea").each(function(i,el) {
+			if (el.name.match(regex)) {
+				if ((el.type!='radio' && el.type!='checkbox') || el.checked) {
+					if (el.type=='file') {
+						tosubFormData.append(el.name, el.files[0]);
+					} else {
+						tosubFormData.append(el.name, el.value);
+					}
+				}
+			}
+		});
+		tosubFormData.append("backgroundsaveforlater",1);
+		tosubFormData.append("tosaveqn",qn);
+		tosubFormData.append("asidverify", document.getElementById("asidverify").value);
+		tosubFormData.append("disptime", document.getElementById("disptime").value);
+		tosubFormData.append("isreview", document.getElementById("isreview").value);
+		$.ajax({
+			type:"POST", 
+			url: window.location.origin+window.location.pathname, 
+			data: tosubFormData, 
+			contentType: false, 
+			processData: false,
+			qn: qn
+		}).done(function(msg){
+			if (assessFormIsDirty.indexOf(this.qn*1)!=-1) {
+		    	    assessFormIsDirty.splice(assessFormIsDirty.indexOf(this.qn*1),1);
+		    	}
+			//console.log(msg);
+		});
+	}
+}
+//this submits one question for grading, in Embedded display
 function assessbackgsubmit(qn,noticetgt) {
 	if (!confirmSubmit($("#embedqwrapper"+qn)[0])) {
 		return false;	
@@ -2165,7 +2209,7 @@ function trackDirty() {
 		if (assessFormIsDirty.indexOf(qn)==-1) {
 			assessFormIsDirty.push(qn);
 		}
-	}	
+	}
 }
 $(function() {
 	$("input,select,textarea").on("change", trackDirty);

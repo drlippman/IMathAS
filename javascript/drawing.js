@@ -1237,10 +1237,11 @@ function encodeDraw() {
 	}
 	out += tpineqout.join(",");
 	if (targetOuts[curTarget].value != out) {
-		if (targetOuts[curTarget].value != '' || out != ';;;;;;;;') {
-			$(targetOuts[curTarget]).trigger("change");
-		}
+		var dochange = (targetOuts[curTarget].value != '' || out != ';;;;;;;;');
 		targetOuts[curTarget].value = out;
+		if (dochange) {
+			$(targetOuts[curTarget]).trigger("change");
+		} 
 	}
 }
 var clickcnt=0;

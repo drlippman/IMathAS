@@ -1107,7 +1107,7 @@
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	$useeditor = 1;
-if (!isset($_REQUEST['embedpostback'])) {
+if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater'])) {
 
 	$cid = $testsettings['courseid'];
 	if ($testsettings['displaymethod'] == "VideoCue") {
@@ -1629,7 +1629,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 	} else {
 		$introhaspages = ($testsettings['displaymethod'] == "Embed" && strpos($testsettings['intro'],'[PAGE')!==false);
 	}
-
+	if (!empty($_POST['backgroundsaveforlater'])) {
+		scorequestion(Sanitize::onlyInt($_POST['tosaveqn']),false);
+		recordtestdata(true);
+		echo "Saved ".Sanitize::onlyInt($_POST['tosaveqn']);
+		exit;
+	}
 	if (isset($_GET['action'])) {
 		if (($_GET['action']=="skip" || $_GET['action']=="seq") && trim($testsettings['intro'])!='') {
 			echo '<div class="right"><a href="#" aria-controls="intro" aria-expanded="false" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
@@ -2614,11 +2619,13 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$perfectscore = true;
 		}
 		if ($testsettings['displaymethod'] == "AllAtOnce") {
+			echo '<script type="text/javascript">
+			  $(function() {$("input:not(:button),textarea,select").on("change", assessbackgsave);});</script>';
 			echo filter("<div class=intro role=region aria-label=\""._('Intro or instructions')."\">{$testsettings['intro']}</div>\n");
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
-			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
-			echo '<input type="hidden" name="disptime" value="'.time().'" />';
-			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+			echo "<input type=\"hidden\" name=\"asidverify\" id=\"asidverify\" value=\"$testid\" />";
+			echo '<input type="hidden" name="disptime" id="disptime" value="'.time().'" />';
+			echo "<input type=\"hidden\" name=\"isreview\" id=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			$numdisplayed = 0;
 
 			for ($i = 0; $i < count($questions); $i++) {
