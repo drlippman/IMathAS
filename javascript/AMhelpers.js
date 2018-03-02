@@ -162,6 +162,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/±/g,"+-").replace(/÷/g,"/").replace(/·|✕|×|⋅/g,"*");
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
 	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
+	str = str.replace(/\u2329/g, "<").replace(/\u232a/g, ">");
 	str = str.replace(/₀/g,"_0").replace(/₁/g,"_1").replace(/₂/g,"_2").replace(/₃/g,"_3");
 	str = str.replace(/\bOO\b/i,"oo");
 	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu")
@@ -1165,6 +1166,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				return false;
 			}
 		}
+		
 	}
 	imathasDraw.encodea11ydraw();
 
@@ -1514,6 +1516,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		    if (usingTinymceEditor) {
 			    initeditor("textareas","mceEditor");
 		    }
+		   
 		    // Loop through every script collected and eval it
 		    initstack.length = 0;
 		    for(var i=0; i<scripts.length; i++) {
@@ -1546,7 +1549,11 @@ function assessbackgsubmit(qn,noticetgt) {
 		    }
 				*/
 		    $(window).trigger("ImathasEmbedReload", [qn]);
-
+		    if (assessFormIsDirty.indexOf(qn*1)!=-1) {
+		    	    assessFormIsDirty.splice(assessFormIsDirty.indexOf(qn*1),1);
+		    }
+		    $("#embedqwrapper"+qn).find("input,textarea").on("change", trackDirty);
+		    
 		    var pagescroll = 0;
 		    if(typeof window.pageYOffset!= 'undefined'){
 			//most browsers
@@ -2145,3 +2152,27 @@ function prepWithMath(str) {
 	str = str.replace(/\((E|PI)\)/g,'(Math.$1)');
 	return str;
 }
+
+var assessFormIsDirty = [];
+function trackDirty() {
+	var name = $(this).attr("name");
+	var m = name.match(/^(qs|qn|tc)(\d+)/);
+	if (m !== null) {
+		var qn = m[2]*1;
+		if (qn>1000) {
+			qn = Math.floor(qn/1000 + .001)-1;
+		}
+		if (assessFormIsDirty.indexOf(qn)==-1) {
+			assessFormIsDirty.push(qn);
+		}
+	}	
+}
+$(function() {
+	$("input,select,textarea").on("change", trackDirty);
+	$(window).on("beforeunload",function() {
+		if ($("form.submitted,form.submitted2").length==0 && assessFormIsDirty.length>0) {
+			return _('Are you sure you want to leave this assessment? You may have unsubmitted work');
+		}
+	});
+});
+

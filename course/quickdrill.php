@@ -385,7 +385,7 @@ if ($page_scoreMsg != '' && $showscore) {
 }
 
 if ($showans) {
-	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this,true,true)\">\n";
 	echo "<p>Displaying last question with solution <input type=submit name=\"next\" value=\"New Question\"/></p>\n";
 	displayq(0,$qsetid,$seed,2,true,0);
 	echo "</form>\n";
@@ -395,7 +395,7 @@ if ($showans) {
 	} else {
 		$doshowans = 0;
 	}
-	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this,true,true)\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"".Sanitize::encodeStringForDisplay($seed)."\" />";
 	displayq(0,$qsetid,$seed,$doshowans,true,0);
 	if ($sa==3) {

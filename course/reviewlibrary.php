@@ -439,7 +439,7 @@ if ($overwriteBody==1) {
 	<div><?php echo  $page_deleteForm; ?></div>
 	<div><?php echo  $page_lastScore; ?></div>
 
-	<form method=post action="reviewlibrary.php?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>" onsubmit="doonsubmit()">
+	<form method=post action="reviewlibrary.php?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>" onsubmit="doonsubmit(this,true,true)">
 		<input type=hidden name=seed value="<?php echo $seed ?>">
 
 <?php

@@ -3858,6 +3858,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$givenans = normalizemathunicode($givenans);
+
 		$ansformats = array_map('trim',explode(',',$answerformat));
 		$answer = str_replace(' ','',$answer);
 
@@ -7424,6 +7425,8 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
 	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
 	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅'), array('(',')','oo','U','<=','>=','*'), $str);
+	//these are the slim vector unicodes: u2329 and u232a
+	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
 	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;

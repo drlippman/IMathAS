@@ -183,7 +183,7 @@ if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
 	echo '</div>';
 }
 
-echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";
+echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit(this)\">\n";
 echo "<input type=\"hidden\" name=\"seed\" value=\"" . Sanitize::encodeStringForDisplay($seed) . "\" />";
 displayq(0,$qsetid,$seed,$showans,true,0,false,false,false,$qcol);
 echo "<p><input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";

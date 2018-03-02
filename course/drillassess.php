@@ -381,7 +381,7 @@ if ($curitem == -1) {
 			} else {
 				$doshowans = 0;
 			}
-			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction&score=true\" onsubmit=\"doonsubmit()\">\n";
+			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction&score=true\" onsubmit=\"doonsubmit(this)\">\n";
 			displayq(0,$curitemid,$seed,$doshowans,true,0);
 			if ($sa==3) {
 				echo "<button type=\"submit\" name=\"next\" value=\"Next Question\">" . _("New Question") . "</button>\n";

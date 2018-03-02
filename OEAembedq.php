@@ -269,7 +269,7 @@ if (isset($QS['showscored'])) {
 		}
 	}
 	$doshowans = 0;
-	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this)\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"".Sanitize::encodeStringForDisplay($seed)."\" />";
 	$scoredonsubmit = false;
 	if (isset($QS['showscoredonsubmit']) && ($QS['showscoredonsubmit']=='1' || $QS['showscoredonsubmit']=='true')) {
