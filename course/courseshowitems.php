@@ -644,11 +644,17 @@ function showitems($items,$parent,$inpublic=false) {
 			   //check for exception
 			   $canundolatepass = false;
 			   $canuselatepass = false;
+			   $duedatewords = _('Due');
 			   if (isset($exceptions[$items[$i]])) {
 			   	   list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$items[$i]], $line);
 			   	   if ($useexception) {
 			   	   	   $line['startdate'] = $exceptions[$items[$i]][0];
 			   	   	   $line['enddate'] = $exceptions[$items[$i]][1];
+			   	   	   if ($exceptions[$items[$i]][2]==1) {
+			   	   	   	$duedatewords = _('With LatePass, due');
+			   	   	   } else if (empty($exceptions[$items[$i]][3])) { //is_lti !isset or is 0
+			   	   	   	$duedatewords = _('With extension, due');   
+			   	   	   }
 			   	   }
 			   } else {
 			   	   $canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($line);
@@ -701,7 +707,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = _('Available until');
 				   } else {
-					   $endname = _('Due');
+					   $endname = $duedatewords;
 				   }
 				   $line['timelimit'] = abs($line['timelimit']);
 				   if ($line['timelimit']>0) {
@@ -828,7 +834,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = _('Available until');
 				   } else {
-					   $endname = _('Due');
+					   $endname = $duedatewords;
 				   }
 
 				   echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
