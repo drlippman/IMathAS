@@ -1610,11 +1610,13 @@ function gbtable() {
 							$cattotpast[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					foreach($cattotpastec[$ln][$cat] as $col=>$v) {
-						if ($gb[0][1][$col][2] == 0) {
-							$cattotpastec[$ln][$cat][$col] = 0;
-						} else {
-							$cattotpastec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+					if (isset($cattotpastec[$ln][$cat])) {
+						foreach($cattotpastec[$ln][$cat] as $col=>$v) {
+							if ($gb[0][1][$col][2] == 0) {
+								$cattotpastec[$ln][$cat][$col] = 0;
+							} else {
+								$cattotpastec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+							}
 						}
 					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotpast[$ln][$cat])) {
@@ -1702,11 +1704,13 @@ function gbtable() {
 							$cattotcur[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					foreach($cattotcurec[$ln][$cat] as $col=>$v) {
-						if ($gb[0][1][$col][2] == 0) {
-							$cattotcurec[$ln][$cat][$col] = 0;
-						} else {
-							$cattotcurec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+					if (isset($cattotcurec[$ln][$cat])) {
+						foreach($cattotcurec[$ln][$cat] as $col=>$v) {
+							if ($gb[0][1][$col][2] == 0) {
+								$cattotcurec[$ln][$cat][$col] = 0;
+							} else {
+								$cattotcurec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+							}
 						}
 					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) {
@@ -1796,11 +1800,13 @@ function gbtable() {
 							$cattotfuture[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					foreach($cattotfutureec[$ln][$cat] as $col=>$v) {
-						if ($gb[0][1][$col][2] == 0) {
-							$cattotfutureec[$ln][$cat][$col] = 0;
-						} else {
-							$cattotfutureec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+					if (isset($cattotfutureec[$ln][$cat])) {
+						foreach($cattotfutureec[$ln][$cat] as $col=>$v) {
+							if ($gb[0][1][$col][2] == 0) {
+								$cattotfutureec[$ln][$cat][$col] = 0;
+							} else {
+								$cattotfutureec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+							}
 						}
 					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) {
@@ -1897,11 +1903,13 @@ function gbtable() {
 							$cattotattempted[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					foreach($cattotattemptedec[$ln][$cat] as $col=>$v) {
-						if ($gb[0][1][$col][2] == 0) {
-							$cattotattemptedec[$ln][$cat][$col] = 0;
-						} else {
-							$cattotattemptedec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+					if (isset($cattotattemptedec[$ln][$cat])) {
+						foreach($cattotattemptedec[$ln][$cat] as $col=>$v) {
+							if ($gb[0][1][$col][2] == 0) {
+								$cattotattemptedec[$ln][$cat][$col] = 0;
+							} else {
+								$cattotattemptedec[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
+							}
 						}
 					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotattempted[$ln][$cat])) { //if drop is set and have enough items

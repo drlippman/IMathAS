@@ -483,6 +483,10 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['copyrubrics'])) {
 				copyrubrics($offlinerubrics);
 			}
+			if (isset($_POST['copystudata']) && ($myrights==100 || ($myspecialrights&32)==32 || ($myspecialrights&64)==64)) {
+				require("../util/copystudata.php");
+				copyStuData($cid, $_POST['ctc']);
+			}
 			//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 			$DBH->commit();
 			if (isset($_POST['selectcalitems'])) {
@@ -931,6 +935,12 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 
 
 	</td></tr>
+	<?php
+	if ($myrights==100 || ($myspecialrights&32)==32 || ($myspecialrights&64)==64) {
+		echo '<tr><td class="r">Also copy students and assessment attempt data?</td>';
+		echo '<td><input type=checkbox name=copystudata value=1> NOT recommended unless you know what you are doing.</td></tr>';
+	}
+	?>
 	</tbody>
 	</table>
 	</fieldset>
