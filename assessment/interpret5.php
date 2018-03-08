@@ -21,6 +21,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
 		$str .= ' ';
+		$str = str_replace("\t", ' ', $str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
