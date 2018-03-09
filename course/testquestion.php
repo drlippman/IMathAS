@@ -166,6 +166,12 @@ if ($overwriteBody==1) {
 			document.getElementById("brokenmsgok").style.display = (tagged==1)?"none":"block";
 			if (tagged==1) {alert("Make sure you also contact the question author or support so they know why you marked the question as broken");}
 		}
+		
+		$(window).on('beforeunload', function() { 
+			if (window.opener && !window.opener.closed) {
+				window.opener.sethighlightrow(-1);
+			}
+		});
 	</script>
 	<?php
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
@@ -173,6 +179,7 @@ if ($overwriteBody==1) {
 		echo "<script type=\"text/javascript\">";
 		echo "var numchked = -1;";
 		echo "if (window.opener && !window.opener.closed) {";
+		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
 		echo " if (prevnext[0][1]>0){
 				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
