@@ -323,7 +323,7 @@ function JSXG_addFunction($board, $ops=array()){
     // Loop through each variable name, add a JS statement if necessary to swap %a with a.Value()
     foreach ($ops['slider-names'] as $sn){
       if (strpos($rule, "%{$sn}")>-1){
-        $out .= "rule = rule.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "rule = rule.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     // Use the mathjs() function to create JS-readable function, return it
