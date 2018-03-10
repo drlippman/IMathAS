@@ -102,7 +102,7 @@ if (!(isset($teacherid))) {
 					$feedback = '';
 					if (trim($fbcol)!='' && intval($fbcol)>0) {
 						//DB $feedback = addslashes($line[intval($fbcol)-1]);
-						$feedback = $line[intval($fbcol)-1];
+						$feedback = Sanitize::incomingHtml($line[intval($fbcol)-1]);
 					}
 					if (trim($line[$col])=='' || $line[$col] == '-') {
 						//echo "breaking 2";

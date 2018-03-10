@@ -286,6 +286,12 @@ span#leftcontenttoggle.leftcontentactive {
 div.editor {
 	margin-bottom: 10px;
 }
+.fbbox {
+	background-color: #fff;
+	border: 1px solid #ccc;
+	margin: 5px;
+	padding: 0px 5px;
+}
 
 span.column {
 	display: block;

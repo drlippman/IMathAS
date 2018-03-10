@@ -67,6 +67,7 @@ function preprint() {
 function quicksave() {
 	var url = $("#mainform").attr("action")+"&quick=true";
 	$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
+	tinymce.triggerSave();
 	$.ajax({
 		url: url,
 		type: "POST",

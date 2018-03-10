@@ -11,7 +11,6 @@
 		exit;
 	}
 
-
 	$cid = Sanitize::courseId($_GET['cid']);
 	$stu = $_GET['stu'];
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
@@ -42,8 +41,9 @@
 
 	if (isset($_GET['update'])) {
 		$allscores = array();
+		$allfeedbacks = array();
 		$grpscores = array();
-		$grpfeedback = array();
+		$grpfeedbacks = array();
 		$locs = array();
 		foreach ($_POST as $k=>$v) {
 			if (strpos($k,'-')!==false) {
@@ -63,13 +63,20 @@
 							$allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
 						}
 					}
+				} else if ($kp[0]=='fb') {
+					if ($v=='' || $v=='<p></p>') {
+						$v = '';
+					} else {
+						$v = Sanitize::incomingHtml($v);
+					}
+					$allfeedbacks[$kp[2]][$kp[1]] = $v;
 				}
 			}
 		}
 		if (isset($_POST['onepergroup']) && $_POST['onepergroup']==1) {
 			foreach ($_POST['groupasid'] as $grp=>$asid) {
 				$grpscores[$grp] = $allscores[$asid];
-				$grpfeedback[$grp] = $_POST['feedback-'.$asid];
+				$grpfeedbacks[$grp] = $allfeedbacks[$asid];
 			}
 			$onepergroup = true;
 		} else {
@@ -101,6 +108,14 @@
 		$updatedata = array();
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			$GLOBALS['assessver'] = $line['ver'];
+			$feedback = json_decode($line['feedback'], true);
+			if ($feedback === null) {
+				if ($line['feedback']=='') {
+					$feedback = array();
+				} else {
+					$feedback = array('Z'=>$line['feedback']);
+				}
+			}
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
 				$sp = explode(';',$line['bestscores']);
 				$scores = explode(",",$sp[0]);
@@ -113,7 +128,13 @@
 							$scores[$loc] = $sv;
 						}
 					}
-					$feedback = $grpfeedback[$line['agroupid']];
+					foreach ($grpfeedback[$line['agroupid']] as $loc=>$sv) {
+						if (trim(strip_tags($sv))=='') {
+							unset($feedback["Q".$loc]);
+						} else {
+							$feedback["Q".$loc] = $sv;
+						}
+					}
 				} else {
 					foreach ($allscores[$line['id']] as $loc=>$sv) {
 						if (is_array($sv)) {
@@ -122,16 +143,27 @@
 							$scores[$loc] = $sv;
 						}
 					}
-					$feedback = $_POST['feedback-'.$line['id']];
+					foreach ($allfeedbacks[$line['id']] as $loc=>$sv) {
+						if (trim(strip_tags($sv))=='') {
+							unset($feedback["Q".$loc]);
+						} else {
+							$feedback["Q".$loc] = $sv;
+						}
+					}
+					//$feedback = $_POST['feedback-'.$line['id']];
 				}
 				$scorelist = implode(",",$scores);
 				if (count($sp)>1) {
 					$scorelist .= ';'.$sp[1].';'.$sp[2];
 				}
-
+				if (count($feedback)>0) {
+					$feedbackout = json_encode($feedback);
+				} else {
+					$feedbackout = '';
+				}
 				//$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id");
 				//$stm2->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$line['id']));
-				array_push($updatedata, $line['id'], $scorelist, $feedback);
+				array_push($updatedata, $line['id'], $scorelist, $feedbackout);
 
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
@@ -147,6 +179,7 @@
 			$stm = $DBH->prepare($query);
 			$stm->execute($updatedata);
 		}
+
 		if (isset($_GET['quick'])) {
 			echo "saved";
 		} else if ($page == -1) {
@@ -208,7 +241,7 @@
 		$points = $defpoints;
 	}
 
-	$useeditor='review';
+	$useeditor='noinit';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=120617"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
@@ -220,6 +253,9 @@
 	$placeinhead .= "}\n";
 	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForDisplay($deffbtext).'";';
 	$placeinhead .= '</script>';
+	if ($sessiondata['useed']!=0) {
+		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
+	}
 	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px;}</style>';
 	require("../includes/rubric.php");
 	$sessiondata['coursetheme'] = $coursetheme;
@@ -332,6 +368,10 @@
 	//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$GLOBALS['assessver'] = $line['ver'];
+		$feedback = json_decode($line['feedback'], true);
+		if ($feedback === null) {
+			$feedback = array('Z'=>$line['feedback']);
+		}
 		if ($page != -1) {
 			echo '<input type="hidden" name="userid" value="' . Sanitize::onlyInt($line['userid']) . '"/>';
 		}
@@ -459,7 +499,7 @@
 				}
 				echo "<input type=text size=4 id=\"scorebox$cnt\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
 				if ($rubric != 0) {
-					echo printrubriclink($rubric,$points,"scorebox$cnt","feedback-" . Sanitize::onlyInt($line['id']),($loc+1));
+					echo printrubriclink($rubric,$points,"scorebox$cnt","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1));
 				}
 			}
 			if ($parts!='') {
@@ -471,7 +511,7 @@
 					}
 					echo "<input type=text size=2 id=\"scorebox$cnt-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
 					if ($rubric != 0) {
-						echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","feedback-" . Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
+						echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
 					}
 					echo ' ';
 				}
@@ -566,7 +606,17 @@
 
 			//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
-			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-".Sanitize::onlyInt($line['id'])."\" name=\"feedback-".Sanitize::onlyInt($line['id'])."\">".Sanitize::encodeStringForDisplay($line['feedback'])."</textarea>";
+			echo "<br/>"._("Question Feedback").": ";
+			//<textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-".Sanitize::onlyInt($line['id'])."\" name=\"feedback-".Sanitize::onlyInt($line['id'])."\">".Sanitize::encodeStringForDisplay($line['feedback'])."</textarea>";
+			if ($sessiondata['useed']==0) {
+				echo '<br/><textarea cols="60" rows="2" class="fbbox" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'" name="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'">';
+				echo Sanitize::encodeStringForDisplay($feedback["Q$loc"]);
+				echo '</textarea>';
+			} else {
+				echo '<div class="fbbox" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'">';
+				echo Sanitize::outgoingHtml($feedback["Q$loc"]);
+				echo '</div>';
+			}
 			echo '<br/>Question #'.($loc+1);
 			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
 					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$seeds[$loc]}-$aid-{$line['ver']}",

@@ -165,6 +165,10 @@ $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=022410" type="text/css" />';
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/posts.js?v=011517"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+if ($caneditscore && $sessiondata['useed']!=0) {
+	$useeditor = "noinit";
+	$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
+}
 require("../header.php");
 
 if ($haspoints && $caneditscore && $rubric != 0) {
@@ -447,7 +451,7 @@ function printchildren($base,$restricttoowner=false) {
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-	global $canviewall, $caneditscore, $canviewscore;
+	global $canviewall, $caneditscore, $canviewscore, $sessiondata;
 	if (!isset($CFG['CPS']['itemicons'])) {
 		$itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -642,17 +646,26 @@ function printchildren($base,$restricttoowner=false) {
 				if ($rubric != 0) {
 					echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
 				}
-				echo " Private Feedback: <textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
-				if ($feedback[$child]!==null) {
-					echo $feedback[$child];
+				echo " Private Feedback: ";
+				if ($sessiondata['useed']==0) {
+					echo "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback$child\" id=\"feedback$child\">";
+					if ($feedback[$child]!==null) {
+						echo Sanitize::encodeStringForDisplay($feedback[$child]);
+					}
+					echo "</textarea>";
+				} else {
+					echo '<div class="fbbox" id="feedback'.$child.'">';
+					if ($feedback[$child]!==null) {
+						echo Sanitize::outgoingHtml($feedback[$child]);
+					}
+					echo '</div>';
 				}
-				echo "</textarea>";
 			} else if (($ownerid[$child]==$userid || $canviewscore) && $points[$child]!==null) {
 				echo '<div class="signup">Score: ';
 				echo "<span class=red>{$points[$child]} points</span><br/> ";
 				if ($feedback[$child]!==null && $feedback[$child]!='') {
 					echo 'Private Feedback: ';
-					echo $feedback[$child];
+					echo '<div>'.Sanitize::outgoingHtml($feedback[$child]).'</div>';
 				}
 				echo '</div>';
 			}

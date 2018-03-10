@@ -367,7 +367,7 @@
 			echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot), Sanitize::encodeStringForDisplay($avgtota));
 			if ($showhints==1) {
-				if ($showextref[$qid]) {
+				if ($showextref[$qid] && $qcnt[$qid]!=$qincomplete[$qid]) {
 					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
                         $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {

@@ -73,6 +73,10 @@
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 		require("../includes/rubric.php");
 	}
+	if ($caneditscore && $sessiondata['useed']!=0) {
+		$useeditor = "noinit";
+		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
+	}
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."\">Forum Topics</a> &gt; Posts by Name</div>\n";
 
@@ -358,14 +362,29 @@
 		if ($haspoints) {
 			if ($caneditscore && $line['userid']!=$userid) {
 				$content .= '<hr/>';
-				$content .= "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[". Sanitize::onlyInt($line['id'])."]\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
+				$content .= "Private Feedback: ";
+				/*echo "<textarea cols=\"50\" rows=\"2\" name=\"feedback[". Sanitize::onlyInt($line['id'])."]\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
 				if ($feedback[$line['id']]!==null) {
 					$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
 				}
 				$content .= "</textarea>";
+				*/
+				if ($sessiondata['useed']==0) {
+					$content .= "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback".Sanitize::onlyInt($line['id'])."\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
+					if ($feedback[$line['id']]!==null) {
+						$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
+					}
+					$content .= "</textarea>";
+				} else {
+					$content .= '<div class="fbbox" id="feedback'.Sanitize::onlyInt($line['id']).'">';
+					if ($feedback[$line['id']]!==null) {
+						$content .= Sanitize::outgoingHtml($feedback[$line['id']]);
+					}
+					$content .= '</div>';
+				}
 			} else if (($line['userid']==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
 				$content .= '<div class="signup">Private Feedback: ';
-				$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);
+				$content .= '<div>'.Sanitize::outgoingHtml($feedback[$line['id']]).'</div>';
 				$content .= '</div>';
 			}
 		}

@@ -103,7 +103,7 @@ row[1][0][0] = "Name"
 row[1][1] scores (all types - type is determined from header row)
 row[1][1][0] first score - assessment
 row[1][1][0][0] = score
-row[1][1][0][1] = 0 no comment, 1 has comment - is comment in stu view
+row[1][1][0][1] = 0 no comment, 1 has comment - is comment in includecomments
 row[1][1][0][2] = show gbviewasid link: 0 no, 1 yes,
 row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT  + 10 if still active
 row[1][1][0][4] = asid, or 'new'
@@ -1178,9 +1178,23 @@ function gbtable() {
 				$cattotfutureec[$row][$category[$i]][$col] = $pts;
 			}
 		}
-		if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
-			$gb[$row][1][$col][1] = $l['feedback']; //the feedback
-		} else if ($limuser==0 && $l['feedback']!='') {
+		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
+			$fbarr = json_decode($l['feedback'], true);
+			if ($fbarr === null) {
+				$gb[$row][1][$col][1] = $l['feedback']; //the feedback
+			} else {
+				$fbtxt = '';
+				foreach ($fbarr as $k=>$v) {
+					if ($k=='Z') {
+						$fbtxt .= 'Overall feedback: '.$v.'.<br>';
+					} else {
+						$q = substr($k,1);
+						$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'.<br>';
+					}
+				}
+				$gb[$row][1][$col][1] = $fbtxt;
+			}
+		} else if ($l['feedback']!='') {
 			$gb[$row][1][$col][1] = 1; //has comment
 		} else {
 			$gb[$row][1][$col][1] = 0; //no comment
@@ -1233,9 +1247,9 @@ function gbtable() {
 				if ($l['score']!=null) {
 					$gb[$row][1][$col][0] = 1*$l['score'];
 				}
-				if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+				if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 					$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
-				} else if ($limuser==0 && $l['feedback']!='') { //feedback
+				} else if ($l['feedback']!='') { //feedback
 					$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 				} else {
 					$gb[$row][1][$col][1] = 0; //no feedback
@@ -1285,18 +1299,18 @@ function gbtable() {
 						$gb[$row][1][$col][0] = 1*$l['score'];
 					}
 				}
-				if ($limuser==0 && !isset($gb[$row][1][$col][1])) {
+				if (!isset($gb[$row][1][$col][1])) {
 					$gb[$row][1][$col][1] = 0; //no feedback
 				}
 				if (trim($l['feedback'])!='') {
-					if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+					if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 						if (isset($gb[$row][1][$col][1])) {
 							$gb[$row][1][$col][1] .= "<br/>".$l['feedback'];
 						} else {
 							$gb[$row][1][$col][1] = $l['feedback'];
 						}
 						//the feedback (for students)
-					} else if ($limuser==0) { //feedback
+					} else { //feedback
 						$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 					}
 				}
@@ -1333,9 +1347,9 @@ function gbtable() {
 				if ($l['score']!=null) {
 					$gb[$row][1][$col][0] = 1*$l['score'];
 				}
-				if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+				if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 					$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
-				} else if ($limuser==0 && $l['feedback']!='') { //feedback
+				} else if ($l['feedback']!='') { //feedback
 					$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 				} else {
 					$gb[$row][1][$col][1] = 0; //no feedback

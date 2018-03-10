@@ -156,9 +156,6 @@ if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 }
 
 
-if (isset($placeinhead)) {
-	echo $placeinhead;
-}
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=013118"></script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
@@ -180,7 +177,9 @@ if ((isset($useeditor) && $sessiondata['useed']==1) || isset($loadiconfont)) {
 	echo '<link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
 	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
-
+if (isset($placeinhead)) {
+	echo $placeinhead;
+}
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
 	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");

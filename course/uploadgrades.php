@@ -91,7 +91,7 @@ if (!(isset($teacherid))) {
 					$feedback = '';
 				} else {
 					//DB $feedback = addslashes($data[$feedbackcol]);
-					$feedback = $data[$feedbackcol];
+					$feedback = Sanitize::incomingHtml($data[$feedbackcol]);
 				}
 				//DB $score = addslashes($data[$scorecol]);
 				$score = $data[$scorecol];

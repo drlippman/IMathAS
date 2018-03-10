@@ -43,7 +43,12 @@
 			$secfilter = -1;
 		}
 	}
-
+	$placeinhead .= '<script type="text/javascript">
+		function showfb(id,type) {
+			GB_show(_("Feedback"), "showfeedback?cid="+cid+"&type="+type+"&id="+id, 500, 500);
+			return false;
+		}
+		</script>';
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
@@ -326,7 +331,23 @@
 				$tottime += $timeused;
 				$ntime++;
 			}
-			echo "<td>{$line['feedback']}&nbsp;</td>";
+			$feedback = json_decode($line['feedback']);
+			if ($feedback===null) {
+				$hasfeedback = ($line['feedback'] != '');
+			} else {
+				$hasfeedback = false;
+				foreach ($feedback as $k=>$v) {
+					if ($v != '' && $v != '<p></p>') {
+						$hasfeedback = true;
+						break;
+					}
+				}
+			}
+			if ($hasfeedback) {
+				echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">', _('[Show Feedback]'), '</a></td>';
+			} else {
+				echo '<td></td>';
+			}
 		}
 		echo "</tr>";
 	}

@@ -179,8 +179,12 @@ function AutoSuggest(elem, suggestions)
 			for (var i=1;i<trs.length;i++) {
 				var tds = trs[i].getElementsByTagName("td");
 				if (tds[0].innerHTML.match(namev) || tds[0].innerHTML==namev) {
-					document.getElementById("qascore").value = tds[tds.length-2].getElementsByTagName("input")[0].value;
-					document.getElementById("qafeedback").value = tds[tds.length-1].getElementsByTagName("textarea")[0].value;
+					document.getElementById("qascore").value = tds[tds.length-3].getElementsByTagName("input")[0].value;
+					if (window.tinymce) {
+						tinymce.get("qafeedback").setContent(tinymce.get(tds[tds.length-2].getElementsByTagName("input")[0].name).getContent());
+					} else {
+						document.getElementById("qafeedback").value = tds[tds.length-2].getElementsByTagName("textarea")[0].value;
+					}
 				}
 			}
 			if (how != "tab") {
@@ -428,33 +432,49 @@ $(function() {
 	});
 })
 function addsuggest() {
-
 	var namev = document.getElementById("qaname").value;
 	var scorev = document.getElementById("qascore").value;
-	var feedbv = document.getElementById("qafeedback").value;
+	if (window.tinymce) {
+		var feedbv = tinymce.get("qafeedback").getContent(); 
+	} else {
+		var feedbv = document.getElementById("qafeedback").value;
+	}
 	if (namev != '') {
 		var found = false;
 		for (var i=1;i<trs.length;i++) {
 			var tds = trs[i].getElementsByTagName("td");
 			if (tds[0].innerHTML==namev) {
 				found = true;
-				tds[tds.length-2].getElementsByTagName("input")[0].value = scorev;
-				tds[tds.length-1].getElementsByTagName("textarea")[0].value = feedbv;
+				tds[tds.length-3].getElementsByTagName("input")[0].value = scorev;
+				if (window.tinymce) {
+					tinymce.get(tds[tds.length-2].getElementsByTagName("input")[0].name).setContent(feedbv);
+				} else {
+					tds[tds.length-2].getElementsByTagName("textarea")[0].value = feedbv;
+				}
 			}
 		}
 		if (!found) {
 			for (var i=1;i<trs.length;i++) {
 				var tds = trs[i].getElementsByTagName("td");
 				if (tds[0].innerHTML.match(namev)) {
-					tds[tds.length-2].getElementsByTagName("input")[0].value = scorev;
-					tds[tds.length-1].getElementsByTagName("textarea")[0].value = feedbv;
+					tds[tds.length-3].getElementsByTagName("input")[0].value = scorev;
+					if (window.tinymce) {
+						tinymce.get(tds[tds.length-2].getElementsByTagName("input")[0].name).setContent(feedbv);
+					} else {
+						tds[tds.length-2].getElementsByTagName("textarea")[0].value = feedbv;
+					}
 				}
 			}
 		}
 	}
 	document.getElementById("qaname").value = '';
 	document.getElementById("qascore").value = '';
-	document.getElementById("qafeedback").value = '';
+
+	if (window.tinymce) {
+		tinymce.get("qafeedback").setContent("");
+	} else {
+		document.getElementById("qafeedback").value = '';
+	}
 	document.getElementById("qaname").focus();
 }
 
@@ -548,21 +568,35 @@ function doonblur(value) {
 //w:  0: score, 1: feedback
 function sendtoall(w,type) {
 	var form=document.getElementById("mainform");
+	if (w==1) {
+		if (window.tinymce) { tinymce.triggerSave(); }
+		var pastfb, editor;
+		var toall = $("input[name=toallfeedback]").val();
+	}
 	if (type==2) {
 		if (w==0 && document.getElementById("toallgrade").value == "" && !confirm("Clear all scores?")) {
 			return;
 		}
-		if (w==1 && document.getElementById("toallfeedback").value == "" && !confirm("Clear all feedback?")) {
+		if (w==1 && (toall == "" || toall == "<p></p>") && !confirm("Clear all feedback?")) {
 			return;
 		}
 	}
 	for (var e = 0; e<form.elements.length; e++) {
 		 var el = form.elements[e];
 		 if (w==1) {
-			if (el.type=="textarea" && el.id!="toallfeedback") {
-				if (type==1) { el.value = document.getElementById("toallfeedback").value + el.value;}
-				else if (type==0) { el.value = el.value+document.getElementById("toallfeedback").value;}
-				else if (type==2) { el.value = document.getElementById("toallfeedback").value;}
+			if (el.name.match(/feedback/) && el.name!="toallfeedback") {
+				pastfb = $(el).val();
+				if (window.tinymce) {
+					editor = tinymce.get(el.name);
+					if (type==1) { editor.setContent(toall + pastfb);}
+					else if (type==0) { editor.setContent(pastfb+toall);}
+					else if (type==2) { editor.setContent(toall);}
+				} else {
+					if (type==1) { el.value = toall + el.value;}
+					else if (type==0) { el.value = el.value+toall;}
+					else if (type==2) { el.value = toall;}
+				}
+				
 			}
 		 } else if (w==0) {
 			if (document.getElementById("toallgrade").value.match(/\d/)) {
@@ -578,7 +612,11 @@ function sendtoall(w,type) {
 			}
 		 }
 	}
-	document.getElementById("toallfeedback").value = '';
+	if (window.tinymce) {
+		tinymce.get("toallfeedback").setContent("");
+	} else {
+		document.getElementById("toallfeedback").value = '';
+	}
 	document.getElementById("toallgrade").value = '';
 }
 
