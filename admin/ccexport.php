@@ -72,10 +72,39 @@ if (isset($_GET['delete'])) {
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
 	//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $items = unserialize(mysql_result($r,0,0));
-	$stm = $DBH->prepare("SELECT itemorder,name FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,name,dates_by_lti FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	list($itemorder,$coursename) = $stm->fetch(PDO::FETCH_NUM);
+	list($itemorder,$coursename,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);
 	$items = unserialize($itemorder);
+	
+	if ($linktype=='canvas') {
+		$newdatesbylti = empty($_POST['datesbylti'])?0:1;
+		if ($newdatesbylti != $datesbylti) {
+			$stm = $DBH->prepare("UPDATE imas_courses SET dates_by_lti=:datesbylti WHERE id=:id");
+			$stm->execute(array(':id'=>$cid, ':datesbylti'=>$newdatesbylti));
+			if ($newdatesbylti==1) {
+				$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");
+				$stm->execute(array(':cid'=>$cid));
+			} else {
+				//undo it - doesn't restore dates
+				$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=0 WHERE date_by_lti>0 AND courseid=:cid");
+				$stm->execute(array(':cid'=>$cid));
+				//remove is_lti from exceptions with latepasses
+				$query = "UPDATE imas_exceptions JOIN imas_assessments ";
+				$query .= "ON imas_exceptions.assessmentid=imas_assessments.id ";
+				$query .= "SET imas_exceptions.is_lti=0 ";
+				$query .= "WHERE imas_exceptions.is_lti>0 AND imas_exceptions.islatepass>0 AND imas_assessments.courseid=:cid";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':cid'=>$cid));
+				//delete any other is_lti exceptions
+				$query = "DELETE imas_exceptions FROM imas_exceptions JOIN imas_assessments ";
+				$query .= "ON imas_exceptions.assessmentid=imas_assessments.id ";
+				$query .= "WHERE imas_exceptions.is_lti>0 AND imas_exceptions.islatepass=0 AND imas_assessments.courseid=:cid";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':cid'=>$cid));
+			}
+		}
+	}
 
 	$newdir = $path . '/CCEXPORT'.$cid;
 	mkdir($newdir);
@@ -737,9 +766,10 @@ if (isset($_GET['delete'])) {
 } else {
 
 
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,dates_by_lti FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	$items = unserialize($stm->fetchColumn(0));
+	list($items, $datesbylti) = $stm->fetch(PDO::FETCH_NUM);
+	$items = unserialize($items);
 
 	$ids = array();
 	$types = array();
@@ -813,6 +843,8 @@ if (isset($_GET['delete'])) {
 	echo '<li><input type=checkbox name=includeduedates value=1 checked /> Include '.Sanitize::encodeStringForDisplay($installname).' due dates for assessments</li>';
 	echo '<li><input type=checkbox name=includestartdates value=1 /> Include '.Sanitize::encodeStringForDisplay($installname).' start dates for assessments and blocks<br/>';
 	echo ' <span class="small">Blocks will only include the start date if they are set to hide contents from students when not available.</span></li>';
+	echo '<li><input type=checkbox name=datesbylti value=1 '.($datesbylti>0?'checked':'').' /> Allow Canvas to set '.Sanitize::encodeStringForDisplay($installname).' due dates<br/>';
+	echo ' <span class="small">This option can also be set on the Course Settings page.</span></li>';
 	echo "</ul><p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
 	echo '</form>';
 
