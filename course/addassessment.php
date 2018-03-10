@@ -50,6 +50,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
+	
+	$stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
+	$stm->execute(array($cid));
+	$dates_by_lti = $stm->fetchColumn(0);
+	
 	if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
@@ -289,6 +294,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $_POST['intro'] = addslashes(myhtmLawed(stripslashes($_POST['intro'])));
 			$_POST['intro'] = myhtmLawed($_POST['intro']);
 		}
+		
 		if (isset($_GET['id'])) {  //already have id; update
 			$stm = $DBH->prepare("SELECT isgroup,intro,itemorder FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
@@ -345,11 +351,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			if ($_POST['avail']==1) {
 				//DB $query .= ",startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate";
-				$query .= ",startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate";
-				$qarr[':startdate'] = $startdate;
-				$qarr[':enddate'] = $enddate;
+				if ($dates_by_lti==0) {
+					$query .= ",startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate";
+					$qarr[':startdate'] = $startdate;
+					$qarr[':enddate'] = $enddate;
+				} else {
+					$query .= ",reviewdate=:reviewdate";
+				}
 				$qarr[':reviewdate'] = $reviewdate;
 			}
+			
 			//DB $query .= " WHERE id='{$_GET['id']}';";
 			$query .= " WHERE id=:id AND courseid=:cid";
 			$qarr[':id'] = $_GET['id'];
@@ -377,6 +388,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			exit;
 		} else { //add new
 			if (!isset($_POST['copyendmsg'])) {$endmsg = '';}
+			if ($dates_by_lti>0) {
+				$datebylti = 1;
+			} else {
+				$datebylti = 0;
+			}
 			//DB $query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
 			//DB $query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,";
 			//DB $query .= "showcat,eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome) VALUES ";
@@ -390,12 +406,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
 			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,";
 			$query .= "eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,";
-			$query .= "exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome,ptsposs) VALUES ";
+			$query .= "exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome,ptsposs,date_by_lti) VALUES ";
 			$query .= "(:courseid, :name, :summary, :intro, :startdate, :enddate, :reviewdate, :timelimit, :minscore, :displaymethod, ";
 			$query .= ":defpoints, :defattempts, :defpenalty, :deffeedback, :shuffle, :gbcategory, :password, :cntingb, :tutoredit, ";
 			$query .= ":showcat, :eqnhelper, :showtips, :caltag, :calrtag, :isgroup, :groupmax, :groupsetid, :showhints, :reqscore, ";
 			$query .= ":reqscoreaid, :noprint, :avail, :allowlate, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
-			$query .= ":posttoforum, :istutorial, :defoutcome, 0)";
+			$query .= ":posttoforum, :istutorial, :defoutcome, 0, :datebylti)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'],
 				':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':timelimit'=>$timelimit,
@@ -408,7 +424,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				':reqscoreaid'=>$_POST['reqscoreaid'], ':noprint'=>$_POST['noprint'], ':avail'=>$_POST['avail'],
 				':allowlate'=>$_POST['allowlate'], ':exceptionpenalty'=>$_POST['exceptionpenalty'], ':ltisecret'=>$_POST['ltisecret'],
 				':endmsg'=>$endmsg, ':deffeedbacktext'=>$deffb, ':msgtoinstr'=>$_POST['msgtoinstr'], ':posttoforum'=>$_POST['posttoforum'],
-				':istutorial'=>$istutorial, ':defoutcome'=>$_POST['defoutcome']));
+				':istutorial'=>$istutorial, ':defoutcome'=>$_POST['defoutcome'], ':datebylti'=>$datebylti));
 
 			//DB $newaid = mysql_insert_id();
 			$newaid = $DBH->lastInsertId();
@@ -550,6 +566,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['defoutcome'] = 0;
 			$taken = false;
 			$line['reqscoretype'] = 0;
+			$line['date_by_lti'] = ($dates_by_lti==0)?0:1;
 			$savetitle = _("Create Assessment");
 		}
 		if (($introjson=json_decode($line['intro']))!==null) { //is json intro
@@ -855,7 +872,9 @@ if ($overwriteBody==1) {
 			<textarea cols=50 rows=20 id=intro name=intro style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['intro']); ?></textarea>
 		</div><BR>
 
-
+<?php
+	if ($dates_by_lti==0) {
+?>
 		<span class=form>Show:</span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
@@ -885,7 +904,36 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
+<?php
+	} else { //dates_by_lti is on
+?>
+		<span class=form>Availability:</span>
+		<span class=formright>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Prevent access<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Allow access<br/>
+		</span><br class="form"/>
+		
+		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
+		
+		<span class=form>Due date</span>
+		<span class=formright>
+			The course setting is enabled for dates to be set via LTI.<br/>
+			<?php
+			if ($line['date_by_lti']==1) {
+				echo 'Waiting for the LMS to send a date';
+			} else {
+				if ($enddate==2000000000) {
+					echo 'Default due date set by LMS: No due date (individual student due dates may vary)';
+				} else {
+					echo 'Default due date set by LMS: '.$edate.' '.$etime.' (individual student due dates may vary).';
+				}
+			}
+			?>
+		</span><br class=form />
 
+<?php
+	}
+?>
 		<span class=form>Keep open as review:</span>
 		<span class=formright>
 			<input type=radio name="doreview" value="0" <?php writeHtmlChecked($line['reviewdate'],0,0); ?>> Never<br/>

@@ -612,6 +612,15 @@ if (isset($_GET['launch'])) {
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
 	}
+	unset($_SESSION['lti_duedate']);
+	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
+		$duedate = strtotime($_REQUEST['custom_canvas_assignment_due_at']);
+		if ($duedate !== false) {
+			$_SESSION['lti_duedate'] = $duedate;
+		} else {
+			$_SESSION['lti_duedate'] = 2000000000;
+		}
+	}
 
 	//look if we know this user
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when LMS GUID change, while still storing it
@@ -981,7 +990,7 @@ if ($stm->rowCount()==0) {
 				//DB $query = "SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id='$sourcecid'";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				//DB $r = mysql_fetch_row($result);
-				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id=:id");
+				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs,dates_by_lti FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$sourcecid));
 				$r = $stm->fetch(PDO::FETCH_NUM);
 
@@ -989,6 +998,7 @@ if ($stm->rowCount()==0) {
 				$ancestors = $r[1];
 				$outcomesarr = $r[2];
 				$latepasshrs = $r[3];
+				$datesbylti = $r[4];
 				if ($ancestors=='') {
 					$ancestors = intval($sourcecid);
 				} else {
@@ -1063,8 +1073,8 @@ if ($stm->rowCount()==0) {
 				$itemorder = serialize($newitems);
 				//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr',latepasshrs='$latepasshrs' WHERE id='$destcid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs WHERE id=:id");
-				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':id'=>$destcid));
+				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,dates_by_lti=:datesbylti WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':datesbylti'=>$datesbylti, ':id'=>$destcid));
 
 				$offlinerubrics = array();
 				/*
@@ -1201,6 +1211,12 @@ if ($stm->rowCount()==0) {
 						reporterror("Error.  Assessment ID '{$_SESSION['place_aid']}' not found.");
 					}
 					$cid = $destcid;
+					
+					$stm = $DBH->prepare("SELECT itemorder,dates_by_lti FROM imas_courses WHERE id=:id");
+					$stm->execute(array(':id'=>$cid));
+					list($items,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);
+					$items = unserialize($items);
+					
 					//DB $newitem = copyitem(mysql_result($result,0,0),array());
 					$newitem = copyitem($stm->fetchColumn(0),array());
 
@@ -1209,14 +1225,7 @@ if ($stm->rowCount()==0) {
 					//DB $aid = mysql_result($result,0,0);
 					$stm = $DBH->prepare("SELECT typeid FROM imas_items WHERE id=:id");
 					$stm->execute(array(':id'=>$newitem));
-					$aid = $stm->fetchColumn(0);
-
-					//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB $items = unserialize(mysql_result($result,0,0));
-					$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-					$stm->execute(array(':id'=>$cid));
-					$items = unserialize($stm->fetchColumn(0));
+					$aid = $stm->fetchColumn(0);			
 
 					$items[] = $newitem;
 					$items = serialize($items);
@@ -1323,13 +1332,25 @@ if ($linkparts[0]=='cid') {
 	//DB $query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT id,courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT id,courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate,date_by_lti FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-  if ($line===false) {
-    reporterror("This assignment does not appear to exist anymore");
-  }
+	if ($line===false) {
+		reporterror("This assignment does not appear to exist anymore");
+	}
 	$cid = $line['courseid'];
+	if (isset($_SESSION['lti_duedate']) && ($line['date_by_lti']==1 || $line['date_by_lti']==2)) {
+		if ($_SESSION['ltirole']=='instructor') {
+			$newdatebylti = 2; //set/keep as instructor-set
+		} else {
+			$newdatebylti = 3; //mark as student-set
+		}
+		//no default due date set yet, or is the instructor:  set the default due date
+		$stm = $DBH->prepare("UPDATE imas_assessments SET enddate=:enddate,date_by_lti=:datebylti WHERE id=:id");
+		$stm->execute(array(':enddate'=>$_SESSION['lti_duedate'], ':datebylti'=>$newdatebylti, ':id'=>$aid));
+		$line['enddate'] = $_SESSION['lti_duedate'];
+	}
+	
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
 		//	reporterror("This assessment is closed");
@@ -1340,14 +1361,28 @@ if ($linkparts[0]=='cid') {
 		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result2);
-		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$exceptionrow = $stm->fetch(PDO::FETCH_NUM);
 		$useexception = false;
 		if ($exceptionrow!=null) {
+			//have exception.  Update using lti_duedate if needed
+			if (isset($_SESSION['lti_duedate']) && $_SESSION['lti_duedate']!=$exceptionrow[1]) {
+				//if new due date is later, or no latepass used, then update
+				if ($exceptionrow[2]==0 || $_SESSION['lti_duedate']>$exceptionrow[1]) {
+					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+					$stm->execute(array(':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
+				}
+			}
 			require_once("./includes/exceptionfuncs.php");
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
+		} else if ($line['date_by_lti']==3 && $line['enddate']!=$_SESSION['lti_duedate']) {
+			//default dates already set by LTI, and users's date doesn't match - create new exception
+			$exceptionrow = array($now, $_SESSION['lti_duedate'], 0, 1);
+			$stm = $DBH->prepare("INSERT INTO imas_exceptions (startdate,enddate,islatepass,is_lti,userid,assessmentid,itemtype) VALUES (?,?,?,?,?,?,'A')");
+			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
+			$useexception = true;
 		}
 		if ($exceptionrow!=null && $useexception) {
 			if ($now<$exceptionrow[0] || $exceptionrow[1]<$now) { //outside exception dates
@@ -1357,7 +1392,7 @@ if ($linkparts[0]=='cid') {
 					//reporterror("This assessment is closed");
 				}
 			} else { //inside exception dates exception
-				if ($line['enddate']<$now) { //exception is for past-due-date
+				if ($line['enddate']<$now && ($exceptionrow[3]==0 || $exceptionrow[2]>0)) { //exception is for past-due-date
 					$inexception = true; //only trigger if past due date for penalty
 				}
 			}

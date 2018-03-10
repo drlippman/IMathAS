@@ -92,9 +92,9 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB $blockcnt = mysql_result($result,0,0);
 //DB $items = unserialize(mysql_result($result,0,1));
-$stm = $DBH->prepare("SELECT blockcnt,itemorder FROM imas_courses WHERE id=:id");
+$stm = $DBH->prepare("SELECT blockcnt,itemorder,dates_by_lti FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
-list($blockcnt, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
+list($blockcnt, $itemorder, $datesbylti) = $stm->fetch(PDO::FETCH_NUM);
 $items = unserialize($itemorder);
 
 //DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());

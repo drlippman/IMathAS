@@ -84,7 +84,7 @@ class ExceptionFuncs {
 	}
 
 	//$exception should be from imas_exceptions, and be null, or
-	//   array(startdate,enddate,islatepass)
+	//   array(startdate,enddate,islatepass,is_lti)
 	//$adata should be associative array from imas_assessments including
 	//   startdate, enddate, allowlate, id
 	//returns array(useexception, canundolatepass, canuselatepass)
@@ -94,7 +94,11 @@ class ExceptionFuncs {
 		$canundolatepass = false;
 
 		$useexception = ($exception!==null && $exception!==false); //use by default
-		if ($exception!==null && $exception[2]>0 && $adata['enddate']>$exception[1]) {
+		if ($exception!==null && $exception!==false && !empty($exception[3])) {
+			//is LTI-set - use the exception
+			//TODO:  Make sure using exception[3] isn't going to conflict anywhere
+			
+		} else if ($exception!==null && $exception[2]>0 && $adata['enddate']>$exception[1]) {
 			//if latepass and assessment enddate is later than exception enddate, skip exception
 			$useexception = false;
 		} else if ($exception!==null && $exception!==false && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
@@ -110,7 +114,12 @@ class ExceptionFuncs {
 				//this logic counts "latepasses used" based on date of exception past original enddate
 				//regardless of whether exception is manual or latepass
 				//prevents using latepasses on top of a manual extension
-				$latepasscnt = max(0,round(($exception[1] - $adata['enddate'])/($this->latepasshrs*3600)));
+				if (!empty($exception[3])) {
+					//with LTI one, base latepasscnt only on the value in the exception
+					$latepasscnt = $exception[2];
+				} else {
+					$latepasscnt = max(0,round(($exception[1] - $adata['enddate'])/($this->latepasshrs*3600)));
+				}
 				//use exception due date for determining canuselatepass
 				$adata['enddate'] = $exception[1];
 			} else {
@@ -155,7 +164,7 @@ class ExceptionFuncs {
 		if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && !in_array($adata['id'],$this->viewedassess) && $this->latepasses>0 && $this->isstu) {
 			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$this->latepasshrs*3600) {
 				$canuselatepass = true;
-			} else if ($now<$adata['enddate']) {
+			} else if ($now<$adata['enddate'] && $adata['enddate']<2000000000) {
 				$canuselatepass = true;
 			}
 		}

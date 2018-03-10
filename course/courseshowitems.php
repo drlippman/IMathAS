@@ -707,7 +707,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   }
 			   }
 
-			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
+			   if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 
 				   echo '<div class="itemhdr">';
@@ -787,7 +787,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 
-			   } else if ($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
+			   } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   echo '<div class="itemhdr">';
 
@@ -820,7 +820,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
-			   } else if ($line['avail']==1 && $line['enddate']<$now && $canuselatepass) {
+			   } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['enddate']<$now && $canuselatepass) {
 					 //not available but can use latepass - show greyed w latepass link
 					  beginitem($canedit,$items[$i]);
 						echo '<div class="itemhdr">';
@@ -835,7 +835,7 @@ function showitems($items,$parent,$inpublic=false) {
  				   	echo '</div>'; //itemhdr
  				   	echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
  				 		enditem($canedit);
-				 } else if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $showgreyedout) {  //greyedout view for conditional items
+				 } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['startdate']<$now && $line['enddate']>$now && $showgreyedout) {  //greyedout view for conditional items
 			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 			   	   echo '<div class="itemhdr">';
 
@@ -865,7 +865,9 @@ function showitems($items,$parent,$inpublic=false) {
 
 			   } else if ($viewall) { //not avail to stu
 				   if ($line['avail']==0) {
-					   $show = _('Hidden');
+				   	$show = _('Hidden');
+				   } else if ($line['date_by_lti']==1) {
+				   	$show = _('Waiting for date to be set via LTI');
 				   } else {
 					   $show = sprintf(_('Available %1$s until %2$s'), $startdate, $enddate);
 					   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {

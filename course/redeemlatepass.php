@@ -116,7 +116,7 @@
 
 		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
 		//DB if (mysql_num_rows($result)==0) {
@@ -130,7 +130,11 @@
 			$r = $stm->fetch(PDO::FETCH_NUM);
 			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
 			if ($useexception) {
-				$usedlatepasses = min(max(0,round(($r[1] - $enddate)/($latepasshrs*3600))), $r[2]);
+				if (!empty($r[3])) { //is_lti - use count in exception
+					$usedlatepasses = $r[2];
+				} else {
+					$usedlatepasses = min(max(0,round(($r[1] - $enddate)/($latepasshrs*3600))), $r[2]);
+				}
 				$thised = $r[1];
 			} else {
 				$usedlatepasses = 0;
@@ -196,7 +200,7 @@
 
 		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
 		//DB if (mysql_num_rows($result)==0) {
@@ -209,7 +213,11 @@
 			$r = $stm->fetch(PDO::FETCH_NUM);
 			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
 			if ($useexception) {
-				$usedlatepasses = min(max(0,round(($r[1] - $enddate)/($latepasshrs*3600))), $r[2]);
+				if (!empty($r[3])) { //is_lti - use count in exception
+					$usedlatepasses = $r[2];
+				} else {
+					$usedlatepasses = min(max(0,round(($r[1] - $enddate)/($latepasshrs*3600))), $r[2]);
+				}
 				$thised = $r[1];
 			} else {
 				$usedlatepasses = 0;

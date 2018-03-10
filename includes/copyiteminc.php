@@ -32,7 +32,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	global $DBH;
 	global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
-	global $posttoforumtrack, $forumtrack;
+	global $posttoforumtrack, $forumtrack, $datesbylti;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -362,6 +362,12 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		$row['name'] .= $_POST['append'];
 
 		$row['courseid'] = $cid;
+		
+		if (isset($datesbylti) && $datesbylti==true) {
+			$row['date_by_lti'] = 1;
+		} else {
+			$row['date_by_lti'] = 0;
+		}
 
 		$fields = implode(",", array_keys($row));
 		//$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";

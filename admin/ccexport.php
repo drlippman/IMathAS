@@ -409,7 +409,7 @@ if (isset($_GET['delete'])) {
 					if ($linktype=='canvas') {
 						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$canvout .= '<content_type>Assignment</content_type>'."\n";
-						$canvout .= '<workflow_state>'.($row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
+						$canvout .= '<workflow_state>'.(row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>'."\n";
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
@@ -439,7 +439,7 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,'<workflow_state>'.($row[6]==0?'unpublished':'published').'</workflow_state>'."\n");
 						fwrite($fp,'<points_possible>'.$row[8].'</points_possible>'."\n");
 						fwrite($fp,'<grading_type>points</grading_type>'."\n");
-						if (isset($_POST['includeduedates'])) {
+						if (isset($_POST['includeduedates']) && $row[4]<2000000000) {
 							fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>'."\n");
 						}
 						if ($row[7] > 0 && isset($_POST['includestartdates'])) {

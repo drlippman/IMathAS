@@ -406,7 +406,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	//DB $query = "SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id='$typeid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	echo "<h3>LTI Placement of " . Sanitize::encodeStringForDisplay($line['name']) . "</h3>";
@@ -419,10 +419,25 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 
 	$now = time();
 	echo '<p>';
-	if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) { //regular show
-		echo "Currently available to students.  Available until " . formatdate($line['enddate']);
-	} else if ($line['avail']==0) {
+	if ($line['avail']==0) {
 		echo 'Currently unavailable to students.';
+	} else if ($line['date_by_lti']==1) {
+		echo 'Waiting for the LMS to send a date';	
+	} else if ($line['date_by_lti']>1) {
+		echo 'Default due date set by LMS. Available until: '.formatdate($line['enddate']).'.';
+		echo '</p><p>';
+		if ($line['date_by_lti']==2) {
+			echo 'This default due date was set by the date reported by the LMS in your instructor launch, and may change when the first student launches the assignment. ';
+		} else {
+			echo 'This default due date was set by the first student launch. ';
+		}
+		echo 'Be aware some LMSs will send unexpected dates on instructor launches, so don\'t worry if the date shown in the assessment preview is different than you expected or different than the default due date. ';
+		echo '</p><p>';
+		echo 'If the LMS reports a different due date for an individual student when they open this assignment, ';
+		echo 'this system will handle that by setting a due date exception. ';
+	} else if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) { //regular show
+		echo "Currently available to students.  ";
+		echo "Available until " . formatdate($line['enddate']);
 	} else {
 		echo 'Currently unavailable to students. Available '.formatdate($line['startdate']).' until '.formatdate($line['enddate']);
 	}

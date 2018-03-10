@@ -397,9 +397,9 @@ if (!(isset($teacherid))) {
 				//DB $query = "SELECT blockcnt FROM imas_courses WHERE id='$cid'";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				//DB $blockcnt = mysql_result($result,0,0);
-				$stm = $DBH->prepare("SELECT blockcnt FROM imas_courses WHERE id=:id");
+				$stm = $DBH->prepare("SELECT blockcnt,dates_by_lti FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));
-				$blockcnt = $stm->fetchColumn(0);
+				list($blockcnt,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);
 
 				//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['ctc']}'";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());

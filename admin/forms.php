@@ -296,6 +296,7 @@ switch($_GET['action']) {
 			$deflatepass = $line['deflatepass'];
 			$deftime = $line['deftime'];
 			$jsondata = json_decode($line['jsondata'], true);
+			$dates_by_lti = $line['dates_by_lti']; 
 			if ($jsondata===null || !isset($jsondata['browser'])) {
 				$browser = array();
 			} else {
@@ -325,6 +326,7 @@ switch($_GET['action']) {
 			$deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
 			$ltisecret = "";
 			$browser = array();
+			$dates_by_lti = 0;
 		}
 		$defetime = $deftime%10000;
 		$hr = floor($defetime/60)%12;
@@ -545,6 +547,11 @@ switch($_GET['action']) {
 				echo 'Course ID not yet set.';
 			}
 			echo '</span></span><br class="form" />';
+			echo '<span class="form">Allow the LMS to set assessment due dates?<br/><span class="small">(Only supported by Canvas)</span></span>';
+			echo '<span class="formright"><input type="checkbox" name="setdatesbylti" value="1" ';
+			if ($dates_by_lti>0) { echo 'checked="checked"';}
+			echo '/> </span><br class="form" />';
+			
 		}
 
 		if (($myspecialrights&1)==1 || ($myspecialrights&2)==2 || $myrights==100) {

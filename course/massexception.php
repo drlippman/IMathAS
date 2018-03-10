@@ -291,9 +291,9 @@
 		//DB $query .= "ORDER BY LastName,FirstName,itemname";
 	//DB }
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.itemtype FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
+	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.itemtype='A' AND ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid=:courseid AND iu.id IN ($tolist) ) ";
-	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.itemtype FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
+	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
 	$query .= "WHERE (ie.itemtype='F' OR ie.itemtype='P' OR ie.itemtype='R') AND ie.assessmentid=i_f.id AND ie.userid=iu.id AND i_f.courseid=:courseid2 AND iu.id IN ($tolist) )";
 	if ($isall) {
 		$query .= "ORDER BY itemname,LastName,FirstName";
@@ -340,12 +340,19 @@
 				if ($row['waivereqscore']==1) {
 					echo ' <i>('._('waives prereq').')</i>';
 				}
+				if ($row['islatepass']>0) {
+					echo ' <i>('._('LatePass').')</i>';
+				} else if ($row['is_lti']>0) {
+					echo ' <i>('._('Set by LTI').')</i>';
+				} 
 				echo "</li>";
+				
 			}
 			echo "</ul></li>";
 		} else {
 			$lasts = 0;
 			$assessarr = array();
+			$notesarr = array();
 			//DB while ($row = mysql_fetch_assoc($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$sdate = tzdate("m/d/y g:i a", $row['startdate']);
@@ -373,14 +380,24 @@
 				} else if ($row['itemtype']=='R') {
 					$assessarr[$row['eid']] .= "(ReplyBy: $edate)";
 				}
+				$notesarr[$row['eid']] = '';
 				if ($row['waivereqscore']==1) {
-					$assessarr[$row['eid']] .= ' <i>('._('waives prereq').')</i>';
+					$notesarr[$row['eid']] .= ' ('._('waives prereq').')';
 				}
+				if ($row['islatepass']>0) {
+					$notesarr[$row['eid']] .= ' ('._('LatePass').')';
+				} else if ($row['is_lti']>0) {
+					$notesarr[$row['eid']] .= ' ('._('Set by LTI').')';
+				} 
 
 			}
 			natsort($assessarr);
 			foreach ($assessarr as $id=>$val) {
-				echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val)."</li>";
+				echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val);
+				if ($notesarr[$id]!='') {
+					echo ' <em class=small>'.Sanitize::encodeStringForDisplay($notesarr[$id]).'</em>';
+				}
+				echo "</li>";
 			}
 			echo "</ul></li>";
 		}
