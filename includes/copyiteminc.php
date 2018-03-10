@@ -29,7 +29,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 
 function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	global $DBH;
-	global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+	global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
 	global $posttoforumtrack, $forumtrack;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
@@ -317,10 +317,15 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		} else {
 			$row['defoutcome'] = 0;
 		}
-		if ($row['ancestors']=='') {
-			$row['ancestors'] = $typeid;
+		if (!empty($sourcecid)) {
+			$newancestor = intval($sourcecid).':'.$typeid;
 		} else {
-			$row['ancestors'] = $typeid.','.$row['ancestors'];
+			$newancestor = $typeid;
+		}
+		if ($row['ancestors']=='') {
+			$row['ancestors'] = $newancestor;
+		} else {
+			$row['ancestors'] = $newancestor.','.$row['ancestors'];
 		}
 		if ($_POST['ctc']!=$cid) {
 			$forumtopostto = $row['posttoforum'];
