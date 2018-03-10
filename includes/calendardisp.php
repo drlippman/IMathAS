@@ -132,7 +132,7 @@ $bestscores_stm = null;
 //DB $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
 //DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 //DB while ($row = mysql_fetch_row($result)) {
-$stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,ptsposs,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 date_by_lti<>1 AND AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
+$stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,ptsposs,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
