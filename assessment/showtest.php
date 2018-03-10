@@ -67,7 +67,9 @@
 		$adata = $stm->fetch(PDO::FETCH_ASSOC);
 		$now = time();
 		$assessmentclosed = false;
-
+		if ($adata['enddate']==2000000000 && $courseenddate<2000000000) {
+			$adata['enddate'] = $courseenddate;
+		}
 		if ($adata['avail']==0 && !isset($teacherid) && !isset($tutorid)) {
 			$assessmentclosed = true;
 		}
@@ -674,6 +676,9 @@
 	$now = time();
 	//check for dates - kick out student if after due date
 	//if (!$isteacher) {
+	if ($testsettings['enddate']==2000000000 && $courseenddate<2000000000) {
+		$testsettings['enddate'] = $courseenddate;
+	}
 	if ($testsettings['avail']==0 && !$isteacher) {
 		echo _('Assessment is closed');
 		leavetestmsg();

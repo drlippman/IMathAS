@@ -323,13 +323,19 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				//DB $query .= "ORDER BY userrole DESC, name";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB while ($row = mysql_fetch_assoc($result)) {
-				$query = "SELECT i_c.id,i_c.name,i_c.msgset,2 AS userrole FROM imas_courses AS i_c JOIN imas_teachers ON ";
-				$query .= "i_c.id=imas_teachers.courseid WHERE imas_teachers.userid=:userid ";
-				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,1 AS userrole FROM imas_courses AS i_c JOIN imas_tutors ON ";
-				$query .= "i_c.id=imas_tutors.courseid WHERE imas_tutors.userid=:userid2 ";
-				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,0 AS userrole FROM imas_courses AS i_c JOIN imas_students ON ";
-				$query .= "i_c.id=imas_students.courseid WHERE imas_students.userid=:userid3 ";
-				$query .= "ORDER BY userrole DESC, name";
+				$query = "SELECT i_c.id,i_c.name,i_c.msgset,2 AS userrole,";
+				$query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
+				$query .= "FROM imas_courses AS i_c JOIN imas_teachers ON ";
+				$query .= "i_c.id=imas_teachers.courseid WHERE imas_teachers.userid=:userid AND imas_teachers.hidefromcourselist=0 ";
+				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,1 AS userrole,";
+				$query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
+				$query .= "FROM imas_courses AS i_c JOIN imas_tutors ON ";
+				$query .= "i_c.id=imas_tutors.courseid WHERE imas_tutors.userid=:userid2 AND imas_tutors.hidefromcourselist=0 ";
+				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,0 AS userrole,";
+				$query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
+				$query .= "FROM imas_courses AS i_c JOIN imas_students ON ";
+				$query .= "i_c.id=imas_students.courseid WHERE imas_students.userid=:userid3 AND imas_students.hidefromcourselist=0 ";
+				$query .= "ORDER BY userrole DESC,active DESC, name";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':userid2'=>$userid, ':userid3'=>$userid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -348,7 +354,12 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						else if ($i==0) { $courseopts .= _("Student"); }
 						$courseopts .= '">';
 						foreach ($course_array[$i] as $r) {
-							$courseopts .= '<option value="'.Sanitize::encodeStringForDisplay($r['id']).'">'.Sanitize::encodeStringForDisplay($r['name']).'</option>';
+							if ($r['active']==0) {
+								$prefix = _('Inactive: ');
+							} else {
+								$prefix = '';
+							}
+							$courseopts .= '<option value="'.Sanitize::encodeStringForDisplay($r['id']).'">'.Sanitize::encodeStringForDisplay($prefix . $r['name']).'</option>';
 						}
 						$courseopts .= '</optgroup>';
 					}
@@ -806,27 +817,37 @@ function chgfilter() {
 	<form id="qform" method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 	<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
 <?php
+
+	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name,";
+	$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active,";
+	$query .= "IF(istu.hidefromcourselist=1 OR itut.hidefromcourselist=1 OR iteach.hidefromcourselist=1,1,0) as hidden ";
+	$query .= "FROM imas_courses JOIN imas_msgs ON imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto=:msgto AND imas_msgs.isread&2=0 ";
+	$query .= "LEFT JOIN imas_students AS istu ON imas_msgs.courseid=istu.courseid AND istu.userid=:uid ";
+	$query .= "LEFT JOIN imas_tutors AS itut ON imas_msgs.courseid=itut.courseid AND itut.userid=:uid2 ";
+	$query .= "LEFT JOIN imas_teachers AS iteach ON imas_msgs.courseid=iteach.courseid AND iteach.userid=:uid3 ";
+	$query .= "ORDER BY hidden,active DESC,imas_courses.name";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':msgto'=>$userid, ':uid'=>$userid, ':uid2'=>$userid, ':uid3'=>$userid));
+	$msgcourses = array();
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		if ($row[3]==1) {
+			$prefix = _('Hidden: ');
+		} else if ($row[2]==0) {
+			$prefix = _('Inactive: ');
+		} else {
+			$prefix = '';
+		}
+		$msgcourses[$row[0]] = $prefix . $row[1];
+	}
+	if (!isset($msgcourses[$cid]) && $cid>0) {
+		$msgcourses[$cid] = $coursename;
+	}
+	//natsort($msgcourses);
 	echo "<option value=\"0\" ";
 	if ($filtercid==0) {
 		echo "selected=1 ";
 	}
 	echo ">All courses</option>";
-	//DB $query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto='$userid'";
-	//DB $query .= " ORDER BY imas_courses.name";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
-	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto=:msgto";
-	$query .= " ORDER BY imas_courses.name";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':msgto'=>$userid));
-	$msgcourses = array();
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$msgcourses[$row[0]] = $row[1];
-	}
-	if (!isset($msgcourses[$cid]) && $cid>0) {
-		$msgcourses[$cid] = $coursename;
-	}
-	natsort($msgcourses);
 	foreach ($msgcourses as $k=>$v) {
 		echo "<option value=\"$k\" ";
 		if ($filtercid==$k) {
@@ -835,6 +856,7 @@ function chgfilter() {
 		echo " >".Sanitize::encodeStringForDisplay($v)."</option>";
 	}
 	echo "</select> ";
+	
 	echo 'By sender: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
 	if ($filteruid==0) {
 		echo 'selected="selected" ';

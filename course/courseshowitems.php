@@ -146,7 +146,7 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false) {
-	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights;
+	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
 	   global $itemshowdata, $exceptionfuncs;
 
@@ -659,7 +659,9 @@ function showitems($items,$parent,$inpublic=false) {
 			   } else {
 			   	   $canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($line);
 			   }
-
+			   if ($line['enddate']==2000000000 && $courseenddate<2000000000) {
+			   	   $line['enddate'] = $courseenddate;
+			   }
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
 			   } else {

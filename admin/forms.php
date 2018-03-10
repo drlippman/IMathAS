@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
 require("../init.php");
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 require("../includes/htmlutil.php");
 
@@ -302,6 +303,8 @@ switch($_GET['action']) {
 			} else {
 				$browser = $jsondata['browser'];
 			}
+			$startdate = $line['startdate'];
+			$enddate = $line['enddate'];
 		} else {
 			$courseid = _("Will be assigned when the course is created");
 			$name = "Enter course name here";
@@ -327,6 +330,8 @@ switch($_GET['action']) {
 			$ltisecret = "";
 			$browser = array();
 			$dates_by_lti = 0;
+			$startdate = 0;
+			$enddate = 2000000000;
 		}
 		$defetime = $deftime%10000;
 		$hr = floor($defetime/60)%12;
@@ -419,7 +424,26 @@ switch($_GET['action']) {
 			}
 			echo '</select></span><br class="form"/>';
 		}
-
+		echo '<span class=form>Course start/end dates:<br/><span class=small>Blank for no limit</span></span>';
+		echo '<span class=formright>';
+		if ($startdate==0) {
+			$sdate = '';
+		} else {
+			$sdate = tzdate("m/d/Y",$startdate);
+		}
+		if ($enddate==2000000000) {
+			$edate = '';
+		} else {
+			$edate = tzdate("m/d/Y",$enddate);
+		}
+		echo 'Start: <input type=text size=10 name="sdate" value="'.$sdate.'">
+			<a href="#" onClick="displayDatePicker(\'sdate\', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+		echo 'End: <input type=text size=10 name="edate" value="'.$edate.'">
+			<a href="#" onClick="displayDatePicker(\'edate\', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+		echo '</span><br class=form />';
+		
 		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
 			echo "<span class=form>Default start/end time for new items:</span><span class=formright>";
 			echo 'Start: <input name="defstime" type="text" size="8" value="'.Sanitize::encodeStringForDisplay($defstimedisp).'"/>, ';

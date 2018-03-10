@@ -203,20 +203,34 @@ function chgfilter() {
 		echo "selected=1 ";
 	}
 	echo ">All courses</option>";
-	//DB $query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom='$userid'";
-	//DB $query .= " ORDER BY imas_courses.name";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
-	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom=:msgfrom";
+	/*$query = "SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom=:msgfrom";
 	$query .= " ORDER BY imas_courses.name";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':msgfrom'=>$userid));
+	*/
+	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name,";
+	$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active,";
+	$query .= "IF(istu.hidefromcourselist=1 OR itut.hidefromcourselist=1 OR iteach.hidefromcourselist=1,1,0) as hidden ";
+	$query .= "FROM imas_courses JOIN imas_msgs ON imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom=:msgfrom AND imas_msgs.isread&4=0 ";
+	$query .= "LEFT JOIN imas_students AS istu ON imas_msgs.courseid=istu.courseid AND istu.userid=:uid ";
+	$query .= "LEFT JOIN imas_tutors AS itut ON imas_msgs.courseid=itut.courseid AND itut.userid=:uid2 ";
+	$query .= "LEFT JOIN imas_teachers AS iteach ON imas_msgs.courseid=iteach.courseid AND iteach.userid=:uid3 ";
+	$query .= "ORDER BY hidden,active DESC,imas_courses.name";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':msgfrom'=>$userid, ':uid'=>$userid, ':uid2'=>$userid, ':uid3'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		if ($row[3]==1) {
+			$prefix = _('Hidden: ');
+		} else if ($row[2]==0) {
+			$prefix = _('Inactive: ');
+		} else {
+			$prefix = '';
+		}
 		echo "<option value=\"".Sanitize::onlyInt($row[0])."\" ";
 		if ($filtercid==$row[0]) {
 			echo 'selected=1';
 		}
-		printf(" >%s</option>", Sanitize::encodeStringForDisplay($row[1]));
+		printf(" >%s</option>", Sanitize::encodeStringForDisplay($prefix . $row[1]));
 	}
 	echo "</select> ";
 	echo 'By recipient: <select id="filteruid" onchange="chgfilter()"><option value="0" ';

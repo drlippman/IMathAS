@@ -150,7 +150,7 @@
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass-1 WHERE userid=:userid AND courseid=:courseid AND latepass>0");
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
-				$enddate = $thised + $addtime;
+				$enddate = min($thised + $addtime, $courseenddate);
 				if ($hasexception) { //already have exception
 					//DB $query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -225,6 +225,7 @@
 			}
 			$hasexception = true;
 		}
+		$limitedByCourseEnd = ($thised + $latepasshrs*3600 > $courseenddate);
 		$timelimitstatus = $exceptionfuncs->getTimelimitStatus($aid);
 
 		if ($latepasses==0) { //shouldn't get here if 0
@@ -235,8 +236,13 @@
 			if ($allowlate%10>1) {
 				echo '<p>You may use up to '.($allowlate%10-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
 			}
-			echo "<p>You have ".Sanitize::encodeStringForDisplay($latepasses)." LatePass(es) remaining.  You can redeem one LatePass for a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour ";
-			echo "extension on this assessment.  Are you sure you want to redeem a LatePass?</p>";
+			echo "<p>You have ".Sanitize::encodeStringForDisplay($latepasses)." LatePass(es) remaining.  ";
+			if ($limitedByCourseEnd) {
+				echo sprintf("You can redeem one LatePass for an extension up to the course end date, %s. ", tzdate("D n/j/y, g:i a", $courseenddate));
+			} else {
+				echo "You can redeem one LatePass for a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour extension on this assessment. ";
+			}
+			echo "Are you sure you want to redeem a LatePass?</p>";
 			if ($timelimitstatus=='started') {
 				echo '<p class="noticetext">'._('Reminder: You have already started this assessment, and it has a time limit.  Using a LatePass does <b>not</b> extend or pause the time limit, only the due date.').'</p>';
 			} else if ($timelimitstatus=='expired') {

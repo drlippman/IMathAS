@@ -139,9 +139,11 @@ $page_studentCourseData = array();
 //DB $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
 //DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-$query = "SELECT imas_courses.name,imas_courses.id,imas_students.hidefromcourselist FROM imas_students,imas_courses ";
+$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.startdate,imas_courses.enddate,imas_students.hidefromcourselist,";
+$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active ";
+$query .= "FROM imas_students,imas_courses ";
 $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid=:userid ";
-$query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
+$query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY active DESC,imas_courses.name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid));
 $stuhashiddencourses = false;
@@ -172,9 +174,11 @@ if ($myrights>10) {
 	//DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB if (mysql_num_rows($result)==0) {
-	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid,imas_courses.ownerid,imas_teachers.hidefromcourselist FROM imas_teachers,imas_courses ";
+	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.startdate,imas_courses.enddate,imas_courses.lockaid,imas_courses.ownerid,imas_teachers.hidefromcourselist,";
+	$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active ";
+	$query .= "FROM imas_teachers,imas_courses ";
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid=:userid ";
-	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY active DESC,imas_courses.name";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':userid'=>$userid));
 	$teachhashiddencourses = false;
@@ -204,9 +208,11 @@ $page_tutorCourseData = array();
 //DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB if (mysql_num_rows($result)==0) {
-$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid,imas_tutors.hidefromcourselist FROM imas_tutors,imas_courses ";
+$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.startdate,imas_courses.enddate,imas_courses.lockaid,imas_tutors.hidefromcourselist,";
+$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active ";
+$query .= "FROM imas_tutors,imas_courses ";
 $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid=:userid ";
-$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY active DESC,imas_courses.name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid));
 $tutorhashiddencourses = false;
@@ -498,6 +504,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	global $shownewmsgnote, $shownewpostnote, $imasroot,$userid;
 	if (count($data)==0 && $type=='tutor') {return;}
 	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
+	$now = time();
 	echo '<div role="navigation" aria-label="'.$title.'">';
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
 	echo '<div class="blockitems"><ul class="nomark courselist courselist-'.$type.'">';
@@ -508,11 +515,25 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			echo ' data-cid="'.$data[$i]['id'].'"';
 		}
 		echo '>';
-		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
-		echo Sanitize::encodeStringForDisplay($data[$i]['name']).'</a>';
+		if ($type!='take' || $now>$data[$i]['startdate']) {
+			echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
+			echo Sanitize::encodeStringForDisplay($data[$i]['name']).'</a>';
+		} else {
+			echo Sanitize::encodeStringForDisplay($data[$i]['name']);
+		}
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
 			echo ' <em style="color:green;">', _('Unavailable'), '</em>';
 		}
+		if (isset($data[$i]['startdate']) && $now<$data[$i]['startdate']) {
+			echo ' <em style="color:green;">';
+			echo _('Starts ').tzdate('m/d/Y', $data[$i]['startdate']);
+			echo '</em>';
+		} else if (isset($data[$i]['enddate']) && $now>$data[$i]['enddate']) {
+			echo ' <em style="color:green;">';
+			echo _('Ended ').tzdate('m/d/Y', $data[$i]['enddate']);
+			echo '</em>';
+		}
+		
 		if (isset($data[$i]['lockaid']) && $data[$i]['lockaid']>0) {
 			echo ' <em style="color:green;">', _('Lockdown'), '</em>';
 		}

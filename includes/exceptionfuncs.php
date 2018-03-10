@@ -10,6 +10,7 @@ class ExceptionFuncs {
 	private $latepasses = 0;
 	private $latepasshrs = 24;
 	private $isstu = true;
+	private $courseenddate = 2000000000;
 
 	function __construct($uid, $cid, $isstu, $latepasses=0, $latepasshrs=24) {
 		$this->uid = $uid;
@@ -17,6 +18,7 @@ class ExceptionFuncs {
 		$this->latepasses = $latepasses;
 		$this->latepasshrs = $latepasshrs;
 		$this->isstu = $isstu;  // !isset($sessiondata['stuview']) && !$actas
+		$this->courseenddate = $GLOBALS['courseenddate'];
 	}
 	public function setLatepasses($lp) {
 		$this->latepasses = $lp;
@@ -96,10 +98,10 @@ class ExceptionFuncs {
 		$useexception = ($exception!==null && $exception!==false); //use by default
 		if ($exception!==null && $exception!==false && !empty($exception[3])) {
 			//is LTI-set - use the exception
-			//TODO:  Make sure using exception[3] isn't going to conflict anywhere
 			
-		} else if ($exception!==null && $exception[2]>0 && $adata['enddate']>$exception[1]) {
+		} else if ($exception!==null && $exception[2]>0 && ($adata['enddate']>$exception[1] || $exception[1]>$this->courseenddate)) {
 			//if latepass and assessment enddate is later than exception enddate, skip exception
+			//or, if latepass and exception would put it past the course end date, skip exception
 			$useexception = false;
 		} else if ($exception!==null && $exception!==false && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
 			//if manual exception and start of exception is equal or after original startdate and asessment enddate is later than exception enddate, skip exception
@@ -161,10 +163,11 @@ class ExceptionFuncs {
 		removed from below:
 			 && !in_array($adata['id'],$this->timelimitup)
 		*/
+
 		if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && !in_array($adata['id'],$this->viewedassess) && $this->latepasses>0 && $this->isstu) {
-			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$this->latepasshrs*3600) {
+			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate']) < $this->latepasshrs*3600 && $adata['enddate'] < $this->courseenddate) {
 				$canuselatepass = true;
-			} else if ($now<$adata['enddate'] && $adata['enddate']<2000000000) {
+			} else if ($now<$adata['enddate'] && $adata['enddate'] < $this->courseenddate) {
 				$canuselatepass = true;
 			}
 		}
