@@ -403,7 +403,6 @@ function printscore($sc,$qn) {
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
 
-
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 
@@ -455,7 +454,7 @@ function printscore($sc,$qn) {
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs);
-		$out = sprintf("%s %s %s (parts: %g)", Sanitize::encodeStringForDisplay($pts), _("out of"),
+		$out = sprintf("%s %s %s (parts: %s)", Sanitize::encodeStringForDisplay($pts), _("out of"),
 			Sanitize::encodeStringForDisplay($poss), $sc);
 	}
 	if ($hasmanual) {
