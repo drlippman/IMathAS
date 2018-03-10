@@ -71,7 +71,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result);
-			$stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			if ($row[0]=='') {
@@ -106,6 +106,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
+			
+			require_once("../includes/updateptsposs.php");
+			updatePointsPossible($aid, $itemorder, $row['defpoints']);
+			
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		}
@@ -346,6 +350,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row[0]));
 			}
 
+			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
+				//update points possible
+				require_once("../includes/updateptsposs.php");
+				updatePointsPossible($aid, $itemorder, $defpoints);
+			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 

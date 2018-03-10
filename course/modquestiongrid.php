@@ -9,14 +9,15 @@
 	}
 
 	if ($_GET['process']== true) {
+		require_once("../includes/updateptsposs.php");
 		if (isset($_POST['add'])) { //adding new questions
 			//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $itemorder = mysql_result($result,0,0);
 			//DB $viddata = mysql_result($result,0,1);
-			$stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			list($itemorder, $viddata) = $stm->fetch(PDO::FETCH_NUM);
+			list($itemorder, $viddata, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 
 			$newitemorder = '';
 			if (isset($_POST['addasgroup'])) {
@@ -86,14 +87,17 @@
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
+			
+			updatePointsPossible($aid, $itemorder, $defpoints);
+			
 		} else if (isset($_POST['mod'])) { //modifying existing
 
 			//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $itemorder = mysql_result($result,0,0);
-			$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			$itemorder = $stm->fetchColumn(0);
+			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
@@ -152,6 +156,8 @@
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
+			
+			updatePointsPossible($aid, $itemorder, $defpoints);
 		}
 
 	} else {

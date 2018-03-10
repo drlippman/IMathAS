@@ -82,13 +82,14 @@ if (!(isset($teacherid))) {
 				$_GET['qsetid'] = $stm->fetchColumn(0);
 			}
 		}
+		require_once("../includes/updateptsposs.php");
 		if (isset($_GET['qsetid'])) { //new - adding
 			//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $itemorder = mysql_result($result,0,0);
-			$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			$itemorder = $stm->fetchColumn(0);
+			list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			for ($i=0;$i<$_POST['copies'];$i++) {
 				//DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints) ";
 				//DB $query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}',$rubric,$showhints)";
@@ -119,6 +120,10 @@ if (!(isset($teacherid))) {
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
+			
+			updatePointsPossible($aid, $itemorder, $defpoints);
+		} else {
+			updatePointsPossible($aid);
 		}
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");

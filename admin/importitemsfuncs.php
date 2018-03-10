@@ -4,6 +4,7 @@
 //(c) 2017 David Lippman
 
 require_once("../includes/htmLawed.php");
+require_once("../includes/updateptsposs.php");
 
 //used during confirmation step
 function getsubinfo($items,$parent,$pre) {
@@ -736,6 +737,7 @@ private function insertAssessment() {
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
 		$tomap[] = $toimport;
 		$thisitemdata = $this->data['items'][$toimport]['data'];
+
 		//map gbcategory
 		if (isset($this->gbmap[$thisitemdata['gbcategory']])) {
 			$thisitemdata['gbcategory'] = $this->gbmap[$thisitemdata['gbcategory']];
@@ -815,6 +817,7 @@ private function insertAssessment() {
 		$db_fields['questions'] = array_values(array_intersect($db_fields['questions'], array_keys($this->data['questions'][0])));
 	}
 	$this->qmap = array();
+	$qpoints = array();
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
 		$tomap = array();
 		$qids = $this->getAssessQids($this->data['items'][$toimport]['data']['itemorder']);
@@ -823,6 +826,10 @@ private function insertAssessment() {
 			$tomap[] = $qid;
 			//remap questionsetid
 			$this->data['questions'][$qid]['questionsetid'] = $this->qsmap[$this->data['questions'][$qid]['questionsetid']];
+			//record points if needed
+			if ($this->data['questions'][$qid]['points']<9999) {
+				$qpoints[$qid] = data['questions'][$qid]['points'];
+			}
 			//add in assessmentid
 			$exarr[] = $this->typemap['Assessment'][$toimport];
 			foreach ($db_fields['questions'] as $field) {
@@ -841,29 +848,40 @@ private function insertAssessment() {
 	}
 
 	//resolve itemorder and reqscoreaid
-	$a_upd_stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=?,itemorder=? WHERE id=?");
+	$a_upd_stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=?,itemorder=?,ptsposs=? WHERE id=?");
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
+		$thisitemdata = $this->data['items'][$toimport]['data'];
 		//remap reqscoreaid
-		if ($this->data['items'][$toimport]['data']['reqscoreaid']>0) {
-			$rsaid = $this->typemap['Assessment'][$this->data['items'][$toimport]['data']['reqscoreaid']];
+		if ($thisitemdata['reqscoreaid']>0) {
+			$rsaid = $this->typemap['Assessment'][$thisitemdata['reqscoreaid']];
 		} else {
 			$rsaid = 0;
 		}
 		//remap itemorder and collapse
-		$aitems = $this->data['items'][$toimport]['data']['itemorder'];
+		$mappedqpoints = array();
+		$aitems = $thisitemdata['itemorder'];
 		foreach ($aitems as $i=>$q) {
 			if (is_array($q)) {
 				foreach ($q as $k=>$subq) {
 					if ($k==0 && strpos($subq,'|')!==false) {continue;}
+					if (isset($qpoints[$subq])) {
+						$mappedqpoints[$this->qmap[$subq]] = $qpoints[$subq];
+					}
 					$q[$k] = $this->qmap[$q[$k]];
 				}
 				$aitems[$i] = implode('~',$q);
 			} else {
 				$aitems[$i] = $this->qmap[$q];
+				if (isset($qpoints[$q])) {
+					$mappedqpoints[$this->qmap[$q]] = $qpoints[$q];
+				}
 			}
 		}
 		$aitemorder = implode(',', $aitems);
-		$a_upd_stm->execute(array($rsaid, $aitemorder, $this->typemap['Assessment'][$toimport]));
+		if (!isset($thisitemdata['ptsposs']) || $thisitemdata['ptsposs']==-1) {
+			$thisitemdata['ptsposs'] = calcPointsPossible($aitemorder, $mappedqpoints, $thisitemdata['defpoints']);
+		}
+		$a_upd_stm->execute(array($rsaid, $aitemorder, $thisitemdata['ptsposs'], $this->typemap['Assessment'][$toimport]));
 	}
 }
 

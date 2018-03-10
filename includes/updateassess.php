@@ -3,6 +3,8 @@
 //utility code for removing withdrawn questions from assessments
 //and replacing questions where replaceby exists.
 
+require_once(__DIR__."/updateptsposs.php");
+
 //aidarr is array of assessment IDs, or course ID to do all
 function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 	global $DBH;
@@ -63,7 +65,7 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 
 		$item_upd_stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 
-		$query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (".implode(',',$todoaid).')';
+		$query = "SELECT id,itemorder,defpoints FROM imas_assessments WHERE id IN (".implode(',',$todoaid).')';
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query($query); //pre-sanitized
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -101,6 +103,8 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 			//DB $query = "UPDATE imas_assessments SET itemorder='$newitemlist' WHERE id={$row[0]}";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$item_upd_stm->execute(array(':itemorder'=>$newitemlist, ':id'=>$row[0]));
+			
+			updatePointsPossible($row[0], $newitemlist, $row[2]);
 		}
 	}
 

@@ -1,8 +1,8 @@
 <?php
 // code is adapted from IMS-DEV sample code
 // on code.google.com/p/ims-dev
-require_once  'OAuth.php';
-
+require_once(__DIR__.'/OAuth.php');
+require_once(__DIR__.'/updateptsposs.php');
 /*
 function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consumer_secret, $content_type, $body)
 {
@@ -208,42 +208,13 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 		//DB $res= mysql_query($query) or die("Query failed : $query" . mysql_error());
 		//DB $aitems = explode(',',mysql_result($res,0,0));
 		//DB $defpoints = mysql_result($res,0,1);
-		$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
-    list($aitems, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
-		$aitems = explode(',',$aitems);
-		foreach ($aitems as $k=>$v) {
-			if (strpos($v,'~')!==FALSE) {
-				$sub = explode('~',$v);
-				if (strpos($sub[0],'|')===false) { //backwards compat
-					$aitems[$k] = $sub[0];
-					$aitemcnt[$k] = 1;
-				} else {
-					$grpparts = explode('|',$sub[0]);
-					$aitems[$k] = $sub[1];
-					$aitemcnt[$k] = $grpparts[0];
-				}
-			} else {
-				$aitemcnt[$k] = 1;
-			}
+		$line = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($line['ptsposs']==-1) {
+			$line['ptsposs'] = updatePointsPossible($aid, $line['itemorder'], $line['defpoints']);
 		}
-
-		$totalpossible = 0;
-    //DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		//DB while ($r = mysql_fetch_row($result2)) {
-    $stm = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
-    $stm->execute(array(':assessmentid'=>$aid));
-		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
-			if (($k=array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
-				if ($r[0]==9999) {
-					$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
-				} else {
-					$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
-				}
-			}
-		}
-		$aidtotalpossible[$aid] = $totalpossible;
+		$aidtotalpossible[$aid] = $line['ptsposs'];
 	}
 	$total = 0;
 	for ($i =0; $i < count($scores);$i++) {

@@ -678,7 +678,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   $nothidden = true;  $showgreyedout = false;
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
 			   	   && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)) {
-			   	   if ($line['reqscore']<0) {
+			   	   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 			   	   	   $showgreyedout = true;
 			   	   }
 				   //DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
@@ -691,8 +691,18 @@ function showitems($items,$parent,$inpublic=false) {
 				   } else {
 					   //DB $scores = explode(';',mysql_result($result,0,0));
 					   $scores = explode(';',$stm->fetchColumn(0));
-					   if (round(getpts($scores[0]),1)+.02<abs($line['reqscore'])) {
-					   	   $nothidden = false;
+					   if ($line['reqscoretype']&2) { //using percent-based
+					   	   if ($line['ptsposs']==-1) {
+					   	   	   require("../includes/updateptsposs.php");
+					   	   	   $line['ptsposs'] = updatePointsPossible($line['id']);
+					   	   }
+					   	   if (round(100*getpts($scores[0])/$line['ptsposs'],1)+.02<abs($line['reqscore'])) {
+							   $nothidden = false;
+						   }
+					   } else { //points based
+						   if (round(getpts($scores[0]),1)+.02<abs($line['reqscore'])) {
+							   $nothidden = false;
+						   }
 					   }
 				   }
 			   }
@@ -838,7 +848,9 @@ function showitems($items,$parent,$inpublic=false) {
 				   }
 
 				   echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
-				   echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
+				   //echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
+				   echo '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
+				   echo _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
 
 				   if ($line['enddate']!=2000000000) {
 					   echo "<br/> $endname $enddate \n";

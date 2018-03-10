@@ -88,7 +88,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 
 	if (isset($itemlist['Assessment'])) {
 		$typeids = implode(',', array_keys($itemlist['Assessment']));
-		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,reqscore,reqscoreaid FROM imas_assessments WHERE avail=1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
+		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,reqscore,reqscoreaid,reqscoretype,ptsposs FROM imas_assessments WHERE avail=1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			require_once("../includes/exceptionfuncs.php");
 			if (isset($exceptions[$row['id']])) {
@@ -110,18 +110,33 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 				}
 				$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
 				if ($bestscores_stm->rowCount()==0) {
-					if ($row['reqscore']<0) {
+					if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 						$showgrayedout = true;
 					} else {
 						continue;
 					}
 				} else {
 					$scores = explode(';',$bestscores_stm->fetchColumn(0));
-					if (round(getpts($scores[0]),1)+.02<abs($row['reqscore'])) {
-						if ($row['reqscore']<0) {
-							$showgrayedout = true;
-						} else {
-							continue;
+					
+					if ($row['reqscoretype']&2) { //using percent-based
+						if ($row['ptsposs']==-1) {
+							require("../includes/updateptsposs.php");
+							$line['ptsposs'] = updatePointsPossible($row['id']);
+						}
+						if (round(100*getpts($scores[0])/$row['ptsposs'],1)+.02<abs($row['reqscore'])) {
+							if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+								$showgrayedout = true;
+							} else {
+								continue;
+							}
+						}
+					} else { //points based
+						if (round(getpts($scores[0]),1)+.02<abs($row['reqscore'])) {
+							if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+								$showgrayedout = true;
+							} else {
+								continue;
+							}
 						}
 					}
 				}

@@ -18,7 +18,7 @@ $db_fields['forum'] = 'name,description,startdate,enddate,settings,defdisplay,re
 $db_fields['forum_posts'] = 'forumid,subject,message,posttype,isanon,replyby,files,tag';
 $db_fields['wiki'] = 'name,description,startdate,enddate,editbydate,settings,avail';
 $db_fields['questions'] = 'questionsetid,points,attempts,penalty,category,regen,showans,showhints,extracredit,fixedseeds';
-$db_fields['assessment'] = 'name,summary,intro,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,itemorder,shuffle,gbcategory,password,cntingb,minscore,showcat,showhints,isgroup,reqscoreaid,reqscore,noprint,avail,groupmax,allowlate,exceptionpenalty,endmsg,tutoredit,eqnhelper,caltag,showtips,calrtag,deffeedbacktext,posttoforum,msgtoinstr,istutorial,viddata';
+$db_fields['assessment'] = 'name,summary,intro,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,itemorder,shuffle,gbcategory,password,cntingb,minscore,showcat,showhints,isgroup,reqscoreaid,reqscore,reqscoretype,noprint,avail,groupmax,allowlate,exceptionpenalty,endmsg,tutoredit,eqnhelper,caltag,showtips,calrtag,deffeedbacktext,posttoforum,msgtoinstr,istutorial,viddata,ptsposs';
 $db_fields['drill'] = 'itemdescr,itemids,scoretype,showtype,n,showtostu,name,summary,startdate,enddate,avail,caltag';
 //added qimgs field if hasimg==1
 //includecodefrom(EID___) uses export ID

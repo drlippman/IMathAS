@@ -395,9 +395,13 @@ if (isset($_GET['delete'])) {
 					//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $row = mysql_fetch_row($r);
-					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail,startdate FROM imas_assessments WHERE id=:id");
+					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail,startdate,ptsposs FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$iteminfo[$item][1]));
 					$row = $stm->fetch(PDO::FETCH_NUM);
+					if ($row[8]==-1) {
+						require_once("../includes/updateptsposs.php");
+						$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);	
+					}
 					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
@@ -427,27 +431,13 @@ if (isset($_GET['delete'])) {
 								$aitemcnt[$k] = 1;
 							}
 						}
-						//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$iteminfo[$item][1]}'";
-						//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-						$stm2 = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
-						$stm2->execute(array(':assessmentid'=>$iteminfo[$item][1]));
-						$totalpossible = 0;
-						//DB while ($r = mysql_fetch_row($result2)) {
-						while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-							if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
-								if ($r[0]==9999) {
-									$totalpossible += $aitemcnt[$k]*$row[2]; //use defpoints
-								} else {
-									$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
-								}
-							}
-						}
+						
 						mkdir($newdir.'/assn'.$iteminfo[$item][1]);
 						$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignment_settings.xml','w');
 						fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">'."\n");
 						fwrite($fp,'<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n");
 						fwrite($fp,'<workflow_state>'.($row[6]==0?'unpublished':'published').'</workflow_state>'."\n");
-						fwrite($fp,'<points_possible>'.$totalpossible.'</points_possible>'."\n");
+						fwrite($fp,'<points_possible>'.$row[8].'</points_possible>'."\n");
 						fwrite($fp,'<grading_type>points</grading_type>'."\n");
 						if (isset($_POST['includeduedates'])) {
 							fwrite($fp,'<due_at>'.gmdate("Y-m-d\TH:i:s", $row[4]).'</due_at>'."\n");

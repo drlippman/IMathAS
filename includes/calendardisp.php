@@ -132,7 +132,7 @@ $bestscores_stm = null;
 //DB $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
 //DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 //DB while ($row = mysql_fetch_row($result)) {
-$stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
+$stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,ptsposs,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
@@ -176,7 +176,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			 }
 			 $bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
 		   if ($bestscores_stm->rowCount()==0) {
-		   	   if ($row['reqscore']<0) {
+		   	   if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 		   	   	   $showgrayedout = true;
 		   	   } else {
 		   	   	   continue;
@@ -184,12 +184,26 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		   } else {
 			   //DB $scores = explode(';',mysql_result($r2,0,0));
 			   $scores = explode(';',$bestscores_stm->fetchColumn(0));
-			   if (round(getpts($scores[0]),1)+.02<abs($row['reqscore'])) {
-				   if ($row['reqscore']<0) {
-					   $showgrayedout = true;
-				   } else {
-					   continue;
-				   }
+			   if ($row['reqscoretype']&2) { //using percent-based
+				if ($row['ptsposs']==-1) {
+					require("../includes/updateptsposs.php");
+					$line['ptsposs'] = updatePointsPossible($row['id']);
+				}
+				if (round(100*getpts($scores[0])/$row['ptsposs'],1)+.02<abs($row['reqscore'])) {
+					if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+						$showgrayedout = true;
+					} else {
+						continue;
+					}
+				}
+			   } else { //points based
+				if (round(getpts($scores[0]),1)+.02<abs($row['reqscore'])) {
+					if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+						$showgrayedout = true;
+					} else {
+						continue;
+					}
+				}
 			   }
 		   }
 	}

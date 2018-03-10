@@ -296,6 +296,11 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$output_item_id = $itemtypebackref['Assessment'][$line['id']];
 			$assessmap[$line['id']] = $output_item_id;
+			//check for ptsposs
+			if (isset($line['ptsposs']) && $line['ptsposs']==-1) {
+				$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);	
+			}
+			
 			unset($line['id']);
 			//map gbcategory
 			if (isset($gbmap[$line['gbcategory']])) {

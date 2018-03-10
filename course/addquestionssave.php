@@ -9,9 +9,9 @@
 	}
 	//DB $query = "SELECT itemorder,viddata,intro FROM imas_assessments WHERE id='$aid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$stm = $DBH->prepare("SELECT itemorder,viddata,intro FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,viddata,intro,defpoints FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($rawitemorder, $viddata,$current_intro_json) = $stm->fetch(PDO::FETCH_NUM);
+	list($rawitemorder, $viddata,$current_intro_json, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 	//DB $rawitemorder = mysql_result($result,0,0);
 	//DB $viddata = mysql_result($result,0,1);
 	$itemorder = str_replace('~',',',$rawitemorder);
@@ -133,6 +133,9 @@
 			$toremove = implode(',', array_map('intval', $toremove));
 			$stm = $DBH->query("DELETE FROM imas_questions WHERE id IN ($toremove)");
 		}
+		//update points possible
+		require_once("../includes/updateptsposs.php");
+		updatePointsPossible($aid, $_REQUEST['order'], $defpoints);
 
 		echo "OK";
 	} else {

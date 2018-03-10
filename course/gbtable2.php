@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 
 require_once("../includes/exceptionfuncs.php");
+
 if ($GLOBALS['canviewall']) {
 	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, false);
 } else {
@@ -253,7 +254,7 @@ function gbtable() {
 		}
 	}
 
-
+/* --ptsposs--
 	//pre-pull questions data
 	$questionpointdata = array();
 	$query = "SELECT iq.points,iq.id FROM imas_questions AS iq JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
@@ -276,14 +277,14 @@ function gbtable() {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$questionpointdata[$line['id']] = $line['points'];
 	}
-
+*/
 
 	//Pull Assessment Info
 	$now = time();
 	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate";
+	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate";
 	if ($limuser>0) {
-		$query .= ',reqscoreaid,reqscore';
+		$query .= ',reqscoreaid,reqscore,reqscoretype';
 	}
 	if (isset($includeendmsg) && $includeendmsg) {
 		$query .= ',endmsg';
@@ -371,17 +372,17 @@ function gbtable() {
 		if ($deffeedback[0]=='Practice') { //set practice as no count in gb
 			$cntingb[$kcnt] = 3;
 		}
-		$aitems = explode(',',$line['itemorder']);
 		$allowlate[$kcnt] = $line['allowlate'];
 
 		if (isset($line['endmsg']) && $line['endmsg']!='') {
 			$endmsgs[$kcnt] = unserialize($line['endmsg']);
 		}
 		if ($limuser>0) {
-			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']));
+			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']), 'calctype'=>($line['reqscoretype']&2));
 		}
 		$k = 0;
-		$atofind = array();
+/* --ptsposs--
+		$aitems = explode(',',$line['itemorder']);
 		$totalpossible = 0;
 		foreach ($aitems as $v) {
 			if (strpos($v,'~')!==FALSE) {
@@ -402,8 +403,12 @@ function gbtable() {
 				$totalpossible += (isset($questionpointdata[$v]))?$questionpointdata[$v]:$line['defpoints'];
 			}
 		}
-
-		$possible[$kcnt] = $totalpossible;
+*/
+		if ($line['ptsposs']==-1) {
+			require_once("../includes/updateptsposs.php");
+			$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);
+		}
+		$possible[$kcnt] = $line['ptsposs'];
 		$kcnt++;
 	}
 
@@ -2250,7 +2255,9 @@ function gbtable() {
 				$gb[1][1][$col][13] = 1;
 				if (isset($reqscores[$k]) && $reqscores[$k]['aid']>0) {
 					$colofprereq = $assesscol[$reqscores[$k]['aid']];
-					if (!isset($gb[1][1][$colofprereq][0]) || $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) {
+					if (!isset($gb[1][1][$colofprereq][0]) || 
+					   ($reqscores[$k]['calctype']==0 && $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) ||
+					   ($reqscores[$k]['calctype']==2 && 100*$gb[1][1][$colofprereq][0]/$gb[0][1][$colofprereq][2]+1e-4 < $reqscores[$k]['score'])) {
 						$gb[1][1][$col][13] = 0;
 					}
 				}

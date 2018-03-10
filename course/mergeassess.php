@@ -18,17 +18,20 @@ if (isset($_POST['mergefrom'])) {
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	//DB $row = mysql_fetch_row($result);
 	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,reqscore,reqscoreaid';
-	$placeholders = ':'.implode(',:', explode(',', $fieldstocopy));
 	$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$seta[0]));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	$defpoints = $row['defpoints'];
 	//DB $row[0] .= ' - merge result';
 	$row['name'] .= ' - merge result';
+	$row['courseid'] = $cid;
 	//DB $row = "'".implode("','",addslashes_deep($row))."'";
 	//DB $query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,reqscore,reqscoreaid) ";
 	//DB $query .= "VALUES ('$cid',$row)";
-	$stm = $DBH->prepare("INSERT INTO imas_assessments ($fieldstocopy) VALUES ($placeholders)");
-	$stm->execute(array(':courseid'=>$cid)+$row);
+	$fieldlist = implode(',', array_keys($row));
+	$placeholders = Sanitize::generateQueryPlaceholders($row);
+	$stm = $DBH->prepare("INSERT INTO imas_assessments ($fieldlist) VALUES ($placeholders)");
+	$stm->execute(array_values($row));
 
 	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 	//DB $newaid = mysql_insert_id();
@@ -192,6 +195,10 @@ if (isset($_POST['mergefrom'])) {
 	$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,intro=:intro WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$newitemorder, ':intro'=>$intro, ':id'=>$newaid));
 
+	//update points poss
+	require_once("../includes/updateptsposs.php");
+	updatePointsPossible($newaid, $newitemorder, $defpoints);
+	
 	//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	//DB $query .= "VALUES ('$cid','Assessment',$newaid)";
 	//DB mysql_query($query) or die("Query failed :$query " . mysql_error());

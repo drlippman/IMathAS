@@ -34,58 +34,6 @@ function getpts($scs) {
   return $tot;
 }
 
-function getpointspossible($aid, $itemorder, $defaultpoints) {
-  global $DBH;
-	$aitems = explode(',', $itemorder);
-	$k = 0;
-	$atofind = array();
-	foreach ($aitems as $v) {
-		if (strpos($v,'~')!==FALSE) {
-			$sub = explode('~',$v);
-			if (strpos($sub[0],'|')===false) { //backwards compat
-				$atofind[$k] = $sub[0];
-				$aitemcnt[$k] = 1;
-				$k++;
-			} else {
-				$grpparts = explode('|',$sub[0]);
-				if ($grpparts[0]==count($sub)-1) { //handle diff point values in group if n=count of group
-					for ($i=1;$i<count($sub);$i++) {
-						$atofind[$k] = $sub[$i];
-						$aitemcnt[$k] = 1;
-						$k++;
-					}
-				} else {
-					$atofind[$k] = $sub[1];
-					$aitemcnt[$k] = $grpparts[0];
-					$k++;
-				}
-			}
-		} else {
-			$atofind[$k] = $v;
-			$aitemcnt[$k] = 1;
-			$k++;
-		}
-	}
-
-	//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-	//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$stm2 = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
-	$stm2->execute(array(':assessmentid'=>$aid));
-	$totalpossible = 0;
-	//DB while ($r = mysql_fetch_row($result2)) {
-	while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-		if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts
-			if ($r[0]==9999) {
-				$totalpossible += $aitemcnt[$k]*$defaultpoints; //use defpoints
-			} else {
-				$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
-			}
-		}
-	}
-	return $totalpossible;
-}
-
-
 
 //set some page specific variables and counters
 $overwriteBody = 0;
@@ -204,7 +152,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	//DB $query .= " where (ia.courseid = '$cid' and endtime > $rangestart ) ";
 	//DB $query .= " order by ias.userid ";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ias.timeontask, ia.id, ia.defpoints, ia.itemorder ";
+	$query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ias.timeontask, ia.id, ia.defpoints, ia.itemorder, ia.ptsposs ";
 	$query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
 	$query .= " where (ia.courseid=:courseid and endtime > :rangestart ) ";
 	$query .= " order by ias.userid ";
@@ -220,11 +168,15 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$aid = $line['id'];
 		$totalAttemptCount++;
 
+		if ($line['ptsposs']==-1) {
+			require_once("../includes/updateptsposs.php");
+			$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);
+		}
 		//store assessment info
 		if (!isset($assessmentInfo[$aid])) {
 			$assessmentInfo[$aid]['name'] = $line['name'];
 			$assessmentInfo[$aid]['attempts'] = 1;
-			$assessmentInfo[$aid]['possible'] = getpointspossible($aid, $line['itemorder'], $line['defpoints']);
+			$assessmentInfo[$aid]['possible'] = $line['ptsposs'];
 			$assessmentInfo[$aid]['minscore'] = $line['minscore'];
 			$assessmentInfo[$aid]['totalPointsEarned'] = 0;
 			$assessmentInfo[$aid]['nocreditstulist'] = array();
