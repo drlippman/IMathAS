@@ -2676,7 +2676,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			recordtestdata();
 			if ($numdisplayed > 0) {
 				echo '<br/><input type="submit" class="btn" value="', _('Submit'), '" />';
-				echo '<input type="submit" class="btn" name="saveforlater" value="', _('Save answers'), '" onclick="return confirm(\'', _('This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'), '\');" />';
+				echo '<input type="submit" class="btn" name="saveforlater" value="', _('Save answers'), '" onclick="var c=confirm(\'', _('This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'), '\');if (c){$(this).attr(\'data-clicked\',1);};return c;" />';
 				echo "</form>\n";
 			} else {
 				startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");

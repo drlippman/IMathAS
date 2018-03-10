@@ -1156,8 +1156,10 @@ function doonsubmit(form,type2,skipconfirm) {
 			form.className = 'submitted';
 		}
 		if (!skipconfirm) {
-			if (type2) {
-				var reallysubmit = confirmSubmit2(form);
+			if (type2 && $("input[name=saveforlater]").attr("data-clicked")==1) {
+				//var reallysubmit = confirmSubmit2(form);
+				var reallysubmit = true;
+				$("input[name=saveforlater]").attr("data-clicked",0);
 			} else {
 				var reallysubmit = confirmSubmit(form);
 			}
