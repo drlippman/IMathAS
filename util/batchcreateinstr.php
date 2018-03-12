@@ -38,6 +38,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     $homelayout = '|0,1,2||0,1';
   }
   $now = time();
+  $isoktocopy = array();
   $handle = fopen_utf8($_FILES['uploadedfile']['tmp_name'],'r');
   while (($data = fgetcsv($handle,2096))!==false) {
     if (trim($data[0])=='') {continue;}
@@ -88,6 +89,29 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     //copy courses
     $i = 5;
     while (isset($data[$i]) && $data[$i]!='' && intval($data[$i])>0) {
+      if ($myrights == 100 || ($myspecialrights&32)==32) {
+        $isoktocopy[$data[$i]] = true;
+      } else if (!isset($isoktocopy[$data[$i]])) {
+      	$query = "SELECT ic.copyrights,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id ";
+      	$query .= "WHERE ic.id=?";
+      	$stm = $DBH->prepare($query);
+      	$stm->execute(array($data[$i]));
+      	$row = $stm->fetch(PDO::FETCH_ASSOC);
+      	if ($row!==false && ($row['copyrights']==2 || ($row['copyrights']==1 && $row['groupid']==$groupid))) {
+      	  $isoktocopy[$data[$i]] = true;
+      	} else {
+      	  $isoktocopy[$data[$i]] = false;
+      	}
+      }
+      $i++;
+    }
+    $i = 5;
+    while (isset($data[$i]) && $data[$i]!='' && intval($data[$i])>0) {
+      if (empty($isoktocopy[$data[$i]])) {
+        echo "Skipping copying course {$data[$i]} - you don't have rights to copy this course without the enrollment key which is not supported by this batch process<br/>";
+        $i++;
+        continue;
+      }
       echo "Copying course {$data[$i]}<br/>";
       $uid = $newuserid;
       $sourcecid = $data[$i];
