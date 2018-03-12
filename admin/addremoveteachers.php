@@ -28,12 +28,15 @@ if (!($myrights==100 || ($myrights>=75 && $coursegroupid==$groupid) || $courseow
 function getTeachers($cid) {
 	global $DBH;
 	
-	$query = "SELECT iu.id,iu.LastName,iu.FirstName,ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON iu.groupid=ig.id ";
+	$query = "SELECT iu.id,iu.LastName,iu.FirstName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id ";
 	$query .= "JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=? ORDER BY LastName, FirstName";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($cid));
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($row['name']==null) {
+			$row['name'] = _('Default');
+		}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
 	}
 	return $out;
