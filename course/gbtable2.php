@@ -282,14 +282,14 @@ function gbtable() {
 	//Pull Assessment Info
 	$now = time();
 	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
-	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate";
+	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti";
 	if ($limuser>0) {
 		$query .= ',reqscoreaid,reqscore,reqscoretype';
 	}
 	if (isset($includeendmsg) && $includeendmsg) {
 		$query .= ',endmsg';
 	}
-	$query .= " FROM imas_assessments WHERE courseid=:courseid AND avail>0 AND date_by_lti<>1 ";
+	$query .= " FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
 
 	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
@@ -352,13 +352,13 @@ function gbtable() {
 		$deffeedback = explode('-',$line['deffeedback']);
 		$assessmenttype[$kcnt] = $deffeedback[0];
 		$sa[$kcnt] = $deffeedback[1];
-		if ($line['avail']==2) {
+		if ($line['avail']==2 || $line['date_by_lti']==1) {
 			$line['startdate'] = 0;
 			$line['enddate'] = 2000000000;
 		}
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
-		if ($now<$line['startdate']) {
+		if ($now<$line['startdate'] || $line['date_by_lti']==1) {
 			$avail[$kcnt] = 2;
 		} else if ($now < $line['enddate']) {
 			$avail[$kcnt] = 1;
