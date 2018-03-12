@@ -2214,7 +2214,7 @@ function trackDirty() {
 	}
 }
 $(function() {
-	$("input,select,textarea").on("change", trackDirty);
+	$("div.question").find("input,select,textarea").on("change", trackDirty);
 	$(window).on("beforeunload",function() {
 		if ($("form.submitted,form.submitted2").length==0 && assessFormIsDirty.length>0) {
 			return _('Are you sure you want to leave this assessment? You may have unsubmitted work');
