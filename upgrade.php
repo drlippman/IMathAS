@@ -1957,7 +1957,8 @@ span.instronly {
 	$migrator = new Migrator($DBH, (isset($dbsetup) && $dbsetup==true));
 	$migrator->migrateAll();
 
-	echo "Migrations complete";
+	echo "Migrations complete.  At version ";
+	echo Sanitize::encodeStringForDisplay($migrator->getLatestVersionApplied());
 	
 
 ?>
