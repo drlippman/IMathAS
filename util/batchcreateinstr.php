@@ -150,7 +150,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
         $replacebyarr[$row[0]] = $row[1];
       }
 
-      if ($outcomesarr!='') {
+      if ($outcomesarr!='' && $outcomesarr!='b:0;') {
         $stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
         $stm->execute(array(':courseid'=>$sourcecid));
         $out_ins_stm = null;
@@ -237,6 +237,8 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
 			echo '<option value="'.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 		}
 	  echo '</select><br/>';
+  } else {
+  	  echo '<input type=hidden name=groupid value="'.Sanitize::onlyInt($groupid).'" />';
   }
   echo 'CSV file: <input type=file name=uploadedfile /><br/>';
   echo '<input type="submit" value="Go"/>';
