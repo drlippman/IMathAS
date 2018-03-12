@@ -27,7 +27,7 @@ if ($from=='admin') {
 } else if (substr($_GET['from'],0,2)=='ud') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='gd') {
-	echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
+	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
 }
 
 switch($_POST['action']) {
