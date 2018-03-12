@@ -290,7 +290,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 			if (type=="F") {
 				GB_show(_("Feedback"), "viewforumgrade.php?embed=true&cid="+cid+"&uid="+uid+"&fid="+id, 600, 600);
 			} else {
-				GB_show(_("Feedback"), "showfeedback?cid="+cid+"&type="+type+"&id="+id, 600, 600);
+				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 600, 600);
 			}
 			return false;
 		}

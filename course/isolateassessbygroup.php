@@ -27,7 +27,7 @@
 	}
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type) {
-			GB_show(_("Feedback"), "showfeedback?cid="+cid+"&type="+type+"&id="+id, 500, 500);
+			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
 			return false;
 		}
 		</script>';
