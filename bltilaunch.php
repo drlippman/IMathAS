@@ -846,7 +846,7 @@ if ($stm->rowCount()==0) {
 						$advuseother .= '<select name="useothercoursecid">';
 						foreach ($othercourses as $k=>$v) {
 							if ($k==$aidsourcecid) {continue;}
-							$advuseother .= '<option value="'.$k.'">'.Sanitize::encodeStringForDisplay($v).'</option>';
+							$advuseother .= '<option value="'.$k.'">'.Sanitize::encodeStringForDisplay($v.' (Course ID '.$k.')').'</option>';
 						}
 						$advuseother .= '</select>';
 						$advuseother .= '<br/>Using this option means students in this LMS course will show up in the Roster and Gradebook of the '.$installname.' course you associate it with.</span></li>';
@@ -866,7 +866,7 @@ if ($stm->rowCount()==0) {
 						if (count($othercourses)>0) {
 							echo '<li><input name="docoursecopy" type="radio" value="copyother" />Create a copy of another course: <select name="othercoursecid">';
 							foreach ($othercourses as $k=>$v) {
-								echo '<option value="'.$k.'">'.Sanitize::encodeStringForDisplay($v).'</option>';
+								echo '<option value="'.$k.'">'.Sanitize::encodeStringForDisplay($v.' (Course ID '.$k.')').'</option>';
 							}
 							echo '</select></li>';
 							echo $advuseother;
@@ -917,6 +917,7 @@ if ($stm->rowCount()==0) {
 				$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 				$msgmonitor = (floor($msgset/5))&1;
 				$msgset = $msgset%5;
+				if (!isset($defaultcoursetheme)) {$defaultcoursetheme = "modern.css";}
 				$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
 				$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
 
