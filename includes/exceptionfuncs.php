@@ -109,7 +109,7 @@ class ExceptionFuncs {
 			$useexception = false;
 		}
 		if (!$limit) {
-			if ($useexception && $exception[2]>0 && ($now < $adata['enddate'] || $exception[1] > $now + $this->latepasshrs*60*60)) {
+			if ($useexception && $exception[2]>0 && ($now < $adata['enddate'] || $exception[1] > strtotime("+".$this->latepasshrs." hours", $now))) {
 				$canundolatepass = true;
 			}
 			if ($useexception) {
@@ -164,8 +164,12 @@ class ExceptionFuncs {
 			 && !in_array($adata['id'],$this->timelimitup)
 		*/
 
+		//replaced ($now - $adata['enddate']) < $this->latepasshrs*3600
+		// $now < $adata['enddate'] + $this->latepasshrs*3600
+		// $now < strtotime("+".$this->latepasshrs." hours", $adata['enddate'])
+		
 		if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && !in_array($adata['id'],$this->viewedassess) && $this->latepasses>0 && $this->isstu) {
-			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate']) < $this->latepasshrs*3600 && $adata['enddate'] < $this->courseenddate) {
+			if ($now>$adata['enddate'] && $adata['allowlate']>10 && $now < strtotime("+".$this->latepasshrs." hours", $adata['enddate']) && $adata['enddate'] < $this->courseenddate) {
 				$canuselatepass = true;
 			} else if ($now<$adata['enddate'] && $adata['enddate'] < $this->courseenddate) {
 				$canuselatepass = true;
@@ -193,7 +197,7 @@ class ExceptionFuncs {
 		   //for forums, exceptions[$items[$i]][0] is used for postby and [1] is used for replyby
 		   if (($exception[4]=='P' || $exception[4]=='F') && $exception[0]>0) {
 			   //if latepass and it's before original due date or exception is for more than a latepass past now
-			   if ($exception[2]>0 && ($now < $line['postby'] || $exception[0] > $now + $this->latepasshrs*60*60)) {
+			   if ($exception[2]>0 && ($now < $line['postby'] || $exception[0] > strtotime("+".$this->latepasshrs." hours", $now))) {
 				   $canundolatepassP = true;
 			   }
 			   if ($exception[2]>0) {
@@ -206,7 +210,7 @@ class ExceptionFuncs {
 		   }
 		   if (($exception[4]=='R' || $exception[4]=='F') && $exception[1]>0) {
 			   //if latepass and it's before original due date or exception is for more than a latepass past now
-			   if ($exception[2]>0 && ($now < $line['replyby'] || $exception[1] > $now + $this->latepasshrs*60*60)) {
+			   if ($exception[2]>0 && ($now < $line['replyby'] || $exception[1] > strtotime("+".$this->latepasshrs." hours", $now))) {
 				   $canundolatepassR = true;
 			   }
 			   if ($exception[2]>0) {
@@ -230,14 +234,14 @@ class ExceptionFuncs {
 		   $allowlaten = $line['allowlate']%10;
 		   $allowlateon = floor($line['allowlate']/10)%10;
 		   if ($allowlateon != 3 && $line['postby']<2000000000 && ($allowlaten==1 || $allowlaten-1>$latepasscntP)) { //it allows post LPs, and can use latepases
-			   if ($line['allowlate']>=100 && ($now - $line['postby'])<$this->latepasshrs*3600) { //allow after due date
+			   if ($line['allowlate']>=100 && $now < strtotime("+".$this->latepasshrs." hours", $line['postby'])) { //allow after due date
 				   $canuselatepassP = true;
 			   } else if ($line['allowlate']<100 && $now < $line['postby']) {
 				   $canuselatepassP = true;
 			   }
 		   }
 		   if ($allowlateon != 2 && $line['replyby']<2000000000&& ($allowlaten==1 || $allowlaten-1>$latepasscntR)) { //it allows replies LPs
-			   if ($line['allowlate']>=100 && ($now - $line['replyby'])<$this->latepasshrs*3600) { //allow after due date
+			   if ($line['allowlate']>=100 && $now < strtotime("+".$this->latepasshrs." hours", $line['replyby'])) { //allow after due date
 				   $canuselatepassR = true;
 			   } else if ($line['allowlate']<100 && $now < $line['replyby']) {
 				   $canuselatepassR = true;

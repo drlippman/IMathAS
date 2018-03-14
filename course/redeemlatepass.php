@@ -58,7 +58,7 @@
 				$stm->execute(array(':id'=>$aid));
 				$enddate = $stm->fetchColumn(0);
 				//if it's past original due date and latepass is for less than latepasshrs past now, too late
-				if ($now > $enddate && $row[0] < $now + $latepasshrs*60*60) {
+				if ($now > $enddate && $row[0] < strtotime("+".$latepasshrs." hours", $now)) {
 					echo '<p>Too late to un-use this LatePass</p>';
 				} else {
 					if ($now < $enddate) { //before enddate, return all latepasses
@@ -69,8 +69,10 @@
 						$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 						$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 					} else { //figure how many are unused
-						$n = floor(($row[0] - $now)/($latepasshrs*60*60));
-						$newend = $row[0] - $n*$latepasshrs*60*60;
+						$n = floor(($row[0] - $now)/($latepasshrs*60*60) + .05);
+						$tothrs = $n*$latepasshrs;
+						$newend = strtotime("-".$tothrs." hours", $row[0]);
+						//$newend = $row[0] - $n*$latepasshrs*60*60;
 						if ($row[1]>$n) {
 							//DB $query = "UPDATE imas_exceptions SET islatepass=islatepass-$n,enddate=$newend WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 							//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -106,7 +108,7 @@
 		require("../footer.php");
 
 	} else if (isset($_POST['confirm'])) {
-		$addtime = $latepasshrs*60*60;
+		//$addtime = $latepasshrs*60*60;
 		//DB $query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
@@ -150,7 +152,7 @@
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass-1 WHERE userid=:userid AND courseid=:courseid AND latepass>0");
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
-				$enddate = min($thised + $addtime, $courseenddate);
+				$enddate = min(strtotime("+".$latepasshrs." hours", $thised), $courseenddate);
 				if ($hasexception) { //already have exception
 					//DB $query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -225,7 +227,7 @@
 			}
 			$hasexception = true;
 		}
-		$limitedByCourseEnd = ($thised + $latepasshrs*3600 > $courseenddate);
+		$limitedByCourseEnd = (strtotime("+".$latepasshrs." hours", $thised) > $courseenddate);
 		$timelimitstatus = $exceptionfuncs->getTimelimitStatus($aid);
 
 		if ($latepasses==0) { //shouldn't get here if 0
