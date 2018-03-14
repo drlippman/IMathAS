@@ -1185,11 +1185,12 @@ function gbtable() {
 			} else {
 				$fbtxt = '';
 				foreach ($fbarr as $k=>$v) {
+					if ($v=='') {continue;}
 					if ($k=='Z') {
-						$fbtxt .= 'Overall feedback: '.$v.'.<br>';
+						$fbtxt .= 'Overall feedback: '.$v.'<br>';
 					} else {
 						$q = substr($k,1);
-						$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'.<br>';
+						$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'<br>';
 					}
 				}
 				$gb[$row][1][$col][1] = $fbtxt;
@@ -1300,15 +1301,15 @@ function gbtable() {
 					}
 				}
 				if (!isset($gb[$row][1][$col][1])) {
-					$gb[$row][1][$col][1] = 0; //no feedback
+					if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
+						$gb[$row][1][$col][1] = '';
+					} else {
+						$gb[$row][1][$col][1] = 0; //no feedback
+					}
 				}
 				if (trim($l['feedback'])!='') {
 					if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
-						if (isset($gb[$row][1][$col][1])) {
-							$gb[$row][1][$col][1] .= "<br/>".$l['feedback'];
-						} else {
-							$gb[$row][1][$col][1] = $l['feedback'];
-						}
+						$gb[$row][1][$col][1] .= 'Post Feedback: <br/>'.$l['feedback'];
 						//the feedback (for students)
 					} else { //feedback
 						$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
