@@ -285,7 +285,7 @@
 				} else if ($row[2]!=$_POST['imgvar-'.$row[0]] || $row[3]!=$_POST['imgalt-'.$row[0]]) {
 					$newvar = $_POST['imgvar-'.$row[0]];
 					$newalt = $_POST['imgalt-'.$row[0]];
-					$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
+					$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','laarr','shanspt','GLOBALS','laparts','anstype','kidx','iidx','tips','optionsPack','partla','partnum','score','disallowedvar','allowedmacros','wherecount','countcnt','myrights','myspecialrights');
 					if (in_array($newvar,$disallowedvar)) {
 						$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
 					} else {
@@ -356,6 +356,16 @@
 				$stm->execute(array(':qsetid'=>$_GET['templateid']));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if (!isset($_POST['delimg-'.$row[3]])) {
+						$_POST['imgvar-'.$row[3]] = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[3]]); 
+						if ($row[0]!=$_POST['imgvar-'.$row[3]] || $row[2]!=$_POST['imgalt-'.$row[3]]) {
+							$newvar = $_POST['imgvar-'.$row[3]];
+							$newalt = $_POST['imgalt-'.$row[3]];
+							$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','laarr','shanspt','GLOBALS','laparts','anstype','kidx','iidx','tips','optionsPack','partla','partnum','score','disallowedvar','allowedmacros','wherecount','countcnt','myrights','myspecialrights');
+							if (!in_array($newvar,$disallowedvar)) {
+								$row[0] = $newvar;
+							}
+							$row[2] = $newalt;
+						}
 						//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES ('$qsetid','{$row[0]}','{$row[1]}','{$row[2]}')";
 						//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 						$stm2 = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alttext)");
