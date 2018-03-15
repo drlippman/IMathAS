@@ -520,7 +520,7 @@
 			}
 			exit;
 		}
-		$useeditor='noinit';
+		$useeditor='review';
 		$sessiondata['coursetheme'] = $coursetheme;
 		$sessiondata['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {

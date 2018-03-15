@@ -241,7 +241,7 @@
 		$points = $defpoints;
 	}
 
-	$useeditor='noinit';
+	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=120617"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
