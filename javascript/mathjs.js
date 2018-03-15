@@ -105,7 +105,7 @@ function mathjs(st,varlist) {
 	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
 	  st = st.replace(reg,"$1#(");
-	  var reg = new RegExp("("+varlist+")("+varlist+")$","g");
+	  var reg = new RegExp("("+varlist+")("+varlist+")","g");
 	  st = st.replace(reg,"($1)($2)");
 	  var reg = new RegExp("("+varlist+")(a#|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root|pi)","g");
 	  st = st.replace(reg,"($1)$2");
