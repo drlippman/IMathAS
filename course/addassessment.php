@@ -897,7 +897,10 @@ if ($overwriteBody==1) {
 		<span class=form>Available Until:</span>
 		<span class=formright>
 			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,"2000000000",0); ?>/>
-			 Always after start date<br/>
+			 Always after start date
+			 <?php if ($courseenddate<2000000000) {
+			 	 echo 'until the course end date, '.tzdate("n/j/Y", $courseenddate);
+			 }?><br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,"2000000000",1); ?>/>
 			<input type=text size=10 name="edate" value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
