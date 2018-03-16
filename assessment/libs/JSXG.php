@@ -323,7 +323,7 @@ function JSXG_addFunction($board, $ops=array()){
     // Loop through each variable name, add a JS statement if necessary to swap %a with a.Value()
     foreach ($ops['slider-names'] as $sn){
       if (strpos($rule, "%{$sn}")>-1){
-        $out .= "rule = rule.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "rule = rule.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     // Use the mathjs() function to create JS-readable function, return it
@@ -342,7 +342,7 @@ function JSXG_addFunction($board, $ops=array()){
                 var lbs = '{$ops['bounds'][0]}';";
       foreach($ops['slider-names'] as $sn){
         if (strpos($ops['bounds'][0], "%{$sn}")>-1){
-          $out .= "lbs = lbs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          $out .= "lbs = lbs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
         }
       }
       // Evaluate the bound statement using mathjs()
@@ -358,7 +358,7 @@ function JSXG_addFunction($board, $ops=array()){
                 var ubs = '{$ops['bounds'][1]}';";
       foreach($ops['slider-names'] as $sn){
         if (strpos($ops['bounds'][1], "%{$sn}")>-1){
-          $out .= "ubs = ubs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          $out .= "ubs = ubs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
         }
       }
       $out .= "with (Math) var ub = eval(mathjs(ubs));
@@ -416,7 +416,7 @@ function JSXG_addParametric($board, $ops=array()){
     // Replace %a with a.Value for each slider name that applies
     foreach($ops['slider-names'] as $sn){
       if (strpos($xRule, "%{$sn}")>-1){
-        $out .= "xrs = xrs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "xrs = xrs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     // Use mathjs() to evaluate the bound statement
@@ -430,7 +430,7 @@ function JSXG_addParametric($board, $ops=array()){
     $out .= "var yrs = '{$yRule}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($yRule, "%{$sn}")>-1){
-        $out .= "yrs = yrs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "yrs = yrs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "with (Math) var yf = eval(mathjs(yrs, '{$inpVar}')); return yf;},";
@@ -443,7 +443,7 @@ function JSXG_addParametric($board, $ops=array()){
     $out .= "function(){var lbs = '{$tStart}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($tStart, "%{$sn}")>-1){
-        $out .= "lbs = lbs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "lbs = lbs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "with (Math) var lb = eval(mathjs(lbs)); return lb;},";
@@ -455,7 +455,7 @@ function JSXG_addParametric($board, $ops=array()){
     $out .= "function(){var ubs = '{$tEnd}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($tEnd, "%{$sn}")>-1){
-        $out .= "ubs = ubs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "ubs = ubs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "with (Math) var ub = eval(mathjs(ubs)); return ub;},";
@@ -510,7 +510,7 @@ function JSXG_addText($board, $ops=array()){
               var xps = '{$xPos}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($xPos, "%{$sn}")>-1){
-        $out .= "xps = xps.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "xps = xps.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "with (Math) var xp = eval(mathjs(xps));
@@ -524,7 +524,7 @@ function JSXG_addText($board, $ops=array()){
               var yps = '{$yPos}';";
     foreach($ops['slider-names'] as $sn){
       if (strpos($yPos, "%{$sn}")>-1){
-        $out .= "yps = yps.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        $out .= "yps = yps.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "with (Math) var yp = eval(mathjs(yps));
@@ -802,7 +802,7 @@ function JSXG_addPolar($board, $ops=array()){
     foreach($ops['slider-names'] as $sn){
       if (strpos($rule, "%{$sn}")-1){
         $out .= "
-            rs = rs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            rs = rs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "
@@ -828,7 +828,7 @@ function JSXG_addPolar($board, $ops=array()){
     foreach($ops['slider-names'] as $sn){
       if (strpos($tStart, "%{$sn}")>-1){
         $out .= "
-          tss = tss.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          tss = tss.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "
@@ -846,7 +846,7 @@ function JSXG_addPolar($board, $ops=array()){
     foreach($ops['slider-names'] as $sn){
       if (strpos($tEnd, "%{$sn}")>-1){
         $out .= "
-          tes = tes.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          tes = tes.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
       }
     }
     $out .= "
@@ -972,7 +972,7 @@ function JSXG_createBlankBoard($label, $ops){
         var xs = '{$x}';";
       foreach($ops['slider-names'] as $sn){
         if (strpos($x, "%{$sn}")>-1){
-          $out .= "xs = xs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          $out .= "xs = xs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
         }
       }
       $out .= "with (Math) var x = eval(mathjs(xs)); return x;},";
@@ -985,7 +985,7 @@ function JSXG_createBlankBoard($label, $ops){
         var ys = '{$y}';";
       foreach($ops['slider-names'] as $sn){
         if (strpos($y, "%{$sn}")>-1){
-          $out .= "ys = ys.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          $out .= "ys = ys.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
         }
       }
       $out .= "with (Math) var y = eval(mathjs(ys)); return y;}],";
@@ -1086,7 +1086,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x1, "%{$sn}")>-1){
-            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x1s = x1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
@@ -1099,7 +1099,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y1, "%{$sn}")>-1){
-            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y1s = y1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
@@ -1118,7 +1118,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x2s = x2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
@@ -1131,7 +1131,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y2s = y2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
@@ -1196,7 +1196,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x1, "%{$sn}")>-1){
-            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x1s = x1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
@@ -1209,7 +1209,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y1, "%{$sn}")>-1){
-            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y1s = y1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
@@ -1228,7 +1228,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x2s = x2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
@@ -1241,7 +1241,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y2s = y2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
@@ -1306,7 +1306,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x1, "%{$sn}")>-1){
-            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x1s = x1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
@@ -1319,7 +1319,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y1, "%{$sn}")>-1){
-            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y1s = y1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
@@ -1338,7 +1338,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x2s = x2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
@@ -1351,7 +1351,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y2s = y2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
@@ -1415,7 +1415,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x1, "%{$sn}")>-1){
-            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x1s = x1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
@@ -1428,7 +1428,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y1, "%{$sn}")>-1){
-            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y1s = y1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
@@ -1447,7 +1447,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x2s = x2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
@@ -1460,7 +1460,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y2s = y2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
@@ -1528,7 +1528,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x2s = x2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
@@ -1541,7 +1541,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y2s = y2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y2 = eval(mathjs(y1s)); return y2;}],[";
@@ -1560,7 +1560,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x1, "%{$sn}")>-1){
-            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x1s = x1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
@@ -1573,7 +1573,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y1, "%{$sn}")>-1){
-            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y1s = y1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}]],";
@@ -1616,7 +1616,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x2s = x2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
@@ -1629,7 +1629,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y2s = y2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y2 = eval(mathjs(y1s)); return y2;}],[";
@@ -1648,7 +1648,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x3s = '{$x3}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x3, "%{$sn}")>-1){
-            $out .= "x3s = x3s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x3s = x3s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x3 = eval(mathjs(x3s)); return x3;},";
@@ -1661,7 +1661,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y3s = '{$y3}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y3, "%{$sn}")>-1){
-            $out .= "y3s = y3s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y3s = y3s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y3 = eval(mathjs(y3s)); return y3;}]],";
@@ -1725,7 +1725,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x1s = '{$x1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x1, "%{$sn}")>-1){
-            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x1s = x1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
@@ -1738,7 +1738,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y1s = '{$y1}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y1, "%{$sn}")>-1){
-            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y1s = y1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
@@ -1755,7 +1755,7 @@ function JSXG_createBlankBoard($label, $ops){
           var rs = '{$p2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($p2, "%{$sn}")>-1){
-            $out .= "rs = rs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "rs = rs.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var r = eval(mathjs(rs)); return r;}],";
@@ -1771,7 +1771,7 @@ function JSXG_createBlankBoard($label, $ops){
           var x2s = '{$x2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "x2s = x2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
@@ -1784,7 +1784,7 @@ function JSXG_createBlankBoard($label, $ops){
           var y2s = '{$y2}';";
         foreach($ops['slider-names'] as $sn){
           if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            $out .= "y2s = y2s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
           }
         }
         $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
@@ -1853,7 +1853,7 @@ function JSXG_createBlankBoard($label, $ops){
             var x1s = '{$x1}';";
           foreach($ops['slider-names'] as $sn){
             if (strpos($x1, "%{$sn}")>-1){
-              $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+              $out .= "x1s = x1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
             }
           }
           $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
@@ -1866,7 +1866,7 @@ function JSXG_createBlankBoard($label, $ops){
             var y1s = '{$y1}';";
           foreach($ops['slider-names'] as $sn){
             if (strpos($y1, "%{$sn}")>-1){
-              $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+              $out .= "y1s = y1s.replace(/%{$sn}/g, '('+param{$label}_{$sn}.Value()+')');";
             }
           }
           $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}]";
