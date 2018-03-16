@@ -1104,14 +1104,15 @@ if ($stm->rowCount()==0) {
 			}
 			//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
 			//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$destcid)";
-			$query = "INSERT INTO imas_lti_courses (org,contextid,courseid,copiedfrom) VALUES ";
-			$query .= "(:org, :contextid, :courseid, :copiedfrom)";
+			$query = "INSERT INTO imas_lti_courses (org,contextid,courseid,copiedfrom,contextlabel) VALUES ";
+			$query .= "(:org, :contextid, :courseid, :copiedfrom, :contextlabel)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(
 				':org'=>$_SESSION['ltiorg'], 
 				':contextid'=>$_SESSION['lti_context_id'], 
 				':courseid'=>$destcid,
-				':copiedfrom'=>($copycourse == "yes")?$sourcecid:0));
+				':copiedfrom'=>($copycourse == "yes")?$sourcecid:0,
+				':contextlabel'=>$_SESSION['lti_context_label']));
 		} else {
 			//DB $destcid = mysql_result($result,0,0);
 			list($destcid, $copiedfromcid) = $stm->fetch(PDO::FETCH_NUM);
@@ -1297,8 +1298,12 @@ if ($_SESSION['lti_keytype']=='cc-of') {
 			if ($stm->rowCount()>0) {
 				//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
 				//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$linkcid)";
-				$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
-				$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$linkcid));
+				$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid,contextlabel) VALUES (:org, :contextid, :courseid, :contextlabel)");
+				$stm->execute(array(
+					':org'=>$_SESSION['ltiorg'], 
+					':contextid'=>$_SESSION['lti_context_id'], 
+					':courseid'=>$linkcid,
+					':contextlabel'=>$_SESSION['lti_context_label']));
 			} else {
 				reporterror("You are not an instructor on the course and folder this link is pointing to. Auto-copying is not currently supported for folder-level links.");
 			}
@@ -2443,17 +2448,24 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 					//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
 					//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}',$destcid)";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
-					$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$destcid));
+					$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid,contextlabel) VALUES (:org, :contextid, :courseid, :contextlabel)");
+					$stm->execute(array(
+						':org'=>$_SESSION['ltiorg'], 
+						':contextid'=>$_SESSION['lti_context_id'], 
+						':courseid'=>$destcid,
+						':contextlabel'=>$_SESSION['lti_context_label']));
+
 				} else if ($_SESSION['lti_keytype']=='cc-c') {
 					$copyaid = true;
 					//link up key/secret course
-					//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-					//DB $query .= "('{$_SESSION['ltiorg']}','{$_SESSION['lti_context_id']}','{$keyparts[1]}')";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
-					$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$keyparts[1]));
 					$destcid = $keyparts[1];
+					$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid,contextlabel) VALUES (:org, :contextid, :courseid, :contextlabel)");
+					$stm->execute(array(
+						':org'=>$_SESSION['ltiorg'], 
+						':contextid'=>$_SESSION['lti_context_id'], 
+						':courseid'=>$destcid,
+						':contextlabel'=>$_SESSION['lti_context_label']));
+
 				}
 			} else {
 				//DB $destcid = mysql_result($result,0,0);
