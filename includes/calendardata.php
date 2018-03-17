@@ -106,7 +106,10 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 			$showgrayedout = false;
 			if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0)) {
 				if ($bestscores_stm===null) { //only prepare once
-					$bestscores_stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
+					$query = "SELECT ias.bestscores,ia.ptsposs FROM imas_assessment_sessions AS ias ";
+					$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
+					$query .= "WHERE assessmentid=:assessmentid AND userid=:userid";
+					$bestscores_stm = $DBH->prepare($query);
 				}
 				$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
 				if ($bestscores_stm->rowCount()==0) {
@@ -116,14 +119,14 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 						continue;
 					}
 				} else {
-					$scores = explode(';',$bestscores_stm->fetchColumn(0));
-					
+					list($scores,$reqscoreptsposs) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+					$scores = explode(';', $scores);
 					if ($row['reqscoretype']&2) { //using percent-based
-						if ($row['ptsposs']==-1) {
+						if ($reqscoreptsposs==-1) {
 							require("../includes/updateptsposs.php");
-							$line['ptsposs'] = updatePointsPossible($row['id']);
+							$reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
 						}
-						if (round(100*getpts($scores[0])/$row['ptsposs'],1)+.02<abs($row['reqscore'])) {
+						if (round(100*getpts($scores[0])/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
 							if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 								$showgrayedout = true;
 							} else {

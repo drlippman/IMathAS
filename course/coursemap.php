@@ -103,11 +103,7 @@ function showitemtree($items,$parent) {
 					   //DB $scores = explode(';',mysql_result($result,0,0));
 					   $scores = explode(';',$stm->fetchColumn(0));
 					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if ($line['ptsposs']==-1) {
-					   	   	   require("../includes/updateptsposs.php");
-					   	   	   $line['ptsposs'] = updatePointsPossible($line['id']);
-					   	   }
-					   	   if (round(100*getpts($scores[0])/$line['ptsposs'],1)+.02<abs($line['reqscore'])) {
+					   	   if (round(100*getpts($scores[0])/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
 							   $nothidden = false;
 						   }
 					   } else { //points based

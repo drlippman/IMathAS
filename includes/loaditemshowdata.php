@@ -111,11 +111,16 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	if (count($assessPreReqsToLookup)>0 && !$limited) {
 		$typelookups['AssessPrereq'] = array();
 		$placeholders = Sanitize::generateQueryPlaceholders($assessPreReqsToLookup);
-		$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE id IN ($placeholders)");
+		$stm = $DBH->prepare("SELECT id,name,ptsposs FROM imas_assessments WHERE id IN ($placeholders)");
 		$stm->execute(array_keys($assessPreReqsToLookup));
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$refaid = $assessPreReqsToLookup[$line['id']];
 			$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscorename'] = $line['name'];
+			if ($line['ptsposs']==-1) {
+				require(__DIR__."/updateptsposs.php");
+				$line['ptsposs'] = updatePointsPossible($line['id']);
+			}
+			$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscoreptsposs'] = $line['ptsposs'];
 		}
 	}
 	if (isset($typelookups['InlineText'])) {
