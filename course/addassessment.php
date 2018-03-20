@@ -296,7 +296,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		
 		if (isset($_GET['id'])) {  //already have id; update
-			$stm = $DBH->prepare("SELECT isgroup,intro,itemorder FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT isgroup,intro,itemorder,deffeedbacktext FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$curassess = $stm->fetch(PDO::FETCH_ASSOC);
 
@@ -374,6 +374,39 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($stm->rowCount()>0 && isset($_POST['defpoints'])) {
 				require_once("../includes/updateptsposs.php");
 				updatePointsPossible($_GET['id'], $curassess['itemorder'], $_POST['defpoints']);
+			}
+			
+			if ($deffb!=$curassess['deffeedbacktext']) {
+				//removed default feedback text; remove it from existing attempts
+				$updatefb = $DBH->prepare("UPDATE imas_assessment_sessions SET feedback=? WHERE id=?");
+				$stm = $DBH->prepare("SELECT id,feedback FROM imas_assessment_sessions WHERE assessmentid=?");
+				$stm->execute(array($_GET['id']));
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+					$fbjson = json_decode($row['feedback'], true);
+					if ($fbjson === null) {
+						//old format
+						if ($row['feedback']==$curassess['deffeedbacktext'] || 
+						   ($row['feedback']=='' && $curassess['deffeedbacktext']=='' && $deffb!='')) {
+							if ($deffb=='') {
+								$updatefb->execute(array('', $row['id']));
+							} else {
+								$updatefb->execute(array(json_encode(array('Z'=>$deffb)), $row['id']));
+							}
+						}
+					} else if (isset($fbjson['Z'])) {
+						if (strip_tags(str_replace(' ','',$fbjson['Z']))==strip_tags(str_replace(' ','',$curassess['deffeedbacktext']))) {
+							if ($deffb=='') {
+								unset($fbjson['Z']);
+							} else {
+								$fbjson['Z']=$deffb;
+							}
+							$updatefb->execute(array(json_encode($fbjson), $row['id']));
+						}
+					} else if ($deffb!='') {
+						$fbjson['Z']=$deffb;
+						$updatefb->execute(array(json_encode($fbjson), $row['id']));
+					} 
+				}
 			}
 			
 			if ($from=='gb') {
