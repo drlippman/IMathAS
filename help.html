@@ -2359,9 +2359,10 @@ of choices is automatically randomized.
 <dl>
 <dt>$displayformat = "horiz", "select", "2column, "3column", or "inline" </dt>
 	<dd>Will lay out the choices horizontally, as a select box, in multiple columns, or inline with text rather than using the default vertical layout</dd>
-<dt>$noshuffle = "all" or "last" </dt>
+<dt>$noshuffle = "all" or "last" or "last2"</dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled).  If $noshuffle = "last", then the $questions
-	array will be randomized, except for the last element.  This is for options like "None of the above"</dd>
+	array will be randomized, except for the last element.  This is for options like "None of the above".
+	You can use "last2" or "last3" to randomize all but the last 2 or 3 elements.</dd>
 <dt>$partialcredit = array(index,score,[index,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(index,score,index,score,...), where
 	index is the index in $questions, and score is a proportion between 0 and 1 to award as partial credit.  For example, if $answer = 0
