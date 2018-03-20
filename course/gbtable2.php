@@ -1665,9 +1665,9 @@ function gbtable() {
 					} else {
 						$tokeep = count($cattotpast[$ln][$cat]);
 					}
-					$cattotpast[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/($tokeep),1);
+					$cattotpast[$ln][$cat] = $catposspast[$cat]*array_sum($cattotpast[$ln][$cat])/($tokeep);
 					if (isset($cattotpastec[$ln][$cat])) {
-						$cattotpastec[$ln][$cat] = round($catposspast[$cat]*array_sum($cattotpastec[$ln][$cat])/$tokeep,1);
+						$cattotpastec[$ln][$cat] = $catposspast[$cat]*array_sum($cattotpastec[$ln][$cat])/$tokeep;
 					}
 				} else {
 					$cattotpast[$ln][$cat] = array_sum($cattotpast[$ln][$cat]);
@@ -1678,16 +1678,16 @@ function gbtable() {
 
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
-						$cattotpast[$ln][$cat] = round($catposspast[$cat]*($cattotpast[$ln][$cat]/$cats[$cat][1]),1);
+						$cattotpast[$ln][$cat] = $catposspast[$cat]*($cattotpast[$ln][$cat]/$cats[$cat][1]);
 					} else if ($cats[$cat][2]==1) { //percent scale
-						$cattotpast[$ln][$cat] = round($cattotpast[$ln][$cat]*(100/($cats[$cat][1])),1);
+						$cattotpast[$ln][$cat] = $cattotpast[$ln][$cat]*(100/($cats[$cat][1]));
 					}
 				}
 				if (isset($cattotpastec[$ln][$cat])) { //add in EC
 					$cattotpast[$ln][$cat] += $cattotpastec[$ln][$cat]; //already summed above //array_sum($cattotpastec[$ln][$cat]);
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catposspast[$cat]>0) {//use fixed pt value for cat
-					$cattotpast[$ln][$cat] = ($catposspast[$cat]==0)?0:round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
+					$cattotpast[$ln][$cat] = ($catposspast[$cat]==0)?0:$cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]);
 				}
 
 				if ($cats[$cat][3]>0) { //chop score - no over 100%
@@ -1698,7 +1698,7 @@ function gbtable() {
 					}
 				}
 
-				$gb[$ln][2][$pos][0] = $cattotpast[$ln][$cat];
+				$gb[$ln][2][$pos][0] = round($cattotpast[$ln][$cat],1);
 
 				if ($useweights==1) {
 					if ($cattotpast[$ln][$cat]>0 && $catposspast[$cat]>0) {
@@ -1707,7 +1707,7 @@ function gbtable() {
 				}
 			} else if (isset($cattotpastec[$ln][$cat])) {
 				$cattotpast[$ln][$cat] = array_sum($cattotpastec[$ln][$cat]);
-				$gb[$ln][2][$pos][0] = $cattotpast[$ln][$cat];
+				$gb[$ln][2][$pos][0] = round($cattotpast[$ln][$cat],1);
 
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][0] = 0;
@@ -1760,9 +1760,9 @@ function gbtable() {
 					} else {
 						$tokeep = count($cattotcur[$ln][$cat]);
 					}
-					$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep),1);
+					$cattotcur[$ln][$cat] = $catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep);
 					if (isset($cattotcurec[$ln][$cat])) {
-						$cattotcurec[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcurec[$ln][$cat])/$tokeep,1);
+						$cattotcurec[$ln][$cat] = $catposscur[$cat]*array_sum($cattotcurec[$ln][$cat])/$tokeep;
 					}
 				} else {
 					$cattotcur[$ln][$cat] = array_sum($cattotcur[$ln][$cat]);
@@ -1773,16 +1773,16 @@ function gbtable() {
 
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
-						$cattotcur[$ln][$cat] = round($catposscur[$cat]*($cattotcur[$ln][$cat]/$cats[$cat][1]),1);
+						$cattotcur[$ln][$cat] = $catposscur[$cat]*($cattotcur[$ln][$cat]/$cats[$cat][1]);
 					} else if ($cats[$cat][2]==1) { //percent scale
-						$cattotcur[$ln][$cat] = round($cattotcur[$ln][$cat]*(100/($cats[$cat][1])),1);
+						$cattotcur[$ln][$cat] = $cattotcur[$ln][$cat]*(100/($cats[$cat][1]));
 					}
 				}
 				if (isset($cattotcurec[$ln][$cat])) {
 					$cattotcur[$ln][$cat] += $cattotcurec[$ln][$cat];
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catposscur[$cat]>0) {//use fixed pt value for cat
-					$cattotcur[$ln][$cat] = ($catposscur[$cat]==0)?0:round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
+					$cattotcur[$ln][$cat] = ($catposscur[$cat]==0)?0:$cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]);
 				}
 
 				if ($cats[$cat][3]>0) {
@@ -1793,7 +1793,7 @@ function gbtable() {
 					}
 				}
 
-				$gb[$ln][2][$pos][1] = $cattotcur[$ln][$cat];
+				$gb[$ln][2][$pos][1] = round($cattotcur[$ln][$cat],1);
 
 				if ($useweights==1) {
 					if ($cattotcur[$ln][$cat]>0 && $catposscur[$cat]>0) {
@@ -1802,7 +1802,7 @@ function gbtable() {
 				}
 			} else if (isset($cattotcurec[$ln][$cat])) {
 				$cattotcur[$ln][$cat] = array_sum($cattotcurec[$ln][$cat]);
-				$gb[$ln][2][$pos][1] = $cattotcur[$ln][$cat];
+				$gb[$ln][2][$pos][1] = round($cattotcur[$ln][$cat],1);
 
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][1] = 0;
@@ -1855,9 +1855,9 @@ function gbtable() {
 					} else {
 						$tokeep = count($cattotfuture[$ln][$cat]);
 					}
-					$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/($tokeep),1);
+					$cattotfuture[$ln][$cat] = $catpossfuture[$cat]*array_sum($cattotfuture[$ln][$cat])/($tokeep);
 					if (isset($cattotfutureec[$ln][$cat])) {
-						$cattotfutureec[$ln][$cat] = round($catpossfuture[$cat]*array_sum($cattotfutureec[$ln][$cat])/$tokeep,1);
+						$cattotfutureec[$ln][$cat] = $catpossfuture[$cat]*array_sum($cattotfutureec[$ln][$cat])/$tokeep;
 					}
 				} else {
 					$cattotfuture[$ln][$cat] = array_sum($cattotfuture[$ln][$cat]);
@@ -1868,16 +1868,16 @@ function gbtable() {
 
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
-						$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*($cattotfuture[$ln][$cat]/$cats[$cat][1]),1);
+						$cattotfuture[$ln][$cat] = $catpossfuture[$cat]*($cattotfuture[$ln][$cat]/$cats[$cat][1]);
 					} else if ($cats[$cat][2]==1) { //percent scale
-						$cattotfuture[$ln][$cat] = round($cattotfuture[$ln][$cat]*(100/($cats[$cat][1])),1);
+						$cattotfuture[$ln][$cat] = $cattotfuture[$ln][$cat]*(100/($cats[$cat][1]));
 					}
 				}
 				if (isset($cattotfutureec[$ln][$cat])) {
 					$cattotfuture[$ln][$cat] += $cattotfutureec[$ln][$cat];
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catpossfuture[$cat]>0) {//use fixed pt value for cat
-					$cattotfuture[$ln][$cat] = round($cats[$cat][5]*($cattotfuture[$ln][$cat]/$catpossfuture[$cat]),1);
+					$cattotfuture[$ln][$cat] = $cats[$cat][5]*($cattotfuture[$ln][$cat]/$catpossfuture[$cat]);
 				}
 
 				if ($cats[$cat][3]>0) {
@@ -1888,7 +1888,7 @@ function gbtable() {
 					}
 				}
 
-				$gb[$ln][2][$pos][2] = $cattotfuture[$ln][$cat];
+				$gb[$ln][2][$pos][2] = round($cattotfuture[$ln][$cat],1);
 
 				if ($useweights==1) {
 					if ($cattotfuture[$ln][$cat]>0 && $catpossfuture[$cat]>0) {
@@ -1897,7 +1897,7 @@ function gbtable() {
 				}
 			} else if (isset($cattotfutureec[$ln][$cat])) {
 				$cattotfuture[$ln][$cat] = array_sum($cattotfutureec[$ln][$cat]);
-				$gb[$ln][2][$pos][2] = $cattotfuture[$ln][$cat];
+				$gb[$ln][2][$pos][2] = round($cattotfuture[$ln][$cat],1);
 
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][2] = 0;
@@ -1960,9 +1960,9 @@ function gbtable() {
 					} else {
 						$tokeep = count($cattotattempted[$ln][$cat]);
 					}
-					$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/($tokeep),1);
+					$cattotattempted[$ln][$cat] = $catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/($tokeep);
 					if (isset($cattotattemptedec[$ln][$cat])) {
-						$cattotattemptedec[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattemptedec[$ln][$cat])/$tokeep,1);
+						$cattotattemptedec[$ln][$cat] = $catpossattemptedstu[$cat]*array_sum($cattotattemptedec[$ln][$cat])/$tokeep;
 					}
 				} else {
 					$cattotattempted[$ln][$cat] = array_sum($cattotattempted[$ln][$cat]);
@@ -1973,16 +1973,16 @@ function gbtable() {
 
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
-						$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*($cattotattempted[$ln][$cat]/$cats[$cat][1]),1);
+						$cattotattempted[$ln][$cat] = $catpossattemptedstu[$cat]*($cattotattempted[$ln][$cat]/$cats[$cat][1]);
 					} else if ($cats[$cat][2]==1) { //percent scale
-						$cattotattempted[$ln][$cat] = round($cattotattempted[$ln][$cat]*(100/($cats[$cat][1])),1);
+						$cattotattempted[$ln][$cat] = $cattotattempted[$ln][$cat]*(100/($cats[$cat][1]));
 					}
 				}
 				if (isset($cattotattemptedec[$ln][$cat])) { //add in EC
 					$cattotattempted[$ln][$cat] += $cattotattemptedec[$ln][$cat];
 				}
 				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
-					$cattotattempted[$ln][$cat] = ($catpossattemptedstu[$cat]==0)?0:round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
+					$cattotattempted[$ln][$cat] = ($catpossattemptedstu[$cat]==0)?0:$cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]);
 					$catpossattemptedstu[$cat] = ($catpossattemptedstu[$cat]==0)?0:$cats[$cat][5];
 				}
 
@@ -1994,18 +1994,18 @@ function gbtable() {
 					}
 				}
 
-				$gb[$ln][2][$pos][3] = $cattotattempted[$ln][$cat];
+				$gb[$ln][2][$pos][3] = round($cattotattempted[$ln][$cat],1);
 
 				if ($useweights==1) {
 					if ($cattotattempted[$ln][$cat]>0 && $catpossattemptedstu[$cat]>0) {
 						$totattempted += ($cattotattempted[$ln][$cat]*$cats[$cat][5])/(100*$catpossattemptedstu[$cat]); //weight total
 					}
 				}
-				$gb[$ln][2][$pos][4] = $catpossattemptedstu[$cat];
+				$gb[$ln][2][$pos][4] = round($catpossattemptedstu[$cat],1);
 			} else if (isset($cattotattemptedec[$ln][$cat])) {
 				$cattotattempted[$ln][$cat] = array_sum($cattotattemptedec[$ln][$cat]);
 				$catpossattemptedstu[$cat] = 0;
-				$gb[$ln][2][$pos][3] = $cattotattempted[$ln][$cat];
+				$gb[$ln][2][$pos][3] = round($cattotattempted[$ln][$cat],1);
 				$gb[$ln][2][$pos][4] = 0;
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][3] = 0;
