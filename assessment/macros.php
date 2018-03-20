@@ -2002,9 +2002,9 @@ function randnamewpronouns() {
 	$gender = $GLOBALS['RND']->rand(0,1);	
 	$name = randnames(1,$gender);
 	if ($gender==0) { //male
-		array(randnames(1,0), _('he'), _('him'), _('his'), _('his'));
+		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'));
 	} else {
-		array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'));
+		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'));
 	}
 }
 function randmalename() {
