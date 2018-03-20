@@ -3505,13 +3505,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($score<0) { $score = 0; }
 		if ($score==0 && isset($partialcredit) && !$islist && is_numeric($givenans)) {
 			foreach ($altanswers as $i=>$anans) {
+				/*  disabled until we can support array $reqsigfigs
 				if (isset($reqsigfigs)) {
 					if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
 						$score = $altweights[$i]; break;
 					} else {
 						continue;
 					}
-				} else if (isset($abstolerance)) {
+				} else
+				*/
+				if (isset($abstolerance)) {
 					if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$score = $altweights[$i]; break;}
 				} else {
 					if ($anans==0) {
