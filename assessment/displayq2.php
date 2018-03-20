@@ -1549,7 +1549,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$akey = array_search($randqkeys[$i],$randakeys);
 			}
 			if ($displayformat == "select") {
-				$sa .= $answers[$randakeys[$akey]].' ';
+				$sa .= '<br/>'.$answers[$randakeys[$akey]];
 			} else {
 				$sa .= chr($akey+97)." ";
 			}
