@@ -217,22 +217,22 @@ if (isset($_POST['checked'])) { //modifying existing
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
 			$qidlist = implode(',', array_map('intval', $qids));
-			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref,imas_questionset.id ";
+			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref,imas_questionset.id AS qsid ";
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
 			$query .= "imas_questions.id IN ($qidlist)";
 			$stm = $DBH->query($query);
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				if ($row[2]==9999) {
-					$row[2] = '';
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if ($row['points']==9999) {
+					$row['points'] = '';
 				}
-				if ($row[3]==9999) {
-					$row[3] = '';
+				if ($row['attempts']==9999) {
+					$row['attempts'] = '';
 				}
 
-				$qrows[$row[0]] = '<tr><td>'.$qns[$row[0]].'</td><td>'.$row[1].'</td>';
-				$qrows[$row[0]] .= '<td>';
-				if ($row[5]!='') {
-					$extref = explode('~~',$row[5]);
+				$qrows[$row['id']] = '<tr><td>'.$qns[$row['id']].'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
+				$qrows[$row['id']] .= '<td>';
+				if ($row['extref']!='') {
+					$extref = explode('~~',$row['extref']);
 					$hasvid = false;  $hasother = false;
 					foreach ($extref as $v) {
 						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
@@ -243,22 +243,22 @@ if (isset($_POST['checked'])) { //modifying existing
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						$qrows[$row[0]] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
+						$qrows[$row['id']] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
 					if ($hasother) {
-						$qrows[$row[0]] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
+						$qrows[$row['id']] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 					}
 				}
-				$qrows[$row[0]] .= '</td>';
-				$qrows[$row[0]] .= '<td><button type="button" onclick="previewq('.$row[6].')">'._('Preview').'</button></td>';
-				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
-				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
-				$qrows[$row[0]] .= "<td><select name=\"showhints{$row[0]}\">";
-				$qrows[$row[0]] .= '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
-				$qrows[$row[0]] .= '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
-				$qrows[$row[0]] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
-				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
-				$qrows[$row[0]] .= '</tr>';
+				$qrows[$row['id']] .= '</td>';
+				$qrows[$row['id']] .= '<td><button type="button" onclick="previewq('.$row['qsid'].')">'._('Preview').'</button></td>';
+				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"{$row['points']}\" /></td>";
+				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
+				$qrows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\">";
+				$qrows[$row['id']] .= '<option value="0" '.(($row['showhints']==0)?'selected="selected"':'').'>Use Default</option>';
+				$qrows[$row['id']] .= '<option value="1" '.(($row['showhints']==1)?'selected="selected"':'').'>No</option>';
+				$qrows[$row['id']] .= '<option value="2" '.(($row['showhints']==2)?'selected="selected"':'').'>Yes</option></select></td>';
+				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
+				$qrows[$row['id']] .= '</tr>';
 			}
 			echo "<th>Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
 			echo '<th>Points<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defpoints']).'</i></th>';
