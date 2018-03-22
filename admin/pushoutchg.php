@@ -6,7 +6,7 @@ ini_set("max_execution_time", "900");
 
 if ($myrights==100) {
    if (isset($_POST['submit'])) {
-   	   $cid = intval($_POST['cid']);
+   	   $cid = Sanitize::onlyInt($_POST['cid']);
    	   if ($cid==0) {
    	   	   echo 'Invalid course id';
    	   }

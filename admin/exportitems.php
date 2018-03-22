@@ -65,7 +65,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	header("Content-Disposition: attachment; filename=\"imasitemexport.imas\"");
 
 	$checked = $_POST['checked'];
-
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT itemorder,ownerid FROM imas_courses WHERE id=:id");
@@ -83,8 +82,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 
 	exportcopysub($items,'0',$newitems);
 	//print_r($newitems);
+    $description = Sanitize::encodeStringForDisplay($_POST['description']);
 	echo "EXPORT DESCRIPTION\n";
-	echo $_POST['description']."\n";
+	echo $description."\n";
 	echo "EXPORT OWNERID\n";
 	echo $line['ownerid']."\n";
 	echo "INSTALLNAME\n";

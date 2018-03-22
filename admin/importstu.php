@@ -61,7 +61,7 @@ function parsecsv($data) {
 		$code = 0;
 	}
 	if ($_POST['sectype']==1) {
-		$sec = $_POST['secval'];
+		$sec = Sanitize::simpleString($_POST['secval']);
 	} else if ($_POST['sectype']==2) {
 		$sec = $data[$_POST['seccol']-1];
 	} else {

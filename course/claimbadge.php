@@ -14,7 +14,7 @@ if (isset($teacherid)) {
 	if (empty($_GET['userid'])) {
 		echo 'Only students can claim a badge';
 	} else {
-		$userid = $_GET['userid'];
+		$userid = (int) Sanitize::onlyInt($_GET['userid']);
 		//DB $query = "SELECT SID FROM imas_users WHERE id='$userid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $username = mysql_result($result,0,0);

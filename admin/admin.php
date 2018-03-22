@@ -19,7 +19,7 @@ $curBreadcrumb = "$breadcrumbbase Admin\n";
  if ($myrights>=75) {
 	 if (isset($_GET['showcourses'])) {
      $showcourses = Sanitize::onlyInt($_GET['showcourses']);
-		 setcookie('showcourses', $showcourses);
+		 setcookie('showcourses', $showcourses,'','','','',true);
 	 } else if (isset($_COOKIE['showcourses'])) {
 		 $showcourses = $_COOKIE['showcourses'];
 	 } else {
@@ -31,7 +31,7 @@ $curBreadcrumb = "$breadcrumbbase Admin\n";
  if ($myrights==100) {
 	 if (isset($_GET['showusers'])) {
      $showusers = Sanitize::onlyInt($_GET['showusers']);
-		 setcookie('showusers', $showusers);
+		 setcookie('showusers', $showusers, '','','','',true);
 	 } else if (isset($_COOKIE['showusers'])) {
 		 $showusers = Sanitize::onlyInt($_COOKIE['showusers']);
 	 } else {

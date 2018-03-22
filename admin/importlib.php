@@ -351,7 +351,7 @@ if ($myrights < 100) {
 	if (isset($_POST['process'])) {
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
 
-		$libstoadd = $_POST['libs'];
+		$libstoadd = array_map('intval',$_POST['libs']);
 
 		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($filename);
 		//DB //need to addslashes before SQL insert
@@ -361,8 +361,8 @@ if ($myrights < 100) {
 		//DB $unique = array_map('addslashes_deep', $unique);
 		//DB $lastmoddate = array_map('addslashes_deep', $lastmoddate);
 
-		$root = $_POST['parent'];
-		$librights = $_POST['librights'];
+		$root = Sanitize::onlyInt(trim($_POST['parent']));
+        $librights = Sanitize::onlyInt(trim($_POST['librights']));
 		$qrights = $_POST['qrights'];
 		$touse = '';
 		//write libraries
@@ -395,6 +395,7 @@ if ($myrights < 100) {
 		$DBH->beginTransaction();
 
 		foreach ($libstoadd as $libid) {
+
 			if ($parents[$libid]==0) {  //use given root parent
 				$parent = $root;
 			} else if (isset($libs[$parents[$libid]])) { //if parent has been set
@@ -486,7 +487,7 @@ if ($myrights < 100) {
 				$includedbackref = array();
 				$toundel = array();
 				if (count($includedqs)>0) {
-					$includedlist = implode(',', $includedqs);  //known decimal values from above
+					$includedlist = implode(',', array_map('floatval', $includedqs));  //known decimal values from above
 					//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 					//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {
