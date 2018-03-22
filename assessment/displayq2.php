@@ -3403,12 +3403,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$islist = false;
 		}
-		foreach ($gaarr as $k=>$v) {
-			$gaarr[$k] = str_replace(array('$',',',' ','/','^','*'),'',$v);
-		}
-
-
-		$extrapennum = count($gaarr)+count($anarr);
 
 		if (in_array('orderedlist',$ansformats)) {
 			if (count($gamasterarr)!=count($anarr)) {
@@ -3422,6 +3416,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
+		foreach ($gaarr as $k=>$v) {
+			$gaarr[$k] = trim(str_replace(array('$',',',' ','/','^','*'),'',$v));
+			if (strtoupper($gaarr[$k])=='DNE') {
+				$gaarr[$k] = 'DNE';
+			} else if ($gaarr[$k]=='oo' || $gaarr[$k]=='-oo' || $gaarr[$k]=='-oo') {
+				//leave alone
+			} else if (preg_match('/\d\s*(x|y|z|r|t|i|X|Y|Z|I)([^a-zA-Z]|$)/', $gaarr[$k])) {
+				//has a variable - don't strip
+			} else {
+				$gaarr[$k] = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)[^+\-]*$/','$1',$gaarr[$k]); //strip out units
+			}
+		}
+
+		$extrapennum = count($gaarr)+count($anarr);
 
 		$correct = 0;
 		foreach($anarr as $i=>$answer) {
@@ -3431,25 +3439,24 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 
 			foreach($gaarr as $j=>$givenans) {
-
-				$givenans = trim($givenans);
 				if (isset($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
 					continue;
 				}
 				$anss = explode(' or ',$answer);
 				foreach ($anss as $anans) {
 					if (!is_numeric($anans)) {
-						if (preg_match('/(\(|\[)(-?[\d\.]+|-oo)\,(-?[\d\.]+|oo)(\)|\])/',$anans,$matches)) {
+						if (preg_match('/(\(|\[)(-?[\d\.]+|-oo)\,(-?[\d\.]+|oo)(\)|\])/',$anans,$matches) && is_numeric($givenans)) {
 							if ($matches[2]=='-oo') {$matches[2] = -1e99;}
 							if ($matches[3]=='oo') {$matches[3] = 1e99;}
 							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
 								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
+									echo "here 3";
 									$correct += 1;
 									$foundloc = $j;
 									break 2;
 								}
 							}
-						} else	if ($anans=="DNE" && strtoupper($givenans)=="DNE") {
+						} else	if ($anans=="DNE" && $givenans=="DNE") {
 							$correct += 1; $foundloc = $j; break 2;
 						} else if (($anans=="+oo" || $anans=="oo") && ($givenans=="+oo" || $givenans=="oo")) {
 							$correct += 1; $foundloc = $j; break 2;
@@ -3460,11 +3467,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					} else {//{if (is_numeric($givenans)) {
 						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
-						if (preg_match('/\d\s*(x|y|z|r|t|i|X|Y|Z|I)([^a-zA-Z]|$)/', $givenans)) {
-							//has a variable - don't strip
-						} else {
-							$givenans = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)[^+\-]*$/','$1',trim($givenans)); //strip out units
-						}
 						if (is_numeric($givenans)) {
 							if (isset($reqsigfigs)) {
 								if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
