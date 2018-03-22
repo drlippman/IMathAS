@@ -21,7 +21,7 @@
 		$gbmode = $stm->fetchColumn(0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
-		$stu = $_GET['stu'];
+		$stu = Sanitize::onlyInt($_GET['stu']);
 	} else {
 		$stu = 0;
 	}
@@ -347,7 +347,7 @@
 				$pc = 0; $pc2 = 0; $pi = "NA";
 			}
 
-			echo "<td>{$itemnum[$qid]}</td><td>";
+			echo "<td>" . Sanitize::onlyInt($itemnum[$qid]) . "</td><td>";
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
@@ -374,7 +374,7 @@
 					echo '<td class="c">N/A</td>';
 				}
 			}
-			echo sprintf("<td><input type=button value=\"Preview\" onClick=\"previewq(%d)\"/></td>\n", $qsetids[$qid]);
+			echo sprintf("<td><input type=button value=\"Preview\" onClick=\"previewq(%d)\"/></td>\n", Sanitize::onlyInt($qsetids[$qid]));
 
 			echo "</tr>\n";
 			$i++;

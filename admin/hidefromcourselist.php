@@ -18,7 +18,7 @@ if ($myrights==100 && isset($_GET['user'])) {
 	$actionuserid = Sanitize::onlyInt($_GET['user']);
 } else if ($myrights>=75 && isset($_GET['user'])) {
 	$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=:id");
-	$stm->execute(array(':id'=>$_GET['user']));
+	$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['user'])));
 	if ($groupid==$stm->fetchColumn(0)) {
 		$actionuserid = Sanitize::onlyInt($_GET['user']);
 	}

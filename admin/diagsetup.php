@@ -12,7 +12,8 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Diagnostic Setup";
-
+$diagId = Sanitize::onlyInt(trim($_POST['id']));
+$courseId = Sanitize::onlyInt(trim($_POST['cid']));
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase ";
 if (!empty($_GET['from'])) {
 	$from = Sanitize::simpleString($_GET['from']);
@@ -84,12 +85,13 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$entryformat = $_POST['entrytype'].$_POST['entrydig'];
 
 	$sel2 = array();
-	if (isset($_POST['id'])) {
+
+	if (!empty($diagId)) {
 		//DB $query = "SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id='{$_POST['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['id']));
+		$stm->execute(array(':id'=>$diagId));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$s1l = explode(',',$row[0]);
 		$s2l = explode(';',$row[2]);
@@ -116,7 +118,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='{$_POST['cid']}'";
 		//DB $result = mysql_query($query);
 		$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$_POST['cid']));
+		$stm->execute(array(':courseid'=>$courseId));
 
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -211,7 +213,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$diagId));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		$diagname = $line['name'];
 		$cid = $line['cid'];

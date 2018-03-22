@@ -17,7 +17,6 @@ $curBreadcrumb .= "&gt; Delete Link\n";
 $pagetitle = "Delete Link";
 
 
-
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
@@ -25,12 +24,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = Sanitize::courseId($_GET['cid']);
-	$block = Sanitize::stripHtmlTags($_GET['block']);
+	$cid = (int) Sanitize::courseId($_GET['cid']);
+	$block = (string) Sanitize::stripHtmlTags($_GET['block']);
+	$textid = Sanitize::onlyInt($_GET['id']);
 
 	if ($_POST['remove']=="really") {
-		require_once("../includes/filehandler.php");
-		$textid = $_GET['id'];
+		require_once("../includes/filehandler.php");		
 
 		$DBH->beginTransaction();
 
@@ -87,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $items = unserialize(mysql_result($result,0,0));
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['cid']));
+			$stm->execute(array(':id'=>$cid));
 			$items = unserialize($stm->fetchColumn(0));
 
 			$blocktree = explode('-',$block);
@@ -107,7 +106,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	} else {
@@ -115,7 +114,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $itemname = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$textid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

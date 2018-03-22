@@ -12,8 +12,9 @@ $since = intval($_GET['since']);
 require("../init_without_validate.php");
 require_once("../includes/filehandler.php");
 
+$peerName = Sanitize::stripHtmlTags($_GET['peer']);
 $stm = $DBH->prepare("SELECT id,secret FROM imas_federation_peers WHERE peername=:peername");
-$stm->execute(array(':peername'=>$_GET['peer']));
+$stm->execute(array(':peername'=>$peerName));
 if ($stm->rowCount()==0) {
 	echo '{error:"Unknown peer"}';
 	exit;
@@ -68,7 +69,7 @@ if ($stage == 0) { //send updated libraries
 	//record this pull
 	$now = time();
 	$stm = $DBH->prepare('UPDATE imas_federation_peers SET lastpull=:now WHERE peername=:peername');
-	$stm->execute(array(':now'=>$now, ':peername'=>$_GET['peer']));
+	$stm->execute(array(':now'=>$now, ':peername'=>$peerName));
 	exit;
 } else if ($stage == 1) { //send updated questions
 	//we're going to order from most recent back so that if something updates while we're

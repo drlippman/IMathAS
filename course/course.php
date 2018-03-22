@@ -40,7 +40,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['cid']));
+		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -88,8 +88,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		//DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$_GET['cid']));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 	}
 
 	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
@@ -177,7 +177,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 
 	if ($_GET['folder']!='0') {
 		$now = time();
-		$blocktree = explode('-',$_GET['folder']);
+		$blocktree = array_map('intval', explode('-',$_GET['folder']));
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
 			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
@@ -198,8 +198,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		}
 	}
 	//DEFAULT DISPLAY PROCESSING
-	$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
-	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course";
+	//$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
+	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course/";
+	//$jsAddress2 = $GLOBALS['basesiteurl'] . "/course";
 
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);
@@ -398,14 +399,14 @@ if ($overwriteBody==1) {
 	if (isset($teacherid)) {
  ?>
 	<script type="text/javascript">
-		/*function moveitem(from,blk) {
-			var to = document.getElementById(blk+'-'+from).value;
-
-			if (to != from) {
-				var toopen = '<?php echo $jsAddress1 ?>&block=' + blk + '&from=' + from + '&to=' + to;
-				window.location = toopen;
-			}
-		}*/
+		//function moveitem(from,blk) {
+		//	var to = document.getElementById(blk+'-'+from).value;
+        //
+		//	if (to != from) {
+		//		var toopen = '<?php //echo $jsAddress1 ?>//&block=' + blk + '&from=' + from + '&to=' + to;
+		//		window.location = toopen;
+		//	}
+		//}
 		function moveDialog(block,item) {
 			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto");
 			return false;
@@ -414,7 +415,7 @@ if ($overwriteBody==1) {
 			var type = document.getElementById('addtype'+blk+'-'+tb).value;
 			if (tb=='BB' || tb=='LB') { tb = 'b';}
 			if (type!='') {
-				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo Sanitize::courseId($_GET['cid']); ?>';
+				var toopen = '<?php echo $jsAddress2 ?>add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo Sanitize::courseId($_GET['cid']); ?>';
 				window.location = toopen;
 			}
 		}
