@@ -36,8 +36,9 @@ if (!empty($newStatus)) {
 		if ($_POST['group']>-1) {
 			$group = Sanitize::onlyInt($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
+			$newGroupName = Sanitize::stripHtmlTags(trim($_POST['newgroup']));
 			$stm = $DBH->prepare("SELECT id FROM imas_groups WHERE name REGEXP ?");
-			$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', Sanitize::encodeStringForDisplay(trim($_POST['newgroup'])))).'[[:space:]]*$'));
+			$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', $newGroupName)).'[[:space:]]*$'));
 			$group = $stm->fetchColumn(0);
 			if ($group === false) {
 				$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");

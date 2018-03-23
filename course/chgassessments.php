@@ -103,9 +103,9 @@ if (!(isset($teacherid))) {
 			} else if ($_POST['skippenalty']>0) {
 				$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 			}
-			$feedback = Sanitize::encodeStringForDisplay($_POST['deffeedback']);
+			$feedback = Sanitize::simpleASCII($_POST['deffeedback']);
 			if ($feedback=="Practice" || $feedback=="Homework") {
-				$showanswerprac = Sanitize::encodeStringForDisplay($_POST['showansprac']);
+				$showanswerprac = Sanitize::simpleASCII($_POST['showansprac']);
 				$deffeedback = $feedback.'-'.$showanswerprac;
 				if (($turnoffshuffle&8)!=8) {
 					$turnoffshuffle += 8;
@@ -114,7 +114,7 @@ if (!(isset($teacherid))) {
 					$turnonshuffle -= 8;
 				}
 			} else {
-				$showanswer = Sanitize::encodeStringForDisplay($_POST['showans']);
+				$showanswer = Sanitize::simpleASCII($_POST['showans']);
 				$deffeedback = $feedback.'-'.$showanswer;
 			}
 
@@ -136,7 +136,7 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chgdisplaymethod'])) {
 				//DB $sets[] = "displaymethod='{$_POST['displaymethod']}'";
 				$sets[] = "displaymethod=:displaymethod";
-				$qarr[':displaymethod'] = Sanitize::encodeStringForDisplay($_POST['displaymethod']);
+				$qarr[':displaymethod'] = Sanitize::simpleASCII($_POST['displaymethod']);
 			}
 			if (isset($_POST['chgdefpoints'])) {
 				//DB $sets[] = "defpoints='{$_POST['defpoints']}'";
@@ -176,7 +176,7 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chgpassword'])) {
 				//DB $sets[] = "password='{$_POST['assmpassword']}'";
 				$sets[] = "password=:password";
-				$qarr[':password'] = Sanitize::encodeStringForDisplay($_POST['assmpassword']);
+				$qarr[':password'] = Sanitize::stripHtmlTags($_POST['assmpassword']);
 			}
 			if (isset($_POST['chghints'])) {
 				//DB $sets[] = "showhints='$showhints'";
@@ -228,11 +228,11 @@ if (!(isset($teacherid))) {
 			}
 
 			if (isset($_POST['chgcaltag'])) {
-				$caltag = Sanitize::encodeStringForDisplay($_POST['caltagact']);
+				$caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
 				//DB $sets[] = "caltag='$caltag'";
 				$sets[] = "caltag=:caltag";
 				$qarr[':caltag'] = $caltag;
-				$calrtag = Sanitize::encodeStringForDisplay($_POST['caltagrev']);
+				$calrtag = Sanitize::stripHtmlTags($_POST['caltagrev']);
 				//DB $sets[] = "calrtag='$calrtag'";
 				$sets[] = "calrtag=:calrtag";
 				$qarr[':calrtag'] = $calrtag;
@@ -257,7 +257,7 @@ if (!(isset($teacherid))) {
 				if (isset($_POST['usedeffb'])) {
 					//DB $sets[] = "deffeedbacktext='{$_POST['deffb']}'";
 					$sets[] = "deffeedbacktext=:deffeedbacktext";
-					$qarr[':deffeedbacktext'] = Sanitize::encodeStringForDisplay($_POST['deffb']);
+					$qarr[':deffeedbacktext'] = Sanitize::incomingHtml($_POST['deffb']);
 				} else {
 					$sets[] = "deffeedbacktext=''";
 				}
@@ -365,7 +365,7 @@ if (!(isset($teacherid))) {
 				$stmupd->execute(array(':id'=>$row['id'], ':intro'=>$outintro));
 			}
 		}
-		exit;
+
 		if (isset($_POST['removeperq'])) {
 			//DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());

@@ -14,24 +14,23 @@ if (!isset($teacherid)) {
 $cid = Sanitize::courseId($_GET['cid']);
 
 if (isset($_POST['checked'])) { //form submitted
-	$checked = Sanitize::onlyInt($_POST['checked']);
+	if (!is_array($_POST['checked'])) {
+		$_POST['checked'] = explode(',',$_POST['checked']);
+	}
+	$checked = array_map('Sanitize::onlyInt', $_POST['checked']);
+	$ph = Sanitize::generateQueryPlaceholders($checked);
 	if ($_POST['submit']=="Delete") {
 		if (isset($_POST['confirm'])) {
-			$checked = explode(',',$checked);
-			foreach ($checked as $k=>$gbi) {
-				$gbi = intval($gbi);
-				$checked[$k] = $gbi;
-				//DB $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='$gbi'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
-				$stm->execute(array(':gradetypeid'=>$gbi));
-			}
-			$checkedlist = implode(',', array_map('intval',$checked));
-			//DB $query = "DELETE FROM imas_gbitems WHERE id IN ($checkedlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->query("DELETE FROM imas_gbitems WHERE id IN ($checkedlist)");
+			
+			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid IN ($ph)");
+			$stm->execute($checked);
+			
+			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id IN ($ph)");
+			$stm->execute($checked);
+			
 		} else {
-			$checkedlist = implode(',', array_map('intval',$checked));
+			$checkedlist = implode(',', $checked);
+			
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -45,7 +44,8 @@ if (isset($_POST['checked'])) { //form submitted
 			//DB $query = "SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
-			$stm = $DBH->query("SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)");
+			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id IN ($ph)");
+			$stm->execute($checked);
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				echo Sanitize::encodeStringForDisplay($row[0]) . '<br/>';
 			}
@@ -58,7 +58,7 @@ if (isset($_POST['checked'])) { //form submitted
 		}
 	} else {
 		require_once("../includes/parsedatetime.php");
-		$checkedlist = implode(',', array_map('intval',$checked));
+
 		$sets = array();
 		$qarr = array();
 		if (isset($_POST['chgshowafter'])) {
@@ -68,30 +68,30 @@ if (isset($_POST['checked'])) { //form submitted
 				$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 			}
 			//DB $sets[] = "showdate='$showdate'";
-			$sets[] = "showdate=:showdate";
-			$qarr[':showdate'] = $showdate;
+			$sets[] = "showdate=?";
+			$qarr[] = $showdate;
 		}
 		if (isset($_POST['chgcount'])) {
 			//DB $sets[] = "cntingb='{$_POST['cntingb']}'";
-			$sets[] = "cntingb=:cntingb";
-			$qarr[':cntingb'] = $_POST['cntingb'];
+			$sets[] = "cntingb=?";
+			$qarr[] = $_POST['cntingb'];
 		}
 		if (isset($_POST['chgtutoredit'])) {
 			//DB $sets[] = "tutoredit='{$_POST['tutoredit']}'";
-			$sets[] = "tutoredit=:tutoredit";
-			$qarr[':tutoredit'] = $_POST['tutoredit'];
+			$sets[] = "tutoredit=?";
+			$qarr[] = $_POST['tutoredit'];
 		}
 		if (isset($_POST['chggbcat'])) {
 			//DB $sets[] = "gbcategory='{$_POST['gbcat']}'";
-			$sets[] = "gbcategory=:gbcategory";
-			$qarr[':gbcategory'] = $_POST['gbcat'];
+			$sets[] = "gbcategory=?";
+			$qarr[] = $_POST['gbcat'];
 		}
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
 			//DB $query = "UPDATE imas_gbitems SET $setslist WHERE id IN ($checkedlist)";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("UPDATE imas_gbitems SET $setslist WHERE id IN ($checkedlist)");
-			$stm->execute($qarr);
+			$stm = $DBH->prepare("UPDATE imas_gbitems SET $setslist WHERE id IN ($ph)");
+			$stm->execute(array_merge($qarr, $checked));
 		}
 	}
 

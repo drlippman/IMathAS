@@ -82,7 +82,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 
 	exportcopysub($items,'0',$newitems);
 	//print_r($newitems);
-    $description = Sanitize::encodeStringForDisplay($_POST['description']);
+	$description = $_POST['description'];
 	echo "EXPORT DESCRIPTION\n";
 	echo $description."\n";
 	echo "EXPORT OWNERID\n";

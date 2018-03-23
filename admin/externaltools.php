@@ -125,6 +125,7 @@ if (isset($_POST['tname'])) {
 	} else {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> \n";
 	}
+	$id = Sanitize::simpleString($_GET['id']); //can be ID int or string "new"
 	if (isset($_GET['delete'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Delete Tool</div>";
 		echo "<h2>Delete Tool</h2>";
@@ -136,31 +137,31 @@ if (isset($_POST['tname'])) {
 		$name = $stm->fetchColumn(0);
 
 		echo '<p>Are you SURE you want to delete the tool <b>' . Sanitize::encodeStringForDisplay($name) . '</b>?  Doing so will break ALL placements of this tool.</p>';
-		echo '<form method="post" action="externaltools.php?cid=' . $cid . $ltfrom . '&amp;id=' . Sanitize::onlyInt($_GET['id']) . '">';
+		echo '<form method="post" action="externaltools.php?cid=' . $cid . $ltfrom . '&amp;id=' . $id . '">';
 		echo '<input type=hidden name=delete value=true />';
 		echo '<input type=submit value="Yes, I\'m Sure">';
 		echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
 		echo '</form>';
 
-	} else if (isset($_GET['id'])) {
+	} else if (!empty($id)) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Edit Tool</div>";
 		echo "<h2>Edit Tool</h2>";
-		if ($_GET['id']=='new') {
+		if ($id=='new') {
 			$name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = 3; $grp = 0;
 		} else {
-      $qsel = 'SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools ';
+			$qsel = 'SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools ';
 			if ($isadmin) {
-        //DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}'";
-        $stm = $DBH->prepare($qsel."WHERE id=:id");
-        $stm->execute(array(':id'=>$id));
-      } else if ($isteacher) {
+				//DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}'";
+				$stm = $DBH->prepare($qsel."WHERE id=:id");
+				$stm->execute(array(':id'=>$id));
+			} else if ($isteacher) {
 				//DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}' AND courseid='$cid'";
 				$stm = $DBH->prepare($qsel."WHERE id=:id AND courseid=:courseid");
-				$stm->execute(array(':id'=>$_GET['id'], ':courseid'=>$cid));
+				$stm->execute(array(':id'=>$id, ':courseid'=>$cid));
 			} else if ($isgrpadmin) {
 				//DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}' AND groupid='$groupid'";
 				$stm = $DBH->prepare($qsel."WHERE id=:id AND groupid=:groupid");
-				$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
+				$stm->execute(array(':id'=>$id, ':groupid'=>$groupid));
 			}
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)==0) { die("invalid id");}
@@ -173,7 +174,7 @@ if (isset($_POST['tname'])) {
 		foreach ($tochg as $v) {
 			${$v} = htmlentities(${$v});
 		}
-		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.Sanitize::onlyInt($_GET['id']).'">';
+		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$id.'">';
 ?>
 		<span class="form">Tool Name:</span>
 		<span class="formright"><input type="text" size="40" name="tname" value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" /></span>

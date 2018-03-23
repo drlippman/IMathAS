@@ -21,7 +21,7 @@ if (isset($_GET['go'])) {
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 			require("../includes/unenroll.php");
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
-				unenrollstu($rcid, $uid);
+				unenrollstu($rcid, array($uid));
 			}
 		}
 		$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=10 WHERE userid=:id");
