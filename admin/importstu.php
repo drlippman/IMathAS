@@ -48,7 +48,7 @@ function parsecsv($data) {
 		$un = $data[$_POST['unloc']-1];
 	}
 	if ($_POST['emailloc']>0) {
-		$email = $data[$_POST['emailloc']-1];
+		$email = Sanitize::emailAddress($data[$_POST['emailloc']-1]);
 		if ($email=='') {
 			$email = 'none@none.com';
 		}
@@ -56,12 +56,12 @@ function parsecsv($data) {
 		$email = 'none@none.com';
 	}
 	if ($_POST['codetype']==1) {
-		$code = $data[$_POST['code']-1];
+		$code = Sanitize::stripHtmlTags($data[$_POST['code']-1]);
 	} else {
 		$code = 0;
 	}
 	if ($_POST['sectype']==1) {
-		$sec = Sanitize::simpleString($_POST['secval']);
+		$sec = Sanitize::stripHtmlTags($_POST['secval']);
 	} else if ($_POST['sectype']==2) {
 		$sec = $data[$_POST['seccol']-1];
 	} else {

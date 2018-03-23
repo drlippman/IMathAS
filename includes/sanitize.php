@@ -323,7 +323,7 @@ class Sanitize
 	/**
 	 * Sanitize data so it only contains simple characters: a-zA-Z0-9_-
 	 *
-	 * @param $data mixed A variable containing a number.
+	 * @param $data mixed A variable containing a string.
 	 * @return string A sanitized variable containing simple characters.
 	 */
 	public static function simpleString($data)
@@ -335,7 +335,7 @@ class Sanitize
 	 * Sanitize data so it only contains ASCII 32-127.
 	 * Also strips HTML tags
 	 *
-	 * @param $data mixed A variable containing a number.
+	 * @param $data mixed A variable containing a string.
 	 * @return string A sanitized variable containing ASCII 32-127.
 	 */
 	public static function simpleASCII($data)
@@ -491,6 +491,15 @@ class Sanitize
 	 */
 	public static function incomingHtml($unsafeContent) {
 		return myhtmLawed($unsafeContent);
+	}
+	
+	/**
+	 * Generate a random string for the query string 
+	 *
+	 * @return string The sanitized content.
+	 */
+	public static function randomQueryStringParam() {
+		return uniqid();
 	}
 
 }

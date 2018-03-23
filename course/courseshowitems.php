@@ -616,7 +616,7 @@ function showitems($items,$parent,$inpublic=false) {
 		   }
 
 		   $line = $itemshowdata[$items[$i]];
-		   $typeid = $line['id'];
+		   $typeid = Sanitize::onlyInt($line['id']);
 
 		   if ($line['itemtype']=="Calendar") {
 			   if ($ispublic) { continue;}
@@ -1893,7 +1893,7 @@ function showitems($items,$parent,$inpublic=false) {
 			echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon.'Calendar</li>';
 
 	   	   } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
-			   $typeid = $itemtypes[$items[$i]][1];
+			   $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['reviewdate'],$line['avail']) = $iteminfo['Assessment'][$typeid];
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
@@ -1925,12 +1925,12 @@ function showitems($items,$parent,$inpublic=false) {
 			echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
 				   $show = sprintf(_('Available until %s'), $enddate);
-				   echo '<b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
+				   echo '<b><span id="A' . $typeid . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   //echo '<b>'.$line['name'].'</b> ';
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
 				   $show = sprintf(_('Review until %s'), $reviewdate);
 				   //echo '<b>'.$line['name'].'</b> ';
-				   echo '<b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
+				   echo '<b><span id="A' . $typeid . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 			   } else {
 				   $show = sprintf(_('Available %1$s to %2$s'), $startdate, $enddate);
 				   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
@@ -1944,7 +1944,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
+				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=" . Sanitize::onlyInt($typeid) . "\">", _('Grades'), "</a>";
@@ -1953,7 +1953,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   echo "</li>";
 
 		   } else if ($itemtypes[$items[$i]][0] == 'InlineText') {
-			   $typeid = $itemtypes[$items[$i]][1];
+			   $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);
 			   list($line['name'],$line['text'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['InlineText'][$typeid];
 			   if ($line['name'] == '##hidden##') {
 				   $line['name'] = strip_tags($line['text']);
@@ -2003,7 +2003,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'LinkedText') {
-			   $typeid = $itemtypes[$items[$i]][1];
+			   $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['LinkedText'][$typeid];
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
@@ -2050,7 +2050,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'Forum') {
-			   $typeid = $itemtypes[$items[$i]][1];
+			   $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Forum'][$typeid];
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
@@ -2097,7 +2097,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'Wiki') {
-			   $typeid = $itemtypes[$items[$i]][1];
+			   $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Wiki'][$typeid];
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
@@ -2144,7 +2144,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   echo '</li>';
 		   } else if ($itemtypes[$items[$i]][0] == 'Drill') {
-			   $typeid = $itemtypes[$items[$i]][1];
+			   $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);
 			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Drill'][$typeid];
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');

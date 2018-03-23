@@ -51,12 +51,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $assessmentId = Sanitize::onlyInt($_GET['id']);
         $cid = Sanitize::courseId($_GET['cid']);
         $block = $_GET['block'];
-        $assessName = Sanitize::encodeStringForDisplay($_POST['name']);
+        $assessName = Sanitize::stripHtmlTags($_POST['name']);
         $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
         $stm->execute(array($cid));
         $dates_by_lti = $stm->fetchColumn(0);
         $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
-        $defpoints = Sanitize::onlyFloat($_POST['defpoints']);
+        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
         $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
         $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
         $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
@@ -76,7 +76,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
             if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
                 require_once('../includes/filehandler.php');
-                deleteallaidfiles(Sanitize::onlyInt($assessmentId));
+                deleteallaidfiles($assessmentId);
                 //DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
                 //DB mysql_query($query) or die("Query failed : " . mysql_error());
                 $stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -112,7 +112,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $cid, $assessmentId);
                 $body .= '</form>';
             }
-        } elseif ($_POST['name']!= null) { //if the form has been submitted
+        } elseif (!empty($_POST['name'])) { //if the form has been submitted
 
             require_once("../includes/parsedatetime.php");
             if ($_POST['avail']==1) {
@@ -178,7 +178,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
 
             if (isset($_POST['usedeffb'])) {
-                $deffb = Sanitize::simpleString($_POST['deffb']);
+                $deffb = Sanitize::incomingHtml($_POST['deffb']);
             } else {
                 $deffb = '';
             }
@@ -205,7 +205,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
             $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
             $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
-            if ($copyFromId!=0) {
+            if (!empty($copyFromId)) {
                 //DB $query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
                 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
                 //DB list($timelimit,$_POST['minscore'],$displayMethod,$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$shwqcat,$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$grpsetid,$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$eqnhelper,$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
@@ -297,24 +297,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
 
 
-            $caltag = Sanitize::encodeStringForDisplay($_POST['caltagact']);
-            $calrtag = Sanitize::encodeStringForDisplay($_POST['caltagrev']);
+            $caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
+            $calrtag = Sanitize::stripHtmlTags($_POST['caltagrev']);
 
-            //DB $_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
-            $_POST['name'] = Sanitize::stripHtmlTags($_POST['name']);
-
-		require_once("../includes/htmLawed.php");
 		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>') {
 			$_POST['summary'] = '';
 		} else {
 			//DB $_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
-			$_POST['summary'] = myhtmLawed($_POST['summary']);
+			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
 		}
 		if ($_POST['intro']=='<p>Enter intro/instructions</p>') {
 			$_POST['intro'] = '';
 		} else {
 			//DB $_POST['intro'] = addslashes(myhtmLawed(stripslashes($_POST['intro'])));
-			$_POST['intro'] = myhtmLawed($_POST['intro']);
+			$_POST['intro'] = Sanitize::incomingHtml($_POST['intro']);
 		}
 		
 		if (isset($_GET['id'])) {  //already have id; update
@@ -345,7 +341,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $query .= "displaymethod=:displaymethod,defattempts=:defattempts,deffeedback=:deffeedback,shuffle=:shuffle,gbcategory=:gbcategory,password=:password,cntingb=:cntingb,showcat=:showcat,caltag=:caltag,calrtag=:calrtag,";
                 $query .= "reqscore=:reqscore,reqscoreaid=:reqscoreaid,reqscoretype=:reqscoretype,noprint=:noprint,avail=:avail,groupmax=:groupmax,allowlate=:allowlate,exceptionpenalty=:exceptionpenalty,ltisecret=:ltisecret,deffeedbacktext=:deffeedbacktext,";
                 $query .= "msgtoinstr=:msgtoinstr,posttoforum=:posttoforum,istutorial=:istutorial,defoutcome=:defoutcome";
-                $qarr = array(':name'=>$_POST['name'], ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'], ':timelimit'=>$timelimit,
+                $qarr = array(':name'=>$assessName, ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'], ':timelimit'=>$timelimit,
                     ':minscore'=>$_POST['minscore'], ':isgroup'=>$isgroup, ':showhints'=>$showhints, ':tutoredit'=>$tutoredit,
                     ':eqnhelper'=>$eqnhelper, ':showtips'=>$showtips, ':displaymethod'=>$displayMethod,
                     ':defattempts'=>$defattempts, ':deffeedback'=>$deffeedback, ':shuffle'=>$shuffle, ':gbcategory'=>$grdebkcat,
@@ -361,7 +357,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $qarr[':groupsetid'] = $updategroupset;
                 }
 
-                if (isset($defpoints)) {
+                if (!empty($defpoints)) {
                     //DB $query .= ",defpoints='{$_POST['defpoints']}',defpenalty='{$_POST['defpenalty']}'";
                     $query .= ",defpoints=:defpoints,defpenalty=:defpenalty";
                     $qarr[':defpoints'] = $defpoints;
@@ -443,8 +439,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			exit;
 		} else { //add new
-		    $copyendmsg = Sanitize::onlyInt($_POST['copyendmsg']);
-			if (empty($copyendmsg)) {$endmsg = '';}
+			if (!isset($_POST['copyendmsg'])) {
+				$endmsg = '';
+			}
 			if ($dates_by_lti>0) {
 				$datebylti = 1;
 			} else {
@@ -1029,10 +1026,10 @@ if ($overwriteBody==1) {
 		<div id="copyfromoptions" class="hidden">
 		<span class=form>Also copy:</span>
 		<span class=formright>
-			<input type=checkbox name="copysummary" /> Summary<br/>
-			<input type=checkbox name="copyinstr" /> Instructions<br/>
-			<input type=checkbox name="copydates" /> Dates <br/>
-			<input type=checkbox name="copyendmsg" /> End of Assessment Messages
+			<input type=checkbox name="copysummary" value=1 /> Summary<br/>
+			<input type=checkbox name="copyinstr" value=1 /> Instructions<br/>
+			<input type=checkbox name="copydates" value=1 /> Dates <br/>
+			<input type=checkbox name="copyendmsg" value=1 /> End of Assessment Messages
 		</span><br class=form />
 		<span class=form>Remove any existing per-question settings?</span>
 		<span class=formright>
