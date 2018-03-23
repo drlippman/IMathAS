@@ -2042,11 +2042,11 @@ function gbtable() {
 			} else {
 				$totattempted = array_sum($cattotattempted[$ln]);
 			}
-			$gb[$ln][3][0] = $totpast;
-			$gb[$ln][3][1] = $totcur;
-			$gb[$ln][3][2] = $totfuture;
-			$gb[$ln][3][6] = $totattempted;
-			$gb[$ln][3][7] = $overallptsattempted;
+			$gb[$ln][3][0] = round($totpast,1);
+			$gb[$ln][3][1] = round($totcur,1);
+			$gb[$ln][3][2] = round($totfuture,1);
+			$gb[$ln][3][6] = round($totattempted,1);
+			$gb[$ln][3][7] = round($overallptsattempted,1);
 			if ($overallptspast>0) {
 				$gb[$ln][3][3] = sprintf("%01.1f", 100*$totpast/$overallptspast);
 			} else {
