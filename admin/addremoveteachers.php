@@ -90,7 +90,7 @@ if (isset($_POST['remove'])) {
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
 	require("../includes/userutils.php");
-	$possible_teachers = searchForUser($_POST['search'], true, true);
+	$possible_teachers = searchForUser(Sanitize::encodeStringForDisplay($_POST['search']), true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
 		if (in_array($row['id'], $existing)) { continue; }

@@ -17,6 +17,8 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
+$cidLookUp = Sanitize::onlyInt($_POST['cidlookup']);
+$ctc = Sanitize::onlyInt($_POST['ctc']);
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Copy Course Items";
 
@@ -29,11 +31,11 @@ if (!(isset($teacherid))) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	$oktocopy = 1;
 
-	if (isset($_POST['cidlookup'])) {
+	if (!empty($cidLookUp)) {
 		$query = "SELECT ic.id,ic.name,ic.enrollkey,ic.copyrights,ic.termsurl,iu.groupid,iu.LastName,iu.FirstName FROM imas_courses AS ic ";
 		$query .= "JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$_POST['cidlookup']));
+		$stm->execute(array(':id'=>$cidLookUp));
 		if ($stm->rowCount()==0) {
 			echo '{}';
 		} else {
@@ -141,7 +143,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 			if ($_POST['whattocopy']=='all') {
@@ -167,13 +169,13 @@ if (!(isset($teacherid))) {
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB $row = mysql_fetch_row($result);
 				$stm = $DBH->prepare("SELECT $tocopy FROM imas_courses WHERE id=:id");
-				$stm->execute(array(':id'=>$_POST['ctc']));
+				$stm->execute(array(':id'=>$ctc));
 				$row = $stm->fetch(PDO::FETCH_ASSOC);
 				$tocopyarr = explode(',',$tocopy);
 				if ($row['ancestors']=='') {
-					$row['ancestors'] = intval($_POST['ctc']);
+					$row['ancestors'] = intval($ctc);
 				} else {
-					$row['ancestors'] = intval($_POST['ctc']).','.$row['ancestors'];
+					$row['ancestors'] = intval($ctc).','.$row['ancestors'];
 				}
 				if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
 					$row['theme'] = $defaultcoursetheme;
@@ -197,7 +199,7 @@ if (!(isset($teacherid))) {
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB $row = mysql_fetch_row($result);
 				$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$stm->execute(array(':courseid'=>$ctc));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				//DB $query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}',colorize='{$row[5]}' WHERE courseid='$cid'";
 				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -209,7 +211,7 @@ if (!(isset($teacherid))) {
 				//DB while ($row = mysql_fetch_row($result)) {
 				$gb_cat_src=null; $gb_cat_ins = null; $gb_cat_upd = null;
 				$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$stm->execute(array(':courseid'=>$ctc));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					//DB $query = "SELECT id FROM imas_gbcats WHERE courseid='$cid' AND name='{$row[1]}'";
 					//DB $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -258,7 +260,7 @@ if (!(isset($teacherid))) {
 				$query = "SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid=:courseid AND ";
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':courseid'=>$_POST['ctc'], ':courseid2'=>$cid));
+				$stm->execute(array(':courseid'=>$ctc, ':courseid2'=>$cid));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$gbcats[$row[0]] = $row[1];
 				}
@@ -273,7 +275,7 @@ if (!(isset($teacherid))) {
 				$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid=:courseid AND ";
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':courseid'=>$_POST['ctc'], ':courseid2'=>$cid));
+				$stm->execute(array(':courseid'=>$ctc, ':courseid2'=>$cid));
 				if ($stm->rowCount()>0) {
 					$hasoutcomes = true;
 				} else {
@@ -288,7 +290,7 @@ if (!(isset($teacherid))) {
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
 				$stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$stm->execute(array(':courseid'=>$ctc));
 				$out_ins_stm = null;
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if (isset($outcomes[$row[0]])) { continue;}
@@ -330,7 +332,7 @@ if (!(isset($teacherid))) {
 					//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					//DB $row = mysql_fetch_row($result);
 					$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
-					$stm->execute(array(':id'=>$_POST['ctc']));
+					$stm->execute(array(':id'=>$ctc));
 					$row = $stm->fetch(PDO::FETCH_NUM);
 					function updateoutcomes(&$arr) {
 						global $outcomes;
@@ -364,7 +366,7 @@ if (!(isset($teacherid))) {
 				$query = "SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid=:courseid AND ";
 				$query .= "toc.courseid=:courseid2";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':courseid'=>$_POST['ctc'], ':courseid2'=>$cid));
+				$stm->execute(array(':courseid'=>$ctc, ':courseid2'=>$cid));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$outcomes[$row[0]] = $row[1];
 				}
@@ -386,7 +388,7 @@ if (!(isset($teacherid))) {
 				$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
 				$query .= "imas_assessments.courseid=:courseid AND imas_questionset.replaceby>0";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$stm->execute(array(':courseid'=>$ctc));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$replacebyarr[$row[0]] = $row[1];
 				}
@@ -405,7 +407,7 @@ if (!(isset($teacherid))) {
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				//DB $items = unserialize(mysql_result($result,0,0));
 				$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-				$stm->execute(array(':id'=>$_POST['ctc']));
+				$stm->execute(array(':id'=>$ctc));
 				$items = unserialize($stm->fetchColumn(0));
 				$newitems = array();
 
@@ -452,7 +454,7 @@ if (!(isset($teacherid))) {
 				//DB $query = "SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid='{$_POST['ctc']}'";
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$stm->execute(array(':courseid'=>$ctc));
 				$gbi_ins_stm = null;
 				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -496,12 +498,12 @@ if (!(isset($teacherid))) {
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
 				$stm = $DBH->prepare("SELECT id,date,tag,title FROM imas_calitems WHERE courseid=:courseid ORDER BY date");
-				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$stm->execute(array(':courseid'=>$ctc));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$calitems[] = $row;
 				}
 			} else {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			  header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 
 				exit;
 			}
@@ -512,7 +514,7 @@ if (!(isset($teacherid))) {
 			$stm = $DBH->prepare("SELECT id,itemorder,picicons,name FROM imas_courses WHERE id IN (?,?)");
 			$stm->execute(array($_POST['ctc'], $cid));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				if ($row['id']==$_POST['ctc']) {
+				if ($row['id']==$ctc) {
 					$items = unserialize($row['itemorder']);
 					$picicons = $row['picicons'];
 					$ctcname = $row['name'];
@@ -777,7 +779,7 @@ if ($overwriteBody==1) {
 ?>
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
 	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
-	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($_POST['ctc']); ?>">
+	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
 	<h4>Select Calendar Items to Copy</h4>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
@@ -829,10 +831,10 @@ if ($overwriteBody==1) {
 	
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
 	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
-	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($_POST['ctc']); ?>">
+	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
 	<p>What to copy:
 	<?php
-		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.$_POST['ctc'].'">Preview source course</a>';}
+		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.Sanitize::onlyInt($ctc).'">Preview source course</a>';}
 	?>
 	<br/>
 	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>

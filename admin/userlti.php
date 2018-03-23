@@ -23,7 +23,7 @@ if ($myrights < 100) {
   }
   exit;
 } else if (isset($_POST['removecourselti'])) {
-  $id = intval($_POST['removecourselti']);
+  $id = Sanitize::onlyInt($_POST['removecourselti']);
   $stm = $DBH->prepare("SELECT org,contextid FROM imas_lti_courses WHERE id=:id");
   $stm->execute(array(':id'=>$id));
   $row = $stm->fetch(PDO::FETCH_ASSOC);
