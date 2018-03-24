@@ -326,6 +326,7 @@ if ($overwriteBody==1) {
 		echo '<p><button type=submit name=delall value=true>'._("Yes, I'm Sure").'</button> ';
 		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
 		echo '</p>';
+		echo '</form>';
 
 	} else if (isset($_GET['delrev']) && isset($teacherid)) {
 		echo '<p>Are you SURE you want to delete all revision history for '.Sanitize::encodeStringForDisplay($grpnote).' Wiki page?  The current version will be retained.</p>';
@@ -335,6 +336,7 @@ if ($overwriteBody==1) {
 		echo '<p><button type=submit name=delrev value=true>'._("Yes, I'm Sure").'</button> ';
 		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
 		echo '</p>';
+		echo '</form>';
 
 	} else if (isset($_GET['revert'])) {
 		$torev = Sanitize::onlyInt($_GET['torev']);
@@ -346,6 +348,7 @@ if ($overwriteBody==1) {
 		echo '<p><button type=submit name=revert value=true>'._("Yes, I'm Sure").'</button> ';
 		echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?$querystring$framed'\">Nevermind</button></p>";
 		echo '</p>';
+		echo '</form>';
 
 	} else if (isset($_GET['snapshot'])) {
 		echo "<p>Current Version Code.  <a href=\"viewwiki.php?cid=".Sanitize::courseId($cid)."&id=". Sanitize::onlyInt($id)."&grp=".Sanitize::onlyInt($groupid).Sanitize::encodeStringForDisplay($framed)."\">Back</a></p>";

@@ -1793,6 +1793,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true,2);
 				echo '<input type="submit" class="btn" value="', _('Continue'), '" />';
+				echo '</form>';
 			} else { //are all done
 				$shown = showscores($questions,$attempts,$testsettings);
 				endtest($testsettings);

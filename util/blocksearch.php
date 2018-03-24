@@ -20,6 +20,7 @@ function getstr($items,$str,$parent) {
 require("../header.php");
 //DB echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities(stripslashes($_POST['search'])).'"> <input type="submit" value="Search"/></p>';
 echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities($_POST['search']).'"> <input type="submit" value="Search"/></p>';
+echo '</form>';
 if (isset($_POST['search'])) {
 	echo '<p>';
 	$srch = $_POST['search'];

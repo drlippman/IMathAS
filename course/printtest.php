@@ -103,6 +103,7 @@ if ($overwriteBody==1) {
 		echo "<p>When you press Continue, your print-ready version of the test will display.  You may wish to go into the File menu of ";
 		echo "your browser and select Page Setup to change the default headers and footers printed by your browser</p>\n";
 		echo "<p><input type=submit value=\"Continue\"></p>\n";
+		echo '</form>';
 	}
 }
 

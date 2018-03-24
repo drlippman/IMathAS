@@ -137,6 +137,7 @@ if (isset($_POST['assess'])) {
     }
     echo '</p>';
     echo '<p><input type="submit" value="Submit"/></p>';
+    echo '</form>';
 }
 require("../footer.php");
 
