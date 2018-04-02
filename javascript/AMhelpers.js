@@ -878,13 +878,27 @@ function AMnumfuncPrepVar(qn,str) {
 	  			break;
 	  		}
 	  	}
-	  	if (!foundaltcap[i]) {
-			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
-			dispstr = dispstr.replace(new RegExp(vars[i],"gi"),vars[i]);
-		}
 	  }
   }
-
+  //sequentially escape variables from longest to shortest, then unescape
+  str = str.replace(new RegExp("("+vl+")","gi"), function(match,p1) {
+	 for (var i=0; i<vars.length;i++) {
+		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) { 
+			return '@v'+i+'@';
+		}
+	 }});
+  str = str.replace(/@v(\d+)@/g, function(match,contents) {
+  	  return vars[contents];
+       });
+  dispstr = dispstr.replace(new RegExp("("+vl+")","gi"), function(match,p1) {
+	 for (var i=0; i<vars.length;i++) {
+		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {  
+			return '@v'+i+'@';
+		}
+	 }});
+  dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
+  	  return vars[contents];
+       });
 
   //quote out multiletter variables
   var varstoquote = new Array(); var regmod;
