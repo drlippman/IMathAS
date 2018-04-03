@@ -1042,15 +1042,12 @@ function prettynegs($a) {
 	return str_replace('-','&#x2212;',$a);
 }
 
-
 function rrand($min,$max,$p=0) {
 	if (func_num_args()!=3) { echo "Error: rrand expects 3 arguments"; return $min;}
 	if ($max < $min) {echo "rrand: Need min&lt;max"; return $min;}
 	if ($p<=0) {echo "Error with rrand: need to set positive step size"; return false;}
-	$rn = 0;
-	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
-	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
 	
+	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 	$out = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
 	if ($rn==0) { $out = (int) $out;}
 	return( $out );
@@ -1080,9 +1077,8 @@ function rrands($min,$max,$p=0,$n=0) {
 	if (func_num_args()!=4) { echo "rrands expects 4 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($p<=0) {echo "Error with rrands: need to set positive step size"; return false;}
-	$rn = 0;
-	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
-	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
+	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	for ($i = 0; $i < $n; $i++) {
 		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
@@ -1166,9 +1162,8 @@ function nonzerorrand($min,$max,$p=0) {
 		return $min;
 	}
 	if ($p<=0) {echo "Error with nonzerorrand: need to set positive step size"; return $min;}
-	$rn = 0;
-	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
-	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
+	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	do {
 		$ret = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
@@ -1213,9 +1208,8 @@ function nonzerorrands($min,$max,$p=0,$n=0) {
 	if (floor(($max-$min)/$p)==0) {
 		return array_fill(0, $n, $min);
 	}
-	$rn = 0;
-	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
-	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	
+	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	for ($i = 0; $i < $n; $i++) {
 		do {
@@ -1271,9 +1265,7 @@ function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 		echo "Error with diffrrands: step size is greater than max-min"; return array_fill(0,$n,$min);
 	}
 
-	$rn = 0;
-	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
-	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
+	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	$maxi = floor(($max-$min)/$p);
 
@@ -3796,6 +3788,22 @@ function evalReturnValue($str,$errordispstr='',$vars=array()) {
 		}
 	}
 	return $res;
+}
+
+function getRoundNumber($val) {
+	$str = (string) $val;
+	if (($s = strpos($str,'.'))===false) { //no decimal places
+		return 0;
+	} else if (($p = strpos($str,'E'))!==false) { //scientific notation
+		$exp = ceil(-log10($val));
+		if ($p-$s == 2 && $str[$s+1]=='0') { //is 3.0E-5 type
+			return ($exp);
+		} else {
+			return ($exp + $p - $s - 1);
+		}
+	} else { //regular non-scientific notation
+		return (strlen($str) - $s - 1);
+	}
 }
 
 ?>
