@@ -149,8 +149,8 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	*/
 	$rubtypeval = array(1,0,3,4,2);
 	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
-    echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
-    echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.str_replace('"','&quot;',$rubname).'"/></p>';
+	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
+	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.Sanitize::encodeStringForDisplay($rubname).'"/></p>';
 
 	echo '<p>Rubric Type: ';
 	writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');

@@ -415,7 +415,7 @@ if ($overwriteBody==1) {
 			var type = document.getElementById('addtype'+blk+'-'+tb).value;
 			if (tb=='BB' || tb=='LB') { tb = 'b';}
 			if (type!='') {
-				var toopen = '<?php echo $jsAddress2 ?>add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo Sanitize::courseId($_GET['cid']); ?>';
+				var toopen = '<?php echo $jsAddress2 ?>add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $cid; ?>';
 				window.location = toopen;
 			}
 		}

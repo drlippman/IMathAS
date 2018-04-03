@@ -50,7 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag .= (!empty($gid)) ? "&id=" . $gid : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
-	$caltag = Sanitize::encodeStringForDisplay($_POST['caltag']);
+	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 	$points = 0;
 
 	if ($_POST['title']!= null) { //if the form has been submitted
@@ -75,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
-				$caltag = Sanitize::encodeStringForDisplay($_POST['altcaltag']);
+				$caltag = Sanitize::stripHtmlTags($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;
 		} else {
@@ -86,9 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$processingerror = false;
 		if ($_POST['linktype']=='text') {
-			require_once("../includes/htmLawed.php");
-			//DB $_POST['text'] = addslashes(myhtmLawed(stripslashes($_POST['text'])));
-			$_POST['text'] = myhtmLawed($_POST['text']);
+			$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
 		} else if ($_POST['linktype']=='file') {
 			require_once("../includes/filehandler.php");
 			if ($_FILES['userfile']['name']!='') {
@@ -148,10 +146,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if (!empty($_POST['curfile'])) {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				///if (!file_exists($uploaddir . $_POST['curfile'])) {
-			  if (!doesfileexist('cfile',stripslashes(str_replace('/', '', $_POST['curfile'])))) {
+				$curfile = Sanitize::sanitizeFilePathAndCheckBlacklist($_POST['curfile']);
+				if (!doesfileexist('cfile', $curfile)) {
 					$processingerror = true;
 				} else {
-					$_POST['text'] = "file:".$_POST['curfile'];
+					$_POST['text'] = "file:".$curfile;
 				}
 			} else {
 				$processingerror = true;
@@ -184,14 +183,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		//DB $_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
-		$_POST['title'] = htmlentities($_POST['title']);
+		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
 
-		require_once("../includes/htmLawed.php");
 		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
 			$_POST['summary'] = '';
 		} else {
 			//DB $_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
-			$_POST['summary'] = myhtmLawed($_POST['summary']);
+			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
 		}
 		$_POST['text'] = trim($_POST['text']);
 		$outcomes = array();
@@ -229,9 +227,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
-				$title = Sanitize::encodeStringForDisplay($_POST['title']);
-				$summary = Sanitize::encodeStringForDisplay($_POST['summary']);
-				$text = Sanitize::encodeStringForDisplay($_POST['summary']);
 				$available = sanitize::onlyInt($_POST['avail']);
 				$target = Sanitize::onlyInt($_POST['target']);
 				//DB $query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
@@ -240,7 +235,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "UPDATE imas_linkedtext SET title=:title,summary=:summary,text=:text,startdate=:startdate,enddate=:enddate,avail=:avail,";
 				$query .= "oncal=:oncal,caltag=:caltag,target=:target,outcomes=:outcomes,points=:points WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':title'=>$title, ':summary'=>$summary, ':text'=>$text, ':startdate'=>$startdate,
+				$stm->execute(array(':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'], ':startdate'=>$startdate,
 					':enddate'=>$enddate, ':avail'=>$available, ':oncal'=>$oncal, ':caltag'=>$caltag, ':target'=>$target,
 					':outcomes'=>$outcomes, ':points'=>$points, ':id'=>$id));
 			}
