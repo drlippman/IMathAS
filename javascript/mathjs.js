@@ -84,6 +84,7 @@ function safepow(base,power) {
 		return Math.pow(base,power);
 	}
 }
+//varlist should be pipe-separated list of variables, presorted from longest to shortest
 function mathjs(st,varlist) {
   //translate a math formula to js function notation
   // a^b --> pow(a,b)
@@ -100,81 +101,106 @@ function mathjs(st,varlist) {
   st = st.replace(/\|(.*?)\|/g,"abs($1)");
   st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/gi, matchtolower);
-  if (varlist != null) {
+  //hide functions for now
+  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  //escape variables so regex's won't interfere
+  if (varlist != null && varlist != '') {
   	  var vararr = varlist.split("|");
-	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
-  	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
-	  st = st.replace(reg,"$1#(");
-	  var reg = new RegExp("("+varlist+")("+varlist+")","g");
-	  st = st.replace(reg,"($1)($2)");
-	  var reg = new RegExp("("+varlist+")(a#|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root|pi)","g");
-	  st = st.replace(reg,"($1)$2");
-	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z#])","g"); // 10/25/10 re-removed \( for x(1+x); moved f() handling to AMhelpers;  6/1/09 readded \( for f(350/x)
-	  st = st.replace(reg,"($1)($2)$3"); //get xy3
-	 // var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
-	  //st = st.replace(reg,"($1)($2)$3"); //get xysin
-	  var reg = new RegExp("([^a-df-zA-Z#])("+varlist+")([^a-df-zA-Z#])","g");
-	  st = st.replace(reg,"$1($2)$3");
-	  var reg = new RegExp("([^a-df-zA-Z#\(])("+varlist+")([^a-df-zA-Z#\)])","g"); //do second time for overlap, like 5x+f(3)
-	  st = st.replace(reg,"$1($2)$3");
-	  var reg = new RegExp("^("+varlist+")([^a-df-zA-Z])","g");
-	  st = st.replace(reg,"($1)$2");
-	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")$","g");
-	  st = st.replace(reg,"$1($2)");
-	  st = st.replace(new RegExp("\\(("+varlist+")\\)","g"), function(match,p1) {
+  	  //search for alt capitalization to escape alt caps correctly
+  	  var foundaltcap = [];
+  	  for (var i=0; i<vararr.length; i++) {
+  	  	  foundaltcap[i] = false;
+  	  	  for (var j=0; j<vararr.length; j++) {
+  	  	  	  if (i!=j && vararr[j].toLowerCase()==vararr[i].toLowerCase() && vararr[j]!=vararr[i]) {
+	  			foundaltcap[i] = true;
+	  			break;
+	  		}
+	  	}
+	  }
+	  st = st.replace(new RegExp("("+varlist+")","gi"), function(match,p1) {
 		 for (var i=0; i<vararr.length;i++) {
-			if (vararr[i]==p1) { return '(@v'+i+'@)';}	//esc var so regex's below don't interfere
+			if (vararr[i]==p1 || (!foundaltcap[i] && vararr[i].toLowerCase()==p1.toLowerCase())) { 
+				return '(@v'+i+'@)';
+			}	
 		 }});
-	  st = st.replace(/@(\d+)@/g, indextofunc);
   }
-
-  st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
-  st = st.replace(/#/g,"");
-  st = st.replace(/\s/g,"");
+  //temp store of scientific notation
+  st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
+  
+  //convert named constants
+  st = st.replace(/pi/g,"(pi)");
+  st = st.replace(/e/g, "(E)");
+  
+  //restore functions
+  st = st.replace(/@(\d+)@/g, indextofunc);
+  
+  //convert functions
   st = st.replace(/log_([a-zA-Z\d\.]+)\(/g,"nthlog($1,");
   st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
-
-  if (st.indexOf("^-1")!=-1) {
-    st = st.replace(/sin\^-1/g,"arcsin");
-    st = st.replace(/cos\^-1/g,"arccos");
-    st = st.replace(/tan\^-1/g,"arctan");
-    st = st.replace(/sec\^-1/g,"arcsec");
-    st = st.replace(/csc\^-1/g,"arccsc");
-    st = st.replace(/cot\^-1/g,"arccot");
-    st = st.replace(/sinh\^-1/g,"arcsinh");
-    st = st.replace(/cosh\^-1/g,"arccosh");
-    st = st.replace(/tanh\^-1/g,"arctanh");
-    st = st.replace(/sech\^-1/g,"arcsech");
-    st = st.replace(/csch\^-1/g,"arccsch");
-    st = st.replace(/coth\^-1/g,"arccoth");
-  }
+  st = st.replace(/(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)\^-1/g,"arc$1");
   st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\(/g,"$1n($2,");
   st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
-  //st = st.replace(/E/g,"(EE)");
-  st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
-
-  st = st.replace(/^e$/g,"(E)");
-  st = st.replace(/pi/g,"(pi)");
-
-  st = st.replace(/@v(\d+)@/g, function(match,contents) {
-  	return vararr[contents];
+  	
+  //add implicit mult for "3 4"
+  st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
+  
+  //clean up
+  st = st.replace(/#/g,"");
+  st = st.replace(/\s/g,"");
+  
+  //restore variables
+  if (varlist != null && varlist != '') {
+    st = st.replace(/@v(\d+)@/g, function(match,contents) {
+  	  return vararr[contents];
        });
-
-  st = st.replace(/^e([^a-zA-Z])/g,"(E)$1");
-  st = st.replace(/([^a-zA-Z])e$/g,"$1(E)");
-
-  st = st.replace(/([^a-zA-Z])e(?=[^a-zA-Z])/g,"$1(E)");
+  }
+  
+  //add implicit multiplication
   st = st.replace(/([0-9])([\(a-zA-Z])/g,"$1*$2");
-  st = st.replace(/(!)([0-9\(])/g,"$1*$2");
-  //want to keep scientific notation
-  st= st.replace(/([0-9])\*\(EE\)([\-0-9])/,"$1e$2");
-
-
+  st = st.replace(/(!)([0-9\(a-zA-Z])/g,"$1*$2");
   st = st.replace(/\)([\(0-9a-zA-Z]|\.\d+)/g,"\)*$1");
 
+  //restore scientific notation
+
+  st= st.replace(/([0-9])\*\(EE\)\*?([\-0-9])/g,"$1e$2");
+
+  //convert powers and factorials
   var i,j,k, ch, nested;
-  while ((i=st.indexOf("^"))!=-1) {
+    while ((i=st.indexOf("!"))!=-1) {
+    //find left argument
+    if (i==0) return "Error: missing argument";
+    j = i-1;
+    ch = st.charAt(j);
+    if (ch>="0" && ch<="9") {// look for (decimal) number
+      j--;
+      while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
+      if (ch==".") {
+        j--;
+        while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
+      }
+    } else if (ch==")") {// look for matching opening bracket and function name
+      nested = 1;
+      j--;
+      while (j>=0 && nested>0) {
+        ch = st.charAt(j);
+        if (ch=="(") nested--;
+        else if (ch==")") nested++;
+        j--;
+      }
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
+        j--;
+    } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
+      j--;
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
+        j--;
+    } else {
+      return "Error: incorrect syntax in "+st+" at position "+j;
+    }
+    st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
+  }
+  console.log(st);
+  while ((i=st.lastIndexOf("^"))!=-1) {
 
     //find left argument
     if (i==0) return "Error: missing argument";
@@ -231,7 +257,7 @@ function mathjs(st,varlist) {
       k++;
       while (k<st.length && ((ch=st.charAt(k))>="a" && ch<="z" ||
                ch>="A" && ch<="Z")) k++;
-      if (ch=='(' && st.slice(i+1,k).match(/^(sin|cos|tan|sec|csc|cot|logten|log|ln|exp|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|sqrt|abs|nthroot)$/)) {
+      if (ch=='(' && st.slice(i+1,k).match(/^(sinn|cosn|tann|secn|cscn|cotn|sin|cos|tan|sec|csc|cot|logten|nthlogten|log|ln|exp|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|sqrt|abs|nthroot|factorial|safepow)$/)) {
 	      nested = 1;
 	      k++;
 	      while (k<st.length && nested>0) {
@@ -247,37 +273,6 @@ function mathjs(st,varlist) {
     st = st.slice(0,j+1)+"safepow("+st.slice(j+1,i)+","+st.slice(i+1,k)+")"+
            st.slice(k);
   }
-  while ((i=st.indexOf("!"))!=-1) {
-    //find left argument
-    if (i==0) return "Error: missing argument";
-    j = i-1;
-    ch = st.charAt(j);
-    if (ch>="0" && ch<="9") {// look for (decimal) number
-      j--;
-      while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
-      if (ch==".") {
-        j--;
-        while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
-      }
-    } else if (ch==")") {// look for matching opening bracket and function name
-      nested = 1;
-      j--;
-      while (j>=0 && nested>0) {
-        ch = st.charAt(j);
-        if (ch=="(") nested--;
-        else if (ch==")") nested++;
-        j--;
-      }
-      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
-        j--;
-    } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
-      j--;
-      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
-        j--;
-    } else {
-      return "Error: incorrect syntax in "+st+" at position "+j;
-    }
-    st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
-  }
+
   return st;
 }

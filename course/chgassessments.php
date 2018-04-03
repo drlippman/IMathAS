@@ -1034,7 +1034,7 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 		</table>
 	</fieldset>
 	<div class=submit><input type=submit value="<?php echo _('Apply Changes')?>"></div>
-
+	</form>
 <?php
 }
 require("../footer.php");

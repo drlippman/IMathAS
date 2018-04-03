@@ -81,6 +81,7 @@ if (isset($_GET['form'])) {
 		echo '<input type=hidden name=action value="emulateuser" />';
 		echo 'Emulate user with userid: <input type="text" size="5" name="uid"/>';
 		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
 		require("../footer.php");
 	} else if ($_GET['form']=='jumptoitem') {
 		require("../header.php");
@@ -93,6 +94,7 @@ if (isset($_GET['form'])) {
 		echo 'Preview Question ID: <input type="text" size="8" name="pqid"/><br/>';
 		echo 'Edit Question ID: <input type="text" size="8" name="eqid"/><br/>';
 		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
 		require("../footer.php");
 
 	} else if ($_GET['form']=='rescue') {
@@ -101,6 +103,7 @@ if (isset($_GET['form'])) {
 		echo '<form method="post" action="'.$imasroot.'/util/rescuecourse.php">';
 		echo 'Recover lost items in course ID: <input type="text" size="5" name="cid"/>';
 		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
 		require("../footer.php");
 	} else if ($_GET['form']=='lookup') {
 		require("../header.php");
@@ -238,7 +241,7 @@ if (isset($_GET['form'])) {
 			echo '<form method="post" action="utils.php?form=lookup">';
 			echo 'Look up user:  LastName: <input type="text" name="LastName" />, FirstName: <input type="text" name="FirstName" />, or username: <input type="text" name="SID"/>, or email: <input type="text" name="email"/>';
 			echo '<input type="submit" value="Go"/>';
-
+			echo '</form>';
 		}
 		require("../footer.php");
 

@@ -111,6 +111,7 @@ if ($overwriteBody==1) {
 	<input type=radio name="delcontents" value="1" checked="checked"/>Also Delete all items in block</p>
 	<p><button type=submit name="remove" value="really">Yes, Delete</button>		
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'"></p>
+	</form>
 <?php
 }
 

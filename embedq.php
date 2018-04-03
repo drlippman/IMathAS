@@ -191,6 +191,7 @@ if (empty($_GET['noregen'])) {
 	echo " <input type=submit name=\"next\" value=\"" . _('New Question') . "\"/>\n";
 }
 echo '</p>';
+echo '</form>';
 /*
 if ($showans) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit()\">\n";

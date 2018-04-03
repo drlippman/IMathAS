@@ -112,7 +112,8 @@ switch($_GET['action']) {
 
 		showNewUserValidation("pageform",array("oldpw"));
 
-		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
+		echo "<div class=submit><input type=submit value=Submit></div>";
+		echo "</form>\n";
 		break;
 	case "chguserinfo":
 		//DB $query = "SELECT * FROM imas_users WHERE id='$userid'";
@@ -347,7 +348,8 @@ switch($_GET['action']) {
 			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 		);
 		</script>';
-		echo '<div class=submit><input type=submit value="Sign Up"></div></form>';
+		echo '<div class=submit><input type=submit value="Sign Up"></div>';
+		echo '</form>';
 		break;
 	case "unenroll":
 		if (!isset($_GET['cid'])) { echo "Course ID not specified\n"; break;}
@@ -360,6 +362,7 @@ switch($_GET['action']) {
 		echo '<form method="post" action="actions.php?cid='.Sanitize::courseId($_GET['cid']).'">';
 		echo '<p><button name="action" value="unenroll">'._('Really Unenroll').'</button>';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid=".Sanitize::courseId($_GET['cid'])."'\"></p>\n";
+		echo '</form>';
 		break;
 	case "resetpw":
 		if ($gb == '') {
@@ -395,7 +398,8 @@ switch($_GET['action']) {
 				invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 			);
 			</script>';
-			echo "<p><input type=submit value=\"Submit\" /></p></form>";
+			echo "<p><input type=submit value=\"Submit\" /></p>";
+			echo "</form>";
 		}
 
 		break;
@@ -415,7 +419,8 @@ switch($_GET['action']) {
 			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
 		);
 		</script>';
-		echo "<p><input type=submit value=\"Submit\" /></p></form>";
+		echo "<p><input type=submit value=\"Submit\" /></p>";
+		echo "</form>";
 		break;
 	case "forumwidgetsettings":
 		//DB $query = "SELECT hideonpostswidget FROM imas_users WHERE id='$userid'";

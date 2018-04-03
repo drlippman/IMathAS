@@ -359,6 +359,7 @@ if ($overwriteBody==1) {
 		echo '</div>';
 	}
 	echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
+	echo '</form>';
 }
 
 require("../footer.php");

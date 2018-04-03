@@ -133,18 +133,18 @@ function conditionalColor(table,type,low,high) {
 						var v = tds[i].textContent;
 					}
 					if (k = v.match(/\(([\d\.]+)%\)/)) {
-						var perc = k[1]/100;
+						var perc = k[1];
 					} else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
-						if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
+						if (k[2]==0) { var perc = 0;} else { var perc= Math.round(1000*k[1]/k[2])/10;}
 					} else {
 						v = v.replace(/[^\d\.]/g,"");
-						var perc = v/poss[i];
+						var perc = Math.round(1000*v/poss[i])/10;
 					}
 
-					if (perc<low/100) {
+					if (perc<low) {
 						tds[i].style.backgroundColor = "#ff9999";
 
-					} else if (perc>high/100) {
+					} else if (perc>=high) {
 						tds[i].style.backgroundColor = "#99ff99";
 					} else {
 						tds[i].style.backgroundColor = "#ffffff";

@@ -278,6 +278,7 @@ foreach ($existblocks as $pos=>$name) {
 </tbody>
 </table>
 <div class=submit><input type=submit value="<?php echo _('Apply Changes')?>"></div>
+</form>
 <?php
 }
 require("../footer.php");
