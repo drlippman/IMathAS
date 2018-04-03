@@ -2272,26 +2272,41 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 </p>
 <p><b>Optional Variables</b><BR>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "sloppymixednumber", "mixednumberorimproper", "scinot", "fracordec", "nodecimal", "notrig", "allowmixed", "noval", "list", "exactlist", or "orderedlist" </dt>
-	<dd>Specifies answer format options.  Some can be combined, like this: $answerformat="nodecimal,notrig".
+<dt>$answerformat = "fraction", or one of the other options below.</dt>
+	<dd>Specifies answer format options.  Some can be combined in a list, like this: $answerformat="nodecimal,notrig".
 	<ul>
-	<li>fraction: requires the answer to be a single fraction (like 10/6, 1/3, or 5)</li>
-	<li>reducedfraction: a reduced fraction (like 5/3 or 5)</li>
-	<li>mixednumber: a reduced mixed number (like 2 1/2 or 2_1/2, or 2/3 or 5)</li>
-	<li>mixednumberorimproper: a reduced mixed number or improper fraction (like 2 1/2 or 5/2)</li>
-	<li>sloppymixednumber: a mixed number (will take 5/2, 2 1/2, even 1 3/2)</li>
-	<li>scinot: scientific notation (like 2.3*10^4)</li>
-	<li>allowxtimes: allows the use of x for multiplication, (like 23x10^2 for 23*10^2)</li>
-	<li>fracordec: a single fraction or decimal value</li>
-	<li>nodecimal: an answer without decimals (also disallows 10^-2 and 3E-2).</li>
-	<li>notrig: an answer without trig functions (sin,cos,tan,sec,csc,cot)</li>
-	<li>allowmixed: will accept mixed numbers (like 2 1/2) as well as other expressions</li>
-	<li>noval: tells the answer preview to not compute a decimal equivalent</li>
-	<li>list:  a list of answers is expected - ignores duplicate values (1,1,2 is equivalent to 1,2)</li>
-	<li>exactlist: a list of answers is expected - does not ignore duplicates</li>
-	<li>orderedlist: a list of answers is expected - order is important, and duplicates are not ignored</li>
-	<li>nosoln or nosolninf: adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
-	$ansprompt = "One value, x=;No values;Many values"</li>
+	<li>Base format types: only use at most one of these at a time
+		<ul>
+		<li>fraction: requires the answer to be a single fraction (like 10/6, 1/3, or 5)</li>
+		<li>reducedfraction: a reduced fraction (like 5/3 or 5)</li>
+		<li>mixednumber: a reduced mixed number (like 2 1/2 or 2_1/2, or 2/3 or 5)</li>
+		<li>mixednumberorimproper: a reduced mixed number or improper fraction (like 2 1/2 or 5/2)</li>
+		<li>sloppymixednumber: a mixed number (will take 5/2, 2 1/2, even 1 3/2)</li>
+		<li>scinot: scientific notation (like 2.3*10^4)</li>
+		<li>fracordec: a single fraction or decimal value.  Can be combined with "allowmixed" to also allow mixed numbers.</li>
+		</ul></li>
+	<li>Mix-ins:  You can add these as needed to modify what's allowed
+		<ul>
+		<li>allowunreduced: can be combined with "mixednumber" or "mixednumberorimproper" to allow unreduced fractional parts</li>
+		<li>allowxtimes: allows the use of x for multiplication (like 23x10^2 for 23*10^2), typically in combo with the "scinot" format</li>
+		<li>nodecimal: require an answer without decimals (also disallows 10^-2 and 3E-2)</li>
+		<li>notrig: require an answer without trig functions (sin,cos,tan,sec,csc,cot)</li>
+		<li>allowmixed: will enable support for mixed numbers (like 2 1/2) in answers</li>
+		<li>noval: tells the answer preview to not compute a decimal equivalent</li>
+		</ul></li>
+	<li>List options: only use at most one of these at a time
+		<ul>
+		<li>list:  a list of answers is expected - ignores duplicate values (1,1,2 is equivalent to 1,2)</li>
+		<li>exactlist: a list of answers is expected - does not ignore duplicates</li>
+		<li>orderedlist: a list of answers is expected - order is important, and duplicates are not ignored</li>
+		</ul></li>
+	<li>Special options:
+		<ul>
+		<li>nosoln: adds radio buttons for "no solutions". Use $answer="DNE" if the answer is no solutions.</li>
+		<li>nosolninf: adds radio buttons for "no solutions" and "infinite solutions".  Use $answer="DNE" or $answer="oo" respectively if needed.</li>
+		<li>To override the default "no solutions" and "infinite solutions" wording, you can define $ansprompt as a list of semicolon-delimited strings
+		    to override the default wording.  For example, <br/><code>$ansprompt = "One value, x=;No values;Many values"</code></li>
+		</ul></li>
 	</ul>
 	</dd>
 <dt>$formatfeedbackon = true</dt>
