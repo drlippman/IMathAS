@@ -251,7 +251,7 @@
 	for ($j=50;$j<90;$j+=($j<70?10:5)) {
 		for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
 			$colorval[] = "$j:$k";
-			$colorlabel[] = "red &le; $j%, green &ge; $k%";
+			$colorlabel[] = "red &lt; $j%, green &ge; $k%";
 		}
 	}
 	$colorval[] = "-1:-1";
