@@ -154,7 +154,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
 		$stm->execute(array(':id'=>$aid, ':intro'=>json_encode($introjson)));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?id=$aid&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?id=$aid&cid=$cid&r=" . Sanitize::randomQueryStringParam());
 	} else {
 		$qcnt = substr_count($qitemorder, ',')+1;
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -170,7 +170,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 		echo '<p>'._('Converting assessments to use the new approach sometimes has issues, so please confirm below that everything looks as expected.  To be totally safe, you may wish to make a copy of your assessment before trying to convert it.').'</p>';
 		echo '<h3>'._('The following will be the main intro/instruction text').'</h3>';
 		echo '<div style="margin-left:30px;border:2px solid #000; padding: 10px;">';
-		echo $introjson[0];
+		echo Sanitize::outgoingHtml($introjson[0]);
 		array_shift($introjson);
 		echo '</div>';
 		if ($isembed) {
@@ -190,7 +190,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 				if ($intpc['ispage']==1) {
 					echo '</div>';
 					echo '<div style="margin-top: 10px; margin-left:30px;border:2px solid #000; padding: 10px;">';
-					echo '<h3>'._('New Page: ').$intpc['pagetitle'].'</h3>';
+					echo '<h3>'._('New Page: ').Sanitize::encodeStringForDisplay($intpc['pagetitle']).'</h3>';
 				}
 				echo $intpc['text'];
 				$nextquestion = $intpc['displayBefore'];

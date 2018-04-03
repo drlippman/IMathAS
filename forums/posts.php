@@ -42,7 +42,7 @@ if (isset($_GET['markunread'])) {
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	header('Location: ' . $redirecturl);
+	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
 if (isset($_GET['marktagged'])) {
@@ -50,14 +50,14 @@ if (isset($_GET['marktagged'])) {
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=1 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	header('Location: ' . $redirecturl);
+	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 } else if (isset($_GET['markuntagged'])) {
 	//DB $query = "UPDATE imas_forum_views SET tagged=0 WHERE userid='$userid' AND threadid='$threadid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=0 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	header('Location: ' . $redirecturl);
+	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
 //DB $query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate FROM imas_forums WHERE id='$forumid'";

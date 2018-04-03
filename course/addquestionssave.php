@@ -42,7 +42,7 @@
 		$new_intro = $current_intro;
 	}
 
-	$submitted = $_REQUEST['order'];
+	$submitted = Sanitize::stripHtmlTags($_REQUEST['order']);
 	$submitted = str_replace('~',',',$submitted);
 	$newitems = array();
 	foreach (explode(',',$submitted) as $qid) {
