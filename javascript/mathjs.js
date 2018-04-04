@@ -199,7 +199,7 @@ function mathjs(st,varlist) {
     }
     st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
   }
-  console.log(st);
+
   while ((i=st.lastIndexOf("^"))!=-1) {
 
     //find left argument

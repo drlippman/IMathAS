@@ -220,7 +220,7 @@ function calculate(inputId,outputId,format) {
 			  	evalstr = evalstr.replace(/%/,'') + '/100';
 			  }
 			  if (format.indexOf('mixed')!=-1) {
-				  evalstr = evalstr.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+				  evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
 			  }
 			  if (format.indexOf('scinot')!=-1) {
 			  	  evalstr = evalstr.replace("xx","*");
@@ -376,7 +376,7 @@ function intcalculate(inputId,outputId,format) {
 					  try {
 					  	toeval = vals[j];
 					  	if (format.indexOf('mixed')!=-1) {
-					  		toeval = toeval.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+					  		toeval = toeval.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
 					  	}
 					  	var res = eval(prepWithMath(mathjs(toeval)));
 					  } catch(e) {
@@ -511,7 +511,7 @@ function ntuplecalc(inputId,outputId,format) {
 				err += syntaxcheckexpr(sub, format);
 				try {
 					if (format.indexOf('mixed')!=-1) {
-						sub = sub.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+						sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
 					}
 					var res = eval(prepWithMath(mathjs(sub)));
 				} catch(e) {
@@ -576,7 +576,7 @@ function complexcalc(inputId,outputId,format) {
 		for (var cnt=0; cnt<arr.length; cnt++) {
 			var prep = arr[cnt];
 			if (format.indexOf('mixed')!=-1) {
-				prep = prep.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+				prep = prep.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
 			}
 			var prep = mathjs(prep,'i');
 			if (format.indexOf("sloppycomplex")==-1) {
@@ -1069,7 +1069,7 @@ function singlevalsyntaxcheck(str,format) {
 			return (_("not a valid fraction")+". ");
 		  }
 	} else if (format.indexOf('mixednumber')!=-1) {
-		  if (!str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*\d+\s*\/\s*\d+\s*$/) && !str.match(/^\s*?\-?\s*\d+\s*$/) && !str.match(/^\s*\-?\s*\d+\s*\/\s*\-?\d+\s*$/)) {
+		  if (!str.match(/^\(?\-?\s*\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))\s*$/) && !str.match(/^\s*\-?\s*\d+\s*$/)) {
 			return (_("not a valid mixed number")+". ");
 		  }
 		  str = str.replace(/_/,' ');
@@ -1231,7 +1231,7 @@ function doonsubmit(form,type2,skipconfirm) {
 
 							  try {
 							  	  if (calcformat[qn].indexOf('mixed')!=-1) {
-							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
 							  	  }
 							  	  var res = eval(prepWithMath(mathjs(vals[j])));
 							  } catch(e) {
@@ -1283,9 +1283,9 @@ function doonsubmit(form,type2,skipconfirm) {
 			if (str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
 				str = str.replace(/%/,'') + '/100';
 			}
-			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
+			str = str.replace(/(\d+)\s*_\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
 			if (calcformat[qn].indexOf('mixed')!=-1) {
-				str = str.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
+				str = str.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
 			}
 			if (str.match(/^\s*$/)) {
 				var res = '';
