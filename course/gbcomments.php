@@ -106,7 +106,7 @@
 				echo "<p>Comments uploaded.". Sanitize::encodeStringForDisplay($successes) ."records.</p> ";
 				if (count($failures)>0) {
 					echo "<p>Comment upload failure on: <br/>";
-					echo implode('<br/>',$failures);
+					echo implode('<br/>', Sanitize::encodeStringForDisplay($failures));
 					echo '</p>';
 				}
 				if ($successes>0) {
@@ -156,19 +156,20 @@
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			//if ($_POST[$row[0]]!='') {
+			$rowInfo = Sanitize::stripHtmlTags($_POST[$row[0]]);
 				if ($comtype=='stu') {
 					//DB $query = "UPDATE imas_students SET gbcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 					$stm2 = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE id=:id");
-					$stm2->execute(array(':gbcomment'=>$_POST[$row[0]], ':id'=>$row[0]));
+					$stm2->execute(array(':gbcomment'=>$rowInfo, ':id'=>$row[0]));
 				} else if ($comtype=='instr') {
 					//DB $query = "UPDATE imas_students SET gbinstrcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 					$stm2 = $DBH->prepare("UPDATE imas_students SET gbinstrcomment=:gbinstrcomment WHERE id=:id");
-					$stm2->execute(array(':gbinstrcomment'=>$_POST[$row[0]], ':id'=>$row[0]));
+					$stm2->execute(array(':gbinstrcomment'=>$rowInfo, ':id'=>$row[0]));
 				}
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 

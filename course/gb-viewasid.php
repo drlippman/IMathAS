@@ -1489,7 +1489,7 @@ function getconfirmheader($group=false) {
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['uid']));
+		$stm->execute(array(':id'=>$userid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$out = "<h3>{$row[1]}, {$row[0]}</h3>\n";
 	}
@@ -1528,7 +1528,7 @@ function isoktorec() {
 		$query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 		$query .= "WHERE ias.id=:id";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$_GET['asid']));
+		$stm->execute(array(':id'=>$asid));
 		if ($stm->fetchColumn(0)==1) {
 			$oktorec = true;
 		}

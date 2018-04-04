@@ -39,16 +39,16 @@ foreach ($result  as $line) {
 $lastforum = '';
 
 if (isset($_GET['unflagall'])) {
-	if (count($forumids)>0) {
-		$threadids = implode(',', array_map('intval', array_keys($lastpost)));
-		$DBH->query("UPDATE imas_forum_views SET tagged=0 WHERE threadid IN ($threadids)");
-	}
-	if ($from=='home') {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
-	} else {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
-	}
-	exit;
+  if (count($forumids)>0) {
+    $threadids = implode(',', array_map('intval', array_keys($lastpost)));
+    $DBH->query("UPDATE imas_forum_views SET tagged=0 WHERE threadid IN ($threadids)");
+  }
+  if ($from=='home') {
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php?r=" . Sanitize::randomQueryStringParam());
+  } else {
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+  }
+  exit;
 }
 
 

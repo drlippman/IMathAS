@@ -79,7 +79,7 @@ if ($myrights<20) {
 				$stm->execute(array(':now'=>$now));
 
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 		} else {
@@ -133,7 +133,7 @@ if ($myrights<20) {
 				}
 
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 		} else {
@@ -380,7 +380,7 @@ if ($myrights<20) {
 
 				}
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 		} else {
@@ -554,7 +554,7 @@ if ($myrights<20) {
 					}
 				}
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 		} else {
@@ -606,7 +606,7 @@ if ($myrights<20) {
         }
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else {
 			$pagetitle = "Change Question Rights";
@@ -772,10 +772,10 @@ if ($myrights<20) {
 		}
 
 		if (isset($_POST['libs'])) {
-			if ($_POST['libs']=='') {
-				$_POST['libs'] = $userdeflib;
-			}
-			$searchlibs = $_POST['libs'];
+		  if ($_POST['libs']=='') {
+		    $_POST['libs'] = $userdeflib;
+		  }
+		  $searchlibs = $_POST['libs'];
 			//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
 			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
 			writesessiondata();

@@ -26,7 +26,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 
 	if ($_POST['remove']=="really") {
-		$forumid = $_GET['id'];
+		$forumid = Sanitize::onlyInt($_GET['id']);
 		$DBH->beginTransaction();
 		//DB $query = "SELECT id FROM imas_items WHERE typeid='$forumid' AND itemtype='Forum' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -51,7 +51,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $items = unserialize(mysql_result($result,0,0));
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['cid']));
+			$stm->execute(array(':id'=>$cid));
 			$items = unserialize($stm->fetchColumn(0));
 
 			$blocktree = explode('-',$block);
@@ -108,7 +108,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 			$stm->execute(array(':forumid'=>$forumid));
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	} else {
@@ -116,7 +116,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $itemname = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$forumid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

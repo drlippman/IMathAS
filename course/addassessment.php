@@ -1348,7 +1348,7 @@ if ($overwriteBody==1) {
 		</div>
 	</fieldset>
 	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
-    </form>
+	</form>
 <?php
 }
 	require("../footer.php");

@@ -37,16 +37,18 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid));
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
 		if ((isset($_POST['submit']) && $_POST['submit']=="Lock") || (isset($_POST['posted']) && $_POST['posted']=="Lock")) {
 			$_GET['uid'] = 'selected';
 		}
+        $courseid = Sanitize::onlyInt($_GET['cid']);
+        $userid = Sanitize::onlyInt($_GET['uid']);
 
 		if ($_GET['uid']=="selected") {
 			if (count($_POST['checked'])>0) {
@@ -58,14 +60,14 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				//DB $query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_GET['cid']));
+				$stm->execute(array(':courseid'=>$courseid));
 			}
 		} else {
 			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['uid']));
+			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$lockConfirm =  "Are you SURE you want to lock {$row[0]} {$row[1]} ($row[2]) out of the course?";
 		}

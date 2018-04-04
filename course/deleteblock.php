@@ -12,9 +12,10 @@ require("../init.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Course Block";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Block";
+$cid = Sanitize::courseId($_GET['cid']);
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".$cid."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Block";
 
-if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
+if (!(isset($cid))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
@@ -32,7 +33,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['cid']));
+		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
 		$sub =& $items;
 		if (count($blocktree)>1) {
@@ -60,7 +61,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		//DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$_GET['cid']));
+		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
@@ -68,8 +69,8 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		$obarr = explode(',',$_COOKIE['openblocks-'.Sanitize::courseId($_GET['cid'])]);
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
-		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',$obarr));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',array_map('intval',$obarr)), 0, null, null, false, true);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 
 	} else {
 		$blocktree = explode('-',$_GET['id']);
@@ -79,7 +80,7 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['cid']));
+		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
 		$sub =& $items;
 		if (count($blocktree)>1) {
