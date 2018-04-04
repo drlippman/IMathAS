@@ -52,7 +52,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('{$_POST['grpsetname']}','$cid')";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_stugroupset (name,courseid) VALUES (:name, :courseid)");
-			$stm->execute(array(':name'=>$_POST['grpsetname'], ':courseid'=>$cid));
+			$stm->execute(array(':name'=>Sanitize::stripHtmlTags($_POST['grpsetname']), ':courseid'=>$cid));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		}
@@ -83,7 +83,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $query = "UPDATE imas_stugroupset SET name='{$_POST['grpsetname']}' WHERE id='{$_GET['rengrpset']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_stugroupset SET name=:name WHERE id=:id");
-			$stm->execute(array(':name'=>$_POST['grpsetname'], ':id'=>$renameGrpSet)); //formerly ':id'=>$_GET['rengrpset']
+			$stm->execute(array(':name'=>Sanitize::stripHtmlTags($_POST['grpsetname']), ':id'=>$renameGrpSet)); //formerly ':id'=>$_GET['rengrpset']
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
@@ -399,7 +399,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$removeall = sanitize::onlyInt($_GET['removeall']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			removeallgroupmembers($_GET['removeall']);
+			removeallgroupmembers($removeall);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {

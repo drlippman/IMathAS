@@ -42,12 +42,12 @@
 		$new_intro = $current_intro;
 	}
 
-	$submitted = Sanitize::stripHtmlTags($_REQUEST['order']);
+	$submitted = $_REQUEST['order'];
 	$submitted = str_replace('~',',',$submitted);
 	$newitems = array();
 	foreach (explode(',',$submitted) as $qid) {
 		if (strpos($qid,'|')===false) {
-			$newitems[] = $qid;
+			$newitems[] = Sanitize::onlyInt($qid);
 		}
 	}
 	$toremove = array_diff($curitems,$newitems);

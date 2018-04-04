@@ -220,7 +220,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if ($_FILES['userfile']['name']!='') {
 			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-      		$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['userfile']['name'])));
+			$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['userfile']['name'])));
 			$filename = $userfilename;
 			$extension = strtolower(strrchr($userfilename,"."));
 			$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".exe",".pl",".p");
@@ -257,7 +257,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$stm = $DBH->prepare("INSERT INTO imas_instr_files (description,filename,itemid) VALUES (:description, :filename, :itemid)");
 					$stm->execute(array(':description'=>$_POST['newfiledescr'], ':filename'=>$filename, ':itemid'=>$newtextid));
 					$addedfile = $DBH->lastInsertId();
-					$_GET['id'] = $newtextid;
 				} else {
 					$overwriteBody = 1;
 					$body = "<p>Error uploading file!</p>\n";
@@ -271,7 +270,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $fileorder = explode(',',mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT fileorder FROM imas_inlinetext WHERE id=:id");
-		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
+		$stm->execute(array(':id'=>Sanitize::onlyInt($newtextid)));
 		$fileorder = explode(',',$stm->fetchColumn(0));
 		if ($fileorder[0]=='') {
 			$fileorder = array();
@@ -298,7 +297,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $query = "UPDATE imas_inlinetext SET fileorder='$fileorder' WHERE id='{$_GET['id']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_inlinetext SET fileorder=:fileorder WHERE id=:id");
-		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$gid));
+		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$newtextid));
 	}
 	if ($_POST['submitbtn']=='Submit') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."&r=" .Sanitize::randomQueryStringParam());
@@ -306,11 +305,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	if (isset($_GET['id'])) {
+		$gid = Sanitize::onlyInt($_GET['id']);
 		//DB $query = "SELECT * FROM imas_inlinetext WHERE id='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT * FROM imas_inlinetext WHERE id=:id");
-		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
+		$stm->execute(array(':id'=>$gid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($line['title']=='##hidden##') {
 			$hidetitle = true;
@@ -374,7 +374,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
-		$stm->execute(array(':itemid'=>Sanitize::onlyInt($_GET['id'])));
+		$stm->execute(array(':itemid'=>$gid));
 		$page_fileorderCount = count($fileorder);
 		$i = 0;
 		$page_FileLinks = array();
@@ -438,7 +438,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	flattenarr($outcomearr);
 
-$page_formActionTag .= (isset($gid)) ? "&id=" . $gid : "";
+	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $gid : "";
 }
 
 
