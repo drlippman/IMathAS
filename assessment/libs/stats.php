@@ -509,16 +509,17 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		return $alt;
 	}
 	$x++;
-	$topborder = ($valuelabels===false?10:25) + (isset($options['toplabel'])?20:0);
-	$leftborder = min(60, 9*strlen($maxfreq)+10) + ($usevertlabel?30:0);
-	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
-	$bottomborder = 25+($label===''?0:20);
-	$outst = "setBorder($leftborder,$bottomborder,0,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
-
+	
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
 
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
+
+	$topborder = ($valuelabels===false?10:25) + (isset($options['toplabel'])?20:0);
+	$leftborder = min(60, 9*max(strlen($maxfreq),strlen($maxfreq-$step))+10) + ($usevertlabel?30:0);
+	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
+	$bottomborder = 25+($label===''?0:20);
+	$outst = "setBorder($leftborder,$bottomborder,0,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 
 	if (isset($options['showgrid']) && $options['showgrid']==false) {
 		$gdy = 0;
