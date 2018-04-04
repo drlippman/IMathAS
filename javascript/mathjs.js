@@ -135,12 +135,12 @@ function mathjs(st,varlist) {
   st = st.replace(/@(\d+)@/g, indextofunc);
   
   //convert functions
-  st = st.replace(/log_([a-zA-Z\d\.]+)\(/g,"nthlog($1,");
-  st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\(/g,"nthlog($1,");
+  st = st.replace(/log_([a-zA-Z\d\.]+)\s*\(/g,"nthlog($1,");
+  st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
   st = st.replace(/(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)\^-1/g,"arc$1");
-  st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\(/g,"$1n($2,");
-  st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
+  st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\s*\(/g,"$1n($2,");
+  st = st.replace(/root\s*\((\d+)\)\s*\(/g,"nthroot($1,");
   	
   //add implicit mult for "3 4"
   st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
