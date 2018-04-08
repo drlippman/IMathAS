@@ -68,10 +68,14 @@ vmnumbertilesgetcount(stuans)
 <BR>return an array array(hundredcount,tencount,onecount) of the count of 
 <BR>hundred blocks, ten blocks, and ones blocks in the drop area
 <BR><h3><a name="vmsetupitemsort">vmsetupitemsort</a></h3>
-vmsetupitemsort(tosort,cats,stuans,qn,[part])
+vmsetupitemsort(tosort,cats,stuans,qn,[part,width])
 <BR>Set up an item sort manipulative, where students sort items into 2 categories
 <BR>tosort = array of items to sort
 <BR>cats = array of titles for the two drop areas
+<BR>stuans = use $stuanswers[$thisq] or $stuanswers[$thisq][partn]
+<BR>qn: use $thisq
+<BR>part: if a multipart or conditional question, put the part index. Can put null if not multipart
+<BR>width: width of each container. Default 150px.
 <BR><h3><a name="vmitemsortgetcontainers">vmitemsortgetcontainers</a></h3>
 vmitemsortgetcontainers(stuans, tosort)
 <BR>tosort = array of items to sort
