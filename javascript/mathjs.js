@@ -106,6 +106,9 @@ function mathjs(st,varlist) {
   //escape variables so regex's won't interfere
   if (varlist != null && varlist != '') {
   	  var vararr = varlist.split("|");
+  	  vararr.push("pi"); //escape pi like a variable to prevent conflict w i as a variable
+  	  vararr.sort(function(a,b) { return b.length - a.length; });
+  	  varlist = vararr.join("|");
   	  //search for alt capitalization to escape alt caps correctly
   	  var foundaltcap = [];
   	  for (var i=0; i<vararr.length; i++) {
@@ -128,7 +131,6 @@ function mathjs(st,varlist) {
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
   
   //convert named constants
-  st = st.replace(/pi/g,"(pi)");
   st = st.replace(/e/g, "(E)");
   
   //restore functions
