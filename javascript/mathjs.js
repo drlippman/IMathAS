@@ -106,6 +106,9 @@ function mathjs(st,varlist) {
   //escape variables so regex's won't interfere
   if (varlist != null && varlist != '') {
   	  var vararr = varlist.split("|");
+  	  vararr.push("pi"); //escape pi like a variable to prevent conflict w i as a variable
+  	  vararr.sort(function(a,b) { return b.length - a.length; });
+  	  varlist = vararr.join("|");
   	  //search for alt capitalization to escape alt caps correctly
   	  var foundaltcap = [];
   	  for (var i=0; i<vararr.length; i++) {
@@ -128,19 +131,18 @@ function mathjs(st,varlist) {
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
   
   //convert named constants
-  st = st.replace(/pi/g,"(pi)");
   st = st.replace(/e/g, "(E)");
   
   //restore functions
   st = st.replace(/@(\d+)@/g, indextofunc);
   
   //convert functions
-  st = st.replace(/log_([a-zA-Z\d\.]+)\(/g,"nthlog($1,");
-  st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\(/g,"nthlog($1,");
+  st = st.replace(/log_([a-zA-Z\d\.]+)\s*\(/g,"nthlog($1,");
+  st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
   st = st.replace(/(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)\^-1/g,"arc$1");
-  st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\(/g,"$1n($2,");
-  st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
+  st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\s*\(/g,"$1n($2,");
+  st = st.replace(/root\s*\((\d+)\)\s*\(/g,"nthroot($1,");
   	
   //add implicit mult for "3 4"
   st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
@@ -199,7 +201,7 @@ function mathjs(st,varlist) {
     }
     st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
   }
-  console.log(st);
+
   while ((i=st.lastIndexOf("^"))!=-1) {
 
     //find left argument

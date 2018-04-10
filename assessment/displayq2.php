@@ -7214,32 +7214,31 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 
 	if (in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats)) {
-		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\s*\d+\s*\/\s*\-?\s*\d+\s*$/',$tocheck)) {
-			//if doesn't match any format, exit
-			return false;
-		} else {
-			if (preg_match('/^\s*\-?\s*\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {   //if a fraction
-				$tmpa = explode("/",str_replace(' ','',$tocheck));
-				if (in_array("mixednumber",$ansformats)) {
-					if (!in_array("allowunreduced",$ansformats) && ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || abs($tmpa[0])>=abs($tmpa[1]))) {
-						return false;
-					}
-				} else if (in_array("mixednumberorimproper",$ansformats)) {
-					if (!in_array("allowunreduced",$ansformats) && ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1))) {
-						return false;
-					}
+		if (preg_match('/^\(?\-?\s*\(?\d+\)?\/\(?\d+\)?$/',$tocheck) || preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck)) { //fraction
+			$tmpa = explode("/",str_replace(array(' ','(',')'),'',$tocheck));
+			if (in_array("mixednumber",$ansformats)) {
+				if (!in_array("allowunreduced",$ansformats) && ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || abs($tmpa[0])>=abs($tmpa[1]))) {
+					return false;
 				}
-			} else	if (!preg_match('/^\s*\-?\s*\d+\s*$/',$tocheck)) {  //is in mixed number format
-				if (in_array("mixednumber",$ansformats)) {
-					if ($mnmatches[2]>=$mnmatches[3] || (!in_array("allowunreduced",$ansformats) && gcd($mnmatches[2],$mnmatches[3])!=1)) {
-						return false;
-					}
-				} else if (in_array("mixednumberorimproper",$ansformats)) {
-					if ((!in_array("allowunreduced",$ansformats) && gcd($mnmatches[2],$mnmatches[3])!=1) || $mnmatches[2]>=$mnmatches[3])  {
-						return false;
-					}
+			} else if (in_array("mixednumberorimproper",$ansformats)) {
+				if (!in_array("allowunreduced",$ansformats) && ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1))) {
+					return false;
 				}
 			}
+		} else if (preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*\(?(\d+)\)?\s*\/\s*\(?(\d+)\)?\s*$/',$tocheck,$mnmatches)) { //mixed number
+			if (in_array("mixednumber",$ansformats)) {
+				if ($mnmatches[2]>=$mnmatches[3] || (!in_array("allowunreduced",$ansformats) && gcd($mnmatches[2],$mnmatches[3])!=1)) {
+					return false;
+				}
+			} else if (in_array("mixednumberorimproper",$ansformats)) {
+				if ((!in_array("allowunreduced",$ansformats) && gcd($mnmatches[2],$mnmatches[3])!=1) || $mnmatches[2]>=$mnmatches[3])  {
+					return false;
+				}
+			}
+		} else if (preg_match('/^\s*\-?\s*\d+\s*$/',$tocheck)) { //integer
+			
+		} else { //not a valid format
+			return false;	
 		}
 	}
 

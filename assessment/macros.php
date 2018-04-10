@@ -516,7 +516,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 }
 
 function addplotborder($plot,$left,$bottom=5,$right=5,$top=5) {
-	return str_replace("setBorder(5)","setBorder($left,$bottom,$right,$top)",$plot);
+	return preg_replace("/setBorder\(.*?\);/","setBorder($left,$bottom,$right,$top);",$plot);
+	//return str_replace("setBorder(5)","setBorder($left,$bottom,$right,$top)",$plot);
 
 }
 

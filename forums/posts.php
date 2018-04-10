@@ -546,9 +546,9 @@ function printchildren($base,$restricttoowner=false) {
 				//DB if (mysql_num_rows($result)>0) {
 				//DB $r = mysql_fetch_row($result);
 				$query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
-				$query .= "WHERE ia.courseid=:courseid AND ia.name=:name AND ias.userid=:ownerid";
+				$query .= "WHERE ia.courseid=:courseid AND (ia.name=:name OR ia.name=:name2) AND ias.userid=:ownerid";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':courseid'=>$cid, ':name'=>$matches[2], ':ownerid'=>intval($ownerid[$child])));
+				$stm->execute(array(':courseid'=>$cid, ':name'=>$matches[2], ':name2'=>htmlentities($matches[2]), ':ownerid'=>intval($ownerid[$child])));
 				if ($stm->rowCount()>0) {
 					$qn = $matches[1];
 					$r = $stm->fetch(PDO::FETCH_NUM);

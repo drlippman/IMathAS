@@ -109,13 +109,15 @@ function vmnumbertilesgetcount($state) {
 	return array($hund,$ten,$one);
 }
 
-//vmsetupitemsort(tosort,cats,stuans,qn,[part])
+//vmsetupitemsort(tosort,cats,stuans,qn,[part,width])
 //Set up an item sort manipulative, where students sort items into 2 categories
 //tosort = array of items to sort
-//cats = array of titles for the two drop areas
-function vmsetupitemsort($numbers,$cats,$state,$qn,$part=null) {
+//cats = array of titles for the drop areas
+function vmsetupitemsort($numbers,$cats,$state,$qn,$part=null,$width=150) {
 	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
 	$numbers = Sanitize::encodeUrlParam(implode(';;',$numbers));
+	$height = (count($cats)>2)?600:300;
+	$totwidth = $width*3 + 60;
 	$cats = Sanitize::encodeUrlParam(implode(';;',$cats));
 	$initbase = "[]";
 	$initobj = "[]";
@@ -130,7 +132,7 @@ function vmsetupitemsort($numbers,$cats,$state,$qn,$part=null) {
 			$initobj = preg_replace('/\[([^\[\]]+?),/','[&quot;$1&quot;,',$initobj);
 		}
 	}
-	$out = '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/numbersort/numbersort.html?qn='.$qn.'&initbase='.$initbase.'&initobj='.$initobj.'&str='.$numbers.'&cats='.$cats.'" width="510" height="300" frameborder="0"></iframe>';
+	$out = '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/numbersort/numbersort.html?qn='.$qn.'&initbase='.$initbase.'&initobj='.$initobj.'&str='.$numbers.'&cats='.$cats.'&width='.$width.'" width="'.$totwidth.'" height="'.$height.'" frameborder="0"></iframe>';
 	return $out;
 }
 
