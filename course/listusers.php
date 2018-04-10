@@ -88,7 +88,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm = $DBH->prepare("UPDATE imas_students SET section=:section,code=:code WHERE id=:id AND courseid=:courseid ");
 				$stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
@@ -177,7 +177,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				//DB $query .= ") VALUES ($vals)";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
 
@@ -239,7 +239,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
 
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
 		}
@@ -456,7 +456,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE courseid=:courseid AND userid=:userid");
 		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid, ':userid'=>$_POST['uid']));
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} elseif (isset($_POST['action']) && $_POST['action']=="unlockone" && is_numeric($_POST['uid'])) {
 		$now = time();
@@ -465,7 +465,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=0 WHERE courseid=:courseid AND userid=:userid");
 		$stm->execute(array(':courseid'=>$cid, ':userid'=>$_POST['uid']));
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //DEFAULT DATA MANIPULATION HERE
 
@@ -911,7 +911,7 @@ if ($overwriteBody==1) {
 				</td>
 				<?php
 				echo $hasSectionData;
-				echo $hasCodeData;
+				echo Sanitize::outgoingHtml($hasCodeData);
 				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid=' . Sanitize::onlyInt($line['userid']) . '" class="ui">';
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
 				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="../img/gears.png"/> ';
@@ -941,7 +941,7 @@ if ($overwriteBody==1) {
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo Sanitize::onlyInt($line['userid']); ?>&from=listusers" class="gl">Grades</a></td>
 				<?php
 				if ($haslatepasses) {
-					echo '<td>'.$line['latepass'].'</td>';
+					echo '<td>'.Sanitize::onlyInt($line['latepass']).'</td>';
 				}
 				?>
 			</tr>

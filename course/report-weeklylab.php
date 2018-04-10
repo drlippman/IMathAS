@@ -38,7 +38,7 @@ function getpts($scs) {
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$cid = intval($_GET['cid']);
+$cid = Sanitize::courseId($_GET['cid']);
 $pagetitle = 'Activity Report - Lab Style Course';
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by someone not in the course
@@ -73,7 +73,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
 		writesessiondata();
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/report-weeklylab.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/report-weeklylab.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 

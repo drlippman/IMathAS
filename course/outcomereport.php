@@ -429,7 +429,7 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				$gcnt++;
 				if ($isheader) {
-					$html[] = $oi['name'];
+				    $html[] = Sanitize::encodeStringForDisplay($oi['name']);
 					list($subhtml,$subtots) = getOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$html = array_merge($html, $subhtml);
 				} else {

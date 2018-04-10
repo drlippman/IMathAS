@@ -188,9 +188,9 @@
 		}
 
 		if ($from=='forum') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid) . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($cid));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($cid) . "&r=" . Sanitize::randomQueryStringParam());
 		}
 
 	} else {
@@ -262,7 +262,7 @@
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
 			echo "<form method=post action=\"redeemlatepassforum.php?cid=".Sanitize::courseId($cid)."&fid=".Sanitize::onlyInt($fid)."&from=".Sanitize::encodeUrlParam($from)."\">";
 			if ($allowlaten>1) {
-				echo '<p>You may use up to '.($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>';
+				echo '<p>You may use up to '.Sanitize::onlyInt($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>';
 			}
 			echo "<p>You have ".Sanitize::onlyInt($numlatepass)." LatePass(es) remaining.</p>";
 			echo "<p>You can redeem one LatePass for a ".Sanitize::onlyInt($hours)." hour extension on ";

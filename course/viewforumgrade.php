@@ -99,7 +99,7 @@
 			echo '</body></html>';
 			exit;
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		}
 		exit;
 	}

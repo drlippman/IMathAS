@@ -33,9 +33,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = $_GET['grp']; writesessiondata();}
+	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
-		$sessiondata['selfrom'.$aid] = $_GET['selfrom'];
+		$sessiondata['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
 		writesessiondata();
 	} else {
 		if (!isset($sessiondata['selfrom'.$aid])) {
@@ -51,7 +51,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if (isset($_POST['add'])) {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
 			}
 		} else {
@@ -106,11 +106,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
-			
+
 			require_once("../includes/updateptsposs.php");
 			updatePointsPossible($aid, $itemorder, $row['defpoints']);
-			
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		}
 	}
@@ -121,7 +121,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
 			}
 		}
@@ -142,7 +142,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -355,7 +355,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require_once("../includes/updateptsposs.php");
 				updatePointsPossible($aid, $itemorder, $defpoints);
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
@@ -1162,7 +1163,7 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 		var curcid = <?php echo $cid ?>;
 		var curaid = <?php echo $aid ?>;
-		var defpoints = <?php echo Sanitize::encodeStringForDisplay($defpoints); ?>;
+		var defpoints = '<?php echo Sanitize::encodeStringForDisplay($defpoints); ?>';
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
 	</script>
@@ -1252,7 +1253,7 @@ if ($overwriteBody==1) {
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
-		var itemarray = <?php echo json_encode($jsarr); ?>;
+		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
@@ -1457,7 +1458,7 @@ if ($overwriteBody==1) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td></td>
-				<td><b><?php echo $page_assessmentQuestions['desc'][$i]; ?></b></td>
+				<td><b><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions['desc'][$i]); ?></b></td>
 				<td></td>
 				<td></td>
 				<td></td>

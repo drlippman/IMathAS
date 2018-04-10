@@ -1388,7 +1388,7 @@ calculations you'll need to display simplified values below. <a href="#" onclick
 <p><a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Function Reference</a> |
 <a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Addon Macro Libraries Reference</a></p>
 
-<textarea name="randvars" id="randvars" style="width: 100%"><?php echo htmlentities($randvars);?></textarea>
+<textarea name="randvars" id="randvars" style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($randvars);?></textarea>
 </div>
 
 <p>This question has
@@ -1490,8 +1490,8 @@ for ($n=0;$n<10;$n++) {
 		echo '><td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
 		if (($qtype[$n]=='choices' && $i==$answer[$n]) || ($qtype[$n]!='choices' && isset($partial[$n][$i]) && $partial[$n][$i]==1)) {echo 'checked="checked"';}
 		echo '/></td>';
-		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
-		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
+		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?Sanitize::encodeStringForDisplay($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
+		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?Sanitize::encodeStringForDisplay($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
 		echo '<td><input autocomplete="off" id="pc'.$n.'-'.$i.'" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?Sanitize::encodeStringForDisplay($partial[$n][$i]):"").'"/></td>';
 
 		echo '</tr>';
@@ -1499,14 +1499,14 @@ for ($n=0;$n<10;$n++) {
 	echo '<tr id="qc'.$n.'-def" ';
 	if ($qtype[$n]!="number" && $qtype[$n]!="numfunc" && $qtype[$n]!="calculated") {echo ' style="display:none;"';};
 	echo '><td colspan="4">Default feedback for incorrect answers: ';
-	echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="60" value="'.(isset($feedbacktxtdef[$n])?prepd($feedbacktxtdef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
+	echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="60" value="'.(isset($feedbacktxtdef[$n])?Sanitize::encodeStringForDisplay($feedbacktxtdef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
 	echo '</tbody></table>';
 	echo '</div>'; //end hasparts holder div
 	echo '<div id="essay'.$n.'wrap" ';
 	if ($qtype[$n]!='essay') {echo ' style="display:none;"';};
 	echo '> Feedback to show: <br/>';
 	echo '<textarea id="essay'.$n.'-fb" name="essay'.$n.'-fb" cols="80" rows="4">';
-	if (isset($feedbacktxtessay[$n])) { echo prepd($feedbacktxtessay[$n]);}
+	if (isset($feedbacktxtessay[$n])) { echo Sanitize::encodeStringForDisplay($feedbacktxtessay[$n]);}
 	echo '</textarea><input type="button" class="txted" value="E" onclick="popupeditor(\'essay'.$n.'-fb\')"/>';
 	echo '</div>'; //end essaywrap div
 	echo '</div>'; //end partwrapper div
@@ -1520,7 +1520,7 @@ for ($n=0;$n<4;$n++) {
 	echo '<p id="hintwrapper'.$n.'"';
 	if ($n>=$nhints) {echo ' style="display:none;"';};
 	echo '>Hint '.($n+1).':';
-	echo '<input autocomplete="off" id="hint'.$n.'" name="hint'.$n.'" type="text" size="80" value="'.(isset($hinttext[$n])?prepd($hinttext[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'hint'.$n.'\')"/></p>';
+	echo '<input autocomplete="off" id="hint'.$n.'" name="hint'.$n.'" type="text" size="80" value="'.(isset($hinttext[$n])?Sanitize::encodeStringForDisplay($hinttext[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'hint'.$n.'\')"/></p>';
 }
 
 if (trim($keepcode)=='') {
@@ -1533,7 +1533,7 @@ if (trim($keepcode)=='') {
 ?>
 <p>Here you can override or extend the default $requiretimes or $answerformat values, or define additional code needed for
 the question text, like creating graphs.</p>
-<textarea name="keepcode" id="keepcode" style="width: 100%"><?php echo htmlentities($keepcode);?></textarea>
+<textarea name="keepcode" id="keepcode" style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($keepcode);?></textarea>
 </div>
 <?php
 
@@ -1548,7 +1548,7 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 ?>
 
 <div class=editor>
-	<textarea cols="60" rows="20" id="text" name="text" style="width: 100%"><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$qtext);?></textarea>
+	<textarea cols="60" rows="20" id="text" name="text" style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($qtext);?></textarea>
 </div>
 
 <div class="editor" id="GB_window" style="display:none; position: absolute; height: auto;">

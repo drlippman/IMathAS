@@ -359,7 +359,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
 
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
-		echo '<form method="post" action="actions.php?cid='.Sanitize::courseId($_GET['cid']).'">';
+		echo '<form method="post" action="actions.php?action=unenroll&cid='.Sanitize::courseId($_GET['cid']).'">';
 		echo '<p><button name="action" value="unenroll">'._('Really Unenroll').'</button>';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid=".Sanitize::courseId($_GET['cid'])."'\"></p>\n";
 		echo '</form>';
@@ -371,8 +371,9 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=resetpw$gb\">\n";
 		if (isset($_GET['code'])) {
+			$userId = Sanitize::onlyInt($_GET['id']);
 			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>$userId));
 			$row = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($row !== false && $row['remoteaccess']!='' && $row['remoteaccess']===$_GET['code']) {
 				echo '<input type="hidden" name="code" value="'.Sanitize::encodeStringForDisplay($_GET['code']).'"/>';

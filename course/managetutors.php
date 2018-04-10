@@ -137,7 +137,7 @@
 			}
 		} else {
 			//if not adding new, redirect back to listusers
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	}

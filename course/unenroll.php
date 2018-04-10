@@ -50,10 +50,10 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=".Sanitize::courseId($cid));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=".Sanitize::courseId($cid) . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($cid)."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&r=".Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
@@ -77,7 +77,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (count($_POST['checked']) == mysql_result($result,0,0)) {
 			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['cid']));
+			$stm->execute(array(':courseid'=>Sanitize::courseId($_GET['cid'])));
 			if (count($_POST['checked']) == $stm->fetchColumn(0)) {
 				$_GET['uid'] = 'all';
 			} else {
@@ -101,7 +101,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_GET['cid']));
+				$stm->execute(array(':courseid'=>Sanitize::courseId($_GET['cid'])));
 				if (count($_POST['checked']) > floor($stm->fetchColumn(0)/2)) {
 					$delForumMsg = "<p>Also delete <b class=noticetext>ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
 					$delWikiMsg = "<p>Also delete <b class=noticetext>ALL</b> wiki revisions: ";
@@ -118,7 +118,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['uid']));
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['uid'])));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$unenrollConfirm =  sprintf("Are you SURE you want to unenroll %s %s (%s)?",
                 Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),

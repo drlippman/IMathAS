@@ -69,7 +69,7 @@ if (!(isset($cid))) { //if the cid is missing go back to the index page
 		$obarr = explode(',',$_COOKIE['openblocks-'.Sanitize::courseId($_GET['cid'])]);
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
-		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',array_map('Sanitize::onlyInt',$obarr)));
+		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',array_map('Sanitize::onlyInt',$obarr)), 0, null, null, false, true);
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 
 	} else {

@@ -116,7 +116,7 @@
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,usersort=:usersort,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode,colorize=:colorize WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$useweights, ':orderby'=>$orderby, ':usersort'=>$usersort, ':defaultcat'=>$defaultcat, ':defgbmode'=>$defgbmode, ':stugbmode'=>$stugbmode, ':colorize'=>$_POST['colorize'], ':courseid'=>$cid));
 		if (isset($_POST['submit'])) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($_GET['cid'])."&refreshdef=true");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($_GET['cid'])."&refreshdef=true"."&r=".Sanitize::randomQueryStringParam());
 			exit;
 		}
 	}
@@ -251,7 +251,7 @@
 	for ($j=50;$j<90;$j+=($j<70?10:5)) {
 		for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
 			$colorval[] = "$j:$k";
-			$colorlabel[] = "red &lt; $j%, green &ge; $k%";
+			$colorlabel[] = "red &le; $j%, green &ge; $k%";
 		}
 	}
 	$colorval[] = "-1:-1";

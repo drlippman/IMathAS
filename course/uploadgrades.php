@@ -51,7 +51,7 @@ if (!(isset($teacherid))) {
 			$feedbackcol = Sanitize::onlyInt($_POST['feedbackcol'])-1;
 
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
-			$handle = fopen_utf8($_FILES['userfile']['tmp_name'],'r');
+			$handle = fopen_utf8(realpath($_FILES['userfile']['tmp_name']),'r');
 			if ($_POST['hashdr']==1) {
 				$data = fgetcsv($handle,4096,',');
 			} else if ($_POST['hashdr']==2) {
@@ -68,7 +68,7 @@ if (!(isset($teacherid))) {
 					if ($data[$usercol]=='') {continue;}
 					//DB $query .= "imas_users.SID='{$data[$usercol]}'";
 					$query .= "imas_users.SID=:SID";
-					$qarr[':SID'] = $data[$usercol];
+					$qarr[':SID'] = Sanitize::stripHtmlTags($data[$usercol]);
 				} else if ($_POST['useridtype']==1) {
 					if (strpos($data[$usercol],',')===false) { continue;}
 					list($last,$first) = explode(',',$data[$usercol]);
@@ -78,8 +78,8 @@ if (!(isset($teacherid))) {
 					$last = trim($last);
 					//DB $query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
 					$query .= "imas_users.FirstName=:firstname AND imas_users.LastName=:lastname";
-					$qarr[':firstname'] = $first;
-					$qarr[':lastname'] = $last;
+					$qarr[':firstname'] = Sanitize::stripHtmlTags($first);
+					$qarr[':lastname'] = Sanitize::stripHtmlTags($last);
 					//echo $query;
 				} else {
 					$query .= "0";
@@ -94,7 +94,7 @@ if (!(isset($teacherid))) {
 					$feedback = Sanitize::incomingHtml($data[$feedbackcol]);
 				}
 				//DB $score = addslashes($data[$scorecol]);
-				$score = $data[$scorecol];
+				$score = Sanitize::onlyFloat($data[$scorecol]);
 				//DB if (mysql_num_rows($result)>0) {
 				if ($stm->rowCount()>0) {
 					//DB $cuserid=mysql_result($result,0,0);
@@ -123,7 +123,7 @@ if (!(isset($teacherid))) {
 			$body = "<p>Grades uploaded.  $successes records.</p> ";
 			if (count($failures)>0) {
 				$body .= "<p>Grade upload failure on: <br/>";
-				$body .= implode('<br/>',$failures);
+				$body .= implode('<br/>', Sanitize::encodeStringForDisplay($failures));
 				$body .= '</p>';
 			}
 			if ($successes>0) {

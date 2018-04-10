@@ -41,7 +41,7 @@ function getquestionlicense($row) {
 }
 
 $ids = explode('-',$_GET['id']);
-$idlist = implode(',',array_map('intval', $ids));
+$idlist = array_map('intval', $ids);
 
 //DB $query = "SELECT id,uniqueid,author,ancestorauthors,license,otherattribution FROM imas_questionset WHERE id IN ($idlist)";
 //DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
@@ -51,7 +51,7 @@ $idlist = implode(',',array_map('intval', $ids));
 $idlist_query_placeholders = Sanitize::generateQueryPlaceholders($ids);
 
 $stm = $DBH->prepare("SELECT id,uniqueid,author,ancestorauthors,license,otherattribution FROM imas_questionset WHERE id IN ($idlist_query_placeholders)");
-$stm->execute($ids);
+$stm->execute($idlist);
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<p>Question ID ".Sanitize::onlyInt($row['id']).' (Universal ID '.Sanitize::onlyInt($row['uniqueid']).')</p>';
 	echo '<p style="margin-left:20px">';
