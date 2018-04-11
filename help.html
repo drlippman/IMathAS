@@ -2086,17 +2086,20 @@ $hints[0] = "This will show on first display"
 $hints[1] = "This will show on second attempt (after 1 missed attempt)"
 $hints[2] = "This will show on third and subsequent attempts, since no later values have been defined"
 </pre>
-It is fine, or example, to not define $hints[0] if you want nothing to display initially.
+It is fine, for example, to not define $hints[0] if you want nothing to display initially.
 </p>
 <p>
 Then in the question text, place the location of the hint using the variable $hintloc.
-<p>
+</p>
 
 <p>In multipart questions, you can follow the process above if you just want a single strand of hints for the entire problem.  If you want per-part hints, define the $hints array as:
 <pre>
 $hints[question part number][attempt number] = "hint text"
 </pre>
 Then in question text, place each hint using $hintloc[question part number]
+</p>
+<p>
+To override the default <i>Hint:</i> text, set $hintlabel.
 </p>
 
 <h4>Help references</h4>
