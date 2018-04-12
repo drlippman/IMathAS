@@ -1052,7 +1052,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 
-				$page_assessmentQuestions['desc'][$x] = $aidnames[$aidq];
+				$page_assessmentQuestions['aiddesc'][$x] = $aidnames[$aidq];
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
 					if (strpos($qid,'|')!==false) { continue;}
@@ -1163,7 +1163,7 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 		var curcid = <?php echo $cid ?>;
 		var curaid = <?php echo $aid ?>;
-		var defpoints = '<?php echo Sanitize::encodeStringForDisplay($defpoints); ?>';
+		var defpoints = <?php echo (int) Sanitize::onlyInt($defpoints); ?>;
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
 	</script>
@@ -1454,11 +1454,11 @@ if ($overwriteBody==1) {
 			<tbody>
 <?php
 			$alt=0;
-			for ($i=0; $i<count($page_assessmentQuestions['desc']);$i++) {
+			for ($i=0; $i<count($page_assessmentQuestions['aiddesc']);$i++) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td></td>
-				<td><b><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions['desc'][$i]); ?></b></td>
+				<td><b><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions['aiddesc'][$i]); ?></b></td>
 				<td></td>
 				<td></td>
 				<td></td>

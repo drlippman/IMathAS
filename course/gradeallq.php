@@ -528,7 +528,7 @@
 				$togr = array();
 				foreach ($qtypes as $k=>$t) {
 					if ($t=='essay' || $t=='file') {
-					  $togr[] = Sanitize::encodeStringForDisplay($k);
+					  $togr[] = Sanitize::onlyInt($k);
 					}
 				}
 				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';
@@ -550,7 +550,7 @@
 						echo "  <b>$cntb:</b> " ;
 						if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
 							$url = getasidfileurl($match[1]);
-							echo "<a href=\"" . str_replace('"','&quot;',$url) . "\" target=\"_new\">".Sanitize::encodeStringForDisplay(basename($match[1]))."</a>";
+							echo "<a href=\"" . Sanitize::encodeUrlForHref($url) . "\" target=\"_new\">".Sanitize::encodeStringForDisplay(basename($match[1]))."</a>";
 						} else {
 							if (strpos($laarr[$k],'$f$')) {
 								if (strpos($laarr[$k],'&')) { //is multipart q

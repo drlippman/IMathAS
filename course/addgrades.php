@@ -11,7 +11,7 @@
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
 	if (isset($teacherid)) { $isteacher = true;}
-    $gbItem = $_GET['gbitem'] == 'new' ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
+	$gbItem = ($_GET['gbitem'] == 'new') ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
 	if ($istutor) {
 		$isok = false;
 		if (is_numeric($gbItem)) {
@@ -38,9 +38,9 @@
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
-    $delItem = Sanitize::onlyInt($_GET['del']);
 
 	if (isset($_GET['del']) && $isteacher) {
+		$delItem = Sanitize::onlyInt($_GET['del']);
 		if (isset($_POST['confirm'])) {
 			//DB $query = "DELETE FROM imas_gbitems WHERE id='{$_GET['del']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -104,7 +104,7 @@
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit,rubric,outcomes) VALUES ";
 			$query .= "(:courseid, :name, :points, :showdate, :gbcategory, :cntingb, :tutoredit, :rubric, :outcomes) ";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':points'=>$_POST['points'], ':showdate'=>$showdate,
+			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':points'=>$post_points, ':showdate'=>$showdate,
 				':gbcategory'=>$_POST['gbcat'], ':cntingb'=>$_POST['cntingb'], ':tutoredit'=>$tutoredit, ':rubric'=>$rubric, ':outcomes'=>$outcomes));
 			$gbItem = $DBH->lastInsertId();
 			$isnewitem = true;
@@ -141,10 +141,11 @@
 
 		}
 	}
-    $assesssnap = Sanitize::encodeStringForDisplay($_POST['assesssnap']);
-	if (!empty($assesssnap)) {
-	    $assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
 
+	if (isset($_POST['assesssnap'])) {
+		$assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
+		$post_points = Sanitize::onlyFloat($_POST['points']);
+		
 		//doing assessment snapshot
 		//DB $query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid='{$_POST['assesssnapaid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -162,9 +163,9 @@
 				}
 				$tot += getpts($v);
 			}
-            $assesssnaptype = (int) trim($_POST['assesssnaptype']);
-            $assesssnapatt = (float) trim($_POST['assesssnapatt']);
-            $assesssnappts = (float) trim($_POST['assesssnappts']);
+			$assesssnaptype = (int) Sanitize::onlyInt($_POST['assesssnaptype']);
+			$assesssnapatt = (float) Sanitize::onlyFloat($_POST['assesssnapatt']);
+			$assesssnappts = (float) Sanitize::onlyFloat($_POST['assesssnappts']);
 
 			if ($assesssnaptype==0) {
 				$score = $tot;

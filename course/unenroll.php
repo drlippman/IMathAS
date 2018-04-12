@@ -1,11 +1,10 @@
 <?php
 //IMathAS:  Unenroll students; called from List Users or Gradebook
+//Included from listusers or gradebook - not called directly
 //(c) 2007 David Lippman
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
-
-require_once(__DIR__ . "/../includes/sanitize.php");
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -13,10 +12,12 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../footer.php");
 		exit;
 	}
+	$get_uid = Sanitize::simpleString($_GET['uid');
+	
 	if (isset($_POST['dounenroll'])) { //do unenroll - postback
-		if ($_GET['uid']=="selected") {
+		if ($get_uid=="selected") {
 			$tounenroll = explode(",",$_POST['tounenroll']);
-		} else if ($_GET['uid']=="all") {
+		} else if ($get_uid=="all") {
 			//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -26,7 +27,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				$tounenroll[] = $row[0];
 			}
 		} else {
-			$tounenroll[] = $_GET['uid'];
+			$tounenroll[] = $get_uid;
 		}
 
 		if (!isset($_POST['delwikirev'])) {
@@ -37,14 +38,14 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require_once("../includes/unenroll.php");
 		if (isset($_POST['removewithdrawn'])) {
 			$withwithdraw = 'remove';
-		} else if ($_GET['uid']=="all") {
+		} else if ($get_uid=="all") {
 			$withwithdraw = 'unwithdraw';
 		} else {
 			$withwithdraw = false;
 		}
 		//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 		$DBH->beginTransaction();
-		unenrollstu($cid,$tounenroll,($_GET['uid']=="all" || isset($_POST['delforumposts'])),($_GET['uid']=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev, isset($_POST['usereplaceby']));
+		unenrollstu($cid,$tounenroll,($get_uid=="all" || isset($_POST['delforumposts'])),($get_uid=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev, isset($_POST['usereplaceby']));
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
 
@@ -60,37 +61,37 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		if ((isset($_POST['submit']) && $_POST['submit']=="Unenroll") || (isset($_POST['posted']) && $_POST['posted']=="Unenroll")) {
 			/*if (isset($_POST['ca']) && $secfilter==-1) {
 				//if "check all" and not section limited, mark as all to deliver "all students" message
-				$_GET['uid'] = "all";
+				$get_uid = "all";
 			} else {
-				$_GET['uid'] = "selected";
+				$get_uid = "selected";
 			}
-			if ($_GET['uid']=="all") {
+			if ($get_uid=="all") {
 				//not quite sure why we're doing this check... makes sure all students were actually selected..
 				//if not, convert to selected type
 				$query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				if (count($_POST['checked']) < mysql_result($result,0,0)) {
-					$_GET['uid'] = 'selected';
+					$get_uid = 'selected';
 				}
 			}*/
 			//DB $query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (count($_POST['checked']) == mysql_result($result,0,0)) {
 			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>Sanitize::courseId($_GET['cid'])));
+			$stm->execute(array(':courseid'=>$cid));
 			if (count($_POST['checked']) == $stm->fetchColumn(0)) {
-				$_GET['uid'] = 'all';
+				$get_uid = 'all';
 			} else {
-				$_GET['uid'] = 'selected';
+				$get_uid = 'selected';
 			}
 		}
 
-		if ($_GET['uid']=="all") {
+		if ($get_uid=="all") {
 			//DB $query = "SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
 			//DB $resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 			$resultUserList = $DBH->prepare("SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid");
 			$resultUserList->execute(array(':courseid'=>$cid));
-		} else if ($_GET['uid']=="selected") {
+		} else if ($get_uid=="selected") {
 			if (count($_POST['checked'])>0) {
 				//DB $ulist = "'".implode("','",$_POST['checked'])."'";
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
@@ -101,7 +102,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>Sanitize::courseId($_GET['cid'])));
+				$stm->execute(array(':courseid'=>$cid));
 				if (count($_POST['checked']) > floor($stm->fetchColumn(0)/2)) {
 					$delForumMsg = "<p>Also delete <b class=noticetext>ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
 					$delWikiMsg = "<p>Also delete <b class=noticetext>ALL</b> wiki revisions: ";
@@ -114,11 +115,11 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				}
 			}
 		} else {
-			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
+			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$get_uid}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['uid'])));
+			$stm->execute(array(':id'=>Sanitize::onlyInt($get_uid)));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$unenrollConfirm =  sprintf("Are you SURE you want to unenroll %s %s (%s)?",
                 Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
@@ -129,13 +130,13 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=".Sanitize::courseId($cid)."&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
+			echo "<form method=post action=\"listusers.php?cid=".Sanitize::courseId($cid)."&action=".Sanitize::encodeUrlParam($_GET['action'])."&uid=".Sanitize::encodeUrlParam($get_uid)."\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&action=unenroll&uid=".Sanitize::encodeUrlParam($_GET['uid'])."\">";
+			echo "<form method=post action=\"gradebook.php?cid=".Sanitize::courseId($cid)."&action=unenroll&uid=".Sanitize::encodeUrlParam($get_uid)."\">";
 		}
 
 
-			if ($_GET['uid']=="all") {
+			if ($get_uid=="all") {
 ?>
 			<p><b class=noticetext>Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
 			If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
@@ -171,7 +172,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 			//<p>Also remove any withdrawn questions from assessments?
 			//	<input type=checkbox name="removewithdrawn" value="1" />
 			//</p>
-			} else if ($_GET['uid']=="selected") {
+			} else if ($get_uid=="selected") {
 				if (count($_POST['checked'])==0) {
 					if ($calledfrom=='lu') {
 						echo "No users selected.  <a href=\"listusers.php?cid=".Sanitize::courseId($cid)."\">Try again</a></form>";

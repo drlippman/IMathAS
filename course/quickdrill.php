@@ -537,9 +537,7 @@ function linkgenerator() {
  <title>Quick Drill Link Generator</title>
  <script type="text/javascript">
  var baseaddr = "<?php echo $addr;?>";
- function isNumeric(n) {
-   return !isNaN(parseFloat(n)) && isFinite(n);
- }
+ 
  function makelink() {
 	 var id = document.getElementById("qid").value;
 	 if (id=='') {alert("Question ID is required"); return false;}
@@ -548,15 +546,13 @@ function linkgenerator() {
 	 var mode = document.getElementById("type").value;
 	 var val = document.getElementById("val").value;
 	 if (mode!='none' && val=='') { alert("need to specify N"); return false;}
-	 var url = baseaddr + '?id=' + id + '&sa='+sa;
-	 if (!isNumeric(id) || (!isNumeric(cid) && cid != 'admin') || !isNumeric(val)) {
-		 return false;
-	 }
+	 var url = baseaddr + '?id=' + encodeURIComponent(id) + '&sa='+encodeURIComponent(sa);
+	 
 	 if (cid != '') {
-		url += '&cid='+cid;
+		url += '&cid='+encodeURIComponent(cid);
 	 }
 	 if (mode == 'n' || mode == 'nc' ||  mode == 't') {
-		 url += '&'+mode+'='+val;
+		 url += '&'+mode+'='+encodeURIComponent(val);
 	 }
 	 document.getElementById("output").innerHTML = "<p>URL to use: "+url+"</p><p><a href=\""+url+"\" target=\"_blank\">Try it</a></p>";
  }
@@ -565,8 +561,8 @@ function linkgenerator() {
  <body>
  <h2>Quick Drill Link Generator</h2>
  <table border=0>
- <tr><td>Question ID to use:</td><td><input type="number" id="qid" /></td></tr>
- <tr><td>Course ID (optional):</td><td><input type="number" id="cid" /></td></tr>
+ <tr><td>Question ID to use:</td><td><input type="number" style="width: 6em" id="qid" /></td></tr>
+ <tr><td>Course ID (optional):</td><td><input type="number" style="width: 6em" id="cid" /></td></tr>
  <tr><td>Show answer option:</td><td><select id="sa">
  	<option value="0">Show score - reshow question with answer if wrong</option>
 	<option value="1">Show score - don't reshow question w answer if wrong</option>
@@ -580,7 +576,7 @@ function linkgenerator() {
 	<option value="nc">Do until N questions are correct, then stop</option>
 	<option value="t">Do as many questions as possible in N seconds</option>
 	</select><br/>
-	Where N = <input type="number" id="val"/></td></tr>
+	Where N = <input type="number" style="width: 3em" id="val"/></td></tr>
 </table>
 
 <input type="button" value="Generate Link" onclick="makelink()"/>

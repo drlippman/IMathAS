@@ -186,7 +186,7 @@ if ($overwriteBody==1) {
 		}
 		div.m {
 			float: left;
-			width: <?php echo Sanitize::encodeStringForCSS($pws); ?>in;
+			width: <?php echo Sanitize::onlyFloat($pws); ?>in;
 			border-bottom: 1px dashed #aaa;
 			padding: 0px;
 			overflow: hidden;

@@ -171,6 +171,21 @@ class Sanitize
 	}
 
 	/**
+	* Simple sanitization and escaping of a URL for inclusion in an href
+	* Not as in-depth as the url method, but sufficient
+	* to ensure basic encoding of quotes and such has been done
+	* and basic allowed characters have been checked
+	*
+	* @param $url the url to sanitize
+	* @return string the sanitized url, for inclusion in an href
+	*/
+	public static function encodeUrlForHref($url) 
+	{
+		$url = filter_var($url, FILTER_SANITIZE_URL);
+		return htmlspecialchars($url, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), false);
+	}
+	
+	/**
 	 * An alias for Sanitize::url().
 	 * TODO: Remove this after merges between all repos are complete and all references to fullUrl() are removed.
 	 *
