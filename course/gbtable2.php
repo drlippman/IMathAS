@@ -152,9 +152,14 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 
 ****/
 function flattenitems($items,&$addto) {
+	$now = time();
 	foreach ($items as $item) {
 		if (is_array($item)) {
-			if (!isset($item['avail']) || $item['avail']>0) {
+			if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+			}
+			$ishidden = ($item['avail']==0 || ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+			if (!$ishidden) {
 				flattenitems($item['items'],$addto);
 			}
 		} else {
