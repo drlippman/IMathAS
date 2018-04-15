@@ -2312,23 +2312,23 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 	} else {
 		return $sign.$numerators[$i].'/'.$denominators[$i];
 	}
-}
+}                                
 
 function makenumberrequiretimes($arr) {
 	if (!is_array($arr)) {
-		$arrlist = $arr;
 		$arr = explode(',',$arr);
-	} else {
-		$arrlist = implode(',',$arr);
-	}
+	} 
 	if (count($arr)==0) {
 		return "";
 	}
+	foreach ($arr as $k=>$num) {
+		$arr[$k] = str_replace(array('-', ' '),'',$num);
+	}
+	$uniq = array_unique($arr);
 	$out = array();
-	foreach ($arr as $num) {
-		$num = abs($num);
-		$nummatch = substr_count($arrlist,$num);
-		$out[] = "$num,=$nummatch";
+	foreach ($uniq as $num) {
+		$nummatch = count(array_keys($arr,$num));
+		$out[] = "#$num,=$nummatch";
 	}
 	return implode(',',$out);
 }

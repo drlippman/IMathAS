@@ -7003,6 +7003,12 @@ function checkreqtimes($tocheck,$rtimes) {
 			foreach ($grouptocheck as $lookfor) {
 				if ($lookfor=='#') {
 					$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
+				} else if ($lookfor[0]=='#') {
+					if (!isset($all_numbers)) {
+						preg_match_all('/[\d\.]+/',$cleanans,$matches);
+						$all_numbers = $matches[0];
+					}
+					$nummatch = count(array_keys($all_numbers,str_replace(array('-', ' '),'',substr($lookfor,1))));
 				} else if (strlen($lookfor)>6 && substr($lookfor,0,6)=='regex:') {
 					$regex = str_replace('/','\\/',substr($lookfor,6));
 					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
