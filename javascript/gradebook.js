@@ -107,7 +107,7 @@ function conditionalColor(table,type,low,high) {
 		var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
 		for (var i=0;i<ths.length;i++) {
 			if (k = ths[i].innerHTML.match(/(\d+)(&nbsp;|\u00a0)pts/)) {
-				poss[i] = k[1]*1;
+				poss[i] = parseFloat(k[1]);
 				if (poss[i]==0) {poss[i]=.0000001;}
 			} else {
 				poss[i] = 100;
@@ -133,12 +133,12 @@ function conditionalColor(table,type,low,high) {
 						var v = tds[i].textContent;
 					}
 					if (k = v.match(/\(([\d\.]+)%\)/)) {
-						var perc = k[1];
+						var perc = parseFloat(k[1]);
 					} else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
-						if (k[2]==0) { var perc = 0;} else { var perc= Math.round(1000*k[1]/k[2])/10;}
+						if (k[2]==0) { var perc = 0;} else { var perc= Math.round(1000*parseFloat(k[1])/parseFloat(k[2]))/10;}
 					} else {
 						v = v.replace(/[^\d\.]/g,"");
-						var perc = Math.round(1000*v/poss[i])/10;
+						var perc = Math.round(1000*parseFloat(v)/poss[i])/10;
 					}
 
 					if (perc<low) {
