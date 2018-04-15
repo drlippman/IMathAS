@@ -322,15 +322,11 @@
 					$avgtota = round($timeontask[$qid]/($tcnt[$qid]),2);
 					if ($avgtot==0) {
 						$avgtot = 'N/A';
-					} else if ($avgtot<60) {
-						$avgtot .= ' sec';
 					} else {
 						$avgtot = round($avgtot/60,2) . ' min';
 					}
 					if ($avgtota==0) {
 						$avgtot = 'N/A';
-					} else if ($avgtota<60) {
-						$avgtota .= ' sec';
 					} else {
 						$avgtota = round($avgtota/60,2) . ' min';
 					}
