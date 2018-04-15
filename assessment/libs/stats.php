@@ -100,6 +100,8 @@ function Nplus1percentile($a,$p) {
 	$l = round(($p/100)*(count($a)+1),2);
 	if (floor($l)==$l) {
 		return ($a[$l-1]);
+	} else if ($l>count($a)) {
+		return $a[floor($l)-1];
 	} else {
 		return (($a[floor($l)-1]+$a[ceil($l)-1])/2);
 	}
