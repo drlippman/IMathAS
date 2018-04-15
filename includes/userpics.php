@@ -26,6 +26,7 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
 	    //invalid image type
 	    return FALSE;
     }
+    
     $createFunc = 'imagecreatefrom' . $type;
    
     $im = @$createFunc( $image[ 'tmp_name' ] );
@@ -64,7 +65,25 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
 	$imT = imagecreatetruecolor( $tmpw, $th );
 	imagecopyresampled( $imT, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
     }
-   
+    if ($type=='jpeg') {
+    	$exif = exif_read_data($image[ 'tmp_name' ]);	  
+    	if (isset($exif['Orientation']) && $exif['Orientation']>1) {
+		switch($exif['Orientation']) {
+			case 3:
+			    $imT = imagerotate($imT, 180, 0);
+			    $changed = true;
+			    break;
+			case 6:
+			    $imT = imagerotate($imT, -90, 0);
+			    $changed = true;
+			    break;
+			case 8:
+			    $imT = imagerotate($imT, 90, 0);
+			    $changed = true;
+			    break;
+		}
+	}
+    }
     // save the image
    imagejpeg( $imT, $galleryPath . 'userimg_'.$imageId . '.jpg', 100 );
    relocatecoursefileifneeded($galleryPath . 'userimg_'.$imageId . '.jpg', 'userimg_'.$imageId . '.jpg');
