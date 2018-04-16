@@ -278,15 +278,27 @@
 		 }
 
 		 if (!empty($_SERVER['QUERY_STRING'])) {
-       $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
+		 	 $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 } else {
 			 $querys = (!empty($addtoquerystring) ? '?' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 }
-		 //$now = time();
-		 //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
-		 //DB //mysql_query($query) or die("Query failed : " . mysql_error());
 
-		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys);
+		 $needToForcePasswordReset = false;
+		 if (isset($CFG['acct']['passwordMinlength']) && strlen($_POST['password'])<$CFG['acct']['passwordMinlength']) {
+		 	 $needToForcePasswordReset = true;
+		 } else if (isset($CFG['acct']['passwordFormat'])) {
+		 	 require_once("includes/newusercommon.php");
+		 	 if (!checkFormatAgainstRegex($_POST['password'], $CFG['acct']['passwordFormat'])) {
+		 	 	 $needToForcePasswordReset = true;
+		 	 }
+		 } 
+		 
+		 if ($needToForcePasswordReset) {
+		 	 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd');
+		 } else {
+		 	 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys);
+		 }
+		 exit;
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;

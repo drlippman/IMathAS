@@ -12,7 +12,9 @@ if ($myrights<100) {
 
 //each test is [string to look at, requiretimes, expected result]
 $reqtimestests = [
-  ['3x^2+4x', 'x,=2,3,>0', 1]
+	['3x^2+4x', 'x,=2,3,>0', 1],
+	['3x+30x^2+4', '3,=2', 1],
+	['3x+30x^2+4', '#3,=1', 1],
 ];
 
 //each test is [string to test, answerformat, expected result]
