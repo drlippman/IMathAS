@@ -466,7 +466,7 @@
 		if (isset($_GET['cid'])) {
 			$cid = Sanitize::courseId($_GET['cid']);
 		} else {
-			$cid = $sessiondata['courseid'];
+			$cid = Sanitize::courseId($sessiondata['courseid']);
 		}
 		//DB $query = "SELECT id,locked,timelimitmult,section,latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());

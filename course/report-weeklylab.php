@@ -38,7 +38,7 @@ function getpts($scs) {
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$cid = Sanitize::courseId($_GET['cid']);
+
 $pagetitle = 'Activity Report - Lab Style Course';
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by someone not in the course

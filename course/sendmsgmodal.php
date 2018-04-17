@@ -8,10 +8,8 @@ $flexwidth = true;
 $nologo = true;
 
 if (isset($_POST['message'])) {
-	require_once("../includes/htmLawed.php");
-	//DB $_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
-	//DB $_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
-	$message = Sanitize::outgoingHtml($_POST['message']);
+	
+	$message = Sanitize::incomingHtml($_POST['message']);
 	$subject = Sanitize::stripHtmlTags($_POST['subject']);
 	$msgto = Sanitize::onlyInt($_POST['sendto']);
 	$error = '';
@@ -87,7 +85,7 @@ if (isset($_POST['message'])) {
 	}
 
 	if (isset($_GET['quoteq'])) {
-        $quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
+		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
 		require("../assessment/displayq2.php");
 		$parts = explode('-',$quoteq);
 		$GLOBALS['assessver'] = $parts[4];

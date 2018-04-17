@@ -134,33 +134,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$outcomes = implode(',',$outcomes);
 
-		//DB $_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
-		$_POST['name'] = htmlentities($_POST['name']);
+		$forumname = Sanitize::stripHtmlTags($_POST['name']);
 
-		require_once("../includes/htmLawed.php");
 		if ($_POST['description']=='<p>Enter forum description here</p>') {
-			$_POST['description'] = '';
+			$forumdesc = '';
 		} else {
-			//DB $_POST['description'] = addslashes(myhtmLawed(stripslashes($_POST['description'])));
-			$_POST['description'] = myhtmLawed($_POST['description']);
+			$forumdesc = Sanitize::incomingHtml($_POST['description']);
 		}
 		if (!isset($_POST['postinstr']) || trim($_POST['postinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['postinstr'])) {
-			$_POST['postinstr'] = '';
+			$postinstruction = '';
 		} else {
-			//DB $_POST['postinstr'] = addslashes(myhtmLawed(stripslashes($_POST['postinstr'])));
-			$_POST['postinstr'] = myhtmLawed($_POST['postinstr']);
+			$postinstruction = Sanitize::incomingHtml($_POST['postinstr']);
 		}
 		if (!isset($_POST['replyinstr']) || trim($_POST['replyinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['replyinstr'])) {
-			$_POST['replyinstr'] = '';
+			$replyinstruction = '';
 		} else {
-			//DB $_POST['replyinstr'] = addslashes(myhtmLawed(stripslashes($_POST['replyinstr'])));
-			$_POST['replyinstr'] = myhtmLawed($_POST['replyinstr']);
+			$replyinstruction = Sanitize::incomingHtml($_POST['replyinstr']);
 		}
-
-		$forumname = Sanitize::stripHtmlTags($_POST['name']);
-		$forumdesc = Sanitize::stripHtmlTags($_POST['description']);
-		$postinstruction = Sanitize::stripHtmlTags($_POST['postinstr']);
-		$replyinstruction = Sanitize::stripHtmlTags($_POST['replyinstr']);
+		
 		$defaultdisplay = Sanitize::onlyInt($_POST['defdisplay']);
 		$groupsetid = Sanitize::onlyInt($_POST['groupsetid']);
 		$points = Sanitize::onlyInt($_POST['points']);
@@ -171,12 +162,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$forumtype = Sanitize::onlyInt($_POST['forumtype']);
 		$forumid = Sanitize::onlyInt($_GET['id']);
 
-		if ($forumid) {  //already have id; update
+		if (!empty($forumid)) {  //already have id; update
 			//DB $query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $oldgroupsetid = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT groupsetid FROM imas_forums WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
+			$stm->execute(array(':id'=>$forumid));
 			$oldgroupsetid = $stm->fetchColumn(0);
 			if ($oldgroupsetid!=$_POST['groupsetid']) {
 				//change of groupset; zero out stugroupid
@@ -269,17 +260,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES (:forumid, :userid)");
 			$stm->execute(array(':forumid'=>$newforumid, ':userid'=>$userid));
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."&r=" .Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid."&r=" .Sanitize::randomQueryStringParam());
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
 		if (isset($_GET['id'])) { //MODIFY MODE
+			$forumid = Sanitize::onlyInt($_GET['id']);
 			$hassubscrip = false;
 			//DB $query = "SELECT id FROM imas_forum_subscriptions WHERE forumid='{$_GET['id']}' AND userid='$userid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_subscriptions WHERE forumid=:forumid AND userid=:userid");
-			$stm->execute(array(':forumid'=>$_GET['id'], ':userid'=>$userid));
+			$stm->execute(array(':forumid'=>$forumid, ':userid'=>$userid));
 			if ($stm->rowCount()>0) {
 				$hassubscrip = true;
 			}
@@ -287,7 +279,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * FROM imas_forums WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
+			$stm->execute(array(':id'=>$forumid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
@@ -306,7 +298,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if (mysql_num_rows($result)>0) {
 				$stm = $DBH->prepare("SELECT * FROM imas_forum_threads WHERE forumid=:forumid AND stugroupid>0 LIMIT 1");
-				$stm->execute(array(':forumid'=>$_GET['id']));
+				$stm->execute(array(':forumid'=>$forumid));
 				if ($stm->rowCount()>0) {
 					$hasgroupthreads = true;
 				} else {
@@ -360,7 +352,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		list($posttag,$replytag) = explode('--',$line['caltag']);
 
 		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
-		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::encodeUrlParam($_GET['id']) : "";
+		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $forumid : "";
 		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
 		$hr = floor($coursedeftime/60)%12;

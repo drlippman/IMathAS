@@ -359,7 +359,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
 
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
-		echo '<form method="post" action="actions.php?action=unenroll&cid='.Sanitize::courseId($_GET['cid']).'">';
+		echo '<form method="post" action="actions.php?cid='.Sanitize::courseId($_GET['cid']).'">';
 		echo '<p><button name="action" value="unenroll">'._('Really Unenroll').'</button>';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='./course/course.php?cid=".Sanitize::courseId($_GET['cid'])."'\"></p>\n";
 		echo '</form>';
