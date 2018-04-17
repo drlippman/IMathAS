@@ -574,11 +574,12 @@ function togglevideoembed() {
 			timeref += '&end='+m[1];
 		}
 		timeref += '&enablejsapi=1';
+		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
 		jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
 			height: 400,
-			src: location.protocol+'//'+vidsrc+vidid+timeref,
+			src: loc_protocol+'//'+vidsrc+vidid+timeref,
 			frameborder: 0,
 			allowfullscreen: 1
 		}).insertAfter(jQuery(this));

@@ -37,7 +37,7 @@ function getTeachers($cid) {
 		if ($row['name']==null) {
 			$row['name'] = _('Default');
 		}
-		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
+		$out[] = array("id"=>Sanitize::onlyInt($row['id']), "name"=>Sanitize::stripHtmlTags($row['LastName']).', '.Sanitize::stripHtmlTags($row['FirstName']).' ('.Sanitize::stripHtmlTags($row['name']).')');
 	}
 	return $out;
 }
@@ -82,7 +82,7 @@ if (isset($_POST['remove'])) {
 		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
-	echo json_encode($out);
+	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['search'])) {
 	$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
@@ -90,13 +90,13 @@ if (isset($_POST['remove'])) {
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
 	require("../includes/userutils.php");
-	$possible_teachers = searchForUser($_POST['search'], true, true);
+	$possible_teachers = searchForUser(Sanitize::encodeStringForDisplay($_POST['search']), true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
 		if (in_array($row['id'], $existing)) { continue; }
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
 	}
-	echo json_encode($out);
+	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 }
 

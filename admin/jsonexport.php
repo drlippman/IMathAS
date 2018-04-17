@@ -36,7 +36,7 @@ if (isset($_GET['cid'])) {
   parseItemorder($items);
 
   //  exports the modules array as json
-  $outputjson = json_encode($output_array);
+  $outputjson = json_encode($output_array, JSON_HEX_TAG);
   header("Content-type: application/json");
   header('Content-Disposition: attachment; filename="results.json"');
   header('Content-Length: ' . strlen($outputjson));

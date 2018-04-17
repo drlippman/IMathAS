@@ -6,14 +6,15 @@ if (isset($sessiondata['emulateuseroriginaluser']) && isset($_GET['unemulateuser
 	$stm->execute(array(':userid'=>$sessiondata['emulateuseroriginaluser'], ':sessionid'=>$sessionid));
 	unset($sessiondata['emulateuseroriginaluser']);
 	writesessiondata();
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=" .Sanitize::randomQueryStringParam());
 	exit;
 }
 
 if ($myrights >= 75 && isset($_GET['emulateuser'])) {
+    $emu_id = Sanitize::onlyInt($_GET['emulateuser']);
 	if ($myrights<100) {
 		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
-		$stm->execute(array($_GET['emulateuser']));
+		$stm->execute(array($emu_id));
 		if ($stm->fetchColumn(0) != $groupid) {
 			echo "You can only emulate teachers from your own group";
 			exit;
@@ -22,8 +23,8 @@ if ($myrights >= 75 && isset($_GET['emulateuser'])) {
 	$sessiondata['emulateuseroriginaluser'] = $userid;
 	writesessiondata();
 	$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
-	$stm->execute(array(':userid'=>$_GET['emulateuser'], ':sessionid'=>$sessionid));
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+	$stm->execute(array(':userid'=>$emu_id, ':sessionid'=>$sessionid));
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=" .Sanitize::randomQueryStringParam());
 	exit;
 }
 if ($myrights<100) {
@@ -57,16 +58,17 @@ if (isset($_GET['fixorphanqs'])) {
 }
 if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['aid'])) {
+		$aid = Sanitize::onlyInt($_GET['aid']);
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
-		$stm->execute(array($_POST['aid']));
+		$stm->execute(array($aid));
 		$destcid = $stm->fetchColumn(0);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".Sanitize::onlyInt($_POST['aid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?cid=".Sanitize::onlyInt($destcid)."&id=".$aid."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['pqid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".Sanitize::onlyInt($_POST['pqid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/testquestion.php?qsetid=".Sanitize::onlyInt($_POST['pqid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['eqid'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/moddataset.php?cid=admin&id=".Sanitize::onlyInt($_POST['eqid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/moddataset.php?cid=admin&id=".Sanitize::onlyInt($_POST['eqid'])."&r=".Sanitize::randomQueryStringParam());
 	}
 	exit;
 }

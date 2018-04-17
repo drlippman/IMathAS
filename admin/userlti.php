@@ -60,7 +60,7 @@ if ($myrights < 100) {
   $query .= "WHERE ilp.contextid=?";
   $stm = $DBH->prepare($query);
   $stm->execute(array($contextid, $contextid));
-  echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC));
+  echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC), JSON_HEX_TAG);
   exit;
 
 } else if (empty($_GET['id'])) {

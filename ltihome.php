@@ -92,22 +92,23 @@ if ($sessiondata['ltiitemtype']==0) {
 }
 
 //handle form postbacks
-if (isset($_POST['createcourse'])) {
+$createcourse = Sanitize::onlyInt($_POST['createcourse']);
+if (!empty($createcourse)) {
 	//DB $query = "SELECT courseid FROM imas_teachers WHERE courseid='{$_POST['createcourse']}' AND userid='$userid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
-	$stm->execute(array(':courseid'=>$_POST['createcourse'], ':userid'=>$userid));
+	$stm->execute(array(':courseid'=>$createcourse, ':userid'=>$userid));
 	if ($stm->rowCount()>0) {
-		$cid = intval($_POST['createcourse']);
+		$cid = $createcourse;
 	} else {
-		$_POST['createcourse'] = intval($_POST['createcourse']);
+		$_POST['createcourse'] = $createcourse;
 		//log terms agreement if needed
 		//DB $query = "SELECT termsurl FROM imas_courses WHERE id='{$_POST['createcourse']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT termsurl FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['createcourse']));
+		$stm->execute(array(':id'=>$createcourse));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row[0]!='') { //has terms of use url
 			$now = time();
@@ -167,7 +168,7 @@ if (isset($_POST['createcourse'])) {
 		//DB $row = mysql_fetch_row($result);
 		//TODO: copy settings in one query?
 		$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$_POST['createcourse']));
+		$stm->execute(array(':courseid'=>$createcourse));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		//DB $query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$cid'";
 		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -179,7 +180,7 @@ if (isset($_POST['createcourse'])) {
 		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$_POST['createcourse']));
+		$stm->execute(array(':courseid'=>$createcourse));
 
 		$stm2 = $DBH->prepare("INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES (:courseid, :name, :scale, :scaletype, :chop, :dropn, :weight)");
 
@@ -200,7 +201,7 @@ if (isset($_POST['createcourse'])) {
 		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['createcourse']));
+		$stm->execute(array(':id'=>$createcourse));
 		$items = unserialize($stm->fetchColumn(0));
 		$newitems = array();
 		require("includes/copyiteminc.php");
@@ -248,9 +249,9 @@ if (isset($_POST['createcourse'])) {
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$atitle = $stm->fetchColumn(0);
-
-			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle));
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid&r=" .Sanitize::randomQueryStringParam();
+			
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
@@ -260,9 +261,8 @@ if (isset($_POST['createcourse'])) {
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$cname = $stm->fetchColumn(0);
-
-			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname));
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0&r" .Sanitize::randomQueryStringParam();
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 		}
 	}
@@ -287,7 +287,7 @@ if (isset($_POST['createcourse'])) {
 
 if ($hasplacement && $placementtype=='course') {
 	if (!isset($_GET['showhome']) && !isset($_GET['chgplacement'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($cid));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($cid) . "&r=" .Sanitize::randomQueryStringParam());
 		exit;
 	}
 }
@@ -320,7 +320,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Your Courses">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf('<option value="%d">%s</option>', $row[0], Sanitize::encodeStringForDisplay($row[1]));
+			printf('<option value="%d">%s</option>' ,Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</optgroup>';
 	}
@@ -354,7 +354,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 			if ($row[3]!='') {
 				echo ' data-termsurl="'.Sanitize::encodeStringForDisplay($row[3]).'"';
 			}
-			echo '>'.$row[1].'</option>';
+			echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 		}
 		echo '</optgroup>';
 	}
@@ -388,7 +388,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Assessment">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf('<option value="%d">%s</option>', $row[0], Sanitize::encodeStringForDisplay($row[1]));
+			printf('<option value="%d">%s</option>', Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</optgroup>';
 	}

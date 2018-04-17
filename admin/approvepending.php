@@ -235,7 +235,7 @@ function sanitizeNewInstructorRequestLog($logtext) {
 	if (!empty($verificationUrl)) {
 		if (!empty($sanitizedLogText)) $sanitizedLogText .= "<br/>";
 		//$verificationUrl is html so dont sanitize
-		$sanitizedLogText .= "VerificationURL: " . $verificationUrl;
+		$sanitizedLogText .= "VerificationURL: " . Sanitize::outgoingHtml($verificationUrl);
 	}
 	if (!empty($phone)) {
 		if (!empty($sanitizedLogText)) $sanitizedLogText .= "<br/>";

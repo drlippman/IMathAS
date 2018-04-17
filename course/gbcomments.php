@@ -53,7 +53,7 @@
 				$scorecol = $_POST['gradecol']-1;
 
 				// $_FILES[]['tmp_name'] is not user provided. This is safe.
-				$handle = fopen_utf8($_FILES['userfile']['tmp_name'],'r');
+				$handle = fopen_utf8(realpath($_FILES['userfile']['tmp_name']),'r');
 				if ($_POST['hashdr']==1) {
 					$data = fgetcsv($handle,4096,',');
 				} else if ($_POST['hashdr']==2) {
@@ -67,15 +67,15 @@
 					if ($_POST['useridtype']==0) {
 						//DB $query .= "imas_users.SID='{$data[$usercol]}'";
 						$query .= "imas_users.SID=:SID";
-						$qarr[':SID'] = $data[$usercol];
+						$qarr[':SID'] = Sanitize::stripHtmlTags($data[$usercol]);
 					} else if ($_POST['useridtype']==1) {
 						list($last,$first) = explode(',',$data[$usercol]);
 						$first = str_replace(' ','',$first);
 						$last = str_replace(' ','',$last);
 						//DB $query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
 						$query .= "imas_users.FirstName=:first AND imas_users.LastName=:last";
-						$qarr[':first'] = $first;
-						$qarr[':last'] = $last;
+						$qarr[':first'] = Sanitize::stripHtmlTags($first);
+						$qarr[':last'] = Sanitize::stripHtmlTags($last);
 						//echo $query;
 					} else {
 						$query .= "0";
@@ -90,11 +90,11 @@
 						if ($comtype=='stu') {
 							//DB $query = "UPDATE imas_students SET gbcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
 							$stm = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE userid=:userid AND courseid=:courseid");
-							$stm->execute(array(':gbcomment'=>$data[$scorecol], ':userid'=>$cuserid, ':courseid'=>$cid));
+							$stm->execute(array(':gbcomment'=>Sanitize::stripHtmlTags($data[$scorecol]), ':userid'=>$cuserid, ':courseid'=>$cid));
 						} else if ($comtype=='instr') {
 							//DB $query = "UPDATE imas_students SET gbinstrcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
 							$stm = $DBH->prepare("UPDATE imas_students SET gbinstrcomment=:gbinstrcomment WHERE userid=:userid AND courseid=:courseid");
-							$stm->execute(array(':gbinstrcomment'=>$data[$scorecol], ':userid'=>$cuserid, ':courseid'=>$cid));
+							$stm->execute(array(':gbinstrcomment'=>Sanitize::stripHtmlTags($data[$scorecol]), ':userid'=>$cuserid, ':courseid'=>$cid));
 						}
 						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 						$successes++;

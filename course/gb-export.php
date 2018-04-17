@@ -123,12 +123,12 @@
 					  if(preg_match("/[\,\"\n\r]/", $val)) {
 						  $val = '"'.str_replace('"', '""', $val).'"';
 					  }
-					  $line .= $val.',';
+					  $line .= Sanitize::outgoingHtml($val).',';
 				}
 				# strip the last deliminator
 				$line = substr($line, 0, -1);
 				$line .= "\n";
-				echo $line;
+				echo Sanitize::outgoingHtml($line);
 			}
 			exit;
 		}

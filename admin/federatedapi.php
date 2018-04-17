@@ -203,7 +203,7 @@ if ($stage == 0) { //send updated libraries
 		$replacebys[] = array('uniqueid'=>$row[0], 'replaceby'=>$row[1]);
 	}
 
-	echo json_encode(array('since'=>$since, 'stage'=>3, 'data'=>array('libitems'=>$libitems,'replacebys'=>$replacebys)));
+	echo json_encode(array('since'=>$since, 'stage'=>3, 'data'=>array('libitems'=>$libitems,'replacebys'=>$replacebys)), JSON_HEX_TAG);
 	exit;
 }
 ?>

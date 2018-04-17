@@ -48,9 +48,9 @@
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread-1 WHERE id=:id and isread>0");
 		$stm->execute(array(':id'=>$msg));
 		if ($type=='new') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&r=" .Sanitize::randomQueryStringParam());
 		}
 		exit;
 	}

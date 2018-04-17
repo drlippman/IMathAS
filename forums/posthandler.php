@@ -354,7 +354,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
 		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //display mod
 		if ($caller=='thread') {
@@ -573,11 +573,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if ($forumsettings['postinstr'] != '' && $_GET['modify']=="new") {
 			echo '<h4>'._('Posting Instructions').'</h4>';
 			// $forumsettings['postinstr'] contains HTML.
-			echo '<div class="intro">'.$forumsettings['postinstr'].'</div><br/>';
+			echo '<div class="intro">'.Sanitize::outgoingHtml($forumsettings['postinstr']).'</div><br/>';
 		} else if ($forumsettings['replyinstr'] != '' && $_GET['modify']=="reply") {
 			echo '<h4>'._('Reply Instructions').'</h4>';
 			// $forumsettings['replyinstr'] contains HTML.
-			echo '<div class="intro">'.$forumsettings['replyinstr'].'</div><br/>';
+			echo '<div class="intro">'.Sanitize::outgoingHtml($forumsettings['replyinstr']).'</div><br/>';
 		}
 		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify=".Sanitize::encodeUrlParam($_GET['modify'])."&replyto=".Sanitize::encodeUrlParam($_GET['replyto'])."\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
@@ -628,7 +628,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
-			echo htmlentities($line['message']);
+			echo Sanitize::encodeStringForDisplay($line['message']);
 			echo "</textarea></div></span><br class=form>\n";
 			if (!$isteacher && $allowanon==1) {
 				echo "<span class=form>Post Anonymously:</span><span class=formright>";
@@ -857,9 +857,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		}
 		if ($caller == "posts" && $lastpost) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid&r=" . Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl&r=" . Sanitize::randomQueryStringParam());
 		}
 		exit;
 	} else {
@@ -970,7 +970,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$stm = $DBH->prepare("UPDATE imas_grades SET gradetypeid=:gradetypeid WHERE gradetype='forum' AND refid IN ($list)");
 			$stm->execute(array(':gradetypeid'=>$_POST['movetof']));
 
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
 			if ($_POST['movetot'] != $threadid) {
@@ -999,7 +999,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				}
 			}
 
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 
 		}

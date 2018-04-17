@@ -97,7 +97,8 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 					'forum' => Sanitize::onlyInt($forumid),
 					'thread' => Sanitize::encodeUrlParam($_GET['thread']),
 					'modify' => 'reply',
-					'replyto' => Sanitize::onlyInt($actionid)
+					'replyto' => Sanitize::onlyInt($actionid),
+				    'r' => Sanitize::randomQueryStringParam(),
 				)));
 		} else if ($action=='modify') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?"
@@ -107,6 +108,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 					'forum' => Sanitize::onlyInt($forumid),
 					'thread' => Sanitize::encodeUrlParam($_GET['thread']),
 					'modify' => Sanitize::onlyInt($actionid),
+				    'r' => Sanitize::randomQueryStringParam(),
 				)));
 		}
 	} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Previous') {
@@ -116,6 +118,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 				'cid' => Sanitize::courseId($cid),
 				'forum' => Sanitize::onlyInt($forumid),
 				'thread' => Sanitize::encodeUrlParam($_POST['prevth']),
+			    'r' => Sanitize::randomQueryStringParam(),
 			)));
 	} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Next') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?"
@@ -124,6 +127,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 				'cid' => Sanitize::courseId($cid),
 				'forum' => Sanitize::onlyInt($forumid),
 				'thread' => Sanitize::encodeUrlParam($_POST['nextth']),
+			    'r' => Sanitize::randomQueryStringParam(),
 			)));
 	} else {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?"
@@ -131,6 +135,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 				'page' => Sanitize::onlyInt($page),
 				'cid' => Sanitize::courseId($cid),
 				'forum' => Sanitize::onlyInt($forumid),
+			    'r' => Sanitize::randomQueryStringParam(),
 			)));
 	}
 	exit;

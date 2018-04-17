@@ -243,7 +243,7 @@ echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
 </div>
 
 <script type="text/javascript">
-var groups = <?php echo json_encode(getGroups()); ?>;
+var groups = <?php echo json_encode(getGroups(), JSON_HEX_TAG); ?>;
 function normalizeGroupName(grpname) {
 	grpname = grpname.toLowerCase();
 	grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.|a|the)\b/g, "");
@@ -272,7 +272,7 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		groups: groups,
-		toApprove: <?php echo json_encode(getReqData()); ?>,
+		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG); ?>,
 		fieldTitles: <?php echo json_encode($reqFields);?>,
 		activeUser: -1,
 		activeUserStatus: -1,

@@ -4,7 +4,7 @@
 	include("init_without_validate.php");
 	if (!isset($_GET['bare'])) {
 ?>
-<html
+<html>
 <head>
 <title><?php echo $installname;?> Help</title>
 <style type="text/css">
@@ -105,7 +105,7 @@ h2,h3,h4,h5,h6 {
 				if (!isset($_GET['bare'])) {
 					echo "<style type=\"text/css\">\n";
 					for ($i=$matches[1]+1;$i<5;$i++) {
-						echo "div.h$i { margin-left: " . 10*($i-$matches[1]) . "px;}\n";
+						echo "div.h$i { margin-left: " . 10*Sanitize::encodeStringForCSS($i-$matches[1]) . "px;}\n";
 					}
 					echo "</style>\n";
 				}

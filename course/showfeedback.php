@@ -45,7 +45,7 @@ if ($type=='A') {
 			echo '<p>'._('Overall feedback:').'</p>';
 		} else {
 			$qn = substr($key,1);
-			echo '<p>'.sprintf(_('Feedback on Question %d:'), $qn+1).'</p>';
+			echo '<p>'.sprintf(_('Feedback on Question %d:'), Sanitize::onlyInt($qn+1)).'</p>';
 		}
 		echo '<div class="fbbox">'.Sanitize::outgoingHtml($feedback[$key]).'</div>';
 	}

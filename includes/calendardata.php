@@ -61,7 +61,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 	$stm = $DBH->prepare("SELECT name,itemorder,latepasshrs FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
-	$coursename = trim($row[0]);
+	$coursename = Sanitize::stripHtmlTags(trim($row[0]));
 	$itemorder = unserialize($row[1]);
 	$itemsimporder = array();
 
@@ -92,10 +92,11 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			require_once("../includes/exceptionfuncs.php");
 			if (isset($exceptions[$row['id']])) {
-				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row, true);
+			    $exceptionid = Sanitize::onlyInt($exceptions[$row['id']]);
+				$useexception = $exceptionfuncs->getCanUseAssessException($exceptionid, $row, true);
 				if ($useexception) {
-					$row['startdate'] = $exceptions[$row['id']][0];
-					$row['enddate'] = $exceptions[$row['id']][1];
+					$row['startdate'] = $exceptionid[0];
+					$row['enddate'] = $exceptionid[1];
 				}
 			}
 			//if startdate is past now, skip

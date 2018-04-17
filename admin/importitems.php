@@ -89,7 +89,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$tosets .= ','.$set;
 				//DB $valsets .= ',\''.$item[$itemtoadd][$set].'\'';
 				$valsets .= ',:'.$set;
-				$qarr[':'.$set] = $item[$itemtoadd][$set];
+				$qarr[':'.$set] = Sanitize::stripHtmlTags($item[$itemtoadd][$set]);
 			}
 		}
 		$query = "INSERT INTO imas_assessments ($tosets) VALUES ($valsets)";
@@ -141,7 +141,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$qarr = array(':description'=>$qset['description'][$n], ':author'=>$qset['author'][$n], ':qtype'=>$qset['qtype'][$n],
 						':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
 						':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':license'=>$qset['license'][$n],
-						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>$qset['extref'][$n],
+						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>Sanitize::stripHtmlTags($qset['extref'])[$n],
 						':lastmoddate'=>$now, ':adddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$questions[$qid]['qsetid']);
 
 					$query = "UPDATE imas_questionset SET description=:description,";
@@ -184,7 +184,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 							}
 							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
 							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
-							$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+							$stm->execute(array(':qsetid'=>Sanitize::onlyInt($questions[$qid]['qsetid']), ':var'=>Sanitize::stripHtmlTags($p[0]), ':filename'=>Sanitize::stripHtmlTags($p[1]), ':alt'=>Sanitize::stripHtmlTags($alttext)));
 						}
 					}
 					if ($qdeleted==1) { //was deleted; need to add library items
@@ -226,11 +226,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) ";
 				$query .= "VALUES (:adddate, :lastmoddate, :uniqueid, :ownerid, :author, :userights, :description, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':adddate'=>$now, ':lastmoddate'=>$qset['lastmod'][$n], ':uniqueid'=>$qset['uniqueid'][$n], ':ownerid'=>$thisownerid,
-					':author'=>$qset['author'][$n], ':userights'=>$thisqrights, ':description'=>$qset['description'][$n], ':qtype'=>$qset['qtype'][$n],
-					':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
-					':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':extref'=>$qset['extref'][$n], ':license'=>$qset['license'][$n],
-					':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
+				$stm->execute(array(':adddate'=>$now, ':lastmoddate'=>Sanitize::stripHtmlTags($qset['lastmod'][$n]), ':uniqueid'=>Sanitize::onlyInt($qset['uniqueid'][$n]), ':ownerid'=>Sanitize::onlyInt($thisownerid),
+					':author'=>Sanitize::stripHtmlTags($qset['author'][$n]), ':userights'=>Sanitize::onlyInt($thisqrights), ':description'=>Sanitize::stripHtmlTags($qset['description'][$n]), ':qtype'=>Sanitize::stripHtmlTags($qset['qtype'][$n]),
+					':control'=>Sanitize::stripHtmlTags($qset['control'][$n]), ':qcontrol'=>Sanitize::stripHtmlTags($qset['qcontrol'][$n]), ':qtext'=>Sanitize::stripHtmlTags($qset['qtext'][$n]), ':answer'=>Sanitize::stripHtmlTags($qset['answer'][$n]),
+					':solution'=>Sanitize::stripHtmlTags($qset['solution'][$n]), ':solutionopts'=>Sanitize::onlyInt($qset['solutionopts'][$n]), ':extref'=>Sanitize::stripHtmlTags($qset['extref'][$n]), ':license'=>Sanitize::onlyInt($qset['license'][$n]),
+					':ancestorauthors'=>Sanitize::stripHtmlTags($qset['ancestorauthors'][$n]), ':otherattribution'=>Sanitize::stripHtmlTags($qset['otherattribution'][$n]), ':hasimg'=>$hasimg, ':importuid'=>$importuid));
 				$questions[$qid]['qsetid'] = $DBH->lastInsertId();
 				if ($hasimg==1) {
 					$qimgs = explode("\n",$qset['qimgs'][$n]);
@@ -239,7 +239,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 						//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
 						//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
 						$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1]));
+						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>Sanitize::stripHtmlTags($p[0]), ':filename'=>Sanitize::stripHtmlTags($p[1])));
 					}
 				}
 				foreach ($newlibs as $lib) {
@@ -271,6 +271,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//look up any refs to UIDs
 			//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+
 			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
 			$includedqs = array();
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -288,7 +289,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//lookup backrefs
 			$includedbackref = array();
 			if (count($includedqs)>0) {
-				$includedlist = implode(',', $includedqs);  //known decimal values from above
+				$includedlist = implode(',', array_map('intval',$includedqs));  //known decimal values from above
 				//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 				//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
@@ -314,7 +315,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				//DB $query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
 				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
 				$stm2 = $DBH->prepare("UPDATE imas_questionset SET control=:control,qtext=:qtext WHERE id=:id");
-				$stm2->execute(array(':control'=>$control, ':qtext'=>$qtext, ':id'=>$row[0]));
+				$stm2->execute(array(':control'=>$control, ':qtext'=>$qtext, ':id'=>Sanitize::onlyInt($row[0])));
 			}
 		}
 
@@ -681,7 +682,7 @@ if (!(isset($teacherid))) {
 		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
 
 		$userights = $_POST['userights'];
-		$newlibs = explode(",",$_POST['libs']);
+		$newlibs = explode(",",array_map('intval',$_POST['libs']));
 		//DB $item = array_map('addslashes_deep', $item);
 		//DB $questions = array_map('addslashes_deep', $questions);
 		//DB $qset = array_map('addslashes_deep', $qset);
@@ -695,8 +696,8 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$cid));
 
 		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-		$ciditemorder = unserialize($itemorder);
-		$items = unserialize($itemlist);
+		$ciditemorder = json_decode($itemorder);
+		$items = json_decode($itemlist);
 		$newitems = array();
 		$missingfiles = array();
 
@@ -715,18 +716,20 @@ if (!(isset($teacherid))) {
 
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
-
+        $rqp = Sanitize::randomQueryStringParam();
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {
 				echo "$file <br/>";
 			}
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$rqp\" >Done</a></p>";
 		} else if ($myrights==100) {
 			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$rqp\" >Done</a></p>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=$rqp");
 		}
 		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
@@ -746,7 +749,7 @@ if (!(isset($teacherid))) {
 			$page_fileErrorMsg .=  "a question or library export.\n";
 		}
 
-		$items = unserialize($itemlist);
+		$items = json_decode($itemlist);
 		$ids = array();
 		$types = array();
 		$names = array();
@@ -867,7 +870,7 @@ function chkgrp(frm, arr, mark) {
 				echo "onClick=\"chkgrp(this.form, '".Sanitize::encodeStringForJavascript($ids[$i])."', this.checked);\" ";
 				echo '/>';
 			} else {
-				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{'" . Sanitize::encodeStringForDisplay($ids[$i]). "'}' checked=checked ";
 				echo '/>';
 			}
 ?>
