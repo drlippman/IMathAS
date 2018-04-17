@@ -901,7 +901,7 @@
 	$placeinhead .= '
 	   var controlEditor;
 	   var qEditor;
-
+	
 	  function toggleeditor(el) {
 	     var qtextbox =  document.getElementById(el);
 	     if ((el=="qtext" && editoron==0) || (el=="solution" && seditoron==0)) {
@@ -926,28 +926,32 @@
 		qtextbox.rows -= 3;
 		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 		if (el=="qtext") {setupQtextEditor();}
-	     }
+	     }    
 	     if (el.match(/qtext/)) {
 	     	editoron = 1 - editoron;
-	     	document.cookie = "qeditoron="+editoron;
+	     	//document.cookie = "qeditoron="+editoron;
 	     } else if (el.match(/solution/)) {
 	     	seditoron = 1 - seditoron;
-	     	document.cookie = "seditoron="+seditoron;
+	     	//document.cookie = "seditoron="+seditoron;
 	     }
 	   }
 	   function initsolneditor() {
+	   	/*
 	   	if (document.cookie.match(/seditoron=1/)) {
 	   		var val = document.getElementById("solution").value;
 	   		if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("solution");}
 	   	}
+	   	*/
 	   }
 
-	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {
+	   addLoadEvent(function(){setupQtextEditor();});
+	   /*
+	   if (document.cookie.match(/qeditoron=1/)) {
 	   	var val = document.getElementById("qtext").value;
 	   	if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("qtext");}
 	   	else {setupQtextEditor();}
 	   }else {setupQtextEditor();}});
-
+	   */
 
 	   function setupQtextEditor() {
 	   	var qtextbox = document.getElementById("qtext");

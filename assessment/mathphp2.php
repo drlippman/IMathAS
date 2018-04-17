@@ -225,7 +225,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				$c = $str{$i};
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word
-			if ($out=='e') {
+			if ($out=='e' && !in_array($out,$vars)) {
 				$out = "exp(1)";
 				$intype = 3;
 			} else if ($out=='pi') {
