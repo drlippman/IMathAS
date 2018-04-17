@@ -839,7 +839,7 @@ echo "</p>";
 				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
 
 				if ($isteacher && $groupsetid>0 && !$dofilter) {
-					echo '<td class=c>'.Sanitize::onlyInt($groupnames[$line['stugroupid']]).'</td>';
+					echo '<td class=c>'.Sanitize::encodeStringForDisplay($groupnames[$line['stugroupid']]).'</td>';
 				}
 
 				echo "<td class=c>".Sanitize::encodeStringForDisplay($posts)."</td>";

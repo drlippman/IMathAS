@@ -1531,6 +1531,10 @@ $showanswer = "Do this first. &lt;br/&gt;Then do this."
 </pre>
 </p>
 
+<p><b>Comments</b></p>
+<p>You can insert comments in your code by starting the comment with two forward slashes: //this is a comment.  
+Typically it's best to put comments on their own line, but they can also be placed after a line of code.</p>
+
 <h4><a name="conditionals">Conditionals</a></h4>
 
 Any assignment line can be followed by one of two conditional:  &quot;where&quot; or &quot;if&quot;.
@@ -2327,7 +2331,10 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
 	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times. <br/>
-	You can	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
+	Be aware that if you search for "5,=1", it will match both 5 and 15 and 2.5, since all three strings contain a 5.  When 
+	searching for numbers, you can avoid this by putting a "#" before the number, like "#5,=1", which would match the 5 but not 15 or 0.5.
+	Beware this type of search ignores signs.<br/>
+	You can	use just "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
 	You can match either of two symbols by putting || between them, like ".5||1/2,>0"<br/>
 	You can use a regular expression by putting in the symbol location "regex:expression"<br/>
 	You can put "ignore_commas,true" at the beginning of the $requiretimes to ignore commas in the answer<br/>
