@@ -4729,6 +4729,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answerformat=='list') {
 			$gaarr = array_map('trim',explode(',',$givenans));
 			$anarr = array_map('trim',explode(',',$answer));
+			$gaarrcnt = count($gaarr);
 		} else {
 			$gaarr = array($givenans);
 			$anarr = array($answer);
@@ -4861,7 +4862,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-		$score = $correct/count($anarr);
+		if ($gaarrcnt <= count($anarr)) {
+			$score = $correct/count($anarr);
+		} else {
+			$score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/($gaarrcnt+count($anarr));
+		}
 		if ($score<0) { $score = 0; }
 		return ($score);
 		//return $correct;
