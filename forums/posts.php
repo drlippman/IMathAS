@@ -21,6 +21,11 @@ $cid = Sanitize::courseId($_GET['cid']);
 $forumid = Sanitize::onlyInt($_GET['forum']);
 $threadid = Sanitize::onlyInt($_GET['thread']);
 $page = Sanitize::onlyInt($_GET['page']);
+if (!empty($_GET['embed'])) {
+	$flexwidth = true;
+	$nologo = true;
+}
+	
 //special "page"s
 //-1 new posts from forum page
 //-2 tagged posts from forum page
@@ -363,18 +368,19 @@ if ($oktoshow) {
 		$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid, ':lastview'=>$now));
 	}
 }
-
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
-if ($page==-4) {
-	echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";
-} else if ($page==-3) {
-	echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
-} else if ($page==-5) {
-	echo "<a href=\"flaggedthreads.php?cid=$cid\">Flagged Threads</a> ";
-} else {
-	echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">".Sanitize::encodeStringForDisplay($forumname)."</a> ";
+if (empty($_GET['embed'])) {
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+	if ($page==-4) {
+		echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";
+	} else if ($page==-3) {
+		echo "<a href=\"newthreads.php?cid=$cid\">New Threads</a> ";
+	} else if ($page==-5) {
+		echo "<a href=\"flaggedthreads.php?cid=$cid\">Flagged Threads</a> ";
+	} else {
+		echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">".Sanitize::encodeStringForDisplay($forumname)."</a> ";
+	}
+	echo "&gt; Posts</div>\n";
 }
-echo "&gt; Posts</div>\n";
 
 if (!$oktoshow) {
 	echo '<p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
@@ -495,7 +501,8 @@ function printchildren($base,$restricttoowner=false) {
 			echo "<input type=button class=\"shbtn\" value=\"Hide\" onClick=\"toggleitem(this)\">\n";
 		}
 		if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\" onclick=\"return checkchgstatus(0,$child)\">Reply</a> ";
+			$embedstr = isset($_GET['embed'])?'&embed=true':'';
+			echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child$embedstr\" onclick=\"return checkchgstatus(0,$child)\">Reply</a> ";
 		}
 		if ($isteacher || ($ownerid[$child]==$userid && $allowmod && (($base==0 && time()<$postby) || ($base>0 && time()<$replyby))) || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 			echo '<span class="dropdown">';
@@ -701,6 +708,10 @@ echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" alt=\"Ex
 echo "<img src=\"$imasroot/img/collapse.gif\" style=\"visibility:hidden\" alt=\"Collapse\" />";
 
 }
-echo "<div class=right><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Forum Topics</a></div>\n";
+if (empty($_GET['embed'])) {
+	echo "<div class=right><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Forum Topics</a></div>\n";
+} else {
+	echo '<div class=right><button type="button" onclick="parent.GB_hide()">'._('Close').'</button></div>';
+}
 require("../footer.php");
 ?>
