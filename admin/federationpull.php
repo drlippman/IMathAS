@@ -1207,13 +1207,19 @@ if (!$continuing) {  //start a fresh pull
 
 	//now, resolve any unassigned issues
 	//first, try to undelete the unassigned library item for any question with no undeleted library items
-	$query = "UPDATE imas_library_items AS ili, (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ";
-	$query .= "SET ili.deleted=0 WHERE ili.qsetid=tofix.qsetid AND ili.libid=0";
+	$query = "UPDATE imas_library_items AS ili JOIN (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ON ili.qsetid=tofix.qsetid ";
+	$query .= "JOIN imas_questionset AS iq ON ili.qsetid=iq.id ";
+	$query .= "SET ili.deleted=0 WHERE ili.libid=0 AND iq.deleted=0";
 	$stm = $DBH->query($query);
 	
 	//if any still have no undeleted library items, then they must not have an unassigned entry to undelete, so add it
 	$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid,junkflag,deleted,lastmoddate) ";
-	$query .= "(SELECT 0,ili.qsetid,iq.ownerid,0,0,iq.lastmoddate FROM imas_library_items AS ili JOIN imas_questionset AS iq ON iq.id=ili.qsetid GROUP BY ili.qsetid HAVING min(ili.deleted)=1)";
+	$query .= "(SELECT 0,ili.qsetid,iq.ownerid,0,0,iq.lastmoddate FROM imas_library_items AS ili JOIN imas_questionset AS iq ON iq.id=ili.qsetid WHERE iq.deleted=0 GROUP BY ili.qsetid HAVING min(ili.deleted)=1)";
+	$stm = $DBH->query($query);
+	
+	//if there are any questions with NO library items, add an unassigned one
+	$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid,junkflag,deleted,lastmoddate) ";
+	$query .= "(SELECT 0,iq.id,iq.ownerid,0,iq.deleted,iq.lastmoddate FROM imas_questionset AS iq LEFT JOIN imas_library_items AS ili ON iq.id=ili.qsetid WHERE ili.id IS NULL)";
 	$stm = $DBH->query($query);
 	
 	//make unassigned deleted if there's also an undeleted other library
