@@ -19,9 +19,9 @@ function mathphppre($st) {
 		$st = str_replace(array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)"),array("arcsin","arccos","arctan","arcsin","arccos","arctan"),$st);
 		$st = str_replace(array("sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),array("arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),$st);
   }
-  $st = preg_replace('/log_([a-zA-Z\d\.\/]+)\(/','nthlog($1,',$st);
-  $st = preg_replace('/log_\(([a-zA-Z\/\d\.\/]+)\)\(/','nthlog($1,',$st);
-  $st = preg_replace('/(sin|cos|tan|sec|csc|cot)\s*\^\s*(\d+)\(/','$1n($2,', $st);
+  $st = preg_replace('/log_([a-zA-Z\d\.\/]+)\s*\(/','nthlog($1,',$st);
+  $st = preg_replace('/log_\(([a-zA-Z\/\d\.\/]+)\)\s*\(/','nthlog($1,',$st);
+  $st = preg_replace('/(sin|cos|tan|sec|csc|cot)\s*\^\s*(\d+)\s*\(/','$1n($2,', $st);
 
   return $st;
 }
