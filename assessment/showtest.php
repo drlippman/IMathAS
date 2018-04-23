@@ -178,20 +178,27 @@
 			$bestscores_stm = $DBH->prepare($query);
 			$bestscores_stm->execute(array(':assessmentid'=>$adata['reqscoreaid'], ':userid'=>$userid));
 			list($prereqscore,$reqscoreptsposs,$reqscorename) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+			
 			if ($prereqscore === null) {
 				$isBlocked = true;
 			} else {
 				$prereqscore = explode(';', $prereqscore);
+				$prereqscore = explode(',', $prereqscore[0]);
+				$prereqscoretot = 0;
+				for ($i=0;$i<count($prereqscore);$i++) {
+					$prereqscoretot += getpts($prereqscore[$i]);
+				}
 				$isBlocked = false;
+				
 				if ($adata['reqscoretype']&2) { //using percent-based
 					if ($reqscoreptsposs==-1) {
 						require("../includes/updateptsposs.php");
 						$reqscoreptsposs = updatePointsPossible($adata['reqscoreaid']);
 					}
-					if (round(100*getpts($prereqscore[0])/$reqscoreptsposs,1)+.02<abs($adata['reqscore'])) {
+					if (round(100*$prereqscoretot/$reqscoreptsposs,1)+.02<abs($adata['reqscore'])) {
 						$isBlocked = true;
 					}
-				} else if (round(getpts($prereqscore[0]),1)+.02<abs($adata['reqscore'])) { //points based
+				} else if ($prereqscoretot+.02<abs($adata['reqscore'])) { //points based
 					$isBlocked = true;
 				}
 			}
