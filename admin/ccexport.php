@@ -195,7 +195,8 @@ if (isset($_GET['delete'])) {
 			$canvout = '';
 			if (is_array($item)) {
 				if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
-					if ($mod_depth>0) {
+					$mod_depth_change = 1;
+					if ($mod_depth>0 || strlen($ind)>2) {
 						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
 						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
@@ -205,6 +206,11 @@ if (isset($_GET['delete'])) {
 							$module_meta .= $canvout;
 						} else {
 							$toplevelitems .= $canvout;
+							$mod_depth_change = 2;
+							if ($inmodule) {
+								$module_meta .= '</items></module>';
+								$inmodule = false;
+							}
 						}
 					} else {
 						if ($inmodule) {
@@ -221,7 +227,7 @@ if (isset($_GET['delete'])) {
 					}
 					$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $mod_depth+1);
+					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $mod_depth+$mod_depth_change);
 					$out .= $ind.'</item>'."\n";
 				} else {
 					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $mod_depth);
