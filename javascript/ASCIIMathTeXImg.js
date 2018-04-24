@@ -429,6 +429,17 @@ function AMgetSymbol(str) {
   AMcurrentSymbol=CONST;
   k = 1;
   st = str.slice(0,1);
+  if (st=='$' && str.length>1 && str.slice(1,2).match(/[a-zA-Z]/)) { //is PHP variable
+  	while (k<=str.length && str.slice(k,k+1).match(/[a-zA-Z0-9_]/)) {
+  		k++;
+  	}
+  	st = str.slice(0,k);
+  	if (st=="-" && AMpreviousSymbol==INFIX) {
+	    AMcurrentSymbol = INFIX;
+	    return {input:st, tag:"mo", output:st, ttype:UNARY, func:true, val:true};
+	}
+	return {input:st, tag:"mo", output:st, ttype:CONST, val:true}; //added val bit
+  }
   var integ = true;
 
   while ("0"<=st && st<="9" && k<=str.length) {
