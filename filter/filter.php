@@ -9,9 +9,6 @@
 	if ((isset($sessiondata['mathdisp']) && $sessiondata['mathdisp']==2 ) || isset($loadmathfilter)) { //use image fallback for math
 		include("$filterdir/math/ASCIIMath2TeX.php");
 		$AMT = new AMtoTeX;
-		if (isset($sessiondata['texalignformatrix'])) {
-			$AMT->setAlignForMatrix($sessiondata['texalignformatrix']);
-		}
 	}
 	if ((isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==2) || isset($loadgraphfilter)) { //use image fallback for graphs
 		include("$filterdir/graph/asciisvgimg.php");
