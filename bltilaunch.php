@@ -1395,7 +1395,7 @@ if ($linkparts[0]=='cid') {
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
 		} else if ($line['date_by_lti']==3 && $line['enddate']!=$_SESSION['lti_duedate']) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
-			$exceptionrow = array($now, $_SESSION['lti_duedate'], 0, 1);
+			$exceptionrow = array(min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1);
 			$stm = $DBH->prepare("INSERT INTO imas_exceptions (startdate,enddate,islatepass,is_lti,userid,assessmentid,itemtype) VALUES (?,?,?,?,?,?,'A')");
 			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
 			$useexception = true;
