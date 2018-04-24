@@ -3128,9 +3128,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							$func = str_replace("(x)",'($x)',$func);
 							$func = create_function('$x', 'return ('.$func.');');
 							
-							$x1 = 0.99/4*$settings[1] + 3.01/4*$settings[0];
-							$x2 = 0.99/2*$settings[1] + 1.01/2*$settings[0];
-							$x3 = 3.01/4*$settings[1] + 0.99/4*$settings[0];
+							$epsilon = ($settings[1]-$settings[0])/97;
+							$x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
+							$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
+							$x3 = 3/4*$settings[1] + 1/4*$settings[0] + $epsilon;
 							
 							$y1 = $func($x1);
 							$y2 = $func($x2);
@@ -5261,9 +5262,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ansellipses = array();
 			$anshyperbolas = array();
 			$x0 = $settings[0];
-			$x1 = 0.99/4*$settings[1] + 3.01/4*$settings[0];
-			$x2 = 0.99/2*$settings[1] + 1.01/2*$settings[0];
-			$x3 = 3.01/4*$settings[1] + 0.99/4*$settings[0];
+			$epsilon = ($settings[1]-$settings[0])/97;
+			$x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
+			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
+			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + $epsilon;
 			$x4 = $settings[1];
 			$x0p = $imgborder;
 			$x1p = $xtopix($x1); //($x1 - $settings[0])*$pixelsperx + $imgborder;
@@ -5727,6 +5729,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$deftol = .1;
 			$defpttol = 5;
+
 			foreach ($anslines as $key=>$ansline) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($lines); $i++) {
@@ -6079,9 +6082,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
 			$ymid = ($settings[2]+$settings[3])/2;
 			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;*/
-			$x1 = 0.99/4*$settings[1] + 3.01/4*$settings[0];
-			$x2 = 0.99/2*$settings[1] + 1.01/2*$settings[0];
-			$x3 = 3.01/4*$settings[1] + 0.99/4*$settings[0];
+			$epsilon = ($settings[1]-$settings[0])/97;
+			$x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
+			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
+			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + $epsilon;
 			
 			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
