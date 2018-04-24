@@ -76,6 +76,15 @@ if (isset($_GET['fixorphanqs'])) {
 	echo '<p><a href="utils.php">Utils</a></p>';
 	exit;
 }
+if (isset($_GET['fixdupgrades'])) {
+	$query = 'DELETE imas_grades FROM imas_grades JOIN ';
+	$query .= "(SELECT min(id) as minid,refid FROM imas_grades WHERE gradetype='forum' AND refid>0 GROUP BY refid having count(id)>1) AS duplic ";
+	$query .= "ON imas_grades.refid=duplic.refid AND imas_grades.gradetype='forum' WHERE imas_grades.id > duplic.minid";
+	$stm = $DBH->query($query);
+	echo "Removed ".($stm->rowCount())." duplicate forum grade records.<br/>";
+	echo '<p><a href="utils.php">Utils</a></p>';
+	exit;
+}
 if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid']));
