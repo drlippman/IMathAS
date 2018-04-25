@@ -133,7 +133,7 @@ if ($line['url']=='') {
 
 try {
 	$parms = signParameters($parms, $line['url'], "POST", $line['ltikey'], $line['secret'], null, $org_id, $org_desc);
-	$content = postLaunchHTML($parms, Sanitize::rawurlencodePath($line['url']),isset($parms['custom_debug']));
+	$content = postLaunchHTML($parms, $line['url'], isset($parms['custom_debug']));
 	print($content);
 } catch (Exception $e) {
 	echo $e->getMessage();

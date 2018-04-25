@@ -100,7 +100,7 @@
 
 		 $sessiondata['secsalt'] = generaterandstring();
 		 if (isset($_POST['savesettings'])) {
-			 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000, null, null, null, true);
+			 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000, '', '', false, true);
 		 }
 		 $enc = base64_encode(serialize($sessiondata));
 		 //DB $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
@@ -478,7 +478,7 @@
 		if (isset($_GET['cid'])) {
 			$cid = Sanitize::courseId($_GET['cid']);
 		} else {
-			$cid = $sessiondata['courseid'];
+			$cid = Sanitize::courseId($sessiondata['courseid']);
 		}
 		//DB $query = "SELECT id,locked,timelimitmult,section,latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());

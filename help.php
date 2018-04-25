@@ -105,7 +105,7 @@ h2,h3,h4,h5,h6 {
 				if (!isset($_GET['bare'])) {
 					echo "<style type=\"text/css\">\n";
 					for ($i=$matches[1]+1;$i<5;$i++) {
-						echo "div.h$i { margin-left: " . 10*Sanitize::encodeStringForCSS($i-$matches[1]) . "px;}\n";
+						echo "div.h$i { margin-left: " . 10*Sanitize::onlyFloat($i-$matches[1]) . "px;}\n";
 					}
 					echo "</style>\n";
 				}

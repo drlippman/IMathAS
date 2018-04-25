@@ -56,7 +56,7 @@ require_once '../../includes/OAuth.php';
   function postLaunchHTML($newparms, $endpoint, $debug) {
     global $last_base_string;
     $r = "<div id=\"ltiLaunchFormSubmitArea\">\n";
-    $r .= "<form action=\"".$endpoint."\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n" ;
+    $r .= "<form action=\"".Sanitize::encodeUrlForHref($endpoint)."\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n" ;
     foreach($newparms as $key => $value ) {
       $key = Sanitize::encodeStringForDisplay($key);
       $value = Sanitize::encodeStringForDisplay($value);
@@ -73,7 +73,7 @@ require_once '../../includes/OAuth.php';
     $r .= "</form>\n";
     if ( $debug ) {
       $r .= "<pre>\n";
-      $r .=  "<b>BasicLTI Endpoint</b>\n" . $endpoint . "\n\n";
+      $r .=  "<b>BasicLTI Endpoint</b>\n" . Sanitize::encodeStringForDisplay($endpoint) . "\n\n";
       $r .=  "<b>BasicLTI Parameters:</b>\n";
       foreach($newparms as $key => $value ) {
         $key = Sanitize::encodeStringForDisplay($key);

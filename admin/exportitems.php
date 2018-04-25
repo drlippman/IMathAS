@@ -84,7 +84,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	//print_r($newitems);
 	$description = $_POST['description'];
 	echo "EXPORT DESCRIPTION\n";
-	echo Sanitize::stripHtmlTags($description)."\n";
+	echo $description."\n";
 	echo "EXPORT OWNERID\n";
 	echo $line['ownerid']."\n";
 	echo "INSTALLNAME\n";

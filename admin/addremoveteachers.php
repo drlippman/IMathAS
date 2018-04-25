@@ -37,7 +37,8 @@ function getTeachers($cid) {
 		if ($row['name']==null) {
 			$row['name'] = _('Default');
 		}
-		$out[] = array("id"=>Sanitize::onlyInt($row['id']), "name"=>Sanitize::stripHtmlTags($row['LastName']).', '.Sanitize::stripHtmlTags($row['FirstName']).' ('.Sanitize::stripHtmlTags($row['name']).')');
+		$userdisplayname = $row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')';
+		$out[] = array("id"=>Sanitize::onlyInt($row['id']), "name"=>Sanitize::encodeStringForDisplay($userdisplayname));
 	}
 	return $out;
 }
@@ -50,7 +51,7 @@ if (isset($_POST['remove'])) {
 	$toremove[] = $cid;
 	$stm->execute($toremove);
 	
-	echo json_encode(getTeachers($cid));
+	echo json_encode(getTeachers($cid), JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['add'])) {
 	$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
@@ -66,7 +67,7 @@ if (isset($_POST['remove'])) {
 	$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES $ph");
 	$stm->execute($exarr);
 	
-	echo json_encode(getTeachers($cid));
+	echo json_encode(getTeachers($cid), JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['loadgroup'])) {
 	$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
@@ -90,7 +91,7 @@ if (isset($_POST['remove'])) {
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
 	require("../includes/userutils.php");
-	$possible_teachers = searchForUser(Sanitize::encodeStringForDisplay($_POST['search']), true, true);
+	$possible_teachers = searchForUser(Sanitize::stripHtmlTags($_POST['search']), true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
 		if (in_array($row['id'], $existing)) { continue; }

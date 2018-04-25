@@ -219,7 +219,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>You've received a new message</p><p>From: $userfullname<br />Course: $cname.</p>\r\n";
 				//DB $message .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
-        $message .= "<p>Subject: ". Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
+				$message .= "<p>Subject: ". Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=" . Sanitize::courseId($_POST['courseid']) . "&msgid=$msgid\">";
 				$message .= "View Message</a></p>\r\n";
 				$message .= "<p>If you do not wish to receive email notification of new messages, please ";
@@ -230,7 +230,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($FCMtokenTo != '') {
 				require_once("../includes/FCM.php");
 				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($_POST['courseid'])."&msgid=$msgid";
-				sendFCM($FCMtokenTo,"Msg from: $userfullname".Sanitize::encodeStringForDisplay($_POST['subject']),$url);
+				sendFCM($FCMtokenTo,"Msg from: $userfullname", $_POST['subject'], $url);
 			}
 			if ($type=='new') {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());

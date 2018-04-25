@@ -102,7 +102,6 @@ if (!empty($createcourse)) {
 	if ($stm->rowCount()>0) {
 		$cid = $createcourse;
 	} else {
-		$_POST['createcourse'] = $createcourse;
 		//log terms agreement if needed
 		//DB $query = "SELECT termsurl FROM imas_courses WHERE id='{$_POST['createcourse']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -116,7 +115,7 @@ if (!empty($createcourse)) {
 			//DB $query = "INSERT INTO imas_log (time,log) VALUES($now,'User $userid agreed to terms of use on course {$_POST['createcourse']}')";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
-			$stm->execute(array(':time'=>$now, ':log'=>'User $userid agreed to terms of use on course '.$_POST['createcourse']));
+			$stm->execute(array(':time'=>$now, ':log'=>'User $userid agreed to terms of use on course '.$createcourse));
 		}
 		//creating a copy of a template course
 		$blockcnt = 1;
@@ -249,7 +248,7 @@ if (!empty($createcourse)) {
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$atitle = $stm->fetchColumn(0);
-			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid&r=" .Sanitize::randomQueryStringParam();
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid";
 			
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
@@ -261,7 +260,7 @@ if (!empty($createcourse)) {
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$cname = $stm->fetchColumn(0);
-			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0&r" .Sanitize::randomQueryStringParam();
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0";
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 		}
@@ -320,7 +319,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Your Courses">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf('<option value="%d">%s</option>' ,Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
+			printf('<option value="%d">%s</option>' ,Sanitize::onlyInt($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</optgroup>';
 	}
@@ -350,7 +349,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Group Template Courses">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
+			echo '<option value="'.Sanitize::onlyInt($row[0]).'"';
 			if ($row[3]!='') {
 				echo ' data-termsurl="'.Sanitize::encodeStringForDisplay($row[3]).'"';
 			}
@@ -388,7 +387,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '<optgroup label="Assessment">';
 		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf('<option value="%d">%s</option>', Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
+			printf('<option value="%d">%s</option>', Sanitize::onlyInt($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</optgroup>';
 	}

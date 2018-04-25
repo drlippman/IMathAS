@@ -115,13 +115,13 @@ if (isset($_GET['showscored'])) {
 	$pts = getpts($after);
 
 	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
-	$postAuth = Sanitize::stripHtmlTags($_POST['auth']);
-	if (isset($postAuth)) {
+	
+	if (isset($_POST['auth'])) {
 		//DB $query = "SELECT password FROM imas_users WHERE SID='".$_POST['auth']."'";
 		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$postAuth));
+		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($_POST['auth'])));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$sig = $row[0];
 	} else {

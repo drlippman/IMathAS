@@ -31,7 +31,7 @@ if (!empty($_GET['from'])) {
 		$backloc = '/index.php?r=' . Sanitize::randomQueryStringParam();
 	} else if ($_GET['from']=='admin2') {
 		$from = 'admin2';
-		$backloc = '/admin/admin2.php';
+		$backloc = '/admin/admin2.php?r=' . Sanitize::randomQueryStringParam();
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'ud'.$userdetailsuid;
@@ -44,7 +44,7 @@ if (!empty($_GET['from'])) {
 }
 
 //process transfer
-$ownerid = intval($_POST['newowner']);
+$ownerid = Sanitize::onlyInt($_POST['newowner']);
 if (!empty($ownerid)) {
 	$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
 	$stm->execute(array(':ownerid'=>$ownerid, ':id'=>$cid));

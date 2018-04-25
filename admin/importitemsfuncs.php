@@ -545,7 +545,7 @@ private function insertInline() {
 		}
 		//sanitize html fields
 		foreach ($db_fields['html']['inlinetext'] as $field) {
-			$thisinline[$field] = myhtmlawed($thisinline[$field]);
+			$thisinline[$field] = Sanitize::incomingHtml($thisinline[$field]);
 		}
 		$exarr[] = $this->cid;
 		foreach ($db_fields['inlinetext'] as $field) {
@@ -624,7 +624,7 @@ private function insertLinked() {
 		}
 		//sanitize html fields
 		foreach ($db_fields['html']['linkedtext'] as $field) {
-			$this->data['items'][$toimport]['data'][$field] = myhtmlawed($this->data['items'][$toimport]['data'][$field]);
+			$this->data['items'][$toimport]['data'][$field] = Sanitize::incomingHtml($this->data['items'][$toimport]['data'][$field]);
 		}
 		$exarr[] = $this->cid;
 		foreach ($db_fields['linkedtext'] as $field) {
@@ -654,7 +654,7 @@ private function insertForum() {
 		}
 		//sanitize html fields
 		foreach ($db_fields['html']['forum'] as $field) {
-			$this->data['items'][$toimport]['data'][$field] = myhtmlawed($this->data['items'][$toimport]['data'][$field]);
+			$this->data['items'][$toimport]['data'][$field] = Sanitize::incomingHtml($this->data['items'][$toimport]['data'][$field]);
 		}
 		$exarr[] = $this->cid;
 		foreach ($db_fields['forum'] as $field) {
@@ -680,7 +680,7 @@ private function insertWiki() {
 		$exarr[] = $this->cid;
 		//sanitize html fields
 		foreach ($db_fields['html']['wiki'] as $field) {
-			$this->data['items'][$toimport]['data'][$field] = myhtmlawed($this->data['items'][$toimport]['data'][$field]);
+			$this->data['items'][$toimport]['data'][$field] = Sanitize::incomingHtml($this->data['items'][$toimport]['data'][$field]);
 		}
 		foreach ($db_fields['wiki'] as $field) {
 			$exarr[] = $this->data['items'][$toimport]['data'][$field];
@@ -710,7 +710,7 @@ private function insertDrill() {
 		$this->data['items'][$toimport]['data']['itemids'] = implode(',', $newitems);
 		//sanitize html fields
 		foreach ($db_fields['html']['drill'] as $field) {
-			$this->data['items'][$toimport]['data'][$field] = myhtmlawed($this->data['items'][$toimport]['data'][$field]);
+			$this->data['items'][$toimport]['data'][$field] = Sanitize::incomingHtml($this->data['items'][$toimport]['data'][$field]);
 		}
 		$exarr[] = $this->cid;
 		foreach ($db_fields['drill'] as $field) {
@@ -754,27 +754,27 @@ private function insertAssessment() {
 		}
 		//sanitize html fields
 		foreach ($db_fields['html']['assessment'] as $field) {
-			$thisitemdata[$field] = myhtmlawed($thisitemdata[$field]);
+			$thisitemdata[$field] = Sanitize::incomingHtml($thisitemdata[$field]);
 		}
 		//sanitize intro field, which may be json
 		$introjson = json_decode($thisitemdata['intro'], true);
 		if ($introjson===null) {
 			//regular intro
-			$thisitemdata['intro'] = myhtmlawed($thisitemdata['intro']);
+			$thisitemdata['intro'] = Sanitize::incomingHtml($thisitemdata['intro']);
 		} else {
-			$introjson[0] = myhtmlawed($introjson[0]);
+			$introjson[0] = Sanitize::incomingHtml($introjson[0]);
 			for ($i=1;$i<count($introjson);$i++) {
-				$introjson[$i]['text'] = myhtmlawed($introjson[$i]['text']);
+				$introjson[$i]['text'] = Sanitize::incomingHtml($introjson[$i]['text']);
 			}
 			$thisitemdata['intro'] = json_encode($introjson);
 		}
 		//Sanitize endmsg
 		if (is_array($thisitemdata['endmsg'])) {
 			$endmsgdata = $thisitemdata['endmsg'];
-			$endmsgdata['commonmsg'] = myhtmLawed($endmsgdata['commonmsg']);
-			$endmsgdata['def'] = myhtmLawed($endmsgdata['def']);
+			$endmsgdata['commonmsg'] = Sanitize::incomingHtml($endmsgdata['commonmsg']);
+			$endmsgdata['def'] = Sanitize::incomingHtml($endmsgdata['def']);
 			foreach (array_keys($endmsgdata['msgs']) as $k) {
-				$endmsgdata['msgs'][$k] = myhtmLawed($endmsgdata['msgs'][$k]);
+				$endmsgdata['msgs'][$k] = Sanitize::incomingHtml($endmsgdata['msgs'][$k]);
 			}
 			$thisitemdata['endmsg'] = serialize($endmsgdata);
 		} else {
@@ -901,7 +901,7 @@ private function addStickyPosts() {
 		$toimport['forumid'] = $this->typemap['Forum'][$toimport['forumid']];
 		//sanitize html fields
 		foreach ($db_fields['html']['forum_posts'] as $field) {
-			$toimport[$field] = myhtmlawed($toimport[$field]);
+			$toimport[$field] = Sanitize::incomingHtml($toimport[$field]);
 		}
 		//rehost files
 		if (is_array($toimport['files'])) {

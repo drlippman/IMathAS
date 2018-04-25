@@ -273,7 +273,7 @@ var app = new Vue({
 	data: {
 		groups: groups,
 		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG); ?>,
-		fieldTitles: <?php echo json_encode($reqFields);?>,
+		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG);?>,
 		activeUser: -1,
 		activeUserStatus: -1,
 		activeUserIndex: -1,

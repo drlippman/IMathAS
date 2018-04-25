@@ -378,12 +378,12 @@ if (isset($_POST['options'])) {
 			  if(preg_match("/[\,\"\n\r]/", $val)) {
 				  $val = '"'.str_replace('"', '""', $val).'"';
 			  }
-			  $line .= Sanitize::outgoingHtml($val).',';
+			  $line .= $val.',';
 		}
 		# strip the last deliminator
 		$line = substr($line, 0, -1);
 		$line .= "\n";
-		echo Sanitize::outgoingHtml($line);
+		echo $line;
 	}
 	exit;
 } else {

@@ -92,11 +92,10 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			require_once("../includes/exceptionfuncs.php");
 			if (isset($exceptions[$row['id']])) {
-			    $exceptionid = Sanitize::onlyInt($exceptions[$row['id']]);
-				$useexception = $exceptionfuncs->getCanUseAssessException($exceptionid, $row, true);
+				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row, true);
 				if ($useexception) {
-					$row['startdate'] = $exceptionid[0];
-					$row['enddate'] = $exceptionid[1];
+					$row['startdate'] = $exceptions[$row['id']][0];
+					$row['enddate'] = $exceptions[$row['id']][1];
 				}
 			}
 			//if startdate is past now, skip
