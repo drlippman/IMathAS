@@ -502,6 +502,34 @@ div.ansred, div.ansgrn, div.ansyel, div.ansorg {
 	border: 1px solid #f60;
 }
 
+ul.tablist {
+	padding: 0;
+	margin: 0;
+	margin-bottom: -1px;
+}
+ul.tablist li {
+	display: inline-block;
+	border: 1px solid #ccc;
+	background-color: #eee;
+	margin-right: 2px;
+}
+ul.tablist li a {
+	display: inline-block;
+	padding: 0.2em 1em;
+	text-decoration: none;
+	color: #000;
+}
+
+ul.tablist li.active {
+	border-bottom: 1px solid #fff;
+	background-color: #fff;
+}
+div.tabpanel {
+	border: 1px solid #ccc;
+	background-color: #fff;
+	margin:0px;
+	padding:5px 5px 5px 0px;
+}
 
 ul#navlist
 {

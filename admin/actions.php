@@ -763,6 +763,17 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");
 				$stm->execute(array(':cid'=>$cid));
 			}
+			/*
+			//add to top of course list (skip until we can do it consistently)
+			$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=?");
+			$stm->execute(array($userid));
+			$user_jsondata = json_decode($stm->fetchColumn(0), true);
+			if ($user_jsondata !== null && isset($user_jsondata['courseListOrder']['teach'])) {
+				array_unshift($user_jsondata['courseListOrder']['teach'], $cid);
+				$stm = $DBH->prepare("UPDATE imas_users SET jsondata=? WHERE id=?");
+				$stm->execute(array(json_encode($user_jsondata), $userid));
+			}
+			*/
 			$DBH->commit();
 
 			require("../header.php");
