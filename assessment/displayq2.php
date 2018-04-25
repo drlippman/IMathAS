@@ -5261,12 +5261,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ansrats = array();
 			$ansellipses = array();
 			$anshyperbolas = array();
-			$x0 = $settings[0];
-			$epsilon = ($settings[1]-$settings[0])/97;
-			$x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
+			$epsilon = ($settings[1]-$settings[0])/499;
+			$x0 = $settings[0] - 3*$epsilon;
+			$x1 = 1/4*$settings[1] + 3/4*$settings[0] - $epsilon;
 			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
-			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + $epsilon;
-			$x4 = $settings[1];
+			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + 3*$epsilon;
+			$x4 = $settings[1] + 5*$epsilon;
 			$x0p = $imgborder;
 			$x1p = $xtopix($x1); //($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = $xtopix($x2); //($x2 - $settings[0])*$pixelsperx + $imgborder;
