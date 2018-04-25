@@ -80,7 +80,7 @@ for ($i=0;$i<3;$i++) {
 			echo 'style="display:none;" ';
 		}
 	}
-	echo '><ul class="nomark">';
+	echo '><ul class="courselist">';
 	if (isset($userjson['courseListOrder'][$types[$i]])) {
 		$printed = array();
 		printCourseOrder($userjson['courseListOrder'][$types[$i]], $allcourses[$i], $printed);
@@ -101,7 +101,7 @@ function printCourseOrder($order, $data, &$printed) {
 	foreach ($order as $item) {
 		if (is_array($item)) {
 			echo '<li class="coursegroup"><b>'.Sanitize::encodeStringForDisplay($item['name']).'</b>';
-			echo '<ul class="nomark">';
+			echo '<ul class="courselist">';
 			printCourseOrder($item['courses'], $data, $printed);
 			echo '</ul></li>';
 		} else if (isset($data[$item])) {

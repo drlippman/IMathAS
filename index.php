@@ -518,7 +518,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	
 	echo '<div role="navigation" aria-label="'.$title.'">';
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
-	echo '<div class="blockitems"><ul class="nomark courselist courselist-'.$type.'">';
+	echo '<div class="blockitems"><ul class="courselist courselist-'.$type.'">';
 	if (!empty($courseListOrder) && isset($courseListOrder[$type])) {
 		$printed = array();
 		printCourseOrder($courseListOrder[$type], $data, $type, $printed);
@@ -564,7 +564,7 @@ function printCourseOrder($order, $data, $type, &$printed) {
 	foreach ($order as $item) {
 		if (is_array($item)) {
 			echo '<li class="coursegroup"><b>'.Sanitize::encodeStringForDisplay($item['name']).'</b>';
-			echo '<ul class="nomark courselist">';
+			echo '<ul class="courselist">';
 			printCourseOrder($item['courses'], $data, $type, $printed);
 			echo '</ul></li>';
 		} else if (isset($data[$item])) {

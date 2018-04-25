@@ -433,6 +433,7 @@ div.ddmenu {
 	padding: 5px;
 	background: #eeffee;
 }
+
 .nowrap {
 	white-space: nowrap;
 }
@@ -530,7 +531,7 @@ div.tabpanel {
 	border: 1px solid #ccc;
 	background-color: #fff;
 	margin:0px;
-	padding:5px 5px 5px 0px;
+	padding:5px 10px;
 }
 
 ul#navlist
@@ -590,6 +591,10 @@ div#rightcolumn {float: right; width: 74%; min-width: 250px;}
 
 ul.courselist {
 	margin: 0px;
+	padding-left: 0px;
+}
+ul.courselist li {
+	list-style-type: none;
 }
 ul.courselist ul {
 	margin-left: 2px;
