@@ -200,6 +200,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
 						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
+						$canvout .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 						$ccnt++;
 						if ($inmodule && $mod_depth>0) {
@@ -605,6 +606,7 @@ if (isset($_GET['delete'])) {
 		if ($toplevelitems != '') {
 			$module_meta = '<module identifier="imported">
 			<title>Imported Content</title>
+			<workflow_state>active</workflow_state>
 			<items>' . $toplevelitems . '</items></module>' . $module_meta;
 		}
 		if ($inmodule) {
