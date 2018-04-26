@@ -78,7 +78,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if (trim($_POST['subject'])=='') {
 			$_POST['subject']= '(none)';
 		}
-		$thisposttime = $now;
+		$thisposttime = $now-1;
 		if ($isteacher) {
 			if ($_POST['releaseon']=='Date') {
 				require_once("../includes/parsedatetime.php");
