@@ -3440,7 +3440,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							if ($matches[3]=='oo') {$matches[3] = 1e99;}
 							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
 								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
-									echo "here 3";
 									$correct += 1;
 									$foundloc = $j;
 									break 2;
