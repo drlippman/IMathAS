@@ -75,6 +75,7 @@
 		}
 		$canuselatepass = false;
 		$waivereqscore = false;
+		$useexception = false;
 		if (!$actas) {
 			if ($isRealStudent) {
 				$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,waivereqscore FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
@@ -89,6 +90,8 @@
 				//do a pseudo-exception
 				$useexception = true;
 				$row = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+			} else {
+				$row = null;
 			}
 			if ($row!=null && $useexception) {
 				if ($now<$row[0] || $row[1]<$now) { //outside exception dates
