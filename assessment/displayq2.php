@@ -4215,9 +4215,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 						return 0;
 					}
-					if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
-						$aarr[$j] = $matches;
-					} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
+					if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
 						if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
 							$aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
 						} else {
@@ -4236,7 +4234,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 					return 0;
 				}
-				if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
+				if (preg_match('/(\(|\[)(.+?)\,(.+?)(\)|\])/',$anans,$matches)) {
+					if ($matches[2]=='-oo') {$matches[2] = -1e99;}
+					if ($matches[3]=='oo') {$matches[3] = 1e99;}
+					if (!is_numeric($matches[2])) {
+						$matches[2] = evalMathPHP($matches[2],null);
+					}
+					if (!is_numeric($matches[3])) {
+						$matches[3] = evalMathPHP($matches[3],null);
+					}
 					$aarr[$j] = $matches;
 				} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
 					if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
