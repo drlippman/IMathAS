@@ -169,13 +169,60 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$absymax = -1E10;
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
-		$alt .= "Start Graph";
+
 		$function = explode(",",$function);
 		//correct for parametric
 		$isparametric = false;
 		$isineq = false;
 		$isxequals = false;
-		if ($function[0]{0}=='[') { //strpos($function[0],"[")===0) {
+		if ($function[0]=='dot') {  //dot,x,y,[closed,color,label,labelloc]
+			if (!isset($function[4]) || $function[4]=='') {
+				$function[4] = 'black';
+			}
+			
+			$path = 'stroke="'.$function[4].'";';
+			$path .= 'dot(['.$function[1].','.$function[2].']';
+			$coord = '('.$function[1].','.$function[2].')';
+			if (isset($function[3]) && $function[3]=='open') {
+				$path .= ',"open"';
+				$alt .= sprintf(_('Open dot at %s'), $coord);
+			} else {
+				$path .= ',"closed"';
+				$alt .= sprintf(_('Dot at %s'), $coord);
+			}
+			$alt .= ', color '.$function[4];
+			
+			if (isset($function[5]) && $function[5]!='') {
+				if (!isset($function[6])) {
+					$function[6] = 'above';
+				}
+				$path .= ',"'.Sanitize::encodeStringForJavascript($function[5]).'"';
+				$path .= ',"'.$function[6].'"';
+				$alt .= ', labeled '.$function[5];
+			}
+			$alt .= '. ';
+			$path .= ');';
+			$commands .= $path;
+			continue; //skip the stuff below
+		} else if ($function[0]=='text') {  //text,x,y,textstring,color,loc,angle
+			if (!isset($function[4]) || $function[4]=='') {
+				$function[4] = 'black';
+			}
+			if (!isset($function[5])) {
+				$function[5] = 'centered';
+			}
+			if (!isset($function[6])) {
+				$function[6] = 0;
+			} else {
+				$function[6] = intval($function[6]);
+			}
+			$path = 'fontfill="'.$function[4].'";';
+			$path .= 'text(['.$function[1].','.$function[2].'],"'.$function[3].'","'.$function[5].'",'.$function[6].');';
+			$coord = '('.$function[1].','.$function[2].')';
+			$alt .= sprintf(_('Text label, color %s, at %s reading: %s'), $function[4], $coord, $function[3]).'. ';
+			$commands .= $path;
+			continue; //skip the stuff below
+		} else if ($function[0]{0}=='[') { //strpos($function[0],"[")===0) {
 			$isparametric = true;
 			$xfunc = makepretty(str_replace("[","",$function[0]));
 			$xfunc = mathphp($xfunc,"t");
@@ -224,7 +271,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 
 		//even though ASCIIsvg has a plot function, we'll calculate it here to hide the function
 
-
+		$alt .= "Start Graph";
 		$path = '';
 		if (isset($function[1]) && $function[1]!='') {
 			$path .= "stroke=\"{$function[1]}\";";

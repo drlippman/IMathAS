@@ -1709,6 +1709,32 @@ The following macros create graphs or tables:
 		<li><b>width</b>: a pixel width for the line</li>
 		<li><b>dash</b>: enter "dash" if you want a dashed line, otherwise the line is solid</li>
 		<li><b>Examples</b>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0" or "x=1,red,,,,,,dash"</li>
+		<li><b>Dots and Labels</b>:  There are two alternate funcstrings formats:
+			<ul>
+			<li><b>dots</b>: For drawing dots. A string containing at least the first three of: "dot,x,y,style,color,label,labelloc"
+				<ul>
+					<li>dot: the literal word dot</li>
+					<li>x,y: the coordinates of the dot</li>
+					<li>style: open or closed</li>
+					<li>color: a color designator: black,red,orange,yellow,green,blue,purple</li>
+					<li>label: a text string to put as a label on the dot</li>
+					<li>labelloc: label location: above, left, right, below, aboveleft, etc.</li>
+					<li><b>Examples:</b>: "dot,3,4", "dot,1,1,open",  "dot,3,3,,blue,A"</li>
+				</ul>
+			</li>
+			<li><b>text</b>: For placing text labels. A string containing at least the 
+				first four of: "text,x,y,label,color,location,angle"
+				<ul>
+					<li>text: the literal word text</li>
+					<li>x,y: the coordinates of the label</li>
+					<li>label: the text string to display</li>
+					<li>color: a color designator: black,red,orange,yellow,green,blue,purple</li>
+					<li>location: label location: above, left, right, below, aboveleft, etc.</li>
+					<li>angle: a rotation angle in degrees for the label (0,90,180,270)</li
+					<li><b>Examples:</b>: "text,2,4,Cars", "text,4,0,Hours,below"</li>
+				</ul>
+			</li>
+			</ul></li>
 		</ul>
 	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both. Use "0:-n" (for some value of n) for xmin or ymin to only
 	       have gridlines and labels after 0, while still using -n to adjust spacing. This is an alternative to using addplotborder to create
