@@ -78,9 +78,9 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 			if (is_array($oi)) {
 				list($outc, $subpts, $subposs) = printoutcomes($oi['outcomes'],$ind+1,$outcomenames,$catscore, $catposs);
 				if ($outc!='') {
-					$out .= '<tr><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td>';
+				  $out .= '<tr><td><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td>';
 					if ($subposs>0) {
-						$out .= '<td><div>'.$subpts.' / '.$subposs.'('.round(100*$subpts/$subposs,1).'%)</div></td>';
+					  $out .= '<td><div>'.Sanitize::onlyFloat($subpts).' / '.Sanitize::onlyFloat($subposs).' ('.round(100*$subpts/$subposs,1).'%)</div></td>';
 					} else {
 						$out .= '<td><div>-</div></td>';
 					}
@@ -91,9 +91,9 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 				$totposs += $subposs;
 			} else {
 				if (isset($catscore[$oi])) {
-					$out .= '<tr><td><span class="ind'.$ind.'">'.$outcomenames[$oi].'</span></td>';
+				  $out .= '<tr><td><span class="ind'.Sanitize::onlyInt($ind).'">'.Sanitize::encodeStringForDisplay($outcomenames[$oi]).'</span></td>';
 					$pc = round(100*$catscore[$oi]/$catposs[$oi],1);
-					$out .= "<td>{$catscore[$oi]} / {$catposs[$oi]} ($pc %)</td></tr>\n";
+					$out .= "<td>" . Sanitize::onlyFloat($catscore[$oi]) . " / " . Sanitize::onlyFloat($catposs[$oi]) . " ($pc%)</td></tr>\n";
 					$totpts += $catscore[$oi];
 					$totposs += $catposs[$oi];
 				}

@@ -96,7 +96,7 @@
 			if (!in_array($line['tid'], $forumthreads[$line['id']])) {
 				$forumthreads[$line['id']][] = $line['tid'];
 			}
-			$forumname[$line['id']] = $line['name'];
+			$forumname[$line['id']] = Sanitize::stripHtmlTags($line['name']);
 			$lastpost[$line['tid']] = formatdate($line['lastposttime']);
 		}
 	}
@@ -136,7 +136,7 @@
 			if (!in_array($line['tid'], $forumthreads[$line['id']])) {
 				$forumthreads[$line['id']][] = $line['tid'];
 			}
-			$forumname[$line['id']] = $line['name'];
+			$forumname[$line['id']] = Sanitize::stripHtmlTags($line['name']);
 			$lastpost[$line['tid']] = formatdate($line['lastposttime']);
 		}
 	}
