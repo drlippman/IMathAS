@@ -1069,11 +1069,7 @@ function gbtable() {
 		if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true) {
 			$gb[$row][1][$col][9] =	$l['endtime'];
 		}
-		if (in_array(-1,$scores)) {
-			$IP=1;
-		} else {
-			$IP=0;
-		}
+		
 		/*
 		Moved up to exception finding so LP mark will show on unstarted assessments
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
@@ -1114,7 +1110,13 @@ function gbtable() {
 		}
 		$gb[$row][1][$col][10] = $canuselatepass;
 		
-		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice"
+		if (in_array(-1,$scores) && ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
+			$IP=1;
+		} else {
+			$IP=0;
+		}
+		
+		if ($canviewall || ($sa[$i]=="I" && ($pts>0 || $IP==0)) || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice"
 			$gb[$row][1][$col][2] = 1; //show link
 		} /*else if ($l['timelimit']<0 && (($now - $l['starttime'])>abs($l['timelimit'])) && $sa[$i]!='N' && ($assessmenttype[$k]=='EachAtEnd' || $assessmenttype[$k]=='EndReview' || $assessmenttype[$k]=='AsGo' || $assessmenttype[$k]=='Homework'))  ) {
 			//has "kickout after time limit" set, time limit has passed, and is set for showing each score
@@ -1137,7 +1139,7 @@ function gbtable() {
 				$gb[$row][1][$col][3] = 1;  //no credit
 				$pts = 0;
 			}
-		} else 	if ($IP==1 && ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
+		} else 	if ($IP==1) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;

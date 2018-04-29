@@ -2519,7 +2519,10 @@ A student is asked to enter a function
 <p><b>Required Variables</b><BR>
 <dl>
 <dt>$answer = string </dt>
-	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)"</dd>
+	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)".  You can
+	specify multiple acceptable answers by separating with a comma, like $answer="x^2 or x^4"<br/>
+	Note: The system will accept any algebraically equivalent answer. To only allow answers of a 
+	specific format, you'll also need to define $requiretimes (see below).</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
@@ -2542,7 +2545,7 @@ A student is asked to enter a function
 	Include "ignore_case,false" to make the search case sensitive.
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "toconst" </dt>
+<dt>$answerformat = "equation" or "toconst" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -2550,7 +2553,11 @@ A student is asked to enter a function
 	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
-	values or raise numbers to very large powers.</dd>
+	values or raise numbers to very large powers.<br/>
+	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". 
+	$ansprompt can override the default statements like this:
+	$ansprompt = "One function, f(x)=;No such function exists"
+	</dd>
 <dt>$formatfeedbackon = true</dt>
 	<dd>Turns on "right answer, wrong format" feedback on the question</dd>
 <dt>$reltolerance = a decimal value </dt>
