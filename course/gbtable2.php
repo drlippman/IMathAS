@@ -76,6 +76,7 @@ row[0][1][0][9] = 5 number summary, if not limuser-ed
 row[0][1][0][10] = 0 regular, 1 group
 row[0][1][0][11] = due date (if $includeduedate is set)
 row[0][1][0][12] = allowlate (in general)
+row[1][1][0][13] = timelimit if requested through $includetimelimit
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -114,7 +115,6 @@ row[1][1][0][8] = time on task (time displayed)
 row[1][1][0][9] = last change time (if $includelastchange is set)
 row[1][1][0][10] = allow latepass use on this item
 row[1][1][0][11] = endmsg if requested through $includeendmsg
-row[1][1][0][12] = timelimit if requested through $includetimelimit
 row[1][1][0][13] = 1 if no reqscore or has been met, 0 if unmet reqscore; only in single stu view ($limuser>0)
 
 row[1][1][1] = offline
@@ -147,6 +147,7 @@ row[1][4][0] = userid
 row[1][4][1] = locked?
 row[1][4][2] = hasuserimg
 row[1][4][3] = has gradebook comment
+row[1][4][4] = timelimitmult if requested through $includetimelimit
 
 cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidden, 7: calctype
 
@@ -748,6 +749,9 @@ function gbtable() {
 					$gb[0][1][$pos][6] = 0; //0 online, 1 offline
 					$gb[0][1][$pos][7] = $assessments[$k];
 					$gb[0][1][$pos][10] = $isgroup[$k];
+					if (!empty($GLOBALS['includetimelimit'])) {
+						$gb[0][1][$pos][13] = $timelimits[$k];
+					}
 					$assesscol[$assessments[$k]] = $pos;
 				} else if (isset($grades[$k])) {
 					$gb[0][1][$pos][6] = 1; //0 online, 1 offline
@@ -827,6 +831,9 @@ function gbtable() {
 				$gb[0][1][$pos][6] = 0; //0 online, 1 offline
 				$gb[0][1][$pos][7] = $assessments[$k];
 				$gb[0][1][$pos][10] = $isgroup[$k];
+				if (!empty($GLOBALS['includetimelimit'])) {
+					$gb[0][1][$pos][13] = $timelimits[$k];
+				}
 				$assesscol[$assessments[$k]] = $pos;
 			} else if (isset($grades[$k])) {
 				$gb[0][1][$pos][6] = 1; //0 online, 1 offline
@@ -915,7 +922,10 @@ function gbtable() {
 		$gb[$ln][4][1] = $line['locked'];
 		$gb[$ln][4][2] = $line['hasuserimg'];
 		$gb[$ln][4][3] = !empty($line['gbcomment']);
-
+		if (!empty($GLOBALS['includetimelimit'])) {
+			$gb[$ln][4][4] = $line['timelimitmult'];
+		}
+		
 		if ($isdiag) {
 			$selparts = explode('~',$line['SID']);
 			$gb[$ln][0][1] = $selparts[0];
@@ -1059,11 +1069,7 @@ function gbtable() {
 		if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true) {
 			$gb[$row][1][$col][9] =	$l['endtime'];
 		}
-		if (in_array(-1,$scores)) {
-			$IP=1;
-		} else {
-			$IP=0;
-		}
+		
 		/*
 		Moved up to exception finding so LP mark will show on unstarted assessments
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
@@ -1103,10 +1109,14 @@ function gbtable() {
 			$inexception = false;
 		}
 		$gb[$row][1][$col][10] = $canuselatepass;
-		if (!empty($GLOBALS['includetimelimit'])) {
-			$gb[$row][1][$col][12] = $timelimits[$i]*$timelimitmult[$l['userid']];
+		
+		if (in_array(-1,$scores) && ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
+			$IP=1;
+		} else {
+			$IP=0;
 		}
-		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice"
+		
+		if ($canviewall || ($sa[$i]=="I" && ($pts>0 || $IP==0)) || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice"
 			$gb[$row][1][$col][2] = 1; //show link
 		} /*else if ($l['timelimit']<0 && (($now - $l['starttime'])>abs($l['timelimit'])) && $sa[$i]!='N' && ($assessmenttype[$k]=='EachAtEnd' || $assessmenttype[$k]=='EndReview' || $assessmenttype[$k]=='AsGo' || $assessmenttype[$k]=='Homework'))  ) {
 			//has "kickout after time limit" set, time limit has passed, and is set for showing each score
@@ -1129,7 +1139,7 @@ function gbtable() {
 				$gb[$row][1][$col][3] = 1;  //no credit
 				$pts = 0;
 			}
-		} else 	if ($IP==1 && ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
+		} else 	if ($IP==1) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;

@@ -18,9 +18,12 @@ $now = time();
 //DB $query = "SELECT homelayout,hideonpostswidget FROM imas_users WHERE id='$userid'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB list($homelayout,$hideonpostswidget) = mysql_fetch_row($result);
-$stm = $DBH->prepare("SELECT homelayout,hideonpostswidget FROM imas_users WHERE id=:id");
+$stm = $DBH->prepare("SELECT homelayout,hideonpostswidget,jsondata FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$userid));
-list($homelayout,$hideonpostswidget) = $stm->fetch(PDO::FETCH_NUM);
+list($homelayout,$hideonpostswidget,$jsondata) = $stm->fetch(PDO::FETCH_NUM);
+$jsondata = json_decode($jsondata, true);
+$courseListOrder = isset($jsondata['courseListOrder'])?$jsondata['courseListOrder']:null;
+
 if ($hideonpostswidget!='') {
 	$hideonpostswidget = explode(',',$hideonpostswidget);
 } else {
@@ -64,7 +67,7 @@ if ($myrights>15) {
   $placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
-  $(".courselist-teach li").css("clear","both").each(function (i,el) {
+  $(".courselist-teach li:not(.coursegroup)").css("clear","both").each(function (i,el) {
   	if ($(el).attr("data-isowner")=="true" && '.($myrights>39?'true':'false').') {
   		var cid = $(el).attr("data-cid");
   		var thishtml = html + \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
@@ -135,10 +138,6 @@ if ($showmessagesgadget) {
 $page_studentCourseData = array();
 
 // check to see if the user is enrolled as a student
-//DB $query = "SELECT imas_courses.name,imas_courses.id,imas_students.hidefromcourselist FROM imas_students,imas_courses ";
-//DB $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
-//DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.startdate,imas_courses.enddate,imas_students.hidefromcourselist,";
 $query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active ";
 $query .= "FROM imas_students,imas_courses ";
@@ -157,7 +156,11 @@ if ($stm->rowCount()==0) {
 			$stuhashiddencourses = true;
 		} else {
 			$noclass = false;
-			$page_studentCourseData[] = $line;
+			if (!empty($courseListOrder) && isset($courseListOrder['take'])) {
+				$page_studentCourseData[$line['id']] = $line;
+			} else {
+				$page_studentCourseData[] = $line;
+			}
 			$page_coursenames[$line['id']] = $line['name'];
 			if (!in_array($line['id'],$hideonpostswidget)) {
 				$postcheckstucids[] = $line['id'];
@@ -191,7 +194,12 @@ if ($myrights>10) {
 				$teachhashiddencourses = true;
 			} else {
 				$noclass = false;
-				$page_teacherCourseData[] = $line;
+				if (!empty($courseListOrder) && isset($courseListOrder['teach'])) {
+					$page_teacherCourseData[$line['id']] = $line;
+				} else {
+					$page_teacherCourseData[] = $line;
+				}
+				
 				$page_coursenames[$line['id']] = $line['name'];
 				if (!in_array($line['id'],$hideonpostswidget)) {
 					$postcheckcids[] = $line['id'];
@@ -225,6 +233,11 @@ if ($stm->rowCount()==0) {
 			$tutorhashiddencourses = true;
 		} else {
 			$noclass = false;
+			if (!empty($courseListOrder) && isset($courseListOrder['tutor'])) {
+				$page_tutorCourseData[$line['id']] = $line;
+			} else {
+				$page_tutorCourseData[] = $line;
+			}
 			$page_tutorCourseData[] = $line;
 			$page_coursenames[$line['id']] = $line['name'];
 			if (!in_array($line['id'],$hideonpostswidget)) {
@@ -499,56 +512,26 @@ for ($i=0; $i<3; $i++) {
 
 require('./footer.php');
 
-
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
-	global $shownewmsgnote, $shownewpostnote, $imasroot,$userid;
+	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $courseListOrder;
 	if (count($data)==0 && $type=='tutor') {return;}
-	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
-	$now = time();
+	
 	echo '<div role="navigation" aria-label="'.$title.'">';
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
-	echo '<div class="blockitems"><ul class="nomark courselist courselist-'.$type.'">';
-	for ($i=0; $i<count($data); $i++) {
-		echo '<li';
-		if ($type=='teach' && $myrights>19) {
-			echo ' data-isowner="'.($data[$i]['ownerid']==$userid?'true':'false').'"';
-			echo ' data-cid="'.$data[$i]['id'].'"';
+	echo '<div class="blockitems"><ul class="courselist courselist-'.$type.'">';
+	if (!empty($courseListOrder) && isset($courseListOrder[$type])) {
+		$printed = array();
+		printCourseOrder($courseListOrder[$type], $data, $type, $printed);
+		$notlisted = array_diff(array_keys($data), $printed);
+		foreach ($notlisted as $i) {
+			if (isset($data[$i])) {
+				printCourseLine($data[$i], $type);
+			}
 		}
-		echo '>';
-		if ($type!='take' || $now>$data[$i]['startdate']) {
-			echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
-			echo Sanitize::encodeStringForDisplay($data[$i]['name']).'</a>';
-		} else {
-			echo Sanitize::encodeStringForDisplay($data[$i]['name']);
+	} else {
+		for ($i=0; $i<count($data); $i++) {
+			printCourseLine($data[$i], $type);
 		}
-		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
-			echo ' <em style="color:green;">', _('Unavailable'), '</em>';
-		}
-		if (isset($data[$i]['startdate']) && $now<$data[$i]['startdate']) {
-			echo ' <em style="color:green;">';
-			echo _('Starts ').tzdate('m/d/Y', $data[$i]['startdate']);
-			echo '</em>';
-		} else if (isset($data[$i]['enddate']) && $now>$data[$i]['enddate']) {
-			echo ' <em style="color:green;">';
-			echo _('Ended ').tzdate('m/d/Y', $data[$i]['enddate']);
-			echo '</em>';
-		}
-		
-		if (isset($data[$i]['lockaid']) && $data[$i]['lockaid']>0) {
-			echo ' <em style="color:green;">', _('Lockdown'), '</em>';
-		}
-		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
-			echo ' <a class="noticetext" href="msgs/msglist.php?page=-1&cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
-		}
-		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
-			printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data[$i]['id'],
-			_('Posts ('.Sanitize::onlyInt($newpostcnt[$data[$i]['id']]).')'));
-			// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data[$i]['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
-		}
-		if ($type != 'teach' || ($data[$i]['ownerid']==$userid && $myrights<40) || $myrights<20) {
-			echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data[$i]['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';
-		}
-		echo '</li>';
 	}
 	if ($type=='teach' && $myrights>39 && count($data)==0) {
 		echo '<li>', _('To add a course, click the button below'), '</li>';
@@ -556,6 +539,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 		echo '<li>', _('Your instructor account has not been approved yet. Please be patient.'), '</li>';
 	}
 	echo '</ul>';
+
 	if ($type=='take') {
 		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
 	} else if ($type=='teach' && $myrights>39) {
@@ -563,6 +547,10 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	}
 
 	echo '<div class="center">';
+	if (count($data)>0) {
+		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">Change Course Order</a>';
+	}
+	echo '</div><div class="center">';
 	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
 	echo '</div>';
 	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
@@ -570,6 +558,68 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	}
 	echo '</div>';
 	echo '</div>';
+}
+
+function printCourseOrder($order, $data, $type, &$printed) {
+	foreach ($order as $item) {
+		if (is_array($item)) {
+			echo '<li class="coursegroup"><b>'.Sanitize::encodeStringForDisplay($item['name']).'</b>';
+			echo '<ul class="courselist">';
+			printCourseOrder($item['courses'], $data, $type, $printed);
+			echo '</ul></li>';
+		} else if (isset($data[$item])) {
+			printCourseLine($data[$item], $type);
+			$printed[] = $item;
+		}
+	}		
+}
+
+function printCourseLine($data, $type=null) {
+	global $shownewmsgnote, $shownewpostnote, $userid;
+	global $myrights, $newmsgcnt, $newpostcnt;
+	$now = time();
+	
+	echo '<li';
+	if ($type=='teach' && $myrights>19) {
+		echo ' data-isowner="'.($data['ownerid']==$userid?'true':'false').'"';
+		echo ' data-cid="'.$data['id'].'"';
+	}
+	echo '>';
+	if ($type!='take' || $now>$data['startdate']) {
+		echo '<a href="course/course.php?folder=0&cid='.$data['id'].'">';
+		echo Sanitize::encodeStringForDisplay($data['name']).'</a>';
+	} else {
+		echo Sanitize::encodeStringForDisplay($data['name']);
+	}
+	if (isset($data['available']) && (($data['available']&1)==1)) {
+		echo ' <em style="color:green;">', _('Unavailable'), '</em>';
+	}
+	if (isset($data['startdate']) && $now<$data['startdate']) {
+		echo ' <em style="color:green;">';
+		echo _('Starts ').tzdate('m/d/Y', $data['startdate']);
+		echo '</em>';
+	} else if (isset($data['enddate']) && $now>$data['enddate']) {
+		echo ' <em style="color:green;">';
+		echo _('Ended ').tzdate('m/d/Y', $data['enddate']);
+		echo '</em>';
+	}
+	
+	if (isset($data['lockaid']) && $data['lockaid']>0) {
+		echo ' <em style="color:green;">', _('Lockdown'), '</em>';
+	}
+	if ($shownewmsgnote && isset($newmsgcnt[$data['id']]) && $newmsgcnt[$data['id']]>0) {
+		echo ' <a class="noticetext" href="msgs/msglist.php?page=-1&cid='.$data['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data['id']]), '</a>';
+	}
+	if ($shownewpostnote && isset($newpostcnt[$data['id']]) && $newpostcnt[$data['id']]>0) {
+		printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data['id'],
+		_('Posts ('.Sanitize::onlyInt($newpostcnt[$data['id']]).')'));
+		// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data['id']]), '</a>';
+	}
+	if ($type != 'teach' || ($data['ownerid']==$userid && $myrights<40) || $myrights<20) {
+		echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';
+	}
+	echo '</li>';
+	
 }
 
 function printMessagesGadget() {

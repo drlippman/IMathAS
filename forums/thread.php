@@ -147,6 +147,55 @@ $stm = $DBH->prepare("SELECT name,postby,replyby,settings,groupsetid,sortby,tagl
 $stm->execute(array(':id'=>$forumid));
 list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $postinstr,$replyinstr, $allowlate) = $stm->fetch(PDO::FETCH_NUM);
 
+$duedates = '';
+if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
+	$exception = null; $latepasses = 0;
+	require_once("../includes/exceptionfuncs.php");
+	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+		//DB $query = "SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid='$forumid' AND userid='$userid' AND (itemtype='F' OR itemtype='P' OR itemtype='R')";
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB if (mysql_num_rows($result)>0) {
+			//DB $exception = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
+		$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
+		if ($stm->rowCount()>0) {
+			$exception = $stm->fetch(PDO::FETCH_NUM);
+		}
+		$latepasses = $studentinfo['latepasses'];
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+	} else {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+	}
+
+	$infoline = array('replyby'=>$replyby, 'postby'=>$postby, 'enddate'=>$enddate, 'allowlate'=>$allowlate);
+	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = $exceptionfuncs->getCanUseLatePassForums($exception, $infoline);
+	if ($postby>0 && $postby<2000000000) {
+		if ($postby>$now) {
+			$duedates .= sprintf(_('New Threads due %s. '), tzdate("D n/j/y, g:i a",$postby));
+		} else {
+			$duedates .= sprintf(_('New Threads were due %s. '), tzdate("D n/j/y, g:i a",$postby));
+		}
+	}
+	if ($replyby>0 && $replyby<2000000000) {
+		//if ($duedates != '') {$duedates .= '<br/>';}
+		if ($replyby>$now) {
+			$duedates .= sprintf(_('Replies due %s. '), tzdate("D n/j/y, g:i a",$replyby));
+		} else {
+			$duedates .= sprintf(_('Replies were due %s. '), tzdate("D n/j/y, g:i a",$replyby));
+		}
+	}
+	//if ($duedates != '' && ($canuselatepassP || $canuselatepassR || $canundolatepass)) {$duedates .= '<br/>';}
+	if ($canuselatepassP || $canuselatepassR) {
+		$duedates .= " <a href=\"$imasroot/course/redeemlatepassforum.php?cid=$cid&fid=$forumid&from=forum\">". _('Use LatePass'). "</a>";
+		if ($canundolatepass) {
+			$duedates .= ' |';
+		}
+	}
+	if ($canundolatepass) {
+		$duedates .= " <a href=\"$imasroot/course/redeemlatepassforum.php?cid=$cid&fid=$forumid&undo=true&from=forum\">". _('Un-use LatePass'). "</a>";
+	}
+}
+
 if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
 	require("../header.php");
 		echo '<p>This forum is closed.  <a href="../course/course.php?cid='.$cid.'">Return to the course page</a></p>';
@@ -160,6 +209,12 @@ $postbeforeview = (($forumsettings&16)==16);
 $canviewall = (isset($teacherid) || isset($tutorid));
 $dofilter = false;
 $now = time();
+
+$caller = 'thread';
+if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
+	require("posthandler.php");
+}
+
 $grpqs = '';
 if ($groupsetid>0) {
 	if (isset($_GET['ffilter'])) {
@@ -374,59 +429,6 @@ if (isset($_GET['markallread'])) {
 	}
 }
 
-$duedates = '';
-if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
-	$exception = null; $latepasses = 0;
-	require_once("../includes/exceptionfuncs.php");
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
-		//DB $query = "SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid='$forumid' AND userid='$userid' AND (itemtype='F' OR itemtype='P' OR itemtype='R')";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
-			//DB $exception = mysql_fetch_row($result);
-		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
-		$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
-		if ($stm->rowCount()>0) {
-			$exception = $stm->fetch(PDO::FETCH_NUM);
-		}
-		$latepasses = $studentinfo['latepasses'];
-		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
-	} else {
-		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
-	}
-
-	$infoline = array('replyby'=>$replyby, 'postby'=>$postby, 'enddate'=>$enddate, 'allowlate'=>$allowlate);
-	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = $exceptionfuncs->getCanUseLatePassForums($exception, $infoline);
-	if ($postby>0 && $postby<2000000000) {
-		if ($postby>$now) {
-			$duedates .= sprintf(_('New Threads due %s. '), tzdate("D n/j/y, g:i a",$postby));
-		} else {
-			$duedates .= sprintf(_('New Threads were due %s. '), tzdate("D n/j/y, g:i a",$postby));
-		}
-	}
-	if ($replyby>0 && $replyby<2000000000) {
-		//if ($duedates != '') {$duedates .= '<br/>';}
-		if ($replyby>$now) {
-			$duedates .= sprintf(_('Replies due %s. '), tzdate("D n/j/y, g:i a",$replyby));
-		} else {
-			$duedates .= sprintf(_('Replies were due %s. '), tzdate("D n/j/y, g:i a",$replyby));
-		}
-	}
-	//if ($duedates != '' && ($canuselatepassP || $canuselatepassR || $canundolatepass)) {$duedates .= '<br/>';}
-	if ($canuselatepassP || $canuselatepassR) {
-		$duedates .= " <a href=\"$imasroot/course/redeemlatepassforum.php?cid=$cid&fid=$forumid&from=forum\">". _('Use LatePass'). "</a>";
-		if ($canundolatepass) {
-			$duedates .= ' |';
-		}
-	}
-	if ($canundolatepass) {
-		$duedates .= " <a href=\"$imasroot/course/redeemlatepassforum.php?cid=$cid&fid=$forumid&undo=true&from=forum\">". _('Un-use LatePass'). "</a>";
-	}
-}
-
-$caller = 'thread';
-if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
-	require("posthandler.php");
-}
 
 $pagetitle = "Threads";
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";

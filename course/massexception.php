@@ -428,21 +428,7 @@
 	} else {
 		$lpmsg = "These students have $lpmin-$lpmax latepasses.";
 	}
-
-	//echo "<h4>Make New Exception</h4>";
-	echo '<h3>'._("Make New Exception").'</h3>';
-	echo '<fieldset class="optionlist"><legend>'._("Exception Options").'</legend>';
-	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
-	echo '<p class="list"><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
-	echo '<p>For assessments:</p>';
-	echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
-	echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
-	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
-	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
-	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
-	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
-	echo '</fieldset>';
-
+	
 
 	//DB $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000))";
 	//DB $query .= ' ORDER BY name';
@@ -459,18 +445,43 @@
 
 	//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
+	$stm = $DBH->prepare("SELECT id,name,date_by_lti FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	$assessarr = array();
+	$isDateByLTI = false;
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$assessarr[$row[0]] = $row[1];
+		if ($row[2]>0) {
+			$isDateByLTI = true;
+		}
 	}
 	if (count($forumarr)>0 && count($assessarr)>0) {
 		$fclass = ' class="split"';
 	} else {
 		$fclass = '';
 	}
+	
+	//echo "<h4>Make New Exception</h4>";
+	echo '<h3>'._("Make New Exception").'</h3>';
+	if ($isDateByLTI) {
+		echo '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
+		echo 'students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given ';
+		echo 'priority.  Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.</p>';
+	}
+	echo '<fieldset class="optionlist"><legend>'._("Exception Options").'</legend>';
+	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
+	echo '<p class="list"><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
+	echo '<p>For assessments:</p>';
+	echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
+	echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
+	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
+	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
+	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
+	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
+	echo '</fieldset>';
+
+	
 	if (count($assessarr)>0) {
 		echo '<fieldset'.$fclass.'><legend>'._("New Assessment Exception").'</legend>';
 

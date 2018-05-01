@@ -62,7 +62,7 @@
 		//DB $query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod FROM imas_assessments WHERE id='$aid'";
 		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		//DB $adata = mysql_fetch_array($result, MYSQL_ASSOC);
-		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod,id FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod,id,reqscoreaid,reqscore,reqscoretype FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$adata = $stm->fetch(PDO::FETCH_ASSOC);
 		$now = time();
@@ -74,20 +74,24 @@
 			$assessmentclosed = true;
 		}
 		$canuselatepass = false;
-
+		$waivereqscore = false;
+		$useexception = false;
 		if (!$actas) {
 			if ($isRealStudent) {
-				$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+				$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,waivereqscore FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 				$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 				$row = $stm2->fetch(PDO::FETCH_NUM);
 				if ($row!=null) {
 					$useexception = $exceptionfuncs->getCanUseAssessException($row, $adata, true);
+					$waivereqscore = ($row[4]>0);
 				}
 			} else if (isset($_SESSION['lti_duedate']) && (isset($teacherid) || isset($tutorid)) && $_SESSION['lti_duedate']!=$adata['enddate']) {
 				//teacher launch with lti duedate that's different than default
 				//do a pseudo-exception
 				$useexception = true;
-				$row = array(0, $_SESSION['lti_duedate'], 0, 1);
+				$row = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+			} else {
+				$row = null;
 			}
 			if ($row!=null && $useexception) {
 				if ($now<$row[0] || $row[1]<$now) { //outside exception dates
@@ -166,6 +170,54 @@
 			}
 			require("../footer.php");
 			exit;
+		}
+		//check reqscore
+		if ($isRealStudent && abs($adata['reqscore'])>0 && $adata['reqscoreaid']>0 && !$waivereqscore) {
+			$isBlocked = false;
+			
+			$query = "SELECT ias.bestscores,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
+			$query .= "imas_assessment_sessions AS ias ON ias.assessmentid=ia.id AND ias.userid=:userid ";
+			$query .= "WHERE ia.id=:assessmentid";
+			$bestscores_stm = $DBH->prepare($query);
+			$bestscores_stm->execute(array(':assessmentid'=>$adata['reqscoreaid'], ':userid'=>$userid));
+			list($prereqscore,$reqscoreptsposs,$reqscorename) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+			
+			if ($prereqscore === null) {
+				$isBlocked = true;
+			} else {
+				$prereqscore = explode(';', $prereqscore);
+				$prereqscore = explode(',', $prereqscore[0]);
+				$prereqscoretot = 0;
+				for ($i=0;$i<count($prereqscore);$i++) {
+					$prereqscoretot += getpts($prereqscore[$i]);
+				}
+				$isBlocked = false;
+				
+				if ($adata['reqscoretype']&2) { //using percent-based
+					if ($reqscoreptsposs==-1) {
+						require("../includes/updateptsposs.php");
+						$reqscoreptsposs = updatePointsPossible($adata['reqscoreaid']);
+					}
+					if (round(100*$prereqscoretot/$reqscoreptsposs,1)+.02<abs($adata['reqscore'])) {
+						$isBlocked = true;
+					}
+				} else if ($prereqscoretot+.02<abs($adata['reqscore'])) { //points based
+					$isBlocked = true;
+				}
+			}
+			if ($isBlocked) {
+				require("header.php");
+				echo '<h3>'._('You cannot start this assessment yet.').'</h3>';
+				echo '<p>';
+				printf(_('Access to this assessment requires a score of %d%s on %s'),
+					abs($adata['reqscore']),
+					($adata['reqscoretype']&2)?'%':_(' points'),
+					Sanitize::encodeStringForDisplay($reqscorename));
+				echo '</p>';
+				require("../footer.php");
+				exit;
+			}
+			
 		}
 
 		//check for password

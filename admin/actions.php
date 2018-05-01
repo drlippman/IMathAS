@@ -221,40 +221,61 @@ switch($_POST['action']) {
 		break;
 	case "deladmin":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
+		$deluid = Sanitize::onlyInt($_GET['id']);
 		if ($myrights < 100) {
 			$stm = $DBH->prepare("DELETE FROM imas_users WHERE id=:id AND groupid=:groupid AND rights<100");
-			$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
+			$stm->execute(array(':id'=>$deluid, ':groupid'=>$groupid));
 		} else {
 			$stm = $DBH->prepare("DELETE FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>$deluid));
 		}
 		if ($stm->rowCount()==0) { break;}
-		$stm = $DBH->prepare("DELETE FROM imas_user_prefs WHERE userid=:userid");
-		$stm->execute(array(':userid'=>$_GET['id']));
-		$stm = $DBH->prepare("DELETE FROM imas_students WHERE userid=:userid");
-		$stm->execute(array(':userid'=>$_GET['id']));
-		$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE userid=:userid");
-		$stm->execute(array(':userid'=>$_GET['id']));
-		$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE userid=:userid");
-		$stm->execute(array(':userid'=>$_GET['id']));
-		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid");
-		$stm->execute(array(':userid'=>$_GET['id']));
-		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:userid");
-		$stm->execute(array(':userid'=>$_GET['id']));
+		$toDelTable = array('user_prefs', 'students', 'teachers', 'tutors',
+			'assessment_sessions', 'exceptions', 'bookmarks', 'content_track', 
+			'forum_views', 'forum_subscriptions', 'grades', 'ltiusers', 'stugroupmembers');
+		foreach ($toDelTable as $table) {
+			$stm = $DBH->prepare("DELETE FROM imas_$table WHERE userid=:userid");
+			$stm->execute(array(':userid'=>$deluid));
+		}
 
+		$stm = $DBH->prepare("DELETE FROM imas_diags WHERE ownerid=:userid");
+		$stm->execute(array(':userid'=>$deluid));
+		$stm = $DBH->prepare("DELETE FROM imas_rubrics WHERE ownerid=:userid AND groupid=-1");
+		$stm->execute(array(':userid'=>$deluid));
+		//soft-delete courses
+		$stm = $DBH->prepare("UPDATE imas_courses SET available=4 WHERE ownerid=:userid");
+		$stm->execute(array(':userid'=>$deluid));
+		
+		//leave any forum posts and wiki revisions - don't want to break anything
+		
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto AND isread>1");
-		$stm->execute(array(':msgto'=>$_GET['id']));
+		$stm->execute(array(':msgto'=>$deluid));
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+2 WHERE msgto=:msgto AND isread<2");
-		$stm->execute(array(':msgto'=>$_GET['id']));
+		$stm->execute(array(':msgto'=>$deluid));
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND isread>1");
-		$stm->execute(array(':msgfrom'=>$_GET['id']));
+		$stm->execute(array(':msgfrom'=>$deluid));
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom=:msgfrom AND isread<2");
-		$stm->execute(array(':msgfrom'=>$_GET['id']));
-		//todo: delete user picture files
-		//todo: delete user file uploads
+		$stm->execute(array(':msgfrom'=>$deluid));
+		
 		require_once("../includes/filehandler.php");
-		deletealluserfiles($_GET['id']);
-		//todo: delete courses if any
+		//delete profile pics
+		deletecoursefile('userimg_'.$deluid.'.jpg');
+		deletecoursefile('userimg_sm'.$deluid.'.jpg');
+		//delete all user uploads
+		deletealluserfiles($deluid);
+		//change owner of libraries and questions
+		if (!empty($_POST['transferto'])) {
+			$dest_uid = Sanitize::onlyInt($_POST['transferto']);
+			$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+			$stm->execute(array($dest_uid));
+			$dest_groupid = $stm->fetchColumn(0);
+			$stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=? WHERE ownerid=?");
+			$stm->execute(array($dest_uid, $deluid));
+			$stm = $DBH->prepare("UPDATE imas_libraries SET ownerid=?,groupid=? WHERE ownerid=?");
+			$stm->execute(array($dest_uid, $dest_groupid, $deluid));
+			$stm = $DBH->prepare("UPDATE imas_library_items SET ownerid=? WHERE ownerid=?");
+			$stm->execute(array($dest_uid, $deluid));
+		}
 		break;
 	case "newadmin":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
@@ -743,6 +764,17 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");
 				$stm->execute(array(':cid'=>$cid));
 			}
+			/*
+			//add to top of course list (skip until we can do it consistently)
+			$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=?");
+			$stm->execute(array($userid));
+			$user_jsondata = json_decode($stm->fetchColumn(0), true);
+			if ($user_jsondata !== null && isset($user_jsondata['courseListOrder']['teach'])) {
+				array_unshift($user_jsondata['courseListOrder']['teach'], $cid);
+				$stm = $DBH->prepare("UPDATE imas_users SET jsondata=? WHERE id=?");
+				$stm->execute(array(json_encode($user_jsondata), $userid));
+			}
+			*/
 			$DBH->commit();
 
 			require("../header.php");

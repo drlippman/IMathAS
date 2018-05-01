@@ -1709,6 +1709,32 @@ The following macros create graphs or tables:
 		<li><b>width</b>: a pixel width for the line</li>
 		<li><b>dash</b>: enter "dash" if you want a dashed line, otherwise the line is solid</li>
 		<li><b>Examples</b>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0" or "x=1,red,,,,,,dash"</li>
+		<li><b>Dots and Labels</b>:  There are two alternate funcstrings formats:
+			<ul>
+			<li><b>dots</b>: For drawing dots. A string containing at least the first three of: "dot,x,y,style,color,label,labelloc"
+				<ul>
+					<li>dot: the literal word dot</li>
+					<li>x,y: the coordinates of the dot</li>
+					<li>style: open or closed</li>
+					<li>color: a color designator: black,red,orange,yellow,green,blue,purple</li>
+					<li>label: a text string to put as a label on the dot</li>
+					<li>labelloc: label location: above, left, right, below, aboveleft, etc.</li>
+					<li><b>Examples:</b>: "dot,3,4", "dot,1,1,open",  "dot,3,3,,blue,A"</li>
+				</ul>
+			</li>
+			<li><b>text</b>: For placing text labels. A string containing at least the 
+				first four of: "text,x,y,label,color,location,angle"
+				<ul>
+					<li>text: the literal word text</li>
+					<li>x,y: the coordinates of the label</li>
+					<li>label: the text string to display</li>
+					<li>color: a color designator: black,red,orange,yellow,green,blue,purple</li>
+					<li>location: label location: above, left, right, below, aboveleft, etc.</li>
+					<li>angle: a rotation angle in degrees for the label (0,90,180,270)</li
+					<li><b>Examples:</b>: "text,2,4,Cars", "text,4,0,Hours,below"</li>
+				</ul>
+			</li>
+			</ul></li>
 		</ul>
 	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both. Use "0:-n" (for some value of n) for xmin or ymin to only
 	       have gridlines and labels after 0, while still using -n to adjust spacing. This is an alternative to using addplotborder to create
@@ -2493,7 +2519,10 @@ A student is asked to enter a function
 <p><b>Required Variables</b><BR>
 <dl>
 <dt>$answer = string </dt>
-	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)"</dd>
+	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)".  You can
+	specify multiple acceptable answers by separating with a comma, like $answer="x^2 or x^4"<br/>
+	Note: The system will accept any algebraically equivalent answer. To only allow answers of a 
+	specific format, you'll also need to define $requiretimes (see below).</dd>
 </dl>
 </p>
 <p><b>Optional Variables</b><BR>
@@ -2516,7 +2545,7 @@ A student is asked to enter a function
 	Include "ignore_case,false" to make the search case sensitive.
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "toconst" </dt>
+<dt>$answerformat = "equation" or "toconst" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -2524,7 +2553,11 @@ A student is asked to enter a function
 	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
-	values or raise numbers to very large powers.</dd>
+	values or raise numbers to very large powers.<br/>
+	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". 
+	$ansprompt can override the default statements like this:
+	$ansprompt = "One function, f(x)=;No such function exists"
+	</dd>
 <dt>$formatfeedbackon = true</dt>
 	<dd>Turns on "right answer, wrong format" feedback on the question</dd>
 <dt>$reltolerance = a decimal value </dt>

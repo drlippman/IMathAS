@@ -27,6 +27,9 @@ if ($caller=="posts") {
 	$returnurl = "thread.php?page=$page&cid=$cid&forum=$forumid";
 	$returnname = "Forum Topics";
 }
+if (!empty($_GET['embed'])) {
+	$returnurl = "embeddone.php?embed=true";
+}
 
 $now = time();
 
@@ -75,7 +78,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if (trim($_POST['subject'])=='') {
 			$_POST['subject']= '(none)';
 		}
-		$thisposttime = $now;
+		$thisposttime = $now-1;
 		if ($isteacher) {
 			if ($_POST['releaseon']=='Date') {
 				require_once("../includes/parsedatetime.php");
@@ -367,14 +370,23 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		if ($caller != 'thread') {
-			echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";
+		if (empty($_GET['embed'])) {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			if ($caller != 'thread') {
+				echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";
+			}
+			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; ";
+			if ($_GET['modify']!="reply" && $_GET['modify']!='new') {
+				echo "Modify Posting";
+			} else if ($_GET['modify']=='reply') {
+				echo "Post Reply";
+			} else if ($_GET['modify']=='new') {
+				echo "Add Thread";
+			}
+			echo '</div>';
 		}
-		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; ";
 		$notice = '';
 		if ($_GET['modify']!="reply" && $_GET['modify']!='new') {
-			echo "Modify Posting</div>\n";
 			//DB $query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -390,7 +402,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo '<div id="headerposthandler" class="pagetitle"><h2>Modify Post</h2></div>';
 		} else {
 			if ($_GET['modify']=='reply') {
-				echo "Post Reply</div>\n";
+				
 					//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 				//DB $query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
 				//DB $query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id='{$_GET['replyto']}'";
@@ -417,7 +429,6 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				}
 				echo '<div id="headerposthandler" class="pagetitle"><h2>Post Reply</h2></div>';
 			} else if ($_GET['modify']=='new') {
-				echo "Add Thread</div>\n";
 				if (isset($studentid)) {
 					if (time()>$postby) {
 						echo 'It is after the New Threads due date.';
@@ -884,9 +895,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				exit;
 			}
 		}
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		if ($caller!='thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
-		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
+		if (empty($_GET['embed'])) {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			if ($caller!='thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
+			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
+		}
 
 		echo "<h3>Remove Post</h3>\n";
 		if ($parent==0) {
@@ -1014,9 +1027,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$pagetitle = "Move Thread";
 
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		if ($caller != 'thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
-		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
+		if (empty($_GET['embed'])) {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+			if ($caller != 'thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
+			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
+		}
 		//DB $query = "SELECT parent FROM imas_forum_posts WHERE id='{$_GET['move']}'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB if (mysql_result($result,0,0)==0) {

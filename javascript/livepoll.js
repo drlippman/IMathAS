@@ -123,14 +123,14 @@ var livepoll = new function() {
 		} else if (data.action=='3') {
 			if (curstate==2) {
 				$("#livepollsubmit").remove();
-				$("#livepollqcontent").find("input").attr("disabled",true);
+				$("#livepollqcontent").find("input").prop("disabled",true);
 				curstate = 3;
 			} else {
 				$.ajax({
 					url: assesspostbackurl+'&action=livepollshowq&qn='+data.qn
 				}).done(function(data) {
 					var parsed = preProcess(data);
-					$("#livepollqcontent").html(parsed.html).find("input").attr("disabled",true);
+					$("#livepollqcontent").html(parsed.html).find("input").prop("disabled",true);
 					postProcess('livepollqcontent',parsed.code);
 					curquestion = qn;
 					curstate = 3;
@@ -422,9 +422,9 @@ var livepoll = new function() {
 				curquestion = qn;
 				curstate = 1;
 
-				$("#LPshowqchkbox").attr("checked", settings.showqonload).trigger("change");
-				$("#LPshowrchkbox").attr("checked", settings.showreslive).trigger("change");
-				$("#LPshowanschkbox").attr("checked", settings.showansonclose).trigger("change");
+				$("#LPshowqchkbox").prop("checked", settings.showqonload).trigger("change");
+				$("#LPshowrchkbox").prop("checked", settings.showreslive).trigger("change");
+				$("#LPshowanschkbox").prop("checked", settings.showansonclose).trigger("change");
 				$("#LPshowansmsg").text(_("Show Answers When Closed"));
 				hideSettings();
 
@@ -544,7 +544,7 @@ var livepoll = new function() {
 				clearInterval(LPtimer);
 				$("#LPshowansmsg").text(_("Show Answers"));
 				showAnsIfAllowed();
-				$("#LPshowrchkbox").attr("checked", settings.showresonclose || $("#LPshowrchkbox").is(":checked")).trigger("change");
+				$("#LPshowrchkbox").prop("checked", settings.showresonclose || $("#LPshowrchkbox").is(":checked")).trigger("change");
 				$(".sabtn").show();
 			}
 		}).always(function(data) {

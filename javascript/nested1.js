@@ -16,8 +16,8 @@ var Nested = new Class({
 			collapse: false, // true/false
 			collapseClass: 'nCollapse', // Class added to collapsed items
 			expandKey: 'shift', // control | shift
-			lock: null, // parent || depth || class
-			lockClass: 'unlocked'
+			lock: 'class', // parent || depth || class
+			lockClass: 'locked'
 		};
 	},
 
@@ -53,7 +53,7 @@ var Nested = new Class({
 		}
 		if (el.nodeName != this.options.childTag) return true;
 		el = $(el);
-		if (this.options.lock == 'class' && !el.hasClass(this.options.lockClass)) return;
+		if (this.options.lock == 'class' && el.hasClass(this.options.lockClass)) return;
 		if (this.options.ghost) { // Create the ghost
 			this.ghost = el.clone().setStyles({
 				'list-style-type': 'none',
@@ -228,6 +228,7 @@ var Nested = new Class({
 			abort += (this.options.lock == 'depth' && el.depth != this.getDepth(dest, (move == 'inside')));
 			abort += (this.options.lock == 'parent' && (move == 'inside' || dest.parentNode != el.parentNode));
 			//abort += (move=='inside' && dest.parentNode.className != "blockli");
+			abort += (dest.parentNode.hasClass('nochildren'));
 			abort += (dest.offsetHeight == 0);
 			sub = $E(this.options.parentTag, over);
 			sub = (sub) ? sub.getTop() : 0;
@@ -297,6 +298,7 @@ window.onDomReady(function() {
 			document.getElementById('recchg').disabled = false;
 			setlinksdisp("none");
 			window.onbeforeunload = function() {return unsavedmsg;}
+			document.getElementById("submitnotice").innerHTML = "";
 		}
 	});
 });
@@ -331,17 +333,35 @@ function submitChanges() {
   //return;
 
   document.getElementById(target).innerHTML = ' Saving Changes... ';
-  if (window.XMLHttpRequest) { 
-    req = new XMLHttpRequest(); 
-  } else if (window.ActiveXObject) { 
-    req = new ActiveXObject("Microsoft.XMLHTTP"); 
-  } 
-  if (typeof req != 'undefined') { 
-	req.open("POST", url, true);
-	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	req.onreadystatechange = function() {NestedahahDone(url, target);}; 
-	req.send(params); 
-  } 
+  jQuery.ajax({
+		type: "POST",
+		url: url,
+		data: params
+	})
+	.done(function(data) {
+		if (data.charAt(0)=='1') {
+			var p = data.indexOf(':');
+			itemorderhash = data.substring(2,p);
+			document.getElementById(target).innerHTML='';
+			document.getElementById('recchg').disabled = true;
+			window.onbeforeunload = null;
+			setlinksdisp("");
+			document.getElementById("qviewtree").innerHTML = data.substring(p+1);
+			sortIt.haschanged = false;
+		} else if (data.charAt(0)=='2') {
+			document.getElementById('recchg').disabled = true;
+			window.onbeforeunload = null;
+			document.getElementById(target).innerHTML=_("Saved");
+			sortIt.haschanged = false;
+	    	} else {
+			document.getElementById(target).innerHTML=data.substring(2);
+		}
+	})
+	.fail(function(xhr, status, errorThrown) {
+	  document.getElementById(target).innerHTML=" Couldn't save changes:\n"+
+			status + "\n" +req.statusText+
+			"\nError: "+errorThrown
+	});
 }  
 
 function quickviewexpandAll() {
@@ -349,27 +369,6 @@ function quickviewexpandAll() {
 }
 function quickviewcollapseAll() {
 	jQuery("#qviewtree li.blockli:not(.nCollapse)").addClass("nCollapse").children("ul").hide();
-}
-
-function NestedahahDone(url, target) { 
-  if (req.readyState == 4) { // only if req is "loaded" 
-    if (req.status == 200) { // only if "OK" 
-	    if (req.responseText.charAt(0)=='1') {
-	    	    var p = req.responseText.indexOf(':');
-	    	    itemorderhash = req.responseText.substring(2,p);
-		    document.getElementById(target).innerHTML='';
-		    document.getElementById('recchg').disabled = true;
-		    window.onbeforeunload = null;
-		    setlinksdisp("");
-		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(p+1);
-		    sortIt.haschanged = false;      
-	    } else {
-		    document.getElementById(target).innerHTML=req.responseText.substring(2);
-	    }
-    } else { 
-	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText; 
-    } 
-  } 
 }
 
 function setlinksdisp(disp) {

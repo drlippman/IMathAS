@@ -58,13 +58,40 @@ switch($_GET['action']) {
 		break;
 	case "deladmin":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
+		if ($myrights==100) {
+			$stm = $DBH->query("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
+		} else {
+			$stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE groupid=? AND rights>12 AND rights<>76 AND rights<>77 ORDER BY LastName,FirstName");
+			$stm->execute(array($groupid));
+		}
+		$otherusers = array();
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$otherusers[$row['id']] = $row['LastName'].', '.$row['FirstName'].(isset($row['name'])?' ('.$row['name'].')':'');
+		}
+		
+		$stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=? and lastaccess>?");
+		$stm->execute(array($_GET['id'], time()-2*365*24*60*60));
+		$hasstu = false;
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if (!isset($CFG['GEN']['enrollonnewinstructor']) || !in_array($row['courseid'], $CFG['GEN']['enrollonnewinstructor'])) {
+				$hasstu = true;
+				break;
+			}
+		}
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		echo "<p>Are you sure you want to delete this user, <b>";
 		printf("%s, %s (%s)", Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
 		echo "</b>?</p>\n";
+		if ($hasstu) {
+			echo '<p class="noticetext">WARNING! This user has student activity within the last two years. Double-check you will not ';
+			echo 'be deleting any important data before deleting this user.</p>';
+		}
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
+		echo '<p>Any questions or libraries owned by this user need to be transfered to another user. <br/>Select user to transfer them to: ';
+		writeHtmlSelect('transferto',array_keys($otherusers),array_values($otherusers), $userid);
+		echo '</p>';
 		echo '<p><button type=submit name="action" value="deladmin">'._('Delete').'</button>';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
@@ -244,6 +271,9 @@ switch($_GET['action']) {
 		if ($_GET['action'] == "newadmin") {
 			require_once("../includes/newusercommon.php");
 			showNewUserValidation("userform");
+		} else if ($myrights==100) {
+			echo '<p>&nbsp;</p><p>&nbsp;</p>';
+			echo '<a href="forms.php?action=deladmin&id='.Sanitize::encodeUrlParam($_GET['id']).'">Delete User</a>';
 		}
 		break;
 	case "modify":

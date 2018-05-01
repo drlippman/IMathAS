@@ -11,6 +11,15 @@ if (!is_numeric($_GET['cid'])) {
 	exit;
 }
 
+function dir_is_empty($dirname) {
+  if (!is_dir($dirname)) return false;
+  foreach (scandir($dirname) as $file)
+  {
+    if (!in_array($file, array('.','..','.svn','.git'))) return false;
+  }
+  return true;
+}
+
 $cid = Sanitize::courseId($_GET['cid']);
 if (!isset($teacherid)) {
 	echo 'You must be a teacher to access this page';
@@ -176,7 +185,7 @@ if (isset($_GET['delete'])) {
 	$toplevelitems = '';
 	$inmodule = false;
 
-	function getorg($it,$parent,&$res,$ind) {
+	function getorg($it,$parent,&$res,$ind,$mod_depth) {
 		global $DBH,$iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
 		global $usechecked,$checked,$usedcats;
 
@@ -186,13 +195,24 @@ if (isset($_GET['delete'])) {
 			$canvout = '';
 			if (is_array($item)) {
 				if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
-					if (strlen($ind)>2) {
+					$mod_depth_change = 1;
+					if ($mod_depth>0 || strlen($ind)>2) {
 						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
 						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+						$canvout .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
+						$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 						$ccnt++;
-						$module_meta .= $canvout;
+						if ($inmodule && $mod_depth>0) {
+							$module_meta .= $canvout;
+						} else {
+							$toplevelitems .= $canvout;
+							$mod_depth_change = 2;
+							if ($inmodule) {
+								$module_meta .= '</items></module>';
+								$inmodule = false;
+							}
+						}
 					} else {
 						if ($inmodule) {
 							$module_meta .= '</items></module>';
@@ -208,10 +228,10 @@ if (isset($_GET['delete'])) {
 					}
 					$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
+					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $mod_depth+$mod_depth_change);
 					$out .= $ind.'</item>'."\n";
 				} else {
-					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
+					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $mod_depth);
 				}
 
 			} else {
@@ -258,7 +278,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+					$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 					$ccnt++;
 
 					$fp = fopen($newdir.'/'.$htmldir.'inlinetext'.$iteminfo[$item][1].'.html','w');
@@ -318,7 +338,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 						$canvout .= '<url>'.htmlentities($alink,ENT_XML1,'UTF-8',false).'</url>';
-						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imswl_xmlv1p1">'."\n";
 						$resitem .= '  <file href="weblink'.$iteminfo[$item][1].'.xml" />'."\n";
@@ -337,7 +357,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource href="'.$filedir.basename($filename).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
 						$resitem .= '  <file href="'.$filedir.basename($filename).'" />'."\n";
@@ -352,7 +372,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 						$ccnt++;
 						$fp = fopen($newdir.'/'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html','w');
 						fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
@@ -386,7 +406,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<workflow_state>'.($row[2]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+					$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 					$ccnt++;
 					$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
 					fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
@@ -441,7 +461,7 @@ if (isset($_GET['delete'])) {
 						$canvout .= '<workflow_state>'.(row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>'."\n";
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+						$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 						$ccnt++;
 						$aitems = explode(',',$row[3]);
 						foreach ($aitems as $k=>$v) {
@@ -526,7 +546,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<workflow_state>'.($row[1]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+					$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
 					$ccnt++;
 
 					$fp = fopen($newdir.'/'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html','w');
@@ -562,7 +582,7 @@ if (isset($_GET['delete'])) {
 					$resitem .= '</resource>';
 					$res[] = $resitem;
 				}
-				if (strlen($ind)>2) {
+				if ($inmodule && $mod_depth>0) {
 					$module_meta .= $canvout;
 				} else {
 					$toplevelitems .= $canvout;
@@ -579,18 +599,22 @@ if (isset($_GET['delete'])) {
 		      <file href="course_settings/module_meta.xml"/>
 		    </resource>';
     	}
-	$manifestorg = getorg($items,'0',$manifestres,'  ');
+	$manifestorg = getorg($items,'0',$manifestres,'  ', 0);
 
 
 	if ($linktype=='canvas') {
 		if ($toplevelitems != '') {
 			$module_meta = '<module identifier="imported">
 			<title>Imported Content</title>
+			<workflow_state>active</workflow_state>
 			<items>' . $toplevelitems . '</items></module>' . $module_meta;
+		}
+		if ($inmodule) {
+			$module_meta .= '</items></module>';
 		}
 		$module_meta = '<?xml version="1.0" encoding="UTF-8"?>
 		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
-		'.$module_meta . '</items>  </module> </modules>';
+		'.$module_meta . '</modules>';
 
 		if (isset($_POST['includeappconfig']) && $_POST['includeappconfig']==1) {
 			$fp = fopen($newdir.'/bltiimathas.xml','w');
@@ -620,9 +644,8 @@ if (isset($_GET['delete'])) {
 		}
 		mkdir($newdir.'/non_cc_assessments');
     		mkdir($newdir.'/course_settings');
-    		$fp = fopen($newdir.'/course_settings/syllabus.html','w');
-    		fwrite($fp,'<html><body> </body></html>');
-    		fclose($fp);
+    		file_put_contents($newdir.'/course_settings/syllabus.html', '<html><body> </body></html>'); 
+    		file_put_contents($newdir.'/course_settings/canvas_export.txt', "Q: Why do pandas prefer Cartesian coordinates? A: Because they're not polar bears");
     		$fp = fopen($newdir.'/course_settings/assignment_groups.xml','w');
     		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>'."\n");
     		fwrite($fp, '<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">'."\n");
@@ -657,6 +680,10 @@ if (isset($_GET['delete'])) {
   		}
   		fwrite($fp, '</course>');
 		fclose($fp);
+		
+		if (dir_is_empty($newdir.'/web_resources')) {
+			rmdir($newdir.'/web_resources');	
+		}
 	}
 
 	$fp = fopen($newdir.'/imsmanifest.xml','w');
@@ -686,7 +713,7 @@ if (isset($_GET['delete'])) {
 	fwrite($fp,'</resources>'."\n");
 	fwrite($fp,'</manifest>'."\n");
 	fclose($fp);
-
+ 
 	// increase script timeout value
 	ini_set('max_execution_time', 300);
 

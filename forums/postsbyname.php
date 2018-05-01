@@ -197,6 +197,16 @@
 			return true;
 		}
 	}
+	function GBviewThread(threadid) {
+		var qsb = "embed=true&cid="+cid+"&thread="+threadid+"&forum=<?php echo $forumid?>";
+		GB_show(_("Thread"),"posts.php?"+qsb,800,"auto");
+		return false;
+	}
+	function GBdoReply(threadid,postid) {
+		var qsb = "embed=true&cid="+cid+"&thread="+threadid+"&forum=<?php echo $forumid?>";
+		GB_show(_("Reply"),"posts.php?"+qsb+"&modify=reply&replyto="+postid,600,"auto");
+		return false;
+	}
 	</script>
 <?php
 
@@ -335,15 +345,20 @@
 				$content .= "<span class=red> ".Sanitize::onlyInt($scores[$line['id']])." pts</span> ";
 			}
 		}
-		$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."\">Thread</a> ";
+		//$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."\">Thread</a> ";
+		$content .= "<a href=\"#\" onclick=\"return GBviewThread(".Sanitize::onlyInt($line['threadid']).")\">Thread</a> ";
+
+		/* don't really need these links on this page
 		if ($isteacher || ($line['userid']==$userid && $allowmod)) {
 			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&modify=".Sanitize::onlyInt($line['id'])."\">Modify</a> \n";
 		}
 		if ($isteacher || ($allowdel && $line['userid']==$userid)) {
 			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&remove=".Sanitize::onlyInt($line['id'])."\">Remove</a> \n";
 		}
+		*/
 		if ($line['posttype']!=2 && $myrights > 5 && $allowreply) {
-			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&modify=reply&replyto=".Sanitize::onlyInt($line['id'])."\">Reply</a>";
+			$content .= "<a href=\"#\" onclick=\"return GBdoReply(".Sanitize::onlyInt($line['threadid']).",".Sanitize::onlyInt($line['id']).")\">Reply</a> ";
+			//$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."&modify=reply&replyto=".Sanitize::onlyInt($line['id'])."\">Reply</a>";
 		}
 		$content .= '</span>';
 		$content .= "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";

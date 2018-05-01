@@ -433,6 +433,7 @@ div.ddmenu {
 	padding: 5px;
 	background: #eeffee;
 }
+
 .nowrap {
 	white-space: nowrap;
 }
@@ -504,6 +505,35 @@ a:hover:focus {
 a:link:focus {
 	text-decoration: underline;
 }
+ul.tablist {
+	padding: 0;
+	margin: 0;
+	margin-bottom: -1px;
+}
+ul.tablist li {
+	display: inline-block;
+	border: 1px solid #ccc;
+	background-color: #eee;
+	margin-right: 2px;
+}
+ul.tablist li a {
+	display: inline-block;
+	padding: 0.2em 1em;
+	text-decoration: none;
+	color: #000;
+}
+
+ul.tablist li.active {
+	border-bottom: 1px solid #fff;
+	background-color: #fff;
+}
+div.tabpanel {
+	border: 1px solid #ccc;
+	background-color: #fff;
+	margin:0px;
+	padding:5px 10px;
+}
+
 ul#navlist
 {
 clear: both;
@@ -560,21 +590,32 @@ div#rightcolumn {float: right; width: 74%; min-width: 250px;}
 }
 
 ul.courselist {
-	margin: 5px;
-	margin-left: 0px;
-	margin-top: 0px;
+	margin: 0px;
+	padding-left: 0px;
+}
+ul.courselist li {
+	list-style-type: none;
+}
+ul.courselist ul {
+	margin-left: 2px;
+	padding-left: 5px;
+}
+li.coursegroup ul {
+	border-left: 1px dashed #ccc;
 }
 ul.courselist > li {
 	border-bottom: 1px solid #999;
-	padding: 3px 5px 2px;
+	padding: 3px 0px 2px;
 }
 ul.courselist > li:last-child {
 	border: 0;
+}
+div > ul.courselist {
 	margin-bottom: 15px;
 }
 ul.courselist > li > a {
 	display:inline-block;
-	margin-right:10px;
+	margin-right:20px;
 }
 ul.courselist li {
 	position: relative;
@@ -639,6 +680,12 @@ input[type=submit]:hover, button:hover,input[type=button]:hover, a.abutton:hover
 }
 input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus {
 	background-color: #e3e3ff;
+}
+input[type=submit]:disabled,input[type=button]:disabled {
+	color: #666;
+}
+input[type=submit]:disabled:hover,input[type=button]:disabled:hover {
+	background-color: #eee;
 }
 #GB_overlay {
   position: fixed;

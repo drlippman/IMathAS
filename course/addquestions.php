@@ -859,9 +859,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 						if (in_array($i,$existingq)) {
-							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
+							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</span>';
 						} else {
-							$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
+							$page_questionTable[$i]['desc'] = filter(Sanitize::encodeStringForDisplay($line['description']));
 						}
 						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\"/>";
 						$page_questionTable[$i]['type'] = $line['qtype'];

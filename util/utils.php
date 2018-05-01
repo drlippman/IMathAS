@@ -49,10 +49,74 @@ if (isset($_GET['removecourselti'])) {
 	$stm->execute(array(':id'=>$id));
 }
 if (isset($_GET['fixorphanqs'])) {
-	$query = "UPDATE imas_library_items AS ili, (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ";
-	$query .= "SET ili.deleted=0 WHERE ili.qsetid=tofix.qsetid AND ili.libid=0";
+	//first, try to undelete the unassigned library item for any question with no undeleted library items
+	$query = "UPDATE imas_library_items AS ili JOIN (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ON ili.qsetid=tofix.qsetid ";
+	$query .= "JOIN imas_questionset AS iq ON ili.qsetid=iq.id ";
+	$query .= "SET ili.deleted=0 WHERE ili.libid=0 AND iq.deleted=0";
 	$stm = $DBH->query($query);
-	echo '<p>'.$stm->rowCount() . ' questions with no libraries fixed</p>';
+	$n1 = $stm->rowCount();
+	
+	//if any still have no undeleted library items, then they must not have an unassigned entry to undelete, so add it
+	$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid,junkflag,deleted,lastmoddate) ";
+	$query .= "(SELECT 0,ili.qsetid,iq.ownerid,0,0,iq.lastmoddate FROM imas_library_items AS ili JOIN imas_questionset AS iq ON iq.id=ili.qsetid WHERE iq.deleted=0 GROUP BY ili.qsetid HAVING min(ili.deleted)=1)";
+	$stm = $DBH->query($query);
+	$n2 = $stm->rowCount();
+	
+	//if there are any questions with NO library items, add an unassigned one
+	$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid,junkflag,deleted,lastmoddate) ";
+	$query .= "(SELECT 0,iq.id,iq.ownerid,0,iq.deleted,iq.lastmoddate FROM imas_questionset AS iq LEFT JOIN imas_library_items AS ili ON iq.id=ili.qsetid WHERE ili.id IS NULL)";
+	$stm = $DBH->query($query);
+	$n3 = $stm->rowCount();
+	
+	//make unassigned deleted if there's also an undeleted other library
+	$query = "UPDATE imas_library_items AS A JOIN imas_library_items AS B ON A.qsetid=B.qsetid AND A.deleted=0 AND B.deleted=0 ";
+	$query .= "SET A.deleted=1 WHERE A.libid=0 AND B.libid>0";
+	$stm = $DBH->query($query);
+	
+	echo '<p>'.($n1+$n2+$n3). ' questions with no libraries fixed</p>';
+	echo '<p><a href="utils.php">Utils</a></p>';
+	exit;
+}
+if (isset($_POST['updatecaption'])) {
+	$vidid = trim($_POST['updatecaption']);
+	if (strlen($vidid)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$vidid)) {
+		echo 'Invalid video ID';
+		exit;
+	}
+	$ctx = stream_context_create(array('http'=>
+	    array(
+		'timeout' => 1
+	    )
+	));
+	$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
+	$captioned = (strpos($t, '<track')===false)?0:1;
+	if ($captioned==1) {
+		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
+		$stm->execute(array('[[:<:]]'.$vidid.'[[:>:]]'));
+		$chg = 0;
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$parts = explode('~~', $row[1]);
+			foreach ($parts as $k=>$v) {
+				if (preg_match('/\b'.$vidid.'\b/', $v)) {
+					$parts[$k] = preg_replace('/!!0$/', '!!1', $v);
+				}
+			}
+			$newextref = implode('~~', $parts);
+			$upd->execute(array($newextref, $row[0]));
+			$chg += $upd->rowCount();
+		}
+	}
+	echo '<p>Updated '.$chg.' records.</p><p><a href="utils.php">Utils</a></p>';
+	exit;
+}
+	
+if (isset($_GET['fixdupgrades'])) {
+	$query = 'DELETE imas_grades FROM imas_grades JOIN ';
+	$query .= "(SELECT min(id) as minid,refid FROM imas_grades WHERE gradetype='forum' AND refid>0 GROUP BY refid having count(id)>1) AS duplic ";
+	$query .= "ON imas_grades.refid=duplic.refid AND imas_grades.gradetype='forum' WHERE imas_grades.id > duplic.minid";
+	$stm = $DBH->query($query);
+	echo "Removed ".($stm->rowCount())." duplicate forum grade records.<br/>";
 	echo '<p><a href="utils.php">Utils</a></p>';
 	exit;
 }
@@ -104,6 +168,14 @@ if (isset($_GET['form'])) {
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Recover Items</div>';
 		echo '<form method="post" action="'.$imasroot.'/util/rescuecourse.php">';
 		echo 'Recover lost items in course ID: <input type="text" size="5" name="cid"/>';
+		echo '<input type="submit" value="Go"/>';
+		echo '</form>';
+		require("../footer.php");
+	} else if ($_GET['form']=='updatecaption') {
+		require("../header.php");
+		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Update Caption Data</div>';
+		echo '<form method="post" action="'.$imasroot.'/util/utils.php">';
+		echo 'YouTube video ID: <input type="text" size="11" name="updatecaption"/>';
 		echo '<input type="submit" value="Go"/>';
 		echo '</form>';
 		require("../footer.php");
@@ -267,6 +339,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="getstucntdet.php">Get Detailed Student Count</a><br/>';
 	echo '<a href="utils.php?debug=true">Enable Debug Mode</a><br/>';
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';
+	echo '<a href="utils.php?form=updatecaption">Update YouTube video caption data</a><br/>';
 	echo '<a href="replaceurls.php">Replace URLS</a><br/>';
 	echo '<a href="utils.php?form=rescue">Recover lost items</a><br/>';
 	echo '<a href="utils.php?fixorphanqs=true">Fix orphaned questions</a><br/>';

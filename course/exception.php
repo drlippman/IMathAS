@@ -189,13 +189,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
-		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['aid'])));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$sdate = tzdate("m/d/Y",$row[0]);
 		$edate = tzdate("m/d/Y",$row[1]);
 		$stime = tzdate("g:i a",$row[0]);
 		$etime = tzdate("g:i a",$row[1]);
+		$isDateByLTI = ($row[2]>0);
 
 		//check if exception already exists
 		//DB $query = "SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
@@ -215,6 +216,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$etime = tzdate("g:i a",$erow[2]);
 			$curwaive = $erow[3];
 			$curepenalty = $erow[4];
+		}
+		if ($isDateByLTI) {
+			$page_isExceptionMsg .= '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
+			$page_isExceptionMsg .=  'students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given ';
+			$page_isExceptionMsg .= 'priority.  Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.</p>';
 		}
 	}
 	//DEFAULT LOAD DATA MANIPULATION

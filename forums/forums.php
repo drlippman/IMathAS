@@ -67,19 +67,33 @@
 	//DB $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid=:courseid";
 	if (!$teacherid) {
-		//DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
-		$query .= " AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now))";
+		//check for avail or past startdate; we'll do an enddate check later
+		$query .= " AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now))";
 	}
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
-	$line = $stm->fetchALL(PDO::FETCH_ASSOC);
+	$lines = $stm->fetchALL(PDO::FETCH_ASSOC);
 	$anyforumsgroup = false;
 	$forumdata = array();
 	$anyforumsgroup = false;
-	foreach ($line as  $line) {
+	foreach ($lines as $line) {
 		$forumdata[$line['id']] = $line;
 		if ($line['groupsetid']>0) {
 			$anyforumsgroup = true;
+		}
+	}
+	
+	//pull exceptions, as they may extend the enddate
+	$exceptions = array();
+	if (isset($studentid) && count($forumdata)>0) {
+		require_once("../includes/exceptionfuncs.php");
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+		$ph = Sanitize::generateQueryPlaceholders($forumdata);
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype,assessmentid FROM imas_exceptions WHERE assessmentid in ($ph) AND userid=? AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
+		$stm->execute(array_merge(array_keys($forumdata), array($userid)));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$exceptionresult = $exceptionfuncs->getCanUseLatePassForums($row, $forumdata[$row[5]]);
+			$forumdata[$row[5]]['enddate'] = $exceptionresult[7];
 		}
 	}
 

@@ -930,6 +930,17 @@ jQuery(function() {
 	initSageCell("body");
 });
 
+function setActiveTab(el) {
+	var tabid = el.id;
+	jQuery(el).closest(".tabwrap").find("li.active").removeClass("active");
+	jQuery(el).closest(".tablist").find("a[role=tab]").attr("aria-selected",false);
+	jQuery(el).attr("aria-selected",true);
+	jQuery(el).parent().addClass("active");
+	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);    
+	var tabpanelid = tabid.replace(/tab/,"tabpanel");
+	jQuery(el).closest(".tabwrap").find("#"+tabpanelid).show().attr("aria-hidden",false);
+}
+
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.5
  * http://getbootstrap.com/javascript/#dropdowns

@@ -64,7 +64,7 @@
 	if ($asid=="new" && $isteacher) {
 		$aid = Sanitize::onlyInt($_GET['aid']);
 		//student could have started, so better check to make sure it still doesn't exist
-		//DB $query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$_GET['uid']}' AND assessmentid='$aid' ORDER BY id";
+		//DB $query = "SELECT id FROM imas_assessment_sessions WHERE userid='{$get_uid}' AND assessmentid='$aid' ORDER BY id";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_num_rows($result)>0) {
 			//DB $_GET['asid'] = mysql_result($result,0,0);
@@ -82,11 +82,8 @@
 
 			$stugroupmem = array();
 			$agroupid = 0;
+			$doadd = true;
 			if ($adata['isgroup']>0) { //if is group assessment, and groups already exist, create asid for all in group
-				//DB $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
-				//DB $query .= "WHERE i_sgm.userid='{$_GET['uid']}' AND i_sg.groupsetid={$adata['groupsetid']}";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 				$stm = $DBH->prepare($query);
@@ -94,7 +91,7 @@
 				if ($stm->rowCount()>0) {
 					//DB $agroupid = mysql_result($result,0,0);
 					$agroupid = $stm->fetchColumn(0);
-					//DB $query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid=$agroupid AND userid<>'{$_GET['uid']}'";
+					//DB $query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid=$agroupid AND userid<>'{$get_uid}'";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {
 					$stm = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=:stugroupid AND userid<>:uid");
@@ -103,9 +100,28 @@
 						$stugroupmem[] = $row[0];
 					}
 				}
+				//check that no group member has started the assessment
+				$ph = Sanitize::generateQueryPlaceholders($stugroupmem);
+				$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
+				$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessment_sessions WHERE userid IN ($ph) AND assessmentid=? ORDER BY id");
+				$stm->execute(array_merge($stugroupmem, array($aid)));
+				if ($stm->rowCount()>0) {
+					$doadd = false;
+					$row = $stm->fetch(PDO::FETCH_ASSOC);
+					$fieldstocopyarr = explode(',',$fieldstocopy);
+					$insrow = ":".implode(',:',$fieldstocopyarr);	
+					$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
+					$query .= "VALUES (:stuid,$insrow)";
+					$stm = $DBH->prepare($query);
+					$row[':stuid'] = $get_uid;
+					$stm->execute($row);
+					$asid = $DBH->lastInsertId();
+					$_GET['asid'] = $asid;
+				}
 			}
 			$stugroupmem[] = $get_uid;
 
+			if ($doadd) {			
 			require("../assessment/asidutil.php");
 			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 			//$starttime = time();
@@ -124,7 +140,7 @@
 				$asid = $DBH->lastInsertId();
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$asid}&from=$from&cid=$cid&uid=$get_uid");
+		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
 
 	}
 	//PROCESS ANY TODOS
@@ -270,7 +286,7 @@
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':scores'=>"$scorelist;$scorelist",
 					':bestattempts'=>$bestattemptslist, ':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':bestscores'=>"$bestscorelist;$bestscorelist;$bestscorelist"));
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$asid}&from=$from&cid=$cid&uid=$get_uid");
+			header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
 		} else {
 			$isgroup = isasidgroup($asid);
 			$overwriteBody = true;
@@ -388,7 +404,7 @@
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
 				}
 
-				header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid={$asid}&from=$from&cid=$cid&uid=$get_uid");
+				header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
 			} else {
 				echo "$clearid";
 				print_r($scores);
@@ -416,9 +432,9 @@
 			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?$querystring'\"></p>\n";
 			$body .= '</form>';
 
-			//echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\"> \n";
-			//echo "<input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&regen=1&confirmed=true'\" value=\"Really Clear and Regen\"> \n";
-			//echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
+			//echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$get_uid}&confirmed=true'\" value=\"Really Clear\"> \n";
+			//echo "<input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$get_uid}&regen=1&confirmed=true'\" value=\"Really Clear and Regen\"> \n";
+			//echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$get_uid}'\"></p>\n";
 			//exit;
 		}
 	}
@@ -639,7 +655,7 @@
 		}
 		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
 
-		//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
+		//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$get_uid}' AND imas_students.courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id=:id AND imas_students.courseid=:courseid");
@@ -735,7 +751,7 @@
 		}
 		$saenddate = $line['enddate'];
 		unset($exped);
-		//DB $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
+		//DB $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$get_uid}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
 		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_num_rows($r2)>0) {
 			//DB $exped = mysql_result($r2,0,0);
@@ -758,11 +774,11 @@
 				$lpnote = ($exception[2]>0)?" (LatePass)":"";
 				if ($useexception) {
 					echo "<p>Has exception$lpnote, with due date: ".tzdate("F j, Y, g:i a",$exped);
-					echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid=$get_uid&asid={$asid}&from=$from&stu=$stu'\">Edit Exception</button>";
+					echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid=$get_uid&asid=$asid&from=$from&stu=$stu'\">Edit Exception</button>";
 					echo "<br/>Original Due Date: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
 				} else {
 					echo "<p>Had exception$lpnote, with due date: ".tzdate("F j, Y, g:i a",$exped);
-					echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid=$get_uid&asid={$asid}&from=$from&stu=$stu'\">Edit Exception</button>";
+					echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid=$get_uid&asid=$asid&from=$from&stu=$stu'\">Edit Exception</button>";
 					echo "<br/>Assessment Due Date is being used instead: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
 
 				}
@@ -1100,7 +1116,7 @@
 					echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}-{$line['assessmentid']}-{$line['ver']}&to=$get_uid\">Use in Msg</a>";
 					//having issues with greybox in assessments
 					//echo '<br/>';
-					//echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?sendtype=msg&cid=$cid&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}',800,'auto')\" title=\"Send Message\">", _('Use in Message'), "</a>";
+					//echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?sendtype=msg&cid=$cid&quoteq=$i-$qsetid-{$seeds[$i]}&to={$get_uid}',800,'auto')\" title=\"Send Message\">", _('Use in Message'), "</a>";
 
 
 					echo " | <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$asid}&uid=$get_uid&clearq=$i\">Clear Score</a> ";
@@ -1216,7 +1232,7 @@
 			}
 		}
 
-		//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
+		//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$get_uid}'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
@@ -1489,15 +1505,15 @@ function sandboxgetweights($code,$seed) {
 }
 
 function getconfirmheader($group=false) {
-	global $DBH, $isteacher, $istutor, $userid;
+	global $DBH, $isteacher, $istutor, $userid, $get_uid, $asid;
 	if ($group) {
 		$out = '<h3>Whole Group</h3>';
 	} else {
-		//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
+		//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$get_uid}'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$userid));
+		$stm->execute(array(':id'=>$get_uid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$out = "<h3>{$row[1]}, {$row[0]}</h3>\n";
 	}

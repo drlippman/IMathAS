@@ -573,10 +573,18 @@ if (!(isset($teacherid))) {
 
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
 
-			//DB $query = "SELECT ic.id,ic.name,ic.termsurl,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
-			//DB $myCourseResult = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$userid));
+			$userjson = json_decode($stm->fetchColumn(0), true);
+
 			$myCourseResult = $DBH->prepare("SELECT ic.id,ic.name,ic.termsurl,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid=:userid and ic.id<>:cid AND ic.available<4 ORDER BY ic.name");
 			$myCourseResult->execute(array(':userid'=>$userid, ':cid'=>$cid));
+			$myCourses = array();
+			$myCoursesDefaultOrder = array();
+			while ($line = $myCourseResult->fetch(PDO::FETCH_ASSOC)) {
+				$myCourses[$line['id']] = $line;
+				$myCoursesDefaultOrder[] = $line['id'];
+			}
 		/*	$i=0;
 			$page_mineList = array();
 			while ($row = mysql_fetch_row($result)) {
@@ -610,7 +618,25 @@ if (!(isset($teacherid))) {
 		}
 	}
 }
-
+function printCourseOrder($order, $data, &$printed) {
+	foreach ($order as $item) {
+		if (is_array($item)) {
+			echo '<li class="coursegroup"><span class=dd>-</span> ';
+			echo '<b>'.Sanitize::encodeStringForDisplay($item['name']).'</b>';
+			echo '<ul class="nomark">';
+			printCourseOrder($item['courses'], $data, $printed);
+			echo '</ul></li>';
+		} else if (isset($data[$item])) {
+			printCourseLine($data[$item]);
+			$printed[] = $item;
+		}
+	}		
+}
+function printCourseLine($data) {
+	echo '<li><span class=dd>-</span> ';
+	writeCourseInfo($data, -1);
+	echo '</li>';
+}
 function writeCourseInfo($line, $skipcopyright=2) {
 	$itemclasses = array();
 	if ($line['copyrights']<$skipcopyright) {
@@ -1094,16 +1120,17 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 				<ul class=hide id="mine">
 <?php
 //my items
-		//DB while ($line = mysql_fetch_array($myCourseResult, MYSQL_ASSOC)) {
-		while ($line = $myCourseResult->fetch(PDO::FETCH_ASSOC)) {
-?>
-
-					<li><span class=dd>-</span>
-						<?php
-						writeCourseInfo($line, -1);
-						?>
-					</li>
-<?php
+		if (isset($userjson['courseListOrder']['teach'])) {
+			$printed = array();
+			printCourseOrder($userjson['courseListOrder']['teach'], $myCourses, $printed);
+			$notlisted = array_diff(array_keys($myCourses), $printed);
+			foreach ($notlisted as $course) {
+				printCourseLine($myCourses[$course]);
+			}
+		} else {
+			foreach ($myCoursesDefaultOrder as $course) {
+				printCourseLine($myCourses[$course]);
+			}
 		}
 ?>
 				</ul>

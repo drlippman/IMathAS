@@ -1888,6 +1888,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 
 		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
+		if (count($fromto)==1) {$fromto[0]=-10; $fromto[1]=10;}
 		$domaingroups = array();
 		$i=0;
 		while ($i<count($fromto)) {
@@ -3126,27 +3127,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							$func = mathphp($func,'x');
 							$func = str_replace("(x)",'($x)',$func);
 							$func = create_function('$x', 'return ('.$func.');');
-							$x1 = 1/4*$settings[1] + 3/4*$settings[0];
-							$x2 = 1/2*$settings[1] + 1/2*$settings[0];
-							$x3 = 3/4*$settings[1] + 1/4*$settings[0];
-
-							$y1 = @$func($x1);
-							$y2 = @$func($x2);
-							$y3 = @$func($x3);
-
-							if ($y1===false) {
-								$x1 = $x1+.2*($x2-$x1);
-								$y1 = @$func($x1);
-								$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
-							} else if ($y2===false) {
-								$x2 = $x2+.2*($x2-$x1);
-								$y2 = @$func($x2);
-								$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
-							} else if ($y3===false) {
-								$x3 = $x3-.2*($x2-$x1);
-								$y3 = @$func($x3);
-								$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
-							}
+							
+							$epsilon = ($settings[1]-$settings[0])/97;
+							$x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
+							$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
+							$x3 = 3/4*$settings[1] + 1/4*$settings[0] + $epsilon;
+							
+							$y1 = $func($x1);
+							$y2 = $func($x2);
+							$y3 = $func($x3);
+	
 							$va = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
 							$ha = (($x1*$y1-$x2*$y2)-$va*($y1-$y2))/($x1-$x2);
 
@@ -3450,7 +3440,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							if ($matches[3]=='oo') {$matches[3] = 1e99;}
 							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
 								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
-									echo "here 3";
 									$correct += 1;
 									$foundloc = $j;
 									break 2;
@@ -4225,9 +4214,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 						return 0;
 					}
-					if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
-						$aarr[$j] = $matches;
-					} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
+					if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
 						if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
 							$aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
 						} else {
@@ -4246,7 +4233,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 					return 0;
 				}
-				if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
+				if (preg_match('/(\(|\[)(.+?)\,(.+?)(\)|\])/',$anans,$matches)) {
+					if ($matches[2]=='-oo') {$matches[2] = -1e99;}
+					if ($matches[3]=='oo') {$matches[3] = 1e99;}
+					if (!is_numeric($matches[2])) {
+						$matches[2] = evalMathPHP($matches[2],null);
+					}
+					if (!is_numeric($matches[3])) {
+						$matches[3] = evalMathPHP($matches[3],null);
+					}
 					$aarr[$j] = $matches;
 				} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
 					if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
@@ -4483,6 +4478,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = str_replace('E','varE',$answer);
 		}
 		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
+		if (count($fromto)==1) {$fromto[0]=-10; $fromto[1]=10;}
 		$domaingroups = array();
 		$i=0;
 		while ($i<count($fromto)) {
@@ -4729,6 +4725,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answerformat=='list') {
 			$gaarr = array_map('trim',explode(',',$givenans));
 			$anarr = array_map('trim',explode(',',$answer));
+			$gaarrcnt = count($gaarr);
 		} else {
 			$gaarr = array($givenans);
 			$anarr = array($answer);
@@ -4861,7 +4858,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-		$score = $correct/count($anarr);
+		if ($gaarrcnt <= count($anarr)) {
+			$score = $correct/count($anarr);
+		} else {
+			$score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/($gaarrcnt+count($anarr));
+		}
 		if ($score<0) { $score = 0; }
 		return ($score);
 		//return $correct;
@@ -5265,11 +5266,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ansrats = array();
 			$ansellipses = array();
 			$anshyperbolas = array();
-			$x0 = $settings[0];
-			$x1 = 1/4*$settings[1] + 3/4*$settings[0];
-			$x2 = 1/2*$settings[1] + 1/2*$settings[0];
-			$x3 = 3/4*$settings[1] + 1/4*$settings[0];
-			$x4 = $settings[1];
+			$epsilon = ($settings[1]-$settings[0])/499;
+			$x0 = $settings[0] - 3*$epsilon;
+			$x1 = 1/4*$settings[1] + 3/4*$settings[0] - $epsilon;
+			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
+			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + 3*$epsilon;
+			$x4 = $settings[1] + 5*$epsilon;
 			$x0p = $imgborder;
 			$x1p = $xtopix($x1); //($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = $xtopix($x2); //($x2 - $settings[0])*$pixelsperx + $imgborder;
@@ -5507,19 +5509,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$ansexps[$key] = array($str,$base);
 
 					} else if (strpos($function[0],'/x')!==false || preg_match('|/\([^\)]*x|', $function[0])) {
-						if ($y1===false) {
-							$x1 = $x1+.2*($x2-$x1);
-							$y1 = @$func($x1);
-							$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
-						} else if ($y2===false) {
-							$x2 = $x2+.2*($x2-$x1);
-							$y2 = @$func($x2);
-							$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
-						} else if ($y3===false) {
-							$x3 = $x3-.2*($x2-$x1);
-							$y3 = @$func($x3);
-							$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
-						}
 						$h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
 						$k = (($x1*$y1-$x2*$y2)-$h*($y1-$y2))/($x1-$x2);
 						$c = ($y1-$k)*($x1-$h);
@@ -5745,6 +5734,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			$deftol = .1;
 			$defpttol = 5;
+
 			foreach ($anslines as $key=>$ansline) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($lines); $i++) {
@@ -6097,9 +6087,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
 			$ymid = ($settings[2]+$settings[3])/2;
 			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;*/
-			$x1 = 1/4*$settings[1] + 3/4*$settings[0];
-			$x2 = 1/2*$settings[1] + 1/2*$settings[0];
-			$x3 = 3/4*$settings[1] + 1/4*$settings[0];
+			$epsilon = ($settings[1]-$settings[0])/97;
+			$x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
+			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
+			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + $epsilon;
+			
 			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
 			$x3p = ($x3 - $settings[0])*$pixelsperx + $imgborder;

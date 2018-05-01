@@ -741,6 +741,7 @@ if ($myrights<20) {
 				//DB $searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
 				$searchlikes = "imas_questionset.id=? AND ";
 				$searchlikevals = array(substr($safesearch,3));
+				$isIDsearch = true;
 			} else {
 				$searchterms = explode(" ",$safesearch);
 				$searchlikes = '';
@@ -881,6 +882,7 @@ if ($myrights<20) {
 		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist{0}=='0')) {
 			$query .= " LIMIT 300";
 		}
+
 		//DB $resultLibs = mysql_query($query) or die("Query failed : " . mysql_error
 		$resultLibs = $DBH->prepare($query);
 		$resultLibs->execute($qarr);
@@ -911,11 +913,11 @@ if ($myrights<20) {
 
 			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 			if ($line['userights']==0) {
-				$page_questionTable[$i]['desc'] = '<span class="noticetext">'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</span>';
+				$page_questionTable[$i]['desc'] = '<span class="noticetext">'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</span>';
 			} else if ($line['replaceby']>0 || $line['junkflag']>0) {
-				$page_questionTable[$i]['desc'] = '<span class="grey"><i>'.Sanitize::encodeStringForDisplay(filter($line['description'])).'</i></span>';
+				$page_questionTable[$i]['desc'] = '<span class="grey"><i>'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</i></span>';
 			} else {
-				$page_questionTable[$i]['desc'] = Sanitize::encodeStringForDisplay(filter($line['description']));
+				$page_questionTable[$i]['desc'] = filter(Sanitize::encodeStringForDisplay($line['description']));
 			}
 
 			if ($line['extref']!='') {

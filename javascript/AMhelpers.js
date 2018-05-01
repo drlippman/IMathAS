@@ -205,7 +205,7 @@ function calculate(inputId,outputId,format) {
 		  	  str = str.replace(/(x|X|\u00D7)/,"*");
 		  }
 		  if (format.indexOf('mixed')!=-1) {
-		  	  str = str.replace(/_/,' ');
+		  	  str = str.replace(/_/g,' ');
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/(x|X|\u00D7)/,"xx");
 		  } else {
@@ -220,7 +220,7 @@ function calculate(inputId,outputId,format) {
 			  	evalstr = evalstr.replace(/%/,'') + '/100';
 			  }
 			  if (format.indexOf('mixed')!=-1) {
-				  evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
+				  evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 			  }
 			  if (format.indexOf('scinot')!=-1) {
 			  	  evalstr = evalstr.replace("xx","*");
@@ -304,7 +304,7 @@ function ineqtointerval(strw) {
 function intcalculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
   if (format.indexOf('mixed')!=-1) {
-	  fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+	  fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
   } else {
 	  fullstr = fullstr.replace(/\s+/g,'');
   }
@@ -366,7 +366,7 @@ function intcalculate(inputId,outputId,format) {
 				  res = NaN;
 				  err += singlevalsyntaxcheck(vals[j], format);
 				  if (format.indexOf('mixed')!=-1) {
-					  vals[j] = vals[j].replace(/_/,' ');
+					  vals[j] = vals[j].replace(/_/g,' ');
 				  } else {
 					  vals[j] = vals[j].replace(/\s/g,'');
 				  }
@@ -376,7 +376,7 @@ function intcalculate(inputId,outputId,format) {
 					  try {
 					  	toeval = vals[j];
 					  	if (format.indexOf('mixed')!=-1) {
-					  		toeval = toeval.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
+					  		toeval = toeval.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 					  	}
 					  	var res = eval(prepWithMath(mathjs(toeval)));
 					  } catch(e) {
@@ -469,7 +469,7 @@ function ntuplecalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = normalizemathunicode(fullstr);
 	if (format.indexOf('mixed')!=-1) {
-		fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
 		fullstr = fullstr.replace(/\s+/g,'');
 	}
@@ -511,7 +511,7 @@ function ntuplecalc(inputId,outputId,format) {
 				err += syntaxcheckexpr(sub, format);
 				try {
 					if (format.indexOf('mixed')!=-1) {
-						sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
+						sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 					}
 					var res = eval(prepWithMath(mathjs(sub)));
 				} catch(e) {
@@ -562,7 +562,7 @@ function complexcalc(inputId,outputId,format) {
 	var outcalced, outstr, err;
 	fullstr = normalizemathunicode(fullstr);
 	if (format.indexOf('mixed')!=-1) {
-		fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
 		fullstr = fullstr.replace(/\s+/g,'');
 	}
@@ -576,7 +576,7 @@ function complexcalc(inputId,outputId,format) {
 		for (var cnt=0; cnt<arr.length; cnt++) {
 			var prep = arr[cnt];
 			if (format.indexOf('mixed')!=-1) {
-				prep = prep.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
+				prep = prep.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 			}
 			var prep = mathjs(prep,'i');
 			if (format.indexOf("sloppycomplex")==-1) {
@@ -1192,7 +1192,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		fullstr = document.getElementById("tc"+qn).value;
 		//fullstr = fullstr.replace(/^\s+/g,'').replace(/\s+$/,'');
 		if (calcformat[qn].indexOf('mixed')!=-1) {
-			fullstr = fullstr.replace(/_/,' ').replace(/^\s+/,'').replace(/\s+$/,'');
+			fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 		} else {
 			fullstr = fullstr.replace(/\s+/g,'');
 		}
@@ -1231,7 +1231,7 @@ function doonsubmit(form,type2,skipconfirm) {
 
 							  try {
 							  	  if (calcformat[qn].indexOf('mixed')!=-1) {
-							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
+							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 							  	  }
 							  	  var res = eval(prepWithMath(mathjs(vals[j])));
 							  } catch(e) {
@@ -1283,9 +1283,9 @@ function doonsubmit(form,type2,skipconfirm) {
 			if (str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
 				str = str.replace(/%/,'') + '/100';
 			}
-			str = str.replace(/(\d+)\s*_\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
+			str = str.replace(/(\d+)\s*_\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 			if (calcformat[qn].indexOf('mixed')!=-1) {
-				str = str.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/,"($1+$2/$3)");
+				str = str.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 			}
 			if (str.match(/^\s*$/)) {
 				var res = '';
