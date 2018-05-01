@@ -1500,7 +1500,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function getconfirmheader($group=false) {
-	global $DBH, $isteacher, $istutor, $userid;
+	global $DBH, $isteacher, $istutor, $userid, $get_uid;
 	if ($group) {
 		$out = '<h3>Whole Group</h3>';
 	} else {
