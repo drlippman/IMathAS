@@ -824,11 +824,21 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//DB $query = "SELECT id FROM imas_forum_posts WHERE threadid='{$_GET['remove']}' AND files<>''";
 				//DB $r = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB while ($row = mysql_fetch_row($r)) {
-				$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE threadid=:threadid AND files<>''");
+				$stm = $DBH->prepare("SELECT id,files FROM imas_forum_posts WHERE threadid=:threadid");
 				$stm->execute(array(':threadid'=>$_GET['remove']));
+				$children = array();
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					deleteallpostfiles($row[0]); //delete files for each post
+					$children[] = $row[0];
+					if ($row[1]!='') {
+						deleteallpostfiles($row[0]); //delete files for each post
+					}
 				}
+				if (count($children)>0) {
+					$ph = Sanitize::generateQueryPlaceholders($children);
+					$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='forum' AND refid IN ($ph)");
+					$stm->execute($children);
+				}
+				
 
 				//DB $query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
