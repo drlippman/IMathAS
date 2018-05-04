@@ -1,10 +1,12 @@
 <html><body>
 <h1>Macro Library plot3d</h1>
-Basic 3D display, using Java applet.  Version 1.1, April 24, 2006
-<BR>requires copying Viewer.class into assessment/libs directory
-<BR><ul>
+<p>Basic 3D graph display, HTML Canvas or Flash fallback.  Also includes
+functions to embed or link to CalcPlot3D.</p>
+<ul>
 <li><a href="#plot3d">plot3d</a></li>
 <li><a href="#spacecurve">spacecurve</a></li>
+<li><a href="#CalcPlot3Dembed">CalcPlot3Dembed</a></li>
+<li><a href="#CalcPlot3Dlink">CalcPlot3Dlink</a></li>
 </ul>
 <h3><a name="plot3d">plot3d</a></h3>
 plot3d(f(x,y),xmin,xmax,ymin,ymax,[disc,width,height,axes]) or
@@ -19,4 +21,46 @@ spacecurve("[x(t),y(t),z(t)]",tmin,tmax,[disc,width,height,axes,bounds])
 <BR>width and height default to 300
 <BR>axes defaults to 1 (on), set to 0 for off
 <BR>bounds: xmin,xmax,ymin,ymax,zmin,zmax
-<BR>
+<h3><a name="CalcPlot3Dembed">CalcPlot3Dembed</a></h3>
+<p>CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])</p>
+<p>Embeds a dynamic figure using <a href="http://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/">CalcPlot3D</a> 
+to draw the graph.  The dynamic figure does not show the CalcPlot3D control panel,
+so if you want that, use the CalcPlot3Dlink function instead.</p>
+<ul>
+  <li>functions: a single string or array of strings in one of these formats:
+  <ul>
+    <li>Standard function: <code>z=x^2+y^2,[xmin,xmax,ymin,ymax,gridlines]</code>
+        <br/>xmin,xmax,ymin,ymax default to the graphing window. gridlines defaults to 30.</li>
+    <li>Implicit function: <code>x^2+y^2=z^2,[xmin,xmax,ymin,ymax,zmin,zmax,cubes]</code>
+        <br/>xmin,xmax,ymin,ymax,zmin,zmax default to the graphing window. cubes defaults to 16.</li>
+    <li>Spacecurve: <code>curve,x(t),y(t),z(t),[tmin,tmax,tsteps]</code>
+    	<br/>Example:  "curve,sin(t),cos(t),t,-2pi,2pi"
+        <br/>Defaults: tmin=-10, tmax=10, tsteps=100</li>
+    <li>Parametric Surface: <code>psurf,x(u,v),y(u,v),z(u,v),[umin,umax,vmin,vmax,usteps,vsteps]</code>
+    	<br/>Example: "psurf,cos(u),sin(u),v"
+    	<br/>Defaults: umin=0, umax=2pi, vmin=0, vmax=pi, usteps=30, vsteps=15</li>
+    <li>Region 1: <code>region,y=f(x) bottom func,y=g(x) top func,z top function,[xmin,xmax]</code>
+    	<br/>Example: "region,y=1,y=2-x^2,z=x^2+y^2
+    	<br/>Defaults: xmin=-1, xmax=1</li>
+    <li>Region 2: <code>region,x=f(y) left func,x=g(y) right func,z top function,[ymin,ymax]</code>
+    	<br/>Example: "region,x=1,x=4-y^2,z=x^2+y^2,-2,2
+    	<br/>Defaults: ymin=-1, ymax=1</li>
+  </ul></li>
+  <li>width, height: the size for the embed. Defaults to 500 by 500</li>
+  <li>xmin, xmax, ymin, ymax, zmin, zmax: the graphing window. Defaults to -2 to 2 for each.</li>
+  <li>xscale, yscale, zscale: spacing for axis labels. Defaults to 1.</li>
+  <li>zclipmin, zclipmax: z-values to chop the graph off at. Defaults to zmin-.5(zmax-zmin) and zmax+.5(zmax-zmin)</li>
+</ul>
+<h3><a name="CalcPlot3Dlink">CalcPlot3Dlink</a></h3>
+<p>CalcPlot3Dlink(functions, linktext, [xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])</p>
+<p>Creates a custom link to <a href="http://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/">CalcPlot3D</a> 
+to draw the graph.  This view will include the CalcPlot3D control panel for exploring the
+graph.</p>
+<ul>
+  <li>functions: a single string or array of strings for the equation to graph. See above for the formats</li>
+  <li>linktext: the text of the link itself</li>
+  <li>xmin, xmax, ymin, ymax, zmin, zmax: the graphing window. Defaults to -2 to 2 for each.</li>
+  <li>xscale, yscale, zscale: spacing for axis labels. Defaults to 1.</li>
+  <li>zclipmin, zclipmax: z-values to chop the graph off at. Defaults to zmin-.5(zmax-zmin) and zmax+.5(zmax-zmin)</li>
+</ul>
+  

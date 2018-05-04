@@ -1,9 +1,9 @@
 <?php
-//Basic 3D display, using Java applet.  Version 1.1, April 24, 2006
-//requires copying Viewer.class into assessment/libs directory
+//Basic 3D display, using HTML5 Canvas or flash fallback.
+// Version 2.0 May 3 2018 adding CalcPlot3D functions
 
 global $allowedmacros;
-array_push($allowedmacros,"plot3d","spacecurve");
+array_push($allowedmacros,"plot3d","spacecurve","CalcPlot3Dembed","CalcPlot3Dlink");
 
 //plot3d(f(x,y),xmin,xmax,ymin,ymax,[disc,width,height,axes]) or
 //plot3d("[x(u,v),y(u,v),z(u,v)]",umin,umax,vmin,vmax,[disc,width,height,axes,bounds])
@@ -287,6 +287,140 @@ function spacecurve($func,$tmin,$tmax) {
 	}
 
 	  return $html;
+}
 
+//CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])
+//funcs is array of function strings
+function CalcPlot3Dembed($funcs, $width=500, $height=500, $xmin=-2, $xmax=2, $ymin=-2, $ymax=2, $zmin=-2, $zmax=2, $xscl=1, $yscl=1, $zscl=1, $zclipmin=null,$zclipmax=null) {
+	if ($zclipmin===null) {
+		$zclipmin = $zmin - .5*($zmax-$zmin);
+	}
+	if ($zclipmax===null) {
+		$zclipmax = $zmax + .5*($zmax-$zmin);
+	}
+	$querystring = CalcPlot3Dquerystring($funcs, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $xscl, $yscl, $zscl, $zclipmin, $zclipmax);
+	$out = '<div class="video-wrapper-wrapper" style="max-width: '.Sanitize::onlyInt($width).'px">';
+	$aspectRatio = round(100*$height/$width,2);
+	$out .= '<div class="fluid-width-video-wrapper" style="padding-top:'.$aspectRatio.'%">';
+	$out .= '<iframe frameborder=0 scrolling="no" ';
+	//$querystring is sanitized as it's constructed
+	$out .= 'src="https://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/dynamicFigure/?'.$querystring.'"></iframe>';
+	$out .= '</div></div>';
+	return $out;
+}
+
+//CalcPlot3Dlink(functions, link text, [xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])
+//funcs is array of function strings
+function CalcPlot3Dlink($funcs, $linktext="View Graph", $xmin=-2, $xmax=2, $ymin=-2, $ymax=2, $zmin=-2, $zmax=2, $xscl=1, $yscl=1, $zscl=1, $zclipmin=null,$zclipmax=null) {
+	if ($zclipmin===null) {
+		$zclipmin = $zmin - .5*($zmax-$zmin);
+	}
+	if ($zclipmax===null) {
+		$zclipmax = $zmax + .5*($zmax-$zmin);
+	}
+	$querystring = CalcPlot3Dquerystring($funcs, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $xscl, $yscl, $zscl, $zclipmin, $zclipmax);
+	//$querystring is sanitized as it's constructed
+	$out = '<a href="https://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/?'.$querystring.'" target="_blank">';
+	$out .= Sanitize::encodeStringForDisplay($linktext).'</a>';
+	return $out;
+}
+
+
+function CalcPlot3Dquerystring($funcs, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $xscl, $yscl, $zscl, $zclipmin, $zclipmax) {
+	$out = array();
+	if (!is_array($funcs)) {
+		$funcs = array($funcs);
+	}
+	foreach ($funcs as $func) {
+		$out[] = CalcPlot3DprepFunc($func, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax);
+	}
+	$win = "type=window;xmin=$xmin;xmax=$xmax;ymin=$ymin;ymax=$ymax;zmin=$zmin;zmax=$zmax;";
+	$win .= "xscale=$xscl;yscale=$yscl;zscale=$zscl;zcmin=$zclipmin;zcmax=$zclipmax";
+	$out[] = $win;
+	return implode('&', array_map('Sanitize::encodeUrlParam', $out));
+}
+
+//Function string formats:
+//  Regular: 		z=x^2+y^2,[xmin,xmax,ymin,ymax,gridlines]
+//				defaults: window's xmin,xmax,ymin,ymax, 30
+//  Implicit: 		x^2+y^2=z^2,[xmin,ymin,xmax,ymax,zmin,zmax,cubes]
+//				defaults: window's xmin,xmax,ymin,ymax,zmin,zmax 16
+//  Spacecurve: 	curve,x(t),y(t),z(t),[tmin,tmax,tsteps]
+//				defaults: -10,10,100
+//  Parametric surf: 	psurf,x(u,v),y(u,v),z(u,v),[umin,umax,vmin,vmax,usteps,vsteps]
+//				defaults: 0,2pi,0,pi,30,15
+//  Region: 		region,y=f(x) bottom func,y=g(x) top func,z top function,[xmin,xmax]
+//				xmin,xmax defaults to -1,1
+//          			Example:  region,y=1,y=2-x^2,z=x^2+y^2
+//         		region,x=f(y) left func,x=g(y) right func,z top function,[ymin,ymax]
+function CalcPlot3DprepFunc($str,$gxmin=-2,$gxmax=2,$gymin=-2,$gymax=2,$gzmin=-2,$gzmax=2) {
+	$bits = array_map('trim', explode(',', $str));
+	$out = array();
+	if ($bits[0] == 'region') {
+		if (count($bits)<4) {
+			echo 'Insufficient information provided for CalcPlot3D region';
+			return '';
+		}
+		$out[] = 'type=region';
+		if ($bits[1][0]=='y') {
+			$out[] = 'region=x';
+		} else {
+			$out[] = 'region=y';;
+		}
+		$out[] = 'bot2d='.substr($bits[1],2);
+		$out[] = 'top2d='.substr($bits[2],2);
+		$out[] = 'top3d='.substr($bits[3],2);
+		$def = array(array('umin','umax'), array(-1,1));
+		$start = 4;
+	} else if ($bits[0]=='curve') {
+		if (count($bits)<4) {
+			echo 'Insufficient information provided for CalcPlot3D spacecurve';
+			return '';
+		}
+		$out[] = 'type=spacecurve';
+		$out[] = 'spacecurve=curve';
+		$out[] = 'x='.$bits[1];
+		$out[] = 'y='.$bits[2];
+		$out[] = 'z='.$bits[3];
+		$def = array(array('tmin','tmax','tsteps'), array(-10,10,100));
+		$start = 4;
+	} else if ($bits[0]=='psurf') {
+		if (count($bits)<4) {
+			echo 'Insufficient information provided for CalcPlot3D parametric surface';
+			return '';
+		}
+		$out[] = 'type=parametric';
+		$out[] = 'parametric=2';
+		$out[] = 'x='.$bits[1];
+		$out[] = 'y='.$bits[2];
+		$out[] = 'z='.$bits[3];
+		$def = array(array('umin','umax','vmin','vmax','usteps','vsteps'), array(0,"2pi",0,"pi",30,15));
+		$start = 4;
+	} else {
+		$funcparts = explode('=',$bits[0]);
+		if (count($funcparts)==1) {
+			$funcparts = array('z',$funcparts[0]);
+		}
+		if ($funcparts[0] == 'z') { //basic z= function
+			$out[] = 'type=z';
+			$out[] = 'z='.$funcparts[1];
+			$def = array(array('umin','umax','vmin','vmax','grid'), array($gxmin,$gxmax,$gymin,$gymax,30));
+			$start = 1;
+		} else { //implicit
+			$out[] = 'type=implicit';
+			$out[] = 'equation='.$funcparts[0].'~'.$funcparts[1];
+			$def = array(array('xmin','xmax','ymin','ymax','zmin','zmax','cubes'), array($gxmin,$gxmax,$gymin,$gymax,$gzmin,$gzmax,16));
+			$start = 1;
+		}
+	}
+	for ($i=0;$i<count($def[0]);$i++) {
+		if (isset($bits[$start+$i]) && $bits[$start+$i]!=='') {
+			$out[] = $def[0][$i].'='.$bits[$start+$i];
+		} else {
+			$out[] = $def[0][$i].'='.$def[1][$i];
+		}
+	}
+	$out[] = 'visible=true';
+	return implode(';',$out);
 }
 ?>
