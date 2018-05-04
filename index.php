@@ -238,7 +238,6 @@ if ($stm->rowCount()==0) {
 			} else {
 				$page_tutorCourseData[] = $line;
 			}
-			$page_tutorCourseData[] = $line;
 			$page_coursenames[$line['id']] = $line['name'];
 			if (!in_array($line['id'],$hideonpostswidget)) {
 				$postcheckstucids[] = $line['id'];
