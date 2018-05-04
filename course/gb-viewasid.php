@@ -93,23 +93,25 @@
 						$stugroupmem[] = $row[0];
 					}
 				}
-				//check that no group member has started the assessment
-				$ph = Sanitize::generateQueryPlaceholders($stugroupmem);
-				$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
-				$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessment_sessions WHERE userid IN ($ph) AND assessmentid=? ORDER BY id");
-				$stm->execute(array_merge($stugroupmem, array($aid)));
-				if ($stm->rowCount()>0) {
-					$doadd = false;
-					$row = $stm->fetch(PDO::FETCH_ASSOC);
-					$fieldstocopyarr = explode(',',$fieldstocopy);
-					$insrow = ":".implode(',:',$fieldstocopyarr);	
-					$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
-					$query .= "VALUES (:stuid,$insrow)";
-					$stm = $DBH->prepare($query);
-					$row[':stuid'] = $get_uid;
-					$stm->execute($row);
-					$asid = $DBH->lastInsertId();
-					$_GET['asid'] = $asid;
+				if (count($stugroupmem)>0) {
+					//check that no group member has started the assessment
+					$ph = Sanitize::generateQueryPlaceholders($stugroupmem);
+					$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
+					$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessment_sessions WHERE userid IN ($ph) AND assessmentid=? ORDER BY id");
+					$stm->execute(array_merge($stugroupmem, array($aid)));
+					if ($stm->rowCount()>0) {
+						$doadd = false;
+						$row = $stm->fetch(PDO::FETCH_ASSOC);
+						$fieldstocopyarr = explode(',',$fieldstocopy);
+						$insrow = ":".implode(',:',$fieldstocopyarr);	
+						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
+						$query .= "VALUES (:stuid,$insrow)";
+						$stm = $DBH->prepare($query);
+						$row[':stuid'] = $get_uid;
+						$stm->execute($row);
+						$asid = $DBH->lastInsertId();
+						$_GET['asid'] = $asid;
+					}
 				}
 			}
 			$stugroupmem[] = $get_uid;
