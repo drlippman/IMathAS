@@ -849,6 +849,9 @@ function AMTparseAMtoTeX($str) {
 	$str = preg_replace('/^\s+/','',$str);
 	if (trim($str)=='') {return '';}
 	
+	$str = preg_replace('/([a-zA-Z])&#770;/', 'hat$1 ', $str);
+	$str = preg_replace('/([a-zA-Z])&#772;/', 'bar$1 ', $str);
+	
 	$result = $this->AMTparseExpr($str, false);
 	$result[0] = '\\displaystyle'.str_replace('$','\\$',$result[0]);
 	return ($result[0]);
