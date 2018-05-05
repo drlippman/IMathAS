@@ -269,5 +269,65 @@ listed here in case anything goes wrong:
 
 </ul>
 </p>
+
+<h3>Testing</h3>
+
+Codeception is used for unit and acceptance tests.
+
+<h4>Requirements</h4>
+
+<ul>
+	<li>PHP &gt;= 7.0</li>
+	<li><a href="https://getcomposer.org/">Composer</a></li>
+	<li><a href="https://www.seleniumhq.org/download/">Selenium Standalone Server</a></li>
+	<li><a href="https://sites.google.com/a/chromium.org/chromedriver/">ChromeDriver</a>
+		(for acceptance tests in Chrome)</li>
+</ul>
+
+<h4>Steps</h4>
+
+<p>Step 1. Install dependencies.</p>
+
+<code>
+	$ composer install
+</code>
+
+<p>Step 2. Enable development includes and start the local development server with:</p>
+
+<code>
+	$ cp devmode.php.dist devmode.php<br/>
+	$ composer start
+</code>
+
+<p>Step 3. Ensure the Selenium standalone server is running with ChromeDriver installed.</p>
+
+<p>Step 4a. Run tests in another window while the dev server is running:</p>
+
+<code>
+	$ composer test
+</code>
+
+<p>Step 4b. Alternatively, more verbose output when running tests is available with:</p>
+
+<code>
+	$ composer testv
+</code>
+
+<p>
+	Step 5. After all tests have run, coverage reports will be available at
+	<a href="tests/_output/coverage/index.html">tests/_output/coverage/index.html</a>.
+</p>
+
+<h4>Notes</h4>
+
+<p>
+	Tests currently depend on:
+</p>
+
+<ul>
+	<li>The application being setup and running with the admin user setup as root/root. (username/password)</li>
+	<li>Selenium running with ChromeDriver.</li>
+</p>
+
 </body>
 </html>
