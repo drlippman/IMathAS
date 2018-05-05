@@ -1,9 +1,12 @@
 {
     "require-dev": {
         "phpunit/phpunit": "^5.7",
-        "codeception/codeception": "^2.4"
+        "codeception/codeception": "^2.4",
+        "codeception/c3": "^2.4"
     },
 	"scripts": {
-		"start": "php -S localhost:3000"
+		"start": "php -S localhost:3000",
+        "test": "codecept run --coverage --coverage-html --coverage-xml",
+        "testv": "codecept run --steps --coverage --coverage-html --coverage-xml"
 	}
 }
