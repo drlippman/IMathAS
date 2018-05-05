@@ -15,7 +15,6 @@ coverage:
         - ./*
     exclude:
         - .git/*
-        - .idea/*
         - javascript/*
         - katex/*
         - mathjax/*
