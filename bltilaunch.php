@@ -1367,15 +1367,20 @@ if ($linkparts[0]=='cid') {
 		$stm->execute(array(':enddate'=>$_SESSION['lti_duedate'], ':datebylti'=>$newdatebylti, ':id'=>$aid));
 		$line['enddate'] = $_SESSION['lti_duedate'];
 	}
-	if (!isset($_SESSION['lti_duedate']) && $line['date_by_lti']==1 && $_SESSION['ltirole']=='instructor') {
+	if (!isset($_SESSION['lti_duedate']) && $line['date_by_lti']==1) {
 		//assessment is set to use dates sent by LTI, but none was sent.  Give error for instructor.
-		$err = 'Your '.$installname.' course is set to use dates sent by the LMS, but the LMS did not send a date. ';
-		$err .= 'Your "App Config" may be old and not contain the necessary info. ';
-		$err .= 'In Canvas, go to Settings -> Apps -> View App Configurations ';
-		$err .= 'and edit the '.$installname.' app. (If you cannot edit it, you may have to ask your ';
-		$err .= 'Canvas admin to edit the app). In the "Custom Fields" box, ';
-		$err .= 'enter this: canvas_assignment_due_at=$Canvas.assignment.dueAt.iso8601';
-		reporterror($err);
+		if ($_SESSION['ltirole'] == 'instructor') {
+			$err = 'Your '.$installname.' course is set to use dates sent by the LMS, but the LMS did not send a date. ';
+			$err .= 'Your "App Config" may be old and not contain the necessary info. ';
+			$err .= 'In Canvas, go to Settings -> Apps -> View App Configurations ';
+			$err .= 'and edit the '.$installname.' app. (If you cannot edit it, you may have to ask your ';
+			$err .= 'Canvas admin to edit the app). In the "Custom Fields" box, ';
+			$err .= 'enter this: canvas_assignment_due_at=$Canvas.assignment.dueAt.iso8601';
+			reporterror($err);
+		} else {
+			$err = 'Tell your teacher that Canvas is not sending due dates.';
+			reporterror($err);
+		}
 	}
 	
 	if ($_SESSION['ltirole']!='instructor') {
