@@ -8,4 +8,19 @@ actor_suffix: Tester
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
+coverage:
+    enabled: true
+    remote: false
+    include:
+        - ./*
+    exclude:
+        - .git/*
+        - .idea/*
+        - javascript/*
+        - katex/*
+        - mathjax/*
+        - migrations/*
+        - tests/*
+        - tinymce4/*
+        - vendor/*
 
