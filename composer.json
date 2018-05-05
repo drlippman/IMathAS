@@ -4,9 +4,12 @@
         "codeception/codeception": "^2.4",
         "codeception/c3": "^2.4"
     },
-	"scripts": {
-		"start": "php -S localhost:3000",
+    "config": {
+        "process-timeout": 0
+    },
+    "scripts": {
+        "start": "php -S localhost:3000 -t .",
         "test": "codecept run --coverage --coverage-html --coverage-xml",
         "testv": "codecept run --steps --coverage --coverage-html --coverage-xml"
-	}
+    }
 }
