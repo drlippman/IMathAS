@@ -28,6 +28,7 @@ if (!(isset($teacherid))) {
 $aid = Sanitize::onlyInt($_GET['aid']);
 $sessiondata['texdisp'] = true;
 $sessiondata['texdoubleescape'] = true;
+$texusealignsformatrix = true;
 
 $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 2;

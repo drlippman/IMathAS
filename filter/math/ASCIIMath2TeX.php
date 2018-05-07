@@ -821,7 +821,11 @@ function AMTparseExpr($str,$rightbracket) {
 							$mxout .= implode('&',$subarr);
 						}
 					}
-					$mxout = "\\begin{array}{".$columnaligns."} ".$mxout."\\end{array}";
+					if (isset($GLOBALS['texusealignsformatrix'])) {
+						$mxout = "\\begin{align} ".$mxout."\\end{align}";
+					} else {
+						$mxout = "\\begin{array}{".$columnaligns."} ".$mxout."\\end{array}";
+					}
 					if ($matrix) {
 						$newFrag = $mxout;
 					}
