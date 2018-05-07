@@ -418,9 +418,19 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 		}
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
+			if (($anstype=='matrix' || $anstype=='calcmatrix') && isset($answersize)) {
+				$oldoptionsanswersize = $options['answersize'];
+				unset($options['answersize']);
+			}
 			list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
+			if (($anstype=='matrix' || $anstype=='calcmatrix') && isset($answersize)) {
+				$options['answersize'] = $oldoptionsanswersize;
+			}
 		}
 	} else {
+		if ($qdata['qtype']=='matrix' || $qdata['qtype']=='calcmatrix') {
+			unset($options['answersize']); //pandoc doesn't like nested tables
+		}
 		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
 	}
 
