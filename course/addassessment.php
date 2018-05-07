@@ -184,6 +184,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if ($_POST['skippenalty']>0) {
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
+		
+		$reqscoretype = 0;
+		if ($_POST['reqscoreshowtype']==1) {
+			$reqscoretype |= 1;
+		}
+		if ($_POST['reqscorecalctype']==1) {
+			$reqscoretype |= 2;
+		}
 		if ($_POST['copyfrom']!=0) {
 			//DB $query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -220,14 +228,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		} else {
 			$_POST['ltisecret'] = '';
-		}
-		
-		$reqscoretype = 0;
-		if ($_POST['reqscoreshowtype']==1) {
-			$reqscoretype |= 1;
-		}
-		if ($_POST['reqscorecalctype']==1) {
-			$reqscoretype |= 2;
 		}
 
 		//is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
@@ -294,7 +294,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $_POST['intro'] = addslashes(myhtmLawed(stripslashes($_POST['intro'])));
 			$_POST['intro'] = myhtmLawed($_POST['intro']);
 		}
-		
+
 		if (isset($_GET['id'])) {  //already have id; update
 			$stm = $DBH->prepare("SELECT isgroup,intro,itemorder,deffeedbacktext FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
@@ -438,12 +438,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
 			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,";
-			$query .= "eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,";
+			$query .= "eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,reqscoretype,noprint,avail,allowlate,";
 			$query .= "exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome,ptsposs,date_by_lti) VALUES ";
 			$query .= "(:courseid, :name, :summary, :intro, :startdate, :enddate, :reviewdate, :timelimit, :minscore, :displaymethod, ";
 			$query .= ":defpoints, :defattempts, :defpenalty, :deffeedback, :shuffle, :gbcategory, :password, :cntingb, :tutoredit, ";
 			$query .= ":showcat, :eqnhelper, :showtips, :caltag, :calrtag, :isgroup, :groupmax, :groupsetid, :showhints, :reqscore, ";
-			$query .= ":reqscoreaid, :noprint, :avail, :allowlate, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
+			$query .= ":reqscoreaid, :reqscoretype, :noprint, :avail, :allowlate, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
 			$query .= ":posttoforum, :istutorial, :defoutcome, 0, :datebylti)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'],
@@ -454,7 +454,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				':tutoredit'=>$tutoredit, ':showcat'=>$_POST['showqcat'], ':eqnhelper'=>$_POST['eqnhelper'], ':showtips'=>$_POST['showtips'],
 				':caltag'=>$caltag, ':calrtag'=>$calrtag, ':isgroup'=>$isgroup, ':groupmax'=>$_POST['groupmax'],
 				':groupsetid'=>$_POST['groupsetid'], ':showhints'=>$showhints, ':reqscore'=>$_POST['reqscore'],
-				':reqscoreaid'=>$_POST['reqscoreaid'], ':noprint'=>$_POST['noprint'], ':avail'=>$_POST['avail'],
+				':reqscoreaid'=>$_POST['reqscoreaid'], ':reqscoretype'=>$reqscoretype, ':noprint'=>$_POST['noprint'], ':avail'=>$_POST['avail'],
 				':allowlate'=>$_POST['allowlate'], ':exceptionpenalty'=>$_POST['exceptionpenalty'], ':ltisecret'=>$_POST['ltisecret'],
 				':endmsg'=>$endmsg, ':deffeedbacktext'=>$deffb, ':msgtoinstr'=>$_POST['msgtoinstr'], ':posttoforum'=>$_POST['posttoforum'],
 				':istutorial'=>$istutorial, ':defoutcome'=>$_POST['defoutcome'], ':datebylti'=>$datebylti));
