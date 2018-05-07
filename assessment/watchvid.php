@@ -71,7 +71,7 @@ if (strpos($url,'vimeo.com/')!==false) {
 }
 if ($doembed) {
 	echo '<html><head><title>Video</title>';
-	echo '<meta name="viewport" content="width=873, initial-scale=1">';
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
 	echo '<style type="text/css"> html, body {margin: 0px} html {padding:0px} body {padding: 10px;}';
 	echo '.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}.video-wrapper-wrapper{width:100%;padding:0;}</style>';
 	echo '<script type="text/javascript">childTimer = window.setInterval(function(){try{window.opener.popupwins[\'video\'] = window;} catch(e){}}, 300);imasroot="";</script>';
