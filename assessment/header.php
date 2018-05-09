@@ -167,12 +167,12 @@ div { zoom: 1; }
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
 <![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=041818";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=050918";?>" type="text/javascript"></script>
 
 <?php
 /*
 <script src="<?php echo $imasroot . "/javascript/general.js?v=012618";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/mathjs.js?v=040718";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/mathjs.js?v=050918";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=041818";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=031018";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/drawing.js?v=030118";?>" type="text/javascript"></script>
