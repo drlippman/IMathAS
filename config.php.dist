@@ -4,6 +4,9 @@
 	//created automatically by install.php
   //(c) 2006 David Lippman
 
+  //uncomment the following line for development
+  //$GLOBALS['environment'] = 'development';
+
   //these settings must be editted before running dbsetup.php
   $dbserver = "localhost";  		//database server
   $dbname = "imas";			//database name
