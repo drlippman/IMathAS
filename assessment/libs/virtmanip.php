@@ -28,7 +28,7 @@
 //Ver 1.0 by David Lippman and Bill Meacham, May 2014
 
 global $allowedmacros;
-array_push($allowedmacros,"vmgetlistener","vmsetupchipmodel","vmchipmodelgetcount","vmsetupnumbertiles","vmnumbertilesgetcount","vmsetupitemsort","vmitemsortgetcontainers","vmsetupnumberlineaddition","vmnumberlineadditiongetvals","vmsetupnumberline","vmnumberlinegetvals","vmsetupnumberlineinterval","vmnumberlineintervalgetvals","vmsetupfractionline","vmgetfractionlinevals","vmsetupfractionmult","vmgetfractionmultvals","vmsetupfractioncompare","vmgetfractioncompareval");
+array_push($allowedmacros,"vmgetlistener","vmgetparam","vmparamtoarray","vmsetupchipmodel","vmchipmodelgetcount","vmsetupnumbertiles","vmnumbertilesgetcount","vmsetupitemsort","vmitemsortgetcontainers","vmsetupnumberlineaddition","vmnumberlineadditiongetvals","vmsetupnumberline","vmnumberlinegetvals","vmsetupnumberlineinterval","vmnumberlineintervalgetvals","vmsetupfractionline","vmgetfractionlinevals","vmsetupfractionmult","vmgetfractionmultvals","vmsetupfractioncompare","vmgetfractioncompareval");
 
 //vmgetlistener(qn,[part])
 //Generates a listener to receive values from virtual manipulatives.
@@ -43,6 +43,37 @@ function vmgetlistener($qn,$part=null) {
 			$("#qn'.$qn.'").val(data[1]);
 		}});});';
 	$out .= '</script>';
+	return $out;
+}
+
+//vmgetparam(parameter string, parameter name)
+//Extracts one parameter value from a parameter string, where
+//parameter string is of the form "name1:value1,name2:value2,name3:value3"
+//returns the value if found, or FALSE if not found
+function vmgetparam($paramstr,$name) {
+	$params = explode(',', $paramstr);
+	foreach ($params as $param) {
+		$p = strpos($param, ':');
+		if ($p !== false && trim(substr($param,0,$p))==$name) {
+			return trim(substr($param,$p+1));
+		}
+	}
+	return false;
+}
+
+//vmparamtoarray(parameter string)
+//Converts a parameter string of the form "name1:value1,name2:value2,name3:value3"
+//into an associative array.  For example, the above would be converted into an
+//array where $a["name1"] would be "value1"
+function vmparamtoarray($paramstr) {
+	$params = explode(',', $paramstr);
+	$out = array();
+	foreach ($params as $param) {
+		$p = strpos($param, ':');
+		if ($p !== false) {
+			$out[trim(substr($param,0,$p))] = trim(substr($param,$p+1));
+		}
+	}
 	return $out;
 }
 
