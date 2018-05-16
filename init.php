@@ -13,6 +13,12 @@ if (!file_exists(__DIR__ . "/config.php")) {
 
 require_once(__DIR__ . "/config.php");
 
+// Development dependencies
+if (isset($GLOBALS['environment']) && 'development' == $GLOBALS['environment']) {
+	require_once(__DIR__ . '/vendor/autoload.php');
+	require_once(__DIR__ . '/c3.php');
+}
+
 // Store PHP sessions in the database.
 require_once(__DIR__ . "/includes/session.php");
 if (!isset($use_local_sessions)) {
@@ -29,3 +35,4 @@ if (!empty($CFG['use_csrfp']) && (!isset($init_skip_csrfp) || (isset($init_skip_
 if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init_skip_validate)) {
 	require_once(__DIR__ . "/validate.php");
 }
+
