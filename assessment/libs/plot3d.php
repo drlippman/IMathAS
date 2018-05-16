@@ -3,39 +3,27 @@
 // Version 2.0 May 3 2018 adding CalcPlot3D functions
 
 global $allowedmacros;
-array_push($allowedmacros,"plot3d","spacecurve","CalcPlot3Dembed","CalcPlot3Dlink");
+array_push($allowedmacros,"plot3d","spacecurve","replace3dalttext","CalcPlot3Dembed","CalcPlot3Dlink");
 
-//plot3d(f(x,y),xmin,xmax,ymin,ymax,[disc,width,height,axes]) or
-//plot3d("[x(u,v),y(u,v),z(u,v)]",umin,umax,vmin,vmax,[disc,width,height,axes,bounds])
+//plot3d(f(x,y),xmin,xmax,ymin,ymax,[disc,width,height,axes,alttext]) or
+//plot3d("[x(u,v),y(u,v),z(u,v)]",umin,umax,vmin,vmax,[disc,width,height,axes,bounds,alttext])
 //discritization is optional - defaults to 20
 //width and height default to 300
 //axes defaults to 1 (on), set to 0 for off
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
-function plot3d($func,$umin,$umax,$vmin,$vmax) {
+//alttext: text for non-visual users. Can also be added later using replace3dalttext
+function plot3d($func,$umin,$umax,$vmin,$vmax,$disc=20,$width=300,$height=300,$axes=1) {
 	global $imasroot;
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
-	if (func_num_args()>5) {
-		$disc = func_get_arg(5);
-		if (!is_numeric($disc)) {
-			$disc = 20;
-		}
-	} else {
-		$disc = 20;
-	}
-	if (func_num_args()>7) {
-		$width = func_get_arg(6);
-		$height = func_get_arg(7);
-	} else {
-		$width = 300;
-		$height = 300;
-	}
-	if (func_num_args()>8) {
-		$axes = func_get_arg(8);
-	} else {
-		$axes = 1;
-	}
+
+	$alt = '3D Plot';
 	if (func_num_args()>14) {
 		$bounds = array_slice(func_get_args(),9,6);
+		if (func_num_args()>15) {
+			$alt = func_get_arg(15);	
+		}
+	} else if (func_num_args()>9) {
+		$alt = func_get_arg(9);	
 	}
 
 	if (strpos($func,',')!==FALSE) {
@@ -130,14 +118,16 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		  }
 	  	  $GLOBALS['3dplotcnt'] = $r;
-	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
+	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
+	  	  $html .= 'role="img" tabindex="0" aria-label="'.Sanitize::encodeStringForDisplay($alt).'" ';
+	  	  $html .= ">";
 	  	  if (isset($bounds)) {
 			  $bndtxt = 'bounds:"' . implode(',',$bounds) . '",';
 		  } else {
 		  	  $bndtxt='';
 		  }
 	  	  $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
-		  $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a>";
+		  $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a></span>";
 	  	  $html .= "</canvas>";
 	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');});</script>";
 	  }
@@ -145,11 +135,12 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 
 }
 
-//spacecurve("[x(t),y(t),z(t)]",tmin,tmax,[disc,width,height,axes,bounds])
+//spacecurve("[x(t),y(t),z(t)]",tmin,tmax,[disc,width,height,axes,bounds,alttext])
 //discritization is optional - defaults to 50
 //width and height default to 300
 //axes defaults to 1 (on), set to 0 for off
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
+//alttext: text for non-visual users. Can also be added later using replace3dalttext
 function spacecurve($func,$tmin,$tmax) {
 	global $imasroot;
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
@@ -175,6 +166,11 @@ function spacecurve($func,$tmin,$tmax) {
 	}
 	if (func_num_args()>12) {
 		$bounds = array_slice(func_get_args(),7,6);
+	}
+	if (func_num_args()>13) {
+		$alt = func_get_arg(13);
+	} else {
+		$alt = '3D Spacecurve';
 	}
 
 	$useragent = $_SERVER['HTTP_USER_AGENT'];
@@ -278,15 +274,22 @@ function spacecurve($func,$tmin,$tmax) {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		 }
 	  	 $GLOBALS['3dplotcnt'] = $r;
-	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\">";
+	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
+	  	 $html .= 'role="img" tabindex="0" aria-label="'.Sanitize::encodeStringForDisplay($alt).'" ';
+	  	 $html .= ">";
+	  	 
 	  	 $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
 		  
-		 $html .= "Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a>";
+		 $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></span>";
 	  	 $html .= "</canvas>";
 	  	 $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');});</script>";
 	}
 
 	  return $html;
+}
+
+function replace3dalttext($plot, $alttext) {
+	return preg_replace('/aria-label="[^"]*"/', 'aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"', $plot);	
 }
 
 //CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])

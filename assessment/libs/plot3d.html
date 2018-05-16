@@ -5,22 +5,32 @@ functions to embed or link to CalcPlot3D.</p>
 <ul>
 <li><a href="#plot3d">plot3d</a></li>
 <li><a href="#spacecurve">spacecurve</a></li>
+<li><a href="#replace3dalttext">replace3dalttext</a></li>
 <li><a href="#CalcPlot3Dembed">CalcPlot3Dembed</a></li>
 <li><a href="#CalcPlot3Dlink">CalcPlot3Dlink</a></li>
 </ul>
 <h3><a name="plot3d">plot3d</a></h3>
-plot3d(f(x,y),xmin,xmax,ymin,ymax,[disc,width,height,axes]) or
-<BR>plot3d("[x(u,v),y(u,v),z(u,v)]",umin,umax,vmin,vmax,[disc,width,height,axes,bounds])
+plot3d(f(x,y),xmin,xmax,ymin,ymax,[disc,width,height,axes,alttext]) or
+<BR>plot3d("[x(u,v),y(u,v),z(u,v)]",umin,umax,vmin,vmax,[disc,width,height,axes,bounds,alttext])
 <BR>discritization is optional - defaults to 20
 <BR>width and height default to 300
 <BR>axes defaults to 1 (on), set to 0 for off
 <BR>bounds: xmin,xmax,ymin,ymax,zmin,zmax
-<BR><h3><a name="spacecurve">spacecurve</a></h3>
-spacecurve("[x(t),y(t),z(t)]",tmin,tmax,[disc,width,height,axes,bounds])
+<br>alttext: text for non-visual users. Can also be added later using replace3dalttext
+
+<h3><a name="spacecurve">spacecurve</a></h3>
+spacecurve("[x(t),y(t),z(t)]",tmin,tmax,[disc,width,height,axes,bounds,alttext])
 <BR>discritization is optional - defaults to 50
 <BR>width and height default to 300
 <BR>axes defaults to 1 (on), set to 0 for off
 <BR>bounds: xmin,xmax,ymin,ymax,zmin,zmax
+<br>alttext: text for non-visual users. Can also be added later using replace3dalttext
+
+<h3><a name="replace3dalttext">replace3dalttext</a></h3>
+replace3dalttext(plot, alttext)
+<br>Replaces or adds alt text to a 3D plot generated with plot3d or spacecurve
+
+
 <h3><a name="CalcPlot3Dembed">CalcPlot3Dembed</a></h3>
 <p>CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])</p>
 <p>Embeds a dynamic figure using <a href="http://www.monroecc.edu/faculty/paulseeburger/CalcPlot3D/">CalcPlot3D</a> 
