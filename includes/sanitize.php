@@ -232,8 +232,12 @@ class Sanitize
 
 		// Sanitize query string
 		$query_map = array();
-		parse_str($parsed_url['query'], $query_map);
-		$encoded_query = http_build_query($query_map);
+		if (isset($parsed_url['query'])) {
+			parse_str($parsed_url['query'], $query_map);
+			$encoded_query = http_build_query($query_map);
+		} else {
+			$encoded_query = '';
+		}
 
 		// Sanitize optional url parts
 		$auth = "";

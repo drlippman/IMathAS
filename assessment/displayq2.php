@@ -548,7 +548,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
 					$extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
 					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
-					echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
+					echo formpopup($extrefpt[0],$extrefpt[1],873,500,"button",true,"video",$qref);
 				} else if ($extrefpt[0]=='read') {
 					echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text",$qref);
 				} else {
@@ -1141,7 +1141,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($answer)) {
 			if (in_array('parenneg',$ansformats) && $answer < 0) {
 				$sa = '('.(-1*$answer).')';
-			} else if (is_numeric($answer) && $answer!=0 && abs($answer)<.001) {
+			} else if (is_numeric($answer) && $answer!=0 && abs($answer)<.001 && abs($answer)>1e-9) {
 				$sa = prettysmallnumber($answer);
 			} else {
 				$sa = $answer;
@@ -3415,7 +3415,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else if (preg_match('/\d\s*(x|y|z|r|t|i|X|Y|Z|I)([^a-zA-Z]|$)/', $gaarr[$k])) {
 				//has a variable - don't strip
 			} else {
-				$gaarr[$k] = preg_replace('/^((-|\+)?\d*\.?\d*E?\-?\d*)[^+\-]*$/','$1',$gaarr[$k]); //strip out units
+				$gaarr[$k] = preg_replace('/^((-|\+)?\d*\.?\d*[Ee]?[+\-]?\d*)[^+\-]*$/','$1',$gaarr[$k]); //strip out units
 			}
 		}
 

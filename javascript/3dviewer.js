@@ -38,7 +38,8 @@ function Viewer3D(paramObj, targetel) {
 	$(t._paper).on('touchstart', function(e) {t.setTouchDown(e)});
 	$(t._paper).on('mouseup touchend', function(e) {t.setMouseUp(e)});
 	$(t._paper).on('mousemove touchmove', function(e) {t.doMouseMove(e)});
-
+	$(t._paper).on('keydown', function(e) {t.doKeydown(e)});
+	
 	t._context.font = "10px sans-serif";
 	t._context.textAlign = "center";
 	t._context.textBaseline = "middle";
@@ -274,6 +275,30 @@ Viewer3D.prototype.doMouseMove = function(e) {
 		t._inrender = false;
 		e.preventDefault();
 	}
+}
+Viewer3D.prototype.doKeydown = function(e) {
+	var t = this;
+	switch (e.keyCode) {
+		case 37:
+			t.theta += 5*t.dfi;
+			break;
+		case 39:
+			t.theta -= 5*t.dfi;
+			break;
+		case 38:
+			t.phi += 5*t.dfi;
+			break;
+		case 40:
+			t.phi -= 5*t.dfi;
+			break;
+		default:
+			return;
+	}
+	t._inrender = true;
+	t.rotate();
+	t.paint();
+	t._inrender = false;
+	e.preventDefault();
 }
 Viewer3D.prototype.rotate = function() {
 	var t = this;

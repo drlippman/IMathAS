@@ -54,6 +54,12 @@ function initcell() {
 	}
 }
 function frameresize() {
+	var imgs = document.getElementsByTagName('img');
+	for (var i=0;i<imgs.length;i++) {
+                if (!imgs[i].complete) {
+                	imgs[i].addEventListener("load", frameresize);
+                }
+        }
 	var default_height = Math.max(
 		document.body.scrollHeight, document.body.offsetHeight,
 		document.documentElement.scrollHeight, document.documentElement.offsetHeight);

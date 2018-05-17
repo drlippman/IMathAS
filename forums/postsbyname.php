@@ -366,7 +366,7 @@
 		if ($line['parent']!=0) {
 			$content .= '</span>';
 		}
-		$dt = tzdate("F j, Y, g:i a",$line['postdate']);
+		$dt = tzdate("D, M j, Y, g:i a",$line['postdate']);
 		$content .= ', Posted: '.Sanitize::encodeStringForDisplay($dt);
 
 		if ($line['lastview']==null || $line['postdate']>$line['lastview']) {

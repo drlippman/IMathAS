@@ -126,6 +126,8 @@ function mathjs(st,varlist) {
 				return '(@v'+i+'@)';
 			}	
 		 }});
+  } else {
+  	  st = st.replace(/pi/g, "(pi)");
   }
   //temp store of scientific notation
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");

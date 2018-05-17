@@ -117,6 +117,10 @@ if (isset($_GET['fixdupgrades'])) {
 	$query .= "ON imas_grades.refid=duplic.refid AND imas_grades.gradetype='forum' WHERE imas_grades.id > duplic.minid";
 	$stm = $DBH->query($query);
 	echo "Removed ".($stm->rowCount())." duplicate forum grade records.<br/>";
+	
+	$stm = $DBH->query("DELETE imas_grades FROM imas_grades LEFT JOIN imas_forum_posts ON imas_grades.refid=imas_forum_posts.id WHERE imas_grades.gradetype='forum' AND imas_forum_posts.userid IS NULL");
+	echo "Removed ".($stm->rowCount())." orphaned forum grade records without a corresponding post.<br/>";
+	
 	echo '<p><a href="utils.php">Utils</a></p>';
 	exit;
 }
@@ -343,6 +347,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="replaceurls.php">Replace URLS</a><br/>';
 	echo '<a href="utils.php?form=rescue">Recover lost items</a><br/>';
 	echo '<a href="utils.php?fixorphanqs=true">Fix orphaned questions</a><br/>';
+	echo '<a href="utils.php?fixdupgrades=true">Fix duplicate forum grades</a><br/>';
 	echo '<a href="utils.php?form=emu">Emulate User</a><br/>';
 	echo '<a href="listextref.php">List ExtRefs</a><br/>';
 	echo '<a href="updateextref.php">Update ExtRefs</a><br/>';

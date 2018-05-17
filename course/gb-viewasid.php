@@ -100,6 +100,7 @@
 						$stugroupmem[] = $row[0];
 					}
 				}
+				if (count($stugroupmem)>0) {
 				//check that no group member has started the assessment
 				$ph = Sanitize::generateQueryPlaceholders($stugroupmem);
 				$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
@@ -118,6 +119,7 @@
 					$asid = $DBH->lastInsertId();
 					$_GET['asid'] = $asid;
 				}
+			}
 			}
 			$stugroupmem[] = $get_uid;
 

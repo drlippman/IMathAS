@@ -210,11 +210,6 @@ $canviewall = (isset($teacherid) || isset($tutorid));
 $dofilter = false;
 $now = time();
 
-$caller = 'thread';
-if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
-	require("posthandler.php");
-}
-
 $grpqs = '';
 if ($groupsetid>0) {
 	if (isset($_GET['ffilter'])) {
@@ -302,6 +297,11 @@ if ($tagfilter != '') {
 		$limthreads = implode(',',$limthreads);  //INT from DB - safe
 	}
 	$dofilter = true;
+}
+
+$caller = 'thread';
+if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
+	require("posthandler.php");
 }
 
 if (isset($_GET['search']) && trim($_GET['search'])!='') {

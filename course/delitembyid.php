@@ -113,6 +113,8 @@ function delitembyid($itemid) {
 		$stm = $DBH->prepare("DELETE FROM imas_forum_threads WHERE forumid=:forumid");
 		$stm->execute(array(':forumid'=>$typeid));
 
+		$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='forum' AND gradetypeid=:forumid");
+		$stm->execute(array(':forumid'=>$typeid));
 
 	} else if ($itemtype == "Assessment") {
 

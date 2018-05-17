@@ -29,7 +29,8 @@
 		$gbmode = $stm->fetchColumn(0);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
-
+	$includeduedate = (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
+	
 	if (isset($tutorsection) && $tutorsection!='') {
 		$secfilter = $tutorsection;
 	} else {
@@ -196,7 +197,11 @@
 	if ($hascodes) {
 		echo '<th>Code</th>';
 	}
-	echo "<th>Grade</th><th>%</th><th>Last Change</th><th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
+	echo "<th>Grade</th><th>%</th><th>Last Change</th>";
+	if ($includeduedate) {
+		echo "<th>Due Date</th>";
+	}
+	echo "<th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
 	$n = 0;
@@ -263,7 +268,11 @@
 					echo '<sup>e</sup>';
 				}
 			}
-			echo "</td><td>-</td><td></td><td></td><td></td>";
+			echo "</td><td>-</td><td></td>";
+			if ($includeduedate) {
+				echo '<td>'.tzdate("n/j/y g:ia",$thisenddate).'</td>';
+			}
+			echo "<td></td><td></td>";
 		} else {
 			$querymap = array(
 				'gbmode' => $gbmode,
@@ -318,6 +327,9 @@
 				}
 			} else {
 				echo '<td>'.tzdate("n/j/y g:ia",$line['endtime']).'</td>';
+			}
+			if ($includeduedate) {
+				echo '<td>'.tzdate("n/j/y g:ia",$thisenddate).'</td>';
 			}
 			if ($line['endtime']==0 || $line['starttime']==0) {
 				echo '<td>&nbsp;</td>';
