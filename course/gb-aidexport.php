@@ -378,7 +378,7 @@ if (isset($_POST['options'])) {
 			  if(preg_match("/[\,\"\n\r]/", $val)) {
 				  $val = '"'.str_replace('"', '""', $val).'"';
 			  }
-			  $line .= $val.',';
+			  $line .= Sanitize::stripHtmlTags($val).',';
 		}
 		# strip the last deliminator
 		$line = substr($line, 0, -1);
