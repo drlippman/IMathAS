@@ -82,6 +82,9 @@ if (isset($CFG['GEN']['favicon'])) {
 } else {
 	echo '<link rel="shortcut icon" href="/favicon.ico" />';
 }
+if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
+	echo csrfProtector::output_header_code();
+}
 //$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; var mathRenderer = "none"; function rendermathnode(el) {AMprocessNode(el);};</script>';
