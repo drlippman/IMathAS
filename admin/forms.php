@@ -56,6 +56,32 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
+	case "anonuser":
+		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$line = $stm->fetch(PDO::FETCH_ASSOC);
+		echo "<p>Are you sure you want to anonymize this user, <b>";
+		printf("%s, %s (%s)", Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
+		echo "</b>?</p>\n";
+	
+		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
+
+		echo '<p>What type of anonymization would you like to do?</p>';
+		echo '<p><input type=radio id="partial" name=anontype value="partial" checked> ';
+		echo '<label for="partial">Replace the user\'s email, username, and password with random values. ';
+		echo 'This will make their account appear to be deleted and un-recoverable using the "forgot username" and "forgot password", ';
+		echo 'but the users\'s name will remain unchanged.</label><br/>';
+		echo '<input type=radio id="full" name=anontype value="full"> ';
+		echo '<label for="full">Replace the user\'s email, username, password, <em>and name</em> with random values. ';
+		echo '</label></p>';
+		
+		echo '<p>Anonymization does NOT delete the user\'s courses or course work</p>';
+		
+		echo '<p><button type=submit name="action" value="anonuser">'._('Anonymize').'</button>';
+		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
+		echo '</form>';
+		break;
 	case "deladmin":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		if ($myrights==100) {
@@ -273,7 +299,8 @@ switch($_GET['action']) {
 			showNewUserValidation("userform");
 		} else if ($myrights==100) {
 			echo '<p>&nbsp;</p><p>&nbsp;</p>';
-			echo '<a href="forms.php?action=deladmin&id='.Sanitize::encodeUrlParam($_GET['id']).'">Delete User</a>';
+			echo '<a href="forms.php?action=deladmin&id='.Sanitize::encodeUrlParam($_GET['id']).'">Delete User</a> ';
+			echo '<a href="forms.php?action=anonuser&id='.Sanitize::encodeUrlParam($_GET['id']).'">Anonymize User</a>';
 		}
 		break;
 	case "modify":

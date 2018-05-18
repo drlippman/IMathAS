@@ -219,6 +219,21 @@ switch($_POST['action']) {
 			$stm->execute(array(':password'=>$md5pw, ':id'=>$_GET['id']));
 		}
 		break;
+	case "anonuser":
+		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		$deluid = Sanitize::onlyInt($_GET['id']);
+		$v = uniqid('anon');
+
+		if ($_POST['anontype']=='full') {
+			$query = "UPDATE imas_users SET FirstName=?,LastName=?,email=?,SID=?,password=? WHERE id=?"; 
+			$qarr = array($v, $v, 'none@none.com', $v, $v, $deluid);
+		} else {
+			$query = "UPDATE imas_users SET email=?,SID=?,password=? WHERE id=?"; 
+			$qarr = array('none@none.com', $v, $v, $deluid);
+		}
+		$stm = $DBH->prepare($query);
+		$stm->execute($qarr);
+		break;
 	case "deladmin":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		$deluid = Sanitize::onlyInt($_GET['id']);
