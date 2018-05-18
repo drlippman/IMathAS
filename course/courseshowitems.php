@@ -1187,9 +1187,11 @@ function showitems($items,$parent,$inpublic=false) {
 				   $alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
 				   $ext = substr($filename,strrpos($filename,'.')+1);
 				   switch($ext) {
-				   	  case 'xls': $icon = 'xls'; break;
+				   	  case 'xlsx':
+				   	  case 'xls': $icon = 'xls'; break;     
 					  case 'pdf': $icon = 'pdf'; break;
 					  case 'html': $icon = 'html'; break;
+					  case 'pptx':
 					  case 'ppt': $icon = 'ppt'; break;
 					  case 'zip': $icon = 'zip'; break;
 					  case 'png':
