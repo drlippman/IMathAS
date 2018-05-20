@@ -27,6 +27,11 @@ Virtual Manipulatives
 <BR>&lt;div style="position:absolute;left:0;right:0;visibility:hidden"&gt;$answerbox&lt;/div&gt;
 <BR>
 <BR>Ver 1.1 by David Lippman and Bill Meacham, May 2018
+<p>For VM writers, a variable called <code>$a11yqs</code> is defined and 
+   can be added to the query string passed to the VM.  It defines three
+   parameters: a11y_graph, a11y_graph, and a11y_keyboard. For each,
+   zero means use an alternative, non-zero means use the default.
+</p>
 <BR><ul>
 <li><a href="#vmgetlistener">vmgetlistener</a></li>
 <li><a href="#vmgetparam">vmgetparam</a></li>

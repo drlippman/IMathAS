@@ -154,6 +154,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['rawscores'])) {
 		$scoreiscorrect = getiscorrect();
 	}
+	$a11yqs = 'a11y_graph='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['graphdisp']);
+	$a11yqs .= '&amp;a11y_keyboard='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['drawentry']);
+	$a11yqs .= '&amp;a11y_math='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['mathdisp']);
+	
+	
 	$preevalerror = error_get_last();
 	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
