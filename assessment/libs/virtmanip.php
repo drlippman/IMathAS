@@ -28,7 +28,28 @@
 //Ver 1.0 by David Lippman and Bill Meacham, May 2014
 
 global $allowedmacros;
-array_push($allowedmacros,"vmgetlistener","vmgetparam","vmparamtoarray","vmsetupchipmodel","vmchipmodelgetcount","vmsetupnumbertiles","vmnumbertilesgetcount","vmsetupitemsort","vmitemsortgetcontainers","vmsetupnumberlineaddition","vmnumberlineadditiongetvals","vmsetupnumberline","vmnumberlinegetvals","vmsetupnumberlineinterval","vmnumberlineintervalgetvals","vmsetupfractionline","vmgetfractionlinevals","vmsetupfractionmult","vmgetfractionmultvals","vmsetupfractioncompare","vmgetfractioncompareval");
+array_push($allowedmacros,"vmsetup","vmgetlistener","vmgetparam","vmparamtoarray","vmsetupchipmodel","vmchipmodelgetcount","vmsetupnumbertiles","vmnumbertilesgetcount","vmsetupitemsort","vmitemsortgetcontainers","vmsetupnumberlineaddition","vmnumberlineadditiongetvals","vmsetupnumberline","vmnumberlinegetvals","vmsetupnumberlineinterval","vmnumberlineintervalgetvals","vmsetupfractionline","vmgetfractionlinevals","vmsetupfractionmult","vmgetfractionmultvals","vmsetupfractioncompare","vmgetfractioncompareval");
+
+function vmsetup($vmname, $vmparams, $width, $height, $qn, $part=null) {
+	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
+	$vmparams['a11y_graph'] = Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['graphdisp']);
+	$vmparams['a11y_mouse'] = Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['drawentry']);
+	$vmparams['a11y_math'] = Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['mathdisp']);
+	$vmparams['qn'] = $qn;
+	
+	if (substr($vmname,0,4)!='http') {
+			$vmname = Sanitize::simpleString($vmname);
+			$vmurl = 'https://s3-us-west-2.amazonaws.com/oervm/'.$vmname.'/'.$vmname.'.html';
+	} else {
+		$vmurl = Sanitize::url($vmname);
+	}
+	$vmurl .= '?'.Sanitize::generateQueryStringFromMap($vmparams);
+	$iframe = '<iframe src="'.$vmurl.'" ';
+	$iframe .= 'width="'.Sanitize::encodeStringForDisplay($width).'" ';
+	$iframe .= 'height="'.Sanitize::encodeStringForDisplay($height).'" ';
+	$iframe .= 'frameborder=0></iframe>';
+	return $iframe;
+}
 
 //vmgetlistener(qn,[part])
 //Generates a listener to receive values from virtual manipulatives.

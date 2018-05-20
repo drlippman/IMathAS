@@ -155,7 +155,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$scoreiscorrect = getiscorrect();
 	}
 	$a11yqs = 'a11y_graph='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['graphdisp']);
-	$a11yqs .= '&amp;a11y_keyboard='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['drawentry']);
+	$a11yqs .= '&amp;a11y_mouse='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['drawentry']);
 	$a11yqs .= '&amp;a11y_math='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['mathdisp']);
 	
 	
