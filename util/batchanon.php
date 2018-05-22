@@ -19,9 +19,9 @@ if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
 		
 		if ($_POST['anontype']=='full') {
 			
-			$query = "UPDATE imas_users SET SID=CONCAT('anon_',MD5(CONCAT(SID, UUID()))),FirstName=SID,LastName=SID,email=?,password=SID "; 
+			$query = "UPDATE imas_users SET SID=CONCAT('anon_',MD5(CONCAT(SID, UUID()))),FirstName=SID,LastName=SID,email=?,password=SID,msgnotify=0 "; 
 		} else {
-			$query = "UPDATE imas_users SET email=?,SID=CONCAT('anon_',MD5(CONCAT(SID, UUID()))),password=SID "; 
+			$query = "UPDATE imas_users SET email=?,SID=CONCAT('anon_',MD5(CONCAT(SID, UUID()))),password=SID,msgnotify=0 "; 
 		}
 		$query .= "WHERE lastaccess<? ";
 		if ($_POST['usertype']=='stu') {
