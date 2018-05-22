@@ -592,8 +592,8 @@ if (isset($_GET['delete'])) {
 		return $out;
 	}
 	if ($linktype=='canvas') {
-		$manifestres[] = '<resource identifier="coursesettings1" href="course_settings/syllabus.html" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" intendeduse="syllabus">
-		      <file href="course_settings/syllabus.html"/>
+		$manifestres[] = '<resource identifier="coursesettings1" href="course_settings/canvas_export.txt" type="associatedcontent/imscc_xmlv1p1/learning-application-resource">
+		      <file href="course_settings/canvas_export.txt"/>
 		      <file href="course_settings/course_settings.xml"/>
 		      <file href="course_settings/assignment_groups.xml"/>
 		      <file href="course_settings/module_meta.xml"/>
@@ -644,7 +644,6 @@ if (isset($_GET['delete'])) {
 		}
 		mkdir($newdir.'/non_cc_assessments');
     		mkdir($newdir.'/course_settings');
-    		file_put_contents($newdir.'/course_settings/syllabus.html', '<html><body> </body></html>'); 
     		file_put_contents($newdir.'/course_settings/canvas_export.txt', "Q: Why do pandas prefer Cartesian coordinates? A: Because they're not polar bears");
     		$fp = fopen($newdir.'/course_settings/assignment_groups.xml','w');
     		fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>'."\n");
