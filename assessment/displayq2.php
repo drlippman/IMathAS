@@ -6863,6 +6863,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else if (isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
 					$la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
 				}
+			} else if (isset($_POST["qn$qnt-0"])) {
+				$tmp = array();
+				$spc = 0;
+				while (isset($_POST["qn$qnt-$spc"])) {
+					$tmp[] = $_POST["qn$qnt-$spc"];
+					$spc++;
+				}
+				$la[$i] = implode('|', $tmp);
 			} else {
 				$la[$i] = $_POST["qn$qnt"];
 			}

@@ -60,6 +60,7 @@ Matrix functions.  Version 1.5, Dec 2017
 <li><a href="#matrixRandomSpan">matrixRandomSpan</a></li>
 <li><a href="#matrixNumberOfRows">matrixNumberOfRows</a></li>
 <li><a href="#matrixNumberOfColumns">matrixNumberOfColumns</a></li>
+<li><a href="#matrixParseStuans">matrixParseStuans</a></li>
 </ul>
 <h3><a name="matrix">matrix</a></h3>
 matrix(vals,rows,cols)
@@ -289,6 +290,14 @@ or one larger than the original matrix's number of rows.</p>
 <p>matrixNumberOfRows(matrix)<br>&nbsp;returns the number of rows of a matrix</p>
 <h3><a name="matrixNumberOfColumns">matrixNumberOfColumns</a></h3>
 <p>matrixNumberOfColumns(matrix)<br>/returns the number of columns of a matrix</p>
+
+<h3><a name="matrixParseStuans">matrixParseStuans</a></h3>
+<p>matrixParseStuans(student answer)</p>
+<p>Converts a students matrix answer into a single array of values</p>
+<p>student answer can come from <code>$stuanswers[$thisq]</code> for single-part
+questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for 
+multi-part</p>
+
 <p>&nbsp;</p>
 <p><br>
 </p>

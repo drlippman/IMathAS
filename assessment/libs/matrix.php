@@ -16,7 +16,7 @@ array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum"
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
-	"matrixGetMinor","matrixDet","matrixRandomMatrix");
+	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.  
@@ -1156,5 +1156,15 @@ function matrixNumberOfRows($m){
 // returns the number of columns of a matrix
 function matrixNumberOfColumns($m){
 	return(count($m[0]));
+}
+
+function matrixParseStuans($stu) {
+	if (substr($stu,0,2)=='[(') {
+		$ansr = substr($stu,2,-2);
+		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
+		return explode(',',$ansr);
+	} else {
+		return explode('|', $stu);
+	}
 }
 ?>
