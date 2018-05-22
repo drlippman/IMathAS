@@ -75,6 +75,7 @@ switch($_GET['action']) {
 		echo '<input type=radio id="full" name=anontype value="full"> ';
 		echo '<label for="full">Replace the user\'s email, username, password, <em>and name</em> with random values. ';
 		echo '</label></p>';
+		echo '<p>Replace email with: <input type=email name=anonemail value="none@none.com" /></p>';
 		
 		echo '<p>Anonymization does NOT delete the user\'s courses or course work</p>';
 		

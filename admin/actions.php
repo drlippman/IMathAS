@@ -223,13 +223,13 @@ switch($_POST['action']) {
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		$deluid = Sanitize::onlyInt($_GET['id']);
 		$v = uniqid('anon');
-
+		$newemail = Sanitize::emailAddress($_POST['anonemail']);
 		if ($_POST['anontype']=='full') {
-			$query = "UPDATE imas_users SET FirstName=?,LastName=?,email=?,SID=?,password=? WHERE id=?"; 
-			$qarr = array($v, $v, 'none@none.com', $v, $v, $deluid);
+			$query = "UPDATE imas_users SET FirstName=?,LastName=?,email=?,SID=?,password=?,msgnotify=0 WHERE id=?"; 
+			$qarr = array($v, $v, $newemail, $v, $v, $deluid);
 		} else {
-			$query = "UPDATE imas_users SET email=?,SID=?,password=? WHERE id=?"; 
-			$qarr = array('none@none.com', $v, $v, $deluid);
+			$query = "UPDATE imas_users SET email=?,SID=?,password=?,msgnotify=0 WHERE id=?"; 
+			$qarr = array($newemail, $v, $v, $deluid);
 		}
 		$stm = $DBH->prepare($query);
 		$stm->execute($qarr);

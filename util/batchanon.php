@@ -15,18 +15,21 @@ echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Batch Anonymize Users</div
 if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
 	$months = Sanitize::onlyFloat($_POST['months']);
 	if ($months>0) {
+		$newemail = Sanitize::emailAddress($_POST['anonemail']);
+		
 		if ($_POST['anontype']=='full') {
-			$query = "UPDATE imas_users SET SID=CONCAT('anon_',UUID_SHORT()),FirstName=SID,LastName=SID,email='none@none.com',password=SID "; 
+			
+			$query = "UPDATE imas_users SET SID=CONCAT('anon_',MD5(CONCAT(SID, UUID()))),FirstName=SID,LastName=SID,email=?,password=SID "; 
 		} else {
-			$query = "UPDATE imas_users SET email='none@none.com',SID=CONCAT('anon_',UUID_SHORT()),password=SID "; 
+			$query = "UPDATE imas_users SET email=?,SID=CONCAT('anon_',MD5(CONCAT(SID, UUID()))),password=SID "; 
 		}
 		$query .= "WHERE lastaccess<? ";
 		if ($_POST['usertype']=='stu') {
 			$query .= "AND rights<11 ";
 		}
 		$stm = $DBH->prepare($query);
-		$old = time() - $months*31*24*60*60;
-		$stm->execute(array($old));
+		$oldtime = time() - $months*31*24*60*60;
+		$stm->execute(array($newemail, $oldtime));
 		$n = $stm->rowCount();
 		echo '<p>'.Sanitize::onlyInt($n).' accounts anonymized (or re-anonymized)</p>';
 		echo '<p><a href="utils.php">Done</a></p>';
@@ -56,7 +59,7 @@ if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
    <label for="full">Replace the user's email, username, password, <em>and name</em> 
    with random values.</label>
 </p>
-		
+<p>Replace email with: <input type=email name=anonemail value="none@none.com" /></p>	
 <p>Anonymization does NOT delete the user's courses or course work</p>
 
 <button type="submit" onclick="return confirm('Are you SURE you want to anonymize all these users?')">Anonymize</button>
