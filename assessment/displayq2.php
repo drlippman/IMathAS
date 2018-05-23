@@ -160,8 +160,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	
 	$preevalerror = error_get_last();
-	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	try {
+		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
+		$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	} catch (Throwable $t) {
+		$res1 = false;
+		$res2 = false;
+	} catch (Exception $e) {
+		$res1 = false;
+		$res2 = false;
+	}
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -841,9 +849,17 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 	}
 	$preevalerror = error_get_last();
-	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	$RND->srand($seed+1);
-	$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	try {
+		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
+		$RND->srand($seed+1);
+		$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	} catch (Throwable $t) {
+		$res1 = false;
+		$res2 = false;
+	} catch (Exception $e) {
+		$res1 = false;
+		$res2 = false;
+	}
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
