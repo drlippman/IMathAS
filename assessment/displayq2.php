@@ -5302,7 +5302,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
 			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + 3*$epsilon;
 			$x4 = $settings[1] + 5*$epsilon;
-			$x0p = $imgborder;
+			$x0p = $xtopix($x0);
 			$x1p = $xtopix($x1); //($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = $xtopix($x2); //($x2 - $settings[0])*$pixelsperx + $imgborder;
 			$x3p = $xtopix($x3); //($x3 - $settings[0])*$pixelsperx + $imgborder;
@@ -6090,6 +6090,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					break;
 				}
 			}
+
 			foreach ($ansabs as $key=>$aabs) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($abs); $i++) {
