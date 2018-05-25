@@ -154,9 +154,22 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['rawscores'])) {
 		$scoreiscorrect = getiscorrect();
 	}
+	$a11yqs = 'a11y_graph='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['graphdisp']);
+	$a11yqs .= '&amp;a11y_mouse='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['drawentry']);
+	$a11yqs .= '&amp;a11y_math='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['mathdisp']);
+	
+	
 	$preevalerror = error_get_last();
-	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	try {
+		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
+		$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	} catch (Throwable $t) {
+		$res1 = false;
+		$res2 = false;
+	} catch (Exception $e) {
+		$res1 = false;
+		$res2 = false;
+	}
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -836,9 +849,17 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 	}
 	$preevalerror = error_get_last();
-	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	$RND->srand($seed+1);
-	$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	try {
+		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
+		$RND->srand($seed+1);
+		$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	} catch (Throwable $t) {
+		$res1 = false;
+		$res2 = false;
+	} catch (Exception $e) {
+		$res1 = false;
+		$res2 = false;
+	}
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -1072,7 +1093,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$shorttip = _('Enter an integer or decimal number');
 			}
 		}
-		$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
+		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
+		}
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to %d decimal places.'), $reqdecimals);
 			$shorttip .= sprintf(_(", accurate to %d decimal places"), $reqdecimals);
@@ -2015,7 +2038,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
 			$shorttip = _('Enter an n-tuple');
 		}
-		$tip .= _('Enter DNE for Does Not Exist');
+		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$tip .= _('Enter DNE for Does Not Exist');
+		}
 
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -2138,8 +2163,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i') . "<br/>";
 			$shorttip = _('Enter a complex number');
 		}
-
-		$tip .= _('Enter DNE for Does Not Exist');
+		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$tip .= _('Enter DNE for Does Not Exist');
+		}
 
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -2470,7 +2496,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6172)') . " <br/>";
 			$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
-			$tip .= _('Enter DNE for an empty set, oo for Infinity');
+			if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+				$tip .= _('Enter DNE for an empty set. Use oo to enter Infinity.');
+			} else {
+				$tip .= _('Use oo to enter Infinity.');
+			}
 			if (isset($reqdecimals)) {
 				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
 			}
@@ -5272,7 +5302,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
 			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + 3*$epsilon;
 			$x4 = $settings[1] + 5*$epsilon;
-			$x0p = $imgborder;
+			$x0p = $xtopix($x0);
 			$x1p = $xtopix($x1); //($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = $xtopix($x2); //($x2 - $settings[0])*$pixelsperx + $imgborder;
 			$x3p = $xtopix($x3); //($x3 - $settings[0])*$pixelsperx + $imgborder;
@@ -6060,6 +6090,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					break;
 				}
 			}
+
 			foreach ($ansabs as $key=>$aabs) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($abs); $i++) {
@@ -6849,6 +6880,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else if (isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
 					$la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
 				}
+			} else if (isset($_POST["qn$qnt-0"])) {
+				$tmp = array();
+				$spc = 0;
+				while (isset($_POST["qn$qnt-$spc"])) {
+					$tmp[] = $_POST["qn$qnt-$spc"];
+					$spc++;
+				}
+				$la[$i] = implode('|', $tmp);
 			} else {
 				$la[$i] = $_POST["qn$qnt"];
 			}
@@ -7307,8 +7346,14 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= '<br/>'._('Do not enter mixed numbers');
 		$shorttip .= _(' (no mixed numbers)');
 	}
-	if ($calledfrom != 'calcmatrix') {
-		$tip .= "<br/>" . _('Enter DNE for Does Not Exist, oo for Infinity');
+	if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
+		if ($calledfrom == 'calcinterval') {
+			$tip .= "<br/>" . _('Enter DNE for an empty set. Use oo to enter Infinity.');
+		} else if ($calledfrom != 'calcmatrix') {
+			$tip .= "<br/>" . _('Enter DNE for Does Not Exist, oo for Infinity');
+		}
+	} else if ($calledfrom == 'calcinterval') {
+		$tip .= "<br/>" . _('Use oo to enter Infinity.');
 	}
 	if (in_array('nodecimal',$ansformats)) {
 		$tip .= "<br/>" . _('Decimal values are not allowed');

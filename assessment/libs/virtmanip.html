@@ -27,10 +27,16 @@ Virtual Manipulatives
 <BR>&lt;div style="position:absolute;left:0;right:0;visibility:hidden"&gt;$answerbox&lt;/div&gt;
 <BR>
 <BR>Ver 1.1 by David Lippman and Bill Meacham, May 2018
+<p>For VM writers, a variable called <code>$a11yqs</code> is defined and 
+   can be added to the query string passed to the VM.  It defines three
+   parameters: a11y_graph, a11y_graph, and a11y_mouse. For each,
+   zero means use an alternative, non-zero means use the default.
+</p>
 <BR><ul>
-<li><a href="#vmgetlistener">vmgetlistener</a></li>
 <li><a href="#vmgetparam">vmgetparam</a></li>
 <li><a href="#vmvmparamtoarray">vmparamtoarray</a></li>
+<li><a href="#vmsetup">vmsetup</a></li>
+<li><a href="#vmgetlistener">vmgetlistener</a></li>
 <li><a href="#vmsetupchipmodel">vmsetupchipmodel</a></li>
 <li><a href="#vmchipmodelgetcount">vmchipmodelgetcount</a></li>
 <li><a href="#vmsetupnumbertiles">vmsetupnumbertiles</a></li>
@@ -50,6 +56,32 @@ Virtual Manipulatives
 <li><a href="#vmsetupfractionmult">vmsetupfractionmult</a></li>
 <li><a href="#vmgetfractionmultvals">vmgetfractionmultvals</a></li>
 </ul>
+
+<h3><a name="vmsetup">vmsetup</a></h3>
+<p>vmsetup(vm name, parameters, width, height, question number, [part number])</p>
+<p>Sets up a virtual manipulative iframe</p>
+<ul>
+  <li>vm name is the name of a VM on the OERVM AWS site, or a URL to another VM</li>
+  <li>parameters is an associative arrays of parameters to be passed to the VM in the query string</li>
+  <li>width, height are the width and height of the iframe</li>
+  <li>qn: use $thisq</li>
+  <li>part: if a multipart or conditional question, put the part index.</li>
+</ul>
+
+<h3><a name="vmgetparam">vmgetparam</a></h3>
+<p>vmgetparam(parameter string, parameter name)</p>
+<p>Extracts one parameter value from a parameter string, where
+the parameter string is of the form <code>"name1:value1,name2:value2,name3:value3"</code>.
+<p>
+<p>Returns the value if found, or FALSE if not found</p>
+
+<h3><a name="vmparamtoarray">vmparamtoarray</a></h3>
+<p>vmparamtoarray(parameter string)</p>
+<p>Converts a parameter string of the form of the form <code>"name1:value1,name2:value2,name3:value3"</code>
+into an associative array.  For example, the above would be converted into an
+array where <code>$a["name1"]</code> would be <code>value1</code>.</p>
+
+
 <h3><a name="vmgetlistener">vmgetlistener</a></h3>
 <p>vmgetlistener(qn,[part])</p>
 <p>Generates a listener to receive values from virtual manipulatives.
@@ -68,20 +100,6 @@ window.parent.postMessage(JSON.stringify(message), "*");
 <p>When using this format, be sure to pass the question number to the manipulative
 in the query string.  <code>qn</code> should be <code>$thisq-1</code> for single-part
 questions, or <code>1000*$thisq + (part index)</code> for multi-part.</p>
-
-<h3><a name="vmgetparam">vmgetparam</a></h3>
-<p>vmgetparam(parameter string, parameter name)</p>
-<p>Extracts one parameter value from a parameter string, where
-the parameter string is of the form <code>"name1:value1,name2:value2,name3:value3"</code>.
-<p>
-<p>Returns the value if found, or FALSE if not found</p>
-
-<h3><a name="vmparamtoarray">vmparamtoarray</a></h3>
-<p>vmparamtoarray(parameter string)</p>
-<p>Converts a parameter string of the form of the form <code>"name1:value1,name2:value2,name3:value3"</code>
-into an associative array.  For example, the above would be converted into an
-array where <code>$a["name1"]</code> would be <code>value1</code>.</p>
-
 
 <BR><h3><a name="vmsetupchipmodel">vmsetupchipmodel</a></h3>
 vmsetupchipmodel(stuans,qn,[part])
