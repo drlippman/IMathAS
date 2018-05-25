@@ -520,5 +520,17 @@ class Sanitize
 	public static function randomQueryStringParam() {
 		return uniqid();
 	}
+	
+	/**
+	 * A function for exporting text within a .imas
+	 * export file. Since this format is intended to
+	 * be a raw copy of the database data, this
+	 * function does nothing.
+	 *
+	 * @return string The "sanitized" content.
+	 */
+	public static function forRawExport($str) {
+		return $str;
+	}
 
 }
