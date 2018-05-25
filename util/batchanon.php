@@ -48,7 +48,7 @@ if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
 	<option value="stu" selected>Students</option>
 	<option value="all">All users</option>
 	</select>
-	who have not logged in for <input type="number" name="months" value="24" style="width:3em" /> months.
+	who have not logged in for <input type="text" name="months" value="24" size="3" /> months.
 </p>
 <p>What type of anonymization would you like to do?</p>
 <p><input type=radio id="partial" name=anontype value="partial" checked> 
@@ -59,7 +59,7 @@ if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
    <label for="full">Replace the user's email, username, password, <em>and name</em> 
    with random values.</label>
 </p>
-<p>Replace email with: <input type=email name=anonemail value="none@none.com" /></p>	
+<p>Replace email with: <input type=text name=anonemail value="none@none.com" /></p>	
 <p>Anonymization does NOT delete the user's courses or course work</p>
 
 <button type="submit" onclick="return confirm('Are you SURE you want to anonymize all these users?')">Anonymize</button>
