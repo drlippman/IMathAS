@@ -51,6 +51,11 @@ function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 	}
 	
 	if ($shuffle&1) {shuffle($questions);}
+	else if ($shuffle&16) {
+		$firstq = array_shift($questions);
+		shuffle($questions);
+		array_unshift($questions, $firstq);
+	}
 	
 	if ($shuffle&2) { //all questions same random seed
 		if ($shuffle&4) { //all students same seed

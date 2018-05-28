@@ -122,7 +122,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$reviewdate = 0;
 		}
 
-		if (isset($_POST['shuffle'])) { $shuffle = 1;} else {$shuffle = 0;}
+		$shuffle = Sanitize::onlyInt($_POST['shuffle']);
 		if (isset($_POST['sameseed'])) { $shuffle += 2;}
 		if (isset($_POST['samever'])) { $shuffle += 4;}
 		if (isset($_POST['reattemptsdiffver']) && $_POST['deffeedback']!="Practice" && $_POST['deffeedback']!="Homework") {
@@ -1165,7 +1165,12 @@ if ($overwriteBody==1) {
 
 
 			<span class=form>Shuffle item order: </span>
-			<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
+			<span class=formright>
+				<select name="shuffle">
+					<option value="0" <?php writeHtmlSelected($line['shuffle']&(1+16),0) ?>>No</option>
+					<option value="1" <?php writeHtmlSelected($line['shuffle']&1,1) ?>>All</option>
+					<option value="16" <?php writeHtmlSelected($line['shuffle']&16,16) ?>>All but first</option>
+				</select>
 			</span><BR class=form>
 			<span class=form>Gradebook Category:</span>
 			<span class=formright>

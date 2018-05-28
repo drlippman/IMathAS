@@ -56,10 +56,14 @@ if (!(isset($teacherid))) {
 			$turnonshuffle = 0;
 			$turnoffshuffle = 0;
 			if (isset($_POST['chgshuffle'])) {
-				if (isset($_POST['shuffle'])) {
+				if ($_POST['shuffle']==1) {
 					$turnonshuffle += 1;
+					$turnoffshuffle += 16;
+				} else if ($_POST['shuffle']==16) {
+					$turnonshuffle += 16;
+					$turnoffshuffle += 1;
 				} else {
-					$turnoffshuffle +=1;
+					$turnoffshuffle += 17;
 				}
 			}
 			if (isset($_POST['chgsameseed'])) {
@@ -885,7 +889,11 @@ $(function() {
 				<td><input type="checkbox" name="chgshuffle" class="chgbox"/></td>
 				<td class="r">Shuffle item order: </td>
 				<td>
-				<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
+				<select name="shuffle">
+					<option value="0" <?php writeHtmlSelected($line['shuffle']&(1+16),0) ?>>No</option>
+					<option value="1" <?php writeHtmlSelected($line['shuffle']&1,1) ?>>All</option>
+					<option value="16" <?php writeHtmlSelected($line['shuffle']&16,16) ?>>All but first</option>
+				</select>
 				</td>
 			</tr>
 
