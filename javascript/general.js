@@ -530,12 +530,14 @@ function togglevideoembed() {
 			els.parent('.fluid-width-video-wrapper').show();
 			jQuery(this).text(' [-]');
 			jQuery(this).attr('title',_("Hide video"));
+			jQuery(this).attr('aria-label',_("Hide embedded video"));
 		} else {
 			els.hide();
 			els.get(0).contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
 			els.parent('.fluid-width-video-wrapper').hide();
 			jQuery(this).text(' [+]');
 			jQuery(this).attr('title',_("Watch video here"));
+			jQuery(this).attr('aria-label',_("Embed video here"));
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
@@ -596,9 +598,13 @@ function setupvideoembeds(i,el) {
 
 	jQuery('<span/>', {
 		text: " [+]",
+		role: "button",
 		title: _("Watch video here"),
+		"aria-label": _("Embed video here"),
 		id: 'videoembedbtn'+videoembedcounter,
 		click: togglevideoembed,
+		keydown: function (e) {if (e.which == 13) { $(this).click();}},
+		tabindex: 0,
 		"class": "videoembedbtn"
 	}).insertAfter(el);
 	videoembedcounter++;
