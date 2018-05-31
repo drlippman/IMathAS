@@ -30,7 +30,7 @@ END;
 	echo <<<END
 <script type="text/javascript">var imasroot = "$imasroot";</script>
 <link rel="stylesheet" href="$imasroot/course/libtree.css?v=090317" type="text/css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="$imasroot/javascript/general.js?v=031111"></script>
 <script type="text/javascript" src="$imasroot/javascript/libtree2.js?v=101717"></script>
 </head>

@@ -75,7 +75,7 @@ if ($doembed) {
 	echo '<style type="text/css"> html, body {margin: 0px} html {padding:0px} body {padding: 10px;}';
 	echo '.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}.video-wrapper-wrapper{width:100%;padding:0;}</style>';
 	echo '<script type="text/javascript">childTimer = window.setInterval(function(){try{window.opener.popupwins[\'video\'] = window;} catch(e){}}, 300);imasroot="";</script>';
-	echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>';
+	echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>';
 	echo '<script type="text/javascript" src="../javascript/general.js"></script>';
 	echo '</head>';
 	echo '<body><div style="width:100%">'.$out.'</div></body></html>';

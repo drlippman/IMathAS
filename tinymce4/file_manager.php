@@ -80,7 +80,7 @@ if (isset($_REQUEST["action"]))
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><?php echo $strings["title"]; ?></title>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="../javascript/jquery.min.js"><\/script>');}
 </script>
