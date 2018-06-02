@@ -222,7 +222,7 @@
 
 		//check for password
 
-		if (trim($adata['password'])!='' && preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/',$adata['password'])) {
+		if (!$isreview && trim($adata['password'])!='' && preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/',$adata['password'])) {
 			//if PW is an IP address, compare against user's
 			$userip = explode('.', $_SERVER['REMOTE_ADDR']);
 			$pwips = explode(',', $adata['password']);
@@ -260,7 +260,7 @@
 				exit;
 			}
 		}
-		if (trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
+		if (!$isreview && trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
 				if (trim($_POST['password'])==trim($adata['password'])) {
