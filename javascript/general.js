@@ -240,23 +240,23 @@ function GB_show(caption,url,width,height) {
 		gb_overlay.onclick = GB_hide;
 		document.getElementsByTagName("body")[0].appendChild(gb_overlay);
 		var gb_window = document.createElement("div");
-		gb_window.setAttribute("aria-role","dialog");
-		gb_window.setAttribute("aria-labelledby","GB_caption");
+		gb_window.setAttribute("role","dialog");
+		gb_window.setAttribute("aria-labelledby","GB_title");
 		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
 		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div>';
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
 		GB_loaded  = true;
 	}
-	document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'"></iframe>';
+	document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
-		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span>Select Libraries<div class="clear"></div>';
+		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span>'+caption;
+		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
 			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;

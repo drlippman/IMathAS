@@ -72,7 +72,7 @@ for ($i=0;$i<3;$i++) {
 	if (count($allcourses[$i])==0) {continue;}
 	echo '<div class="tabpanel" ';
 	if ($usetabs) {
-		echo 'id="homemenutabpanel'.$i.'" aria-labeledby="homemenutab'.$i.'" ';
+		echo 'id="homemenutabpanel'.$i.'" aria-labelledby="homemenutab'.$i.'" ';
 	}
 	if ($usetabs) {
 		echo 'aria-hidden="'.(($firsttab==$i)?'false':'true').'" ';
