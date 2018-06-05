@@ -196,9 +196,11 @@
 	<div id="forumsearch">
 	<form method="post" action="forums.php?cid=<?php echo $cid;?>">
 		<p>
-		Search: <input type=text name="search" value="<?php echo Sanitize::encodeStringForDisplay($searchstr);?>" />
-		<input type="radio" name="searchtype" value="thread" <?php if ($searchtype!='posts') {echo 'checked="checked"';}?>/>All thread subjects
-		<input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts.
+		<label for="search">Search</label>: <input type=text id="search" name="search" value="<?php echo Sanitize::encodeStringForDisplay($searchstr);?>" />
+		<span role="radiogroup" aria-label="what to search">
+		<label><input type="radio" name="searchtype" value="thread" <?php if ($searchtype!='posts') {echo 'checked="checked"';}?>/>All thread subjects</label>
+		<label><input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts</label>
+		</span>
 		<?php
 		if ($tagfilterselect != '') {
 			echo "Limit by $tagfilterselect";

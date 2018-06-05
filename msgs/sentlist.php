@@ -196,7 +196,7 @@ function chgfilter() {
 }
 </script>
 	<form id="qform" method="post" action="sentlist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
-	<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
+	<p><label for="filtercid">Filter by course</label>: <select id="filtercid" onchange="chgfilter()">
 <?php
 	echo "<option value=\"0\" ";
 	if ($filtercid==0) {
@@ -233,7 +233,7 @@ function chgfilter() {
 		printf(" >%s</option>", Sanitize::encodeStringForDisplay($prefix . $row[1]));
 	}
 	echo "</select> ";
-	echo 'By recipient: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
+	echo '<label for="filteruid">By recipient</label>: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
 	if ($filteruid==0) {
 		echo 'selected="selected" ';
 	}

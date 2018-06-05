@@ -168,9 +168,9 @@ switch($_GET['action']) {
 		} else {
 			echo "No Pic ";
 		}
-		echo '<br/><input type="file" name="stupic"/></span><br class="form" />';
+		echo '<br/><input type="file" name="stupic" id="stupic"/></span><br class="form" />';
 		echo '<span class="form"><label for="perpage">Messages/Posts per page:</label></span>';
-		echo '<span class="formright"><select name="perpage">';
+		echo '<span class="formright"><select name="perpage" id="perpage">';
 		for ($i=10;$i<=100;$i+=10) {
 			echo '<option value="'.$i.'" ';
 			if ($i==$line['listperpage']) {echo 'selected="selected"';}
