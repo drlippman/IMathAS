@@ -621,6 +621,9 @@
 	$verified = true;
 
  }
+ if (!empty($flexwidth)) {
+ 	 $nologo = true;
+ }
 
  if (!$verified) {
 	if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
