@@ -680,6 +680,16 @@ function rotateimg(el) {
 	}
 }
 
+function sendLTIresizemsg() {
+	var default_height = Math.max(
+		document.body.scrollHeight, document.body.offsetHeight)+100;
+		//document.documentElement.clientHeight, document.documentElement.scrollHeight,
+		//document.documentElement.offsetHeight
+	if (window.parent != window.self) {
+		parent.postMessage(JSON.stringify({subject:'lti.frameResize', height: default_height}), '*');
+	}
+}
+	
 jQuery(document).ready(function($) {
 	$(window).on("message", function(e) {
 		if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/lti\.frameResize/)) {

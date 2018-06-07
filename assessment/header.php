@@ -85,6 +85,14 @@ if (isset($CFG['GEN']['favicon'])) {
 if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
+if (isset($sessiondata['ltiitemtype']) && ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3)) {
+	echo '<script type="text/x-mathjax-config">
+		MathJax.Hub.Queue(function () {
+			sendLTIresizemsg();
+		});
+		MathJax.Hub.Register.MessageHook("End Process", sendLTIresizemsg);
+	     </script>';
+}
 //$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; var mathRenderer = "none"; function rendermathnode(el) {AMprocessNode(el);};</script>';
@@ -170,11 +178,11 @@ div { zoom: 1; }
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
 <![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=050918";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=060618";?>" type="text/javascript"></script>
 
 <?php
 /*
-<script src="<?php echo $imasroot . "/javascript/general.js?v=012618";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/general.js?v=060618";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/mathjs.js?v=050918";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=041818";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=031018";?>" type="text/javascript"></script>
@@ -239,32 +247,12 @@ if (isset($CFG['GEN']['translatewidgetID'])) {
 }
 if (isset($sessiondata['ltiitemtype'])) {
 	echo '<script type="text/javascript">
-	function sendLTIresizemsg() {
-		var default_height = Math.max(
-							document.body.scrollHeight, document.body.offsetHeight,
-							document.documentElement.clientHeight, document.documentElement.scrollHeight,
-							document.documentElement.offsetHeight)+100;
-		parent.postMessage(JSON.stringify({subject:\'lti.frameResize\', height: default_height}), \'*\');
-	}
 	if (mathRenderer == "Katex") {
 		window.katexDoneCallback = sendLTIresizemsg;
-	} else if (typeof MathJax != "undefined") {
-		MathJax.Hub.Queue(function () {
-			sendLTIresizemsg();
-		});
 	} else {
-		$(function() {
-			sendLTIresizemsg();
-		});
+		$(sendLTIresizemsg);
 	}
 	</script>';
-	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
-		echo '<script type="text/x-mathjax-config">
-			MathJax.Hub.Queue(function () {
-				sendLTIresizemsg();
-			});
-		</script>';
-	}
 }
 echo '</head>';
 if ($isfw!==false) {
