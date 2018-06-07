@@ -521,7 +521,7 @@ echo $ul[0];
 <div id="bmrecout" style="display:none;"></div>
 </div>
 <div id="centercontent" role="main">
-<iframe id="readerframe" name="readerframe" style="width:100%; border:1px solid #ccc;" src="<?php echo $imasroot . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
+<iframe id="readerframe" name="readerframe" title="Selected Content" style="width:100%; border:1px solid #ccc;" src="<?php echo $imasroot . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
 </div>
 <?php
 require("../footer.php");

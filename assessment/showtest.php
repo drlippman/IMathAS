@@ -222,7 +222,7 @@
 
 		//check for password
 
-		if (trim($adata['password'])!='' && preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/',$adata['password'])) {
+		if (!$isreview && trim($adata['password'])!='' && preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/',$adata['password'])) {
 			//if PW is an IP address, compare against user's
 			$userip = explode('.', $_SERVER['REMOTE_ADDR']);
 			$pwips = explode(',', $adata['password']);
@@ -260,7 +260,7 @@
 				exit;
 			}
 		}
-		if (trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
+		if (!$isreview && trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
 				if (trim($_POST['password'])==trim($adata['password'])) {
@@ -901,7 +901,11 @@
 							$lastanswers[$i] = '';
 							$scores[$i] = -1;
 						}
-						if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+						if (($testsettings['shuffle']&4)==4) {
+							//all stu same seed; don't change seed
+						} else if (($testsettings['shuffle']&2)==2 && $i>0) {  //all q same seed
+							$seeds[$i] = $seeds[0];
+						} else if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
 							$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
 							if (count($fs)>1) {
 								//find existing seed and use next one
@@ -1104,7 +1108,11 @@
 				$scores[$i] = -1;
 				$rawscores[$i] = -1;
 				$attempts[$i] = 0;
-				if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+				if (($testsettings['shuffle']&4)==4) {
+					//all stu same seed; don't change seed
+				} else if (($testsettings['shuffle']&2)==2 && $i>0) {  //all q same seed
+					$seeds[$i] = $seeds[0];
+				} else if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
 					$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
 					if (count($fs)>1) {
 						//find existing seed and use next one

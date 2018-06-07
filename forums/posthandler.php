@@ -648,7 +648,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "></span><br class=form/>";
 			}
 			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
-				echo "<span class=form>Post Type:</span><span class=formright>\n";
+				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";
 				echo "<input type=radio name=type id=type0 value=0 ";
 				if ($line['posttype']==0) { echo "checked=1 ";}
 				echo "> <label for=type0>Regular</label><br>\n";
@@ -662,7 +662,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if ($line['posttype']==3) { echo "checked=1 ";}
 				echo "> <label for=type3>Displayed at top and students can only see their own replies</label>\n";
 				echo "</span><br class=form>";
-				echo "<span class=form>Allow replies: </span><span class=formright>\n";
+				
+				echo "<span class=form id=allowreplieslabel>Allow replies: </span><span class=formright role=radiogroup aria-labelledby=allowreplieslabel>\n";
 				echo "<input type=radio name=replyby id=replyby0 value=\"null\" ";
 				if ($line['replyby']==null) { echo "checked=1 ";}
 				echo "/> <label for=replyby0>Use default</label><br/>";
@@ -693,7 +694,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$releasebydate = tzdate("m/d/Y",$now);
 					$releasebytime = tzdate("g:i a",$now);
 				}
-				echo "<span class=form>Release Post:</span><span class=formright>\n";
+				echo "<span class=form id=releasepostlabel>Release Post:</span><span class=formright role=radiogroup aria-labelledby=releasepostlabel>\n";
 				if ($_GET['modify']=='new') {
 					echo "<input type=radio name=releaseon id=releaseon1 value=\"Immediately\" ";
 					if ($thread_lastposttime<=$now) { echo "checked=1 ";}

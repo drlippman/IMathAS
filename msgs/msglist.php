@@ -480,7 +480,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				echo "<input type=hidden name=courseid value=\"".Sanitize::courseId($courseid)."\"/>\n";
 			} else {
 				if ($filtercid>0) {
-					echo "<select name=\"to\" id=\"to\">";
+					echo '<select name="to" id="to" aria-label="'._('Select an individual').'">';
 					echo '<option value="0">Select a recipient...</option>';
 					if ($isteacher || $msgset<2) {
 						//DB $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -551,11 +551,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					echo "</select>";
 					echo "<input type=hidden name=courseid value=\"".Sanitize::courseId($courseid)."\"/>\n";
 				} else {
-					echo '<select name="courseid" onchange="updateTo(this)" aria-label="Select a course">';
+					echo '<select name="courseid" onchange="updateTo(this)" aria-label="'._('Select a course').'">';
 					echo '<option value="0">Select a course...</option>';
 					echo $courseopts;
 					echo '</select><br/>';
-					echo '<select name="to" id="to" style="display:none;" aria-label="Select an individual ">';
+					echo '<select name="to" id="to" style="display:none;" aria-label="'._('Select an individual').'">';
 					echo '<option value="0">Select an individual...</option></select>';
 				}
 
@@ -815,7 +815,7 @@ function chgfilter() {
 }
 </script>
 	<form id="qform" method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
-	<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
+	<p><label for="filtercid">Filter by course</label>: <select id="filtercid" onchange="chgfilter()">
 <?php
 
 	$query = "SELECT DISTINCT imas_courses.id,imas_courses.name,";
@@ -857,7 +857,7 @@ function chgfilter() {
 	}
 	echo "</select> ";
 	
-	echo 'By sender: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
+	echo '<label for="filteruid">By sender</label>: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
 	if ($filteruid==0) {
 		echo 'selected="selected" ';
 	}

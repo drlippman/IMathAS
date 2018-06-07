@@ -1248,10 +1248,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-			$out .= "<span $style id=\"qnwrap$qn\">";
+			$out .= "<span $style id=\"qnwrap$qn\" role=radiogroup aria-label=\""._('Select an answer')."\">";
 		} else if ($displayformat != 'select') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\">";
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=radiogroup aria-label=\""._('Select an answer')."\">";
 		}
 		if ($displayformat == "select") {
 			$msg = '?';
@@ -1262,21 +1262,21 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 			}
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style><option value=\"NA\">$msg</option>\n";
+			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style aria-label=\""._('Select an answer')."\"><option value=\"NA\">$msg</option>\n";
 		} else if ($displayformat == "horiz") {
 
 		} else if ($displayformat == "inline") {
 
 		} else if ($displayformat == 'column') {
 
-		}  else {
-			$out .= "<ul class=nomark>";
+		} else {
+			$out .= '<ul class=nomark>';
 		}
 
 
 		for ($i=0; $i < count($randkeys); $i++) {
 			if ($displayformat == "horiz") {
-				$out .= "<div class=choice ><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/><input type=radio id=\"qn$qn-$i\" name=qn$qn value=$i ";
+				$out .= "<div class=choice><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/><input type=radio id=\"qn$qn-$i\" name=qn$qn value=$i ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " /></div>\n";
 			} else if ($displayformat == "select") {
@@ -1381,10 +1381,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-			$out .= "<span $style id=\"qnwrap$qn\">";
+			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
 		} else  {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\">";
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
 		}
 		if ($displayformat == "horiz") {
 

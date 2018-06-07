@@ -579,7 +579,9 @@ echo "<input type=hidden name=cid value=\"$cid\"/>";
 echo "<input type=hidden name=forum value=\"$forumid\"/>";
 
 ?>
-<label for="search">Search</label>: <input type=text name="search" id="search" /> <input type=checkbox name="allforums" id="allforums" /> <label for="allforums">All forums in course?</label> <input type="submit" value="Search"/>
+<label for="search">Search</label>: <input type=text name="search" id="search" /> 
+<input type=checkbox name="allforums" id="allforums" /> <label for="allforums">All forums in course?</label> 
+<input type="submit" value="Search"/>
 </form>
 <?php
 if ($isteacher && $groupsetid>0) {
@@ -616,7 +618,7 @@ if ($isteacher && $groupsetid>0) {
 	echo "  window.location = \"thread.php?page=$pages&cid=$cid&forum=$forumid&ffilter=\"+ffilter;";
 	echo '}';
 	echo '</script>';*/
-	echo '<p>Show posts for group: <select id="ffilter" onChange="chgfilter()"><option value="-1" ';
+	echo '<p><label for="ffilter">Show posts for group</label>: <select id="ffilter" onChange="chgfilter()"><option value="-1" ';
 	if ($curfilter==-1) { echo 'selected="1"';}
 	echo '>All groups</option>';
 	foreach ($groupnames as $gid=>$gname) {
