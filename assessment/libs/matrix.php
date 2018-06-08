@@ -1061,7 +1061,7 @@ function matrixAspansB($A,$B){
 //matrixAbasisForB(matrix A, matrix B)
 //tests if the rows of A are a basis for the row space of B
 function matrixAbasisForB($A,$B){
-	if(count($A[0]!=$B[0])){
+	if(count($A[0])!=count($B[0])){
 		echo("The number of columns of A must equal to the number of columns of B");
 	}
 	$retVal = true;
