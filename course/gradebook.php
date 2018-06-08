@@ -330,9 +330,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "&gt; ", _('Gradebook'), "</div>";
 	}
 	if ($stu==-1) {
-		echo '<div id="headergradebook" class="pagetitle"><h2>', _('Grade Book Averages'), ' </h2></div>';
+		echo '<div id="headergradebook" class="pagetitle"><h1>', _('Grade Book Averages'), ' </h1></div>';
 	} else {
-		echo '<div id="headergradebook" class="pagetitle"><h2>', _('Grade Book Student Detail'), '</h2></div>';
+		echo '<div id="headergradebook" class="pagetitle"><h1>', _('Grade Book Student Detail'), '</h1></div>';
 	}
 	if ($canviewall) {
 		echo "<div class=cpmid>";
@@ -408,11 +408,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "&gt; ", _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 
-	echo '<div id="headergradebook" class="pagetitle"><h2>', _('Gradebook'), ' <span class="noticetext" id="newflag" style="font-size: 70%" >';
+	echo '<div id="headergradebook" class="pagetitle"><h1>', _('Gradebook'), ' <span class="noticetext" id="newflag" style="font-size: 70%" >';
 	if (($coursenewflag&1)==1) {
 		echo _('New');
 	}
-	echo '</span></h2></div>';
+	echo '</span></h1></div>';
 	if ($isdiag) {
 		echo "<a href=\"gb-testing.php?cid=$cid\">", _('View diagnostic gradebook'), "</a>";
 	}

@@ -808,7 +808,7 @@ if (isset($_GET['delete'])) {
 	getsubinfo($items,'0','',false,'|- ');
 
 
-	echo '<h2>Common Cartridge Export</h2>';
+	echo '<h1>Common Cartridge Export</h1>';
 	echo '<p>This feature will allow you to export a v1.1 compliant IMS Common Cartridge export of your course, which can ';
 	echo 'then be loaded into other Learning Management Systems that support this standard.  Inline text, web links, ';
 	echo 'course files, and forums will all transfer reasonably well, but be aware that any math exported will call back to this server for display.</p>';

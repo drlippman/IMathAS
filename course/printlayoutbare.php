@@ -60,7 +60,7 @@ if ($overwriteBody==1) {
 	}
 	echo '</div>';
 
-	echo "<h2>Copy-and-Paste Print Version</h2>";
+	echo "<h1>Copy-and-Paste Print Version</h1>";
 
 	echo '<p>This page will help you create a copy of this assessment that you should be able to cut and ';
 	echo 'paste into Word or another word processor and adjust layout for printing</p>';

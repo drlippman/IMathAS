@@ -10,8 +10,8 @@ $nologo = true;
 	
 ?>
 
-<h2>Guides</h2>
-<h4>Use Guides</h4>
+<h1>Guides</h1>
+<h3>Use Guides</h3>
 <ul>
 <li><a href="GettingStarted.pdf">Getting Started in WAMAP</a> (PDF file).  A walkthrough of creating a course in WAMAP, with screenshots.  This
    version is specific to the WAMAP installation of IMathAS, but applies to any installation.</li>
@@ -25,7 +25,7 @@ $nologo = true;
 
 </ul>
 
-<h4>Video Guides</h4>
+<h3>Video Guides</h3>
 <ul>
 <li><a href="http://www.imathas.com/imathas/docs/gettingstarted/gettingstarted.html">Getting Started in IMathAS</a> video guide.</li>
 <li><a href="http://www.imathas.com/training.html">Training Videos</a>.  A complete training course set of video guides.</li>
@@ -34,7 +34,7 @@ $nologo = true;
   course assignments created by your colleagues.</li>
 <li><a href="http://www.imathas.com/imathas/docs/docs.html">Video versions of several other guides</a> are also available.</p>
 </ul>
-<h4>Question Writing Guides</h4>
+<h3>Question Writing Guides</h3>
 <ul>
 <li><a href="introquestionwriting.html">Intro to Question Writing in IMathAS</a>.  A step-by-step guide for writing
    your first IMathAS question.</li>
@@ -43,7 +43,7 @@ $nologo = true;
 <li><a href="langquickref.doc">Language Quick Reference</a>.  Short document with quick function reference.</li>
 </ul>
 
-<h2>Documentation</h2>
+<h1>Documentation</h1>
 <ul>
 <li><a href="../help.html">Help file</a>.  Detailed documentation of all of IMathAS's features and
    question language</li>

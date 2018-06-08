@@ -79,8 +79,8 @@
 	}
 
 
-	echo '<div id="headerisolateassessgrade" class="pagetitle"><h2>';
-	echo "Group grades for " . Sanitize::encodeStringForDisplay($name) . "</h2></div>";
+	echo '<div id="headerisolateassessgrade" class="pagetitle"><h1>';
+	echo "Group grades for " . Sanitize::encodeStringForDisplay($name) . "</h1></div>";
 	echo "<p>$totalpossible points possible</p>";
 
 //	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";

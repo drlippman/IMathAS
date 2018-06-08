@@ -794,7 +794,7 @@ function chkgrp(frm, arr, mark) {
 </script>
 
 <?php echo $curBreadcrumb; ?>
-	<div id="headerimportitems" class="pagetitle"><h2>Import Course Items</h2></div>
+	<div id="headerimportitems" class="pagetitle"><h1>Import Course Items</h1></div>
 	<form id="qform" enctype="multipart/form-data" method=post action="importitems.php?cid=<?php echo $cid ?>">
 
 <?php
@@ -816,7 +816,7 @@ function chkgrp(frm, arr, mark) {
 		} else {
 			echo $page_fileHiddenInput;
 ?>
-		<h3>Package Description</h3>
+		<h2>Package Description</h2>
 		<?php echo Sanitize::encodeStringForDisplay($desc); ?>
 
 

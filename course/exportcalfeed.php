@@ -59,7 +59,7 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$cou
 echo '&gt; <a href="showcalendar.php?cid='.$cid.'">'._('Calendar').'</a> ';
 echo '&gt; '._('Generate Calendar Feed').'</div>';
 
-echo '<div id="headercalfeed" class="pagetitle"><h2>'._('Generate Calendar Feed').'</h2></div>';
+echo '<div id="headercalfeed" class="pagetitle"><h1>'._('Generate Calendar Feed').'</h1></div>';
 
 echo '<p>';
 echo _('The link below can be used to subscribe to a calendar feed for the due dates and events in this course. ');
@@ -95,16 +95,16 @@ echo '<div class="form"><button type="button" onclick="updatecallink()">'._('Upd
 echo '<span id="updatenotice" class="noticetext"></span></div>';
 echo '</fieldset></form>';
 */
-echo '<h3>'._('To load in the calendar feed').'</h3>';
+echo '<h2>'._('To load in the calendar feed').'</h2>';
 echo '<p>'._('Start by copying the link above. Usually you can do that by right-clicking on it and Copy Link Address').'</p>';
-echo '<h4>'._('Google Calendar').'</h4>';
+echo '<h3>'._('Google Calendar').'</h3>';
 echo '<p>';
 echo _('In the left column, click the triangle after "Other calendars" and select "Add by URL". Paste in the feed link and Add Calendar.');
 echo '</p><p>';
 echo _('If you wish to set up notifications/alarms, after adding the calendar click the arrow that shows when you hover over the calendar. Click Edit Notifications, then under Event Notifications click Add a notification.');
 echo '</p>';
 
-echo '<h4>'._('iOS').'</h4>';
+echo '<h3>'._('iOS').'</h3>';
 echo '<p>';
 echo _('Go to Settings, then "Mail, Contacts, and Calendars". Tap "Add Account", then "Other". Tap "Add Subscribed Calendar" and paste in the feed link.');
 echo '</p>';

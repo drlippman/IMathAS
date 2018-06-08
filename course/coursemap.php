@@ -177,7 +177,7 @@ echo "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDispla
 echo _('Course Map');
 echo '</div>';
 
-echo '<div id="headercoursemap" class="pagetitle"><h2>'._('Course Map').'</h2></div>';
+echo '<div id="headercoursemap" class="pagetitle"><h1>'._('Course Map').'</h1></div>';
 echo '<p>'._('Select an item to jump to its location in the course, or a folder to view the contents').'</p>';
 echo '<ul class="qview coursemap">';
 showitemtree($items,'0');

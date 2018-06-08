@@ -51,7 +51,7 @@ h2,h3,h4,h5,h6 {
 		echo "</head><body>\n";
 	}
 	if (isset($_GET['section']) && !isset($_GET['bare'])) {
-		echo '<div id="headerindex" class="pagetitle"><h2>'.$installname.' Help</h2></div>';
+		echo '<div id="headerindex" class="pagetitle"><h1>'.$installname.' Help</h1></div>';
 	}
 
 

@@ -606,7 +606,7 @@ if ($overwriteBody==1) {
 <?php
 	}
    makeTopMenu();
-   echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>".Sanitize::encodeStringForDisplay($curname)."</h2></div>\n";
+   echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>".Sanitize::encodeStringForDisplay($curname)."</h1></div>\n";
 
    if (count($items)>0) {
 

@@ -94,7 +94,7 @@ Read   Deleted   Deleted by Sender   Tagged
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Sent Message List</div>";
-	echo '<div id="headersentlist" class="pagetitle"><h2>Sent Messages</h2></div>';
+	echo '<div id="headersentlist" class="pagetitle"><h1>Sent Messages</h1></div>';
 
 	echo "<div class=\"cpmid\"><a href=\"msglist.php?cid=$cid\">Received Messages</a></div>";
 

@@ -127,7 +127,7 @@ if (isset($_POST['tname'])) {
 	}
 	if (isset($_GET['delete'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Delete Tool</div>";
-		echo "<h2>Delete Tool</h2>";
+		echo "<h1>Delete Tool</h1>";
 		//DB $query = "SELECT name FROM imas_external_tools WHERE id='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $name = mysql_result($result,0,0);
@@ -144,7 +144,7 @@ if (isset($_POST['tname'])) {
 
 	} else if (isset($_GET['id'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Edit Tool</div>";
-		echo "<h2>Edit Tool</h2>";
+		echo "<h1>Edit Tool</h1>";
 		if ($_GET['id']=='new') {
 			$name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = 3; $grp = 0;
 		} else {
@@ -215,7 +215,7 @@ if (isset($_POST['tname'])) {
 
 	} else {
 		echo " &gt; External Tools</div>";
-		echo "<h2>External Tools</h2>";
+		echo "<h1>External Tools</h1>";
 
 		if ($isadmin) {
 			echo '<p><b>System and Group Tools</b></p>';

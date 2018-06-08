@@ -122,7 +122,7 @@ if ($overwriteBody==1) {
 ?>
 
 <div class=breadcrumb><?php echo $curBreadcrumb; ?></div>
-<h3><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h3>
+<h2><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h2>
 Are you SURE you want to delete this text item?
 	<form method="POST" action="deleteinlinetext.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>

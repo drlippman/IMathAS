@@ -304,7 +304,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=".Sanitize::courseId($cid)."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	echo "<a href=\"thread.php?page=".Sanitize::onlyInt($page)."&cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($forumid)."\">Forum Topics</a> &gt; Search Results</div>\n";
 
-	echo "<h2>Forum Search Results</h2>";
+	echo "<h1>Forum Search Results</h1>";
 
 	if (!isset($_GET['allforums']) && $postbeforeview && !$canviewall) {
 		//DB $query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";
@@ -435,7 +435,7 @@ require("../header.php");
 
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Forum Topics</div>\n";
-echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h2></div>';
+echo '<div id="headerthread" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 
 if ($duedates!='') {
 	//$duedates contains HTML from above
@@ -454,12 +454,12 @@ if ($postinstr != '' || $replyinstr != '') {
 	echo '</a>';
 	echo '<div id="postreplyinstr" style="display:none;" class="intro">';
 	if ($postinstr != '') {
-		echo '<h4>'._('Posting Instructions').'</h4>';
+		echo '<h3>'._('Posting Instructions').'</h3>';
 		// $postinstr contains HTML.
 		echo Sanitize::outgoingHtml($postinstr);
 	}
 	if ($replyinstr != '') {
-		echo '<h4>'._('Reply Instructions').'</h4>';
+		echo '<h3>'._('Reply Instructions').'</h3>';
 		// $postinstr contains HTML.
 		echo Sanitize::outgoingHtml($replyinstr);
 	}

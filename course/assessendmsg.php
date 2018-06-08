@@ -89,7 +89,7 @@ require_once("../includes/htmLawed.php");
 		$endmsg['msgs'] = array();
 		$endmsg['commonmsg'] = '';
 	}
-	echo '<div id="headerassessendmsg" class="pagetitle"><h2>End of Assessment Messages</h2></div>';
+	echo '<div id="headerassessendmsg" class="pagetitle"><h1>End of Assessment Messages</h1></div>';
 	echo "<form method=\"post\" action=\"assessendmsg.php?cid=$cid&amp;record=true\" />";
 	if (isset($_POST['checked'])) {
 		echo '<input type="hidden" name="aidlist" value="' . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . '" />';

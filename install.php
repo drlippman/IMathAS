@@ -186,7 +186,7 @@ p.imp {
 <title>IMathAS Install</title>
 </head>
 <body>
-<h2>IMathAS Install</h2>
+<h1>IMathAS Install</h1>
 <?php
 if (extension_loaded("suhosin")) {
 	echo '<p><b>Warning</b>:  It appears the Suhosin PHP extension is loaded on this server.  ';
@@ -197,7 +197,7 @@ if (extension_loaded("suhosin")) {
 changed.  The rest of the settings autopopulate to reasonable defaults but can be
 changed to allow for customization.</p>
 <form method="post" action="install.php?submit=true">
-<h3>Database Settings</h3>
+<h2>Database Settings</h2>
 <p class="imp">
 Database server.  Could be localhost or mysql.yoursite.edu<br/>
 <input type="text" name="dbserver" value="localhost" />
@@ -222,7 +222,7 @@ Database password.  The password for the database user above.<br/>
 <b>The database and database user you provided above must already exist.</b>
 </p>
 
-<h3>Customization</h3>
+<h2>Customization</h2>
 <p>
 The name of this installation.  This allows you to custom-brand the site<br/>
 <input type="text" name="installname" value="IMathAS" />
@@ -271,7 +271,7 @@ Color shift icons from green to red as deadlines approach?<br/>
 <input type="radio" name="colorshift" value="false" /> No
 </p>
 
-<h3>Settings</h3>
+<h2>Settings</h2>
 
 <p>
 Path to IMathAS install.  Blank if install is in web root directory.  Might be something like "/imathas" if in a

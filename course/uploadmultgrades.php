@@ -242,7 +242,7 @@ if (!(isset($teacherid))) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
-echo '<div id="headeruploadmultgrades" class="pagetitle"><h2>Upload Multiple Grades</h2></div>';
+echo '<div id="headeruploadmultgrades" class="pagetitle"><h1>Upload Multiple Grades</h1></div>';
 if ($overwriteBody==1) {
 	echo $body;
 } else {

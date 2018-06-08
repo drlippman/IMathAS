@@ -14,7 +14,7 @@ if (empty($_GET['badgeid'])) {
 	require("../header.php");
 
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Badge Settings</div>';
-	echo '<div id="headerbadgesettings" class="pagetitle"><h2>Badge Settings</h2></div>';
+	echo '<div id="headerbadgesettings" class="pagetitle"><h1>Badge Settings</h1></div>';
 
 	//DB $query = "SELECT id,name FROM imas_badgesettings WHERE courseid='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -133,7 +133,7 @@ if (empty($_GET['badgeid'])) {
 		require("../header.php");
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; <a href="definebadges.php?cid='.$cid.'">Badge Settings</a> ';
 		echo '&gt; Details</div>';
-		echo '<div id="headerbadgesettings" class="pagetitle"><h2>Badge Setting Details</h2></div>';
+		echo '<div id="headerbadgesettings" class="pagetitle"><h1>Badge Setting Details</h1></div>';
 
 		echo '<form method="post" action="definebadges.php?cid='.$cid.'&amp;badgeid='.$badgeid.'">';
 

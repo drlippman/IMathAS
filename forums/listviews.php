@@ -30,7 +30,7 @@ $flexwidth = true;
 $nologo = true;
 require("../header.php");
 
-echo '<h4>'._('Thread Views').'</h4>';
+echo '<h3>'._('Thread Views').'</h3>';
 
 //DB $query = "SELECT iu.LastName,iu.FirstName,ifv.lastview FROM imas_users AS iu JOIN ";
 //DB $query .= "imas_forum_views AS ifv ON iu.id=ifv.userid WHERE ifv.threadid=$thread ORDER BY ifv.lastview";

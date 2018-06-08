@@ -337,9 +337,9 @@
 	echo "&gt; Offline Grades</div>";
 
 	if ($_GET['gbitem']=='new') {
-		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h2>Add Offline Grades</h2></div>";
+		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h1>Add Offline Grades</h1></div>";
 	} else {
-		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h2>Modify Offline Grades</h2></div>";
+		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h1>Modify Offline Grades</h1></div>";
 	}
 
     printf("<form id=\"mainform\" method=post action=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&gbitem=%s&grades=%s\">",
@@ -526,7 +526,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		$stm = $DBH->prepare("SELECT name,rubric,points FROM imas_gbitems WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['gbitem']));
 		list($rubname, $rubric, $points) = $stm->fetch(PDO::FETCH_NUM);
-		echo '<h3>'.Sanitize::encodeStringForDisplay($rubname).'</h3>';
+		echo '<h2>'.Sanitize::encodeStringForDisplay($rubname).'</h2>';
 		//DB $rubric = mysql_result($result,0,1);
 		//DB $points = mysql_result($result,0,2);
 	    }
@@ -536,7 +536,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		$stm = $DBH->prepare("SELECT name,rubric,points FROM imas_gbitems WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['gbitem']));
 		list($rubname, $rubric, $points) = $stm->fetch(PDO::FETCH_NUM);
-		echo '<h3>'.Sanitize::encodeStringForDisplay($rubname).'</h3>';
+		echo '<h2>'.Sanitize::encodeStringForDisplay($rubname).'</h2>';
 		//DB $rubric = mysql_result($result,0,1);
 		//DB $points = mysql_result($result,0,2);
 	}

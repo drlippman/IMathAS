@@ -122,7 +122,7 @@ $pagetitle = _('New Forum Posts');
 require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; New Forum Posts</div>\n";
-echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
+echo '<div id="headernewthreads" class="pagetitle"><h1>New Forum Posts</h1></div>';
 echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?from=".Sanitize::encodeUrlParam($from)."&cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
 
 if (count($lastpost)>0) {

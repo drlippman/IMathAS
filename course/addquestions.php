@@ -153,7 +153,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$aid));
 			$assessmentname = $stm->fetchColumn(0);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
-			$body .= "<h3>".Sanitize::encodeStringForDisplay($assessmentname)."</h3>";
+			$body .= "<h2>".Sanitize::encodeStringForDisplay($assessmentname)."</h2>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= '<form method="POST" action="'.sprintf('addquestions.php?cid=%s&aid=%d',$cid, $aid).'">';
 			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
@@ -366,7 +366,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$overwriteBody = 1;
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
-			$body .= "<h3>Withdraw Question</h3>";
+			$body .= "<h2>Withdraw Question</h2>";
 			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw=".Sanitize::encodeStringForDisplay($_GET['withdraw'])."\">";
 			if ($isingroup) {
 				$body .= '<p><b>This question is part of a group of questions</b>.  </p>';
@@ -1170,14 +1170,14 @@ if ($overwriteBody==1) {
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 
-	<div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions
+	<div id="headeraddquestions" class="pagetitle"><h1>Add/Remove Questions
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-	</h2></div>
+	</h1></div>
 <?php
 	echo '<div class="cp"><a href="addassessment.php?id='.Sanitize::onlyInt($_GET['aid']).'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';
 	if ($beentaken) {
 ?>
-	<h3>Warning</h3>
+	<h2>Warning</h2>
 	<p>This assessment has already been taken.  Adding or removing questions, or changing a
 		question's settings (point value, penalty, attempts) now would majorly mess things up.
 		If you want to make these changes, you need to clear all existing assessment attempts
@@ -1187,7 +1187,7 @@ if ($overwriteBody==1) {
 <?php
 	}
 ?>
-	<h3>Questions in Assessment - <?php echo Sanitize::encodeStringForDisplay($page_assessmentName); ?></h3>
+	<h2>Questions in Assessment - <?php echo Sanitize::encodeStringForDisplay($page_assessmentName); ?></h2>
 
 <?php
 	if ($itemorder == '') {
@@ -1296,7 +1296,7 @@ if ($overwriteBody==1) {
 		if (!$beentaken) {
 ?>
 
-	<h3>Potential Questions</h3>
+	<h2>Potential Questions</h2>
 	<form method=post action="addquestions.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
 
 		In Libraries:
@@ -1426,7 +1426,7 @@ if ($overwriteBody==1) {
 	} else if ($sessiondata['selfrom'.$aid]=='assm') { //select from assessments
 ?>
 
-	<h3>Potential Questions</h3>
+	<h2>Potential Questions</h2>
 
 <?php
 		if (isset($_POST['achecked']) && (count($_POST['achecked'])==0)) {
@@ -1501,7 +1501,7 @@ if ($overwriteBody==1) {
 <?php
 		} else {  //choose assessments
 ?>
-		<h4>Choose assessments to take questions from</h4>
+		<h3>Choose assessments to take questions from</h3>
 		<form id="sela" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
 		Check: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)">None</a>
 		<input type=submit value="Use these Assessments" /> or

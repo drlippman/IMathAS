@@ -91,9 +91,9 @@ function print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout,
 	global $installname, $imasroot;
 	$coursetheme = "default.css";
 	require("../header.php");
-	echo '<h2>Badge: '.Sanitize::encodeStringForDisplay($name).'</h2>';
+	echo '<h1>Badge: '.Sanitize::encodeStringForDisplay($name).'</h1>';
 	if ($stuout != null) {
-		echo '<h3>'.$stuname. ' ('.$email.')</h3>';
+		echo '<h2>'.$stuname. ' ('.$email.')</h2>';
 	}
 	if ($descr!='') {echo '<p>'.Sanitize::encodeStringForDisplay($descr).'</p>';}
 	if ($longdescr!='') {echo '<p>'.Sanitize::encodeStringForDisplay($longdescr).'</p>';}

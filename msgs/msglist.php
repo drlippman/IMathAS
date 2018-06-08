@@ -214,7 +214,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
-				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
+				$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 				$message .= "<p>You've received a new message</p><p>From: $userfullname<br />Course: $cname.</p>\r\n";
 				//DB $message .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
         $message .= "<p>Subject: ". Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
@@ -296,10 +296,10 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($replyto > 0) {
 				echo "&gt; <a href=\"viewmsg.php?page=$page&type=".Sanitize::encodeUrlParam($type)."&cid=$cid&filtercid=$filtercid&msgid=".Sanitize::onlyInt($replyto)."\">Message</a> ";
 				echo "&gt; Reply</div>";
-				echo "<h2>Reply</h2>\n";
+				echo "<h1>Reply</h1>\n";
 			} else {
 				echo "&gt; New Message</div>";
-				echo "<h2>New Message</h2>\n";
+				echo "<h1>New Message</h1>\n";
 			}
 
 
@@ -648,7 +648,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Message List</div>";
-	echo '<div id="headermsglist" class="pagetitle"><h2>';
+	echo '<div id="headermsglist" class="pagetitle"><h1>';
 	if ($limittotagged) {
 		echo _('Tagged Messages');
 	} else if ($limittonew) {
@@ -656,7 +656,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	} else {
 		echo _('Messages');
 	}
-	echo '</h2></div>';
+	echo '</h1></div>';
 
 	if ($myrights > 5 && $filtercid>0) {
 		//DB $query = "SELECT msgset FROM imas_courses WHERE id='$filtercid'";

@@ -36,7 +36,7 @@ if ($overwriteBody==1) {
 	$curBreadcrumb .= "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curname = Sanitize::encodeStringForDisplay($coursename);
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Course Reports</div>';
-	echo '<div class="pagetitle"><h2>Course Reports</h2></div>';
+	echo '<div class="pagetitle"><h1>Course Reports</h1></div>';
 	echo '<ul class="nomark">';
 	echo '<li><a href="report-weeklylab.php?cid='.$cid.'">Activity Report - Lab Style Courses</a></li>';
 	echo '<li><a href="report-commonstu.php?cid='.$cid.'">Activity Report - Sort Students by Activity</a></li>';

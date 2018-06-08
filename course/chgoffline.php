@@ -134,7 +134,7 @@ require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Manage Offline Grades</div>";
-echo '<div id="headerchgoffline" class="pagetitle"><h2>Manage Offline Grades</h2></div>';
+echo '<div id="headerchgoffline" class="pagetitle"><h1>Manage Offline Grades</h1></div>';
 
 echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 

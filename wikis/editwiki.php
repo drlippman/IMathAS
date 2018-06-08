@@ -237,7 +237,7 @@ if ($overwriteBody==1) {
 		echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 	}
 ?>
-	<div id="headereditwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+	<div id="headereditwiki" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 
 <?php
 if ($groupid>0) {

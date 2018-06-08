@@ -194,7 +194,7 @@ if (!(isset($teacherid))) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 		if ($stm->rowCount() > 0) {
-			$page_beenTakenMsg = "<h3>Warning</h3>\n";
+			$page_beenTakenMsg = "<h2>Warning</h2>\n";
 			$page_beenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
 			$page_beenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
 			$page_beenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
@@ -258,7 +258,7 @@ if ($overwriteBody==1) {
 	<?php echo $page_beenTakenMsg; ?>
 
 
-<div id="headermodquestion" class="pagetitle"><h2>Modify Question Settings</h2></div>
+<div id="headermodquestion" class="pagetitle"><h1>Modify Question Settings</h1></div>
 <p><?php
 	echo '<b>'.Sanitize::encodeStringForDisplay($qdescrip).'</b> ';
 	echo '<button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($qsetid).')">'._('Preview').'</button>';

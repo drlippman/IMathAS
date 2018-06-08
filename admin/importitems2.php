@@ -78,7 +78,7 @@ if (!(isset($teacherid))) {
 	$res = $importer->importdata($data, $cid, $_POST['checked'], $options);
 
 	$overwriteBody = 1;
-	$body = '<h2>Import Results</h2><p>';
+	$body = '<h1>Import Results</h1><p>';
 	foreach ($res as $k=>$v) {
 		$body .= Sanitize::encodeStringForDisplay($k.': '.$v).'<br/>';
 	}
@@ -158,7 +158,7 @@ $(function() {
 </script>
 <?php
 echo $curBreadcrumb;
-echo '<div id="headerimportitems" class="pagetitle"><h2>'._('Import Course Items').'</h2></div>';
+echo '<div id="headerimportitems" class="pagetitle"><h1>'._('Import Course Items').'</h1></div>';
 echo '<form id="qform" enctype="multipart/form-data" method=post action="importitems2.php?cid='.$cid.'">';
 if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 	if (strlen($page_fileErrorMsg)>1) {
@@ -176,7 +176,7 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 <?php
 } else {
 	echo $page_fileHiddenInput;
-	echo '<h3>'._('Course').': '.$data['course']['name'].'</h3>';
+	echo '<h2>'._('Course').': '.$data['course']['name'].'</h2>';
 
 	if ($myrights==100) {
 		echo '<p><input type="checkbox" name="importasteacher" id="importasteacher" checked /> Import as course owner (for ownership when updating or adding questions).</p>';

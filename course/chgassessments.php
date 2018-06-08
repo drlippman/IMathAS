@@ -595,9 +595,9 @@ $(function() {
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerchgassessments" class="pagetitle"><h2>Mass Change Assessment Settings
+	<div id="headerchgassessments" class="pagetitle"><h1>Mass Change Assessment Settings
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-	</h2></div>
+	</h1></div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
 	<p><b>Be aware</b> that changing default points or penalty after an assessment has been
@@ -605,7 +605,7 @@ $(function() {
 	 This page will <i>always</i> show the system default settings; it does not show the current settings for your assessments.</p>
 
 	<form id="qform" method=post action="chgassessments.php?cid=<?php echo $cid; ?>" onsubmit="return valform();">
-		<h3>Assessments to Change</h3>
+		<h2>Assessments to Change</h2>
 
 		Check: <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
 		Check by gradebook category:

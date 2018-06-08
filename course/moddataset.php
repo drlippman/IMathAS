@@ -1060,7 +1060,7 @@
 	echo "<div id='outputmsgContainer'>$outputmsg</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
-	echo "<h2>" . Sanitize::encodeStringForDisplay($addmod) . " QuestionSet Question</h2>\n";
+	echo "<h1>" . Sanitize::encodeStringForDisplay($addmod) . " QuestionSet Question</h1>\n";
 	echo '</div>';
 
 	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {

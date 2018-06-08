@@ -115,7 +115,7 @@ require("../header.php");
 		<div class=clear></div>
 </div>
 <?php
- echo "<h2>".Sanitize::encodeStringForDisplay($curname)."</h2>\n";
+ echo "<h1>".Sanitize::encodeStringForDisplay($curname)."</h1>\n";
  if (count($items)>0) {
 	 showitems($items,$_GET['folder'],$blockispublic);
  }

@@ -106,7 +106,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $itemname; ?></h3>
+	<h2><?php echo $itemname; ?></h2>
 	<form method=post action="deleteblock.php?cid=<?php echo $cid; ?>&id=<?php echo Sanitize::encodeStringForDisplay($_GET['id']) ?>">
 	<p>Are you SURE you want to delete this Block?</p>
 	<p><input type=radio name="delcontents" value="0"/>Move all items out of block<br/>

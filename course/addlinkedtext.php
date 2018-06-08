@@ -529,7 +529,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
-	<div id="headeraddlinkedtext" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+	<div id="headeraddlinkedtext" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 
 	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
 		<span class=form>Title: </span>

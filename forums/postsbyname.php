@@ -81,7 +81,7 @@
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."\">Forum Topics</a> &gt; Posts by Name</div>\n";
 
 	echo '<div id="headerpostsbyname" class="pagetitle">';
-	echo "<h2>Posts by Name - ".Sanitize::encodeStringForDisplay($forumname)."</h2>\n";
+	echo "<h1>Posts by Name - ".Sanitize::encodeStringForDisplay($forumname)."</h1>\n";
 	echo '</div>';
 	if (!$canviewall && $postbeforeview) {
 		//DB $query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";

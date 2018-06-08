@@ -26,7 +26,7 @@ $pagetitle = "View Activity Log";
 require("../header.php");
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 
-echo '<div id="headerloginlog" class="pagetitle"><h2>'.$pagetitle. '</h2></div>';
+echo '<div id="headerloginlog" class="pagetitle"><h1>'.$pagetitle. '</h1></div>';
 
 echo '<div class="cpmid"><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">View Login Log</a></div>';
 
@@ -37,7 +37,7 @@ echo '<div class="cpmid"><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">Vi
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);
-echo '<h3>Activity Log for '.Sanitize::encodeStringForDisplay($row[0]).', '.Sanitize::encodeStringForDisplay($row[1]).'</h3>';
+echo '<h2>Activity Log for '.Sanitize::encodeStringForDisplay($row[0]).', '.Sanitize::encodeStringForDisplay($row[1]).'</h2>';
 
 
 $actions = array();

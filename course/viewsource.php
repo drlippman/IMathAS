@@ -40,20 +40,20 @@
 	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
-	echo '<div id="headerviewsource" class="pagetitle"><h2>Question Source</h2></div>';
-	echo "<h4>Description</h4>\n";
+	echo '<div id="headerviewsource" class="pagetitle"><h1>Question Source</h1></div>';
+	echo "<h3>Description</h3>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['description'])."</pre>\n";
-	echo "<h4>Author</h4>\n";
+	echo "<h3>Author</h3>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['author'])."</pre>\n";
-	echo "<h4>Question Type</h4>\n";
+	echo "<h3>Question Type</h3>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['qtype'])."</pre>\n";
-	echo "<h4>Common Control</h4>\n";
+	echo "<h3>Common Control</h3>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['control'])."</pre>\n";
-	echo "<h4>Question Control</h4>\n";
+	echo "<h3>Question Control</h3>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['qcontrol'])."</pre>\n";
-	echo "<h4>Question Text</h4>\n";
+	echo "<h3>Question Text</h3>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['qtext'])."</pre>\n";
-	echo "<h4>Answer</h4>\n";
+	echo "<h3>Answer</h3>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['answer'])."</pre>\n";
 
 

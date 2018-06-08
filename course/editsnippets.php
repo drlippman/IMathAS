@@ -222,7 +222,7 @@ if (isset($_POST['snippets'])) {
 
 	echo '<div class=breadcrumb>'.$breadcrumbbase.' '._("Prewritten Snippets").'</div>';
 
-	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Prewritten Snippets")."</h2></div>\n";
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Prewritten Snippets")."</h1></div>\n";
 
 	echo '<p><button type="button" class="savebtn" onclick="savesnippets()">'._('Save Changes').'</button> ';
 	echo '<span class="submitnotice noticetext"></span></p>';

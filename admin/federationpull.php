@@ -97,7 +97,7 @@ if (!$continuing) {  //start a fresh pull
 	require("../header.php");
 	print_header();
 
-	echo '<h2>Updating Libraries</h2>';
+	echo '<h1>Updating Libraries</h1>';
 
 	$data = json_decode(file_get_contents(getfopenloc($pullstatus['fileurl'])), true);
 
@@ -180,7 +180,7 @@ if (!$continuing) {  //start a fresh pull
 			}
 		}
 
-		echo '<h3>Libraries to Add</h3>';
+		echo '<h2>Libraries to Add</h2>';
 		if (count($toadd)==0) {
 			echo '<p>No libraries to add</p>';
 		} else {
@@ -209,7 +209,7 @@ if (!$continuing) {  //start a fresh pull
 			echo '</tbody></table>';
 		}
 
-		echo '<h3>Libraries to Change</h3>';
+		echo '<h2>Libraries to Change</h2>';
 		if (count($tochg)==0) {
 			echo '<p>No libraries to change</p>';
 		} else {
@@ -498,7 +498,7 @@ if (!$continuing) {  //start a fresh pull
 	require("../header.php");
 	print_header();
 
-	echo '<h2>Updating Questions Batch</h2>';
+	echo '<h1>Updating Questions Batch</h1>';
 
 	echo '<input type="hidden" name="nextoffset" value="'.Sanitize::onlyInt($data['nextoffset']).'"/>';
 
@@ -695,7 +695,7 @@ if (!$continuing) {  //start a fresh pull
 		//handle any new questions
 		//we've unset any $quidref that were used, so loop over unused
 		if (count($quidref)>0) {
-			echo '<h3>Adding Questions</h3>';
+			echo '<h2>Adding Questions</h2>';
 		}
 		foreach ($quidref as $uqid=>$i) {
 			$remote = $data['data'][$i];
@@ -718,7 +718,7 @@ if (!$continuing) {  //start a fresh pull
 				//is in. No point asking about questions where we didn't bring in the library
 				continue;
 			}
-			echo '<h4><b>Question UID '.$remote['uniqueid'].'</b>.</h4> ';
+			echo '<h3><b>Question UID '.$remote['uniqueid'].'</b>.</h3> ';
 			echo '<p>Description: '.Sanitize::encodeStringForDisplay($remote['description']);
 			echo '. Check <a href="#" onclick="chkall2('.$remote['uniqueid'].');return false;">All</a> ';
 			echo '<a href="#" onclick="chknone2('.$remote['uniqueid'].');return false;">None</a></p>';
@@ -1018,7 +1018,7 @@ if (!$continuing) {  //start a fresh pull
 		$libdata[$row['uniqueid']] = array('id'=>$row['id'], 'name'=>$row['name']);
 	}
 
-	echo '<h2>Updating Library Assignments for Unchanged Questions</h2>';
+	echo '<h1>Updating Library Assignments for Unchanged Questions</h1>';
 	$lookups = array();
 	$qlookups = array();
 	foreach ($data['data']['libitems'] AS $i=>$rli) {
@@ -1103,7 +1103,7 @@ if (!$continuing) {  //start a fresh pull
 		}
 	}
 
-	echo '<h2>Updating ReplaceBy Records</h2>';
+	echo '<h1>Updating ReplaceBy Records</h1>';
 	$lookups = array();
 	$qlookups = array();
 	foreach ($data['data']['replacebys'] AS $i=>$rb) {

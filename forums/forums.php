@@ -186,9 +186,9 @@
 	echo '</div>';
 
 	if ($searchtype=='none') {
-		echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
+		echo '<div id="headerforums" class="pagetitle"><h1>Forums</h1></div>';
 	} else {
-		echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
+		echo '<div id="headerforums" class="pagetitle"><h1>Forum Search Results</h1></div>';
 	}
 ?>
 

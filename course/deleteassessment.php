@@ -118,7 +118,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h3>
+	<h2><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h2>
 	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
 
 	<form method="POST" action="deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">

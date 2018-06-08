@@ -108,7 +108,7 @@ if ($from=="cal") {
 	echo "&gt; <a href=\"showcalendar.php?cid=$cid\">Calendar</a> ";
 }
 echo "&gt; Manage Calendar Items</div>\n";
-echo '<div id="headermanagecalitems" class="pagetitle"><h2>Manage Calendar Items</h2></div>';
+echo '<div id="headermanagecalitems" class="pagetitle"><h1>Manage Calendar Items</h1></div>';
 echo "<p>This page allows you to add events to the calendar.  Course items automatically place themselves on the calendar.</p>";
 
 //DB $query = "SELECT id,date,title,tag FROM imas_calitems WHERE courseid='$cid' ORDER BY date";
@@ -118,7 +118,7 @@ $stm->execute(array(':courseid'=>$cid));
 
 ?>
 <form method=post action="managecalitems.php?cid=<?php echo $cid.'&amp;from='.$from;?>">
-<h4>Manage Events</h4>
+<h3>Manage Events</h3>
 <table class="gb">
 <thead>
 <tr><th>Delete?</th><th>Date</th><th>Tag</th><th>Event Details</th></tr>
@@ -141,7 +141,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 echo '</tbody></table>';
 echo '<p><button type="submit" name="submit" value="Save">'._('Save Changes').'</button></p>';
-echo '<h4>Add New Events</h4>';
+echo '<h3>Add New Events</h3>';
 echo '<table class="gb" id="newEventsTable">
 <thead>
 <tr><th>Date</th><th>Tag</th><th>Event Details</th></tr>

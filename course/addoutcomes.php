@@ -268,7 +268,7 @@ require("../header.php");
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Course Outcomes").'</div>';
 
-echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Course Outcomes")."</h2></div>\n";
+echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Course Outcomes")."</h1></div>\n";
 
 echo '<div class="cpmid"><a href="outcomemap.php?cid='.$cid.'">'._('View Outcomes Map').'</a> | <a href="outcomereport.php?cid='.$cid.'">'._('View Outcomes Report').'</a></div>';
 

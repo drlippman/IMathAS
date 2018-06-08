@@ -168,13 +168,13 @@ if ($overwriteBody==1) {
   echo $body;
 } else {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
-	echo '<div id="headeruserdetail" class="pagetitle"><h2>'._('LTI Connections').': ';
+	echo '<div id="headeruserdetail" class="pagetitle"><h1>'._('LTI Connections').': ';
   echo Sanitize::encodeStringForDisplay($userinfo['LastName'].', '.$userinfo['FirstName']);
-  echo '</h2></div>';
+  echo '</h1></div>';
 
   echo '<p>'._('Group').': '.Sanitize::encodeStringForDisplay($userinfo['gname']).'</p>';
 
-  echo '<h4>'._('LTI user connections').'</h4>';
+  echo '<h3>'._('LTI user connections').'</h3>';
   echo '<table class="gb" id="ltiusers"><thead><tr>';
   echo '<th>'._('Key:org').'</th>';
   echo '<th>'._('Remote Userid').'</th>';
@@ -194,7 +194,7 @@ if ($overwriteBody==1) {
     initSortTable("ltiusers",Array("S","S",false),true);
     </script>';
 
-  echo '<h4>'._('LTI course connections').'</h4>';
+  echo '<h3>'._('LTI course connections').'</h3>';
   echo '<table class="gb" id="lticourses"><thead><tr>';
   echo '<th>'._('Course').'</th>';
   echo '<th>'._('Course ID').'</th>';
@@ -222,7 +222,7 @@ if ($overwriteBody==1) {
     initSortTable("lticourses",Array("S","N","S","S",false),true);
     </script>';
   echo '<p>'._('Click a contextid above to list the associated placements').'</p>';
-  echo '<div id="placementwrap" style="display:none"><h4></h4>';
+  echo '<div id="placementwrap" style="display:none"><h3></h3>';
   echo '<table id="placements" class="gb"><caption></caption><thead><tr>';
   echo '<th>',_('Type'),'</th>';
   echo '<th>',_('Item'),'</th>';

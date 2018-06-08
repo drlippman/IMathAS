@@ -225,7 +225,7 @@
 		echo "\">Gradebook</a> &gt; Manage Exceptions</div>\n";
 	}
 
-	echo '<div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>';
+	echo '<div id="headermassexception" class="pagetitle"><h1>Manage Exceptions</h1></div>';
 	if ($calledfrom=='lu') {
 		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\" id=\"qform\">\n";
 	} else if ($calledfrom=='gb') {
@@ -274,11 +274,11 @@
 		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=:id AND istu.courseid=:courseid");
 		$stm->execute(array(':id'=>$tolist, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<h2>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]);
+		echo "<h1>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]);
 		if ($row[2]!='') {
 			echo ' <span class="small">(Section: '.Sanitize::encodeStringForDisplay($row[2]).')</span>';
 		}
-		echo "</h2>";
+		echo "</h1>";
 	}
 
 	//DB $query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.itemtype FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
@@ -303,11 +303,11 @@
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
 
-	echo '<h3>'._("Existing Exceptions").'</h3>';
+	echo '<h2>'._("Existing Exceptions").'</h2>';
 	echo '<fieldset><legend>'._("Existing Exceptions").'</legend>';
 	//DB if (mysql_num_rows($result)>0) {
 	if ($stm->rowCount()>0) {
-		//echo "<h4>Existing Exceptions</h4>";
+		//echo "<h3>Existing Exceptions</h3>";
 		echo "Select exceptions to clear. ";
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',false)">None</a>. ';
 
@@ -462,8 +462,8 @@
 		$fclass = '';
 	}
 	
-	//echo "<h4>Make New Exception</h4>";
-	echo '<h3>'._("Make New Exception").'</h3>';
+	//echo "<h3>Make New Exception</h3>";
+	echo '<h2>'._("Make New Exception").'</h2>';
 	if ($isDateByLTI) {
 		echo '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
 		echo 'students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given ';
@@ -568,7 +568,7 @@
 
 	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
 		echo '<fieldset><legend>'._("Students Selected").'</legend>';
-		//echo "<h4>Students Selected</h4>";
+		//echo "<h3>Students Selected</h3>";
 		//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
 		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->query("SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");

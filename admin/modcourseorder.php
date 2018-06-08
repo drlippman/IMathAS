@@ -179,7 +179,7 @@ require("../header.php");
 
 echo '<div class=breadcrumb>'.$breadcrumbbase._("Course Order").'</div>';
 
-echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>";
+echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>";
 echo _("Display Order").': ';
 if ($type=='take') {
 	echo _('Courses you\'re taking');
@@ -188,7 +188,7 @@ if ($type=='take') {
 } else if ($type=='teach') {
 	echo _('Courses you\'re teaching');
 }
-echo "</h2></div>\n";
+echo "</h1></div>\n";
 
 echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move courses inside groups.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/><span id="submitnotice" class=noticetext></span></div>';
 

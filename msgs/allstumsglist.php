@@ -61,7 +61,7 @@
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 	echo "&gt; <a href=\"msglist.php?cid=$cid\">Message List</a> &gt; Student Messages</div>";
-	echo '<div id="headerallstumsglist" class="pagetitle"><h2>All Student Messages</h2></div>';
+	echo '<div id="headerallstumsglist" class="pagetitle"><h1>All Student Messages</h1></div>';
 
 	//DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE courseid='$cid' AND (isread<2 OR isread>3)";
 	//DB if ($filterstu>0) {

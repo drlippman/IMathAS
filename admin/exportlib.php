@@ -322,7 +322,7 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="exportlib.php?cid=<?php echo $cid ?>">
 
-		<div id="headerexportlib" class="pagetitle"><h2>Library Export</h2></div>
+		<div id="headerexportlib" class="pagetitle"><h1>Library Export</h1></div>
 		<p>Note:  If a parent library is selected, it's children libraries are included in the export,
 		and heirarchy will be maintained.  If libraries from different trees are selected, the topmost
 		libraries in each branch selected will be exported at the same level.</p>

@@ -794,7 +794,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headercopyitems" class="pagetitle"><h2>Copy Course Items</h2></div>
+	<div id="headercopyitems" class="pagetitle"><h1>Copy Course Items</h1></div>
 
 <?php
 	}
@@ -804,7 +804,7 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
 	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($_POST['ctc']); ?>">
-	<h4>Select Calendar Items to Copy</h4>
+	<h3>Select Calendar Items to Copy</h3>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
 	<table cellpadding=5 class=gb>
@@ -870,7 +870,7 @@ if ($overwriteBody==1) {
 		values </p>
 	</div>
 	<div id="selectitemstocopy" style="display:none;">
-	<h4>Select Items to Copy</h4>
+	<h3>Select Items to Copy</h3>
 
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
@@ -1082,7 +1082,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		}
 	}
 	</script>
-	<h4>Select a course to copy items from</h4>
+	<h3>Select a course to copy items from</h3>
 
 	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=select">
 <?php

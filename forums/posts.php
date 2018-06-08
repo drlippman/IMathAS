@@ -385,7 +385,7 @@ if (empty($_GET['embed'])) {
 if (!$oktoshow) {
 	echo '<p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>';
 } else {
-	echo '<div id="headerposts" class="pagetitle"><h2>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h2></div>';
+	echo '<div id="headerposts" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
 
 	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";

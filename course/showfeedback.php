@@ -29,7 +29,7 @@ if ($type=='A') {
 	
 	list($aname, $origfeedback) = $stm->fetch(PDO::FETCH_NUM);
 	
-	echo '<h2>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h2>';
+	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
 	$feedback = json_decode($origfeedback, true);
 	if ($feedback === null) {
 		$feedback = array('Z'=>$origfeedback);
@@ -67,7 +67,7 @@ if ($type=='A') {
 	$stm->execute($qarr);
 	
 	list($aname, $feedback) = $stm->fetch(PDO::FETCH_NUM);
-	echo '<h2>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h2>';
+	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
 	echo '<div class="fbbox">'.Sanitize::outgoingHtml($feedback).'</div>';
 }
 

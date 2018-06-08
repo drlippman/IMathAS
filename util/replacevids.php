@@ -53,7 +53,7 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 	}
 	exit;
 }
-echo '<h3>Replace video links</h3>';
+echo '<h2>Replace video links</h2>';
 echo '<p>This will replace video links or question button links anywhere on the system</p>';
 echo '<form method="post">';
 echo '<p>Replace video ID <input type="text" name="from" size="11"/> with video ID <input type="text" name="to" size="11"/></p>';

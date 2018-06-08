@@ -74,7 +74,7 @@ if ($type=='notstart') {
 	}
 	$stunames = getstunames($stus);
 	natsort($stunames);
-	echo '<h3>Students who have not started this assessment</h3><ul>';
+	echo '<h2>Students who have not started this assessment</h2><ul>';
 	foreach ($stunames as $name) {
 		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
 	}
@@ -101,7 +101,7 @@ if ($type=='notstart') {
 	}
 	$stunames = getstunames($stus);
 	natsort($stunames);
-	echo '<h3>Students who clicked on help for this question</h3><ul>';
+	echo '<h2>Students who clicked on help for this question</h2><ul>';
 	foreach ($stunames as $name) {
 		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
 	}
@@ -159,7 +159,7 @@ if ($type=='notstart') {
 	if ($type=='incomp') {
 		$stunames = getstunames(array_keys($stuincomp));
 		natsort($stunames);
-		echo '<h3>Students who have started the assignment, but have not completed this question</h3><ul>';
+		echo '<h2>Students who have started the assignment, but have not completed this question</h2><ul>';
 		foreach ($stunames as $name) {
 			echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
 		}
@@ -167,7 +167,7 @@ if ($type=='notstart') {
 	} else if ($type=='score') {
 		$stunames = getstunames(array_keys($stuscores));
 		asort($stuscores);
-		echo '<h3>Students with lowest scores</h3><table class="gb"><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody>';
+		echo '<h2>Students with lowest scores</h2><table class="gb"><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody>';
 		foreach ($stuscores as $uid=>$sc) {
 			echo sprintf('<tr><td>%s</td><td>%s</td></tr>', Sanitize::encodeStringForDisplay($stunames[$uid]),
 				Sanitize::encodeStringForDisplay($sc));
@@ -177,7 +177,7 @@ if ($type=='notstart') {
 		$stunames = getstunames(array_keys($stuatt));
 		arsort($stuatt);
 		arsort($sturegens);
-		echo '<h3>Students with most attempts on scored version and Most Regens</h3><table class="gb"><thead><tr><th>Name</th><th>Attempts</th><th style="border-right:1px solid">&nbsp;</th><th>Name</th><th>Regens</th></tr></thead><tbody>';
+		echo '<h2>Students with most attempts on scored version and Most Regens</h2><table class="gb"><thead><tr><th>Name</th><th>Attempts</th><th style="border-right:1px solid">&nbsp;</th><th>Name</th><th>Regens</th></tr></thead><tbody>';
 
 		$rows = array();
 		foreach ($stuatt as $uid=>$sc) {
@@ -199,7 +199,7 @@ if ($type=='notstart') {
 	} else if ($type=='time') {
 		$stunames = getstunames(array_keys($stutimes));
 		arsort($stutimes);
-		echo '<h3>Students with most time spent on this question</h3><table class="gb"><thead><tr><th>Name</th><th>Time</th></tr></thead><tbody>';
+		echo '<h2>Students with most time spent on this question</h2><table class="gb"><thead><tr><th>Name</th><th>Time</th></tr></thead><tbody>';
 		foreach ($stutimes as $uid=>$sc) {
 			echo sprintf('<tr><td>%s</td><td>', Sanitize::encodeStringForDisplay($stunames[$uid]));
 			if ($sc<60) {

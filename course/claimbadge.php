@@ -63,7 +63,7 @@ if (isset($teacherid)) {
 		}
 
 		$reqmet = true;
-		echo '<h2>Badge: ' . Sanitize::encodeStringForDisplay($name) . '</h2>';
+		echo '<h1>Badge: ' . Sanitize::encodeStringForDisplay($name) . '</h1>';
 		echo '<p>Badge requirements:</p>';
 		echo '<table class="gb"><thead><tr><th>Category/Course Total</th><th>Score Required</th><th>Your Score</th><th>Requirement Met</th></tr></thead><tbody>';
 		foreach ($req['data'] as $r) {  //r = array(gbcat, gradetype, score)
@@ -126,7 +126,7 @@ if (isset($teacherid)) {
 		echo '</tbody></table>';
 
 		if ($reqmet) {
-			echo '<h3>Badge Requirements have been met!</h3>';
+			echo '<h2>Badge Requirements have been met!</h2>';
 			$verify = Sanitize::encodeUrlParam(hash('sha256', $username . $userid));
 			$url = $GLOBALS['basesiteurl'] . '/course/verifybadge.php?format=json&userid='.$userid.'&badgeid='.$badgeid.'&v='.$verify;
 

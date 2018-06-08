@@ -381,7 +381,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb; ?></div>
-	<div id="headerreviewlibrary" class="pagetitle"><h2>Review Library</h2></div>
+	<div id="headerreviewlibrary" class="pagetitle"><h1>Review Library</h1></div>
 <?php
 	if (!isset($_REQUEST['lib'])) {
 ?>
@@ -434,7 +434,7 @@ if ($overwriteBody==1) {
 	<p style="color: red;"><?php echo $page_updatedMsg; ?></p>
 	<p><?php echo $page_lastLink . " | " . $page_nextLink; ?></p>
 
-	<h4><?php echo Sanitize::onlyInt($qsetid) ?>: <?php echo Sanitize::encodeStringForDisplay($lineQSet['description'])?></h4>
+	<h3><?php echo Sanitize::onlyInt($qsetid) ?>: <?php echo Sanitize::encodeStringForDisplay($lineQSet['description'])?></h3>
 
 	<div><?php echo  $page_deleteForm; ?></div>
 	<div><?php echo  $page_lastScore; ?></div>

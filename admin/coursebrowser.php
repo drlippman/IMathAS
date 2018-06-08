@@ -128,7 +128,7 @@ require("../header.php");
 if (!isset($_GET['embedded'])) {
   $curBreadcrumb = $breadcrumbbase . _('Course Browser');
   echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
-	echo '<div id="headercoursebrowser" class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
+	echo '<div id="headercoursebrowser" class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 }
 ?>
 <div id="app" v-cloak>

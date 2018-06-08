@@ -49,7 +49,7 @@ if ($overwriteBody==1) {
 
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
 
-	echo "<h2>"._('Generate Word Version')."</h2>";
+	echo "<h1>"._('Generate Word Version')."</h1>";
 
 	echo '<p>This page will help you create a copy of this assessment as a Word 2007+ file that you can then edit for printing.</p>';
 
@@ -296,7 +296,7 @@ if ($overwriteBody==1) {
 
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
 
-	echo "<h2>"._('Generate Word Version')."</h2>";
+	echo "<h1>"._('Generate Word Version')."</h1>";
 	echo '<p>'._('Assessment is prepared, and ready for conversion').'.</p>';
 	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
 	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';

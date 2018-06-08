@@ -241,11 +241,11 @@ $placeinhead .= '</script>';
 
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
-	<div id="headeradmin" class="pagetitle"><h2><?php echo $installname ?> Administration</h2></div>
+	<div id="headeradmin" class="pagetitle"><h1><?php echo $installname ?> Administration</h1></div>
 	<b>Hello <?php echo $username ?></b>
 
 <?php //WRITE OUT COURSES BLOCK ?>
-	<h3>Courses</h3>
+	<h2>Courses</h2>
 	<div class=item>
 	<table class=gb border=0 width="90%">
 		<thead>
@@ -310,7 +310,7 @@ $placeinhead .= '</script>';
 
 <?php //END COURSE BLOCK, BEGIN ADMINISTRATION BLOCK ?>
 
-	<h3>Administration</h3>
+	<h2>Administration</h2>
 	<div class=cp>
 		<A HREF="forms.php?action=chgpwd">Change my password</a><BR>
 		<A HREF="../help.php?section=administration">Help</a><BR>
@@ -370,7 +370,7 @@ $placeinhead .= '</script>';
 // END OF ADMINISTRATION BLOCK, BEGIN DIAGNOSTICS BLOCK
 	if(($myspecialrights&4)==4 || $myrights == 100) {
 ?>
-	<h4>Diagnostics</h4>
+	<h3>Diagnostics</h3>
 	<div class=item>
 	<table class=gb width="90%" id="diagTable">
 		<thead>
@@ -406,7 +406,7 @@ $placeinhead .= '</script>';
 
 	if($myrights >= 75) {
 ?>
-	<h4><?php echo $page_userBlockTitle ?></h4>
+	<h3><?php echo $page_userBlockTitle ?></h3>
 	<div class=item>
 		<table class=gb width="90%" id="myTable">
 		<thead>

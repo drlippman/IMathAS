@@ -203,7 +203,7 @@ $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Map").'</div>';
 
-echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Map")."</h2></div>\n";
+echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Outcomes Map")."</h1></div>\n";
 
 if ($outcomelinks==0) {
 	echo '<p>No items have been associated with outcomes yet</p>';

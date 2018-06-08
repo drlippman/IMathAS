@@ -37,7 +37,7 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New Student Signup</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>New Student Signup</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>New Student Signup</h1></div>';
 		echo "<form id=\"newuserform\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">Choose a password:</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
@@ -99,7 +99,7 @@ switch($_GET['action']) {
 		if ($gb == '' && $_GET['action']!='forcechgpwd') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Change Password</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Change Your Password</h1></div>';
 		if ($_GET['action']=='forcechgpwd') {
 			echo '<p>'._('To ensure the security of your account, we are requiring a password change. Please select a new password.').'</p>';
 			echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=forcechgpwd$gb\">\n";
@@ -126,7 +126,7 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>User Profile</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>User Profile</h1></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
@@ -303,7 +303,7 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Enroll in a Course</h1></div>';
 		echo "<form id=\"pageform\" method=post action=\"actions.php?action=enroll$gb\">";
 		$doselfenroll = false;
 		//DB $query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
@@ -356,7 +356,7 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Unenroll</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Unenroll</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Unenroll</h1></div>';
 
 		echo "Are you SURE you want to unenroll from this course?  All assessment attempts will be deleted.\n";
 		echo '<form method="post" action="actions.php?cid='.Sanitize::courseId($_GET['cid']).'">';
@@ -368,7 +368,7 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Password Reset</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Reset Password</h1></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=resetpw$gb\">\n";
 		if (isset($_GET['code'])) {
 			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
@@ -407,7 +407,7 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Username Lookup</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Lookup Username</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Lookup Username</h1></div>';
 		echo "<form id=\"pageform\" method=post action=\"actions.php?action=lookupusername$gb\">\n";
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
 		echo "<p><label for=email>Email</label>: <input type=text name=\"email\" id=email /></p>";
@@ -432,7 +432,7 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Forum Widget Settings</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Forum Widget Settings</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Forum Widget Settings</h1></div>';
 		echo '<p>The most recent 10 posts from each course show in the New Forum Posts widget.  Select the courses you want to show in the widget.</p>';
 		echo "<form method=post action=\"actions.php?action=forumwidgetsettings$gb\">\n";
 		$allcourses = array();
@@ -514,7 +514,7 @@ switch($_GET['action']) {
 			$stm->execute(array(':remoteaccess'=>$pass, ':id'=>$userid));
 			$code = $pass;
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>Google Gadget Access Code</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Google Gadget Access Code</h1></div>';
 		echo "<p>The $installname Google Gadget allow you to view a list of new forum posts ";
 		echo "and messages from your iGoogle page.  To install, click the link below to add ";
 		echo "the gadget to your iGoogle page, then use the Access key below in the settings ";

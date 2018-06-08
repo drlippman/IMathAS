@@ -16,7 +16,7 @@ function selgrp(n) {
 }
 </script>';
 require("../header.php");
-echo '<h2>Remove Questions Marked with Wrong Library</h2>';
+echo '<h1>Remove Questions Marked with Wrong Library</h1>';
 
 if (isset($_POST['record'])) {
 	$now = time();

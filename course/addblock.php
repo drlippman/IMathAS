@@ -43,9 +43,9 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::en
 $curBreadcrumb .= (isset($_GET['id'])) ? "&gt; Modify Block\n" : "&gt; Add Block\n";
 
 if (isset($_GET['id'])) {
-	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h2>Modify Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
+	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Modify Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
 } else {
-	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h2>Add Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
+	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Add Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
 }
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];

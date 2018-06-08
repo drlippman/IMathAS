@@ -81,7 +81,7 @@ if ($myrights==100) {
    	   echo '<a href="../index.php">Back to home page</a>';
    } else {
    	   $pagetitle = "Push out Changes";
-   	   echo '<h2>Push out Changes</h2>';
+   	   echo '<h1>Push out Changes</h1>';
    	   echo '<form method="post" action="pushoutchg.php">';
    	   echo '<p>Select the course to push out from: <select name="cid">';
    	   //DB $query = "SELECT ic.id,ic.name FROM imas_courses as ic JOIN imas_teachers ON imas_teachers.courseid=ic.id WHERE imas_teachers.userid='$userid' ORDER BY ic.name";

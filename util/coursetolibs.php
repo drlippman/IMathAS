@@ -194,7 +194,7 @@ function setlibnames(libn) {
 	document.getElementById("libnames").innerHTML = libn;
 }
 </script>
-<h2>Course to Libraries</h2>
+<h1>Course to Libraries</h1>
 
 <?php
 

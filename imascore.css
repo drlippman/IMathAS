@@ -17,6 +17,30 @@ p {
 br {
 	line-height: 1em;
 }
+h1,h2,h3,h4,h5,h6 {
+	padding: 0;
+	font-weight: bold;
+}
+h1 {
+	font-size: 1.5em;
+	margin: .7em 0;
+}
+h2,h3,h4,h5,h6 {
+	margin: 1em 0;
+}
+h2 {
+	font-size: 1.25em;
+}
+h3 {
+	font-size: 1.1em;
+}
+h4 {
+	font-size: 1.05em;
+}
+h5,h6 {
+	font-size: 1em;
+}
+	
 div.pagetitle h2, div.pagetitle h1 {
 	margin: 10px 0px 20px 0px;
 }

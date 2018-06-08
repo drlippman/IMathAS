@@ -650,7 +650,7 @@
 			echo '</a>';
 			echo '</div>';
 		}
-		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
+		echo '<div id="headergb-viewasid" class="pagetitle"><h1>Grade Book Detail</h1></div>';
 
 		//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$get_uid}' AND imas_students.courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -658,7 +658,7 @@
 		$stm = $DBH->prepare("SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id=:id AND imas_students.courseid=:courseid");
 		$stm->execute(array(':id'=>$get_uid, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
+		echo "<h2>{$row[1]}, {$row[0]}</h2>\n";
 
 
 		//do time limit mult
@@ -705,7 +705,7 @@
 			require("../footer.php");
 			exit;
 		}
-		echo "<h4>{$line['name']}</h4>\n";
+		echo "<h3>{$line['name']}</h3>\n";
 
 		$aid = $line['assessmentid'];
 
@@ -1247,11 +1247,11 @@
 			$selparts = explode('~',$row[2]);
 			$ID = $selparts[0];
 			$term = $selparts[1];
-			echo "<h2>Score Report</h2>\n";
-			echo "<h3>{$row[1]}, {$row[0]}<br/>($ID)</h3>\n";
+			echo "<h1>Score Report</h1>\n";
+			echo "<h2>{$row[1]}, {$row[0]}<br/>($ID)</h2>\n";
 		} else {
-			echo "<h2>Grade Book Summary</h2>\n";
-			echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
+			echo "<h1>Grade Book Summary</h1>\n";
+			echo "<h2>{$row[1]}, {$row[0]}</h2>\n";
 		}
 
 		//DB $query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessments.endmsg,imas_assessment_sessions.* ";
@@ -1324,7 +1324,7 @@
 			}
 		}
 
-		echo "<h4>{$line['name']}</h4>\n";
+		echo "<h3>{$line['name']}</h3>\n";
 		if ($line['starttime']==0) {
 			echo '<p>Started: Not yet started<br/>';
 		} else {
@@ -1354,7 +1354,7 @@
 		}
 
 		if (!($istutor && $isdiag)) {
-			echo "<h4>Question Breakdown</h4>\n";
+			echo "<h3>Question Breakdown</h3>\n";
 			echo "<table cellpadding=5 class=gb><thead><tr><th>Q#</th><th>Question</th><th>Points / Possible</th><th>Preview</th></tr></thead><tbody>\n";
 			foreach ($qs as $i=>$qid) {
 				if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
@@ -1504,7 +1504,7 @@ function sandboxgetweights($code,$seed) {
 function getconfirmheader($group=false) {
 	global $DBH, $isteacher, $istutor, $userid, $get_uid;
 	if ($group) {
-		$out = '<h3>Whole Group</h3>';
+		$out = '<h2>Whole Group</h2>';
 	} else {
 		//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$get_uid}'";
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -1512,7 +1512,7 @@ function getconfirmheader($group=false) {
 		$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$get_uid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		$out = "<h3>{$row[1]}, {$row[0]}</h3>\n";
+		$out = "<h2>{$row[1]}, {$row[0]}</h2>\n";
 	}
 	//DB $query = "SELECT imas_assessments.name FROM imas_assessments,imas_assessment_sessions ";
 	//DB $query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
@@ -1531,8 +1531,8 @@ function getconfirmheader($group=false) {
 	} else {
 		$stm->execute(array(':id'=>$_GET['asid']));
 	}
-	//DB $out .= "<h4>".mysql_result($result,0,0)."</h4>";
-	$out .= "<h4>".$stm->fetchColumn(0)."</h4>";
+	//DB $out .= "<h3>".mysql_result($result,0,0)."</h3>";
+	$out .= "<h3>".$stm->fetchColumn(0)."</h3>";
 	return $out;
 }
 

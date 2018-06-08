@@ -86,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$cid, Sanitize::encodeStringForDisplay($coursename));
 			$body .= sprintf("&gt; <a href=\"addassessment.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
 				$cid, Sanitize::onlyInt($_GET['id']));
-			$body .= sprintf("<h3>%s</h3>", Sanitize::encodeStringForDisplay($assessmentname));
+			$body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
 			$body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, Sanitize::onlyInt($_GET['id'])).'">';
 			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
@@ -678,9 +678,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		if (isset($_GET['id'])) {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
 		} else {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
 		}
 
 		$page_formActionTag = sprintf("addassessment.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);

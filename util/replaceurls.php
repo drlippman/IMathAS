@@ -107,7 +107,7 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 	exit;
 
 }
-echo '<h3>Replace URL links</h3>';
+echo '<h2>Replace URL links</h2>';
 echo '<p>This will replace URLS in linkedtext summaries and text, inlinetext summaries, and assessment summaries and intros across ALL courses.</p>';
 echo '<form method="post">';
 echo '<p>Replace URL: <input type="text" name="from" size="50"/><br/>with URL: <input type="text" name="to" size="50"/></p>';

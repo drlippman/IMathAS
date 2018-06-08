@@ -432,13 +432,13 @@ if (!isset($CFG['GEN']['homelinkbox'])) {
 	echo '</div>';
 }
 
-echo '<div class="pagetitle" id="headerhome" role="banner"><h2>';
+echo '<div class="pagetitle" id="headerhome" role="banner"><h1>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
 } else {
 	echo _('Welcome to'), " $installname, " . Sanitize::encodeStringForDisplay($userfullname);
 }
-echo '</h2>';
+echo '</h1>';
 echo '</div>';
 if (isset($sessiondata['emulateuseroriginaluser'])) {
 	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
@@ -516,7 +516,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	if (count($data)==0 && $type=='tutor') {return;}
 	
 	echo '<div role="navigation" aria-label="'.$title.'">';
-	echo '<div class="block"><h3>'.$title.'</h3></div>';
+	echo '<div class="block"><h2>'.$title.'</h2></div>';
 	echo '<div class="blockitems"><ul class="courselist courselist-'.$type.'">';
 	if (!empty($courseListOrder) && isset($courseListOrder[$type])) {
 		$printed = array();
@@ -624,7 +624,7 @@ function printCourseLine($data, $type=null) {
 function printMessagesGadget() {
 	global $page_newmessagelist, $page_coursenames;
 	echo '<div role="complementary" aria-label="'._('New messages').'">';
-	echo '<div class="block"><h3>', _('New messages'), '</h3></div>';
+	echo '<div class="block"><h2>', _('New messages'), '</h2></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newmessagelist)==0) {
 		echo '<p>', _('No new messages'), '</p>';
@@ -669,7 +669,7 @@ function printPostsGadget() {
 	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
 	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"Settings\"/></a></span>";
 
-	echo '<h3>', _('New forum posts'), '</h3></div>';
+	echo '<h2>', _('New forum posts'), '</h2></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newpostlist)==0) {
 		echo '<p>', _('No new posts'), '</p>';

@@ -59,7 +59,7 @@ $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/th
 $pagetitle = _('Flagged Forum Posts');
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; "._('Flagged Forum Posts')."</div>\n";
-echo '<div id="headerflaggedthreads" class="pagetitle"><h2>'._('Flagged Forum Posts').'</h2></div>';
+echo '<div id="headerflaggedthreads" class="pagetitle"><h1>'._('Flagged Forum Posts').'</h1></div>';
 echo "<p><button type=\"button\" onclick=\"window.location.href='flaggedthreads.php?from=" . Sanitize::encodeUrlParam($from) . "&cid=$cid&unflagall=true'\">" . _('Unflag All') . "</button></p>";
 
 if (count($lastpost)>0) {

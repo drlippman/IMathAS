@@ -96,7 +96,7 @@ if ($stm->rowCount()==0) {
 		$details = '';
 	}
 
-	echo '<h2>Account Approval</h2>';
+	echo '<h1>Account Approval</h1>';
 	echo '<form method="post" action="approvepending.php?go=true&amp;skipn='.$offset.'">';
 	echo '<input type="hidden" name="email" value="' . Sanitize::encodeStringForDisplay($row[4]) . '"/>';
 	echo '<input type="hidden" name="id" value="' . Sanitize::encodeStringForDisplay($row[0]) . '"/>';

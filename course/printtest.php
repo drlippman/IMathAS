@@ -38,28 +38,28 @@ if ($overwriteBody==1) {
 		}
 		echo '</div>';
 	}
-	echo '<div id="headerprinttest" class="pagetitle"><h2>Print Test</h2></div>';
+	echo '<div id="headerprinttest" class="pagetitle"><h1>Print Test</h1></div>';
 
 	if (!isset($_POST['heights'])) {
 		echo "<form method=post action=\"printlayout.php?cid=$cid&aid=$aid\">\n";
-		echo "<h4>Header Setup</h4>\nPlease select the items you'd like in the test header:";
+		echo "<h3>Header Setup</h3>\nPlease select the items you'd like in the test header:";
 		echo "<ul><li><input type=checkbox name=aname checked=1>Assessment Name</li>\n";
 		echo "<li><input type=checkbox name=iname checked=1>Instructor Name</li>\n";
 		echo "<li><input type=checkbox name=cname checked=1>Course Name</li>\n";
 		echo "<li><input type=checkbox name=sname checked=1>Student Name blank</li>\n";
 		echo "<li><input type=checkbox name=otherheader>Other student entry: <input type=text name=otherheadertext size=20></li>\n";
 		echo "</ul>\n";
-		echo "<h4>Settings</h4>\n";
+		echo "<h3>Settings</h3>\n";
 		echo "<ul>";
 		echo "<li><input type=checkbox name=points checked=1>Show point values</li>\n";
 		echo "<li><input type=checkbox name=hidetxtboxes >Hide text entry lines</li>\n";
 		echo "</ul>";
-		echo "<h4>Print Margin Setup</h4>\n";
+		echo "<h3>Print Margin Setup</h3>\n";
 		echo "Please check Page Setup under the File menu of your browser, and look up your print margin settings.<br/>\n";
 		echo "Left + Right:  <input type=text name=horiz size=5 value=\"1.0\"> inches<br/>\n";
 		echo "Top + Bottom:  <input type=text name=vert size=5 value=\"1.0\"> inches<br/>\n";
 		echo "<p>Browser: <input type=radio name=browser value=0 checked=1>Internet Explorer <input type=radio name=browser value=1>FireFox<sup>*</sup></p>\n";
-		echo "<h4>Print Layout</h4>\n";
+		echo "<h3>Print Layout</h3>\n";
 		echo "<p>On the next page, you will see alternating blue and green rectangles indicating the size of pages.  Use the resizing ";
 		echo "buttons next to each question to increase or decrease the space after each question until the questions fall nicely onto ";
 		echo "the pages.  You can use Print Preview in your browser to verify that the print layout looks correct.  After you have completed ";
@@ -97,7 +97,7 @@ if ($overwriteBody==1) {
 			echo "<input type=hidden name=otherheader value=1>\n";
 			echo "<input type=hidden name=otherheadertext value=\"".Sanitize::encodeStringForDisplay($_POST['otherheadertext'])."\">\n";
 		}
-		echo "<h4>Final print settings</h4>\n";
+		echo "<h3>Final print settings</h3>\n";
 		echo "<p>Number of different versions to print: <input type=text name=versions value=\"1\"></p>\n";
 		echo "<p>Print answer keys? <input type=radio name=keys value=0>No <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=2>Yes, one per page</p>\n";
 		echo "<p>When you press Continue, your print-ready version of the test will display.  You may wish to go into the File menu of ";

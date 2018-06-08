@@ -138,13 +138,13 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	echo $body;
 } else {
 	echo $curBreadcrumb;
-	echo '<div id="headerdiagonetime" class="pagetitle"><h2>Diagnostic One-time Passwords</h2></div>';
+	echo '<div id="headerdiagonetime" class="pagetitle"><h1>Diagnostic One-time Passwords</h1></div>';
 	//DB $query = "SELECT name FROM imas_diags WHERE id='$diag'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB echo '<h4>'.mysql_result($result,0,0).'</h4>';
+	//DB echo '<h3>'.mysql_result($result,0,0).'</h3>';
 	$stm = $DBH->prepare("SELECT name FROM imas_diags WHERE id=:id");
 	$stm->execute(array(':id'=>$diag));
-	echo '<h4>' . Sanitize::encodeStringForDisplay($stm->fetchColumn(0)) . '</h4>';
+	echo '<h3>' . Sanitize::encodeStringForDisplay($stm->fetchColumn(0)) . '</h3>';
 	if (isset($_GET['generate'])) {
 		if (isset($_POST['n'])) {
 			echo "<b>Newly generated passwords</b> <a href=\"diagonetime.php?from=$from&id=" . Sanitize::encodeUrlParam($diag) . "&view=true\">View all</a>";

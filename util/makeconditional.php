@@ -83,7 +83,7 @@ if (isset($_POST['aidorder'])) {
 
 	require("../header.php");
 
-	echo '<h2>Quick-setup conditional release</h2>';
+	echo '<h1>Quick-setup conditional release</h1>';
 
 	echo '<p>If an item is checked, the item prior in the course order will be set as the prereq assignment</p>';
 

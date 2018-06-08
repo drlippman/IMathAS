@@ -45,7 +45,7 @@ require_once("includes/sanitize.php");
 			if ($gb == '') {
 				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
 			}
-			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
+			echo '<div id="headerforms" class="pagetitle"><h1>New User Signup</h1></div>';
 			echo $error;
 			echo '<p><a href="forms.php?action=newuser">Try Again</a></p>';
 			require("footer.php");
@@ -126,7 +126,7 @@ require_once("includes/sanitize.php");
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
-			$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
+			$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 			$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 			$message .= "and paste it into your webbrowser:</p>\r\n";
 			$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
@@ -136,7 +136,7 @@ require_once("includes/sanitize.php");
 			if ($gb == '') {
 				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
 			}
-			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
+			echo '<div id="headerforms" class="pagetitle"><h1>New User Signup</h1></div>';
 			echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
 			echo "<a href=\"$imasroot/index.php\">Back to main login page</a>\n";
 			require("footer.php");
@@ -146,7 +146,7 @@ require_once("includes/sanitize.php");
 			$pagetitle = 'Account Created';
 			require("header.php");
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
-			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
+			echo '<div id="headerforms" class="pagetitle"><h1>New User Signup</h1></div>';
 			echo "<p>Your account with username <b>" . Sanitize::encodeStringForDisplay($_POST['SID']) . "</b> has been created.  If you forget your password, you can ask your ";
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
 			if (trim($_POST['courseid'])!='') {
@@ -270,7 +270,7 @@ require_once("includes/sanitize.php");
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From:".$sendfrom."\r\n";
-				$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
+				$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
 				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
 				$message .= "will then be prompted to choose a new password.</p>";
@@ -351,7 +351,7 @@ require_once("includes/sanitize.php");
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
-			$message  = "<h4>This is an automated message from $installname.  Do not respond to this email</h4>\r\n";
+			$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 			$message .= "<p>Your email was entered in the Username Lookup page on $installname.  If you did not do this, you may ignore and delete this message.  ";
 			$message .= "All usernames using this email address are listed below</p><p>";
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -448,7 +448,7 @@ require_once("includes/sanitize.php");
 		if ($gb == '') {
 			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
 		}
-		$pagetopper .= '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
+		$pagetopper .= '<div id="headerforms" class="pagetitle"><h1>Enroll in a Course</h1></div>';
 		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
 			require("header.php");
 			echo $pagetopper;
@@ -653,7 +653,7 @@ require_once("includes/sanitize.php");
 		if ($gb == '') {
 			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
 		}
-		$pagetopper .= '<div id="headerforms" class="pagetitle"><h2>Modify User Profile</h2></div>';
+		$pagetopper .= '<div id="headerforms" class="pagetitle"><h1>Modify User Profile</h1></div>';
 		require('includes/userpics.php');
 		if (isset($_POST['msgnot'])) {
 			$msgnot = 1;

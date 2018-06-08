@@ -195,7 +195,7 @@ if ($report=='overview') {
 
 
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
-	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Outcomes Report")."</h1></div>\n";
 
 	if (count($outcomes)==0) {
 		echo '<p>'._('No outcomes are defined in this course.').'</p>';
@@ -252,7 +252,7 @@ if ($report=='overview') {
 
 	$ot = outcometable();
 
-	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Detail on Outcome: ").Sanitize::encodeStringForDisplay($outcomeinfo[$outcome])."</h2></div>\n";
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Outcomes Detail on Outcome: ").Sanitize::encodeStringForDisplay($outcomeinfo[$outcome])."</h1></div>\n";
 	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
 	echo '<th>'._('Total').'</th>';
@@ -323,7 +323,7 @@ if ($report=='overview') {
 	}
 
 	$ot = outcometable($stu);
-	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Student Detail for: ").Sanitize::encodeStringForDisplay($ot[1][0][0])."</h2></div>\n";
+	echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Outcomes Student Detail for: ").Sanitize::encodeStringForDisplay($ot[1][0][0])."</h1></div>\n";
 	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th>';
 
