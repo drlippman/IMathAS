@@ -1009,4 +1009,18 @@ button.hamburger {
 	.navbar.videocued.shownav {
 		display: block;
 	}
+	table[role=presentation] > tbody > tr > td,
+	table[role=presentation] > tbody > tr > th,
+	table[role=presentation] > thead > tr > td,
+	table[role=presentation] > thead > tr > th
+	{
+		display: block;
+	}
+	table.responsive > tbody > tr > td,
+	table.responsive > tbody > tr > th,
+	table.responsive > thead > tr > td,
+	table.responsive > thead > tr > th
+	{
+		display: block;
+	}
 }
