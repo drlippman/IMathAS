@@ -650,7 +650,7 @@ div.coursedd {
 	top: 2px;
 }
 
-div.block h3 {
+div.block h3,div.block h2 {
 	margin: 2px;
 }
 div#viewbuttoncont {

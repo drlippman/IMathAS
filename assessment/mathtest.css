@@ -169,7 +169,7 @@ div.navbar {
 div.navbar.fixedonscroll {
 	width:125px;
 }
-div.navbar h4 {
+div.navbar h4, div.navbar h3 {
 	margin-top: 0px;
 }
 
