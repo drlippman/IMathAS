@@ -28,6 +28,8 @@
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
 	}
+	$hidesection = (((floor($gbmode/100000)%10)&1)==1);
+	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$includeduedate = (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
 	
@@ -191,10 +193,10 @@
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
-	if ($hassection) {
+	if ($hassection && !$hidesection) {
 		echo '<th>Section</th>';
 	}
-	if ($hascodes) {
+	if ($hascodes && !$hidecode) {
 		echo '<th>Code</th>';
 	}
 	echo "<th>Grade</th><th>%</th><th>Last Change</th>";
@@ -225,10 +227,10 @@
 			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
-		if ($hassection) {
+		if ($hassection && !$hidesection) {
 			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['section']));
 		}
-		if ($hascodes) {
+		if ($hascodes && !$hidecode) {
 			if ($line['code']==null) {$line['code']='';}
 			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['code']));
 		}
@@ -364,7 +366,7 @@
 		echo "</tr>";
 	}
 	echo '<tr><td>Average</td>';
-	if ($hassection) {
+	if ($hassection && !$hidesection) {
 		echo '<td></td>';
 	}
 	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=isolate\">";
@@ -388,9 +390,9 @@
 	}
 	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
-	if ($hassection && $hascodes) {
+	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
 		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true);</script>";
-	} else if ($hassection) {
+	} else if ($hassection && !$hidesection) {
 		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true);</script>";
 	} else {
 		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true);</script>";
