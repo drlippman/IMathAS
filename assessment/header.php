@@ -85,6 +85,22 @@ if (isset($CFG['GEN']['favicon'])) {
 if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
+
+echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=060618" type="text/javascript"></script>';
+
+/*
+
+/assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
+
+echo '<script src="' . $imasroot . '/javascript/general.js?v=060618" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=050918" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=041818" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/drawing.js?v=030118" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/eqntips.js?v=082616" type="text/javascript"></script>';
+
+*/
+
 if (isset($sessiondata['ltiitemtype']) && ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3)) {
 	echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Queue(function () {
@@ -178,19 +194,10 @@ div { zoom: 1; }
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
 <![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=060618";?>" type="text/javascript"></script>
+
 
 <?php
-/*
-<script src="<?php echo $imasroot . "/javascript/general.js?v=060618";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/mathjs.js?v=050918";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=041818";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=031018";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/drawing.js?v=030118";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/eqntips.js?v=082616";?>" type="text/javascript"></script>
 
-*/
-//assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=013118"></script>';
