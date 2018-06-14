@@ -101,45 +101,46 @@
 					}
 				}
 				if (count($stugroupmem)>0) {
-				//check that no group member has started the assessment
-				$ph = Sanitize::generateQueryPlaceholders($stugroupmem);
-				$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
-				$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessment_sessions WHERE userid IN ($ph) AND assessmentid=? ORDER BY id");
-				$stm->execute(array_merge($stugroupmem, array($aid)));
-				if ($stm->rowCount()>0) {
-					$doadd = false;
-					$row = $stm->fetch(PDO::FETCH_ASSOC);
-					$fieldstocopyarr = explode(',',$fieldstocopy);
-					$insrow = ":".implode(',:',$fieldstocopyarr);	
-					$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
-					$query .= "VALUES (:stuid,$insrow)";
-					$stm = $DBH->prepare($query);
-					$row[':stuid'] = $get_uid;
-					$stm->execute($row);
-					$asid = $DBH->lastInsertId();
-					$_GET['asid'] = $asid;
+					//check that no group member has started the assessment
+					$ph = Sanitize::generateQueryPlaceholders($stugroupmem);
+					$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
+					$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessment_sessions WHERE userid IN ($ph) AND assessmentid=? ORDER BY id");
+					$stm->execute(array_merge($stugroupmem, array($aid)));
+					if ($stm->rowCount()>0) {
+						$doadd = false;
+						$row = $stm->fetch(PDO::FETCH_ASSOC);
+						$fieldstocopyarr = explode(',',$fieldstocopy);
+						$insrow = ":".implode(',:',$fieldstocopyarr);	
+						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
+						$query .= "VALUES (:stuid,$insrow)";
+						$stm = $DBH->prepare($query);
+						$row[':stuid'] = $get_uid;
+						$stm->execute($row);
+						$asid = $DBH->lastInsertId();
+						$_GET['asid'] = $asid;
+					}
 				}
-			}
 			}
 			$stugroupmem[] = $get_uid;
 
 			if ($doadd) {			
-			require("../assessment/asidutil.php");
-			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
-			//$starttime = time();
-			foreach ($stugroupmem as $uid) {
-				//DB $query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
-				//DB $query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist;$scorelist','$attemptslist','$lalist',0,'$scorelist;$scorelist;$scorelist','$attemptslist','$seedlist','$lalist','$scorelist;$scorelist','$attemptslist','$reviewseedlist','$lalist');";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $asid = mysql_insert_id();
-				$query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,ver) ";
-				$query .= "VALUES (:userid, :agroupid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, 2);";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':userid'=>$uid, ':agroupid'=>$agroupid, ':assessmentid'=>$aid, ':questions'=>$qlist, ':seeds'=>$seedlist,
-					':scores'=>"$scorelist;$scorelist", ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':starttime'=>0,
-					':bestscores'=>"$scorelist;$scorelist;$scorelist", ':bestattempts'=>$attemptslist, ':bestseeds'=>$seedlist, ':bestlastanswers'=>$lalist,
-					':reviewscores'=>"$scorelist;$scorelist", ':reviewattempts'=>$attemptslist, ':reviewseeds'=>$reviewseedlist, ':reviewlastanswers'=>$lalist));
-				$asid = $DBH->lastInsertId();
+				require("../assessment/asidutil.php");
+				list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
+				//$starttime = time();
+				foreach ($stugroupmem as $uid) {
+					//DB $query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
+					//DB $query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist;$scorelist','$attemptslist','$lalist',0,'$scorelist;$scorelist;$scorelist','$attemptslist','$seedlist','$lalist','$scorelist;$scorelist','$attemptslist','$reviewseedlist','$lalist');";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $asid = mysql_insert_id();
+					$query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,ver) ";
+					$query .= "VALUES (:userid, :agroupid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, 2);";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':userid'=>$uid, ':agroupid'=>$agroupid, ':assessmentid'=>$aid, ':questions'=>$qlist, ':seeds'=>$seedlist,
+						':scores'=>"$scorelist;$scorelist", ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':starttime'=>0,
+						':bestscores'=>"$scorelist;$scorelist;$scorelist", ':bestattempts'=>$attemptslist, ':bestseeds'=>$seedlist, ':bestlastanswers'=>$lalist,
+						':reviewscores'=>"$scorelist;$scorelist", ':reviewattempts'=>$attemptslist, ':reviewseeds'=>$reviewseedlist, ':reviewlastanswers'=>$lalist));
+					$asid = $DBH->lastInsertId();
+				}
 			}
 		}
 		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
