@@ -13,6 +13,7 @@ ini_set("post_max_size", "10485760");
 /*** master php includes *******/
 require("../init.php");
 require_once(__DIR__ . "/../includes/htmLawed.php");
+require("../includes/safeunserialize.php");
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -64,7 +65,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 
 		// Sanitize endmsg content.
 		if (isset($item[$itemtoadd]['endmsg'])) {
-		    $data = unserialize($item[$itemtoadd]['endmsg']);
+		    $data = safe_unserialize($item[$itemtoadd]['endmsg']);
 		    $data['commonmsg'] = Sanitize::incomingHtml($data['commonmsg']);
 		    $data['def'] = Sanitize::incomingHtml($data['def']);
 		    foreach (array_keys($data['msgs']) as $k) {
@@ -700,8 +701,8 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$cid));
 
 		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-		$ciditemorder = unserialize($itemorder);
-		$items = unserialize($itemlist);
+		$ciditemorder = safe_unserialize($itemorder);
+		$items = safe_unserialize($itemlist);
 		$newitems = array();
 		$missingfiles = array();
 
@@ -753,7 +754,7 @@ if (!(isset($teacherid))) {
 			$page_fileErrorMsg .=  "a question or library export.\n";
 		}
 
-		$items = unserialize($itemlist);
+		$items = safe_unserialize($itemlist);
 		$ids = array();
 		$types = array();
 		$names = array();
