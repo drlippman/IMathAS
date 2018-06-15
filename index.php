@@ -628,7 +628,7 @@ function printMessagesGadget() {
 	echo '<div class="blockitems">';
 	if (count($page_newmessagelist)==0) {
 		echo '<p>', _('No new messages'), '</p>';
-		echo '</div>';
+		echo '</div></div>';
 		return;
 	}
 	echo '<table class="gb" id="newmsglist"><thead><tr><th>', _('Message'), '</th><th>', _('From'), '</th><th>', _('Course'), '</th><th>' ,_('Sent'), '</th></tr></thead>';
@@ -673,7 +673,7 @@ function printPostsGadget() {
 	echo '<div class="blockitems">';
 	if (count($page_newpostlist)==0) {
 		echo '<p>', _('No new posts'), '</p>';
-		echo '</div>';
+		echo '</div></div>';
 		return;
 	}
 	$threadlist = implode(',',$postthreads);
