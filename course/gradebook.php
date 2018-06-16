@@ -1702,8 +1702,10 @@ function gbinstrdisp() {
 						if ($istutor && $gbt[$i][1][$j][4]=='average') {
 
 						} else if ($gbt[$i][1][$j][4]=='average') {
+							$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
 							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
-							echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
@@ -1752,8 +1754,11 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
+							$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
+							
 							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$j][7]}\" ";
-							echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
 							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades={$gbt[$i][4][0]}&amp;gbitem={$gbt[0][1][$j][7]}\">";
@@ -1786,7 +1791,9 @@ function gbinstrdisp() {
 							echo $gbt[$i][1][$j][0];
 							echo '</a>';
 						} else {
-							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\"> ";
+							$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
+							echo "<span onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\"> ";
 							echo $gbt[$i][1][$j][0];
 							echo '</span>';
 						}
@@ -1804,8 +1811,10 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==3) { //exttool
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
+							$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
 							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid=all&amp;lid={$gbt[0][1][$j][7]}\" ";
-							echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
 							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid={$gbt[$i][4][0]}&amp;lid={$gbt[0][1][$j][7]}\">";
