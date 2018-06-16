@@ -97,7 +97,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line == null) {
 		$overwriteBody = 1;
-		$body = _("Course does not exist.  <a hre=\"../index.php\">Return to main page</a>") . "</body></html>\n";
+		$body = _("Course does not exist").'. <a href="../index.php">'. _('Return to home page'). '</a></body></html>';
 	}
 
 	$allowunenroll = $line['allowunenroll'];
