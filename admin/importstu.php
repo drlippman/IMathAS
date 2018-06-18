@@ -63,7 +63,7 @@ function parsecsv($data) {
 	if ($_POST['sectype']==1) {
 		$sec = Sanitize::stripHtmlTags($_POST['secval']);
 	} else if ($_POST['sectype']==2) {
-		$sec = $data[$_POST['seccol']-1];
+		$sec = Sanitize::stripHtmlTags($data[$_POST['seccol']-1]);
 	} else {
 		$sec = 0;
 	}
