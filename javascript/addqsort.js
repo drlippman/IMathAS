@@ -109,10 +109,12 @@ function refreshTable() {
 	initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
 	tinymce.init({
 		selector: "h4.textsegment",
-		inline: 1,
+		inline: true,
 		menubar: false,
+		statusbar: false,
+		branding: false,
 		plugins: ["charmap"],
-		toolbar1: "charmap saveclose",
+		toolbar: "charmap saveclose",
 		setup: editorSetup
 	});
 	activateLastEditorIfBlank();
