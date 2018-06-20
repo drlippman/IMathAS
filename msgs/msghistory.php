@@ -164,7 +164,7 @@
 	}
 	echo "<a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid&type=$type&filtercid=$filtercid\">Message</a> &gt; Message Conversation</div>\n";
 
-	echo '<div id="headermsghistory" class="pagetitle"><h2>Message Conversation</h2></div>';
+	echo '<div id="headermsghistory" class="pagetitle"><h1>Message Conversation</h1></div>';
 	echo "<p><a href=\"viewmsg.php?page=$page&cid=$cid&msgid=$msgid&type=$type&filtercid=$filtercid\">Back to Message</a></p>";
 	//echo "<p><b>Message: {$subject[$msgid]}</b></p>\n";
 	echo '<button onclick="expandall()">'._('Expand All').'</button>';

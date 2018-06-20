@@ -50,7 +50,7 @@ $curBreadcrumb = "$breadcrumbbase Unhide Courses\n";
 require("../header.php");
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
-echo '<h2>View Hidden Courses You\'re '.$typename.'</h2>';
+echo '<h1>View Hidden Courses You\'re '.$typename.'</h1>';
 
 
 

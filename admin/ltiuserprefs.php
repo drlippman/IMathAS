@@ -22,7 +22,7 @@ if (isset($_POST['mathdisp'])) {
 		echo '<input type="button" onclick="parent.GB_hide()" value="'._('Done').'" />';
 	}
 } else {
-	echo '<div id="headerforms" class="pagetitle"><h2>'._('User Preferences').'</h2></div>';
+	echo '<div id="headerforms" class="pagetitle"><h1>'._('User Preferences').'</h1></div>';
 	echo "<form enctype=\"multipart/form-data\" method=post action=\"$action\">\n";
 	showUserPrefsForm();
 	echo "<div class=submit><input type=submit value='Update Info'></div>\n";

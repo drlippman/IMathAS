@@ -1095,7 +1095,7 @@ function getnextprev(formn,loc) {
 </script>
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
-	<div id="headermanageqset" class="pagetitle"><h2><?php echo $pagetitle; echo $helpicon; ?></h2></div>
+	<div id="headermanageqset" class="pagetitle"><h1><?php echo $pagetitle; echo $helpicon; ?></h1></div>
 
 <?php
 	if (isset($_POST['remove']) || isset($_GET['remove'])) {

@@ -97,7 +97,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line == null) {
 		$overwriteBody = 1;
-		$body = _("Course does not exist.  <a hre=\"../index.php\">Return to main page</a>") . "</body></html>\n";
+		$body = _("Course does not exist").'. <a href="../index.php">'. _('Return to home page'). '</a></body></html>';
 	}
 
 	$allowunenroll = $line['allowunenroll'];
@@ -607,7 +607,7 @@ if ($overwriteBody==1) {
 <?php
 	}
    makeTopMenu();
-   echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>".Sanitize::encodeStringForDisplay($curname)."</h2></div>\n";
+   echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>".Sanitize::encodeStringForDisplay($curname)."</h1></div>\n";
 
    if (count($items)>0) {
 

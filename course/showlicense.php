@@ -2,7 +2,7 @@
 
 require("../init_without_validate.php");
 require("../header.php");
-echo '<h3>Question License</h3>';
+echo '<h2>Question License</h2>';
 
 if (empty($_GET['id'])) {
 	echo "No IDs specified";

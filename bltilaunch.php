@@ -166,7 +166,7 @@ if (isset($_GET['launch'])) {
 	$nologo = true;
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
-	echo "<h4>Connecting to $installname</h4>";
+	echo "<h3>Connecting to $installname</h3>";
 	echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of "
@@ -1819,7 +1819,7 @@ if (isset($_GET['launch'])) {
 	$nologo = true;
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
-	echo "<h4>Connecting to $installname</h4>";
+	echo "<h3>Connecting to $installname</h3>";
 	echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of ".Sanitize::encodeStringForDisplay($sessiondata['ltitlwrds']).".  Click OK to start or continue working on the assessment.\")' >";

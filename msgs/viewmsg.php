@@ -81,7 +81,7 @@
 	} else {
 		echo " <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> &gt; Message</div>";
 	}
-	echo '<div id="headerviewmsg" class="pagetitle"><h2>Message</h2></div>';
+	echo '<div id="headerviewmsg" class="pagetitle"><h1>Message</h1></div>';
 
 
 

@@ -96,7 +96,7 @@ if ($overwriteBody==1) {
 } else {
 	?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerenrollfromothercourse" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+	<div id="headerenrollfromothercourse" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 	<form id="qform" method="post" action="enrollfromothercourse.php?cid=<?php echo $cid ?>">
 	<?php
 	if (isset($resultCourseList)) {

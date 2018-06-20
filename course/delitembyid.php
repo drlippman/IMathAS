@@ -2,7 +2,7 @@
 require_once("../includes/filehandler.php");
 
 function delitembyid($itemid) {
-	global $DBH;
+	global $DBH, $cid;
 
 	//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
@@ -140,6 +140,10 @@ function delitembyid($itemid) {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$typeid));
+		
+		$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=0 WHERE reqscoreaid=:assessmentid AND courseid=:courseid");
+		$stm->execute(array(':assessmentid'=>$typeid, ':courseid'=>$cid));
+		
 	} else if ($itemtype == "Drill") {
 		//DB $query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid='$typeid'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());

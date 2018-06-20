@@ -23,7 +23,7 @@
 		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
 		echo "<img class=\"floatleft\" src=\"$imasroot/img/ruler.jpg\" alt=\"Picture of a ruler\"/>
 		<div class=\"content\">
-		<div id=\"headerdiagindex\" class=\"pagetitle\"><h2>", _('Available Diagnostics'), "</h2></div>
+		<div id=\"headerdiagindex\" class=\"pagetitle\"><h1>", _('Available Diagnostics'), "</h1></div>
 		<ul class=\"nomark\">";
 		//DB $query = "SELECT id,name FROM imas_diags WHERE public=3 OR public=7";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());

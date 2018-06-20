@@ -78,7 +78,7 @@ $flexwidth = true;
 $nologo = true;
 require("../header.php");
 
-echo '<h2>'.sprintf(_('All Feedback For %s'), $gbt[1][0][0]).'</h2>';
+echo '<h1>'.sprintf(_('All Feedback For %s'), $gbt[1][0][0]).'</h1>';
 
 for ($i=0;$i<count($gbt[0][1]);$i++) {
 	if ($gbt[1][1][$i][1] == '' || $gbt[1][1][$i][1]=='<p></p>') {
@@ -98,10 +98,10 @@ for ($i=0;$i<count($gbt[0][1]);$i++) {
 	if ($hidepast && $gbt[0][1][$i][3]==0) {
 		continue;
 	}
-	echo '<h4>';
+	echo '<h3>';
 	echo Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
 	echo ' '.sprintf(_('(Score: %g/%g)'), $gbt[1][1][$i][0], $gbt[0][1][$i][2]);
-	echo '</h4>';
+	echo '</h3>';
 	echo '<div class="fbbox">';
 	echo Sanitize::outgoingHtml($gbt[1][1][$i][1]);
 	echo '</div>';

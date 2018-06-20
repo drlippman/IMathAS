@@ -126,7 +126,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headeraddforum" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 <?php
 if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	echo '<p>Select a rubric to edit or <a href="addrubric.php?cid='.$cid.'&amp;id=new">Add a new rubric</a></p><p>';

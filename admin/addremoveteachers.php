@@ -157,12 +157,12 @@ if ($from == 'admin') {
 	echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('Group Details').'</a> &gt; ';
 }
 echo "$pagetitle</div>\n";
-echo '<div class="pagetitle"><h2>'.$pagetitle.' - '.Sanitize::encodeStringForDisplay($coursename).'</h2></div>';
+echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDisplay($coursename).'</h1></div>';
 ?>
 
 <div id="app" v-cloak>
 <div id="currentteachers">
-	<h3>Current Teachers</h3>
+	<h2>Current Teachers</h2>
 	<p>With selected: <button @click="removeTeachers()">Remove as teacher</button>
 	   <span v-if="processingRemove" class="noticetext">Saving Changes... <img src="../img/updating.gif"></span>
 	</p>
@@ -173,7 +173,7 @@ echo '<div class="pagetitle"><h2>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	</transition-group>
 </div>
 <div id="potentialteachers">
-	<h3>Potential Teachers</h3>
+	<h2>Potential Teachers</h2>
 	<p><button @click="loadGroup()">List my group members</button>
 		or lookup a teacher: <input v-model="toLookup" size=30>
 		<button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>

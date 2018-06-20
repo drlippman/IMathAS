@@ -65,7 +65,7 @@ $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a
 
 require("../header.php");
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
-echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
+echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
 ?>
 
@@ -201,7 +201,7 @@ echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
 
 <div v-if="resultMessage!=''">{{resultMessage}}</div>
 <div v-if="resultRuleSet!=-1">
-	<h3>Student Groupings: {{ ruleSets[resultRuleSet].name }}</h3>
+	<h2>Student Groupings: {{ ruleSets[resultRuleSet].name }}</h2>
 	<div v-for="(rule,index) in ruleSets[resultRuleSet].rules">
 		<p>Students {{ rulePhrases[index] }}
 		<span v-if="results[index].length>0">

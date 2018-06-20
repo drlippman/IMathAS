@@ -294,7 +294,7 @@ if ($overwriteBody==1) {
 
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Mass Change Dates</div>\n";
-	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
+	echo '<div id="headermasschgdates" class="pagetitle"><h1>Mass Change Dates</h1></div>';
 
 	echo "<script type=\"text/javascript\">var filteraddr = \"$imasroot/course/masschgdates.php?cid=$cid&orderby=" . Sanitize::encodeUrlParam($orderby) . "\";";
 

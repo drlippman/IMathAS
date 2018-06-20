@@ -179,7 +179,7 @@ require("../header.php");
 
 echo '<div class=breadcrumb>'.$breadcrumbbase._("Course Order").'</div>';
 
-echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>";
+echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>";
 echo _("Display Order").': ';
 if ($type=='take') {
 	echo _('Courses you\'re taking');
@@ -188,7 +188,7 @@ if ($type=='take') {
 } else if ($type=='teach') {
 	echo _('Courses you\'re teaching');
 }
-echo "</h2></div>\n";
+echo "</h1></div>\n";
 
 echo '<div class="breadcrumb">'._('Use colored boxes to drag-and-drop order and move courses inside groups.').' <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/><span id="submitnotice" class=noticetext></span></div>';
 
@@ -215,6 +215,16 @@ function listCourse($course) {
 }
 $cnt = 0;
 $shownCourses = array();
+function cleanCourseList(&$arr) {
+	global $courses;
+	foreach ($arr as $k=>$item) {
+		if (is_array($item)) {
+			cleanCourseList($arr[$k]['courses']);
+		} else if (!isset($courses[$item])) {
+			unset($arr[$k]);
+		}
+	}
+}
 function showCourseList($arr) {
 	global $courses,$cnt,$shownCourses;
 	foreach ($arr as $item) {
@@ -241,6 +251,7 @@ echo '<li class="blockli" id="maingrp"><b>'._('Displayed Courses').'</b>';
 echo  '<ul class="qview">';
 //display main courses
 if (isset($courseListOrder[$type])) {
+	cleanCourseList($courseListOrder[$type]);
 	showCourseList($courseListOrder[$type]);
 	$unlisted = array_diff($defaultcourseorder, $shownCourses);
 	foreach ($unlisted as $course) {

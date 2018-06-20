@@ -78,7 +78,7 @@ function showUserPrefsForm() {
 		writeHtmlSelect($key,array_keys($prefs[$key]), array_values($prefs[$key]), isset($sessiondata['userprefs'][$key])?$sessiondata['userprefs'][$key]:$prefdefaults[$key]);
 		if ($key=='tztype') {
 			echo '<span id="tzset" style="display:none;"><br/>';
-			echo _('Set timezone to:').' <select name="settimezone" id="settimezone">';
+			echo '<label for="settimezone">'._('Set timezone to:').'</label> <select name="settimezone" id="settimezone">';
 			foreach ($timezones as $tz) {
 				echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';
 			}

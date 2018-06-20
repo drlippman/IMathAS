@@ -68,7 +68,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 		$catscore[$cat[$quests[$i]]] += $pts;
 		$catposs[$cat[$quests[$i]]] += $pospts[$quests[$i]];
 	}
-	echo "<h4>", _('Categorized Score Breakdown'), "</h4>\n";
+	echo "<h3>", _('Categorized Score Breakdown'), "</h3>\n";
 	echo "<table cellpadding=5 class=gb><thead><tr><th>", _('Category'), "</th><th>", _('Points Earned / Possible (Percent)'), "</th></tr></thead><tbody>\n";
 	$alt = 0;
 	function printoutcomes($arr,$ind, $outcomenames, $catscore, $catposs) {

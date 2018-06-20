@@ -61,7 +61,7 @@
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	}
 	echo "&gt; New Message List</div>";
-	echo '<div id="headernewmsglist" class="pagetitle"><h2>New Messages</h2></div>';
+	echo '<div id="headernewmsglist" class="pagetitle"><h1>New Messages</h1></div>';
 
 ?>
 
@@ -95,7 +95,7 @@
 				if($lastcourse!='') {
 					echo '</tbody></table>';
 				}
-				echo '<h4>Course: '.Sanitize::encodeStringForDisplay($line['name']).'</h4>';
+				echo '<h3>Course: '.Sanitize::encodeStringForDisplay($line['name']).'</h3>';
 				echo '<table class="gb"><thead><tr><th></th><th>Message</th><th>Replied</th><th>From</th><th>Course</th><th>Sent</th></tr></thead><tbody>';
 				$lastcourse = $line['name'];
 			}

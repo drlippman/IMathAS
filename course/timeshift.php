@@ -182,7 +182,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3>Shift Course Dates</h3>
+	<h2>Shift Course Dates</h2>
 	<p>
 		This page will change <b>ALL</b> course available dates and due dates based on
 		changing one item.  This is intended to allow you to reset all course item

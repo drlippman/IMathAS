@@ -10,7 +10,7 @@ if ((isset($_POST['submit']) && $_POST['submit']=="Message") || isset($_GET['mas
 }
 
 require("../header.php");
-echo '<h3>Search through inline and link text items</h3>';
+echo '<h2>Search through inline and link text items</h2>';
 //DB echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities(stripslashes($_POST['search'])).'"> <input type="submit" value="Search"/></p>';
 echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.Sanitize::encodeStringForDisplay($_POST['search']).'"> <input type="submit" value="Search"/></p>';
 if (isset($_POST['search'])) {

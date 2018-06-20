@@ -1086,7 +1086,7 @@ if (isset($_GET['aid'])) {
 }
 
 echo '<div id="headermoddataset" class="pagetitle">';
-echo "<h2>$addmod Tutorial Question</h2>\n";
+echo "<h1>$addmod Tutorial Question</h1>\n";
 echo '</div>';
 
 if ($editmsg != '' || $_GET['id']!='new') {
@@ -1404,7 +1404,7 @@ for ($n=0;$n<10;$n++) {
 	if ($n>=$nparts) {echo ' style="display:none;"';};
 	echo '>';
 
-	echo '<h4>Part '.($n).' Question</h4>';
+	echo '<h3>Part '.($n).' Question</h3>';
 	echo '<p>This part is ';
 	writeHtmlSelect("qtype$n",$qtypeval,$qtypelbl, $qtype[$n], null, null, 'onchange="changeqtype('.$n.',this)"');
 
@@ -1512,7 +1512,7 @@ for ($n=0;$n<10;$n++) {
 	echo '</div>'; //end partwrapper div
 }
 
-echo '<h4>Hints</h4>';
+echo '<h3>Hints</h3>';
 echo '<p>This question has ';
 writeHtmlSelect("nhints",range(0,4),range(0,4), $nhints,null,null,'onchange="changehparts(this)"');
 echo 'hints.</p>';
@@ -1537,7 +1537,7 @@ the question text, like creating graphs.</p>
 </div>
 <?php
 
-echo '<h4>Question Text</h4>';
+echo '<h3>Question Text</h3>';
 echo '<p>In the question text, enter <span id="anstipsingle" ';
 if ($nparts!=1) {echo 'style="display:none;" ';}
 echo '><b>$answerbox</b> to place the question list into the question.  Enter <b>$feedback</b> to indicate where the feedback should be displayed.</span> <span id="anstipmult" ';

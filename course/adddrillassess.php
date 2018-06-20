@@ -649,7 +649,7 @@ function updateorder(el) {
 <?php
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Add/Modify Drill Assessment</div>";
-echo "<h2>Add/Modify Drill Assessment</h2>";
+echo "<h1>Add/Modify Drill Assessment</h1>";
 
 printf("<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=%s&daid=%d&block=%s&tb=%s&record=true\">",
     $cid, $daid, Sanitize::encodeUrlParam($block), Sanitize::encodeUrlParam($totb));
@@ -763,7 +763,7 @@ echo '<table>';
 if (!$beentaken) {
 ?>
 
-	<h3>Potential Questions</h3>
+	<h2>Potential Questions</h2>
 
 		In Libraries:
 		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames) ?></span>

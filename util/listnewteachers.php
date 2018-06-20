@@ -27,8 +27,8 @@ if (isset($_GET['end'])) {
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js"></script>';
 require("../header.php");
 
-echo '<h2>New Instructor Account Requests from ';
-echo date('M j, Y',$start).' to '.date('M j, Y',$end).'</h2>';
+echo '<h1>New Instructor Account Requests from ';
+echo date('M j, Y',$start).' to '.date('M j, Y',$end).'</h1>';
 
 $stm = $DBH->prepare("SELECT time,log FROM imas_log WHERE log LIKE :log AND time>:start AND time<:end");
 $stm->execute(array(':log'=>"New Instructor Request%",':start'=>$start,':end'=>$end));

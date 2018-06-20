@@ -404,7 +404,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 			require("../header.php");
 			echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
-			echo '<div id="headerlistusers" class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
+			echo '<div id="headerlistusers" class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 			echo "<p>User info updated. ";
 			echo $msgout;
 			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
@@ -627,7 +627,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerlistusers" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+	<div id="headerlistusers" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 <?php
 
 	if (isset($_GET['assigncode'])) {

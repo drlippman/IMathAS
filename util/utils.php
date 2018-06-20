@@ -330,7 +330,7 @@ if (isset($_GET['form'])) {
 	//listing of utilities
 	require("../header.php");
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Utilities</div>';
-	echo '<h3>Admin Utilities </h3>';
+	echo '<h2>Admin Utilities </h2>';
 	if (isset($_GET['debug'])) {
 		echo '<p>Debug Mode Enabled - Error reporting is now turned on.</p>';
 	}

@@ -49,7 +49,7 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$name = $stm->fetchColumn(0);
-		echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Delete Course</h1></div>';
 		echo "<p>Are you sure you want to delete the course <b>".Sanitize::encodeStringForDisplay($name)."</b>?</p>\n";
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="delete">'._('Delete').'</button>';
@@ -131,7 +131,7 @@ switch($_GET['action']) {
 		echo "\">\n";
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']).'" />';
 		if ($_GET['action'] == "newadmin") {
-			echo '<div class="pagetitle"><h2>'._('New User').'</h2></div>';
+			echo '<div class="pagetitle"><h1>'._('New User').'</h1></div>';
 			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):0);
 			$oldrights = 10;
 		} else {
@@ -141,7 +141,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			printf("<div class=pagetitle><h2>%s %s</h2></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
+			printf("<div class=pagetitle><h1>%s %s</h1></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
 				Sanitize::encodeStringForDisplay($line['LastName']));
 			$oldgroup = $line['groupid'];
 			$oldrights = $line['rights'];
@@ -410,13 +410,13 @@ switch($_GET['action']) {
 			$cid = Sanitize::courseId($_GET['cid']);
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Course Settings</div>";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h2>';
+		echo '<div id="headerforms" class="pagetitle"><h1>';
 		if ($_GET['action']=='modify') {
 			echo _('Course Settings');
 		} else {
 			echo _('Add New Course');
 		}
-		echo '</h2></div>';
+		echo '</h1></div>';
 		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
 		if (isset($_GET['cid'])) {
 			echo "&cid=$cid";
@@ -884,7 +884,7 @@ switch($_GET['action']) {
 	case "importmacros":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		
-		echo "<h3>Install Macro File</h3>\n";
+		echo "<h2>Install Macro File</h2>\n";
 		echo "<p><b>Warning:</b> Macro Files have a large security risk.  <b>Only install macro files from a trusted source</b></p>\n";
 		echo "<p><b>Warning:</b> Install will overwrite any existing macro file of the same name</p>\n";
 		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
@@ -897,7 +897,7 @@ switch($_GET['action']) {
 
 	case "importqimages":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
-		echo "<h3>Install Question Images</h3>\n";
+		echo "<h2>Install Question Images</h2>\n";
 		echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install question images from a trusted source</b>, and where you've verified the archive only contains images.</p>\n";
 		echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n";
 		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
@@ -909,7 +909,7 @@ switch($_GET['action']) {
 		break;
 	case "importcoursefiles":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
-		echo "<h3>Install Course files</h3>\n";
+		echo "<h2>Install Course files</h2>\n";
 		echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install course files from a trusted source</b>, and where you've verified the archive only contains regular files (no PHP files).</p>\n";
 		echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n";
 		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
@@ -921,7 +921,7 @@ switch($_GET['action']) {
 		break;
 	case "deloldusers":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
-		echo "<h3>Delete Old Users</h3>\n";
+		echo "<h2>Delete Old Users</h2>\n";
 		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
 		echo '<input type=hidden name=action value="deloldusers" />';
 		echo "<span class=form>Delete Users older than:</span>";
@@ -935,7 +935,7 @@ switch($_GET['action']) {
 	case "listltidomaincred":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>Modify LTI Domain Credentials</h3>\n";
+		echo "<h2>Modify LTI Domain Credentials</h2>\n";
 		echo '</div>';
 		echo "<table><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr>\n";
 		//DB $query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76 OR rights=77";
@@ -985,7 +985,7 @@ switch($_GET['action']) {
 	case "delltidomaincred":
 		if ($myrights<100) { echo "not allowed"; exit;}
 		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>Delete LTI Domain Credentials</h3>\n";
+		echo "<h2>Delete LTI Domain Credentials</h2>\n";
 		echo '</div>';
 		$stm = $DBH->prepare("SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
@@ -1001,7 +1001,7 @@ switch($_GET['action']) {
 	case "modltidomaincred":
 		if ($myrights<100) { echo "not allowed"; exit;}
 		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>Modify LTI Domain Credentials</h3>\n";
+		echo "<h2>Modify LTI Domain Credentials</h2>\n";
 		echo '</div>';
 		//DB $query = "SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1038,7 +1038,7 @@ switch($_GET['action']) {
 	case "listfedpeers":
 		if ($myrights<100) { echo "not allowed"; exit;}
 		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>View Federation Peers</h3>\n";
+		echo "<h2>View Federation Peers</h2>\n";
 		echo '</div>';
 		echo "<table><tr><th>Name</th><th>Description</th><th>Their Last Pull</th><th>Our Last Pull</th><th>Modify</th><th>Delete</th><th>Pull</th></tr>\n";
 
@@ -1083,7 +1083,7 @@ switch($_GET['action']) {
 	case "modfedpeers":
 		if ($myrights<100) { echo "not allowed"; exit;}
 		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>Modify Federation Peer</h3>\n";
+		echo "<h2>Modify Federation Peer</h2>\n";
 		echo '</div>';
 		//DB $query = "SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1109,7 +1109,7 @@ switch($_GET['action']) {
 	case "listgroups":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>Modify Groups</h3>\n";
+		echo "<h2>Modify Groups</h2>\n";
 		echo '</div>';
 		echo "<table class=gb><thead><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr></thead><tbody>\n";
 		if ($from=='admin2') {
@@ -1147,7 +1147,7 @@ switch($_GET['action']) {
 	case "delgroup":
 		if ($myrights<100) { echo "not allowed"; exit;}
 		echo '<div id="headerforms" class="pagetitle">';
-		echo "<h3>Delete Group</h3>\n";
+		echo "<h2>Delete Group</h2>\n";
 		echo '</div>';
 		$stm = $DBH->prepare("SELECT name,parent FROM imas_groups WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
@@ -1162,7 +1162,7 @@ switch($_GET['action']) {
 		break;
 	case "modgroup":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
-		echo '<div id="headerforms" class="pagetitle"><h2>Rename Instructor Group</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Rename Instructor Group</h1></div>';
 		//DB $query = "SELECT name,parent FROM imas_groups WHERE id='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB list($gpname,$parent) = mysql_fetch_row($result);
@@ -1201,7 +1201,7 @@ switch($_GET['action']) {
 		break;
 	case "findstudent":
 		if ($myrights < 20) { echo "You don't have the authority for this action"; break;}
-		echo '<div id="headerforms" class="pagetitle"><h2>Find Student</h2></div>';
+		echo '<div id="headerforms" class="pagetitle"><h1>Find Student</h1></div>';
 		echo '<form method="post" action="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">';
 		echo '<p>Enter all or part of the name, email, or username: ';
 		echo '<input type=text size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo']).'"/></p>';

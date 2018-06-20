@@ -15,7 +15,8 @@ $pagetitle = "Delete Course Block";
 $cid = Sanitize::courseId($_GET['cid']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".$cid."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Block";
 
-if (!(isset($cid))) { //if the cid is missing go back to the index page
+
+if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
@@ -66,11 +67,11 @@ if (!(isset($cid))) { //if the cid is missing go back to the index page
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
 
-		$obarr = explode(',',$_COOKIE['openblocks-'.Sanitize::courseId($_GET['cid'])]);
+		$obarr = explode(',',$_COOKIE['openblocks-'.$cid]);
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
 		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',array_map('Sanitize::onlyInt',$obarr)));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=". $cid . "&r=" . Sanitize::randomQueryStringParam());
 
 	} else {
 		$blocktree = explode('-',$_GET['id']);
@@ -105,13 +106,13 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h3><?php echo $itemname; ?></h3>
-	<form method=post action="deleteblock.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&id=<?php echo Sanitize::encodeStringForDisplay($_GET['id']) ?>">
+	<h2><?php echo $itemname; ?></h2>
+	<form method=post action="deleteblock.php?cid=<?php echo $cid; ?>&id=<?php echo Sanitize::encodeStringForDisplay($_GET['id']) ?>">
 	<p>Are you SURE you want to delete this Block?</p>
 	<p><input type=radio name="delcontents" value="0"/>Move all items out of block<br/>
 	<input type=radio name="delcontents" value="1" checked="checked"/>Also Delete all items in block</p>
 	<p><button type=submit name="remove" value="really">Yes, Delete</button>		
-	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'"></p>
+	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $cid; ?>'"></p>
 	</form>
 <?php
 }

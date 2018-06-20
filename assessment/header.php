@@ -43,7 +43,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=042418";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=060918";?>" type="text/css"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
@@ -84,6 +84,30 @@ if (isset($CFG['GEN']['favicon'])) {
 }
 if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
+}
+
+echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=060618" type="text/javascript"></script>';
+
+/*
+
+/assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
+
+echo '<script src="' . $imasroot . '/javascript/general.js?v=060618" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=050918" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=041818" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/drawing.js?v=030118" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/eqntips.js?v=082616" type="text/javascript"></script>';
+
+*/
+
+if (isset($sessiondata['ltiitemtype']) && ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3)) {
+	echo '<script type="text/x-mathjax-config">
+		MathJax.Hub.Queue(function () {
+			sendLTIresizemsg();
+		});
+		MathJax.Hub.Register.MessageHook("End Process", sendLTIresizemsg);
+	     </script>';
 }
 //$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
@@ -170,19 +194,10 @@ div { zoom: 1; }
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
 <![endif]-->
 
-<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=050918";?>" type="text/javascript"></script>
+
 
 <?php
-/*
-<script src="<?php echo $imasroot . "/javascript/general.js?v=012618";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/mathjs.js?v=050918";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/AMhelpers.js?v=041818";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=031018";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/drawing.js?v=030118";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/eqntips.js?v=082616";?>" type="text/javascript"></script>
 
-*/
-//assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=013118"></script>';
@@ -239,33 +254,13 @@ if (isset($CFG['GEN']['translatewidgetID'])) {
 }
 if (isset($sessiondata['ltiitemtype'])) {
 	echo '<script type="text/javascript">
-	function sendLTIresizemsg() {
-		var default_height = Math.max(
-							document.body.scrollHeight, document.body.offsetHeight,
-							document.documentElement.clientHeight, document.documentElement.scrollHeight,
-							document.documentElement.offsetHeight)+100;
-		parent.postMessage(JSON.stringify({subject:\'lti.frameResize\', height: default_height}), \'*\');
-	}
 	if (mathRenderer == "Katex") {
 		window.katexDoneCallback = sendLTIresizemsg;
-	} else if (typeof MathJax != "undefined") {
-		MathJax.Hub.Queue(function () {
-			sendLTIresizemsg();
-		});
 	} else {
-		$(function() {
-			sendLTIresizemsg();
-		});
+		$(sendLTIresizemsg);
 	}
 	</script>';
-	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
-		echo '<script type="text/x-mathjax-config">
-			MathJax.Hub.Queue(function () {
-				sendLTIresizemsg();
-			});
-		</script>';
 	}
-}
 echo '</head>';
 if ($isfw!==false) {
 	echo "<body class=\"fw$isfw\">\n";

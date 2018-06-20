@@ -96,7 +96,7 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 		$headers .= "From: $sendfrom\r\n";
-		$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
+		$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 		$message .= "<p>Quick Drill Results for ".Sanitize::encodeStringForDisplay($stuname)."</p>";
 		$message .= "<p>$out</p>";
 		mail(Sanitize::emailAddress($_GET['email']),'QuickDrill Results',$message,$headers);
@@ -559,7 +559,7 @@ function linkgenerator() {
  </script>
  </head>
  <body>
- <h2>Quick Drill Link Generator</h2>
+ <h1>Quick Drill Link Generator</h1>
  <table border=0>
  <tr><td>Question ID to use:</td><td><input type="number" style="width: 6em" id="qid" /></td></tr>
  <tr><td>Course ID (optional):</td><td><input type="number" style="width: 6em" id="cid" /></td></tr>

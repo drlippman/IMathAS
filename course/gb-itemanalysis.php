@@ -74,7 +74,7 @@
 
 	echo '<div class="cpmid"><a href="isolateassessgrade.php?cid='.$cid.'&amp;aid='.$aid.'">View Score List</a></div>';
 
-	echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Analysis: ';
+	echo '<div id="headergb-itemanalysis" class="pagetitle"><h1>Item Analysis: ';
 
 	$qtotal = array();
 	$qcnt = array();
@@ -92,7 +92,7 @@
 	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = $stm->fetch(PDO::FETCH_NUM);
-	echo Sanitize::encodeStringForDisplay($aname) . '</h2></div>';
+	echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
 
 
 	$itemarr = array();

@@ -267,7 +267,7 @@ if ($overwriteBody==1) {
 	echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; Activity Report - Lab</div>';
 
 
-	echo '<div class="pagetitle"><h2>Activity Report - Lab Style Courses</h2></div>';
+	echo '<div class="pagetitle"><h1>Activity Report - Lab Style Courses</h1></div>';
 	echo '<p>This report summarizes the activity of students for '.$intervalarr[$interval].'.<br/>';
 	if ($useminscore) {
 		echo 'Activity is divided into "credit" or "no credit". If a "minimum score to receive credit" is set for the assignment, that is ';
@@ -295,7 +295,7 @@ if ($overwriteBody==1) {
 	echo '</form></fieldset>';
 
 
-	echo '<h3>'.$timedescr.'</h3>';
+	echo '<h2>'.$timedescr.'</h2>';
 	echo '<table class="gb">';
 	echo '<tr> <td>'.$attemptedstudents.' (out of '.$totalstudents.') </td><td> Students attempted at least one assessment. </td></tr>';
 	echo '<tr> <td class="r">'.$assessmentcount.'</td><td> Assessments were attempted. </td></tr>';
@@ -303,7 +303,7 @@ if ($overwriteBody==1) {
 	echo '</table>';
 
 ?>
-<h3>Student Summary: </h3>
+<h2>Student Summary: </h2>
 <p>Click a row for details.
    <button type="button" onclick="expandAllSummaries('stu')">Expand All</button>
    <button type="button" onclick="collapseAllSummaries('stu')">Collapse All</button>
@@ -392,7 +392,7 @@ foreach ($st as $uid=>$stu) {
 
 <br/>
 
-<h3>Assessment Summary: </h3>
+<h2>Assessment Summary: </h2>
 
 <p>Click a row for details.
    <button type="button" onclick="expandAllSummaries('as')">Expand All</button>

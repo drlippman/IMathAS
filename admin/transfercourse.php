@@ -125,7 +125,7 @@ if ($from == 'admin') {
 	echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$imasroot.$backloc.'">'._('Group Details').'</a> &gt; ';
 }
 echo "$pagetitle</div>\n";
-echo '<div class="pagetitle"><h2>'.$pagetitle.' - '.Sanitize::encodeStringForDisplay($coursename).'</h2></div>';
+echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDisplay($coursename).'</h1></div>';
 ?>
 <form method="post">
 <div id="app" v-cloak>

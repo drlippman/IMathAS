@@ -146,7 +146,7 @@
 	} //end $editingon block
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Calendar</div>";
-	echo '<div id="headercalendar" class="pagetitle"><h2>Calendar</h2></div>';
+	echo '<div id="headercalendar" class="pagetitle"><h1>Calendar</h1></div>';
 
 	 if (isset($teacherid)) {
 		echo "<div class=\"cpmid\"><a id=\"mcelink\" href=\"managecalitems.php?from=cal&cid=$cid\">Manage Events</a> | ";

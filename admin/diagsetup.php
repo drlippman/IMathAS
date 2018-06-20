@@ -317,8 +317,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 
 	if (isset($_GET['step']) && $_GET['step']==2) {  //STEP 2 DISPLAY
 ?>
-		<div id="headerdiagsetup" class="pagetitle"><h2>Diagnostic Setup</h2></div>
-		<h4>Second-level Selector - extra information</h4>
+		<div id="headerdiagsetup" class="pagetitle"><h1>Diagnostic Setup</h1></div>
+		<h3>Second-level Selector - extra information</h3>
 		<form method=post action="diagsetup.php?step=3&amp;from=<?php echo $from;?>">
 
 			<input type=hidden name="sel1list" value="<?php echo Sanitize::encodeStringForDisplay($sel1list); ?>"/>
@@ -405,7 +405,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	} else {
 	 //STEP 1 DISPLAY
 ?>
-<div id="headerdiagsetup" class="pagetitle"><h2>Diagnostic Setup</h2></div>
+<div id="headerdiagsetup" class="pagetitle"><h1>Diagnostic Setup</h1></div>
 <form method=post action=diagsetup.php?step=2&amp;from=<?php echo $from; ?>>
 
 <?php echo (isset($_GET['id'])) ? "	<input type=hidden name=id value=\"".Sanitize::encodeUrlParam($_GET['id'])."\"/>" : ""; ?>
@@ -569,7 +569,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 ?>
 	</p>
 
-	<h4>First-level selector - selects assessment to be delivered</h4>
+	<h3>First-level selector - selects assessment to be delivered</h3>
 	<p>Selector name:  <input name="sel" type=text value="<?php echo Sanitize::encodeStringForDisplay($sel); ?>"/> "Please select your _______"</p>
 	<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
 	<p>Enter new selector option:

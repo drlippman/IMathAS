@@ -180,7 +180,7 @@ if ($overwriteBody==1) {
 	<?php echo $curBreadcrumb; ?>
 </div>
 <form id="qform" method="post" action="chgblocks.php?cid=<?php echo $cid;?>">
-<h3><?php echo _('Blocks to Change');?></h3>
+<h2><?php echo _('Blocks to Change');?></h2>
 Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All');?></a>
 <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None');?></a>
 <ul class="nomark">

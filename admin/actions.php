@@ -794,7 +794,7 @@ switch($_POST['action']) {
 
 			require("../header.php");
 			echo '<div class="breadcrumb">'.$breadcrumbbase.' Course Creation Confirmation</div>';
-			echo '<h2>Your course has been created!</h2>';
+			echo '<h1>Your course has been created!</h1>';
 			echo '<p>For students to enroll in this course, you will need to provide them two things:<ol>';
 			echo '<li>The course ID: <b>'.$cid.'</b></li>';
 			if (trim($_POST['ekey'])=='') {
@@ -1044,7 +1044,7 @@ switch($_POST['action']) {
 						} else if (strpos($buffer,"function")===0) {
 							$func = substr($buffer,9,strpos($buffer,"(")-9);
 							if ($comments!='') {
-								$outlines .= "<h3><a name=\"$func\">$func</a></h3>\n";
+								$outlines .= "<h2><a name=\"$func\">$func</a></h2>\n";
 								$funcs[] = $func;
 								$outlines .= $comments;
 								$comments = '';

@@ -104,7 +104,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $cid, Sanitize::encodeStringForDisplay($coursename));
                 $body .= sprintf("&gt; <a href=\"addassessment.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
                     $cid, $assessmentId);
-                $body .= sprintf("<h3>%s</h3>", Sanitize::encodeStringForDisplay($assessmentname));
+			$body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
                 $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
                 $body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, $assessmentId).'">"';
                 $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
@@ -140,7 +140,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $reviewdate = 0;
             }
 
-            if (isset($_POST['shuffle'])) { $shuffle = 1;} else {$shuffle = 0;}
+		$shuffle = Sanitize::onlyInt($_POST['shuffle']);
             if (isset($_POST['sameseed'])) { $shuffle += 2;}
             if (isset($_POST['samever'])) { $shuffle += 4;}
             if (isset($_POST['reattemptsdiffver']) && $_POST['deffeedback']!="Practice" && $_POST['deffeedback']!="Homework") {
@@ -700,9 +700,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
 
             if (isset($_GET['id'])) {
-                $formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
             } else {
-                $formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h2>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h2></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
             }
 
             $page_formActionTag = sprintf("addassessment.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);
@@ -1187,7 +1187,12 @@ if ($overwriteBody==1) {
 
 
 			<span class=form>Shuffle item order: </span>
-			<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
+			<span class=formright>
+				<select name="shuffle">
+					<option value="0" <?php writeHtmlSelected($line['shuffle']&(1+16),0) ?>>No</option>
+					<option value="1" <?php writeHtmlSelected($line['shuffle']&1,1) ?>>All</option>
+					<option value="16" <?php writeHtmlSelected($line['shuffle']&16,16) ?>>All but first</option>
+				</select>
 			</span><BR class=form>
 			<span class=form>Gradebook Category:</span>
 			<span class=formright>

@@ -128,11 +128,11 @@ function mbxfilter($str) {
 
 	//rewrite opening and closing tags. Strip any remaining sub/sup
 	$str = str_replace(
-		array('<b>','<i>','<u>','<strong>','<br>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<sup>','<sub>'),
+		array('<b>','<i>','<u>','<strong>','<br>','<h1>','<h1>','<h2>','<h3>','<h5>','<h6>','<sup>','<sub>'),
 		array('<em>','<em>','','<em>','','<p>','<p>','<p>','<p>','<p>','<p>','^','_'),
 		$str);
 	$str = str_replace(
-		array('</b>','</i>','</u>','</strong>','</br>','</h1>','</h2>','</h3>','</h4>','</h5>','</h6>','</sup>','</sub>'),
+		array('</b>','</i>','</u>','</strong>','</br>','</h1>','</h1>','</h2>','</h3>','</h5>','</h6>','</sup>','</sub>'),
 		array('</em>','</em>','','</em>','','</p>','</p>','</p>','</p>','</p>','</p>','',''),
 		$str);
 

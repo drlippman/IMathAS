@@ -15,7 +15,7 @@ if (!isset($_POST['libs']) || $_POST['libs']=='') {
 		echo "<p><b>No library selected.  Try again</b></p>";
 	}
 
-			echo "<h3>Copy Course Questions to </h3>\n";
+			echo "<h2>Copy Course Questions to </h2>\n";
 			echo "<form method=post action=\"coursetolibrary.php?cid=$cid\">\n";
 
 			echo <<<END

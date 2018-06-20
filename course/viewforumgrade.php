@@ -144,7 +144,7 @@
 		echo "&gt; View Forum Grade</div>";
 	}
 
-	echo '<div id="headerviewforumgrade" class="pagetitle"><h2>View Forum Grade</h2></div>';
+	echo '<div id="headerviewforumgrade" class="pagetitle"><h1>View Forum Grade</h1></div>';
 	echo "<p>Grades on forum <b>".Sanitize::encodeStringForDisplay($row[2])."</b> for <b>".Sanitize::encodeStringForDisplay($row[1])." ".Sanitize::encodeStringForDisplay($row[0])."</b></p>";
 
 	if ($istutor && $tutoredit==2) {

@@ -265,7 +265,7 @@
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Item Analysis</a> ";
 	echo "&gt; Grading a Question</div>";
-	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h2></div>";
+	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h1>Grading a Question in ".Sanitize::encodeStringForDisplay($aname)."</h1></div>";
 	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
 	echo '<div class="cpmid">';
 	if ($page==-1) {
@@ -440,11 +440,11 @@
 			}
 			echo '</p>';
 			if (!$groupdup) {
-				echo '<h4 class="group" style="display:none">'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
+				echo '<h3 class="group" style="display:none">'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
-					echo ' ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</h4>';
+					echo ' ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</h3>';
 				} else {
-					echo ' (empty)</h4>';
+					echo ' (empty)</h3>';
 				}
 			}
 

@@ -306,7 +306,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 	}
 	</script>';
-	echo '<h3>Link courses</h3>';
+	echo '<h2>Link courses</h2>';
 	echo '<form method="post" action="ltihome.php">';
 	echo "<p>This course on your LMS has not yet been linked to a course on $installname.";
 	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse" onchange="updateCourseSelector(this)"> ';
@@ -364,7 +364,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo "<p>If you want to create a new course, log directly into $installname to create new courses</p>";
 	echo '</form>';
 } else if (!$hasplacement || isset($_GET['chgplacement'])) {
-	echo '<h3>Link courses</h3>';
+	echo '<h2>Link courses</h2>';
 	echo '<form method="post" action="ltihome.php">';
 	echo "<p>This placement on your LMS has not yet been linked to content on $installname. ";
 	//if (!isset($sessiondata['lti_selection_return'])) {
@@ -398,7 +398,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '<a href="ltihome.php?chgcourselink=true" onclick="return confirm(\'Are you SURE you want to do this? This may break existing placements.\');">Change course link</a></p>';
 	echo '</form>';
 } else if ($placementtype=='course') {
-	echo '<h3>LTI Placement of whole course</h3>';
+	echo '<h2>LTI Placement of whole course</h2>';
 	echo "<p><a href=\"course/course.php?cid=" . Sanitize::courseId($cid) . "\">Enter course</a></p>";
 	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 } else if ($placementtype=='assess') {
@@ -408,7 +408,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-	echo "<h3>LTI Placement of " . Sanitize::encodeStringForDisplay($line['name']) . "</h3>";
+	echo "<h2>LTI Placement of " . Sanitize::encodeStringForDisplay($line['name']) . "</h2>";
 	echo "<p><a href=\"assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
 	echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
 	if ($role == 'teacher') {

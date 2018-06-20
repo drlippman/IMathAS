@@ -133,7 +133,7 @@ if (isset($_POST['mergefrom'])) {
 			}
 		}
 		if (isset($_POST['nameasheader'])) {
-			$thisintro = '<h3>'.$thisname.'</h3>'.$thisintro;
+			$thisintro = '<h2>'.$thisname.'</h2>'.$thisintro;
 		}
 		if ($_POST['mergetype']==0 || $_POST['mergetype']==3) {
 			$thisintro = preg_replace_callback('/\[QUESTION\s*(\d+)\s*\]/','incrementqnum',$thisintro);
@@ -230,7 +230,7 @@ if (isset($_POST['mergefrom'])) {
 
 	require("../header.php");
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
-	echo '<div class="pagetitle"><h2>Merge Assessments</h2></div>';
+	echo '<div class="pagetitle"><h1>Merge Assessments</h1></div>';
 	echo '<p>Merge complete</p>';
 	require("../footer.php");
 	exit;
@@ -281,7 +281,7 @@ if (isset($_POST['mergefrom'])) {
 
 	require("../header.php");
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
-	echo '<div class="pagetitle"><h2>Merge Assessments</h2></div>';
+	echo '<div class="pagetitle"><h1>Merge Assessments</h1></div>';
 
 	echo '<form method="post" action="mergeassess.php?cid='.$cid.'">';
 	echo '<p><b>Number the assessments you want to merge into a new assessment</b>.  Note that assessment settings and summary will be taken from the first assessment.</p>';

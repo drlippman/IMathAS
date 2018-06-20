@@ -301,7 +301,7 @@ if ($overwriteBody==1) {
 		echo $page_fileHiddenInput;
 ?>
 
-		<div id="headerimportstu" class="pagetitle"><h2>Import Students</h2></div>
+		<div id="headerimportstu" class="pagetitle"><h1>Import Students</h1></div>
 		<p>The first 5 students in the file are listed below.  Check the columns were identified correctly</p>
 			<table class=gb>
 			<thead>
@@ -336,7 +336,7 @@ if ($overwriteBody==1) {
 		echo "<p><input type=submit name=\"process\" value=\"Accept and Enroll\"></p>\n";
 	} else { //STEP 1 DISPLAY
 ?>
-		<div id="headerimportstu" class="pagetitle"><h2>Import Students from File</h2></div>
+		<div id="headerimportstu" class="pagetitle"><h1>Import Students from File</h1></div>
 		<p>Register and enroll students from a CSV (comma separated values) file</p>
 
 		<span class=form>Import File: </span>

@@ -26,7 +26,29 @@ form {
 	margin: 0px;
 	padding: 0px;
 }
-
+h1,h2,h3,h4,h5,h6 {
+	padding: 0;
+	font-weight: bold;
+}
+h1 {
+	font-size: 1.5em;
+	margin: .7em 0;
+}
+h2,h3,h4,h5,h6 {
+	margin: 1em 0;
+}
+h2 {
+	font-size: 1.25em;
+}
+h3 {
+	font-size: 1.1em;
+}
+h4 {
+	font-size: 1.05em;
+}
+h5,h6 {
+	font-size: 1em;
+}
 div.main {
 	padding: 0px;
 }
@@ -147,7 +169,7 @@ div.navbar {
 div.navbar.fixedonscroll {
 	width:125px;
 }
-div.navbar h4 {
+div.navbar h4, div.navbar h3 {
 	margin-top: 0px;
 }
 
@@ -985,6 +1007,20 @@ button.hamburger {
 		padding-left: 0px;
 	}
 	.navbar.videocued.shownav {
+		display: block;
+	}
+	table[role=presentation] > tbody > tr > td,
+	table[role=presentation] > tbody > tr > th,
+	table[role=presentation] > thead > tr > td,
+	table[role=presentation] > thead > tr > th
+	{
+		display: block;
+	}
+	table.responsive > tbody > tr > td,
+	table.responsive > tbody > tr > th,
+	table.responsive > thead > tr > td,
+	table.responsive > thead > tr > th
+	{
 		display: block;
 	}
 }

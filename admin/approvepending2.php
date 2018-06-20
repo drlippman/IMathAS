@@ -185,7 +185,7 @@ if (!isset($_GET['from'])) {
 
 require("../header.php");
 echo '<div class="breadcrumb">'. $curBreadcrumb . $pagetitle.'</div>';
-echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
+echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
 ?>
 
@@ -193,7 +193,7 @@ echo '<div class="pagetitle"><h2>'.$pagetitle.'</h2></div>';
   <div style="float:right" class="noticetext">{{statusMsg}}</div>
   <div v-if="toApprove.length==0">No requests to process</div>
   <div v-for="(users,status) in toApprove" v-if="users.length>0">
-    <h4>{{ statusTitle[status] }}</h4>
+    <h3>{{ statusTitle[status] }}</h3>
     <ul class="userlist">
       <li v-for="(user,userindex) in users">
         <span @click="toggleActiveUser(user.id, status, userindex)">

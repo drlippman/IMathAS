@@ -218,7 +218,7 @@ END;
 	$itemarr = str_replace('~',',',$itemarr);
 	$itemarr = explode(',', $itemarr);
 
-	echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
+	echo '<div id="headercategorize" class="pagetitle"><h1>Categorize Questions</h1></div>';
 	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';

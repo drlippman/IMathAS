@@ -259,7 +259,7 @@
 		if ($numlatepass==0) { //shouldn't get here if 0
 			echo "<p>You have no late passes remaining.</p>";
 		} else if ($canuselatepasspost || $canuselatepassreply) {
-			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
+			echo '<div id="headerredeemlatepass" class="pagetitle"><h1>Redeem LatePass</h1></div>';
 			echo "<form method=post action=\"redeemlatepassforum.php?cid=".Sanitize::courseId($cid)."&fid=".Sanitize::onlyInt($fid)."&from=".Sanitize::encodeUrlParam($from)."\">";
 			if ($allowlaten>1) {
 				echo '<p>You may use up to '.Sanitize::onlyInt($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>';

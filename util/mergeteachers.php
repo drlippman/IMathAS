@@ -15,7 +15,7 @@ if (empty($_POST['from']) || empty($_POST['to'])) {
 		$ops .= '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[2]).' ('.Sanitize::encodeStringForDisplay($row[3]).') '.Sanitize::encodeStringForDisplay(tzdate('n/j/y',$row[4])).'</option>';
 	}
 	require("../header.php");
-	echo "<h2>Merge Teacher Accounts</h2>";
+	echo "<h1>Merge Teacher Accounts</h1>";
 	echo '<form method="post">';
 	echo 'Move everything from <select name="from">'.$ops.'</select><br/>';
 	echo 'to <select name="to">'.$ops.'</select><br/>';

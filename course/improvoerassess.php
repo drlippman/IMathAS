@@ -176,7 +176,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tab
 require("../header.php");
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._('Assessment Metric');
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
-echo '<div id="headeraddlinkedtext" class="pagetitle"><h2>'._('Assessment Metric').'</h2></div>';
+echo '<div id="headeraddlinkedtext" class="pagetitle"><h1>'._('Assessment Metric').'</h1></div>';
 
 echo '<table id="myTable" class="gb"><thead><tr><th>Item Name</th><th>Magic Metric</th>';
 echo '<th>Mean</th><th>Q1</th><th>Median</th><th>Q3</th><th>Percent Late</th><th>Percent Submitted</th>';

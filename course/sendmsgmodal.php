@@ -77,10 +77,10 @@ if (isset($_POST['message'])) {
 	$useeditor = "message";
 	require("../header.php");
 	if ($_GET['sendtype']=='msg') {
-		echo '<h2>New Message</h2>';
+		echo '<h1>New Message</h1>';
 		$to = Sanitize::stripHtmlTags("$lastname, $firstname");
 	} else if ($_GET['sendtype']=='email') {
-		echo '<h2>New Email</h2>';
+		echo '<h1>New Email</h1>';
 		$to = Sanitize::stripHtmlTags("$lastname, $firstname ($email)");
 	}
 

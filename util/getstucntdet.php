@@ -34,7 +34,7 @@ ul {
 		}
 	}
 
-	echo '<h2>Enrollments from '.date('M j, Y',$start).' to '.date('M j, Y',$end).'</h2>';
+	echo '<h1>Enrollments from '.date('M j, Y',$start).' to '.date('M j, Y',$end).'</h1>';
 	echo '<p>This will list all students who last accessed the course between those dates.</p>';
 
 	echo '<p>Courses marked with <sup>*</sup> have more than one instructor, and the enrollments have already been counted earlier so will be omitted</p>';

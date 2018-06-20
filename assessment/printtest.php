@@ -159,8 +159,8 @@
 
 	$qi = getquestioninfo($questions,$testsettings,true);
 
-	echo "<h4 style=\"float:right;\">Name: " . Sanitize::encodeStringForDisplay($userfullname) . " </h4>\n";
-	echo "<h3>".Sanitize::encodeStringForDisplay($testsettings['name'])."</h3>\n";
+	echo "<h3 style=\"float:right;\">Name: " . Sanitize::encodeStringForDisplay($userfullname) . " </h3>\n";
+	echo "<h2>".Sanitize::encodeStringForDisplay($testsettings['name'])."</h2>\n";
 
 
 	$allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
@@ -179,7 +179,7 @@
 	}
 
 	$endtext = '';  $intropieces = array();
-	$testsettings['intro'] = preg_replace('/\[PAGE\s+(.*?)\]/', '<h3>$1</h3>', $testsettings['intro']);
+	$testsettings['intro'] = preg_replace('/\[PAGE\s+(.*?)\]/', '<h2>$1</h2>', $testsettings['intro']);
 	$intropieces = array();
 	if (strpos($testsettings['intro'], '[QUESTION')!==false) {
 		//embedded type
@@ -208,7 +208,7 @@
 		$textsegcnt = -1;
 		for ($i=1;$i<count($introjson);$i++) {
 			if (isset($introjson[$i]['ispage']) && $introjson[$i]['ispage']==1 && $testsettings['displaymethod'] == "Embed") {
-				$introjson[$i]['text'] = '<h2>'.strip_tags(str_replace(array("\n","\r","]"),array(' ',' ','&#93;'), $introjson[$i]['pagetitle'])).'</h2>'.$introjson[$i]['text'];
+				$introjson[$i]['text'] = '<h1>'.strip_tags(str_replace(array("\n","\r","]"),array(' ',' ','&#93;'), $introjson[$i]['pagetitle'])).'</h1>'.$introjson[$i]['text'];
 			}
 			if ($introjson[$i]['displayBefore'] == $lastdisplaybefore) {
 				$intropcs[$textsegcnt] .= $introjson[$i]['text'];

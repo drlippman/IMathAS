@@ -154,7 +154,7 @@ if ($overwriteBody==1) {
  echo $body;
 } else {
   	echo '<div class=breadcrumb>',$curBreadcrumb,'</div>';
-  	echo '<div id="headeradmin" class="pagetitle"><h2>',$pagetitle,'</h2></div>';
+  	echo '<div id="headeradmin" class="pagetitle"><h1>',$pagetitle,'</h1></div>';
     if ($page=='groupadmin') {
       //group admin header top navigation
       echo '<div class=cpmid>';

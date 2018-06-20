@@ -22,14 +22,14 @@ img {
 <img class="floatleft" src="<?php echo $imasroot;?>/img/typing.jpg" alt="Picture of typing"/>
 
 <div class="content">
-<h4>Answer Types</h4>
+<h3>Answer Types</h3>
 <p class="ind">
 Each question requests a specific type of answer.  Usually a question will display a hint
 at the end of the question as to what type of answer is expected.  In addition to 
 multiple choice questions and other standard types, this system also features several mathematical
 answer types.  Read on for suggestions on entering answers for these types.</p>
 
-<h4>Numerical Answers</h4>
+<h3>Numerical Answers</h3>
 <p class="ind">
 Some question ask for numerical answers.  Acceptable answers include whole numbers, integers (negative numbers), and decimal values. 
 </p>
@@ -40,7 +40,7 @@ In special cases, you may need to enter DNE for "Does not exist", oo for infinit
 If your answer is not an exact value, you'll want to enter at least 3 decimal places unless the problem specifies otherwise.
 </p>
 
-<h4>Fractions and Mixed Numbers</h4>
+<h3>Fractions and Mixed Numbers</h3>
 <p class="ind">
 Some questions ask for fractions or mixed number answers.
 </p>
@@ -57,7 +57,7 @@ fractions are OK, like <img src="answerimgs/103.gif">, but mixed numbers will no
 For a mixed number problem, enter your answer like 5_1/3 for <img src="answerimgs/513.gif">. Improper 
 fractions will not be accepted. Also, be sure to reduce the fractional portion of the mixed number to lowest terms.</p>
 
-<h4>Calculations</h4>
+<h3>Calculations</h3>
 <p class="ind">Some questions allow calculations be entered as answers.  You can also enter whole numbers, 
 negative numbers, or decimal numbers.  If you enter a decimal value, be sure to give <i>at least</i> 3 decimal places.</p>
 
@@ -75,7 +75,7 @@ Alternatively, you can enter mathematical expressions.  Some examples:
 </p>
 <p class="ind">You can use the Preview button to see how the computer is interpreting what you have entered</p>
 
-<h4>Algebraic Expressions</h4>
+<h3>Algebraic Expressions</h3>
 <p class="ind">Some questions ask for algebraic expression answers.  With these types of questions, 
 be sure to use the variables indicated.  In your answer, you can also use mathematical expressions for numerical calculations.</p>
 

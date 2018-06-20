@@ -164,9 +164,9 @@ if ($overwriteBody==1) {
  echo $body;
 } else {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
-	echo '<div id="headeruserdetail" class="pagetitle"><h2>'._('User Detail').': ';
+	echo '<div id="headeruserdetail" class="pagetitle"><h1>'._('User Detail').': ';
   echo Sanitize::encodeStringForDisplay($userinfo['LastName'].', '.$userinfo['FirstName']);
-  echo '</h2></div>';
+  echo '</h1></div>';
 
 
   //sub nav links
@@ -207,7 +207,7 @@ if ($overwriteBody==1) {
   }
 
   if (count($courses_teaching)>0) {
-    echo '<h4 id="courses-teaching-header">'._('Courses Teaching').'</h4>';
+    echo '<h3 id="courses-teaching-header">'._('Courses Teaching').'</h3>';
     echo '<table class="gb" id="courses-teaching"><thead><tr>';
     echo '<th>'._('Name').'</th>';
     echo '<th>'._('Course ID').'</th>';
@@ -254,7 +254,7 @@ if ($overwriteBody==1) {
       </script>';
   }
   if (count($courses_tutoring)>0) {
-    echo '<h4 id="courses-teaching-header">'._('Courses Tutoring').'</h4>';
+    echo '<h3 id="courses-teaching-header">'._('Courses Tutoring').'</h3>';
     echo '<table class="gb" id="courses-tutoring"><thead><tr>';
     echo '<th>'._('Name').'</th>';
     echo '<th>'._('Course ID').'</th>';
@@ -295,7 +295,7 @@ if ($overwriteBody==1) {
 
   }
   if (count($courses_taking)>0) {
-    echo '<h4 id="courses-taking-header">'._('Courses Taking').'</h4>';
+    echo '<h3 id="courses-taking-header">'._('Courses Taking').'</h3>';
     echo '<table class="gb" id="courses-taking"><thead><tr>';
     echo '<th>'._('Name').'</th>';
     echo '<th>'._('Course ID').'</th>';

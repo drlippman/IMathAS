@@ -207,7 +207,7 @@
 			}
 			if ($isBlocked) {
 				require("header.php");
-				echo '<h3>'._('You cannot start this assessment yet.').'</h3>';
+				echo '<h2>'._('You cannot start this assessment yet.').'</h2>';
 				echo '<p>';
 				printf(_('Access to this assessment requires a score of %d%s on %s'),
 					abs($adata['reqscore']),
@@ -222,7 +222,7 @@
 
 		//check for password
 
-		if (trim($adata['password'])!='' && preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/',$adata['password'])) {
+		if (!$isreview && trim($adata['password'])!='' && preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/',$adata['password'])) {
 			//if PW is an IP address, compare against user's
 			$userip = explode('.', $_SERVER['REMOTE_ADDR']);
 			$pwips = explode(',', $adata['password']);
@@ -260,7 +260,7 @@
 				exit;
 			}
 		}
-		if (trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
+		if (!$isreview && trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
 				if (trim($_POST['password'])==trim($adata['password'])) {
@@ -273,7 +273,7 @@
 				require("../header.php");
 				showEnterAssessmentBreadcrumbs($adata['name']);
 				echo $out;
-				echo '<h2>'.$adata['name'].'</h2>';
+				echo '<h1>'.$adata['name'].'</h1>';
 				if (strpos($adata['name'],'RPNow') !== false && strpos($_SERVER['HTTP_USER_AGENT'],'RPNow') === false) {
 					echo '<p>' . _("This assessment requires the use of Remote Proctor Now (RPNow).") . '</p>';
 				} else {
@@ -901,7 +901,11 @@
 							$lastanswers[$i] = '';
 							$scores[$i] = -1;
 						}
-						if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+						if (($testsettings['shuffle']&4)==4) {
+							//all stu same seed; don't change seed
+						} else if (($testsettings['shuffle']&2)==2 && $i>0) {  //all q same seed
+							$seeds[$i] = $seeds[0];
+						} else if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
 							$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
 							if (count($fs)>1) {
 								//find existing seed and use next one
@@ -1104,7 +1108,11 @@
 				$scores[$i] = -1;
 				$rawscores[$i] = -1;
 				$attempts[$i] = 0;
-				if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
+				if (($testsettings['shuffle']&4)==4) {
+					//all stu same seed; don't change seed
+				} else if (($testsettings['shuffle']&2)==2 && $i>0) {  //all q same seed
+					$seeds[$i] = $seeds[0];
+				} else if ($qi[$questions[$i]]['fixedseeds'] !== null && $qi[$questions[$i]]['fixedseeds'] != '') {
 					$fs = explode(',',$qi[$questions[$i]]['fixedseeds']);
 					if (count($fs)>1) {
 						//find existing seed and use next one
@@ -1404,7 +1412,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				$stm->execute(array(':time'=>$now, ':log'=>$loginfo));
 			}
 		} else {
-			echo '<div id="headershowtest" class="pagetitle"><h2>', _('Select group members'), '</h2></div>';
+			echo '<div id="headershowtest" class="pagetitle"><h1>', _('Select group members'), '</h1></div>';
 			if ($sessiondata['groupid']==0) {
 				//a group should already exist
 				//DB $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
@@ -1517,7 +1525,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 	//if was added to existing group, need to reload $questions, etc
 	echo '<div id="headershowtest" class="pagetitle">';
-	echo "<h2>{$testsettings['name']}</h2></div>\n";
+	echo "<h1>{$testsettings['name']}</h1></div>\n";
 	if (isset($sessiondata['actas'])) {
 		echo '<p style="color: red;">', _('Teacher Acting as ');
 		//DB $query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$sessiondata['actas']}'";
@@ -3101,7 +3109,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			if ($sessiondata['isteacher']) {
 				echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
 				echo '<p id="livepollactivestu" style="margin-top:0px">&nbsp;</p>';
-				echo "<h4>", _('Questions'), "</h4>\n";
+				echo "<h3>", _('Questions'), "</h3>\n";
 				echo "<ul class=qlist>\n";
 				for ($i = 0; $i < count($questions); $i++) {
 					echo "<li>";
@@ -3291,7 +3299,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		
 		echo '<div class="navbar fixedonscroll" role="navigation" aria-label="'._("Page and question navigation").'">';
 		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";		
-		echo "<h4>", _('Pages'), "</h4>\n";
+		echo "<h3>", _('Pages'), "</h3>\n";
 		echo '<ul class="navlist">';
 		$jsonbits = array();
 		$max = (count($pginfo)-1)/2;
@@ -3427,7 +3435,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		
 		echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
 		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";
-		echo "<h4>", _('Questions'), "</h4>\n";
+		echo "<h3>", _('Questions'), "</h3>\n";
 		echo "<ul class=qlist>\n";
 		for ($i = 0; $i < count($questions); $i++) {
 			echo "<li>";
@@ -3603,13 +3611,13 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$stm = $DBH->prepare("SELECT * from imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$userinfo = $stm->fetch(PDO::FETCH_ASSOC);
-			printf("<h3>%s, %s: ", Sanitize::encodeStringForDisplay($userinfo['LastName']),
+			printf("<h2>%s, %s: ", Sanitize::encodeStringForDisplay($userinfo['LastName']),
 				Sanitize::encodeStringForDisplay($userinfo['FirstName']));
 			echo Sanitize::encodeStringForDisplay(substr($userinfo['SID'],0,strpos($userinfo['SID'],'~')));
-			echo "</h3>\n";
+			echo "</h2>\n";
 		}
 
-		echo "<h3>", _('Scores:'), "</h3>\n";
+		echo "<h2>", _('Scores:'), "</h2>\n";
 
 		if (!$noindivscores && !$reviewatend) {
 			echo "<table class=scores>";

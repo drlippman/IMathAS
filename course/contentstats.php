@@ -124,7 +124,7 @@ if ($overwritebody) {
 	echo " &gt; Content Stats</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
-	echo "<h2>Stats: $itemname</h2>\n";
+	echo "<h1>Stats: $itemname</h1>\n";
 	echo '</div>';
 
 	$idents = array_keys($descrips);
@@ -143,7 +143,7 @@ if ($overwritebody) {
 	}
 
 	foreach ($idents as $ident) {
-		echo '<h4>'.$descrips[$ident].'</h4>';
+		echo '<h3>'.$descrips[$ident].'</h3>';
 		echo '<table class="gb"><thead>';
 		if ($stype=='F') {
 			if ($descrips[$ident] == 'Forum posts') {

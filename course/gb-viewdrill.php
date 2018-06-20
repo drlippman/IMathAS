@@ -111,7 +111,7 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tab
 
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Drill Assessment Results</div>";
-echo "<h2>Drill Assessment Results</h2>";
+echo "<h1>Drill Assessment Results</h1>";
 
 echo '<table id="myTable" class="gb">';
 echo '<thead><tr><th>Best (# tries)<br/>Last</th>';

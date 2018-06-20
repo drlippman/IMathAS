@@ -91,7 +91,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerlogingrid" class="pagetitle"><h2>Login Grid View</h2></div>
+	<div id="headerlogingrid" class="pagetitle"><h1>Login Grid View</h1></div>
 
 	<form method="post" action="logingrid.php?cid=<?php echo $cid;?>">
 	<p>Showing Number of Logins <?php echo "$starttime through $endtime";?></p>

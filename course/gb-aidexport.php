@@ -393,7 +393,7 @@ if (isset($_POST['options'])) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; <a href=\"gb-itemanalysis.php?aid=$aid&cid=$cid\">Item Analysis</a> ";
 	echo '&gt; Assessment Export</div>';
-	echo '<div id="headergb-aidexport" class="pagetitle"><h2>Assessment Results Export</h2></div>';
+	echo '<div id="headergb-aidexport" class="pagetitle"><h1>Assessment Results Export</h1></div>';
 
 	echo "<form method=\"post\" action=\"gb-aidexport.php?aid=$aid&cid=$cid\">";
 	echo 'What do you want to include in the export:<br/>';

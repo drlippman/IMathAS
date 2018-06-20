@@ -103,13 +103,13 @@ if ($overwriteBody==1) {
   echo $body;
 } else {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
-  echo '<div id="headerdiaglist" class="pagetitle"><h2>'._('Diagnostics');
+  echo '<div id="headerdiaglist" class="pagetitle"><h1>'._('Diagnostics');
   if ($list=='self') {
     echo ': '.Sanitize::encodeStringForDisplay($userdisplayname);
   } else if ($list=='group') {
     echo ': '.Sanitize::encodeStringForDisplay($groupname);
   }
-  echo '</h2></div>';
+  echo '</h1></div>';
 	echo '<div class="cpmid">';
 	echo '<a href="diagsetup.php">'._('Add New Diagnostic').'</a>';
 	echo '</div>';

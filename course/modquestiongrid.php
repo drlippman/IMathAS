@@ -183,7 +183,7 @@
 		echo "Question Settings</div>\n";
 
 ?>
-<div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
+<div id="headermodquestiongrid" class="pagetitle"><h1>Modify Question Settings</h1></div>
 <p>For more advanced settings, modify the settings for individual questions after adding.</p>
 <?php
 if (isset($_POST['checked'])) { //modifying existing

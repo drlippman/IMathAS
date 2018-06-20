@@ -220,7 +220,8 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 	for ($i =0; $i < count($scores);$i++) {
 		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
 	}
-	$grade = number_format($total/$aidtotalpossible[$aid],4);
+	$grade = min(1, max(0,$total/$aidtotalpossible[$aid]));
+	$grade = number_format($grade,4);
 	return updateLTIgrade('update',$sourcedid,$aid,$grade);
 }
 
@@ -300,6 +301,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 		}
 		if ($secret != '') {
 			if ($action=='update') {
+				$grade = min(1, max(0,$grade));
 				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
 			} else if ($action=='delete') {
 				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);

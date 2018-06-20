@@ -26,7 +26,7 @@ $flexwidth = true;
 $nologo = true;
 require("../header.php");
 
-echo '<h4>'._('Post Likes').'</h4>';
+echo '<h3>'._('Post Likes').'</h3>';
 
 //DB query = "SELECT iu.LastName,iu.FirstName FROM imas_users AS iu JOIN ";
 //DB $query .= "imas_forum_likes AS ifl ON iu.id=ifl.userid WHERE ifl.postid=$postid ORDER BY iu.LastName,iu.FirstName";

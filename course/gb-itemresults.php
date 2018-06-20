@@ -127,17 +127,17 @@ require("../assessment/header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
-echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Results: ';
+echo '<div id="headergb-itemanalysis" class="pagetitle"><h1>Item Results: ';
 
 //DB $query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $stm = $DBH->prepare("SELECT defpoints,name,itemorder FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
 //DB $defpoints = mysql_result($result,0,0);
-//DB echo mysql_result($result,0,1).'</h2></div>';
+//DB echo mysql_result($result,0,1).'</h1></div>';
 //DB $itemorder = mysql_result($result,0,2);
 list ($defpoints, $aname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
-echo Sanitize::encodeStringForDisplay($aname) . '</h2></div>';
+echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
 $itemarr = array();
 $itemnum = array();
 foreach (explode(',',$itemorder) as $k=>$itel) {

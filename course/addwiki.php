@@ -264,7 +264,7 @@ if ($overwriteBody==1) {
 
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headeraddwiki" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
+	<div id="headeraddwiki" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 <?php
 if (isset($_GET['clearattempts'])) {
 	$id = Sanitize::onlyInt($_GET['id']);

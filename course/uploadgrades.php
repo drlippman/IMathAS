@@ -151,7 +151,7 @@ if ($overwriteBody==1) {
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 
-	<div id="headeruploadgrades" class="pagetitle"><h2><?php echo Sanitize::encodeStringForDisplay($pagetitle) ?></h2></div>
+	<div id="headeruploadgrades" class="pagetitle"><h1><?php echo Sanitize::encodeStringForDisplay($pagetitle) ?></h1></div>
 
 
 	<form enctype="multipart/form-data" method=post action="uploadgrades.php?cid=<?php echo $cid ?>&gbmode=<?php echo Sanitize::encodeUrlParam($_GET['gbmode']); ?>&gbitem=<?php echo Sanitize::encodeUrlParam($_GET['gbitem']); ?>">

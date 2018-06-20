@@ -51,7 +51,7 @@ h2,h3,h4,h5,h6 {
 		echo "</head><body>\n";
 	}
 	if (isset($_GET['section']) && !isset($_GET['bare'])) {
-		echo '<div id="headerindex" class="pagetitle"><h2>'.$installname.' Help</h2></div>';
+		echo '<div id="headerindex" class="pagetitle"><h1>'.$installname.' Help</h1></div>';
 	}
 
 
@@ -101,9 +101,9 @@ h2,h3,h4,h5,h6 {
 					echo $next;
 				}
 			
-			} else if (preg_match('/.*<h([1-6])>\s*<a\s+name\="([^"]+)".*/',$buffer,$matches) && $matches[2]==$_GET['section']) {
+			} else if (preg_match('/.*<h([1-6])\s+id="?([^">]+).*/',$buffer,$matches) && $matches[2]==$_GET['section']) {
 				if (!isset($_GET['bare'])) {
-					echo "<style type=\"text/css\">\n";
+					echo "<style>\n";
 					for ($i=$matches[1]+1;$i<5;$i++) {
 						echo "div.h$i { margin-left: " . 10*Sanitize::onlyFloat($i-$matches[1]) . "px;}\n";
 					}

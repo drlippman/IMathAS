@@ -125,7 +125,7 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize:
 echo "&gt; Diagnostic Gradebook</div>";
 echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 
-echo '<div id="headergb-testing" class="pagetitle"><h2>Diagnostic Grade Book</h2></div>';
+echo '<div id="headergb-testing" class="pagetitle"><h1>Diagnostic Grade Book</h1></div>';
 echo "<a href=\"gradebook.php?cid=$cid\">View regular gradebook</a>";
 echo "<div class=cpmid>";
 

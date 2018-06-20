@@ -636,7 +636,7 @@ if ($overwriteBody==1) {
 		echo $page_uploadSuccessMsg;
 	} else { //STEP 1 or 2
 ?>
-	<div id="headerimportlib" class="pagetitle"><h2>Import Question Libraries</h2></div>
+	<div id="headerimportlib" class="pagetitle"><h1>Import Question Libraries</h1></div>
 	<form enctype="multipart/form-data" method=post action="importlib.php?cid=<?php echo $cid ?>">
 
 <?php
@@ -661,7 +661,7 @@ if ($overwriteBody==1) {
 
 <?php echo Sanitize::encodeStringForDisplay($packname); ?>
 
-			<h3>Select Libraries to import</h3>
+			<h2>Select Libraries to import</h2>
 			<p>Note:  If a parent library is not selected, NONE of the children libraries will be added,
 			regardless of whether they're checked or not
 			</p>
