@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"start": "php -S localhost:3000 -t .",
-		"test": "codecept run",
-		"testv": "codecept run --steps" 
+		"test": "codecept run --coverage --coverage-html",
+		"testv": "codecept run --steps --coverage --coverage-html" 
 	}
 }
