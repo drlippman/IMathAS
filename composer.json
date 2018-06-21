@@ -1,5 +1,14 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "^5.7"
-    }
+        "codeception/codeception": "^2.4",
+        "codeception/c3": "^2.4"
+    },
+	"config": {
+		"process-timeout": 0
+	},
+	"scripts": {
+		"start": "php -S localhost:3000 -t .",
+		"test": "codecept run",
+		"testv": "codecept run --steps" 
+	}
 }
