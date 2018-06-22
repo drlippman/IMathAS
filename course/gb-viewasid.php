@@ -1118,8 +1118,10 @@
 
 					echo " | <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$get_uid}&clearq=$i\">Clear Score</a> ";
 					echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>";
+					echo ' Seed: '.Sanitize::onlyInt($seeds[$i]);
 					if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-						echo ". <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$owners[$questions[$i]]}&title=Problem%20with%20question%20id%20$qsetid\" target=\"_blank\">Message owner</a> to report problems.";
+						$quoteq = 'quoteq='.Sanitize::encodeUrlParam("0-$qsetid-{$seeds[$i]}-reperr-{$GLOBALS['assessver']}");
+						echo ". <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$owners[$questions[$i]]}&title=Problem%20with%20question%20id%20$qsetid&$quoteq\" target=\"_blank\">Message owner</a> to report problems.";
 					}
 					echo ')';
 
@@ -1127,7 +1129,7 @@
 					if (isset($extref[$questions[$i]])) {
 						echo "&nbsp; Had help available: ";
 						foreach ($extref[$questions[$i]] as $v) {
-							$extrefpt = explode('!!',$v);
+							$extrefpt = explode('!!',$v);                                                                                                                                                     
 							echo '<a href="'.$extrefpt[1].'" target="_blank">'.$extrefpt[0].'</a> ';
 						}
 					}

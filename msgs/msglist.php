@@ -395,8 +395,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					    }, $message);
 				}
 				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-
-				$message = '<br/><hr/>'.$message;
+				$qinfo = 'Question ID '.Sanitize::onlyInt($parts[1]).', seed '.Sanitize::onlyInt($parts[2]);
+				$message = '<br/><hr/>'.$qinfo.'<br/><br/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 				if (isset($parts[3]) && $parts[3] === 'reperr') {
 					$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
