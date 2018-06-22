@@ -1821,6 +1821,8 @@ function drawMouseMove(ev) {
 				drawTarget();
 			}
 			return false;
+		} else if (curIneqcurve!=null && !mouseisdown) {
+			drawTarget();
 		}
 	}
 
