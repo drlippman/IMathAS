@@ -1098,13 +1098,13 @@ function ASplot($function) {
 	}
 	$avoid = array();
 	if (isset($function[1]) && $function[1]!='' && $function[1]!='null') {
-		$xmin = $function[1];
+		$xmin = $this->evalifneeded($function[1]);
 	} else {
 		$xmin = $this->xmin - min($this->border[0],5)/$this->xunitlength;
 	}
 	if (isset($function[2]) && $function[2]!='' && $function[2]!='null') {
 		$xmaxarr = explode('!',$function[2]);
-		$xmax = $xmaxarr[0];
+		$xmax = $this->evalifneeded($xmaxarr[0]);
 		$avoid = array_slice($xmaxarr,1);
 	} else {
 		$xmax = $this->xmax + min($this->border[2],5)/$this->xunitlength;
@@ -1256,6 +1256,7 @@ function outputimage() {
 	}
 }
 function evalifneeded($str) {
+	$str = str_replace('pi','3.141593', $str);
 	if (is_numeric($str)) {
 		return $str;
 	} else if (trim($str)=='' || preg_match('/[^\(\)\d+\-\/\*\.]/',$str)) {
