@@ -273,15 +273,15 @@ echo '<div class=mainbody>';
 if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
-if (!isset($flexwidth)) {
+if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	echo '<div class="headerwrapper">';
 }
 
-if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
+if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	require("$curdir/../{$CFG['GEN']['headerinclude']}");
 }
 
-if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false)) {
+if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !$isdiag && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false)) {
 	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 
@@ -314,7 +314,7 @@ if (isset($cid) && !isset($flexwidth) && !$isdiag && (!isset($sessiondata['intre
 	$didnavlist = true;
 }
 
-if (!isset($flexwidth)) {
+if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	echo '</div>';
 }
 echo '<div class="midwrapper" role="main">';

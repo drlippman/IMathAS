@@ -432,7 +432,7 @@
 	}
 	
 	if (isset($sessiondata['ltiitemtype'])) {
-		$flexwidth = true;
+		$hideAllHeaderNav = true;
 		if ($sessiondata['ltiitemtype']==1) {
 			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && isset($_GET['cid']) && $sessiondata['ltiitemid']!=$_GET['cid']) {
 				echo "You do not have access to this page";
@@ -621,7 +621,7 @@
 	$verified = true;
 
  }
- if (!empty($flexwidth)) {
+ if (!empty($flexwidth) || !empty($hideAllHeaderNav)) {
  	 $nologo = true;
  }
 

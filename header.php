@@ -220,10 +220,10 @@ $insertinheaderwrapper = ' '; //"<h1>$coursename</h1>";
 if (isset($insertinheaderwrapper)) {
 	//echo '<div class="headerwrapper">'.$insertinheaderwrapper.'</div>';
 }
-if (!isset($flexwidth)) {
+if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	echo '<div class="headerwrapper">';
 }
-if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth)) {
+if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	require("$curdir/{$CFG['GEN']['headerinclude']}");
 }
 $didnavlist = false;  $essentialsnavcnt = 0;
@@ -243,7 +243,7 @@ function getactivetab() {
 	}
 	return $a;
 }
-if (isset($cid) && !isset($flexwidth)) {
+if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 	$a = array('course'=>'', 'msg'=>'', 'forum'=>'', 'cal'=>'', 'gb'=>'', 'roster'=>'');
@@ -278,7 +278,7 @@ if (isset($cid) && !isset($flexwidth)) {
 	echo '</div>';
 	$didnavlist = true;
 }
-if (!isset($flexwidth)) {
+if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	echo '</div>';
 }
 echo '<div class="midwrapper" role="main">';
