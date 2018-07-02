@@ -90,7 +90,6 @@ body {
 	width: 100%; 
 	z-index: 10;
 	background-color: #fff;
-	padding: 5px;
 	border-bottom: 1px solid #ccc;
 }
 #card-deck-wrap {
@@ -132,6 +131,33 @@ body {
 .filterwrap label:hover {
 	background-color: #fefefe;
 }
+
+#courseTypeTabs {
+	border-bottom: 1px solid #ccc;
+}
+#courseTypeTabs ul {
+	margin: 0;
+	padding: 0;
+}
+#courseTypeTabs ul li {
+	display: inline-block;
+	padding: 5px 15px;
+	background-color: #eee;
+	color: #666;
+	cursor: pointer;
+}
+#courseTypeTabs ul li.active, #courseTypeTabs ul li.active:hover {
+	background-color: #006;
+	color: #fff;
+}
+#courseTypeTabs ul li:hover {
+	color: #000;
+	background-color: #ddd;
+}
+#filters {
+	padding: 5px;
+}
+
 .dropdown-wrap {
 	position: relative;
 }
@@ -183,6 +209,7 @@ ul.nomark {
 	text-indent: -1em;
 	padding-left: 1em;
 }
+
 [v-cloak] {
 	display:none;
 }

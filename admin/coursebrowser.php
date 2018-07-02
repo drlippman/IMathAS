@@ -132,29 +132,41 @@ if (!isset($_GET['embedded'])) {
 }
 ?>
 <div id="app" v-cloak>
-<div <?php if (isset($_GET['embedded'])) {echo 'id="fixedfilters"';}?>>Filter results: 
-<span v-for="propname in propsToFilter" class="dropdown-wrap">
-	<button @click="showFilter = (showFilter==propname)?'':propname">
-		{{ courseBrowserProps[propname].name }} {{ catprops[propname].length > 0 ? '('+catprops[propname].length+')': '' }}
-		<span class="arrow-down" :class="{rotated: showFilter==propname}"></span>	
-	</button>
-	<transition name="fade" @enter="adjustpos">
-		<ul v-if="showFilter == propname" class="filterwrap">
-			<li v-if="courseBrowserProps[propname].hasall">
-				<span>Show courses that contain <i>all</i> of:</span>
-			</li>
-			<li v-if="!courseBrowserProps[propname].hasall">
-				<span>Show courses that contain <i>any</i> of:</span>
-			</li>
-			<li v-for="(longname,propval) in courseBrowserProps[propname].options">
-				<span v-if="propval.match(/^group/)" class="optgrplabel"><em>{{ longname }}</em></span>
-				<label v-else><input type="checkbox" :value="propname+'.'+propval" v-model="selectedItems">
-				{{ longname }}</label>
-			</li>
-		</ul>
-	</transition>
-</span>
-<a href="#" @click.prevent="selectedItems = []" v-if="selectedItems.length>0">Clear Filters</a>
+<div <?php if (isset($_GET['embedded'])) {echo 'id="fixedfilters"';}?>>
+<div id="courseTypeTabs" v-if="useTabs">
+	<ul>
+		<li v-for="type in activeCourseTypes"
+			@click="activeTab=type"
+			:class="{'active': activeTab==type}">
+			{{courseBrowserProps.meta.courseTypeTabs[type]}}
+		</li>
+	<ul>
+</div>
+<div id="filters">
+	Filter results: 
+	<span v-for="propname in propsToFilter" class="dropdown-wrap">
+		<button @click="showFilter = (showFilter==propname)?'':propname">
+			{{ courseBrowserProps[propname].name }} {{ catprops[propname].length > 0 ? '('+catprops[propname].length+')': '' }}
+			<span class="arrow-down" :class="{rotated: showFilter==propname}"></span>	
+		</button>
+		<transition name="fade" @enter="adjustpos">
+			<ul v-if="showFilter == propname" class="filterwrap">
+				<li v-if="courseBrowserProps[propname].hasall">
+					<span>Show courses that contain <i>all</i> of:</span>
+				</li>
+				<li v-if="!courseBrowserProps[propname].hasall">
+					<span>Show courses that contain <i>any</i> of:</span>
+				</li>
+				<li v-for="(longname,propval) in courseBrowserProps[propname].options">
+					<span v-if="propval.match(/^group/)" class="optgrplabel"><em>{{ longname }}</em></span>
+					<label v-else><input type="checkbox" :value="propname+'.'+propval" v-model="selectedItems">
+					{{ longname }}</label>
+				</li>
+			</ul>
+		</transition>
+	</span>
+	<a href="#" @click.prevent="selectedItems = []" v-if="selectedItems.length>0">Clear Filters</a>
+</div>
 </div>
 <div style="position: relative" id="card-deck-wrap">
 <transition-group name="fade" tag="div" class="card-deck">
@@ -205,6 +217,7 @@ new Vue({
 		showFilter: '',
 		filterLeft: 0,
 		courseTypes: courseBrowserProps.meta.courseTypes,
+		activeTab: 0,
 	},
 	methods: {
 		clickaway: function(event) {
@@ -293,11 +306,30 @@ new Vue({
 			}
 			return catarr;
 		},
+		activeCourseTypes: function() {
+			var activeTypes = [];
+			for (type in this.courseTypes) {
+				for (var i=0; i<courses.length; i++) {
+					if (courses[i].coursetype == type) {
+						activeTypes.push(type);
+						break;
+					}
+				}
+			}
+			return activeTypes;
+		},
+		useTabs: function () {
+			return (!!this.courseBrowserProps.meta.courseTypeTabs &&
+				this.activeCourseTypes.length>1);
+		},
 		filteredCourses: function() {
 			var selectedCourses = [];
 			
 			var includeCourse = true;
 			for (var i=0; i<courses.length; i++) {
+				if (this.useTabs && courses[i].coursetype != this.activeTab) {
+					continue;
+				}
 				includeCourse = true;
 				for (prop in this.courseBrowserProps) {
 					if (this.catprops[prop].length==0) {
