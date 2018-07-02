@@ -361,6 +361,11 @@ switch($_GET['action']) {
 			} else {
 				$browser = $jsondata['browser'];
 			}
+			if ($jsondata===null || !isset($jsondata['blockLTICopyOfCopies'])) {
+				$blockLTICopyOfCopies = false;
+			} else {
+				$blockLTICopyOfCopies = $jsondata['blockLTICopyOfCopies'];
+			}
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 		} else {
@@ -387,6 +392,7 @@ switch($_GET['action']) {
 			$deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
 			$ltisecret = "";
 			$browser = array();
+			$blockLTICopyOfCopies = false;
 			$dates_by_lti = 0;
 			$startdate = 0;
 			$enddate = 2000000000;
@@ -633,7 +639,12 @@ switch($_GET['action']) {
 			echo '<span class="formright"><input type="checkbox" name="setdatesbylti" value="1" ';
 			if ($dates_by_lti>0) { echo 'checked="checked"';}
 			echo '/> </span><br class="form" />';
-			
+			if ($myrights>=75) {
+				echo '<span class="form">LMS course copies always copy from this original course</span>';
+				echo '<span class="formright"><input type="checkbox" name="blocklticopies" value="1" ';
+				if ($blockLTICopyOfCopies) { echo 'checked="checked"';}
+				echo '/> </span><br class="form" />';
+			}
 		}
 
 		if (($myspecialrights&1)==1 || ($myspecialrights&2)==2 || $myrights==100) {

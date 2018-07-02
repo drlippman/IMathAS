@@ -811,6 +811,11 @@ if ($stm->rowCount()==0) {
 						$copycourse = "no";
 					}
 				}
+				$stm = $DBH->prepare('SELECT jsondata FROM imas_courses WHERE id=:aidsourcecid');
+				$stm->execute(array(':aidsourcecid'=>$aidsourcecid));
+				$aidsourcejsondata = json_decode($stm->fetchColumn(0), true);
+				$blockLTICopyOfCopies = ($aidsourcejsondata!==null && !empty($aidsourcejsondata['blockLTICopyOfCopies']));
+				
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {
 					$destcid = $_POST['useothercoursecid'];
 					$copycourse = "no";
@@ -865,7 +870,7 @@ if ($stm->rowCount()==0) {
 							<ul class=nomark>
 							<li><input name=\"docoursecopy\" type=\"radio\" value=\"useexisting\" checked />Associate this LMS course with my existing course (ID $aidsourcecid) on $installname</li>
 							<li><input name=\"docoursecopy\" type=\"radio\" value=\"makecopy\" />Create a copy of my existing course (ID $aidsourcecid) on $installname</li>";
-						if (count($othercourses)>0) {
+						if (count($othercourses)>0 && !$blockLTICopyOfCopies) {
 							echo '<li><input name="docoursecopy" type="radio" value="copyother" />Create a copy of another course: <select name="othercoursecid">';
 							foreach ($othercourses as $k=>$v) {
 								echo '<option value="'.$k.'">'.Sanitize::encodeStringForDisplay($v.' (Course ID '.$k.')').'</option>';
@@ -885,7 +890,7 @@ if ($stm->rowCount()==0) {
 							and this LMS course will be associated with that copy in $installname.  This will allow you to make changes to the assignments
 							without affecting the original course, and will ensure your student records are housed in your own
 							$installname course.</p>";
-						if (count($othercourses)>0) {
+						if (count($othercourses)>0 && !$blockLTICopyOfCopies) {
 							echo "<ul class=nomark><li><input name=\"docoursecopy\" type=\"radio\" value=\"makecopy\" />Create a copy of the original course (ID $aidsourcecid) on $installname</li>";
 							echo '<li><input name="docoursecopy" type="radio" value="copyother" />Create a copy of another course: <select name="othercoursecid">';
 							foreach ($othercourses as $k=>$v) {

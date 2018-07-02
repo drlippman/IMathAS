@@ -532,17 +532,16 @@ switch($_POST['action']) {
 			$CFG['coursebrowserRightsToPromote'] = 40;
 		}
 		$updateJsonData = false;
+		$jsondata = json_decode($old_jsondata, true);
+		if ($jsondata===null) {
+			$jsondata = array();
+		}
 		if ($CFG['coursebrowserRightsToPromote']>$myrights && ($old_istemplate&16)==16) {
 			$istemplate |= 16;
 		} else if (isset($_POST['promote']) && isset($_GET['id']) && $CFG['coursebrowserRightsToPromote']<=$myrights) {
 			$browserprops = json_decode(file_get_contents(__DIR__.'/../javascript/'.$CFG['coursebrowser'], false, null, 25), true);
 
 			$isok = ($copyrights>1);
-
-			$jsondata = json_decode($old_jsondata, true);
-			if ($jsondata===null) {
-				$jsondata = array();
-			}
 
 			$browserdata = array();
 			foreach ($browserprops as $propname=>$propvals) {
@@ -571,6 +570,16 @@ switch($_POST['action']) {
 				$updateJsonData = true;
 			}
 		}
+		if ($myrights>=75) {
+			if (!empty($jsondata['blockLTICopyOfCopies']) && !isset($_POST['blocklticopies'])) { //un-checked
+				$jsondata['blockLTICopyOfCopies'] = false;
+				$updateJsonData = true;
+			} else if (isset($_POST['blocklticopies'])) { //checking it
+				$jsondata['blockLTICopyOfCopies'] = true;
+				$updateJsonData = true;
+			}
+		}
+			
 		require_once("../includes/parsedatetime.php");
 		if (trim($_POST['sdate'])=='') {
 			$startdate = 0;
