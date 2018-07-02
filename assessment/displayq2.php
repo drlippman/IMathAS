@@ -1977,7 +1977,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				echo 'Warning: use abs(x) not |x| in $answer';
 			}
 			$sa = makeprettydisp($answer);
-			$greekletters = array('alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega');
+			$greekletters = array('alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega');
 
 			for ($i = 0; $i < count($variables); $i++) {
 				if (strlen($variables[$i])>1 && $variables[$i]!='varE') {
