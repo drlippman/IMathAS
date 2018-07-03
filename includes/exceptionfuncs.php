@@ -26,6 +26,20 @@ class ExceptionFuncs {
 	public function setLatepasshrs($lph) {
 		$this->latepasshrs = $lph;
 	}
+	
+	public function calcLPneeded($end) {
+		$now = time();
+		$latepassesNeededToExtend = ceil(($now - $end)/($this->latepasshrs*3600) - .0001);
+		//adjust for possible off-by-one due to DST
+		if ($now < strtotime("+".($this->latepasshrs*($latepassesNeededToExtend-1))." hours", $end)) { //are OK with one less
+			$latepassesNeededToExtend--;
+		} else if ($now < strtotime("+".($this->latepasshrs*$latepassesNeededToExtend)." hours", $end)) { //calculated # works
+			
+		} else { //really need 1 more
+			$latepassesNeededToExtend++;
+		}
+		return $latepassesNeededToExtend;
+	}
 
 	//get which assessments have expired timelimits
 	private function getTimesUsed() {
@@ -163,6 +177,23 @@ class ExceptionFuncs {
 		removed from below:
 			 && !in_array($adata['id'],$this->timelimitup)
 		*/
+		//**FIX/check
+		if ($adata['allowlate']%10==1) {
+			$latepassesAllowed = 10000000;  //unlimited
+		} else {
+			$latepassesAllowed = $adata['allowlate']%10-1;
+		}
+		if (!in_array($adata['id'],$this->viewedassess) && $this->latepasses>0 && $this->isstu && $adata['enddate'] < $this->courseenddate) { //basic checks
+			if ($now<$adata['enddate'] && $latepassesAllowed > $latepasscnt) { //before due date and use is allowed
+				$canuselatepass = true;
+			} else if ($now>$adata['enddate'] && $adata['allowlate']>10) { //after due date and allows use after due date
+				$latepassesNeededToExtend = $this->calcLPneeded($adata['enddate']);
+				if ($latepassesAllowed >= $latepasscnt + $latepassesNeededToExtend && $latepassesNeededToExtend<=$this->latepasses) {
+					$canuselatepass = true;
+				}
+			}
+		}
+		/**old version
 
 		//replaced ($now - $adata['enddate']) < $this->latepasshrs*3600
 		// $now < $adata['enddate'] + $this->latepasshrs*3600
@@ -175,6 +206,7 @@ class ExceptionFuncs {
 				$canuselatepass = true;
 			}
 		}
+		*/
 		return $canuselatepass;
 	}
 

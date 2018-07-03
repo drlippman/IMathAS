@@ -1155,7 +1155,7 @@ if ($overwriteBody==1) {
 				<?php
 				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
 				?>
-				<label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>10,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
+				<label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>10,true); ?>> Allow LatePasses after due date</label>
 			</span><BR class=form>
 
 			<span class=form>Make hard to print?</span>

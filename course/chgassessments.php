@@ -875,7 +875,7 @@ $(function() {
 				<?php
 				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],1);
 				?>
-				<label><input type="checkbox" name="latepassafterdue"> Allow LatePasses after due date, within 1 LatePass period</label>
+				<label><input type="checkbox" name="latepassafterdue"> Allow LatePasses after due date</label>
 				</td>
 			</tr>
 			<tr class="coptr">
