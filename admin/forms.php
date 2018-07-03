@@ -320,12 +320,14 @@ switch($_GET['action']) {
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($myrights<75 && $line['ownerid']!=$userid) {
 				echo "You don't have the authority for this action"; break;
-			} else if ($myrights > 74 && $line['ownerid']!=$userid) {
-				$isadminview = true;
+			} else if ($myrights > 74) {
+				if ($line['ownerid']!=$userid) {
+					$isadminview = true;
+				}
 				//DB $query = "SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id={$line['ownerid']}";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 				//DB $udat = mysql_fetch_array($result, MYSQL_ASSOC);
-				$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
+				$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name, ig.parent FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
 				$stm->execute(array(':id'=>$line['ownerid']));
 				$udat = $stm->fetch(PDO::FETCH_ASSOC);
 				if ($udat['groupid']==0) {
@@ -333,6 +335,11 @@ switch($_GET['action']) {
 				}
 				if ($myrights===75 && $udat['groupid']!=$groupid) {
 					echo "You don't have the authority for this action"; break;
+				}
+				if ($udat['parent']>0) {
+					$hassupergroup = true;
+				} else {
+					$hassupergroup = false;
 				}
 			}
 			$courseid = $line['id'];
@@ -433,7 +440,7 @@ switch($_GET['action']) {
 		$(function() {
 			$("form").on("submit",function(e) {
 				var needsgrp = $("input[name=isgrptemplate]:checked").length;
-				var needsall = $("input[name=istemplate]:checked,input[name=isselfenroll]:checked").length;
+				var needsall = $("input[name=istemplate]:checked,input[name=isselfenroll]:checked,input[name=issupergrptemplate]:checked").length;
 
 				var copyrights = $("input[name=copyrights]:checked").val();
 				var ok = true;
@@ -442,7 +449,7 @@ switch($_GET['action']) {
 					ok = false;
 				}
 				if (copyrights<2 && needsall>0) {
-					alert(_("Setting a course as a template or self enroll requires setting the copy permissions to: no key required for anyone"));
+					alert(_("Setting a course as a global template, super-group template, or self enroll requires setting the copy permissions to: no key required for anyone"));
 					ok = false;
 				}
 				if (copyrights<1 && needsgrp) {
@@ -654,6 +661,11 @@ switch($_GET['action']) {
 				echo '<input type=checkbox name="isgrptemplate" value="2" ';
 				if (($istemplate&2)==2) {echo 'checked="checked"';};
 				echo ' /> Mark as group template course';
+			}
+			if ((($myspecialrights&2)==2 || $myrights==100) && $hassupergroup) {
+				echo '<br/><input type=checkbox name="issupergrptemplate" value="32" ';
+				if (($istemplate&32)==32) {echo 'checked="checked"';};
+				echo ' /> Mark as super-group template course';
 			}
 			if (($myspecialrights&2)==2 || $myrights==100) {
 				echo '<br/><input type=checkbox name="istemplate" value="1" ';

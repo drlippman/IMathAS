@@ -520,6 +520,13 @@ switch($_POST['action']) {
 		} else if (($old_istemplate&1)==1) {
 			$istemplate |= 1;
 		}
+		if (($myspecialrights&2)==2 || $myrights==100) {
+			if (isset($_POST['issupergrptemplate'])) {
+				$istemplate |= 32;
+			}
+		} else if (($old_istemplate&32)==32) {
+			$istemplate |= 32;
+		}
 		if ($myrights==100) {
 			if (isset($_POST['isselfenroll'])) {
 				$istemplate |= 4;

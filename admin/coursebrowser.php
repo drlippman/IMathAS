@@ -32,11 +32,22 @@ if (isset($_GET['embedded'])) {
 /*** Utility functions ***/
 function getCourseBrowserJSON() {
   global $DBH, $browserprops, $groupid;
-  $query = "SELECT ic.id,ic.name,ic.jsondata,iu.FirstName,iu.LastName,ig.name AS groupname,ic.istemplate,iu.groupid ";
-  $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id ";
-  $query .= "WHERE ((ic.istemplate&17)>0 OR ((ic.istemplate&2)>0 AND iu.groupid=?))";
-  $stm = $DBH->prepare($query);
+  
+  $stm = $DBH->prepare("SELECT parent FROM imas_groups WHERE id=?");
   $stm->execute(array($groupid));
+  $supergroupid = $stm->fetchColumn(0);
+  
+  $query = "SELECT ic.id,ic.name,ic.jsondata,iu.FirstName,iu.LastName,ig.name AS groupname,ig.parent,ic.istemplate,iu.groupid ";
+  $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id ";
+  $query .= "WHERE ((ic.istemplate&17)>0 OR ((ic.istemplate&2)>0 AND iu.groupid=?)";
+  $qarr = array($groupid);
+  if ($supergroupid>0) {
+  	  $query .= " OR ((ic.istemplate&32)>0 AND ig.parent=?)";
+  	  array_push($qarr, $supergroupid);
+  }
+  $query .= ")";
+  $stm = $DBH->prepare($query);
+  $stm->execute($qarr);
   $courseinfo = array();
   while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $jsondata = json_decode($row['jsondata'], true);
@@ -54,6 +65,8 @@ function getCourseBrowserJSON() {
    
     if (($row['istemplate']&2)==2 && $row['groupid']==$groupid) { //group template for user's group
     	$jsondata['browser']['coursetype'] = 0;	    
+    } else if (($row['istemplate']&32)==32 && $row['parent']==$supergroupid) { //super-group template for user's group
+    	$jsondata['browser']['coursetype'] = 0;  
     } else if (($row['istemplate']&1)==1) { //global template
     	$jsondata['browser']['coursetype'] = 1;	        
     } else {
