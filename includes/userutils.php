@@ -91,7 +91,7 @@ function logout() {
 	$stm->execute(array($sessionid));
 	$_SESSION = array();
 	if (isset($_COOKIE[session_name()])) {
-		setcookie(session_name(), '', time()-42000, '/');
+		setcookie(session_name(), '', time()-42000, '/', null, false, true);
 	}
 	session_destroy();
 }

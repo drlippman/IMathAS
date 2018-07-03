@@ -58,7 +58,7 @@
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $itemid = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid=:typeid");
-	$stm->execute(array(':typeid'=>$_GET['id']));
+	$stm->execute(array(':typeid'=>intval($_GET['id'])));
 	$itemid = $stm->fetchColumn(0);
 
 	//DB $query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
@@ -93,7 +93,7 @@
 	//DB $query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id");
-	$stm->execute(array(':id'=>$_GET['id']));
+	$stm->execute(array(':id'=>intval($_GET['id'])));
 	//DB $text = mysql_result($result, 0,0);
 	//DB $title = mysql_result($result,0,1);
 	list($text,$title) = $stm->fetch(PDO::FETCH_NUM);
@@ -103,7 +103,7 @@
 	echo "<div class=breadcrumb>$breadcrumbbase ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
 
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
-	echo filter($text);
+	echo Sanitize::outgoingHtml(filter($text));
 	echo '</div>';
 	if (!($_GET['from'])) {
 		echo "<div class=right><a href=\"course.php?cid=$cid\">Back</a></div>\n";

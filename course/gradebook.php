@@ -132,7 +132,7 @@ if ($canviewall) {
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
-	$stu = $_GET['stu'];
+	$stu = Sanitize::onlyInt($_GET['stu']);
 } else {
 	$stu = 0;
 }
@@ -199,10 +199,10 @@ if ($isteacher) {
 			$value = $_POST['checked'];
 			$last = count($value)-1;
 			for($i = 0; $i < $last; $i++){
-				gbstudisp($value[$i]);
+				gbstudisp(Sanitize::onlyInt($value[$i]));
 				echo "<div style=\"page-break-after:always\"></div>";
 			}
-			gbstudisp($value[$last]);//no page break after last report
+			gbstudisp(Sanitize::onlyInt($value[$last]));//no page break after last report
 
 			echo "</div></div></div>";
 		}
@@ -250,7 +250,7 @@ if ($isteacher) {
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 }
@@ -661,7 +661,7 @@ function gbstudisp($stu) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
 					if ($lastsec=='') {echo '</optgroup>';}
-					echo '<optgroup label="Section '.htmlentities($row[3]).'">';
+					echo '<optgroup label="Section '.Sanitize::encodeStringForDisplay($row[3]).'">';
 					$lastsec = $row[3];
 				}
 				echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';

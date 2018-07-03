@@ -126,7 +126,7 @@ if (!(isset($teacherid))) {
 			updatePointsPossible($aid);
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 

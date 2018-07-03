@@ -4,20 +4,22 @@
 //(c) 2009 David Lippman
 	$init_skip_csrfp = true;
    	require("init_without_validate.php");
+   	$keyString = Sanitize::simpleString($_GET['key']);
 	if (!empty($_COOKIE['remoteaccess']) && strlen($_COOKIE['remoteaccess'])==10) {
-		$_GET['key'] = $_COOKIE['remoteaccess'];
-	} else if (empty($_GET['key']) || strlen(trim($_GET['key']))!=10) {
+        $keyString = Sanitize::simpleString($_COOKIE['remoteaccess']);
+	} else if (empty($keyString) || strlen(trim($keyString))!=10) {
 		echo "Key Error";
+        setcookie('remoteaccess',$keyString, time()+60*60*24*30*365*10,'','',true,true);
 		exit;
 	} else {
-		setcookie('remoteaccess',$_GET['key'], time()+60*60*24*30*365*10);
+		//setcookie('remoteaccess',$keyString, time()+60*60*24*30*365*10,'','',true,true);
 	}
 	//look up user
 	//DB $query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE remoteaccess=:remoteaccess");
-	$stm->execute(array(':remoteaccess'=>$_GET['key']));
+	$stm->execute(array(':remoteaccess'=>$keyString));
 	if ($stm->rowCount()==0) {
 		echo "Access key invalid";
 		exit;
@@ -94,7 +96,7 @@
 			if (!in_array($line['tid'], $forumthreads[$line['id']])) {
 				$forumthreads[$line['id']][] = $line['tid'];
 			}
-			$forumname[$line['id']] = $line['name'];
+			$forumname[$line['id']] = Sanitize::stripHtmlTags($line['name']);
 			$lastpost[$line['tid']] = formatdate($line['lastposttime']);
 		}
 	}
@@ -113,10 +115,11 @@
 		$query .= "JOIN imas_students ON imas_forums.courseid=imas_students.courseid AND imas_students.userid=:userid ";
 		$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:useridB ";
 		$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
-		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid)) ";
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridC)) ";
 		$query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
+
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':userid'=>$userid, ':userid'=>$userid, ':useridB'=>$userid, 'now'=>$now));
+		$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now, ':useridC'=>$userid));
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($courseforums[$line['courseid']])) {
 				$courseforums[$line['courseid']] = array();
@@ -133,7 +136,7 @@
 			if (!in_array($line['tid'], $forumthreads[$line['id']])) {
 				$forumthreads[$line['id']][] = $line['tid'];
 			}
-			$forumname[$line['id']] = $line['name'];
+			$forumname[$line['id']] = Sanitize::stripHtmlTags($line['name']);
 			$lastpost[$line['tid']] = formatdate($line['lastposttime']);
 		}
 	}
@@ -144,7 +147,8 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
   //we know $cidlist is all integers from the database, so this is safe
-	$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE id IN ($cidlist)");
+$stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
+	$stm->execute(array(':cidlist'=>$cidlist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$coursenames[$row[0]] = $row[1];
 	}
@@ -156,8 +160,9 @@
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
     //we know $threadids is all integers from the database, so this is safe
 		$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
-		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadids) ORDER BY imas_forum_posts.postdate DESC";
-		$stm = $DBH->query($query);
+		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN (:threadids) ORDER BY imas_forum_posts.postdate DESC";
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(':threadids'=>$threadids));
 		$lastforum = '';
 		$lastcourse = '';
 		$forumcontent = array();
@@ -180,7 +185,7 @@
 
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-below:5px;'>New Posts</div>";
 		foreach($coursenames as $id=>$name) {
-			echo "<div style='font-size:100%; color: #606; font-weight: 700; '>$name</div>";
+			echo "<div style='font-size:100%; color: #606; font-weight: 700; '>" .Sanitize::encodeStringForDisplay($name)."</div>";
 			echo "<div style='margin-left: 5px;'>";
 			asort($courseforums[$id]);
 			foreach($courseforums[$id] as $fid) {

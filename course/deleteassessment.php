@@ -23,9 +23,9 @@ if (!(isset($teacherid))) {
 } elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
-
+	$aid = Sanitize::onlyInt($_GET['id']);
+	
 	if ($_POST['remove']=="really") {
-		$aid = Sanitize::onlyInt($_GET['id']);
 		$DBH->beginTransaction();
 		//DB $query = "DELETE FROM imas_assessments WHERE id='$aid' AND courseid=$cid";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -91,7 +91,7 @@ if (!(isset($teacherid))) {
 			$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	} else {
@@ -99,7 +99,7 @@ if (!(isset($teacherid))) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $itemname = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$aid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

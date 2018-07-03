@@ -197,7 +197,7 @@ function successmessage($type,$msgid,$score) {
         <imsx_codeMajor>success</imsx_codeMajor>
         <imsx_severity>status</imsx_severity>
         <imsx_operationRefIdentifier>'.$type.'</imsx_operationRefIdentifier>
-        <imsx_messageRefIdentifier>'.$msgid.'</imsx_messageRefIdentifier>
+        <imsx_messageRefIdentifier>'.Sanitize::stripHtmlTags($msgid).'</imsx_messageRefIdentifier>
       </imsx_statusInfo>
     </imsx_POXResponseHeaderInfo>
   </imsx_POXHeader>

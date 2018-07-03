@@ -218,7 +218,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	} else { //DEFAULT DATA MANIPULATION

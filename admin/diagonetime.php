@@ -102,7 +102,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_diag_onetime WHERE diag=:diag");
 		$stm->execute(array(':diag'=>$diag));
-		header('Location: ' . $GLOBALS['basesiteurl'] . $backtrack);
+		header('Location: ' . $GLOBALS['basesiteurl'] . $backtrack . '?r='.Sanitize::randomQueryStringParam());
 		exit;
 	}
 } else {

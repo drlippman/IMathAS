@@ -61,7 +61,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 	$stm = $DBH->prepare("SELECT name,itemorder,latepasshrs FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
-	$coursename = trim($row[0]);
+	$coursename = Sanitize::stripHtmlTags(trim($row[0]));
 	$itemorder = unserialize($row[1]);
 	$itemsimporder = array();
 

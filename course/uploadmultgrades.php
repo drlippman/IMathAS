@@ -147,7 +147,7 @@ if (!(isset($teacherid))) {
 			}
 		}
 		unlink($dir.$filename);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/chgoffline.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/chgoffline.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		//upload file
@@ -179,9 +179,9 @@ if (!(isset($teacherid))) {
 						if (isset($srow[$i])) {
 							$p = explode(':',$hrow[$i]);
 							if (count($p)>1) {
-								$names[$i] = strip_tags($p[0]);
+							    $names[$i] = Sanitize::stripHtmlTags($p[0]);
 							} else {
-								$names[$i] = strip_tags($hrow[$i]);
+								$names[$i] = Sanitize::stripHtmlTags($hrow[$i]);
 							}
 							$pts = intval(preg_replace('/[^\d\.]/','',$srow[$i]));
 							//if ($pts==0) {$pts = '';}
@@ -189,10 +189,10 @@ if (!(isset($teacherid))) {
 							$p = explode(':',$hrow[$i]);
 							if (count($p)>1) {
 								$pts = intval(preg_replace('/[^\d\.]/','',$p[count($p)-1]));
-								$names[$i] = strip_tags($p[0]);
+								$names[$i] = Sanitize::stripHtmlTags($p[0]);
 							} else {
 								$pts = 0;
-								$names[$i] = strip_tags($hrow[$i]);
+								$names[$i] = Sanitize::stripHtmlTags($hrow[$i]);
 							}
 							//if ($pts==0) {$pts = '';}
 						}
@@ -293,7 +293,7 @@ if ($overwriteBody==1) {
 				echo '<option value="'.Sanitize::encodeStringForDisplay($data[3]).'" selected="selected">Overwrite existing scores</option>';
 			}
 			echo '</select></td>';
-			echo '<td><input type="text" size="20" name="colname'.$col.'" value="'.htmlentities($data[0]).'" /></td>';
+			echo '<td><input type="text" size="20" name="colname'.$col.'" value="'.Sanitize::encodeStringForDisplay($data[0]).'" /></td>';
 			echo '<td><input type="text" size="3" name="colpts'.$col.'"  value="'.Sanitize::encodeStringForDisplay($data[1]).'" /></td>';
 			echo '<td><select name="colcnt'.$col.'">';
 			echo '<option value="1" selected="selected">Count in gradebook</option>';
@@ -301,7 +301,7 @@ if ($overwriteBody==1) {
 			echo '<option value="3">Don\'t count in grade total</option>';
 			echo '<option value="2">Count as extra credit</option></select></td>';
 			echo '<td><select name="colgbcat'.$col.'">'.$gbcatoptions.'</select></td>';
-			echo '<td><input type="text" size="3" name="colfeedback'.$col.'"  value="'.($data[2]>-1?$data[2]+1:'').'" /></td>';
+			echo '<td><input type="text" size="3" name="colfeedback'.$col.'"  value="'.Sanitize::encodeStringForDisplay($data[2]>-1?$data[2]+1:'').'" /></td>';
 			echo '</tr>';
 		}
 		echo '</tbody></table>';

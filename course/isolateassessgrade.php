@@ -345,6 +345,7 @@
 				$tottime += $timeused;
 				$ntime++;
 			}
+
 			$feedback = json_decode($line['feedback']);
 			if ($feedback===null) {
 				$hasfeedback = ($line['feedback'] != '');

@@ -53,7 +53,7 @@
 				$scorecol = $_POST['gradecol']-1;
 
 				// $_FILES[]['tmp_name'] is not user provided. This is safe.
-				$handle = fopen_utf8($_FILES['userfile']['tmp_name'],'r');
+				$handle = fopen_utf8(realpath($_FILES['userfile']['tmp_name']),'r');
 				if ($_POST['hashdr']==1) {
 					$data = fgetcsv($handle,4096,',');
 				} else if ($_POST['hashdr']==2) {
@@ -67,15 +67,15 @@
 					if ($_POST['useridtype']==0) {
 						//DB $query .= "imas_users.SID='{$data[$usercol]}'";
 						$query .= "imas_users.SID=:SID";
-						$qarr[':SID'] = $data[$usercol];
+						$qarr[':SID'] = Sanitize::stripHtmlTags($data[$usercol]);
 					} else if ($_POST['useridtype']==1) {
 						list($last,$first) = explode(',',$data[$usercol]);
 						$first = str_replace(' ','',$first);
 						$last = str_replace(' ','',$last);
 						//DB $query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
 						$query .= "imas_users.FirstName=:first AND imas_users.LastName=:last";
-						$qarr[':first'] = $first;
-						$qarr[':last'] = $last;
+						$qarr[':first'] = Sanitize::stripHtmlTags($first);
+						$qarr[':last'] = Sanitize::stripHtmlTags($last);
 						//echo $query;
 					} else {
 						$query .= "0";
@@ -90,11 +90,11 @@
 						if ($comtype=='stu') {
 							//DB $query = "UPDATE imas_students SET gbcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
 							$stm = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE userid=:userid AND courseid=:courseid");
-							$stm->execute(array(':gbcomment'=>$data[$scorecol], ':userid'=>$cuserid, ':courseid'=>$cid));
+							$stm->execute(array(':gbcomment'=>Sanitize::stripHtmlTags($data[$scorecol]), ':userid'=>$cuserid, ':courseid'=>$cid));
 						} else if ($comtype=='instr') {
 							//DB $query = "UPDATE imas_students SET gbinstrcomment='{$data[$scorecol]}' WHERE userid='$cuserid' AND courseid='$cid'";
 							$stm = $DBH->prepare("UPDATE imas_students SET gbinstrcomment=:gbinstrcomment WHERE userid=:userid AND courseid=:courseid");
-							$stm->execute(array(':gbinstrcomment'=>$data[$scorecol], ':userid'=>$cuserid, ':courseid'=>$cid));
+							$stm->execute(array(':gbinstrcomment'=>Sanitize::stripHtmlTags($data[$scorecol]), ':userid'=>$cuserid, ':courseid'=>$cid));
 						}
 						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 						$successes++;
@@ -106,7 +106,7 @@
 				echo "<p>Comments uploaded.". Sanitize::encodeStringForDisplay($successes) ."records.</p> ";
 				if (count($failures)>0) {
 					echo "<p>Comment upload failure on: <br/>";
-					echo implode('<br/>',$failures);
+					echo implode('<br/>', array_map('Sanitize::encodeStringForDisplay', $failures));
 					echo '</p>';
 				}
 				if ($successes>0) {
@@ -156,19 +156,20 @@
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			//if ($_POST[$row[0]]!='') {
+			$rowInfo = Sanitize::stripHtmlTags($_POST[$row[0]]);
 				if ($comtype=='stu') {
 					//DB $query = "UPDATE imas_students SET gbcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 					$stm2 = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE id=:id");
-					$stm2->execute(array(':gbcomment'=>$_POST[$row[0]], ':id'=>$row[0]));
+					$stm2->execute(array(':gbcomment'=>$rowInfo, ':id'=>$row[0]));
 				} else if ($comtype=='instr') {
 					//DB $query = "UPDATE imas_students SET gbinstrcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 					$stm2 = $DBH->prepare("UPDATE imas_students SET gbinstrcomment=:gbinstrcomment WHERE id=:id");
-					$stm2->execute(array(':gbinstrcomment'=>$_POST[$row[0]], ':id'=>$row[0]));
+					$stm2->execute(array(':gbinstrcomment'=>$rowInfo, ':id'=>$row[0]));
 				}
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 

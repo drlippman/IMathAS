@@ -5,11 +5,12 @@ if (empty($_GET['linkid'])) {
 	echo "no link id provided";
 	exit;
 }
+$linkid = Sanitize::onlyInt($_GET['linkid']);
 //DB $query = "SELECT text,title,points FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB list($text,$title,$points) = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT text,title,points FROM imas_linkedtext WHERE id=:id");
-$stm->execute(array(':id'=>$_GET['linkid']));
+$stm->execute(array(':id'=>$linkid));
 list($text,$title,$points) = $stm->fetch(PDO::FETCH_NUM);
 $toolparts = explode('~~',substr($text,8));
 $tool = $toolparts[0];
@@ -48,7 +49,7 @@ if (trim($line['custom'])!='') {
 		$pt = explode('=',$custbit);
 		if (count($pt)==2 && trim($pt[0])!='' && trim($pt[1])!='') {
 			$pt[0] = map_keyname($pt[0]);
-			$parms['custom_'.$pt[0]] = str_replace(array('$cid','$userid','$linkid'),array($cid,$userid,intval($_GET['linkid'])),$pt[1]);
+			$parms['custom_'.$pt[0]] = str_replace(array('$cid','$userid','$linkid'),array($cid,$userid,$linkid),$pt[1]);
 		}
 	}
 }
@@ -58,7 +59,7 @@ if (trim($linkcustom)!='') {
 		$pt = explode('=',$custbit);
 		if (count($pt)==2 && trim($pt[0])!='' && trim($pt[1])!='') {
 			$pt[0] = map_keyname($pt[0]);
-			$parms['custom_'.$pt[0]] = str_replace(array('$cid','$userid','$linkid'),array($cid,$userid,intval($_GET['linkid'])),$pt[1]);
+			$parms['custom_'.$pt[0]] = str_replace(array('$cid','$userid','$linkid'),array($cid,$userid,$linkid),$pt[1]);
 		}
 	}
 }
@@ -88,7 +89,7 @@ $parms['context_id'] = $cid;
 $parms['context_title'] = trim($coursename);
 $parms['context_label'] = trim($coursename);
 $parms['context_type'] = 'CourseSection';
-$parms['resource_link_id'] = $cid.'-'.$_GET['linkid'];
+$parms['resource_link_id'] = $cid.'-'.$linkid;
 
 if ($points>0 && isset($studentid) && !isset($sessiondata['stuview'])) {
 	$sig = sha1($gradesecret.'::'.$parms['resource_link_id'].'::'.$userid);
@@ -132,7 +133,7 @@ if ($line['url']=='') {
 
 try {
 	$parms = signParameters($parms, $line['url'], "POST", $line['ltikey'], $line['secret'], null, $org_id, $org_desc);
-	$content = postLaunchHTML($parms, $line['url'],isset($parms['custom_debug']));
+	$content = postLaunchHTML($parms, $line['url'], isset($parms['custom_debug']));
 	print($content);
 } catch (Exception $e) {
 	echo $e->getMessage();

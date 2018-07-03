@@ -510,7 +510,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 
 	//dump it!
-	echo json_encode($output, JSON_FORCE_OBJECT);
+	echo json_encode($output, JSON_FORCE_OBJECT|JSON_HEX_TAG);
 	exit;
 
 } else { //STEP 1 DATA PROCESSING, INITIAL LOAD

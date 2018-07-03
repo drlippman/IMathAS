@@ -23,6 +23,11 @@ function httpPost($url, $data)
     $response = curl_exec($curl);
     curl_close($curl);
 		*/
+        if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+         	 $ishttps = true;
+        } else {
+         	 $ishttps = false;
+        }
 		$options = array(
 	    'http' => array(
 	        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -30,7 +35,7 @@ function httpPost($url, $data)
 	        'content' => http_build_query($data)
 	    ), 
 	    'ssl' => array(
-	    	    'verify_peer' => false,
+	    	    'verify_peer' => $ishttps,
 	    ),
 		);
 		$context  = stream_context_create($options);
@@ -39,7 +44,7 @@ function httpPost($url, $data)
 }
 
 //build assessment javascript min file
-$g = minify(file_get_contents("../javascript/general.js"));
+$g = minify(file_get_contents("../javascript/general.js"));	
 $m = minify(file_get_contents("../javascript/mathjs.js"));
 $a = minify(file_get_contents("../javascript/AMhelpers.js"));
 $c = minify(file_get_contents("../javascript/confirmsubmit.js"));

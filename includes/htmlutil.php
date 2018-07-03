@@ -33,7 +33,8 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 		foreach ($valList as $oc) {
 			if ($oc[1]==1) {//is group
 				if ($ingrp) { echo '</optgroup>';}
-				echo '<optgroup label="'.htmlentities($oc[0]).'">';
+                $optionGroupLabel = Sanitize::encodeStringForDisplay($oc[0]);
+				echo '<optgroup label="'.$optionGroupLabel.'">';
 				$ingrp = true;
 			} else {
 				echo '<option value="'.Sanitize::encodeStringForDisplay($oc[0]).'">'.Sanitize::encodeStringForDisplay($labelList[$oc[0]]).'</option>';

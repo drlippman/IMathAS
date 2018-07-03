@@ -52,7 +52,7 @@ if (isset($_POST['vidid'])) {
 	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
 	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
 
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 	exit;
 }
 

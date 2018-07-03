@@ -5,7 +5,7 @@
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	 if (!file_exists("$curdir/config.php")) {
-		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php");
+		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php?r=" . Sanitize::randomQueryStringParam());
 	 }
  	require_once(__DIR__ . "/init_without_validate.php");
 	require_once(__DIR__ ."/includes/newusercommon.php");
@@ -84,12 +84,12 @@
 				//DB $query = "INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES ('$userid','$cid','{$_POST['ekey2']}','$code','$deflatepass');";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
-				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$_GET['cid'], ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
 			} else {
 				//DB $query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','$cid','$code','$deflatepass');";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES (:userid, :courseid, :gbcomment, :latepass)");
-				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$_GET['cid'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':gbcomment'=>$code, ':latepass'=>$deflatepass));
 			}
 
 			if ($emailconfirmation) {
@@ -136,15 +136,15 @@
 					//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','$cid','{$_REQUEST['ekey']}','$deflatepass')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
+					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
 				} else {
 					//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','$cid','$deflatepass')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,latepass) VALUES (:userid, :courseid, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':latepass'=>$deflatepass));
+					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':latepass'=>$deflatepass));
 				}
 
-				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid);
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid. '&r=' . Sanitize::randomQueryStringParam());
 				exit;
 			} else {
 				require("header.php");
@@ -158,7 +158,7 @@
 				exit;
 			}
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid);
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid . '&r=' . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //not verified
@@ -204,7 +204,7 @@
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $enrollkey = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT enrollkey FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['cid']));
+		$stm->execute(array(':id'=>$cid));
 		$enrollkey = $stm->fetchColumn(0);
 
 ?>

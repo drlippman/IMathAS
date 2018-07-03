@@ -247,11 +247,11 @@ if ($mode == 'cntdown') {
 	}
 } else {
 	if ($stopattype=='a') {
-		echo sprintf(_("Attempt %d questions"), $n);
+		echo sprintf(_("Attempt %d questions"), Sanitize::onlyInt($n));
 	} else if ($stopattype=='c') {
-		echo sprintf(_("Get %d questions correct"), $n);
+	    echo sprintf(_("Get %d questions correct"), Sanitize::onlyInt($n));
 	} else if ($stopattype=='s') {
-		echo sprintf(_("Get a streak of %d questions correct in a row"), $n);
+	    echo sprintf(_("Get a streak of %d questions correct in a row"), Sanitize::onlyInt($n));
 	}
 	if ($torecord=='t') {
 		echo ' ' . _('in the shortest time possible');

@@ -23,7 +23,7 @@ if ($myrights < 100) {
   }
   exit;
 } else if (isset($_POST['removecourselti'])) {
-  $id = intval($_POST['removecourselti']);
+  $id = Sanitize::onlyInt($_POST['removecourselti']);
   $stm = $DBH->prepare("SELECT org,contextid FROM imas_lti_courses WHERE id=:id");
   $stm->execute(array(':id'=>$id));
   $row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -60,7 +60,7 @@ if ($myrights < 100) {
   $query .= "WHERE ilp.contextid=?";
   $stm = $DBH->prepare($query);
   $stm->execute(array($contextid, $contextid));
-  echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC));
+  echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC), JSON_HEX_TAG);
   exit;
 
 } else if (empty($_GET['id'])) {

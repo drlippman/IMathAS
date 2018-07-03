@@ -94,17 +94,17 @@ if (!(isset($teacherid)) && $myrights<20) {
 				$parents[$libcnt] = 0;
 				echo "\nSTART LIBRARY\n";
 				echo "ID\n";
-				echo rtrim($libcnt) . "\n";
+				echo Sanitize::forRawExport(rtrim($libcnt)) . "\n";
 				echo "UID\n";
-				echo rtrim($row[3]) . "\n";
+				echo Sanitize::forRawExport(Sanitize::forRawExport(rtrim($row[3]))) . "\n";
 				echo "LASTMODDATE\n";
-				echo rtrim($row[4]) . "\n";
+				echo Sanitize::forRawExport(rtrim($row[4])) . "\n";
 				echo "OWNERID\n";
-				echo rtrim($row[5]) . "\n";
+				echo Sanitize::forRawExport(rtrim($row[5])) . "\n";
 				echo "USERIGHTS\n";
-				echo rtrim($row[6]) . "\n";
+				echo Sanitize::forRawExport(rtrim($row[6])) . "\n";
 				echo "NAME\n";
-				echo rtrim($row[1]) . "\n";
+				echo Sanitize::forRawExport(rtrim($row[1])) . "\n";
 				echo "PARENT\n";
 				echo "0\n";
 				$libcnt++;
@@ -137,19 +137,19 @@ if (!(isset($teacherid)) && $myrights<20) {
 						$parents[$libcnt] = $libs[$lib];
 						echo "\nSTART LIBRARY\n";
 						echo "ID\n";
-						echo rtrim($libcnt) . "\n";
+						echo Sanitize::forRawExport(rtrim($libcnt)) . "\n";
 						echo "UID\n";
-						echo rtrim($row[2]) . "\n";
+						echo Sanitize::forRawExport(rtrim($row[2])) . "\n";
 						echo "LASTMODDATE\n";
-						echo rtrim($row[3]) . "\n";
+						echo Sanitize::forRawExport(rtrim($row[3])) . "\n";
 						echo "OWNERID\n";
-						echo rtrim($row[5]) . "\n";
+						echo Sanitize::forRawExport(rtrim($row[5])) . "\n";
 						echo "USERIGHTS\n";
-						echo rtrim($row[6]) . "\n";
+						echo Sanitize::forRawExport(rtrim($row[6])) . "\n";
 						echo "NAME\n";
-						echo rtrim($row[1]) . "\n";
+						echo Sanitize::forRawExport(rtrim($row[1])) . "\n";
 						echo "PARENT\n";
-						echo rtrim($libs[$lib]) . "\n";
+						echo Sanitize::forRawExport(rtrim($libs[$lib])) . "\n";
 						$libcnt++;
 						getchildlibs($row[0]);
 					}
@@ -191,9 +191,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 			if (isset($libitems[$newid])) {
 				echo "\nSTART LIBRARY ITEMS\n";
 				echo "LIBID\n";
-				echo rtrim($newid) . "\n";
+				echo Sanitize::forRawExport(rtrim($newid)) . "\n";
 				echo "QSETIDS\n";
-				echo rtrim(implode(',',$libitems[$newid])) . "\n";
+				echo Sanitize::forRawExport(rtrim(implode(',',$libitems[$newid]))) . "\n";
 			}
 		}
 
@@ -252,41 +252,41 @@ if (!(isset($teacherid)) && $myrights<20) {
         }, $line['qtext']);
 			echo "\nSTART QUESTION\n";
 			echo "QID\n";
-			echo rtrim($qassoc[$line['id']]) . "\n";
+			echo Sanitize::forRawExport(rtrim($qassoc[$line['id']])) . "\n";
 			echo "\nUQID\n";
-			echo rtrim($line['uniqueid']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['uniqueid'])) . "\n";
 			echo "\nLASTMOD\n";
-			echo rtrim($line['lastmoddate']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['lastmoddate'])) . "\n";
 			echo "\nDESCRIPTION\n";
-			echo rtrim($line['description']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['description'])) . "\n";
 			echo "\nAUTHOR\n";
-			echo rtrim($line['author']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['author'])) . "\n";
 			echo "\nOWNERID\n";
-			echo rtrim($line['ownerid']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['ownerid'])) . "\n";
 			echo "\nUSERIGHTS\n";
-			echo rtrim($line['userights']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['userights'])) . "\n";
 			echo "\nCONTROL\n";
-			echo rtrim($line['control']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['control'])) . "\n";
 			echo "\nQCONTROL\n";
-			echo rtrim($line['qcontrol']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['qcontrol'])) . "\n";
 			echo "\nQTYPE\n";
-			echo rtrim($line['qtype']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['qtype'])) . "\n";
 			echo "\nQTEXT\n";
-			echo rtrim($line['qtext']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['qtext'])) . "\n";
 			echo "\nANSWER\n";
-			echo rtrim($line['answer']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['answer'])) . "\n";
 			echo "\nSOLUTION\n";
-			echo rtrim($line['solution']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['solution'])) . "\n";
 			echo "\nSOLUTIONOPTS\n";
-			echo rtrim($line['solutionopts']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['solutionopts'])) . "\n";
 			echo "\nEXTREF\n";
-			echo rtrim($line['extref']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['extref'])) . "\n";
 			echo "\nLICENSE\n";
-			echo rtrim($line['license']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['license'])) . "\n";
 			echo "\nANCESTORAUTHORS\n";
-			echo rtrim($line['ancestorauthors']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['ancestorauthors'])) . "\n";
 			echo "\nOTHERATTRIBUTION\n";
-			echo rtrim($line['otherattribution']) . "\n";
+			echo Sanitize::forRawExport(rtrim($line['otherattribution'])) . "\n";
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
 				//DB $query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
@@ -295,7 +295,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo $row[0].','.getqimageurl($row[1],true).','.$row[2]. "\n";
+					echo Sanitize::forRawExport($row[0].','.getqimageurl($row[1],true).','.$row[2]). "\n";
 				}
 			}
 		}

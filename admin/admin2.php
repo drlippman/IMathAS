@@ -71,7 +71,7 @@ if ($myrights < 75) {
     
     //only one match - redirect to user details page
     if (count($possible_users)==1) {
-      header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userdetails.php?id=".Sanitize::encodeUrlParam($possible_users[0]['id']));
+      header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userdetails.php?id=".Sanitize::encodeUrlParam($possible_users[0]['id']). "&r=" .Sanitize::randomQueryStringParam());
     	exit;
     }
     
@@ -80,7 +80,8 @@ if ($myrights < 75) {
 
   } else if (!empty($_GET['findgroup'])) {
     $hasp1 = false;
-    $words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$_GET['findgroup'])));
+    $findGroup = Sanitize::stripHtmlTags($_GET['findgroup']);
+    $words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$findGroup)));
     $likearr = array();
     foreach ($words as $v) {
       $likearr[] = '%'.$v.'%';
@@ -101,7 +102,7 @@ if ($myrights < 75) {
     }
     //only one match - redirect to user details page
     if (count($possible_groups)==1) {
-      header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php?groupdetails=".Sanitize::encodeUrlParam($possible_groups[0]['id']));
+      header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php?groupdetails=".Sanitize::encodeUrlParam($possible_groups[0]['id']). "&r=" .Sanitize::randomQueryStringParam());
       exit;
     }
     //sort by priority

@@ -22,8 +22,9 @@ $body = "";
 $useeditor = "text,summary";
 
 $cid = Sanitize::courseId($_GET['cid']);
+$gid = Sanitize::onlyInt($_GET['id']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-if (isset($_GET['id'])) {
+if (!empty($gid)) {
 	$curBreadcrumb .= "&gt; Modify Link\n";
 	$pagetitle = "Modify Link";
 } else {
@@ -39,18 +40,17 @@ if (isset($_GET['tb'])) {
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (!(isset($_GET['cid']))) {
+} elseif (empty($cid)) {
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => $_GET['folder']));
-	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::onlyInt($_GET['id']) : "";
+	$page_formActionTag .= (!empty($gid)) ? "&id=" . $gid : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
-	$caltag = $_POST['caltag'];
+	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 	$points = 0;
 
 	if ($_POST['title']!= null) { //if the form has been submitted
@@ -67,7 +67,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 			}
-			$oncal = $_POST['oncal'];
+			$oncal = Sanitize::onlyInt($_POST['oncal']);
 		} else if ($_POST['avail']==2) {
 			if ($_POST['altoncal']==0) {
 				$startdate = 0;
@@ -75,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
-				$caltag = $_POST['altcaltag'];
+				$caltag = Sanitize::stripHtmlTags($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;
 		} else {
@@ -86,9 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$processingerror = false;
 		if ($_POST['linktype']=='text') {
-			require_once("../includes/htmLawed.php");
-			//DB $_POST['text'] = addslashes(myhtmLawed(stripslashes($_POST['text'])));
-			$_POST['text'] = myhtmLawed($_POST['text']);
+			$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
 		} else if ($_POST['linktype']=='file') {
 			require_once("../includes/filehandler.php");
 			if ($_FILES['userfile']['name']!='') {
@@ -148,10 +146,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if (!empty($_POST['curfile'])) {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				///if (!file_exists($uploaddir . $_POST['curfile'])) {
-				if (!doesfileexist('cfile',$_POST['curfile'])) {
+				$curfile = Sanitize::sanitizeFilePathAndCheckBlacklist($_POST['curfile']);
+				if (!doesfileexist('cfile', $curfile)) {
 					$processingerror = true;
 				} else {
-					$_POST['text'] = "file:".$_POST['curfile'];
+					$_POST['text'] = "file:".$curfile;
 				}
 			} else {
 				$processingerror = true;
@@ -176,22 +175,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 
-		if ($points==0 && isset($_POST['hadpoints']) && isset($_GET['id'])) {
+		if ($points==0 && isset($_POST['hadpoints']) && !empty($gid)) {
 			//DB $query = "DELETE FROM imas_grades WHERE gradetypeid='{$_GET['id']}' AND gradetype='exttool'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
-			$stm->execute(array(':gradetypeid'=>$_GET['id']));
+			$stm->execute(array(':gradetypeid'=>$gid));
 		}
 
 		//DB $_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
-		$_POST['title'] = htmlentities($_POST['title']);
+		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
 
-		require_once("../includes/htmLawed.php");
 		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
 			$_POST['summary'] = '';
 		} else {
 			//DB $_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
-			$_POST['summary'] = myhtmLawed($_POST['summary']);
+			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
 		}
 		$_POST['text'] = trim($_POST['text']);
 		$outcomes = array();
@@ -203,12 +201,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		$outcomes = implode(',',$outcomes);
-		if (isset($_GET['id'])) {  //already have id; update
+		if (!empty($gid)) {  //already have id; update
 			//DB $query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $text = trim(mysql_result($result,0,0));
 			$stm = $DBH->prepare("SELECT text FROM imas_linkedtext WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>$gid));
 			$text = trim($stm->fetchColumn(0));
 			if (substr($text,0,5)=='file:') { //has file
 				//DB $safetext = addslashes($text);
@@ -229,6 +227,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
+				$available = sanitize::onlyInt($_POST['avail']);
+				$target = Sanitize::onlyInt($_POST['target']);
 				//DB $query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
 				//DB $query .= "WHERE id='{$_GET['id']}'";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -236,8 +236,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query .= "oncal=:oncal,caltag=:caltag,target=:target,outcomes=:outcomes,points=:points WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'], ':startdate'=>$startdate,
-					':enddate'=>$enddate, ':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag, ':target'=>$_POST['target'],
-					':outcomes'=>$outcomes, ':points'=>$points, ':id'=>$_GET['id']));
+					':enddate'=>$enddate, ':avail'=>$available, ':oncal'=>$oncal, ':caltag'=>$caltag, ':target'=>$target,
+					':outcomes'=>$outcomes, ':points'=>$points, ':id'=>$id));
 			}
 		} else if (!$processingerror) { //add new
 			//DB $query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) VALUES ";
@@ -297,16 +297,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$body = "<p>Error with your submission</p>";
 			}
-			$body .= "<p><a href=\"addlinkedtext.php?cid=" . Sanitize::courseId($_GET['cid']);
-			if (isset($_GET['id'])) {
-				$body .= "&id=" . Sanitize::onlyInt($_GET['id']);
+			$body .= "<p><a href=\"addlinkedtext.php?cid=" . $cid;
+			if (!empty($gid)) {
+				$body .= "&id=" . $gid;
 			} else {
 				$body .= "&id=$newtextid";
 			}
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid ."&r=" .Sanitize::randomQueryStringParam());
 		}
 		exit;
 	} else {
@@ -314,12 +314,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$selectedtool = 0;
 		$filename = '';
 		$webaddr = '';
-		if (isset($_GET['id'])) {
+		if (!empty($gid)) {
 			//DB $query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * FROM imas_linkedtext WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>$gid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
@@ -417,7 +417,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$etime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 		}
 
-		if (!isset($_GET['id'])) {
+		if (empty($gid)) {
 			$stime = $defstime;
 			$etime = $deftime;
 		}
@@ -538,7 +538,7 @@ if ($overwriteBody==1) {
 
 		Summary<BR>
 		<div class=editor>
-			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo htmlentities($line['summary']);?></textarea>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary']);?></textarea>
 		</div>
 		<br/>
 
@@ -555,13 +555,13 @@ if ($overwriteBody==1) {
 		<div id="textinput" <?php if ($type != 'text') {echo 'style="display:none;"';}?> >
 			Text<BR>
 			<div class=editor>
-				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']);?></textarea>
+				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['text']);?></textarea>
 			</div>
 		</div>
 		<div id="webinput" <?php if ($type != 'web') {echo 'style="display:none;"';}?> >
 			<span class="form">Weblink (start with http://)</span>
 			<span class="formright">
-				<input size="80" name="web" value="<?php echo htmlentities($webaddr);?>" />
+				<input size="80" name="web" value="<?php echo Sanitize::encodeStringForDisplay($webaddr);?>" />
 			</span><br class="form">
 
 		</div>
@@ -587,14 +587,14 @@ if ($overwriteBody==1) {
 			<?php
 			if (count($toolvals)>0) {
 				writeHtmlSelect('tool',$toolvals,$toollabels,$selectedtool);
-				echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="'.htmlentities($toolcustom).'" /><br/>';
-				echo 'Custom launch URL: <input type="text" name="toolcustomurl" size="40" value="'.htmlentities($toolcustomurl).'" /><br/>';
+				echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustom).'" /><br/>';
+				echo 'Custom launch URL: <input type="text" name="toolcustomurl" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustomurl).'" /><br/>';
 			} else {
 				echo 'No Tools defined yet<br/>';
 			}
 			if (!isset($CFG['GEN']['noInstrExternalTools'])) {
 				echo '<a href="../admin/externaltools.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-                        'ltfrom' => Sanitize::onlyInt($_GET['id']))) .'">Add or edit an external tool</a>';
+                        'ltfrom' => $gid)) .'">Add or edit an external tool</a>';
 			}
 			?>
 			</span><br class="form"/>

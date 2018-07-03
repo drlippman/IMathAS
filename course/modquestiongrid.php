@@ -229,7 +229,7 @@ if (isset($_POST['checked'])) { //modifying existing
 					$row['attempts'] = '';
 				}
 
-				$qrows[$row['id']] = '<tr><td>'.$qns[$row['id']].'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
+				$qrows[$row['id']] = '<tr><td>'.Sanitize::onlyInt($qns[$row['id']]).'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
 				$qrows[$row['id']] .= '<td>';
 				if ($row['extref']!='') {
 					$extref = explode('~~',$row['extref']);
@@ -257,7 +257,7 @@ if (isset($_POST['checked'])) { //modifying existing
 				$qrows[$row['id']] .= '<option value="0" '.(($row['showhints']==0)?'selected="selected"':'').'>Use Default</option>';
 				$qrows[$row['id']] .= '<option value="1" '.(($row['showhints']==1)?'selected="selected"':'').'>No</option>';
 				$qrows[$row['id']] .= '<option value="2" '.(($row['showhints']==2)?'selected="selected"':'').'>Yes</option></select></td>';
-				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
+				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"copies" . Sanitize::onlyInt($row['id']) . "\" value=\"0\" /></td>";
 				$qrows[$row['id']] .= '</tr>';
 			}
 			echo "<th>Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
@@ -338,7 +338,7 @@ if (isset($_POST['checked'])) { //modifying existing
 				}
 				echo '<td><button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($row[0]).')">'._('Preview').'</button></td>';
 				echo "<td><input type=text size=4 name=\"points" . Sanitize::encodeStringForDisplay($row[0]) . "\" value=\"\" />";
-				echo '<input type="hidden" name="qparts'.Sanitize::encodeStringForDisplay($row[0]).'" value="'.$n.'"/></td>';
+				echo '<input type="hidden" name="qparts'.Sanitize::encodeStringForDisplay($row[0]).'" value="'.Sanitize::onlyInt($n).'"/></td>';
 				echo "<td><input type=text size=4 name=\"attempts" . Sanitize::encodeStringForDisplay($row[0]) ."\" value=\"\" /></td>";
 				echo "<td><select name=\"showhints" . Sanitize::encodeStringForDisplay($row[0]) . "\">";
 				echo '<option value="0" selected="selected">Use Default</option>';

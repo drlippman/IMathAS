@@ -13,6 +13,7 @@ ini_set("post_max_size", "10485760");
 /*** master php includes *******/
 require("../init.php");
 require_once(__DIR__ . "/../includes/htmLawed.php");
+require("../includes/safeunserialize.php");
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -60,29 +61,33 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		$qarr[':courseid'] = $cid;
 
 		// Sanitize summary content.
-		$item[$itemtoadd]['summary'] = myhtmLawed($item[$itemtoadd]['summary']);
+		$item[$itemtoadd]['summary'] = Sanitize::incomingHtml($item[$itemtoadd]['summary']);
 
-        // Sanitize endmsg content.
-        if (isset($item[$itemtoadd]['endmsg'])) {
-            $data = unserialize($item[$itemtoadd]['endmsg']);
-            $data['commonmsg'] = myhtmLawed($data['commonmsg']);
-            $data['def'] = myhtmLawed($data['def']);
-            foreach (array_keys($data['msgs']) as $k) {
-                $data['msgs'][$k] = myhtmLawed($data['msgs'][$k]);
-            }
-        }
+		// Sanitize endmsg content.
+		if (isset($item[$itemtoadd]['endmsg'])) {
+		    $data = safe_unserialize($item[$itemtoadd]['endmsg']);
+		    $data['commonmsg'] = Sanitize::incomingHtml($data['commonmsg']);
+		    $data['def'] = Sanitize::incomingHtml($data['def']);
+		    foreach (array_keys($data['msgs']) as $k) {
+			$data['msgs'][$k] = Sanitize::incomingHtml($data['msgs'][$k]);
+		    }
+		    $item[$itemtoadd]['endmsg'] = serialize($data);
+		}
 
 
 		// Sanitize intro content.
-        if (isset($item[$itemtoadd]['intro'])) {
-            $json = json_decode($item[$itemtoadd]['intro']);
-            if (null != $json) {
-                $json[0] = myhtmLawed($json[0]);
-                for ($i = 1; $i < count($json); $i++) {
-                    $json[$i]['text'] = myhtmLawed($json[$i]['text']);
-                }
-            }
-        }
+		if (isset($item[$itemtoadd]['intro'])) {
+		    $json = json_decode($item[$itemtoadd]['intro'], true);
+		    if (null !== $json) {
+			$json[0] = Sanitize::incomingHtml($json[0]);
+			for ($i = 1; $i < count($json); $i++) {
+			    $json[$i]['text'] = Sanitize::incomingHtml($json[$i]['text']);
+			}
+			$item[$itemtoadd]['intro'] = json_encode($json);
+		    } else {
+		        $item[$itemtoadd]['intro'] = Sanitize::incomingHtml($item[$itemtoadd]['intro']);
+		    }
+		}
 
 		foreach ($setstoadd as $set) {
 			if (isset($item[$itemtoadd][$set])) {
@@ -184,7 +189,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 							}
 							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
 							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
-							$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+							$stm->execute(array(':qsetid'=>Sanitize::onlyInt($questions[$qid]['qsetid']), ':var'=>Sanitize::stripHtmlTags($p[0]), ':filename'=>Sanitize::stripHtmlTags($p[1]), ':alt'=>Sanitize::stripHtmlTags($alttext)));
 						}
 					}
 					if ($qdeleted==1) { //was deleted; need to add library items
@@ -239,7 +244,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 						//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
 						//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
 						$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1]));
+						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>Sanitize::stripHtmlTags($p[0]), ':filename'=>Sanitize::stripHtmlTags($p[1])));
 					}
 				}
 				foreach ($newlibs as $lib) {
@@ -271,6 +276,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//look up any refs to UIDs
 			//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+
 			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
 			$includedqs = array();
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -288,7 +294,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//lookup backrefs
 			$includedbackref = array();
 			if (count($includedqs)>0) {
-				$includedlist = implode(',', $includedqs);  //known decimal values from above
+				$includedlist = implode(',', array_map('intval',$includedqs));  //known decimal values from above
 				//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 				//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
@@ -314,7 +320,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				//DB $query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
 				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
 				$stm2 = $DBH->prepare("UPDATE imas_questionset SET control=:control,qtext=:qtext WHERE id=:id");
-				$stm2->execute(array(':control'=>$control, ':qtext'=>$qtext, ':id'=>$row[0]));
+				$stm2->execute(array(':control'=>$control, ':qtext'=>$qtext, ':id'=>Sanitize::onlyInt($row[0])));
 			}
 		}
 
@@ -358,17 +364,17 @@ function additem($itemtoadd,$item,$questions,$qset) {
 
 		// Sanitize description content.
 		if (isset($item[$itemtoadd]['description'])) {
-			$item[$itemtoadd]['description'] = myhtmLawed($item[$itemtoadd]['description']);
+			$item[$itemtoadd]['description'] = Sanitize::incomingHtml($item[$itemtoadd]['description']);
 		}
 
 		// Sanitize postinstr content.
 		if (isset($item[$itemtoadd]['postinstr'])) {
-			$item[$itemtoadd]['postinstr'] = myhtmLawed($item[$itemtoadd]['postinstr']);
+			$item[$itemtoadd]['postinstr'] = Sanitize::incomingHtml($item[$itemtoadd]['postinstr']);
 		}
 
 		// Sanitize replyinstr content.
 		if (isset($item[$itemtoadd]['replyinstr'])) {
-			$item[$itemtoadd]['replyinstr'] = myhtmLawed($item[$itemtoadd]['replyinstr']);
+			$item[$itemtoadd]['replyinstr'] = Sanitize::incomingHtml($item[$itemtoadd]['replyinstr']);
         }
 
 		foreach ($settings as $set) {
@@ -390,7 +396,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 	} else if ($item[$itemtoadd]['type'] == "InlineText") {
 		// Sanitize text content.
 		if (isset($item[$itemtoadd]['text'])) {
-			$item[$itemtoadd]['text'] = myhtmLawed($item[$itemtoadd]['text']);
+			$item[$itemtoadd]['text'] = Sanitize::incomingHtml($item[$itemtoadd]['text']);
 		}
 
 		//DB $query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag)";
@@ -435,12 +441,12 @@ function additem($itemtoadd,$item,$questions,$qset) {
 	} else if ($item[$itemtoadd]['type'] == "LinkedText") {
 		// Sanitize text content.
 		if (isset($item[$itemtoadd]['text'])) {
-			$item[$itemtoadd]['text'] = myhtmLawed($item[$itemtoadd]['text']);
+			$item[$itemtoadd]['text'] = Sanitize::incomingHtml($item[$itemtoadd]['text']);
 		}
 
 		// Sanitize summary content.
 		if (isset($item[$itemtoadd]['summary'])) {
-			$item[$itemtoadd]['summary'] = myhtmLawed($item[$itemtoadd]['summary']);
+			$item[$itemtoadd]['summary'] = Sanitize::incomingHtml($item[$itemtoadd]['summary']);
 		}
 
 		//DB $query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,avail,startdate,enddate,oncal,caltag,target)";
@@ -681,7 +687,7 @@ if (!(isset($teacherid))) {
 		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
 
 		$userights = $_POST['userights'];
-		$newlibs = explode(",",$_POST['libs']);
+		$newlibs = explode(",",array_map('intval',$_POST['libs']));
 		//DB $item = array_map('addslashes_deep', $item);
 		//DB $questions = array_map('addslashes_deep', $questions);
 		//DB $qset = array_map('addslashes_deep', $qset);
@@ -695,8 +701,8 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$cid));
 
 		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-		$ciditemorder = unserialize($itemorder);
-		$items = unserialize($itemlist);
+		$ciditemorder = safe_unserialize($itemorder);
+		$items = safe_unserialize($itemlist);
 		$newitems = array();
 		$missingfiles = array();
 
@@ -715,18 +721,20 @@ if (!(isset($teacherid))) {
 
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
-
+		$rqp = Sanitize::randomQueryStringParam();
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {
 				echo "$file <br/>";
 			}
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\" >Done</a></p>";
 		} else if ($myrights==100) {
 			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\" >Done</a></p>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=$rqp");
 		}
 		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
@@ -746,7 +754,7 @@ if (!(isset($teacherid))) {
 			$page_fileErrorMsg .=  "a question or library export.\n";
 		}
 
-		$items = unserialize($itemlist);
+		$items = safe_unserialize($itemlist);
 		$ids = array();
 		$types = array();
 		$names = array();
@@ -867,7 +875,8 @@ function chkgrp(frm, arr, mark) {
 				echo "onClick=\"chkgrp(this.form, '".Sanitize::encodeStringForJavascript($ids[$i])."', this.checked);\" ";
 				echo '/>';
 			} else {
-				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				$boxid = $parents[$i].'.'.$ids[$i];
+				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='" . Sanitize::encodeStringForDisplay($boxid). "' checked=checked ";
 				echo '/>';
 			}
 ?>

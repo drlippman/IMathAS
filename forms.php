@@ -371,8 +371,9 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>Reset Password</h1></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=resetpw$gb\">\n";
 		if (isset($_GET['code'])) {
+			$userId = Sanitize::onlyInt($_GET['id']);
 			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>$userId));
 			$row = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($row !== false && $row['remoteaccess']!='' && $row['remoteaccess']===$_GET['code']) {
 				echo '<input type="hidden" name="code" value="'.Sanitize::encodeStringForDisplay($_GET['code']).'"/>';

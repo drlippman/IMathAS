@@ -40,13 +40,7 @@ function getquestionlicense($row) {
 	return $license;
 }
 
-$ids = explode('-',$_GET['id']);
-$idlist = implode(',',array_map('intval', $ids));
-
-//DB $query = "SELECT id,uniqueid,author,ancestorauthors,license,otherattribution FROM imas_questionset WHERE id IN ($idlist)";
-//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-//DB while ($row = mysql_fetch_assoc($result)) {
-
+$ids = array_map('Sanitize::onlyInt', explode('-',$_GET['id']));
 
 $idlist_query_placeholders = Sanitize::generateQueryPlaceholders($ids);
 

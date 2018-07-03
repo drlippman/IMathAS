@@ -18,13 +18,14 @@
 		$stm = $DBH->prepare("SELECT id,category FROM imas_questions WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$aid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$upd_category = Sanitize::stripHtmlTags($_POST[$row[0]]);
 			if ($row[1] != $_POST[$row[0]]) {
 				//DB $query = "UPDATE imas_questions SET category='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$upd_stm->execute(array(':category'=>$_POST[$row[0]], ':id'=>$row[0]));
+				$upd_stm->execute(array(':category'=>$upd_category, ':id'=>$row[0]));
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	}
@@ -226,7 +227,7 @@ END;
 	foreach($itemarr as $qid) {
 		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
 		echo "<td>" . Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td><td>";
-		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", $qid, $qsetids[$qid]);
+		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", Sanitize::onlyInt($qid), Sanitize::onlyInt($qsetids[$qid]));
 		echo "<select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
@@ -239,7 +240,7 @@ END;
 		foreach ($outcomes as $oc) {
 			if ($oc[1]==1) {//is group
 				if ($ingrp) { echo '</optgroup>';}
-				echo '<optgroup label="'.htmlentities($oc[0]).'">';
+				echo '<optgroup label="'.Sanitize::encodeStringForDisplay($oc[0]).'">';
 				$ingrp = true;
 			} else {
 				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '" ';
@@ -284,7 +285,7 @@ END;
 		foreach ($outcomes as $oc) {
 			if ($oc[1]==1) {//is group
 				if ($ingrp) { echo '</optgroup>';}
-				echo '<optgroup label="'.htmlentities($oc[0]).'">';
+				echo '<optgroup label="'.Sanitize::encodeStringForDisplay($oc[0]).'">';
 				$ingrp = true;
 			} else {
 				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '">' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';

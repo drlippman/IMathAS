@@ -4,42 +4,45 @@ require("../init.php");
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
+$newStatus = Sanitize::onlyInt($_POST['newstatus']);
+$instId = Sanitize::onlyInt($_POST['userid']);
 //handle ajax postback
-if (isset($_POST['newstatus'])) {
+if (!empty($newStatus)) {
 	$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
-	$stm->execute(array($_POST['userid']));
+	$stm->execute(array($instId));
 	$reqdata = json_decode($stm->fetchColumn(0), true);
-	
+
 	if (!isset($reqdata['actions'])) {
 		$reqdata['actions'] = array();
 	}
 	$reqdata['actions'][] = array(
 		'by'=>$userid,
 		'on'=>time(),
-		'status'=>$_POST['newstatus']);
+		'status'=>$newStatus);
 	
 	$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=?,reqdata=? WHERE userid=?");
-	$stm->execute(array($_POST['newstatus'], json_encode($reqdata), $_POST['userid']));
+	$stm->execute(array($newStatus, json_encode($reqdata), $instId));
 	
-	if ($_POST['newstatus']==10) { //deny
+	if ($newStatus==10) { //deny
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['userid']));
+		$stm->execute(array(':id'=>$instId));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 			require("../includes/unenroll.php");
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
-				unenrollstu($rcid, array(intval($_POST['userid'])));
+				unenrollstu($rcid, array(intval($instId)));
 			}
 		}
-	} else if ($_POST['newstatus']==11) { //approve
+	} else if ($newStatus==11) { //approve
 		if ($_POST['group']>-1) {
-			$group = intval($_POST['group']);
+			$group = Sanitize::onlyInt($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
+			$newGroupName = Sanitize::stripHtmlTags(trim($_POST['newgroup']));
 			$stm = $DBH->prepare("SELECT id FROM imas_groups WHERE name REGEXP ?");
-			$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', trim($_POST['newgroup']))).'[[:space:]]*$'));
+			$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', $newGroupName)).'[[:space:]]*$'));
 			$group = $stm->fetchColumn(0);
 			if ($group === false) {
 				$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-				$stm->execute(array(':name'=>$_POST['newgroup']));
+				$stm->execute(array(':name'=>$newGroupName));
 				$group = $DBH->lastInsertId();
 			}
 		} else {
@@ -47,10 +50,10 @@ if (isset($_POST['newstatus'])) {
 		}
 		
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
-		$stm->execute(array(':groupid'=>$group, ':id'=>$_POST['userid']));
+		$stm->execute(array(':groupid'=>$group, ':id'=>$instId));
 		
 		$stm = $DBH->prepare("SELECT FirstName,SID,email FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['userid']));
+		$stm->execute(array(':id'=>$instId));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -240,7 +243,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 </div>
 
 <script type="text/javascript">
-var groups = <?php echo json_encode(getGroups()); ?>;
+var groups = <?php echo json_encode(getGroups(), JSON_HEX_TAG); ?>;
 function normalizeGroupName(grpname) {
 	grpname = grpname.toLowerCase();
 	grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.|a|the)\b/g, "");
@@ -269,8 +272,8 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		groups: groups,
-		toApprove: <?php echo json_encode(getReqData()); ?>,
-		fieldTitles: <?php echo json_encode($reqFields);?>,
+		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG); ?>,
+		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG);?>,
 		activeUser: -1,
 		activeUserStatus: -1,
 		activeUserIndex: -1,

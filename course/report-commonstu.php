@@ -30,7 +30,7 @@ $now = time();
 $defsdate = tzdate('n/j/Y', $now);
 $defedate = tzdate('n/j/Y', $now+7*24*60*60);
 
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
+$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
@@ -325,7 +325,7 @@ var app = new Vue({
 		editingRuleSet: -1,
 		allRules: [],
 		curRuleSetName: '',
-		ruleSets: <?php echo json_encode($rulesets); ?>,
+		ruleSets: <?php echo json_encode($rulesets, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>,
 		currentRule: {
 			ruleType: 'none',
 			abovebelow: 0,

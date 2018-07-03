@@ -144,7 +144,7 @@
 	}
 
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=" . Sanitize::encodeUrlParam($_GET['stu']) . "&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=" . Sanitize::encodeUrlParam($_GET['stu']) . "&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&cid=".Sanitize::courseId($_GET['cid']) . "&r=".Sanitize::randomQueryStringParam());
 		exit;
 	}
 

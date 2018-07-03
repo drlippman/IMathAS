@@ -186,7 +186,7 @@ if ($overwriteBody==1) {
 		}
 		div.m {
 			float: left;
-			width: <?php echo $pws ?>in;
+			width: <?php echo Sanitize::onlyFloat($pws); ?>in;
 			border-bottom: 1px dashed #aaa;
 			padding: 0px;
 			overflow: hidden;
@@ -402,9 +402,9 @@ if ($overwriteBody==1) {
 			for ($i=0; $i<$numq; $i++) {
 				echo '<li>';
 				if (is_array($sa[$j][$i])) {
-					echo filter(implode(' ~ ',$sa[$j][$i]));
+					echo Sanitize::outgoingHtml(filter(implode(' ~ ',$sa[$j][$i])));
 				} else {
-					echo filter($sa[$j][$i]);
+				  echo Sanitize::outgoingHtml(filter($sa[$j][$i]));
 				}
 				echo "</li>\n";
 			}
@@ -525,11 +525,11 @@ function printq($qn,$qsetid,$seed,$pts) {
 	if (strpos($toevalqtxt,'$answerbox')===false) {
 		if (is_array($answerbox)) {
 			foreach($answerbox as $iidx=>$abox) {
-				echo printfilter(filter("<div>$abox</div>\n"));
+				echo Sanitize::outgoingHtml(printfilter(filter("<div>$abox</div>\n")));
 				echo "<div class=spacer>&nbsp;</div>\n";
 			}
 		} else {  //one question only
-			echo printfilter(filter("<div>$answerbox</div>\n"));
+		  echo Sanitize::outgoingHtml(printfilter(filter("<div>$answerbox</div>\n")));
 		}
 
 

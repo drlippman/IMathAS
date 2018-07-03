@@ -10,7 +10,7 @@ if (!isset($_REQUEST['t'])) {
 }
 //check token.  It was signed with user's password, so runs with their authority
 try {
-	$JWTsess = JWT::decode($_REQUEST['t']);
+	$JWTsess = JWT::decode(Sanitize::stripHtmlTags($_REQUEST['t']));
 } catch (Exception $e) {
 	echo "Error:", $e->getMessage();
 	exit;

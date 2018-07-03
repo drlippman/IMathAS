@@ -58,10 +58,10 @@ if (isset($_POST['aidorder'])) {
 		$score = ceil($reqval/100*$possible[$prereq] - .000000000001);
 		//DB $query = "UPDATE imas_assessments SET reqscoreaid='$prereq',reqscore=$score WHERE id='$tochgaid' AND courseid='$cid'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		$stm->execute(array(':reqscoreaid'=>$prereq, ':reqscore'=>$score, ':id'=>$tochgaid, ':courseid'=>$cid));
+		$stm->execute(array(':reqscoreaid'=>$prereq, ':reqscore'=>$score, ':id'=>intval($tochgaid), ':courseid'=>$cid));
 	}
 
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 
 } else {

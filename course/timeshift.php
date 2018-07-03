@@ -147,7 +147,7 @@ if (!(isset($teacherid))) {
 			$upd->execute(array($row['showdate'], $row['id']));
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&" .Sanitize::randomQueryStringParam());
 
 		exit;
 	} else { //DEFAULT DATA MANIPULATION

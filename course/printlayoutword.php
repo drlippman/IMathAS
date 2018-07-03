@@ -303,7 +303,7 @@ if ($overwriteBody==1) {
 	echo '<form id="theform" method="post" action="http://'.$CFG['GEN']['pandocserver'].'/html2docx.php">';
 	echo '<input type="submit" value="'._("Convert to Word").'"/> ';
 	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">'._('Change print settings').'</a>';
-	echo '<textarea name="html" style="visibility:hidden">'.htmlentities($out).'</textarea>';
+	echo '<textarea name="html" style="visibility:hidden">'.Sanitize::encodeStringForDisplay($out).'</textarea>';
 	echo '</form>';
 
 	/*

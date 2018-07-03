@@ -73,7 +73,7 @@ if (isset($_GET['clearatt'])) {
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
 	$stm->execute(array(':drillassessid'=>$daid));
-	header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d', $GLOBALS['basesiteurl'], $cid, $daid));
+	header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
 	exit;
 }
 if (isset($_GET['record'])) {
@@ -302,9 +302,9 @@ if (isset($_GET['record'])) {
 		writesessiondata();
 	}
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
-		header(sprintf('Location: %s/course/course.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+		header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, Sanitize::randomQueryStringParam()));
 	} else {
-		header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d', $GLOBALS['basesiteurl'], $cid, $daid));
+		header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
 	}
 	exit;
 }

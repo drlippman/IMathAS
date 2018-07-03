@@ -8,12 +8,10 @@ $flexwidth = true;
 $nologo = true;
 
 if (isset($_POST['message'])) {
-	require_once("../includes/htmLawed.php");
-	//DB $_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
-	//DB $_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
-	$_POST['message'] = myhtmLawed($_POST['message']);
-	$_POST['subject'] = strip_tags($_POST['subject']);
-	$msgto = intval($_POST['sendto']);
+	
+	$message = Sanitize::incomingHtml($_POST['message']);
+	$subject = Sanitize::stripHtmlTags($_POST['subject']);
+	$msgto = Sanitize::onlyInt($_POST['sendto']);
 	$error = '';
 	if ($_POST['sendtype']=='msg') {
 		$now = time();
@@ -23,7 +21,7 @@ if (isset($_POST['message'])) {
 		$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 		$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$_POST['message'], ':msgto'=>$msgto, ':msgfrom'=>$userid,
+		$stm->execute(array(':title'=>$subject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
 			':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
 		$success = _('Message sent');
 	} else if ($_POST['sendtype']=='email') {
@@ -38,8 +36,6 @@ if (isset($_POST['message'])) {
 			$addy = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1])." <".Sanitize::emailAddress($row[2]).">";
 			//DB $subject = stripslashes($_POST['subject']);
 			//DB $message = stripslashes($_POST['message']);
-			$subject = $_POST['subject']; // Sanitized by strip_tags near line 14.
-			$message = $_POST['message']; // Sanitized by myhtmLawed near line 14.
 			$sessiondata['mathdisp']=2;
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
@@ -71,7 +67,7 @@ if (isset($_POST['message'])) {
 	require("../footer.php");
 	exit;
 } else {
-	$msgto = intval($_GET['to']);
+	$msgto = Sanitize::onlyInt($_GET['to']);
 	//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id=$msgto";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB list($firstname, $lastname, $email) = mysql_fetch_row($result);
@@ -89,8 +85,9 @@ if (isset($_POST['message'])) {
 	}
 
 	if (isset($_GET['quoteq'])) {
+		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
 		require("../assessment/displayq2.php");
-		$parts = explode('-',$_GET['quoteq']);
+		$parts = explode('-',$quoteq);
 		$GLOBALS['assessver'] = $parts[4];
 		$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
 		$message = printfilter(forcefiltergraph($message));
@@ -102,7 +99,7 @@ if (isset($_POST['message'])) {
 			//DB $query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$parts[3]));
+			$stm->execute(array(':id'=>Sanitize::onlyInt($parts[3])));
 			//DB $title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
 			$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',$stm->fetchColumn(0));
 			if ($_GET['to']=='instr') {

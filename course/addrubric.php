@@ -86,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':ownerid'=>$userid, ':name'=>$_POST['rubname'], ':rubrictype'=>$_POST['rubtype'], ':groupid'=>$rubgrp, ':rubric'=>$rubricstring));
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr&r=" .Sanitize::randomQueryStringParam());
 
 
 
@@ -99,7 +99,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$rubtype = 1;
 				$savetitle = _('Create Rubric');
 			} else {
-				$rubid = intval($_GET['id']);
+				$rubid = Sanitize::onlyInt($_GET['id']);
 				//DB $query = "SELECT name,groupid,rubrictype,rubric FROM imas_rubrics WHERE id=$rubid";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB list($rubname,$rubgrp,$rubtype,$rubric) = mysql_fetch_row($result);
@@ -149,8 +149,8 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	*/
 	$rubtypeval = array(1,0,3,4,2);
 	$rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only');
-    echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
-	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></p>';
+	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
+	echo '<p>Name:  <input type="text" size="70" name="rubname" value="'.Sanitize::encodeStringForDisplay($rubname).'"/></p>';
 
 	echo '<p>Rubric Type: ';
 	writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');

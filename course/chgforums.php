@@ -206,7 +206,7 @@ if (isset($_POST['checked'])) { //form submitted
 		}
 
 	}
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
 

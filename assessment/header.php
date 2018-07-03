@@ -44,7 +44,7 @@ window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=060918";?>" type="text/css"/>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
@@ -124,7 +124,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		} else {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none"});
 		}
-		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/javascript/mathjax";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
 		//webFont: "STIX-Web",
@@ -144,7 +144,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		} else {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none", skipStartupTypeset: true});
 		}
-		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/javascript/mathjax";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		MathJax.Hub.Register.StartupHook("Begin Config", setupKatexAutoRenderWhenReady);
 		</script>
@@ -260,7 +260,7 @@ if (isset($sessiondata['ltiitemtype'])) {
 		$(sendLTIresizemsg);
 	}
 	</script>';
-}
+	}
 echo '</head>';
 if ($isfw!==false) {
 	echo "<body class=\"fw$isfw\">\n";

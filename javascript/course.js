@@ -344,7 +344,8 @@ function playliststart(id,vidk,el) {
 	if (playlist[id][vidk].isGdrive) {
 		var url = "https://drive.google.com/file/d/"+playlist[id][vidk].vidid+"/preview";
 	} else {
-		var url = location.protocol+'//www.youtube.com/embed/'+playlist[id][vidk].vidid;
+		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
+		var url = loc_protocol+'//www.youtube.com/embed/'+playlist[id][vidk].vidid;
 	}
 	if (playlist[id][vidk].start>0) {
 		url += '?start='+playlist[id][vidk].start+'&';

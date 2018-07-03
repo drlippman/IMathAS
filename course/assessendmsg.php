@@ -10,30 +10,28 @@ if (!isset($imasroot)) {
 		exit;
 	}
 }
-require_once("../includes/sanitize.php");
-require_once("../includes/htmLawed.php");
 
 	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['record'])) {
 		$endmsg = array();
-		$endmsg['type'] = $_POST['type'];
+		$endmsg['type'] = Sanitize::onlyInt($_POST['type']);
 		//DB $endmsg['def'] = stripslashes($_POST['msg'][0]);
-		$endmsg['def'] = myhtmLawed($_POST['msg'][0]);
+		$endmsg['def'] = Sanitize::incomingHtml($_POST['msg'][0]);
 		$i=1;
 		$msgarr = array();
 		while (isset($_POST['sc'][$i]) && !empty($_POST['sc'][$i]) ) {
 			$key = (int)$_POST['sc'][$i];
 			if ($key>0) {
 				//DB $msgarr[$key] = stripslashes($_POST['msg'][$i]);
-				$msgarr[$key] = myhtmLawed($_POST['msg'][$i]);
+				$msgarr[$key] = Sanitize::incomingHtml($_POST['msg'][$i]);
 			}
 			$i++;
 		}
 		krsort($msgarr);
 		$endmsg['msgs'] = $msgarr;
 		//DB $endmsg['commonmsg'] = myhtmLawed(stripslashes($_POST['commonmsg']));
-		$endmsg['commonmsg'] = myhtmLawed($_POST['commonmsg']);
+		$endmsg['commonmsg'] = Sanitize::incomingHtml($_POST['commonmsg']);
 		//DB $msgstr = addslashes(serialize($endmsg));
 		$msgstr = serialize($endmsg);
 		if (isset($_POST['aid'])) {
@@ -50,7 +48,7 @@ require_once("../includes/htmLawed.php");
 			$stm->execute(array(':endmsg'=>$msgstr));
 
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	}
@@ -122,7 +120,7 @@ require_once("../includes/htmLawed.php");
 	echo '</tbody></table>';
 	echo '<p>After the score-specific message, display this text to everyone:</p>';
 	echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" id="commonmsg" style="width: 100%">';
-	echo htmlentities($endmsg['commonmsg']);
+	echo Sanitize::encodeStringForDisplay($endmsg['commonmsg']);
 	echo '</textarea></div>';
 	echo '<div class="submit"><input type="submit" value="'._('Save').'" /></div>';
 	echo '</form>';

@@ -561,9 +561,9 @@
 			// Don't echo or die if in quicksave mode.
 		} else {
 			if ($errmsg == '' && !isset($_GET['aid'])) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/manageqset.php?cid='.$cid);
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/manageqset.php?cid='.$cid.'&r='.Sanitize::randomQueryStringParam());
 			} else if ($errmsg == '' && $frompot==0) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/addquestions.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']));
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/addquestions.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
 			} else {
 				require("../header.php");
 				echo $errmsg;
@@ -1129,7 +1129,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	} else {
 		echo '<br/><span id="addattrspan">';
 	}
-	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/>';
+	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.Sanitize::encodeStringForDisplay($line['otherattribution']).'"/>';
 	if ($line['otherattribution']!='') {
 		echo '<br/><span class=noticetext style="font-size:80%">You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution</span>';
 	}

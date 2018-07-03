@@ -40,7 +40,7 @@ if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and draw
 	setcookie("OEAembeduserprefs", json_encode(array(
 		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
 		'drawentry'=>$sessiondata['userprefs']['drawentry']
-		)));
+		)),0,'','',false,true);
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
 	$sessiondata[$key] = $sessiondata['userprefs'][$key];
@@ -170,7 +170,7 @@ if (isset($QS['showscored'])) {
 		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$_POST['auth']));
+		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($_POST['auth'])));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$key = $row[0];
 		$jwtcheck = json_decode(json_encode(JWT::decode($_POST['jwtchk'], $key)), true);
@@ -289,7 +289,7 @@ if (isset($QS['showscored'])) {
 		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$QS['auth']));
+		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($QS['auth'])));
 		$key = $stm->fetchColumn(0);
 
 		echo '<input type="hidden" name="jwtchk" value="'.JWT::encode($verarr,$key).'"/>';

@@ -429,7 +429,7 @@ if ($searchtype == 'thread') {
 			//if (count($fl)>2) {echo '</ul>';}
 			echo '</p>';
 		}
-		echo filter($line['message']);
+		echo Sanitize::outgoingHtml(filter($line['message']));
 		echo "<p><a href=\"posts.php?cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&thread=" . Sanitize::onlyInt($line['threadid']) . "&page=-4\">Show full thread</a></p>";
 		echo "</div>\n";
 	}

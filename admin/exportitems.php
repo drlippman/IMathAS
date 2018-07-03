@@ -65,7 +65,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	header("Content-Disposition: attachment; filename=\"imasitemexport.imas\"");
 
 	$checked = $_POST['checked'];
-
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT itemorder,ownerid FROM imas_courses WHERE id=:id");
@@ -83,8 +82,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 
 	exportcopysub($items,'0',$newitems);
 	//print_r($newitems);
+	$description = Sanitize::outgoingHtml($_POST['description']);
 	echo "EXPORT DESCRIPTION\n";
-	echo $_POST['description']."\n";
+	echo $description."\n";
 	echo "EXPORT OWNERID\n";
 	echo $line['ownerid']."\n";
 	echo "INSTALLNAME\n";
@@ -103,7 +103,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$stm->execute(array(':id'=>$itemid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		echo "TYPE\n";
-		echo $row[0] . "\n";
+		echo Sanitize::stripHtmlTags($row[0]) . "\n";
 		switch ($row[0]) {
 			case ($row[0]==="InlineText"):
 				//DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
@@ -144,7 +144,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					echo "INSTRFILES\n";
 					foreach (explode(',',$line['fileorder']) as $fid) {
 						if (!isset($filenames[$fid])) {continue;}
-						echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
+						echo Sanitize::stripHtmlTags($filenames[$fid]). ':::'.Sanitize::stripHtmlTags($filedescr[$fid])."\n";
 					}
 				}
 				echo "END ITEM\n";
@@ -203,7 +203,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['postby'] . "\n";
 				echo "SETTINGS\n";
 				foreach (array("defdisplay","points","cntingb","settings") as $setting) {
-					echo "$setting=".$line[$setting]."\n";
+					echo "$setting=".Sanitize::stripHtmlTags($line[$setting])."\n";
 				}
 				echo "END ITEM\n";
 				break;
@@ -230,7 +230,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['reviewdate'] . "\n";
 				echo "SETTINGS\n";
 				foreach (array("timelimit","displaymethod","defpoints","defattempts","deffeedback","defpenalty","shuffle","password","cntingb","minscore","showcat","showhints","isgroup","allowlate","exceptionpenalty","noprint","groupmax","endmsg","eqnhelper","caltag","calrtag","showtips","deffeedbacktext","msgtoinstr","istutorial","viddata") as $setting) {
-					echo "$setting=".$line[$setting]."\n";
+					echo "$setting=".Sanitize::stripHtmlTags($line[$setting])."\n";
 				}
 				echo "QUESTIONS\n";
 				if (trim($line['itemorder'])!='') {
@@ -419,7 +419,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo $row[0].','.getqimageurl($row[1],true).','.$row[2]. "\n";
+					echo Sanitize::stripHtmlTags($row[0]).','.getqimageurl($row[1],true).','.Sanitize::stripHtmlTags($row[2]). "\n";
 
 				}
 			}

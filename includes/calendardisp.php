@@ -3,11 +3,11 @@ $cid = Sanitize::courseId($_GET['cid']);
 
 
 if (isset($_GET['calstart'])) {
-	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']));
+	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']),'','','',false,true);
 	$_COOKIE["calstart".$cid] = Sanitize::onlyInt($_GET['calstart']);
 }
 if (isset($_GET['callength'])) {
-	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']));
+	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']),'','','',false,true);
 	$_COOKIE["callength".$cid] = Sanitize::onlyInt($_GET['callength']);
 }
 
@@ -798,7 +798,7 @@ foreach ($dates as $moday=>$val) {
 
 echo '<script type="text/javascript">';
 echo "cid = $cid;";
-echo "caleventsarr = ".json_encode($jsarr).";";
+echo "caleventsarr = ".json_encode($jsarr, JSON_HEX_TAG).";";
 echo '$(function() {
 	$(".cal td").off("click.cal").on("click.cal", function() { showcalcontents(this); })
 	 .off("keyup.cal").on("keyup.cal", function(e) { if(e.which==13) {showcalcontents(this);} })
@@ -825,7 +825,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 					$style = ' style="background-color:'.Sanitize::encodeStringForCSS($colors[$k]).'"';
 				}
 				//echo $assess[$ids[$i][$j]][$k];
-				echo "<span class=\"calitem\" id=\"".$itemidref[$k]."\" $style>";
+				echo "<span class=\"calitem\" id=\"".Sanitize::encodeStringForDisplay($itemidref[$k])."\" $style>";
 				if ($editingon) {
 					$type = $itemidref[$k]{1};
 					if ($type=='S') {

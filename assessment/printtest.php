@@ -308,7 +308,8 @@
 						echo "  <b>$cnt:</b> " ;
 						if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
 							$url = getasidfileurl($match[1]);
-							echo "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
+							echo '<a href="'.Sanitize::encodeStringForDisplay($url).'" ';
+							echo 'target="_blank">'.Sanitize::encodeStringForDisplay(basename($match[1])).'</a>';
 						} else {
 							if (strpos($laarr[$k],'$f$')) {
 								if (strpos($laarr[$k],'&')) { //is multipart q

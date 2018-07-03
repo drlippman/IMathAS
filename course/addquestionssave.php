@@ -47,7 +47,7 @@
 	$newitems = array();
 	foreach (explode(',',$submitted) as $qid) {
 		if (strpos($qid,'|')===false) {
-			$newitems[] = $qid;
+			$newitems[] = Sanitize::onlyInt($qid);
 		}
 	}
 	$toremove = array_diff($curitems,$newitems);

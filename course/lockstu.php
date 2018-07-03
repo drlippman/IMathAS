@@ -1,11 +1,11 @@
 <?php
 //IMathAS:  Lock students students; called from List Users or Gradebook
+//  This file is always included from listusers.php or gradebook.php
+//  The isset($teacherid) check blocks access if accessed directly
 //(c) 2013 David Lippman
 @set_time_limit(0);
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
-
-require_once(__DIR__ . "/../includes/sanitize.php");
 
 	if (!(isset($teacherid))) {
 		require("../header.php");
@@ -13,10 +13,13 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../footer.php");
 		exit;
 	}
+	
+	$get_uid = Sanitize::simpleString($_GET['uid']);
+	
 	if (isset($_POST['dolockstu']) || isset($_POST['lockinstead'])) { //do lockout - postback
-		if ($_GET['uid']=="selected") {
+		if ($get_uid=="selected") {
 			$tolock = explode(",",$_POST['tolock']);
-		} else if ($_GET['uid']=="all") {
+		} else if ($get_uid=="all") {
 			//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -26,7 +29,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				$tolock[] = $row[0];
 			}
 		} else {
-			$tolock[] = $_GET['uid'];
+			$tolock[] = $get_uid;
 		}
 
 		$locklist = implode(',', array_map('intval',$tolock));
@@ -37,18 +40,18 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid));
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
 		if ((isset($_POST['submit']) && $_POST['submit']=="Lock") || (isset($_POST['posted']) && $_POST['posted']=="Lock")) {
-			$_GET['uid'] = 'selected';
+			$get_uid = 'selected';
 		}
 
-		if ($_GET['uid']=="selected") {
+		if ($get_uid=="selected") {
 			if (count($_POST['checked'])>0) {
 				//DB $ulist = "'".implode("','",$_POST['checked'])."'";
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
@@ -58,14 +61,14 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				//DB $query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_GET['cid']));
+				$stm->execute(array(':courseid'=>$cid));
 			}
 		} else {
-			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
+			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$get_uid}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['uid']));
+			$stm->execute(array(':id'=>$get_uid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$lockConfirm =  "Are you SURE you want to lock {$row[0]} {$row[1]} ($row[2]) out of the course?";
 		}
@@ -74,13 +77,13 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($_GET['uid']) . "&confirmed=true\">";
+			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($_GET['uid']) . "&confirmed=true\">";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
 		}
 
 
-		if ($_GET['uid']=="selected") {
+		if ($get_uid=="selected") {
 				if (count($_POST['checked'])==0) {
 					if ($calledfrom=='lu') {
 						echo "No users selected.  <a href=\"listusers.php?cid=$cid\">Try again</a></form>";

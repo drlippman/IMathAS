@@ -28,38 +28,39 @@ $from = 'admin2';
 if (!empty($_GET['from'])) {
 	if ($_GET['from']=='home') {
 		$from = 'home';
-		$backloc = '/index.php';
+		$backloc = '/index.php?r=' . Sanitize::randomQueryStringParam();
 	} else if ($_GET['from']=='admin2') {
 		$from = 'admin2';
-		$backloc = '/admin/admin2.php';
+		$backloc = '/admin/admin2.php?r=' . Sanitize::randomQueryStringParam();
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'ud'.$userdetailsuid;
-		$backloc = '/admin/userdetails.php?id='.Sanitize::encodeUrlParam($userdetailsuid);
+		$backloc = '/admin/userdetails.php?id='.Sanitize::encodeUrlParam($userdetailsuid) .'&r=' . Sanitize::randomQueryStringParam();
 	} else if (substr($_GET['from'],0,2)=='gd') {
 		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'gd'.$groupdetailsgid;
-		$backloc = '/admin/admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
+		$backloc = '/admin/admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid).'&r=' . Sanitize::randomQueryStringParam();
 	}
 }
 
 //process transfer
-if (isset($_POST['newowner']) && intval($_POST['newowner'])>0) {
+$ownerid = Sanitize::onlyInt($_POST['newowner']);
+if (!empty($ownerid)) {
 	$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
-	$stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$cid));
+	$stm->execute(array(':ownerid'=>$ownerid, ':id'=>$cid));
 	if ($stm->rowCount()>0) {
 		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$_POST['newowner']));
+		$stm->execute(array(':courseid'=>$cid, ':userid'=>$ownerid));
 		if ($stm->rowCount()==0) {
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
-			$stm->execute(array(':userid'=>$_POST['newowner'], ':courseid'=>$cid));
+			$stm->execute(array(':userid'=>$ownerid, ':courseid'=>$cid));
 		}
 		if (isset($_POST['removeasteacher'])) {
 			$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
 			$stm->execute(array(':courseid'=>$cid, ':userid'=>$courseownerid));
 		}
 	}
-	header('Location: ' . $GLOBALS['basesiteurl'] . $backloc);
+	header('Location: ' . $GLOBALS['basesiteurl'] . $backloc );
 	exit;
 }
 
@@ -72,17 +73,18 @@ if (isset($_POST['loadgroup'])) {
 		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
-	echo json_encode($out);
+	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['search'])) {
 	require("../includes/userutils.php");
-	$possible_teachers = searchForUser($_POST['search'], true, true);
+	$search = (string) trim($_POST['search']);
+	$possible_teachers = searchForUser($search, true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
 		if ($row['id']==$courseownerid) { continue; }
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
 	}
-	echo json_encode($out);
+	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 }
 

@@ -2,8 +2,7 @@
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
 	require("../init.php");
-
-
+	$linkedtextid = Sanitize::onlyInt($_GET['id']);
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
 		require("../header.php");
@@ -11,7 +10,7 @@
 		require("../footer.php");
 		exit;
 	}
-	if (!isset($_GET['id'])) {
+	if (empty($linkedtextid)) {
 		echo "<html><body>No item specified. <a href=\"course.php?cid=$cid\">Try again</a></body></html>\n";
 		exit;
 	}
@@ -27,7 +26,7 @@
 	//DB $query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT text,title,target FROM imas_linkedtext WHERE id=:id");
-	$stm->execute(array(':id'=>$_GET['id']));
+	$stm->execute(array(':id'=>$linkedtextid));
 	//DB $text = mysql_result($result, 0,0);
 	//DB $title = mysql_result($result,0,1);
 	//DB $target = mysql_result($result,0,2);
@@ -35,7 +34,7 @@
 	$titlesimp = strip_tags($title);
 
 	if (substr($text,0,8)=='exttool:') {
-		$param = "linkid=".Sanitize::encodeUrlParam($_GET['id'])."&cid=$cid";
+		$param = "linkid=".Sanitize::encodeUrlParam($linkedtextid)."&cid=$cid";
 
 		if ($target==0) {
 			$height = '500px';
@@ -46,7 +45,7 @@
 		} else {
 			//redirect to post page
 			$param .= '&target=new';
-			header('Location: ' . $GLOBALS['basesiteurl'] . '/filter/basiclti/post.php?'.$param);
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/filter/basiclti/post.php?'. $param . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else if ((substr($text,0,4)=="http") && (strpos(trim($text)," ")===false)) { //is a web link
@@ -60,7 +59,7 @@
 
 	$placeinhead = '';
 	if (isset($studentid)) {
-		$rec = "data-base=\"linkedintext-".Sanitize::onlyInt($_GET['id'])."\" ";
+		$rec = "data-base=\"linkedintext-".$linkedtextid."\" ";
 		$text = str_replace('<a ','<a '.$rec, $text);
 		$placeinhead = '<script type="text/javascript">
 			function recunload() {
@@ -68,7 +67,7 @@
 					$.ajax({
 						type: "POST",
 						url: "'.$imasroot.'/course/rectrack.php?cid='.$cid.'",
-						data: "unloadinglinked='.Sanitize::encodeStringForJavascript($_GET['id']).'",
+						data: "unloadinglinked='.Sanitize::encodeStringForJavascript($linkedtextid).'",
 						async: false
 					   });
 					recordedunload = true;
@@ -121,7 +120,7 @@
 		//DB while ($row = mysql_fetch_assoc($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$itemdata[$row['itemid']] = $row;
-			if ($row['id']==$_GET['id']) {
+			if ($row['id']==$linkedtextid) {
 				$thisitemid = $row['itemid'];
 			}
 		}

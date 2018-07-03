@@ -251,11 +251,11 @@
 			}
 		}
 		if ($calledfrom=='lu') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='itemsearch') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin2.php");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin2.php?r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='embed') {
 			require("../header.php");
 			echo '<p>'._('Messages Sent').'.';

@@ -60,7 +60,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm->execute($qarr);
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 
 	} else if (isset($_POST['sourcecourse'])) {

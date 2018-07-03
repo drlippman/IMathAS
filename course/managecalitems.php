@@ -60,9 +60,9 @@ if (isset($_POST['submit'])) {
 	}
 	if ($_POST['submit']=='Save') {
 		if ($from=='cp') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/showcalendar.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/showcalendar.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		}
 		exit;
 	}

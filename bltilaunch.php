@@ -527,7 +527,7 @@ if (isset($_GET['launch'])) {
 		session_regenerate_id();
 		$sessionid = session_id();
 		$_SESSION = array();
-		setcookie(session_name(),session_id());
+		setcookie(session_name(),session_id(),0,'','',false,true );
 	}
 
 	/*if (empty($_REQUEST['roles'])) {
@@ -1567,7 +1567,7 @@ if ($stm->rowCount()>0) {	//check that same userid, and that we're not jumping o
 		session_start();
 		session_regenerate_id();
 		$sessionid = session_id();
-		setcookie(session_name(),session_id());
+		setcookie(session_name(),session_id(),0,'','',false,true );
 		$sessiondata = array();
 		$createnewsession = true;
 	} else {
@@ -2132,7 +2132,7 @@ if (isset($_GET['launch'])) {
 		session_regenerate_id();
 		$sessionid = session_id();
 		$_SESSION = array();
-		setcookie(session_name(),session_id());
+		setcookie(session_name(),session_id(),0,'','',false,true );
 	}
 
 	/*if (empty($_REQUEST['roles'])) {
@@ -2808,7 +2808,7 @@ if ($stm->rowCount()>0) {
 		session_start();
 		session_regenerate_id();
 		$sessionid = session_id();
-		setcookie(session_name(),session_id());
+		setcookie(session_name(),session_id(),0,'','',false,true );
 		$sessiondata = array();
 		$createnewsession = true;
 	} else {
