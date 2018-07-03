@@ -53,6 +53,11 @@
 			unset($blocktree);
 			break;
 		}
+		if (strlen($items[$blocktree[$i]-1]['SH'])>2) {
+			$contentbehavior = $items[$blocktree[$i]-1]['SH'][2];
+		} else {
+			$contentbehavior = 0;
+		}
 		$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	   }
    }
@@ -140,9 +145,7 @@
    if (count($items)>0) {
 	   //update block start/end dates to show blocks containing items with exceptions
 
-
-
-	   showitems($items,$_GET['folder']);
+	   showitems($items,$_GET['folder'],false,$contentbehavior);
 	   if (isset($teacherid)) {
 		   //echo generateadditem($_GET['folder'],'b');
 	   }

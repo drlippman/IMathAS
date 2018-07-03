@@ -194,6 +194,11 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 					exit;
 				}
 			}
+			if (strlen($items[$blocktree[$i]-1]['SH'])>2) {
+				$contentbehavior = $items[$blocktree[$i]-1]['SH'][2];
+			} else {
+				$contentbehavior = 0;
+			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
 	}
@@ -378,7 +383,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=072917\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=070218\"></script>";
 if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -627,7 +632,7 @@ if ($overwriteBody==1) {
 		   echo '</ul>';
 		   echo '<p>&nbsp;</p>';
 	   } else {
-		   showitems($items,$_GET['folder']);
+		   showitems($items,$_GET['folder'],false,$contentbehavior);
 	   }
 
    } else {

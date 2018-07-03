@@ -159,11 +159,18 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	//echo "{$row['name']}, {$row['enddate']}, $uppertime, {$row['reviewdate']}<br/>";
 	//if startdate is past now
 	if (!$editingon && ($row['startdate']>$now && !isset($teacherid))) {
-		continue;
+		//continue; //TODO:  change this for greyed out
 	}
 	//if past reviewdate
 	if (!$editingon && $row['reviewdate']>0 && $now>$row['reviewdate'] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row['enddate'] && $row['reviewdate']==0)
 		//continue;
+	}
+	if ($row['startdate'] > $now) {
+		$status = 1;  //before the start date
+	} else if ($now > $row['enddate']) {
+		$status = 2;  //after the end date
+	} else {
+		$status = 0;  //avail now
 	}
 
 	$showgrayedout = false;
@@ -228,7 +235,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$json['editlink'] = true;
 		}
 		//if (($row['enddate']<$uppertime && $row['enddate']>$exlowertime) || $editingon) {  //if going to do a second tag, need to increment.
-			$byid['AR'.$row['id']] = array($moday,$tag,$colors,$json,$row['name']);
+			$byid['AR'.$row['id']] = array($moday,$tag,$colors,$json,$row['name'],($now>$row['reviewdate'])?2:0);
 		//}
 	}
 	$tag = htmlentities($row['caltag'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
@@ -282,7 +289,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($teacherid)) {
 			$json['editlink'] = true;
 		}
-		$byid['AE'.$row['id']] = array($moday,$tag,$colors,$json,$row['name']);
+		$byid['AE'.$row['id']] = array($moday,$tag,$colors,$json,$row['name'],$status);
 	}
 	if ($editingon && $row['startdate']>$exlowertime && $row['startdate']<$uppertime) {
 		$json = array(
@@ -291,7 +298,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"tag"=>$tag,
 			"name"=> $row['name']
 		);
-		$byid['AS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']) ,$tag,'',$json,$row['name']);
+		$byid['AS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']) ,$tag,'',$json,$row['name'],$status);
 	}
 }
 // 4/4/2011, changing tthis to code block below.  Not sure why change on 10/23 was made :/
@@ -337,6 +344,13 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
 		$datefield = 'E';
 	}
+	if ($row[4] > $now) {
+		$status = 1;  //before the start date
+	} else if ($now > $row[2]) {
+		$status = 2;  //after the end date
+	} else {
+		$status = 0;  //avail now
+	}
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$colors = makecolor2($row[4],$row[2],$now);
 	if ($row[7]==2) {
@@ -357,7 +371,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if (isset($teacherid)) {
 		$json['editlink'] = true;
 	}
-	$byid['I'.$datefield.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+	$byid['I'.$datefield.$row[0]] = array($moday,$tag,$colors,$json,$row[1],$status);
 
 	if ($editingon && $datefield != 'O' && $row[7]==1) {
 		if ($datefield=='S' && $row[2]>$exlowertime && $row[2]<$uppertime) {
@@ -367,7 +381,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				"tag"=>$tag,
 				"name"=> $row[1]
 			);
-			$byid['IE'.$row[0]] = array(tzdate('Y-n-j',$row[2]),$tag,$colors,$json,$row[1]);
+			$byid['IE'.$row[0]] = array(tzdate('Y-n-j',$row[2]),$tag,$colors,$json,$row[1],$status);
 		} else if ($datefield=='E' && $row[4]>$exlowertime && $row[4]<$uppertime) {
 			$json = array(
 				"type"=>"IS",
@@ -375,7 +389,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				"tag"=>$tag,
 				"name"=> $row[1]
 			);
-			$byid['IS'.$row[0]] = array(tzdate('Y-n-j',$row[4]),$tag,$colors,$json,$row[1]);
+			$byid['IS'.$row[0]] = array(tzdate('Y-n-j',$row[4]),$tag,$colors,$json,$row[1],$status);
 		}
 	}
 
@@ -403,6 +417,13 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	} else {
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
 		$datefield = 'E';
+	}
+	if ($row[4] > $now) {
+		$status = 1;  //before the start date
+	} else if ($now > $row[2]) {
+		$status = 2;  //after the end date
+	} else {
+		$status = 0;  //avail now
 	}
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	 if ((substr($row[3],0,4)=="http") && (strpos($row[3]," ")===false)) { //is a web link
@@ -439,7 +460,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	}
 
 
-	$byid['L'.$datefield.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+	$byid['L'.$datefield.$row[0]] = array($moday,$tag,$colors,$json,$row[1],$status);
 	if ($editingon && $datefield != 'O' && $row[7]==1) {
 		if ($datefield=='S' && $row[2]>$exlowertime && $row[2]<$uppertime) {
 			$json = array(
@@ -448,7 +469,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				"tag"=>$tag,
 				"name"=> $row[1]
 			);
-			$byid['LE'.$row[0]] = array(tzdate('Y-n-j',$row[2]),$tag,$colors,$json,$row[1]);
+			$byid['LE'.$row[0]] = array(tzdate('Y-n-j',$row[2]),$tag,$colors,$json,$row[1],$status);
 		} else if ($datefield=='E' && $row[4]>$exlowertime && $row[4]<$uppertime) {
 			$json = array(
 				"type"=>"LS",
@@ -456,7 +477,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				"tag"=>$tag,
 				"name"=> $row[1]
 			);
-			$byid['LS'.$row[0]] = array(tzdate('Y-n-j',$row[4]),$tag,$colors,$json,$row[1]);
+			$byid['LS'.$row[0]] = array(tzdate('Y-n-j',$row[4]),$tag,$colors,$json,$row[1],$status);
 		}
 	}
 }
@@ -465,7 +486,7 @@ if (isset($teacherid)) {
 	$query = "SELECT id,name,enddate,startdate,caltag,avail FROM imas_drillassess WHERE (enddate>$exlowertime AND enddate<$uppertime) AND avail=1 AND courseid=:courseid ORDER BY name";
 } else {
 	$query = "SELECT id,name,enddate,startdate,caltag,avail FROM imas_drillassess WHERE ";
-	$query .= "avail=1 AND (enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) ";
+	$query .= "avail=1 AND (enddate>$exlowertime AND enddate<$uppertime) ";
 	$query .= "AND courseid=:courseid ORDER BY name";
 }
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
@@ -473,7 +494,13 @@ $stm->execute(array(':courseid'=>$cid));
 //DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
-
+	if ($row[3] > $now) {
+		$status = 1;  //before the start date
+	} else if ($now > $row[2]) {
+		$status = 2;  //after the end date
+	} else {
+		$status = 0;  //avail now
+	}
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 
 	$colors = makecolor2($row[3],$row[2],$now);
@@ -495,7 +522,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$json['editlink'] = true;
 	}
 
-	$byid['DE'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+	$byid['DE'.$row[0]] = array($moday,$tag,$colors,$json,$row[1],$status);
 	if ($editingon && $row[3]>$exlowertime && $row[3]<$uppertime) {
 		$json = array(
 			"type"=>"DS",
@@ -503,7 +530,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			"tag"=>$tag,
 			"name"=> $row[1]
 		);
-		$byid['DS'.$row[0]] = array(tzdate('Y-n-j',$row[3]),$tag,'',$json,$row[1]);
+		$byid['DS'.$row[0]] = array(tzdate('Y-n-j',$row[3]),$tag,'',$json,$row[1],$status);
 	}
 }
 
@@ -513,7 +540,14 @@ $stm->execute(array(':courseid'=>$cid));
 //DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if (($row['startdate']>$now && !isset($teacherid))) {
-		continue;
+		//continue;
+	}
+	if ($row['startdate'] > $now) {
+		$status = 1;  //before the start date
+	} else if ($now > $row['enddate']) {
+		$status = 2;  //after the end date
+	} else {
+		$status = 0;  //avail now
 	}
 	//check for exception
 	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = $exceptionfuncs->getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
@@ -523,6 +557,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$replytag = htmlentities($replytag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	if ($row['postby']!=2000000000) { //($row['postby']>$now || isset($teacherid))
+		
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['postby']));
 		$colors = makecolor2($row['startdate'],$row['postby'],$now);
 		if ($editingon) {$colors='';}
@@ -541,7 +576,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($teacherid)) {
 			$json['editlink'] = true;
 		}
-		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json,$row['name']);
+		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json,$row['name'],$status);
 	}
 	if ($row['replyby']!=2000000000) { //($row['replyby']>$now || isset($teacherid))
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['replyby']));
@@ -563,7 +598,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$json['editlink'] = true;
 		}
 
-		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name']);
+		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name'],$status);
 	}
 	$tag = substr($row[1],0,8);
 	if ($editingon && $row['startdate']>$exlowertime && $row['startdate']<$uppertime) {
@@ -573,7 +608,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"tag"=>"F",
 			"name"=> $row['name']
 		);
-		$byid['FS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']),$tag,'',$json,$row['name']);
+		$byid['FS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']),$tag,'',$json,$row['name'],$status);
 	}
 	if ($editingon && $row['enddate']>$exlowertime && $row['enddate']<$uppertime) {
 		$json = array(
@@ -582,7 +617,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"tag"=>"F",
 			"name"=> $row['name']
 		);
-		$byid['FE'.$row['id']] = array(tzdate('Y-n-j',$row['enddate']),$tag,'',$json,$row['name']);
+		$byid['FE'.$row['id']] = array(tzdate('Y-n-j',$row['enddate']),$tag,'',$json,$row['name'],$status);
 	}
 }
 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
@@ -594,8 +629,9 @@ $itemorder = unserialize($stm->fetchColumn(0));
 $itemsimporder = array();
 $itemfolder = array();
 $hiddenitems = array();
+$greyitems = array();
 
-flattenitems($itemorder,$itemsimporder,$itemfolder,$hiddenitems,'0');
+flattenitems($itemorder,$itemsimporder,$itemfolder,$hiddenitems,$greyitems,'0');
 
 $itemsassoc = array();
 //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
@@ -614,37 +650,57 @@ $names = array();
 $itemidref = array();
 $k = 0;
 foreach ($itemsimporder as $item) {
-	if (isset($hiddenitems[$item]) && !isset($teacherid)) {
+	if (isset($hiddenitems[$item]) && !$greyitems[$item] && !isset($teacherid)) {
 		//skip over any items in a hidden folder or future not-yet-open folder if it's a student
 		continue;
 	}
 	if ($itemsassoc[$item][0]=='Assessment') {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
+				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
+					continue;
+				}
 				$moday = $byid['A'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'A'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][1];
 				$colors[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][4];
+				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+					$colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+					unset($assess[$moday][$k]['id']);
+				}
 				$k++;
 			}
 		}
 	} else if ($itemsassoc[$item][0]=='Forum') {
 		foreach (array('S','E','P','R') as $datetype) {
 			if (isset($byid['F'.$datetype.$itemsassoc[$item][1]])) {
+				if (($greyitems[$item]&$byid['F'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 
+					&& !isset($teacherid) && ($datetype=='S' || $datetype=='E')) { //only show postby and replyby greyed
+					continue;
+				}
 				$moday = $byid['F'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'F'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][1];
 				$colors[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][4];
+				if (($greyitems[$item]&$byid['F'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+					$colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+					unset($assess[$moday][$k]['id']);
+				}
 				$k++;
 			}
 		}
 	} else if ($itemsassoc[$item][0]=='InlineText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['I'.$datetype.$itemsassoc[$item][1]])) {
+				if ($greyitems[$item] && !isset($teacherid)) {
+					continue;
+				}
 				$moday = $byid['I'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'I'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][1];
@@ -654,30 +710,54 @@ foreach ($itemsimporder as $item) {
 				}
 				$assess[$moday][$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][4];
+				if (($greyitems[$item]&$byid['I'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+					$colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+					unset($assess[$moday][$k]['id']);
+				}
 				$k++;
 			}
 		}
 	} else if ($itemsassoc[$item][0]=='LinkedText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['L'.$datetype.$itemsassoc[$item][1]])) {
+				if ($greyitems[$item] && !isset($teacherid)) {
+					continue;
+				}
 				$moday = $byid['L'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'L'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][1];
 				$colors[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][4];
+				if (($greyitems[$item]&$byid['L'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+					$colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+					unset($assess[$moday][$k]['id']);
+				}
 				$k++;
 			}
 		}
 	} else if ($itemsassoc[$item][0]=='Drill') {
 		foreach (array('S','E') as $datetype) {
 			if (isset($byid['D'.$datetype.$itemsassoc[$item][1]])) {
+				echo "here1";
+				echo $greyitems[$item].','.$byid['D'.$datetype.$itemsassoc[$item][1]][5];
+				if (($greyitems[$item]&$byid['D'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['D'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
+					continue;
+				}
+				echo "here";
 				$moday = $byid['D'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'D'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][1];
 				$colors[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][4];
+				if (($greyitems[$item]&$byid['D'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+					$colors[$k] = '#ccc';
+					$assess[$moday][$k]['color'] = '#ccc';
+					unset($assess[$moday][$k]['id']);
+				}
 				$k++;
 			}
 		}
@@ -787,7 +867,7 @@ if ($pageshift==0) {
 }
 
 }
-function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,$folder,$avail=true,$ishidden=false) {
+function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$folder,$avail=true,$ishidden=false,$curblockgrey=0) {
 	$now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
@@ -795,13 +875,20 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,$folder,$avai
 				$item['avail'] = 1;
 			}
 			$thisavail = ($avail && ($item['avail']==2 || ($item['avail']==1 && ($item['SH'][0]=='S' || ($item['startdate']<$now && $item['enddate']>$now)))));
+			$thisblockgrey = 0;
+			if (strlen($item['SH'])>2) {
+				$thisblockgrey = intval($item['SH'][2]);
+			} else {
+				$thisblockgrey = 0;
+			}
 			//set as hidden if explicitly hidden or opens in future.  We won't count past folders that aren't showing as hidden
 			//  to allow students with latepasses to access old assignments even if the folder is gone.
 			$thisishidden = ($ishidden || $item['avail']==0 || ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
-			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$folder.'-'.($k+1),$thisavail,$thisishidden);
+			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
 		} else {
 			$addto[] = $item;
 			$folderholder[$item] = $folder;
+			$greyitems[$item] = $curblockgrey;
 			if ($ishidden) {
 				$hiddenholder[$item] = true;
 			}

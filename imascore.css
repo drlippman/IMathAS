@@ -448,6 +448,9 @@ img.faded {
 .grey {
 	color: #999;
 }
+.itemgrey {
+	opacity: .5;	
+}
 div.ddmenu {
 	position: absolute;
 	right: 10px;

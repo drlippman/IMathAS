@@ -10,11 +10,16 @@ if (isset($studentid) && !isset($sessiondata['stuview'])) {
 } else {
 	$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
 }
-function beginitem($canedit,$aname='') {
+function beginitem($canedit,$aname='',$greyed=false) {
+	if ($greyed) {
+		$class = "item itemgrey";
+	} else {
+		$class = "item";
+	}
 	 if ($aname != '') {
-		 echo "<div class=\"item\" id=\"$aname\">\n";
+		 echo "<div class=\"$class\" id=\"$aname\">\n";
 	 } else {
-	 	 echo "<div class=\"item\">\n";
+	 	 echo "<div class=\"$class\">\n";
 	 }
 }
 function enditem($canedit) {
@@ -145,7 +150,7 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 
 
 $itemshowdata = null;
-function showitems($items,$parent,$inpublic=false) {
+function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
 	   global $itemshowdata, $exceptionfuncs;
@@ -217,6 +222,12 @@ function showitems($items,$parent,$inpublic=false) {
 			} else {
 				$availbeh = _('Collapsed');
 			}
+			if (strlen($items[$i]['SH'])>2) {
+				$contentbehavior = $items[$i]['SH'][2];
+			} else {
+				$contentbehavior = 0;
+			}
+			
 			if ($items[$i]['colors']=='') {
 				$titlebg = '';
 			} else {
@@ -225,11 +236,13 @@ function showitems($items,$parent,$inpublic=false) {
 			if (!isset($items[$i]['avail'])) { //backwards compat
 				$items[$i]['avail'] = 1;
 			}
+			
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) { //if "available"
 				if ($firstload && (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O')) {
 					echo "<script> oblist = oblist + ',".$items[$i]['id']."';</script>\n";
 					$isopen = true;
 				}
+				$opacity = '';
 				if ($items[$i]['avail']==2) {
 					$show = sprintf(_('Showing %s Always'), $availbeh);
 				} else {
@@ -238,8 +251,11 @@ function showitems($items,$parent,$inpublic=false) {
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					echo '<div class="block folder" ';
 					if ($titlebg!='') {
-						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
+						echo "style=\"{$opacity}background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
+					} else if ($opacity!='') {
+						echo "style=\"$opacity\"";
+						$astyle = '';
 					} else {
 						$astyle = '';
 					}
@@ -284,8 +300,11 @@ function showitems($items,$parent,$inpublic=false) {
 
 					echo '<div class="block folder treereader" ';
 					if ($titlebg!='') {
-						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
+						echo "style=\"{$opacity}background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
+					} else if ($opacity!='') {
+						echo "style=\"$opacity\"";
+						$astyle = '';
 					} else {
 						$astyle = '';
 					}
@@ -332,8 +351,11 @@ function showitems($items,$parent,$inpublic=false) {
 					echo '<div class="blockwrap">';
 					echo "<div class=block ";
 					if ($titlebg!='') {
-						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
+						echo "style=\"{$opacity}background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
+					} else if ($opacity!='') {
+						echo "style=\"$opacity\"";
+						$astyle = '';
 					} else {
 						$astyle = '';
 					}
@@ -398,7 +420,7 @@ function showitems($items,$parent,$inpublic=false) {
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
 						//if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
-						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic);
+						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic, $contentbehavior);
 						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
 						echo _('Loading content...');
@@ -582,7 +604,7 @@ function showitems($items,$parent,$inpublic=false) {
 					echo "id=\"block{$items[$i]['id']}\">";
 					if ($isopen) {
 						//if (isset($teacherid)) {echo generateadditem($parent.'-'.$bnum,'t');}
-						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic);
+						showitems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic, $contentbehavior);
 
 						//if (isset($teacherid) && count($items[$i]['items'])>0) {echo generateadditem($parent.'-'.$bnum,'b');}
 					} else {
@@ -591,7 +613,7 @@ function showitems($items,$parent,$inpublic=false) {
 					echo "</div>";
 					echo '</div>'; //end blockwrap
 				}
-			}
+			} 
 			continue;
 		   } else if ($ispublic && !$inpublic) {
 			   continue;
@@ -861,6 +883,26 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 
+			   } else if (!$viewall && $line['avail']>0 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
+			   	   
+			   	   if ($now<$line['startdate']) {
+			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
+			   	   } else {
+			   	   	   $show = sprintf(_('This assessment was due %1$s'), $enddate);
+			   	   }
+			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   echo '<div class="itemhdr">';
+				   echo getItemIcon('assess', 'assessment', true);
+				   echo "<div class=\"title grey\"><i>".Sanitize::encodeStringForDisplay($line['name'])."</i>";
+				   echo "<br/><i>$show</i>\n";
+				   echo '</div>'; //title
+				   if ($canedit) {
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i]);
+				   }
+				   echo '</div>'; //itemhdr
+				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
+				   enditem($canedit);
+				    				 		
 			   } else if ($viewall) { //not avail to stu
 				   if ($line['avail']==0) {
 				   	$show = _('Hidden');
@@ -1127,6 +1169,34 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
+			   } else if (!$viewall && $line['avail']>0 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
+			   	   
+			   	   if ($now<$line['startdate']) {
+			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
+			   	   } else {
+			   	   	   $show = sprintf(_('This item was available until %1$s'), $enddate);
+			   	   }
+			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   echo '<div class="itemhdr">';
+				   echo getItemIcon('drill', 'Drill', true);
+
+				   echo "<div class=\"title grey\">";
+				   echo "<i>".Sanitize::encodeStringForDisplay($line['name'])."</i>\n";
+				   if ($viewall) {
+					   echo '<span class="instrdates">';
+					   echo "<br/>$show ";
+					   echo '</span>';
+				   } else if ($line['enddate']!=2000000000) {
+					   echo "<br/>$show";
+				   }
+
+				   echo '</div>'; //title
+				   if ($canedit) {
+				   	   echo getDrillDD($i, $typeid, $parent, $items[$i]);
+				   }
+				   echo '</div>'; //itemhdr
+				   enditem($canedit); //echo "</div>\n";
+			   	   
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
 					   $show = _('Hidden');
@@ -1371,11 +1441,73 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
+			   } else if (!$viewall && $line['avail']==1 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate'])) &&
+			   	   (($line['postby']!=2000000000 && $line['postby']!=0) || $line['replyby']!=2000000000 && $line['replyby']!=0)) { //show greyed
+			   	   
+			   	   if ($now<$line['startdate']) {
+			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
+			   	   } else {
+			   	   	   $show = sprintf(_('This forum closed %1$s'), $enddate);
+			   	   }
+			   	   $duedates = "";
+			   	   if ($line['postby']!=2000000000 && $line['postby']!=0) {
+				   	   if ($line['postby']>$now) {
+					   	$duedates .= sprintf(_('New Threads will be due %s. '), formatdate($line['postby']));
+					   } else {
+					   	$duedates .= sprintf(_('New Threads were due %s. '), formatdate($line['postby']));
+					   }
+				   }
+				   if ($line['replyby']!=2000000000 && $line['replyby']!=0) {
+				   	   if ($line['replyby']>$now) {
+				   	   	   $duedates .= sprintf(_('Replies will be due %s. '), formatdate($line['replyby']));
+				   	   } else {
+				   	   	   $duedates .= sprintf(_('Replies were due %s. '), formatdate($line['replyby']));
+				   	   }
+				   }
+				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   echo '<div class="itemhdr">';
+				   echo getItemIcon('forum', 'forum', true);
+				   echo "<div class=\"title grey\"><i>".Sanitize::encodeStringForDisplay($line['name'])."</i>";
+				   echo "<br/><i>$show</i>\n";
+				   echo "<br/><i>$duedates</i>\n";
+				   if (!$canedit) {
+				   	if ($canuselatepassP || $canuselatepassR) {
+				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid\">", _('Use LatePass'), "</a>";
+				   		if ($canundolatepass) {
+				   			echo ' |';
+				   		}
+				   	}
+				   	if ($canundolatepass) {
+				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
+				   	}
+				   }
+				   echo '</div>'; //title
+				   if ($canedit) {
+				   	echo getForumDD($i, $typeid, $parent, $items[$i]);
+				   }
+				   echo '</div>'; //itemhdr
+				   echo filter("<div class=\"itemsum grey\">{$line['description']}</div>\n");
+				   enditem($canedit);
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
 					   $show = _('Hidden');
 				   } else {
 					   $show = sprintf(_('Showing %1$s until %2$s'), $startdate, $enddate);
+				   }
+				   $duedates = "";
+				   if ($line['postby']!=2000000000 && $line['postby']!=0) {
+				   	   if ($line['postby']>$now) {
+					   	$duedates .= sprintf(_('New Threads due %s. '), formatdate($line['postby']));
+					   } else {
+					   	$duedates .= sprintf(_('New Threads were due %s. '), formatdate($line['postby']));
+					   }
+				   }
+				   if ($line['replyby']!=2000000000 && $line['replyby']!=0) {
+				   	   if ($line['replyby']>$now) {
+				   	   	   $duedates .= sprintf(_('Replies due %s. '), formatdate($line['replyby']));
+				   	   } else {
+				   	   	   $duedates .= sprintf(_('Replies were due %s. '), formatdate($line['replyby']));
+				   	   }
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   echo '<div class="itemhdr">';
@@ -1388,6 +1520,9 @@ function showitems($items,$parent,$inpublic=false) {
 				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
+				   if ($duedates != '') {
+				   	   echo "<br/><i>$duedates </i>";
+				   }
 				   echo '</span>';
 
 				   if ($canedit) {

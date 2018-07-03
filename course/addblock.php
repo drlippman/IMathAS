@@ -143,7 +143,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['startdate'] = $startdate;
 		$sub[$existingid]['enddate'] = $enddate;
 		$sub[$existingid]['avail'] = $_POST['avail'];
-		$sub[$existingid]['SH'] = $_POST['showhide'] . $_POST['availbeh'];
+		$sub[$existingid]['SH'] = $_POST['showhide'] . $_POST['availbeh'] . $_POST['contentbehavior'];
 		$sub[$existingid]['colors'] = $colors;
 		$sub[$existingid]['public'] = $public;
 		$sub[$existingid]['fixedheight'] = $fixedheight;
@@ -156,7 +156,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockitems['startdate'] = $startdate;
 		$blockitems['enddate'] = $enddate;
 		$blockitems['avail'] = $_POST['avail'];
-		$blockitems['SH'] = $_POST['showhide'] . $_POST['availbeh'];
+		$blockitems['SH'] = $_POST['showhide'] . $_POST['availbeh'] . $_POST['contentbehavior'];;
 		$blockitems['colors'] = $colors;
 		$blockitems['public'] = $public;
 		$blockitems['fixedheight'] = $fixedheight;
@@ -213,10 +213,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$public = 0;
 		}
 		$showhide = $blockitems[$existingid]['SH'][0];
-		if (strlen($blockitems[$existingid]['SH'])==1) {
-			$availbeh = 'O';
-		} else {
+		if (strlen($blockitems[$existingid]['SH'])>1) {
 			$availbeh = $blockitems[$existingid]['SH'][1];
+		} else {
+			$availbeh = 'O';
+		}
+		if (strlen($blockitems[$existingid]['SH'])>2) {
+			$contentbehavior = $blockitems[$existingid]['SH'][2];
+		} else {
+			$contentbehavior = 0;
 		}
 		if ($blockitems[$existingid]['colors']=='') {
 			$titlebg = "#DDDDFF";
@@ -239,6 +244,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$enddate = time() + 7*24*60*60;
 		$availbeh = 'O';
 		$showhide = 'H';
+		$contentbehavior = 0;
 		$avail = 1;
 		$public = 0;
 		$titlebg = "#DDDDFF";
@@ -388,6 +394,17 @@ if ($overwriteBody==1) {
 	<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
 	</span><br class=form />
 
+	<span class=form>For assignments within this block, when they are not available:</span
+	<span class=formright>
+	<?php
+		writeHtmlSelect('contentbehavior',array(0,1,2,3),array(
+			_('Hide'),
+			_('Show greyed out before start date, hide after end date'),
+			_('Hide before start date, show greyed out after end date'),
+			_('Show greyed out before and after'),
+		), $contentbehavior); 
+	?>
+	</span><br class=form />
 	<span class="form">If expanded, limit height to:</span>
 	<span class="formright">
 	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo Sanitize::onlyInt($fixedheight);};?>" />pixels (blank for no limit)

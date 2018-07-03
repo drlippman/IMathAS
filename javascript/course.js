@@ -132,7 +132,7 @@ function showcalcontents(el) {
 function hidevisualcal() {
 	showcalcontents(1);
 	jQuery("table.cal").toggle();
-}
+}                                                                         
 
 function showcalcontentsid(elid) {
 	var html = '';
@@ -193,7 +193,7 @@ function showcalcontentsid(elid) {
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type.charAt(0)=='I') {
 				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].folder != '@@@') {
+				if (caleventsarr[elid].data[i].folder != '@@@' && !caleventsarr[elid].data[i].hasOwnProperty('inactive')) {
 					html += '<a href="../course/course.php?cid='+cid+'&folder='+caleventsarr[elid].data[i].folder+'#inline'+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
 				} else {
