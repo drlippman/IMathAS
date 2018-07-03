@@ -260,7 +260,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo "<script> oblist = oblist + ',".$items[$i]['id']."';</script>\n";
 					$isopen = true;
 				}
-				$opacity = '';
 				if ($items[$i]['avail']==2) {
 					$show = sprintf(_('Showing %s Always'), $availbeh);
 				} else {
@@ -269,11 +268,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
 					echo '<div class="block folder" ';
 					if ($titlebg!='') {
-						echo "style=\"{$opacity}background-color:$titlebg;color:$titletxt;\"";
+						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
-					} else if ($opacity!='') {
-						echo "style=\"$opacity\"";
-						$astyle = '';
 					} else {
 						$astyle = '';
 					}
@@ -318,11 +314,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo '<div class="block folder treereader" ';
 					if ($titlebg!='') {
-						echo "style=\"{$opacity}background-color:$titlebg;color:$titletxt;\"";
+						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
-					} else if ($opacity!='') {
-						echo "style=\"$opacity\"";
-						$astyle = '';
 					} else {
 						$astyle = '';
 					}
@@ -369,11 +362,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo '<div class="blockwrap">';
 					echo "<div class=block ";
 					if ($titlebg!='') {
-						echo "style=\"{$opacity}background-color:$titlebg;color:$titletxt;\"";
+						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
-					} else if ($opacity!='') {
-						echo "style=\"$opacity\"";
-						$astyle = '';
 					} else {
 						$astyle = '';
 					}
