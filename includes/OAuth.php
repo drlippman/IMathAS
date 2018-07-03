@@ -234,7 +234,7 @@ class OAuthRequest {
       // Parse the query-string to find GET parameters
       $parameters = OAuthUtil::parse_parameters($_SERVER['QUERY_STRING']);
 
-      $ourpost = $_POST;
+      //$ourpost = $_POST;
       // Deal with magic_quotes
       // http://www.php.net/manual/en/security.magicquotes.disabling.php
      /* if ( get_magic_quotes_gpc() ) {
@@ -245,7 +245,22 @@ class OAuthRequest {
          }
       }*/
      // Add POST Parameters if they exist
-      $parameters = array_merge($parameters, $ourpost);
+      //$parameters = array_merge($parameters, $ourpost);
+      
+      // It's a POST request of the proper content-type, so parse POST
+      // parameters and add those overriding any duplicates from GET
+      if ($http_method == "POST"
+              &&  isset($request_headers['Content-Type'])
+              && strstr($request_headers['Content-Type'], 'application/x-www-form-urlencoded')) {
+              $post_data = OAuthUtil::parse_parameters(file_get_contents(self::$POST_INPUT));
+              $parameters = array_merge($parameters, $post_data);
+      }
+      
+      if (isset($parameters['resource_link_description']) && 
+      	      !empty($parameters['ext_lms']) && substr($parameters['ext_lms'],0,3)=='bb-') {
+      	      $parameters['resource_link_description'] = str_replace('><br><',">\r\n<",$parameters['resource_link_description']);
+      }
+      
       //DB foreach ($parameters as $k=>$v) { //because IMathAS addslashes everything
       //DB 	      $parameters[$k] = stripslashes($v);
       //DB }
@@ -713,51 +728,55 @@ class OAuthUtil {
   // parameters, has to do some unescaping
   // Can filter out any non-oauth parameters if needed (default behaviour)
   public static function split_header($header, $only_allow_oauth_parameters = true) {
-    $pattern = '/(([-_a-z]*)=("([^"]*)"|([^,]*)),?)/';
-    $offset = 0;
-    $params = array();
-    while (preg_match($pattern, $header, $matches, PREG_OFFSET_CAPTURE, $offset) > 0) {
-      $match = $matches[0];
-      $header_name = $matches[2][0];
-      $header_content = (isset($matches[5])) ? $matches[5][0] : $matches[4][0];
-      if (preg_match('/^oauth_/', $header_name) || !$only_allow_oauth_parameters) {
-        $params[$header_name] = OAuthUtil::urldecode_rfc3986($header_content);
-      }
-      $offset = $match[1] + strlen($match[0]);
+        $params = array();
+        if (preg_match_all('/('.($only_allow_oauth_parameters ? 'oauth_' : '').'[a-z_-]*)=(:?"([^"]*)"|([^,]*))/', $header, $matches)) {
+            foreach ($matches[1] as $i => $h) {
+                $params[$h] = OAuthUtil::urldecode_rfc3986(empty($matches[3][$i]) ? $matches[4][$i] : $matches[3][$i]);
+            }
+            if (isset($params['realm'])) {
+                unset($params['realm']);
+            }
+        }
+        return $params;
     }
 
-    if (isset($params['realm'])) {
-      unset($params['realm']);
-    }
-
-    return $params;
-  }
 
   // helper to try to sort out headers for people who aren't running apache
-  public static function get_headers() {
-    if (function_exists('apache_request_headers')) {
-      // we need this to get the actual Authorization: header
-      // because apache tends to tell us it doesn't exist
-      return apache_request_headers();
+   public static function get_headers() {
+        if (function_exists('apache_request_headers')) {
+            // we need this to get the actual Authorization: header
+            // because apache tends to tell us it doesn't exist
+            $headers = apache_request_headers();
+            // sanitize the output of apache_request_headers because
+            // we always want the keys to be Cased-Like-This and arh()
+            // returns the headers in the same case as they are in the
+            // request
+            $out = array();
+            foreach ($headers AS $key => $value) {
+                $key = str_replace(" ", "-", ucwords(strtolower(str_replace("-", " ", $key))));
+                $out[$key] = $value;
+            }
+        } else {
+            // otherwise we don't have apache and are just going to have to hope
+            // that $_SERVER actually contains what we need
+            $out = array();
+            if( isset($_SERVER['CONTENT_TYPE']) )
+                $out['Content-Type'] = $_SERVER['CONTENT_TYPE'];
+            if( isset($_ENV['CONTENT_TYPE']) )
+                $out['Content-Type'] = $_ENV['CONTENT_TYPE'];
+            foreach ($_SERVER as $key => $value) {
+                if (substr($key, 0, 5) == 'HTTP_') {
+                    // this is chaos, basically it is just there to capitalize the first
+                    // letter of every word that is not an initial HTTP and strip HTTP
+                    // code from przemek
+                    $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
+                    $out[$key] = $value;
+                }
+            }
+        }
+        return $out;
     }
-    // otherwise we don't have apache and are just going to have to hope
-    // that $_SERVER actually contains what we need
-    $out = array();
-    foreach ($_SERVER as $key => $value) {
-      if (substr($key, 0, 5) == "HTTP_") {
-        // this is chaos, basically it is just there to capitalize the first
-        // letter of every word that is not an initial HTTP and strip HTTP
-        // code from przemek
-        $key = str_replace(
-          " ",
-          "-",
-          ucwords(strtolower(str_replace("_", " ", substr($key, 5))))
-        );
-        $out[$key] = $value;
-      }
-    }
-    return $out;
-  }
+
 
   // This function takes a input like a=b&a=c&d=e and returns the parsed
   // parameters like this
@@ -808,7 +827,7 @@ class OAuthUtil {
       if (is_array($value)) {
         // If two or more parameters share the same name, they are sorted by their value
         // Ref: Spec: 9.1.1 (1)
-        natsort($value);
+        sort($value, SORT_STRING);
         foreach ($value as $duplicate_value) {
           $pairs[] = $parameter . '=' . $duplicate_value;
         }

@@ -146,8 +146,14 @@ dd {
 	<li><a href="#masschgdates">Change Dates</a></li>
 	<li><a href="#masschgassessments">Change Assessments</a></li>
 	<li><a href="#importexportitems">Import/Export Course Items</a></li>
-	<li><a href="#mashups">Mashups: Google Gadgets</a></li>
-	<li><a href="#lti">BasicLTI</a></li>
+	<li><a href="#lti">LTI Integration</a>
+		<ul>
+		<li><a href="#lticanvas">Canvas Integration</a></li>
+		<li><a href="#ltibb">Blackboard Integration</a></li>
+		<li><a href="#ltid2l">D2L Brightspace Integration</a></li>
+		<li><a href="#ltimoodle">Moodle Integration</a></li>
+		<li><a href="#ltiother">LTI Integration for Other LMSs</a></li>
+		</ul></li>
 	</ul></li>
 
 <li><a href="#writingquestions">Writing Questions</a>
@@ -200,7 +206,7 @@ dd {
 	<li><a href="#homepage">Home Page</a>
 		<ul>
 		<li><a href="#userprofile">Changing Your User Profile</a>
-		  <ul>
+		<ul>
 			<li><a href="#accessibility">Accessibility and Display Preferences</a></li>
 		  </ul></li>
 		<li><a href="#enrollinginacourse">Enrolling in a Course</a></li>
@@ -213,7 +219,7 @@ dd {
 		<li><a href="#enteringmath">Entering Math</a></li>
 		</ul></li>
 	</ul></li>
-</ul>
+	</ul>
 </div> <!-- h1 -->
 <div class=h1>
 <h1 id="administration">Administration</h1>
@@ -676,7 +682,7 @@ For Linked Text items, you will asked to provide:
 	</ul></li>
 <li><strong>Available after</strong>:  The first date for the item to display to students</li>
 <li><strong>Available until</strong>:  The last date for the item to display to students</li>
-</ul>
+	</ul>
 
 </div> <!-- h3 -->
 <div class=h3>
@@ -834,11 +840,11 @@ students request a similar problem, different students will receive different ve
 <p>In the Intro/Instructions box, you can make question-specific instructions by putting a tag of the form [Q #] or [Q #-#] before the
 text specific to that question or range of questions.  Here is an example:</p>
 <div style="border: 1px solid #000;padding:8px;">
-  <p>This is the general info<p>
-  <p>[Q 1]</p>
-  <p>This text will display before question 1</p>
-  <p>[Q 3-4]</p>
-  <p>This text will display before questions 3 and 4.  Since there was no tag for question 2, it will display
+<p>This is the general info<p>
+<p>[Q 1]</p>
+<p>This text will display before question 1</p>
+<p>[Q 3-4]</p>
+<p>This text will display before questions 3 and 4.  Since there was no tag for question 2, it will display
   directly after question 1, with no associated intro text.  Likewise, if there was a question 5, it would
   display directly after question 4 with no associated intro text.</p>
 </div> <!-- special -->
@@ -1377,14 +1383,15 @@ column.  When you are done, click "Submit"</p>
 
 </div> <!-- h2 -->
 <div class=h2>
-<h2 id="importexportitems">Import/Export Course Items</h2>
+<h2 id="importexportitems">Import/Export Course Items (for another IMathAS system)</h2>
 <p>Course Item import/export allows you to share a course setup with other instructors, or copy
 a class for yourself.  Note that item structure and questions are exported, but not students, assessment
 attempts, or forum threads.</p>
 
-<p>On Export, you provide a export description, and select the items you wish to export.
+<p>On Export, start by selecting the items you wish to export.
 If you export an item currently contained in a block and do not export the block, the item
-will be exported as an item on the main course page.</p>
+will be exported as an item on the main course page.  There are options on whether or not to 
+include course and gradebook settings in the export.</p>
 
 <p>On Import, first provide the import file.  If there are assessment questions that do not
 already exist on your system, they will be added to the system.  Select the library into which
@@ -1393,27 +1400,14 @@ the existing question with the import question (if it is newer), or create a new
 the designated library.  Select the items to import, and click "Import Items".</p>
 
 </div> <!-- h2 -->
+
 <div class=h2>
-<h2 id="mashups">Mashups: Google Gadget</h2>
-<p>IMathAS has experimental support for two mashups: BasicLTI as a producer, and Google Gadgets</p>
+<h2 id="lti">LTI Integration</h2>
 
-<p>There is a Google Gadget which users can add to their iGoogle account available through
-a link on the Change User Info page, accessible from the users' home page.  The gadget
-will tell the user how many new messages and forum posts they have.</p>
+<p>IMathAS can be used as a LTI tool using a course-level configuration or a global college-wide configuration.</p>
 
-<p>There is also a link from the Google Gadget page to a webpage that will report new
-messages and posts without requiring you to log in.  This page is convenient on a mobile device.</p>
-</div> <!-- h2 -->
-<div class=h2>
-<h2 id="lti">BasicLTI</h2>
-
-<p>IMathAS can be used as a BasicLTI producer using two instructor-initiated placement methods: course level, or
-assessment level.  A course level placement will provide access to an entire IMathAS course;  an assessment
-level placement will allow you to provide access to a single assessment via LTI.  You can set the LTI
-access secret through the Course Settings and Assessment Settings pages.  The URL and key to use are also provided on those
-pages.  Follow the instructions in your LTI consumer to make the placement using the URL, key and secret.</p>
-
-<p>Your LTI keys will take the form cid_###_# or aid_###_#.  The last number determines how authentication is handled.
+<p>For a course-level configuration, your LTI key will take the form LTKkey_###_#.  The first number, ###, is your course ID.
+The last number determines how authentication is handled.
 If that last digit is 0, then when the student accesses the LTI placement, the first time they will be asked to sign into their
 IMathAS account or create one, and that account will be linked with the account at the host LMS.  From then on, when the same
 student accesses any LTI placement, they will not need to sign in again.  They will be able to sign in directly to IMathAS as well.</p>
@@ -1422,7 +1416,367 @@ student accesses any LTI placement, they will not need to sign in again.  They w
 accesses the LTI placement, and that account will be linked with the host LMS account.  The student will not be provided an IMathAS
 username or password, so they will only be able to access IMathAS resources through the LMS LTI placements.</p>
 
-<p>IMathAS can also be an LTI consumer.  In any text item, enter [LTI: url=theurl, key=thekey, secret=thesecret] to place a tool</p>
+<p>Note that grade return ONLY works with the _1 type keys, so that type of key is recommended.</p>
+
+<p>IMathAS can also be an LTI consumer, using the External Tool option for Link items.</p>
+
+<p>IMathAS supports several types of LTI integration, including whole course single-signon,
+   and new links created from the LMS.  For most cases, though, a tight integration is
+   recommended, and the easiest way to set up LTI links in the LMS is to use the
+   Export feature in IMathAS to create links and import those into your LMS.</p>
+   
+<p>To do this, go to Course Items -> Export, select the items you want to export, 
+   your LMS, and Download the CC Export.  Then follow the appropriate instructions below.</p>
+
+<div class=h3>
+<h3 id="lticanvas">Canvas Integration</h3>
+	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
+	   and Download the Export Cartridge</p>
+	<p>To import the cartridge in Canvas:</p>
+	<ul>
+		<li>Go to Settings, then Import Course Content</li>
+		<li>For Content Type, select Canvas Course Export Package.  
+			Select the export file from your computer,
+			and select All Content.  Click Import.</li>
+		<li>If you have a course-level configuration, skip ahead.
+		   If are setting up a course-level App Config follow these steps.
+			<ul>
+			<li>Go to Settings, then Apps, then View App Configurations</li>
+			<li>Locate for the IMathAS App. Use the gear icon dropdown to select Edit</li>
+			<li>For the Consumer Key, enter: <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+			<li>For Shared Secret enter the secret you set up in your Course Settings</li>
+			<li>Click Submit</li>
+			</ul>
+		</li>
+	</ul>
+	<p>Next you will need to establish the connection between your IMathAS course and Canvas course</p>
+	<ul>
+	<li>In Canvas, click one of the assessment links in your course.</li>
+	<li>If this is your first time using this key and secret, IMathAS will
+	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+	    establish a connection between your LMS account and your IMathAS account.  
+	    You will not need to do this step again, and students will not be asked to sign in 
+	    and will not need a IMathAS account.</li>
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	    or create a copy.</li>
+	<li>Once complete, all the LTI links in your LMS should work.</li>
+	<li>Be aware:
+		<ul>
+		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		    them in IMathAS will not change them in your LMS</li>
+		<li>If you change assessment settings or the questions in an assessment in IMathAS,
+		    those changes will show up when the assessment is launched from the LMS</li>
+		<li>Any new items added in IMathAS, including new assessments, will not
+		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		    every time the student completes a question, but the LMS may delay updating the grade.</li>
+		</ul>
+	</li>
+	</ul>
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	   With this type of key, students will not have or need a username for IMathAS, and they must
+	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
+	   grades are passed from IMathAS back to the LMS.
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
+	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
+	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
+<div class=h3 style="display:none">
+<h3 id="ltibbold">Blackboard Integration - older Common Cartridge Instructions</h3>
+	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
+	   and Download the Export Cartridge</p>
+	<p>To import the cartridge in BlackBoard:</p>
+	<ul>
+		<li>Go to Packages and Utilities, then Import Package</li>
+		<li>Click Import Package</li>
+		<li>Select the export file from your computer, click Select All
+		    to select all course materials, then click Submit.</li>
+		<li>If your school has a global key and secret setup, skip ahead.  
+		    If you need to set up a course-level configuration, follow these steps.
+			<ul>
+			<li>To to Packages and Utilities, then Manage LTI Links</li>
+			<li>If the links are listed as Working, then you have an existing configuration,
+			  and do not need to continue.</li>
+			<li>For one of the links with status listed as Broken, use the drop-down menu
+			  that shows when hovering over the link name and select Edit Credentials.</li>
+			<li>For the Tool Provider Key, enter: <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+			<li>For the Tool Provider Secret enter the secret you set up in your Course Settings</li>
+			<li>Check the box "Apply these credentials to all links"</li>
+			<li>Click Submit</li>
+			</ul>
+		</li>
+		<li>To enable grade return, Blackboard requires some additional steps:
+			<ul>
+			<li>Return to the main course page in Blackboard.</li>
+			<li>For each assessment link that was imported, use the drop-down menu and select Edit</li>
+			<li>Set the Enable Evaluation option to Yes, specify the points possible (it does not 
+			    need to match the points possible in IMathAS), and set a Due Date if desired.</li>
+			</ul>
+		</li>
+	</ul>
+	<p>Next you will need to establish the connection between your IMathAS course and BlackBoard course</p>
+	<ul>
+	<li>In BlackBoard, click one of the assessment links in your course.</li>
+	<li>If this is your first time using this key and secret, IMathAS will
+	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+	    establish a connection between your LMS account and your IMathAS account.  
+	    You will not need to do this step again, and students will not be asked to sign in 
+	    and will not need a IMathAS account.</li>
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	    or create a copy.</li>
+	<li>Once complete, all the LTI links in your LMS should work.</li>
+	<li>Be aware:
+		<ul>
+		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		    them in IMathAS will not change them in your LMS</li>
+		<li>If you change assessment settings or the questions in an assessment in IMathAS,
+		    those changes will show up when the assessment is launched from the LMS</li>
+		<li>Any new items added in IMathAS, including new assessments, will not
+		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		    every time the student completes a question, but the LMS may delay updating the grade.</li>
+		</ul>
+	</li>
+	</ul>
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	   With this type of key, students will not have or need a username for IMathAS, and they must
+	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
+	   grades are passed from IMathAS back to the LMS.
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
+	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
+	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
+<div class=h3>
+<h3 id="ltibb">Blackboard Integration</h3>
+	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
+	   and Download the Export Cartridge</p>
+	<p>To import the cartridge in BlackBoard:</p>
+	<ul>
+		<li>Go to Packages and Utilities, then Import Package</li>
+		<li>Click Import Package</li>
+		<li>Select the export file from your computer, click Select All
+		    to select all course materials, then click Submit.</li>
+		<li>If your school has a global key and secret setup, skip ahead.  
+		    If you need to set up a course-level configuration, follow these steps.
+			<ul>
+			<li>To to Packages and Utilities, then Manage LTI Links</li>
+			<li>If the links are listed as Working, then you have an existing configuration,
+			  and do not need to continue.</li>
+			<li>For one of the links with status listed as Broken, use the drop-down menu
+			  that shows when hovering over the link name and select Edit Credentials.</li>
+			<li>For the Tool Provider Key, enter: <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+			<li>For the Tool Provider Secret enter the secret you set up in your Course Settings</li>
+			<li>Check the box "Apply these credentials to all links"</li>
+			<li>Click Submit</li>
+			</ul>
+		</li>
+	</ul>
+	<p>Next you will need to establish the connection between your IMathAS course and BlackBoard course</p>
+	<ul>
+	<li>In BlackBoard, click one of the assessment links in your course.</li>
+	<li>If this is your first time using this key and secret, IMathAS will
+	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+	    establish a connection between your LMS account and your IMathAS account.  
+	    You will not need to do this step again, and students will not be asked to sign in 
+	    and will not need a IMathAS account.</li>
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	    or create a copy.</li>
+	<li>Once complete, all the LTI links in your LMS should work.</li>
+	<li>Be aware:
+		<ul>
+		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		    them in IMathAS will not change them in your LMS</li>
+		<li>If you change assessment settings or the questions in an assessment in IMathAS,
+		    those changes will show up when the assessment is launched from the LMS</li>
+		<li>Any new items added in IMathAS, including new assessments, will not
+		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		    every time the student completes a question, but the LMS may delay updating the grade.</li>
+		</ul>
+	</li>
+	</ul>
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	   With this type of key, students will not have or need a username for IMathAS, and they must
+	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
+	   grades are passed from IMathAS back to the LMS.
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
+	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
+	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
+<div class=h3>
+<h3 id="ltid2l">D2L Brightspace Integration</h3>
+	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
+	   and Download the Export Cartridge</p>
+	<p>To import the cartridge in Brightspace:</p>
+	<ul>
+		<li>Go to Course Admin, and select Import/Export/Copy Components.</li>
+		<li>Select Import Components, and "from a File"</li>
+		<li>Choose the export file and click Import All Components.</li>
+		<li>If you have a global key and secret, you can skip ahead. 
+		    If you need to set up a course-level configuration, follow these steps.
+			<ul>
+			<li>Go to Course Admin, and click External Learning Tools</li>
+			<li>Click on Manage Tool Providers.  If you do not see this link, 
+			   then your LMS administrators have blocked your ability to self-configure the connection.  
+			   You will need to ask for them to set up a global tool provider.</li>
+			<li>Click New Tool Provider</li>
+			<li>For the Launch Point enter the address shown on the Export page</li>
+			<li>For the Secret enter the secret you set up in your Course Settings</li>
+			<li>Click the "Use custom tool information" box if needed</li>
+			<li>For the Key, enter: <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+			<li>For the name name, enter: <code>IMathAS</code></li>
+			<li>Click the "Allow users to use this tool provider" if that option is available.</li>
+			<li>Under Security Settings, make sure the following options are checked (it is OK to check other ones as well):
+				<ul>
+				<li>Send tool consumer information to tool provider</li>
+				<li>Send context information to tool provider</li>
+				<li>Send course information to tool provider</li>
+				<li>Send LTI user ID and LTI role to tool provider</li>
+				<li>Send user name to tool provider</li>
+				<li>Send user email to tool provider (optional, but recommended)</li>
+				</ul>
+			</li>
+			<li>Save</li>
+			</ul>
+		</li>
+	</ul>
+	<p>Next you will need to establish the connection between your IMathAS course and Brightspace course</p>
+	<ul>
+	<li>In Brightspace, click one of the assessment links in your course.</li>
+	<li>If this is your first time using this key and secret, IMathAS will
+	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+	    establish a connection between your LMS account and your IMathAS account.  
+	    You will not need to do this step again, and students will not be asked to sign in 
+	    and will not need a IMathAS account.</li>
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	    or create a copy.</li>
+	<li>Once complete, all the LTI links in your LMS should work.</li>
+	<li>Be aware:
+		<ul>
+		<li>LTI assessments may not show in the gradebook columns until a student started working on an assignment.</li>
+		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		    them in IMathAS will not change them in your LMS</li>
+		<li>If you change assessment settings or the questions in an assessment in IMathAS,
+		    those changes will show up when the assessment is launched from the LMS</li>
+		<li>Any new items added in IMathAS, including new assessments, will not
+		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		    every time the student completes a question, but the LMS may delay updating the grade.</li>
+		</ul>
+	</li>
+	</ul>
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	   With this type of key, students will not have or need a username for IMathAS, and they must
+	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
+	   grades are passed from IMathAS back to the LMS.
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
+	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
+	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
+<div class=h3>
+<h3 id="ltimoodle">Moodle Integration</h3>
+	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
+	   and Download the Export Cartridge</p>
+	<p>To import the cartridge in Moodle:</p>
+	<ul>
+		<li>Under Course Administration, select Restore.</li>
+		<li>Choose the export file and select Restore.</li>
+		<li>Follow the prompts to import the content.</li>
+		<li>Turn on editing for your course.</li>
+		<li>For one of the assessment, use the Edit dropdown and select Edit Settings.</li>
+		<li>If the Launch URL does not display the warning <em>Tool configuration not found for this URL</em>, 
+		   then you must have an existing key and secret set up, and can skip ahead.  
+		   If you do see that warning, then follow these steps.
+			<ul>
+			<li>Click the + sign located directly after the External tool type pulldown</li>
+			<li>Give the tool a name, like IMathAS</li>
+			<li>For Tool base URL enter the address shown on the Export page</li>
+			<li>For Consumer Key, enter: <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+			<li>For Shared Secret enter the secret you set up in your Course Settings</li>
+			<li>Under Privacy, it is recommended to set all options to Always, but it is fine to leave it as Delegate to teacher instead.</li>
+			<li>Save changes</li>
+			<li>The Launch URL should now indicate <em>Using tool configuration IMathAS</em>.  Click Save.</li>
+			</ul>
+		</li>
+	</ul>
+	<p>Next you will need to establish the connection between your IMathAS course and Moodle course</p>
+	<ul>
+	<li>In Moodle, click one of the assessment links in your course.</li>
+	<li>If this is your first time using this key and secret, IMathAS will
+	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+	    establish a connection between your LMS account and your IMathAS account.  
+	    You will not need to do this step again, and students will not be asked to sign in 
+	    and will not need a IMathAS account.</li>
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	    or create a copy.</li>
+	<li>Once complete, all the LTI links in your LMS should work.</li>
+	<li>Be aware:
+		<ul>
+		<li>LTI assessments may not show in the gradebook columns until a student started working on an assignment.</li>
+		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		    them in IMathAS will not change them in your LMS</li>
+		<li>If you change assessment settings or the questions in an assessment in IMathAS,
+		    those changes will show up when the assessment is launched from the LMS</li>
+		<li>Any new items added in IMathAS, including new assessments, will not
+		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		    every time the student completes a question, but the LMS may delay updating the grade.</li>
+		</ul>
+	</li>
+	</ul>
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	   With this type of key, students will not have or need a username for IMathAS, and they must
+	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
+	   grades are passed from IMathAS back to the LMS.
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
+	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
+	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
+<div class=h3>
+<h3 id="ltiother">LTI Integration for Other LMSs</h3>
+	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
+	   and Download the Export Cartridge.  The cartridge is an IMS Common Cartridge format.</p>
+	<p>Import the cartridge into your LMS. If your school has a global key and secret setup, skip ahead.
+	   Otherwise, you'll likely need to configure the LTI connection by providing the key and secret, which
+	   can be found on the Course Settings page.</p>
+	<p>Next you will need to establish the connection between your IMathAS course and LMS course</p>
+	<ul>
+	<li>In your LMS, click one of the assessment links in your course.</li>
+	<li>If this is your first time using this key and secret, IMathAS will
+	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+	    establish a connection between your LMS account and your IMathAS account.  
+	    You will not need to do this step again, and students will not be asked to sign in 
+	    and will not need a IMathAS account.</li>
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	    or create a copy.</li>
+	<li>Once complete, all the LTI links in your LMS should work.</li>
+	<li>Be aware:
+		<ul>
+		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		    them in IMathAS will not change them in your LMS</li>
+		<li>If you change assessment settings or the questions in an assessment in IMathAS,
+		    those changes will show up when the assessment is launched from the LMS</li>
+		<li>Any new items added in IMathAS, including new assessments, will not
+		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		    every time the student completes a question, but the LMS may delay updating the grade.</li>
+		</ul>
+	</li>
+	</ul>
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	   With this type of key, students will not have or need a username for IMathAS, and they must
+	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
+	   grades are passed from IMathAS back to the LMS.
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
+	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
+	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
 </div> <!-- h2 -->
 </div> <!-- h1 -->
 <div class=h1>
@@ -1744,7 +2098,7 @@ The following macros create graphs or tables:
 					<li>label: a text string to put as a label on the dot</li>
 					<li>labelloc: label location: above, left, right, below, aboveleft, etc.</li>
 					<li><strong>Examples:</strong>: "dot,3,4", "dot,1,1,open",  "dot,3,3,,blue,A"</li>
-				</ul>
+		</ul>
 			</li>
 			<li><strong>text</strong>: For placing text labels. A string containing at least the 
 				first four of: "text,x,y,label,color,location,angle"
@@ -1986,7 +2340,7 @@ These macros are used to test various conditions.  They typically return true or
   $answer,$showanswer = scorestring($answer,"",$words,$stuanswers,$thisq)<Br/>
   Usage for multipart questions (again where $words is predefined). This is example is for part 2: <br/>
   $answer,$showanswer = scorestring($answer,$showanswer,$words,$stuanswers,$thisq,2)</li>
-</ul>
+  </ul>
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="feedbackmacros">Feedback Macros</h2>
@@ -2424,8 +2778,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
 <dt>$hidetips = true </dt>
 	<dd>Hides the question entry tips that display by default.
-	This should only be used when a question type is being used in an unintentional way,
-	or if the question type gives away critical info to the student.</dd>
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
 </dl>
 
 </div> <!-- h3 -->

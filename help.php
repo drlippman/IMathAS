@@ -65,6 +65,7 @@ h2,h3,h4,h5,h6 {
 	if ($handle) {
 		while (!feof($handle)) {
 			$buffer = fgets($handle, 4096);
+			$buffer = str_replace('IMathAS', $installname, $buffer);
 			if (!$inbody) {
 				if (strpos($buffer,"<body")!==false) {
 					$inbody = true;
