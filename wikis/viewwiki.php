@@ -37,10 +37,6 @@ if ($cid==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a wiki id";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-
-	//DB $query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -52,8 +48,6 @@ if ($cid==0) {
 		$body = "This wiki is not currently available for viewing";
 	} else if (isset($_REQUEST['delall']) && isset($teacherid)) {
 		if (isset($_POST['delall']) && $_POST['delall']=='true') {
-			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid");
 			$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed&r=" .Sanitize::randomQueryStringParam());
@@ -65,16 +59,10 @@ if ($cid==0) {
 		}
 	} else if (isset($_REQUEST['delrev']) && isset($teacherid)) {
 		if (isset($_POST['delrev']) && $_POST['delrev']=='true') {
-			//DB $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-				//DB $curid = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT id FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid ORDER BY id DESC LIMIT 1");
 			$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid));
 			if ($stm->rowCount()>0) {
 				$curid = $stm->fetchColumn(0);
-				//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id<$curid";
-				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid AND id<:curid");
 				$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':curid'=>$curid));
 			}
@@ -89,11 +77,6 @@ if ($cid==0) {
 	} else if (isset($_REQUEST['revert']) && isset($teacherid)) {
 		if (isset($_POST['revert']) && $_POST['revert']=='true') {
 			$revision = intval($_GET['torev']);
-			//DB $query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' ";
-			//DB $query .= "AND id>=$revision ORDER BY id DESC";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>1 && $revision>0) {
-				//DB $row = mysql_fetch_row($result);
 			$query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid ";
 			$query .= "AND id>=:id ORDER BY id DESC";
 			$stm = $DBH->prepare($query);
@@ -101,18 +84,12 @@ if ($cid==0) {
 			if ($stm->rowCount()>1 && $revision>0) {
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				$base = diffstringsplit($row[0]);
-				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$base = diffapplydiff($base,$row[0]);
 				}
-				//DB $newbase = addslashes(implode(' ',$base));
 				$newbase = implode(' ',$base);
-				//DB $query = "UPDATE imas_wiki_revisions SET revision='$newbase' WHERE id=$revision";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_wiki_revisions SET revision=:revision WHERE id=:id");
 				$stm->execute(array(':revision'=>$newbase, ':id'=>$revision));
-				//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid' AND id>$revision";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid AND id>:id");
 				$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':id'=>$revision));
 			}
@@ -138,10 +115,6 @@ if ($cid==0) {
 		if ($row['groupsetid']>0 && !isset($teacherid)) {
 			$isgroup = true;
 			$groupsetid = $row['groupsetid'];
-			//DB $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
-			//DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB if (mysql_num_rows($result)==0) {
 			$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 			$stm = $DBH->prepare($query);
@@ -151,8 +124,6 @@ if ($cid==0) {
 				$body = "You need to be a member of a group before you can view or edit this wiki";
 				$isgroup = false;
 			} else {
-				//DB $groupid = mysql_result($result,0,0);
-				//DB $curgroupname = mysql_result($result,0,1);
 				list($groupid, $curgroupname) = $stm->fetch(PDO::FETCH_NUM);
 			}
 		} else if ($row['groupsetid']>0 && isset($teacherid)) {
@@ -162,18 +133,11 @@ if ($cid==0) {
 			$stugroup_names = array();
 			$hasnew = array();
 			$wikilastviews = array();
-			//DB $query = "SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$id'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid=:userid AND wikiid=:wikiid");
 			$stm->execute(array(':userid'=>$userid, ':wikiid'=>$id));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			 	$wikilastviews[$row[0]] = $row[1];
 			}
-
-			//DB $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$id' GROUP BY stugroupid";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid=:wikiid GROUP BY stugroupid");
 			$stm->execute(array(':wikiid'=>$id));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -182,9 +146,6 @@ if ($cid==0) {
 				}
 			}
 			$i = 0;
-			//DB $query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY name";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY name");
 			$stm->execute(array(':groupsetid'=>$groupsetid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -211,10 +172,6 @@ if ($cid==0) {
 
 		if ($groupid>0) {
 			$grpmem = '<p>Group Members: <ul class="nomark">';
-			//DB $query = "SELECT i_u.LastName,i_u.FirstName FROM imas_stugroupmembers AS i_sg,imas_users AS i_u WHERE ";
-			//DB $query .= "i_u.id=i_sg.userid AND i_sg.stugroupid='$groupid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT i_u.LastName,i_u.FirstName FROM imas_stugroupmembers AS i_sg,imas_users AS i_u WHERE ";
 			$query .= "i_u.id=i_sg.userid AND i_sg.stugroupid=:stugroupid";
 			$stm = $DBH->prepare($query);
@@ -224,12 +181,6 @@ if ($cid==0) {
 			}
 			$grpmem .= '</ul></p>';
 		}
-
-		//DB $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
-		//DB $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-		//DB $query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY i_w_r.id DESC";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $numrevisions = mysql_num_rows($result);
 		$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
 		$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 		$query .= "WHERE i_w_r.wikiid=:wikiid AND i_w_r.stugroupid=:stugroupid ORDER BY i_w_r.id DESC";
@@ -240,7 +191,6 @@ if ($cid==0) {
 		if ($numrevisions == 0) {
 			$text = '';
 		} else {
-			//DB $row = mysql_fetch_row($result);
 			$row = $stm->fetch(PDO::FETCH_ASSOC);
 			$text = $row['revision'];
 			if (strlen($text)>6 && substr($text,0,6)=='**wver') {
@@ -256,14 +206,9 @@ if ($cid==0) {
 			$rec = "data-base=\"wikiintext-$id\" ";
 			$text = str_replace('<a ','<a '.$rec, $text);
 		}
-		//DB $query = "UPDATE imas_wiki_views SET lastview=$now WHERE userid='$userid' AND wikiid='$id' AND stugroupid='$groupid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_affected_rows()==0) {
 		$stm = $DBH->prepare("UPDATE imas_wiki_views SET lastview=:lastview WHERE userid=:userid AND wikiid=:wikiid AND stugroupid=:stugroupid");
 		$stm->execute(array(':lastview'=>$now, ':userid'=>$userid, ':wikiid'=>$id, ':stugroupid'=>$groupid));
 		if ($stm->rowCount()==0) {
-			//DB $query = "INSERT INTO imas_wiki_views (userid,wikiid,stugroupid,lastview) VALUES ('$userid','$id',$groupid,$now)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_wiki_views (userid,wikiid,stugroupid,lastview) VALUES (:userid, :wikiid, :stugroupid, :lastview)");
 			$stm->execute(array(':userid'=>$userid, ':wikiid'=>$id, ':stugroupid'=>$groupid, ':lastview'=>$now));
 		}
@@ -309,9 +254,6 @@ if ($overwriteBody==1) {
 <?php
 
 	if (isset($teacherid) && $groupid>0 && !isset($curgroupname)) {
-		//DB $query = "SELECT name FROM imas_stugroups WHERE id='$groupid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $grpnote = 'group '.mysql_result($result,0,0)."'s";
 		$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
 		$stm->execute(array(':id'=>$groupid));
 		$grpnote = 'group '.$stm->fetchColumn(0)."'s";

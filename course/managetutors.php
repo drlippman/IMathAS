@@ -22,18 +22,13 @@
 	if (isset($_POST['submit'])) {
 		//remove any selected tutors
 		if (count($_POST['remove'])>0) {
-			//DB $toremove = "'".implode("','",$_POST['remove'])."'";
 			$toremove = implode(',', array_map('intval', $_POST['remove']));
-			//DB $query = "DELETE FROM imas_tutors WHERE id IN ($toremove) AND courseid='$cid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE id IN ($toremove) AND courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 		}
 		//update sections
 		if (count($_POST['section'])>0) {
 			foreach ($_POST['section'] as $id=>$val) {
-				//DB $query = "UPDATE imas_tutors SET section='$val' WHERE id='$id' AND courseid='$cid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_tutors SET section=:section WHERE id=:id AND courseid=:courseid");
 				$stm->execute(array(':section'=>$val, ':id'=>$id, ':courseid'=>$cid));
 			}
@@ -58,18 +53,12 @@
 			//gotta check if they're already a tutor
 			$existingtutorsids = array();
 			$existingstusids = array();
-			//DB $query = "SELECT u.SID FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT u.SID FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$existingtutorsids[] = $row[0];
 			}
 			//also don't want students enrolled as tutors
-			//DB $query = "SELECT u.SID FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT u.SID,u.id,u.FirstName,u.LastName FROM imas_students as stu JOIN imas_users as u ON stu.userid=u.id WHERE stu.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			$stuinfo = array();
@@ -84,26 +73,18 @@
 			$sidstouse = array_diff($sids,$existingtutorsids,$existingstusids);
 			if (count($sidstouse)>0) {
 				//check if SID exists
-				//DB $tutsids = "'".implode("','",$sidstouse)."'";
-				//DB $query = "SELECT id,SID FROM imas_users WHERE SID in ($tutsids)";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
-					//DB while ($row = mysql_fetch_row($result)) {
 				$query_placeholders = Sanitize::generateQueryPlaceholders($sidstouse);
 				$stm = $DBH->prepare("SELECT id,SID FROM imas_users WHERE SID IN ($query_placeholders)");
 				$stm->execute($sidstouse);
 				$insvals = array();
 				if ($stm->rowCount()>0) {
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						//DB $inspt[] = "('{$row[0]}','$cid','')";
 						$inspt[] = "(?,?,'')";
 						array_push($insvals, $row[0], $cid);
 						$foundsid[] = $row[1];
 					}
 					$ins = implode(',',$inspt);
 					//insert them
-					//DB $query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES $ins";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_tutors (userid,courseid,section) VALUES $ins");
 					$stm->execute($insvals);
 					$notfound = array_diff($sids,$foundsid);
@@ -147,15 +128,10 @@
 	$sections = array();
 	//if diagnostic, then we'll use level-2 selectors in place of sections.  level-2 selector is recorded into the
 	//imas_students.section field, so filter will act the same.
-	//DB $query = "SELECT sel2name,sel2list FROM imas_diags WHERE cid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->prepare("SELECT sel2name,sel2list FROM imas_diags WHERE cid=:cid");
 	$stm->execute(array(':cid'=>$cid));
 	if ($stm->rowCount()>0) {
 		$isdiag = true;
-		//DB $limitname = mysql_result($result,0,0);
-		//DB $sel2list = mysql_result($result,0,1);
 		list($limitname,$sel2list) = $stm->fetch(PDO::FETCH_NUM);
 		$sel2list = str_replace('~',';',$sel2list);
 		$sections = array_unique(explode(';',$sel2list));
@@ -163,9 +139,6 @@
 
 	//if not diagnostic, we'll work off the sections
 	if (!$isdiag) {
-		//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' AND section IS NOT NULL";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid AND section IS NOT NULL");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -179,9 +152,6 @@
 	//get tutorlist
 	$tutorlist = array();
 	$i = 0;
-	//DB $query = "SELECT tut.id,u.LastName,u.FirstName,tut.section FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid='$cid' ORDER BY u.LastName,u.FirstName";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT tut.id,u.LastName,u.FirstName,tut.section FROM imas_tutors as tut JOIN imas_users as u ON tut.userid=u.id WHERE tut.courseid=:courseid ORDER BY u.LastName,u.FirstName");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {

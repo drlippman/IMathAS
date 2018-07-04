@@ -10,21 +10,13 @@ if (isset($_POST['aidorder'])) {
 	$aidorder = explode(',',$_POST['aidorder']);
 	$aidorder = array_map('intval', $aidorder);
 	$aidlist = implode(',', $aidorder);
-
-	//DB $query = "SELECT id,points FROM imas_questions WHERE assessmentid IN ($aidlist) AND points<9999";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->query("SELECT id,points FROM imas_questions WHERE assessmentid IN ($aidlist) AND points<9999");
 	$qpoints = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$qpoints[$row[0]] = $row[1];
 	}
-
-	//DB $query = "SELECT id,defpoints,itemorder FROM imas_assessments WHERE id IN ($aidlist) AND courseid='$cid'";
 	$stm = $DBH->query("SELECT id,defpoints,itemorder FROM imas_assessments WHERE id IN ($aidlist) AND courseid=$cid"); //presanitized
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$possible = array();
-	//DB while ($line = mysql_fetch_assoc($result)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$pos = 0;
 		$aitems = explode(',',$line['itemorder']);
@@ -56,8 +48,6 @@ if (isset($_POST['aidorder'])) {
 		$prereq = $aidorder[$pos-1]; //identify prereq assignment
 
 		$score = ceil($reqval/100*$possible[$prereq] - .000000000001);
-		//DB $query = "UPDATE imas_assessments SET reqscoreaid='$prereq',reqscore=$score WHERE id='$tochgaid' AND courseid='$cid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm->execute(array(':reqscoreaid'=>$prereq, ':reqscore'=>$score, ':id'=>intval($tochgaid), ':courseid'=>$cid));
 	}
 
@@ -66,11 +56,7 @@ if (isset($_POST['aidorder'])) {
 
 } else {
 	require("../includes/copyiteminc.php");
-	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->query("SELECT itemorder FROM imas_courses WHERE id=$cid");
-
-	//DB $items = unserialize(mysql_result($result,0,0));
 	$items = unserialize($stm->fetchColumn(0));
 	$gitypeids = array();
 	$ids = array();

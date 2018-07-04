@@ -39,8 +39,6 @@ END;
 END;
 	}
 	echo "<script type=\"text/javascript\">";
-	//DB $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
-	//DB $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
 	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,imas_libraries.federationlevel,COUNT(imas_library_items.id) AS count ";
 	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 WHERE imas_libraries.deleted=0 ";
 	$qarr = array();
@@ -67,7 +65,6 @@ END;
 	}
 
 	//$query = "SELECT id,name,parent FROM imas_libraries ORDER BY parent";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 
 	if (isset($_GET['select'])) {
 		$select = $_GET['select'];
@@ -92,10 +89,8 @@ END;
 	$rights = array();
 	$sortorder = array();
 	$federated = array();
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$id = $line['id'];
-		//DB $name = addslashes($line['name']);
 		$name = htmlentities($line['name'], ENT_QUOTES);
 		$parent = $line['parent'];
 		if ($line['count']==0) {

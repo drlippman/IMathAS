@@ -63,11 +63,7 @@ unset($dbpassword);
 			exit;
 		}
 	}
-
-	//DB $query = "SELECT ver FROM imas_dbschema WHERE id=1";
-	//DB $result = mysql_query($query);
 	$stm = $DBH->query("SELECT ver FROM imas_dbschema WHERE id=1");
-	//DB if ($result===false) {
 	if ($stm===false || $stm->rowCount()==0) {//for upgrading older versions
 		$handle = @fopen("upgradecounter.txt",'r');
 		if ($handle===false) {
@@ -80,7 +76,6 @@ unset($dbpassword);
 			fclose($handle);
 		}
 	} else {
-		//DB $last = mysql_result($result,0,0);
 		$last = $stm->fetchColumn(0);
 	}
 }
@@ -140,12 +135,9 @@ unset($dbpassword);
 			//for existing diag, put level2 selector as section
 			$query = "SELECT imas_students.id,imas_users.email FROM imas_students JOIN imas_users ON imas_users.id=imas_students.userid AND imas_users.SID LIKE '%~%~%'";
 			$stm = $DBH->query($query);
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm2 = $DBH->prepare("UPDATE imas_students SET section=:section WHERE id=:id");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$epts = explode('@',$row[1]);
-				//DB $query = "UPDATE imas_students SET section='{$epts[1]}' WHERE id='{$row[0]}'";
-				//DB $DBH->query($query);
 				$stm2->execute(array(':section'=>$epts[1], ':id'=>$row[0]));
 			}
 		}
@@ -154,20 +146,15 @@ unset($dbpassword);
 			$query = "SELECT u.id,t.id,t.courseid FROM imas_users as u JOIN imas_teachers as t ON u.id=t.userid AND u.rights=15";
 			$stm = $DBH->query($query);
 			$lastuser = -1;
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm2 = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 			$stm3 = $DBH->prepare("DELETE FROM imas_teachers WHERE id=:id");
 			$stm4 = $DBH->prepare("INSERT INTO imas_tutors (userid,courseid,section) VALUES (:userid, :courseid, '')");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[0]!=$lastuser) {
-					//DB $query = "UPDATE imas_users SET rights=10 WHERE id='{$row[0]}'";
-					//DB $DBH->query($query);
 					$stm2->execute(array(':id'=>$row[0]));
 					$lastuser = $row[0];
 				}
-				//DB $query = "DELETE FROM imas_teachers WHERE id='{$row[1]}'";
 				$stm3->execute(array(':id'=>$row[1]));
-				//DB $query = "INSERT INTO imas_tutors (userid,courseid,section) VALUES ('{$row[0]}','{$row[2]}','')";
 				$stm4->execute(array(':userid'=>$row[0], ':courseid'=>$row[2]));
 			}
 		}
@@ -175,7 +162,6 @@ unset($dbpassword);
 			//if postback
 			if (isset($_POST['diag'])) {
 				foreach ($_POST['diag'] as $did=>$uid) {
-					//DB $query = "UPDATE imas_diags SET ownerid='$uid' WHERE id='$did'";
 					$stm = $DBH->prepare("UPDATE imas_diags SET ownerid=:ownerid WHERE id=:id");
 					$stm->execute(array(':ownerid'=>$uid, ':id'=>$did));
 				}
@@ -185,11 +171,9 @@ unset($dbpassword);
 				$out = '';
 				$query = "SELECT id,ownerid,name FROM imas_diags";
 				$stm = $DBH->query($query);
-				//DB if (mysql_num_rows($result)>0) {
 				if ($stm->rowCount()>0) {
 					$owners = array();
 					$dnames = array();
-					//DB while ($row = mysql_fetch_row($result)) {
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$owners[$row[1]][] = $row[0];
 						$dnames[$row[0]] = $row[2];
@@ -198,20 +182,15 @@ unset($dbpassword);
 					$users = array();
 					$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE groupid=:groupid AND rights>59 ORDER BY id");
 					foreach ($ow as $ogrp) {
-						//DB $query = "SELECT id,LastName,FirstName FROM imas_users WHERE groupid='$ogrp' AND rights>59 ORDER BY id";
 						$stm->execute(array(':groupid'=>$ogrp));
-						//DB if (mysql_num_rows($result)==0) {
 						if ($stm->rowCount()==0) {
 							echo "Orphaned Diags: ".implode(',',$owners[$ogrp]).'<br/>';
-						//DB } else if (mysql_num_rows($result)==1) {
 						} else if ($stm->rowCount()==1) {
-							//DB $uid = mysql_result($result,0,0);
 							$uid = $stm->fetchColumn(0);
 							$query = "UPDATE imas_diags SET ownerid=$uid WHERE id IN (".implode(',',$owners[$ogrp]).")";
 							$DBH->query($query);
 						} else {
 							$ops = '';
-							//DB while ($row = mysql_fetch_row($result)) {
 							while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 								$ops .= sprintf('<option value="%d">%s, %s</option>', $row[0],
 									Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
@@ -524,9 +503,6 @@ unset($dbpassword);
 		if ($last < 30.5) {
 			if (isset($GLOBALS['AWSkey'])) {
 				//update files.  Need to update before changinge agroupids so we will know the curs3asid
-				//DB $query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
-				//DB $query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
-				//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 				$query = "SELECT id,agroupid,lastanswers,bestlastanswers,reviewlastanswers,assessmentid FROM imas_assessment_sessions ";
 				$query .= "WHERE lastanswers LIKE '%@FILE:%' OR bestlastanswers LIKE '%@FILE:%' OR reviewlastanswers LIKE '%@FILE:%'";
 				$stm = $DBH->query($query);
@@ -534,7 +510,6 @@ unset($dbpassword);
 				$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 				$doneagroups = array();
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET lastanswers=:lastanswers,bestlastanswers=:bestlastanswers,reviewlastanswers=:reviewlastanswers WHERE id=:id");
-				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					//set path to aid/asid/  or aid/agroupid/  - won't interefere with random values, and easier to do.
 					if ($row[1]==0) {
@@ -556,15 +531,9 @@ unset($dbpassword);
 							$doneagroups[] = $row[1];
 						}
 					}
-
-					//DB $la = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[2]));
-					//DB $bla = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[3]));
-					//DB $rla = addslashes(preg_replace('/@FILE:/',"@FILE:$path/",$row[4]));
 					$la = preg_replace('/@FILE:/',"@FILE:$path/",$row[2]);
 					$bla = preg_replace('/@FILE:/',"@FILE:$path/",$row[3]);
 					$rla = preg_replace('/@FILE:/',"@FILE:$path/",$row[4]);
-					//DB $query = "UPDATE imas_assessment_sessions SET lastanswers='$la',bestlastanswers='$bla',reviewlastanswers='$rla' WHERE id={$row[0]}";
-					//DB $res = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 					$stm2->execute(array(':lastanswers'=>$la, ':bestlastanswers'=>$bla, ':reviewlastanswers'=>$rla, ':id'=>$row[0]));
 				}
 				echo 'Done up through s3 file change.  <a href="upgrade.php?last=30.5">Continue</a>';
@@ -573,31 +542,20 @@ unset($dbpassword);
 		}
 		if ($last < 31) {
 			//implement groups changes
-			//DB $query = "SELECT courseid,id,name FROM imas_assessments WHERE isgroup>0";
-			//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 			$stm = $DBH->query("SELECT courseid,id,name FROM imas_assessments WHERE isgroup>0");
 			$assessgrpset = array();
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm2 = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
 			$stm3 = $DBH->prepare("UPDATE imas_assessments SET groupsetid=:groupsetid WHERE id=:id");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				//DB $query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('{$row[0]}','Group set for {$row[2]}')";
-				//DB $res = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
-				//DB $assessgrpset[$row[1]] = mysql_insert_id();
 				$stm2->execute(array(':courseid'=>$row[0], ':name'=>"Group set for $row[2]"));
 				$assessgrpset[$row[1]] = $DBH->lastInsertId();
-				//DB $query = "UPDATE imas_assessments SET groupsetid={$assessgrpset[$row[1]]} WHERE id={$row[1]}";
-				//DB mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 				$stm3->execute(array(':groupsetid'=>$assessgrpset[$row[1]], ':id'=>$row[1]));
 			}
 
 			//identify student group relations
-			//DB $query = "SELECT userid,id,agroupid,assessmentid FROM imas_assessment_sessions WHERE agroupid>0";
-			//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 			$stm = $DBH->query("SELECT userid,id,agroupid,assessmentid FROM imas_assessment_sessions WHERE agroupid>0");
 			$agroupusers = array();
 			$agroupaids = array();
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!isset($assessgrpset[$row[3]])) { //why would agroupid>0 and not isgroup>0?
 					continue;
@@ -614,9 +572,6 @@ unset($dbpassword);
 			$agroupstugrp = array();
 			$userref = array();
 			foreach($agroups as $agroup) {
-				//DB $query = "INSERT INTO imas_stugroups (groupsetid,name) VALUES (".$assessgrpset[$agroupaids[$agroup]].",'Unnamed group')";
-				//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
-				//DB $stugrp = mysql_insert_id();
 				$stm = $DBH->prepare("INSERT INTO imas_stugroups (groupsetid,name) VALUES (:groupsetid,'Unnamed group')");
 				$stm->execute(array(':groupsetid'=>$assessgrpset[$agroupaids[$agroup]]));
 				$stugrp = $DBH->lastInsertId();
@@ -626,42 +581,30 @@ unset($dbpassword);
 						$userref[$v.'-'.$agroupaids[$agroup]] = $stugrp;  //$userref[userid-aid] = stugrp
 					}
 					$query = "INSERT INTO imas_stugroupmembers (stugroupid,userid) VALUES ".implode(',',$agroupusers[$agroup]);
-					//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 					$DBH->query($query); //is DB INTs - safe
 				}
-				//DB $query = "UPDATE imas_assessment_sessions SET agroupid='$stugrp' WHERE agroupid='$agroup'";
-				//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 				$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET agroupid=:agroupid WHERE agroupid=:agroupid");
 				$stm->execute(array(':agroupid'=>$stugrp, ':agroupid'=>$agroup));
 			}
 
 			//update forums and forum posts for groups
 			$forumaid = array();
-			//DB $query = "SELECT id,grpaid FROM imas_forums WHERE grpaid>0";
-			//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT id,grpaid FROM imas_forums WHERE grpaid>0");
 			$stm2 = $DBH->prepare("UPDATE imas_forums SET groupsetid=:groupsetid WHERE id=:id");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$forumaid[$row[0]] = $row[1];
-				//DB $query = "UPDATE imas_forums SET groupsetid={$assessgrpset[$row[1]]} WHERE id={$row[0]}";
-				//DB mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 				$stm2->execute(array(':groupsetid'=>$assessgrpset[$row[1]], ':id'=>$row[0]));
 			}
 			if (count($forumaid)>0) {
 				$forumlist = implode(',',array_keys($forumaid));
 				$query = "SELECT forumid,threadid,userid FROM imas_forum_posts WHERE forumid IN ($forumlist) AND parent=0";
-				//DB $result = mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 				$stm = $DBH->query($query); //is DB INTs - safe
-				//DB while ($row = mysql_fetch_row($result)) {
 				$stm2 = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=:stugroupid WHERE id=:id");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if (!isset($userref[$row[2].'-'.$forumaid[$row[0]]])) {
 						continue;
 					}
 					$stugrp = $userref[$row[2].'-'.$forumaid[$row[0]]];
-					//DB $query = "UPDATE imas_forum_threads SET stugroupid=$stugrp WHERE id={$row[1]}";
-					//DB mysql_query($query) or die("Query failed : $query:" . $DBH->errorInfo());
 					$stm2->execute(array(':stugroupid'=>$stugrp, ':id'=>$row[1]));
 				}
 			}
@@ -805,11 +748,9 @@ unset($dbpassword);
 			 $query = "SELECT id,forumid,userid,points FROM imas_forum_posts WHERE points IS NOT NULL";
 			 $stm = $DBH->query($query);
 			 $i = 0;
-			 //DB while ($row = mysql_fetch_row($res)) {
 			 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			 	 if ($i%500==0) {
 			 	 	 if ($i>0) {
-			 	 	 	 //DB mysql_query($ins);
 						 $DBH->query($ins);
 			 	 	 }
 			 	 	 $ins = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score) VALUES ";
@@ -820,7 +761,6 @@ unset($dbpassword);
 			 	 $i++;
 			 }
 			 if ($i>0) {
-			 	 //DB mysql_query($ins);
 				 $DBH->query($ins);
 			 }
 		}
@@ -870,10 +810,7 @@ unset($dbpassword);
 			$query .= "ON ig.gradetype='forum' AND ig.refid=ifp.id AND ifp.userid<>ig.userid";
 			$stm = $DBH->query($query);
 			$stm2 = $DBH->prepare("UPDATE imas_grades SET userid=:userid WHERE id=:id");
-			//DB while ($row = mysql_fetch_row($res)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				//DB $query = "UPDATE imas_grades SET userid={$row[1]} WHERE id={$row[0]}";
-				//DB mysql_query($query);
 				$stm2->execute(array(':userid'=>$row[1], ':id'=>$row[0]));
 			}
 		}
@@ -996,15 +933,10 @@ unset($dbpassword);
 			 //grab msg to instr settings and move to asssessments
 			  $query = "SELECT id,msgset FROM imas_courses WHERE msgset>9";
 			  $res = $DBH->query($query);
-			  //DB while ($row = mysql_fetch_row($res)) {
 				$stm = $DBH->prepare("UPDATE imas_assessments SET msgtoinstr=1 WHERE courseid=:courseid");
 			  while ($row = $res->fetch(PDO::FETCH_NUM)) {
-			  	  //DB $query = "UPDATE imas_assessments SET msgtoinstr=1 WHERE courseid={$row[0]}";
-			  	  //DB mysql_query($query);
 			  	  $stm->execute(array(':courseid'=>$row[0]));
 			  }
-			  //DB $query = "UPDATE imas_courses SET msgset=msgset-10 WHERE msgset>9";
-			  //DB mysql_query($query);
 			  $stm = $DBH->query("UPDATE imas_courses SET msgset=msgset-10 WHERE msgset>9");
 
 		}
@@ -1170,8 +1102,6 @@ unset($dbpassword);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			 } else {
-			 	 //DB $query = "INSERT INTO imas_dbschema (id,ver) VALUES (1,$latest)";
-			 	 //DB mysql_query($query) or die ("can't run $query");
 			 	 $stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver)");
 			 	 $stm->execute(array(':id'=>1, ':ver'=>65));
 			 }
@@ -1226,9 +1156,7 @@ unset($dbpassword);
 			 if (count($hasimg)>0) {
 			 	 $haslist = implode(',',$hasimg);
 			 	 $query = "UPDATE imas_users SET hasuserimg=1 WHERE id IN ($haslist)"; //is INTs - safe
-			 	 //DB mysql_query($query);
 				 $DBH->query($query);
-			 	 //DB $n = mysql_affected_rows();
 				 $n = $DBH->rowCount();
 			 }
 			 echo "hasuserimg field added, $n user images identified<br/>";
@@ -1559,21 +1487,15 @@ unset($dbpassword);
 			if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			}
-			//DB while ($row = mysql_fetch_row($res)) {
 			$stm3 = $DBH->prepare("UPDATE imas_questionset SET ancestorauthors=:authors WHERE id=:id");
 			while ($row = $res->fetch(PDO::FETCH_NUM)) {
-				//DB $query = "SELECT author FROM imas_questionset WHERE id IN ({$row[1]})";
-				//DB $res2 = mysql_query($query);
 				$stm2 = $DBH->query("SELECT author FROM imas_questionset WHERE id IN ({$row[1]})");
 				$thisauthor = array();
-				//DB while ($r = mysql_fetch_row($res2)) {
 				while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 					if ($r[0] != $row[2] && !in_array($r[0],$thisauthor)) {
 						$thisauthor[] = $r[0];
 					}
 				}
-				//DB $query = "UPDATE imas_questionset SET ancestorauthors='".addslashes(implode('; ',$thisauthor))."' WHERE id='{$row[0]}'";
-				//DB mysql_query($query);
 				$stm3->execute(array(':id'=>$row[0], ':authors'=>implode('; ',$thisauthor)));
 			}
 

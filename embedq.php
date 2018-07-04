@@ -256,9 +256,6 @@ function printscore($sc,$qsetid,$seed) {
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
-		//DB $query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		//DB $control = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id=:id");
 		$stm->execute(array(':id'=>$qsetid));
 		$control = $stm->fetchColumn(0);

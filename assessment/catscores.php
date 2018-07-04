@@ -8,13 +8,10 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 		$quests[$i] = intval($q);  //sanitize
 	}
 	$qlist = implode(',',$quests);
-	//DB $query = "SELECT id,category,points FROM imas_questions WHERE id IN ($qlist)";
- 	//DB $result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
 	$stm = $DBH->query("SELECT id,category,points FROM imas_questions WHERE id IN ($qlist)"); //sanitized above - safe
 	$cat = array();
 	$pospts = array();
 	$tolookup = array(intval($defoutcome));
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (is_numeric($row[1]) && $row[1]==0 && $defoutcome!=0) {
 			$cat[$row[0]] = $defoutcome;
@@ -36,17 +33,10 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 	$outcomenames[0] = "Uncategorized";
 	if (count($tolookup)>0) {
 		$lulist = implode(',',$tolookup);
-		//DB $query = "SELECT id,name FROM imas_outcomes WHERE id IN ($lulist)";
-		//DB $result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_outcomes WHERE id IN ($lulist)");  //santitized above - safe
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$outcomenames[$row[0]] = $row[1];
 		}
-
-		//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -115,9 +105,6 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 			continue;
 		} elseif (0==strncmp($category,"AID-",4)) { //category is another assessment
 			$categoryaid=intval(substr($category,4));
-			//DB $query = "SELECT name FROM imas_assessments WHERE id='$categoryaid' AND courseid='$cid' LIMIT 1";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $assessmentname = mysql_result($result, 0, 0);
 			$assess_name_stm->execute(array(':id'=>$categoryaid, ':courseid'=>$cid));
 			$assessmentname = $assess_name_stm->fetchColumn(0);
 			//link to the other assessment

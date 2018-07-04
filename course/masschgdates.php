@@ -22,10 +22,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['chgcnt'])) {
-
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
@@ -210,9 +206,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute($forumfulltoupdate);
 		}
 		if ($blockchg>0) {
-			//DB $itemorder = addslashes(serialize($items));
-			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$itemorder = serialize($items);
 			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
@@ -371,18 +364,11 @@ if ($overwriteBody==1) {
 	$prefix = array();
 	if ($orderby==3) {  //course page order
 		$itemsassoc = array();
-		//DB $query = "SELECT id,typeid,itemtype FROM imas_items WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,typeid,itemtype FROM imas_items WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$itemsassoc[$row[0]] = $row[2].$row[1];
 		}
-
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB $itemorder = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$itemorder = unserialize($stm->fetchColumn(0));
@@ -418,9 +404,6 @@ if ($overwriteBody==1) {
 	$courseorder = Array();
 	$pres = array();
 	if ($filter=='all' || $filter=='assessments') {
-		//DB $query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid=:courseid ");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -437,9 +420,6 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='inlinetext') {
-		//DB $query = "SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid='$cid' ";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid=:courseid ");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -456,9 +436,6 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='linkedtext') {
-		//DB $query = "SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid='$cid' ";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid=:courseid ");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -475,9 +452,6 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='forums') {
-		//DB $query = "SELECT name,startdate,enddate,id,avail,postby,replyby FROM imas_forums WHERE courseid='$cid' ";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT name,startdate,enddate,id,avail,postby,replyby FROM imas_forums WHERE courseid=:courseid ");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -495,9 +469,6 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='wikis') {
-		//DB $query = "SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid='$cid' ";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid=:courseid ");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -514,9 +485,6 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='blocks') {
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
@@ -528,7 +496,6 @@ if ($overwriteBody==1) {
 					$ids[] = $parent.'-'.($k+1);
 					$types[] = "Block";
 					if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
-					//DB $names[] = stripslashes($item['name']);
 					$names[] = $item['name'];
 					$startdates[] = $item['startdate'];
 					$enddates[] = $item['enddate'];

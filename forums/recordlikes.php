@@ -20,33 +20,19 @@ $postid = intval($_GET['postid']);
 $like = intval($_GET['like']);
 
 if ($like==0) {
-	//DB $query = "DELETE FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";
-	//DB $result = mysql_query($query);
-	//DB $aff =  mysql_affected_rows();
 	$stm = $DBH->prepare("DELETE FROM imas_forum_likes WHERE postid=:postid AND userid=:userid");
 	$stm->execute(array(':postid'=>$postid, ':userid'=>$userid));
 	$aff =  $stm->rowCount();
 } else {
-	//DB $query = "SELECT id FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";
-	//DB $result = mysql_query($query);
-	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->prepare("SELECT id FROM imas_forum_likes WHERE postid=:postid AND userid=:userid");
 	$stm->execute(array(':postid'=>$postid, ':userid'=>$userid));
 	if ($stm->rowCount()>0) {
 		$aff = 0;
 	} else {
-		//DB $query = "SELECT threadid FROM imas_forum_posts WHERE id=$postid";
-		//DB $result = mysql_query($query);
-		//DB if (mysql_num_rows($result)==0) {echo "fail";exit;}
-		//DB $threadid = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT threadid FROM imas_forum_posts WHERE id=:id");
 		$stm->execute(array(':id'=>$postid));
 		if ($stm->rowCount()==0) {echo "fail";exit;}
 		$threadid = $stm->fetchColumn(0);
-
-		//DB $query = "INSERT INTO imas_forum_likes (userid,threadid,postid,type) VALUES ";
-		//DB $query .= "('$userid',$threadid,$postid,$isteacher)";
-		//DB mysql_query($query);
 		$query = "INSERT INTO imas_forum_likes (userid,threadid,postid,type) VALUES ";
 		$query .= "(:userid, :threadid, :postid, :type)";
 		$stm = $DBH->prepare($query);
@@ -56,10 +42,6 @@ if ($like==0) {
 }
 
 $likes = array(0,0,0);
-//DB $query = "SELECT type,count(*) FROM imas_forum_likes WHERE postid='$postid'";
-//DB $query .= "GROUP BY type";
-//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT type,count(*) FROM imas_forum_likes WHERE postid=:postid GROUP BY type");
 $stm->execute(array(':postid'=>$postid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {

@@ -43,9 +43,6 @@ if (!isset($_GET['cid'])) {
 switch($_GET['action']) {
 	case "delete":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
-		//DB $query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $name = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$name = $stm->fetchColumn(0);
@@ -135,9 +132,6 @@ switch($_GET['action']) {
 			$oldgroup = (isset($_GET['group'])?Sanitize::onlyInt($_GET['group']):0);
 			$oldrights = 10;
 		} else {
-			//DB $query = "SELECT FirstName,LastName,rights,groupid,specialrights FROM imas_users WHERE id='{$_GET['id']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -277,9 +271,6 @@ switch($_GET['action']) {
 				echo "selected=1";
 			}
 			echo ">Default</option>\n";
-			//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				printf('<option value="%d" ', Sanitize::onlyInt($row[0]));
@@ -310,10 +301,6 @@ switch($_GET['action']) {
 
 		$isadminview = false;
 		if ($_GET['action']=='modify') {
-			//DB $query = "SELECT * FROM imas_courses WHERE id='{$_GET['id']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)==0) {break;}
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			if ($stm->rowCount()==0) {break;}
@@ -324,9 +311,6 @@ switch($_GET['action']) {
 				if ($line['ownerid']!=$userid) {
 					$isadminview = true;
 				}
-				//DB $query = "SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id={$line['ownerid']}";
-				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				//DB $udat = mysql_fetch_array($result, MYSQL_ASSOC);
 				$stm = $DBH->prepare("SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name, ig.parent FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id=:id");
 				$stm->execute(array(':id'=>$line['ownerid']));
 				$udat = $stm->fetch(PDO::FETCH_ASSOC);
@@ -483,9 +467,6 @@ switch($_GET['action']) {
 			echo '<option value="0" ';
 			if ($lockaid==0) { echo 'selected="1"';}
 			echo '>No lock</option>';
-			//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='{$_GET['id']}' ORDER BY name";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 			$stm->execute(array(':courseid'=>$_GET['id']));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -835,9 +816,6 @@ switch($_GET['action']) {
 				$globalcourse = array();
 				$groupcourse = array();
 				$terms = array();
-				//DB $query = "SELECT id,name,copyrights,istemplate,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND available<4 AND copyrights=2 ORDER BY name";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
 				$stm = $DBH->query("SELECT id,name,copyrights,istemplate,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND available<4 AND copyrights=2 ORDER BY name");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$globalcourse[$row[0]] = $row[1];
@@ -845,10 +823,6 @@ switch($_GET['action']) {
 						$terms[$row[0]] = $row[4];
 					}
 				}
-				//DB $query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
-				//DB $query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
 				$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
 				$query .= "iu.groupid=:groupid AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
 				$stm = $DBH->prepare($query);
@@ -961,9 +935,6 @@ switch($_GET['action']) {
 		echo "<h2>Modify LTI Domain Credentials</h2>\n";
 		echo '</div>';
 		echo "<table><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr>\n";
-		//DB $query = "SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76 OR rights=77";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,email,SID,rights FROM imas_users WHERE rights=11 OR rights=76 OR rights=77");
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf("<tr><td>%s</td><td>%s</td>", Sanitize::encodeStringForDisplay($row[1]),
@@ -993,9 +964,6 @@ switch($_GET['action']) {
 		//echo "<option value=\"77\">Yes, with access via LMS only</option>
 		echo "</select><br/>\n";
 		echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
-		//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -1026,9 +994,6 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h2>Modify LTI Domain Credentials</h2>\n";
 		echo '</div>';
-		//DB $query = "SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -1044,9 +1009,6 @@ switch($_GET['action']) {
 		if ($row[4]==76) {echo 'selected="selected"';}
 		echo ">Yes</option></select><br/>\n";
 		echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
-		//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($r = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 			printf('<option value="%d"', Sanitize::onlyInt($r[0]));
@@ -1108,9 +1070,6 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h2>Modify Federation Peer</h2>\n";
 		echo '</div>';
-		//DB $query = "SELECT id,email,SID,password,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT id,peername,peerdescription,url,secret,lastpull FROM imas_federation_peers WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -1138,9 +1097,6 @@ switch($_GET['action']) {
 		if ($from=='admin2') {
 			echo '<tr class="even"><td><a href="admin2.php?groupdetails=0">'._('Default Group').'</a></td><td></td><td></td></tr>';
 		}
-		//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 		$alt = 1;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -1186,9 +1142,6 @@ switch($_GET['action']) {
 	case "modgroup":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle"><h1>Rename Instructor Group</h1></div>';
-		//DB $query = "SELECT name,parent FROM imas_groups WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB list($gpname,$parent) = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT name,parent FROM imas_groups WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($gpname,$parent) = $stm->fetch(PDO::FETCH_NUM);
@@ -1200,9 +1153,6 @@ switch($_GET['action']) {
 		echo 'Parent: <select name="parentid"><option value="0" ';
 		if ($parent==0) { echo ' selected="selected"';}
 		echo '>None</option>';
-		//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($r = mysql_fetch_row($result)) {
 		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 			echo '<option value="'.Sanitize::encodeStringForDisplay($r[0]).'"';

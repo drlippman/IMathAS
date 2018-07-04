@@ -15,9 +15,6 @@ $catfilter = -1;
 $secfilter = -1;
 
 //load outcomes
-//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $row = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -31,9 +28,6 @@ if ($row[0]=='') {
 }
 
 $outcomeinfo = array();
-//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -45,9 +39,6 @@ if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 } else if (isset($sessiondata[$cid.'gbmode'])) {
 	$gbmode =  $sessiondata[$cid.'gbmode'];
 } else {
-	//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $gbmode = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	$gbmode = $stm->fetchColumn(0);

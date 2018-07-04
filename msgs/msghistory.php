@@ -45,12 +45,6 @@
 	require("../header.php");
 
 	$allowmsg = false;
-
-	//DB $query = "SELECT baseid FROM imas_msgs WHERE id='$msgid'";
-	//DB $query .= " AND (msgto='$userid' OR msgfrom='$userid')";
-	//DB if ($type!='allstu' || !$isteacher) {
-	//DB 	$query .= " AND (msgto='$userid' OR msgfrom='$userid')";
-	//DB }
 	$query = "SELECT baseid FROM imas_msgs WHERE id=:id";
 	if ($type!='allstu' || !$isteacher) {
 		$query .= " AND (msgto=:msgto OR msgfrom=:msgfrom)";
@@ -61,23 +55,15 @@
 	} else {
 		$stm->execute(array(':id'=>$msgid));
 	}
-
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	if ($stm->rowCount()==0) {
 		echo "Message not found";
 		require("../footer.php");
 		exit;
 	}
-	//DB $baseid = mysql_result($result,0,0);
 	$baseid = $stm->fetchColumn(0);
 	if ($baseid==0) {
 		$baseid=$msgid;
 	}
-	//DB $query = "SELECT imas_msgs.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_msgs,imas_users ";
-	//DB $query .= "WHERE imas_msgs.msgfrom=imas_users.id AND (imas_msgs.id='$baseid' OR imas_msgs.baseid='$baseid') ORDER BY imas_msgs.id";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT imas_msgs.*,imas_users.FirstName,imas_users.LastName,imas_users.email from imas_msgs,imas_users ";
 	$query .= "WHERE imas_msgs.msgfrom=imas_users.id AND (imas_msgs.id=:id OR imas_msgs.baseid=:baseid) ORDER BY imas_msgs.id";
 	$stm = $DBH->prepare($query);
@@ -111,9 +97,6 @@
 
 	}
 	if ($line['courseid']>0) {
-		//DB $query = "SELECT msgset FROM imas_courses WHERE id='{$line['courseid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB $msgset = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$line['courseid']));
 		$msgset = $stm->fetchColumn(0);
@@ -122,18 +105,12 @@
 		if ($msgset<3 || $isteacher) {
 			$cansendmsgs = true;
 			if ($msgset==1 && !$isteacher) { //check if sending to teacher
-				//DB $query = "SELECT id FROM imas_teachers WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
 				$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid and courseid=:courseid");
 				$stm->execute(array(':userid'=>$line['msgfrom'], ':courseid'=>$line['courseid']));
 				if ($stm->rowCount()==0) {
 					$cansendmsgs = false;
 				}
 			} else if ($msgset==2 && !$isteacher) { //check if sending to stu
-				//DB $query = "SELECT id FROM imas_students WHERE userid='{$line['msgfrom']}' and courseid='{$line['courseid']}'";
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
 				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid and courseid=:courseid");
 				$stm->execute(array(':userid'=>$line['msgfrom'], ':courseid'=>$line['courseid']));
 				if ($stm->rowCount()==0) {

@@ -18,15 +18,11 @@ require("header.php");
 
 $start = microtime(true);
 //get last updated time
-//DB $query = "SELECT id,ver FROM imas_dbschema WHERE id=3 OR id=4";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $stm = $DBH->query("SELECT id,ver FROM imas_dbschema WHERE id=3 OR id=4");
 if ($stm->rowCount()==0) {
 	$lastupdate = 0;
 	$lastfirstupdate = 0;
 } else {
-	//DB while ($r = mysql_fetch_row($result)) {
 	while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($r[0]==3) {
 			$lastupdate = $r[1];
@@ -46,10 +42,6 @@ $doslowmethod = false;
 
 if ($doslowmethod) {
 	$qtimes = array();
-
-	//DB $query = "SELECT questions,timeontask FROM imas_assessment_sessions WHERE timeontask<>'' AND endtime>$lastupdate";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT questions,timeontask FROM imas_assessment_sessions WHERE timeontask<>'' AND endtime>:lastupdate");
 	$stm->execute(array(':lastupdate'=>$lastupdate));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -74,9 +66,6 @@ if ($doslowmethod) {
 	$qstimes = array();
 	$qsfirsttimes = array();
 	$qsfirstscores = array();
-	//DB $query = "SELECT id,questionsetid FROM imas_questions WHERE 1";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->query("SELECT id,questionsetid FROM imas_questions WHERE 1");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (isset($qtimes[$row[0]])) {
@@ -106,12 +95,8 @@ $n = array();
 $thistimes = array();
 $thisscores = array();
 $lastq = -1;
-//DB $query = "SELECT qsetid,score,timespent FROM imas_firstscores WHERE timespent>0 AND timespent<1200 AND id>$lastfirstupdate ORDER BY qsetid";
-//DB $result = mysql_unbuffered_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT qsetid,score,timespent FROM imas_firstscores WHERE timespent>0 AND timespent<1200 AND id>:lastfirstupdate ORDER BY qsetid");
 $stm->execute(array(':lastfirstupdate'=>$lastfirstupdate));
-//DB $result = mysql_unbuffered_query($query) or die("Query failed : " . mysql_error());
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[0] != $lastq && $lastq>0) {
 		$n[$lastq] = count($thisscores);
@@ -144,21 +129,14 @@ $totn = array_sum($n);
 if ($lastfirstupdate==0) {
 	foreach ($n as $qsid=>$nval) {
 		if ($doslowmethod) {
-			//DB $avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
 			$avg = $avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		} else {
-			//DB $avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
 			$avg = '0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		}
-		//DB $query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_questionset SET avgtime=:avgtime WHERE id=:id");
 		$stm->execute(array(':avgtime'=>$avg, ':id'=>$qsid));
 	}
 } else {
-	//DB $query = "SELECT id,avgtime FROM imas_questionset";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT id,avgtime FROM imas_questionset");
 	$stm->execute(array());
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -175,22 +153,14 @@ if ($lastfirstupdate==0) {
 			$n[$qsid] += $oldn;
 		}
 		if ($doslowmethod) {
-			//DB $avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
 			$avg = $avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		} else {
-			//DB $avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
 			$avg = '0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		}
-		//DB $query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm2 = $DBH->prepare("UPDATE imas_questionset SET avgtime=:avgtime WHERE id=:id");
 		$stm2->execute(array(':avgtime'=>$avg, ':id'=>$qsid));
 	}
 }
-
-//DB $query = "SELECT max(id) FROM imas_firstscores";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $row = mysql_fetch_row($result);
 $stm = $DBH->query("SELECT max(id) FROM imas_firstscores");
 $row = $stm->fetch(PDO::FETCH_NUM);
 if ($lastfirstupdate == 0) {
@@ -198,20 +168,14 @@ if ($lastfirstupdate == 0) {
 	if ($doslowmethod) {
 		$lastupdate = time();
 	}
-	//DB $query = "INSERT INTO imas_dbschema (id,ver) VALUES (3,$lastupdate),(4,$lastfirstupdate)";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver),(:idB, :verB)");
 	$stm->execute(array(':id'=>3, ':ver'=>$lastupdate, ':idB'=>4, ':verB'=>$lastfirstupdate));
 } else {
 	$lastfirstupdate = $row[0];
-	//DB $query = "UPDATE imas_dbschema SET ver=$lastfirstupdate WHERE id=4";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=4");
 	$stm->execute(array(':ver'=>$lastfirstupdate));
 	if ($doslowmethod) {
 		$lastupdate = time();
-		//DB $query = "UPDATE imas_dbschema SET ver=$lastupdate WHERE id=3";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=3");
 		$stm->execute(array(':ver'=>$lastupdate));
 	}

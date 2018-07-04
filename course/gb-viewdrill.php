@@ -27,17 +27,12 @@ if (!isset($teacherid)) {
 	echo 'You are not authorized to view this page';
 	exit;
 }
-
-//DB $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
 $stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
 if ($stm->rowCount()==0) {
 	echo 'Invalid drill id.';
 	exit;
 }
-//DB $dadata = mysql_fetch_array($result, MYSQL_ASSOC);
 $dadata = $stm->fetch(PDO::FETCH_ASSOC);
 $n = $dadata['n'];
 $showtype = $dadata['showtype'];
@@ -64,10 +59,6 @@ if ($dadata['itemdescr']=='') {
 $classbests = explode(',',$dadata['classbests']);
 
 $studata = array();
-//DB $query = "SELECT iu.LastName,iu.FirstName,ids.scorerec FROM imas_drillassess_sessions AS ids ";
-//DB $query .= "JOIN imas_users AS iu ON iu.id=ids.userid WHERE ids.drillassessid=$daid ORDER BY iu.LastName, iu.FirstName";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $query = "SELECT iu.LastName,iu.FirstName,ids.scorerec FROM imas_drillassess_sessions AS ids ";
 $query .= "JOIN imas_users AS iu ON iu.id=ids.userid WHERE ids.drillassessid=:drillassessid ORDER BY iu.LastName, iu.FirstName";
 $stm = $DBH->prepare($query);

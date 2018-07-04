@@ -128,8 +128,6 @@ if (!(isset($teacherid)) && $myrights<100) {
 			for ($i=0;$i<count($arr);$i++) {
 				$arr[$i] = trim($arr[$i]);
 			}
-
-			//DB addslashes_deep($arr);
 			if (trim($arr[0])=='' || trim($arr[0])=='_') {
 				continue;
 			}
@@ -155,11 +153,6 @@ if (!(isset($teacherid)) && $myrights<100) {
 				echo "Password for username ".Sanitize::encodeStringForDisplay($arr[0])." is invalid format; skipping<br/>\n";
 				continue;
 			}
-
-			//DB $query = "SELECT id FROM imas_users WHERE SID='$arr[0]'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-				//DB $id = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 			$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($arr[0])));
 			if ($stm->rowCount()>0) {
@@ -171,37 +164,17 @@ if (!(isset($teacherid)) && $myrights<100) {
 				} else {
 					$pw = md5($arr[6]);
 				}
-				
-				//DB $query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $id = mysql_insert_id();
 				$stm = $DBH->prepare("INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password,forcepwreset) VALUES (:SID, :FirstName, :LastName, :email, :rights, :password, 1)");
 				$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($arr[0]), ':FirstName'=>Sanitize::stripHtmlTags($arr[1]), ':LastName'=>Sanitize::stripHtmlTags($arr[2]), ':email'=>Sanitize::emailAddress($arr[3]), ':rights'=>10, ':password'=>$pw));
 				$id = $DBH->lastInsertId();
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
-
-				//DB $vals = "'$id','$ncid'";
-				//DB $query = "SELECT id FROM imas_students WHERE userid='$id' AND courseid='$ncid'";
-				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
 				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid));
 				if ($stm->rowCount()>0) {
 					echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." already enrolled in course.  Skipping<br/>";
 					continue;
 				}
-
-				//DB $query = "INSERT INTO imas_students (userid,courseid";
-				//DB if ($_POST['codetype']==1) {
-				//DB 	$query .= ",code";
-				//DB 	$vals .= ",'$arr[4]'";
-				//DB }
-				//DB if ($_POST['sectype']>0) {
-				//DB 	$query .= ",section";
-				//DB 	$vals .= ",'$arr[5]'";
-				//DB }
-				//DB $query .= ") VALUES ($vals)";
 
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,code,section,latepass) VALUES (:userid, :courseid, :code, :section, :latepass)");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid,
@@ -266,14 +239,10 @@ if (!(isset($teacherid)) && $myrights<100) {
 	} else { //STEP 1 DATA MANIPULATION
 
 		if ($isadmin) {
-			//DB $query = "SELECT imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName FROM imas_courses,imas_users ";
-			//DB $query .= "WHERE imas_users.id=imas_courses.ownerid ";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "SELECT imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName FROM imas_courses,imas_users ";
 			$query .= "WHERE imas_users.id=imas_courses.ownerid ";
 			$stm = $DBH->query($query);
 			$i=0;
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_adminUserSelectVals[$i] = $row[0];
 				$page_adminUserSelectLabels[$i] = "$row[1] ($row[2], $row[3])";

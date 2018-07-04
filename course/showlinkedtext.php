@@ -23,13 +23,8 @@
 	}
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
-	//DB $query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT text,title,target FROM imas_linkedtext WHERE id=:id");
 	$stm->execute(array(':id'=>$linkedtextid));
-	//DB $text = mysql_result($result, 0,0);
-	//DB $title = mysql_result($result,0,1);
-	//DB $target = mysql_result($result,0,2);
 	list($text,$title,$target) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 
@@ -104,9 +99,6 @@
 	$navbuttons = '';
 	if ((isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) || isset($sessiondata['readernavon'])) {
 		$now = time();
-		//DB $query = "SELECT il.id,il.title,il.avail,il.startdate,il.enddate,ii.id AS itemid ";
-		//DB $query .= "FROM imas_linkedtext as il JOIN imas_items AS ii ON il.id=ii.typeid AND ii.itemtype='LinkedText' ";
-		//DB $query .= "WHERE ii.courseid='$cid' ";
 		$query = "SELECT il.id,il.title,il.avail,il.startdate,il.enddate,ii.id AS itemid ";
 		$query .= "FROM imas_linkedtext as il JOIN imas_items AS ii ON il.id=ii.typeid AND ii.itemtype='LinkedText' ";
 		$query .= "WHERE ii.courseid=:courseid ";
@@ -115,9 +107,7 @@
 		}
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid));
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$itemdata = array();
-		//DB while ($row = mysql_fetch_assoc($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$itemdata[$row['itemid']] = $row;
 			if ($row['id']==$linkedtextid) {
@@ -144,9 +134,6 @@
 				}
 			}
 		}
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);

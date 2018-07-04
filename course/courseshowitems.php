@@ -214,7 +214,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					continue;
 				}
 			}
-			//DB $items[$i]['name'] = stripslashes($items[$i]['name']);;
 			if ($canedit) {
 				//echo generatemoveselect($i,count($items),$parent,$blocklist);
 			}
@@ -713,15 +712,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 			   	   	   $showgreyedout = true;
 			   	   }
-				   //DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
-				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   //DB if (mysql_num_rows($result)==0) {
 				   $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
 				   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
 				   if ($stm->rowCount()==0) {
 					   $nothidden = false;
 				   } else {
-					   //DB $scores = explode(';',mysql_result($result,0,0));
 					   $scores = explode(';',$stm->fetchColumn(0));
 					   if ($line['reqscoretype']&2) { //using percent-based
 					   	   if (round(100*getpts($scores[0])/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
@@ -1048,16 +1043,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 
 				   echo filter("<div class=itemsum>{$line['text']}\n");
-				   //DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
-				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   //DB if (mysql_num_rows($result)>0) {
 				   $stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
 				   $stm->execute(array(':itemid'=>$typeid));
 				   if ($stm->rowCount()>0) {
 					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
-					   //DB while ($row = mysql_fetch_row($result)) {
 					   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						   $filenames[$row[0]] = $row[2];
 						   $filedescr[$row[0]] = $row[1];
@@ -1101,16 +1092,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 
 				   echo filter("<div class=itemsum>{$line['text']}\n");
-				   //DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
-				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   //DB if (mysql_num_rows($result)>0) {
 				   $stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
 				   $stm->execute(array(':itemid'=>$typeid));
 				   if ($stm->rowCount()>0) {
 					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
-					   //DB while ($row = mysql_fetch_row($result)) {
 					   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						   $filenames[$row[0]] = $row[2];
 						   $filedescr[$row[0]] = $row[1];
@@ -1570,11 +1557,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   $hasnew = false;
 			   if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 		   	   if ($line['groupsetid']>0 && !$canedit) {
-		   	   	   //DB $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
-		   	   	   //DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='{$line['groupsetid']}'";
-		   	   	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   	   	   //DB if (mysql_num_rows($result)>0) {
-		   	   	   	   //DB $wikigroupid = mysql_result($result,0,0);
 		   	   	   $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 		   	   	   $query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 		   	   	   $stm = $DBH->prepare($query);
@@ -1586,21 +1568,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		   	   	   }
 		   	   }
 		   	   $wikilastviews = array();
-		   	   //DB $query = "SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
-		   	   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   //DB while ($row = mysql_fetch_row($result)) {
 		   	   $stm = $DBH->prepare("SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid=:userid AND wikiid=:wikiid");
 		   	   $stm->execute(array(':userid'=>$userid, ':wikiid'=>$typeid));
 				   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				   	   $wikilastviews[$row[0]] = $row[1];
 				   }
-
-				   //DB $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
-				   //DB if ($line['groupsetid']>0 && !$canedit) {
-				   	   //DB $query .= "AND stugroupid='$wikigroupid' ";
-				   //DB }
-				   //DB $query .= "GROUP BY stugroupid";
-				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid=:wikiid ";
 				   if ($line['groupsetid']>0 && !$canedit) {
 						 $query .= "AND stugroupid=:stugroupid ";
@@ -1612,7 +1584,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   } else {
 						 $stm->execute(array(':wikiid'=>$typeid));
 					 }
-				   //DB while ($row = mysql_fetch_row($result)) {
 				   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				   	   if (!isset($wikilastviews[$row[0]]) || $wikilastviews[$row[0]] < $row[1]) {
 				   	   	   $hasnew = true;
@@ -1872,63 +1843,41 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {
 		   $itemtypes = array();  $iteminfo = array();
-		   //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   //DB while ($row = mysql_fetch_row($result)) {
 		   $stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $itemtypes[$row[0]] = array($row[1],$row[2]);
 		   }
-		   //DB $query = "SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid='$cid'";
-		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   //DB while ($row = mysql_fetch_row($result)) {
 		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $id = array_shift($row);
 			   $iteminfo['Assessment'][$id] = $row;
 		   }
-		   //DB $query = "SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
-		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   //DB while ($row = mysql_fetch_row($result)) {
 		   $stm = $DBH->prepare("SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $id = array_shift($row);
 			   $iteminfo['InlineText'][$id] = $row;
 		   }
-		   //DB $query = "SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid='$cid'";
-		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   //DB while ($row = mysql_fetch_row($result)) {
 		   $stm = $DBH->prepare("SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $id = array_shift($row);
 			   $iteminfo['LinkedText'][$id] = $row;
 		   }
-		   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid='$cid'";
-		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   //DB while ($row = mysql_fetch_row($result)) {
 		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $id = array_shift($row);
 			   $iteminfo['Forum'][$id] = $row;
 		   }
-
-		   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
-		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   //DB while ($row = mysql_fetch_row($result)) {
 		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $id = array_shift($row);
 			   $iteminfo['Wiki'][$id] = $row;
 		   }
-		   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid='$cid'";
-		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   //DB while ($row = mysql_fetch_row($result)) {
 		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -1939,7 +1888,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   $now = time();
 	   for ($i=0;$i<count($items); $i++) {
 		   if (is_array($items[$i])) { //is a block
-			//DB $items[$i]['name'] = stripslashes($items[$i]['name']);
 			$items[$i]['name'] = $items[$i]['name'];
 
 			if ($items[$i]['startdate']==0) {

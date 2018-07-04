@@ -51,23 +51,13 @@
 		}
 		return false;
 	}
-
-	//DB $query = "SELECT id FROM imas_items WHERE itemtype='Wiki' AND typeid='$id'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $itemid = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='Wiki' AND typeid=:typeid");
 	$stm->execute(array(':typeid'=>$id));
 	$itemid = $stm->fetchColumn(0);
-
-	//DB $query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $items = unserialize(mysql_result($result,0,0));
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$items = unserialize($stm->fetchColumn(0));
 	if ($fcid==0) {
-		//DB $coursename = mysql_result($result,0,1);
-		//DB $coursetheme = mysql_result($result,0,2);
 		list($coursename, $coursetheme) = $stm->fetch(PDO::FETCH_NUM);
 		$breadcrumbbase = "<a href=\"$imasroot/course/public.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	} else {
@@ -81,11 +71,6 @@
 		exit;
 	}
 	$ispublic = true;
-
-
-	//DB $query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_NUM);
@@ -101,12 +86,6 @@
 	require("../header.php");
 	echo "<div class=breadcrumb> $breadcrumbbase View Wiki</div>";
 	echo '<div id="headerviewwiki" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($wikiname).'</h1></div>';
-
-	//DB $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
-	//DB $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-	//DB $query .= "WHERE i_w_r.wikiid='$id' ORDER BY i_w_r.id DESC LIMIT 1";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
 	$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 	$query .= "WHERE i_w_r.wikiid=:wikiid ORDER BY i_w_r.id DESC LIMIT 1";

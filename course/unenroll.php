@@ -18,9 +18,6 @@ ini_set("max_execution_time", "600");
 		if ($get_uid=="selected") {
 			$tounenroll = explode(",",$_POST['tounenroll']);
 		} else if ($get_uid=="all") {
-			//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -43,10 +40,8 @@ ini_set("max_execution_time", "600");
 		} else {
 			$withwithdraw = false;
 		}
-		//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 		$DBH->beginTransaction();
 		unenrollstu($cid,$tounenroll,($get_uid=="all" || isset($_POST['delforumposts'])),($get_uid=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev, isset($_POST['usereplaceby']));
-		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
 
 
@@ -74,9 +69,6 @@ ini_set("max_execution_time", "600");
 					$get_uid = 'selected';
 				}
 			}*/
-			//DB $query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (count($_POST['checked']) == mysql_result($result,0,0)) {
 			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			if (count($_POST['checked']) == $stm->fetchColumn(0)) {
@@ -87,20 +79,12 @@ ini_set("max_execution_time", "600");
 		}
 
 		if ($get_uid=="all") {
-			//DB $query = "SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
-			//DB $resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 			$resultUserList = $DBH->prepare("SELECT iu.LastName,iu.FirstName,iu.SID FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid");
 			$resultUserList->execute(array(':courseid'=>$cid));
 		} else if ($get_uid=="selected") {
 			if (count($_POST['checked'])>0) {
-				//DB $ulist = "'".implode("','",$_POST['checked'])."'";
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
-				//DB $query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)";
-				//DB $resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
-				//DB $query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (count($_POST['checked']) > floor(mysql_result($result,0,0)/2)) {
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 				if (count($_POST['checked']) > floor($stm->fetchColumn(0)/2)) {
@@ -115,9 +99,6 @@ ini_set("max_execution_time", "600");
 				}
 			}
 		} else {
-			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$get_uid}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($get_uid)));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -143,7 +124,6 @@ ini_set("max_execution_time", "600");
 			<p>Are you SURE you want to unenroll ALL students?</p>
 			<ul>
 <?php
-					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
 						printf("			<li>%s %s (%s)</li>",
                             Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
@@ -185,7 +165,6 @@ ini_set("max_execution_time", "600");
 		<p>Are you SURE you want to unenroll the selected students?</p>
 		<ul>
 <?php
-					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
 						printf("			<li>%s %s (%s)</li>",
 							Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),

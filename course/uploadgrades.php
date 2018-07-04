@@ -30,9 +30,6 @@ if (!(isset($teacherid))) {
 	if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
 			$curscores = array();
-			//DB $query = "SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
 			$stm->execute(array(':gradetypeid'=>$_GET['gbitem']));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -60,23 +57,17 @@ if (!(isset($teacherid))) {
 			}
 			while (($data = fgetcsv($handle, 4096, ",")) !== FALSE) {
 				$data = array_map('trim', $data);
-				//DB $query = "SELECT imas_users.id FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' AND ";
 				$query = "SELECT imas_users.id FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid AND ";
 				$qarr = array(':courseid'=>$cid);
 				if ($_POST['useridtype']==0) {
-					//DB $data[$usercol] = str_replace("'","\\'",trim($data[$usercol]));
 					if ($data[$usercol]=='') {continue;}
-					//DB $query .= "imas_users.SID='{$data[$usercol]}'";
 					$query .= "imas_users.SID=:SID";
 					$qarr[':SID'] = Sanitize::stripHtmlTags($data[$usercol]);
 				} else if ($_POST['useridtype']==1) {
 					if (strpos($data[$usercol],',')===false) { continue;}
 					list($last,$first) = explode(',',$data[$usercol]);
-					//DB $first = str_replace("'","\\'",trim($first));
-					//DB $last = str_replace("'","\\'",trim($last));
 					$first = trim($first);
 					$last = trim($last);
-					//DB $query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
 					$query .= "imas_users.FirstName=:firstname AND imas_users.LastName=:lastname";
 					$qarr[':firstname'] = Sanitize::stripHtmlTags($first);
 					$qarr[':lastname'] = Sanitize::stripHtmlTags($last);
@@ -84,36 +75,27 @@ if (!(isset($teacherid))) {
 				} else {
 					$query .= "0";
 				}
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 				if ($feedbackcol==-1) {
 					$feedback = '';
 				} else {
-					//DB $feedback = addslashes($data[$feedbackcol]);
 					$feedback = Sanitize::incomingHtml($data[$feedbackcol]);
 				}
-				//DB $score = addslashes($data[$scorecol]);
 				$score = Sanitize::onlyFloat($data[$scorecol]);
-				//DB if (mysql_num_rows($result)>0) {
 				if ($stm->rowCount()>0) {
-					//DB $cuserid=mysql_result($result,0,0);
 					$cuserid=$stm->fetchColumn(0);
 					if (isset($curscores[$cuserid])) {
-						//DB $query = "UPDATE imas_grades SET score='$score',feedback='$feedback' WHERE userid='$cuserid' AND gradetype='offline' AND gradetypeid='{$_GET['gbitem']}'";
 						$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE userid=:userid AND gradetype='offline' AND gradetypeid=:gradetypeid");
 						$stm->execute(array(':score'=>$score, ':feedback'=>$feedback, ':userid'=>$cuserid, ':gradetypeid'=>$_GET['gbitem']));
 						$successes++;
 					} else {
-						//DB $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
-						//DB $query .= "('offline','{$_GET['gbitem']}','$cuserid','$score','$feedback')";
 						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 						$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':gradetype'=>'offline', ':gradetypeid'=>$_GET['gbitem'], ':userid'=>$cuserid, ':score'=>$score, ':feedback'=>$feedback));
 						$successes++;
 					}
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				} else {
 					$failures[] = $data[$usercol];
 				}

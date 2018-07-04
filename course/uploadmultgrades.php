@@ -33,9 +33,6 @@ if (!(isset($teacherid))) {
 			echo "File is missing!";
 			exit;
 		}
-		//DB $query = "SELECT imas_users.id,imas_users.SID FROM imas_users JOIN imas_students ON imas_students.userid=imas_users.id WHERE imas_students.courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT imas_users.id,imas_users.SID FROM imas_users JOIN imas_students ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -57,10 +54,6 @@ if (!(isset($teacherid))) {
 			$gbcat = $_POST["colgbcat$col"];
 			if ($_POST["coloverwrite$col"]>0) {
 				//we're going to check that this id really belongs to this course.  Don't want cross-course hacking :)
-				//DB $query = "SELECT id FROM imas_gbitems WHERE id='{$_POST["coloverwrite$col"]}' AND courseid='$cid'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
-					//DB $gbitemid[$col] = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT id FROM imas_gbitems WHERE id=:id AND courseid=:courseid");
 				$stm->execute(array(':id'=>$_POST["coloverwrite$col"], ':courseid'=>$cid));
 				if ($stm->rowCount()>0) {
@@ -72,14 +65,10 @@ if (!(isset($teacherid))) {
 					continue;
 				}
 			}
-			//DB $query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
-			//DB $query .= "('$cid','$name','$pts',$showdate,'$gbcat','$cnt',0) ";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
 			$query .= "(:courseid, :name, :points, :showdate, :gbcategory, :cntingb, :tutoredit) ";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':name'=>$name, ':points'=>$pts, ':showdate'=>$showdate, ':gbcategory'=>$gbcat, ':cntingb'=>$cnt, ':tutoredit'=>0));
-			//DB $gbitemid[$col] = mysql_insert_id();
 			$gbitemid[$col] = $DBH->lastInsertId();
 		}
 		$adds = array();
@@ -101,7 +90,6 @@ if (!(isset($teacherid))) {
 					$fbcol = $_POST["colfeedback$col"];
 					$feedback = '';
 					if (trim($fbcol)!='' && intval($fbcol)>0) {
-						//DB $feedback = addslashes($line[intval($fbcol)-1]);
 						$feedback = Sanitize::incomingHtml($line[intval($fbcol)-1]);
 					}
 					if (trim($line[$col])=='' || $line[$col] == '-') {
@@ -119,7 +107,6 @@ if (!(isset($teacherid))) {
 					if (isset($gradestodel[$col])) {
 						$gradestodel[$col][] = $stu;
 					}
-					//DB $adds[] = "('offline',$gid,$stu,$score,'$feedback')";
 					$adds[] = "('offline',?,?,?,?)";
 					array_push($addsvals, $gid,$stu,$score,$feedback);
 				}
@@ -129,17 +116,12 @@ if (!(isset($teacherid))) {
 			foreach ($gradestodel as $col=>$stus) {
 				if (count($stus)>0) {
 					$stulist = implode(',', array_map('intval', $stus));
-					//DB $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid={$gbitemid[$col]} AND userid IN ($stulist)";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid AND userid IN ($stulist)");
 					$stm->execute(array(':gradetypeid'=>$gbitemid[$col]));
 				}
 			}
 			//now we load in the data!
 			if (count($adds)>0) {
-				//DB $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
-				//DB $query .= implode(',',$adds);
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ".implode(',',$adds);
 				$stm = $DBH->prepare($query);
 				$stm->execute($addsvals);
@@ -200,16 +182,8 @@ if (!(isset($teacherid))) {
 					}
 				}
 				//look to see if any of these names have been used before
-				//DB foreach ($names as $k=>$n) {
-					//DB //prep for db use
-					//DB $names[$k] = addslashes($n);
-				//DB }
-				//DB $namelist = "'".implode("','",$names)."'";
 				if (count($names)>0) {
 					$query_placeholders = Sanitize::generateQueryPlaceholders($names);
-					//DB $query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB while ($row = mysql_fetch_row($result)) {
 					$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($query_placeholders) AND courseid=?");
 					$stm->execute(array_merge($names, array($cid)));
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -271,13 +245,9 @@ if ($overwriteBody==1) {
 		</thead>
 		<tbody>
 	<?php
-		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbcatoptions = '<option value="0" selected=1>Default</option>';
-		//DB if (mysql_num_rows($result)>0) {
-			//DB while ($row = mysql_fetch_row($result)) {
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$gbcatoptions .= "<option value=\"".Sanitize::onlyInt($row[0])."\">".Sanitize::encodeStringForDisplay($row[1])."</option>\n";

@@ -33,7 +33,6 @@
 	}
 
 	if (isset($_POST['remove'])) {
-		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$goodmsgs = array();
 		foreach ($_POST['checked'] as $msgid) {
 			if (in_numeric($msgid) && $msgid!=0) {
@@ -43,12 +42,9 @@
 		$checklist = implode(',', $goodmsgs);
 		//TODO: check courseid on these msgs against teacher courses
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist)";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
 	if (isset($_GET['removeid'])) {
-		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}'";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['removeid']));
 	}
@@ -62,13 +58,6 @@
 	}
 	echo "&gt; <a href=\"msglist.php?cid=$cid\">Message List</a> &gt; Student Messages</div>";
 	echo '<div id="headerallstumsglist" class="pagetitle"><h1>All Student Messages</h1></div>';
-
-	//DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE courseid='$cid' AND (isread<2 OR isread>3)";
-	//DB if ($filterstu>0) {
-	//DB	$query .= " AND msgto='$filterstu'";
-	//DB }
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB $numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	if ($filterstu>0) {
 		$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE courseid=:courseid AND (isread<2 OR isread>3) AND msgto=:msgto");
 		$stm->execute(array(':courseid'=>$cid, ':msgto'=>$filterstu));
@@ -138,11 +127,6 @@ function chgfilter() {
 		echo "selected=1 ";
 	}
 	echo ">All students</option>";
-	//DB $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_students WHERE ";
-	//DB $query .= "imas_students.userid=imas_users.id AND imas_students.courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB $stulist = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_students WHERE ";
 	$query .= "imas_students.userid=imas_users.id AND imas_students.courseid=:courseid";
 	$stm = $DBH->prepare($query);
@@ -157,11 +141,6 @@ function chgfilter() {
 		echo " >" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</option>";
 	}
 	echo "</select></p>";
-
-	//DB $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_teachers WHERE ";
-	//DB $query .= "imas_teachers.userid=imas_users.id AND imas_teachers.courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_teachers WHERE ";
 	$query .= "imas_teachers.userid=imas_users.id AND imas_teachers.courseid=:courseid";
 	$stm = $DBH->prepare($query);
@@ -180,14 +159,6 @@ function chgfilter() {
 	</thead>
 	<tbody>
 <?php
-	//DB $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_msgs.msgto,imas_msgs.msgfrom,imas_msgs.isread,imas_courses.name ";
-	//DB $query .= "FROM imas_msgs,imas_courses WHERE imas_courses.id=imas_msgs.courseid AND ";
-	//DB $query .= "(imas_msgs.isread<2 OR imas_msgs.isread>3) AND imas_msgs.courseid='$cid' ";
-	//DB if ($filterstu>0) {
-	//DB 	$query .= "AND imas_msgs.msgto='$filterstu'";
-	//DB }
-	//DB $query .= "ORDER BY senddate DESC ";
-	//DB $query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
 	$offset = ($page-1)*$threadsperpage;
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_msgs.msgto,imas_msgs.msgfrom,imas_msgs.isread,imas_courses.name ";
 	$query .= "FROM imas_msgs,imas_courses WHERE imas_courses.id=imas_msgs.courseid AND ";
@@ -202,13 +173,9 @@ function chgfilter() {
 	} else {
 		$stm->execute(array(':courseid'=>$cid));
 	}
-
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	if ($stm->rowCount()==0) {
 		echo "<tr><td></td><td>No messages</td><td></td></tr>";
 	}
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';

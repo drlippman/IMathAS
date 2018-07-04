@@ -87,9 +87,6 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$sel2 = array();
 
 	if (!empty($diagId)) {
-		//DB $query = "SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id='{$_POST['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id=:id");
 		$stm->execute(array(':id'=>$diagId));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -114,13 +111,8 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$page_selectLabelList[$k] = array();
 		$page_selectName[$k] = "aid" . $k;
 		$i=0;
-
-		//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='{$_POST['cid']}'";
-		//DB $result = mysql_query($query);
 		$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$courseId));
-
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_selectValList[$k][$i] = $row[0];
 			$page_selectLabelList[$k][$i] = $row[1];
@@ -172,12 +164,6 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$sel2list = implode(';',$sel2);
 
 	if (isset($_POST['id']) && $_POST['id'] != 0) {
-		//DB $query = "UPDATE imas_diags SET ";
-		//DB $query .= "name='{$_POST['diagname']}',cid='{$_POST['cid']}',term='{$_POST['term']}',public='{$_POST['public']}',";
-		//DB $query .= "ips='{$_POST['iplist']}',pws='{$_POST['pwlist']}',idprompt='{$_POST['idprompt']}',sel1name='{$_POST['sel1name']}',";
-		//DB $query .= "sel1list='{$_POST['sel1list']}',aidlist='$aidlist',sel2name='{$_POST['sel2name']}',sel2list='$sel2list',entryformat='{$_POST['entryformat']}',forceregen='$forceregen',reentrytime='{$_POST['reentrytime']}' ";
-		//DB $query .= " WHERE id='{$_POST['id']}'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "UPDATE imas_diags SET ";
 		$query .= "name=:name,cid=:cid,term=:term,public=:public,ips=:ips,pws=:pws,idprompt=:idprompt,sel1name=:sel1name,";
 		$query .= "sel1list=:sel1list,aidlist=:aidlist,sel2name=:sel2name,sel2list=:sel2list,entryformat=:entryformat,forceregen=:forceregen,reentrytime=:reentrytime ";
@@ -190,10 +176,6 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$id = Sanitize::onlyInt($_POST['id']);
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
 	} else {
-		//DB $query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime) VALUES ";
-		//DB $query .= "('$userid','{$_POST['diagname']}','{$_POST['cid']}','{$_POST['term']}','{$_POST['public']}','{$_POST['iplist']}','{$_POST['pwlist']}','{$_POST['idprompt']}','{$_POST['sel1name']}','{$_POST['sel1list']}','$aidlist','{$_POST['sel2name']}','$sel2list','{$_POST['entryformat']}','$forceregen','{$_POST['reentrytime']}')";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $id = mysql_insert_id();
 		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime) VALUES ";
 		$query .= "(:ownerid, :name, :cid, :term, :public, :ips, :pws, :idprompt, :sel1name, :sel1list, :aidlist, :sel2name, :sel2list, :entryformat, :forceregen, :reentrytime)";
 		$stm = $DBH->prepare($query);
@@ -209,9 +191,6 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 
 } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
 	if (isset($_GET['id'])) {
-		//DB $query = "SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id=:id");
 		$stm->execute(array(':id'=>$diagId));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -257,11 +236,6 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$entrytype = chr(ord($entrytype)+2);
 		$entrynotunique = true;
 	}
-
-
-	//DB $query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
-	//DB $query .= "AND imas_teachers.userid='$owner' ORDER BY imas_courses.name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
 	$query .= "AND imas_teachers.userid=:userid ORDER BY imas_courses.name";
 	$stm = $DBH->prepare($query);
@@ -269,7 +243,6 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 
 	$i=0;
 	$page_courseSelectList = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_courseSelectList['val'][$i]=$row[0];
 		$page_courseSelectList['label'][$i]=$row[1];

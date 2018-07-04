@@ -59,12 +59,8 @@
 	if ($isteacher && isset($_GET['asid'])) {
 		$testid = Sanitize::onlyInt($_GET['asid']);
 	} else {
-		//DB $testid = addslashes($sessiondata['sessiontestid']);
 		$testid = $sessiondata['sessiontestid'];
 	}
-	//DB $query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -98,9 +94,6 @@
 
 	if ($isteacher) {
 		if ($line['userid']!=$userid) {
-			//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$line['userid']));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -108,10 +101,6 @@
 		}
 		$userid= $line['userid'];
 	}
-
-	//DB $query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	//DB $testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$line['assessmentid']));
 	$testsettings = $stm->fetch(PDO::FETCH_ASSOC);
@@ -120,9 +109,6 @@
 	$now = time();
 	$isreview = false;
 	if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
-		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
-		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result2);
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$line['assessmentid']));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
@@ -263,9 +249,6 @@
 		}
 		echo '<div class="nobreak printqwrap">';
 		if (isset($_GET['descr'])) {
-			//DB $query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
-			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			//DB echo '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
 			$stm = $DBH->prepare("SELECT description FROM imas_questionset WHERE id=:id");
 			$stm->execute(array(':id'=>$qsetid));
 			echo '<div>ID:'.Sanitize::onlyInt($qsetid).', '.Sanitize::encodeStringForDisplay($stm->fetchColumn(0)).'</div>';

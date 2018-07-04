@@ -260,10 +260,6 @@ class OAuthRequest {
       	      !empty($parameters['ext_lms']) && substr($parameters['ext_lms'],0,3)=='bb-') {
       	      $parameters['resource_link_description'] = str_replace('><br><',">\r\n<",$parameters['resource_link_description']);
       }
-      
-      //DB foreach ($parameters as $k=>$v) { //because IMathAS addslashes everything
-      //DB 	      $parameters[$k] = stripslashes($v);
-      //DB }
 
       // We have a Authorization-header with OAuth data. Parse the header
       // and add those overriding any duplicates from GET or POST

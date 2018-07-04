@@ -25,14 +25,10 @@
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h1>", _('Available Diagnostics'), "</h1></div>
 		<ul class=\"nomark\">";
-		//DB $query = "SELECT id,name FROM imas_diags WHERE public=3 OR public=7";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query("SELECT id,name FROM imas_diags WHERE public=3 OR public=7");
-		//DB if (mysql_num_rows($result)==0) {
 		if ($stm->rowCount()==0) {
 			echo "<li>", _('No diagnostics are available through this page at this time'), "</li>";
 		}
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			echo "<li><a href=\"$imasroot/diag/index.php?id=" . Sanitize::onlyInt($row[0]) . "\">".Sanitize::encodeStringForDisplay($row[1])."</a></li>";
 		}
@@ -41,10 +37,6 @@
 		exit;
 	}
 	$diagid = Sanitize::onlyInt($_GET['id']);
-
-	//DB $query = "SELECT * from imas_diags WHERE id='$diagid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT * from imas_diags WHERE id=:id");
 	$stm->execute(array(':id'=>$diagid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -83,16 +75,10 @@
 			}
 		}
 	}
-
-	//DB $query = "SELECT sessiondata FROM imas_sessions WHERE sessionid='$sessionid'";
-	//DB $result =  mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT sessiondata FROM imas_sessions WHERE sessionid=:sessionid");
 	$stm->execute(array(':sessionid'=>$sessionid));
 	//if (isset($sessiondata['mathdisp'])) {
-	//DB if (mysql_num_rows($result)>0) {
 	if ($stm->rowCount()>0) {
-	   //DB $query = "DELETE FROM imas_sessions WHERE sessionid='$sessionid'";
-	   //DB mysql_query($query) or die("Query failed : " . mysql_error());
 	   $stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=:sessionid");
 	   $stm->execute(array(':sessionid'=>$sessionid));
 	   $sessiondata = array();
@@ -172,7 +158,6 @@ if (isset($_POST['SID'])) {
 	foreach ($superpw as $k=>$v) {
 		$superpw[$k] = strtolower($v);
 	}
-	//DB $diagSID = $_POST['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
 	$diagSID = $_POST['SID'].'~'.$diagqtr.'~'.$pcid;
 	if ($entrynotunique) {
 		$diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
@@ -182,33 +167,23 @@ if (isset($_POST['SID'])) {
 	}
 	if (!$noproctor) {
 		if (!in_array(strtolower($_POST['passwd']),$basicpw) && !in_array(strtolower($_POST['passwd']),$superpw)) {
-			//DB $query = "SELECT id,goodfor FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("SELECT id,goodfor FROM imas_diag_onetime WHERE code=:code AND diag=:diag");
 			$stm->execute(array(':code'=>strtoupper($_POST['passwd']), ':diag'=>$diagid));
 			$passwordnotfound = false;
-			//DB if (mysql_num_rows($result)>0) {
 			if ($stm->rowCount()>0) {
-				//DB $row = mysql_fetch_row($result);
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row[1]==0) {  //onetime
-					//DB $query = "DELETE FROM imas_diag_onetime WHERE id={$row[0]}";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("DELETE FROM imas_diag_onetime WHERE id=:id");
 					$stm->execute(array(':id'=>$row[0]));
 				} else { //set time expiry
 					$now = time();
 					if ($row[1]<100000000) { //is time its good for - not yet used
 						$expiry = $now + $row[1]*60;
-						//DB $query = "UPDATE imas_diag_onetime SET goodfor=$expiry WHERE id={$row[0]}";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 						$stm = $DBH->prepare("UPDATE imas_diag_onetime SET goodfor=:goodfor WHERE id=:id");
 						$stm->execute(array(':goodfor'=>$expiry, ':id'=>$row[0]));
 					} else if ($now<$row[1]) {//is expiry time and we're within it
 						//alls good
 					} else { //past expiry
-						//DB $query = "DELETE FROM imas_diag_onetime WHERE id={$row[0]}";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 						$stm = $DBH->prepare("DELETE FROM imas_diag_onetime WHERE id=:id");
 						$stm->execute(array(':id'=>$row[0]));
 						$passwordnotfound = true;
@@ -218,9 +193,6 @@ if (isset($_POST['SID'])) {
 				$passwordnotfound = true;
 			}
 			if ($passwordnotfound) {
-				//DB $query = "SELECT password FROM imas_users WHERE SID='$diagSID'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)>0 && strtoupper(mysql_result($result,0,0))==strtoupper($_POST['passwd'])) {
 				$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
 				$stm->execute(array(':SID'=>$diagSID));
 				if ($stm->rowCount()>0 && strtoupper($stm->fetchColumn(0))==strtoupper($_POST['passwd'])) {
@@ -234,11 +206,6 @@ if (isset($_POST['SID'])) {
 	}
 	$cnt = 0;
 	$now = time();
-
-	//DB $query = "SELECT id FROM imas_users WHERE SID='$diagSID'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
-		//DB $userid = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 	$stm->execute(array(':SID'=>$diagSID));
 	if ($stm->rowCount()>0) {
@@ -247,9 +214,6 @@ if (isset($_POST['SID'])) {
 		if (!in_array(strtolower($_POST['passwd']),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
-			//DB $query = "SELECT id,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid'";
-			//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($r2)>0) {
 			$stm2 = $DBH->prepare("SELECT id,starttime FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 			$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
 			if ($stm2->rowCount()>0) {
@@ -257,7 +221,6 @@ if (isset($_POST['SID'])) {
 					echo _("You've already taken this diagnostic."), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Back'), "</a>\n";
 					exit;
 				} else {
-					//DB $d = mysql_fetch_row($r2);
 					$d = $stm2->fetch(PDO::FETCH_NUM);
 					$now = time();
 					if ($now - $d[1] > 60*$line['reentrytime']) {
@@ -281,21 +244,14 @@ if (isset($_POST['SID'])) {
 			} else {
 				$tzname = '';
 			}
-			//DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
 			$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessiondata'=>$enc));
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
 			if ((intval($line['forceregen']) & (1<<intval($_POST['course'])))>0) {
-				//DB $query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid' LIMIT 1";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
 				$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
 			}
-
-			//DB $query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
-		 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 			$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
@@ -310,11 +266,6 @@ if (isset($_POST['SID'])) {
 	}
 
 	$eclass = $sel1[$_POST['course']] . '@' . $_POST['teachers'];
-
-	//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
-	//DB $query .= "VALUES ('$diagSID','{$_POST['passwd']}',10,'{$_POST['firstname']}','{$_POST['lastname']}','$eclass',$now);";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $userid = mysql_insert_id();
 	$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
 	$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :lastaccess);";
 	$stm = $DBH->prepare($query);
@@ -323,8 +274,6 @@ if (isset($_POST['SID'])) {
 	}
 	$stm->execute(array(':SID'=>$diagSID, ':password'=>$_POST['passwd'], ':rights'=>10, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$eclass, ':lastaccess'=>$now));
 	$userid = $DBH->lastInsertId();
-	//DB $query = "INSERT INTO imas_students (userid,courseid,section) VALUES ('$userid','$pcid','{$_POST['teachers']}');";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	if (!isset($_POST['timelimitmult'])) {
 		$_POST['timelimitmult'] = 1;
 	}
@@ -341,8 +290,6 @@ if (isset($_POST['SID'])) {
 	} else {
 		$tzname = '';
 	}
-	//DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
 	$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessiondata'=>$enc));
 	$aids = explode(',',$line['aidlist']);

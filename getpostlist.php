@@ -15,16 +15,12 @@
 		//setcookie('remoteaccess',$keyString, time()+60*60*24*30*365*10,'','',true,true);
 	}
 	//look up user
-	//DB $query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE remoteaccess=:remoteaccess");
 	$stm->execute(array(':remoteaccess'=>$keyString));
 	if ($stm->rowCount()==0) {
 		echo "Access key invalid";
 		exit;
 	}
-	//DB $userid = mysql_result($result,0,0);
 	$userid = $stm->fetchColumn(0);
   $tzoffset = Sanitize::onlyInt($_GET['tzoffset']);
 	$now = time();
@@ -62,15 +58,6 @@
 	$lastpost = array();
 	$forumcourse = array();
 	if ($_GET['limit'] != 'take') {//teach or all
-		//DB $query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
-		//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-		//DB $query .= "JOIN imas_teachers ON imas_forums.courseid=imas_teachers.courseid AND imas_teachers.userid='$userid' ";
-		//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
-		//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-    //DB // $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
-		//DB $query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
     $query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
 		$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 		$query .= "JOIN imas_teachers ON imas_forums.courseid=imas_teachers.courseid AND imas_teachers.userid=:userid ";
@@ -101,15 +88,6 @@
 		}
 	}
 	if ($_GET['limit'] != 'teach') {  //take or all
-		//DB $query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
-		//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-		//DB $query .= "JOIN imas_students ON imas_forums.courseid=imas_students.courseid AND imas_students.userid='$userid' ";
-		//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
-		//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-		//DB $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
-		//DB $query .= "ORDER BY imas_forum_threads.lastposttime DESC LIMIT 30";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$query = "SELECT imas_forums.courseid, imas_forums.name, imas_forums.id, imas_forum_threads.id as tid, imas_forum_threads.lastposttime FROM imas_forum_threads ";
 		$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 		$query .= "JOIN imas_students ON imas_forums.courseid=imas_students.courseid AND imas_students.userid=:userid ";
@@ -143,9 +121,6 @@
 
 	$coursenames = array();
 	$cidlist = implode(',',array_keys($courseforums));
-	//DB $query = "SELECT id,name FROM imas_courses WHERE id IN ($cidlist)";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
   //we know $cidlist is all integers from the database, so this is safe
 $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 	$stm->execute(array(':cidlist'=>$cidlist));
@@ -155,9 +130,6 @@ $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 	asort($coursenames);
 	if (count($lastpost)>0) {
 		$threadids = implode(',',array_keys($lastpost));
-		//DB $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
-		//DB $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadids) ORDER BY imas_forum_posts.postdate DESC";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
     //we know $threadids is all integers from the database, so this is safe
 		$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
 		$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN (:threadids) ORDER BY imas_forum_posts.postdate DESC";
@@ -166,7 +138,6 @@ $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 		$lastforum = '';
 		$lastcourse = '';
 		$forumcontent = array();
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($forumcontent[$line['forumid']])) {
 				$forumcontent[$line['forumid']] = '';
@@ -199,13 +170,6 @@ $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 	} else {
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; margin-below:5px;'>No New Posts</div>";
 	}
-
-
-	//DB $query = "SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_users.FirstName,imas_users.LastName ";
-	//DB $query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgto='$userid' AND imas_msgs.msgfrom=imas_users.id ";
-	//DB $query .= "AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ORDER BY imas_msgs.senddate DESC";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
 	$query = "SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_users.FirstName,imas_users.LastName ";
 	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgto=:msgto AND imas_msgs.msgfrom=imas_users.id ";
 	$query .= "AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ORDER BY imas_msgs.senddate DESC";
@@ -219,7 +183,6 @@ $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 		echo "<div style='font-size:100%; font-weight: 700; background-color: #ccf; '>No New Messages</div>";
     $intable = false;
 	}
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$n = 0;
 		if (trim($line['title'])=='') {

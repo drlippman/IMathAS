@@ -7,10 +7,8 @@ if ($myrights<100) {
 }
 
 if (empty($_POST['from']) || empty($_POST['to'])) {
-	//DB $query = "SELECT id, LastName, FirstName, SID, lastaccess FROM imas_users WHERE rights>11 ORDER BY LastName, FirstName";
 	$stm = $DBH->query("SELECT id, LastName, FirstName, SID, lastaccess FROM imas_users WHERE rights>11 ORDER BY LastName, FirstName");
 	$ops = '';
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$ops .= '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[2]).' ('.Sanitize::encodeStringForDisplay($row[3]).') '.Sanitize::encodeStringForDisplay(tzdate('n/j/y',$row[4])).'</option>';
 	}

@@ -26,29 +26,20 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['read']) && count($_POST['checked'])>0) {
-		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
 	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
-		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
 	if (isset($_GET['removeid'])) {
-		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&4)=4";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND (isread&4)=4");
 		$stm->execute(array(':id'=>$_GET['removeid']));
-		//DB $query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id='{$_GET['removeid']}'";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=(isread|2) WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['removeid']));
 	}
@@ -72,12 +63,6 @@
 	<input type=submit name="remove" value="Delete">
 
 <?php
-	//DB $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
-	//DB $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-	//DB $query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&3)=0 ";
-	//DB $query .= "ORDER BY imas_courses.name, senddate DESC ";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_courses.id AS cid ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
 	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread&3)=0 ";
@@ -88,7 +73,6 @@
 		echo "<p>No new messages</p>";
 	} else {
 		$lastcourse = '';
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		    $line['title'] = Sanitize::encodeStringForDisplay($line['title']);
 			if ($line['name']!=$lastcourse) {

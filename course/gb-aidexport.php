@@ -80,14 +80,9 @@ if (isset($_POST['options'])) {
 	if (isset($_POST['la'])) { $dola = true; $outcol++;}
 
 	//get assessment info
-	//DB $query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT defpoints,name,itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($defpoints, $assessname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
-	//DB $defpoints = mysql_result($result,0,0);
-	//DB $assessname = mysql_result($result,0,1);
-	//DB $itemorder = mysql_result($result,0,2);
 	$itemarr = array();
 	$itemnum = array();
 	foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -108,9 +103,6 @@ if (isset($_POST['options'])) {
 	//get question info
 	$qpts = array();
 	$qsetids = array();
-	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid=:assessmentid");
 	$stm->execute(array(':assessmentid'=>$aid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -129,9 +121,6 @@ if (isset($_POST['options'])) {
 		require_once("../assessment/mathphp2.php");
 		require("../assessment/interpret5.php");
 		require("../assessment/macros.php");
-		//DB $query = "SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 
 		$query_placeholders = Sanitize::generateQueryPlaceholders(array_values($qsetids));
 		$stm = $DBH->prepare("SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($query_placeholders)"); //INT vals from DB
@@ -194,10 +183,6 @@ if (isset($_POST['options'])) {
 	}
 
 	//create row headers
-	//DB $query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
-	//DB $query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid' ";
-	//DB $query .= "ORDER BY iu.LastName, iu.FirstName";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT iu.id,iu.FirstName,iu.LastName,imas_students.section FROM imas_users AS iu JOIN ";
 	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid ";
 	if ($hassection) {
@@ -209,7 +194,6 @@ if (isset($_POST['options'])) {
 	$stm->execute(array(':courseid'=>$cid));
 	$r = 2;
 	$sturow = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$gb[$r] = array_fill(0,count($gb[0]),'');
 		$gb[$r][0] = $row[2].', '.$row[1];
@@ -221,10 +205,6 @@ if (isset($_POST['options'])) {
 	}
 
 	//pull assessment data
-	//DB $query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
-	//DB $query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid=:courseid AND ias.assessmentid=:assessmentid";
 	$stm = $DBH->prepare($query);

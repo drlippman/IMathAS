@@ -57,10 +57,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$checked = $_POST['nchecked'];
 			foreach ($checked as $qsetid) {
-				//DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
-				//DB $query .= "VALUES ('$aid',9999,9999,9999,'$qsetid');";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $qids[] = mysql_insert_id();
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
 				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :questionsetid);";
 				$stm = $DBH->prepare($query);
@@ -68,9 +64,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$qids[] = $DBH->lastInsertId();
 			}
 			//add to itemorder
-			//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -99,11 +92,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if ($finalseg != '') {
 					$viddata[] = $finalseg;
 				}
-				//DB $viddata = addslashes(serialize($viddata));
 				$viddata = serialize($viddata);
 			}
-			//DB $query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 
@@ -130,25 +120,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
-			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			//DB $query = "DELETE FROM imas_livepoll_status WHERE assessmentid='$aid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			//DB $query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		} else {
 			$overwriteBody = 1;
-			//DB $query = "SELECT name FROM imas_assessments WHERE id={$_GET['aid']}";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $assessmentname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			$assessmentname = $stm->fetchColumn(0);
@@ -256,12 +237,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$isingroup = false;
 				$toremove = $_GET['withdraw'];
 			}
-			//DB $query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			//DB $itemorder = explode(',',mysql_result($result,0,0));
-			//DB $defpoints = mysql_result($result,0,1);
 			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			$itemorder = explode(',', $itemorder);
 
@@ -287,16 +264,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query .= ',points=0';
 			}
 			$query .= " WHERE id IN ($qidlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query($query);
 
 			//get possible points if needed
 			if ($_POST['withdrawtype']=='full' || $_POST['withdrawtype']=='groupfull') {
 				$poss = array();
 				$query = "SELECT id,points FROM imas_questions WHERE id IN ($qidlist)";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->query($query);
-				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if ($row[1]==9999) {
 						$poss[$row[0]] = $defpoints;
@@ -307,9 +281,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 
 			//update assessment sessions
-			//DB $query = "SELECT id,questions,bestscores FROM imas_assessment_sessions WHERE assessmentid='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT id,questions,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -344,8 +315,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else {
 					$slist = implode(',',$bestscores );
 				}
-				//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$slist' WHERE id='{$row[0]}'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores WHERE id=:id");
 				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row[0]));
 			}
@@ -405,11 +374,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//load filter.  Need earlier than usual header.php load
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/../filter/filter.php");
-
-	//DB $query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-	//DB $query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid' LIMIT 1";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result) > 0) {
 	$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 	$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
 	$stm = $DBH->prepare($query);
@@ -419,17 +383,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$beentaken = false;
 	}
-
-	//DB $query = "SELECT itemorder,name,defpoints,displaymethod,showhints,$intro FROM imas_assessments WHERE id='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef, $assessintro) = $stm->fetch(PDO::FETCH_NUM);
-	//DB $itemorder = mysql_result($result, 0,0);
-	//DB $page_assessmentName = mysql_result($result,0,1);
-	//DB $defpoints = mysql_result($result,0,2);
-	//DB $displaymethod = mysql_result($result,0,3);
-	//DB $showhintsdef = mysql_result($result,0,4);
 	$ln = 1;
 
 	// Format of imas_assessments.intro is a JSON representation like
@@ -597,7 +553,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['search'])) {
 			$safesearch = trim($_POST['search']);
 			$safesearch = str_replace(' and ', ' ',$safesearch);
-			//DB $search = stripslashes($safesearch);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
 			$sessiondata['lastsearch'.$cid] = $safesearch; ///str_replace(" ","+",$safesearch);
@@ -622,7 +577,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
 			$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
-			//DB $search = stripslashes($safesearch);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
@@ -641,11 +595,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			if (substr($safesearch,0,6)=='regex:') {
 				$safesearch = substr($safesearch,6);
-				//DB $searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
 				$searchlikes = "imas_questionset.description REGEXP ? AND ";
 				$searchlikevals[] = $safesearch;
 			} else if (substr($safesearch,0,3)=='id=') {
-				//DB $searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
 				$searchlikes = "imas_questionset.id=? AND ";
 				$searchlikevals = array(substr($safesearch,3));
 			} else {
@@ -653,13 +605,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$searchlikes = '';
 				foreach ($searchterms as $k=>$v) {
 					if (substr($v,0,5) == 'type=') {
-						//DB $searchlikes .= "imas_questionset.qtype='".substr($v,5)."' AND ";
 						$searchlikes .= "imas_questionset.qtype=? AND ";
 						$searchlikevals[] = substr($v,5);
 						unset($searchterms[$k]);
 					}
 				}
-				//DB $searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
 				if (count($searchterms)>0) {
 					$searchlikes .= "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
 					foreach ($searchterms as $t) {
@@ -667,7 +617,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 					if (is_numeric($safesearch)) {
-	          //DB $searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
 						$searchlikes .= "OR imas_questionset.id=?) AND ";
 						$searchlikevals[] = $safesearch;
 					} else {
@@ -703,11 +652,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (isset($CFG['AMS']['guesslib']) && count($existingq)>0) {
 				$maj = count($existingq)/2;
 				$existingqlist = implode(',', $existingq);  //pulled from database, so no quotes needed
-				//DB $query = "SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid";
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->query("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) AND deleted=0 GROUP BY libid");
 				$foundmaj = false;
-				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if ($row[1]>=$maj) {
 						$searchlibs = $row[0];
@@ -723,7 +669,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$searchlibs = $userdeflib;
 			}
 		}
-		//DB $llist = "'".implode("','",explode(',',$searchlibs))."'";
 		$llist = implode(',',array_map('intval', explode(',',$searchlibs)));
 
 		if (!$beentaken) {
@@ -734,10 +679,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$lnamesarr[0] = "Unassigned";
 				$libsortorder[0] = 0;
 			}
-
-			//DB $query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$lnamesarr[$row[1]] = $row[0];
@@ -749,10 +690,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if (isset($search) && ($searchall==0 || $searchlikes!='')) {
 				$qarr = $searchlikevals;
-				//DB $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
-				//DB $query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
-				//DB $query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
-				//DB $query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
@@ -763,7 +700,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query .= "AND imas_library_items.libid IN ($llist)"; //pre-sanitized
 				}
 				if ($searchmine==1) {
-					//DB $query .= " AND imas_questionset.ownerid='$userid'";
 					$query .= " AND imas_questionset.ownerid=?";
 					$qarr[] = $userid;
 				} else {
@@ -777,18 +713,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 				if ($search=='recommend' && count($existingq)>0) {
 					$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
-					//DB $query = "SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
-						//DB imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.ownerid
-						//DB FROM imas_questions AS a
-						//DB JOIN imas_questions AS b ON a.assessmentid = b.assessmentid
-						//DB JOIN imas_questions AS c ON b.questionsetid = c.questionsetid
-						//DB AND c.assessmentid ='$aid'
-						//DB JOIN imas_questionset  ON a.questionsetid=imas_questionset.id
-						//DB AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)
-						//DB AND imas_questionset.deleted=0
-						//DB AND imas_questionset.replaceby=0
-						//DB WHERE a.questionsetid NOT IN ($existingqlist)
-						//DB GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100";
 					$stm = $DBH->prepare("SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
 						imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.ownerid
 						FROM imas_questions AS a
@@ -806,12 +730,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$stm = $DBH->prepare($query);
 					$stm->execute($qarr);
 				}
-				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
 				if ($stm->rowCount()==0) {
 					$noSearchResults = true;
 				} else {
-					//DB $searchlimited = (mysql_num_rows($result)==300);
 					$searchlimited = ($stm->rowCount()==300);
 
 					$alt=0;
@@ -821,8 +742,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_libstouse = array();
 					$page_libqids = array();
 					$page_useavgtimes = false;
-
-					//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 					while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 						if ($newonly && in_array($line['id'],$existingq)) {
 							continue;
@@ -959,10 +878,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					//pull question useage data
 					if (count($page_questionTable)>0) {
 						$allusedqids = implode(',', array_keys($page_questionTable));
-						//DB $query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
 						$stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
-						//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-						//DB while ($row = mysql_fetch_row($result)) {
 						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 							$page_questionTable[$row[0]]['times'] = $row[1];
 						}
@@ -999,12 +915,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		if (isset($sessiondata['aidstolist'.$aid])) { //list questions
-
-			//DB $aidlist = "'".implode("','",addslashes_deep($sessiondata['aidstolist'.$aid]))."'";
 			$aidlist = implode(',', array_map('intval', $sessiondata['aidstolist'.$aid]));
-			//DB $query = "SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$aidnames[$row[0]] = $row[1];
@@ -1018,10 +929,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$x=0;
 			$page_assessmentQuestions = array();
 			foreach ($sessiondata['aidstolist'.$aid] as $aidq) {
-				//DB $query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
-				//DB $query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid='$aidq'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid=:assessmentid";
 				$stm = $DBH->prepare($query);
@@ -1029,7 +936,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if ($stm->rowCount()==0) {
 					continue;
 				}
-				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$qsetid[$row[0]] = $row[1];
 					$descr[$row[0]] = $row[2];
@@ -1042,11 +948,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				//pull question useage data
 				if (count($qsetid)>0) {
 					$allusedqids = implode(',', array_unique($qsetid));
-					//DB $query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
-					//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 					$stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
 					$qsetusecnts = array();
-					//DB while ($row = mysql_fetch_row($result)) {
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$qsetusecnts[$row[0]] = $row[1];
 					}
@@ -1103,19 +1006,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$x++;
 			}
 		} else {  //choose assessments
-
-			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $items = unserialize(mysql_result($result,0,0));
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cid));
 			$items = unserialize($stm->fetchColumn(0));
 
 			$itemassoc = array();
-			//DB $query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
-			//DB $query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid='$cid' AND ia.id<>'$aid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_assoc($result)) {
 			$query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
 			$query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid=:courseid AND ia.id<>:aid";
 			$stm = $DBH->prepare($query);

@@ -47,19 +47,15 @@ if ($myrights < 40) {
 } else {
  //data manipulation here
  //data processing for COURSES block
-	//DB $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
-	//DB $query .= "WHERE imas_courses.ownerid=imas_users.id ";
 	$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
 	$query .= "WHERE imas_courses.ownerid=imas_users.id ";
   $qarr = array();
 	if ($myrights<100) { $query .= " AND imas_courses.available<4 ";}
 	if (($myrights >= 40 && $myrights<75) || $showcourses==0) {
-    //DB $query .= " AND imas_courses.ownerid='$userid'";
     $query .= " AND imas_courses.ownerid=:ownerid";
     $qarr[':ownerid'] = $userid;
   }
 	if ($myrights >= 75 && $showcourses>0) {
-		//DB $query .= " AND imas_courses.ownerid='$showcourses'";
     $query .= " AND imas_courses.ownerid=:ownerid";
     $qarr[':ownerid'] = $showcourses;
 		$query .= " ORDER BY imas_users.LastName,imas_courses.name";
@@ -68,11 +64,8 @@ if ($myrights < 40) {
 	}
   $stm = $DBH->prepare($query);
 	$stm->execute($qarr);
-
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$page_courseList = array();
 	$i=0;
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$page_courseList[$i]['id'] = $line['id'];
 		$page_courseList[$i]['name'] = $line['name'];
@@ -92,16 +85,12 @@ if ($myrights < 40) {
 
 	//get list of teachers for the select box
 	if ($myrights==75) {
-		//DB $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid='$groupid' ORDER BY LastName,FirstName";
 		$stm = $DBH->prepare("SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid=:groupid ORDER BY LastName,FirstName");
 		$stm->execute(array(':groupid'=>$groupid));
 	} else if ($myrights==100) {
-		//DB $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
 		$stm = $DBH->query("SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName");
 	}
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$i=0;
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_teacherSelectVal[$i] = $row[0];
 		$page_teacherSelectLabel[$i] = sprintf("%s, %s (%s)", Sanitize::encodeStringForDisplay($row[1]),
@@ -113,15 +102,11 @@ if ($myrights < 40) {
 	if (($myspecialrights&4)==4 || $myrights == 100) {
 
 		if ($myrights<75) {
-      //DB $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
-			//DB $query .= " WHERE d.ownerid='$userid' ORDER BY d.name";
       $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
 			$query .= " WHERE d.ownerid=:ownerid ORDER BY d.name";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':ownerid'=>$userid));
 		} else if ($myrights<100) {
-      //DB $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
-			//DB $query .= " WHERE u.groupid='$groupid' ORDER BY d.name";
       $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
 			$query .= " WHERE u.groupid=:groupid ORDER BY d.name";
 			$stm = $DBH->prepare($query);
@@ -129,9 +114,7 @@ if ($myrights < 40) {
 		} else {
       $stm = $DBH->query("SELECT id,name,public FROM imas_diags ORDER BY name");
     }
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=0;
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_diagnosticsId[$i] = $row[0];
 			$page_diagnosticsName[$i] = $row[1];
@@ -144,31 +127,24 @@ if ($myrights < 40) {
 	//DATA PROCESSING FOR USERS BLOCK
 	if ($myrights < 100) {
 		$page_userBlockTitle = "Group - Non Students";
-		//DB $query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$groupid' ORDER BY LastName";
 		$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid=:groupid ORDER BY LastName");
 		$stm->execute(array(':groupid'=>$groupid));
 	} else {
 		if ($showusers==-1) {
 			$page_userBlockTitle = "Pending Users";
-			//DB $query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName";
 			$stm = $DBH->query("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName");
 		} else if (is_numeric($showusers)) {
 			$page_userBlockTitle = "Group Users";
-			//DB $query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
 			$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 11 AND rights<>76 AND groupid=:groupid ORDER BY LastName");
 			$stm->execute(array(':groupid'=>$showusers));
 		} else {
 			$page_userBlockTitle = "All Users - $showusers";
-			//DB $query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)='$showusers' ORDER BY LastName";
 			$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)=:showusers ORDER BY LastName");
 			$stm->execute(array(':showusers'=>$showusers));
 		}
 	}
 
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-
 	$i=0;
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$page_userDataId[$i] = $line['id'];
 		$page_userDataSid[$i] = $line['SID'];
@@ -194,11 +170,8 @@ if ($myrights < 40) {
 	$page_userSelectVal[1] = 0;
 	$page_userSelectLabel[1] = "Default";
 	$i=2;
-	//DB $query = "SELECT id,name,parent from imas_groups ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->query("SELECT id,name,parent from imas_groups ORDER BY name");
 	$groupdata = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$groupdata[$row[0]] = $row;
 	}

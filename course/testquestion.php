@@ -63,7 +63,6 @@ if ($myrights<20) {
 	if (isset($_POST['seed'])) {
 		list($score,$rawscores[$qn]) = scoreq($qn,$_GET['qsetid'],$_POST['seed'],$_POST['qn'.$qn],$attempt-1);
 		$scores[$qn] = $score;
-		//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 		$page_scoreMsg =  "<p>Score on last answer: ".Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
@@ -87,11 +86,6 @@ if ($myrights<20) {
 	if (isset($_GET['fixedseeds'])) {
 		$page_formAction .=  "&fixedseeds=1";
 	}
-
-	//DB $query = "SELECT imas_users.email,imas_questionset.* ";
-	//DB $query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $line = mysql_fetch_assoc($result);
 	$query = "SELECT imas_users.email,imas_questionset.* ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id=:id";
 	$stm = $DBH->prepare($query);
@@ -110,9 +104,6 @@ if ($myrights<20) {
 	} else {
 		$eqnhelper = 0;
 	}
-
-	//DB $query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='{$_GET['qsetid']}'";
-	//DB $resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());
 	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
 	$resultLibNames->execute(array(':qsetid'=>$_GET['qsetid']));
 }
@@ -323,7 +314,6 @@ if ($overwriteBody==1) {
 
 	echo '<p>Question is in these libraries:';
 	echo '<ul>';
-	//DB while ($row = mysql_fetch_row($resultLibNames)) {
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
 		if ($myrights==100) {

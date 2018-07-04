@@ -15,9 +15,6 @@ if (isset($teacherid)) {
 		echo 'Only students can claim a badge';
 	} else {
 		$userid = Sanitize::onlyInt($_GET['userid']);
-		//DB $query = "SELECT SID FROM imas_users WHERE id='$userid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $username = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT SID FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));
 		$username = $stm->fetchColumn(0);
@@ -33,15 +30,11 @@ if (isset($teacherid)) {
 //	echo 'You are not authorized to view this page.';
 } else {
 	$badgeid = Sanitize::onlyInt($_GET['badgeid']);
-	//DB $query = "SELECT name, requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT name, requirements FROM imas_badgesettings WHERE id=:id AND courseid=:courseid");
 	$stm->execute(array(':id'=>$badgeid, ':courseid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo 'Invalid badge ID for this course';
 	} else {
-		//DB list($name,$req) = mysql_fetch_row($result);
 		list($name,$req) = $stm->fetch(PDO::FETCH_NUM);
 		$req = unserialize($req);
 
@@ -49,15 +42,9 @@ if (isset($teacherid)) {
 		require("gbtable2.php");
 		$secfilter = -1;
 		$gbt = gbtable($userid);
-
-
-		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$gtypes = array('0'=>'Past Due', '3'=>'Past and Attempted', '1'=>'Past and Available', '2'=>'All Items');
-
-		//DB while ($row=mysql_fetch_row($result)) {
 		while ($row=$stm->fetch(PDO::FETCH_NUM)) {
 			$gbcats[$row[0]] = $row[1];
 		}

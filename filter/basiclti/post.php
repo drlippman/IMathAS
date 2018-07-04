@@ -6,9 +6,6 @@ if (empty($_GET['linkid'])) {
 	exit;
 }
 $linkid = Sanitize::onlyInt($_GET['linkid']);
-//DB $query = "SELECT text,title,points FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB list($text,$title,$points) = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT text,title,points FROM imas_linkedtext WHERE id=:id");
 $stm->execute(array(':id'=>$linkid));
 list($text,$title,$points) = $stm->fetch(PDO::FETCH_NUM);
@@ -27,17 +24,12 @@ if (isset($toolparts[3])) {
 	$gradesecret = $toolparts[6];
 }
 $tool = intval($tool);
-
-//DB $query = "SELECT * from imas_external_tools WHERE id=$tool AND (courseid='$cid' OR (courseid=0 AND (groupid='$groupid' OR groupid=0)))";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $stm = $DBH->prepare("SELECT * from imas_external_tools WHERE id=:id AND (courseid=:courseid OR (courseid=0 AND (groupid=:groupid OR groupid=0)))");
 $stm->execute(array(':id'=>$tool, ':courseid'=>$cid, ':groupid'=>$groupid));
 if ($stm->rowCount()==0) {
 	echo '<html><body>Invalid tool</body></html>';
 	exit;
 }
-//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 require_once("blti_util.php");
@@ -63,10 +55,6 @@ if (trim($linkcustom)!='') {
 		}
 	}
 }
-
-//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB list($firstname,$lastname,$email) = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$userid));
 list($firstname,$lastname,$email) = $stm->fetch(PDO::FETCH_NUM);

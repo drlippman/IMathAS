@@ -58,10 +58,6 @@
 		//check dates, determine if review
 		$aid = Sanitize::onlyInt($_GET['id']);
 		$isreview = false;
-
-		//DB $query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod FROM imas_assessments WHERE id='$aid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		//DB $adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod,id,reqscoreaid,reqscore,reqscoretype FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$adata = $stm->fetch(PDO::FETCH_ASSOC);
@@ -152,10 +148,6 @@
 					//in LTI and right item
 					list($atype,$sa) = explode('-',$adata['deffeedback']);
 					if ($sa!='N') {
-						//DB $query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' ORDER BY id LIMIT 1";
-						//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-						//DB if (mysql_num_rows($result)>0) {
-							//DB echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'" ';
 						$stm = $DBH->prepare("SELECT id FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid ORDER BY id LIMIT 1");
 						$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 						if ($stm->rowCount()>0) {
@@ -308,10 +300,6 @@
 
 		$sessiondata['istutorial'] = $adata['istutorial'];
 		$_SESSION['choicemap'] = array();
-
-		//DB $query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}' ORDER BY id DESC LIMIT 1";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT id,agroupid,lastanswers,bestlastanswers,starttime,ver FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid ORDER BY id DESC LIMIT 1");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$_GET['id']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -345,11 +333,6 @@
 
 			$stugroupid = 0;
 			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid) && !isset($tutorid)) {
-				//DB $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
-				//DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid={$adata['groupsetid']}";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
-					//DB $stugroupid = mysql_result($result,0,0);
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 				$stm = $DBH->prepare($query);
@@ -362,9 +345,6 @@
 						echo "<html><body>", _('You are not yet a member of a group.  Contact your instructor to be added to a group.'), "  <a href=\"$imasroot/course/course.php?cid=".Sanitize::courseId($_GET['cid'])."\">Back</a></body></html>";
 						exit;
 					}
-					//DB $query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB $stugroupid = mysql_insert_id();
 					$stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',:groupsetid)");
 					$stm->execute(array(':groupsetid'=>$adata['groupsetid']));
 					$stugroupid = $DBH->lastInsertId();
@@ -373,24 +353,17 @@
 					//} else {
 						$sessiondata['groupid'] = 0;  //leave as 0 to trigger adding group members
 					//}
-					//DB $query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid',$stugroupid)";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid, :stugroupid)");
 					$stm->execute(array(':userid'=>$userid, ':stugroupid'=>$stugroupid));
 				}
 
 			}
-			//DB $deffeedbacktext = addslashes($adata['deffeedbacktext']);
 			$deffeedbacktext = $adata['deffeedbacktext'];
 			if (isset($sessiondata['lti_lis_result_sourcedid']) && strlen($sessiondata['lti_lis_result_sourcedid'])>1) {
-				//DB $ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup']));
 				$ltisourcedid = $sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
 			} else {
 				$ltisourcedid = '';
 			}
-			//DB $query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid) ";
-			//DB $query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext','$ltisourcedid');";
-			//DB $result = mysql_query($query);
 			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid,ver) ";
 			$query .= "VALUES (:userid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, :agroupid, :feedback, :lti_sourcedid,2);";
 			$stm = $DBH->prepare($query);
@@ -401,31 +374,24 @@
 			if ($result===false) {
 				echo _('Error DupASID.') . ' <a href="showtest.php?cid='.$cid.'&aid='.$aid.'">' . _("Try again") . '</a>';
 			}
-			//DB $sessiondata['sessiontestid'] = mysql_insert_id();
 			$sessiondata['sessiontestid'] = $DBH->lastInsertId();
 
 			if ($stugroupid==0) {
 				$sessiondata['groupid'] = 0;
 			} else {
 				//if a group assessment and already in a group, we'll create asids for all the group members now
-				//DB $query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid=$stugroupid AND userid<>$userid";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=:stugroupid AND userid<>:userid");
 				$stm->execute(array(':stugroupid'=>$stugroupid, ':userid'=>$userid));
 				$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,ver) VALUES ";
 				$cnt = 0;
 				$insval = array();
-				//DB if (mysql_num_rows($result)>0) {
-					//DB while ($row = mysql_fetch_row($result)) {
 				if ($stm->rowCount()>0) {
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						if ($cnt>0) {$query .= ',';}
-						//DB $query .= "('{$row[0]}','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext')";
 						$query .= "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,2)";
 						array_push($insval, $row[0], $_GET['id'], $qlist, $seedlist, $scorelist, $attemptslist, $lalist, $starttime, $bestscorelist, $bestattemptslist, $bestseedslist, $bestlalist, $scorelist, $attemptslist, $reviewseedlist, $lalist, $stugroupid, $deffeedbacktext);
 						$cnt++;
 					}
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare($query);
 					$stm->execute($insval);
 				}
@@ -453,8 +419,6 @@
 			$stm->execute(array(':id'=>$_GET['cid']));
 			$courseinfo = $stm->fetch(PDO::FETCH_ASSOC);
 			$sessiondata['courseid'] = Sanitize::courseId($_GET['cid']);
-			//DB $sessiondata['coursename'] = mysql_result($result,0,0);
-			//DB $sessiondata['coursetheme'] = mysql_result($result,0,1);
 			$sessiondata['coursename'] = $courseinfo['name'];
 			if (!isset($coursetheme)) { //should already be set from validate.php
 				$coursetheme = $courseinfo['theme'];
@@ -483,8 +447,6 @@
 				require_once("../includes/filehandler.php");
 				//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$aid),1);
 				deleteasidfilesbyquery2('userid',$userid,$aid,1);
-				//DB $query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' LIMIT 1";
-				//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
 				$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=" . Sanitize::courseId($_GET['cid']) . "&id=$aid");
@@ -509,9 +471,6 @@
 				$sessiondata['groupid'] = $line['agroupid'];
 			} else if (!isset($teacherid) && !isset($tutorid)) { //isgroup>0 && agroupid==0
 				//already has asid, but broken from group
-				//DB $query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',{$adata['groupsetid']})";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $stugroupid = mysql_insert_id();
 				$stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',:groupsetid)");
 				$stm->execute(array(':groupsetid'=>$adata['groupsetid']));
 				$stugroupid = $DBH->lastInsertId();
@@ -520,14 +479,8 @@
 				} else {
 					$sessiondata['groupid'] = 0;  //leave as 0 to trigger adding group members
 				}
-
-				//DB $query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid',$stugroupid)";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid, :stugroupid)");
 				$stm->execute(array(':userid'=>$userid, ':stugroupid'=>$stugroupid));
-
-				//DB $query = "UPDATE imas_assessment_sessions SET agroupid=$stugroupid WHERE id={$line['id']}";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET agroupid=:agroupid,ver=:ver WHERE id=:id");
 				$stm->execute(array(':agroupid'=>$stugroupid, ':id'=>$line['id'], ':ver'=>$line['ver']));
 			}
@@ -546,12 +499,8 @@
 			}
 
 			if (isset($sessiondata['lti_lis_result_sourcedid'])) {
-				//DB $altltisourcedid = stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup']);
 				$altltisourcedid = $sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
 				if ($altltisourcedid != $line['lti_sourcedid']) {
-					//DB $altltisourcedid = addslashes($altltisourcedid);
-					//DB $query = "UPDATE imas_assessment_sessions SET lti_sourcedid='$altltisourcedid' WHERE id='{$line['id']}'";
-					//DB mysql_query($query) or die("Query failed : $query: " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET lti_sourcedid=:lti_sourcedid WHERE id=:id");
 					$stm->execute(array(':lti_sourcedid'=>$altltisourcedid, ':id'=>$line['id']));
 				}
@@ -570,16 +519,12 @@
 		echo "<html><body>", _('Error.  Access assessment from course page'), "</body></html>\n";
 		exit;
 	}
-	//DB $testid = addslashes($sessiondata['sessiontestid']);
 	$testid = $sessiondata['sessiontestid'];
 	$asid = $testid;
 	$isteacher = $sessiondata['isteacher'];
 	if (isset($sessiondata['actas'])) {
 		$userid = $sessiondata['actas'];
 	}
-	//DB $query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -637,15 +582,9 @@
 
 	if ($starttime == 0) {
 		$starttime = time();
-		//DB $query = "UPDATE imas_assessment_sessions SET starttime=$starttime WHERE id='$testid'";
-		//DB mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET starttime=:starttime WHERE id=:id");
 		$stm->execute(array(':starttime'=>$starttime, ':id'=>$testid));
 	}
-
-	//DB $query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	//DB $testsettings = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$line['assessmentid']));
 	$testsettings = $stm->fetch(PDO::FETCH_ASSOC);
@@ -654,17 +593,11 @@
 	}
 	if (preg_match('/ImportFrom:\s*([a-zA-Z]+)(\d+)/',$testsettings['intro'],$matches)==1) {
 		if (strtolower($matches[1])=='link') {
-			//DB $query = 'SELECT text FROM imas_linkedtext WHERE id='.intval($matches[2]);
-			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			//DB $vals = mysql_fetch_row($result);
 			$stm = $DBH->prepare('SELECT text FROM imas_linkedtext WHERE id=:id');
 			$stm->execute(array(':id'=>$matches[2]));
 			$vals = $stm->fetch(PDO::FETCH_NUM);
 			$testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
 		} else if (strtolower($matches[1])=='assessment') {
-			//DB $query = 'SELECT intro FROM imas_assessments WHERE id='.intval($matches[2]);
-			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-			//DB $vals = mysql_fetch_row($result);
 			$stm = $DBH->prepare('SELECT intro FROM imas_assessments WHERE id=:id');
 			$stm->execute(array(':id'=>$matches[2]));
 			$vals = $stm->fetch(PDO::FETCH_NUM);
@@ -707,19 +640,13 @@
 
 	//if livepoll get status
 	if ($testsettings['displaymethod']=='LivePoll') {
-		//DB $query = "SELECT curquestion,curstate,seed,startt FROM imas_livepoll_status WHERE assessmentid=".$testsettings['id'];
-		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
 		$stm = $DBH->prepare("SELECT curquestion,curstate,seed,startt FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$testsettings['id']));
 		if ($stm->rowCount()==0) {
 			$LPinf = array("curquestion"=>0, "curstate"=>0, "seed"=>0, "startt"=>0);
-			//DB $query = "INSERT INTO imas_livepoll_status (assessmentid,curquestion,curstate) VALUES ({$testsettings['id']},0,0) ON DUPLICATE KEY UPDATE curquestion=curquestion";
-			//DB mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_livepoll_status (assessmentid,curquestion,curstate) VALUES (:assessmentid, :curquestion, :curstate) ON DUPLICATE KEY UPDATE curquestion=curquestion");
 			$stm->execute(array(':assessmentid'=>$testsettings['id'], ':curquestion'=>0, ':curstate'=>0));
 		} else {
-			//DB $LPinf = mysql_fetch_assoc($result);
 			$LPinf = $stm->fetch(PDO::FETCH_ASSOC);
 		}
 		$testsettings['shuffle'] = $testsettings['shuffle'] | 4; //force all students same seed
@@ -738,9 +665,6 @@
 	}
 	$ltiexception = false;
 	if (!$actas) {
-		//DB $query = "SELECT startdate,enddate,islatepass,exceptionpenalty FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
-		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result2);
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$line['assessmentid']));
 		$exceptionrow = $stm2->fetch(PDO::FETCH_NUM);
@@ -789,9 +713,6 @@
 			}
 		}
 	} else {
-		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='{$sessiondata['actas']}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
-		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result2);
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$sessiondata['actas'], ':assessmentid'=>$line['assessmentid']));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
@@ -998,8 +919,6 @@
 			if ($now-$sessiondata['lastregen']<$sessiondata['regendelay']) {
 				$sessiondata['regendelay'] = 5;
 				echo '<html><body><p>Hey, about slowing down and trying the problem before hitting regen?  Wait 5 seconds before trying again.</p><p></body></html>';
-				//DB $query = "INSERT INTO imas_log (time,log) VALUES ($now,'Quickregen triggered by $userid')";
-				//DB mysql_query($query) or die("Query failed : $query: " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 				$stm->execute(array(':time'=>$now, ':log'=>"Quickregen triggered by $userid"));
 				if (!isset($sessiondata['regenwarnings'])) {
@@ -1008,8 +927,6 @@
 					$sessiondata['regenwarnings']++;
 				}
 				if ($sessiondata['regenwarnings']>10) {
-					//DB $query = "INSERT INTO imas_log (time,log) VALUES ($now,'Over 10 regen warnings triggered by $userid')";
-					//DB mysql_query($query) or die("Query failed : $query: " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 					$stm->execute(array(':time'=>$now, ':log'=>"Over 10 regen warnings triggered by $userid"));
 				}
@@ -1141,8 +1058,6 @@
 			require_once("../includes/filehandler.php");
 			//deleteasidfilesbyquery(array('userid'=>$userid,'assessmentid'=>$testsettings['id']),1);
 			deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
-			//DB $query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$testsettings['id']}' LIMIT 1";
-			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
 			$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$testsettings['id']));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid={$testsettings['courseid']}&id={$testsettings['id']}");
@@ -1177,8 +1092,6 @@
 
 	if (isset($CFG['GEN']['keeplastactionlog']) && isset($sessiondata['loginlog'.$testsettings['courseid']])) {
 		$now = time();
-		//DB $query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$testsettings['courseid']];
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
 		$stm->execute(array(':lastaction'=>$now, ':id'=>$sessiondata['loginlog'.$testsettings['courseid']]));
 	}
@@ -1277,9 +1190,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		}
 		$out = '';
 		if ($testsettings['msgtoinstr']==1) {
-			//DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $msgcnt = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
 			$stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 			$msgcnt = $stm->fetchColumn(0);
@@ -1315,30 +1225,20 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo '<p>', _('Group error - lost group info'), '</p>';
 			}
 			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,ver';
-
-			//DB $query = "SELECT $fieldstocopy FROM imas_assessment_sessions WHERE id='$testid'";
-			//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-			//DB $rowgrptest = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessment_sessions WHERE id=:id");
 			$stm->execute(array(':id'=>$testid));
 			$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);
-			//DB $rowgrptest = addslashes_deep($rowgrptest);
-			//DB $insrow = "'".implode("','",$rowgrptest)."'";
 			$loginfo = "$userfullname creating group. ";
 			if (isset($CFG['GEN']['newpasswords'])) {
 				require_once("../includes/password.php");
 			}
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
-					//DB $query = "SELECT password,LastName,FirstName FROM imas_users WHERE id='{$_POST['user'.$i]}'";
-					//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 					$stm = $DBH->prepare("SELECT password,LastName,FirstName FROM imas_users WHERE id=:id");
 					$stm->execute(array(':id'=>$_POST['user'.$i]));
 					$thisuser = $stm->fetch(PDO::FETCH_ASSOC);
-					//DB $thisusername = mysql_result($result,0,2) . ' ' . mysql_result($result,0,1);
 					$thisusername = $thisuser['FirstName'] . ' ' . $thisuser['LastName'];
 					if ($testsettings['isgroup']==1) {
-						//DB $actualpw = mysql_result($result,0,0);
 						$actualpw = $thisuser['password'];
 						$md5pw = md5($_POST['pw'.$i]);
 						if (!($actualpw==$md5pw || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['pw'.$i],$actualpw)))) {
@@ -1349,10 +1249,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					}
 
 					$thisuser = $_POST['user'.$i];
-					//DB $query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='{$_POST['user'.$i]}' AND assessmentid={$testsettings['id']} ORDER BY id LIMIT 1";
-					//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-					//DB if (mysql_num_rows($result)>0) {
-						//DB $row = mysql_fetch_row($result);
 					$stm = $DBH->prepare("SELECT id,agroupid FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid ORDER BY id LIMIT 1");
 					$stm->execute(array(':userid'=>$_POST['user'.$i], ':assessmentid'=>$testsettings['id']));
 					if ($stm->rowCount()>0) {
@@ -1361,19 +1257,15 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							echo "<p>", _(sprintf('%s already has a group.  No change made'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
 							$loginfo .= "$thisusername already in group. ";
 						} else {
-							//DB $query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('{$_POST['user'.$i]}','{$sessiondata['groupid']}')";
-							//DB mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid,:stugroupid)");
 							$stm->execute(array(':userid'=>$_POST['user'.$i], ':stugroupid'=>$sessiondata['groupid']));
 
 							$fieldstocopy = explode(',',$fieldstocopy);
 							$sets = array();
 							foreach ($fieldstocopy as $k=>$val) {
-								//DB $sets[] = "$val='{$rowgrptest[$k]}'";
 								$sets[] = "$val=:$val";
 							}
 							$setslist = implode(',',$sets);
-							//DB $query = "UPDATE imas_assessment_sessions SET $setslist WHERE id='{$row[0]}'";
 							$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET $setslist WHERE id=:id");
 							$stm->execute(array(':id'=>$row[0]) + $rowgrptest);
 
@@ -1382,20 +1274,14 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
 							//$query .= "bestscores='{$rowgrptest[11]}',bestlastanswers='{$rowgrptest[12]}'  WHERE id='{$row[0]}'";
 							//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
-							//DB mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							echo "<p>", _(sprintf('%s added to group, overwriting existing attempt.'), Sanitize::encodeStringForDisplay($thisusername)), "</p>";
 							$loginfo .= "$thisusername switched to group. ";
 						}
 					} else {
-						//DB $query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('{$_POST['user'.$i]}','{$sessiondata['groupid']}')";
-						//DB mysql_query($query) or die("Query failed : $query:" . mysql_error());
 						$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid,:stugroupid)");
 						$stm->execute(array(':userid'=>$_POST['user'.$i], ':stugroupid'=>$sessiondata['groupid']));
 
 						$fieldphs = ':'.implode(',:', explode(',', $fieldstocopy));
-						//DB $query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
-						//DB $query .= "VALUES ('{$_POST['user'.$i]}',$insrow)";
-						//DB mysql_query($query) or die("Query failed : $query:" . mysql_error());
 						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES (:userid,$fieldphs)";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':userid'=>$_POST['user'.$i]) + $rowgrptest);
@@ -1406,8 +1292,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 			$now = time();
 			if (isset($GLOBALS['CFG']['log'])) {
-				//DB $query = "INSERT INTO imas_log (time,log) VALUES ($now,'".addslashes($loginfo)."')";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 				$stm->execute(array(':time'=>$now, ':log'=>$loginfo));
 			}
@@ -1415,10 +1299,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo '<div id="headershowtest" class="pagetitle"><h1>', _('Select group members'), '</h1></div>';
 			if ($sessiondata['groupid']==0) {
 				//a group should already exist
-				//DB $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
-				//DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid={$testsettings['groupsetid']}";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 				$stm = $DBH->prepare($query);
@@ -1426,7 +1306,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				if ($stm->rowCount()==0) {
 					echo '<p>', _('Group error.  Please try reaccessing the assessment from the course page'), '</p>';
 				}
-				//DB $agroupid = mysql_result($result,0,0);
 				$agroupid = $stm->fetchColumn(0);
 				$sessiondata['groupid'] = $agroupid;
 				writesessiondata();
@@ -1437,10 +1316,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 			echo _('Current Group Members:'), " <ul>";
 			$curgrp = array();
-			//DB $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ";
-			//DB $query .= "imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
-			//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ";
 			$query .= "imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid=:stugroupid ORDER BY imas_users.LastName,imas_users.FirstName";
 			$stm = $DBH->prepare($query);
@@ -1452,10 +1327,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo "</ul>";
 
 			$curinagrp = array();
-			//DB $query = 'SELECT i_sgm.userid FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
-			//DB $query .= "WHERE i_sg.groupsetid={$testsettings['groupsetid']}";
-			//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$query = 'SELECT i_sgm.userid FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 			$query .= "WHERE i_sg.groupsetid=:groupsetid";
 			$stm = $DBH->prepare($query);
@@ -1466,12 +1337,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$curids = array_map('intval', $curinagrp);
 			$curids_query_placeholders = Sanitize::generateQueryPlaceholders($curids);
 			$selops = '<option value="0">' . _('Select a name..') . '</option>';
-
-			//DB $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
-			//DB $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='{$testsettings['courseid']}' ";
-			//DB $query .= "AND imas_users.id NOT IN ($curids) ORDER BY imas_users.LastName,imas_users.FirstName";
-			//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid=? ";
 			$query .= "AND imas_users.id NOT IN ($curids_query_placeholders) ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -1528,9 +1393,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	echo "<h1>{$testsettings['name']}</h1></div>\n";
 	if (isset($sessiondata['actas'])) {
 		echo '<p style="color: red;">', _('Teacher Acting as ');
-		//DB $query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$sessiondata['actas']}'";
-		//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT LastName, FirstName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$sessiondata['actas']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -1817,7 +1679,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					$done = true;
 				}
 			} else if (isset($_GET['to'])) {
-				//DB $toshow = addslashes($_GET['to']);
 				$toshow = $_GET['to'];
 				$done = false;
 			}
@@ -2486,9 +2347,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$aid = $testsettings['id'];
 			$seed = Sanitize::onlyInt($_GET['seed']);
 			$startt = $_GET['startt'];
-
-			//DB $query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate=2,seed='$seed',startt='$startt' WHERE assessmentid='$aid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=2,seed=:seed,startt=:startt WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':curquestion'=>$qn, ':seed'=>$seed, ':startt'=>$startt, ':assessmentid'=>$aid));
 
@@ -2532,9 +2390,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			if (isset($CFG['GEN']['livepollpassword'])) {
 				$livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($aid.$qn . $newstate. $CFG['GEN']['livepollpassword'] . $now,true)));
 			}
-
-			//DB $query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate='$newstate' WHERE assessmentid='$aid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=:curstate WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':curquestion'=>$qn, ':curstate'=>$newstate, ':assessmentid'=>$aid));
 
@@ -2590,9 +2445,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 				$out["anstypes"] = implode(',',$anstypes);
 				$out["seed"] = $seeds[$qn];
-
-				//DB $query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate=1 WHERE assessmentid=".$testsettings['id'];
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=1 WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':curquestion'=>$qn, ':assessmentid'=>$testsettings['id']));
 
@@ -2669,12 +2521,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$testsettings['intro'] .= "<p><span class=noticetext >" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
 			if (!$isteacher || isset($sessiondata['actas'])) {
 				$testsettings['intro'] .= _('Group Members:') . " <ul>";
-
-				//DB $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
-				//DB $query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ";
-				//DB $query .= "AND imas_assessment_sessions.assessmentid='{$testsettings['id']}' ORDER BY imas_users.LastName,imas_users.FirstName";
-				//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
 				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
 				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid=:agroupid ";
 				$query .= "AND imas_assessment_sessions.assessmentid=:assessmentid ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -3155,9 +3001,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo ' <div id="livepollrcontent" style="display:none"></div></div>';
 				echo '</div>';
 				//pull any existing result data
-				//DB $query = "SELECT userid,bestscores,bestlastanswers FROM imas_assessment_sessions WHERE assessmentid='{$testsettings['id']}'";
-				//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
 				$LPdata = array();
 				$stm = $DBH->prepare("SELECT userid,bestscores,bestlastanswers FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$testsettings['id']));
@@ -3605,9 +3448,6 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 		if ($isdiag) {
 			global $userid;
-			//DB $query = "SELECT * from imas_users WHERE id='$userid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $userinfo = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * from imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$userinfo = $stm->fetch(PDO::FETCH_ASSOC);

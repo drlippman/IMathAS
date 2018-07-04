@@ -204,10 +204,6 @@ $aidtotalpossible = array();
 function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 	global $DBH, $aidtotalpossible;
 	if (!isset($aidtotalpossible[$aid])) {
-		//DB $query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
-		//DB $res= mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB $aitems = explode(',',mysql_result($res,0,0));
-		//DB $defpoints = mysql_result($res,0,1);
 		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -239,10 +235,6 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				if (isset($testsettings) && isset($testsettings['ltisecret'])) {
 					$secret = $testsettings['ltisecret'];
 				} else {
-					//DB $query = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
-					//DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
-					//DB if (mysql_num_rows($res)>0) {
-						//DB $secret = mysql_result($res,0,0);
 					$stm = $DBH->prepare("SELECT ltisecret FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$aid));
 					if ($stm->rowCount()>0) {
@@ -262,10 +254,6 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				//change to use launched key rather than key from course in case someone uses material
 				//from multiple imathas courses in one LMS course.
 				$keyparts = explode('_',$ltikey);
-				//DB $query = "SELECT ltisecret FROM imas_courses WHERE id=".intval($keyparts[1]);
-				//DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
-				//DB if (mysql_num_rows($res)>0) {
-					//DB $secret = mysql_result($res,0,0);
 				$stm = $DBH->prepare("SELECT ltisecret FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$keyparts[1]));
 				if ($stm->rowCount()>0) {
@@ -277,19 +265,12 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				}
 			} else {
 				if (isset($sessiondata['lti_origkey'])) {
-					//DB $query = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76 OR rights=77)";
-          //DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
 					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
 					$stm->execute(array(':SID'=>$sessiondata['lti_origkey']));
 				} else {
-					//DB $query = "SELECT password FROM imas_users WHERE SID='".addslashes($ltikey)."' AND (rights=11 OR rights=76 OR rights=77)";
-          //DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
 					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
 					$stm->execute(array(':SID'=>$ltikey));
 				}
-
-				//DB if (mysql_num_rows($res)>0) {
-					//DB $secret = mysql_result($res,0,0);
 				if ($stm->rowCount()>0) {
 					$secret = $stm->fetchColumn(0);
 					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;

@@ -32,33 +32,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		require_once("../includes/filehandler.php");		
 
 		$DBH->beginTransaction();
-
-		//DB $query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='LinkedText' AND courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $itemid = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='LinkedText' AND courseid=:courseid");
 		$stm->execute(array(':typeid'=>$textid, ':courseid'=>$cid));
 		if ($stm->rowCount()>0) {
 			$itemid = $stm->fetchColumn(0);
-
-			//DB $query = "DELETE FROM imas_items WHERE id='$itemid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
 			$stm->execute(array(':id'=>$itemid));
-
-			//DB $query = "SELECT text,points FROM imas_linkedtext WHERE id='$textid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT text,points FROM imas_linkedtext WHERE id=:id");
 			$stm->execute(array(':id'=>$textid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$text = trim($row[0]);
 			$points = $row[1];
 			if (substr($text,0,5)=='file:') { //delete file if not used
-				//DB $safetext = addslashes($text);
-				//DB $query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)==1) {
 				$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
 				$stm->execute(array(':text'=>$text));
 				if ($stm->rowCount()==1) {
@@ -71,20 +56,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if ($points>0) {
-				//DB $query = "DELETE FROM imas_grades WHERE gradetypeid='$textid' AND gradetype='exttool'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
 				$stm->execute(array(':gradetypeid'=>$textid));
 			}
-
-			//DB $query = "DELETE FROM imas_linkedtext WHERE id='$textid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_linkedtext WHERE id=:id");
 			$stm->execute(array(':id'=>$textid));
-
-			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $items = unserialize(mysql_result($result,0,0));
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cid));
 			$items = unserialize($stm->fetchColumn(0));
@@ -97,10 +73,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$key = array_search($itemid,$sub);
 			if ($key!==false) {
 				array_splice($sub,$key,1);
-				//DB $itemorder = addslashes(serialize($items));
 				$itemorder = serialize($items);
-				//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 			}
@@ -110,9 +83,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		exit;
 	} else {
-		//DB $query = "SELECT title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $itemname = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
 		$stm->execute(array(':id'=>$textid));
 		$itemname = $stm->fetchColumn(0);

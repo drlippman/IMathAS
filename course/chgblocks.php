@@ -29,7 +29,6 @@ function buildExistBlocksArray($items,$parent) {
 	$i=0;
 	foreach ($existblocks as $k=>$name) {
 		$existBlocksVals[$i]=$k;
-		//DB $existBlocksLabels[$i]=stripslashes($name);
 		$existBlocksLabels[$i]=$name;
 		$i++;
 	}
@@ -63,9 +62,6 @@ $body = "";
 $cid = Sanitize::courseId($_GET['cid']);
 $pagetitle = "Mass Change Block Settings";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".$cid.'">'.Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Block Settings";
-//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $items = unserialize(mysql_result($result,0,0));
 $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 $items = unserialize($stm->fetchColumn(0));
@@ -122,11 +118,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	updateBlocksArray($items,$checked,$sets);
-
-	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
-	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
@@ -142,9 +134,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$page_sectionlistval = array("none");
 	$page_sectionlistlabel = array(_("No restriction"));
-	//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {

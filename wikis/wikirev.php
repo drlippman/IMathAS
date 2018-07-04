@@ -26,9 +26,6 @@ if ($cid==0) {
 	$overwriteBody=1;
 	$body = "Error - need wiki id";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	//DB $query = "SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$id'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -45,19 +42,12 @@ if ($cid==0) {
 		} else {
 			$canedit = false;
 		}
-		//DB $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
-		//DB $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-		//DB $query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY i_w_r.id DESC";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $numrevisions = mysql_num_rows($result);
 		$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id AS userid FROM ";
 		$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 		$query .= "WHERE i_w_r.wikiid=:wikiid AND i_w_r.stugroupid=:stugroupid ORDER BY i_w_r.id DESC";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid));
 		$numrevisions = $stm->rowCount();
-
-		//DB $row = mysql_fetch_row($result);
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		$text = $row['revision'];
 		if (strlen($text)>6 && substr($text,0,6)=='**wver') {
@@ -75,7 +65,6 @@ if ($cid==0) {
 
 		if ($numrevisions>1) {
 			$i = 0;
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$revisionusers[$row['userid']] =  $row['LastName'].', '.$row['FirstName'];
 				//$row[1] = filter(str_replace('"','@^@^@',$row[1]));

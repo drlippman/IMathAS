@@ -44,11 +44,6 @@ END;
 
 }
 $tolib = $_POST['libs'];
-
-//DB $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid FROM imas_questions,imas_assessments,imas_questionset WHERE imas_questions.assessmentid=imas_assessments.id AND ";
-//DB $query .= "imas_questionset.id=imas_questions.questionsetid AND imas_assessments.courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid FROM imas_questions,imas_assessments,imas_questionset WHERE imas_questions.assessmentid=imas_assessments.id AND ";
 $query .= "imas_questionset.id=imas_questions.questionsetid AND imas_assessments.courseid=:courseid";
 $stm = $DBH->prepare($query);
@@ -60,18 +55,15 @@ if ($stm->rowCount()==0) {
 $qarr = array();
 $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ";
 $first = true;
-//DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($first) {
 		$first = false;
 	} else {
 		$query .= ',';
 	}
-	//DB $query .= "('$tolib','{$row[0]}','{$row[1]}')";
 	$query .= "(?,?,?)";
 	array_push($qarr, $tolib, $row[0], $row[1]);
 }
-//DB mysql_query($query) or die("Query failed : " . mysql_error());
 $stm = $DBH->prepare($query);
 $stm->execute($qarr);
 echo "Done.  <a href=\"course.php?cid=$cid\">Return to course page</a>";

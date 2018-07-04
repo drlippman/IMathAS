@@ -18,9 +18,6 @@
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
 	} else {
-		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $gbmode = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
@@ -34,10 +31,6 @@
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Group Scores</div>";
-
-	//DB $query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = $stm->fetch(PDO::FETCH_NUM);
@@ -61,13 +54,9 @@
 			$aitemcnt[$k] = 1;
 		}
 	}
-
-	//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-	//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$stm = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
 	$stm->execute(array(':assessmentid'=>$aid));
 	$totalpossible = 0;
-	//DB while ($r = mysql_fetch_row($result2)) {
 	while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
 			if ($r[0]==9999) {
@@ -88,10 +77,6 @@
 //	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 
 	$scoredata = array();
-	//DB $query = "SELECT ias.agroupid,ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM ";
-	//DB $query .= "imas_assessment_sessions AS ias WHERE ias.assessmentid='$aid' GROUP BY ias.agroupid";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT ias.agroupid,ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM ";
 	$query .= "imas_assessment_sessions AS ias WHERE ias.assessmentid=:assessmentid GROUP BY ias.agroupid";
 	$stm = $DBH->prepare($query);
@@ -108,22 +93,15 @@
 	$lc = 1;
 	$n = 0;
 	$tot = 0;
-	//DB $query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$groupsetid' ORDER BY id";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY id");
 	$stm->execute(array(':groupsetid'=>$groupsetid));
 	$grpnums = 1;
 	$stu_name = null;
 	$groupnames = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1] == 'Unnamed group') {
 			$row[1] .= " $grpnums";
 			$grpnums++;
-			//DB $query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
-			//DB $query .= "ON iu.id=isgm.userid AND isgm.stugroupid='{$row[0]}' ORDER BY isgm.id LIMIT 1";
-			//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($r)>0) {
 			if ($stu_name===null) {
 				$query = "SELECT iu.LastName,iu.FirstName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
 				$query .= "ON iu.id=isgm.userid AND isgm.stugroupid=:stugroupid ORDER BY isgm.id LIMIT 1";
@@ -131,7 +109,6 @@
 			}
 			$stu_name->execute(array(':stugroupid'=>$row[0]));
 			if ($stu_name->rowCount()>0) {
-				//DB $row[1] .= ' ('.mysql_result($r,0,0).', '.mysql_result($r,0,1).' &isin;)';
 				$row[1] .= ' ('.implode(', ', $stu_name->fetch(PDO::FETCH_NUM)).' &isin;)';
 			}
 		}

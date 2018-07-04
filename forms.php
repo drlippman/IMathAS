@@ -56,9 +56,6 @@ switch($_GET['action']) {
 
 		if (!$emailconfirmation) {
 			$doselfenroll = false;
-			//DB $query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name");
 			if ($stm->rowCount()>0) {
 				$doselfenroll = true;
@@ -66,7 +63,6 @@ switch($_GET['action']) {
 				echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 				echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
 				echo '<optgroup label="Self-study courses">';
-				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 				}
@@ -116,9 +112,6 @@ switch($_GET['action']) {
 		echo "</form>\n";
 		break;
 	case "chguserinfo":
-		//DB $query = "SELECT * FROM imas_users WHERE id='$userid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT * FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -132,9 +125,6 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
 		if ($myrights>10 && $groupid>0) {
-			//DB $query = "SELECT name FROM imas_groups WHERE id=".intval($groupid);
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $r = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
 			$stm->execute(array(':id'=>$groupid));
 			$r = $stm->fetch(PDO::FETCH_NUM);
@@ -252,9 +242,6 @@ switch($_GET['action']) {
 			if ($line['deflib']==0) {
 				$lname = "Unassigned";
 			} else {
-				//DB $query = "SELECT name FROM imas_libraries WHERE id='{$line['deflib']}'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $lname = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT name FROM imas_libraries WHERE id=:id");
 				$stm->execute(array(':id'=>$line['deflib']));
 				$lname = $stm->fetchColumn(0);
@@ -306,9 +293,6 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>Enroll in a Course</h1></div>';
 		echo "<form id=\"pageform\" method=post action=\"actions.php?action=enroll$gb\">";
 		$doselfenroll = false;
-		//DB $query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
 		$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name");
 		if ($stm->rowCount()>0) {
 			$doselfenroll = true;
@@ -316,7 +300,6 @@ switch($_GET['action']) {
 			echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 			echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
 			echo '<optgroup label="Self-study courses">';
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 			}
@@ -424,9 +407,6 @@ switch($_GET['action']) {
 		echo "</form>";
 		break;
 	case "forumwidgetsettings":
-		//DB $query = "SELECT hideonpostswidget FROM imas_users WHERE id='$userid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $hidelist = explode(',', mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT hideonpostswidget FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));
 		$hidelist = explode(',', $stm->fetchColumn(0));
@@ -437,14 +417,10 @@ switch($_GET['action']) {
 		echo '<p>The most recent 10 posts from each course show in the New Forum Posts widget.  Select the courses you want to show in the widget.</p>';
 		echo "<form method=post action=\"actions.php?action=forumwidgetsettings$gb\">\n";
 		$allcourses = array();
-		//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
 		$stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS it ON ic.id=it.courseid WHERE it.userid=:userid ORDER BY ic.name");
 		$stm->execute(array(':userid'=>$userid));
 		if ($stm->rowCount()>0) {
 			echo '<p><b>Courses you\'re teaching:</b> Check: <a href="#" onclick="$(\'.teaching\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.teaching\').prop(\'checked\',false);return false;">None</a>';
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = $row[0];
 				echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.Sanitize::encodeStringForDisplay($row[0]).'" id="c'.Sanitize::encodeStringForDisplay($row[0]).'"';
@@ -453,14 +429,10 @@ switch($_GET['action']) {
 			}
 			echo '</p>';
 		}
-		//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
 		$stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS it ON ic.id=it.courseid WHERE it.userid=:userid ORDER BY ic.name");
 		$stm->execute(array(':userid'=>$userid));
 		if ($stm->rowCount()>0) {
 			echo '<p><b>Courses you\'re tutoring:</b> Check: <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',false);return false;">None</a>';
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = Sanitize::encodeStringForDisplay($row[0]);
 				echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.Sanitize::encodeStringForDisplay($row[0]).'" id="c'.Sanitize::encodeStringForDisplay($row[0]).'"';
@@ -469,14 +441,10 @@ switch($_GET['action']) {
 			}
 			echo '</p>';
 		}
-		//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
 		$stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS it ON ic.id=it.courseid WHERE it.userid=:userid ORDER BY ic.name");
 		$stm->execute(array(':userid'=>$userid));
 		if ($stm->rowCount()>0) {
 			echo '<p><b>Courses you\'re taking:</b> Check: <a href="#" onclick="$(\'.taking\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.taking\').prop(\'checked\',false);return false;">None</a>';
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = $row[0];
 				echo '<br/><input type="checkbox" name="checked[]" class="taking" value="'.Sanitize::encodeStringForDisplay($row[0]).'" id="c'.Sanitize::encodeStringForDisplay($row[0]).'"';
@@ -490,9 +458,6 @@ switch($_GET['action']) {
 		echo '</form>';
 		break;
 	case "googlegadget":
-		//DB $query = "SELECT remoteaccess FROM imas_users WHERE id='$userid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $code = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));
 		$code = $stm->fetchColumn(0);
@@ -503,14 +468,9 @@ switch($_GET['action']) {
 				for ($i=0;$i<10;$i++) {
 					$pass .= substr($chars,rand(0,61),1);
 				}
-				//DB $query = "SELECT id FROM imas_users WHERE remoteaccess='$pass'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("SELECT id FROM imas_users WHERE remoteaccess=:remoteaccess");
 				$stm->execute(array(':remoteaccess'=>$pass));
-			//DB } while (mysql_num_rows($result)>0);
 			} while ($stm->rowCount()>0);
-			//DB $query = "UPDATE imas_users SET remoteaccess='$pass' WHERE id='$userid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess=:remoteaccess WHERE id=:id");
 			$stm->execute(array(':remoteaccess'=>$pass, ':id'=>$userid));
 			$code = $pass;

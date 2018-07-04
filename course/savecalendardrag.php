@@ -43,17 +43,12 @@ switch ($itempart) {
 	case 'D': $field = 'date'; break;
 	default: echo '{"res":"error", "error":"invalid item date part"}'; exit;
 }
-
-//DB $query = "SELECT $field FROM $table WHERE id=$itemid AND courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $stm = $DBH->prepare("SELECT $field FROM $table WHERE id=:id AND courseid=:courseid");
 $stm->execute(array(':id'=>$itemid, ':courseid'=>$cid));
 if ($stm->rowCount()==0) {
 	echo '{"res":"error", "error":"invalid item id"}';
 	exit;
 }
-//DB $row = mysql_fetch_row($result);
 $row = $stm->fetch(PDO::FETCH_NUM);
 list($hour,$min) = explode('-', tzdate('G-i', $row[0]));
 //adjust timezone based on offset if name isn't being used
@@ -62,9 +57,6 @@ if ($tzname=='') {
 	$min += $serveroffset;
 }
 $newdate = mktime($hour, $min, 0, $month, $day, $year);
-
-//DB $query = "UPDATE $table set $field=$newdate WHERE id=$itemid AND courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 $stm = $DBH->prepare("UPDATE $table set $field=:field WHERE id=:id AND courseid=:courseid");
 $stm->execute(array(':field'=>$newdate, ':id'=>$itemid, ':courseid'=>$cid));
 echo '{"res":"ok","success":"In '.$table.' SET '.$field.' to '.$newdate.'"}';

@@ -16,23 +16,18 @@ if (isset($_POST['data'])) {
 	$replacelist = implode(',',array_keys($replace));
 
 	$query = "SELECT id,uniqueid,replaceby FROM imas_questionset WHERE uniqueid IN ($destlist)";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query); //we know values are all numeric
 	$ref = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$ref[$row[1]] = $row[0];
 	}
 
 	$query = "SELECT id,uniqueid,replaceby FROM imas_questionset WHERE uniqueid IN ($replacelist)";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query); //we know values are all numeric
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[2]==0) { //no existing replaceby
 			if (isset($ref[$replace[$row[1]]])) { //if the replaceby exists on this system
 				$query = 'UPDATE imas_questionset SET replaceby=:replaceby where id=:id';
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare($query); //we know values are all numeric
 				$stm->execute(array(':replaceby'=>intval($ref[$replace[$row[1]]]), ':id'=>$row[0]));
 				echo "Updated question ID ".Sanitize::onlyInt($row[0])."<br/>";

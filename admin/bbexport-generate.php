@@ -153,18 +153,11 @@ if ($usechecked) {
 }
 
 $iteminfo = array();
-//DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
-//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($r)) {
 $stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$iteminfo[$row[0]] = array($row[1],$row[2]);
 }
-
-//DB $query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
-//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $items = unserialize(mysql_result($r,0,0));
 $stm = $DBH->prepare("SELECT itemorder,name,dates_by_lti FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 list($itemorder,$coursename,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);
@@ -262,7 +255,6 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 					$files = explode(',',$row[2]);
 					$stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
 					$stm->execute(array(':itemid'=>$iteminfo[$item][1]));
-					//DB while ($r = mysql_fetch_row($result)) {
 					while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 						//do files as weblinks rather than including the file itself
 						if (substr($r[2],0,4)=='http') {
@@ -387,9 +379,6 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						), 'forumlink', $res);
 				
 			} else if ($iteminfo[$item][0]=='Assessment') {
-				//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
-				//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $row = mysql_fetch_row($r);
 				$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail,startdate,ptsposs FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);

@@ -44,25 +44,17 @@
 			}
 		}
 		require_once("../includes/htmLawed.php");
-		//DB $_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
-		//DB $_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
 		$_POST['message'] = myhtmLawed($_POST['message']);
 		$_POST['subject'] = strip_tags($_POST['subject']);
 
 		if ($_GET['masssend']=="Message") {
 			$now = time();
-			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
 			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
-			//DB $query = "SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)");
 			$emailaddys = array();
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!in_array($row[2],$toignore)) {
 					$fullnames[$row[2]] = strip_tags($row[1]. ', '.$row[0]);
-					//DB $firstnames[$row[2]] = addslashes($row[0]);
-					//DB $lastnames[$row[2]] = addslashes($row[1]);
 					$firstnames[$row[2]] = strip_tags($row[0]);
 					$lastnames[$row[2]] = strip_tags($row[1]);
 
@@ -79,10 +71,6 @@
 			} else {
 				$isread = 4;
 			}
-
-			//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id='$userid'";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB $from = mysql_result($result,0,0).' '.mysql_result($result,0,1);
 			$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));
@@ -91,7 +79,6 @@
 			$headers .= "From: $sendfrom\r\n";
 			$messagep1 = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 			$messagep1 .= "<p>You've received a new message</p><p>From: ".Sanitize::encodeStringForDisplay($from)."<br />Course: ".Sanitize::encodeStringForDisplay($coursename).".</p>\r\n";
-			//DB $messagep1 .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
 			$messagep1 .= "<p>Subject: ".$_POST['subject']."</p>"; // Sanitized by htmLawed near line 40.
 			$messagep1 .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=$cid&msgid=";
 			$messagep2 = "\">";
@@ -103,10 +90,6 @@
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
-					//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-					//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB $msgid = mysql_insert_id();
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 					$stm = $DBH->prepare($query);
@@ -124,9 +107,6 @@
 			if ($_POST['self']=="self") {
 				$tolist[] = $userid;
 			} else if ($_POST['self']=="allt") {
-				//DB $query = "SELECT imas_users.id FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
 				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_teachers,imas_users WHERE imas_teachers.courseid=:courseid AND imas_teachers.userid=imas_users.id ");
 				$stm->execute(array(':courseid'=>$cid));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -134,7 +114,6 @@
 				}
 			}
 			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
-			//DB $message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
 			// $_POST['message'] is sanitized by htmlLawed near line 40.
 			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".$sentto." </p>\n";
 			if (isset($_POST['tutorcopy'])) {
@@ -146,9 +125,6 @@
 				}
 			}
 			foreach ($tolist as $msgto) {
-				//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-				//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,0,'$cid')";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 				$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 				$stm = $DBH->prepare($query);
@@ -159,14 +135,10 @@
 
 			//$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 			//$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id";
-			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
 			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
-			//DB $query = "SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)");
 			$emailaddys = array();
 			$fullnames = array();
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!in_array($row[3],$toignore) && $row[2]!='' && $row[2]!='none@none.com') {
 					$emailaddys[] = Sanitize::simpleASCII("{$row[0]} {$row[1]}"). ' <'. Sanitize::emailAddress($row[2]) .'>';
@@ -175,9 +147,6 @@
 					$fullnames[] = $row[1].', '.$row[0];
 				}
 			}
-
-			//DB $subject = stripslashes($_POST['subject']);
-			//DB $message = stripslashes($_POST['message']);
 			$subject = $_POST['subject']; // Sanitized by strip_tags near line 40.
 			$message = $_POST['message']; // Sanitized by myhtmLawed near line 40.
 			$sessiondata['mathdisp']=2;
@@ -187,9 +156,6 @@
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$GLOBALS['basesiteurl'] .'/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -214,11 +180,6 @@
 				$message .= '<p>A copy was sent to all tutors.</p>';
 			}
 			if ($_POST['self']=="allt") {
-				//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
-				//DB $query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
-				//DB $query .= "AND imas_users.id<>'$userid'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
 				$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 				$query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid=:courseid AND imas_teachers.userid=imas_users.id ";
 				$query .= "AND imas_users.id<>:userid";
@@ -337,9 +298,6 @@
 			echo '</select> this assessment: ';
 			echo "<select name=\"aidselect\" id=\"aidselect\">\n";
 			echo "<option value=\"0\">Don't limit - send to all</option>\n";
-			//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
 			$stm->execute(array(':courseid'=>$cid));
 			while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
@@ -354,17 +312,13 @@
 		echo "</span><br class=form />\n";
 		echo "<div class=submit><input type=submit value=\"Send ".Sanitize::encodeStringForDisplay($sendtype)."\"></div>\n";
 		echo "</form>\n";
-		//DB $tolist = "'".implode("','",$_POST['checked'])."'";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));
-		//DB $query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");
 		if (isset($_GET['nolimit'])) {
 			echo '<p>Message will be sent to:<ul>';
 		} else {
 			echo '<p>Unless limited, message will be sent to:<ul>';
 		}
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf("<li>%s, %s (%s)</li>", Sanitize::encodeStringForDisplay($row[0]),
 				Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));

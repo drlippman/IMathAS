@@ -105,7 +105,6 @@ function showitemtree($items,$parent,$greyitems=0) {
 				   if ($stm->rowCount()==0) {
 					   $nothidden = false;
 				   } else {
-					   //DB $scores = explode(';',mysql_result($result,0,0));
 					   $scores = explode(';',$stm->fetchColumn(0));
 					   if ($line['reqscoretype']&2) { //using percent-based
 					   	   if (round(100*getpts($scores[0])/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {

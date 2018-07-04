@@ -27,9 +27,6 @@
 
 	if (($isteacher || $istutor) && (isset($_POST['score']) || isset($_POST['newscore']))) {
 		if ($istutor) {
-			//DB $query = "SELECT tutoredit FROM imas_forums WHERE id='$forumid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT tutoredit FROM imas_forums WHERE id=:id");
 			$stm->execute(array(':id'=>$forumid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -46,9 +43,6 @@
 			}
 			if (count($keys)>0) {
 				$kl = implode(',', array_map('intval', $keys));
-				//DB $query = "SELECT refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid' AND refid IN ($kl)";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while($row = mysql_fetch_row($result)) {
 				$stm = $DBH->prepare("SELECT refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid AND refid IN ($kl)");
 				$stm->execute(array(':gradetypeid'=>$forumid, ':userid'=>$uid));
 				while($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -67,13 +61,9 @@
 					$_POST['feedback'.$k] = '';
 				}
 				if ($sc!='') {
-					//DB $query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE refid=:refid AND gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid");
 					$stm->execute(array(':score'=>$sc, ':feedback'=>$_POST['feedback'.$k], ':refid'=>$k, ':gradetypeid'=>$forumid, ':userid'=>$uid));
 				} else {
-					//DB $query = "DELETE FROM imas_grades WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("DELETE FROM imas_grades WHERE refid=:refid AND gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid");
 					$stm->execute(array(':refid'=>$k, ':gradetypeid'=>$forumid, ':userid'=>$uid));
 				}
@@ -83,9 +73,6 @@
 			foreach($_POST['newscore'] as $k=>$sc) {
 				if (trim($k)=='') {continue;}
 				if ($sc!='') {
-					//DB $query = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score,feedback) VALUES ";
-					//DB $query .= "('forum','$forumid','$k','$uid','$sc','{$_POST['feedback'][$k]}')";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score,feedback) VALUES ";
 					$query .= "(:gradetype, :gradetypeid, :refid, :userid, :score, :feedback)";
 					$stm = $DBH->prepare($query);
@@ -154,12 +141,9 @@
 	}
 
 	$scores = array();
-	//DB $query = "SELECT score,feedback,refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT score,feedback,refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid");
 	$stm->execute(array(':gradetypeid'=>$forumid, ':userid'=>$uid));
 	$totalpts = 0;
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$scores[$row[2]] = $row;
 		$totalpts += $row[0];
@@ -177,9 +161,6 @@
 	}
 
 	echo '<table class="gb"><thead><tr><th>Post</th><th>Points</th><th>Private Feedback</th></tr></thead><tbody>';
-	//DB $query = "SELECT id,threadid,subject FROM imas_forum_posts WHERE forumid='$forumid' AND userid='$uid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT id,threadid,subject FROM imas_forum_posts WHERE forumid=:forumid AND userid=:userid");
 	$stm->execute(array(':forumid'=>$forumid, ':userid'=>$uid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {

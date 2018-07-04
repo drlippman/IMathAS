@@ -43,40 +43,26 @@ if ($page==-4) {
 	$redirecturl = $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=$cid&forum=$forumid&page=$page";
 }
 if (isset($_GET['markunread'])) {
-	//DB $query = "DELETE FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
 if (isset($_GET['marktagged'])) {
-	//DB $query = "UPDATE imas_forum_views SET tagged=1 WHERE userid='$userid' AND threadid='$threadid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=1 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 } else if (isset($_GET['markuntagged'])) {
-	//DB $query = "UPDATE imas_forum_views SET tagged=0 WHERE userid='$userid' AND threadid='$threadid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=0 WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
-//DB $query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate FROM imas_forums WHERE id='$forumid'";
-//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 $stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate FROM imas_forums WHERE id=:id");
 $stm->execute(array(':id'=>$forumid));
-
-//DB list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate) = mysql_fetch_row($result);
 list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate) = $stm->fetch(PDO::FETCH_NUM);
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
-	//DB $query = "SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid='$forumid' AND userid='$userid' AND (itemtype='F' OR itemtype='P' OR itemtype='R')";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
-	//DB $exception = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 	$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
 	if ($stm->rowCount()>0) {
@@ -116,11 +102,6 @@ $canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit<2));
 if ($groupset>0) {
 	if (!isset($_GET['grp'])) {
 		if (!$canviewall) {
-			//DB $query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
-			//DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupset'";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-			//DB $groupid = mysql_result($result,0,0);
 			$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 			$stm = $DBH->prepare($query);
@@ -136,9 +117,6 @@ if ($groupset>0) {
 	} else {
 		if (!$canviewall) {
 			$groupid = intval($_GET['grp']);
-			//DB $query = "SELECT id FROM imas_stugroupmembers WHERE stugroupid='$groupid' AND userid='$userid'";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB if (mysql_num_rows($result)==0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_stugroupmembers WHERE stugroupid=:stugroupid AND userid=:userid");
 			$stm->execute(array(':stugroupid'=>$groupid, ':userid'=>$userid));
 			if ($stm->rowCount()==0) {
@@ -177,10 +155,6 @@ if ($caneditscore && $sessiondata['useed']!=0) {
 require("../header.php");
 
 if ($haspoints && $caneditscore && $rubric != 0) {
-	//DB $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=$rubric";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
-	//DB $row = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=:id");
 	$stm->execute(array(':id'=>$rubric));
 	if ($stm->rowCount()>0) {
@@ -192,9 +166,6 @@ if ($haspoints && $caneditscore && $rubric != 0) {
 
 $allowmsg = false;
 if (!$canviewall) {
-	//DB $query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if ((mysql_result($result,0,0)%5)==0) {
 	$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	if (($stm->fetchColumn(0)%5)==0) {
@@ -202,16 +173,10 @@ if (!$canviewall) {
 	}
 }
 if ($postbeforeview && !$canviewall) {
-	//DB $query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB $oktoshow = (mysql_num_rows($result)>0);
 	$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE forumid=:forumid AND parent=0 AND userid=:userid LIMIT 1");
 	$stm->execute(array(':forumid'=>$forumid, ':userid'=>$userid));
 	$oktoshow = ($stm->rowCount()>0);
 	if (!$oktoshow) {
-		//DB $query = "SELECT posttype FROM imas_forum_posts WHERE id='$threadid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB $oktoshow = (mysql_result($result,0,0)>0);
 		$stm = $DBH->prepare("SELECT posttype FROM imas_forum_posts WHERE id=:id");
 		$stm->execute(array(':id'=>$threadid));
 		$oktoshow = ($stm->fetchColumn(0)>0);
@@ -222,21 +187,12 @@ if ($postbeforeview && !$canviewall) {
 
 if ($oktoshow) {
 	if ($haspoints) {
-		//DB $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section FROM ";
-		//DB $query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
-		//DB $query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid='$cid' ";
-		//DB $query .= "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
-		//DB $query .= "WHERE (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
 		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section FROM ";
 		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
 		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
 		$query .= "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
 		$query .= "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
 	} else {
-		//DB $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section FROM ";
-		//DB $query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
-		//DB $query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid='$cid' ";
-		//DB $query .= "WHERE (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
 		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section FROM ";
 		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
 		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
@@ -249,7 +205,6 @@ if ($oktoshow) {
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
-	//DB while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -308,10 +263,6 @@ if ($oktoshow) {
 
 	if ($allowlikes) {
 		//get likes
-		//DB $query = "SELECT postid,type,count(*) FROM imas_forum_likes WHERE threadid='$threadid'";
-		//DB $query .= "GROUP BY postid,type";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$query = "SELECT postid,type,count(*) FROM imas_forum_likes WHERE threadid=:threadid ";
 		$query .= "GROUP BY postid,type";
 		$stm = $DBH->prepare($query);
@@ -319,10 +270,6 @@ if ($oktoshow) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$likes[$row[0]][$row[1]] = $row[2];
 		}
-
-		//DB $query = "SELECT postid FROM imas_forum_likes WHERE threadid='$threadid' AND userid='$userid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT postid FROM imas_forum_likes WHERE threadid=:threadid AND userid=:userid");
 		$stm->execute(array(':threadid'=>$threadid, ':userid'=>$userid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -334,36 +281,22 @@ if ($oktoshow) {
 		require_once('../includes/filehandler.php');
 	}
 	//update view count
-	//DB $query = "UPDATE imas_forum_posts SET views='$newviews' WHERE id='$threadid'";
-	//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_posts SET views=:views WHERE id=:id");
 	$stm->execute(array(':views'=>$newviews, ':id'=>$threadid));
-
-	//DB $query = "UPDATE imas_forum_threads SET views=views+1 WHERE id='$threadid'";
-	//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_forum_threads SET views=views+1 WHERE id=:id");
 	$stm->execute(array(':id'=>$threadid));
 
 	//mark as read
-	//DB $query = "SELECT lastview,tagged FROM imas_forum_views WHERE userid='$userid' AND threadid='$threadid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare("SELECT lastview,tagged FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
 	$now = time();
-	//DB if (mysql_num_rows($result)>0) {
-	//DB $lastview = mysql_result($result,0,0);
-	//DB $tagged = mysql_result($result,0,1);
 	if ($stm->rowCount()>0) {
 		list($lastview, $tagged) = $stm->fetch(PDO::FETCH_NUM);
-		//DB $query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid' AND threadid='$threadid'";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE userid=:userid AND threadid=:threadid");
 		$stm->execute(array(':lastview'=>$now, ':userid'=>$userid, ':threadid'=>$threadid));
 	} else {
 		$lastview = 0;
 		$tagged = 0;
-		//DB $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','$threadid',$now)";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview)");
 		$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid, ':lastview'=>$now));
 	}
@@ -387,12 +320,9 @@ if (!$oktoshow) {
 } else {
 	echo '<div id="headerposts" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
-
-	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";
 	$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid AND lastposttime<:now ";
 	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
 	if ($groupset>0 && $groupid!=-1) {
-		//DB $query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";
 		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
 		$array[':stugroupid']=$groupid;
 	}
@@ -402,20 +332,15 @@ if (!$oktoshow) {
 	$stm->execute($array);
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$prevth = '';
-	//DB if (mysql_num_rows($result)>0) {
-	//DB $prevth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$prevth = $stm->fetchColumn(0);
 		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($prevth)."&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
 	}
-
-	//DB $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id>'$threadid' ";
 	$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid AND lastposttime<:now ";
 	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
 	if ($groupset>0 && $groupid!=-1) {
-		//DB $query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";
 		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
 		$array[':stugroupid']=$groupid;
 	}
@@ -425,8 +350,6 @@ if (!$oktoshow) {
 	//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$nextth = '';
-	//DB if (mysql_num_rows($result)>0) {
-	//DB $nextth = mysql_result($result,0,0);
 	if ($stm->rowCount()>0) {
 		$nextth = $stm->fetchColumn(0);
 		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($nextth)."&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
@@ -546,12 +469,6 @@ function printchildren($base,$restricttoowner=false) {
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
 			echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
 			if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
-				//DB $query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
-				//DB $aname = addslashes($matches[2]);
-				//DB $query .= "WHERE ia.courseid='$cid' AND ia.name='$aname' AND ias.userid=".intval($ownerid[$child]);
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				//DB if (mysql_num_rows($result)>0) {
-				//DB $r = mysql_fetch_row($result);
 				$query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
 				$query .= "WHERE ia.courseid=:courseid AND (ia.name=:name OR ia.name=:name2) AND ias.userid=:ownerid";
 				$stm = $DBH->prepare($query);

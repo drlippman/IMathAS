@@ -35,14 +35,10 @@ if (isset($_POST['assess'])) {
         $err = true;
     } else {
         $query = "SELECT itemorder FROM imas_assessments WHERE id=$dest";
-        //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
         $stm = $DBH->query($query); //presanitized
-        //DB $sourceitemord = mysql_result($result,0,0);
         $sourceitemord = $stm->fetchColumn(0);
         $query = "SELECT itemorder,name FROM imas_assessments WHERE id IN (".implode(',',$source).")";
-        //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
         $stm = $DBH->query($query); //presanitized
-        //DB while ($row = mysql_fetch_row($result)) {
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             if (substr_count($row[0],',') != substr_count($sourceitemord,',')) {
                 echo 'one of this things is not like the others.... '.Sanitize::encodeStringForDisplay($row[1]).' does not match same number of questions.   assessments cannot be merged';
@@ -53,10 +49,8 @@ if (isset($_POST['assess'])) {
     }
     if (!$err) {
         $query = "SELECT userid,bestseeds,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions WHERE assessmentid=$dest";
-        //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
         $stm = $DBH->query($query); //presanitized
       	$adata = array();
-        //DB while ($row = mysql_fetch_row($result)) {
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
       		$adata[$row[0]] = array();
       		$adata[$row[0]]['seeds'] = explode(',',$row[1]);
@@ -71,9 +65,7 @@ if (isset($_POST['assess'])) {
       	}
 
       	$query = "SELECT userid,bestseeds,bestscores,bestattempts,bestlastanswers FROM imas_assessment_sessions WHERE assessmentid IN (".implode(',',$source).")";
-        //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
         $stm = $DBH->query($query); //presanitized
-      	//DB while ($row = mysql_fetch_row($result)) {
       	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
       		$seeds = explode(',',$row[1]);
       		$sp = explode(';', $row[2]);
@@ -108,12 +100,8 @@ if (isset($_POST['assess'])) {
       		$bestattemptslist = implode(',',$val['attempts']);
       		$bestseedslist = implode(',',$val['seeds']);
       		$bestlalist = implode('~',$val['la']);
-      		//DB $bestlalist = addslashes(stripslashes($bestlalist));
-      		//DB $query = "UPDATE imas_assessment_sessions SET bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist' ";
-      		//DB $query .= "WHERE userid='$uid' AND assessmentid='$dest'";
 
       		$stm->execute(array(':bestseeds'=>$bestseedslist, ':bestattempts'=>$bestattemptslist, ':bestscores'=>$bestscorelist, ':bestlastanswers'=>$bestlalist, ':userid'=>$uid, ':assessmentid'=>$dest));
-      		//DB mysql_query($query) or die("Query failed : " . mysql_error());
       	}
       	echo "Merge complete";
     }
@@ -128,10 +116,8 @@ if (isset($_POST['assess'])) {
 
     echo '<form method="post" action="mergescores.php?cid='.$cid.'">';
     $query = "SELECT id,name FROM imas_assessments WHERE courseid=$cid ORDER BY name";
-    //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
     $stm = $DBH->query($query); //presanitized
     echo '<p>';
-    //DB while ($row = mysql_fetch_row($result)) {
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {
         echo '<input type="input" size="1" name="assess['.Sanitize::encodeStringForDisplay($row[0]).']" />'.Sanitize::encodeStringForDisplay($row[1]).'<br/>';
     }

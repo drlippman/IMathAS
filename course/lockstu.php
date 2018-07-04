@@ -20,9 +20,6 @@ ini_set("max_execution_time", "600");
 		if ($get_uid=="selected") {
 			$tolock = explode(",",$_POST['tolock']);
 		} else if ($get_uid=="all") {
-			//DB $query = "SELECT userid FROM imas_students WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -34,8 +31,6 @@ ini_set("max_execution_time", "600");
 
 		$locklist = implode(',', array_map('intval',$tolock));
 		$now = time();
-		//DB $query = "UPDATE imas_students SET locked='$now' WHERE courseid='$cid' AND userid IN ($locklist)";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE courseid=:courseid AND userid IN ($locklist)");
 		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid));
 
@@ -53,20 +48,12 @@ ini_set("max_execution_time", "600");
 
 		if ($get_uid=="selected") {
 			if (count($_POST['checked'])>0) {
-				//DB $ulist = "'".implode("','",$_POST['checked'])."'";
 				$ulist = implode(',', array_map('intval', $_POST['checked']));
-				//DB $query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)";
-				//DB $resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
-				//DB $query = "SELECT COUNT(id) FROM imas_students WHERE courseid='{$_GET['cid']}'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 			}
 		} else {
-			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$get_uid}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$get_uid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
@@ -94,7 +81,6 @@ ini_set("max_execution_time", "600");
 		Are you SURE you want to lock the selected students out of the course?
 		<ul>
 <?php
-					//DB while ($row = mysql_fetch_row($resultUserList)) {
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
 						printf("			<li>%s, %s (%s)</li>",
                             Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),

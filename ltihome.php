@@ -13,15 +13,9 @@ if ($sessiondata['ltiitemtype']==0) {
 	$hasplacement = true;
 	$placementtype = 'assess';
 	$typeid = $sessiondata['ltiitemid'];
-	//DB $query = "SELECT courseid FROM imas_assessments WHERE id='$typeid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $cid = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$cid = $stm->fetchColumn(0);
-	//DB $query = "SELECT id FROM imas_teachers WHERE courseid='$cid' AND userid='$userid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
 	$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
 	if ($stm->rowCount()==0) {
@@ -30,10 +24,6 @@ if ($sessiondata['ltiitemtype']==0) {
 		$role = 'teacher';
 	}
 } else {
-	//DB $query = "SELECT courseid FROM imas_lti_courses WHERE contextid='{$sessiondata['lti_context_id']}' ";
-	//DB $query .= "AND org='{$sessiondata['ltiorg']}'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org=:org");
 	$stm->execute(array(':contextid'=>$sessiondata['lti_context_id'], ':org'=>$sessiondata['ltiorg']));
 	if ($stm->rowCount()==0) {
@@ -41,9 +31,6 @@ if ($sessiondata['ltiitemtype']==0) {
 		if (isset($sessiondata['lti_launch_get']) && isset($sessiondata['lti_launch_get']['cid'])) {
 			$cid = intval($sessiondata['lti_launch_get']['cid']);
 			if ($cid>0) {
-				//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-				//DB $query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
 				$stm->execute(array(':org'=>$sessiondata['ltiorg'], ':contextid'=>$sessiondata['lti_context_id'], ':courseid'=>$cid));
 				$hascourse = true;
@@ -51,14 +38,9 @@ if ($sessiondata['ltiitemtype']==0) {
 		}
 	} else {
 		$hascourse = true;
-		//DB $cid = mysql_result($result,0,0);
 		$cid = $stm->fetchColumn(0);
 	}
 	if ($hascourse) {
-		//DB $query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid='{$sessiondata['lti_context_id']}' ";
-		//DB $query .= "AND org='{$sessiondata['ltiorg']}' AND linkid='{$sessiondata['lti_resource_link_id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
 		$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid=:contextid ";
 		$query .= "AND org=:org AND linkid=:linkid";
 		$stm = $DBH->prepare($query);
@@ -70,10 +52,6 @@ if ($sessiondata['ltiitemtype']==0) {
 				if ($aid>0) {
 					$placementtype = 'assess';
 					$typeid = $aid;
-					//DB $query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
-					//DB $query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB $placementid = mysql_insert_id();
 					$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
 					$query .= "(:org, :contextid, :linkid, :placementtype, :typeid)";
 					$stm = $DBH->prepare($query);
@@ -84,7 +62,6 @@ if ($sessiondata['ltiitemtype']==0) {
 			}
 		} else {
 			$hasplacement = true;
-			//DB list($placementid,$placementtype,$typeid) = mysql_fetch_row($result);
 			list($placementid,$placementtype,$typeid) = $stm->fetch(PDO::FETCH_NUM);
 		}
 		$role = 'teacher';
@@ -94,32 +71,23 @@ if ($sessiondata['ltiitemtype']==0) {
 //handle form postbacks
 $createcourse = Sanitize::onlyInt($_POST['createcourse']);
 if (!empty($createcourse)) {
-	//DB $query = "SELECT courseid FROM imas_teachers WHERE courseid='{$_POST['createcourse']}' AND userid='$userid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->prepare("SELECT courseid FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
 	$stm->execute(array(':courseid'=>$createcourse, ':userid'=>$userid));
 	if ($stm->rowCount()>0) {
 		$cid = $createcourse;
 	} else {
 		//log terms agreement if needed
-		//DB $query = "SELECT termsurl FROM imas_courses WHERE id='{$_POST['createcourse']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT termsurl FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$createcourse));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row[0]!='') { //has terms of use url
 			$now = time();
 			$userid = intval($userid);
-			//DB $query = "INSERT INTO imas_log (time,log) VALUES($now,'User $userid agreed to terms of use on course {$_POST['createcourse']}')";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 			$stm->execute(array(':time'=>$now, ':log'=>'User $userid agreed to terms of use on course '.$createcourse));
 		}
 		//creating a copy of a template course
 		$blockcnt = 1;
-		//DB $itemorder = addslashes(serialize(array()));
 		$itemorder = serialize(array());
 		$randkey = uniqid();
 		$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
@@ -134,7 +102,6 @@ if (!empty($createcourse)) {
 
 		$avail = 0;
 		$lockaid = 0;
-		//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 		$DBH->beginTransaction();
 
 		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
@@ -145,8 +112,6 @@ if (!empty($createcourse)) {
 			':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 		$cid = $DBH->lastInsertId();
 		//if ($myrights==40) {
-			//DB $query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$cid')";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		//}
@@ -154,78 +119,43 @@ if (!empty($createcourse)) {
 		$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
 		$defgbmode = intval(isset($CFG['GBS']['defgbmode'])?$CFG['GBS']['defgbmode']:21);
 		$usersort = intval(isset($CFG['GBS']['usersort'])?$CFG['GBS']['usersort']:0);
-
-		//DB $query = "INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES ('$cid',$useweights,$orderby,$defgbmode,$usersort)";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES (:courseid, :useweights, :orderby, :defgbmode, :usersort)");
 		$stm->execute(array(':courseid'=>$cid, ':useweights'=>$useweights, ':orderby'=>$orderby, ':defgbmode'=>$defgbmode, ':usersort'=>$usersort));
-
-
-
-		//DB $query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='{$_POST['createcourse']}'";
-		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		//TODO: copy settings in one query?
 		$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$createcourse));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		//DB $query = "UPDATE imas_gbscheme SET useweights='{$row[0]}',orderby='{$row[1]}',defaultcat='{$row[2]}',defgbmode='{$row[3]}',stugbmode='{$row[4]}' WHERE courseid='$cid'";
-		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$row[0], ':orderby'=>$row[1], ':defaultcat'=>$row[2], ':defgbmode'=>$row[3], ':stugbmode'=>$row[4], ':courseid'=>$cid));
 
 		$gbcats = array();
-		//DB $query = "SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid='{$_POST['createcourse']}'";
-		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$createcourse));
 
 		$stm2 = $DBH->prepare("INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES (:courseid, :name, :scale, :scaletype, :chop, :dropn, :weight)");
 
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			//DB $query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES ";
-			//DB $frid = array_shift($row);
-			//DB $irow = "'".implode("','",addslashes_deep($row))."'";
-			//DB $query .= "('$cid',$irow)";
-			//DB $query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight) VALUES ($row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$row[6])";
-			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
-			//DB $gbcats[$frid] = mysql_insert_id();
 			$frid = $row[0];
 			$stm2->execute(array(':courseid'=>$cid, ':name'=>$row[1], ':scale'=>$row[2], ':scaletype'=>$row[3], ':chop'=>$row[4], ':dropn'=>$row[5], ':weight'=>$row[6]));
 			$gbcats[$frid] = $DBH->lastInsertId();
 		}
 		$copystickyposts = true;
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_POST['createcourse']}'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$createcourse));
 		$items = unserialize($stm->fetchColumn(0));
 		$newitems = array();
 		require("includes/copyiteminc.php");
 		copyallsub($items,'0',$newitems,$gbcats);
-		//DB $itemorder = addslashes(serialize($newitems));
 		$itemorder = serialize($newitems);
-		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		copyrubrics();
-		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
 
 	}
-	//DB $query = "UPDATE imas_lti_courses SET courseid=$cid WHERE org='{$sessiondata['ltiorg']}' AND contextid='{$sessiondata['lti_context_id']}'";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_affected_rows()==0) {
 	$stm = $DBH->prepare("UPDATE imas_lti_courses SET courseid=:courseid WHERE org=:org AND contextid=:contextid");
 	$stm->execute(array(':courseid'=>$cid, ':org'=>$sessiondata['ltiorg'], ':contextid'=>$sessiondata['lti_context_id']));
-	//DB if (mysql_affected_rows()==0) {
 	if ($stm->rowCount()==0) {
-		//DB $query = "INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES ";
-		//DB $query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}',$cid)";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
 		$stm->execute(array(':org'=>$sessiondata['ltiorg'], ':contextid'=>$sessiondata['lti_context_id'], ':courseid'=>$cid));
 	}
@@ -242,9 +172,6 @@ if (!empty($createcourse)) {
 	if (isset($sessiondata['lti_selection_return'])) {
 		//Canvas custom LTI selection return
 		if ($placementtype=='assess') {
-			//DB $query = "SELECT name FROM imas_assessments WHERE id='$typeid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $atitle = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$atitle = $stm->fetchColumn(0);
@@ -254,9 +181,6 @@ if (!empty($createcourse)) {
 			exit;
 
 		} else {
-			//DB $query = "SELECT name FROM imas_courses WHERE id='$typeid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $cname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$cname = $stm->fetchColumn(0);
@@ -266,15 +190,9 @@ if (!empty($createcourse)) {
 		}
 	}
 	if ($hasplacement) {
-		//DB $query = "UPDATE imas_lti_placements SET placementtype='$placementtype',typeid='$typeid' WHERE id='$placementid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_lti_placements SET placementtype=:placementtype,typeid=:typeid WHERE id=:id");
 		$stm->execute(array(':placementtype'=>$placementtype, ':typeid'=>$typeid, ':id'=>$placementid));
 	} else {
-		//DB $query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
-		//DB $query .= "('{$sessiondata['ltiorg']}','{$sessiondata['lti_context_id']}','{$sessiondata['lti_resource_link_id']}','$placementtype','$typeid')";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $placementid = mysql_insert_id();
 		$query = "INSERT INTO imas_lti_placements (org,contextid,linkid,placementtype,typeid) VALUES ";
 		$query .= "(:org, :contextid, :linkid, :placementtype, :typeid)";
 		$stm = $DBH->prepare($query);
@@ -310,27 +228,18 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '<form method="post" action="ltihome.php">';
 	echo "<p>This course on your LMS has not yet been linked to a course on $installname.";
 	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse" onchange="updateCourseSelector(this)"> ';
-	//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' AND ic.available<4 ORDER BY ic.name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid=:userid AND ic.available<4 ORDER BY ic.name");
 	$stm->execute(array(':userid'=>$userid));
 	if ($stm->rowCount()>0) {
 		echo '<optgroup label="Your Courses">';
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf('<option value="%d">%s</option>' ,Sanitize::onlyInt($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
 		echo '</optgroup>';
 	}
-
-	//DB $query = "SELECT id,name,copyrights,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->query("SELECT id,name,copyrights,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name");
 	if ($stm->rowCount()>0) {
 		echo '<optgroup label="Template Courses">';
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
 			if ($row[3]!='') {
@@ -347,7 +256,6 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	$stm->execute(array(':groupid'=>$groupid));
 	if ($stm->rowCount()>0) {
 		echo '<optgroup label="Group Template Courses">';
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			echo '<option value="'.Sanitize::onlyInt($row[0]).'"';
 			if ($row[3]!='') {
@@ -378,14 +286,10 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	//if (!isset($sessiondata['lti_selection_return'])) {
 		echo '<option value="course">Whole course Placement</option>';
 	//}
-	//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	if ($stm->rowCount()>0) {
 		echo '<optgroup label="Assessment">';
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf('<option value="%d">%s</option>', Sanitize::onlyInt($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
@@ -402,9 +306,6 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo "<p><a href=\"course/course.php?cid=" . Sanitize::courseId($cid) . "\">Enter course</a></p>";
 	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 } else if ($placementtype=='assess') {
-	//DB $query = "SELECT name,avail,startdate,enddate FROM imas_assessments WHERE id='$typeid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);

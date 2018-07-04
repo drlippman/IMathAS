@@ -26,14 +26,9 @@ if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['fol
 }
 
 if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the student's record
-	//DB $query = "UPDATE imas_bookmarks SET value='{$_GET['recordbookmark']}' WHERE userid='$userid' AND courseid='$cid' AND name='TR{$_GET['folder']}'";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_affected_rows()==0) {
 	$stm = $DBH->prepare("UPDATE imas_bookmarks SET value=:value WHERE userid=:userid AND courseid=:courseid AND name=:name");
 	$stm->execute(array(':value'=>$_GET['recordbookmark'], ':userid'=>$userid, ':courseid'=>$cid, ':name'=>'TR'.$_GET['folder']));
 	if ($stm->rowCount()==0) {
-		//DB $query = "INSERT INTO imas_bookmarks (userid,courseid,name,value) VALUES ('$userid','$cid','TR{$_GET['folder']}','{$_GET['recordbookmark']}')";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("INSERT INTO imas_bookmarks (userid,courseid,name,value) VALUES (:userid, :courseid, :name, :value)");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':name'=>'TR'.$_GET['folder'], ':value'=>$_GET['recordbookmark']));
 	}
@@ -77,7 +72,6 @@ if (isset($backtrack) && count($backtrack)>0) {
 		if ($i!=count($backtrack)-1) {
 			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[$i][1])."\">";
 		}
-		//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
 		$curBreadcrumb .= Sanitize::encodeStringForDisplay($backtrack[$i][0]);
 		if ($i!=count($backtrack)-1) {
 			$curBreadcrumb .= "</a>";
@@ -226,16 +220,11 @@ $placeinhead .= '<script type="text/javascript">$(function() {
   });
 });</script>';
 require("../header.php");
-
-//DB $query = "SELECT value FROM imas_bookmarks WHERE userid='$userid' AND courseid='$cid' AND name='TR{$_GET['folder']}'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $stm = $DBH->prepare("SELECT value FROM imas_bookmarks WHERE userid=:userid AND courseid=:courseid AND name=:name");
 $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':name'=>'TR'.$_GET['folder']));
 if ($stm->rowCount()==0) {
 	$openitem = '';
 } else {
-	//DB $openitem = mysql_result($result,0,0);
 	$openitem = $stm->fetchColumn(0);
 }
 
@@ -244,10 +233,6 @@ $foundopenitem = '';
 
 $astatus = array();
 if (!$viewall) {
-	//DB $query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
-	//DB $query .= "WHERE ia.courseid='$cid' AND ias.userid='$userid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 	$query .= "WHERE ia.courseid=:courseid AND ias.userid=:userid";
 	$stm = $DBH->prepare($query);
@@ -268,12 +253,6 @@ if (!$viewall) {
 	}
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
-		//DB $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
-		//DB $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid='$cid') ";
-		//DB $query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid='$userid' AND ";
-		//DB $query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid='$cid') ";
 		$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
 		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=:userid AND ";
 		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid=:courseid) ";
@@ -285,8 +264,6 @@ if (!$viewall) {
 
 		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore'],$line['itemtype']);
 		}
@@ -326,9 +303,6 @@ function printlist($items) {
 				$out .=  '</ul></li>';
 			}
 		} else {
-			//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$item'";
-			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
 			$stm->execute(array(':id'=>$item));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -344,9 +318,6 @@ function printlist($items) {
 			if ($line['itemtype']=='Assessment') {
 				//TODO check availability, timelimit, etc.
 				//TODO: reqscoreaid, latepasses
-				 //DB $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit,displaymethod FROM imas_assessments WHERE id='$typeid'";
-				 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				 //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 				 $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,displaymethod FROM imas_assessments WHERE id=:id");
 				 $stm->execute(array(':id'=>$typeid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -414,9 +385,6 @@ function printlist($items) {
 				 }
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
-				 //DB $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
-				 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				 //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 				 $stm = $DBH->prepare("SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id=:id");
 				 $stm->execute(array(':id'=>$typeid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -443,9 +411,6 @@ function printlist($items) {
 				 $out .=  '<li><img src="'.$imasroot.'/img/forum_tiny.png" alt="Forum"> <a href="'.$imasroot.'/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid.'" onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 			} */else if ($line['itemtype']=='Wiki') {
 				//TODO check availability, etc.
-				 //DB $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
-				 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				 //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 				 $stm = $DBH->prepare("SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id=:id");
 				 $stm->execute(array(':id'=>$typeid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);

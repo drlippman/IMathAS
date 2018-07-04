@@ -28,7 +28,6 @@ function buildExistBlocksArray($items,$parent) {
 	$i=0;
 	foreach ($existblocks as $k=>$name) {
 		$existBlocksVals[$i]=$k;
-		//DB $existBlocksLabels[$i]=stripslashes($name);
 		$existBlocksLabels[$i]=$name;
 		$i++;
 	}
@@ -95,14 +94,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$grouplimit[] = $_POST['grouplimit'];
 	}
 	//$_POST['title'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['title']);
-
-	//DB $query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT itemorder,blockcnt FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	list ($itemlist, $blockcnt) = $stm->fetch(PDO::FETCH_NUM);
-	//DB $items = unserialize(mysql_result($result,0,0));
-	//DB $blockcnt = mysql_result($result,0,1);
 	$items = unserialize($itemlist);
 
 	if (isset($_GET['block'])) { //adding new
@@ -138,7 +132,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 	if (isset($existingid)) {  //already have id; update
-		//DB $sub[$existingid]['name'] = htmlentities(stripslashes($_POST['title']));
 		$sub[$existingid]['name'] = htmlentities($_POST['title']);
 		$sub[$existingid]['startdate'] = $startdate;
 		$sub[$existingid]['enddate'] = $enddate;
@@ -150,7 +143,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['grouplimit'] = $grouplimit;
 	} else { //add new
 		$blockitems = array();
-		//DB $blockitems['name'] = htmlentities(stripslashes($_POST['title']));
 		$blockitems['name'] = htmlentities($_POST['title']);
 		$blockitems['id'] = $blockcnt;
 		$blockitems['startdate'] = $startdate;
@@ -170,10 +162,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$blockcnt++;
 	}
-	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
-	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=$blockcnt WHERE id='$cid';";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
 	header(sprintf('Location: %s/course/course.php?cid=%s&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'], $cid));
@@ -182,9 +171,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { //it is a teacher but the form has not been posted
 
 	if (isset($_GET['id'])) { //teacher modifying existing block, load form with block data
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
@@ -197,7 +183,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$blockitems = $blockitems[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}
-		//DB $title = stripslashes($blockitems[$existingid]['name']);
 		$title = $blockitems[$existingid]['name'];
 		$title = str_replace('"','&quot;',$title);
 		$startdate = $blockitems[$existingid]['startdate'];
@@ -253,9 +238,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$usedef = 1;
 		$fixedheight = 0;
 		$grouplimit = array();
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
@@ -270,9 +252,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$page_sectionlistval = array("none");
 	$page_sectionlistlabel = array("No restriction");
-	//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {

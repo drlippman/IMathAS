@@ -29,35 +29,18 @@ if (!(isset($teacherid))) {
 	if ($_POST['remove']=="really") {
 		require_once("../includes/filehandler.php");
 		$DBH->beginTransaction();
-		//DB $query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='InlineText' AND courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $itemid = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='InlineText' AND courseid=:courseid");
 		$stm->execute(array(':typeid'=>$textid, ':courseid'=>$cid));
 		if ($stm->rowCount()>0) {
 			$itemid = $stm->fetchColumn(0);
-
-			//DB $query = "DELETE FROM imas_items WHERE id='$itemid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
 			$stm->execute(array(':id'=>$itemid));
-
-			//DB $query = "DELETE FROM imas_inlinetext WHERE id='$textid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_inlinetext WHERE id=:id");
 			$stm->execute(array(':id'=>$textid));
-
-			//DB $query = "SELECT filename FROM imas_instr_files WHERE itemid='$textid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("SELECT filename FROM imas_instr_files WHERE itemid=:itemid");
 			$stm->execute(array(':itemid'=>$textid));
 			//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				//DB $safefn = addslashes($row[0]);
-				//DB $query = "SELECT id FROM imas_instr_files WHERE filename='$safefn'";
-				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($r2)==1) {
 				if (substr($row[0],0,4)!='http') {
 					$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
 					$stm2->execute(array(':filename'=>$row[0]));
@@ -67,14 +50,8 @@ if (!(isset($teacherid))) {
 					}
 				}
 			}
-			//DB $query = "DELETE FROM imas_instr_files WHERE itemid='$textid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_instr_files WHERE itemid=:itemid");
 			$stm->execute(array(':itemid'=>$textid));
-
-			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $items = unserialize(mysql_result($result,0,0));
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cid));
 			$items = unserialize($stm->fetchColumn(0));
@@ -87,10 +64,7 @@ if (!(isset($teacherid))) {
 			$key = array_search($itemid,$sub);
 			if ($key!==false) {
 				array_splice($sub,$key,1);
-				//DB $itemorder = addslashes(serialize($items));
 				$itemorder = serialize($items);
-				//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 			}
@@ -99,9 +73,6 @@ if (!(isset($teacherid))) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else {
-		//DB $query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $itemname = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
 		$stm->execute(array(':id'=>$textid));
 		$itemname = $stm->fetchColumn(0);

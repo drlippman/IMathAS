@@ -59,29 +59,20 @@ isread is bitwise:
 Read   Deleted   Deleted by Sender   Tagged
 	*/
 	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
-		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&2)=2";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 		$query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id IN ($checklist)";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
 	if (isset($_POST['unsend']) && count($_POST['checked'])>0) {
-		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist)";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
 	if (isset($_GET['removeid'])) {
-		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&2)=2";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND (isread&2)=2");
 		$stm->execute(array(':id'=>$_GET['removeid']));
-		//DB $query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id='{$_GET['removeid']}'";
-		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=(isread|4) WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['removeid']));
 	}
@@ -97,14 +88,6 @@ Read   Deleted   Deleted by Sender   Tagged
 	echo '<div id="headersentlist" class="pagetitle"><h1>Sent Messages</h1></div>';
 
 	echo "<div class=\"cpmid\"><a href=\"msglist.php?cid=$cid\">Received Messages</a></div>";
-
-	//DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND (isread&4)=0";
-	//DB if ($filtercid>0) {
-	//DB 	$query .= " AND courseid='$filtercid'";
-	//DB }
-	//DB if ($filteruid>0) {
-	//DB 	$query .= " AND msgto='$filteruid'";
-	//DB }
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom=:msgfrom AND (isread&4)=0";
 	$qarr = array(':msgfrom'=>$userid);
 	if ($filtercid>0) {
@@ -115,21 +98,13 @@ Read   Deleted   Deleted by Sender   Tagged
 		$query .= " AND msgto=:msgto";
 		$qarr[':msgto'] = $filteruid;
 	}
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
-	//DB $numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 	$numpages = ceil($stm->fetchColumn(0)/$threadsperpage);
 	if ($numpages==0 && $filteruid>0) {
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
 		$filteruid = 0;
-		//DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom='$userid' AND (isread&4)=0";
-		//DB if ($filtercid>0) {
-			//DB $query .= " AND courseid='$filtercid'";
-		//DB }
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB $numpages = ceil(mysql_result($result,0,0)/$threadsperpage);
 		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgfrom=:msgfrom AND (isread&4)=0";
 		if ($filtercid>0) {
 			$query .= " AND courseid=:courseid";
@@ -238,14 +213,6 @@ function chgfilter() {
 		echo 'selected="selected" ';
 	}
 	echo '>All</option>';
-	//DB $query = "SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users ";
-	//DB $query .= "JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom='$userid'";
-	//DB if ($filtercid>0) {
-		//DB $query .= " AND imas_msgs.courseid='$filtercid'";
-	//DB }
-	//DB $query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users ";
 	$query .= "JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom=:msgfrom";
 	if ($filtercid>0) {
@@ -283,16 +250,6 @@ function chgfilter() {
 	<tbody>
 <?php
 	$offset = ($page-1)*$threadsperpage;
-	//DB $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users ";
-	//DB $query .= "WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$userid' AND (imas_msgs.isread&4)=0 ";
-	//DB if ($filtercid>0) {
-	//DB 	$query .= "AND imas_msgs.courseid='$filtercid' ";
-	//DB }
-	//DB if ($filteruid>0) {
-	//DB 	$query .= "AND imas_msgs.msgto='$filteruid' ";
-	//DB }
-	//DB $query .= " ORDER BY senddate DESC ";
-	//DB $query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users ";
 	$query .= "WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom=:msgfrom AND (imas_msgs.isread&4)=0 ";
 	$qarr = array(':msgfrom'=>$userid);
@@ -306,14 +263,11 @@ function chgfilter() {
 	}
 	$query .= " ORDER BY senddate DESC ";
 	$query .= "LIMIT $offset,$threadsperpage";// known INTs
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->prepare($query);
   $stm->execute($qarr);
-	//DB if (mysql_num_rows($result)==0) {
 	if ($stm->rowCount()==0) {
 		echo "<tr><td></td><td>No messages</td><td></td><td></td></tr>";
 	}
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (trim($line['title'])=='') {
 			$line['title'] = '[No Subject]';

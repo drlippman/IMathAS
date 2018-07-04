@@ -13,7 +13,6 @@ $aid = Sanitize::onlyInt($_GET['aid']);
 //form handling
 
 if (isset($_POST['vidid'])) {
-	//DB $_POST = stripslashes_deep($_POST);
 	$vidid = $_POST['vidid'];
 	$vidar = $_POST['vidar'];
 	$data = array();
@@ -45,10 +44,7 @@ if (isset($_POST['vidid'])) {
 	if (trim($_POST['finalseg'])!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
-	//DB 	$data = addslashes(serialize($data));
 	$data = serialize($data);
-	//DB $query = "UPDATE imas_assessments SET viddata='$data' WHERE id='$aid'";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
 	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
 
@@ -62,11 +58,6 @@ require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Video Navigation</div>\n";
-
-
-//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $row = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -88,10 +79,6 @@ for ($i=0;$i<count($qorder);$i++) {
 
 //Get question titles
 $qtitlebyid = array();
-//DB $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
-//DB $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid=:assessmentid";
 $stm = $DBH->prepare($query);

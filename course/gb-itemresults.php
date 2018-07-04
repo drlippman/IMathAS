@@ -21,9 +21,6 @@ $aid = Sanitize::onlyInt($_GET['aid']); //imas_assessments id
 
 //pull questionset ids
 $qsids = array();
-//DB $query = "SELECT id,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id,questionsetid FROM imas_questions WHERE assessmentid=:assessmentid");
 $stm->execute(array(':assessmentid'=>$aid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -32,9 +29,6 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 
 //pull question data
 $qsdata = array();
-//DB $query = "SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $query_placeholders = Sanitize::generateQueryPlaceholders($qsids);
 $stm = $DBH->prepare("SELECT id,qtype,control,description FROM imas_questionset WHERE id IN ($query_placeholders)");
 $stm->execute(array_values($qsids)); //INT from DB
@@ -49,17 +43,12 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 //   to backtrack to original option
 //tally results, grouping by result
 //output results.  For numeric/function, sort by frequency
-
-//DB $query = "SELECT questions,seeds,lastanswers,scores FROM imas_assessment_sessions ";
-//DB $query .= "WHERE assessmentid='$aid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $query = "SELECT questions,bestseeds,bestlastanswers,bestscores,ver FROM imas_assessment_sessions ";
 $query .= "WHERE assessmentid=:assessmentid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':assessmentid'=>$aid));
 $sessioncnt = 0;
 $qdata = array();
-//DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$GLOBALS['assessver'] = $row[4];
 	if (strpos($row[0],';')===false) {
@@ -128,14 +117,8 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize:
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
 echo '<div id="headergb-itemanalysis" class="pagetitle"><h1>Item Results: ';
-
-//DB $query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $stm = $DBH->prepare("SELECT defpoints,name,itemorder FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
-//DB $defpoints = mysql_result($result,0,0);
-//DB echo mysql_result($result,0,1).'</h1></div>';
-//DB $itemorder = mysql_result($result,0,2);
 list ($defpoints, $aname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
 echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
 $itemarr = array();

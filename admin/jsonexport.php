@@ -9,12 +9,6 @@ if (isset($_GET['cid'])) {
 
   //get assessment items and associated data
   $assessinfo = array();
-  //DB $query = "SELECT i_a.name, i_a.itemorder, i_i.id, i_i.typeid ";
-  //DB $query .= "FROM imas_assessments as i_a JOIN imas_items AS i_i ON ";
-  //DB $query .= "i_a.id=i_i.typeid AND i_i.itemtype='Assessment' ";
-  //DB $query .= "WHERE i_i.courseid=$cid";
-  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-  //DB while ($row = mysql_fetch_assoc($result)) {
   $query = "SELECT i_a.name, i_a.itemorder, i_i.id, i_i.typeid ";
   $query .= "FROM imas_assessments as i_a JOIN imas_items AS i_i ON ";
   $query .= "i_a.id=i_i.typeid AND i_i.itemtype='Assessment' ";
@@ -24,10 +18,6 @@ if (isset($_GET['cid'])) {
   while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     $assessinfo[$row['id']] = $row;
   }
-
-  //DB $query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
-  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-  //DB $items = unserialize(mysql_result($result,0,0));
   $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
   $stm->execute(array(':id'=>$cid));
   $items = unserialize($stm->fetchColumn(0));
@@ -62,15 +52,11 @@ function parseItemorder($items, $blockname='Main Page') {
 function getAssessmentQuestionIds($aid, $itemorder) {
   global $DBH;
   if ($itemorder=='') {return array();}
-  //DB $query = "SELECT imas_questions.id, imas_questions.questionsetid FROM imas_questions JOIN imas_assessments ";
-  //DB $query .= "ON imas_questions.assessmentid = imas_assessments.id WHERE imas_assessments.id=$aid";
-  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
   $query = "SELECT imas_questions.id, imas_questions.questionsetid FROM imas_questions JOIN imas_assessments ";
   $query .= "ON imas_questions.assessmentid = imas_assessments.id WHERE imas_assessments.id=:id";
   $stm = $DBH->prepare($query);
   $stm->execute(array(':id'=>$aid));
   $questionsetids = array();
-  //DB while($row = mysql_fetch_row($result)) {
   while($row = $stm->fetch(PDO::FETCH_NUM)) {
     $questionsetids[$row[0]] = $row[1]*1;
   }

@@ -45,9 +45,6 @@ if ($canviewall) {
 	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $gbmode = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
@@ -57,9 +54,6 @@ if ($canviewall) {
 	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
 	} else {
-		//DB $query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $colorize = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT colorize FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$colorize = $stm->fetchColumn(0);
@@ -211,8 +205,6 @@ if ($isteacher) {
 
 	}
 	if (isset($_POST['usrcomments']) && $stu>0) {
-			//DB $query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu' AND courseid='$cid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE userid=:userid AND courseid=:courseid");
 			$stm->execute(array(':gbcomment'=>$_POST['usrcomments'], ':userid'=>$stu, ':courseid'=>$cid));
 			//echo "<p>Comment Updated</p>";
@@ -220,13 +212,9 @@ if ($isteacher) {
 	if (isset($_POST['score']) && $stu>0) {
 		foreach ($_POST['score'] as $id=>$val) {
 			if (trim($val)=='') {
-				//DB $query = "DELETE FROM imas_grades WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
 				$stm->execute(array(':userid'=>$stu, ':gradetypeid'=>$id));
 			} else {
-				//DB $query = "UPDATE imas_grades SET score='$val',feedback='{$_POST['feedback'][$id]}' WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
 				$stm->execute(array(':score'=>$val, ':feedback'=>$_POST['feedback'][$id], ':userid'=>$stu, ':gradetypeid'=>$id));
 			}
@@ -238,13 +226,11 @@ if ($isteacher) {
 		$qarr = array();
 		foreach ($_POST['newscore'] as $id=>$val) {
 			if (trim($val)=="") {continue;}
-			//DB $toins[] = "('$id','offline','$stu','$val','{$_POST['feedback'][$id]}')";
 			$toins[] = "(?,?,?,?,?)";
 			array_push($qarr, $id, 'offline', $stu, $val, $_POST['feedback'][$id]);
 		}
 		if (count($toins)>0) {
 			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 		}
@@ -343,9 +329,6 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="0" ';
 		if ($catfilter==0) { echo "selected=1";}
 		echo '>', _('Default'), '</option>';
-		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -485,9 +468,6 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<option value="0" ';
 	if ($catfilter==0) { echo "selected=1";}
 	echo '>', _('Default'), '</option>';
-	//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -587,9 +567,6 @@ function gbstudisp($stu) {
 	$now = time();
 	$hasoutcomes = false;
 	if ($stu>0) {
-		//DB $query = "SELECT showlatepass,latepasshrs FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB list($showlatepass,$latepasshrs) = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT showlatepass,latepasshrs,outcomes FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		list($showlatepass,$latepasshrs,$outcomedata) = $stm->fetch(PDO::FETCH_NUM);
@@ -599,11 +576,6 @@ function gbstudisp($stu) {
 				$hasoutcomes = true;
 			}
 		}
-
-		//DB $query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
-		//DB $query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
 		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
 		$query .= "imas_students.userid=imas_users.id AND imas_users.id=:id AND imas_students.courseid=:courseid";
 		$stm = $DBH->prepare($query);
@@ -613,7 +585,6 @@ function gbstudisp($stu) {
 			require("../footer.php");
 			exit;
 		}
-		//DB list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = mysql_fetch_row($result);
 		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -624,9 +595,6 @@ function gbstudisp($stu) {
 		echo '<div style="font-size:1.1em;font-weight:bold">';
 		if ($isteacher || $istutor) {
 			if ($gbt[1][0][1] != '') {
-				//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $usersort = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$cid));
 				$usersort = $stm->fetchColumn(0);
@@ -641,7 +609,6 @@ function gbstudisp($stu) {
 					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\" alt=\"User picture\"/>";
 				}
 			}
-			//DB $query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid='$cid' ";
 			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid=:courseid ";
 			if ($hidelocked) {
 				$query .= "AND istu.locked=0 ";
@@ -651,13 +618,11 @@ function gbstudisp($stu) {
 			} else {
 				$query .= "ORDER BY iu.LastName,iu.FirstName";
 			}
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid));
 
 			echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
 			$lastsec = '';
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
 					if ($lastsec=='') {echo '</optgroup>';}
@@ -1052,9 +1017,6 @@ function gbstudisp($stu) {
 	}
 	echo '</tbody></table><br/>';
 	if (!$hidepast) {
-		//DB $query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $show = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT stugbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>Sanitize::courseId($cid)));
 		$show = $stm->fetchColumn(0);
@@ -1339,9 +1301,6 @@ function gbinstrdisp() {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>', _('All'), '</option>';
-			//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {

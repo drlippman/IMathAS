@@ -54,10 +54,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	} else {
 		$seqinactive = false;
 	}*/
-
-	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id='$qidx'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 	if (isset($GLOBALS['qdatafordisplayq'])) {
 		$qdata = $GLOBALS['qdatafordisplayq'];
 	} else if (isset($GLOBALS['qi']) && isset($GLOBALS['qi'][$GLOBALS['questions'][$qnidx]]['qtext'])) {
@@ -69,9 +65,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 
 	if ($qdata['hasimg']>0) {
-		//DB $query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 		$stm->execute(array(':qsetid'=>$qidx));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -739,7 +732,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		//for ($kidx=0;$kidx<count($_POST);$kidx++) {
 		//	$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["tc$partnum"])) {
-				//DB $stuanswers[$thisq][$kidx] = stripslashes($_POST["tc$partnum"]);
 				$stuanswers[$thisq][$kidx] = $_POST["tc$partnum"];
 				if ($_POST["qn$partnum"]==='') {
 					$stuanswersval[$thisq][$kidx] = null;
@@ -757,7 +749,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 					$tmp = array();
 					$spc = 0;
 					while (isset($_POST["qn$partnum-$spc"])) {
-						//DB $tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
 						$tmp[] = $_POST["qn$partnum-$spc"];
 						$spc++;
 					}
@@ -790,7 +781,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$tmp = array();
 				$spc = 0;
 				while (isset($_POST["qn$partnum-$spc"])) {
-					//DB $tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
 					$tmp[] = $_POST["qn$partnum-$spc"];
 					$spc++;
 				}
@@ -799,7 +789,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 	} else {
 		if (isset($_POST["tc$qnidx"])) {
-			//DB $stuanswers[$thisq] = stripslashes($_POST["tc$qnidx"]);
 			$stuanswers[$thisq] = $_POST["tc$qnidx"];
 			if (is_numeric($_POST["qn$qnidx"])) {
 				$stuanswersval[$thisq] = floatval($_POST["qn$qnidx"]);
@@ -814,7 +803,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$tmp = array();
 				$spc = 0;
 				while (isset($_POST["qn$qnidx-$spc"])) {
-					//DB $tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
 					$tmp[] = $_POST["qn$qnidx-$spc"];
 					$spc++;
 				}
@@ -841,7 +829,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$tmp = array();
 			$spc = 0;
 			while (isset($_POST["qn$qnidx-$spc"])) {
-				//DB $tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
 				$tmp[] = $_POST["qn$qnidx-$spc"];
 				$spc++;
 			}
@@ -2448,7 +2435,6 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= getcolormark($colorbox);
 			$out .= "</div>";
 		} else {
-			//DB $la = stripslashes($la);
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
 				$la = str_replace('&quot;','"',$la);
@@ -4749,7 +4735,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($scoremethod) && $scoremethod=='takeanything' && trim($givenans)!='') {
 			return 1;
 		}
-		//DB $givenans = stripslashes($givenans);
 
 		if (!isset($answerformat)) { $answerformat = "normal";}
 		if ($answerformat=='list') {
@@ -4898,7 +4883,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		//return $correct;
 	} else if ($anstype == "essay") {
 		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
-		//DB $givenans = addslashes(myhtmLawed(stripslashes($givenans)));
 		$givenans = myhtmLawed($givenans);
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
@@ -6946,10 +6930,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 function getqsetid($questionid) {
 	global $DBH;
-	//DB $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
-	//DB $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
 	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
@@ -6965,15 +6945,10 @@ function getqsetid($questionid) {
 
 function getallqsetid($questions) {
 	global $DBH;
-	//DB $qids = "'".implode("','",$questions)."'";
 	$qids = array_map('intval', $questions);
 	$qids_query_placeholders = Sanitize::generateQueryPlaceholders($qids);
 	$order = array_flip($questions);
 	$out = array();
-	//DB $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
-	//DB $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
 	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids_query_placeholders)";
 	$stm = $DBH->prepare($query);

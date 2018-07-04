@@ -65,21 +65,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 
 		//check if exception already exists
-		//DB $query = "SELECT id FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
-			//DB $query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore,exceptionpenalty=$epenalty WHERE id='{$row[0]}'";
-			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty WHERE id=:id");
 			$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':id'=>$row[0]));
 		} else {
-			//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty) VALUES ";
-			//DB $query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate,$waivereqscore,$epenalty)";
-			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty) VALUES ";
 			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty)";
 			$stm = $DBH->prepare($query);
@@ -88,8 +80,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
-			//DB $query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid=:userid AND courseid=:courseid");
 			$stm->execute(array(':userid'=>$_GET['uid'], ':courseid'=>$cid));
 		}
@@ -99,18 +89,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//this is not group-safe
 			$stu = $_GET['uid'];
 			$aid = Sanitize::onlyInt($_GET['aid']);
-			//DB $query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			//DB list($shuffle) = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT shuffle FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			list($shuffle) = $stm->fetch(PDO::FETCH_NUM);
 			$allqsameseed = (($shuffle&2)==2);
-
-			//DB $query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-				//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 			$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
 			if ($stm->rowCount()>0) {
@@ -153,11 +135,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$seedslist = implode(',',$seeds);
 				$lastanswers = str_replace('~','',$lastanswers);
 				$lalist = implode('~',$lastanswers);
-				//DB $lalist = addslashes(stripslashes($lalist));
 				$reattemptinglist = implode(',',$reattempting);
-				//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
-				//DB $query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";
-				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,seeds=:seeds,lastanswers=:lastanswers,";
 				$query .= "reattempting=:reattempting WHERE id=:id";
 				$stm = $DBH->prepare($query);
@@ -170,8 +148,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?cid=$cid&asid=" . Sanitize::onlyInt($asid) . "&uid=" . Sanitize::onlyInt($uid) . "&stu=" . Sanitize::onlyInt($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "&r=" . Sanitize::randomQueryStringParam());
 
 	} else if (isset($_GET['clear'])) {
-		//DB $query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
-		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['clear']));
 		$rpq =  Sanitize::randomQueryStringParam();
@@ -179,16 +155,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			. Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'asid' => $asid, 'uid' => $uid,
 				'stu' => $stu, 'from' => $from, 'r' => $rpq)));
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
-		//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $stuname = implode(', ', mysql_fetch_row($result));
 		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$uid));
 		$stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
-
-		//DB $query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['aid'])));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -199,9 +168,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$isDateByLTI = ($row[2]>0);
 
 		//check if exception already exists
-		//DB $query = "SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $erow = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>Sanitize::onlyInt($_GET['aid'])));
 		$erow = $stm->fetch(PDO::FETCH_NUM);
@@ -226,14 +192,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DEFAULT LOAD DATA MANIPULATION
 	$address = $GLOBALS['basesiteurl'] . "/course/exception.php?" . Sanitize::generateQueryStringFromMap(array(
 			'cid' => $_GET['cid'], 'uid' => $_GET['uid'], 'asid' => $asid, 'stu' => $stu, 'from' => $from));
-
-	//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	$page_courseSelect = array();
 	$i=0;
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$page_courseSelect['val'][$i] = $line['id'];
 		$page_courseSelect['label'][$i] = $line['name'];
@@ -241,10 +203,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 }
-
-//DB $query = "SELECT latepass FROM imas_students WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $latepasses = mysql_result($result,0,0);
 $stm = $DBH->prepare("SELECT latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 $stm->execute(array(':userid'=>$_GET['uid'], ':courseid'=>$cid));
 $latepasses = $stm->fetchColumn(0);

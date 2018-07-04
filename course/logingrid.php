@@ -47,9 +47,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	$edate = tzdate("m/d/Y",$end);
 
 	$logins = array();
-	//DB $query = "SELECT userid,logintime FROM imas_login_log WHERE courseid='$cid' AND logintime>=$start AND logintime<=$end";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT userid,logintime FROM imas_login_log WHERE courseid=:courseid AND logintime>=:start AND logintime<=:end");
 	$stm->execute(array(':courseid'=>$cid, ':start'=>$start, ':end'=>$end));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -68,10 +65,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	}
 
 	$stus = array();
-	//DB $query = "SELECT iu.LastName,iu.FirstName,iu.id FROM imas_users as iu JOIN imas_students ON iu.id=imas_students.userid ";
-	//DB $query .= "WHERE imas_students.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT iu.LastName,iu.FirstName,iu.id FROM imas_users as iu JOIN imas_students ON iu.id=imas_students.userid ";
 	$query .= "WHERE imas_students.courseid=:courseid ORDER BY iu.LastName,iu.FirstName";
 	$stm = $DBH->prepare($query);

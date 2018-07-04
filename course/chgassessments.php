@@ -38,17 +38,11 @@ if (!(isset($teacherid))) {
 		$qarr = array();
 		if (isset($_POST['docopyopt'])) {
 			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
-
-			//DB $query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
-			//DB $tocopyarr = explode(',',$tocopy);
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopt'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
-				//DB $sets[] = "$item='".addslashes($row[$k])."'";
 				$sets[] = "$item=:$item";
 			}
 
@@ -128,87 +122,70 @@ if (!(isset($teacherid))) {
 				if (isset($_POST['timelimitkickout'])) {
 					$timelimit = -1*$timelimit;
 				}
-				//DB $sets[] = "timelimit='$timelimit'";
 				$sets[] = "timelimit=:timelimit";
 				$qarr[':timelimit'] = $timelimit;
 			}
 			if (isset($_POST['chgtutoredit'])) {
-				//DB $sets[] = "tutoredit='{$_POST['tutoredit']}'";
 				$sets[] = "tutoredit=:tutoredit";
 				$qarr[':tutoredit'] = Sanitize::onlyInt($_POST['tutoredit']);
 			}
 			if (isset($_POST['chgdisplaymethod'])) {
-				//DB $sets[] = "displaymethod='{$_POST['displaymethod']}'";
 				$sets[] = "displaymethod=:displaymethod";
 				$qarr[':displaymethod'] = Sanitize::simpleASCII($_POST['displaymethod']);
 			}
 			if (isset($_POST['chgdefpoints'])) {
-				//DB $sets[] = "defpoints='{$_POST['defpoints']}'";
 				$sets[] = "defpoints=:defpoints";
 				$qarr[':defpoints'] = Sanitize::onlyInt($_POST['defpoints']);
 			}
 			if (isset($_POST['chgdefattempts'])) {
-				//DB $sets[] = "defattempts='{$_POST['defattempts']}'";
 				$sets[] = "defattempts=:defattempts";
 				$qarr[':defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
 			}
 			if (isset($_POST['chgdefpenalty'])) {
-				//DB $sets[] = "defpenalty='{$_POST['defpenalty']}'";
 				$sets[] = "defpenalty=:defpenalty";
 				$qarr[':defpenalty'] = Sanitize::onlyInt($_POST['defpenalty']);
 			}
 			if (isset($_POST['chgfeedback'])) {
-				//DB $sets[] = "deffeedback='$deffeedback'";
 				$sets[] = "deffeedback=:deffeedback";
 				$qarr[':deffeedback'] = $deffeedback;
 			}
 			if (isset($_POST['chggbcat'])) {
-				//DB $sets[] = "gbcategory='{$_POST['gbcat']}'";
 				$sets[] = "gbcategory=:gbcategory";
 				$qarr[':gbcategory'] = Sanitize::onlyInt($_POST['gbcat']);
 			}
 			if (isset($_POST['chgallowlate'])) {
-				//DB $sets[] = "allowlate='$allowlate'";
 				$sets[] = "allowlate=:allowlate";
 				$qarr[':allowlate'] = $allowlate;
 			}
 			if (isset($_POST['chgexcpen'])) {
-				//DB $sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
 				$sets[] = "exceptionpenalty=:exceptionpenalty";
 				$qarr[':exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
 			}
 			if (isset($_POST['chgpassword'])) {
-				//DB $sets[] = "password='{$_POST['assmpassword']}'";
 				$sets[] = "password=:password";
 				$qarr[':password'] = Sanitize::stripHtmlTags($_POST['assmpassword']);
 			}
 			if (isset($_POST['chghints'])) {
-				//DB $sets[] = "showhints='$showhints'";
 				$sets[] = "showhints=:showhints";
 				$qarr[':showhints'] = $showhints;
 			}
 			if (isset($_POST['chgshowtips'])) {
-				//DB $sets[] = "showtips='{$_POST['showtips']}'";
 				$sets[] = "showtips=:showtips";
 				$qarr[':showtips'] = Sanitize::onlyInt($_POST['showtips']);
 			}
 			if (isset($_POST['chgnoprint'])) {
-				//DB $sets[] = "noprint='{$_POST['noprint']}'";
 				$sets[] = "noprint=:noprint";
 				$qarr[':noprint'] = Sanitize::onlyInt($_POST['noprint']);
 			}
 			if (isset($_POST['chgisgroup'])) {
-				//DB $sets[] = "isgroup='{$_POST['isgroup']}'";
 				$sets[] = "isgroup=:isgroup";
 				$qarr[':isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
 			}
 			if (isset($_POST['chggroupmax'])) {
-				//DB $sets[] = "groupmax='{$_POST['groupmax']}'";
 				$sets[] = "groupmax=:groupmax";
 				$qarr[':groupmax'] = Sanitize::onlyInt($_POST['groupmax']);
 			}
 			if (isset($_POST['chgcntingb'])) {
-				//DB $sets[] = "cntingb='{$_POST['cntingb']}'";
 				$sets[] = "cntingb=:cntingb";
 				$qarr[':cntingb'] = Sanitize::onlyInt($_POST['cntingb']);
 			}
@@ -216,28 +193,23 @@ if (!(isset($teacherid))) {
 				if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $_POST['minscore']>0) {
 					$_POST['minscore'] = intval($_POST['minscore'])+10000;
 				}
-				//DB $sets[] = "minscore='{$_POST['minscore']}'";
 				$sets[] = "minscore=:minscore";
 				$qarr[':minscore'] = Sanitize::onlyInt($_POST['minscore']);
 			}
 			if (isset($_POST['chgshowqcat'])) {
-				//DB $sets[] = "showcat='{$_POST['showqcat']}'";
 				$sets[] = "showcat=:showcat";
 				$qarr[':showcat'] = Sanitize::onlyInt($_POST['showqcat']);
 			}
 			if (isset($_POST['chgeqnhelper'])) {
-				//DB $sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
 				$sets[] = "eqnhelper=:eqnhelper";
 				$qarr[':eqnhelper'] = Sanitize::onlyInt($_POST['eqnhelper']);	
 			}
 
 			if (isset($_POST['chgcaltag'])) {
 				$caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
-				//DB $sets[] = "caltag='$caltag'";
 				$sets[] = "caltag=:caltag";
 				$qarr[':caltag'] = $caltag;
 				$calrtag = Sanitize::stripHtmlTags($_POST['caltagrev']);
-				//DB $sets[] = "calrtag='$calrtag'";
 				$sets[] = "calrtag=:calrtag";
 				$qarr[':calrtag'] = $calrtag;
 			}
@@ -250,7 +222,6 @@ if (!(isset($teacherid))) {
 			}
 			if (isset($_POST['chgposttoforum'])) {
 				if (isset($_POST['doposttoforum'])) {
-					//DB $sets[] = "posttoforum='{$_POST['posttoforum']}'";
 					$sets[] = "posttoforum=:posttoforum";
 					$qarr[':posttoforum'] = Sanitize::onlyInt($_POST['posttoforum']);
 				} else {
@@ -259,7 +230,6 @@ if (!(isset($teacherid))) {
 			}
 			if (isset($_POST['chgdeffb'])) {
 				if (isset($_POST['usedeffb'])) {
-					//DB $sets[] = "deffeedbacktext='{$_POST['deffb']}'";
 					$sets[] = "deffeedbacktext=:deffeedbacktext";
 					$qarr[':deffeedbacktext'] = Sanitize::incomingHtml($_POST['deffb']);
 				} else {
@@ -293,7 +263,6 @@ if (!(isset($teacherid))) {
 			}
 		}
 		if (isset($_POST['chgavail'])) {
-			//DB $sets[] = "avail='{$_POST['avail']}'";
 			$sets[] = "avail=:avail";	
 			$qarr[':avail'] = Sanitize::onlyInt($_POST['avail']);
 		}
@@ -307,23 +276,15 @@ if (!(isset($teacherid))) {
 		}
 
 		if (isset($_POST['chgsummary'])) {
-			//DB $query = "SELECT summary FROM imas_assessments WHERE id='{$_POST['summary']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("SELECT summary FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['summary'])));
-			//DB $sets[] = "summary='".addslashes(mysql_result($result,0,0))."'";
-			//DB $sets[] = "summary=$summary";
 			$sets[] = "summary=:summary";
 			$qarr[':summary'] = $stm->fetchColumn(0);
 		}
 		if (isset($_POST['chgdates'])) {
-			//DB $query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['dates']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['dates'])));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			//DB $sets[] = "startdate='{$row[0]}',enddate='{$row[1]}',reviewdate='{$row[2]}'";
 			$sets[] = "startdate=:startdate";
 			$qarr[':startdate'] = $row[0];
 			$sets[] = "enddate=:enddate";
@@ -331,24 +292,17 @@ if (!(isset($teacherid))) {
 			$sets[] = "reviewdate=:reviewdate";
 			$qarr[':reviewdate'] = $row[2];
 		} if (isset($_POST['chgcopyendmsg'])) {	
-			//DB $query = "SELECT endmsg FROM imas_assessments WHERE id='{$_POST['copyendmsg']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyendmsg'])));
-			//DB $sets[] = "endmsg='".addslashes(mysql_result($result,0,0))."'";
 			$sets[] = "endmsg=:endmsg";
 			$qarr[':endmsg'] = $stm->fetchColumn(0);
 		}
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
-			//DB $query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist);";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)");
 			$stm->execute($qarr);
 		}
 		if (isset($_POST['chgintro'])) {
-			//DB $query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['intro'])));
 			$cpintro = $stm->fetchColumn(0);
@@ -371,8 +325,6 @@ if (!(isset($teacherid))) {
 		}
 
 		if (isset($_POST['removeperq'])) {
-			//DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0,fixedseeds=NULL WHERE assessmentid IN ($checkedlist)");
 		}
 		if (isset($_POST['docopyopt']) || isset($_POST['chgdefpoints']) || isset($_POST['removeperq'])) {
@@ -417,13 +369,8 @@ if (!(isset($teacherid))) {
 		} else {
 			$skippenalty = 0;
 		}
-
-		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
-
-		//DB $items = unserialize(mysql_result($result,0,0));
 		$items = unserialize($stm->fetchColumn(0));
 		$gitypeids = array();
 		$ids = array();
@@ -435,10 +382,6 @@ if (!(isset($teacherid))) {
 		$prespace = array();
 		$itemshowdata = loadItemShowData($items,false,true,false,false,'Assessment',true);
 		getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
-
-		//DB $query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
 		$stm = $DBH->prepare("SELECT id,name,gbcategory FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		if ($stm->rowCount()==0) {
@@ -447,7 +390,6 @@ if (!(isset($teacherid))) {
 			$page_assessListMsg = "";
 			$i=0;
 			$page_assessSelect = array();
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_assessSelect['val'][$i] = $row[0];
 				$page_assessSelect['label'][$i] = $row[1];
@@ -455,17 +397,12 @@ if (!(isset($teacherid))) {
 				$i++;
 			}
 		}
-
-		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=1;
 		$page_gbcatSelect = array();
 		$page_gbcatSelect['val'][0] = 0;
 		$page_gbcatSelect['label'][0] ='Default';
-		//DB if (mysql_num_rows($result)>0) {
-			//DB while ($row = mysql_fetch_row($result)) {
 		if ($stm->rowCount()>0) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
@@ -475,13 +412,10 @@ if (!(isset($teacherid))) {
 		}
 
 		$page_forumSelect = array();
-		//DB $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$page_forumSelect['val'][0] = 0;
 		$page_forumSelect['label'][0] = "None";
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];

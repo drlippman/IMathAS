@@ -18,11 +18,6 @@ Because of this, this file does NOT contain the full up-to-date database schema.
 $dbsetup = true;
 $use_local_sessions = true;
 include("init_without_validate.php");
-
-//DB $query = "SELECT ver FROM imas_dbschema WHERE id=1";
-//DB $result = mysql_query($query);
-//DB if ($result!==false) {
-//DB $stm = $DBH->query("SELECT ver FROM imas_dbschema WHERE id=1");
 $stm = $DBH->query("SHOW TABLES LIKE 'imas_dbschema'");
 if ($stm->rowCount()>0) {
 	echo "It appears the database setup has already been run.  Aborting.  If you need to ";
@@ -113,7 +108,6 @@ $sql = 'CREATE TABLE `imas_users` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'User Information\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 
 
@@ -139,7 +133,6 @@ $sql = 'CREATE TABLE `imas_students` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Which courses each student is enrolled in\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_students created<br/>';
 
@@ -152,7 +145,6 @@ $sql = 'CREATE TABLE `imas_teachers` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Which courses each teacher is teaching\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_teachers created<br/>';
 
@@ -165,7 +157,6 @@ $sql = 'CREATE TABLE `imas_tutors` ('
 	. 'INDEX (`userid`), INDEX(`courseid`) '
 	. ' ) ENGINE = InnoDB '
 	. 'COMMENT = \'course tutors\'';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_tutors created<br/>';
 
@@ -199,7 +190,6 @@ $sql = 'CREATE TABLE `imas_courses` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Course list\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_courses created<br/>';
 
@@ -254,7 +244,6 @@ $sql = 'CREATE TABLE `imas_assessments` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Assessment info\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_assessments created<br/>';
 
@@ -277,7 +266,6 @@ $sql = 'CREATE TABLE `imas_questions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Questions in an assessment\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_questions created<br/>';
 
@@ -312,7 +300,6 @@ $sql = 'CREATE TABLE `imas_questionset` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Actual set of questions\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_questionset created<br/>';
 
@@ -326,7 +313,6 @@ $sql = 'CREATE TABLE `imas_qimages` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Static image ref for questionset\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_qimages created<br/>';
 
@@ -339,7 +325,6 @@ $sql = 'CREATE TABLE `imas_items` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Items within a course\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_items created<br/>';
 
@@ -374,7 +359,6 @@ $sql = 'CREATE TABLE `imas_assessment_sessions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Assessment Sessions\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_assessment_sessions created<br/>';
 
@@ -387,7 +371,6 @@ $sql = 'CREATE TABLE `imas_firstscores` (
 	`timespent` SMALLINT(5) UNSIGNED NOT NULL,
 	INDEX ( `courseid`), INDEX(`qsetid`)
 	) ENGINE = InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_firstscores created<br/>';
 
@@ -402,7 +385,6 @@ $sql = 'CREATE TABLE `imas_sessions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Session data\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_sessions created<br/>';
 
@@ -423,7 +405,6 @@ $sql = 'CREATE TABLE `imas_inlinetext` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Inline text items\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_inlinetext created<br/>';
 
@@ -436,7 +417,6 @@ $sql = 'CREATE TABLE `imas_instr_files` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Inline text file attachments\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_instr_files created<br/>';
 
@@ -458,7 +438,6 @@ $sql = 'CREATE TABLE `imas_linkedtext` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Linked Text Items\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_linkedtext created<br/>';
 
@@ -476,7 +455,6 @@ $sql = 'CREATE TABLE `imas_exceptions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Per student exceptions to assessment start/end date\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_exceptions created<br/>';
 
@@ -495,7 +473,6 @@ $sql = 'CREATE TABLE `imas_libraries` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'QuestionSet Libraries\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_libraries created<br/>';
 
@@ -509,7 +486,6 @@ $sql = 'CREATE TABLE `imas_library_items` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Library assignments\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_library_items created<br/>';
 
@@ -545,7 +521,6 @@ $sql = 'CREATE TABLE `imas_forums` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forums\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_forums created<br/>';
 
@@ -559,7 +534,6 @@ $sql = 'CREATE TABLE `imas_forum_threads` ('
 	. ' PRIMARY KEY (`id`), INDEX (`forumid`), INDEX(`lastposttime`), INDEX(`stugroupid`) ) '
 	. ' ENGINE = InnoDB '
 	. ' COMMENT = \'Forum threads\'';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_forum_threads created<br/>';
 
@@ -582,7 +556,6 @@ $sql = 'CREATE TABLE `imas_forum_posts` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forum Postings\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_forum_posts created<br/>';
 
@@ -596,7 +569,6 @@ $sql = 'CREATE TABLE `imas_forum_views` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forum last viewings\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_forum_views created<br/>';
 
@@ -608,7 +580,6 @@ $sql = 'CREATE TABLE `imas_forum_likes` (
 	`type` TINYINT(1) UNSIGNED NOT NULL,
 	INDEX (`userid`), INDEX(`threadid`), INDEX(`postid`)
 	) ENGINE = InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_forum_likes created<br/>';
 
@@ -628,7 +599,6 @@ $sql = 'CREATE TABLE `imas_wikis` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Wikis\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_wikis created<br/>';
 
@@ -643,7 +613,6 @@ $sql = 'CREATE TABLE `imas_wiki_revisions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Wiki revisions\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_wiki_revisions created<br/>';
 
@@ -657,7 +626,6 @@ $sql = 'CREATE TABLE `imas_wiki_views` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Wiki last viewings\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_wiki_views created<br/>';
 
@@ -668,7 +636,6 @@ $sql = 'CREATE TABLE `imas_groups` ('
         . ' `parent` INT(10) UNSIGNED NOT NULL DEFAULT \'0\''
         . ' )'
         . ' ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_groups created<br/>';
 
@@ -683,7 +650,6 @@ $sql = 'CREATE TABLE `imas_rubrics` ('
 	. ' )'
 	. ' ENGINE = InnoDB'
 	. ' COMMENT = \'Rubrics\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_rubrics created<br/>';
 
@@ -708,7 +674,6 @@ $sql = 'CREATE TABLE `imas_diags` ('
         . ' INDEX (`ownerid`), INDEX(`public`), INDEX(`cid`)'
         . ' )'
         . ' ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_diags created<br/>';
 
@@ -721,7 +686,6 @@ $sql = 'CREATE TABLE `imas_diag_onetime` ('
         . ' INDEX (`diag`), INDEX(`time`), INDEX(`code`)'
         . ' )'
         . ' ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_diag_onetime created<br/>';
 
@@ -741,7 +705,6 @@ $sql = 'CREATE TABLE `imas_msgs` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Internal messages\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_msgs created<br/>';
 
@@ -753,7 +716,6 @@ $sql = 'CREATE TABLE `imas_forum_subscriptions` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forum subscriptions\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_forum_subscriptions created<br/>';
 
@@ -772,7 +734,6 @@ $sql = 'CREATE TABLE `imas_gbscheme` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Gradebook scheme\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_gbscheme created<br/>';
 
@@ -791,7 +752,6 @@ $sql = 'CREATE TABLE `imas_gbitems` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Gradebook offline items\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_gbitems created<br/>';
 
@@ -807,7 +767,6 @@ $sql = 'CREATE TABLE `imas_grades` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Offline grades\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_grades created<br/>';
 
@@ -826,7 +785,6 @@ $sql = 'CREATE TABLE `imas_gbcats` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Gradebook Categories\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_gbcats created<br/>';
 
@@ -840,7 +798,6 @@ $sql = 'CREATE TABLE `imas_calitems` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Calendar Items\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_calitems created<br/>';
 
@@ -853,7 +810,6 @@ $sql = 'CREATE TABLE `imas_stugroupset` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Student Group Sets\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_stugroupset created<br/>';
 
@@ -865,7 +821,6 @@ $sql = 'CREATE TABLE `imas_stugroups` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Student Groups\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_stugroups created<br/>';
 
@@ -877,7 +832,6 @@ $sql = 'CREATE TABLE `imas_stugroupmembers` ('
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Student Group Members\';';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_stugroupmembers created<br/>';
 
@@ -888,7 +842,6 @@ $sql = 'CREATE TABLE `imas_outcomes` (
 	`ancestors` TEXT NOT NULL,
 	INDEX ( `courseid`)
 	) ENGINE = InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_outcomes created<br/>';
 
@@ -900,7 +853,6 @@ $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' INDEX ( `ltiuserid`) '
         . ' )'
         . ' ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_ltiusers created<br/>';
 
@@ -910,7 +862,6 @@ $sql = 'CREATE TABLE `imas_ltinonces` ('
         . ' `time` INT(10) UNSIGNED NOT NULL'
         . ' )'
         . ' ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_ltinonces created<br/>';
 
@@ -921,7 +872,6 @@ $sql = 'CREATE TABLE `imas_lti_courses` (
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
 	 INDEX(`org`,`contextid`)
 	) ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_lti_courses created<br/>';
 
@@ -934,7 +884,6 @@ $sql = 'CREATE TABLE `imas_lti_placements` (
 	`placementtype` VARCHAR( 10 ) NOT NULL ,
 	 INDEX(`org`, `contextid`, `linkid`)
 	) ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_lti_placements created<br/>';
 
@@ -948,8 +897,6 @@ $sql = 'CREATE TABLE `mc_sessions` ('
         . ' `graphdisp` TINYINT( 1 ) NOT NULL,'
         . ' INDEX ( `sessionid` ), INDEX( `room` ), INDEX( `lastping` )'
         . ' ) ENGINE = InnoDB;';
-
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'mc_sessions created<br/>';
 
@@ -960,7 +907,6 @@ $sql = 'CREATE TABLE `mc_msgs` ('
         . ' `time` INT( 10 ) UNSIGNED NOT NULL ,'
         . ' INDEX ( `userid` ), INDEX ( `time` )'
         . ' ) ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'mc_msgs created<br/>';
 
@@ -982,7 +928,6 @@ $sql = 'CREATE TABLE `imas_drillassess` (
 	`showtostu` TINYINT( 1 ) UNSIGNED NOT NULL ,
 	INDEX ( `courseid` ), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)
 	) ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_drillassess created<br/>';
 
@@ -997,7 +942,6 @@ $sql = 'CREATE TABLE `imas_drillassess_sessions` (
 	`scorerec` TEXT NOT NULL ,
 	INDEX ( `drillassessid`), INDEX(`userid` )
 	) ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_drillassess_sessions created<br/>';
 
@@ -1009,7 +953,6 @@ $sql = 'CREATE TABLE `imas_login_log` (
 	`lastaction` INT( 10 ) UNSIGNED NOT NULL ,
 	 INDEX(`userid` ), INDEX(`courseid`)
 	) ENGINE = InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_login_log created<br/>';
 
@@ -1018,7 +961,6 @@ $sql = 'CREATE TABLE `imas_log` (
 	`time` INT( 10 ) UNSIGNED NOT NULL ,
 	`log` TEXT NOT NULL
 	) ENGINE = InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_log created<br/>';
 
@@ -1034,7 +976,6 @@ $sql = 'CREATE TABLE `imas_external_tools` (
 	`groupid` INT( 10 ) UNSIGNED NOT NULL ,
 	INDEX ( `url` ), INDEX( `courseid` ), INDEX( `groupid` )
 	) ENGINE = InnoDB COMMENT = \'LTI external tools\'';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_external_tools created<br/>';
 
@@ -1048,7 +989,6 @@ $sql = 'CREATE TABLE `imas_badgesettings` (
 	  `requirements` text NOT NULL,
 	  INDEX(`courseid`)
 	) ENGINE=InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_badgesettings created<br/>';
 
@@ -1059,7 +999,6 @@ $sql = 'CREATE TABLE `imas_badgerecords` (
 	  `data` text NOT NULL,
 	  INDEX (`userid`), INDEX(`badgeid`)
 	) ENGINE=InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_badgerecords created<br/>';
 
@@ -1071,7 +1010,6 @@ $sql = 'CREATE TABLE `imas_bookmarks` (
 	`value` TEXT NOT NULL ,
 	INDEX ( `courseid`) , INDEX( `userid`) , INDEX( `name` )
 	) ENGINE = InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_bookmarks created<br/>';
 
@@ -1086,7 +1024,6 @@ $sql = 'CREATE TABLE `imas_content_track` (
 	INDEX ( `courseid`) , INDEX( `userid`),
 	INDEX ( `typeid`)
 	) ENGINE = InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_content_track created<br/>';
 
@@ -1097,7 +1034,6 @@ $sql = 'CREATE TABLE `imas_livepoll_status` (
 	  `seed` INT(10) unsigned NOT NULL,
 	  `startt` BIGINT(13) unsigned NOT NULL
 	) ENGINE=InnoDB;';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_livepoll_status created<br/>';
 
@@ -1105,10 +1041,8 @@ $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,
 	`ver` INT( 10 ) UNSIGNED NOT NULL
 	) ENGINE = InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 $sql = 'INSERT INTO imas_dbschema (id,ver) VALUES (2,0)';  //initialize guest account counter
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'imas_dbschema created<br/>';
 
@@ -1119,7 +1053,6 @@ $sql = 'CREATE TABLE `php_sessions` (
 	PRIMARY KEY (`id`),
 	INDEX (`access`)
 	) ENGINE=InnoDB';
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $DBH->query($sql);
 echo 'php_sessions created<br/>';
 
@@ -1130,8 +1063,6 @@ if (isset($CFG['GEN']['newpasswords'])) {
 	$md5pw = md5($password);
 }
 $now = time();
-//DB $query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES ('$username','$md5pw',100,'$firstname','$lastname','$email')";
-//DB mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 $stm = $DBH->prepare("INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email) VALUES (:SID, :password, :rights, :FirstName, :LastName, :email)");
 $stm->execute(array(':SID'=>$username, ':password'=>$md5pw, ':rights'=>100, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email));
 

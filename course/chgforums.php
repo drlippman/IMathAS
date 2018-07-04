@@ -15,12 +15,10 @@ $cid = Sanitize::courseId($_GET['cid']);
 if (isset($_POST['checked'])) { //form submitted
 	$checked = $_POST['checked'];
 	require_once("../includes/parsedatetime.php");
-	//DB $checkedlist = "'".implode("','",$checked)."'";
 	$checkedlist = implode(',', array_map('intval', $checked));
 	$sets = array();
 	$qarr = array();
 	if (isset($_POST['chgavail'])) {
-		//DB $sets[] = 'avail='.intval($_POST['avail']);
 		$sets[] = "avail=:avail";
 		$qarr[':avail'] = $_POST['avail'];
 	}
@@ -32,7 +30,6 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
 		}
-		//DB $sets[] = "replyby='$replyby'";
 		$sets[] = "replyby=:replyby";
 		$qarr[':replyby'] = $replyby;
 	}
@@ -44,7 +41,6 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
 		}
-		//DB $sets[] = "postby='$postby'";
 		$sets[] = "postby=:postby";
 		$qarr[':postby'] = $postby;
 	}
@@ -56,12 +52,10 @@ if (isset($_POST['checked'])) { //form submitted
 				$allowlate += 100;
 			}
 		}
-		//DB $sets[] = "allowlate=$allowlate";
 		$sets[] = "allowlate=:allowlate";
 		$qarr[':allowlate'] = $allowlate;
 	}
 	if (isset($_POST['chgcaltag'])) {
-		//DB $sets[] = "caltag='".$_POST['caltagpost'].'--'.$_POST['caltagreply']."'";
 		$sets[] = "caltag=:caltag";
 		$qarr[':caltag'] = $_POST['caltagpost'].'--'.$_POST['caltagreply'];
 	}
@@ -119,12 +113,10 @@ if (isset($_POST['checked'])) { //form submitted
 		$sets[] = "settings=$out";  //safe, calculation
 	}
 	if (isset($_POST['chgdefdisplay'])) {
-		//DB $sets[] = 'defdisplay='.intval($_POST['defdisplay']);
 		$sets[] = "defdisplay=:defdisplay";
 		$qarr[':defdisplay'] = $_POST['defdisplay'];
 	}
 	if (isset($_POST['chgsortby'])) {
-		//DB $sets[] = 'sortby='.intval($_POST['sortby']);
 		$sets[] = "sortby=:sortby";
 		$qarr[':sortby'] = $_POST['sortby'];
 	}
@@ -136,22 +128,18 @@ if (isset($_POST['checked'])) { //form submitted
 		} else if ($_POST['cntingb'] == 4) {
 			$_POST['cntingb'] = 0;
 		}
-		//DB $sets[] = 'cntingb='.intval($_POST['cntingb']);
 		$sets[] = "cntingb=:cntingb";
 		$qarr[':cntingb'] = $_POST['cntingb'];
 		if (is_numeric($_POST['points'])) {
-			//DB $sets[] = 'points='.intval($_POST['points']);
 			$sets[] = "points=:points";
 			$qarr[':points'] = $_POST['points'];
 		}
 	}
 	if (isset($_POST['chggbcat'])) {
-		//DB $sets[] = "gbcategory='{$_POST['gbcat']}'";
 		$sets[] = "gbcategory=:gbcategory";
 		$qarr[':gbcategory'] = $_POST['gbcat'];
 	}
 	if (isset($_POST['chgforumtype'])) {
-		//DB $sets[] = "forumtype='{$_POST['forumtype']}'";
 		$sets[] = "forumtype=:forumtype";
 		$qarr[':forumtype'] = $_POST['forumtype'];
 	}
@@ -161,14 +149,11 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$taglist = '';
 		}
-		//DB $sets[] = "taglist='$taglist'";
 		$sets[] = "taglist=:taglist";
 		$qarr[':taglist'] = $taglist;
 	}
 	if (count($sets)>0 & count($checked)>0) {
 		$setslist = implode(',',$sets);
-		//DB $query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);");
 		$stm->execute($qarr);
 	}
@@ -176,12 +161,9 @@ if (isset($_POST['checked'])) { //form submitted
 
 		if (isset($_POST['subscribe'])) {
 			//add any subscriptions we don't already have
-			//DB $query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid=:userid");
 			$stm->execute(array(':userid'=>$userid));
 			$hassubscribe = array();
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$hassubscribe[] = $row[0];
 			}
@@ -190,16 +172,12 @@ if (isset($_POST['checked'])) { //form submitted
 			foreach ($toadd as $fid) {
 				$fid = intval($fid);
 				if ($fid>0) {
-					//DB $query = "INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES ('$fid','$userid')";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES (:forumid, :userid)");
 					$stm->execute(array(':forumid'=>$fid, ':userid'=>$userid));
 				}
 			}
 		} else {
 			//remove any existing subscriptions
-			//DB $query = "DELETE FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid=:userid");
 			$stm->execute(array(':userid'=>$userid));
 
@@ -212,35 +190,24 @@ if (isset($_POST['checked'])) { //form submitted
 
 //prep for output
 $forumitems = array();
-//DB $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid ORDER BY name");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$forumitems[$row[0]] = $row[1];
 }
-
-//DB $query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
 $stm->execute(array(':courseid'=>$cid));
 $i=0;
 $page_groupSelect = array();
-//DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$page_groupSelect['val'][$i] = $row[0];
 	$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 	$i++;
 }
-
-//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 $page_gbcatSelect = array();
 $i=0;
-//DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$page_gbcatSelect['val'][$i] = $row[0];
 	$page_gbcatSelect['label'][$i] = $row[1];

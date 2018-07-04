@@ -30,9 +30,7 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 		} else {
 			$query .= " AND ia.courseid=$aidarr";
 		}
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query($query); //pre-sanitized
-		//DB $replacedcnt = mysql_affected_rows();
 		$replacedcnt = $stm->rowCount();
 	}
 
@@ -50,9 +48,7 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 		}
 		$todoaid = array();
 		$withdrawn = array();
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query($query); //pre-sanitized
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$todoaid[] = $row[0];
 			if ($row[2]>0) {
@@ -66,9 +62,7 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 		$item_upd_stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 
 		$query = "SELECT id,itemorder,defpoints FROM imas_assessments WHERE id IN (".implode(',',$todoaid).')';
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query($query); //pre-sanitized
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$items = explode(',',$row[1]);
 			$newitems = array();
@@ -100,8 +94,6 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 				}
 			}
 			$newitemlist = implode(',', $newitems);
-			//DB $query = "UPDATE imas_assessments SET itemorder='$newitemlist' WHERE id={$row[0]}";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$item_upd_stm->execute(array(':itemorder'=>$newitemlist, ':id'=>$row[0]));
 			
 			updatePointsPossible($row[0], $newitemlist, $row[2]);

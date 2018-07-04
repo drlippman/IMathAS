@@ -31,18 +31,11 @@ if ($_POST['lms']=='canvas') {
 }
 
 $iteminfo = array();
-//DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
-//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($r)) {
 $stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$iteminfo[$row[0]] = array($row[1],$row[2]);
 }
-
-//DB $query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
-//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $items = unserialize(mysql_result($r,0,0));
 $stm = $DBH->prepare("SELECT itemorder,name,dates_by_lti FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 list($itemorder,$coursename,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);
@@ -190,20 +183,14 @@ function getorg($it,$parent,&$res,$ind) {
 				continue;
 			}
 			if ($iteminfo[$item][0]=='InlineText') {
-				//DB $query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
-				//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $row = mysql_fetch_row($r);
 				$stm = $DBH->prepare("SELECT title,text,fileorder,avail FROM imas_inlinetext WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row[2]!='') {
 					$files = explode(',',$row[2]);
-					//DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$iteminfo[$item][1]}'";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
 					$stm->execute(array(':itemid'=>$iteminfo[$item][1]));
 					$filesout = array();
-					//DB while ($r = mysql_fetch_row($result)) {
 					while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 						//if s3 filehandler, do files as weblinks rather than including the file itself
 						if (substr($r[2],0,4)=='http') {
@@ -260,9 +247,6 @@ function getorg($it,$parent,&$res,$ind) {
 				$resitem .= '</resource>';
 				$res[] = $resitem;
 			} else if ($iteminfo[$item][0]=='LinkedText') {
-				//DB $query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
-				//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $row = mysql_fetch_row($r);
 				$stm = $DBH->prepare("SELECT title,text,summary,avail FROM imas_linkedtext WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
@@ -343,9 +327,6 @@ function getorg($it,$parent,&$res,$ind) {
 					$res[] = $resitem;
 				}
 			} else if ($iteminfo[$item][0]=='Forum') {
-				//DB $query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
-				//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $row = mysql_fetch_row($r);
 				$stm = $DBH->prepare("SELECT name,description,avail FROM imas_forums WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
@@ -392,9 +373,6 @@ function getorg($it,$parent,&$res,$ind) {
 				$res[] = $resitem;
 
 			} else if ($iteminfo[$item][0]=='Assessment') {
-				//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
-				//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $row = mysql_fetch_row($r);
 				$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail,startdate,ptsposs FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
@@ -483,9 +461,6 @@ function getorg($it,$parent,&$res,$ind) {
 					$res[] = $resitem;
 				}
 			} else if ($iteminfo[$item][0]=='Wiki') {
-				//DB $query = "SELECT name FROM imas_wikis WHERE id='{$iteminfo[$item][1]}'";
-				//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $row = mysql_fetch_row($r);
 				$stm = $DBH->prepare("SELECT name,avail FROM imas_wikis WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
@@ -509,11 +484,6 @@ function getorg($it,$parent,&$res,$ind) {
 					fwrite($fp,'<meta name="workflow_state" content="'.($row[1]==0?'unpublished':'active').'"/>');
 				}
 				fwrite($fp,"</head><body>");
-
-				//DB $query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='{$iteminfo[$item][1]}' AND stugroupid=0 ORDER BY id DESC LIMIT 1";
-				//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($r)>0) {
-					//DB $row = mysql_fetch_row($r);
 				$stm = $DBH->prepare("SELECT revision FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=0 ORDER BY id DESC LIMIT 1");
 				$stm->execute(array(':wikiid'=>$iteminfo[$item][1]));
 				if ($stm->rowCount()>0) {

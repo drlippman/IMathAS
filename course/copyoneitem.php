@@ -22,18 +22,12 @@ if (isset($_GET['noappend'])) {
 }
 $_POST['ctc'] = $cid;
 $gbcats = array();
-//DB $query = "SELECT id FROM imas_gbcats WHERE courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id FROM imas_gbcats WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$gbcats[$row[0]] = $row[0];
 }
 $outcomes = array();
-//DB $query = "SELECT id FROM imas_outcomes WHERE courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id FROM imas_outcomes WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -47,7 +41,6 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 		if (is_array($item)) {
 			if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
 				$newblock = array();
-				//DB $newblock['name'] = $item['name'].stripslashes($_POST['append']);
 				$newblock['name'] = $item['name'].$_POST['append'];
 				$newblock['id'] = $blockcnt;
 				$blockcnt++;
@@ -87,31 +80,18 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 		}
 	}
 }
-
-//DB $query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid';";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $blockcnt = mysql_result($result,0,0);
-//DB $items = unserialize(mysql_result($result,0,1));
 $stm = $DBH->prepare("SELECT blockcnt,itemorder,dates_by_lti FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 list($blockcnt, $itemorder, $datesbylti) = $stm->fetch(PDO::FETCH_NUM);
 $items = unserialize($itemorder);
-
-//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 $DBH->beginTransaction();
 
 $notimportant = array();
 copysubone($items,'0',false,$notimportant);
 copyrubrics();
-
-//DB $itemorder = addslashes(serialize($items));
 $itemorder = serialize($items);
-//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 $stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
-
-//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 $DBH->commit();
 
 header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");

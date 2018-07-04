@@ -9,10 +9,6 @@ if ($myrights<100) {
 
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($aid==0) {exit;}
-
-//DB $query = "SELECT itemorder,defpoints,defpenalty,defattempts FROM imas_assessments WHERE id='$aid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $adata = mysql_fetch_assoc($result);
 $stm = $DBH->prepare("SELECT itemorder,defpoints,defpenalty,defattempts FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
 $adata = $stm->fetch(PDO::FETCH_ASSOC);
@@ -28,9 +24,7 @@ $questions = implode(',', $goodqs);
 
 $qdata = array();
 $query = "SELECT id,points,penalty,attempts FROM imas_questions WHERE id IN ($questions)";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $stm = $DBH->query($query);
-//DB while ($row = mysql_fetch_assoc($result)) {
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if ($row['points']==9999) {
 		$row['points'] = $adata['defpoints'];
@@ -49,10 +43,6 @@ $inexception = false;
 
 $n = 0;
 $upd_stm = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,scores=:scores WHERE id=:id");
-
-//DB $query = "SELECT id,questions,bestscores,bestattempts,scores,attempts FROM imas_assessment_sessions WHERE assessmentid='$aid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_assoc($result)) {
 $stm = $DBH->prepare("SELECT id,questions,bestscores,bestattempts,scores,attempts FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 $stm->execute(array(':assessmentid'=>$aid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -81,8 +71,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	}
 	$newbest = implode(',', $bscores).';'.$bscparts[1].';'.$bscparts[2];
 	$newsc = implode(',', $scores).';'.$scparts[1];
-	//DB $q = "UPDATE imas_assessment_sessions SET bestscores='$newbest',scores='$newsc' WHERE id={$row['id']}";
-	//DB mysql_query($q) or die("Query failed : " . mysql_error());
 	$upd_stm->execute(array(':bestscores'=>$newbest, ':scores'=>$newsc, ':id'=>$row['id']));
 	$n++;
 }

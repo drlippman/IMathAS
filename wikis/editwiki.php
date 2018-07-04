@@ -38,10 +38,6 @@ if ($cid==0) {
 
 	$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	$curBreadcrumb .= "<a href=\"$imasroot/wikis/viewwiki.php?cid=$cid&id=$id\">View Wiki</a> &gt; Edit Wiki";
-
-	//DB $query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -54,23 +50,15 @@ if ($cid==0) {
 		if ($row['groupsetid']>0) {
 			if (isset($teacherid)) {
 				$groupid = intval($_GET['grp']);
-				//DB $query = "SELECT name FROM imas_stugroups WHERE id='$groupid'";
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-				//DB $groupname = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
 				$stm->execute(array(':id'=>$groupid));
 				$groupname = $stm->fetchColumn(0);
 			} else {
 				$groupsetid = $row['groupsetid'];
-				//DB $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
-				//DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
-				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':groupsetid'=>$groupsetid));
-				//DB $groupid = mysql_result($result,0,0);
-				//DB $groupname = mysql_result($result,0,1);
 				list($groupid, $groupname) = $stm->fetch(PDO::FETCH_NUM);
 			}
 		} else {
@@ -82,19 +70,12 @@ if ($cid==0) {
 
 			//clean up wiki content
 			require_once("../includes/htmLawed.php");
-			//DB $wikicontent = myhtmLawed(stripslashes($_POST['wikicontent']));
 			$wikicontent = myhtmLawed($_POST['wikicontent']);
 			$wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
 			$wikicontent = preg_replace('/\s+/',' ',$wikicontent);
 			$now = time();
 
 			//check for conflicts
-			//DB $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
-			//DB $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-			//DB $query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-				//DB $row = mysql_fetch_row($result);
 			$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
 			$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 			$query .= "WHERE i_w_r.wikiid=:wikiid AND i_w_r.stugroupid=:stugroupid ORDER BY id DESC LIMIT 1";
@@ -153,32 +134,21 @@ if ($cid==0) {
 
 						print_r($diff);
 						*/
-						//DB $diffstr = addslashes($diff);
-						//DB $wikicontent = addslashes($wikicontent);
 						if ($wikiver>1) {
 							$wikicontent = '**wver'.$wikiver.'**'.$wikicontent;
 						}
 						//insert latest content
-						//DB $query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
-						//DB $query .= "($id,'$groupid','$userid','$wikicontent',$now)";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 						$query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
 						$query .= "(:wikiid, :stugroupid, :userid, :revision, :time)";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid, ':userid'=>$userid, ':revision'=>$wikicontent, ':time'=>$now));
 						//replace previous version with diff off current version
-						//DB $query = "UPDATE imas_wiki_revisions SET revision='$diffstr' WHERE id='$revisionid'";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 						$stm = $DBH->prepare("UPDATE imas_wiki_revisions SET revision=:revision WHERE id=:id");
 						$stm->execute(array(':revision'=>$diff, ':id'=>$revisionid));
 					}
 				}
 			} else { //no wiki page exists yet - just need to insert revision
-				//DB $wikicontent = addslashes('**wver2**'.$wikicontent);
 				$wikicontent = '**wver2**'.$wikicontent;
-				//DB $query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
-				//DB $query .= "($id,'$groupid','$userid','$wikicontent',$now)";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "INSERT INTO imas_wiki_revisions (wikiid,stugroupid,userid,revision,time) VALUES ";
 				$query .= "(:wikiid, :stugroupid, :userid, :revision, :time)";
 				$stm = $DBH->prepare($query);
@@ -191,12 +161,6 @@ if ($cid==0) {
 			}
 
 		} else {
-			//DB $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
-			//DB $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-			//DB $query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupid' ORDER BY id DESC LIMIT 1";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-				//DB $row = mysql_fetch_row($result);
 			$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
 			$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
 			$query .= "WHERE i_w_r.wikiid=:wikiid AND i_w_r.stugroupid=:stugroupid ORDER BY id DESC LIMIT 1";

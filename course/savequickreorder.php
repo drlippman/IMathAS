@@ -13,10 +13,6 @@
  }
  $cid = Sanitize::courseId($_GET['cid']);
  $order = $_POST['order'];
-
- //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
- //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
- //DB $items = unserialize(mysql_result($result,0,0));
  $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
  $stm->execute(array(':id'=>$cid));
  $itemorder = $stm->fetchColumn(0);
@@ -34,27 +30,21 @@
 	 $type = $id{0};
 	 $typeid = substr($id,1);
 	 if ($type=="I") {
-		 //DB $query = "UPDATE imas_inlinetext SET title='$val' WHERE id='$typeid'";
 		 $stm = $DBH->prepare("UPDATE imas_inlinetext SET title=:title WHERE id=:id");
 		 $stm->execute(array(':title'=>$val, ':id'=>$typeid));
 	 } else if ($type=="L") {
-		 //DB $query = "UPDATE imas_linkedtext SET title='$val' WHERE id='$typeid'";
 		 $stm = $DBH->prepare("UPDATE imas_linkedtext SET title=:title WHERE id=:id");
 		 $stm->execute(array(':title'=>$val, ':id'=>$typeid));
 	 } else if ($type=="A") {
-		 //DB $query = "UPDATE imas_assessments SET name='$val' WHERE id='$typeid'";
 		 $stm = $DBH->prepare("UPDATE imas_assessments SET name=:name WHERE id=:id");
 		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="F") {
-		 //DB $query = "UPDATE imas_forums SET name='$val' WHERE id='$typeid'";
 		 $stm = $DBH->prepare("UPDATE imas_forums SET name=:name WHERE id=:id");
 		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="W") {
-		 //DB $query = "UPDATE imas_wikis SET name='$val' WHERE id='$typeid'";
 		 $stm = $DBH->prepare("UPDATE imas_wikis SET name=:name WHERE id=:id");
 		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="D") {
-		 //DB $query = "UPDATE imas_drillassess SET name='$val' WHERE id='$typeid'";
 		 $stm = $DBH->prepare("UPDATE imas_drillassess SET name=:name WHERE id=:id");
 		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="B") {
@@ -66,7 +56,6 @@
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}
-		//DB $sub[$existingid]['name'] = stripslashes($val);
 		$sub[$existingid]['name'] = $val;
 	 }
  }
@@ -74,9 +63,6 @@
  $newitems = array();
 
  $newitems = additems($order);
- //DB $itemlist = addslashes(serialize($newitems));
- //DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
- //DB mysql_query($query) or die("Query failed : " . mysql_error());
  $itemlist = serialize($newitems);
  $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
  $stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));

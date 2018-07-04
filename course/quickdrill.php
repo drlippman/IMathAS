@@ -59,11 +59,8 @@ $pagetitle = "Quick Drill";
 if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	$qids = array_keys($sessiondata['drillresults']);
 	$list = implode(',', array_map('intval', $qids));
-	//DB $query = "SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description";
-	//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 	$stm = $DBH->query("SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description");
 	$out = '';
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$out .= "<p><b>".Sanitize::encodeStringForDisplay($row[1])."</b><ul>";
 		foreach ($sessiondata['drillresults'][$row[0]] as $item) {
@@ -190,7 +187,6 @@ $page_formAction = "quickdrill.php$public";
 $showans = false;
 if (isset($_POST['seed'])) {
 	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
-	//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($score,$qsetid,$_POST['seed']);
 	if (getpts($score)<1 && $sa==0) {
 		$showans = true;
@@ -453,9 +449,6 @@ function printscore($sc,$qsetid,$seed) {
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
-		//DB $query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		//DB $control = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id=:id");
 		$stm->execute(array(':id'=>$qsetid));
 		$control = $stm->fetchColumn(0);

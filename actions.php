@@ -102,10 +102,6 @@ require_once("includes/sanitize.php");
 				exit;
 			}
 		}
-		//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
-		//DB $query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $newuserid = mysql_insert_id();
 
 		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
 		$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
@@ -156,9 +152,6 @@ require_once("includes/sanitize.php");
 				if (!is_numeric($_POST['courseid'])) {
 					$error = 'Invalid course id';
 				} else {
-					//DB $query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['courseid']}' AND (available=0 OR available=2)";
-					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 
 					$query = "SELECT enrollkey,allowunenroll,deflatepass,msgset FROM imas_courses WHERE id=:cid AND (available=0 OR available=2)";
 					$stm = $DBH->prepare($query);
@@ -178,7 +171,6 @@ require_once("includes/sanitize.php");
 							$error = 'Incorrect enrollment key';
 						} else {
 							if (count($keylist)>1) {
-								//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 								$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
 								$array = array(
 									':uid'=>$newuserid,
@@ -187,13 +179,11 @@ require_once("includes/sanitize.php");
 									':latepass'=>$line['deflatepass']
 								);
 							} else {
-								//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$line['deflatepass']}');";
 								$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES (:uid,:cid,:latepass);";
 								$array = array(':uid'=>$newuserid, ':cid'=>$_POST['courseid'], ':latepass'=>$line['deflatepass']);
 							}
 							$stm = $DBH->prepare($query);
 							$stm->execute($array);
-							//DB mysql_query($query) or die("Query failed : " . mysql_error());
 							echo '<p>You have been enrolled in course ID '.Sanitize::encodeStringForDisplay($_POST['courseid']).'</p>';
 
 							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
@@ -224,9 +214,6 @@ require_once("includes/sanitize.php");
 		exit;
 	} else if ($_GET['action']=="confirm") {
 		require_once("init_without_validate.php");
-		//DB $query = "UPDATE imas_users SET rights=10 WHERE id='{$_GET['id']}' AND rights=0";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_affected_rows()>0) {
 
 		$query = "UPDATE imas_users SET rights=10 WHERE id=:id AND rights=0";
 		$stm = $DBH->prepare($query);
@@ -245,24 +232,18 @@ require_once("includes/sanitize.php");
 	} else if ($_GET['action']=="resetpw") {
 		require_once("init_without_validate.php");
 		if (isset($_POST['username'])) {
-			//DB $query = "SELECT id,email,rights FROM imas_users WHERE SID='{$_POST['username']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
 
 			$query = "SELECT id,email,rights FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':sid'=>$_POST['username']));
 			if ($stm->rowCount()>0) {
 				list($id,$email,$rights) = $stm->fetch(PDO::FETCH_NUM);
-				//DB mysql_fetch_row($result);
 
 				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 				$code = '';
 				for ($i=0;$i<10;$i++) {
 					$code .= substr($chars,rand(0,61),1);
 				}
-				//DB $query = "UPDATE imas_users SET remoteaccess='$code' WHERE id=$id";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 
 				$query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
 				$stm = $DBH->prepare($query);
@@ -302,10 +283,6 @@ require_once("includes/sanitize.php");
 					.'&id='.Sanitize::encodeUrlParam($_POST['id']).'">Try again</a>';
 				exit;
 			}
-			//DB $query = "SELECT remoteaccess FROM imas_users WHERE id='{$_POST['id']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $realcode = mysql_result($result,0,0);
-			//DB if (mysql_num_rows($result)>0 && $_POST['code']===$realcode && $realcode!='') {
 
 			$query = "SELECT remoteaccess FROM imas_users WHERE id=:id";
 			$stm = $DBH->prepare($query);
@@ -318,8 +295,6 @@ require_once("includes/sanitize.php");
 					} else {
 						$newpw = md5($_POST['pw1']);
 					}
-					//DB $query = "UPDATE imas_users SET password='$newpw',remoteaccess='' WHERE id='{$_POST['id']}' LIMIT 1";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 
 					$query = "UPDATE imas_users SET password=:newpw,remoteaccess='' WHERE id=:id LIMIT 1";
 					$stm = $DBH->prepare($query);
@@ -339,9 +314,6 @@ require_once("includes/sanitize.php");
 		}
 	} else if ($_GET['action']=="lookupusername") {
 		require_once("init_without_validate.php");
-		//DB $query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}' AND SID NOT LIKE 'lti-%'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
 
 		$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
 		$stm = $DBH->prepare($query);
@@ -355,7 +327,6 @@ require_once("includes/sanitize.php");
 			$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 			$message .= "<p>Your email was entered in the Username Lookup page on $installname.  If you did not do this, you may ignore and delete this message.  ";
 			$message .= "All usernames using this email address are listed below</p><p>";
-			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['lastaccess']==0) {
 					$lastlogin = "Never";
@@ -373,9 +344,6 @@ require_once("includes/sanitize.php");
 
 			exit;
 		} else {
-			//DB $query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
 
 			$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID LIKE 'lti-%'";
 			$stm = $DBH->prepare($query);
@@ -406,8 +374,6 @@ require_once("includes/sanitize.php");
 	require("init.php");
 	if ($_GET['action']=="logout") {
 		$sessionid = session_id();
-		//DB $query = "DELETE FROM imas_sessions WHERE sessionid='$sessionid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=?");
 		$stm->execute(array($sessionid));
 		$_SESSION = array();
@@ -416,9 +382,6 @@ require_once("includes/sanitize.php");
 		}
 		session_destroy();
 	} else if ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd") {
-		//DB $query = "SELECT password FROM imas_users WHERE id = '$userid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -457,9 +420,6 @@ require_once("includes/sanitize.php");
 			require("footer.php");
 			exit;
 		}
-		//DB $query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['cid']}' AND (available=0 OR available=2)";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 
 		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll,deflatepass,msgset FROM imas_courses WHERE id = :cid AND (available=0 OR available=2)");
 		$stm->execute(array(':cid'=>$_POST['cid']));
@@ -484,9 +444,6 @@ require_once("includes/sanitize.php");
 			require("footer.php");
 			exit;
 		}  else {
-			//DB $query = "SELECT * FROM imas_teachers WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid, ':cid'=>$_POST['cid']));
 			if ($stm->rowCount() > 0) {
@@ -498,9 +455,6 @@ require_once("includes/sanitize.php");
 				require("footer.php");
 				exit;
 			}
-			//DB $query = "SELECT * FROM imas_tutors WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid, ':cid'=>$_POST['cid']));
 			if ($stm->rowCount() > 0) {
@@ -511,9 +465,6 @@ require_once("includes/sanitize.php");
 				require("footer.php");
 				exit;
 			}
-			//DB $query = "SELECT * FROM imas_students WHERE userid='$userid' AND courseid='{$_POST['cid']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid, ':cid'=>$_POST['cid']));
 			if ($stm->rowCount() > 0) {
@@ -532,11 +483,9 @@ require_once("includes/sanitize.php");
 					exit;
 				} else {
 					if (count($keylist)>1) {
-						//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_POST['cid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 						$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
 						$array = array(':uid'=>$userid, ':cid'=>$_POST['cid'], ':section'=>$_POST['ekey'],':latepass'=>$line['deflatepass']);
 					} else {
-						//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_POST['cid']}','{$line['deflatepass']}');";
 						$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES (:uid,:cid,:latepass);";
 						$array = array(':uid'=>$userid, ':cid'=>$_POST['cid'], ':latepass'=>$line['deflatepass']);
 					}
@@ -554,8 +503,6 @@ require_once("includes/sanitize.php");
 								':msgto'=>$tuid, ':msgfrom'=>$userid, ':senddate'=>time()));
 						}
 					}
-
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					require("header.php");
 					echo $pagetopper;
 					echo '<p>You have been enrolled in course ID '.Sanitize::courseId($_POST['cid']).'</p>';
@@ -581,29 +528,17 @@ require_once("includes/sanitize.php");
 			exit;
 		}
 		$cid = Sanitize::courseId($_GET['cid']);
-		//DB $query = "SELECT allowunenroll FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_result($result,0,0)==1) {
 		$stm = $DBH->prepare("SELECT allowunenroll FROM imas_courses WHERE id=:cid");
 		$stm->execute(array(':cid'=>$cid));
 		if ($stm->fetchColumn()==1) {
-			//DB $query = "DELETE FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_students WHERE userid=:uid AND courseid=:cid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-			//DB $query = "SELECT id FROM imas_assessments WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			/*
 			$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE courseid=:cid");
 			$stm->execute(array(':cid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:aid AND userid=:uid");
 				$stm->execute(array(':uid'=>$userid,':aid'=>$row['id']));
-				//DB $query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:aid AND itemtype='A' AND userid=:uid");
 				$stm->execute(array(':uid'=>$userid,':aid'=>$row['id']));
 			}
@@ -613,29 +548,11 @@ require_once("includes/sanitize.php");
 
 			$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE itemtype='A' AND assessmentid IN (SELECT id FROM imas_assessments WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-
-			//DB $query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid IN (SELECT id FROM imas_drillassess WHERE courseid='$cid') AND userid='$userid'";
-			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid IN (SELECT id FROM imas_drillassess WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-
-			//DB $query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
-				//DB $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$row[0]}' AND userid='$userid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//}
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid= IN (SELECT id FROM imas_gbitems WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-
-			//DB $query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
-				//DB $q2 = "SELECT threadid FROM imas_forum_posts WHERE forumid='{$row[0]}'";
-				//DB $r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
-				//DB while ($rw2 = mysql_fetch_row($r2)) {
-					//DB $query = "DELETE FROM imas_forum_views WHERE threadid='{$rw2[0]}' AND userid='$userid'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//	}
 			//}
 			$query = "DELETE FROM imas_forum_views WHERE userid=:uid AND threadid IN ";
@@ -718,8 +635,6 @@ require_once("includes/sanitize.php");
 		$_POST['theme'] = str_replace(array('/','..'), '', $_POST['theme']);
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
-		//DB $query .= "WHERE id='$userid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 
 		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
@@ -729,9 +644,6 @@ require_once("includes/sanitize.php");
 			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>$_POST['theme'], ':listperpage'=>$perpage, ':uid'=>$userid));
 
 		if (isset($_POST['dochgpw'])) {
-			//DB $query = "SELECT password FROM imas_users WHERE id = '$userid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -741,8 +653,6 @@ require_once("includes/sanitize.php");
 				} else {
 					$newpw =md5($_POST['pw1']);
 				}
-				//DB $query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_users SET password = :newpw WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 			} else {
@@ -762,8 +672,6 @@ require_once("includes/sanitize.php");
 		if (isset($_POST['settimezone'])) {
 			if (date_default_timezone_set($_POST['settimezone'])) {
 				$tzname = $_POST['settimezone'];
-				//DB $query = "UPDATE imas_sessions SET tzname='$tzname' WHERE sessionid='$sessionid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_sessions SET tzname=:tzname WHERE sessionid=:sessionid");
 				$stm->execute(array(':tzname'=>$tzname, ':sessionid'=>$sessionid));
 			}
@@ -776,14 +684,10 @@ require_once("includes/sanitize.php");
 		}
 		$tohide = array_diff($all,$checked);
 		$hidelist = implode(',', $tohide);
-		//DB $query = "UPDATE imas_users SET hideonpostswidget='$hidelist' WHERE id='$userid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_users SET hideonpostswidget=:hidelist WHERE id= :uid");
 		$stm->execute(array(':uid'=>$userid, ':hidelist'=>$hidelist));
 	} else if ($_GET['action']=="googlegadget") {
 		if (isset($_GET['clear'])) {
-			//DB $query = "UPDATE imas_users SET remoteaccess='' WHERE id='$userid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess='' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 		}

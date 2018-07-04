@@ -18,15 +18,11 @@ function getstr($items,$str,$parent) {
 	return array();
 }
 require("../header.php");
-//DB echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities(stripslashes($_POST['search'])).'"> <input type="submit" value="Search"/></p>';
 echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.Sanitize::encodeStringForDisplay($_POST['search']).'"> <input type="submit" value="Search"/></p>';
 echo '</form>';
 if (isset($_POST['search'])) {
 	echo '<p>';
 	$srch = $_POST['search'];
-	//DB $query = "SELECT id,itemorder,name FROM imas_courses WHERE itemorder LIKE '%$srch%' LIMIT 40";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT id,itemorder,name FROM imas_courses WHERE itemorder LIKE :srch LIMIT 40");
 	$stm->execute(array(':srch'=>"%:srch%"));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {

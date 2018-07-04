@@ -962,8 +962,6 @@ switch($_POST['action']) {
 						}
 					}
 				}
-				//DB $query = "DELETE FROM imas_instr_files WHERE itemid='{$ilid[0]}'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_instr_files WHERE itemid=:itemid");
 				$stm->execute(array(':itemid'=>$ilid[0]));
 			}

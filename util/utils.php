@@ -36,15 +36,11 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</
 
 if (isset($_GET['removelti'])) {
 	$id = intval($_GET['removelti']);
-	//DB $query = "DELETE FROM imas_ltiusers WHERE id=$id";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 }
 if (isset($_GET['removecourselti'])) {
 	$id = intval($_GET['removecourselti']);
-	//DB $query = "DELETE FROM imas_lti_courses WHERE id=$id";
-	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 }
@@ -210,10 +206,8 @@ if (isset($_GET['form'])) {
 				}
 				$query .= "ORDER BY imas_users.LastName,imas_users.FirstName LIMIT 100";
 			}
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
-			//DB if (mysql_num_rows($result)==0) {
 			if ($stm->rowCount()==0) {
 				echo "No results found";
 			} else {
@@ -222,8 +216,6 @@ if (isset($_GET['form'])) {
 				$tutor_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
 				$teach_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
 				$lti_stm = $DBH->prepare("SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=:userid");
-
-				//DB while ($row = mysql_fetch_assoc($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
 					echo '<form method="post" action="../admin/actions.php?id='.Sanitize::encodeUrlParam($row['id']).'">';
@@ -233,9 +225,6 @@ if (isset($_GET['form'])) {
 					if ($row['name']!=null) {
 						echo '<li>Group: '.Sanitize::encodeStringForDisplay($row['name']).'</li>';
 						if ($row['parent']>0) {
-							//DB $query = 'SELECT name FROM imas_groups WHERE id='.$row['parent'];
-							//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-							//DB $r = mysql_fetch_row($res2);
 							$group_stm->execute(array(':id'=>$row['parent']));
 							$r = $group_stm->fetch(PDO::FETCH_NUM);
 							echo '<li>Parent Group: '.Sanitize::encodeStringForDisplay($r[0]).'</li>';
@@ -246,51 +235,35 @@ if (isset($_GET['form'])) {
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
 					echo '<li>Rights: '.Sanitize::encodeStringForDisplay($row['rights']).' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.Sanitize::encodeUrlParam($row['id']).'">[edit]</a></li>';
 					echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
-					//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
-					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB if (mysql_num_rows($res2)>0) {
 					$stu_stm->execute(array(':userid'=>$row['id']));
 					if ($stu_stm->rowCount()>0) {
 						echo '<li>Enrolled as student in: <ul>';
-						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $stu_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.Sanitize::encodeUrlParam($r[0]).'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.Sanitize::encodeStringForDisplay($r[0]).')</a></li>';
 						}
 						echo '</ul></li>';
 					}
-					//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
-					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB if (mysql_num_rows($res2)>0) {
 					$tutor_stm->execute(array(':userid'=>$row['id']));
 					if ($tutor_stm->rowCount()>0) {
 						echo '<li>Tutor in: <ul>';
-						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $tutor_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.Sanitize::encodeUrlParam($r[0]).'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.Sanitize::encodeStringForDisplay($r[0]).')</a></li>';
 						}
 						echo '</ul></li>';
 					}
 					$teachercourses = array();
-					//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
-					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB if (mysql_num_rows($res2)>0) {
 					$teach_stm->execute(array(':userid'=>$row['id']));
 					if ($teach_stm->rowCount()>0) {
 						echo '<li>Teacher in: <ul>';
-						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $teach_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.Sanitize::encodeUrlParam($r[0]).'">'.Sanitize::encodeStringForDisplay($r[1]).' (ID '.Sanitize::encodeStringForDisplay($r[0]).')</a></li>';
 							$teachercourses[] = $r[0];
 						}
 						echo '</ul></li>';
 					}
-					//DB $query = "SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=".$row['id'];
-					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					//DB if (mysql_num_rows($res2)>0) {
 					$lti_stm->execute(array(':userid'=>$row['id']));
 					if ($lti_stm->rowCount()>0) {
 						echo '<li>LTI user connections: <ul>';
-						//DB while ($r = mysql_fetch_row($res2)) {
 						while ($r = $lti_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li>key:'.Sanitize::encodeStringForDisplay(substr($r[0],0,strpos($r[0],':'))).', remote userid:'.Sanitize::encodeStringForDisplay($r[2]).' <a href="utils.php?removelti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
 						}
@@ -298,12 +271,9 @@ if (isset($_GET['form'])) {
 					}
 					if (count($teachercourses)>0) {
 						$query = "SELECT org,id,courseid,contextid FROM imas_lti_courses WHERE courseid IN (".implode(",",$teachercourses).")";
-						//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
 						$lti_c_stm = $DBH->query($query);
-						//DB if (mysql_num_rows($res2)>0) {
 						if ($lti_c_stm->rowCount()>0) {
 							echo '<li>LTI course connections: <ul>';
-							//DB while ($r = mysql_fetch_row($res2)) {
 							while ($r = $lti_c_stm->fetch(PDO::FETCH_NUM)) {
 								echo '<li>Course: '.Sanitize::encodeStringForDisplay($r[2]).', key:'.Sanitize::encodeStringForDisplay(substr($r[0],0,strpos($r[0],':'))).', context:'.Sanitize::encodeStringForDisplay($r[3]).' <a href="utils.php?removecourselti='.Sanitize::encodeUrlParam($r[1]).'">Remove connection</a></li>';
 							}

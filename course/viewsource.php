@@ -33,9 +33,6 @@
 	}
 
 	$qsetid = $_GET['id'];
-	//DB $query = "SELECT * FROM imas_questionset WHERE id='$qsetid'";
-	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
 	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);

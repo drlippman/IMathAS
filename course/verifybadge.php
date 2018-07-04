@@ -11,10 +11,6 @@ $badgeid = intval($_GET['badgeid']);
 
 if (!empty($_GET['userid'])) {
 	$userid = intval($_GET['userid']);
-	//DB $query = "SELECT SID FROM imas_users WHERE id='$userid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
-		//DB $s = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT SID FROM imas_users WHERE id=:id");
 	$stm->execute(array(':id'=>$userid));
 	if ($stm->rowCount()>0) {
@@ -28,17 +24,12 @@ if (!empty($_GET['userid'])) {
 } else {
 	$userid = 0;
 }
-
-//DB $query = "SELECT courseid, name, badgetext, description, longdescription, requirements FROM imas_badgesettings WHERE id=$badgeid";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $stm = $DBH->prepare("SELECT courseid, name, badgetext, description, longdescription, requirements FROM imas_badgesettings WHERE id=:id");
 $stm->execute(array(':id'=>$badgeid));
 if ($stm->rowCount()==0) {
 	echo "Invalid Badge";
 	exit;
 } else {
-	//DB list($cid, $name, $badgetext, $descr, $longdescr, $req) = mysql_fetch_row($result);
 	list($cid, $name, $badgetext, $descr, $longdescr, $req) = $stm->fetch(PDO::FETCH_NUM);
 	$req = unserialize($req);
 	if ($userid==0) {//this is a criteria request
@@ -50,21 +41,14 @@ if ($stm->rowCount()==0) {
 		list($reqnameout,$reqout,$stuout,$metout) = validatebadge($badgeid, $cid, $req, 0);
 		print_html($badgetext, $name, $descr, $longdescr, $reqnameout, $reqout);
 	} else { //student specific
-		//DB $query = "SELECT id FROM imas_students WHERE courseid=$cid AND userid=$userid";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
 		$stm = $DBH->prepare("SELECT id FROM imas_students WHERE courseid=:courseid AND userid=:userid");
 		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
 		if ($stm->rowCount()==0) {
-			//DB $query = "SELECT data FROM imas_badgerecords WHERE userid=$userid AND badgeid=$badgeid";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_fetch_row($result)==0) {
 			$stm = $DBH->prepare("SELECT data FROM imas_badgerecords WHERE userid=:userid AND badgeid=:badgeid");
 			$stm->execute(array(':userid'=>$userid, ':badgeid'=>$badgeid));
 			if ($stm->fetch(PDO::FETCH_NUM)==0) {
 				exit;
 			} else {
-				//DB $data = unserialize(mysql_result($result,0,0));
 				$data = unserialize($stm->fetchColumn(0));
 				//if ($_GET['format']=='json') {
 					print_assertation($cid, $badgetext, $name, $descr, $userid, $data[5]);
@@ -205,15 +189,10 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 		$canviewall = true;
 		$gbt = gbtable($userid);
 	}
-
-	//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	$gtypes = array('0'=>'Past Due', '3'=>'Past and Attempted', '1'=>'Past and Available', '2'=>'All Items');
 	$gbcats = array();
-
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$gbcats[$row[0]] = $row[1];
 	}
@@ -280,26 +259,16 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 
 	if ($reqmet) {
 		if (isset($userid) && $userid!=0) {
-			//DB $query = "SELECT FirstName, LastName, email FROM imas_users WHERE id=$userid";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName, LastName, email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$stuname = $row[1]. ', '.$row[0];
 			$email = $row[2];
 			$data = array($reqnameout, $reqout, $stuout, $metout, $stuname, $email);
-
-			//DB $data = addslashes(serialize($data));
 			$data = serialize($data);
-			//DB $query = "UPDATE imas_badgerecords SET data='$data' WHERE badgeid='$badgeid' AND userid='$userid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_affected_rows()==0) {
 			$stm = $DBH->prepare("UPDATE imas_badgerecords SET data=:data WHERE badgeid=:badgeid AND userid=:userid");
 			$stm->execute(array(':data'=>$data, ':badgeid'=>$badgeid, ':userid'=>$userid));
 			if ($stm->rowCount()==0) {
-				//DB $query = "INSERT INTO imas_badgerecords (badgeid,userid,data) VALUES ('$badgeid','$userid','$data')";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_badgerecords (badgeid,userid,data) VALUES (:badgeid, :userid, :data)");
 				$stm->execute(array(':badgeid'=>$badgeid, ':userid'=>$userid, ':data'=>$data));
 			}

@@ -12,17 +12,12 @@
 	if (isset($teacherid)) { $isteacher = true;}
 
 	$lid = intval($_GET['lid']);
-
-	//DB $query = "SELECT title,text,points FROM imas_linkedtext WHERE id='$lid' AND courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT title,text,points FROM imas_linkedtext WHERE id=:id AND courseid=:courseid");
 	$stm->execute(array(':id'=>$lid, ':courseid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "invalid item";
 		exit;
 	}
-	//DB list($name,$text,$points) = mysql_fetch_row($result);
 	list($name,$text,$points) = $stm->fetch(PDO::FETCH_NUM);
 	$toolparts = explode('~~',substr($text,8));
 	if (isset($toolparts[3])) {
@@ -53,8 +48,6 @@
 	/*Not called from anywhere?
 	if (isset($_REQUEST['clear']) && $isteacher) {
 		if (isset($_POST['confirm'])) {
-			//DB $query = "DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid='$lid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='exttool' AND gradetypeid=:gradetypeid");
 			$stm->execute(array(':gradetypeid'=>$lid));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=".Sanitize::courseId($_GET['cid']));
@@ -86,9 +79,6 @@
 		}
 		if (count($keys)>0) {
 			$kl = implode(',', array_map('intval',$keys));
-			//DB $query = "SELECT userid FROM imas_grades WHERE gradetype='exttool' AND gradetypeid='$lid' AND userid IN ($kl)";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT userid FROM imas_grades WHERE gradetype='exttool' AND gradetypeid=:gradetypeid AND userid IN ($kl)");
 			$stm->execute(array(':gradetypeid'=>$lid));
 			while($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -105,13 +95,9 @@
 			if (trim($k)=='') { continue;}
 			$sc = trim($sc);
 			if ($sc!='') {
-				//DB $query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='exttool' AND gradetypeid='$lid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE userid=:userid AND gradetype='exttool' AND gradetypeid=:gradetypeid");
 				$stm->execute(array(':score'=>$sc, ':feedback'=>$_POST['feedback'][$k], ':userid'=>$k, ':gradetypeid'=>$lid));
 			} else {
-				//DB $query = "UPDATE imas_grades SET score=NULL,feedback='{$_POST['feedback'][$k]}' WHERE userid='$k' AND gradetype='exttool' AND gradetypeid='$lid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_grades SET score=NULL,feedback=:feedback WHERE userid=:userid AND gradetype='exttool' AND gradetypeid=:gradetypeid");
 				$stm->execute(array(':feedback'=>$_POST['feedback'][$k], ':userid'=>$k, ':gradetypeid'=>$lid));
 				//$query = "DELETE FROM imas_grades WHERE gbitemid='$lid' AND userid='$k'";
@@ -124,17 +110,11 @@
 		foreach($_POST['newscore'] as $k=>$sc) {
 			if (trim($k)=='') {continue;}
 			if ($sc!='') {
-				//DB $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
-				//DB $query .= "('exttool','$lid','$k','$sc','{$_POST['feedback'][$k]}')";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 				$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':gradetype'=>'exttool', ':gradetypeid'=>$lid, ':userid'=>$k, ':score'=>$sc, ':feedback'=>$_POST['feedback'][$k]));
 			} else if (trim($_POST['feedback'][$k])!='') {
-				//DB $query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
-				//DB $query .= "('exttool','$lid','$k',NULL,'{$_POST['feedback'][$k]}')";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 				$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 				$stm = $DBH->prepare($query);
@@ -166,12 +146,6 @@
 	echo '<h2>' . Sanitize::encodeStringForDisplay($name) . '</h2>';
 
 	echo "<form id=\"mainform\" method=post action=\"edittoolscores.php?stu=" . Sanitize::onlyInt($_GET['stu']) . "&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&cid=$cid&lid=$lid&uid=" . Sanitize::encodeUrlParam($_GET['uid']) . "\">";
-
-
-		//DB $query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
-		//DB $query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_result($result,0,0)>0) {
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 		$stm = $DBH->prepare($query);
@@ -183,9 +157,6 @@
 		}
 
 		if ($hassection) {
-			//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_result($result,0,0)==0) {
 			$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			if ($stm->fetchColumn(0)==0) {
@@ -218,19 +189,14 @@
 
 
 		if ($_GET['uid']!='all') {
-			//DB $query = "SELECT userid,score,feedback FROM imas_grades WHERE gradetype='exttool' AND gradetypeid='$lid' ";
-			//DB $query .= "AND userid='{$_GET['uid']}' ";
 			$query = "SELECT userid,score,feedback FROM imas_grades WHERE gradetype='exttool' AND gradetypeid=:gradetypeid ";
 			$query .= "AND userid=:userid ";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':gradetypeid'=>$lid, ':userid'=>$_GET['uid']));
 		} else {
-			//DB $query = "SELECT userid,score,feedback FROM imas_grades WHERE gradetype='exttool' AND gradetypeid='$lid' ";
 			$stm = $DBH->prepare("SELECT userid,score,feedback FROM imas_grades WHERE gradetype='exttool' AND gradetypeid=:gradetypeid ");
 			$stm->execute(array(':gradetypeid'=>$lid));
 		}
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($row[1]!=null) {
 				$score[$row[0]] = $row[1];
@@ -239,22 +205,6 @@
 			}
 			$feedback[$row[0]] = $row[2];
 		}
-
-		//DB $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
-		//DB if ($_GET['uid']!='all') {
-			//DB $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
-		//DB } else {
-			//DB $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
-		//DB }
-		//DB if ($istutor && isset($tutorsection) && $tutorsection!='') {
-			//DB $query .= " AND imas_students.section='$tutorsection' ";
-		//DB }
-		//DB if ($hassection && $sortorder=="sec") {
-			 //DB $query .= " ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
-		//DB } else {
-			 //DB $query .= " ORDER BY imas_users.LastName,imas_users.FirstName";
-		//DB }
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
 		if ($_GET['uid']!='all') {
 			$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id=:id AND imas_students.courseid=:courseid";
@@ -274,8 +224,6 @@
 		}
 		$stm = $DBH->prepare($query);
 		$stm->execute($qarr);
-
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($row[4]>0) {
 				echo '<tr><td style="text-decoration: line-through;">';

@@ -13,9 +13,6 @@
 	if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $gbmode = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
@@ -167,9 +164,6 @@
 			$headers .= "MIME-Version: 1.0\n";
 			$headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"";
 			if ($_GET['emailgb']=="me") {
-				//DB $query = "SELECT email FROM imas_users WHERE id='$userid'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $_GET['emailgb'] = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT email FROM imas_users WHERE id=:id");
 				$stm->execute(array(':id'=>$userid));
 				$_GET['emailgb'] = $stm->fetchColumn(0);
@@ -336,9 +330,6 @@ function gbinstrexport() {
 
 	//get gb comments;
 	$gbcomments = array();
-	//DB $query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -779,9 +770,6 @@ function gbinstrdisp() {
 	echo '</tr></thead><tbody>';
 	//get gb comments;
 	$gbcomments = array();
-	//DB $query = "SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {

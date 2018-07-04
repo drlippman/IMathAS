@@ -54,9 +54,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	} else if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $gbmode = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
@@ -120,19 +117,16 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 
 	// Set up the main $st array with first and last name for all students
 	// in a class
-	//DB $query = "select userid, firstName, lastName from imas_students as stu join imas_users as iu on iu.id = stu.userid  where courseid ='$cid' ";
 	$query = "select userid, firstName, lastName from imas_students as stu join imas_users as iu on iu.id = stu.userid  where courseid=:courseid ";
 	if ($hidelocked) {
 		$query .= "AND stu.locked=0 ";
 	}
   $stm = $DBH->prepare($query);
   $stm->execute(array(':courseid'=>$cid));
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$totalstudents = 0;
 
 	//student data array. Initialize with names and zero out totals and assessment lists
 	$st = array();
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$uid = $line['userid'];
 		$totalstudents++;
@@ -147,11 +141,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	//pull assessment data
 	//We're pulling the assessment info (name, itemorder) along with scores to
 	//reduce number of database pulls at the expense of pulling more data
-	//DB $query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ia.id, ia.defpoints, ia.itemorder ";
-	//DB $query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
-	//DB $query .= " where (ia.courseid = '$cid' and endtime > $rangestart ) ";
-	//DB $query .= " order by ias.userid ";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ias.timeontask, ia.id, ia.defpoints, ia.itemorder, ia.ptsposs ";
 	$query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
 	$query .= " where (ia.courseid=:courseid and endtime > :rangestart ) ";
@@ -161,7 +150,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 
 	$assessmentInfo = array();
 	$totalAttemptCount = 0;
-	//DB while($line = mysql_fetch_assoc($result)) {
 	while($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$uid = $line['userid'];
 		if (!isset($st[$uid])) { continue; } //not a student we're reporting on

@@ -37,23 +37,16 @@
 			echo ' <a href="gradebook.php?cid='.$cid.'">'._('Gradebook').'</a> &gt; ';
 		}
 		echo "Un-use LatePass</div>";
-		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
 		$stm = $DBH->prepare("SELECT enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		if ($stm->rowCount()==0) {
 			echo '<p>Invalid</p>';
 		} else {
-			//DB $row = mysql_fetch_row($result);
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			if ($row[1]==0) {
 				echo '<p>Invalid</p>';
 			} else {
 				$now = time();
-				//DB $query = "SELECT enddate FROM imas_assessments WHERE id='$aid'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $enddate = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT enddate FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$aid));
 				$enddate = $stm->fetchColumn(0);
@@ -64,8 +57,6 @@
 					if ($now < $enddate) { //before enddate, return all latepasses
 						$maxLP = max(0,floor(($row[0]-$enddate)/($latepasshrs*3600)+.05));
 						$n = min($maxLP,$row[1]);
-						//DB $query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 						$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 						$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 					} else { //figure how many are unused
@@ -74,13 +65,9 @@
 						$newend = strtotime("-".$tothrs." hours", $row[0]);
 						//$newend = $row[0] - $n*$latepasshrs*60*60;
 						if ($row[1]>$n) {
-							//DB $query = "UPDATE imas_exceptions SET islatepass=islatepass-$n,enddate=$newend WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-							//DB mysql_query($query) or die("Query failed : " . mysql_error());
 							$stm = $DBH->prepare("UPDATE imas_exceptions SET islatepass=islatepass-:n,enddate=:enddate WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 							$stm->execute(array(':enddate'=>$newend, ':userid'=>$userid, ':assessmentid'=>$aid, ':n'=>$n));
 						} else {
-							//DB $query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-							//DB mysql_query($query) or die("Query failed : " . mysql_error());
 							$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 							$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 							$n = $row[1];
@@ -88,8 +75,6 @@
 					}
 					printf("<p>Returning %d LatePass", Sanitize::onlyInt($n));
 					echo ($n>1?"es":"")."</p>";
-					//DB $query = "UPDATE imas_students SET latepass=latepass+$n WHERE userid='$userid' AND courseid='$cid'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass+:n WHERE userid=:userid AND courseid=:courseid");
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':n'=>$n));
 				}
@@ -109,15 +94,9 @@
 
 	} else if (isset($_POST['confirm'])) {
 		//$addtime = $latepasshrs*60*60;
-		//DB $query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		list($allowlate,$enddate,$startdate) =$stm->fetch(PDO::FETCH_NUM);
-
-		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
@@ -127,7 +106,6 @@
 			$useexception = false;
 			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
 		} else {
-			//DB $r = mysql_fetch_row($result);
 			$r = $stm->fetch(PDO::FETCH_NUM);
 			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
 			if ($useexception) {
@@ -151,22 +129,14 @@
 		}
 		
 		if ($canuselatepass) {
-			//DB $query = "UPDATE imas_students SET latepass=latepass-1 WHERE userid='$userid' AND courseid='$cid' AND latepass>0";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_affected_rows()>0) {
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
 			$stm->execute(array(':lps'=>$LPneeded, ':lps2'=>$LPneeded, ':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
 				$enddate = min(strtotime("+".($latepasshrs*$LPneeded)." hours", $thised), $courseenddate);
 				if ($hasexception) { //already have exception
-					//DB $query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+:lps WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 					$stm->execute(array(':lps'=>$LPneeded, ':userid'=>$userid, ':assessmentid'=>$aid, ':enddate'=>$enddate));
 				} else {
-
-					//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES ('$userid','$aid','$startdate','$enddate',1,'A')";
-					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES (:userid, :assessmentid, :startdate, :enddate, :islatepass, :itemtype)");
 					$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate, ':islatepass'=>$LPneeded, ':itemtype'=>'A'));
 				}
@@ -197,26 +167,17 @@
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 		//$curBreadcrumb .= " Redeem LatePass\n";
 		//echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
-
-		//DB $query = "SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id='$aid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		list($allowlate,$enddate,$startdate,$timelimit) =$stm->fetch(PDO::FETCH_NUM);
-
-		//DB $query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
-		//DB if (mysql_num_rows($result)==0) {
 		if ($stm->rowCount()==0) {
 			$usedlatepasses = 0;
 			$thised = $enddate;
 			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
 		} else {
-			//DB $r = mysql_fetch_row($result);
 			$r = $stm->fetch(PDO::FETCH_NUM);
 			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
 			if ($useexception) {

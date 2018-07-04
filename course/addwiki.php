@@ -35,8 +35,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_REQUEST['clearattempts'])) {
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="true") {
 			$id = Sanitize::onlyInt($_GET['id']);
-			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
 			$stm->execute(array(':wikiid'=>$id));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addwiki.php?cid=$cid&id=$id&r=" .Sanitize::randomQueryStringParam());
@@ -72,22 +70,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$settings = intval($_POST['settings']);
-
-		//DB $_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
 		$_POST['name'] = htmlentities($_POST['name']);
 
 		require_once("../includes/htmLawed.php");
 		if ($_POST['description']=='<p>Enter Wiki description here</p>') {
 			$_POST['description'] = '';
 		} else {
-			//DB $_POST['description'] = addslashes(myhtmLawed(stripslashes($_POST['description'])));
 			$_POST['description'] = myhtmLawed($_POST['description']);
 		}
 		if (isset($_GET['id'])) {  //already have id - update
-			//DB $query = "UPDATE imas_wikis SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";
-			//DB $query .= "editbydate=$revisedate,avail='{$_POST['avail']}',groupsetid='{$_POST['groupsetid']}',settings=$settings ";
-			//DB $query .= "WHERE id='{$_GET['id']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_wikis SET name=:name,description=:description,startdate=:startdate,enddate=:enddate,";
 			$query .= "editbydate=:editbydate,avail=:avail,groupsetid=:groupsetid,settings=:settings ";
 			$query .= "WHERE id=:id";
@@ -96,30 +87,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				':editbydate'=>$revisedate, ':avail'=>$_POST['avail'], ':groupsetid'=>$_POST['groupsetid'], ':settings'=>$settings, ':id'=>$_GET['id']));
 			$newwikiid = $_GET['id'];
 		} else { //add new
-			//DB $query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) VALUES ";
-			//DB $query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$revisedate,'{$_POST['avail']}',$settings,'{$_POST['groupsetid']}');";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $newwikiid = mysql_insert_id();
 			$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) VALUES ";
 			$query .= "(:courseid, :name, :description, :startdate, :enddate, :editbydate, :avail, :settings, :groupsetid);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':description'=>$_POST['description'], ':startdate'=>$startdate,
 				':enddate'=>$enddate, ':editbydate'=>$revisedate, ':avail'=>$_POST['avail'], ':settings'=>$settings, ':groupsetid'=>$_POST['groupsetid']));
 			$newwikiid = $DBH->lastInsertId();
-
-			//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
-			//DB $query .= "('$cid','Wiki','$newwikiid');";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $itemid = mysql_insert_id();
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "(:courseid, 'Wiki', :typeid);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':typeid'=>$newwikiid));
 			$itemid = $DBH->lastInsertId();
-
-			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -135,10 +113,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($totb=='t') {
 				array_unshift($sub,$itemid);
 			}
-			//DB $itemorder = addslashes(serialize($items));
 			$itemorder = serialize($items);
-			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 
@@ -159,9 +134,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 		if (isset($_GET['id'])) { //MODIFY MODE
-			//DB $query = "SELECT * FROM imas_wikis WHERE id='{$_GET['id']}';";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * FROM imas_wikis WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -169,9 +141,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$enddate = $line['enddate'];
 			$revisedate = $line['editbydate'];
 			$settings = $line['settings'];
-			//DB $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='{$_GET['id']}';";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_wiki_revisions WHERE wikiid=:wikiid");
 			$stm->execute(array(':wikiid'=>$_GET['id']));
 			if ($stm->rowCount()>0) {
@@ -236,14 +205,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$etime = $deftime;
 			$rtime = $deftime;
 		}
-
-		//DB $query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=0;
 		$page_groupSelect = array();
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";

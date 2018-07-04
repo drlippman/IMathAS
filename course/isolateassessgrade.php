@@ -21,9 +21,6 @@
 	} else if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $gbmode = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
@@ -57,11 +54,6 @@
 	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
 
 	echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
-
-	//DB $query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
-	//DB $query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB if (mysql_result($result,0,0)>0) {
 	/*$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 	$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 	$stm = $DBH->prepare($query);
@@ -79,9 +71,6 @@
 	$hascodes = ($seccodecnt[1]>0);
 
 	if ($hassection) {
-		//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB if (mysql_result($result,0,0)==0) {
 		$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		if ($stm->fetchColumn(0)==0) {
@@ -92,10 +81,6 @@
 	} else {
 		$sortorder = "name";
 	}
-
-	//DB $query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder FROM imas_assessments WHERE id='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder) = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
@@ -119,14 +104,9 @@
 			$aitemcnt[$k] = 1;
 		}
 	}
-
-	//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-	//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	//DB $totalpossible = 0;
 	$stm = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
 	$stm->execute(array(':assessmentid'=>$aid));
 	$totalpossible = 0;
-	//DB while ($r = mysql_fetch_row($result2)) {
 	while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 		if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
 			if ($r[0]==9999) {
@@ -147,12 +127,9 @@
 //	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 
 	//get exceptions
-	//DB $query = "SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid='$aid' AND itemtype='A'";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->prepare("SELECT userid,startdate,enddate,islatepass FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
 	$stm->execute(array(':assessmentid'=>$aid));
 	$exceptions = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
 	}
@@ -160,13 +137,6 @@
 		require_once("../includes/exceptionfuncs.php");
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher && !$istutor);
 	}
-
-	//DB $query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
-	//DB $query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
-	//DB $query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid' WHERE istu.courseid='$cid' ";
-	//DB if ($secfilter != -1) {
-		//DB $query .= " AND istu.section='$secfilter' ";
-	//DB }
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
 	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
 	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
@@ -181,7 +151,6 @@
 	} else {
 		 $query .= " ORDER BY iu.LastName,iu.FirstName";
 	}
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->prepare($query);
 	if ($secfilter != -1) {
 		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid, ':courseid2'=>$cid, ':section'=>$secfilter));
@@ -211,7 +180,6 @@
 	$tot = 0;
 	$tottime = 0;
 	$tottimeontask = 0;
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($lc%2!=0) {
 			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">";

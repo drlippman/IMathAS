@@ -67,7 +67,6 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if (isset($_POST['rootlib'])) {
 			array_unshift($rootlibs,$_POST['rootlib']);
 		}
-		//DB $rootlist = "'".implode("','",$rootlibs)."'";
 		$rootlist = implode(',', array_map('intval', $rootlibs));
 
 		$libcnt = 1;
@@ -85,9 +84,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND userights>0";
 		}
 		$query .= " ORDER BY uniqueid";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->query($query);
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if (!in_array($row[2],$rootlibs)) { //don't export children here
 				$libs[$row[0]] = $libcnt;
@@ -114,14 +111,6 @@ if (!(isset($teacherid)) && $myrights<20) {
 		//lists child libraries
 		function getchildlibs($lib) {
 			global $DBH,$libs,$libcnt,$nonpriv;
-			//DB $query = "SELECT id,name,uniqueid,lastmoddate FROM imas_libraries WHERE parent='$lib'";
-			//DB if ($nonpriv) {
-				//DB $query .= " AND userights>0";
-			//DB }
-			//DB $query .= " ORDER BY uniqueid";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_num_rows($result)>0) {
-				//DB while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT id,name,uniqueid,lastmoddate FROM imas_libraries WHERE parent=:parent AND deleted=0";
 			if ($nonpriv) {
 				$query .= " AND userights>0";
@@ -176,12 +165,10 @@ if (!(isset($teacherid)) && $myrights<20) {
 		if ($noncopyright) {
 			$query .= " AND imas_questionset.license>0";
 		}
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$stm = $DBH->query($query);
 		$qassoc = Array();
 		$libitems = Array();
 		$qcnt = 0;
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if (!isset($qassoc[$row[0]])) {$qassoc[$row[0]] = $qcnt; $qcnt++;}
 			$libitems[$libs[$row[1]]][] = $qassoc[$row[0]];
@@ -207,10 +194,8 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND userights>0";
 		}
 		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$stm = $DBH->query($query);
 		$includedqs = array();
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
@@ -222,9 +207,6 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$includedbackref = array();
 		if (count($includedqs)>0) {
 			$includedlist = implode(',', array_map('intval', $includedqs));
-			//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
-			//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->query("SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$includedbackref[$row[0]] = $row[1];
@@ -238,12 +220,8 @@ if (!(isset($teacherid)) && $myrights<20) {
 			$query .= " AND userights>0";
 		}
 		$query .= " ORDER BY uniqueid";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$stm = $DBH->query($query);
-		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			//DB $line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
-			//DB $line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
       $line['control'] = preg_replace_callback('/includecodefrom\((\d+)\)/', function($matches) use ($includedbackref) {
           return "includecodefrom(UID".$includedbackref[$matches[1]].")";
         }, $line['control']);
@@ -289,9 +267,6 @@ if (!(isset($teacherid)) && $myrights<20) {
 			echo Sanitize::forRawExport(rtrim($line['otherattribution'])) . "\n";
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
-				//DB $query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
-				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while ($row = mysql_fetch_row($r2)) {
 				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {

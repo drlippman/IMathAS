@@ -11,21 +11,15 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 	if (!is_array($qns)) {
 		$qns = array($qns);
 	}
-	//DB $qnlist = "'".implode("','",$qns)."'";
 	$qnlist = implode(',', array_map('intval', $qns));
 	if ($testsettings['defoutcome']!=0) {
 		//we'll need to run two simpler queries rather than a single join query
 		$outcomenames = array();
-		//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='{$testsettings['courseid']}'";
-		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$testsettings['courseid']));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$outcomenames[$row[0]] = $row[1];
 		}
-		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control ";
-		//DB $query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
 		if ($preloadqsdata) {
 			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iq.fixedseeds,";
 			$query .= "iqs.qtype,iqs.control,iqs.qcontrol,iqs.qtext,iqs.answer,iqs.hasimg,iqs.extref,iqs.solution,iqs.solutionopts ";
@@ -35,9 +29,6 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 		$query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
 		$stm = $DBH->query($query);
 	} else {
-		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
-		//DB $query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
-		//DB $query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
 		if ($preloadqsdata) {
 			$query = "SELECT iq.id AS qid,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iq.fixedseeds,";
 			$query .= "iqs.qtype,iqs.control,iqs.qcontrol,iqs.qtext,iqs.answer,iqs.hasimg,iqs.extref,iqs.solution,iqs.solutionopts ";
@@ -48,8 +39,6 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 		$query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
 		$stm = $DBH->query($query);
 	}
-	//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (is_numeric($line['category'])) {
 			if ($testsettings['defoutcome']!=0) {
@@ -541,14 +530,11 @@ function scorequestion($qn, $rectime=true) {
 		} else {
 			$time = 0;  //for all at once display, where time is not useful info
 		}
-		//DB $query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
-		//DB $query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
 		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
 		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$testsettings['courseid'], ':qsetid'=>$qi[$questions[$qn]]['questionsetid'],
 			':score'=>round(100*getpts($unitrawscore)), ':scoredet'=>$rawscores[$qn], ':timespent'=>$time));
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 
 	//$scores[$qn] = $afterpenalty;
@@ -585,7 +571,6 @@ function recordtestdata($limit=false) {
 	$bestseedslist = implode(',',$bestseeds);
 	$bestlastanswers = str_replace('~','',$bestlastanswers);
 	$bestlalist = implode('~',$bestlastanswers);
-	//DB $bestlalist = addslashes(stripslashes($bestlalist));
 
 	if ($noraw) {
 		$scorelist = implode(',',$scores);
@@ -596,7 +581,6 @@ function recordtestdata($limit=false) {
 	$seedslist = implode(',',$seeds);
 	$lastanswers = str_replace('~','',$lastanswers);
 	$lalist = implode('~',$lastanswers);
-	//DB $lalist = addslashes(stripslashes($lalist));
 	$timeslist = implode(',',$timesontask);
 
 	$reattemptinglist = implode(',',$reattempting);
@@ -609,25 +593,18 @@ function recordtestdata($limit=false) {
 	$now = time();
 	if ($isreview) {
 		if ($limit) {
-			//DB $query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
 			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers=:reviewlastanswers ";
 			$qarr = array(':reviewlastanswers'=>$lalist);
 		} else {
-			//DB $query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewattempts='$attemptslist',reviewseeds='$seedslist',reviewlastanswers='$lalist',";
-			//DB $query .= "reviewreattempting='$reattemptinglist' ";
 			$query = "UPDATE imas_assessment_sessions SET reviewscores=:reviewscores,reviewattempts=:reviewattempts,reviewseeds=:reviewseeds,reviewlastanswers=:reviewlastanswers,";
 			$query .= "reviewreattempting=:reviewreattempting ";
 			$qarr = array(':reviewscores'=>$scorelist, ':reviewattempts'=>$attemptslist, ':reviewseeds'=>$seedslist, ':reviewlastanswers'=>$lalist, ':reviewreattempting'=>$reattemptinglist);
 		}
 	} else {
 		if ($limit) {
-			//DB $query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist',timeontask='$timeslist' ";
 			$query = "UPDATE imas_assessment_sessions SET lastanswers=:lastanswers,timeontask=:timeontask ";
 			$qarr = array(':lastanswers'=>$lalist, ':timeontask'=>$timeslist);
 		} else {
-			//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
-			//DB $query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-			//DB $query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist',questions='$questionlist' ";
 			$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,seeds=:seeds,lastanswers=:lastanswers,";
 			$query .= "bestseeds=:bestseeds,bestattempts=:bestattempts,bestscores=:bestscores,bestlastanswers=:bestlastanswers,";
 			$query .= "endtime=:endtime,reattempting=:reattempting,timeontask=:timeontask,questions=:questions ";
@@ -652,18 +629,15 @@ function recordtestdata($limit=false) {
 		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
-		//DB $query .= "WHERE agroupid='{$sessiondata['groupid']}' AND assessmentid='{$testsettings['id']}'";
 		$query .= "WHERE agroupid=:agroupid AND assessmentid=:assessmentid";
 		$qarr[':agroupid']=$sessiondata['groupid'];
 		$qarr[':assessmentid']=$testsettings['id'];
 	} else {
-		//DB $query .= "WHERE id='$testid' LIMIT 1";
 		$query .= "WHERE id=:id LIMIT 1";
 		$qarr[':id']=$testid;
 	}
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
-	//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {

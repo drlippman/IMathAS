@@ -5,17 +5,11 @@ if ($myrights<100) {
 	echo "No rights";
 	exit;
 }
-
-//DB $query = "SELECT * FROM imas_libraries WHERE uniqueid = 1143581427433 ";
-//DB $result = mysql_query($query) or die("Error: $query: " . mysql_error());
-//DB if (mysql_num_rows($result)>0) {
 $stm = $DBH->query("SELECT * FROM imas_libraries WHERE uniqueid = 1143581427433 ");
 if ($stm->rowCount()>0) {
 	echo "Library already exists; aborting";
 	exit;
 }
-//DB $query = 'INSERT INTO `imas_libraries` (`id`, `uniqueid`, `adddate`, `lastmoddate`, `name`, `ownerid`, `userights`, `parent`, `groupid`) VALUES (1, 1143581427433, 1227157541, 1227157541, \'Examples\', 1, 8, 0, 0);';
-//DB mysql_query($query) or die("Error: $query: " . mysql_error());
 $stm = $DBH->query('INSERT INTO `imas_libraries` (`id`, `uniqueid`, `adddate`, `lastmoddate`, `name`, `ownerid`, `userights`, `parent`, `groupid`) VALUES (1, 1143581427433, 1227157541, 1227157541, \'Examples\', 1, 8, 0, 0);');
 
 $query = 'INSERT INTO `imas_library_items` (`id`, `libid`, `qsetid`, `ownerid`) VALUES (1, 1, 1, 1),
@@ -53,7 +47,6 @@ $query = 'INSERT INTO `imas_library_items` (`id`, `libid`, `qsetid`, `ownerid`) 
 (46, 1, 33, 1),
 (51, 1, 34, 1),
 (58, 1, 35, 1);';
-//DB mysql_query($query) or die("Error: $query: " . mysql_error());
 $DBH->query($query);
 
 $query = 'INSERT INTO `imas_questionset` (`id`, `uniqueid`, `adddate`, `lastmoddate`, `ownerid`, `author`, `userights`, `description`, `qtype`, `control`, `qcontrol`, `qtext`, `answer`, `extref`, `hasimg`, `ancestors`)
@@ -93,7 +86,6 @@ VALUES
 (33, 1193679368434747, 1227157541, 1227157541, 1, \'Lippman, David\', 2, \'Stuanswers example; answer meeting a condition\', \'multipart\', \'$anstypes = "number,number"\\n$a = rand(3,9)\\n$as = $a^2\\n\\n$answerboxsize = 2\\n\\n$x = $stuanswers[$thisq][0] //the answer to this question, part 0\\n$y = $stuanswers[$thisq][1]\\n\\n$x = 9999 if ($x===null) //define to crazy value if student didn\\\'t answer\\n$y = 9999 if ($y===null) //define to crazy value if student didn\\\'t answer\\n\\n$answer[0] = $x+100   //by default the answer is something different than what they typed\\n$answer[0] = $x if (abs($x^2+$y^2 -$as) < .000001)  //if they meet our condition, set answer to what they entered\\n\\n$answer[1] = $y+100\\n$answer[1] = $y if (abs($x^2+$y^2 -$as) < .000001)\\n\\n//it\\\'s always best to define showanswer here; otherwise the wrong answers above may display as the answer\\n$showanswer = "Any point on the circle will be acceptable"\', \'\', \'Enter a point on the circle `x^2+y^2 = $as`\\n\\n($answerbox[0],$answerbox[1])\', \'\', \'\', 0, \'\'),
 (34, 1197605392402294, 1227157541, 1227157541, 1, \'Lippman, David\', 2, \'Drawing entry: polygons\', \'draw\', \'//y=a-x,  y=b-2x    a-x=b-2x    x=b-a\\n\\n$b = rrand(6,10,2)\\n$a = rand(3,$b-1) where ($b-$a<$b/2)\\n$hb = $b/2\\n$x = $b-$a\\n$y = $a-$x\\n\\n$grid = "-1,10,-1,10"\\n$answers = array("0,0","0,$a","$x,$y","$hb,0","0,0")\\n$answerformat = "polygon"\', \'\', \'Draw the boundary to the feasible region corresponding to the constraints\\n\\n`{(y+x le $a),(y+2x le $b),(x ge 0),(y ge 0):}`\', \'\', \'\', 0, \'\'),
 (35, 1206685650334340, 1227157541, 1227157541, 1, \'Lippman, David\', 2, \'Graphing: axis labeling\', \'number\', \'$h = rand(50,80)\\n$v = rand(5,30)\\n\\n$g = showplot("$h+$v*x-9.8*x^2",0,5,0,100,"1:20","1:20",300,300)\\n\\n//adds border around main graph, in pixels: left, bottom, right, top\\n$g = addplotborder($g,55,40,5,10)\\n\\n//normal addlabel function, uses x,y location relative to graph coordinates\\n$g = addlabel($g,2,$h+2*$v-4*9.8,"f(x)","blue","aboveright")\\n\\n//new addlabelabs, uses pixel x,y location; 0,0 in bottom left\\n$g = addlabelabs($g,175,0,"Time (sec)","red","above")\\n\\n//addlabel and addlabelabs get new argument: text rotation angle\\n$g = addlabelabs($g,0,170,"Height (m)","red","right",90)\', \'\', \'$g\', \'\', \'\', 0, \'\');';
-//DB mysql_query($query) or die("Error: $query: " . mysql_error());
 $DBH->query($query);
 ?>
 <html>

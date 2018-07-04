@@ -30,18 +30,11 @@ $assessmetrics = array();
 $maxattemptratio = 0;
 
 //estimate course start/end dates
-//DB $query = "SELECT min(enddate),max(enddate) FROM imas_assessments WHERE courseid='$cid' AND enddate<2000000000";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $row = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT min(enddate),max(enddate) FROM imas_assessments WHERE courseid=:courseid AND enddate<2000000000");
 $stm->execute(array(':courseid'=>$cid));
 $row = $stm->fetch(PDO::FETCH_NUM);
 $mindate = $row[0];
 $maxdate = $row[1];
-
-//DB $query = "SELECT min(showdate),max(showdate) FROM imas_gbitems WHERE courseid='$cid' AND showdate<2000000000";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $row = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT min(showdate),max(showdate) FROM imas_gbitems WHERE courseid=:courseid AND showdate<2000000000");
 $stm->execute(array(':courseid'=>$cid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -49,9 +42,6 @@ if ($row[0]<$mindate) { $mindate = $row[0];}
 if ($row[1]>$maxdate) { $maxdate = $row[1];}
 
 $discussdates = array();
-//DB $query = "SELECT id,postby,replyby FROM imas_forums WHERE courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id,postby,replyby FROM imas_forums WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -67,9 +57,6 @@ $numsubmissions = array();
 $numattempts = array();
 $timesonfirst = array();
 //pull assessment data to look at number of attempts
-//DB $query = "SELECT ia.defattempts,ias.* FROM imas_assessment_sessions as ias JOIN imas_assessments as ia ON ias.assessmentid=ia.id AND ia.courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_assoc($result)) {
 $stm = $DBH->prepare("SELECT ia.defattempts,ias.* FROM imas_assessment_sessions as ias JOIN imas_assessments as ia ON ias.assessmentid=ia.id AND ia.courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {

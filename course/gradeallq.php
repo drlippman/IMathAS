@@ -18,9 +18,6 @@
 	} else if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $gbmode = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
@@ -82,14 +79,6 @@
 		} else {
 			$onepergroup = false;
 		}
-
-		//DB $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
-		//DB $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid='$aid' ";
-		//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-		//DB if ($page != -1 && isset($_GET['userid'])) {
-			//DB $query .= " AND userid='{$_POST['userid']}'";
-		//DB }
-		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -103,8 +92,6 @@
 			$stm->execute(array(':assessmentid'=>$aid));
 		}
 		$cnt = 0;
-
-		//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$updatedata = array();
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			$GLOBALS['assessver'] = $line['ver'];
@@ -275,12 +262,6 @@
 	}
 	echo '</div>';
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
-
-	//DB $query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
-	//DB $query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id='$qid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
-		//DB echo printrubrics(array(mysql_fetch_row($result)));
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
@@ -325,11 +306,6 @@
 
 	if ($page!=-1) {
 		$stulist = array();
-		//DB $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
-		//DB $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
-		//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		if ($hidelocked) {
@@ -342,10 +318,6 @@
 			$stulist[] = $row[0].', '.$row[1];
 		}
 	}
-
-	//DB $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
-	//DB $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
-	//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 	if ($hidelocked) {
@@ -358,14 +330,10 @@
 	}
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
-	//DB if (mysql_num_rows($result)>0) {
 	if ($stm->rowCount()>0) {
-
-	//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$GLOBALS['assessver'] = $line['ver'];
 		$feedback = json_decode($line['feedback'], true);

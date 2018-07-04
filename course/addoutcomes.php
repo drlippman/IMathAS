@@ -10,9 +10,6 @@ if (isset($_POST['order'])) {
 	//array(name=>name, items=>array(outcome ids))
 	//get list of existing outcomes
 	$curoutcomes = array();
-	//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -65,10 +62,6 @@ if (isset($_POST['order'])) {
 			 } else { //is an outcome
 			 	 if (substr($it,0,3)=='new') {
 			 	 	$ocnt = substr($it,3);
-			 	 	//DB $query = "INSERT INTO imas_outcomes (courseid, name) VALUES ";
-			 	 	//DB $query .= "('$cid','{$_POST['newo'.$ocnt]}')";
-			 	 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			 	 	//DB $newid = mysql_insert_id();
 			 	 	$stm = $DBH->prepare("INSERT INTO imas_outcomes (courseid, name) VALUES (:cid,:name)");
 			 	 	$stm->execute(array(':cid'=>$cid, ':name'=>$_POST['newo'.$ocnt]));
 			 	 	$newid = $DBH->lastInsertId();
@@ -76,8 +69,6 @@ if (isset($_POST['order'])) {
 			 	 	$outarr[] = $newid;
 			 	 } else if (isset($curoutcomes[$it])) {
 			 	 	if ($_POST['o'.$it]!=$curoutcomes[$it]) {
-						 //DB $query = "UPDATE imas_outcomes SET name='{$_POST['o'.$it]}' WHERE id='$it' AND courseid='$cid'";
-						 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 						 $stm = $DBH->prepare("UPDATE imas_outcomes SET name=:name WHERE id=:id AND courseid=:courseid");
 						 $stm->execute(array(':name'=>$_POST['o'.$it], ':id'=>$it, ':courseid'=>$cid));
 			 	 	}
@@ -92,11 +83,7 @@ if (isset($_POST['order'])) {
 
 	 //this call parses the item array, adds any new outcomes, and updates names of any existing ones
 	 $itemarray = additems($_POST['order']);
-
-	 //DB $outcomeorder = addslashes(serialize($itemarray));
 	 $outcomeorder = serialize($itemarray);
-	 //DB $query = "UPDATE imas_courses SET outcomes='$outcomeorder' WHERE id='$cid'";
-	 //DB mysql_query($query) or die("Query failed : " . mysql_error());
 	 $stm = $DBH->prepare("UPDATE imas_courses SET outcomes=:outcomes WHERE id=:id");
 	 $stm->execute(array(':outcomes'=>$outcomeorder, ':id'=>$cid));
 
@@ -108,13 +95,9 @@ if (isset($_POST['order'])) {
 		//these aren't horribly efficient, but shouldn't be called that often, so oh well.
 
 		$unusedlist = implode(',',array_map('intval',$unused));
-		//DB $query = "DELETE FROM imas_outcomes WHERE id IN ($unusedlist)";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$DBH->query("DELETE FROM imas_outcomes WHERE id IN ($unusedlist)");
 
 		//detach unused outcomes from questions/content items
-		//DB $query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$cid' AND defoutcome IN ($unusedlist)";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_assessments SET defoutcome=0 WHERE courseid=:courseid AND defoutcome IN ($unusedlist)");
 		$stm->execute(array(':courseid'=>$cid));
 
@@ -140,9 +123,6 @@ if (isset($_POST['order'])) {
 
 
 //load existing outcomes
-//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $row = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -156,9 +136,6 @@ if ($row[0]=='') {
 }
 
 $outcomeinfo = array();
-//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {

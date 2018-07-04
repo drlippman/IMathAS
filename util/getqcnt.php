@@ -54,9 +54,6 @@
 	$runtot = 0;
 	$info = array();
 	//echo "<p>Questions anywhere on system created since 6/10/07</p>\n";
-	//DB $query = "SELECT COUNT(DISTINCT imas_questionset.id) AS qcnt,imas_users.LastName,imas_users.id,imas_users.email,imas_users.FirstName FROM imas_questionset,imas_users WHERE imas_users.id=imas_questionset.ownerid GROUP BY imas_questionset.ownerid  ORDER BY qcnt DESC ";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->query("SELECT COUNT(DISTINCT imas_questionset.id) AS qcnt,imas_users.LastName,imas_users.id,imas_users.email,imas_users.FirstName FROM imas_questionset,imas_users WHERE imas_users.id=imas_questionset.ownerid GROUP BY imas_questionset.ownerid  ORDER BY qcnt DESC ");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		//echo "$row[1]: $row[0]<br/>\n";
@@ -72,9 +69,7 @@
 	$query .= "WHERE imas_users.id=imas_questionset.ownerid AND ";
 	$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid=imas_libraries.id AND ";
 	$query .= "imas_libraries.userights>0 AND imas_questionset.userights>0 AND imas_questionset.adddate>$startt GROUP BY imas_questionset.ownerid";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		//echo "$row[1]: $row[0]<br/>\n";
 		$qsnp[$row[2]] = $row[0];
@@ -89,9 +84,7 @@
 	$query .= "WHERE imas_users.id=imas_questionset.ownerid AND ";
 	$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid=imas_libraries.id AND ";
 	$query .= "imas_libraries.userights=8 AND imas_questionset.userights>0 AND imas_questionset.adddate>$startt GROUP BY imas_questionset.ownerid";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		//echo "$row[1]: $row[0]<br/>\n";
 		$qsp[$row[2]] = $row[0];

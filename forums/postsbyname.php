@@ -21,36 +21,22 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_GET['markallread'])) {
-		//DB $query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid='$forumid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid=:forumid");
 		$stm->execute(array(':forumid'=>$forumid));
 		$now = time();
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			//DB $query = "SELECT id FROM imas_forum_views WHERE userid='$userid' AND threadid='{$row[0]}'";
-			//DB $r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			//DB if (mysql_num_rows($r2)>0) {
-				//DB $r2id = mysql_result($r2,0,0);
 			$stm2 = $DBH->prepare("SELECT id FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 			$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0]));
 			if ($stm2->rowCount()>0) {
 				$r2id = $stm2->fetchColumn(0);
-				//DB $query = "UPDATE imas_forum_views SET lastview=$now WHERE id='$r2id'";
-				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm2 = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE id=:id");
 				$stm2->execute(array(':lastview'=>$now, ':id'=>$r2id));
 			} else{
-				//DB $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','{$row[0]}',$now)";
-				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm2 = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview)");
 				$stm2->execute(array(':userid'=>$userid, ':threadid'=>$row[0], ':lastview'=>$now));
 		}
 		}
 	}
-	//DB $query = "SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid FROM imas_forums WHERE id='$forumid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid) = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid FROM imas_forums WHERE id=:id");
 	$stm->execute(array(':id'=>$forumid));
 	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid) = $stm->fetch(PDO::FETCH_NUM);
@@ -84,9 +70,6 @@
 	echo "<h1>Posts by Name - ".Sanitize::encodeStringForDisplay($forumname)."</h1>\n";
 	echo '</div>';
 	if (!$canviewall && $postbeforeview) {
-		//DB $query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
 		$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE forumid=:forumid AND parent=0 AND userid=:userid LIMIT 1");
 		$stm->execute(array(':forumid'=>$forumid, ':userid'=>$userid));
 		if ($stm->rowCount()==0) {
@@ -211,10 +194,6 @@
 <?php
 
 	if ($haspoints && $caneditscore && $rubric != 0) {
-		//DB $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=$rubric";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
-			//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id=:id");
 		$stm->execute(array(':id'=>$rubric));
 		if ($stm->rowCount()>0) {
@@ -227,9 +206,6 @@
 	$scores = array();
 	$feedback = array();
 	if ($haspoints) {
-		//DB $query = "SELECT refid,score,feedback FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT refid,score,feedback FROM imas_grades WHERE gradetype='forum' AND gradetypeid=:gradetypeid");
 		$stm->execute(array(':gradetypeid'=>$forumid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -239,11 +215,6 @@
 	}
 	$dofilter = false;
 	if (!$canviewall && $groupsetid>0) {
-		//DB $query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
-		//DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
-			//DB $groupid = mysql_result($result,0,0);
 		$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 		$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 		$stm = $DBH->prepare($query);
@@ -264,10 +235,6 @@
 			$blockreplythreads[] = $row[0];
 		}
 	}
-
-	//DB $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
-	//DB $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
-	//DB $query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumid' AND imas_forum_posts.isanon=0 ";
 	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview FROM imas_forum_posts JOIN ";
 	$query .= "imas_forum_threads AS ift ON ift.id=imas_forum_posts.threadid AND ift.lastposttime<:now JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid=:userid) AS ifv ON ";
@@ -308,7 +275,6 @@
 		echo '<div class="forumgrp">'.$content.'</div>';
 	}
 	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = '';
-	//DB while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {

@@ -16,14 +16,10 @@
 	if (isset($_POST['hours'])) {
 		if (isset($_POST['latepass'])) {
 			foreach ($_POST['latepass'] as $uid=>$lp) {
-				//DB $query = "UPDATE imas_students SET latepass='$lp' WHERE userid='$uid' AND courseid='$cid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_students SET latepass=:latepass WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':latepass'=>$lp, ':userid'=>$uid, ':courseid'=>$cid));
 			}
 		}
-		//DB $query = "UPDATE imas_courses SET latepasshrs='{$_POST['hours']}' WHERE id='$cid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET latepasshrs=:latepasshrs WHERE id=:id");
 		$stm->execute(array(':latepasshrs'=>$_POST['hours'], ':id'=>$cid));
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
@@ -109,10 +105,6 @@ function sendtoall(type) {
 }
 </script>
 <?php
-		//DB $query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
-		//DB $query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_result($result,0,0)>0) {
 		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 		$stm = $DBH->prepare($query);
@@ -124,9 +116,6 @@ function sendtoall(type) {
 		}
 
 		if ($hassection) {
-			//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB if (mysql_result($result,0,0)==0) {
 			$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 			if ($stm->fetchColumn(0)==0) {
@@ -141,9 +130,6 @@ function sendtoall(type) {
 		if ($hassection) {
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
-		//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $hours = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$hours = $stm->fetchColumn(0);
@@ -156,10 +142,6 @@ function sendtoall(type) {
 			echo '<th>Section</th>';
 		}
 		echo "<th>LatePasses Remaining</th></tr></thead><tbody>";
-
-		//DB $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.latepass ";
-		//DB $query .= "FROM imas_users,imas_students WHERE ";
-		//DB $query .= "imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
 		$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.latepass ";
 		$query .= "FROM imas_users,imas_students WHERE ";
 		$query .= "imas_users.id=imas_students.userid AND imas_students.courseid=:courseid";
@@ -169,11 +151,8 @@ function sendtoall(type) {
 		} else {
 			 $query .= " ORDER BY imas_users.LastName,imas_users.FirstName";
 		}
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid));
-
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			echo "<tr><td>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</td>";
 			if ($hassection) {

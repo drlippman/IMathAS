@@ -74,10 +74,6 @@ if ($overwriteBody==1) {
 	require_once("$curdir/../filter/filter.php");
 
 	$out = '<!DOCTYPE html><html><body>';
-
-	//DB $query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -123,11 +119,7 @@ if ($overwriteBody==1) {
 	$points = array();
 	$qn = array();
 	$fixedseeds = array();
-	//DB $qlist = "'".implode("','",$questions)."'";
 	$qlist = array_map('Sanitize::onlyInt', $questions);
-	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
 	$stm = $DBH->prepare("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($query_placeholders)");
 	$stm->execute($qlist);
@@ -348,18 +340,11 @@ require("../footer.php");
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	global $RND,$DBH,$isfinal,$imasroot,$urlmode;
 	$RND->srand($seed);
-
-	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
 	$stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id=:id");
 	$stm->execute(array(':id'=>$qsetid));
 	$qdata = $stm->fetch(PDO::FETCH_ASSOC);
 
 	if ($qdata['hasimg']>0) {
-		//DB $query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 		$stm->execute(array(':qsetid'=>$qsetid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {

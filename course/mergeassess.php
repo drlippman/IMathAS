@@ -14,27 +14,17 @@ if (isset($_POST['mergefrom'])) {
 			$seta[$n - 1] = $aid;
 		}
 	}
-	//DB $query = "SELECT name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,reqscore,reqscoreaid FROM imas_assessments WHERE id='{$seta[0]}'";
-	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,reqscore,reqscoreaid';
 	$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$seta[0]));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
 	$defpoints = $row['defpoints'];
-	//DB $row[0] .= ' - merge result';
 	$row['name'] .= ' - merge result';
 	$row['courseid'] = $cid;
-	//DB $row = "'".implode("','",addslashes_deep($row))."'";
-	//DB $query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,reqscore,reqscoreaid) ";
-	//DB $query .= "VALUES ('$cid',$row)";
 	$fieldlist = implode(',', array_keys($row));
 	$placeholders = Sanitize::generateQueryPlaceholders($row);
 	$stm = $DBH->prepare("INSERT INTO imas_assessments ($fieldlist) VALUES ($placeholders)");
 	$stm->execute(array_values($row));
-
-	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB $newaid = mysql_insert_id();
 	$newaid = $DBH->lastInsertId();
 
 	$intro = '';
@@ -47,12 +37,9 @@ if (isset($_POST['mergefrom'])) {
 	}
 
 	for ($i=0;$i<count($seta);$i++) {
-		//DB $query = "SELECT itemorder,intro,name FROM imas_assessments WHERE id='{$seta[$i]}'";
-		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$stm = $DBH->prepare("SELECT itemorder,intro,name FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$seta[$i]));
 		list($itemorder, $curintro, $thisname) = $stm->fetch(PDO::FETCH_NUM);
-		//DB $thisname = mysql_result($result,0,2);
 		$thisintro = '';
 		if (isset($_POST['addpages'])) {
 			$thisintro .= "<p>[PAGE $thisname]</p>";
@@ -64,28 +51,17 @@ if (isset($_POST['mergefrom'])) {
 			$thisintro .= $thisintroraw;
 		}
 		$thisqcnt = 0;
-		//DB if (trim(mysql_result($result,0,0))!='') {
 		if (trim($itemorder)!='') {
-			//DB $aitems = explode(',',mysql_result($result,0,0));
 			$aitems = explode(',', $itemorder);
 			foreach ($aitems as $k=>$aitem) {
 				if (strpos($aitem,'~')===FALSE) {
 					///$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 					///$query .= "SELECT '$newaid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$aitem'";
 					//mysql_query($query) or die("Query failed :$query " . mysql_error());
-					//DB $query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$aitem'";
-					//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-					//DB $row = mysql_fetch_row($result);
 					$stm = $DBH->prepare("SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id=:id");
 					$stm->execute(array(':id'=>$aitem));
 					$row = $stm->fetch(PDO::FETCH_ASSOC);
-					//DB $rubric = array_pop($row);
 					$rubric = $row['rubric'];
-					//DB $row = "'".implode("','",addslashes_deep($row))."'";
-					//DB $query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
-					//DB $query .= "VALUES ('$newaid',$row)";
-					//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-					//DB $newid = mysql_insert_id();
 					$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 					$query .= "VALUES (:assessmentid,:questionsetid,:points,:attempts,:penalty,:category)";
 					$stm = $DBH->prepare($query);
@@ -106,25 +82,15 @@ if (isset($_POST['mergefrom'])) {
 						//$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 						//$query .= "SELECT '$newaid',questionsetid,points,attempts,penalty,category FROM imas_questions WHERE id='$subi'";
 						//mysql_query($query) or die("Query failed : $query" . mysql_error());
-						//DB $query = "SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id='$subi'";
-						//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-						//DB $row = mysql_fetch_row($result);
 						$stm = $DBH->prepare("SELECT questionsetid,points,attempts,penalty,category,rubric FROM imas_questions WHERE id=:id");
 						$stm->execute(array(':id'=>$subi));
 						$row = $stm->fetch(PDO::FETCH_ASSOC);
-						//DB $rubric = array_pop($row);
 						$rubric = $row['rubric'];
-						//DB $row = "'".implode("','",addslashes_deep($row))."'";
-						//DB $query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
-						//DB $query .= "VALUES ('$newaid',$row)";
-						//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 						$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category) ";
 						$query .= "VALUES (:assessmentid,:questionsetid,:points,:attempts,:penalty,:category)";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':assessmentid'=>$newaid, ':questionsetid'=>$row['questionsetid'], ':points'=>$row['points'],
 							':attempts'=>$row['attempts'], ':penalty'=>$row['penalty'], ':category'=>$row['category']));
-
-						//DB $newid = mysql_insert_id();
 						$newid = $DBH->lastInsertId();
 						$newsub[] = $newid;
 					}
@@ -188,40 +154,24 @@ if (isset($_POST['mergefrom'])) {
 		}
 		$intro = $out;
 	}
-	//DB $intro = addslashes($intro);
 	$newitemorder = implode(',',$newaitems);
-	//DB $query = "UPDATE imas_assessments SET itemorder='$newitemorder',intro='$intro' WHERE id='$newaid'";
-	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,intro=:intro WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$newitemorder, ':intro'=>$intro, ':id'=>$newaid));
 
 	//update points poss
 	require_once("../includes/updateptsposs.php");
 	updatePointsPossible($newaid, $newitemorder, $defpoints);
-	
-	//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
-	//DB $query .= "VALUES ('$cid','Assessment',$newaid)";
-	//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES (:courseid, 'Assessment', :typeid)";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':typeid'=>$newaid));
-	//DB $newitemid = mysql_insert_id();
 	$newitemid = $DBH->lastInsertId();
-
-	//DB $query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid';";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $blockcnt = mysql_result($result,0,0);
-	//DB $items = unserialize(mysql_result($result,0,1));
 	$stm = $DBH->prepare("SELECT blockcnt,itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	list($blockcnt, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
 	$items = unserialize($itemorder);
 	$items[] = $newitemid;
-	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
-	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
 	$pagetitle = "Merge Assessments";
@@ -236,9 +186,6 @@ if (isset($_POST['mergefrom'])) {
 	exit;
 
 } else {
-	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB $itemorder = unserialize(mysql_result($result,0,0));
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$itemorder = unserialize($stm->fetchColumn(0));
@@ -256,22 +203,14 @@ if (isset($_POST['mergefrom'])) {
 	flattenitems($itemorder,$itemsimporder);
 
 	$itemsassoc = array();
-	//DB $query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Assessment'";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->prepare("SELECT id,typeid FROM imas_items WHERE courseid=:courseid AND itemtype='Assessment'");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$itemsassoc[$row[0]] = $row[1];
 	}
-
-
-	//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	$assess = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$assess[$row[0]] = $row[1];
 	}

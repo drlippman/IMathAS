@@ -9,10 +9,6 @@ if (!isset($_GET['libitemid']) || $myrights<20) {
 }
 
 $ischanged = false;
-
-//DB $query = "UPDATE imas_library_items SET junkflag='{$_GET['flag']}' WHERE id='{$_GET['libitemid']}'";
-//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-//DB if (mysql_affected_rows()>0) {
 $now = time();
 
 $stm = $DBH->prepare("UPDATE imas_library_items SET junkflag=:junkflag,lastmoddate=:lastmoddate WHERE id=:id");

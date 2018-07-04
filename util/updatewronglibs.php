@@ -9,10 +9,8 @@ function doquery($vals) {  //provide presanitized values
 	  JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
 	  JOIN imas_libraries AS il ON ili.libid=il.id
 	  SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN ($query_placeholders)";
-	 //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	 $stm = $DBH->prepare($query);
 	 $stm->execute($vals);
-	 //DB return mysql_affected_rows();
 	 return $stm->rowCount();
 }
 

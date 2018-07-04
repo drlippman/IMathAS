@@ -55,28 +55,19 @@ if (!(isset($teacherid))) {
 		}
 		if (isset($_GET['id'])) { //already have id - updating
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
-				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints";
-				//DB $query .= ',questionsetid='.intval($_POST['replacementid'])." WHERE id='{$_GET['id']}'";
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':rubric'=>$rubric,
 					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
 			} else {
-				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints";
-				//DB $query .= " WHERE id='{$_GET['id']}'";
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
 					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$_GET['id']));
 			}
-
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
-				//DB $query = "SELECT questionsetid FROM imas_questions WHERE id='{$_GET['id']}'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $_GET['qsetid'] = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT questionsetid FROM imas_questions WHERE id=:id");
 				$stm->execute(array(':id'=>$_GET['id']));
 				$_GET['qsetid'] = $stm->fetchColumn(0);
@@ -84,17 +75,10 @@ if (!(isset($teacherid))) {
 		}
 		require_once("../includes/updateptsposs.php");
 		if (isset($_GET['qsetid'])) { //new - adding
-			//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $itemorder = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			for ($i=0;$i<$_POST['copies'];$i++) {
-				//DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints) ";
-				//DB $query .= "VALUES ('$aid','$points','$attempts','$penalty','$regen','$showans','{$_GET['qsetid']}',$rubric,$showhints)";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB $qid = mysql_insert_id();
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints,fixedseeds) ";
 				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :questionsetid, :rubric, :showhints, :fixedseeds)";
 				$stm = $DBH->prepare($query);
@@ -116,8 +100,6 @@ if (!(isset($teacherid))) {
 					}
 				}
 			}
-			//DB $query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
 			
@@ -131,9 +113,6 @@ if (!(isset($teacherid))) {
 	} else { //DEFAULT DATA MANIPULATION
 
 		if (isset($_GET['id'])) {
-			//DB $query = "SELECT points,attempts,penalty,regen,showans,rubric,showhints FROM imas_questions WHERE id='{$_GET['id']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -175,20 +154,12 @@ if (!(isset($teacherid))) {
 
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
-		//DB $query = "SELECT id,name FROM imas_rubrics WHERE ownerid='$userid' OR groupid='$gropuid' ORDER BY name";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
 		$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$gropuid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}
-
-		//DB $query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-		//DB $query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result) > 0) {
 		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
 		$stm = $DBH->prepare($query);

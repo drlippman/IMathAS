@@ -35,15 +35,10 @@ function getpts($sc) {
 //determine if diagnostic - used in gradebook too
 $isdiag = false;
 if ($canviewall) {
-	//DB $query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)>0) {
 	$stm = $DBH->prepare("SELECT sel1name,sel2name FROM imas_diags WHERE cid=:cid");
 	$stm->execute(array(':cid'=>$cid));
 	if ($stm->rowCount()>0) {
 		$isdiag = true;
-		//DB $sel1name = mysql_result($result,0,0);
-		//DB $sel2name = mysql_result($result,0,1);
 		list($sel1name, $sel2name) = $stm->fetch(PDO::FETCH_NUM);
 	}
 }
@@ -197,9 +192,6 @@ function gbtable() {
 	$ln = 0;
 
 	//Pull Gradebook Scheme info
-	//DB $query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	list($useweights,$orderby,$defaultcat,$usersort) = $stm->fetch(PDO::FETCH_NUM);
@@ -287,7 +279,6 @@ function gbtable() {
 
 	//Pull Assessment Info
 	$now = time();
-	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
 	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti";
 	if ($limuser>0) {
 		$query .= ',reqscoreaid,reqscore,reqscoretype';
@@ -306,11 +297,6 @@ function gbtable() {
 	if (!$isteacher) {
 		//$query .= "AND startdate<$now ";
 	}
-	//DB if ($catfilter>-1) {
-		//DB $query .= "AND gbcategory='$catfilter' ";
-	//DB }
-	//DB $query .= "ORDER BY enddate,name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory=:gbcategory ";
 	}
@@ -344,7 +330,6 @@ function gbtable() {
 	$allowlate = array();
 	$endmsgs = array();
 	$reqscores = array();
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($courseitemsassoc['Assessment'.$line['id']])) {
 			continue; //assess is in hidden block - skip it
@@ -422,10 +407,6 @@ function gbtable() {
 
 
 	//Pull Offline Grade item info
-	//DB $query = "SELECT * from imas_gbitems WHERE courseid='$cid' ";
-	//DB if ($catfilter>-1) {
-		//DB $query .= "AND gbcategory='$catfilter' ";
-	//DB }
 	$query = "SELECT * from imas_gbitems WHERE courseid=:courseid ";
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory=:gbcategory ";
@@ -440,14 +421,12 @@ function gbtable() {
 		$query .= "AND tutoredit<2 ";
 	}
 	$query .= "ORDER BY showdate,name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare($query);
 	if ($catfilter>-1) {
 		$stm->execute(array(':courseid'=>$cid, ':gbcategory'=>$catfilter));
 	} else {
 		$stm->execute(array(':courseid'=>$cid));
 	}
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$grades[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Offline";
@@ -470,10 +449,6 @@ function gbtable() {
 	}
 
 	//Pull Discussion Grade info
-	//DB $query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
-	//DB if ($catfilter>-1) {
-		//DB $query .= "AND gbcategory='$catfilter' ";
-	//DB }
 	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid=:courseid AND points>0 AND avail>0 ";
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory=:gbcategory ";
@@ -491,8 +466,6 @@ function gbtable() {
 	} else {
 		$stm->execute(array(':courseid'=>$cid));
 	}
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($courseitemsassoc['Forum'.$line['id']])) {
 			continue; //assess is in hidden block - skip it
@@ -541,7 +514,6 @@ function gbtable() {
 	}
 
 	//Pull External Tools info
-	//DB $query = "SELECT id,title,text,startdate,enddate,points,avail FROM imas_linkedtext WHERE courseid='$cid' AND points>0 AND avail>0 ";
 	$query = "SELECT id,title,text,startdate,enddate,points,avail FROM imas_linkedtext WHERE courseid=:courseid AND points>0 AND avail>0 ";
 	if (!$canviewall) {
 		$query .= "AND startdate<$now ";
@@ -555,8 +527,6 @@ function gbtable() {
 	$query .= "ORDER BY enddate,startdate";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($courseitemsassoc['LinkedText'.$line['id']])) {
 			continue; //assess is in hidden block - skip it
@@ -614,11 +584,6 @@ function gbtable() {
 		$catcolcnt++;
 
 	}
-
-	//DB $query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid='$cid' ";
-	//DB $query .= "ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid ";
 	$query .= "ORDER BY name";
 	$stm = $DBH->prepare($query);
@@ -864,20 +829,16 @@ function gbtable() {
 
 	//Pull student data
 	$ln = 1;
-	//DB $query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
-	//DB $query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
 	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid ";
 	$qarr = array(':courseid'=>$cid);
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
-	//DB if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
 	if ($limuser>0) {
 		$query .= "AND imas_users.id=:userid ";
 		$qarr[':userid'] = $limuser;
 	}
 	if ($secfilter!=-1 && $limuser<=0) {
-		//DB $query .= "AND imas_students.section='$secfilter' ";
 		$query .= "AND imas_students.section=:section ";
 		$qarr[':section'] = $secfilter;
 	}
@@ -902,11 +863,9 @@ function gbtable() {
 	}
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
-	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$alt = 0;
 	$sturow = array();
 	$timelimitmult = array();
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		$cattotpast[$ln] = array();
@@ -953,9 +912,6 @@ function gbtable() {
 
 	//pull logincnt if needed
 	if ($logincnt==1) {
-		//DB $query = "SELECT userid,count(*) FROM imas_login_log WHERE courseid='$cid' GROUP BY userid";
-		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($r = mysql_fetch_row($result2)) {
 		$stm2 = $DBH->prepare("SELECT userid,count(*) FROM imas_login_log WHERE courseid=:courseid GROUP BY userid");
 		$stm2->execute(array(':courseid'=>$cid));
 		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
@@ -969,18 +925,12 @@ function gbtable() {
 	$exceptions = array();
 	$canuseexception = array();
 	$forumexceptions = array();
-	//DB $query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
-	//DB $query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
-	//DB $query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
-	//DB $query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid='$cid'";
-	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate FROM imas_exceptions AS ie,imas_assessments WHERE ";
 	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
 	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_forums.enddate,imas_forums.startdate FROM imas_exceptions AS ie,imas_forums WHERE ";
 	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
-	//DB while ($r = mysql_fetch_assoc($result2)) {
 	while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($sturow[$r['userid']])) { continue;}
 		if ($r['itemtype']=='A') {
@@ -1014,13 +964,6 @@ function gbtable() {
 	}
 
 	//Get assessment scores
-	//DB $query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
-	//DB $query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid' ";
-	//DB if ($limuser>0) {
-		//DB $query .= " AND ias.userid='$limuser' ";
-	//DB }
-	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid=:courseid ";
 	if ($limuser>0) {
@@ -1241,15 +1184,11 @@ function gbtable() {
 		//$query = "SELECT imas_grades.gradetypeid,imas_grades.gradetype,imas_grades.refid,imas_grades.id,imas_grades.score,imas_grades.feedback,imas_grades.userid FROM imas_grades,imas_gbitems WHERE ";
 		//$query .= "imas_grades.gradetypeid=imas_gbitems.id AND imas_gbitems.courseid='$cid'";
 		if ($limuser>0) {
-			//DB $query = "SELECT * FROM imas_grades WHERE ($sel) AND userid='$limuser' ";
 			$stm2 = $DBH->prepare("SELECT * FROM imas_grades WHERE ($sel) AND userid=:userid ");
 			$stm2->execute(array(':userid'=>$limuser));
 		} else {
-			//DB $query = "SELECT * FROM imas_grades WHERE ($sel)";
 			$stm2 = $DBH->query("SELECT * FROM imas_grades WHERE ($sel)");
 		}
-		//DB $result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		//DB while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 		while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
 			if ($l['gradetype']=='offline') {
 				if (!isset($gradeidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($gradecol[$l['gradetypeid']])) {

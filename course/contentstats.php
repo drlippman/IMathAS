@@ -22,35 +22,23 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 	$descrips = array();
 	$qarr = array(':courseid'=>$cid, ':typeid'=>$typeid);
 	if ($stype=='I') {
-		//DB $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type='inlinetext' AND typeid='$typeid'";
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type='inlinetext' AND typeid=:typeid");
-		//DB $query = "SELECT title FROM imas_inlinetext WHERE id='$typeid'";
 		$stm2 = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
 	} else if ($stype=='L') {
-		//DB $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid='$typeid'";
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid=:typeid");
-		//DB $q2 = "SELECT title FROM imas_linkedtext WHERE id='$typeid'";
 		$stm2 = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
 	} else if ($stype=='A') {
-		//DB $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('assessintro','assessum','assess') AND typeid='$typeid'";
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type IN ('assessintro','assessum','assess') AND typeid=:typeid");
-		//DB $q2 = "SELECT name FROM imas_assessments WHERE id='$typeid'";
 		$stm2 = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 	} else if ($stype=='W') {
-		//DB $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('wiki','wikiintext') AND typeid='$typeid'";
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type IN ('wiki','wikiintext') AND typeid=:typeid");
-		//DB $q2 = "SELECT name FROM imas_wikis WHERE id='$typeid'";
 		$stm2 = $DBH->prepare("SELECT name FROM imas_wikis WHERE id=:id");
 	} else if ($stype=='F') {
-		//DB $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$cid' AND type IN ('forumpost','forumreply') AND info='$typeid'";
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND ((type='forumpost' AND info=:typeid) OR (type='forumreply' AND info LIKE :likeid))");
 		$qarr[':likeid'] = "$typeid;%";
-		//DB $q2 = "SELECT name FROM imas_forums WHERE id='$typeid'";
 		$stm2 = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
 	}
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm->execute($qarr);
-	//DB while ($row = mysql_fetch_assoc($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$type = $row['type'];
 		if ($type=='linkedviacal') {
@@ -94,16 +82,9 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 		}
 	}
 	$stm2->execute(array(':id'=>$typeid));
-	//DB $result = mysql_query($q2) or die("Query failed : " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$itemname = Sanitize::encodeStringForDisplay($stm2->fetchColumn(0));
 
 	$stus = array();
-	//DB $query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu ";
-	//DB $query .= "JOIN imas_students AS istu ON iu.id=istu.userid AND istu.courseid='$cid' ";
-	//DB $query .= "ORDER BY iu.LastName,iu.FirstName";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_assoc($result)) {
 	$query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu ";
 	$query .= "JOIN imas_students AS istu ON iu.id=istu.userid AND istu.courseid=:courseid ";
 	$query .= "ORDER BY iu.LastName,iu.FirstName";

@@ -36,13 +36,10 @@ function getstunames($a) {
 	global $DBH;
 	if (count($a)==0) { return array();}
 	$a = array_map('Sanitize::onlyInt', $a);
-	//DB $query = "SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($a)";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$query_placeholders = Sanitize::generateQueryPlaceholders($a);
 	$stm = $DBH->prepare("SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($query_placeholders)");
 	$stm->execute($a);
 	$names = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$names[$row[2]] = $row[0].', '.$row[1];
 	}
@@ -51,13 +48,6 @@ function getstunames($a) {
 
 $stus = array();
 if ($type=='notstart') {
-	//DB $query = "SELECT ims.userid FROM imas_students AS ims LEFT JOIN imas_assessment_sessions AS ias ON ims.userid=ias.userid AND ias.assessmentid='$aid'";
-	//DB $query .= "WHERE ias.id IS NULL AND ims.courseid='$cid' AND ims.locked=0 ";
-	//DB if ($secfilter!=-1) {
-		//DB $query .= " AND ims.section='$secfilter' ";
-	//DB }
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT ims.userid FROM imas_students AS ims LEFT JOIN imas_assessment_sessions AS ias ON ims.userid=ias.userid AND ias.assessmentid=:assessmentid ";
 	$query .= "WHERE ias.id IS NULL AND ims.courseid=:courseid AND ims.locked=0 ";
 	if ($secfilter!=-1) {
@@ -80,12 +70,6 @@ if ($type=='notstart') {
 	}
 	echo '</ul>';
 } else if ($type=='help') {
-	//DB $query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid='$qid' AND ims.locked=0 ";
-	//DB if ($secfilter!=-1) {
-		//DB $query .= " AND ims.section='$secfilter' ";
-	//DB }
-	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid=:courseid AND ict.courseid=:courseid2 AND ict.type='extref' AND ict.typeid=:typeid AND ims.locked=0 ";
 	if ($secfilter!=-1) {
 		$query .= " AND ims.section=:section ";
@@ -107,12 +91,6 @@ if ($type=='notstart') {
 	}
 	echo '</ul>';
 } else {
-	//DB $query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
-	//DB $query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid' AND imas_students.locked=0";
-	//DB if ($secfilter!=-1) {
-		//DB $query .= " AND imas_students.section='$secfilter' ";
-	//DB }
-	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid=:courseid AND ias.assessmentid=:assessmentid AND imas_students.locked=0";
 	if ($secfilter!=-1) {
@@ -129,7 +107,6 @@ if ($type=='notstart') {
 	$stutimes = array();
 	$sturegens = array();
 	$stuatt = array();
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (strpos($line['questions'],';')===false) {
 			$questions = explode(",",$line['questions']);

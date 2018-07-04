@@ -4,10 +4,6 @@ if ($myrights<100) {
 	exit;
 }
 if (isset($_REQUEST['cid'])) {
-	//DB $query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_GET['cid']}'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $items = unserialize(mysql_result($result,0,0));
-	//DB $blockcnt = mysql_result($result,0,1);
 	$stm = $DBH->prepare("SELECT itemorder,blockcnt FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$_REQUEST['cid']));
 	list($itemorder, $blockcnt) = $stm->fetch(PDO::FETCH_NUM);
@@ -18,12 +14,8 @@ if (isset($_REQUEST['cid'])) {
 }
 
 $allitems = array();
-//DB $query = "SELECT id FROM imas_items WHERE courseid='{$_GET['cid']}'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id FROM imas_items WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$_REQUEST['cid']));
-//DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$allitems[] = $row[0];
 }
@@ -77,17 +69,11 @@ if (count($recovereditems)>0) {
 	$block['items'] = $recovereditems;
 	array_push($items,$block);
 	echo "recovered ". count($recovereditems) . "items";
-	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
-	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=blockcnt+1 WHERE id='{$_GET['cid']}'";
-	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=blockcnt+1 WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$_REQUEST['cid']));
 } else {
-	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
-	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='{$_GET['cid']}'";
-	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$_REQUEST['cid']));
 }

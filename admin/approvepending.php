@@ -14,8 +14,6 @@ if (isset($_GET['go'])) {
 	if (isset($_POST['skip'])) {
 		$offset++;
 	} else 	if (isset($_POST['deny'])) {
-		//DB $query = "UPDATE imas_users SET rights=10 WHERE id='{$_POST['id']}'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$uid));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
@@ -30,26 +28,17 @@ if (isset($_GET['go'])) {
 		if ($_POST['group']>-1) {
 			$group = intval($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
-			//DB $query = "INSERT INTO imas_groups (name) VALUES ('{$_POST['newgroup']}')";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB $group = mysql_insert_id();
 			$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
 			$stm->execute(array(':name'=>$_POST['newgroup']));
 			$group = $DBH->lastInsertId();
 		} else {
 			$group = 0;
 		}
-		//DB $query = "UPDATE imas_users SET rights=40,groupid=$group WHERE id='{$_POST['id']}'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
 		$stm->execute(array(':groupid'=>$group, ':id'=>$uid));
 
 		$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=11 WHERE userid=:id");
 		$stm->execute(array(':id'=>$uid));
-		
-		//DB $query = "SELECT FirstName,SID,email FROM imas_users WHERE id='{$_POST['id']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT FirstName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$uid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -71,20 +60,11 @@ if (isset($_GET['go'])) {
 }
 
 require("../header.php");
-//DB $query = "SELECT id,SID,LastName,FirstName,email FROM imas_users WHERE rights=0 OR rights=12 LIMIT 1 OFFSET $offset";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB if (mysql_num_rows($result)==0) {
 $stm = $DBH->query("SELECT id,SID,LastName,FirstName,email FROM imas_users WHERE rights=0 OR rights=12 LIMIT 1 OFFSET $offset"); //sanitized above
 if ($stm->rowCount()==0) {
 	echo 'No one to approve';
 } else {
-	//DB $row = mysql_fetch_row($result);
 	$row = $stm->fetch(PDO::FETCH_NUM);
-
-	//DB $query = "SELECT log FROM imas_log WHERE log LIKE 'New Instructor Request: {$row[0]}::%'";
-	//DB $res = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($res)>0) {
-		//DB $log = explode('::', mysql_result($res,0,0));
 	$stm = $DBH->prepare("SELECT time,log FROM imas_log WHERE log LIKE :log");
 	$stm->execute(array(':log'=>"New Instructor Request: {$row[0]}::%"));
 	if ($stm->rowCount()>0) {
@@ -134,9 +114,6 @@ if ($stm->rowCount()==0) {
 
 
 	echo '<p>Group: <select name="group"><option value="-1">New Group</option>';
-	//DB $query = "SELECT id,name FROM imas_groups ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
 	$opts = '';
 	$groups = array();

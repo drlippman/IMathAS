@@ -11,10 +11,6 @@ $sgid = intval($_GET['gid']);
 
 $out = '<ul>';
 $userfound = false;
-//DB $query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu JOIN imas_stugroupmembers AS isg ";
-//DB $query .= "ON iu.id=isg.userid WHERE isg.stugroupid=$sgid ORDER BY iu.LastName,iu.FirstName";
-//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu JOIN imas_stugroupmembers AS isg ";
 $query .= "ON iu.id=isg.userid WHERE isg.stugroupid=:stugroupid ORDER BY iu.LastName,iu.FirstName";
 $stm = $DBH->prepare($query);

@@ -12,8 +12,6 @@ $query .= "ON mfv.threadid=imas_forum_posts.threadid WHERE imas_forums.courseid=
 $query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))";
 */
 $now = time();
-//DB $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
-//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,mfv.tagged FROM imas_forum_threads ";
 $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
 $array = array(':now'=>$now);
@@ -51,8 +49,6 @@ if (isset($_GET['markallread'])) {
   if (count($forumids)>0) {
     $forumidlist = array_map('Sanitize::onlyInt', array_values($forumids));
     $forumidlist_query_placeholders = Sanitize::generateQueryPlaceholders($forumidlist);
-    //DB $query = "SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist)";
-    //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
     $stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist_query_placeholders)");
 	  $stm->execute(array_values($forumidlist));
 
@@ -66,10 +62,6 @@ if (isset($_GET['markallread'])) {
       $threadids_query_placeholders = Sanitize::generateQueryPlaceholders($threadidsSanitize);
 
       $toupdate = array();
-      //DB $query = "SELECT threadid FROM imas_forum_views WHERE userid='$userid' AND threadid IN ($threadlist)";
-      //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-      //DB while ($row = mysql_fetch_row($result)) {
-      //DB $to
       $stm = $DBH->prepare("SELECT threadid FROM imas_forum_views WHERE userid=? AND threadid IN ($threadids_query_placeholders)");
       $stm->execute(array_merge(array($userid), $threadidsSanitize));
       while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -78,15 +70,11 @@ if (isset($_GET['markallread'])) {
       if (count($toupdate)>0) {
         $toupdatelistSanitize = array_map('Sanitize::onlyInt', $toupdate);//INT vals from DB - safe
         $toupdatelist_query_placeholders = Sanitize::generateQueryPlaceholders($toupdatelistSanitize);
-        //DB $query = "UPDATE imas_forum_views SET lastview=$now WHERE userid='$userid AND threadid IN ($toupdatelist)'";
-        //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
   			$stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=? WHERE userid=? AND threadid IN ($toupdatelist_query_placeholders)");
 		    $stm->execute(array_merge(array($now, $userid), $toupdatelistSanitize));
   		}
       $toinsert = array_diff($threadids,$toupdate);
       if (count($toinsert)>0) {
-        //DB $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
-        //DB $query .= ",('$userid','$tid',$now)";
         $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
         $array = array();
 
@@ -95,7 +83,6 @@ if (isset($_GET['markallread'])) {
           if (!$first) {
 						$query .= ',';
 					}
-          //DB $query .= "('$userid','$tid',$now)";
 					$query .= "(?,?,?)";
           array_push($array, $userid, $tid, $now);
 
@@ -128,11 +115,6 @@ echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?
 if (count($lastpost)>0) {
   echo '<table class="gb forum" id="newthreads"><thead><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
   $threadids = array_map('intval', array_keys($lastpost));
-  //DB $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
-  //DB $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
-  //DB $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_posts.parent=0 ORDER BY imas_forum_posts.forumid, imas_forum_threads.lastposttime DESC";
-  //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-  //DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$ph = Sanitize::generateQueryPlaceholders($threadids);
   $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";

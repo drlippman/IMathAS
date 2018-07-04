@@ -156,13 +156,9 @@ if (!(isset($teacherid))) {
 		$curBreadcrumb .= " &gt; Shift Course Dates ";
 
 		$sdate = tzdate("m/d/Y",time());
-
-		//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=0;
-		//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			$page_assessmentList['val'][$i] = $line['id'];
 			$page_assessmentList['label'][$i] = $line['name'];

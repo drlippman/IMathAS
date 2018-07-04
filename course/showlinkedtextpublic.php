@@ -53,24 +53,14 @@
 		}
 		return false;
 	}
-
-	//DB $query = "SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid='{$_GET['id']}'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $itemid = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid=:typeid");
 	$stm->execute(array(':typeid'=>intval($_GET['id'])));
 	$itemid = $stm->fetchColumn(0);
-
-	//DB $query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB $items = unserialize(mysql_result($result,0,0));
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	list($itemorder,$itemcoursename,$itemcoursetheme) = $stm->fetch(PDO::FETCH_NUM);
 	$items = unserialize($itemorder);
 	if ($fcid==0) {
-		//DB $coursename = mysql_result($result,0,1);
-		//DB $coursetheme = mysql_result($result,0,2);
 		$coursename = $itemcoursename;
 		$coursetheme = $itemcoursetheme;
 		$breadcrumbbase = "<a href=\"public.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -90,12 +80,8 @@
 		echo "<html><body>No item specified.</body></html>\n";
 		exit;
 	}
-	//DB $query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id");
 	$stm->execute(array(':id'=>intval($_GET['id'])));
-	//DB $text = mysql_result($result, 0,0);
-	//DB $title = mysql_result($result,0,1);
 	list($text,$title) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 

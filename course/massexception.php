@@ -9,10 +9,7 @@
 	}
 
 	if (isset($_POST['clears'])) {
-		//DB $clearlist = "'".implode("','",$_POST['clears'])."'";
 		$clearlist = implode(',', array_map('intval', $_POST['clears']));
-		//DB $query = "DELETE FROM imas_exceptions WHERE id IN ($clearlist)";
-		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->query("DELETE FROM imas_exceptions WHERE id IN ($clearlist)");
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
@@ -70,18 +67,10 @@
 			foreach($addexcarr as $aid) {
 				if (isset($_POST['forceregen'])) {
 					//this is not group-safe
-					//DB $query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
-					//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-					//DB list($shuffle) = mysql_fetch_row($result);
 					$stm = $DBH->prepare("SELECT shuffle FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$aid));
 					$shuffle = $stm->fetchColumn(0);
 					$allqsameseed = (($shuffle&2)==2);
-
-					//DB $query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
-					//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-					//DB if (mysql_num_rows($result)>0) {
-						//DB $row = mysql_fetch_row($result);
 					$stm = $DBH->prepare("SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
 					if ($stm->rowCount()>0) {
@@ -123,11 +112,7 @@
 						$seedslist = implode(',',$seeds);
 						$lastanswers = str_replace('~','',$lastanswers);
 						$lalist = implode('~',$lastanswers);
-						//DB $lalist = addslashes(stripslashes($lalist));
 						$reattemptinglist = implode(',',$reattempting);
-						//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
-						//DB $query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";
-						//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 						$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,seeds=:seeds,lastanswers=:lastanswers,";
 						$query .= "reattempting=:reattempting WHERE id=:id";
 						$stm = $DBH->prepare($query);
@@ -137,8 +122,6 @@
 
 				} else if (isset($_POST['forceclear'])) {
 					//this is not group-safe
-					//DB $query = "DELETE FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
-					//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
 				}
@@ -158,35 +141,24 @@
 			}
 			*/
 			foreach($addfexcarr as $fid) {
-				//DB $query = "SELECT id FROM imas_exceptions WHERE userid='$stu' AND assessmentid='$fid' and (itemtype='F' OR itemtype='P' OR itemtype='R')";
-				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
 				$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid and (itemtype='F' OR itemtype='P' OR itemtype='R')");
 				$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$fid));
 				if ($stm->rowCount()==0) {
-					//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,itemtype) VALUES ";
-					//DB $query .= "('$stu','$fid',$postbydate,$replybydate,'$forumitemtype')";
 					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,itemtype) VALUES ";
 					$query .= "(:userid, :assessmentid, :startdate, :enddate, :itemtype)";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$fid, ':startdate'=>$postbydate, ':enddate'=>$replybydate, ':itemtype'=>$forumitemtype));
 				} else {
-					//DB $eid = mysql_result($result,0,0);
 					$eid = $stm->fetchColumn(0);
-					//DB $query = "UPDATE imas_exceptions SET startdate=$postbydate,enddate=$replybydate,islatepass=0,itemtype='$forumitemtype' WHERE id=$eid";
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,itemtype=:itemtype WHERE id=:id");
 					$stm->execute(array(':startdate'=>$postbydate, ':enddate'=>$replybydate, ':itemtype'=>$forumitemtype, ':id'=>$eid));
 				}
-				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 			}
 		}
 
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
-			//DB $tolist = implode("','",explode(',',$_POST['tolist']));
 			$tolist = implode(',', array_map('intval', explode(',',$_POST['tolist'])));
-			//DB $query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid IN ('$tolist') AND courseid='$cid'";
-			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid IN ($tolist) AND courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
 		}
@@ -240,7 +212,6 @@
 		$_POST['checked'] = explode(',',$_POST['tolist']);
 	}
 	if (isset($_GET['uid'])) {
-		//DB $tolist = "'{$_GET['uid']}'";
 		$tolist = intval($_GET['uid']);
 		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::onlyInt($_GET['uid']) . "\">\n";
 	} else {
@@ -255,7 +226,6 @@
 			exit;
 		}
 		echo "<input type=hidden name=\"tolist\" value=\"" . Sanitize::encodeStringForDisplay(implode(',',$_POST['checked'])) . "\">\n";
-		//DB $tolist = "'".implode("','",$_POST['checked'])."'";
 		$tolist = implode(',', array_map('intval', $_POST['checked']));
 	}
 
@@ -268,9 +238,6 @@
 
 
 	if (isset($_GET['uid']) || count($_POST['checked'])==1) {
-		//DB $query = "SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=$tolist AND istu.courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=:id AND istu.courseid=:courseid");
 		$stm->execute(array(':id'=>$tolist, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
@@ -280,17 +247,6 @@
 		}
 		echo "</h1>";
 	}
-
-	//DB $query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.itemtype FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
-	//DB $query .= "WHERE ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid='$cid' AND iu.id IN ($tolist) )";
-	//DB $query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.itemtype FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
-	//DB $query .= "WHERE ie.assessmentid=i_f.id AND ie.userid=iu.id AND i_f.courseid='$cid' AND iu.id IN ($tolist) )";
-	//DB if ($isall) {
-		//DB $query .= "ORDER BY itemname,LastName,FirstName";
-	//DB } else {
-		//DB $query .= "ORDER BY LastName,FirstName,itemname";
-	//DB }
-	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.itemtype='A' AND ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid=:courseid AND iu.id IN ($tolist) ) ";
 	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
@@ -305,7 +261,6 @@
 
 	echo '<h2>'._("Existing Exceptions").'</h2>';
 	echo '<fieldset><legend>'._("Existing Exceptions").'</legend>';
-	//DB if (mysql_num_rows($result)>0) {
 	if ($stm->rowCount()>0) {
 		//echo "<h3>Existing Exceptions</h3>";
 		echo "Select exceptions to clear. ";
@@ -314,7 +269,6 @@
 		echo '<ul>';
 		if ($isall) {
 			$lasta = 0;
-			//DB while ($row = mysql_fetch_assoc($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$sdate = tzdate("m/d/y g:i a", $row['startdate']);
 				$edate = tzdate("m/d/y g:i a", $row['enddate']);
@@ -353,7 +307,6 @@
 			$lasts = 0;
 			$assessarr = array();
 			$notesarr = array();
-			//DB while ($row = mysql_fetch_assoc($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$sdate = tzdate("m/d/y g:i a", $row['startdate']);
 				$edate = tzdate("m/d/y g:i a", $row['enddate']);
@@ -408,15 +361,11 @@
 		echo "<p>No exceptions currently exist for the selected students.</p>";
 	}
 	echo '</fieldset>';
-	//DB $query = "SELECT latepass FROM imas_students WHERE courseid='$cid' AND userid IN ($tolist)";
-	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-	//DB $row = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT latepass FROM imas_students WHERE courseid=:courseid AND userid IN ($tolist)");
 	$stm->execute(array(':courseid'=>$cid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
 	$lpmin = $row[0];
 	$lpmax = $row[0];
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[0]<$lpmin) { $lpmin = $row[0];}
 		if ($row[0]>$lpmax) { $lpmax = $row[0];}
@@ -428,28 +377,18 @@
 	} else {
 		$lpmsg = "These students have $lpmin-$lpmax latepasses.";
 	}
-	
-
-	//DB $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000))";
-	//DB $query .= ' ORDER BY name';
-	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	$query = "SELECT id,name FROM imas_forums WHERE courseid=:courseid AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000))";
 	$query .= ' ORDER BY name';
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
 	$forumarr = array();
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$forumarr[$row[0]] = $row[1];
 	}
-
-	//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	$stm = $DBH->prepare("SELECT id,name,date_by_lti FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	$assessarr = array();
 	$isDateByLTI = false;
-	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$assessarr[$row[0]] = $row[1];
 		if ($row[2]>0) {
@@ -569,11 +508,8 @@
 	if (!isset($_GET['uid']) && count($_POST['checked'])>1) {
 		echo '<fieldset><legend>'._("Students Selected").'</legend>';
 		//echo "<h3>Students Selected</h3>";
-		//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
-		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->query("SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");
 		echo "<ul>";
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf("<li>%s, %s</li>", Sanitize::encodeStringForDisplay($row[0]),
 				Sanitize::encodeStringForDisplay($row[1]));

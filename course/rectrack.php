@@ -22,24 +22,15 @@ if (isset($studentid)) {
 	$now = time();
 	if (isset($_POST['unloadinglinked'])) {
 		$typeid = intval($_POST['unloadinglinked']);
-		//DB $query = "SELECT id FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='linkedlink' AND typeid='$typeid' ORDER BY viewtime DESC LIMIT 1";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
-			//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT id FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='linkedlink' AND typeid=:typeid ORDER BY viewtime DESC LIMIT 1");
 		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid, ':typeid'=>$typeid));
 		if ($stm->rowCount()>0) {
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			//DB $query = "UPDATE imas_content_track SET info=CONCAT(info,'::$now') WHERE id=".$row[0];
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_content_track SET info=CONCAT(info,:info) WHERE id=:id");
 			$stm->execute(array(':info'=>"::$now", ':id'=>$row[0]));
 		}
 	}
 	if (isset($_POST['type'])) {
-		//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
-		//DB $query .= "('$userid','$cid','{$_POST['type']}','{$_POST['typeid']}',$now,'{$_POST['info']}')";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime,info) VALUES ";
 		$query .= "(:userid, :courseid, :type, :typeid, :viewtime, :info)";
 		$stm = $DBH->prepare($query);

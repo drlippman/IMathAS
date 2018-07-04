@@ -11,10 +11,6 @@ if (isset($_POST['data'])) {
 		$info[$uid] = array($lastm,$extref);
 	}
 	$add_extref_stm = $DBH->prepare("UPDATE imas_questionset SET extref=:extref WHERE id=:id");
-
-	//DB $query = "SELECT id,uniqueid,lastmoddate,extref FROM imas_questionset WHERE 1";
-	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	//DB while ($row = mysql_fetch_assoc($result)) {
 	$stm = $DBH->query("SELECT id,uniqueid,lastmoddate,extref FROM imas_questionset WHERE 1");
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($info[$row['uniqueid']])) {continue;}
@@ -22,16 +18,12 @@ if (isset($_POST['data'])) {
 			if ($row['extref']=='') {
 				echo "Found new extref.  Adding.<br/>";
 				//add it
-				//DB $query = "UPDATE imas_questionset SET extref='".$info[$row['uniqueid']][1]."' WHERE id=".$row['id'];
-				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$add_extref_stm->execute(array(':extref'=>$info[$row['uniqueid']][1], ':id'=>$row['id']));
 			} else {
 				if ($row['lastmoddate']>$info[$row['uniqueid']][0]) {
 					echo 'Local more recent '.Sanitize::onlyInt($row['id']).': '.Sanitize::encodeStringForDisplay($row['extref']). ' vs. '.Sanitize::encodeStringForDisplay($info[$row['uniqueid']][1]).'.  Skipping.<br/>';
 				} else {
 					echo 'Import more recent '.Sanitize::onlyInt($row['id']).': '.Sanitize::encodeStringForDisplay($row['extref']). ' vs. '.Sanitize::encodeStringForDisplay($info[$row['uniqueid']][1]).'.   Updating.<br/>';
-					//DB $query = "UPDATE imas_questionset SET extref='".$info[$row['uniqueid']][1]."' WHERE id=".$row['id'];
-					//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 					$add_extref_stm->execute(array(':extref'=>$info[$row['uniqueid']][1], ':id'=>$row['id']));
 				}
 			}

@@ -12,8 +12,6 @@ if ($myrights < 100) {
 	$body = "You don't have authority to view this page.";
 } else if (isset($_POST['removeuserlti'])) {
   $id = intval($_POST['removeuserlti']);
-  //DB $query = "DELETE FROM imas_ltiusers WHERE id=$id";
-  //DB mysql_query($query) or die("Query failed : " . mysql_error());
   $stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id");
   $stm->execute(array(':id'=>$id));
   if ($stm->rowCount()>0) {
@@ -40,8 +38,6 @@ if ($myrights < 100) {
   exit;
 } else if (isset($_POST['removeplacementlti'])) {
   $id = intval($_POST['removeplacementlti']);
-  //DB $query = "DELETE FROM imas_ltiusers WHERE id=$id";
-  //DB mysql_query($query) or die("Query failed : " . mysql_error());
   $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE id=:id");
   $stm->execute(array(':id'=>$id));
   if ($stm->rowCount()>0) {

@@ -13,9 +13,6 @@
 	if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $gbmode = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
@@ -85,10 +82,6 @@
 	$timeontask = array();
 	$attempts = array();
 	$regens = array();
-
-	//DB $query = "SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id='$aid'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = $stm->fetch(PDO::FETCH_NUM);
@@ -117,13 +110,6 @@
 			$curqnum++;
 		}
 	}
-
-	//DB $query = "SELECT count(id) FROM imas_students WHERE courseid='$cid' AND locked=0 ";
-	//DB if ($secfilter!=-1) {
-		//DB $query .= " AND imas_students.section='$secfilter' ";
-	//DB }
-	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	//DB $totstucnt = mysql_result($result,0,0);
 	$query = "SELECT count(id) FROM imas_students WHERE courseid=:courseid AND locked=0 ";
 	if ($secfilter!=-1) {
 		$query .= " AND imas_students.section=:section ";
@@ -135,14 +121,6 @@
 		$stm->execute(array(':courseid'=>$cid));
 	}
 	$totstucnt = $stm->fetchColumn(0);
-
-	//DB $query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
-	//DB $query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid' AND imas_students.locked=0 ";
-	//DB if ($secfilter!=-1) {
-		//DB $query .= " AND imas_students.section='$secfilter' ";
-	//DB }
-	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
 	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid=:courseid AND ias.assessmentid=:assessmentid AND imas_students.locked=0 ";
 	if ($secfilter!=-1) {
@@ -202,13 +180,6 @@
 	$vidcnt = array();
 	if (count($qcnt)>0) {
 		$qlist = implode(',', array_map('intval', array_keys($qcnt)));
-		//DB $query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid IN ($qlist)";
-		//DB if ($secfilter!=-1) {
-			//DB $query .= " AND ims.section='$secfilter' ";
-		//DB }
-		//DB $query .= " GROUP BY ict.typeid";
-		//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
 		$query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid=:courseid AND ict.courseid=:courseid2 AND ict.type='extref' AND ict.typeid IN ($qlist)";
 		if ($secfilter!=-1) {
 			$query .= " AND ims.section=:section ";
@@ -249,10 +220,6 @@
 		$i = 1;
 		//$qs = array_keys($qtotal);
 		$qslist = array_map('Sanitize::onlyInt',$itemarr);
-		//DB $query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
-		//DB $query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		//DB $query .= " AND imas_questions.id IN ($qslist)";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$query_placeholders = Sanitize::generateQueryPlaceholders($qslist);
 		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
@@ -265,7 +232,6 @@
 		$qsetids = array();
 		$needmanualgrade = array();
 		$showextref = array();
-		//DB while ($row = mysql_fetch_row($result)) {
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$descrips[$row[1]] = $row[0];
 			$points[$row[1]] = $row[2];
@@ -403,10 +369,6 @@
 	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
 	echo "Note: Average Attempts, Regens, and Time only counts those who attempted the problem<br/>";
 	echo 'All averages only include those who have started the assessment</p>';
-
-	//DB $query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
-	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	//DB if (mysql_result($result,0,0)>0) {
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
 	if ($stm->fetchColumn(0)>0) {

@@ -29,11 +29,6 @@ echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 echo '<div id="headerloginlog" class="pagetitle"><h1>'.$pagetitle. '</h1></div>';
 
 echo '<div class="cpmid"><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">View Login Log</a></div>';
-
-
-//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB $row = mysql_fetch_row($result);
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -42,10 +37,6 @@ echo '<h2>Activity Log for '.Sanitize::encodeStringForDisplay($row[0]).', '.Sani
 
 $actions = array();
 $lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array());
-
-//DB $query = "SELECT type,typeid,viewtime,info FROM imas_content_track WHERE userid='$uid' AND courseid='$cid' ORDER BY viewtime DESC";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT type,typeid,viewtime,info FROM imas_content_track WHERE userid=:userid AND courseid=:courseid ORDER BY viewtime DESC");
 $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -59,9 +50,6 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 $asnames = array();
 if (count($lookups['as'])>0) {
-	//DB $query = 'SELECT id,name FROM imas_assessments WHERE id IN ('..')';
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$lookuplist = array_map('intval', array_unique($lookups['as']));
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE id IN ($query_placeholders)");
@@ -73,9 +61,6 @@ if (count($lookups['as'])>0) {
 $innames = array();
 if (count($lookups['in'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['in']));
-	//DB $query = 'SELECT id,title FROM imas_inlinetext WHERE id IN ('.implode(',',array_unique($lookups['in'])).')';
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,title FROM imas_inlinetext WHERE id IN ($query_placeholders)");
 	$stm->execute(array_values($lookuplist));
@@ -86,9 +71,6 @@ if (count($lookups['in'])>0) {
 $linames = array();
 if (count($lookups['li'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['li']));
-	//DB $query = 'SELECT id,title FROM imas_linkedtext WHERE id IN ('.implode(',',array_unique($lookups['li'])).')';
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,title FROM imas_linkedtext WHERE id IN ($query_placeholders)");
 	$stm->execute(array_values($lookuplist));
@@ -99,9 +81,6 @@ if (count($lookups['li'])>0) {
 $winames = array();
 if (count($lookups['wi'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['wi']));
-	//DB $query = 'SELECT id,name FROM imas_wikis WHERE id IN ('.implode(',',array_unique($lookups['wi'])).')';
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,name FROM imas_wikis WHERE id IN ($query_placeholders)");
 	$stm->execute(array_values($lookuplist));
@@ -112,9 +91,6 @@ if (count($lookups['wi'])>0) {
 $exnames = array();
 if (count($lookups['ex'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['ex']));
-	//DB $query = 'SELECT id,assessmentid FROM imas_questions WHERE id IN ('.implode(',',array_unique($lookups['ex'])).')';
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,assessmentid FROM imas_questions WHERE id IN ($query_placeholders)");
 	$stm->execute(array_values($lookuplist));
@@ -125,9 +101,6 @@ if (count($lookups['ex'])>0) {
 $fpnames = array();
 if (count($lookups['fo'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['fo']));
-	//DB $query = 'SELECT id,subject FROM imas_forum_posts WHERE id IN ('.implode(',',array_unique($lookups['fo'])).')';
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,subject FROM imas_forum_posts WHERE id IN ($query_placeholders)");
 	$stm->execute(array_values($lookuplist));
@@ -138,9 +111,6 @@ if (count($lookups['fo'])>0) {
 $forumnames = array();
 if (count($lookups['forums'])>0) {
 	$lookuplist = array_map('intval', array_unique($lookups['forums']));
-	//DB $query = 'SELECT id,name FROM imas_forums WHERE id IN ('.implode(',',array_unique($lookups['forums'])).')';
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB while ($row = mysql_fetch_row($result)) {
 	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
 	$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE id IN ($query_placeholders)");
 	$stm->execute(array_values($lookuplist));

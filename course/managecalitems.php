@@ -22,8 +22,6 @@ if (isset($_POST['submit'])) {
 	//delete any marked for deletion
 	if (isset($_POST['del']) && count($_POST['del'])>0) {
 		foreach ($_POST['del'] as $id=>$val) {
-			//DB $query = "DELETE FROM imas_calitems WHERE id='$id' AND courseid='$cid'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':id'=>$id, ':courseid'=>$cid));
 		}
@@ -35,8 +33,6 @@ if (isset($_POST['submit'])) {
 			$date = $_POST['date'.$id];
 			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
 			$date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-			//DB $query = "UPDATE imas_calitems SET date='$date',tag='$tag',title='{$_POST['txt'][$id]}' WHERE id='$id'";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_calitems SET date=:date,tag=:tag,title=:title WHERE id=:id");
 			$stm->execute(array(':date'=>$date, ':tag'=>Sanitize::stripHtmlTags($tag),
 				':title'=>Sanitize::stripHtmlTags($_POST['txt'][$id]), ':id'=>$id));
@@ -50,8 +46,6 @@ if (isset($_POST['submit'])) {
 			$date = $_POST['datenew-'.$newcnt];
 			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
 			$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-			//DB $query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ('$cid','$datenew','{$_POST['tagnew']}','{$_POST['txtnew']}')";
-			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES (:courseid, :date, :tag, :title)");
 			$stm->execute(array(':courseid'=>$cid, ':date'=>$datenew, ':tag'=>Sanitize::stripHtmlTags($_POST['tagnew-'.$newcnt]),
 				':title'=>Sanitize::stripHtmlTags($_POST['txtnew-'.$newcnt])));
@@ -110,9 +104,6 @@ if ($from=="cal") {
 echo "&gt; Manage Calendar Items</div>\n";
 echo '<div id="headermanagecalitems" class="pagetitle"><h1>Manage Calendar Items</h1></div>';
 echo "<p>This page allows you to add events to the calendar.  Course items automatically place themselves on the calendar.</p>";
-
-//DB $query = "SELECT id,date,title,tag FROM imas_calitems WHERE courseid='$cid' ORDER BY date";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $stm = $DBH->prepare("SELECT id,date,title,tag FROM imas_calitems WHERE courseid=:courseid ORDER BY date");
 $stm->execute(array(':courseid'=>$cid));
 
@@ -126,7 +117,6 @@ $stm->execute(array(':courseid'=>$cid));
 <tbody>
 <?php
 $cnt = 0;
-//DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	echo '<tr>';
 	echo '<td><input type=checkbox name="del['.Sanitize::onlyInt($row[0]).']" /></td>';

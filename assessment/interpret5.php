@@ -32,16 +32,12 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 
 function getquestionqtext($m) {
 	global $DBH;
-	//DB $query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
-	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT qtext FROM imas_questionset WHERE id=:id");
 	$stm->execute(array(':id'=>$m[2]));
 	if ($stm->rowCount()==0) {
 		echo _('bad question id in includeqtextfrom');
 		return "";
 	} else {
-		//DB return mysql_result($result,0,0);
 		return $stm->fetchColumn(0);
 	}
 }
@@ -592,9 +588,6 @@ function tokenize($str,$anstype,$countcnt) {
 				$connecttolast = 0;
 			} else if ($lastsym[0] == 'importcodefrom' || $lastsym[0] == 'includecodefrom') {
 				$out = intval(substr($out,1,strlen($out)-2));
-				//DB $query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB if (mysql_num_rows($result)==0) {
 				$stm = $DBH->prepare("SELECT control,qtype FROM imas_questionset WHERE id=:id");
 				$stm->execute(array(':id'=>$out));
 				if ($stm->rowCount()==0) {
@@ -603,9 +596,7 @@ function tokenize($str,$anstype,$countcnt) {
 				} else {
 					list($thiscontrol, $thisqtype) = $stm->fetch(PDO::FETCH_NUM);
 					//$inside = interpretline(mysql_result($result,0,0),$anstype);
-					//DB $inside = interpret('control',$anstype,mysql_result($result,0,0),$countcnt+1);
 					$inside = interpret('control',$anstype,$thiscontrol,$countcnt+1);
-					//DB if (mysql_result($result,0,1)!=$anstype) {
 					if ($thisqtype!=$anstype) {
 						//echo 'Imported code question type does not match current question answer type';
 					}
