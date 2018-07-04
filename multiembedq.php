@@ -190,6 +190,12 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 
 	//"save" session
 	echo '<script type="text/javscript">$("#asidverify").val("'.$jwtstring.'");</script>';
+	$scoremessage = array(
+		'action' => 'updatescores',
+		'scores' => $rawscores,
+		'jwt' => $jwtstring
+	);
+	echo '<script type="text/javascript">window.parent.postMessage(JSON.stringify('.json_encode($scoremessage,JSON_HEX_TAG).'), "*");</script>';
 	exit;
 }
 
