@@ -59,16 +59,17 @@ function replaceintemplate($template, $rep) {
 	}
 	return $template;
 }
+$filecnt = 0;
 function addbbfile($courseid, $url, $fileaction, &$files, &$crs) {
-	global $newdir,$bbtemplates;
+	global $newdir,$bbtemplates,$filecnt;
 	$filename = basename(parse_url($url, PHP_URL_PATH));
 	$pathinfo = pathinfo($filename);
 	$basename = Sanitize::simpleString($pathinfo['filename']);
 	$extension = Sanitize::simpleString($pathinfo['extension']);
 	$bbnow = bbdate(time());
 	if ($basename != '') {
-		$fileitemid = uniqid();
-		$fileid = uniqid();
+		$fileitemid = '_10'.leftpad($filecnt).'_1';
+		$fileid = '_2'.leftpad($filecnt).'_1';
 		//copy file
 		if (!is_dir($newdir.'/csfiles')) {
 			mkdir($newdir.'/csfiles');
@@ -101,7 +102,7 @@ function addbbfile($courseid, $url, $fileaction, &$files, &$crs) {
 			'{{fileitemid}}' => $fileitemid,
 			'{{fileid}}' => $fileid,
 			'{{filename}}' => xmlstr($filename),
-			'{{id}}' => uniqid() ));
+			'{{id}}' => '_3'.leftpad($filecnt).'_1' ));
 	}
 }
 
@@ -179,15 +180,15 @@ $filedir = '';
 file_put_contents($newdir.'/.bb-package-info',$bbtemplates['bbinfo']);
 
 $bbnow = bbdate(time());
-$courseexportid = uniqid();
+$courseexportid = '_4'.$cid.'_1';
 
 //write initial folder stuff
 createbbitem('res00001', '', 'toc', $coursename, array(
-	'{{id}}' => uniqid(),
+	'{{id}}' => '_5'.$cid.'_1',
 	'{{label}}' => xmlstr($coursename)
 	), 'toc', $manifestres);
 
-$initialblockid = uniqid();
+$initialblockid = '_600000_1';
 createbbitem('res00002', '', 'toctop', '--TOP--', array(
 	'{{id}}' => $initialblockid,
 	'{{title}}' => '--TOP--',
@@ -221,7 +222,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 			if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
 				$resid = 'res'.leftpad($datcnt);
 				$datcnt++;
-				$blockid = uniqid();
+				$blockid = '_6'.leftpad($item['id']).'_1';
 				createbbitem($resid, $parentid, 'toctop', $item['name'], array(
 					'{{id}}' => $blockid,
 					'{{title}}' =>  xmlstr($item['name']),
@@ -280,7 +281,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				}*/
 				
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
-					'{{id}}' => uniqid(),
+					'{{id}}' => '_7'.$item.'_1',
 					'{{title}}' => xmlstr($row[0]),
 					'{{summary}}' => xmlstr(filtercapture($text)),
 					'{{created}}' => $bbnow,
@@ -308,7 +309,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 					addbbfile($courseexportid, $coursefileurl, 'EMBED', $filesout, $crslinks);
 					//$row[1] = getcoursefileurl(trim(substr(strip_tags($row[1]),5)), true);
 					createbbitem($resid, $parentid, 'basicitem', $row[0], array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
 						'{{summary}}' => xmlstr(filtercapture($row[2])),
 						'{{created}}' => $bbnow,
@@ -319,7 +320,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				} else if ((substr($row[1],0,4)=="http") && (strpos(trim($row[1])," ")===false)) { //is a web link
 					$alink = trim($row[1]);
 					createbbitem($resid, $parentid, 'basicitem', $row[0], array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
 						'{{summary}}' => xmlstr(filtercapture($row[2])),
 						'{{created}}' => $bbnow,
@@ -329,7 +330,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						), 'link', $res);
 				} else { //is text
 					createbbitem($resid, $parentid, 'basicitem', $row[0], array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
 						'{{summary}}' => xmlstr(filtercapture($row[1])),
 						'{{created}}' => $bbnow,
@@ -344,7 +345,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				
 				$forumresid = $resid;
 				createbbitem($forumresid, $parentid, 'forum', $row[0], array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_8'.$item.'_1',
 						'{{conferenceid}}' => 'conf1',
 						'{{title}}' => xmlstr($row[0]),
 						'{{summary}}' => xmlstr(filtercapture($row[1])),
@@ -360,7 +361,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$out .= $ind.'</item>'."\n";
 									
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
 						'{{summary}}' => xmlstr(filtercapture($row[1])),
 						'{{created}}' => $bbnow,
@@ -372,7 +373,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$datcnt++;
 				
 				createbbitem($forumlinkresid, $parentid, 'forumlink', '', array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_9'.$item.'_1',
 						'{{itemdat}}' => $resid,
 						'{{avail}}' => $row[2]==0?'false':'true',
 						'{{forumdat}}' => $forumresid
@@ -396,7 +397,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$extended .= '<ENTRY key="vendorInfo">name='.$installname.'&amp;code=IMathAS</ENTRY>';
 				
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
 						'{{summary}}' => xmlstr(filtercapture($row[1])),
 						'{{created}}' => $bbnow,
@@ -407,7 +408,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						), 'lti', $res);
 				
 				$gbitem = $bbtemplates['outcomedef'];
-				$gbitem = str_replace('{{defid}}', uniqid(), $gbitem);
+				$gbitem = str_replace('{{defid}}', '_11'.$item.'_1', $gbitem);
 				$gbitem = str_replace('{{resid}}', $resid, $gbitem);
 				$includeduedate = ($_POST['includeduedates']==1 && $row[4]<2000000000);
 				$gbitem = str_replace('{{duedate}}', $includeduedate?bbdate($row[4]):'', $gbitem);
@@ -435,7 +436,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				}
 				
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
-						'{{id}}' => uniqid(),
+						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
 						'{{summary}}' => xmlstr(filtercapture($text)),
 						'{{created}}' => $bbnow,
