@@ -18,8 +18,14 @@ AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx
 AddType application/vnd.ms-excel.template.macroEnabled.12 xltm
 AddType application/vnd.openxmlformats-officedocument.spreadsheetml.template xltx
 Options -Indexes
-php_value upload_max_filesize 10M
-php_value max_input_vars 5000
+<IfModule mod_php5.c>
+  php_value upload_max_filesize 10M
+  php_value max_input_vars 5000
+</IfModule>
+<IfModule mod_php7.c>
+  php_value upload_max_filesize 10M
+  php_value max_input_vars 5000
+</IfModule>
 
 <Files "composer.json">
 deny from all
