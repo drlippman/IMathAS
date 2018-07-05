@@ -2511,6 +2511,7 @@ function intervaltoineq($str,$var) {
 }
 
 function cleanbytoken($str,$funcs = array()) {
+	if (is_array($str)) { return $str;} //avoid errors by just skipping this if called with an array somehow
 	$str = str_replace('`', '', $str);
 	$instr = 0;
 	$primeoff = 0;
