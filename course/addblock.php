@@ -64,6 +64,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
 } elseif ($_POST['title']!= null) { //form posted to itself with new/modified data, update the block
+	$DBH->beginTransaction();
 	require_once("../includes/parsedatetime.php");
 	if ($_POST['avail']==1) {
 		if ($_POST['sdatetype']=='0') {
@@ -165,6 +166,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$itemorder = serialize($items);
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
+	$DBH->commit();
 	header(sprintf('Location: %s/course/course.php?cid=%s&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'], $cid));
 
 	exit;
