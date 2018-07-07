@@ -40,6 +40,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$block = $_GET['block'];
 
 	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
+		$DBH->beginTransaction();
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -227,6 +228,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES (:forumid, :userid)");
 			$stm->execute(array(':forumid'=>$newforumid, ':userid'=>$userid));
 		}
+		$DBH->commit();
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid."&r=" .Sanitize::randomQueryStringParam());
 
 		exit;

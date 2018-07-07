@@ -13,6 +13,7 @@
  }
  $cid = Sanitize::courseId($_GET['cid']);
  $order = $_POST['order'];
+ $DBH->beginTransaction();
  $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
  $stm->execute(array(':id'=>$cid));
  $itemorder = $stm->fetchColumn(0);
@@ -66,7 +67,7 @@
  $itemlist = serialize($newitems);
  $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
  $stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
-
+ $DBH->commit();
 
  function countitems($arr) {
  	$n = 0;

@@ -75,6 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
         if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
             if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
+            	$DBH->beginTransaction();
                 require_once('../includes/filehandler.php');
                 deleteallaidfiles($assessmentId);
                 $stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -83,6 +84,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $stm->execute(array(':assessmentid'=>$assessmentId));
                 $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));
+                $DBH->commit();
                 header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
                         $cid, $assessmentId));
                 exit;
@@ -104,7 +106,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $body .= '</form>';
             }
         } elseif (!empty($_POST['name'])) { //if the form has been submitted
-
+        	$DBH->beginTransaction();
             require_once("../includes/parsedatetime.php");
             if ($_POST['avail']==1) {
                 if ($_POST['sdatetype']=='0') {
@@ -125,13 +127,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 } else {
                     $reviewdate = parsedatetime($_POST['rdate'],$_POST['rtime']);
                 }
-            }else {
+            } else {
                 $startdate = 0;
                 $enddate = 2000000000;
                 $reviewdate = 0;
             }
 
-		$shuffle = Sanitize::onlyInt($_POST['shuffle']);
+            $shuffle = Sanitize::onlyInt($_POST['shuffle']);
             if (isset($_POST['sameseed'])) { $shuffle += 2;}
             if (isset($_POST['samever'])) { $shuffle += 4;}
             if (isset($_POST['reattemptsdiffver']) && $_POST['deffeedback']!="Practice" && $_POST['deffeedback']!="Homework") {
@@ -386,6 +388,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
+			$DBH->commit();
             $rqp = Sanitize::randomQueryStringParam();
 			if ($from=='gb') {
 				header(sprintf('Location: %s/course/gradebook.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
@@ -453,6 +456,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $itemorder = serialize($items);
                 $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
                 $stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+                $DBH->commit();
                 header(sprintf('Location: %s/course/addquestions.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'], $cid, $newaid));
                 exit;
             }

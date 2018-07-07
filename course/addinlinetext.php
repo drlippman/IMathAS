@@ -64,6 +64,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag .= "&tb=$totb";
 	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
+		$DBH->beginTransaction();
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -180,6 +181,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 
 		}
+		$DBH->commit();
 		if ($_FILES['userfile']['name']!='') {
 			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 			$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['userfile']['name'])));
