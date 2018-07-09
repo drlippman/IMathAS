@@ -70,6 +70,7 @@ if (isset($_GET['clearatt'])) {
 	exit;
 }
 if (isset($_GET['record'])) {
+	$DBH->beginTransaction();
 	if ($_POST['avail']==1) {
 		if ($_POST['sdatetype']=='0') {
 			$startdate = 0;
@@ -261,6 +262,7 @@ if (isset($_GET['record'])) {
 		$safesearch = '';
 		writesessiondata();
 	}
+	$DBH->commit();
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
 		header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, Sanitize::randomQueryStringParam()));
 	} else {

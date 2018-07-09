@@ -23,6 +23,7 @@ if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
+	$DBH->beginTransaction();
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
@@ -43,7 +44,9 @@ if (!(isset($teacherid))) {
 	$itemorder = serialize($items);
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+	$DBH->commit();
 } else {
+	$DBH->beginTransaction();
 	$block = $_GET['block'];
 	$cid = Sanitize::courseId($_GET['cid']);
 	$query = "INSERT INTO imas_items (courseid,itemtype) VALUES ";
@@ -69,7 +72,7 @@ if (!(isset($teacherid))) {
 	$itemorder = serialize($items);
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-
+	$DBH->commit();
 }
 header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 exit;

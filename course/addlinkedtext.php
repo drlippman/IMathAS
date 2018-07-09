@@ -54,6 +54,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$points = 0;
 
 	if ($_POST['title']!= null) { //if the form has been submitted
+		$DBH->beginTransaction();
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -257,6 +258,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 
 		}
+		$DBH->commit();
 		if ($uploaderror == true || $processingerror == true) {
 			if ($uploaderror == true) {
 				$body = "<p>Error uploading file! $errormsg</p>\n";
