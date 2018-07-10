@@ -3,11 +3,11 @@ $cid = Sanitize::courseId($_GET['cid']);
 
 
 if (isset($_GET['calstart'])) {
-	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']),'','','',false,true);
+	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']),0,'','',false,true);
 	$_COOKIE["calstart".$cid] = Sanitize::onlyInt($_GET['calstart']);
 }
 if (isset($_GET['callength'])) {
-	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']),'','','',false,true);
+	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']),0,'','',false,true);
 	$_COOKIE["callength".$cid] = Sanitize::onlyInt($_GET['callength']);
 }
 
@@ -516,7 +516,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	}
 }
 
-$query = "SELECT id,name,postby,replyby,startdate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+$query = "SELECT id,name,postby,replyby,startdate,enddate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -632,8 +632,11 @@ foreach ($itemsimporder as $item) {
 	if ($itemsassoc[$item][0]=='Assessment') {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
-				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
-					continue;
+				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && $datetype=='S') {
+					continue;  //always skip start date when not avail	
+				}
+				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['A'.$datetype.$itemsassoc[$item][1]][5]==1 && !isset($teacherid)) {
+					continue;  //only skip if before the start date - always show after due date
 				}
 				$moday = $byid['A'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'A'.$datetype.$itemsassoc[$item][1];
@@ -641,7 +644,8 @@ foreach ($itemsimporder as $item) {
 				$colors[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][4];
-				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+				//if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+				if ($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {  //hide link and grey if not current
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
 					unset($assess[$moday][$k]['id']);
@@ -652,9 +656,12 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='Forum') {
 		foreach (array('S','E','P','R') as $datetype) {
 			if (isset($byid['F'.$datetype.$itemsassoc[$item][1]])) {
-				if (($greyitems[$item]&$byid['F'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 
-					&& !isset($teacherid) && ($datetype=='S' || $datetype=='E')) { //only show postby and replyby greyed
-					continue;
+				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && ($datetype=='S' || $datetype=='E')) {
+					continue;  //always skip start and end dates when not avail	
+				}
+				if (($greyitems[$item]&$byid['F'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['F'.$datetype.$itemsassoc[$item][1]][5]==1
+					&& !isset($teacherid)) { 
+					continue; //only skip if before the start date - always show after postby/replyby date
 				}
 				$moday = $byid['F'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'F'.$datetype.$itemsassoc[$item][1];
@@ -662,7 +669,7 @@ foreach ($itemsimporder as $item) {
 				$colors[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][4];
-				if (($greyitems[$item]&$byid['F'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
 					unset($assess[$moday][$k]['id']);
@@ -716,12 +723,9 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='Drill') {
 		foreach (array('S','E') as $datetype) {
 			if (isset($byid['D'.$datetype.$itemsassoc[$item][1]])) {
-				echo "here1";
-				echo $greyitems[$item].','.$byid['D'.$datetype.$itemsassoc[$item][1]][5];
 				if (($greyitems[$item]&$byid['D'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['D'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
 					continue;
 				}
-				echo "here";
 				$moday = $byid['D'.$datetype.$itemsassoc[$item][1]][0];
 				$itemidref[$k] = 'D'.$datetype.$itemsassoc[$item][1];
 				$tags[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][1];
