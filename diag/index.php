@@ -12,6 +12,10 @@
 	session_start();
 	$sessionid = session_id();
 
+	function decodeSelector($sel) {
+		return str_replace(array('@c@','@s@','@t@'), array(',',';','~'), $sel);	
+	}
+	
 	if (!isset($_GET['id'])) {
 		//echo "<html><body><h1>Diagnostics</h1><ul>";
 		$nologo = true;
@@ -49,7 +53,7 @@
 	} else {
 		$diagqtr = $line['term'];
 	}
-	$sel1 = explode(',',$line['sel1list']);
+	$sel1 = array_map('decodeSelector', explode(',',$line['sel1list']));
 	$entryformat = $line['entryformat'];
 
 	if (!($line['public']&1)) {
@@ -327,7 +331,8 @@ var teach = new Array();
 
 	$sel2 = explode(';',$line['sel2list']);
 	foreach ($sel2 as $k=>$v) {
-		echo "teach[$k] = new Array('".implode("','",explode('~',$sel2[$k]))."');\n";
+		$sel2opts = array_map('decodeSelector', explode('~',$sel2[$k]));
+		echo "teach[$k] = new Array('".implode("','", $sel2opts)."');\n";
 	}
 ?>
 

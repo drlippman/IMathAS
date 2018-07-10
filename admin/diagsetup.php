@@ -12,8 +12,7 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Diagnostic Setup";
-$diagId = Sanitize::onlyInt(trim($_POST['id']));
-$courseId = Sanitize::onlyInt(trim($_POST['cid']));
+$diagId = Sanitize::onlyInt(trim($_REQUEST['id']));
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase ";
 if (!empty($_GET['from'])) {
 	$from = Sanitize::simpleString($_GET['from']);
@@ -41,7 +40,12 @@ if (!empty($_GET['from'])) {
 	$backtrack = 'admin2.php';
 }
 $curBreadcrumb .= _("Diagnostic Setup").'</div>';
-
+function encodeSelector($sel) {
+	return str_replace(array(',',';','~'), array('@c@','@s@','@t@'), $sel);	
+}
+function decodeSelector($sel) {
+	return str_replace(array('@c@','@s@','@t@'), array(',',';','~'), $sel);	
+}
 	// SECURITY CHECK DATA PROCESSING
 if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$overwriteBody = 1;
@@ -63,12 +67,13 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 			$spws[] = $v;
 		}
 	}
+
 	if (isset($_POST['alpha'])) {
 		natsort($sel1);
 		$sel1 = array_values($sel1);
 	}
 
-	$sel1list = implode(',',$sel1);
+	$sel1list = implode(',', array_map('encodeSelector',$sel1));
 	$iplist = implode(',',$ips);
 	$pwlist = implode(',',$pws) . ';'. implode(',',$spws);
 	$public = 1*$_POST['avail'] + 2*$_POST['public'] + 4*$_POST['reentry'];
@@ -93,11 +98,11 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$s1l = explode(',',$row[0]);
 		$s2l = explode(';',$row[2]);
 		for ($i=0;$i<count($s1l);$i++) {
-			$sel2[$s1l[$i]] = explode('~',$s2l[$i]);
+			$sel2[decodeSelector($s1l[$i])] = explode('~',$s2l[$i]);
 		}
 		$sel2name = $row[1];
 		$aids = explode(',',$row[3]);
-		$page_updateId = $_POST['id'];
+		$page_updateId = $diagId;
 		$forceregen = $row[4];
 	} else {
 		$sel2name = "instructor";
@@ -112,7 +117,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$page_selectName[$k] = "aid" . $k;
 		$i=0;
 		$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$courseId));
+		$stm->execute(array(':courseid'=>Sanitize::courseId($_POST['cid'])));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_selectValList[$k][$i] = $row[0];
 			$page_selectLabelList[$k][$i] = $row[1];
@@ -149,7 +154,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		if (isset($_POST['alpha'])) {
 			sort($sel2[0]);
 		}
-		$sel2[0] = implode('~',$sel2[0]);
+		$sel2[0] = implode('~', array_map('encodeSelector', $sel2[0]));
 		for ($i=1; $i<count($sel1); $i++) {
 			$sel2[$i] = $sel2[0];
 		}
@@ -158,7 +163,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 			if (isset($_POST['alpha'])) {
 				sort($sel2[$i]);
 			}
-			$sel2[$i] = implode('~',$sel2[$i]);
+			$sel2[$i] = implode('~', array_map('encodeSelector', $sel2[$i]));
 		}
 	}
 	$sel2list = implode(';',$sel2);
@@ -343,8 +348,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 				for ($i=0;$i<count($sel2[$s1]);$i++) {
 ?>
 				<tr id="trout<?php echo $k . "-" . $i ?>">
-					<td><input type=hidden id="out<?php echo $k . "-" . $i ?>" name="out<?php echo $k . "-" . $i ?>" value="<?php echo Sanitize::encodeStringForDisplay($sel2[$s1][$i]); ?>">
-					<?php echo Sanitize::encodeStringForDisplay($sel2[$s1][$i]); ?></td>
+					<td><input type=hidden id="out<?php echo $k . "-" . $i ?>" name="out<?php echo $k . "-" . $i ?>" value="<?php echo Sanitize::encodeStringForDisplay(decodeSelector($sel2[$s1][$i])); ?>">
+					<?php echo Sanitize::encodeStringForDisplay(decodeSelector($sel2[$s1][$i])); ?></td>
 					<td><a href='#' onclick="removeitem('out<?php echo $k . "-" . $i ?>','out<?php echo $k ?>')">Remove</a>
 					<a href='#' onclick="moveitemup('out<?php echo $k . "-" . $i ?>','out<?php echo $k ?>')">Move up</a>
 					<a href='#' onclick="moveitemdown('out<?php echo $k . "-" . $i ?>','out<?php echo $k ?>')">Move down</a>
@@ -559,8 +564,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 ?>
 				<tr id="trselout-<?php echo $i ?>">
 					<td>
-						<input type=hidden id="selout-<?php echo $i ?>" name="selout-<?php echo $i ?>" value="<?php echo Sanitize::encodeStringForDisplay($sl[$i]); ?>">
-						<?php echo Sanitize::encodeStringForDisplay($sl[$i]); ?>
+						<input type=hidden id="selout-<?php echo $i ?>" name="selout-<?php echo $i ?>" value="<?php echo Sanitize::encodeStringForDisplay(decodeSelector($sl[$i])); ?>">
+						<?php echo Sanitize::encodeStringForDisplay(decodeSelector($sl[$i])); ?>
 					</td>
 					<td>
 						<a href='#' onclick="return removeitem('selout-<?php echo $i ?>','selout')">Remove</a>
