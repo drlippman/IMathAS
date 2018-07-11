@@ -123,12 +123,11 @@ $placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .endmsg {di
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Diagnostic Gradebook</div>";
-echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 
 echo '<div id="headergb-testing" class="pagetitle"><h1>Diagnostic Grade Book</h1></div>';
 echo "<a href=\"gradebook.php?cid=$cid\">View regular gradebook</a>";
 echo "<div class=cpmid>";
-
+echo "<form method=post action=\"gradebook.php?cid=$cid\">";
 echo "Students starting in: <select id=\"timetoggle\" onchange=\"chgtimefilter()\">";
 echo "<option value=1 "; writeHtmlSelected($timefilter,1); echo ">last 1 hour</option>";
 echo "<option value=2 "; writeHtmlSelected($timefilter,2); echo ">last 2 hours</option>";
@@ -143,14 +142,16 @@ echo "</select>";
 echo " Last name: <input type=text id=\"lnfilter\" value=\"" . Sanitize::encodeStringForDisplay($lnfilter) . "\" />";
 echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
 echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="display:none;">Show End Messages</button>';
+echo "</form>";
 echo "</div>";
 
 $gbt = gbinstrdisp();
-echo "</form>";
-echo "</div>";
+
+echo "<p>Meanings:   NC-no credit</p>";
+//echo "</div>";
 require("../footer.php");
 //echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
-echo "Meanings:   NC-no credit";
+
 /*if ($isteacher) {
 	echo "<div class=cp>";
 	echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
@@ -350,6 +351,7 @@ function gbinstrdisp() {
 
 	}
 	echo "</tbody></table>";
+	echo "</div>";
 	if ($n>0) {
 		$sarr = array_fill(0,$n-1,"'N'");
 	} else {
