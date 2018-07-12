@@ -275,7 +275,7 @@
          }
 		 
 		 if ($needToForcePasswordReset) {
-		 	 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd?r='.Sanitize::randomQueryStringParam());
+		 	 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd&r='.Sanitize::randomQueryStringParam());
 		 } else {
 		 	 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys . $rqp);
 		 }

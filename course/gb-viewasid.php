@@ -181,6 +181,15 @@
 			//exit;
 		}
 	}
+	if (isset($_REQUEST['clearreviewview']) && $isteacher) {
+		$stm = $DBH->prepare("DELETE FROM imas_content_track WHERE typeid=:typeid AND userid=:userid AND (type='gbviewasid' OR type='assessreview')");
+		$stm->execute(array(
+			':typeid' => Sanitize::onlyInt($_REQUEST['aid']),
+			':userid' => $get_uid
+		));
+		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
+		
+	}
 	if (isset($_REQUEST['breakfromgroup']) && $isteacher) {
 		if (isset($_POST['breakfromgroup']) && $_POST['breakfromgroup']=="confirmed") {
 			include("../includes/stugroups.php");
@@ -565,7 +574,7 @@
 			echo '</div>';
 		}
 		echo '<div id="headergb-viewasid" class="pagetitle"><h1>Grade Book Detail</h1></div>';
-		$stm = $DBH->prepare("SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id=:id AND imas_students.courseid=:courseid");
+		$stm = $DBH->prepare("SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult,imas_students.latepass FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id=:id AND imas_students.courseid=:courseid");
 		$stm->execute(array(':id'=>$get_uid, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		echo "<h2>{$row[1]}, {$row[0]}</h2>\n";
@@ -574,6 +583,7 @@
 		//do time limit mult
 		$timelimitmult = $row[2];
 		$line['timelimit'] *= $timelimitmult;
+		$stuLP = $row[3];
 
 		//unencode feedback
 		$feedback = json_decode($line['feedback'], true);
@@ -612,7 +622,7 @@
 		}
 		echo "<h3>{$line['name']}</h3>\n";
 
-		$aid = $line['assessmentid'];
+		$aid = Sanitize::onlyInt($line['assessmentid']);
 
 		if (($isteacher || $istutor) && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			if ($line['agroupid']>0) {
@@ -649,6 +659,15 @@
 		}
 		$saenddate = $line['enddate'];
 		unset($exped);
+		
+		require_once("../includes/exceptionfuncs.php");
+		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP);
+		$excepadata = array(
+			'id'=>$line['assessmentid'], 
+			'allowlate'=>$line['allowlate'],
+			'enddate'=>$line['enddate']
+			);
+			
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$get_uid, ':assessmentid'=>$line['assessmentid']));
 		$useexception = false;
@@ -658,13 +677,14 @@
 			if ($exped>$saenddate) {
 				$saenddate = $exped;
 			}
-			require("../includes/exceptionfuncs.php");
-			$exceptionfuncs = new ExceptionFuncs($userid, $cid, !($isteacher || $istutor));
-			$useexception = $exceptionfuncs->getCanUseAssessException($exception, $line, true);
+			list($useexception,$LPblocked) = $exceptionfuncs->getCanUseAssessException($exception, $excepadata, false, true);
+		} else if ($isteacher) {
+			$LPblocked = $exceptionfuncs->getLatePassBlockedByView($excepadata);
 		}
 
 		if ($isteacher) {
 			if (isset($exped) && $exped!=$line['enddate']) {
+				$padata = array('id'=>$line['id'], 'allowlate'=>$line['allowlate'], 'enddate'=>$exped);
 				$lpnote = ($exception[2]>0)?" (LatePass)":"";
 				if ($useexception) {
 					echo "<p>Has exception$lpnote, with due date: ".tzdate("F j, Y, g:i a",$exped);
@@ -681,6 +701,11 @@
 				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid=$get_uid&asid={$asid}&from=$from&stu=$stu'\">Make Exception</button>";
 			}
 			echo "</p>";
+			if ($LPblocked) {
+				echo '<p>Use of a LatePass is currently blocked because the student viewed the assessment in review mode. ';
+				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&aid=$aid&asid=$asid&from=$from&uid=$get_uid&clearreviewview=true\">";
+				echo 'Clear review view</a> to allow use of a LatePass</p>';
+			}
 		}
 		if ($isteacher) {
 			if ($line['agroupid']>0) {

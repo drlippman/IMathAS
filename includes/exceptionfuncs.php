@@ -103,8 +103,10 @@ class ExceptionFuncs {
 	//   array(startdate,enddate,islatepass,is_lti)
 	//$adata should be associative array from imas_assessments including
 	//   startdate, enddate, allowlate, id
-	//returns array(useexception, canundolatepass, canuselatepass)
-	public function getCanUseAssessException($exception, $adata, $limit=false) {
+	//returns normally array(useexception, canundolatepass, canuselatepass)
+	//if canuseifblocked is set, returns array(useexception, canuselatepass if unblocked)
+	//if limit is set, just returns useexception
+	public function getCanUseAssessException($exception, $adata, $limit=false, $canuseifblocked=false) {
 		$now = time();
 		$canuselatepass = false;
 		$canundolatepass = false;
@@ -146,20 +148,40 @@ class ExceptionFuncs {
 					$latepasscnt = 0;
 				}
 			}
-
-			$canuselatepass = $this->getCanUseAssessLatePass($adata, $latepasscnt);
-
-			return array($useexception, $canundolatepass, $canuselatepass);
+			if ($canuseifblocked) {
+				$canuselatepass = $this->getLatePassBlockedByView($adata, $latepasscnt);
+				return array($useexception, $canuselatepass);
+			} else {
+				$canuselatepass = $this->getCanUseAssessLatePass($adata, $latepasscnt);
+				return array($useexception, $canundolatepass, $canuselatepass);
+			}
 		} else {
 			return $useexception;
 		}
 
 	}
+	
+	//get if latepass could be used if viewedassess was cleared
+	// latepasscnt is number of latepasses already used
+	public function getLatePassBlockedByView($adata, $latepasscnt = 0) {
+		$now = time();
+		//not blocked if before due date, no latepasses, or not allowed after
+		if ($now < $adata['enddate'] || $this->latepasses == 0 || $adata['allowlate']<10) {
+			return false;
+		}
+		$canUseIfUnblocked = $this->getCanUseAssessLatePass($adata, $latepasscnt, true);
+		if ($canUseIfUnblocked && in_array($adata['id'],$this->viewedassess)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	//get if latepass can be used.
 	// Typically used if exception doesn't already exist, called without second parameter
 	// Also called internally from getCanUseAssessException using second param
-	public function getCanUseAssessLatePass($adata, $latepasscnt = 0) {
+	// latepasscnt is number of latepasses already used
+	public function getCanUseAssessLatePass($adata, $latepasscnt = 0, $skipViewedCheck=false) {
 		$now = time();
 		$canuselatepass = false;
 		if ($this->viewedassess===null) {
@@ -183,7 +205,8 @@ class ExceptionFuncs {
 		} else {
 			$latepassesAllowed = $adata['allowlate']%10-1;
 		}
-		if (!in_array($adata['id'],$this->viewedassess) && $this->latepasses>0 && $this->isstu && $adata['enddate'] < $this->courseenddate) { //basic checks
+		if ((!in_array($adata['id'],$this->viewedassess) || $skipViewedCheck) && 
+			$this->latepasses>0 && $this->isstu && $adata['enddate'] < $this->courseenddate) { //basic checks
 			if ($now<$adata['enddate'] && $latepassesAllowed > $latepasscnt) { //before due date and use is allowed
 				$canuselatepass = true;
 			} else if ($now>$adata['enddate'] && $adata['allowlate']>10) { //after due date and allows use after due date
