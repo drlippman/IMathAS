@@ -958,6 +958,9 @@ function gbtable() {
 				continue; //assessment is hidden
 			}
 			$forumexceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
+			if ($limuser>0) {
+				$gb[0][1][$discusscol[$r['typeid']]][11] = max($r['exceptionstartdate'],$r['exceptionenddate']);
+			}
 			$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			//$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		}
