@@ -114,9 +114,15 @@ if (isset($_GET['fixdupgrades'])) {
 	$stm = $DBH->query($query);
 	echo "Removed ".($stm->rowCount())." duplicate forum grade records.<br/>";
 	
+	$query = 'DELETE imas_grades FROM imas_grades JOIN ';
+	$query .= "(SELECT min(id) as minid,gradetypeid,userid FROM imas_grades WHERE gradetype='offline' GROUP BY gradetypeid,userid having count(id)>1) AS duplic ";
+	$query .= "ON imas_grades.gradetypeid=duplic.gradetypeid AND imas_grades.userid=duplic.userid AND imas_grades.gradetype='offline' WHERE imas_grades.id > duplic.minid";
+	$stm = $DBH->query($query);
+	echo "Removed ".($stm->rowCount())." duplicate offline grade records.<br/>";
+	
 	$stm = $DBH->query("DELETE imas_grades FROM imas_grades LEFT JOIN imas_forum_posts ON imas_grades.refid=imas_forum_posts.id WHERE imas_grades.gradetype='forum' AND imas_forum_posts.userid IS NULL");
 	echo "Removed ".($stm->rowCount())." orphaned forum grade records without a corresponding post.<br/>";
-	
+
 	echo '<p><a href="utils.php">Utils</a></p>';
 	exit;
 }

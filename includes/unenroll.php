@@ -105,6 +105,12 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$query = "DELETE FROM imas_wiki_views WHERE wikiid IN ($wikilist)  AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
 		}
+		if (count($forums)>0) {
+			$query = "DELETE FROM imas_grades WHERE gradetype='forum' AND gradetypeid IN ($forumlist) AND userid IN ($stulist)";
+			$DBH->query($query); //values already sanitized
+			$query = "DELETE FROM imas_exceptions WHERE (itemtype='F' OR itemtype='P' OR itemtype='R') AND assessmentid IN ($forumlist) AND userid IN ($stulist)";
+			$DBH->query($query); //values already sanitized
+		}
 
 		if (count($stugroups)>0) {
 			$stugrouplist = implode(',',$stugroups);
@@ -126,12 +132,6 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		$query = "DELETE FROM imas_forum_posts WHERE forumid IN ($forumlist) AND posttype=0";
 		$DBH->query($query); //values already sanitized
 
-		if (count($tounenroll)>0) {
-			$query = "DELETE FROM imas_grades WHERE gradetype='forum' AND gradetypeid IN ($forumlist) AND userid IN ($stulist)";
-			$DBH->query($query); //values already sanitized
-			$query = "DELETE FROM imas_exceptions WHERE (itemtype='F' OR itemtype='P' OR itemtype='R') AND assessmentid IN ($forumlist) AND userid IN ($stulist)";
-			$DBH->query($query); //values already sanitized
-		}
 		/* //old
 		foreach ($forums as $fid) {
 			$query = "DELETE imas_forum_threads FROM imas_forum_posts JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0 WHERE imas_forum_threads.forumid='$fid'";

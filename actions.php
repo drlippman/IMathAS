@@ -551,13 +551,16 @@ require_once("includes/sanitize.php");
 			$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid IN (SELECT id FROM imas_drillassess WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
 			//}
-			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid= IN (SELECT id FROM imas_gbitems WHERE courseid=:cid) AND userid=:uid");
+			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid IN (SELECT id FROM imas_gbitems WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
 			//	}
 			//}
 			$query = "DELETE FROM imas_forum_views WHERE userid=:uid AND threadid IN ";
 			$query .= "(SELECT ifp.threadid FROM imas_forum_posts AS ifp JOIN imas_forums ON ifp.forumid=imas_forums.id WHERE imas_forums.courseid=:cid)";
 			$stm = $DBH->prepare($query);
+			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
+			
+			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='forum' AND gradetypeid IN (SELECT id FROM imas_forums WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
 
 			$query = "DELETE FROM imas_exceptions WHERE (itemtype='F' OR itemtype='P' OR itemtype='R') AND userid=:uid AND assessmentid IN ";
