@@ -2452,7 +2452,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				} else {
 					$out .= "cols=\"$cols\" ";
 				}
-				$out .= sprintf(">%s</textarea>\n", Sanitize::encodeStringForDisplay($la));
+				$out .= sprintf(">%s</textarea>\n", Sanitize::encodeStringForDisplay($la, true));
 				$out .= getcolormark($colorbox);
 				if ($colorbox!='') { $out .= '</div>';}
 			}

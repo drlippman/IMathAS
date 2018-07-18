@@ -676,7 +676,7 @@ function gbstudisp($stu) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?".Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING'])."\">";
 				echo _('Gradebook Comment').': '.  "<input type=submit value=\"", _('Update Comment'), "\"><br/>";
-				echo "<textarea name=\"usrcomments\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbcomment) . "</textarea>";
+				echo "<textarea name=\"usrcomments\" rows=3 cols=60>" . Sanitize::encodeStringForDisplay($gbcomment, true) . "</textarea>";
 				echo '</form>';
 			} else {
 				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";

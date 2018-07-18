@@ -819,12 +819,12 @@ if ($overwriteBody==1) {
 
 		Summary:<BR>
 		<div class=editor>
-			<textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary']); ?></textarea>
+			<textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary'], true); ?></textarea>
 		</div><BR>
 		Intro/Instructions:<BR>
 		<?php if (isset($introconvertmsg)) {echo $introconvertmsg;} ?>
 		<div class=editor>
-			<textarea cols=50 rows=20 id=intro name=intro style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['intro']); ?></textarea>
+			<textarea cols=50 rows=20 id=intro name=intro style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['intro'], true); ?></textarea>
 		</div><BR>
 
 <?php

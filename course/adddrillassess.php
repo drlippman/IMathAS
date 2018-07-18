@@ -596,7 +596,7 @@ printf("<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=%s&
 
 		Summary<BR>
 		<div class=editor>
-			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($drillsummary);?></textarea>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($drillsummary, true);?></textarea>
 		</div>
 		<br/>
 		<span class=form>Show:</span>

@@ -87,17 +87,17 @@ class Sanitize
 	/**
 	 * Encode a string for display in a web browser. Use for page text and HTML attributes only!
 	 *
-	 * This method will not double-encode existing HTML entities.
-	 *
 	 * @see encodeStringForJavascript
 	 * @see encodeStringForCSS
 	 *
 	 * @param $string string The string to encode.
+	 * @param $doubleencode boolean whether or not to double-encode existing
+	 *                              entities. Optional, default: false
 	 * @return string the encoded string.
 	 */
-	public static function encodeStringForDisplay($string)
+	public static function encodeStringForDisplay($string, $doubleencode = false)
 	{
-		return htmlspecialchars($string, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), false);
+		return htmlspecialchars($string, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), $doubleencode);
 	}
 
 	/**

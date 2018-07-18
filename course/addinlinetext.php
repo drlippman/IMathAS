@@ -441,7 +441,7 @@ $(function() { chghidetitle(); });
 
 	Text:<BR>
 	<div class=editor>
-		<textarea cols=60 rows=20 id=text name=text style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['text']);?></textarea>
+		<textarea cols=60 rows=20 id=text name=text style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['text'], true);?></textarea>
 	</div>
 
 	<span class=form>

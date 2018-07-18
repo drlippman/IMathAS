@@ -488,7 +488,7 @@ if ($overwriteBody==1) {
 
 		Summary<BR>
 		<div class=editor>
-			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary']);?></textarea>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary'], true);?></textarea>
 		</div>
 		<br/>
 
@@ -505,7 +505,7 @@ if ($overwriteBody==1) {
 		<div id="textinput" <?php if ($type != 'text') {echo 'style="display:none;"';}?> >
 			Text<BR>
 			<div class=editor>
-				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['text']);?></textarea>
+				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['text'], true);?></textarea>
 			</div>
 		</div>
 		<div id="webinput" <?php if ($type != 'web') {echo 'style="display:none;"';}?> >

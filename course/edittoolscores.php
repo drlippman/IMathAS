@@ -244,7 +244,7 @@
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
 
 			echo "</td>";
-			echo "<td><textarea cols=60 rows=1 id=\"feedback" . Sanitize::encodeStringForDisplay($row[0]) . "\" name=\"feedback[" . Sanitize::encodeStringForDisplay($row[0]) . "]\">" . Sanitize::encodeStringForDisplay($feedback[$row[0]]) . "</textarea></td>";
+			echo "<td><textarea cols=60 rows=1 id=\"feedback" . Sanitize::encodeStringForDisplay($row[0]) . "\" name=\"feedback[" . Sanitize::encodeStringForDisplay($row[0]) . "]\">" . Sanitize::encodeStringForDisplay($feedback[$row[0]], true) . "</textarea></td>";
 			echo "</tr>";
 		}
 
