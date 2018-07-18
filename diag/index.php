@@ -369,11 +369,19 @@ for ($i=0;$i<count($sel1);$i++) {
 
 <?php
 	if (!$noproctor) {
+		$aids = array_map('Sanitize::onlyInt', explode(',',$line['aidlist']));
+		$ph = Sanitize::generateQueryPlaceholders($aids);
+		$stm = $DBH->prepare("SELECT count(id) FROM imas_assessments WHERE id IN ($ph) AND ABS(timelimit)>0");
+		$stm->execute($aids);
+		$hasTimeLimit = ($stm->fetchColumn(0)>0);
 		echo "<b>", _('This test can only be accessed from this location with an access password'), "</b></br>\n";
 		echo "<span class=form>", _('Access password:'), "</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
-		echo "<span class=form>", _('Time limit (if timed):'), "</span>  ";
-		echo '<select name=timelimitmult><option value="1">'._('Standard').'</option><option value="1.5">'._('1.5x standard').'</option>';
-		echo '<option value="2">'._('2x standard').'</option></select><BR class=form>';
+		if ($hasTimeLimit) {
+			echo "<span class=form>", _('Time limit (if timed):'), "</span>  ";
+			echo '<select name=timelimitmult><option value="1">'._('Standard').'</option><option value="1.5">'._('1.5x standard').'</option>';
+			echo '<option value="2">'._('2x standard').'</option></select><BR class=form>';
+		}
+		
 	}
 ?>
 <input type="hidden" id="tzoffset" name="tzoffset" value="">

@@ -135,7 +135,7 @@ if ($overwriteBody==1) {
       echo Sanitize::encodeStringForDisplay($diag['name']).'</a></td>';
       echo '<td>',(($diag['public']&1) ? _("Yes") : _("No")),'</td>';
       echo '<td>',(($diag['public']&2) ? _("Yes") : _("No")),'</td>';
-      echo '<td><a href="../course/course.php?id='.Sanitize::encodeUrlParam($diag['cid']).'">';
+      echo '<td><a href="../course/course.php?cid='.Sanitize::encodeUrlParam($diag['cid']).'">';
       echo Sanitize::encodeStringForDisplay($diag['cname']).'</a></td>';
       if ($list=='group' || $list=='all') {
         echo '<td>',Sanitize::encodeStringForDisplay($diag['LastName'].', '.$diag['FirstName']),'</td>';
