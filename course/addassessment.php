@@ -69,7 +69,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $allowlate = Sanitize::onlyInt($_POST['allowlate']);
         $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
         $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
-        $msgtoinstr = Sanitize::onlyInt($_POST['msgtoinstr']);
         $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
         $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
@@ -184,7 +183,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             if (!isset($_POST['doposttoforum'])) {
                 $posttoforum = 0;
             }
-            if (isset($msgtoinstr)) {
+            if (isset($_POST['msgtoinstr'])) {
                 $msgtoinstr = 1;
             } else {
                 $msgtoinstr = 0;
