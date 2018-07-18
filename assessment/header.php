@@ -55,6 +55,9 @@ if (isset($CFG['locale'])) {
 		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
 	}
 }
+if (!isset($sessiondata['coursetheme']) && isset($coursetheme)) {
+	$sessiondata['coursetheme'] = $coursetheme;
+}
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace(array('_fw1920','_fw1000','_fw'),'',$sessiondata['coursetheme']);
