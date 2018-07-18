@@ -2630,7 +2630,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 				basicshowq($i);
 				showqinfobar($i,true,true,2);
-				echo '<input type="submit" class="btn" value="', _('Next'), '" />';
+				echo '<input type="submit" class="btn" value="', _('Continue'), '" />';
 				echo "</form>\n";
 			}
 		} else if ($testsettings['displaymethod'] == "SkipAround") {
