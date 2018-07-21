@@ -235,7 +235,7 @@ tr {
 	padding: 0px;
 }
 
-td.c {
+td.c, input.c {
 	text-align: center;
 }
 td.r {
@@ -803,7 +803,7 @@ a.attach {
     background: url(tinymce4/plugins/attach/ed_attach.gif) center left no-repeat;
     padding-left: 20px;
 }
-a[target=_blank]:after {
+a[target=_blank]::after {
 	content: "";
 	width:16px;
 	height:1em;
@@ -956,6 +956,10 @@ pre {
 a.dropdown-toggle:hover {
 	text-decoration: none;
 }
+a.dropdown-toggle.arrow-down:hover {
+	color: #00f;
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -988,7 +992,7 @@ a.dropdown-toggle:hover {
   overflow: hidden;
   background-color: #e5e5e5;
 }
-.dropdown-menu > li > a {
+.dropdown-menu > li > a, .dropdown-menu > li > span {
   display: block;
   padding: 3px 20px;
   clear: both;
@@ -1079,6 +1083,15 @@ a.dropdown-toggle:hover {
     right: auto;
     left: 0;
   }
+}
+
+.arrow-down::after {
+	content: "\25bc"; 
+	padding-left: 0.2em; 
+	font-size:70%; 
+	position:relative;
+	top:-.2em;
+	text-decoration: none;
 }
 
 .fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper, .fw1000 .midwrapper {

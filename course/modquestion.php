@@ -27,7 +27,6 @@ if (!(isset($teacherid))) {
 
 	if ($_GET['process']== true) {
 		if (isset($_GET['usedef'])) {
-			$points = 9999;
 			$attempts=9999;
 			$penalty=9999;
 			$regen = 0;
@@ -37,7 +36,6 @@ if (!(isset($teacherid))) {
 			$fixedseeds = null;
 			$_POST['copies'] = 1;
 		} else {
-			if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
 			if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
 			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
 			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
@@ -55,16 +53,16 @@ if (!(isset($teacherid))) {
 		}
 		if (isset($_GET['id'])) { //already have id - updating
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
-				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
+				$query = "UPDATE imas_questions SET attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':rubric'=>$rubric,
+				$stm->execute(array(':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':rubric'=>$rubric,
 					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
 			} else {
-				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
+				$query = "UPDATE imas_questions SET attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
+				$stm->execute(array(':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
 					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$_GET['id']));
 			}
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
@@ -82,7 +80,7 @@ if (!(isset($teacherid))) {
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints,fixedseeds) ";
 				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :questionsetid, :rubric, :showhints, :fixedseeds)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':assessmentid'=>$aid, ':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen,
+				$stm->execute(array(':assessmentid'=>$aid, ':points'=>9999, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen,
 					':showans'=>$showans, ':questionsetid'=>$_GET['qsetid'], ':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds));
 				$qid = $DBH->lastInsertId();
 
@@ -113,7 +111,7 @@ if (!(isset($teacherid))) {
 	} else { //DEFAULT DATA MANIPULATION
 
 		if (isset($_GET['id'])) {
-			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
+			$stm = $DBH->prepare("SELECT attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($line['penalty']{0}==='L') {
@@ -126,14 +124,12 @@ if (!(isset($teacherid))) {
 				$skippenalty = 0;
 			}
 
-			if ($line['points']==9999) {$line['points']='';}
 			if ($line['attempts']==9999) {$line['attempts']='';}
 			if ($line['penalty']==9999) {$line['penalty']='';}
 			if ($line['fixedseeds']===null) {$line['fixedseeds'] = '';}
 			$qsetid = $line['questionsetid'];
 		} else {
 			//set defaults
-			$line['points']="";
 			$line['attempts']="";
 			$line['penalty']="";
 			$line['fixedseeds'] = '';
@@ -166,7 +162,7 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 		if ($stm->rowCount() > 0) {
 			$page_beenTakenMsg = "<h2>Warning</h2>\n";
-			$page_beenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
+			$page_beenTakenMsg .= "<p>This assessment has already been taken.  Altering the penalty will not change the scores of students who already completed this question. ";
 			$page_beenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
 			$page_beenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
 			$beentaken = true;
@@ -228,8 +224,15 @@ if ($overwriteBody==1) {
 	<div class="breadcrumb"><?php echo $curBreadcrumb; ?></div>
 	<?php echo $page_beenTakenMsg; ?>
 
-
-<div id="headermodquestion" class="pagetitle"><h1>Modify Question Settings</h1></div>
+<div id="headermodquestion" class="pagetitle"><h1>
+<?php 
+if (isset($_GET['id'])) {
+	echo 'Modify Question Settings';
+} else {
+	echo 'New Question Settings';
+}
+?>
+</h1></div>
 <p><?php
 	echo '<b>'.Sanitize::encodeStringForDisplay($qdescrip).'</b> ';
 	echo '<button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($qsetid).')">'._('Preview').'</button>';
@@ -238,9 +241,6 @@ if ($overwriteBody==1) {
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
 <p>Leave items blank to use the assessment's default values.
 <input type="submit" value="<?php echo ('Save Settings');?>"></p>
-
-<span class=form>Points for this problem:</span>
-<span class=formright> <input type=text size=4 name=points value="<?php echo Sanitize::encodeStringForDisplay($line['points']);?>"><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defpoints']);?></i></span><BR class=form>
 
 <span class=form>Attempts allowed for this problem (0 for unlimited):</span>
 <span class=formright> <input type=text size=4 name=attempts value="<?php echo Sanitize::encodeStringForDisplay($line['attempts']);?>"><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defattempts']);?></i></span><BR class=form>

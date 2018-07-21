@@ -383,8 +383,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } td.trld {display:table-cell;vertical-align:middle;} </style>";
-	$placeinhead .= '<style type="text/css"> .arrow-down::after { content: "\\25bc"; padding-left: 0.2em; font-size:70%; position:relative;top:-.2em; }
-		.dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
+	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";

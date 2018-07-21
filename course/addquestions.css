@@ -1,4 +1,9 @@
 /*Styles for addquestions.php but initially for addqsort.js */
+
+input[id^=pts],input[id^=grppts],input[id^=grpn],#defpts {
+	width:2em;
+	text-align: center;
+}
 .textsegment {
 	border: 2px solid transparent;
 }

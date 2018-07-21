@@ -101,11 +101,7 @@ function handleClickTextSegmentButton(e) {
 function refreshTable() {
 	tinymce.remove();
 	document.getElementById("curqtbl").innerHTML = generateTable();
-	if (usingASCIIMath) {
-		rendermathnode(document.getElementById("curqtbl"));
-
-  }
-  updateqgrpcookie();
+	updateqgrpcookie();
 	initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
 	tinymce.init({
 		selector: "h4.textsegment",
@@ -118,6 +114,17 @@ function refreshTable() {
 		setup: editorSetup
 	});
 	activateLastEditorIfBlank();
+	$(".dropdown-toggle").dropdown();
+	$("#curqtbl input").off('keydown.doblur').on('keydown.doblur', function(e) {
+			if (e.which==13) {
+				e.preventDefault();
+				$(this).blur();
+			}
+	});
+	$("[id^=pts],[id^=grppts],#defpts").off('blur.pts').on('blur.pts', updatePts);
+	if (usingASCIIMath) {
+		rendermathnode(document.getElementById("curqtbl"));
+	}
 }
 
 //Show the editor toolbar on a newly created text segment
@@ -505,13 +512,16 @@ function generateShowforSelect(num) {
 		i++;
 	}
 	while (i<itemarray.length && itemarray[i][0]!="text") {
+		if (itemarray[i].length<5) { //is group
+			n += itemarray[i][0]; //pick n from group
+		} else {
+			n++;
+		}
 		i++;
-		n++;
 	}
 	if (!(5 in itemarray[num])) {
 		itemarray[num][5] = 0;
 	}
-	console.log(itemarray[num]);
 	if (n==0) {
 		return '';
 	} else {
@@ -653,12 +663,14 @@ function groupSelected() {
 	}
 	var grplist = new Array;
 	var form = document.getElementById("curqform");
+	var grppoints = 0;
 	for (var e = form.elements.length-1; e >-1 ; e--) {
 		var el = form.elements[e];
 		if (el.type == 'checkbox' && el.checked && el.value!='ignore' && !el.value.match(":text") && el.id.match("qc")) {
 			val = el.value.split(":")[0];
 			if (val.indexOf("-")>-1) { //is group
 				val = val.split("-")[0];
+				grppoints = itemarray[val][2][0][4]; //point values from first in group
 			} else {
 
 			}
@@ -681,8 +693,14 @@ function groupSelected() {
 	var existingcnt = 0;
 	if (itemarray[to].length<5) {  //moving to existing group
 		existingcnt = itemarray[to][2].length;
+		if (grppoints == 0) {
+			grppoints = itemarray[to][2][0][4]; //point values from first in group
+		}
 	} else {
 		var existing = itemarray[to];
+		if (grppoints == 0) {
+			grppoints = existing[4]; //point values from this question
+		}
 		itemarray[to] = [1,0,[existing],1];
 		existingcnt = 1;
 	}
@@ -698,7 +716,50 @@ function groupSelected() {
 			itemarray[to][2].splice(existingcnt,0,tomove[0]);
 		}
 	}
+	for (i=0; i<itemarray[to][2].length; i++) {
+		itemarray[to][2][i][4] = grppoints;	
+	}
 	submitChanges();
+}
+
+function updatePts() {
+	if (!confirm_textseg_dirty()) {
+		$("[id^=pts-],[id^=grppts],#defpts").each(function() {
+			$(this).val($(this).attr("data-lastval"));	
+		});
+	} else {
+		var newdefpts = Math.round($("#defpts").val());
+		var olddefpts = $("#defpts").attr("data-lastval");
+		if (newdefpts == "" || newdefpts <= 0) {
+			newdefpts = olddefpts;
+			$("#defpts").val(olddefpts);
+		}
+		var qparts,curval;
+		$("[id^=pts-]").each(function() {
+			qparts = $(this).attr("id").split('-');
+			curval = Math.round($(this).val());
+			if (curval == "" || curval <= 0) {
+				curval = $(this).attr("data-lastval");
+			}
+			if (newdefpts != olddefpts && curval==olddefpts) {
+				//update pts to match new default
+				curval = newdefpts;
+			}
+			itemarray[qparts[1]][4] = (curval==newdefpts)?9999:curval;
+		});
+		$("[id^=grppts-]").each(function() {
+			qparts = $(this).attr("id").split('-');
+			curval = $(this).val();
+			if (newdefpts != olddefpts && curval==olddefpts) {
+				//update pts to match new default
+				curval = newdefpts;
+			}
+			for (var i=0;i<itemarray[qparts[1]][2].length;i++) {
+				itemarray[qparts[1]][2][i][4] = (curval==newdefpts)?9999:curval;
+			}
+		});
+		submitChanges();
+	}
 }
 
 function updateGrpN(num,old_num) {
@@ -727,6 +788,11 @@ function updateGrpT(num,old_type) {
 	}
 
 }
+
+function confirmclearattempts() {
+	return confirm(_("Are you sure you want to clear all attempts on this question?"));
+}
+	
 
 function edittextseg(i) {
 	tinyMCE.get("textseg"+i).setContent(itemarray[i][1]);
@@ -811,6 +877,7 @@ function updateTextseg(i) {
 function generateOutput() {
 	var out = '';
 	var text_segments = [];
+	var pts = {};
 	var qcnt = 0;
 	for (var i=0; i<itemarray.length; i++) {
 		if (itemarray[i][0]=='text') { //is text item
@@ -823,6 +890,7 @@ function generateOutput() {
 			out += itemarray[i][0]+'|'+itemarray[i][1];
 			for (var j=0; j<itemarray[i][2].length; j++) {
 				out += '~'+itemarray[i][2][j][0];
+				pts["qn"+itemarray[i][2][j][0]] = itemarray[i][2][j][4];
 			}
 			qcnt += itemarray[i][0];
 		} else {
@@ -830,10 +898,11 @@ function generateOutput() {
 				out += ',';
 			}
 			out += itemarray[i][0];
+			pts["qn"+itemarray[i][0]] = itemarray[i][4];
 			qcnt++;
 		}
 	}
-	return [out,text_segments];
+	return [out,text_segments,pts];
 }
 
 function collapseqgrp(i) {
@@ -866,6 +935,8 @@ function generateTable() {
 	var ln = 0;
 	var pttotal = 0;
 	var html = '';
+	var totalcols = 10;
+
 	html += "<table cellpadding=5 class=gb><thead><tr>";
 	if (!beentaken) {
 		html += "<th></th>";
@@ -873,14 +944,15 @@ function generateTable() {
 	html += "<th>Order</th>";
 	//return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
 	html += "<th>Description";
-	html += "</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
-	if (beentaken) {
-		html += "<th>Clear Attempts</th><th>Withdraw</th>";
-	} else {
-		html += "<th>Template</th><th>Remove</th>";
+	html += "</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Avg Time</th>";
+	html += "<th>Points";
+	if (!beentaken) {
+		html += "<br/><span class=small>Default: <input id=\"defpts\" size=2 value=\""+defpoints+"\" data-lastval=\""+defpoints+"\"/></span>";
 	}
+	html += "</th>";
+	html += "<th>Actions</th>";
 	html += "</thead><tbody>";
-	var text_segment_count = 0; var curqnum = 0; var curqitemloc = 0;
+	var text_segment_count = 0; var curqnum = 0; var curqitemloc = 0;  
 	var badgrppoints = false; var badthisgrppoints = false; var grppoints = -1;
 	for (var i=0; i<itemcount; i++) {
 		curistext = 0;
@@ -910,16 +982,30 @@ function generateTable() {
 				curclass += ' textsegmentrow skipmathrender';
 			}
 			html += "<tr class='"+curclass+"'>";
+			if (curisgroup) {
+				if (curitems[0][4]==9999) { //points
+					curgrppoints = defpoints;
+				} else {
+					curgrppoints = curitems[0][4];
+				}
+			}
 			if (beentaken) {
 				if (curisgroup) {
 					if (j==0) {
-						html += "<td>Q"+(curqnum+1)+"</td><td><b>Group</b>, choosing "+itemarray[i][0];
+						html += "<td>Q"+(curqnum+1)+"</td><td colspan="+(totalcols-4)+"><b>Group</b>, choosing "+itemarray[i][0];
 						if (itemarray[i][1]==0) {
 							html += " without";
 						} else if (itemarray[i][1]==1) {
 							html += " with";
 						}
-						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
+						html += " replacement</td>";
+						//html += "<td class=\"c nowrap\"><input size=2 class=c id=\"grppts-"+i+"\" value=\""+curgrppoints+"\" data-lastval=\""+curgrppoints+"\"/>";
+						html += "<td class=\"c nowrap\">"+curgrppoints;
+						if (itemarray[i][0]>1) {
+							html += "ea";
+						}
+						html += "</td><td></td>";
+						html += "</tr><tr class="+curclass+">";
 					}
 					html += "<td>&nbsp;Q"+(curqnum+1)+'-'+(j+1);
 				} else if (curistext) {
@@ -945,7 +1031,7 @@ function generateTable() {
 					}
 					html += ms;
 					if (curisgroup) {
-						html += "</td><td colspan='"+(beentaken?8:9)+"'><b>Group</b> ";
+						html += "</td><td colspan="+(totalcols-4)+"><b>Group</b> ";
 						html += "Select <input type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+","+itemarray[i][0]+")'/> from group of "+curitems.length;
 						html += " <select id='grptype"+i+"' onchange='updateGrpT("+i+","+itemarray[i][1]+")'><option value=0 ";
 						if (itemarray[i][1]==0) {
@@ -956,6 +1042,11 @@ function generateTable() {
 							html += "selected=1";
 						}
 						html += ">With</option></select> replacement";
+						html += "</td>";
+						html += "<td class=\"nowrap\"><input size=2 id=\"grppts-"+i+"\" value=\""+curgrppoints+"\" data-lastval=\""+curgrppoints+"\"/>";
+						if (itemarray[i][0]>1) {
+							html += "ea";
+						}
 						html += "</td><td class=c><a href=\"#\" onclick=\"return removegrp('"+i+"');\">Remove</a></td></tr>";
 						if (itemarray[i][3]==0) { //collapsed group
 							if (curitems[0][4]==9999) { //points
@@ -980,7 +1071,7 @@ function generateTable() {
 				//html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
 				//html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
 				if (displaymethod=="Embed") {
-					html += "<td colspan=8 id=\"textsegdescr"+i+"\" class=\"description-cell\">";
+					html += "<td colspan="+(totalcols-4)+" id=\"textsegdescr"+i+"\" class=\"description-cell\">";
 					if (curitems[j][3]==1) {
 						var header_contents= curitems[j][4];
 						html += "<div style=\"position: relative\"><h4 id=\"textsegheader"+i+"\" class=\"textsegment collapsedheader\">"+header_contents+"</h4>";
@@ -995,7 +1086,7 @@ function generateTable() {
 					html += '>New page</label></td>';
 				} else {
 					var contents = curitems[j][1];
-					html += "<td colspan=7 id=\"textsegdescr"+i+"\" class=\"description-cell\">"; //description
+					html += "<td colspan="+(totalcols-5)+" id=\"textsegdescr"+i+"\" class=\"description-cell\">"; //description
 					html += "<div class=\"intro intro-like\"><div id=\"textseg"+i+"\" class=\"textsegment collapsed\">"+contents+"</div>";
 					html += "<div class=\"text-segment-icon\"><button id=\"edit-button"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-span"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div></div></td>";
 					html += "<td colspan=2>"+generateShowforSelect(i)+"</td>";
@@ -1006,7 +1097,13 @@ function generateTable() {
 					html += "<td class=c><a href=\"#\" onclick=\"return removeitem('"+i+"');\">Remove</a></td>";
 				//}
 			} else {
-				html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
+				if (beentaken && curitems[j][6]==1) {
+					html += '<td class="greystrike" title="Question Withdrawn">';
+				} else {
+					html += '<td>';
+				}
+				html += "<input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>";
+				html += curitems[j][2]+"</td>"; //description
 				html += "<td class=\"nowrap\"><div";
 				if ((curitems[j][7]&16) == 16) {
 					html += " class=\"ccvid\"";
@@ -1039,6 +1136,18 @@ function generateTable() {
 					html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
 				}
 				html += "<td>"+curitems[j][3]+"</td>"; //question type
+				html += "<td class=c>";
+				if (curitems[j][8][0]>0) {
+					if (curitems[j][8].length>3) {
+						html += '<span onmouseover="tipshow(this,\'Avg score on first try: '+curitems[j][8][1]+'%';
+						html += '<br/>Avg time on first try: '+curitems[j][8][2]+' min<br/>N='+curitems[j][8][3]+'\')" onmouseout="tipout()">';
+					}
+					html += curitems[j][8][0];
+					if (curitems[j][8].length>3) {
+						html += '</span>';
+					}
+				}
+				html += "</td>";
 				if (curitems[j][4]==9999) { //points
 					curpt = defpoints;
 				} else {
@@ -1049,16 +1158,49 @@ function generateTable() {
 						grppoints = curpt;
 					} else if (curpt != grppoints) {
 						badgrppoints = true;
-						badthisgrppoints = true;
+						//fix it
+						if (grppoints == defpoints) {
+							itemarray[i][2][j][4] = 9999;
+						} else {
+							itemarray[i][2][j][4] = grppoints;
+						}
 					}
 				}
-				if (badthisgrppoints) {
-					html += "<td><span class=noticehighlight>"+curpt+"</span></td>"; //points
+				if (curisgroup) {
+					html += "<td></td>";
+				//} else if (badthisgrppoints) {
+				//	html += "<td class=c><span class=noticehighlight>"+curpt+"</span></td>"; //points
 				} else {
-					html += "<td>"+curpt+"</td>"; //points
+					if (beentaken) {
+						html += "<td class=c>"+curpt+"</td>";
+					} else {
+						html += "<td><input size=2 id=\"pts-"+i+"\" value=\""+curpt+"\" data-lastval=\""+curpt+"\"/></td>"; //points
+					}
 				}
 
-
+				html += '<td class=c><div class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+				html += 'Action</a><ul role="menu" class="dropdown-menu dropdown-menu-right">';
+				html += " <li><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change Settings</a></li>";
+				if (curitems[j][5]==1) {
+					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit Code</a></li>"; //edit
+				} else {
+					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&aid="+curaid+"&cid="+curcid+"\">View Code</a></li>";
+					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit Personal Copy</a></li>"; //edit makelocal
+				}
+				if (beentaken) {
+					html += "<li><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\" ";
+					html += "onclick=\"return confirmclearattempts()\">Clear Attempts</a></li>"; //add link
+					if (curitems[j][6]!=1) {
+						html += "<li><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?curqitemloc+'-'+j:curqitemloc)+"\">Withdraw</a></li>";
+					} else {
+						html += '<li><span><span class=noticetext>Withdrawn</span></span></li>';
+					}
+				} else {
+					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></li>"; //add link
+					html += "<li><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></li>"; //add link and checkbox
+				}
+				html += '</ul></div>';
+				/*
 				html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change</a></td>"; //settings
 				if (curitems[j][5]==1) {
 					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
@@ -1076,6 +1218,7 @@ function generateTable() {
 					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
 					html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
 				}
+				*/
 			}
 			html += "</tr>";
 			ln++;
@@ -1101,6 +1244,7 @@ function generateTable() {
 
 	html += "</tbody></table>";
 	if (badgrppoints) {
+		submitChanges();
 		html += "<p class=noticetext>WARNING: All question in a group should be given the same point values.</p>";
 	}
 	document.getElementById("pttotal").innerHTML = pttotal;
@@ -1163,13 +1307,24 @@ function submitChanges() {
 	check_textseg_itemarray();
 	document.getElementById(target).innerHTML = _(' Saving Changes... ');
 	data=generateOutput();
+	var outdata = {
+			order: data[0], 
+			text_order: JSON.stringify(data[1])
+	};
+	if (!beentaken) {
+		outdata["pts"] = JSON.stringify(data[2]);
+		outdata["defpts"] = $("#defpts").val()
+	}
 	$.ajax({
 		type: "POST",
 		//url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid",
 		url: AHAHsaveurl,
-		data: {order: data[0], text_order: JSON.stringify(data[1])}
+		data: outdata
 	})
 	.done(function() {
+		if (!beentaken) {
+			defpoints = $("#defpts").val();
+		}
 		document.getElementById(target).innerHTML='';
 		refreshTable();
 		updateSaveButtonDimming();

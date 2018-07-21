@@ -222,45 +222,46 @@
 				} else {
 					$outputmsg .= "Library Assignments Updated. ";
 				}
-			}
-			$stm = $DBH->prepare("SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid=:qsetid");
-			$stm->execute(array(':qsetid'=>$_GET['id']));
-			$imgcnt = $stm->rowCount();
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$_POST['imgvar-'.$row[0]] = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[0]]); 
-				if (isset($_POST['delimg-'.$row[0]])) {
-					if (substr($row[1],0,4)!='http') {
-						$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
-						$stm2->execute(array(':filename'=>$row[1]));
-						if ($stm2->rowCount()==1) {
-							//unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
-							deleteqimage($row[1]);
+			
+				$stm = $DBH->prepare("SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid=:qsetid");
+				$stm->execute(array(':qsetid'=>$_GET['id']));
+				$imgcnt = $stm->rowCount();
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$_POST['imgvar-'.$row[0]] = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[0]]); 
+					if (isset($_POST['delimg-'.$row[0]])) {
+						if (substr($row[1],0,4)!='http') {
+							$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
+							$stm2->execute(array(':filename'=>$row[1]));
+							if ($stm2->rowCount()==1) {
+								//unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+								deleteqimage($row[1]);
+							}
+						}
+						$stm2 = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
+						$stm2->execute(array(':id'=>$row[0]));
+						$imgcnt--;
+						if ($imgcnt==0) {
+							$stm2 = $DBH->prepare("UPDATE imas_questionset SET hasimg=0 WHERE id=:id");
+							$stm2->execute(array(':id'=>$_GET['id']));
+						}
+					} else if ($row[2]!=$_POST['imgvar-'.$row[0]] || $row[3]!=$_POST['imgalt-'.$row[0]]) {
+						$newvar = $_POST['imgvar-'.$row[0]];
+						$newalt = $_POST['imgalt-'.$row[0]];
+						$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','laarr','shanspt','GLOBALS','laparts','anstype','kidx','iidx','tips','optionsPack','partla','partnum','score','disallowedvar','allowedmacros','wherecount','countcnt','myrights','myspecialrights');
+						if (in_array($newvar,$disallowedvar)) {
+							$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
+						} else {
+							$stm2 = $DBH->prepare("UPDATE imas_qimages SET var=:var,alttext=:alttext WHERE id=:id");
+							$stm2->execute(array(':var'=>$newvar, ':alttext'=>$newalt, ':id'=>$row[0]));
 						}
 					}
-					$stm2 = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
-					$stm2->execute(array(':id'=>$row[0]));
-					$imgcnt--;
-					if ($imgcnt==0) {
-						$stm2 = $DBH->prepare("UPDATE imas_questionset SET hasimg=0 WHERE id=:id");
-						$stm2->execute(array(':id'=>$_GET['id']));
-					}
-				} else if ($row[2]!=$_POST['imgvar-'.$row[0]] || $row[3]!=$_POST['imgalt-'.$row[0]]) {
-					$newvar = $_POST['imgvar-'.$row[0]];
-					$newalt = $_POST['imgalt-'.$row[0]];
-					$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','laarr','shanspt','GLOBALS','laparts','anstype','kidx','iidx','tips','optionsPack','partla','partnum','score','disallowedvar','allowedmacros','wherecount','countcnt','myrights','myspecialrights');
-					if (in_array($newvar,$disallowedvar)) {
-						$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
-					} else {
-						$stm2 = $DBH->prepare("UPDATE imas_qimages SET var=:var,alttext=:alttext WHERE id=:id");
-						$stm2->execute(array(':var'=>$newvar, ':alttext'=>$newalt, ':id'=>$row[0]));
-					}
 				}
-			}
-			if ($replaceby!=0) {
-				$query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
-				$query .= "SET imas_questions.questionsetid=:replaceby WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid=:questionsetid";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':replaceby'=>$replaceby, ':questionsetid'=>$qsetid));
+				if ($replaceby!=0) {
+					$query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
+					$query .= "SET imas_questions.questionsetid=:replaceby WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid=:questionsetid";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':replaceby'=>$replaceby, ':questionsetid'=>$qsetid));
+				}
 			}
 
 		} else { //adding new
@@ -326,57 +327,59 @@
 				$outputmsg .= " Question Added to QuestionSet. ";
 				$frompot = 1;
 			}
-
+			$isok = true;
 		}
 
-		//upload image files if attached
-		if ($_FILES['imgfile']['name']!='') {
-			$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
-			$_POST['newimgvar'] = preg_replace('/[^\w\[\]]/','', $_POST['newimgvar']);
-			if (!is_uploaded_file($_FILES['imgfile']['tmp_name'])) {
-				switch($_FILES['imgfile']['error']){
-			    case 1:
-			    case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
-			      $errmsg .= "The file you are trying to upload is too big.";
-			      break;
-			    case 3: //uploaded file was only partially uploaded
-			      $errmsg .= "The file you are trying upload was only partially uploaded.";
-			      break;
-			    default: //a default error, just in case!  :)
-			      $errmsg .= "There was a problem with your upload.";
-			      break;
-					}
-			} else if (trim($_POST['newimgvar'])=='') {
-				$errmsg .= "<p>Need to specify variable for image to be referenced by</p>";
-			} else if (in_array($_POST['newimgvar'],$disallowedvar)) {
-				$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
-			} else {
-				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/';
-				//$filename = basename($_FILES['imgfile']['name']);
-				$userfilename = preg_replace('/[^\w\.]/','',basename(str_replace('\\','/',$_FILES['imgfile']['name'])));
-				$filename = $userfilename;
-
-				//$uploadfile = $uploaddir . $filename;
-				//$t=0;
-				//while(file_exists($uploadfile)){
-				//	$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
-				//	$uploadfile=$uploaddir.$filename;
-				//	$t++;
-				//}
-				$result_array = getimagesize($_FILES['imgfile']['tmp_name']);
-				if ($result_array === false) {
-					$errmsg .= "<p>File is not image file</p>";
+		if ($isok) {
+			//upload image files if attached
+			if ($_FILES['imgfile']['name']!='') {
+				$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
+				$_POST['newimgvar'] = preg_replace('/[^\w\[\]]/','', $_POST['newimgvar']);
+				if (!is_uploaded_file($_FILES['imgfile']['tmp_name'])) {
+					switch($_FILES['imgfile']['error']){
+					case 1:
+					case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
+					  $errmsg .= "The file you are trying to upload is too big.";
+					  break;
+					case 3: //uploaded file was only partially uploaded
+					  $errmsg .= "The file you are trying upload was only partially uploaded.";
+					  break;
+					default: //a default error, just in case!  :)
+					  $errmsg .= "There was a problem with your upload.";
+					  break;
+						}
+				} else if (trim($_POST['newimgvar'])=='') {
+					$errmsg .= "<p>Need to specify variable for image to be referenced by</p>";
+				} else if (in_array($_POST['newimgvar'],$disallowedvar)) {
+					$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
 				} else {
-					if (($filename=storeuploadedqimage('imgfile',$filename))!==false) {
-					//if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
-						//echo "<p>File is valid, and was successfully uploaded</p>\n";
-						$stm = $DBH->prepare("INSERT INTO imas_qimages (var,qsetid,filename,alttext) VALUES (:var, :qsetid, :filename, :alttext)");
-						$stm->execute(array(':var'=>$_POST['newimgvar'], ':qsetid'=>$qsetid, ':filename'=>$filename, ':alttext'=>$_POST['newimgalt']));
-						$stm = $DBH->prepare("UPDATE imas_questionset SET hasimg=1 WHERE id=:id");
-						$stm->execute(array(':id'=>$qsetid));
+					$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/';
+					//$filename = basename($_FILES['imgfile']['name']);
+					$userfilename = preg_replace('/[^\w\.]/','',basename(str_replace('\\','/',$_FILES['imgfile']['name'])));
+					$filename = $userfilename;
+	
+					//$uploadfile = $uploaddir . $filename;
+					//$t=0;
+					//while(file_exists($uploadfile)){
+					//	$filename = substr($filename,0,strpos($userfilename,"."))."_$t".strstr($userfilename,".");
+					//	$uploadfile=$uploaddir.$filename;
+					//	$t++;
+					//}
+					$result_array = getimagesize($_FILES['imgfile']['tmp_name']);
+					if ($result_array === false) {
+						$errmsg .= "<p>File is not image file</p>";
 					} else {
-						echo "<p>Error uploading image file!</p>\n";
-						exit;
+						if (($filename=storeuploadedqimage('imgfile',$filename))!==false) {
+						//if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
+							//echo "<p>File is valid, and was successfully uploaded</p>\n";
+							$stm = $DBH->prepare("INSERT INTO imas_qimages (var,qsetid,filename,alttext) VALUES (:var, :qsetid, :filename, :alttext)");
+							$stm->execute(array(':var'=>$_POST['newimgvar'], ':qsetid'=>$qsetid, ':filename'=>$filename, ':alttext'=>$_POST['newimgalt']));
+							$stm = $DBH->prepare("UPDATE imas_questionset SET hasimg=1 WHERE id=:id");
+							$stm->execute(array(':id'=>$qsetid));
+						} else {
+							echo "<p>Error uploading image file!</p>\n";
+							exit;
+						}
 					}
 				}
 			}
@@ -697,6 +700,10 @@
 
 			$addmod = "Add";
 	}
+	if (!$myq) {
+		$addmod = 'View';
+	}
+	
 	$inlibssafe = implode(',', array_map('intval', explode(',',$inlibs)));
 
 	$lnames = array();
@@ -838,13 +845,14 @@
 	   function setupQtextEditor() {
 	   	var qtextbox = document.getElementById("qtext");
 			qtextbox.value = qtextbox.value.replace(/\s*<br\s*\/>\s*<br\s*\/>\s*/g, "\n<br /><br />\n");
-			qEditor = CodeMirror.fromTextArea(qtextbox, {
+	   	qEditor = CodeMirror.fromTextArea(qtextbox, {
 			matchTags: true,
 			mode: "imathasqtext",
 			smartIndent: true,
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
+			'.(!$myq?'readOnly:true,':'').'
 			styleSelectedText:true
 		      });
 			for (var i=0;i<qEditor.lineCount();i++) { qEditor.indentLine(i); }
@@ -861,6 +869,7 @@
 			lineWrapping: true,
 			indentUnit: 2,
 			tabSize: 2,
+			'.(!$myq?'readOnly:true,':'').'
 			styleSelectedText:true
 		      });
 		//controlEditor.setSize("100%",6+14*document.getElementById("control").rows);
@@ -954,7 +963,7 @@
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
 
-	if (isset($inusecnt) && $inusecnt>0) {
+	if (isset($inusecnt) && $inusecnt>0 && $myq) {
 		echo '<p class=noticetext>This question is currently being used in ';
 		if ($inusecnt>1) {
 			echo Sanitize::onlyInt($inusecnt).' assessments that are not yours.  ';
@@ -969,14 +978,14 @@
 		echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
 	}
 	if (!$myq) {
-		echo "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
+		echo "<p class=noticetext>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
 	}
 ?>
 <form enctype="multipart/form-data" method=post action="<?php echo $formAction; // Sanitized near line 806 ?>">
 <input type="hidden" name="hasimg" value="<?php echo Sanitize::encodeStringForDisplay($line['hasimg']);?>"/>
 <p>
 Description:<BR>
-<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['description'], true);?></textarea>
+<textarea cols=60 rows=4 name=description <?php if (!$myq) echo "disabled";?>><?php echo Sanitize::encodeStringForDisplay($line['description'], true);?></textarea>
 </p>
 <p>
 Author: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input type="hidden" name="author" value="<?php echo Sanitize::encodeStringForDisplay($author); ?>">
@@ -1112,7 +1121,7 @@ Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsi
 <button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
 <span class="noticetext quickSaveNotice"></span>
 <BR>
-<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['control'], true);?></textarea>
+<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "disabled";?>><?php echo Sanitize::encodeStringForDisplay($line['control'], true);?></textarea>
 </div>
 
 
@@ -1156,7 +1165,9 @@ Display with the "Show Answer"<br/>
 </div>
 <div id=imgbox>
 <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
-Image file: <input type="file" name="imgfile"/> assign to variable: <input type="text" name="newimgvar" size="6"/> Description: <input type="text" size="20" name="newimgalt" value=""/><br/>
+Image file: <input type="file" name="imgfile" <?php if (!$myq) {echo 'disabled';};?>/> 
+  assign to variable: <input type="text" name="newimgvar" size="6" <?php if (!$myq) {echo 'disabled';};?>/> 
+  Description: <input type="text" size="20" name="newimgalt" value="" <?php if (!$myq) {echo 'disabled';};?>/><br/>
 <div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
 	Images:
 	<ul id='imgList'>
@@ -1171,19 +1182,19 @@ if (isset($images['vars']) && count($images['vars'])>0) {
 			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
 		}
 		echo "<li>";
-		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\"/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
-		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\"/> Delete? <input type=checkbox name=\"delimg-$id\"/>";
+		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\" ".($myq?'':'disabled')."/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
+		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\" ".($myq?'':'disabled')."/> Delete? <input type=checkbox name=\"delimg-$id\" ".($myq?'':'disabled')."/>";
 		echo "</li>";
 	}
 }
 ?>
 	</ul>
 </div>
-Help button: Type: <select name="helptype">
+Help button: Type: <select name="helptype" <?php if (!$myq) {echo 'disabled';};?>>
  <option value="video">Video</option>
  <option value="read">Read</option>
  </select>
- URL: <input type="text" name="helpurl" size="30" /><br/>
+ URL: <input type="text" name="helpurl" size="30" <?php if (!$myq) {echo 'disabled';};?>/><br/>
 <?php
 echo '<div id="helpbtnwrap" ';
 if (count($extref)==0) {
@@ -1198,7 +1209,7 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/></li>";
+	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap

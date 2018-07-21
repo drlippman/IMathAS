@@ -426,7 +426,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$questionjsarr = array();
 	$existingq = array();
-	$query = "SELECT imas_questions.id,imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions ";
+	$query = "SELECT imas_questions.id,imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts,imas_questionset.avgtime FROM imas_questions ";
 	$query .= "JOIN imas_questionset ON imas_questionset.id=imas_questions.questionsetid JOIN imas_users ON imas_questionset.ownerid=imas_users.id ";
 	$query .= "WHERE imas_questions.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
@@ -471,6 +471,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
 			$extrefval += 8;
 		}
+		$avgtimepts = array_map('Sanitize::onlyFloat', explode(',', $line['avgtime']));
+		if ($avgtimepts[0]>0) {
+			$timeout = array(round($avgtimepts[0]/60,1));
+		} else if (isset($avgtimepts[1]) && isset($avgtimepts[3]) && $avgtimepts[3]>10) {
+			$timeout = array(round($avgtimepts[1]/60,1));
+		} else {
+			$timeout = array(0);
+		}
+		if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
+			$timeout[1] = round($avgtimepts[2]); //score 
+			$timeout[2] = round($avgtimepts[1]/60,1); //time first try
+			$timeout[3] = Sanitize::onlyInt($avgtimepts[3]); //# of data
+		}
 		$questionjsarr[$line['id']] = array((int)$line['id'],
 			(int)$line['questionsetid'],
 			Sanitize::encodeStringForDisplay($line['description']),
@@ -478,7 +491,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			(int)Sanitize::onlyInt($line['points']),
 			(int)$canedit,
 			(int)Sanitize::onlyInt($line['withdrawn']),
-			(int)$extrefval);
+			(int)$extrefval,
+			$timeout);
 
 	}
 
@@ -866,7 +880,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
 							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
 						} else {
-							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">View</a>";
+							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">View Code</a>";
 						}
 
 						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&template=true\">Template</a>";
@@ -972,7 +986,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_assessmentQuestions[$x]['times'][$y] = $qsetusecnts[$qsetid[$qid]];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;
 					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">Add</a>";
-					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">View</a>" ;
+					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">View Code</a>" ;
 					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&template=true\">Template</a>";
 					$page_assessmentQuestions[$x]['extref'][$y] = '';
 					$page_assessmentQuestions[$x]['cap'][$y] = 0;
@@ -1151,8 +1165,8 @@ if ($overwriteBody==1) {
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
-		document.getElementById("curqtbl").innerHTML = generateTable();
-		initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
+		/*document.getElementById("curqtbl").innerHTML = generateTable();
+		initeditor("selector","div.textsegment",null,true ,editorSetup);
 		tinymce.init({
 			selector: "h4.textsegment",
 			inline: true,
@@ -1163,6 +1177,8 @@ if ($overwriteBody==1) {
 			toolbar: "charmap saveclose",
 			setup: editorSetup
 		});
+		*/
+		$(refreshTable);
 	</script>
 <?php
 	}
@@ -1239,7 +1255,7 @@ if ($overwriteBody==1) {
 					<?php echo $page_libRowHeader ?>
 					<th>Times Used</th>
 					<?php if ($page_useavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>
-					<th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+					<th>Mine</th><th>Actions</th>
 					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
 				</tr>
 			</thead>
@@ -1290,9 +1306,15 @@ if ($overwriteBody==1) {
 					}
 					echo $page_questionTable[$qid]['avgtime'].'</span>'; ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['add']; ?></td>
-					<td><?php echo $page_questionTable[$qid]['src']; ?></td>
-					<td class=c><?php echo $page_questionTable[$qid]['templ']; ?></td>
+					<td><div class="dropdown">
+					  <a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					    Action</a>
+					  <ul role="menu" class="dropdown-menu dropdown-menu-right">
+					   <li><?php echo $page_questionTable[$qid]['add']; ?></li>
+					   <li><?php echo $page_questionTable[$qid]['src']; ?></li>
+					   <li><?php echo $page_questionTable[$qid]['templ']; ?></li>
+					  </ul>
+					</td>
 					<?php if ($searchall==0) {
 						if ($page_questionTable[$qid]['junkflag']==1) {
 							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Flagged\" /></td>";
@@ -1313,6 +1335,7 @@ if ($overwriteBody==1) {
 		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
 		<script type="text/javascript">
 			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
+		    $(".dropdown-toggle").dropdown();
 		</script>
 	</form>
 
