@@ -605,6 +605,9 @@ switch($_POST['action']) {
 		} else {
 			$setdatesbylti = 0;
 		}
+		if (trim($_POST['coursename'])=='') {
+			$_POST['coursename'] = '(No name provided)';
+		}
 
 		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,hideicons=:hideicons,available=:available,lockaid=:lockaid,picicons=:picicons,showlatepass=:showlatepass,";
@@ -648,9 +651,16 @@ switch($_POST['action']) {
 					$stm->execute(array(':cid'=>$_GET['id']));
 				}
 			}
-		} else {
+		} else { //new course
 			$blockcnt = 1;
 			$itemorder = serialize(array());
+			
+			$chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+			$ltisecret = '';
+			for ($i=0;$i<8;$i++) {
+				$ltisecret .= substr($chars,rand(0,56),1);
+			}
+			
 			$DBH->beginTransaction();
 			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,theme,ltisecret,dates_by_lti,blockcnt) VALUES ";
 			$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :theme, :ltisecret, :ltidates, :blockcnt);";
@@ -658,7 +668,7 @@ switch($_POST['action']) {
 			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$userid, ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':picicons'=>$picicons,
 				':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':toolset'=>$toolset, ':showlatepass'=>$showlatepass,
 				':itemorder'=>$itemorder, ':available'=>$avail, ':istemplate'=>$istemplate, ':deftime'=>$deftime, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':deflatepass'=>$deflatepass, ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt));
+				':deflatepass'=>$deflatepass, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt));
 			$cid = $DBH->lastInsertId();
 			//if ($myrights==40) {
 				$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
@@ -672,8 +682,22 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES (:courseid, :useweights, :orderby, :defgbmode, :usersort)");
 			$stm->execute(array(':courseid'=>$cid, ':useweights'=>$useweights, ':orderby'=>$orderby, ':defgbmode'=>$defgbmode, ':usersort'=>$usersort));
 
-
-			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+			if (isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+				//additional validation of permission to copy
+				$query = "SELECT ic.name,ic.enrollkey,ic.copyrights,ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ";
+				$query .= "ON ic.ownerid=iu.id WHERE ic.id=:id";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':id'=>$ctc));
+				$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
+				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $userid) || 
+					($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
+					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {
+						//did not provide valid enrollment key
+						$_POST['usetemplate'] = 0; //skip copying
+					}
+				}
+			}
+			if (isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
 
 				$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$_POST['usetemplate']));
@@ -808,6 +832,10 @@ switch($_POST['action']) {
 			*/
 			$DBH->commit();
 
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
+			$stm->execute(array($groupid));
+			$hasGroupLTI = ($stm->fetchColumn() !== false);
+			
 			require("../header.php");
 			echo '<div class="breadcrumb">'.$breadcrumbbase.' Course Creation Confirmation</div>';
 			echo '<h1>Your course has been created!</h1>';
@@ -821,6 +849,18 @@ switch($_POST['action']) {
 				echo '<li>The enrollment key: <b>'.$_POST['ekey'].'</b></li>';
 			}
 			echo '</ol></p>';
+			
+			echo '<p>If you plan to integrate this course with your school\'s Learning Management System (LMS), ';
+			if ($hasGroupLTI) {
+				echo 'it looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
+				echo 'If so, you will not need to set up a course-level configuration. ';
+				echo 'If you do need to set up a course-level configuration, here is the information you will need:</p>';
+			} else {
+				echo 'here is the information you will need to set up a course-level configuration, ';
+				echo 'since your school does not appear to have a school-wide LTI key and secret established.</p>';
+			}
+			echo '<ul class=nomark><li>Key: LTIkey_'.$cid.'_1</li>';
+			echo '<li>Secret: '.Sanitize::encodeStringForDisplay($ltisecret).'</li></ul>';
 			echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
 			echo '<a href="../course/course.php?cid='.$cid.'">Enter the Course</a>';
 			require("../footer.php");

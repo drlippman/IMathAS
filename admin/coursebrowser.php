@@ -133,7 +133,7 @@ $placeinhead .= 'var courseBrowserAction = "'.Sanitize::simpleString($action).'"
 $placeinhead .= '</script>';
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>
 <script src="'.$imasroot.'/javascript/'.$CFG['coursebrowser'].'"></script>
-<link rel="stylesheet" href="coursebrowser.css?v=121817" type="text/css" />';
+<link rel="stylesheet" href="coursebrowser.css?v=072018" type="text/css" />';
 
 $pagetitle = _('Course Browser');
 require("../header.php");
@@ -160,7 +160,7 @@ if (!isset($_GET['embedded'])) {
 	<span v-for="propname in propsToFilter" class="dropdown-wrap">
 		<button @click="showFilter = (showFilter==propname)?'':propname">
 			{{ courseBrowserProps[propname].name }} {{ catprops[propname].length > 0 ? '('+catprops[propname].length+')': '' }}
-			<span class="arrow-down" :class="{rotated: showFilter==propname}"></span>	
+			<span class="arrow-down2" :class="{rotated: showFilter==propname}"></span>	
 		</button>
 		<transition name="fade" @enter="adjustpos">
 			<ul v-if="showFilter == propname" class="filterwrap">

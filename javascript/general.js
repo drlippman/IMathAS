@@ -787,6 +787,41 @@ function _(txt) {
 	return outtxt;
 }
 
+function randID() {
+	return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+//generic grouping block toggle
+jQuery(document).ready(function($) {
+	$(".grouptoggle").each(function() {
+		var id = randID();
+		$(this).next(".blockitems")
+			.hide()
+			.removeClass("hidden")
+			.attr("id", "bi"+id);
+		$(this).attr("id", id).attr("aria-controls", "bi"+id)
+			.attr("aria-expanded", false)
+			.attr("tabindex", 0)
+			.css("cursor", "pointer")
+			.on("click keydown", function(e) {
+				if (e.type=="click" || e.which==13) {
+					console.log($(this).attr("aria-expanded"));
+					if ($(this).attr("aria-expanded") == "true") {
+						console.log("here");
+						$(this).attr("aria-expanded", false);
+						$(this).children("img").attr("src", "../img/expand.gif");
+						$(this).next(".blockitems").slideUp();
+					} else {
+						$(this).attr("aria-expanded", true);
+						$(this).children("img").attr("src", "../img/collapse.gif");
+						$(this).next(".blockitems").slideDown();
+					}
+				}	
+			});
+	});
+	$(".grouptoggle img").attr("alt", "expand/collapse");
+});
+
 //https://github.com/davatron5000/FitVids.js
 (function( $ ){
 

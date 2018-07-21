@@ -361,8 +361,8 @@ switch($_GET['action']) {
 			$enddate = $line['enddate'];
 		} else {
 			$courseid = _("Will be assigned when the course is created");
-			$name = "Enter course name here";
-			$ekey = "Enter enrollment key here";
+			$name = "";
+			$ekey = "";
 			$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
 			$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
 			$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
@@ -387,6 +387,40 @@ switch($_GET['action']) {
 			$dates_by_lti = 0;
 			$startdate = 0;
 			$enddate = 2000000000;
+			if (isset($_POST['ctc']) || isset($_POST['coursebrowserctc'])) {
+				if (!empty($_POST['coursebrowserctc'])) {                                           
+					$ctc = Sanitize::onlyInt($_POST['coursebrowserctc']);
+				} else {
+					$ctc = Sanitize::onlyInt($_POST['ctc']);
+				}
+				if ($ctc>0) {
+					$query = "SELECT ic.name,ic.enrollkey,ic.copyrights,ic.ownerid,iu.groupid ";
+					$query .= "FROM imas_courses AS ic JOIN imas_users AS iu ";
+					$query .= "ON ic.ownerid=iu.id WHERE ic.id=:id";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':id'=>$ctc));
+					if ($stm->rowCount()==0) {
+						echo '<p>Invalid course. <a href="addcourse.php">Try again</a></p>';
+						require("../footer.php");
+						exit;
+					}
+					$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
+					//check permissions
+					if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $userid) || 
+						($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
+						if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {
+							//did not provide valid enrollment key
+							echo '<p>Incorrect enrollment key provided. <a href="addcourse.php">Try again</a></p>';
+							require("../footer.php");
+							exit;
+						}
+					}
+					$ctcekey = $_POST['ekey'];
+					$name = $ctcinfo['name'];
+				}
+			} else {
+				$ctc = 0;
+			}
 		}
 		$defetime = $deftime%10000;
 		$hr = floor($defetime/60)%12;
@@ -450,14 +484,37 @@ switch($_GET['action']) {
 		})
 		</script>';
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']) .'" />';
-		echo "<span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($courseid)."</span><br class=form>\n";
+		if ($_GET['action']=='addcourse') {
+			if ($ctc==0) {
+				echo '<span class=form>'._('Starting with:').'</span><span class=formright>';
+				echo _('A blank course');
+			} else {
+				echo '<span class=form>'._('Copying: ').'</span><span class=formright>';
+				echo '<strong>'.Sanitize::encodeStringForDisplay($ctcinfo['name']).'</strong>';
+				echo '<input type="hidden" id="usetemplate" name="usetemplate" value="'.Sanitize::encodeStringForDisplay($ctc).'" />';
+				echo '<input type=hidden name=ekey value="'.Sanitize::encodeStringForDisplay($ctcekey).'"/>';
+				echo '<input type=hidden name=termsagree value="1"/>';
+			}
+			echo ' <a class=small href="addcourse.php">Change</a>';
+			echo '</span><br class=form>';
+		} else {
+			echo "<span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($courseid)."</span><br class=form>\n";
+		}
 		if ($isadminview) {
 			echo '<span class="form">Owner:</span><span class="formright">';
 			printf('%s, %s (%s)</span><br class="form"/>', Sanitize::encodeStringForDisplay($udat['LastName']),
 				Sanitize::encodeStringForDisplay($udat['FirstName']), Sanitize::encodeStringForDisplay($udat['name']));
 		}
-		echo "<span class=form>Enter Course name:</span><input class=form type=text size=80 name=\"coursename\" value=\"".Sanitize::encodeStringForDisplay($name)."\"><BR class=form>\n";
-		echo "<span class=form>Enter Enrollment key:</span><input class=form type=text size=30 name=\"ekey\" value=\"".Sanitize::encodeStringForDisplay($ekey)."\"><BR class=form>\n";
+		echo "<span class=form>Course name:</span><input class=form type=text size=80 name=\"coursename\" value=\"".Sanitize::encodeStringForDisplay($name)."\"><BR class=form>\n";
+		echo "<span class=form>Enrollment key:</span><input class=form type=text size=30 name=\"ekey\" value=\"".Sanitize::encodeStringForDisplay($ekey)."\"><BR class=form>\n";
+		
+		//Start grouping: Availability and Access
+		echo '<div class="block grouptoggle">';
+		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo 'Availability and Access';
+		echo '</div>';
+		echo '<div class="blockitems hidden">';
+		
 		echo '<span class=form>Available?</span><span class=formright>';
 		echo '<input type="checkbox" name="stuavail" value="1" ';
 		if (($avail&1)==0) { echo 'checked="checked"';}
@@ -502,7 +559,90 @@ switch($_GET['action']) {
 			echo 'end: <input name="deftime" type="text" size="8" value="'.Sanitize::encodeStringForDisplay($deftimedisp).'"/>';
 			echo '</span><br class="form"/>';
 		}
+		
+		if (!isset($CFG['CPS']['unenroll']) || $CFG['CPS']['unenroll'][1]==1) {
+			echo "<span class=form>Allow students to self-<u>un</u>enroll</span><span class=formright>";
+			echo '<input type=radio name="allowunenroll" value="0" ';
+			if (($allowunenroll&1)==0) { echo "checked=1";}
+			echo '/> No <input type=radio name="allowunenroll" value="1" ';
+			if (($allowunenroll&1)==1) { echo "checked=1";}
+			echo '/> Yes </span><br class=form />';
 
+			echo "<span class=form>Allow students to self-enroll</span><span class=formright>";
+			echo '<input type=radio name="allowenroll" value="2" ';
+			if (($allowunenroll&2)==2) { echo "checked=1";}
+			echo '/> No <input type=radio name="allowenroll" value="0" ';
+			if (($allowunenroll&2)==0) { echo "checked=1";}
+			echo '/> Yes </span><br class=form />';
+		}
+		
+		if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1]==1) {
+			echo "<span class=form>Allow other instructors to copy course items:</span><span class=formright>";
+			echo '<input type=radio name="copyrights" value="0" ';
+			if ($copyrights==0) { echo "checked=1";}
+			echo '/> Require enrollment key from everyone<br/> <input type=radio name="copyrights" value="1" ';
+			if ($copyrights==1) { echo "checked=1";}
+			echo '/> No key required for group members, require key from others <br/><input type=radio name="copyrights" value="2" ';
+			if ($copyrights==2) { echo "checked=1";}
+			echo '/> No key required from anyone</span><br class=form />';
+		}
+		
+		echo '</div>' ; //end Availability and Access grouping
+		
+		if (isset($enablebasiclti) && $enablebasiclti==true) {
+			//Start grouping: LMS Integration
+			echo '<div class="block grouptoggle">';
+			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo 'LMS Integration (LTI)';
+			echo '</div>';
+			echo '<div class="blockitems hidden">';
+	
+			echo '<p>For integration setup instructions, visit the Course Items: Export page inside your course</p>';
+			
+			if (isset($_GET['id'])) {
+				echo '<span class="form">LTI Key:</span>';
+				echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
+				echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
+				echo '</span><br class="form" />';
+				
+				echo '<span class="form">LTI Secret (max 10 chars)</span>';
+				echo '<span class="formright"><input name="ltisecret" type="text" value="'.Sanitize::encodeStringForDisplay($ltisecret).'" maxlength="10"/> ';
+				echo '</span><br class="form" />';
+			}
+			
+			echo '<span class="form">Allow the LMS to set assessment due dates?<br/><span class="small">(Only supported by Canvas)</span></span>';
+			echo '<span class="formright"><input type="checkbox" name="setdatesbylti" value="1" ';
+			if ($dates_by_lti>0) { echo 'checked="checked"';}
+			echo '/> </span><br class="form" />';
+			if ($myrights>=75) {
+				echo '<span class="form">LMS course copies always copy from this original course</span>';
+				echo '<span class="formright"><input type="checkbox" name="blocklticopies" value="1" ';
+				if ($blockLTICopyOfCopies) { echo 'checked="checked"';}
+				echo '/> </span><br class="form" />';
+			}
+			
+			echo '</div>'; //end LTI grouping
+		}
+		
+		//Start grouping: Additional Options
+		echo '<div class="block grouptoggle">';
+		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo 'Additional Options';
+		echo '</div>';
+		echo '<div class="blockitems hidden">';
+		
+		if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1]==1) {
+			echo '<span class="form">Auto-assign LatePasses on course enroll:</span><span class="formright">';
+			echo '<input type="text" size="3" name="deflatepass" value="'.Sanitize::encodeStringForDisplay($deflatepass).'"/> LatePasses</span><br class="form" />';
+		}
+		
+		if (!isset($CFG['CPS']['msgonenroll']) || $CFG['CPS']['msgonenroll'][1]==1) {
+			echo '<span class="form">'._('Send teachers a message when students enroll').':</span><span class="formright">';
+			echo '<input type="checkbox" name="msgonenroll" value="10" ';
+			if ($msgOnEnroll>0) { echo 'checked="checked"';}
+			echo '/> '._('Send').'</span><br class="form" />';
+		}
+		
 		if (!isset($CFG['CPS']['theme']) || $CFG['CPS']['theme'][1]==1) {
 			echo "<span class=form>Theme:</span><span class=formright>";
 			echo " <select name=\"theme\">";
@@ -536,31 +676,8 @@ switch($_GET['action']) {
 			echo " </select></span><br class=\"form\" />";
 		}
 
-		if (!isset($CFG['CPS']['unenroll']) || $CFG['CPS']['unenroll'][1]==1) {
-			echo "<span class=form>Allow students to self-<u>un</u>enroll</span><span class=formright>";
-			echo '<input type=radio name="allowunenroll" value="0" ';
-			if (($allowunenroll&1)==0) { echo "checked=1";}
-			echo '/> No <input type=radio name="allowunenroll" value="1" ';
-			if (($allowunenroll&1)==1) { echo "checked=1";}
-			echo '/> Yes </span><br class=form />';
-
-			echo "<span class=form>Allow students to self-enroll</span><span class=formright>";
-			echo '<input type=radio name="allowenroll" value="2" ';
-			if (($allowunenroll&2)==2) { echo "checked=1";}
-			echo '/> No <input type=radio name="allowenroll" value="0" ';
-			if (($allowunenroll&2)==0) { echo "checked=1";}
-			echo '/> Yes </span><br class=form />';
-		}
-		if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1]==1) {
-			echo "<span class=form>Allow other instructors to copy course items:</span><span class=formright>";
-			echo '<input type=radio name="copyrights" value="0" ';
-			if ($copyrights==0) { echo "checked=1";}
-			echo '/> Require enrollment key from everyone<br/> <input type=radio name="copyrights" value="1" ';
-			if ($copyrights==1) { echo "checked=1";}
-			echo '/> No key required for group members, require key from others <br/><input type=radio name="copyrights" value="2" ';
-			if ($copyrights==2) { echo "checked=1";}
-			echo '/> No key required from anyone</span><br class=form />';
-		}
+		
+		
 		if (!isset($CFG['CPS']['msgset']) || $CFG['CPS']['msgset'][1]==1) {
 			echo "<span class=form>Message System:</span><span class=formright>";
 			//0 on, 1 to instr, 2 to stu, 3 nosend, 4 off
@@ -592,17 +709,6 @@ switch($_GET['action']) {
 			echo '</span><br class=form />';
 		}
 
-		if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1]==1) {
-			echo '<span class="form">Auto-assign LatePasses on course enroll:</span><span class="formright">';
-			echo '<input type="text" size="3" name="deflatepass" value="'.Sanitize::encodeStringForDisplay($deflatepass).'"/> LatePasses</span><br class="form" />';
-		}
-		if (!isset($CFG['CPS']['msgonenroll']) || $CFG['CPS']['msgonenroll'][1]==1) {
-			echo '<span class="form">'._('Send teachers a message when students enroll').':</span><span class="formright">';
-			echo '<input type="checkbox" name="msgonenroll" value="10" ';
-			if ($msgOnEnroll>0) { echo 'checked="checked"';}
-			echo '/> '._('Send').'</span><br class="form" />';
-		}
-
 		if (!isset($CFG['CPS']['showlatepass']) || $CFG['CPS']['showlatepass'][1]==1) {
 			echo '<span class="form">Show remaining LatePasses on student gradebook page:</span><span class="formright">';
 			echo '<input type=checkbox name="showlatepass" value="1" ';
@@ -610,30 +716,6 @@ switch($_GET['action']) {
 			echo ' /></span><br class="form" />';
 		}
 
-		if (isset($enablebasiclti) && $enablebasiclti==true && isset($_GET['id'])) {
-			echo '<span class="form">LTI access secret (max 10 chars; blank to not use)</span>';
-			echo '<span class="formright"><input name="ltisecret" type="text" value="'.Sanitize::encodeStringForDisplay($ltisecret).'" maxlength="10"/> ';
-			echo '<button type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">'._('Show LTI key and URL').'</button>';
-			echo '<span id="ltiurl" style="display:none;">';
-			if (isset($_GET['id'])) {
-				echo '<br/>URL: ' . $GLOBALS['basesiteurl'] . '/bltilaunch.php<br/>';
-				echo 'Key: LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.') or<br/>';
-				echo 'Key: LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS )';
-			} else {
-				echo 'Course ID not yet set.';
-			}
-			echo '</span></span><br class="form" />';
-			echo '<span class="form">Allow the LMS to set assessment due dates?<br/><span class="small">(Only supported by Canvas)</span></span>';
-			echo '<span class="formright"><input type="checkbox" name="setdatesbylti" value="1" ';
-			if ($dates_by_lti>0) { echo 'checked="checked"';}
-			echo '/> </span><br class="form" />';
-			if ($myrights>=75) {
-				echo '<span class="form">LMS course copies always copy from this original course</span>';
-				echo '<span class="formright"><input type="checkbox" name="blocklticopies" value="1" ';
-				if ($blockLTICopyOfCopies) { echo 'checked="checked"';}
-				echo '/> </span><br class="form" />';
-			}
-		}
 
 		if (($myspecialrights&1)==1 || ($myspecialrights&2)==2 || $myrights==100) {
 			echo '<span class="form">Mark course as template?</span>';
@@ -692,6 +774,8 @@ switch($_GET['action']) {
 			echo ' /> '._('Promote in Course Browser').'</label></span><br class="form">';
 			echo '<fieldset id=promotediv '.((($istemplate&16)==16)?'':'style="display:none"').'>';
 			echo '<legend>'._('Course Browser Settings').'</legend>';
+			echo '<p class="noticetext">'._('Promoting your course will advertise it to all users of this system, making it easy for them to copy this course.');
+			echo ' '._('You should only promote a course that is complete and ready to share with the world.').'</p>';
 			echo '<p class="noticetext">'._('Before sharing your course, check to ensure that it only contains materials you created or have the rights to share.');
 			echo ' '._('Your course should contain no commercial, copyrighted content, including textbook pages, activites, test bank items, etc.');
 			echo ' '._('Openly licensed material, clearly marked with an open license, is fine to include.');
@@ -768,7 +852,8 @@ switch($_GET['action']) {
 			}
 			echo '</p></fieldset>';
 		}
-
+		echo '</div>'; //end Additional Options grouping
+		/*
 		if (isset($CFG['CPS']['templateoncreate']) && $_GET['action']=='addcourse' ) {
 			if (isset($CFG['coursebrowser'])) {
 				//use the course browser
@@ -874,6 +959,7 @@ switch($_GET['action']) {
 				echo '}</script>';
 			}
 		}
+		*/
 
 
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";

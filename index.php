@@ -474,7 +474,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	if ($type=='take') {
 		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
 	} else if ($type=='teach' && $myrights>39) {
-		echo '<div class="center"><a class="abutton" href="admin/forms.php?from=home&action=addcourse">', _('Add New Course'), '</a></div>';
+		echo '<div class="center"><a class="abutton" href="admin/addcourse.php">', _('Add New Course'), '</a></div>';
 	}
 
 	echo '<div class="center">';
