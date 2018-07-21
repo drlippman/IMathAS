@@ -623,7 +623,7 @@ function recordtestdata($limit=false) {
 					if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
 				}
 				$totpossible = totalpointspossible($qi);
-				$grade = round($total/$totpossible,4);
+				$grade = round($total/$totpossible,8);
 				$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade);
 			}
 		}

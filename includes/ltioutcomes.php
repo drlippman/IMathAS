@@ -217,7 +217,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
 	}
 	$grade = min(1, max(0,$total/$aidtotalpossible[$aid]));
-	$grade = number_format($grade,4);
+	$grade = number_format($grade,8);
 	return updateLTIgrade('update',$sourcedid,$aid,$grade);
 }
 
