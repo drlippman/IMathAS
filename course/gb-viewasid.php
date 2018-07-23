@@ -841,7 +841,8 @@
 		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
 		echo ' <button type="button" id="prevtoggle" onclick="previewall()">'._('Preview All').'</button></p>';
 		$total = 0;
-
+		$GLOBALS['capturedrawinit'] = true;
+		
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
 			if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
@@ -986,27 +987,29 @@
 								//remove any $#$ numeric value bits
 								$laarr[$k] = preg_replace('/\$#\$.*?(&|$)/','$1', $laarr[$k]);
 
-								//replace MC with visual of answer
-								if (strpos($laarr[$k],'$!$')) {
-									if (strpos($laarr[$k],'&')) { //is multipart q
-										$laparr = explode('&',$laarr[$k]);
-										foreach ($laparr as $lk=>$v) {
-											if (strpos($v,'$!$')!==false) {
-												$qn = ($i+1)*1000+$lk;
-												$tmp = explode('$!$',$v);
-												$laparr[$lk] = prepchoicedisp($choicesdata[$qn][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$qn]);
-											} else {
-												$laparr[$lk] = Sanitize::encodeStringForDisplay(str_replace(array('%nbsp;','%%'),array('&nbsp;','&'),$laparr[$lk]));
-											}
-										}
-										$laarr[$k] = implode('; ',$laparr);
+								$laparr = explode('&',$laarr[$k]); //handle multipart
+								foreach ($laparr as $lk=>$v) {
+									if (count($laparr)>1) {
+										$qn = ($i+1)*1000+$lk;
 									} else {
-										$tmp = explode('$!$',$laarr[$k]);
-										$laarr[$k] = prepchoicedisp($choicesdata[$i][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$i]);
+										$qn = $i;
 									}
-								} else {
-									$laarr[$k] = Sanitize::encodeStringForDisplay(str_replace(array('&','%nbsp;','%%'),array('; ','&nbsp;','&'),strip_tags($laarr[$k])));
+									if (strpos($v,'$!$')!==false) { //choices
+										$tmp = explode('$!$',$v);
+										if ($qn==$i && !isset($choicesdata[$qn])) { //handle single-part multipart
+											$choicesdata[$qn] = $choicesdata[($i+1)*1000];
+										}
+										$laparr[$lk] = prepchoicedisp($choicesdata[$qn][0]=='matching'?$tmp[0]:$tmp[1], $choicesdata[$qn]);
+									} else if (strpos($v,';;')!==false) { //drawing
+										if ($qn==$i && !isset($GLOBALS['drawinitdata'][$qn])) { //handle single-part multipart
+											$GLOBALS['drawinitdata'][$qn] = $GLOBALS['drawinitdata'][($i+1)*1000];
+										}
+										$laparr[$lk] = '<span onmouseover="showgraphtip(this,\''.Sanitize::encodeStringForJavascript($v).'\',\''.Sanitize::encodeStringForJavascript($GLOBALS['drawinitdata'][$qn]).'\')" onmouseout="tipout()">[view]</span>';
+									} else {
+										$laparr[$lk] = Sanitize::encodeStringForDisplay(str_replace(array('%nbsp;','%%'),array('&nbsp;','&'),$v));
+									}
 								}
+								$laarr[$k] = implode('; ',$laparr);
 
 								echo $laarr[$k];
 							}

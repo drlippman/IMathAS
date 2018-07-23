@@ -126,6 +126,28 @@ function cleardeffeedback() {
 	}
 }
 
+function showgraphtip(el, la, init) {
+	var initpts = init.replace(/"|'/g,'').split(",");
+	for (var j=1;j<initpts.length;j++) {
+		initpts[j] *= 1;  //convert to number
+	}
+	var drawwidth = initpts[6];
+	var drawheight = initpts[7];
+	la = la.replace(/\(/g,"[").replace(/\)/g,"]").split(";;")
+	if  (la[0]!='') {
+		la[0] = '['+la[0].replace(/;/g,"],[")+"]";
+	}
+	la = '[['+la.join('],[')+']]';
+	var id = randID();
+	canvases["GBR"+id] = initpts.slice();
+	canvases["GBR"+id].unshift("GBR"+id);
+	drawla["GBR"+id] = JSON.parse(la);
+	var out = '<canvas class="drawcanvas" id="canvasGBR'+id+'" width='+drawwidth+' height='+drawheight+'></canvas>';
+	out += '<input type="hidden" id="qnGBR'+id+'"/>';
+	tipshow(el, out);
+	imathasDraw.initCanvases("GBR"+id);
+}
+
 var focuscolorlock = false;
 $(function() {
 	$(".review input[id*='-']").each(function(i, el) {
