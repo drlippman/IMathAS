@@ -4,7 +4,7 @@
 
 
 
-array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs","dechex","hexdec","print_r","replacealttext","randpythag");
+array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs","dechex","hexdec","print_r","replacealttext","randpythag","drawtoshowplot");
 array_push($allowedmacros,"numtowords","randname","randnamewpronouns","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbackbasic","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates","prettysmallnumber","makeprettynegative");
 function mergearrays() {
 	$args = func_get_args();
@@ -3451,13 +3451,18 @@ function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=
 	}
 	return $outpts;
 }
-function getdotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+function getdotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300, $type='dots') {
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
 	list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$str);
-	if ($dots=='') { return array();}
-	$dots = explode('),(', substr($dots,1,strlen($dots)-2));
+	if ($type=='dots') {
+		if ($dots=='') { return array();}
+		$dots = explode('),(', substr($dots,1,strlen($dots)-2));
+	} else if ($type=='odots') {
+		if ($odots=='') { return array();}
+		$dots = explode('),(', substr($odots,1,strlen($odots)-2));
+	}
 	foreach ($dots as $k=>$pt) {
 		 $pt =  explode(',',$pt);
 		 $pt[0] = ($pt[0] - $imgborder)/$pixelsperx + $xmin;
@@ -3886,6 +3891,140 @@ function getRoundNumber($val) {
 		}
 	} else { //regular non-scientific notation
 		return (strlen($str) - $s - 1);
+	}
+}
+
+function drawtoshowplot($drawla, $grid='', $snaptogrid=0) {
+	$settings = array(-5,5,-5,5,1,1,300,300);
+	if ($grid != '') {
+		$grid = array_map('trim',explode(',',$grid));
+		for ($i=0; $i<count($grid); $i++) {
+			if ($grid[$i]!='') {
+				if (strpos($grid[$i],':')!==false) {
+					$pts = explode(':',$grid[$i]);
+					foreach ($pts as $k=>$v) {
+						$pts[$k] = evalbasic($v);
+					}
+					$settings[$i] = implode(':',$pts);
+				} else {
+					$settings[$i] = evalbasic($grid[$i]);
+				}
+			}
+		}
+		if (strpos($settings[0],'0:')===0) {
+			$settings[0] = substr($settings[0],2);
+		}
+		if (strpos($settings[2],'0:')===0) {
+			$settings[2] = substr($settings[2],2);
+		}
+	}
+	if ($snaptogrid>0) {
+		list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
+		if (abs($newwidth - $settings[6])/$settings[6]<.1) {
+			$settings[6] = $newwidth;
+		}
+		if (abs($newheight- $settings[7])/$settings[7]<.1) {
+			$settings[7] = $newheight;
+		}
+	}
+	
+	$pixelsperx = ($settings[6] - 2*$imgborder)/($settings[1]-$settings[0]);
+	$pixelspery = ($settings[7] - 2*$imgborder)/($settings[3]-$settings[2]);
+        
+	list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$drawla);
+	
+	$outplots = array();
+	
+	if ($dots != '') {
+		$dotsarr = explode('),(', substr($dots,1,strlen($dots)-2));
+		foreach ($dotsarr as $dotpt) {
+			$pt =  explode(',',$pt);
+			$x = ($pt[0] - $imgborder)/$pixelsperx + $xmin;
+			$y = ($h - $pt[1] - $imgborder)/$pixelspery + $ymin;
+			$outplots[] = "dot,$x,$y,closed";
+		}
+	}
+	if ($odots != '') {
+		$dotsarr = explode('),(', substr($odots,1,strlen($odots)-2));
+		foreach ($dotsarr as $dotpt) {
+			$pt =  explode(',',$pt);
+			$x = ($pt[0] - $imgborder)/$pixelsperx + $xmin;
+			$y = ($h - $pt[1] - $imgborder)/$pixelspery + $ymin;
+			$outplots[] = "dot,$x,$y,open";
+		}
+	}
+	if ($tplines != '') {
+		$tplines = explode('),(', substr($tplines,1,strlen($tplines)-2));
+		foreach ($tplines as $k=>$val) {
+			$pts = explode(',',$val);
+			if ($pts[0]=="5" || $pts[0]=="5.2" || $pts[0]=="5.3" || $pts[0]=="5.4") { //line
+				if ($pts[3]==$pts[1]) { //vert
+					$outstr = "x={$pts[1]}";
+				} else {
+					$slope = ($pts[4]-$pts[2])/($pts[3]-$pts[1]);
+					$outstr = "$slope*(x-({$pts[1]})) + ({$pts[2]})";
+				}
+				$outstr .= ',blue';
+				if ($pts[0]=="5.2" || $pts[0]=="5.3" || $pts[0]=="5.4") { //line seg or vec
+					if ($pts[3]==$pts[1]) { //vert
+						if ($pts[0]=="5.2") { $pts[4] == '';}
+						$outstr .= ",{$pts[2]},{$pts[4]}";
+					} else {
+						if ($pts[0]=="5.2") { $pts[3] == '';}
+						$outstr .= ",{$pts[1]},{$pts[3]}";
+					}
+					if ($pts[0]=="5.4") {
+						$outstr .= ",,arrow";
+					}
+				}
+				$outplots[] = $outstr;
+			} else if ($pts[0]=="6") { //parab
+				if ($pts[4]==$pts[2]) {
+					$outplots[] = "{$pts[2]}";
+				} else if ($pts[3]!=$pts[1]) {
+					$a = ($pts[4]-$pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
+					$outplots[] = "$a*(x-({$pts[1]}))^2 + ({$pts[2]})";
+				}
+			} else if ($pts[0]=="6.1") { //horiz parab
+				if ($pts[3]==$pts[1]) {
+					$outplots[] = "x={$pts[1]}";
+				} else if ($pts[4]!=$pts[2]) {
+					$a = ($pts[3]-$pts[1])/(($pts[4]-$pts[2])*($pts[4]-$pts[2]));
+					$outplots[] = "[$a*(t-({$pts[2]}))^2 + ({$pts[1]}), t]";
+				}	
+			} else if ($pts[0]=="6.5") { //sqrt
+				$flip = ($pts[3] < $pts[1])?-1:1;
+				$stretch = ($pts[4] - $pts[2])/sqrt($flip*($pts[3]-$pts[1]));
+				$outplots[] = "$stretch*sqrt($flip*(x-({$pts[1]}))) + ({$pts[2]})";
+			} else if ($pts[0]=="7") { //circle
+				$rad = sqrt(($pts[3]-$pts[1])*($pts[3]-$pts[1]) + ($pts[4]-$pts[2])*($pts[4]-$pts[2]));
+				$outplots[] = "[({$pts[1]})+$rad*cos(t), ({$pts[2]})+$rad*sin(t)],blue,0,2pi";
+			} else if ($pts[0]=="7.2") { //ellipse
+				$xrad = abs($pts[3]-$pts[1]);
+				$yrad = abs($pts[4]-$pts[2]);
+				$outplots[] = "[({$pts[1]})+$xrad*cos(t), ({$pts[2]})+$yrad*sin(t)],blue,0,2pi";
+			} else if ($pts[0]=="7.4") { //vert hyperb
+				
+			} else if ($pts[0]=="7.5") { //horiz hyperb
+				
+			} else if ($pts[0]=="8") { //abs
+				
+			} else if ($pts[0]=="8.2") { //rational
+				
+			} else if ($pts[0]=="8.3") { //exp
+				
+			} else if ($pts[0]=="8.4") { //log
+				
+			} else if ($pts[0]=="9") { //cos
+				
+			} else if ($pts[0]=="9.1") { //sin
+				
+			} else if ($pts[0]==10 || $pts[0]==10.2) { //linear inequality
+				
+			} else if ($pts[0]==10.3 || $pts[0]==10.4) { //quad inequality
+				
+			}
+	
 	}
 }
 
