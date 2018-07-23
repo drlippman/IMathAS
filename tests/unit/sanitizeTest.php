@@ -73,9 +73,9 @@ final class SanitizeTest extends TestCase
 
 	public function testEncodeStringForJavascript()
 	{
-		$result = Sanitize::encodeStringForJavascript("<h1 style='color: red;'>Hello, world!</h1>");
+		$result = Sanitize::encodeStringForJavascript('<h1 style="color: red;">Hello, world!</h1>');
 		$this->assertEquals(
-			'\x3ch1\x20style\x3d\x27color\x3a\x20red\x3b\x27\x3eHello\x2c\x20world\x21\x3c\x2fh1\x3e', $result);
+			'\u003Ch1 style=\u0022color: red;\u0022\u003EHello, world!\u003C\/h1\u003E', $result);
 	}
 
 	/*

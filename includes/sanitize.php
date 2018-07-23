@@ -111,7 +111,11 @@ class Sanitize
 	 */
 	public static function encodeStringForJavascript($string)
 	{
-		$safeString = '';
+		$string = (string) $string; //force to string type
+		$string = json_encode($string, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG); 
+		return mb_substr($string, 1, -1);
+		
+		/*$safeString = '';
 
 		$stringLength = strlen($string);
 		for ($i = 0; $i < $stringLength; $i++) {
@@ -120,6 +124,7 @@ class Sanitize
 		}
 
 		return $safeString;
+		*/
 	}
 
 	/**
