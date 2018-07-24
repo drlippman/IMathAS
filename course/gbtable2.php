@@ -40,6 +40,12 @@ if ($canviewall) {
 	if ($stm->rowCount()>0) {
 		$isdiag = true;
 		list($sel1name, $sel2name) = $stm->fetch(PDO::FETCH_NUM);
+		if ($sel1name[0]=='!') {
+			$sel1name = substr($sel1name,1);
+		}
+		if ($sel2name[0]=='!') {
+			$sel2name = substr($sel2name,1);
+		}
 	}
 }
 

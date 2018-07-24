@@ -110,6 +110,11 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$page_updateId = 0;
 		$forceregen = 0;
 	}
+	if ($sel2name[0]=='!') {
+		$sel2name = substr($sel2name,1);
+	} else {
+		$sel2name = 'Select your '.$sel2name;
+	}
 
 	foreach($sel1 as $k=>$s1) {
 		$page_selectValList[$k] = array();
@@ -175,8 +180,8 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$query .= " WHERE id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':name'=>$_POST['diagname'], ':cid'=>$_POST['cid'], ':term'=>$_POST['term'], ':public'=>$_POST['public'],
-			':ips'=>$_POST['iplist'], ':pws'=>$_POST['pwlist'], ':idprompt'=>$_POST['idprompt'], ':sel1name'=>$_POST['sel1name'],
-			':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>$_POST['sel2name'], ':sel2list'=>$sel2list,
+			':ips'=>$_POST['iplist'], ':pws'=>$_POST['pwlist'], ':idprompt'=>$_POST['idprompt'], ':sel1name'=>'!'.$_POST['sel1name'],
+			':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>'!'.$_POST['sel2name'], ':sel2list'=>$sel2list,
 			':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime'], ':id'=>$_POST['id']));
 		$id = Sanitize::onlyInt($_POST['id']);
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
@@ -186,7 +191,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':ownerid'=>$userid, ':name'=>$_POST['diagname'], ':cid'=>$_POST['cid'], ':term'=>$_POST['term'],
 			':public'=>$_POST['public'], ':ips'=>$_POST['iplist'], ':pws'=>$_POST['pwlist'], ':idprompt'=>$_POST['idprompt'],
-			':sel1name'=>$_POST['sel1name'], ':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>$_POST['sel2name'],
+			':sel1name'=>'!'.$_POST['sel1name'], ':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>'!'.$_POST['sel2name'],
 			':sel2list'=>$sel2list, ':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime']));
 		$id = $DBH->lastInsertId();
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
@@ -233,6 +238,11 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 		$forceregen = 0;
 		$reentrytime = 0;
 		$owner = $userid;
+	}
+	if ($sel[0]=='!') {
+		$sel = substr($sel,1);
+	} else {
+		$sel = 'Select your '.$sel;
 	}
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
 	$entrydig = substr($entryformat,1); //$entryformat{1};
@@ -311,9 +321,8 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			<input type=hidden name="public" value="<?php echo Sanitize::encodeStringForDisplay($public); ?>"/>
 			<input type=hidden name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($_POST['reentrytime']); ?>"/>
 			<input type=hidden name="id" value="<?php echo Sanitize::onlyInt($page_updateId); ?>" >
-			<p>Second-level selector name:
-			<input type=text name=sel2name value="<?php echo Sanitize::encodeStringForDisplay($sel2name); ?>"/>
-			'Select your ______'</p>
+			<p>Second-level selector name (ex: "Select your instructor"):
+			<input type=text name=sel2name value="<?php echo Sanitize::encodeStringForDisplay($sel2name); ?>"/></p>
 			<p>For each of the first-level selectors, select which assessment should be delivered,
 			and provide options for the second-level selector</p>
 			<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
@@ -548,7 +557,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 	</p>
 
 	<h3>First-level selector - selects assessment to be delivered</h3>
-	<p>Selector name:  <input name="sel" type=text value="<?php echo Sanitize::encodeStringForDisplay($sel); ?>"/> "Please select your _______"</p>
+	<p>Selector: (ex: "Select a test to take") <input name="sel" size=40 type=text value="<?php echo Sanitize::encodeStringForDisplay($sel); ?>"/></p>
 	<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
 	<p>Enter new selector option:
 		<input type=text id="sellist"  onkeypress="return onenter(event,'sellist','selout')">
