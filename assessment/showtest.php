@@ -3455,6 +3455,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				Sanitize::encodeStringForDisplay($userinfo['FirstName']));
 			echo Sanitize::encodeStringForDisplay(substr($userinfo['SID'],0,strpos($userinfo['SID'],'~')));
 			echo "</h2>\n";
+			echo '<p>'._('Date: ').tzdate("F j, Y, g:i a", time()).'</p>';
 		}
 
 		echo "<h2>", _('Scores:'), "</h2>\n";
