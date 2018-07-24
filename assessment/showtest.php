@@ -771,7 +771,15 @@
 		//check for past time limit, with some leniency for javascript timing.
 		//want to reject if javascript was bypassed
 		if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],10)) {
-			echo _('Time limit has expired.  Submission rejected. ');
+			require("header.php");
+			showEnterAssessmentBreadcrumbs($testsettings['name']);
+			echo '<p>';
+			if (isset($_POST['asidverify'])) {
+				echo _('Time limit has expired.  Submission rejected. ');
+			} else {
+				echo _('Your time limit on this assessment has expired.');
+			}
+			echo '</p>';
 			leavetestmsg();
 			exit;
 		}
