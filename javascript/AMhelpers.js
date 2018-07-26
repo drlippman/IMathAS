@@ -1080,8 +1080,16 @@ function singlevalsyntaxcheck(str,format) {
 		  str = str.replace(/\s/g,'');
 		  str = str.replace(/(x|X|\u00D7)/,"xx");
 		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
-			return (_("not valid scientific notation")+". ");
+		  	if (format.indexOf('scinotordec')==-1) { //not scinotordec
+		  		return (_("not valid scientific notation")+". ");
+		  	} else if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+		  		return (_("not valid decimal or scientific notation")+". ");
+		  	}
 		  }
+	} else if (format.indexOf('decimal')!=-1 && format.indexOf('nodecimal')==-1) {
+		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+			return (_(" not a valid integer or decimal number")+". ");
+		}
 	}
 	return '';
 }

@@ -1669,7 +1669,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$sa = '`'.decimaltofraction($answer,"mixednumber").'`';
 			} else if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer).'`';
-			} else if (in_array("scinot",$ansformats)) {
+			} else if (in_array("scinot",$ansformats) || (in_array("scinotordec",$ansformats) && (abs($answer)>1000 || abs($answer)<.001))) {
 				$sa = '`'.makescinot($answer,-1,'*').'`';
 			} else {
 				$sa = $answer;
@@ -4221,7 +4221,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$requiretimeslistpart = explode(';', $requiretimeslistpart);
 		}
 
-		if (in_array("scinot",$ansformats)) {
+		if (in_array("scinot",$ansformats) || in_array("scinotordec",$ansformats)) {
 			$answer = str_replace('xx','*',$answer);
 		}
 		if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
@@ -7230,6 +7230,19 @@ function checkanswerformat($tocheck,$ansformats) {
 			return false;
 		}
 	}
+	if (in_array("decimal", $ansformats)) {
+		$totest = str_replace(' ','',$tocheck);
+		if (!is_numeric($totest) || !preg_match('/^[\d\.]+$/',$totest)) {
+			return false;
+		}
+	}
+	if (in_array("scinotordec",$ansformats)) {
+		$totest = str_replace(' ','',$tocheck);
+		if (!is_numeric($totest) && !preg_match('/^\-?[1-9](\.\d*)?(\*|x|X|×)10\^(\(?\-?\d+\)?)$/',$totest)) {
+			echo "here: $totest";
+			return false;
+		}
+	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
 		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|x|X|×)10\^(\(?\-?\d+\)?)$/',$totest)) {
@@ -7322,6 +7335,12 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 			$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
 			$shorttip = $islist?sprintf(_('Enter a %s of fractions or exact decimals'), $listtype):_('Enter a fraction or exact decimal');
 		}
+	} else if (in_array('decimal',$ansformats)) {
+		$tip .= sprintf(_('Enter %s as an integer or decimal value (like 5 or 3.72)'), $eword);
+		$shorttip = $islist?sprintf(_('Enter a %s of integer or decimal values'), $listtype):_('Enter an integer or decimal value');
+	} else if (in_array('scinotordec',$ansformats)) {
+		$tip .= sprintf(_('Enter %s as a decimal or in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
+		$shorttip = $islist?sprintf(_('Enter a %s of numbers using decimals or scientific notation'), $listtype):_('Enter a number using decimals or scientific notation');
 	} else if (in_array('scinot',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of numbers using scientific notation'), $listtype):_('Enter a number using scientific notation');
