@@ -63,7 +63,7 @@
 	<input type=submit name="remove" value="Delete">
 
 <?php
-	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_courses.id AS cid ";
+	$query = "SELECT imas_msgs.id,imas_msgs.msgfrom,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_courses.id AS cid ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
 	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread&3)=0 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
@@ -110,10 +110,15 @@
 				echo "Yes";
 			}
 			if ($line['LastName']==null) {
-				$line['LastName'] = "[Deleted]";
+				if ($line['msgfrom']==0) {
+					$line['fullname'] = _("[System Message]");
+				} else {
+					$line['fullname'] = _("[Deleted]");
+				}
+			} else {
+				$line['fullname'] = sprintf('%s, %s', $line['LastName'], $line['FirstName']);
 			}
-			printf("</td><td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
-                Sanitize::encodeStringForDisplay($line['FirstName']));
+			printf("</td><td>%s</td>", Sanitize::encodeStringForDisplay($line['fullname']));
 			if ($line['name']==null) {
 				$line['name'] = "[Deleted]";
 			}

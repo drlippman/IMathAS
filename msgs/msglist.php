@@ -831,7 +831,13 @@ function chgfilter() {
 			echo "Yes";
 		}
 		if ($line['LastName']==null) {
-			$line['LastName'] = "[Deleted]";
+			if ($line['msgfrom']==0) {
+				$line['fullname'] = _("[System Message]");
+			} else {
+				$line['fullname'] = _("[Deleted]");
+			}
+		} else {
+			$line['fullname'] = sprintf('%s, %s', $line['LastName'], $line['FirstName']);
 		}
 		echo '</td><td>';
 
@@ -850,8 +856,7 @@ function chgfilter() {
 			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(".Sanitize::onlyInt($line['id']).");return false;\" alt=\"Not flagged\"/>";
 		}
 		echo '</td>';
-		printf('<td>%s, %s</td>', Sanitize::encodeStringForDisplay($line['LastName']),
-            Sanitize::encodeStringForDisplay($line['FirstName']));
+		printf('<td>%s</td>', Sanitize::encodeStringForDisplay($line['fullname']));
 
 
 		if ($line['name']==null) {

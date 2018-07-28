@@ -508,6 +508,27 @@ switch($_GET['action']) {
 		echo "<span class=form>Course name:</span><input class=form type=text size=80 name=\"coursename\" value=\"".Sanitize::encodeStringForDisplay($name)."\"><BR class=form>\n";
 		echo "<span class=form>Enrollment key:</span><input class=form type=text size=30 name=\"ekey\" value=\"".Sanitize::encodeStringForDisplay($ekey)."\"><BR class=form>\n";
 		
+		if ($_GET['action']=="modify" && $line['cleanupdate']>0) {
+			$courseid = Sanitize::courseId($_GET['id']);
+			echo '<p>This class has been scheduled for data cleanup, on ';
+			echo tzdate('F j, Y', $line['cleanupdate']).'. ';
+			echo 'On that date, all student data in this course will be deleted ';
+			echo 'as part of our data management policies, ';
+			echo 'but the course itself will be untouched. If you need a long-term ';
+			echo 'copy of student grades, it is recommended you ';
+			echo '<a href="../course/gb-export.php?cid='.$courseid.'&export=true">export the gradebook</a>. ';
+			echo 'You are also welcome to <a href="../course/listusers.php?cid='.$courseid.'&action=unenroll&uid=all">';
+			echo 'manually cleanup</a> your course now.</p>';
+			if (isset($CFG['cleanup']['groups'][$groupid]['allowoptout'])) {
+				$allowoptout = $CFG['cleanup']['groups'][$groupid]['allowoptout'];
+			} else {
+				$allowoptout = (!isset($CFG['cleanup']['allowoptout']) || $CFG['cleanup']['allowoptout']==true);
+			}
+			if ($allowoptout) {
+				echo '<p>If you have a strong reason, you can <input type=checkbox name=cleanupoptout value=1 /> ';
+				echo 'opt out of having the student data deleted. </p>';
+			}
+		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';
 		echo '<img class="mida" src="../img/expand.gif" /> ';

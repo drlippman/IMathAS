@@ -418,9 +418,17 @@ switch($_POST['action']) {
 			}
 		}
 		if (isset($_GET['id'])) {
-			$stm = $DBH->prepare("SELECT istemplate,jsondata FROM imas_courses WHERE id=:id");
+			$stm = $DBH->prepare("SELECT istemplate,jsondata,cleanupdate FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
-			list($old_istemplate, $old_jsondata) = $stm->fetch(PDO::FETCH_NUM);
+			list($old_istemplate, $old_jsondata, $cleanupdate) = $stm->fetch(PDO::FETCH_NUM);
+			if (isset($CFG['cleanup']['groups'][$groupid]['allowoptout'])) {
+				$allowoptout = $CFG['cleanup']['groups'][$groupid]['allowoptout'];
+			} else {
+				$allowoptout = (!isset($CFG['cleanup']['allowoptout']) || $CFG['cleanup']['allowoptout']==true);
+			}
+			if ($allowoptout && isset($_POST['cleanupoptout'])) {
+				$cleanupdate = 0;
+			}
 		} else {
 			$old_istemplate = 0;
 		}
@@ -614,11 +622,12 @@ switch($_POST['action']) {
 			if ($updateJsonData) {
 				$query .= "jsondata=:jsondata,";
 			}
-			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass,dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate WHERE id=:id";
+			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass,dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate,cleanupdate=:cleanupdate WHERE id=:id";
 			$qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
 				':picicons'=>$picicons, ':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset,
 				':toolset'=>$toolset, ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':istemplate'=>$istemplate,
-				':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, ':startdate'=>$startdate, ':enddate'=>$enddate, ':id'=>$_GET['id']);
+				':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, ':startdate'=>$startdate, ':enddate'=>$enddate, 
+				':cleanupdate'=>$cleanupdate,':id'=>$_GET['id']);
 			if ($myrights<75) {
 				$query .= " AND ownerid=:ownerid";
 				$qarr[':ownerid']=$userid;
