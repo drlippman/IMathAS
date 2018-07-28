@@ -286,8 +286,36 @@ class ExceptionFuncs {
 		$canuselatepassP = false;
 		$canuselatepassR = false;
 		if ($line['allowlate']>0 && $this->latepasses>0 && $this->isstu) {
-		   $allowlaten = $line['allowlate']%10;
-		   $allowlateon = floor($line['allowlate']/10)%10;
+		   //$allowlaten = $line['allowlate']%10;
+		   if ($line['allowlate']%10 == 1) { //unlimited
+		   	   $latepassesAllowed = 10000000;
+		   } else {
+		   	   $latepassesAllowed =  $line['allowlate']%10 - 1;
+		   }
+		   $allowlateon = floor($line['allowlate']/10)%10;  //0: both, 2: posts only, 3: replies only
+		   
+		   if ($allowlateon != 3  && $line['postby']<2000000000) { //it allows post LPs
+		   	if ($now < $line['postby'] && $latepassesAllowed > $latepasscntP) { //before due date and use is allowed
+		   		$canuselatepassP = true;
+		   	} else if ($now > $line['postby'] && $line['allowlate']>=100) { //after due date and allows use after due date
+		   		$latepassesNeededToExtend = $this->calcLPneeded($line['postby']);
+				if ($latepassesAllowed >= $latepasscntP + $latepassesNeededToExtend && $latepassesNeededToExtend<=$this->latepasses) {
+					$canuselatepassP = true;
+				}
+		   	}
+		   }
+		   if ($allowlateon != 2  && $line['replyby']<2000000000) { //it allows reply LPs
+		   	if ($now < $line['replyby'] && $latepassesAllowed > $latepasscntR) { //before due date and use is allowed
+		   		$canuselatepassR = true;
+		   	} else if ($now > $line['replyby'] && $line['allowlate']>=100) { //after due date and allows use after due date
+		   		$latepassesNeededToExtend = $this->calcLPneeded($line['replyby']);
+				if ($latepassesAllowed >= $latepasscntR + $latepassesNeededToExtend && $latepassesNeededToExtend<=$this->latepasses) {
+					$canuselatepassR = true;
+				}	
+		   	}
+		   }
+		   /*
+		   old code
 		   if ($allowlateon != 3 && $line['postby']<2000000000 && ($allowlaten==1 || $allowlaten-1>$latepasscntP)) { //it allows post LPs, and can use latepases
 			   if ($line['allowlate']>=100 && $now < strtotime("+".$this->latepasshrs." hours", $line['postby'])) { //allow after due date
 				   $canuselatepassP = true;
@@ -302,6 +330,7 @@ class ExceptionFuncs {
 				   $canuselatepassR = true;
 			   }
 		   }
+		   */
 		}
 		return array($canundolatepassP && $canundolatepass, $canundolatepassR && $canundolatepass, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']);
 	}

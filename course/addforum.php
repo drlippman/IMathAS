@@ -288,7 +288,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['rubric'] = 0;
 			$line['postinstr'] = '';
 			$line['replyinstr'] = '';
-			$line['allowlate'] = 0;
+			$line['allowlate'] = isset($CFG['FORUM']['allowlate'])?$CFG['FORUM']['allowlate']:0;
 			$gradeoutcomes = array();
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
@@ -611,7 +611,7 @@ if ($overwriteBody==1) {
 				echo ' on ';
 				writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],floor($line['allowlate']/10)%10);
 				?>
-				<br/><label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>100,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
+				<br/><label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>100,true); ?>> Allow LatePasses after due date</label>
 			</span><BR class=form>
 
 		<span class="form">Calendar icon:</span>
