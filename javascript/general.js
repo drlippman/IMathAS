@@ -76,7 +76,16 @@ function arraysearch(needle,hay) {
    }
 
 var tipobj = 0; var curtipel = null;
-function tipshow(el,tip) {
+function tipshow(el,tip, e) {
+	if (typeof e != 'undefined' && e.type=='touchstart') {
+		if (curtipel == el) {
+			tipout();
+			return false;
+		}
+		jQuery(document).on('touchstart.tipshow', function() {
+			tipout(el);
+		});
+	}
 	if (typeof tipobj!= 'object') {
 		tipobj = document.createElement("div");
 		tipobj.className = "tips";
@@ -121,15 +130,29 @@ function tipshow(el,tip) {
         x += scrOfX;
         if ((p[0] + tipobj.offsetWidth)>x-10) {
         	p[0] = x - tipobj.offsetWidth - 30;
+        	$(tipobj).addClass("tipright");
+        } else {
+        	$(tipobj).removeClass("tipright");
         }
 
-	tipobj.style.left = (p[0]+20) + "px";
+	tipobj.style.left = (p[0]+15) + "px";
 	if (p[1] < 30) {
 		tipobj.style.top = (p[1]+20) + "px";
 	} else {
 		tipobj.style.top = (p[1]-tipobj.offsetHeight) + "px";
-	}
+	}	
 }
+
+function tipout(el) {
+	jQuery(document).off('touchstart.tipshow');
+	tipobj.style.display = "none";
+	tipobj.setAttribute("aria-hidden","true");
+	if (curtipel) {
+		curtipel.removeAttribute("aria-describedby");
+	}
+	curtipel = null;
+}
+
 var popupwins = [];
 function popupwindow(id,content,width,height,scroll) {
 	if (height=='fit') {
@@ -153,14 +176,7 @@ function popupwindow(id,content,width,height,scroll) {
 		popupwins[id] = win1;
 	}
 }
-function tipout(el) {
-	tipobj.style.display = "none";
-	tipobj.setAttribute("aria-hidden","true");
-	if (curtipel) {
-		curtipel.removeAttribute("aria-describedby");
-	}
-	curtipel = null;
-}
+
 
 function findPos(obj) { //from quirksmode.org
 	var curleft = curtop = 0;

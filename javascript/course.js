@@ -25,7 +25,7 @@ function ahahDone(url, target) {
       $('#'+target+' a').each(setuptracklinks);
       $('#'+target+' a[href*="youtu"]').each(setupvideoembeds);
       $('#'+target+' a[href*="vimeo"]').each(setupvideoembeds);
-
+      $('#'+target+' div.itemhdricon[data-tip]').on('click mouseover', icontipshow).on('mouseout', tipout);
       var x = document.getElementById(target).getElementsByTagName("script");
       for(var i=0;i<x.length;i++) {
 	      if (x[i].src) {
@@ -45,7 +45,19 @@ function ahahDone(url, target) {
   }
 }
 
-
+function icontipshow(evt) {
+	var el = $(evt.target).closest("div.itemhdricon")[0];
+	if (evt.type=="touchstart") {
+		evt.stopPropagation();
+		tipshow(el, null, evt);
+	} else {
+		tipshow(el);
+	}
+	return false;
+}
+$(function() {
+  $("div.itemhdricon[data-tip]").on('touchstart mouseover', icontipshow).on('mouseout', tipout);
+});
 
 var loadedblocks = new Array();
 

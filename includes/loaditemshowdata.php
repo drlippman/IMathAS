@@ -63,7 +63,7 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 *	$limited:	True to only return ids and names/summaries
 ***/
 function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=false,$limittype=false,$limited=false) {
-	global $DBH;
+	global $DBH,$userid;
 	$itemshowdata = array();
 	if ($onlyopen===true) {$onlyopen = 1;} else if ($onlyopen===false) {$onlyopen = 0;}
 	$itemstolookup = array();
@@ -104,10 +104,26 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 			$line['itemtype'] = 'Assessment';
 			$itemshowdata[$typelookups['Assessment'][$line['id']]] = $line;
 			if ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&1)) {
-				if (!isset($assessPreReqsToLookup[$line['reqscoreaid']])) {
-					$assessPreReqsToLookup[$line['reqscoreaid']] = array();
+				if (isset($itemshowdata[$typelookups['Assessment'][$line['reqscoreaid']]]) &&
+				    isset($itemshowdata[$typelookups['Assessment'][$line['reqscoreaid']]]['ptsposs'])) {
+					$itemshowdata[$typelookups['Assessment'][$line['id']]]['reqscoreptsposs'] = $itemshowdata[$typelookups['Assessment'][$line['reqscoreaid']]]['ptsposs'];
+				} else {
+					if (!isset($assessPreReqsToLookup[$line['reqscoreaid']])) {
+						$assessPreReqsToLookup[$line['reqscoreaid']] = array();
+					}
+					$assessPreReqsToLookup[$line['reqscoreaid']][] = $line['id'];
 				}
-				$assessPreReqsToLookup[$line['reqscoreaid']][] = $line['id'];
+			}
+		}
+		if (!$limited && !$viewall) {
+			$stm = $DBH->prepare("SELECT assessmentid,bestscores FROM imas_assessment_sessions WHERE assessmentid IN ($placeholders) AND userid=?");
+			$stm->execute(array_merge(array_keys($typelookups['Assessment']), array($userid)));
+			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (preg_match('/(^|,|~)\.?\d/', $line['bestscores'])) {
+					//ptsstatus: 1: some questions unattempted, 2: all questions attempted
+					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (strpos($line['bestscores'],"-1")===false)?2:1;
+					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = getpts($line['bestscores']);
+				}
 			}
 		}
 	}

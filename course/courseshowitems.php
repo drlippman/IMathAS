@@ -70,13 +70,29 @@ if (! isset ( $CFG ['CPS'] ['itemicons'] )) {
  * echo '</div>'; //itemhdr
  *
  */
-function getItemIcon($type, $alt, $faded = false) {
+function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 	global $imasroot, $itemicons;
-	$out = '<div class="itemhdricon">';
+	$out = '<div class="itemhdricon"';
+	if ($scoremsg != '') {
+		$out .= ' data-tip="'. Sanitize::encodeStringForDisplay($scoremsg) . '"';
+		//$out .= ' onclick="tipshow(this, null, true, event);"';
+		//$out .= ' onmouseover="tipshow(this);" onmouseout="tipout()"';
+	}
+	$out .= '>';
 	if ($faded) {
 		$class = 'class="faded"';
 	}
 	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $imasroot . '/img/' . $itemicons [$type] . '"/>';
+	if ($status>-1) {
+		switch ($status) {
+			case 0: $icon = 'emptycircle'; break;
+			case 1: $icon = 'halfcircle'; break;
+			case 2: $icon = 'fullcircle'; break;
+		}
+		$class = $faded?' faded':'';
+		$out .= '<img alt="' . Sanitize::encodeStringForDisplay($scoremsg) . '" ';
+		$out .= 'src="' . $imasroot . '/img/' . $icon . '.png" class="circoverlay'. $class . '" />';
+	}
 	$out .= '</div>';
 	return $out;
 }
@@ -729,13 +745,39 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					   }
 				   }
 			   }
+			   
+			   //calc status icon
+			   
+			   if (!$canedit) {
+				   $deffb = explode('-', $line['deffeedback']);
+				   if (isset($line['ptsearned'])) {
+				   	   if ($line['ptsstatus']==1) {
+				   	   	   $iconstatus = 1;
+				   	   	   $scoremsg = _('You have some unanswered questions');
+				   	   } else if ($line['ptsstatus']==2) {
+				   	   	   $iconstatus = 2;
+				   	   	   $scoremsg = _('All questions attempted');
+				   	   }
+					   if ($deffb[0]=='NoScores' || $deffb[0]=='EndScore' || $deffb[0]=='EachAtEnd') {
+						   //don't show score 	   
+					   } else {
+						   $scoremsg .= '. '._('Score: ').round(100*$line['ptsearned']/$line['ptsposs'],1).'%';
+					   }
+				   } else {
+				   	   $iconstatus = 0;
+					   $scoremsg = _('You haven\'t started this assessment yet');
+				   }
+			   } else {
+			   	   $iconstatus = -1;
+			   	   $scoremsg = '';
+			   }
 
 			   if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 
 				   echo '<div class="itemhdr">';
 
-				   echo getItemIcon('assess', 'assessment', false);
+				   echo getItemIcon('assess', 'assessment', false, $iconstatus, $scoremsg);
 
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = _('Available until');
@@ -781,7 +823,6 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   if ($line['enddate']!=2000000000) {
 					   echo "<BR> $endname $enddate \n";
 				   }
-
 				   if ($canedit) {
 
 					echo '<span class="instronly">';
@@ -814,7 +855,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   echo '<div class="itemhdr">';
 
-				   echo getItemIcon('assess', 'assessment', false);
+				   echo getItemIcon('assess', 'assessment', false, $iconstatus, $scoremsg);
 
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\"";
 
@@ -847,7 +888,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					 //not available but can use latepass - show greyed w latepass link
 					  beginitem($canedit,$items[$i]);
 						echo '<div class="itemhdr">';
-						echo getItemIcon('assess', 'assessment', true);
+						echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 						echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
  				   	echo "<br/> "._('This assessment was due').' '.$enddate;
 						echo ". <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
@@ -862,7 +903,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 			   	   echo '<div class="itemhdr">';
 
-				   echo getItemIcon('assess', 'assessment', true);
+				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = _('Available until');
@@ -895,7 +936,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   }
 			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   echo '<div class="itemhdr">';
-				   echo getItemIcon('assess', 'assessment', true);
+				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 				   echo "<div class=\"title grey\"><i>".Sanitize::encodeStringForDisplay($line['name'])."</i>";
 				   echo "<br/><i>$show</i>\n";
 				   echo '</div>'; //title
@@ -920,7 +961,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   echo '<div class="itemhdr">';
 
-				   echo getItemIcon('assess', 'assessment', true);
+				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 
 				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >".Sanitize::encodeStringForDisplay($line['name'])."</a></i>";
 				   echo '<span class="instrdates">';

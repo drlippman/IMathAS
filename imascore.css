@@ -69,6 +69,9 @@ div.itemsum {
 span.iteminfo {
 	margin-left: 30px;
 }
+.info {
+	color: #4bb6e8;
+}
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
 }
@@ -114,15 +117,9 @@ div.itemhdrdd, div.itemhdrright {
 }
 
 @media only screen and (min-width: 1005px) {
-	.notfw .itemhdricon {
-		display: inline-block;
-		position: static;
-		vertical-align: top;
-	}
+	/* put dropdown next to item when wide*/
 	.notfw .itemhdr .title {
 		display: inline-block;
-		margin-left: 6px;
-		margin-right: 10px;
 	}
 	.notfw div.itemhdrdd {
 		display: inline-block;
@@ -520,13 +517,43 @@ div.blockwrapper {
 }
 
 div.tips {
- 	border: 1px solid #000;
+ 	border: 1px solid #91d5d5;
+ 	border-radius: 8px;
 	background-color: #cff;
 	position: absolute;
-	padding: 5px;
+	padding: 3px 6px;
 	z-index: 100;
 }
+/*
+ need to resolve tips below first
+div.tips:after, div.tips:before {
+	top: 100%;
+	left: 15px;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+div.tips.tipsright:after, div.tips.tipsright:before {
+	left: auto;
+	right: 15px;
+}
 
+div.tips:after {
+	border-color: rgba(204, 255, 255, 0);
+	border-top-color: #cff;
+	border-width: 6px;
+	margin-left: -6px;        
+}
+div.tips:before {
+	border-color: rgba(145, 213, 213, 0);
+	border-top-color: #91d5d5;
+	border-width: 7px;
+	margin-left: -7px;
+}
+*/
 #headerlogo {
 	position: absolute;
 	right:0px;
@@ -945,6 +972,12 @@ pre {
 	background: transparent url("img/cc.png") no-repeat right bottom;
 }
 
+.circoverlay {
+	width: 9px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+}
 
 /*dropdown CSS from bootstrap */
 .dropup,
