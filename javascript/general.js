@@ -104,7 +104,7 @@ function tipshow(el,tip, e) {
 	}
 	tipobj.style.left = "5px";
 	//tipobj.style.display = "block";
-	$(tipobj).fadeIn(100);
+	$(tipobj).stop(true,true).fadeIn(100);
 	tipobj.setAttribute("aria-hidden","false");
 	el.setAttribute("aria-describedby", "hovertipsholder");
 

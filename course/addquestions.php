@@ -604,6 +604,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$newonly = 0;
 		}
 		$searchlikevals = array();
+		$isIDsearch = 0;
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
 		} else {
@@ -614,6 +615,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id=? AND ";
 				$searchlikevals = array(substr($safesearch,3));
+				$isIDsearch = substr($safesearch,3);
 			} else {
 				$searchterms = explode(" ",$safesearch);
 				$searchlikes = '';
@@ -630,9 +632,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$searchlikevals[] = "%$t%";
 					}
 
-					if (is_numeric($safesearch)) {
+					if (ctype_digit($safesearch)) {
 						$searchlikes .= "OR imas_questionset.id=?) AND ";
 						$searchlikevals[] = $safesearch;
+						$isIDsearch = $safesearch;
 					} else {
 						$searchlikes .= ") AND";
 					}
@@ -717,8 +720,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query .= " AND imas_questionset.ownerid=?";
 					$qarr[] = $userid;
 				} else {
-					$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?) ";
-					$qarr[] = $userid;
+					if ($isIDsearch>0) {
+						$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=? OR imas_questionset.id=?) ";
+						$qarr[] = $userid;
+						$qarr[] = $isIDsearch;
+					} else {
+						$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?) ";
+						$qarr[] = $userid;
+					}
+					
 				}
 				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
@@ -1221,13 +1231,13 @@ if ($overwriteBody==1) {
 		<br>
 		Search:
 		<input type=text size=15 name=search value="<?php echo $search ?>">
-		<span tabindex="0" data-tip="Search all libraries, not just selected ones" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
+		<span tabindex="0" data-tip="Search all libraries, not just selected ones" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
 		Search all libs</span>
-		<span tabindex="0" data-tip="List only questions I own" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
+		<span tabindex="0" data-tip="List only questions I own" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
 		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
 		Mine only</span>
-		<span tabindex="0" data-tip="Exclude questions already in assessment" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
+		<span tabindex="0" data-tip="Exclude questions already in assessment" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
 		Exclude added</span>
 		<input type=submit value=Search>
@@ -1254,9 +1264,9 @@ if ($overwriteBody==1) {
 				<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th>
 					<?php echo $page_libRowHeader ?>
 					<th>Times Used</th>
-					<?php if ($page_useavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>
+					<?php if ($page_useavgtimes) {?><th><span onmouseenter="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseleave="tipout()">Avg Time</span></th><?php } ?>
 					<th>Mine</th><th>Actions</th>
-					<?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
+					<?php if ($searchall==0) { echo '<th><span onmouseenter="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseleave="tipout()">Wrong Lib</span></th>';} ?>
 				</tr>
 			</thead>
 			<tbody>
@@ -1299,8 +1309,8 @@ if ($overwriteBody==1) {
 					</td>
 					<?php if ($page_useavgtimes) {?><td class="c"><?php
 					if (isset($page_questionTable[$qid]['qdata'])) {
-						echo '<span onmouseover="tipshow(this,\'Avg score on first try: '.round($page_questionTable[$qid]['qdata'][0]).'%';
-						echo '<br/>Avg time on first try: '.round($page_questionTable[$qid]['qdata'][1]/60,1).' min<br/>N='.$page_questionTable[$qid]['qdata'][2].'\')" onmouseout="tipout()">';
+						echo '<span onmouseenter="tipshow(this,\'Avg score on first try: '.round($page_questionTable[$qid]['qdata'][0]).'%';
+						echo '<br/>Avg time on first try: '.round($page_questionTable[$qid]['qdata'][1]/60,1).' min<br/>N='.$page_questionTable[$qid]['qdata'][2].'\')" onmouseleave="tipout()">';
 					} else {
 						echo '<span>';
 					}
