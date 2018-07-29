@@ -56,7 +56,7 @@ function icontipshow(evt) {
 	return false;
 }
 $(function() {
-  $("div.itemhdricon[data-tip]").on('touchstart mouseover', icontipshow).on('mouseout', tipout);
+  $("div.itemhdricon[data-tip]").on('touchstart mouseenter', icontipshow).on('mouseleave', tipout);
 });
 
 var loadedblocks = new Array();

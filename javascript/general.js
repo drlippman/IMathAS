@@ -86,6 +86,9 @@ function tipshow(el,tip, e) {
 			tipout(el);
 		});
 	}
+	if (curtipel==el) {
+		return;
+	}
 	if (typeof tipobj!= 'object') {
 		tipobj = document.createElement("div");
 		tipobj.className = "tips";
@@ -100,7 +103,8 @@ function tipshow(el,tip, e) {
 		tipobj.innerHTML = tip;
 	}
 	tipobj.style.left = "5px";
-	tipobj.style.display = "block";
+	//tipobj.style.display = "block";
+	$(tipobj).fadeIn(100);
 	tipobj.setAttribute("aria-hidden","false");
 	el.setAttribute("aria-describedby", "hovertipsholder");
 
@@ -143,9 +147,10 @@ function tipshow(el,tip, e) {
 	}	
 }
 
-function tipout(el) {
+function tipout(e) {
 	jQuery(document).off('touchstart.tipshow');
-	tipobj.style.display = "none";
+	//tipobj.style.display = "none";
+	$(tipobj).fadeOut(100);
 	tipobj.setAttribute("aria-hidden","true");
 	if (curtipel) {
 		curtipel.removeAttribute("aria-describedby");
