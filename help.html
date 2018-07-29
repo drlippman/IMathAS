@@ -2755,6 +2755,16 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$reqsigfigs = a number </dt>
+	<dd>Defines the significant figure accuracy required.  Only valid for "decimal", "scinot", and "scinotordec" $answerformat options. 
+	Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
+	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
+	significant figures required.  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
+	<br/>This setting overrides both $reltolerance and $abstolerance, and by default tests that the student answer rounded to the specified sigfigs matches
+	the correct answer.  To override the tolerance use +- in the setting, like this:
+	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
+	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $relatolerance = .01)</dd>
+
 <dt>$requiretimes = a list, like "^,=3,cos,&lt;2" </dt>
 	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,

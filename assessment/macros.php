@@ -1738,32 +1738,58 @@ function prettysmallnumber($n) {
 	return $n;
 }
 
-function prettysigfig($a,$sigfig,$comma=',',$choptrailing=false) {
-	$a = str_replace(',','',$a);
-	if ($a==0) { return 0;}
-	if ($a < 0 ) {
-		$sign = '-';
-		$a *= -1;
+function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=false) {
+	if (!is_array($aarr)) {
+		$arrayout = false;
+		$aarr = array($aarr);
 	} else {
-		$sign = '';
+		$arrayout = true;
 	}
-
-	$v = floor(-log10($a)-1e-12);
-	if ($v+$sigfig <= 0) {
-		return $sign.number_format(round($a,$v+$sigfig),0,'.',$comma);
-	} else {
-		$nv = round($a, $v+$sigfig);
-		$n = number_format($a,$v+$sigfig,'.',$comma);
-		if ($choptrailing && ($v+$sigfig > 0) && abs($a - round($a,$v+$sigfig))<1e-12) {
-			$n = rtrim($n,'0');
-			$n = rtrim($n,'.');
-		} else {
-			if (floor(-log10($nv)-1e-12) != $v) {  //adjust for .009 -> .010 1 sig
-				$n = substr($n,0,-1);
-			}
-			$n = rtrim($n,'.');
+	$out = array();
+	foreach ($aarr as $a) {
+		$a = str_replace(',','',$a);
+		if ($orscinot && is_numeric($a) && (abs($a)>1000 || abs($a)<.001)) {
+			$out[] = makescinot($a, $sigfig-1, '*');
+			continue;
 		}
-		return $sign.$n;
+		$a = str_replace('xx','*',$a);
+		if (strpos($a,'*')!==false) {
+			$pts = explode('*', $a);
+			$a = $pts[0];
+			$scinot = '*'.$pts[1];
+		} else {
+			$scinot = '';
+		}
+		if ($a==0) { return 0;}
+		if ($a < 0 ) {
+			$sign = '-';
+			$a *= -1;
+		} else {
+			$sign = '';
+		}
+	
+		$v = floor(-log10($a)-1e-12);
+		if ($v+$sigfig <= 0) {
+			$out[] = $sign.number_format(round($a,$v+$sigfig),0,'.',$comma).$scinot;
+		} else {
+			$nv = round($a, $v+$sigfig);
+			$n = number_format($a,$v+$sigfig,'.',$comma);
+			if ($choptrailing && ($v+$sigfig > 0) && abs($a - round($a,$v+$sigfig))<1e-12) {
+				$n = rtrim($n,'0');
+				$n = rtrim($n,'.');
+			} else {
+				if (floor(-log10($nv)-1e-12) != $v) {  //adjust for .009 -> .010 1 sig
+					$n = substr($n,0,-1);
+				}
+				$n = rtrim($n,'.');
+			}
+			$out[] = $sign.$n.$scinot;
+		}
+	}
+	if ($arrayout) {
+		return $out;
+	} else {
+		return $out[0];
 	}
 }
 
@@ -3670,6 +3696,32 @@ function sign($a,$str=false) {
 
 function lensort($a,$b) {
 	return strlen($b)-strlen($a);
+}
+
+function parsereqsigfigs($reqsigfigs) {
+	$reqsigfigoffset = 0;
+	$reqsigfigparts = explode('+-',$reqsigfigs);
+	$reqsigfigs = $reqsigfigparts[0];
+	$sigfigscoretype = array('abs',0);
+	if (count($reqsigfigparts)>1) {
+		if (substr($reqsigfigparts[1], -1)=='%') {
+			$sigfigscoretype = array('rel', substr($reqsigfigparts[1], 0, -1));
+		} else {
+			$sigfigscoretype = array('abs',$reqsigfigparts[1]);
+		}
+	}
+	if ($reqsigfigs{0}=='=') {
+		$exactsigfig = true;
+		$reqsigfigs = substr($reqsigfigs,1);
+	} else if ($reqsigfigs{0}=='[') {
+		$exactsigfig = false;
+		$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
+		$reqsigfigs = $reqsigfigparts[0];
+		$reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
+	} else {
+		$exactsigfig = false;
+	}
+	return array($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype);
 }
 
 function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) {

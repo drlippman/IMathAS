@@ -1093,7 +1093,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($reqsigfigs)) {
 			if ($reqsigfigs{0}=='=') {
 				$reqsigfigs = substr($reqsigfigs,1);
-				$answer = prettysigfig($answer,$reqsigfigs);
+				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs));
+				} else {
+					$answer = prettysigfig($answer,$reqsigfigs);
+				}
 				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
 				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
 			} else if ($reqsigfigs{0}=='[') {
@@ -1105,7 +1109,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;
 				}
 				if ($answer!=0  && $v < 0 && strlen($answer) - strpos($answer,'.')-1 + $v < 0) {
-					$answer = prettysigfig($answer,$reqsigfigs);
+					if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+						$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs));
+					} else {
+						$answer = prettysigfig($answer,$reqsigfigs);
+					}
 				}
 				$tip .= "<br/>" . sprintf(_('Your answer should have at least %d significant figures.'), $reqsigfigs);
 				$shorttip .= sprintf(_(', with at least %d significant figures'), $reqsigfigs);
@@ -1575,6 +1583,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
+		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 
 		if (!isset($sz)) { $sz = 20;}
@@ -1623,7 +1632,38 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		list($longtip,$shorttip) = formathint($eword,$ansformats,isset($reqdecimals)?$reqdecimals:null,'calculated',(in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('set',$ansformats) || in_array('exactset',$ansformats)), 1);
 		$tip .= $longtip;
-
+		if (isset($reqsigfigs) && !in_array("scinot",$ansformats) && !in_array("scinotordec",$ansformats) && !in_array("decimal",$ansformats)) {
+			unset($reqsigfigs);
+		}
+		if (isset($reqsigfigs)) {
+			if ($reqsigfigs{0}=='=') {
+				$reqsigfigs = substr($reqsigfigs,1);
+				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs,'',false,in_array("scinot",$ansformats)||in_array("scinotordec",$ansformats)));
+				} else {
+					$answer = prettysigfig($answer,$reqsigfigs,'',false,in_array("scinot",$ansformats)||in_array("scinotordec",$ansformats));
+				}
+				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
+				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
+			} else if ($reqsigfigs{0}=='[') {
+				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
+				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigparts[0], $reqsigfigparts[1]);
+				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigparts[0], $reqsigfigparts[1]);
+			} else {
+				if ($answer!=0) {
+					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;
+				}
+				if ($answer!=0  && $v < 0 && strlen($answer) - strpos($answer,'.')-1 + $v < 0) {
+					if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+						$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs,'',false,in_array("scinot",$ansformats)||in_array("scinotordec",$ansformats)));
+					} else {
+						$answer = prettysigfig($answer,$reqsigfigs,'',false,in_array("scinot",$ansformats)||in_array("scinotordec",$ansformats));
+					}
+				}
+				$tip .= "<br/>" . sprintf(_('Your answer should have at least %d significant figures.'), $reqsigfigs);
+				$shorttip .= sprintf(_(', with at least %d significant figures'), $reqsigfigs);
+			}
+		}
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -3333,28 +3373,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($reqsigfigs)) {
-			$reqsigfigoffset = 0;
-			$reqsigfigparts = explode('+-',$reqsigfigs);
-			$reqsigfigs = $reqsigfigparts[0];
-			$sigfigscoretype = array('abs',0);
-			if (count($reqsigfigparts)>1) {
-				if (substr($reqsigfigparts[1], -1)=='%') {
-					$sigfigscoretype = array('rel', substr($reqsigfigparts[1], 0, -1));
-				} else {
-					$sigfigscoretype = array('abs',$reqsigfigparts[1]);
-				}
-			}
-			if ($reqsigfigs{0}=='=') {
-				$exactsigfig = true;
-				$reqsigfigs = substr($reqsigfigs,1);
-			} else if ($reqsigfigs{0}=='[') {
-				$exactsigfig = false;
-				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
-				$reqsigfigs = $reqsigfigparts[0];
-				$reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
-			} else {
-				$exactsigfig = false;
-			}
+			list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
 		}
 
 		if ($answer==='') {
@@ -4191,6 +4210,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
@@ -4219,7 +4239,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//return 0;
 			$formatok = "nowhole";
 		}
-
+		
+		if (isset($reqsigfigs)) {
+			if (!in_array("scinot",$ansformats) && !in_array("scinotordec",$ansformats) && !in_array("decimal",$ansformats)) {
+				unset($reqsigfigs);	
+			} else {
+				list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
+			}
+		}
+		
 		if (isset($requiretimeslistpart) && strpos($requiretimeslistpart,';')!==false) {
 			$requiretimeslistpart = explode(';', $requiretimeslistpart);
 		}
@@ -4398,7 +4426,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							}
 						}*/
 					} else if (is_numeric($givenans)) {
-						if (isset($abstolerance)) {
+						if (isset($reqsigfigs)) {
+							$tocheck = preg_replace('/\s*(\*|x|X|×)\s*10\s*\^/','E',$orarr[$j]);
+							if (checksigfigs($tocheck, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
+								if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
+									$formatok = "nopart";  $partformatok = false;
+								}
+								if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
+							} else if ($exactsigfig && checksigfigs($tocheck, $anans, $reqsigfigs, false, $reqsigfigoffset, $sigfigscoretype)) {
+								//see if it'd be right aside from exact sigfigs
+								$formatok = "nopart";  $partformatok = false; $correctanyformat++; $foundloc = $j; break 2;
+							}
+						} else if (isset($abstolerance)) {
 							if (abs($anans-$givenans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
 								if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($orarr[$j],$requiretimeslistpart[$i])==0) {
 									$formatok = "nopart";  $partformatok = false;
