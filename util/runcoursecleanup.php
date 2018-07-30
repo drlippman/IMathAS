@@ -64,14 +64,23 @@ $query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 $msgins = $DBH->prepare($query);
 
 $updcrs = $DBH->prepare("UPDATE imas_courses SET cleanupdate=? WHERE id=?");
+$stuchk = $DBH->prepare("SELECT count(id) FROM imas_students WHERE courseid=?");
 	
-$query = "SELECT ic.id,ic.name,ic.ownerid,iu.FirstName,iu.LastName,iu.email,iu.msgnotify,iu.groupid ";
+$query = "SELECT ic.id,ic.name,ic.ownerid,iu.FirstName,iu.LastName,iu.email,iu.msgnotify,iu.groupid,ic.enddate ";
 $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id ";
 $query .= "WHERE ic.cleanupdate=1 ORDER BY ic.id LIMIT 10";
 $stm = $DBH->query($query);
 $num = 0;
 $allowoptout = (!isset($CFG['cleanup']['allowoptout']) || $CFG['cleanup']['allowoptout']==true);
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	if ($row['enddate']<2000000000) { //check to ensure course isn't alredy empty
+		$stuchk->execute(array($row['id']));
+		if ($stuchk->fetchColumn(0) == 0) {
+			//class is already empty; remove from cleaning plan
+			$updcrs->execute(array(0, $row['id']));
+			continue;
+		}
+	}
 	if (isset($CFG['cleanup']['groups']) && isset($CFG['cleanup']['groups'][$row['groupid']])) {
 		$grpdet = $CFG['cleanup']['groups'][$row['groupid']];
 		$thisdelay = 24*60*60*$grpdet['delay'];
