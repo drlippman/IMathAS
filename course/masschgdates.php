@@ -29,12 +29,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$cnt = $_POST['chgcnt'];
 		$blockchg = 0;
 
-		$assesstoupdate = array();
+		$assessbasictoupdate = array();
+		$assessfulltoupdate = array();
 		$inlinetoupdate = array();
 		$wikitoupdate = array();
 		$linktoupdate = array();
 		$forumbasictoupdate = array();
 		$forumfulltoupdate = array();
+		$fullassess = false;
+		$fullforum = false;
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("../includes/parsedatetime.php");
 
@@ -123,7 +126,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if ($id>0) {
 					//$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate,avail=:avail WHERE id=:id");
 					//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':avail'=>$avail, ':id'=>$id));
-					array_push($assesstoupdate, $id, $startdate, $enddate, $reviewdate, $lpdate, $avail);
+					if ($data[2] != 'NA' && $data[5] != 'NA') {
+						array_push($assessfulltoupdate, $id, $startdate, $enddate, $reviewdate, $lpdate, $avail);
+					} else {
+						array_push($assessbasictoupdate, $id, $startdate, $enddate, $avail);
+					}
 				}
 			} else if ($type=='Forum') {
 				if ($id>0) {
@@ -171,12 +178,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 
 		}
-		if (count($assesstoupdate)>0) {
-			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($assesstoupdate, 6);
+		if (count($assessbasictoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($assessbasictoupdate, 4);
+			$query = "INSERT INTO imas_assessments (id,startdate,enddate,avail) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($assessbasictoupdate);
+		}
+		if (count($assessfulltoupdate)>0) {
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($assessfulltoupdate, 6);
 			$query = "INSERT INTO imas_assessments (id,startdate,enddate,reviewdate,LPcutoff,avail) VALUES $placeholders ";
 			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),reviewdate=VALUES(reviewdate),LPcutoff=VALUES(LPcutoff),avail=VALUES(avail)";
 			$stm = $DBH->prepare($query);
-			$stm->execute($assesstoupdate);
+			$stm->execute($assessfulltoupdate);
 		}
 		if (count($inlinetoupdate)>0) {
 			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($inlinetoupdate, 4);
