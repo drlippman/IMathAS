@@ -132,7 +132,10 @@
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
 			$stm->execute(array(':lps'=>$LPneeded, ':lps2'=>$LPneeded, ':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
-				$enddate = min(strtotime("+".($latepasshrs*$LPneeded)." hours", $thised), $courseenddate, $LPcutoff);
+				$enddate = min(strtotime("+".($latepasshrs*$LPneeded)." hours", $thised), $courseenddate);
+				if ($LPcutoff>0) {
+					$enddate = min($enddate, $LPcutoff);
+				}
 				if ($hasexception) { //already have exception
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+:lps WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 					$stm->execute(array(':lps'=>$LPneeded, ':userid'=>$userid, ':assessmentid'=>$aid, ':enddate'=>$enddate));
