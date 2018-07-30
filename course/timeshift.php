@@ -79,8 +79,8 @@ if (!(isset($teacherid))) {
 				$upd->execute(array($row['startdate'], $row['enddate'], $row['id']));
 			}
 		}
-		$upd = $DBH->prepare("UPDATE imas_assessments SET startdate=?,enddate=?,reviewdate=? WHERE id=?");
-		$stm = $DBH->prepare("SELECT id,startdate,enddate,reviewdate FROM imas_assessments WHERE courseid=?");
+		$upd = $DBH->prepare("UPDATE imas_assessments SET startdate=?,enddate=?,reviewdate=?,LPcutoff=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,reviewdate,LPcutoff FROM imas_assessments WHERE courseid=?");
 		$stm->execute(array($cid));
 		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['startdate']>0) {
@@ -89,10 +89,13 @@ if (!(isset($teacherid))) {
 			if ($row['enddate']<2000000000) {
 				$row['enddate'] = strtotime($shiftstring, $row['enddate']);
 			}
-			if ($row['reviewdate']>0 && $row['reviewdate']<2000000000) {
-				$row['reviewdate'] = strtotime($shiftstring, $row['reviewdate']);
+			if ($row['LPcutoff']>0 && $row['LPcutoff']<2000000000) {
+				$row['LPcutoff'] = strtotime($shiftstring, $row['LPcutoff']);
 			}
-			$upd->execute(array($row['startdate'], $row['enddate'], $row['reviewdate'], $row['id']));
+			if ($row['reviewdate']>0) {
+				$row['reviewdate'] = 2000000000;
+			}
+			$upd->execute(array($row['startdate'], $row['enddate'], $row['reviewdate'], $row['LPcutoff'], $row['id']));
 		}
 		$upd = $DBH->prepare("UPDATE imas_wikis SET startdate=?,enddate=?,editbydate=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,startdate,enddate,editbydate FROM imas_wikis WHERE courseid=?");

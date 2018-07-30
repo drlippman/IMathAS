@@ -88,7 +88,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 
 	if (isset($itemlist['Assessment'])) {
 		$typeids = implode(',', array_keys($itemlist['Assessment']));
-		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,reqscore,reqscoreaid,reqscoretype,ptsposs FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
+		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,LPcutoff,reqscore,reqscoreaid,reqscoretype,ptsposs FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			require_once("../includes/exceptionfuncs.php");
 			if (isset($exceptions[$row['id']])) {

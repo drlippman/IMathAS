@@ -107,15 +107,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			*/
+			if ($data[5] != 'NA') {
+				if ($data[5]=='N') {
+					$lpdate = 0;
+				} else {
+					$pts = explode('~',$data[5]);
+					$lpdate = parsedatetime($pts[0],$pts[1]);
+				}
+			}
 
-			$type = $data[5]; // $_POST['type'.$i];
-			$id = $data[6]; // $_POST['id'.$i];
-			$avail = intval($data[7]);
+			$type = $data[6]; // $_POST['type'.$i];
+			$id = $data[7]; // $_POST['id'.$i];
+			$avail = intval($data[8]);
 			if ($type=='Assessment') {
 				if ($id>0) {
 					//$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate,avail=:avail WHERE id=:id");
 					//$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':avail'=>$avail, ':id'=>$id));
-					array_push($assesstoupdate, $id, $startdate, $enddate, $reviewdate, $avail);
+					array_push($assesstoupdate, $id, $startdate, $enddate, $reviewdate, $lpdate, $avail);
 				}
 			} else if ($type=='Forum') {
 				if ($id>0) {
@@ -164,9 +172,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		}
 		if (count($assesstoupdate)>0) {
-			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($assesstoupdate, 5);
-			$query = "INSERT INTO imas_assessments (id,startdate,enddate,reviewdate,avail) VALUES $placeholders ";
-			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),reviewdate=VALUES(reviewdate),avail=VALUES(avail)";
+			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($assesstoupdate, 6);
+			$query = "INSERT INTO imas_assessments (id,startdate,enddate,reviewdate,LPcutoff,avail) VALUES $placeholders ";
+			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),reviewdate=VALUES(reviewdate),LPcutoff=VALUES(LPcutoff),avail=VALUES(avail)";
 			$stm = $DBH->prepare($query);
 			$stm->execute($assesstoupdate);
 		}
@@ -216,7 +224,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=041316\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=072818\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }
@@ -256,15 +264,7 @@ if ($overwriteBody==1) {
 	} else {
 		$filter = "all";
 	}
-	/*if (isset($_GET['incforum'])) {
-		$incforum = $_GET['incforum'];
-		$sessiondata['mcdincforum'.$cid] = $incforum;
-		writesessiondata();
-	} else if (isset($sessiondata['mcdincforum'.$cid])) {
-		$incforum = $sessiondata['mcdincforum'.$cid];
-	} else {
-	*/
-	$incforum = false;
+	
 //	}
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 	//$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
@@ -277,12 +277,19 @@ if ($overwriteBody==1) {
 			.mcind0 img, .mcind1 img, .mcind2 img, .mcind3 img, .mcind4 img, .mcind5 img, .mcind6 img {float: left;}
 			.mcind0 div, .mcind1 div, .mcind2 div, .mcind3 div, .mcind4 div, .mcind5 div, .mcind6 div {margin-left: 21px;}
 			</style>';
-	if (!$incforum) {
+	if ($filter!='assessments') {
+		$placeinhead .= '<style type="text/css">.mca {display:none;}</style>';
+		$placeinhead .= '<script type="text/javascript">var includeassess = false;</script>';
+	} else {
+		$placeinhead .= '<script type="text/javascript">var includeassess = true;</script>';
+	}
+	if ($filter!='forums') {
 		$placeinhead .= '<style type="text/css">.mcf {display:none;}</style>';
 		$placeinhead .= '<script type="text/javascript">var includeforums = false;</script>';
 	} else {
 		$placeinhead .= '<script type="text/javascript">var includeforums = true;</script>';
 	}
+	
 	require("../header.php");
 
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -331,13 +338,24 @@ if ($overwriteBody==1) {
 	if ($filter=='blocks') {echo 'selected="selected"';}
 	echo '>Blocks</option>';
 	echo '</select> ';
-	echo '<button type="button" id="MCDforumtoggle" onclick="toggleMCDincforum()">';
-	if ($incforum) {
-		echo _('Hide Forum Dates');
-	} else {
-		echo _('Show Forum Dates');
+	if ($filter=='all' || $filter=='forums') {
+		echo '<button type="button" id="MCDforumtoggle" onclick="toggleMCDincforum()">';
+		if ($filter!='forums') {
+			echo _('Show Forum Dates');
+		} else {
+			echo _('Hide Forum Dates');
+		}
+		echo '</button>';
 	}
-	echo '</button>';
+	if ($filter=='all' || $filter=='assessments') {
+		echo '<button type="button" id="MCDassesstoggle" onclick="toggleMCDincassess()">';
+		if ($filter!='assessments') {
+			echo _('Show Assessment Dates');
+		} else {
+			echo _('Hide Assessment Dates');
+		}
+		echo '</button>';
+	}
 	echo '</p>';
 
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
@@ -351,15 +369,27 @@ if ($overwriteBody==1) {
 	echo '<p>Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a>. ';
 
 	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
-	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option><option value="a">Show</option></select>';
-	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
+	echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)">
+		<option value="a" selected>Show</option>
+		<option value="s">Start Date</option>
+		<option value="e">End Date</option>
+		<option value="r">Review Date</option>
+		<option value="lp">LatePass Cutoff</option>
+		<option value="fp">Forum Post By</option>
+		<option value="fp">Forum Reply By</option>
+		</select>';
+	echo ' to <select id="swapselected">
+		<option value="0">Hidden</option>
+		<option value="1">By Dates</option>
+		<option value="2">Always/By Dates</option>
+		</select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
 	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
 
 	if ($picicons) {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
+		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th class=mca>Review</th><th class=mca>LatePass Cutoff</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
 	} else {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
+		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th class=mca>Review</th><th class=mca>LatePass Cutoff</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
 	}
 	$prefix = array();
 	if ($orderby==3) {  //course page order
@@ -396,6 +426,7 @@ if ($overwriteBody==1) {
 	$startdates = Array();
 	$enddates = Array();
 	$reviewdates = Array();
+	$LPcutoffs = Array();
 	$fpdates = Array();
 	$frdates = Array();
 	$ids = Array();
@@ -404,7 +435,7 @@ if ($overwriteBody==1) {
 	$courseorder = Array();
 	$pres = array();
 	if ($filter=='all' || $filter=='assessments') {
-		$stm = $DBH->prepare("SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid=:courseid ");
+		$stm = $DBH->prepare("SELECT name,startdate,enddate,reviewdate,id,avail,LPcutoff FROM imas_assessments WHERE courseid=:courseid ");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$types[] = "Assessment";
@@ -415,6 +446,7 @@ if ($overwriteBody==1) {
 			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[4];
 			$avails[] = $row[5];
+			$LPcutoffs[] = $row[6]*1;
 			if (isset($prefix['Assessment'.$row[4]])) {$pres[] = $prefix['Assessment'.$row[4]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Assessment'.$row[4]];}
 		}
@@ -431,6 +463,7 @@ if ($overwriteBody==1) {
 			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			$LPcutoffs[] = -1;
 			if (isset($prefix['InlineText'.$row[3]])) {$pres[] = $prefix['InlineText'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['InlineText'.$row[3]];}
 		}
@@ -447,6 +480,7 @@ if ($overwriteBody==1) {
 			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			$LPcutoffs[] = -1;
 			if (isset($prefix['LinkedText'.$row[3]])) {$pres[] = $prefix['LinkedText'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['LinkedText'.$row[3]];}
 		}
@@ -464,6 +498,7 @@ if ($overwriteBody==1) {
 			$frdates[] = $row[6];
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			$LPcutoffs[] = -1;
 			if (isset($prefix['Forum'.$row[3]])) {$pres[] = $prefix['Forum'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Forum'.$row[3]];}
 		}
@@ -480,6 +515,7 @@ if ($overwriteBody==1) {
 			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
+			$LPcutoffs[] = -1;
 			if (isset($prefix['Wiki'.$row[3]])) {$pres[] = $prefix['Wiki'.$row[3]];} else {$pres[] = '';}
 			if ($orderby==3) {$courseorder[] = $itemscourseorder['Wiki'.$row[3]];}
 		}
@@ -490,7 +526,7 @@ if ($overwriteBody==1) {
 		$items = unserialize($stm->fetchColumn(0));
 
 		function getblockinfo($items,$parent) {
-			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$frdates,$fpdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
+			global $ids,$types,$names,$startdates,$enddates,$LPcutoffs,$reviewdates,$frdates,$fpdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1);
@@ -501,6 +537,7 @@ if ($overwriteBody==1) {
 					$enddates[] = $item['enddate'];
 					$avails[] = $item['avail'];
 					$reviewdates[] = -1;
+					$LPcutoffs[] = -1;
 					$fpdates[] = -1; $frdates[] = -1;
 					if (isset($prefix['Block'.$parent.'-'.($k+1)])) {$pres[] = $prefix['Block'.$parent.'-'.($k+1)];} else {$pres[] = '';}
 					if (count($item['items'])>0) {
@@ -523,6 +560,11 @@ if ($overwriteBody==1) {
 	$am = ($coursedefstime<12*60)?'am':'pm';
 	$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 
+	//figure out a "now" based on deftime
+	$nowpts = explode('-', date("G-i-s", $now));
+	$defnow  = $now - $nowpts[2] - $nowpts[1]*60 - $nowpts[0]*60*60 + 60*$coursedeftime;
+	$defsnow  = $now - $nowpts[2] - $nowpts[1]*60 - $nowpts[0]*60*60 + 60*$coursedefstime;
+	
 	if ($orderby==0) {
 		asort($startdates);
 		$keys = array_keys($startdates);
@@ -563,21 +605,20 @@ if ($overwriteBody==1) {
 			}
 			echo '"/><div>';
 		}
+		$sdatebase = ($startdates[$i]==0)?$defsnow:$startdates[$i];
+		$edatebase = ($enddates[$i]==2000000000)?(($startdates[$i]==0?$defnow:$sdatebase)+7*24*60*60):$enddates[$i];
+		$lpdatebase = ($LPcutoffs[$i]==0)?$edatebase+7*24*60*60:$LPcutoffs[$i];
+		$fpdatebase = ($fpdates[$i]==0 || $fpdates[$i]==2000000000)?$defnow:$fpdates[$i];
+		$frdatebase = ($frdates[$i]==0 || $frdates[$i]==2000000000)?$defnow+7*24*60*60:$frdates[$i];
+		
 		echo Sanitize::encodeStringForDisplay($names[$i])."<input type=hidden id=\"id" . Sanitize::encodeStringForDisplay($cnt) . "\" value=\"" . Sanitize::encodeStringForDisplay($ids[$i]) . "\"/></div>";
-		echo "<script> basesdates[$cnt] = ";
-		//if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
-		echo Sanitize::encodeStringForJavascript($startdates[$i]);
-		echo "; baseedates[$cnt] = ";
-		//if ($enddates[$i]==0 || $enddates[$i]==2000000000) { echo '"NA"';} else {echo $enddates[$i];}
-		echo Sanitize::encodeStringForJavascript($enddates[$i]);
-		echo "; baserdates[$cnt] = ";
-		//if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {echo '"NA"';} else { echo $reviewdates[$i];}
-		if ($reviewdates[$i]==-1) {echo '"NA"';} else { echo Sanitize::encodeStringForJavascript($reviewdates[$i]);}
-		echo "; basefpdates[$cnt] = ";
-		if ($fpdates[$i]==-1) {echo '"NA"';} else { echo Sanitize::encodeStringForJavascript($fpdates[$i]);}
-		echo "; basefrdates[$cnt] = ";
-		if ($frdates[$i]==-1) {echo '"NA"';} else { echo Sanitize::encodeStringForJavascript($frdates[$i]);}
-		echo ";</script>";
+		echo "<script> basesdates[$cnt] = ". Sanitize::onlyInt($sdatebase) . ";";
+		echo "baseedates[$cnt] = ". Sanitize::onlyInt($edatebase) . ";";
+		echo "baselpdates[$cnt] = ". Sanitize::onlyInt($lpdatebase) . ";";
+		echo "baserdates[$cnt] = ". (($reviewdates[$i]==-1)?'"NA"':Sanitize::onlyInt($reviewdates[$i])) . ";";
+		echo "basefpdates[$cnt] = ". (($fpdates[$i]==-1)?'"NA"':Sanitize::onlyInt($fpdatebase)) . ";";
+		echo "basefrdates[$cnt] = ". (($frdates[$i]==-1)?'"NA"':Sanitize::onlyInt($frdatebase)) . ";";
+		echo "</script>";
 		echo "</td>";
 		if ($picicons==0) {
 			echo "<td>";
@@ -593,19 +634,14 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"1\"/>";
 		}
+		
+		echo '<span id="sspan0'.$cnt.'" class="'.($startdates[$i]==0?'show':'hide').'" onclick="MCDtoggle(\'s\','.$cnt.')">';
+		echo _('Always').'</span>';
+		
+		echo '<span id="sspan1'.$cnt.'" class="'.($startdates[$i]==0?'hide':'show').'">';
+		
 		if ($startdates[$i]==0) {
-			echo "<span id=\"sspan0$cnt\" class=\"show\">Always</span>";
-		} else {
-			echo "<span id=\"sspan0$cnt\" class=\"hide\">Always</span>";
-		}
-		if ($startdates[$i]==0) {
-			echo "<span id=\"sspan1$cnt\" class=\"hide\">";
-		} else {
-			echo "<span id=\"sspan1$cnt\" class=\"show\">";
-		}
-		if ($startdates[$i]==0) {
-			$startdates[$i] = time();
-			$sdate = tzdate("m/d/Y",$startdates[$i]);
+			$sdate = tzdate("m/d/Y", $sdatebase);
 			$stime = $defstime;
 		} else {
 			$sdate = tzdate("m/d/Y",$startdates[$i]);
@@ -613,7 +649,7 @@ if ($overwriteBody==1) {
 		}
 
 		echo "<input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
-		echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
+		echo "<span id=\"sd$cnt\">".getshortday($sdatebase).'</span>';
 		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 		echo ") <a href=\"#\" onClick=\"displayDatePicker('sdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 
@@ -626,20 +662,14 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"1\"/>";
 		}
-		if ($enddates[$i]==2000000000) {
-			echo "<span id=\"espan0$cnt\" class=\"show\">Always</span>";
-		} else {
-			echo "<span id=\"espan0$cnt\" class=\"hide\">Always</span>";
-		}
-		if ($enddates[$i]==2000000000) {
-			echo "<span id=\"espan1$cnt\" class=\"hide\">";
-		} else {
-			echo "<span id=\"espan1$cnt\" class=\"show\">";
-		}
+		
+		echo '<span id="espan0'.$cnt.'" class="'.($enddates[$i]==2000000000?'show':'hide').'" onclick="MCDtoggle(\'e\','.$cnt.')">';
+		echo _('Always').'</span>';
+		
+		echo '<span id="espan1'.$cnt.'" class="'.($enddates[$i]==2000000000?'hide':'show').'">';
 
 		if ($enddates[$i]==2000000000) {
-			$enddates[$i]  = $startdates[$i] + 7*24*60*60;
-			$edate = tzdate("m/d/Y",$enddates[$i]);
+			$edate = tzdate("m/d/Y", $edatebase);
 			$etime = $deftime;
 		} else {
 			$edate = tzdate("m/d/Y",$enddates[$i]);
@@ -647,56 +677,49 @@ if ($overwriteBody==1) {
 		}
 
 		echo "<input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
-		echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
+		echo "<span id=\"ed$cnt\">".getshortday($edatebase).'</span>';
 		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 		echo ") <a href=\"#\" onClick=\"displayDatePicker('edate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 
 		echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
 		echo '</span></td>';
 
-		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
+		echo "<td class=\"mca togdis".($avails[$i]!=1?' dis':'')."\" onclick=\"MCDtoggle('r',$cnt)\">";
 		if ($types[$i]=='Assessment') {
-			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('r',$cnt)\"/>";
-			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\"/>";
+			if ($reviewdates[$i]==0) {
 				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"0\"/>";
 			} else {
 				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"1\"/>";
 			}
-			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
-				echo "<span id=\"rspan0$cnt\" class=\"show\">";
+			echo '<span id="rspan0'.$cnt.'" class="'.($reviewdates[$i]==0?'show':'hide').'">Never</span>';
+			echo '<span id="rspan1'.$cnt.'" class="'.($reviewdates[$i]>0?'show':'hide').'">After Due</span>';
+		}
+		echo '</td>';
+		echo "<td class=\"mca togdishid".($avails[$i]==0?' dis':'')."\">";
+		if ($types[$i]=='Assessment') {
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('lp',$cnt)\"/>";
+			if ($LPcutoffs[$i]==0) {
+				echo "<input type=hidden id=\"lpdatetype$cnt\" name=\"lpdatetype$cnt\" value=\"0\"/>";
 			} else {
-				echo "<span id=\"rspan0$cnt\" class=\"hide\">";
+				echo "<input type=hidden id=\"lpdatetype$cnt\" name=\"lpdatetype$cnt\" value=\"1\"/>";
 			}
-			echo "<input type=radio name=\"rdatean$cnt\" value=\"0\" id=\"rdateanN$cnt\" ";
-			if ($reviewdates[$i]!=2000000000) {
-				echo 'checked=1';
-			}
-			echo " />Never <input type=radio name=\"rdatean$cnt\" value=\"2000000000\"  id=\"rdateanA$cnt\"  ";
-			if ($reviewdates[$i]==2000000000) {
-				echo 'checked=1';
-			}
-			echo " />Always</span>";
-
-			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
-				echo "<span id=\"rspan1$cnt\" class=\"hide\">";
+			if ($LPcutoffs[$i]==0) {
+				$lpdate = tzdate("m/d/Y", $lpdatebase);
+				$lptime = $deftime;
 			} else {
-				echo "<span id=\"rspan1$cnt\" class=\"show\">";
+				$lpdate = tzdate("m/d/Y",$LPcutoffs[$i]);
+				$lptime = tzdate("g:i a",$LPcutoffs[$i]);
 			}
-			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
-				$reviewdates[$i] = $enddates[$i] + 7*24*60*60;
-				$rdate = tzdate("m/d/Y",$reviewdates[$i]);
-				$rtime = $deftime;
-			} else {
-				$rdate = tzdate("m/d/Y",$reviewdates[$i]);
-				$rtime = tzdate("g:i a",$reviewdates[$i]);
-			}
-
-			echo "<input type=text size=10 id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"$rdate\" onblur=\"ob(this)\"/>(";
-			echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
+			echo '<span id="lpspan0'.$cnt.'" class="'.($LPcutoffs[$i]==0?'show':'hide').'" onclick="MCDtoggle(\'lp\','.$cnt.')">';
+			echo _('No limit').'</span>';
+			
+			echo '<span id="lpspan1'.$cnt.'" class="'.($LPcutoffs[$i]==0?'hide':'show').'">';
+			echo "<input type=text size=10 id=\"lpdate$cnt\" name=\"lpdate$cnt\" value=\"$lpdate\" onblur=\"ob(this)\"/>(";
+			echo "<span id=\"lpd$cnt\">".getshortday($lpdatebase).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].rdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].rdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-			echo ") <a href=\"#\" onClick=\"displayDatePicker('rdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-
-			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></span>";
+			echo ") <a href=\"#\" onClick=\"displayDatePicker('lpdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+			echo " at <input type=text size=8 id=\"lptime$cnt\" name=\"lptime$cnt\" value=\"$lptime\"></span>";
 		}
 		echo '</td>';
 		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
@@ -728,8 +751,7 @@ if ($overwriteBody==1) {
 				echo "<span id=\"fpspan1$cnt\" class=\"show\">";
 			}
 			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
-				$fpdates[$i] = $enddates[$i];
-				$fpdate = tzdate("m/d/Y",$fpdates[$i]);
+				$fpdate = tzdate("m/d/Y",$fpdatebase);
 				$fptime = $deftime;
 			} else {
 				$fpdate = tzdate("m/d/Y",$fpdates[$i]);
@@ -737,7 +759,7 @@ if ($overwriteBody==1) {
 			}
 
 			echo "<input type=text size=10 id=\"fpdate$cnt\" name=\"fpdate$cnt\" value=\"$fpdate\" onblur=\"ob(this)\"/>(";
-			echo "<span id=\"fpd$cnt\">".getshortday($fpdates[$i]).'</span>';
+			echo "<span id=\"fpd$cnt\">".getshortday($fpdatebase).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].fpdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].fpdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('fpdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 
@@ -773,8 +795,7 @@ if ($overwriteBody==1) {
 				echo "<span id=\"frspan1$cnt\" class=\"show\">";
 			}
 			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
-				$frdates[$i] = $enddates[$i];
-				$frdate = tzdate("m/d/Y",$frdates[$i]);
+				$frdate = tzdate("m/d/Y",$frbasedate);
 				$frtime = $deftime;
 			} else {
 				$frdate = tzdate("m/d/Y",$frdates[$i]);
@@ -782,7 +803,7 @@ if ($overwriteBody==1) {
 			}
 
 			echo "<input type=text size=10 id=\"frdate$cnt\" name=\"frdate$cnt\" value=\"$frdate\" onblur=\"ob(this)\"/>(";
-			echo "<span id=\"frd$cnt\">".getshortday($frdates[$i]).'</span>';
+			echo "<span id=\"frd$cnt\">".getshortday($frbasedate).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].frdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].frdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('frdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 
@@ -801,7 +822,10 @@ if ($overwriteBody==1) {
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',3)">Copy down dates &amp; times</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',4)">Copy down start date &amp; time</a></li>';
 		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',5)">Copy down end date &amp; time</a></li>';
-		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',6)">Copy down review date &amp; time</a></li>';
+		//echo '<li><a href="#" onclick="return senddownaction('.$cnt.',6)">Copy down review date &amp; time</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',7)">Copy down LatePass cutoff date &amp; time</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',8)">Copy down forum post-by date &amp; time</a></li>';
+		echo '<li><a href="#" onclick="return senddownaction('.$cnt.',9)">Copy down forum reply-by date &amp; time</a></li>';
 		echo '</ul></div></td>';
 
 		/*echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";

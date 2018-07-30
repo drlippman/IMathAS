@@ -94,9 +94,9 @@
 
 	} else if (isset($_POST['confirm'])) {
 		//$addtime = $latepasshrs*60*60;
-		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,LPcutoff FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
-		list($allowlate,$enddate,$startdate) =$stm->fetch(PDO::FETCH_NUM);
+		list($allowlate,$enddate,$startdate,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM);
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
@@ -104,10 +104,10 @@
 			$usedlatepasses = 0;
 			$thised = $enddate;
 			$useexception = false;
-			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
+			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff, 'id'=>$aid));
 		} else {
 			$r = $stm->fetch(PDO::FETCH_NUM);
-			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
+			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff, 'id'=>$aid));
 			if ($useexception) {
 				if (!empty($r[3])) { //is_lti - use count in exception
 					$usedlatepasses = $r[2];
@@ -132,7 +132,7 @@
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
 			$stm->execute(array(':lps'=>$LPneeded, ':lps2'=>$LPneeded, ':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
-				$enddate = min(strtotime("+".($latepasshrs*$LPneeded)." hours", $thised), $courseenddate);
+				$enddate = min(strtotime("+".($latepasshrs*$LPneeded)." hours", $thised), $courseenddate, $LPcutoff);
 				if ($hasexception) { //already have exception
 					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+:lps WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 					$stm->execute(array(':lps'=>$LPneeded, ':userid'=>$userid, ':assessmentid'=>$aid, ':enddate'=>$enddate));
@@ -167,19 +167,19 @@
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 		//$curBreadcrumb .= " Redeem LatePass\n";
 		//echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
-		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit,LPcutoff FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
-		list($allowlate,$enddate,$startdate,$timelimit) =$stm->fetch(PDO::FETCH_NUM);
+		list($allowlate,$enddate,$startdate,$timelimit,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM);
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
 		if ($stm->rowCount()==0) {
 			$usedlatepasses = 0;
 			$thised = $enddate;
-			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
+			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff, 'id'=>$aid));
 		} else {
 			$r = $stm->fetch(PDO::FETCH_NUM);
-			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'id'=>$aid));
+			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($r, array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff, 'id'=>$aid));
 			if ($useexception) {
 				if (!empty($r[3])) { //is_lti - use count in exception
 					$usedlatepasses = $r[2];
@@ -204,7 +204,8 @@
 		} else {
 			$LPneeded = 1;
 		}
-		$limitedByCourseEnd = (strtotime("+".($latepasshrs*$LPneeded)." hours", $thised) > $courseenddate);
+		$limitedByCourseEnd = (strtotime("+".($latepasshrs*$LPneeded)." hours", $thised) > $courseenddate && ($LPcutoff==0 || $LPcutoff>$courseenddate));
+		$limitedByLPcutoff = ($LPcutoff>0 && strtotime("+".($latepasshrs*$LPneeded)." hours", $thised) > $LPcutoff && $LPcutoff<$courseenddate);
 		
 		$timelimitstatus = $exceptionfuncs->getTimelimitStatus($aid);
 
@@ -222,6 +223,8 @@
 				echo '<p>';
 				if ($limitedByCourseEnd) {
 					echo sprintf("You can redeem one LatePass for an extension up to the course end date, %s. ", tzdate("D n/j/y, g:i a", $courseenddate));
+				} else if ($limitedByLPcutoff) {
+					echo sprintf("You can redeem one LatePass for an extension up to the cutoff date, %s. ", tzdate("D n/j/y, g:i a", $LPcutoff));
 				} else {
 					echo "You can redeem one LatePass for a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour extension on this assessment. ";
 				}
@@ -230,6 +233,8 @@
 				echo "<p>Each LatePass gives a ".Sanitize::encodeStringForDisplay($latepasshrs)." hour extension on this assessment. ";
 				if ($limitedByCourseEnd) {
 					echo sprintf("You would need %d LatePasses to reopen this assignment up to the course end date, %s. ", $LPneeded, tzdate("D n/j/y, g:i a", $courseenddate));
+				} else if ($limitedByLPcutoff) {
+					echo sprintf("You would need %d LatePasses to reopen this assignment up to the cutoff date, %s. ", $LPneeded, tzdate("D n/j/y, g:i a", $LPcutoff));
 				} else {
 					echo "You would need $LPneeded LatePasses to reopen this assignment. ";
 				}

@@ -140,7 +140,7 @@
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$qn = $matches[1];
 			$aname = $matches[2];
-			$stm = $DBH->prepare("SELECT id,startdate,enddate,allowlate FROM imas_assessments WHERE (name=:name OR name=:name2) AND courseid=:courseid");
+			$stm = $DBH->prepare("SELECT id,startdate,enddate,allowlate,LPcutoff FROM imas_assessments WHERE (name=:name OR name=:name2) AND courseid=:courseid");
 			$stm->execute(array(':name'=>$aname, ':name2'=>htmlentities($aname), ':courseid'=>$line['courseid']));
 			if ($stm->rowCount()>0) {
 				$adata = $stm->fetch(PDO::FETCH_ASSOC);

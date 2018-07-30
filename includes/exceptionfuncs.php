@@ -102,11 +102,11 @@ class ExceptionFuncs {
 	//$exception should be from imas_exceptions, and be null, or
 	//   array(startdate,enddate,islatepass,is_lti)
 	//$adata should be associative array from imas_assessments including
-	//   startdate, enddate, allowlate, id
+	//   startdate, enddate, allowlate, id, LPcutoff
 	//returns normally array(useexception, canundolatepass, canuselatepass)
 	//if canuseifblocked is set, returns array(useexception, canuselatepass if unblocked)
 	//if limit is set, just returns useexception
-	public function getCanUseAssessException($exception, $adata, $limit=false, $canuseifblocked=false) {
+	public function getCanUseAssessException($exception, $adata, $limit=false, $canuseifunblocked=false) {
 		$now = time();
 		$canuselatepass = false;
 		$canundolatepass = false;
@@ -148,7 +148,7 @@ class ExceptionFuncs {
 					$latepasscnt = 0;
 				}
 			}
-			if ($canuseifblocked) {
+			if ($canuseifunblocked) {
 				$canuselatepass = $this->getLatePassBlockedByView($adata, $latepasscnt);
 				return array($useexception, $canuselatepass);
 			} else {
@@ -205,7 +205,11 @@ class ExceptionFuncs {
 		} else {
 			$latepassesAllowed = $adata['allowlate']%10-1;
 		}
-		if ((!in_array($adata['id'],$this->viewedassess) || $skipViewedCheck) && 
+		if (!isset($adata['LPcutoff'])) {
+			$adata['LPcutoff'] = 0;
+		}
+		if ((!in_array($adata['id'],$this->viewedassess) || $skipViewedCheck) &&
+			($adata['LPcutoff']==0 || ($now<$adata['LPcutoff'] && $adata['enddate']<$adata['LPcutoff'])) &&
 			$this->latepasses>0 && $this->isstu && $adata['enddate'] < $this->courseenddate) { //basic checks
 			if ($now<$adata['enddate'] && $latepassesAllowed > $latepasscnt) { //before due date and use is allowed
 				$canuselatepass = true;
