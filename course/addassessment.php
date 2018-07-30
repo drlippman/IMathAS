@@ -427,7 +427,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $query .= "(:courseid, :name, :summary, :intro, :startdate, :enddate, :reviewdate, :timelimit, :minscore, :displaymethod, ";
                 $query .= ":defpoints, :defattempts, :defpenalty, :deffeedback, :shuffle, :gbcategory, :password, :cntingb, :tutoredit, ";
                 $query .= ":showcat, :eqnhelper, :showtips, :caltag, :calrtag, :isgroup, :groupmax, :groupsetid, :showhints, :reqscore, ";
-			$query .= ":reqscoreaid, :reqscoretype, :noprint, :avail, :allowlate, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
+			$query .= ":reqscoreaid, :reqscoretype, :noprint, :avail, :allowlate, :LPcutoff, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
                 $query .= ":posttoforum, :istutorial, :defoutcome, 0, :datebylti)";
                 $stm = $DBH->prepare($query);
                 $stm->execute(array(':courseid'=>$cid, ':name'=>$assessName, ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'],
