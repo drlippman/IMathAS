@@ -266,6 +266,10 @@ if (!(isset($teacherid))) {
 			$sets[] = "avail=:avail";	
 			$qarr[':avail'] = Sanitize::onlyInt($_POST['avail']);
 		}
+		if (isset($_POST['chgreview'])) {
+			$sets[] = "reviewdate=:reviewdate";
+			$qarr[':reviewdate'] = isset($_POST['doreview'])?2000000000:0;
+		}
 		if (isset($_POST['chgreqscoretype'])) {
 			if ($_POST['reqscoretype']==0) {
 				$sets[] = 'reqscore=ABS(reqscore)';
@@ -289,16 +293,20 @@ if (!(isset($teacherid))) {
 			$qarr[':startdate'] = $row[0];
 			$sets[] = "enddate=:enddate";
 			$qarr[':enddate'] = $row[1];
-			$sets[] = "reviewdate=:reviewdate";
-			$qarr[':reviewdate'] = $row[2];
+			if (!isset($_POST['chgreview'])) {
+				$sets[] = "reviewdate=:reviewdate";
+				$qarr[':reviewdate'] = $row[2];
+			}
 			$sets[] = "LPcutoff=:LPcutoff";
 			$qarr[':LPcutoff'] = $row[3];
-		} if (isset($_POST['chgcopyendmsg'])) {	
+		} 
+		if (isset($_POST['chgcopyendmsg'])) {	
 			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyendmsg'])));
 			$sets[] = "endmsg=:endmsg";
 			$qarr[':endmsg'] = $stm->fetchColumn(0);
 		}
+		
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
 			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)");
@@ -625,6 +633,14 @@ $(function() {
 				<td>
 				<input type=radio name="avail" value="0" />Hide<br/>
 				<input type=radio name="avail" value="1" checked="checked"/>Show by Dates
+				</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="chgreview" class="chgbox"/></td>
+				<td class="r">Review mode:</td>
+				<td><input type="checkbox" name="doreview" checked/>
+				  Keep open for un-graded practice after the due date
+				</td>
 				</td>
 			</tr>
 			<tr class="doubledivider">
