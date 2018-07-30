@@ -826,9 +826,7 @@ jQuery(document).ready(function($) {
 			.css("cursor", "pointer")
 			.on("click keydown", function(e) {
 				if (e.type=="click" || e.which==13) {
-					console.log($(this).attr("aria-expanded"));
 					if ($(this).attr("aria-expanded") == "true") {
-						console.log("here");
 						$(this).attr("aria-expanded", false);
 						$(this).children("img").attr("src", "../img/expand.gif");
 						$(this).next(".blockitems").slideUp();
@@ -884,7 +882,6 @@ jQuery(document).ready(function($) {
 
 //code for alt selectors
 function setAltSelectors(group,val) {
-	console.log("looking for "+group);
 	$(".alts."+group).parents(".altWrap").find(".altContentOn").removeClass("altContentOn").addClass("altContentOff");
 	$(".alts."+group).parents(".altWrap").find("."+val).addClass("altContentOn").removeClass("altContentOff");
 	$("select.alts."+group).val(group+":"+val);

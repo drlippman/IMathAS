@@ -151,12 +151,12 @@ Date.prototype.getWeekDays = function(d) {
 	  
   }
   var basesdates = new Array(); var baseedates = new Array(); var baserdates = new Array();
-  var basefpdates = new Array(); var basefrdates = new Array();
+  var basefpdates = new Array(); var basefrdates = new Array(); var baselpdates = new Array();
   
   var globd = new Date();
   function ob(el) {
 	 globd.setTime(Date.parse(el.value));
-	 if (el.id.charAt(0)=='f') {
+	 if (el.id.charAt(0)=='f' || el.id.charAt(0)=='l') {
 	 	 var chgid = el.id.substring(0,3)+el.id.substring(6);
 	 } else {
 	 	 var chgid = el.id.substring(0,2)+el.id.substring(5);
@@ -184,6 +184,12 @@ Date.prototype.getWeekDays = function(d) {
 		  copydown(ln,1,'e');
 	  } else if (val==6) {
 		  copydown(ln,1,'r');
+	  } else if (val==7) {
+		  copydown(ln,1,'lp');
+	  } else if (val==8) {
+		  copydown(ln,1,'fp');
+	  } else if (val==9) {
+		  copydown(ln,1,'fr');
 	  }
 	  el.selectedIndex= 0;
   }
@@ -205,10 +211,16 @@ Date.prototype.getWeekDays = function(d) {
 		  copydown(ln,1,'e');
 	  } else if (val==6) {
 		  copydown(ln,1,'r');
+	  } else if (val==7) {
+		  copydown(ln,1,'lp');
+	  } else if (val==8) {
+		  copydown(ln,1,'fp');
+	  } else if (val==9) {
+		  copydown(ln,1,'fr');
 	  }
 	  return false;
   }
-  function copydownsub(type,basearr,st,usecb,ctype) {  //type: s,e,r
+  function copydownsub(type,basearr,st,usecb,ctype) {  //type: s,e,r,lp,fp,fr
 	  if (document.getElementById(type+"datetype"+st).value==1) {
 		   var newstartdate = document.getElementById(type+"date"+st).value;
 		   globd.setTime(Date.parse(newstartdate));
@@ -246,8 +258,11 @@ Date.prototype.getWeekDays = function(d) {
 	  if (limit == null || limit == 'e') {
 	  	  copydownsub('e',baseedates,st,usecb,type);
 	  }
-	  if ((limit == null || limit == 'r') && baserdates[st]!="NA") {
+	  /*if ((limit == null || limit == 'r') && baserdates[st]!="NA") {
 		 copydownsub('r',baserdates,st,usecb,type);
+	  }*/
+	  if ((limit == null || limit == 'lp') && baselpdates[st]!="NA") {
+		 copydownsub('lp',baselpdates,st,usecb,type);
 	  }
 	  if ((limit == null || limit == 'fp') && basefpdates[st]!="NA") {
 		 copydownsub('fp',basefpdates,st,usecb,type);
@@ -256,7 +271,7 @@ Date.prototype.getWeekDays = function(d) {
 		 copydownsub('fr',basefrdates,st,usecb,type);
 	  }
   }
-  function senddownsub(type,basearr,st,usebusdays,usecb) {  //type: s,e,r
+  function senddownsub(type,basearr,st,usebusdays,usecb) {  //type: s,e,r,lp,fp,fr
 	  var d = new Date();
 	  var db = new Date();
 	  if (document.getElementById(type+"datetype"+st).value==1) {
@@ -311,8 +326,11 @@ Date.prototype.getWeekDays = function(d) {
 	 
 	  senddownsub('s',basesdates,st,usebusdays,usecb);
 	  senddownsub('e',baseedates,st,usebusdays,usecb);
-	  if (baserdates[st]!="NA") {
+	 /* if (baserdates[st]!="NA") {
 		  senddownsub('r',baserdates,st,usebusdays,usecb);
+	  }*/
+	  if (baselpdates[st]!="NA") {
+		  senddownsub('lp',baselpdates,st,usebusdays,usecb);
 	  }
 	  if (basefpdates[st]!="NA") {
 		  senddownsub('fp',basefpdates,st,usebusdays,usecb);
@@ -345,7 +363,7 @@ Date.prototype.getWeekDays = function(d) {
   }
   function datePickerClosed(dateField) {
 	  var globd = getFieldDate(dateField.value);
-	 if (dateField.id.charAt(0)=='f') {
+	 if (dateField.id.charAt(0)=='f' || dateField.id.charAt(0)=='l') {
 	 	 var chgid = dateField.id.substring(0,3)+dateField.id.substring(6);
 	 } else {
 	 	 var chgid = dateField.id.substring(0,2)+dateField.id.substring(5);
@@ -419,7 +437,7 @@ Date.prototype.getWeekDays = function(d) {
 						document.getElementById(type+"span0"+cnt).className="show";
 						document.getElementById(type+"span1"+cnt).className="hide";
 						document.getElementById(type+"datetype"+cnt).value = 0;
-						if (type=='r' || type=='fp' || type=='fr') {
+						if (/*type=='r' ||*/ type=='fp' || type=='fr') {
 							if (to=='always') {
 								document.getElementById(type+"dateanA"+cnt).checked=true;
 							} else {
@@ -488,15 +506,11 @@ Date.prototype.getWeekDays = function(d) {
   		} else { 
   			out.push(document.getElementById("edate"+i).value + "~" + document.getElementById("etime"+i).value);
   		}
-  		if (document.getElementById("rdatetype"+i)) {
+  		if (includeassess && document.getElementById("rdatetype"+i)) {
   			if (document.getElementById("rdatetype"+i).value == 0) {
-  				if (document.getElementById("rdateanN"+i).checked) {
-  					out.push("N");
-  				} else {
-  					out.push("A");
-  				}
+  				out.push("N");
   			} else {
-  				out.push(document.getElementById("rdate"+i).value + "~" + document.getElementById("rtime"+i).value);
+  				out.push("A");
   			} 
   		} else {
   			out.push('NA');
@@ -527,6 +541,15 @@ Date.prototype.getWeekDays = function(d) {
   		} else {
   			out.push('NA');
   		}
+  		if (includeassess && document.getElementById("lpdatetype"+i)) {
+  			if (document.getElementById("lpdatetype"+i).value == 0) {
+  				out.push("N");
+  			} else {
+  				out.push(document.getElementById("lpdate"+i).value + "~" + document.getElementById("lptime"+i).value);
+  			} 
+  		} else {
+  			out.push('NA');
+  		}
   		out.push(document.getElementById("type"+i).value);
   		out.push(document.getElementById("id"+i).value);
   		out.push(document.getElementById("avail"+i).value);
@@ -546,6 +569,12 @@ Date.prototype.getWeekDays = function(d) {
   	  	   elout.options[elout.options.length] = new Option('Hidden','0',false,false);
   	  	   elout.options[elout.options.length] = new Option('By Dates','1',false,false);
   	  	   elout.options[elout.options.length] = new Option('Always/By Dates','2',false,false);
+  	  } else if (el.value=='r') {
+  	  	   elout.options[elout.options.length] = new Option('Never','never',false,false);
+  	  	   elout.options[elout.options.length] = new Option('After Due','dates',false,false);
+  	  } else if (el.value=='lp') {
+  	  	   elout.options[elout.options.length] = new Option('No Limit','always',false,false);
+  	  	   elout.options[elout.options.length] = new Option('By Dates','dates',false,false);
   	  } else {
   	  	   elout.options[elout.options.length] = new Option('Always','always',false,false);
 		  if (el.value=='r' || el.value=='fp' || el.value=='fr') {
@@ -566,6 +595,17 @@ Date.prototype.getWeekDays = function(d) {
   	  	$('td.mcf, th.mcf').show();
   	  }
   	  includeforums = !includeforums;
+  }
+  function toggleMCDincassess() {
+  	  var cookiereg = new RegExp('mcdincassess'+cid+'=[^;]*','i');
+  	  if (includeassess) {
+  	  	$('#MCDassesstoggle').text(_('Show Assessment Dates'));
+  	  	$('td.mca, th.mca').hide();  	  	
+  	  } else {
+  	  	$('#MCDassesstoggle').text(_('Hide Assessment Dates'));  
+  	  	$('td.mca, th.mca').show();
+  	  }
+  	  includeassess = !includeassess;
   }
   
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately

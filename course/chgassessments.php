@@ -209,9 +209,9 @@ if (!(isset($teacherid))) {
 				$caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
 				$sets[] = "caltag=:caltag";
 				$qarr[':caltag'] = $caltag;
-				$calrtag = Sanitize::stripHtmlTags($_POST['caltagrev']);
+				/*$calrtag = Sanitize::stripHtmlTags($_POST['caltagrev']);
 				$sets[] = "calrtag=:calrtag";
-				$qarr[':calrtag'] = $calrtag;
+				$qarr[':calrtag'] = $calrtag;*/
 			}
 			if (isset($_POST['chgmsgtoinstr'])) {
 				if (isset($_POST['msgtoinstr'])) {
@@ -282,7 +282,7 @@ if (!(isset($teacherid))) {
 			$qarr[':summary'] = $stm->fetchColumn(0);
 		}
 		if (isset($_POST['chgdates'])) {
-			$stm = $DBH->prepare("SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT startdate,enddate,reviewdate,LPcutoff FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['dates'])));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$sets[] = "startdate=:startdate";
@@ -291,6 +291,8 @@ if (!(isset($teacherid))) {
 			$qarr[':enddate'] = $row[1];
 			$sets[] = "reviewdate=:reviewdate";
 			$qarr[':reviewdate'] = $row[2];
+			$sets[] = "LPcutoff=:LPcutoff";
+			$qarr[':LPcutoff'] = $row[3];
 		} if (isset($_POST['chgcopyendmsg'])) {	
 			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyendmsg'])));
@@ -452,6 +454,9 @@ span.show {
 table td {
 	border-bottom: 1px solid #ccf;
 }
+.doubledivider td {
+	border-bottom: 3px double #000;
+}
 </style>
 <script type="text/javascript">
 function chgfb() {
@@ -467,20 +472,7 @@ function chgfb() {
 }
 
 function copyfromtoggle(frm,mark) {
-	var tds = frm.getElementsByTagName("tr");
-	for (var i = 0; i<tds.length; i++) {
-		try {
-			if (tds[i].className=='coptr') {
-				if (mark) {
-					tds[i].style.display = "none";
-				} else {
-					tds[i].style.display = "";
-				}
-			}
-
-		} catch(er) {}
-	}
-
+	$(".coptr").toggle(!mark);
 }
 function chkgrp(frm, arr, mark) {
 	  var els = frm.getElementsByTagName("input");
@@ -527,7 +519,6 @@ $(function() {
 			$(this).parents("tr").removeClass("odd");
 		}*/
 	});
-
 })
 </script>
 
@@ -636,17 +627,17 @@ $(function() {
 				<input type=radio name="avail" value="1" checked="checked"/>Show by Dates
 				</td>
 			</tr>
-			<tr>
-				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcopyendmsg"/></td>
-				<td class="r" style="border-bottom: 1px solid #000">End of Assessment Messages:</td>
-				<td style="border-bottom: 1px solid #000">Copy from:
+			<tr class="doubledivider">
+				<td ><input type="checkbox" name="chgcopyendmsg"/></td>
+				<td class="r">End of Assessment Messages:</td>
+				<td>Copy from:
 <?php
 	writeHtmlSelect("copyendmsg",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
 				<br/><i style="font-size: 75%">Use option near the bottom to define new messages</i>
 				</td>
 			</tr>
-			<tr>
+			<tr class="doubledivider">
 				<td><input type="checkbox" name="docopyopt" class="chgbox" onClick="copyfromtoggle(this.form,this.checked)"/></td>
 				<td class="r">Copy remaining options</td>
 				<td>Copy from:
@@ -655,19 +646,7 @@ $(function() {
 ?>
 				</td>
 			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
-				<td class="r">Require Password (blank for none):</td>
-				<td><input type=text name="assmpassword" value="" autocomplete="off"></td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
-				<td class="r">Time Limit (minutes, 0 for no time limit): </td>
-				<td><input type=text size=4 name="timelimit" value="0" />
-				   <input type="checkbox" name="timelimitkickout" /> Kick student out at timelimit
-				   </td>
-			</tr>
-
+			
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgdisplaymethod" class="chgbox"/></td>
 				<td class="r">Display method: </td>
@@ -679,38 +658,6 @@ $(function() {
 					<option value="SkipAround" <?php writeHtmlSelected($line['displaymethod'],"SkipAround",0) ?>>Skip Around</option>
 					<option value="Embed" <?php writeHtmlSelected($line['displaymethod'],"Embed",0) ?>>Embedded</option>
 				</select>
-				</td>
-			</tr>
-
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgdefpoints" class="chgbox"/></td>
-				<td class="r">Default points per problem: </td>
-				<td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" ></td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgdefattempts" class="chgbox"/></td>
-				<td class="r">Default attempts per problem (0 for unlimited): </td>
-				<td>
-					<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
- 					<span id="showreattdiffver" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
- 					<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($line['shuffle']&8,8); ?> />
- 					Reattempts different versions</span>
-				</td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
-				<td class="r">Default penalty:</td>
-				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
-   					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
-						<option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
-						<option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
-						<option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
-						<option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
-						<option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
-						<option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
-						<option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
-						<option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
-					</select>
 				</td>
 			</tr>
 			<tr class="coptr">
@@ -752,26 +699,144 @@ $(function() {
 					</span>
 				</td>
 			</tr>
-
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
-				<td class="r">Use equation helper?</td>
+				<td><input type="checkbox" name="chgdefpoints" class="chgbox"/></td>
+				<td class="r">Default points per problem: </td>
+				<td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" ></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgdefattempts" class="chgbox"/></td>
+				<td class="r">Default attempts per problem (0 for unlimited): </td>
 				<td>
-				<select name="eqnhelper">
-					<option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
-				<?php
-					//phase out unless a default
-					if ($CFG['AMS']['eqnhelper']==1 || $CFG['AMS']['eqnhelper']==2) {
-				?>
-					<option value="1" <?php writeHtmlSelected($line['eqnhelper'],1) ?>>Yes, simple form (no logs or trig)</option>
-					<option value="2" <?php writeHtmlSelected($line['eqnhelper'],2) ?>>Yes, advanced form</option>
-				<?php
-					}
-				?>
-					<option value="3" <?php writeHtmlSelected($line['eqnhelper'],3) ?>>MathQuill, simple form</option>
-					<option value="4" <?php writeHtmlSelected($line['eqnhelper'],4) ?>>MathQuill, advanced form</option>
+					<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
+ 					<span id="showreattdiffver" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
+ 					<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($line['shuffle']&8,8); ?> />
+ 					Reattempts different versions</span>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
+				<td class="r">Default penalty:</td>
+				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
+   					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
+						<option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
+						<option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
+						<option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
+						<option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
+						<option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
+						<option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
+						<option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
+						<option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
+					</select>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
+				<td class="r">Gradebook category: </td>
+				<td>
+<?php
+writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,null,null," id=gbcat");
+?>
+
+				</td>
+			</tr>
+			
+			<tr class="coptr highlight">
+				<td colspan="3"><strong>Additional Display Options</strong></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
+				<td class="r">Calendar icon:</td>
+				<td>
+				<input name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgshuffle" class="chgbox"/></td>
+				<td class="r">Shuffle item order: </td>
+				<td>
+				<select name="shuffle">
+					<option value="0" <?php writeHtmlSelected($line['shuffle']&(1+16),0) ?>>No</option>
+					<option value="1" <?php writeHtmlSelected($line['shuffle']&1,1) ?>>All</option>
+					<option value="16" <?php writeHtmlSelected($line['shuffle']&16,16) ?>>All but first</option>
 				</select>
 				</td>
+			</tr>
+			<tr class="coptr">
+				<td ><input type="checkbox" name="chgshowqcat" class="chgbox"/></td>
+				<td class="r" >Show question categories: </td>
+				<td ><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
+				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
+				<input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
+				<td class="r">Make hard to print?: </td>
+				<td>
+				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgsameseed" class="chgbox"/></td>
+				<td class="r">All items same random seed: </td>
+				<td><input type="checkbox" name="sameseed"></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgsamever" class="chgbox"/></td>
+				<td class="r">All students same version of questions: </td>
+				<td><input type="checkbox" name="samever"></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgistutorial" class="chgbox"/></td>
+				<td class="r">Display for tutorial-style questions: </td>
+				<td>
+				<input type="checkbox" name="istutorial"/>
+				</td>
+			</tr>
+			
+			<tr class="coptr highlight">
+				<td colspan="3"><strong>Time Limit and Access Control</strong></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgallowlate" class="chgbox"/></td>
+				<td class="r">Allow use of LatePasses?: </td>
+				<td>
+				<?php
+				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
+				?>
+				<label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>10,true); ?>> Allow LatePasses after due date</label>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
+				<td class="r">Time Limit (minutes, 0 for no time limit): </td>
+				<td><input type=text size=4 name="timelimit" value="0" />
+				   <input type="checkbox" name="timelimitkickout" /> Kick student out at timelimit
+				   </td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
+				<td class="r">Require Password (blank for none):</td>
+				<td><input type=text name="assmpassword" value="" autocomplete="off"></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgreqscoretype" class="chgbox"/></td>
+				<td class="r">"Show based on another assessment" display:</td>
+				<td>
+				<select name="reqscoretype">
+				<option value="0">Hide until requirement is met</option>
+				<option value="1">Show greyed until requirement is met</option>
+				</select>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td></td>
+				<td class="r">Clear "show based on another assessment" settings.</td>
+				<td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
+			</tr>
+			<tr class="coptr highlight">
+				<td colspan="3"><strong>Help and Hints</strong></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chghints" class="chgbox"/></td>
@@ -795,6 +860,26 @@ $(function() {
 				</td>
 			</tr>
 			<tr class="coptr">
+				<td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
+				<td class="r">Use equation helper?</td>
+				<td>
+				<select name="eqnhelper">
+					<option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
+				<?php
+					//phase out unless a default
+					if ($CFG['AMS']['eqnhelper']==1 || $CFG['AMS']['eqnhelper']==2) {
+				?>
+					<option value="1" <?php writeHtmlSelected($line['eqnhelper'],1) ?>>Yes, simple form (no logs or trig)</option>
+					<option value="2" <?php writeHtmlSelected($line['eqnhelper'],2) ?>>Yes, advanced form</option>
+				<?php
+					}
+				?>
+					<option value="3" <?php writeHtmlSelected($line['eqnhelper'],3) ?>>MathQuill, simple form</option>
+					<option value="4" <?php writeHtmlSelected($line['eqnhelper'],4) ?>>MathQuill, advanced form</option>
+				</select>
+				</td>
+			</tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgshowtips" class="chgbox"/></td>
 				<td class="r">Show answer entry tips?</td>
 				<td>
@@ -805,79 +890,21 @@ $(function() {
 				</select>
 				</td>
 			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgallowlate" class="chgbox"/></td>
-				<td class="r">Allow use of LatePasses?: </td>
-				<td>
-				<?php
-				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
-				?>
-				<label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>10,true); ?>> Allow LatePasses after due date</label>
-				</td>
+			
+			<tr class="coptr highlight">
+				<td colspan="3"><strong>Grading and Feedback</strong></td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
-				<td class="r">Make hard to print?: </td>
-				<td>
-				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes
-				</td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgshuffle" class="chgbox"/></td>
-				<td class="r">Shuffle item order: </td>
-				<td>
-				<select name="shuffle">
-					<option value="0" <?php writeHtmlSelected($line['shuffle']&(1+16),0) ?>>No</option>
-					<option value="1" <?php writeHtmlSelected($line['shuffle']&1,1) ?>>All</option>
-					<option value="16" <?php writeHtmlSelected($line['shuffle']&16,16) ?>>All but first</option>
+				<td><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
+				<td class="r" >Count: </td>
+				<td><select name="cntingb">
+					<option value="1" selected> Count in Gradebook</option>
+					<option value="0"> Don't count in grade total and hide from students</option>
+					<option value="3"> Don't count in grade total</option>
+					<option value="2"> Count as Extra Credit</option>
 				</select>
 				</td>
 			</tr>
-
-
-			<tr class="coptr">
-				<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
-				<td class="r">Gradebook category: </td>
-				<td>
-<?php
-writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,null,null," id=gbcat");
-?>
-
-				</td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgtutoredit" class="chgbox"/></td>
-				<td class="r">Tutor Access: </td>
-				<td>
-<?php
-$page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
-$page_tutorSelect['val'] = array(2,0,1);
-writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
-
-$deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
-
-?>
-				</td>
-			</tr>
-
-			<tr class="coptr">
-				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
-				<td class="r" style="border-bottom: 1px solid #000">Count: </td>
-				<td style="border-bottom: 1px solid #000"><input name="cntingb" value="1" checked="checked" type="radio"> Count in Gradebook<br>
-				<input name="cntingb" value="0" type="radio"> Don't count in grade total and hide from students<br>
-				<input name="cntingb" value="3" type="radio"> Don't count in grade total<br>
-				<input name="cntingb" value="2" type="radio"> Count as Extra Credit
-				</td>
-			</tr>
-
-
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
-				<td class="r">Calendar icon:</td>
-				<td>
-				Active: <input name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>"/>,
-				Review: <input name="caltagrev" type=text size=8 value="<?php echo $line['calrtag'];?>"/>
-				</td>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgminscore" class="chgbox"/></td>
 				<td class="r">Minimum score to receive credit: </td>
@@ -895,38 +922,30 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 				Text: <input type="text" size="60" name="deffb" value="<?php echo $deffb;?>" /></td>
 			</tr>
 			<tr class="coptr">
-				<td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
-				<td class="r">Clear "show based on another assessment" settings.</td>
-				<td></td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgreqscoretype" class="chgbox"/></td>
-				<td class="r">"Show based on another assessment" display:</td>
+				<td><input type="checkbox" name="chgtutoredit" class="chgbox"/></td>
+				<td class="r">Tutor Access: </td>
 				<td>
-				<select name="reqscoretype">
-				<option value="0">Hide until requirement is met</option>
-				<option value="1">Show greyed until requirement is met</option>
-				</select>
+<?php
+$page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
+$page_tutorSelect['val'] = array(2,0,1);
+writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
+
+$deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
+
+?>
 				</td>
 			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgsameseed" class="chgbox"/></td>
-				<td class="r">All items same random seed: </td>
-				<td><input type="checkbox" name="sameseed"></td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgsamever" class="chgbox"/></td>
-				<td class="r">All students same version of questions: </td>
-				<td><input type="checkbox" name="samever"></td>
-			</tr>
-
-			<tr class="coptr">
+			<tr class="coptr doubledivider">
 				<td><input type="checkbox" name="chgexcpen" class="chgbox"/></td>
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
 				<td>
 				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
 				</td>
 			</tr>
+
+
+
+			
 <?php
 /* removed because gets too confusing with group sets
 			<tr class="coptr">
@@ -947,25 +966,12 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 			</tr>
 */
 ?>
-			<tr class="coptr">
-				<td ><input type="checkbox" name="chgshowqcat" class="chgbox"/></td>
-				<td class="r" >Show question categories: </td>
-				<td ><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
-				<input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
-				<input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
-				</td>
-			</tr>
-			<tr class="coptr">
-				<td><input type="checkbox" name="chgistutorial" class="chgbox"/></td>
-				<td class="r">Display for tutorial-style questions: </td>
-				<td>
-				<input type="checkbox" name="istutorial"/>
-				</td>
-			</tr>
+			
+			
 			<tr>
-				<td style="border-top: 1px solid #000"></td>
-				<td class="r" style="border-top: 1px solid #000">Define end of assessment messages?</td>
-				<td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" class="chgbox"/> You will be taken to a page to change these after you hit submit</td>
+				<td></td>
+				<td class="r">Define end of assessment messages?</td>
+				<td><input type="checkbox" name="chgendmsg" class="chgbox"/> You will be taken to a page to change these after you hit submit</td>
 			</tr>
 			<tr>
 				<td></td>

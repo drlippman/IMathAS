@@ -78,6 +78,7 @@ row[0][1][0][10] = 0 regular, 1 group
 row[0][1][0][11] = due date (if $includeduedate is set)
 row[0][1][0][12] = allowlate (in general)
 row[1][1][0][13] = timelimit if requested through $includetimelimit
+row[0][1][0][14] = LP cutoff
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -285,7 +286,7 @@ function gbtable() {
 
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti";
+	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti";
 	if ($limuser>0) {
 		$query .= ',reqscoreaid,reqscore,reqscoretype';
 	}
@@ -325,6 +326,7 @@ function gbtable() {
 	$assessmenttype = array();
 	$startdate = array();
 	$enddate = array();
+	$LPcutoff = array();
 	$tutoredit = array();
 	$isgroup = array();
 	$avail = array();
@@ -355,6 +357,7 @@ function gbtable() {
 		}
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
+		$LPcutoff[$kcnt] = $line['LPcutoff'];
 		if ($now<$line['startdate'] || $line['date_by_lti']==1) {
 			$avail[$kcnt] = 2;
 		} else if ($now < $line['enddate']) {
@@ -744,6 +747,9 @@ function gbtable() {
 				if ($allowlate[$k]>0) {
 					$gb[0][1][$pos][12] = $allowlate[$k];
 				}
+				if (isset($LPcutoff[$k])) {
+					$gb[0][1][$pos][14] = $LPcutoff[$k];
+				}
 
 				$pos++;
 			}
@@ -825,6 +831,9 @@ function gbtable() {
 			}
 			if ($allowlate[$k]>0) {
 				$gb[0][1][$pos][12] = $allowlate[$k];
+			}
+			if (isset($LPcutoff[$k])) {
+				$gb[0][1][$pos][14] = $LPcutoff[$k];
 			}
 			$pos++;
 		}
@@ -931,9 +940,9 @@ function gbtable() {
 	$exceptions = array();
 	$canuseexception = array();
 	$forumexceptions = array();
-	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate FROM imas_exceptions AS ie,imas_assessments WHERE ";
+	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate,imas_assessments.LPcutoff FROM imas_exceptions AS ie,imas_assessments WHERE ";
 	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
-	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_forums.enddate,imas_forums.startdate FROM imas_exceptions AS ie,imas_forums WHERE ";
+	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_forums.enddate,imas_forums.startdate,0 AS LPcutoff FROM imas_exceptions AS ie,imas_forums WHERE ";
 	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
@@ -1030,9 +1039,9 @@ function gbtable() {
 		*/
 		$useexception = false; $canuselatepass = false;
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
-			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid']));
+			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
 		} else {
-			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid']));
+			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
 		}
 		//if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
 

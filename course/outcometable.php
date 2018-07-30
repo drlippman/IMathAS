@@ -110,7 +110,7 @@ function outcometable() {
 	}
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome,allowlate FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome,allowlate FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
 	$query .= "AND cntingb>0 AND cntingb<3 ";
 	$qarr = array(':courseid'=>$cid);
 	if ($istutor) {
@@ -132,6 +132,7 @@ function outcometable() {
 	$discuss = array();
 	$startdate = array();
 	$enddate = array();
+	$LPcutoff = array();
 	$allowlate = array();
 	$timelimits = array();
 	$avail = array();
@@ -158,7 +159,8 @@ function outcometable() {
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
 		$allowlate[$kcnt] = $line['allowlate'];
-
+		$LPcutoff[$kcnt] = $line['LPcutoff'];
+		
 		$timelimits[$kcnt] = $line['timelimit'];
 
 		$assessments[$kcnt] = $line['id'];
@@ -564,7 +566,7 @@ function outcometable() {
 		}
 		$useexception = false;
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
-			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i]), true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'LPcutoff'=>$LPcutoff[$i]), true);
 		}
 
 		if ($useexception) {

@@ -81,9 +81,9 @@
 	} else {
 		$sortorder = "name";
 	}
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
@@ -213,7 +213,7 @@
 		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
-			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate), true);
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
 			if ($useexception) {
 				$thisenddate = $exceptions[$line['userid']][1];
 			}
