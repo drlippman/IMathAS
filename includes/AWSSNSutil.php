@@ -10,6 +10,7 @@ if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])
 	if ($msg !== null && isset($msg['SubscribeURL'])) {
 		//call subscription URL to confirm
 		$res = file_get_contents($msg['SubscribeURL']);
+		exit;
 	}
 }
 
