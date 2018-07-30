@@ -897,8 +897,8 @@ if ($overwriteBody==1) {
 ?>
 		<span class=form>Availability:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Prevent access<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Allow access<br/>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Prevent access<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);"/>Allow access<br/>
 		</span><br class="form"/>
 		
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">

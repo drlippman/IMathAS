@@ -601,9 +601,9 @@ printf("<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=%s&
 		<br/>
 		<span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='none';"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="document.getElementById('datediv').style.display='block';document.getElementById('altcaldiv').style.display='none';"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='block';"/>Show Always<br/>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="$('#datediv').slideDown(100);$('#altcaldiv').slideUp(100);"/>Show by Dates<br/>
+			<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideDown(100);"/>Show Always<br/>
 		</span><br class="form"/>
 
 		<div id="datediv" style="display:<?php echo ($avail==1)?"block":"none"; ?>">
