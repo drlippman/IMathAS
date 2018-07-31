@@ -1471,6 +1471,7 @@ function assessbackgsave() {
 }
 //this submits one question for grading, in Embedded display
 function assessbackgsubmit(qn,noticetgt) {
+	qn = parseInt(qn);
 	if (!confirmSubmit($("#embedqwrapper"+qn)[0])) {
 		return false;	
 	}
@@ -1500,6 +1501,7 @@ function assessbackgsubmit(qn,noticetgt) {
 	} else {
 		var regex = new RegExp("^(qn|tc|qs)");
 	}
+
 	for (var i=0;i<els.length;i++) {
 		if (els[i].name.match(regex)) {
 			if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {
@@ -1543,6 +1545,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		params['disptime'] = document.getElementById("disptime").value;
 		params['isreview'] = document.getElementById("isreview").value;
 	}
+
 	var options = {
 		type: "POST",
 		url: assesspostbackurl,
@@ -1655,7 +1658,7 @@ function embedEnterHandler(el) {
 	  .on("keydown.embedenterhandler", function(e) {
 		if (e.which==13) {
 			e.preventDefault();
-			var id = $(this).closest(".embedqwrapper").attr("id").substr(13);
+			var id = parseInt($(this).closest(".embedqwrapper").attr("id").substr(13));
 			assessbackgsubmit(id, "submitnotice"+id);
 		}
 	});

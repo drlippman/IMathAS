@@ -98,7 +98,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $cid, $assessmentId);
 			$body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
                 $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-                $body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, $assessmentId).'">"';
+                $body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, $assessmentId).'">';
                 $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
                 $body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=%s&id=%d'\"></p>\n",
                     $cid, $assessmentId);
