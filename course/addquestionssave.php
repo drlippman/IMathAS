@@ -134,9 +134,9 @@
 	$qarr = array(':itemorder'=>$_REQUEST['order'], ':viddata'=>$viddata, ':intro'=>$new_intro, ':id'=>$aid, ':courseid'=>$cid);
 	$query = "UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata,intro=:intro";
 	if (isset($_POST['defpts'])) {
-		$defpts = Sanitize::onlyInt($_POST['defpts']);
+		$defpoints = Sanitize::onlyInt($_POST['defpts']);
 		$query .= ",defpoints=:defpts";
-		$qarr[':defpts'] = $defpts;
+		$qarr[':defpts'] = $defpoints;
 	}
 	$query .= " WHERE id=:id AND courseid=:courseid";
 	//store new itemorder

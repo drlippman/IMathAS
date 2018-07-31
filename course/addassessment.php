@@ -419,6 +419,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$datebylti = 0;
 			}
+			if (empty($defpoints)) {
+				$defpoints = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']:10;
+			}
 
                 $query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
                 $query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,";
