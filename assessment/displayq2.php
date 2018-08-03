@@ -2496,8 +2496,6 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
 				$la = str_replace('&quot;','"',$la);
-
-				$la = htmlentities($la);
 			}
 			if ($rows<2) {
 				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" /> ";
