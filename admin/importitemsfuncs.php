@@ -828,7 +828,7 @@ private function insertAssessment() {
 			$this->data['questions'][$qid]['questionsetid'] = $this->qsmap[$this->data['questions'][$qid]['questionsetid']];
 			//record points if needed
 			if ($this->data['questions'][$qid]['points']<9999) {
-				$qpoints[$qid] = data['questions'][$qid]['points'];
+				$qpoints[$qid] = $this->data['questions'][$qid]['points'];
 			}
 			//add in assessmentid
 			$exarr[] = $this->typemap['Assessment'][$toimport];
