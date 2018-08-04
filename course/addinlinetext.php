@@ -156,6 +156,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':courseid'=>$cid, ':title'=>$_POST['title'], ':text'=>$_POST['text'], ':startdate'=>$startdate, ':enddate'=>$enddate,
 				':avail'=>$_POST['avail'], ':oncal'=>$_POST['oncal'], ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist));
 			$newtextid = $DBH->lastInsertId();
+			$_GET['id'] = $newtextid;
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "(:courseid, 'InlineText', :typeid);";
 			$stm = $DBH->prepare($query);
