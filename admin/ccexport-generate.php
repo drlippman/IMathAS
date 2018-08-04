@@ -407,7 +407,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				if ($linktype=='canvas') {
 					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$canvout .= '<content_type>Assignment</content_type>'."\n";
-					$canvout .= '<workflow_state>'.(row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
+					$canvout .= '<workflow_state>'.($row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>'."\n";
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max($mod_depth-1,0)."</indent> </item>";
