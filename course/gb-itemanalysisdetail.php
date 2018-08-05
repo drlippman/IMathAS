@@ -104,6 +104,7 @@ if ($type=='notstart') {
 	}
 	$stuincomp = array();
 	$stuscores = array();
+	$stuscoreparts = array();
 	$stutimes = array();
 	$sturegens = array();
 	$stuatt = array();
@@ -116,6 +117,7 @@ if ($type=='notstart') {
 		}
 		$sp = explode(';', $line['bestscores']);
 		$scores = explode(',', $sp[0]);
+		$rawscores = explode(',', $sp[1]);
 		$attp = explode(',',$line['bestattempts']);
 		$bla = explode('~',$line['bestlastanswers']);
 		$timeot = explode(',',$line['timeontask']);
@@ -124,6 +126,17 @@ if ($type=='notstart') {
 		if (strpos($scores[$k],'-1')!==false) {
 			$stuincomp[$line['userid']] = 1;
 		} else {
+			if ($type=='score' && strpos($rawscores[$k], '~')!==false) {
+				$scparts = explode('~', $rawscores[$k]);
+				foreach ($scparts as $pidx=>$ptsc) {
+					if ($ptsc != '-1') {
+						if (!isset($stuscoreparts[$pidx])) {
+							$stuscoreparts[$pidx] = array();
+						}
+						$stuscoreparts[$pidx][] = $ptsc;
+					}
+				}
+			}
 			$stuscores[$line['userid']] = getpts($scores[$k]);
 			$stuatt[$line['userid']] = $attp[$k];
 			$sturegens[$line['userid']] = substr_count($bla[$k],'ReGen');
@@ -142,6 +155,12 @@ if ($type=='notstart') {
 		}
 		echo '</ul>';
 	} else if ($type=='score') {
+		if (count($stuscoreparts)>0) {
+			echo '<h2>Average Score by Part</h2>';
+			foreach ($stuscoreparts as $k=>$v) {
+				echo "Part $k: ".round(100*array_sum($v)/count($v), 1).'%<br/>';	
+			}
+		}
 		$stunames = getstunames(array_keys($stuscores));
 		asort($stuscores);
 		echo '<h2>Students with lowest scores</h2><table class="gb"><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody>';
