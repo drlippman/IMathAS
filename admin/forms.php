@@ -345,6 +345,7 @@ switch($_GET['action']) {
 			$istemplate = $line['istemplate'];
 			$deflatepass = $line['deflatepass'];
 			$deftime = $line['deftime'];
+			$latepasshrs = $line['latepasshrs'];
 			$jsondata = json_decode($line['jsondata'], true);
 			$dates_by_lti = $line['dates_by_lti']; 
 			if ($jsondata===null || !isset($jsondata['browser'])) {
@@ -381,6 +382,7 @@ switch($_GET['action']) {
 			$lockaid = 0;
 			$deftime = isset($CFG['CPS']['deftime'])?$CFG['CPS']['deftime'][0]:600;
 			$deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
+			$latepasshrs = isset($CFG['CPS']['latepasshrs'])?$CFG['CPS']['latepasshrs'][0]:24;
 			$ltisecret = "";
 			$browser = array();
 			$blockLTICopyOfCopies = false;
@@ -655,6 +657,10 @@ switch($_GET['action']) {
 		if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1]==1) {
 			echo '<span class="form">Auto-assign LatePasses on course enroll:</span><span class="formright">';
 			echo '<input type="text" size="3" name="deflatepass" value="'.Sanitize::encodeStringForDisplay($deflatepass).'"/> LatePasses</span><br class="form" />';
+		}
+		if (!isset($CFG['CPS']['latepasshrs']) || $CFG['CPS']['latepasshrs'][1]==1) {
+			echo '<span class="form">Late Passes extend the due date by:</span><span class="formright">';
+			echo '<input type="text" size="3" name="latepasshrs" value="'.Sanitize::encodeStringForDisplay($latepasshrs).'"/> hours</span><br class="form" />';
 		}
 		
 		if (!isset($CFG['CPS']['msgonenroll']) || $CFG['CPS']['msgonenroll'][1]==1) {
