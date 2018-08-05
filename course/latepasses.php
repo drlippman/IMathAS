@@ -133,7 +133,10 @@ function sendtoall(type) {
 		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$hours = $stm->fetchColumn(0);
-		echo '<p>Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.  Students must redeem the LatePass before the Due Date, unless you opt in your assessment settings to allow use after the due date (but within 1 LatePass period, specified below).</p>';
+		echo '<p>Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor. ';
+		echo 'In each assessment\'s settings, an instructor can specify whether LatePasses are allowed, ';
+		echo 'limit the number of passes allowed, limit whether they can be used after the due date, ';
+		echo 'or specify a hard date after which LatePasses are not allowed.</p>';
 		echo "<p>Late Passes extend the due date by <input type=text size=3 name=\"hours\" id=\"hours\" value=\"" . Sanitize::encodeStringForDisplay($hours) . "\"/> hours</p>";
 		echo "<p>To all students:  <input type=\"text\" size=\"3\" value=\"1\" id=\"toall\"/> ";
 		echo '<input type=button value="Add" onClick="sendtoall(0);"/> <input type=button value="Replace" onclick="sendtoall(1)"/><p>';
