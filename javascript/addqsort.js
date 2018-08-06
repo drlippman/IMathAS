@@ -737,8 +737,8 @@ function updatePts() {
 		var qparts,curval;
 		$("[id^=pts-]").each(function() {
 			qparts = $(this).attr("id").split('-');
-			curval = Math.round($(this).val());
-			if (curval == "" || curval <= 0) {
+			curval = $(this).val().replace(/\s/g,'');
+			if (curval == "" || !curval.match(/^\d+$/) || 1.0*curval < 0) {
 				curval = $(this).attr("data-lastval");
 			}
 			if (newdefpts != olddefpts && curval==olddefpts) {
@@ -749,7 +749,10 @@ function updatePts() {
 		});
 		$("[id^=grppts-]").each(function() {
 			qparts = $(this).attr("id").split('-');
-			curval = $(this).val();
+			curval = $(this).val().replace(/\s/g,'');
+			if (curval == "" || !curval.match(/^\d+$/) || 1.0*curval < 0) {
+				curval = $(this).attr("data-lastval");
+			}
 			if (newdefpts != olddefpts && curval==olddefpts) {
 				//update pts to match new default
 				curval = newdefpts;
