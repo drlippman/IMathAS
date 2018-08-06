@@ -157,9 +157,13 @@ if ($type=='notstart') {
 	} else if ($type=='score') {
 		if (count($stuscoreparts)>0) {
 			echo '<h2>Average Score by Part</h2>';
+			echo '<p>';
 			foreach ($stuscoreparts as $k=>$v) {
-				echo "Part $k: ".round(100*array_sum($v)/count($v), 1).'%<br/>';	
+				echo "Part ".($k+1).": ".round(100*array_sum($v)/count($v), 1).'%<br/>';	
 			}
+			echo '</p>';
+			echo '<p class=small>Note: These are based on raw correct/not scores, and do <em>not</em> take into account missed attempt penalties, ';
+			echo 'so may appear higher than the score seen on the main item analysis page.</p>';
 		}
 		$stunames = getstunames(array_keys($stuscores));
 		asort($stuscores);
