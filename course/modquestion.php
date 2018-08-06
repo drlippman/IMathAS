@@ -45,7 +45,7 @@ if (!(isset($teacherid))) {
 				if ($_POST['skippenalty']==10) {
 					$penalty = 'L'.$penalty;
 				} else if ($_POST['skippenalty']>0) {
-					$penalty = 'S'.$_POST['skippenalty'].$penalty;
+					$penalty = 'S'.intval($_POST['skippenalty']).$penalty;
 				}
 			}
 			$regen = $_POST['regen'] + 3*$_POST['allowregen'];
@@ -118,14 +118,14 @@ if (!(isset($teacherid))) {
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($line['penalty']{0}==='L') {
 				$line['penalty'] = substr($line['penalty'],1);
-				$skippenalty==10;
+				$skippenalty = 10;
 			} else if ($line['penalty']{0}==='S') {
 				$skippenalty = $line['penalty']{1};
 				$line['penalty'] = substr($line['penalty'],2);
 			} else {
 				$skippenalty = 0;
 			}
-			
+
 			if ($line['points']==9999) {$line['points']='';}
 			if ($line['attempts']==9999) {$line['attempts']='';}
 			if ($line['penalty']==9999) {$line['penalty']='';}
@@ -183,14 +183,14 @@ if (!(isset($teacherid))) {
 		list($deffeedback,$defshowans) = explode('-',$defaults['deffeedback']);
 		if ($defaults['defpenalty']{0}==='L') {
 			$defaults['defpenalty'] = substr($defaults['defpenalty'],1);
-			$skippenalty=_('on last possible attempt only');
+			$skippenaltystr=_('on last possible attempt only');
 		} else if ($defaults['defpenalty']{0}==='S') {
-			$skippenalty = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty']{1});
+			$skippenaltystr = sprintf(_('per missed attempt, after %d'), $defaults['defpenalty']{1});
 			$defaults['defpenalty'] = substr($defaults['defpenalty'],2);
 		} else {
-			$skippenalty = _('per missed attempt');
+			$skippenaltystr = _('per missed attempt');
 		}
-		$defaults['penalty'] = $defaults['defpenalty'].'% '.$skippenalty;
+		$defaults['penalty'] = $defaults['defpenalty'].'% '.$skippenaltystr;
 		if ($deffeedback=="Practice" || $deffeedback=="Homework") {
 			$defaults['allowregen'] = _('Yes');
 		} else {
