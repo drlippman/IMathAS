@@ -124,7 +124,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$public = 0;
 	}
-
+	if (isset($_POST['innav'])) {
+		$innav = 1;
+	} else {
+		$innav = 0;
+	}
 
 	$sub =& $items;
 	if (count($blocktree)>1) {
@@ -140,6 +144,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['SH'] = $_POST['showhide'] . $_POST['availbeh'] . $_POST['contentbehavior'];
 		$sub[$existingid]['colors'] = $colors;
 		$sub[$existingid]['public'] = $public;
+		$sub[$existingid]['innav'] = $innav;
 		$sub[$existingid]['fixedheight'] = $fixedheight;
 		$sub[$existingid]['grouplimit'] = $grouplimit;
 	} else { //add new
@@ -152,6 +157,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockitems['SH'] = $_POST['showhide'] . $_POST['availbeh'] . $_POST['contentbehavior'];;
 		$blockitems['colors'] = $colors;
 		$blockitems['public'] = $public;
+		$blockitems['innav'] = $innav;
 		$blockitems['fixedheight'] = $fixedheight;
 		$blockitems['grouplimit'] = $grouplimit;
 		$blockitems['items'] = array();
@@ -198,6 +204,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$public = $blockitems[$existingid]['public'];
 		} else {
 			$public = 0;
+		}
+		if (isset($blockitems[$existingid]['innav'])) { //backwards compat
+			$innav = $blockitems[$existingid]['innav'];
+		} else {
+			$innav = 0;
 		}
 		$showhide = $blockitems[$existingid]['SH'][0];
 		if (strlen($blockitems[$existingid]['SH'])>1) {
@@ -293,16 +304,47 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 //anything in the placeinhead variable is inserted in the html doc between the HEAD tags
 $placeinhead = "<script type=\"text/javascript\">
-function init() {
+function updateSlides(init) {
+	if (typeof init != 'boolean') {
+		init = false;
+	}
+	var availval = $('input[name=avail]:checked').val();
+	/*if (availval==0) {
+		$('.availbh').slideUp(init?0:100);
+	} else {
+		$('.availbh').slideDown(init?0:100);
+	}*/
+	if (availval==1) {
+		$('.navail,#datediv').slideDown(init?0:100);
+	} else {
+		$('.navail,#datediv').slideUp(init?0:100);
+	}
+	var colorval = $('input[name=colors]:checked').val();
+	if (colorval=='custom') {
+		$('.coloropts').slideDown(init?0:100);
+	} else {
+		$('.coloropts').slideUp(init?0:100);
+	}
+	var showstyle = $('input[name=availbeh]:checked').val();
+	if (showstyle=='O' || showstyle=='C') {
+		$('.expando').slideDown(init?0:100);
+	} else {
+		$('.expando').slideUp(init?0:100);
+	}
+}
+$(function() {
 	var inp1 = document.getElementById(\"titlebg\");
 	attachColorPicker(inp1);
 	var inp2 = document.getElementById(\"titletxt\");
 	attachColorPicker(inp2);
 	var inp3 = document.getElementById(\"bi\");
 	attachColorPicker(inp3);
-}
+	updateSlides(true);
+	$('input[name=colors]').on('click', updateSlides);
+	$('input[name=avail]').on('click', updateSlides);
+	$('input[name=availbeh]').on('click', updateSlides);
+});
 var imgBase = '$imasroot/javascript/cpimages';
-window.onload = init;
 </script>";
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");}</style>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/colorpicker.js\"></script>";
@@ -333,12 +375,12 @@ if ($overwriteBody==1) {
 	<BR class=form>
 	<span class=form>Show:</span>
 	<span class=formright>
-		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="$('#datediv').slideUp(100);$('#availbhdiv').slideUp(100);"/>Hide <span class=small>(this will hide all items in the block from the gradebook)</span><br/>
-		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="$('#datediv').slideDown(100);$('#availbhdiv').slideDown(100);"/>Show by Dates<br/>
-		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="$('#datediv').slideUp(100);$('#availbhdiv').slideDown(100);"/>Show Always<br/>
+		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?>/>Hide <span class=small>(this will hide all items in the block from the gradebook)</span><br/>
+		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?>/>Show by Dates<br/>
+		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?>/>Show Always<br/>
 	</span><br class="form"/>
 
-	<div id="datediv" style="display:<?php echo ($avail==1)?"block":"none"; ?>">
+	<div id="datediv">
 	<span class=form>Available After:</span>
 	<span class=formright>
 	<input type=radio name="sdatetype" value="0" <?php  writeHtmlChecked($startdate,0) ?>/>
@@ -361,7 +403,7 @@ if ($overwriteBody==1) {
 	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
 	<BR class=form>
 	</div>
-	<div id="availbhdiv" style="display:<?php echo ($avail==0)?"none":"block"; ?>">
+	<div class="availbh">
 	<span class=form>When available:</span>
 	<span class=formright>
 	<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
@@ -369,13 +411,16 @@ if ($overwriteBody==1) {
 	<input type=radio name=availbeh value="F" <?php writeHtmlChecked($availbeh,'F')?> />Show as Folder<br/>
 	<input type=radio name=availbeh value="T" <?php writeHtmlChecked($availbeh,'T')?> />Show as TreeReader
 	</span><br class=form />
+	</div>
+	<div class="navail">
 	<span class=form>When not available:</span>
 	<span class=formright>
 	<input type=radio name=showhide value="H" <?php writeHtmlChecked($showhide,'H') ?> />Hide from Students<br/>
 	<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
 	</span><br class=form />
-
-	<span class=form>For assignments within this block, when they are not available:</span
+	</div>
+	<div class="availbh">
+	<span class=form>For assignments within this block, when they are not available:</span>
 	<span class=formright>
 	<?php
 		writeHtmlSelect('contentbehavior',array(0,1,2,3),array(
@@ -386,21 +431,27 @@ if ($overwriteBody==1) {
 		), $contentbehavior); 
 	?>
 	</span><br class=form />
+	<div class="expando">
 	<span class="form">If expanded, limit height to:</span>
 	<span class="formright">
 	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo Sanitize::onlyInt($fixedheight);};?>" />pixels (blank for no limit)
 	</span><br class="form" />
-
+	</div>
 	<span class="form">Restrict access to students in section:</span>
 	<span class="formright">
 	<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,$grouplimit[0]); ?>
 	</span><br class="form" />
 
-	<span class=form>Make items publicly accessible<sup>*</sup>:</span>
+	<span class=form>Quick Links:</span>
 	<span class=formright>
-	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> />
+	<input type=checkbox name=innav value="1" <?php writeHtmlChecked($innav,'1') ?> /> List block in student left navigation
 	</span><br class=form />
-	</div>
+	
+	<span class=form>Public:</span>
+	<span class=formright>
+	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> /> Make items publicly accessible<sup>*</sup>
+	</span><br class=form />
+	
 
 	<span class=form>Block colors:</span>
 	<span class=formright>
@@ -412,20 +463,20 @@ if ($overwriteBody==1) {
 	?>
 
 	<br />&nbsp;<br/>
-	<input type=radio name="colors" id="colorcustom" value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> />Use custom:
-	<table style="display: inline; border-collapse: collapse; margin-left: 15px;">
+	<input type=radio name="colors" id="colorcustom" value="custom" <?php if ($usedef==0) {echo "CHECKED";}?> />Use custom
+	<table class="coloropts" style="display: inline; border-collapse: collapse; margin-left: 15px;">
 		<tr>
 			<td id="ex1" style="border: 1px solid #000;background-color:
 			<?php echo $titlebg;?>;color:<?php echo $titletxt;?>;">
 			Sample Title Cell</td>
 		</tr>
-		<tr>
+		<tr class="expando">
 			<td id="ex2" style="border: 1px solid #000;background-color:
 			<?php echo $bi;?>;">&nbsp;sample content cell</td>
 		</tr>
 	</table>
-	<br/>
-	<table style=" margin-left: 30px;">
+	<br class="coloropts"/>
+	<table class="coloropts" style=" margin-left: 30px;">
 		<tr>
 			<td>Title Background: </td>
 			<td><input type=text id="titlebg" name="titlebg" value="<?php echo $titlebg;?>" />
@@ -436,7 +487,7 @@ if ($overwriteBody==1) {
 			<td><input type=text id="titletxt" name="titletxt" value="<?php echo $titletxt;?>" />
 			</td>
 		</tr>
-		<tr>
+		<tr class="expando">
 			<td>Items Background: </td>
 			<td><input type=text id="bi" name="bi" value="<?php echo $bi;?>" />
 			</td>
@@ -444,11 +495,12 @@ if ($overwriteBody==1) {
 	</table>
 	</span>
 	<br class="form"/>
-
+	</div>
 	<div class=submit><input type=submit value="<?php echo $savetitle?>"></div>
 </form>
 <p class="small"><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>
-Items from publicly accessible blocks can viewed without logging in at <?php echo $GLOBALS['basesiteurl'] ?>/course/public.php?cid=<?php echo $cid; ?>. </p>
+Items from publicly accessible blocks can viewed without logging in at <?php echo $GLOBALS['basesiteurl'] ?>/course/public.php?cid=<?php echo $cid; ?>.<br/>
+Note that assessments are never publicly accessible.</p>
 
 
 
