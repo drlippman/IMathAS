@@ -138,13 +138,14 @@
 				$("#solvertopbar").css( "background-color",
 						$("#navlist").css("background-color") );
 			}*/
+			var sagecommand = '';
 			$("#solverpopup").show()
 				if (controlEditor.somethingSelected()) {
 					var selection=controlEditor.getSelection();
 					$("#imathastosage").val(selection);
 					var formula_variables = convertMomSageVariables(selection,true);
 					sagecommand=guessSageCommand(formula_variables);
-					sendSageCommand(sagecommand);
+					//sendSageCommand(sagecommand);
 				}
 			if (controlEditor.getValue().search(/\$answer[\[\]\s0-9]*=/i) > 0) {
 				//disable Append button
@@ -156,7 +157,7 @@
 				$("#solverappend").css("color", "#000000");
 			}
 			// Make the div with id "sagecell" a Sage cell
-			this.sm=sagecell.makeSagecell({inputLocation:  "#sagecell",
+			/*this.sm=sagecell.makeSagecell({inputLocation:  "#sagecell",
 					outputLocation: "#sagecelloutput",
 					//callback: handleSolverCopy,
 					autoeval: true,
@@ -164,11 +165,21 @@
 					hide: ["permalink","evalButton"],
 					evalButtonText: "Evaluate"});
 			$("#sagecell").find(".sagecell_evalButton").click();
+			*/
+			if ($("#sagecell iframe").length > 0) {
+				document.getElementById("solversagecell").contentWindow.setCode(sagecommand);
+			} else {
+				$("#sagecell").append($("<iframe></iframe>", {
+						id: "solversagecell",
+						src: imasroot+"/javascript/solversagecell.html?code="+encodeURIComponent(sagecommand)
+				}));
+			}
 		}
-
+                                                   
 		//facilitate copying to Common Control
 		function handleSolverCopy() {
-			var sageoutput=$("#solverpopup").find(".sagecell_sessionOutput").text();
+			//var sageoutput=$("#solverpopup").find(".sagecell_sessionOutput").text();
+			var sageoutput=document.getElementById("solversagecell").contentWindow.getOutput();
 			if (sageoutput.match(/Traceback|Error/i)) {
 				//show error message
 				$("#sagecelloutput").css("opacity",1.0);
@@ -268,8 +279,8 @@
 				return { formula: formula, variables: sage_variables};
 			} else {  //converting to MOM
 				//remove initial "x =="
-				formula=formula.replace(/\[[a-z]\w* ==/ig,"");
-				formula=formula.replace(/,\s?[a-z]\w* ==/ig,",");
+				formula=formula.replace(/\[[a-z]\w* ==\s*/ig,"");
+				formula=formula.replace(/,\s?[a-z]\w* ==\s*/ig,",");
 				if (this.imathas_variables!==undefined && this.imathas_variables!=null) {
 					//prepend IMathAS variables with $
 					imathas_variables.forEach(function(value,index) {
@@ -314,7 +325,7 @@
 		//Send command to Sage cell
 		function sendSageCommand(command) {
 			//append a new script element to #sagecell for new sagecell
-			var script = document.createElement("script");
+			/*var script = document.createElement("script");
 			script.type="text/x-sage";
 			script.innerHTML=sagecommand;
 			$("#sagecell").append(script);
@@ -322,7 +333,7 @@
 			//update existing sagecell with new command
 			if ( $("#sagecell").find(".CodeMirror").size() > 0 ) {
 				$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);
-			}
+			}*/
 		}
 
 		function hideSolver() {
@@ -353,7 +364,8 @@
 					}
 				}
 				
-				$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);;
+				//$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);;
+				document.getElementById("solversagecell").contentWindow.setCode(sagecommand);
 			} else {
 				if ( $("#sagecell").find(".CodeMirror").size() <= 0 ) {
 					return; //no code window found
@@ -386,9 +398,10 @@
 					sagecommand=sagecommand.replace(/,\s*([a-z0-9_]+)/i,"");
 					sagecommand="def fullsimp(expr):return expr.simplify_full().simplify_trig()\n"+variables+"\nfullsimp"+sagecommand;
 				}
-				$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);
+				//$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);
+				document.getElementById("solversagecell").contentWindow.setCode(sagecommand);
 			}
-			$("#sagecell").find(".sagecell_evalButton").click();
+			//$("#sagecell").find(".sagecell_evalButton").click();
 		}
 
 		function handleSolverGo() {
@@ -396,9 +409,10 @@
 				var formula_variables = convertMomSageVariables(
 						$("#imathastosage").val(), true);
 				sagecommand=guessSageCommand(formula_variables);
-				sendSageCommand(sagecommand);
+				document.getElementById("solversagecell").contentWindow.setCode(sagecommand);
+				//sendSageCommand(sagecommand);
 			}
-			$("#sagecell").find(".sagecell_evalButton").click();
+			//$("#sagecell").find(".sagecell_evalButton").click();
 		}
 
 		function handleImathasClick() {
@@ -427,8 +441,9 @@
 			var imathas_dropped = event.originalEvent.dataTransfer.getData("Text");
 			var formula_variables = convertMomSageVariables(imathas_dropped , true);
 			sagecommand=guessSageCommand(formula_variables);
-			sendSageCommand(sagecommand);
-			$("#sagecell").find(".sagecell_evalButton").click();
+			//sendSageCommand(sagecommand);
+			//$("#sagecell").find(".sagecell_evalButton").click();
+			document.getElementById("solversagecell").contentWindow.setCode(sagecommand);
 			return false;
 		}
 

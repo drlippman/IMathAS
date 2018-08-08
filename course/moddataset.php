@@ -912,7 +912,7 @@
 	   	}
 	   }
 	   </script>';
-	//$placeinhead .= "<script src=\"$imasroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
+	$placeinhead .= "<script src=\"$imasroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
 		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
@@ -921,7 +921,7 @@
 		.CodeMirror-focused .CodeMirror-selected {background: #3366AA;}
 		.CodeMirror-selected {background: #666666;}
 		</style>';
-	//$placeinhead .= "<link href=\"$imasroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
+	$placeinhead .= "<link href=\"$imasroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
 	$placeinhead .= "<style>.quickSaveButton {display:none;}</style>";
 
 	require("../header.php");
@@ -1115,7 +1115,7 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 </p>
 <div id=ccbox>
 Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
-<!--<input type=button id="solveropenbutton" value="Solver">-->
+<input type=button id="solveropenbutton" value="Solver">
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
 <button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
