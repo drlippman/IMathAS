@@ -191,7 +191,7 @@ function refreshDatePicker(dateFieldName, year, month, day, jumpFieldName, jumpT
   var today = new Date();
   var todayString = "Today is " + dayArrayMed[today.getDay()] + ", " + monthArrayMed[ today.getMonth()] + " " + today.getDate();
   html += TR_todaybutton + TD_todaybutton;
-  if (jumpFieldName) {
+  if (jumpFieldName && document.getElementsByName(jumpFieldName).length>0) {
 	  var dtj = getFieldDate(document.getElementsByName (jumpFieldName).item(0).value );
 	  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\","+ dtj.getFullYear()+ ","+ dtj.getMonth()+ ","+dtj.getDate()+ ",\""+jumpFieldName+ "\",\""+ jumpTitle + "\");'>"+jumpTitle+"</button> ";
 	  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\",0,0,0,\""+jumpFieldName+ "\",\""+ jumpTitle + "\");'>this month</button><br/> ";
