@@ -109,7 +109,7 @@ function tipshow(el,tip, e) {
 	el.setAttribute("aria-describedby", "hovertipsholder");
 
 	if (typeof usingASCIIMath!='undefined' && typeof noMathRender != 'undefined') {
-		if (usingASCIIMath && !noMathRender) {
+		if (usingASCIIMath && !noMathRender && tipobj.innerHTML.indexOf('`')!=-1) {
 			rendermathnode(tipobj);
 		}
 	}
