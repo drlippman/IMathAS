@@ -168,6 +168,7 @@ if ($viddata != '') {
 	$showlink = array_fill(0, $n, true);
 	$finalsegtitle = '';
 	$vidid = '';
+	$aspectRatio = 16/9;
 
 }
 ?>
