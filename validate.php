@@ -349,7 +349,9 @@
 		$coursetheme = $sessiondata['userprefs']['usertheme'];
 	}
 	
-	if (!empty($line['forcepwreset']) && (empty($_GET['action']) || $_GET['action']!='forcechgpwd') && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltirole']!='learner')) {
+	if (!empty($line['forcepwreset']) && (empty($_GET['action']) || $_GET['action']!='forcechgpwd') 
+		&& (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltirole']!='learner')
+		&& !isset($sessiondata['emulateuseroriginaluser'])) {
 		 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd&r='.Sanitize::randomQueryStringParam());
 		 exit;
 	}
