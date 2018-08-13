@@ -47,37 +47,46 @@ if ($lastrun === false) {  //run for first time
 */
 $runGroups = array();
 if (isset($CFG['cleanup']['groups'])) {
-	$query = "UPDATE imas_courses SET cleanupdate=1 WHERE id IN ( SELECT tempic.id FROM (";
-	$query .= " SELECT ic.id FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id ";
-	$query .= " WHERE iu.groupid=? AND ic.cleanupdate=0 AND ic.id IN (";
-	$query .= "  SELECT id FROM imas_courses WHERE cleanupdate=0 AND ((enddate>? AND enddate<=?) OR  ";
-	$query .= "    (enddate=2000000000 AND id IN (";
-	$query .= "      SELECT courseid FROM imas_students GROUP BY courseid HAVING ";
-	$query .= "      MAX(lastaccess)>? AND MAX(lastaccess)<=?))) ";
-	$query .= ")) AS tempic)";  
+	$query = 'UPDATE imas_courses SET cleanupdate=1 WHERE id IN ( SELECT tempic.id FROM (
+		SELECT ic.id FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id 
+		JOIN imas_students AS istu ON istu.courseid=ic.id WHERE
+		  ic.cleanupdate=0 AND ic.enddate=2000000000 AND iu.groupid=?
+		  GROUP BY istu.courseid
+		  HAVING MAX(istu.lastaccess)>? AND MAX(istu.lastaccess)<=?
+		UNION
+		SELECT ic.id FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE
+		  ic.cleanupdate=0 AND iu.groupid=? 
+		  AND ic.enddate>? AND ic.enddate<=?) as tempic)';
 	foreach ($CFG['cleanup']['groups'] as $grp=>$grpdet) {
 		$grpold = 24*60*60*$grpdet['old'];
-		$stm->execute(array($grp, $lastrun-$grpold, $now-$grpold, $lastrun-$grpold, $now-$grpold));
+		$stm->execute(array($grp, $lastrun-$grpold, $now-$grpold, $grp, $lastrun-$grpold, $now-$grpold));
 		$runGroups[] = $grp;
 	}
 }
 
 
-$query = "UPDATE imas_courses SET cleanupdate=1 WHERE id IN ( SELECT tempic.id FROM (";
-$query .= " SELECT ic.id FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE";
+
+$query = 'UPDATE imas_courses SET cleanupdate=1 WHERE id IN ( SELECT tempic.id FROM (
+	SELECT ic.id FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id 
+	JOIN imas_students AS istu ON istu.courseid=ic.id WHERE
+	  ic.cleanupdate=0 AND ic.enddate=2000000000 ';
 if (count($runGroups)>0) {
 	$grplist = implode(',', array_map('Sanitize::onlyInt', $runGroups));
-	$query .= " iu.groupid NOT IN ($grplist) AND ";
+	$query .= " AND iu.groupid NOT IN ($grplist) ";
 }
-$query .= " ic.cleanupdate=0 AND ic.id IN (";
-$query .= "  SELECT id FROM imas_courses WHERE cleanupdate=0 AND ((enddate>? AND enddate<=?) OR  ";
-$query .= "    (enddate=2000000000 AND id IN (";
-$query .= "      SELECT courseid FROM imas_students GROUP BY courseid HAVING ";
-$query .= "      MAX(lastaccess)>? AND MAX(lastaccess)<=?))) ";
-$query .= ")) AS tempic)"; 
+$query .= ' GROUP BY istu.courseid
+	  HAVING MAX(istu.lastaccess)>? AND MAX(istu.lastaccess)<=?
+	UNION
+	SELECT ic.id FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE
+	  ic.cleanupdate=0 ';
+if (count($runGroups)>0) {
+	$query .= " AND iu.groupid NOT IN ($grplist) ";
+}	  
+$query .= 'AND ic.enddate>? AND ic.enddate<=?) as tempic)';
 $stm = $DBH->prepare($query);
 $stm->execute(array($lastrun-$old, $now - $old, $lastrun-$old, $now - $old));
 
 $stm = $DBH->prepare("UPDATE imas_dbschema SET ver=? WHERE id=5");
 $stm->execute(array($now));
 $DBH->commit();
+echo "Done";
