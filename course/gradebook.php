@@ -713,10 +713,6 @@ function gbstudisp($stu) {
 			echo '<th>'._('Last Changed').'</th>';
 			$sarr .= ",'D'";
 		}
-		if ($includeduedate) {
-			echo '<th>'._('Due Date').'</th>';
-			$sarr .= ",'D'";
-		}
 	} else if ($stu==-1) {
 		echo '<th>', _('Time Spent (In Questions)'), '</th>';
 		$sarr = "'S','N','N','N','N'";
@@ -724,6 +720,10 @@ function gbstudisp($stu) {
 		$sarr = "'S','N','N','N'";
 	}
 	if ($stu>0) {
+		if ($includeduedate) {
+			echo '<th>'._('Due Date').'</th>';
+			$sarr .= ",'D'";
+		}
 		//echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
 		echo '<th>', _('Feedback'), '<br/>';
 		echo '<a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($stu).',\'all\')">', _('View All'), '</a>';
@@ -982,6 +982,14 @@ function gbstudisp($stu) {
 						echo '<td></td>';
 					}
 				}
+			} else if ($stu==-1) {
+				if (isset($gbt[1][1][$i][7]) && $gbt[1][1][$i][7]>-1) {
+					echo '<td>'.$gbt[1][1][$i][7].' min ('.$gbt[1][1][$i][8].' min)</td>';
+				} else {
+					echo '<td></td>';
+				}
+			}
+			if ($stu>0) {
 				if ($includeduedate) {
 					if ($gbt[0][1][$i][11]<2000000000) {
 						echo '<td>'.tzdate('n/j/y g:ia',$gbt[0][1][$i][11]);
@@ -991,14 +999,6 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-			} else if ($stu==-1) {
-				if (isset($gbt[1][1][$i][7]) && $gbt[1][1][$i][7]>-1) {
-					echo '<td>'.$gbt[1][1][$i][7].' min ('.$gbt[1][1][$i][8].' min)</td>';
-				} else {
-					echo '<td></td>';
-				}
-			}
-			if ($stu>0) {
 				if ($gbt[1][1][$i][1]==0) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
