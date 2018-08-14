@@ -72,6 +72,7 @@
 		$canuselatepass = false;
 		$waivereqscore = false;
 		$useexception = false;
+		$activestartdate = $adata['startdate'];
 		if (!$actas) {
 			if ($isRealStudent) {
 				$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti,waivereqscore FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
@@ -104,6 +105,7 @@
 					}
 				}
 				$exceptionduedate = $row[1];
+				$activestartdate = $row[0];
 			} else { //has no exception
 				if ($now < $adata['startdate'] || $adata['enddate']<$now) { //outside normal dates
 					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
@@ -137,8 +139,12 @@
 		if ($assessmentclosed) {
 			require("header.php");
 			showEnterAssessmentBreadcrumbs($adata['name']);
-			echo '<p>', _('This assessment is closed'), '</p>';
-			if ($adata['avail']>0) {
+			if ($now<$activestartdate) {
+				echo '<p>', _('This assessment is not available yet'), '</p>';
+			} else {
+				echo '<p>', _('This assessment is closed'), '</p>';
+			}
+			if ($adata['avail']>0 && $now>$activestartdate) {
 
 				if (!$actas && $canuselatepass) {
 					echo "<p><a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid=$aid\">", _('Use LatePass'), "</a></p>";
