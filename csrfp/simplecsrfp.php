@@ -96,8 +96,10 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			}
 
 			if (function_exists('apache_request_headers')) {
-				if (isset(apache_request_headers()[CSRFP_TOKEN])) {
-					return apache_request_headers()[CSRFP_TOKEN];
+				$apache_headers = array_change_key_case(apache_request_headers(), CASE_LOWER);
+				$lowertoken = strtolower(CSRFP_TOKEN);
+				if (isset($apache_headers[$lowertoken])) {
+					return $apache_headers[$lowertoken];
 				}
 			}
 
