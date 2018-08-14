@@ -143,7 +143,7 @@ if (!(isset($teacherid))) {
 			}
 			if (isset($_POST['chgdefpenalty'])) {
 				$sets[] = "defpenalty=:defpenalty";
-				$qarr[':defpenalty'] = Sanitize::onlyInt($_POST['defpenalty']);
+				$qarr[':defpenalty'] = Sanitize::simpleASCII($_POST['defpenalty']);
 			}
 			if (isset($_POST['chgfeedback'])) {
 				$sets[] = "deffeedback=:deffeedback";
