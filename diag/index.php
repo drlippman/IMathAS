@@ -385,7 +385,7 @@ for ($i=0;$i<count($sel1);$i++) {
 		$stm = $DBH->prepare("SELECT count(id) FROM imas_assessments WHERE id IN ($ph) AND ABS(timelimit)>0");
 		$stm->execute($aids);
 		$hasTimeLimit = ($stm->fetchColumn(0)>0);
-		echo "<b>", _('This test can only be accessed from this location with an access password'), "</b></br>\n";
+		echo "<b>", _('This test can only be accessed from this location with an access password'), "</b><br/>\n";
 		echo "<span class=form>", _('Access password:'), "</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
 		if ($hasTimeLimit) {
 			echo "<span class=form>", _('Time limit (if timed):'), "</span>  ";
@@ -410,14 +410,13 @@ for ($i=0;$i<count($sel1);$i++) {
 $allowreentry = ($line['public']&4);
 $pws = explode(';',$line['pws']);
 if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line['reentrytime']>0)) {
-	echo "<p>", _('No access code is required for this diagnostic.  However, if your testing window has expired, a proctor can enter a password to allow reaccess to this test.'), "</br>\n";
+	echo "<p>", _('No access code is required for this diagnostic.  However, if your testing window has expired, a proctor can enter a password to allow reaccess to this test.'), "<br/>\n";
 	echo "<span class=form>", _('Override password'), ":</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
 }
 ?>
 </form>
-
 <div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>
-
+</div>
 <script type="text/javascript">
 function determinesetup() {
 	document.getElementById("submit").style.display = "block";
@@ -440,10 +439,10 @@ if (existingonload) {
 	window.onload = determinesetup;
 }
 </script>
-<hr/><div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2014 David Lippman</div>
-</div>
-</body>
-</html>
+<hr/>
+<div class=right style="font-size:70%;">Built on <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2018 David Lippman</div>
+
 <?php
+require("../footer.php");
 }
 ?>

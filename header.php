@@ -10,7 +10,7 @@
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <?php
 if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="'.$imasroot.'/javascript/jquery.min.js"></script>';
@@ -93,10 +93,11 @@ if (isset($sessiondata['ltiitemtype']) && ($sessiondata['mathdisp']==1 || $sessi
 
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathrenderer="none";</script>';
+	//don't load MathJax async when using mathgraphcheck; it needs to check immediately
 	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
