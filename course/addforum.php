@@ -137,7 +137,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$forumname = Sanitize::stripHtmlTags($_POST['name']);
 
-		if ($_POST['description']=='<p>Enter forum description here</p>') {
+		if ($_POST['description']=='<p>Enter forum description here</p>' || $_POST['description']=='<p></p>') {
 			$forumdesc = '';
 		} else {
 			$forumdesc = Sanitize::incomingHtml($_POST['description']);
@@ -279,8 +279,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$savetitle = _("Save Changes");
 		} else {  //ADD MODE
 			//set defaults
-			$line['name'] = "Enter Forum Name here";
-			$line['description'] = "<p>Enter forum description here</p>";
+			$line['name'] = "";
+			$line['description'] = "";
 			$line['avail'] = 1;
 			$line['caltag'] = 'FP--FR';
 			$line['forumtype'] = 0;
@@ -470,11 +470,11 @@ if ($overwriteBody==1) {
 	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
 
 	<form method=post action="addforum.php<?php echo $page_formActionTag ?>">
-		<span class=form>Name: </span>
-		<span class=formright><input type=text size=60 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']);?>"></span>
+		<span class=form>Forum Name: </span>
+		<span class=formright><input type=text size=60 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']);?>" required /></span>
 		<BR class=form>
 
-		Description:<BR>
+		Description: (shows on course page)<BR>
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
 		<?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>

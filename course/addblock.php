@@ -237,7 +237,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	} else { //teacher adding new block, load form with default data
 		//set defaults
-		$title = 'Enter Block name here';
+		$title = '';
 		$startdate = time() + 60*60;
 		$enddate = time() + 7*24*60*60;
 		$availbeh = 'O';
@@ -371,7 +371,7 @@ if ($overwriteBody==1) {
 
 <form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::onlyInt($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
 	<span class=form>Title: </span>
-	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>"></span>
+	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>" required></span>
 	<BR class=form>
 	<span class=form>Show:</span>
 	<span class=formright>

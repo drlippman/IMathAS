@@ -52,6 +52,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $cid = Sanitize::courseId($_GET['cid']);
         $block = $_GET['block'];
         $assessName = Sanitize::stripHtmlTags($_POST['name']);
+        if ($assessName == '') {
+        	$assessName = _('Unnamed Assessment');
+        }
         $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
         $stm->execute(array($cid));
         $dates_by_lti = $stm->fetchColumn(0);
@@ -287,12 +290,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
             $calrtag = 'R'; //not used anymore Sanitize::stripHtmlTags($_POST['caltagrev']);
 
-		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>') {
+		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
 			$_POST['summary'] = '';
 		} else {
 			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
 		}
-		if ($_POST['intro']=='<p>Enter intro/instructions</p>') {
+		if ($_POST['intro']=='<p>Enter intro/instructions</p>' || $_POST['intro']=='<p></p>') {
 			$_POST['intro'] = '';
 		} else {
 			$_POST['intro'] = Sanitize::incomingHtml($_POST['intro']);
@@ -510,18 +513,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $usedeffb = true;
                     $deffb = $line['deffeedbacktext'];
                 }
-                if ($line['summary']=='') {
-                //	$line['summary'] = "<p>Enter summary here (shows on course page)</p>";
-                }
-                if ($line['intro']=='') {
-                //	$line['intro'] = "<p>Enter intro/instructions</p>";
-                }
                 $savetitle = _("Save Changes");
             } else {  //INITIAL LOAD IN ADD MODE
                 //set defaults
-                $line['name'] = "Enter assessment name";
-                $line['summary'] = "<p>Enter summary here (shows on course page)</p>";
-                $line['intro'] = "<p>Enter intro/instructions</p>";
+                $line['name'] = "";
+                $line['summary'] = "";
+                $line['intro'] = "";
                 $startdate = time()+60*60;
                 $enddate = time() + 7*24*60*60;
                 $line['startdate'] = $startdate;
@@ -850,9 +847,9 @@ if ($overwriteBody==1) {
 
 	<form method=post action="<?php echo $page_formActionTag ?>">
 		<span class=form>Assessment Name:</span>
-        <span class=formright><input type=text size=30 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']); ?>"></span><BR class=form>
+        <span class=formright><input type=text size=30 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']); ?>" required></span><BR class=form>
 
-		Summary:<BR>
+		Summary: (shows on course page)<BR>
 		<div class=editor>
 			<textarea cols=50 rows=15 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary'], true); ?></textarea>
 		</div><BR>

@@ -182,7 +182,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
 
-		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
+		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>' || $_POST['summary']=='<p></p>') {
 			$_POST['summary'] = '';
 		} else {
 			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
@@ -300,11 +300,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (substr($line['text'],0,4)=='http') {
 				$type = 'web';
 				$webaddr = $line['text'];
-				$line['text'] = "<p>Enter text here</p>";
+				$line['text'] = "";
 			} else if (substr($line['text'],0,5)=='file:') {
 				$type = 'file';
 				$filename = substr($line['text'],5);
-				$line['text'] = "<p>Enter text here</p>";
+				$line['text'] = "";
 			} else if (substr($line['text'],0,8)=='exttool:') {
 				$type = 'tool';
 				$points= $line['points'];
@@ -322,7 +322,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$tutoredit = $toolparts[5];
 					$gradesecret = $toolparts[6];
 				}
-				$line['text'] = "<p>Enter text here</p>";
+				$line['text'] = "";
 			} else {
 				$type = 'text';
 			}
@@ -331,15 +331,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$gradeoutcomes = array();
 			}
-			if ($line['summary']=='') {
-				//$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
-			}
+			
 			$savetitle = _("Save Changes");
 		} else {
 			//set defaults
-			$line['title'] = "Enter title here";
-			$line['summary'] = "<p>Enter summary here (displays on course page)</p>";
-			$line['text'] = "<p>Enter text here</p>";
+			$line['title'] = "";
+			$line['summary'] = "";
+			$line['text'] = "";
 			$line['avail'] = 1;
 			$line['oncal'] = 0;
 			$line['caltag'] = '!';
@@ -483,10 +481,10 @@ if ($overwriteBody==1) {
 
 	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
 		<span class=form>Title: </span>
-		<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>">
+		<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>" required />
 		</span><BR class=form>
 
-		Summary<BR>
+		Summary: (shows on course page)<BR>
 		<div class=editor>
 			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary'], true);?></textarea>
 		</div>

@@ -70,13 +70,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$settings = intval($_POST['settings']);
-		$_POST['name'] = htmlentities($_POST['name']);
+		$_POST['name'] = Sanitize::stripHtmlTags($_POST['name']);
 
-		require_once("../includes/htmLawed.php");
 		if ($_POST['description']=='<p>Enter Wiki description here</p>') {
 			$_POST['description'] = '';
 		} else {
-			$_POST['description'] = myhtmLawed($_POST['description']);
+			$_POST['description'] = Sanitize::incomingHtml($_POST['description']);
 		}
 		if (isset($_GET['id'])) {  //already have id - update
 			$query = "UPDATE imas_wikis SET name=:name,description=:description,startdate=:startdate,enddate=:enddate,";
@@ -148,13 +147,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$started = false;
 			}
-			if ($line['description']=='') {
-				//$line['description'] = "<p>Enter Wiki description here</p>";
-			}
+			
 			$savetitle = _("Save Changes");
 		} else {
-			$line['name'] = "Enter Wiki Name here";
-			$line['description'] = "<p>Enter Wiki description here</p>";
+			$line['name'] = "";
+			$line['description'] = "";
 			$line['avail'] = 1;
 			$line['groupsetid'] = 0;
 			$startdate = time();
@@ -252,11 +249,11 @@ if ($started) {
 ?>
 
 	<form method=post action="addwiki.php<?php echo $page_formActionTag; ?>">
-		<span class=form>Name: </span>
-		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span>
+		<span class=form>Wiki Name: </span>
+		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>" required /></span>
 		<BR class=form>
 
-		Description:<BR>
+		Description: (shows on course page)<BR>
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
 		<?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>

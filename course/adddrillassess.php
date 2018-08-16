@@ -32,8 +32,8 @@ if ($stm->rowCount()==0) {
 	$n = 30;
 	$showtostu = 7;
 	$daid = 0;
-	$drillname = "Enter title here";
-	$drillsummary = "<p>Enter summary here (displays on course page)</p>";
+	$drillname = "";
+	$drillsummary = "";
 	$startdate = time();
 	$enddate = time() + 7*24*60*60;
 	$avail = 1;
@@ -86,13 +86,12 @@ if (isset($_GET['record'])) {
 		$startdate = 0;
 		$enddate =  2000000000;
 	}
-	$_POST['title'] = htmlentities($_POST['title']);
+	$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
 
-	require_once("../includes/htmLawed.php");
-	if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
+	if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>' || $_POST['summary']=='<p></p>') {
 		$_POST['summary'] = '';
 	} else {
-		$_POST['summary'] = myhtmLawed($_POST['summary']);
+		$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
 	}
 
 	if (isset($_POST['descr'])) {
@@ -591,10 +590,10 @@ printf("<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=%s&
     $cid, $daid, Sanitize::encodeUrlParam($block), Sanitize::encodeUrlParam($totb));
 ?>
 		<span class=form>Title: </span>
-		<span class=formright><input type=text size=60 name="title" value="<?php echo Sanitize::encodeStringForDisplay($drillname);?>">
+		<span class=formright><input type=text size=60 name="title" value="<?php echo Sanitize::encodeStringForDisplay($drillname);?>" required />
 		</span><BR class=form>
 
-		Summary<BR>
+		Summary: (shows on course page)<BR>
 		<div class=editor>
 			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($drillsummary, true);?></textarea>
 		</div>
