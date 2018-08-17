@@ -64,9 +64,9 @@ if ($myrights>15) {
   $placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
-  $(".courselist-teach li:not(.coursegroup)").css("clear","both").each(function (i,el) {
+  $(".courselist-teach li[data-cid]:not(.coursegroup)").css("clear","both").each(function (i,el) {
+  	var cid = $(el).attr("data-cid");
   	if ($(el).attr("data-isowner")=="true" && '.($myrights>39?'true':'false').') {
-  		var cid = $(el).attr("data-cid");
   		var thishtml = html + \' <li><a href="admin/forms.php?from=home&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
   		thishtml += \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');return false;">'._('Hide from course list').'</a></li>\';
   		thishtml += \' <li><a href="admin/addremoveteachers.php?from=home&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
@@ -75,7 +75,6 @@ if ($myrights>15) {
   		thishtml += \'</ul></div>\';
   		$(el).append(thishtml);
   	} else if ($(el).attr("data-isowner")!="true") {
-  		var cid = $(el).attr("data-cid");
   		var thishtml = html + \' <li><a href="#" onclick="hidefromcourselist(this,\'+cid+\',\\\'teach\\\');return false;">'._('Hide from course list').'</a></li>\';
   		thishtml += \' <li><a href="#" onclick="removeSelfAsCoteacher(this,\'+cid+\');return false;">'._('Remove yourself as a co-teacher').'</a></li>\';
   		thishtml += \'</ul></div>\';
