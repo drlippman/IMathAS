@@ -142,7 +142,33 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	}
 	exit;
 }
-
+if (isset($_GET['listadmins'])) {
+	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a>\n";
+	require("../header.php");
+	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Admin List</div>';
+	echo '<h1>Admin List</h1>';
+	$query = 'SELECT iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON iu.groupid=ig.id ';
+	$stm = $DBH->query($query.' WHERE iu.rights=100 ORDER BY LastName,FirstName');
+	echo '<h2>Full Admins</h2><ul>';
+	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
+		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+	}
+	echo '</ul>';
+	echo '<h2>Group Admins</h2><ul>';
+	$stm = $DBH->query($query.' WHERE iu.rights=75 ORDER BY LastName,FirstName');
+	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
+		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+	}
+	echo '</ul>';
+	echo '<h2>Global Account Approvers</h2><ul>';
+	$stm = $DBH->query($query.' WHERE iu.rights>39 AND (iu.specialrights&64)=64 ORDER BY LastName,FirstName');
+	while ($user = $stm->fetch(PDO::FETCH_ASSOC)) {
+		echo '<li>'.Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName'].' ('.$user['name'].')').'</li>';
+	}
+	echo '</ul>';
+	require("../footer.php");
+	exit;
+}
 if (isset($_GET['form'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
 
@@ -326,6 +352,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="utils.php?fixorphanqs=true">Fix orphaned questions</a><br/>';
 	echo '<a href="utils.php?fixdupgrades=true">Fix duplicate forum grades</a><br/>';
 	echo '<a href="utils.php?form=emu">Emulate User</a><br/>';
+	echo '<a href="utils.php?listadmins=true">List Admins</a><br/>';
 	echo '<a href="listextref.php">List ExtRefs</a><br/>';
 	echo '<a href="updateextref.php">Update ExtRefs</a><br/>';
 	echo '<a href="delwronglibs.php">Delete Questions with WrongLib Flag</a><br/>';
