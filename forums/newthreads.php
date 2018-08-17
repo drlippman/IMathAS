@@ -44,65 +44,51 @@ foreach ($result  as $line) {
 }
 $lastforum = '';
 
-if (isset($_GET['markallread'])) {
-  $now = time();
-  if (count($forumids)>0) {
-    $forumidlist = array_map('Sanitize::onlyInt', array_values($forumids));
-    $forumidlist_query_placeholders = Sanitize::generateQueryPlaceholders($forumidlist);
-    $stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid IN ($forumidlist_query_placeholders)");
-	  $stm->execute(array_values($forumidlist));
-
-    $threadids = array();
-    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-      $threadids[] = $row[0];
-    }
-    if (count($threadids)>0) {
-      // $threadlist = implode(',', $threadids);  //INT vals from DB - safe
-      $threadidsSanitize = array_map('Sanitize::onlyInt', $threadids);//INT vals from DB - safe
-      $threadids_query_placeholders = Sanitize::generateQueryPlaceholders($threadidsSanitize);
-
-      $toupdate = array();
-      $stm = $DBH->prepare("SELECT threadid FROM imas_forum_views WHERE userid=? AND threadid IN ($threadids_query_placeholders)");
-      $stm->execute(array_merge(array($userid), $threadidsSanitize));
-      while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-        $toupdate[] = $row[0];
-      }
-      if (count($toupdate)>0) {
-        $toupdatelistSanitize = array_map('Sanitize::onlyInt', $toupdate);//INT vals from DB - safe
-        $toupdatelist_query_placeholders = Sanitize::generateQueryPlaceholders($toupdatelistSanitize);
-  			$stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=? WHERE userid=? AND threadid IN ($toupdatelist_query_placeholders)");
-		    $stm->execute(array_merge(array($now, $userid), $toupdatelistSanitize));
-  		}
-      $toinsert = array_diff($threadids,$toupdate);
-      if (count($toinsert)>0) {
-        $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
-        $array = array();
-
-        $first = true;
-        foreach($toinsert as $i=>$tid) {
-          if (!$first) {
-						$query .= ',';
-					}
-					$query .= "(?,?,?)";
-          array_push($array, $userid, $tid, $now);
-
-          $first = false;
-        }
-        $stm = $DBH->prepare($query);
-        $stm->execute($array);
-
-        // mysql_query($query) or die("Query failed : $query " . mysql_error());
-      }
-    }
-  }
-  if ($from=='home') {
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
-  } else {
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
-  }
-  exit;
+if (isset($_GET['markread']) && isset($_POST['checked']) && count($_POST['checked'])>0) {
+	$checked = array_map('Sanitize::onlyInt', $_POST['checked']);
+	$toupdate = array();
+	$threadids_query_placeholders = Sanitize::generateQueryPlaceholders($checked);
+	$stm = $DBH->prepare("SELECT threadid FROM imas_forum_views WHERE userid=? AND threadid IN ($threadids_query_placeholders)");
+	$stm->execute(array_merge(array($userid), $checked));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$toupdate[] = $row[0];
+	}
+	
+	if (count($toupdate)>0) {
+		$toupdatelistSanitize = array_map('Sanitize::onlyInt', $toupdate);
+		$toupdatelist_query_placeholders = Sanitize::generateQueryPlaceholders($toupdatelistSanitize);
+  		$stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=? WHERE userid=? AND threadid IN ($toupdatelist_query_placeholders)");
+		$stm->execute(array_merge(array($now, $userid), $toupdatelistSanitize));
+  	}
+  	$toinsert = array_diff($checked,$toupdate);
+  	if (count($toinsert)>0) {
+  		$ph = 
+  		$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
+  		$qarray = array();
+  		$first = true;
+  		foreach($toinsert as $i=>$tid) {
+  			if (!$first) {
+  				$query .= ',';
+			}
+			$query .= "(?,?,?)";
+			array_push($qarray, $userid, $tid, $now);
+			$first = false;
+		}
+		 $stm = $DBH->prepare($query);
+		 $stm->execute($qarray);
+	}
+	if (count($forumids)==count($checked)) { //marking all read
+		if ($from=='home') {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
+		} else {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
+		}
+	} else {
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/newthreads.php?cid=$cid&from=".Sanitize::simpleString($from));
+	}
+       	exit;
 }
-
+                                    
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
 $pagetitle = _('New Forum Posts');
@@ -110,10 +96,12 @@ require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"forums.php?cid=$cid\">Forums</a> &gt; New Forum Posts</div>\n";
 echo '<div id="headernewthreads" class="pagetitle"><h1>New Forum Posts</h1></div>';
-echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?from=".Sanitize::encodeUrlParam($from)."&cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
 
 if (count($lastpost)>0) {
-  echo '<table class="gb forum" id="newthreads"><thead><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
+  echo '<form id=qform method=post action="newthreads.php?from='.Sanitize::encodeUrlParam($from).'&cid='.$cid.'&markread=true">';
+  echo '<p>Check: <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">'._('All').'</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">'._('None').'</a> ';
+  echo '<button type=submit>'._('Mark Selected as Read').'</button></p>';
+  echo '<table class="gb forum" id="newthreads"><thead><th></th><th>Topic</th><th>Started By</th><th>Forum</th><th>Last Post Date</th></thead><tbody>';
   $threadids = array_map('intval', array_keys($lastpost));
 	$ph = Sanitize::generateQueryPlaceholders($threadids);
   $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
@@ -130,6 +118,7 @@ if (count($lastpost)>0) {
     }
     if ($alt==0) {$stripe = "even"; $alt=1;} else {$stripe = "odd"; $alt=0;}
     echo '<tr>';
+    echo '<td><input type=checkbox name="checked[]" value="'.Sanitize::onlyInt($line['threadid']).'"/></td>';
     echo "<td><a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
     printf("<td>%s</td>", Sanitize::encodeStringForDisplay($name));
     echo "<td><a href=\"thread.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
@@ -137,6 +126,7 @@ if (count($lastpost)>0) {
   }
   echo '</tbody></table>';
   echo '<script type="text/javascript">	initSortTable("newthreads",Array("S","S","S","D"),true);</script>';
+  echo '</form>';
 } else {
   echo "No new posts";
 }
