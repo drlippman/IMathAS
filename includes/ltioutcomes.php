@@ -99,7 +99,7 @@ function post_socket_xml($endpoint, $data, $moreheaders=false) {
   return false;
 }
 
-function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consumer_secret, $content_type, $body)
+function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consumer_secret, $content_type, $body, $checkResponse=false)
 {
     $hash = base64_encode(sha1($body, TRUE));
 
@@ -120,6 +120,10 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     $header = $acc_req->to_header();
     $header = $header . "\r\nContent-Type: " . $content_type . "\r\n";
 
+    if ($checkResponse) { //use a send that waits for response
+    	return newXMLoverPost($endpoint, $body, $header, $method);
+    }
+    //try to spawn a curl call so we don't have to wait for a response
     $disabled = explode(', ', ini_get('disable_functions'));
     if (function_exists('exec') && !in_array('exec', $disabled)) {
 	    try {
@@ -140,6 +144,7 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
 	    }
     }
 
+    //try other methods
     $response = post_socket_xml($endpoint,$body,$header);
     if ( $response !== false && strlen($response) > 0) return $response;
 
@@ -198,6 +203,80 @@ function sendXmlOverPost($url, $xml, $header) {
   return $result;
 }
 
+function newXMLoverPost($url, $request, $requestHeaders, $method = 'POST') {
+	//From https://github.com/IMSGlobal/LTI-Tool-Provider-Library-PHP/blob/master/src/HTTPMessage.php
+	//Stephen P Vickers <svickers@imsglobal.org> copyright IMS Global Learning Consortium Inc
+	//License: http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
+	
+	$ok = false; $resp = '';
+	
+	// Try using curl if available
+	if (function_exists('curl_init')) {
+		$resp = '';
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		$requestHeaders = explode("\r\n", trim($requestHeaders));
+		if (!empty($requestHeaders)) {
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
+		} else {
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+		}
+		if ($method === 'POST') {
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
+		} else if ($method !== 'GET') {
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+			if (!is_null($request)) {
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
+			}
+		}
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); //time to wait to connect
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10); //time to wait for response
+		$chResp = curl_exec($ch);
+
+		$ok = $chResp !== false;
+		if ($ok) {
+			$chResp = str_replace("\r\n", "\n", $chResp);
+			$chRespSplit = explode("\n\n", $chResp, 2);
+			if ((count($chRespSplit) > 1) && (substr($chRespSplit[1], 0, 5) === 'HTTP/')) {
+				$chRespSplit = explode("\n\n", $chRespSplit[1], 2);
+			}
+			$responseHeaders = $chRespSplit[0];
+			$resp = $chRespSplit[1];
+			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$ok = $status < 400;
+			/*if (!$ok) {
+				echo "error: ";
+				echo htmlentities(curl_error());
+			}*/
+		}
+		curl_close($ch);
+	} else {
+		// Try using fopen if curl was not available
+		$opts = array('method' => $method,
+				'content' => $request,
+				'timeout' => 10
+					 );
+		if (!empty($requestHeaders)) {
+			$opts['header'] = $requestHeaders;
+		}
+		try {
+			$ctx = stream_context_create(array('http' => $opts));
+			$fp = @fopen($url, 'rb', false, $ctx);
+			if ($fp) {
+				$resp = @stream_get_contents($fp);
+				$ok = $resp !== false;
+			}
+		} catch (\Exception $e) {
+			$ok = false;
+		}
+	}
+	//echo "Response: ".htmlentities($resp);
+	return array($ok,$resp);
+}
 
 $aidtotalpossible = array();
 //use this if we don't know the total possible
@@ -222,9 +301,15 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 }
 
 //use this if we know the grade, or want to delete
-function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
-	global $DBH,$sessiondata,$testsettings,$cid;
+function updateLTIgrade($action,$sourcedid,$aid,$grade=0,$sendnow=false) {
+	global $DBH,$sessiondata,$testsettings,$cid,$CFG;
+	
+	//if we're using the LTI message queue, and it's an update, queue it
+	if (isset($CFG['LTI']['usequeue']) && $action=='update') {
+		return addToLTIQueue($sourcedid, $grade, $sendnow);
+	}
 
+	//otherwise, send now
 	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
 
 	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
@@ -297,7 +382,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 	}
 }
 
-function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
+function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResponse=false) {
 
 	$method="POST";
 	$content_type = "application/xml";
@@ -368,8 +453,33 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
 	    return false;
 	}
 
-	$response = sendOAuthBodyPOST($method, $url, $key, $secret, $content_type, $postBody);
+	$response = sendOAuthBodyPOST($method, $url, $key, $secret, $content_type, $postBody, $checkResponse);
 	return $response;
 }
 
+/*
+  table imas_ltiqueue
+     hash, sourcedid, grade, sendon
+     index sendon
+*/
+
+function addToLTIQueue($sourcedid, $grade, $sendnow=false) {
+	global $DBH, $CFG;
+	
+	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
+
+	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon) ';
+	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon) ON DUPLICATE KEY UPDATE ';
+	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),failures=0 ';
+	
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(
+		':hash' => md5($sourcedid),
+		':sourcedid' => $sourcedid,
+		':grade' => $grade,
+		':sendon' => (time() + ($sendnow?0:$LTIdelay))
+	));
+	
+	return ($stm->rowCount()>0);
+}
 ?>
