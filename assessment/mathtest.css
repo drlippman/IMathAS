@@ -171,8 +171,11 @@ div.navbar.fixedonscroll {
 }
 div.navbar h4, div.navbar h3 {
 	margin-top: 0px;
+	margin-bottom: .3em;
 }
-
+div.navbar ul {
+	margin-bottom: .7em;
+}
 div.navbar a {
 	color: blue;
 }

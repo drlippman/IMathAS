@@ -37,7 +37,7 @@ if (!(isset($teacherid))) {
 		$sets = array();
 		$qarr = array();
 		if (isset($_POST['docopyopt'])) {
-			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
+			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum,extrefs';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopt'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
@@ -204,7 +204,25 @@ if (!(isset($teacherid))) {
 				$sets[] = "eqnhelper=:eqnhelper";
 				$qarr[':eqnhelper'] = Sanitize::onlyInt($_POST['eqnhelper']);	
 			}
+			if (isset($_POST['chgextrefs'])) {
+				$extrefs = array();
+				$labelkeys = preg_grep('/extreflabel/', array_keys($_POST));
+				foreach ($labelkeys as $extkey) {
+					$linkkey = str_replace('label','link',$extkey);
+					$_POST[$extkey] = trim(Sanitize::simpleString($_POST[$extkey]));
+					$_POST[$linkkey] = trim(Sanitize::url($_POST[$linkkey]));
+					if ($_POST[$extkey] != '' && $_POST[$linkkey] != '') {
+						$extrefs[] = array(
+							'label' => $_POST[$extkey],
+							'link' => $_POST[$linkkey]
+						);
+					}
+				}
+				$extrefencoded = json_encode($extrefs);
+				$sets[] = "extrefs=:extrefs";
+				$qarr[':extrefs'] = $extrefencoded;	
 
+			}
 			if (isset($_POST['chgcaltag'])) {
 				$caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
 				$sets[] = "caltag=:caltag";
@@ -502,6 +520,20 @@ function chkgbcat(cat) {
 	     	       el.checked = true;
 		  }
 	}
+}
+var newextrefcnt = 0;
+function addextref(el) {
+	var html = '<span class="aextref">';
+	html += '<label for=newextreflabel'+newextrefcnt+'>Label:</label>';
+	html += '<input id=newextreflabel'+newextrefcnt+' name=newextreflabel'+newextrefcnt+' size=10 /> ';
+	html += '<label for=newextreflink'+newextrefcnt+'>Link:</label>';
+	html += '<input id=newextreflink'+newextrefcnt+' name=newextreflink'+newextrefcnt+' size=30 />';		
+	html += '<button type=button onclick="removeextref(this)">Remove</button><br/></span>';
+	newextrefcnt++;
+	$(el).before(html);
+}
+function removeextref(el) {
+	$(el).closest(".aextref").remove();	
 }
 function valform() {
 	if ($("#qform input:checkbox[name='checked[]']:checked").length == 0) {
@@ -873,6 +905,13 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td class="r">Show "Post this question to forum" links?</td>
 				<td>
 				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> To forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
+				</td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgextrefs" class="chgbox"/></td>
+				<td class="r">Assessment resource links</td>
+				<td>
+				<button type=button onclick="addextref(this)">Add Resource</button>
 				</td>
 			</tr>
 			<tr class="coptr">

@@ -204,6 +204,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             } else if ($skippenalty_post>0) {
                 $defpenalty = 'S'.$skippenalty_post.$defpenalty;
             }
+            
+            $extrefs = array();
+            $labelkeys = preg_grep('/extreflabel/', array_keys($_POST));
+            foreach ($labelkeys as $extkey) {
+            	$linkkey = str_replace('label','link',$extkey);
+            	$_POST[$extkey] = trim(Sanitize::simpleString($_POST[$extkey]));
+            	$_POST[$linkkey] = trim(Sanitize::url($_POST[$linkkey]));
+            	if ($_POST[$extkey] != '' && $_POST[$linkkey] != '') {
+            		$extrefs[] = array(
+            			'label' => $_POST[$extkey],
+            			'link' => $_POST[$linkkey]
+            		);
+            	}
+            }
+            $extrefencoded = json_encode($extrefs);
+            
 		if ($_POST['reqscoreshowtype']==-1 || $reqscore==0) {
 			$reqscore = 0;
 			$reqscoretype = 0;
@@ -221,10 +237,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
         $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
         if (!empty($copyFromId)) {
-                $stm = $DBH->prepare("SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,reqscoretype,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id=:id");
+                $stm = $DBH->prepare("SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,reqscoretype,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome,extrefs FROM imas_assessments WHERE id=:id");
                 $stm->execute(array(':id'=>$copyFromId));
 
-                list($timelimit,$_POST['minscore'],$displayMethod,$defpoints,$defattempts,$defpenalty,$deffeedback,$shuffle,$grdebkcat,$assmpassword,$cntingb_int,$tutoredit,$shwqcat,$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$grpmax,$grpsetid,$showhints,$reqscore,$_POST['reqscoreaid'],$reqscoretype,$_POST['noprint'],$allowlate,$eqnhelper,$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$showtips,$exceptpenalty,$ltisecret,$msgtoinstr,$posttoforum,$istutorial,$defoutcome) = $stm->fetch(PDO::FETCH_NUM);
+                list($timelimit,$_POST['minscore'],$displayMethod,$defpoints,$defattempts,$defpenalty,$deffeedback,$shuffle,$grdebkcat,$assmpassword,$cntingb_int,$tutoredit,$shwqcat,$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$grpmax,$grpsetid,$showhints,$reqscore,$_POST['reqscoreaid'],$reqscoretype,$_POST['noprint'],$allowlate,$eqnhelper,$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$showtips,$exceptpenalty,$ltisecret,$msgtoinstr,$posttoforum,$istutorial,$defoutcome,$extrefencoded) = $stm->fetch(PDO::FETCH_NUM);
                 if (isset($_POST['copyinstr'])) {
                     if (($introjson=json_decode($cpintro))!==null) { //is json intro
                         $_POST['intro'] = $introjson[0];
@@ -321,7 +337,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $query = "UPDATE imas_assessments SET name=:name,summary=:summary,intro=:intro,timelimit=:timelimit,minscore=:minscore,isgroup=:isgroup,showhints=:showhints,tutoredit=:tutoredit,eqnhelper=:eqnhelper,showtips=:showtips,";
                 $query .= "displaymethod=:displaymethod,defattempts=:defattempts,deffeedback=:deffeedback,shuffle=:shuffle,gbcategory=:gbcategory,password=:password,cntingb=:cntingb,showcat=:showcat,caltag=:caltag,calrtag=:calrtag,";
                 $query .= "reqscore=:reqscore,reqscoreaid=:reqscoreaid,reqscoretype=:reqscoretype,noprint=:noprint,avail=:avail,groupmax=:groupmax,allowlate=:allowlate,exceptionpenalty=:exceptionpenalty,ltisecret=:ltisecret,deffeedbacktext=:deffeedbacktext,";
-                $query .= "msgtoinstr=:msgtoinstr,posttoforum=:posttoforum,istutorial=:istutorial,defoutcome=:defoutcome,LPcutoff=:LPcutoff";
+                $query .= "msgtoinstr=:msgtoinstr,posttoforum=:posttoforum,istutorial=:istutorial,defoutcome=:defoutcome,LPcutoff=:LPcutoff,extrefs=:extrefs";
                 $qarr = array(':name'=>$assessName, ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'], ':timelimit'=>$timelimit,
                     ':minscore'=>$_POST['minscore'], ':isgroup'=>$isgroup, ':showhints'=>$showhints, ':tutoredit'=>$tutoredit,
                     ':eqnhelper'=>$eqnhelper, ':showtips'=>$showtips, ':displaymethod'=>$displayMethod,
@@ -331,7 +347,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     ':avail'=>$_POST['avail'], ':groupmax'=>$grpmax, ':allowlate'=>$allowlate,
                     ':exceptionpenalty'=>$exceptpenalty, ':ltisecret'=>$ltisecret, ':deffeedbacktext'=>$deffb,
                     ':msgtoinstr'=>$msgtoinstr, ':posttoforum'=>$posttoforum, ':istutorial'=>$istutorial,
-                    ':defoutcome'=>$defoutcome, ':LPcutoff'=>$LPcutoff);
+                    ':defoutcome'=>$defoutcome, ':LPcutoff'=>$LPcutoff, ':extrefs'=>$extrefencoded);
 
                 if ($updategroupset!='') {
                     $query .= ",groupsetid=:groupsetid";
@@ -431,12 +447,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
                 $query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,";
 		$query .= "eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,reqscoretype,noprint,avail,allowlate,";
-                $query .= "LPcutoff,exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome,ptsposs,date_by_lti) VALUES ";
+                $query .= "LPcutoff,exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome,extrefs,ptsposs,date_by_lti) VALUES ";
                 $query .= "(:courseid, :name, :summary, :intro, :startdate, :enddate, :reviewdate, :timelimit, :minscore, :displaymethod, ";
                 $query .= ":defpoints, :defattempts, :defpenalty, :deffeedback, :shuffle, :gbcategory, :password, :cntingb, :tutoredit, ";
                 $query .= ":showcat, :eqnhelper, :showtips, :caltag, :calrtag, :isgroup, :groupmax, :groupsetid, :showhints, :reqscore, ";
 			$query .= ":reqscoreaid, :reqscoretype, :noprint, :avail, :allowlate, :LPcutoff, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
-                $query .= ":posttoforum, :istutorial, :defoutcome, 0, :datebylti)";
+                $query .= ":posttoforum, :istutorial, :defoutcome, :extrefs, 0, :datebylti)";
                 $stm = $DBH->prepare($query);
                 $stm->execute(array(':courseid'=>$cid, ':name'=>$assessName, ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'],
                     ':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':timelimit'=>$timelimit,
@@ -449,7 +465,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     ':reqscoreaid'=>$_POST['reqscoreaid'], ':reqscoretype'=>$reqscoretype, ':noprint'=>$_POST['noprint'], ':avail'=>$_POST['avail'],
                     ':allowlate'=>$allowlate, ':LPcutoff'=>$LPcutoff, ':exceptionpenalty'=>$exceptpenalty, ':ltisecret'=>$ltisecret,
                     ':endmsg'=>$endmsg, ':deffeedbacktext'=>$deffb, ':msgtoinstr'=>$msgtoinstr, ':posttoforum'=>$posttoforum,
-                    ':istutorial'=>$istutorial, ':defoutcome'=>$defoutcome, ':datebylti'=>$datebylti));
+                    ':istutorial'=>$istutorial, ':defoutcome'=>$defoutcome, ':extrefs'=>$extrefencoded, ':datebylti'=>$datebylti));
                 $newaid = $DBH->lastInsertId();
                 $query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
                 $query .= "(:courseid, :itemtype, :typeid);";
@@ -514,6 +530,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $deffb = $line['deffeedbacktext'];
                 }
                 $savetitle = _("Save Changes");
+                $extrefs = json_decode($line['extrefs'], true);
+                if ($extrefs === null) {
+                	$extrefs = array();
+                }
             } else {  //INITIAL LOAD IN ADD MODE
                 //set defaults
                 $line['name'] = "";
@@ -564,6 +584,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $line['reqscoretype'] = 0;
                 $line['date_by_lti'] = ($dates_by_lti==0)?0:1;
                 $savetitle = _("Create Assessment");
+                $extrefs = array();
             }
             if (($introjson=json_decode($line['intro']))!==null) { //is json intro
                 $line['intro'] = $introjson[0];
@@ -816,7 +837,21 @@ if ($overwriteBody==1) {
 		} else {
 			el.type = "password";
 			s.innerHTML = "Show";
-		}
+		}xe
+	}
+	var newextrefcnt = 0;
+	function addextref(el) {
+		var html = '<span class="aextref">';
+		html += '<label for=newextreflabel'+newextrefcnt+'>Label:</label>';
+		html += '<input id=newextreflabel'+newextrefcnt+' name=newextreflabel'+newextrefcnt+' size=10 /> ';
+		html += '<label for=newextreflink'+newextrefcnt+'>Link:</label>';
+		html += '<input id=newextreflink'+newextrefcnt+' name=newextreflink'+newextrefcnt+' size=30 />';		
+		html += '<button type=button onclick="removeextref(this)">Remove</button><br/></span>';
+		newextrefcnt++;
+		$(el).before(html);
+	}
+	function removeextref(el) {
+		$(el).closest(".aextref").remove();	
 	}
 	$(function() {
 		$("input[name=dolpcutoff]").on("click", function() {
@@ -1183,6 +1218,22 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr'],1); ?>/> Show "Message instructor about this question" links<br/>
 				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> Show "Post this question to forum" links, to forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
+			</span><br class=form>
+			
+			<span class=form>Assessment resource links</span>
+			<span class=formright>
+<?php
+			foreach ($extrefs as $k=>$extref) {
+				echo '<span class="aextref">';
+				echo '<label for="extreflabel'.$k.'">Label:</label>';
+				echo '<input id="extreflabel'.$k.'" name="extreflabel'.$k.'" size=10 value="'.Sanitize::encodeStringForDisplay($extref['label']).'" /> ';
+				echo '<label for="extreflink'.$k.'">Link:</label>';
+				echo '<input id="extreflink'.$k.'" name="extreflink'.$k.'" size=30 value="'.Sanitize::encodeStringForDisplay($extref['link']).'" />';
+				echo '<button type=button onclick="removeextref(this)">Remove</button>';
+				echo '<br/></span>';
+			}
+?>
+			<button type=button onclick="addextref(this)">Add Resource</button>
 			</span><br class=form>
 
 			<span class="form">Use equation helper?</span>

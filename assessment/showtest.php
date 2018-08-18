@@ -616,6 +616,14 @@
 	} else {
 		$introjson = array();
 	}
+	$extrefs = json_decode($testsettings['extrefs'], true);
+	if ($extrefs !== null && count($extrefs)>0 && $testsettings['displaymethod'] != "SkipAround") {
+		$testsettings['intro'] .= '<p>Resources: ';
+		foreach ($extrefs as $extref) {
+			$testsettings['intro'] .= '<a target="_blank" href="'.Sanitize::url($extref['link']).'">'.Sanitize::encodeStringForDisplay($extref['label']).'</a> ';
+		}
+		$testsettings['intro'] .= '</p>';
+	}
 
 	if (!$isteacher) {
 		$rec = "data-base=\"assessintro-{$line['assessmentid']}\" ";
@@ -1764,7 +1772,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 			   if (!$superdone) {
 				echo filter("<div id=intro role=region aria-label=\""._('Intro or instructions')."\" class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
-				$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat']);
+				$lefttodo = shownavbar($questions,$scores,$qn,$testsettings['showcat'],$testsettings['extrefs']);
 
 				echo "<div class=inset>\n";
 				echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
@@ -1902,7 +1910,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				$next = $_GET['to'];
 				echo filter("<div id=intro role=region aria-label=\""._('Intro or instructions')."\"  class=hidden aria-hidden=true aria-expanded=false>{$testsettings['intro']}</div>\n");
 
-				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat']);
+				$lefttodo = shownavbar($questions,$scores,$next,$testsettings['showcat'],$testsettings['extrefs']);
 				if (unans($scores[$next]) || amreattempting($next)) {
 					echo "<div class=inset>\n";
 					if (isset($intropieces)) {
@@ -2655,7 +2663,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					break;
 				}
 			}
-			shownavbar($questions,$scores,$i,$testsettings['showcat']);
+			shownavbar($questions,$scores,$i,$testsettings['showcat'],$testsettings['extrefs']);
 			if ($i == count($questions)) {
 				echo "<div class=inset><br/>\n";
 				echo "<div class=\"screenreader\" id=\"beginquestions\">"._('Start of Questions')."</div>\n";
@@ -3284,7 +3292,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		echo '</div>';
 	}
 
-	function shownavbar($questions,$scores,$current,$showcat) {
+	function shownavbar($questions,$scores,$current,$showcat,$extrefs) {
 		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;
 		$todo = 0;
 		$earned = 0;
@@ -3292,6 +3300,15 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		
 		echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
 		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";
+		$extrefs = json_decode($extrefs, true);
+		if ($extrefs !== null && count($extrefs)>0) {
+			echo '<h3>'._('Resources').'</h3>';
+			echo '<ul class=qlist>';
+			foreach ($extrefs as $extref) {
+				echo '<li><a target="_blank" href="'.Sanitize::url($extref['link']).'">'.Sanitize::encodeStringForDisplay($extref['label']).'</a></li>';
+			}
+			echo '</ul>';
+		}
 		echo "<h3>", _('Questions'), "</h3>\n";
 		echo "<ul class=qlist>\n";
 		for ($i = 0; $i < count($questions); $i++) {
