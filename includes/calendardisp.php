@@ -329,7 +329,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
 		$datefield = 'E';
 	}
-	if ($row[4] > $now) {
+	if ($row[7]==2) { //avail always, so avail now
+		$status = 0;  //avail now
+	} else if ($row[4] > $now) {
 		$status = 1;  //before the start date
 	} else if ($now > $row[2]) {
 		$status = 2;  //after the end date
@@ -401,7 +403,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
 		$datefield = 'E';
 	}
-	if ($row[4] > $now) {
+	if ($row[7]==2) { //avail always, so avail now
+		$status = 0;  //avail now
+	} else if ($row[4] > $now) {
 		$status = 1;  //before the start date
 	} else if ($now > $row[2]) {
 		$status = 2;  //after the end date
@@ -678,7 +682,7 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='InlineText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['I'.$datetype.$itemsassoc[$item][1]])) {
-				if ($greyitems[$item] && !isset($teacherid)) {
+				if ($byid['I'.$datetype.$itemsassoc[$item][5]]>0 && !isset($teacherid)) { //if not available, skip
 					continue;
 				}
 				$moday = $byid['I'.$datetype.$itemsassoc[$item][1]][0];
@@ -701,7 +705,7 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='LinkedText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['L'.$datetype.$itemsassoc[$item][1]])) {
-				if ($greyitems[$item] && !isset($teacherid)) {
+				if ($byid['L'.$datetype.$itemsassoc[$item][1]]>0 && !isset($teacherid)) { //if not available, skip
 					continue;
 				}
 				$moday = $byid['L'.$datetype.$itemsassoc[$item][1]][0];
