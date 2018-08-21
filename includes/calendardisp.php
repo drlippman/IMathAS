@@ -705,7 +705,7 @@ foreach ($itemsimporder as $item) {
 	} else if ($itemsassoc[$item][0]=='LinkedText') {
 		foreach (array('S','E','O') as $datetype) {
 			if (isset($byid['L'.$datetype.$itemsassoc[$item][1]])) {
-				if ($byid['L'.$datetype.$itemsassoc[$item][1]]>0 && !isset($teacherid)) { //if not available, skip
+				if ($byid['L'.$datetype.$itemsassoc[$item][5]]>0 && !isset($teacherid)) { //if not available, skip
 					continue;
 				}
 				$moday = $byid['L'.$datetype.$itemsassoc[$item][1]][0];
