@@ -97,6 +97,7 @@ function printCourseLine($data) {
 	echo '</li>';
 }
 function writeCourseInfo($line, $skipcopyright=2) {
+	global $imasroot;
 	$itemclasses = array();
 	if ($line['copyrights']<$skipcopyright) {
 		$itemclasses[] = 'copyr';
@@ -114,7 +115,7 @@ function writeCourseInfo($line, $skipcopyright=2) {
 	if ($line['copyrights']<$skipcopyright) {
 		echo "&copy;\n";
 	} else {
-		echo " <a href=\"course.php?cid=" . Sanitize::courseId($line['id']) . "\" target=\"_blank\" class=\"small\">Preview</a>";
+		echo " <a href=\"$imasroot/course/course.php?cid=" . Sanitize::courseId($line['id']) . "\" target=\"_blank\" class=\"small\">Preview</a>";
 	}
 }
 
