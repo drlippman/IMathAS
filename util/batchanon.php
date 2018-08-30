@@ -4,7 +4,7 @@
 
 require("../init.php");
 
-if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+if ($myrights < 100) { echo "You don't have the authority for this action"; exit;}
 
 require("../header.php");
 
