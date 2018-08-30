@@ -837,7 +837,7 @@ if ($overwriteBody==1) {
 		} else {
 			el.type = "password";
 			s.innerHTML = "Show";
-		}xe
+		}
 	}
 	var newextrefcnt = 0;
 	function addextref(el) {
