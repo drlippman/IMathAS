@@ -119,7 +119,7 @@ if (!(isset($teacherid))) {
 			}
 			$DBH->beginTransaction();
 			if (isset($_POST['copycourseopt'])) {
-				$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,picicons,showlatepass,theme,latepasshrs';
+				$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,picicons,showlatepass,theme,latepasshrs,deflatepass';
 				$stm = $DBH->prepare("SELECT $tocopy FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$ctc));
 				$row = $stm->fetch(PDO::FETCH_ASSOC);

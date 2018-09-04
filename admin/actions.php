@@ -735,13 +735,12 @@ switch($_POST['action']) {
 					$gbcats[$frid] = $DBH->lastInsertId();
 				}
 				$copystickyposts = true;
-				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id=:id");
+				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$_POST['usetemplate']));
 				$r = $stm->fetch(PDO::FETCH_NUM);
 				$items = unserialize($r[0]);
 				$ancestors = $r[1];
 				$outcomesarr = $r[2];
-				$latepasshrs = $r[3];
 				if ($ancestors=='') {
 					$ancestors = intval($_POST['usetemplate']);
 				} else {
@@ -800,8 +799,8 @@ switch($_POST['action']) {
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($_POST['usetemplate']);
 				$itemorder = serialize($newitems);
-				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs WHERE id=:id");
-				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':id'=>$cid));
+				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':id'=>$cid));
 				//copy offline
 				$offlinerubrics = array();
 				$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid=:courseid");

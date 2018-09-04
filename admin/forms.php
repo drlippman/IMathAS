@@ -333,9 +333,7 @@ switch($_GET['action']) {
 			$picicons = $line['picicons'];
 			$allowunenroll = $line['allowunenroll'];
 			$copyrights = $line['copyrights'];
-			$msgset = $line['msgset']%5;
-			$msgmonitor = (floor($line['msgset']/5))&1;
-			$msgOnEnroll = (floor($line['msgset']/5))&2;
+			$msgset = $line['msgset'];
 			$toolset = $line['toolset'];
 			$avail = $line['available'];
 			$lockaid = $line['lockaid'];
@@ -372,9 +370,6 @@ switch($_GET['action']) {
 			$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 			$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 			$toolset = isset($CFG['CPS']['toolset'])?$CFG['CPS']['toolset'][0]:0;
-			$msgmonitor = (floor($msgset/5))&1;
-			$msgOnEnroll = (floor($msgset/5))&2;
-			$msgset = $msgset%5;
 			$theme = isset($CFG['CPS']['theme'])?$CFG['CPS']['theme'][0]:$defaultcoursetheme;
 			$showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
 			$istemplate = 0;
@@ -396,7 +391,7 @@ switch($_GET['action']) {
 					$ctc = Sanitize::onlyInt($_POST['ctc']);
 				}
 				if ($ctc>0) {
-					$query = "SELECT ic.name,ic.enrollkey,ic.copyrights,ic.ownerid,iu.groupid ";
+					$query = "SELECT ic.*,iu.groupid ";
 					$query .= "FROM imas_courses AS ic JOIN imas_users AS iu ";
 					$query .= "ON ic.ownerid=iu.id WHERE ic.id=:id";
 					$stm = $DBH->prepare($query);
@@ -419,11 +414,16 @@ switch($_GET['action']) {
 					}
 					$ctcekey = $_POST['ekey'];
 					$name = $ctcinfo['name'];
+					$latepasshrs = $ctcinfo['latepasshrs'];
+					$deflatepass = $ctcinfo['deflatepass'];
 				}
 			} else {
 				$ctc = 0;
 			}
 		}
+		$msgmonitor = (floor($msgset/5))&1;
+		$msgOnEnroll = (floor($msgset/5))&2;
+		$msgset = $msgset%5;
 		$defetime = $deftime%10000;
 		$hr = floor($defetime/60)%12;
 		$min = $defetime%60;

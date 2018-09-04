@@ -908,7 +908,7 @@ if ($stm->rowCount()==0) {
 					$gbcats[$frid] = $DBH->lastInsertId();
 				}
 				$copystickyposts = true;
-				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs,dates_by_lti FROM imas_courses WHERE id=:id");
+				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs,dates_by_lti,deflatepass FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$sourcecid));
 				$r = $stm->fetch(PDO::FETCH_NUM);
 
@@ -917,6 +917,7 @@ if ($stm->rowCount()==0) {
 				$outcomesarr = $r[2];
 				$latepasshrs = $r[3];
 				$datesbylti = $r[4];
+				$deflatepass = $r[5];
 				if ($ancestors=='') {
 					$ancestors = intval($sourcecid);
 				} else {
@@ -974,8 +975,8 @@ if ($stm->rowCount()==0) {
 				doaftercopy($sourcecid);
 	
 				$itemorder = serialize($newitems);
-				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,dates_by_lti=:datesbylti WHERE id=:id");
-				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':datesbylti'=>$datesbylti, ':id'=>$destcid));
+				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,deflatepass=:deflatepass,dates_by_lti=:datesbylti WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':deflatepass'=>$deflatepass, ':datesbylti'=>$datesbylti, ':id'=>$destcid));
 
 				$offlinerubrics = array();
 				/*
