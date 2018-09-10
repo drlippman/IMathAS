@@ -35,9 +35,9 @@ if (isset($CFG['coursebrowser'])) {
 }
 echo '<p><button type=button onclick="showCopyOpts()">';
 if (isset($CFG['coursebrowser'])) {
-	echo _('Copy from my or a colleage\'s course');
+	echo _('Copy from my or a colleague\'s course');
 } else {
-	echo _('Copy from my, a colleage\'s, or template course');
+	echo _('Copy from my, a colleague\'s, or template course');
 }
 echo '</button></p>';
 echo '<div id=copyoptions style="display:none; padding-left: 20px">';
