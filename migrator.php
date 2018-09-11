@@ -21,7 +21,9 @@ class Migrator
      */
     public function migrateAll()
     {
-      $latestVersionApplied = $this->getLatestVersionApplied();
+
+      $latestOldStyleVersionApplied = $this->getLatestVersionAppliedOldStyle();
+      $appliedMigrations = $this->getAppliedMigrations();
       $migrationsAppliedThisRun = 0;
 
       $migrationFilenames = glob(__DIR__ . '/migrations/*.php');
@@ -30,8 +32,10 @@ class Migrator
       foreach ($migrationFilenames as $migrationFilename) {
         $migrationVersion = $this->getMigrationFileVersion($migrationFilename);
 
-        if ($migrationVersion <= $latestVersionApplied) {
-          continue;
+        if ($migrationVersion <= $latestOldStyleVersionApplied) {
+        	continue;
+        } else if ($migrationVersion>156 && in_array($migrationVersion, $appliedMigrations)) {
+        	continue;
         }
 
         $result = $this->migrateSingle($migrationFilename);
@@ -40,8 +44,12 @@ class Migrator
           printf("<p style='color: #ff0000;'>Migration FAILED: %s</p>\n", basename($migrationFilename));
           return null;
         } else {
-          $this->storeLatestVersionApplied($migrationVersion);
-          ++$migrationsAppliedThisRun;
+        	if ($migrationVersion <= 156) { //156 is the last old-style migration
+        		$this->storeLatestVersionAppliedOldStyle($migrationVersion);
+        	} else {
+        		$this->storeMigrationApplied($migrationVersion, $migrationFilename);
+        	}
+        	++$migrationsAppliedThisRun;
         }
       }
 
@@ -94,11 +102,33 @@ class Migrator
 
         return $migrationVersion;
     }
+    
+    /**
+      * Get all applied migrations (new style)
+      */
+    private function getAppliedMigrations() 
+    {
+    	$stm = $this->DBH->query("SELECT id FROM imas_dbschema WHERE id>156");
+        return $stm->fetchAll(PDO::FETCH_COLUMN);
+    }
+    /**
+      * Store that the migration was applied.
+      */
+    private function storeMigrationApplied($version, $filename)
+    {
+        $stm = $this->DBH->prepare("INSERT INTO imas_dbschema (id,ver,details) VALUES (:id,:ver,:details)");
+        $stm->execute(array(':id'=>$version, ':ver'=>time(), ':details'=>basename($filename)));
+
+        if (false === $stm) {
+            printf("<p style='color: #ff0000'>Unable to store migration version: %s</p>\n", $version);
+        }
+    }
+
 
     /**
       * Store the latest successfully applied migration version to the DB.
       */
-    private function storeLatestVersionApplied($version)
+    private function storeLatestVersionAppliedOldStyle($version)
     {
         $stm = $this->DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=1");
         $stm->execute(array(':ver'=>$version));
@@ -109,33 +139,39 @@ class Migrator
     }
 
     /**
-     * Get the last successfully applied migration version from the DB.
+     * Get the last successfully applied migration version from the DB,
+     *  of the older format migrations (sequential), the last of which was 156.
      *
      * @return float The last successfully applied migration version.
      */
-    public function getLatestVersionApplied()
+    public function getLatestVersionAppliedOldStyle()
     {
         $stm = $this->DBH->query("SELECT ver FROM imas_dbschema WHERE id=1");
         $lastVersion = $stm->fetchColumn(0);
 
         return $lastVersion;
     }
-    
     /**
-     * Get the last available migration version in the migration directory
+     * Get the last successfully applied migration version from the DB,
+     * new format, assuming in numerical order
      *
-     * @return float The last available migration version.
+     * @return float The last successfully applied migration version.
      */
-    public function getLatestVersionAvailable()
+    public function getLatestVersionApplied()
     {
-        $migrationFilenames = glob(__DIR__ . '/migrations/*.php');
-        if (count($migrationFilenames)==0) {
-        	return 0;
-        }
-        natsort($migrationFilenames);
-
-        $lastVersion = $this->getMigrationFileVersion($migrationFilenames[count($migrationFilenames)-1]);
-        
-        return $lastVersion;
+    	$lastOldVersion = $this->getLatestVersionAppliedOldStyle();
+    	if ($lastOldVersion<156) {
+    		return $lastOldVersion;
+    	} else {
+    		$stm = $this->DBH->query("SELECT id FROM imas_dbschema WHERE ver>0 AND id>156 ORDER BY id DESC LIMIT 1");
+    		$lastVersion = $stm->fetchColumn(0);
+    		if ($lastVersion === false) {
+    			return $lastOldVersion;
+    		} else {
+    			return $lastVersion;
+    		}
+    	}
     }
+    
+   
 }
