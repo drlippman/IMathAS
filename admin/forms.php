@@ -83,13 +83,16 @@ switch($_GET['action']) {
 	case "deladmin":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		if ($myrights==100) {
-			$stm = $DBH->query("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
+			$stm = $DBH->query("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
 		} else {
 			$stm = $DBH->prepare("SELECT id,FirstName,LastName FROM imas_users WHERE groupid=? AND rights>12 AND rights<>76 AND rights<>77 ORDER BY LastName,FirstName");
 			$stm->execute(array($groupid));
 		}
 		$otherusers = array();
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['name'] === null) {
+				$row['name'] = _('Default');
+			}
 			$otherusers[$row['id']] = $row['LastName'].', '.$row['FirstName'].(isset($row['name'])?' ('.$row['name'].')':'');
 		}
 		
