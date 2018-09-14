@@ -277,10 +277,21 @@ if ($myrights<20) {
 		}
 
 		$seed = rand(0,10000);
+		$lastanswers = array();
+		$scores = array();
+		$rawscores = array();
+		$qn = 27;  //question number to use during testing
+		$lastanswers[$qn] = '';
+		$rawscores[$qn] = -1;
+		$scores[$qn] = -1;
 		require("../assessment/displayq2.php");
 		if (isset($_POST['seed'])) {
-			list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
+			list($score,$rawscores[$qn]) = scoreq($qn,$qsetid,$_POST['seed'],$_POST['qn'.$qn]);
+			$scores[$qn] = $score;
 			$page_lastScore = "<p>Score on last answer: ".Sanitize::onlyFloat($score)."/1</p>\n";
+		} else {
+			$page_lastScore = "";
+			$_SESSION['choicemap'] = array();
 		}
 
 		$twobx = ($lineQSet['qcontrol']=='' && $lineQSet['answer']=='');
@@ -372,7 +383,7 @@ if ($overwriteBody==1) {
 
 <?php
 		unset($lastanswers);
-		displayq(0,$qsetid,$seed,true,true,0);
+		displayq($qn,$qsetid,$seed,true,true,0);
 ?>
 		<input type=submit value="Submit">
 	</form>
