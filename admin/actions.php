@@ -1090,6 +1090,8 @@ switch($_POST['action']) {
 			$DBH->commit();
 		}
 		break;
+	/*
+	removed from production code - security risk
 	case "importmacros":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
 		$uploaddir = rtrim(dirname("../config.php"), '/\\') .'/assessment/libs/';
@@ -1104,9 +1106,11 @@ switch($_POST['action']) {
 						if (strpos($buffer,"//")===0) {
 							$trimmed = trim(substr($buffer,2));
 							if ($trimmed{0}!='<' && substr($trimmed,-1)!='>') {
-								$comments .= preg_replace('/^( +)/e', 'str_repeat("&nbsp;", strlen("$1"))', substr($buffer,2)) .  "<BR>";
+								$numspaces = strlen(substr($buffer,2)) - strlen(ltrim(substr($buffer,2)));
+								$comments .= str_repeat('&nbsp;', $numspaces);
+								$comments .= $trimmed . '<br/>';
 							} else {
-								$comments .= trim(substr($buffer,2));
+								$comments .= $trimmed;
 							}
 						} else if (strpos($buffer,"function")===0) {
 							$func = substr($buffer,9,strpos($buffer,"(")-9);
@@ -1145,6 +1149,7 @@ switch($_POST['action']) {
 			require("../footer.php");
 			exit;
 		}
+	*/
 	case "importqimages":
 		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';

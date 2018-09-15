@@ -182,13 +182,13 @@ function processScript($script) {
 				case 'ymin':
 				case 'ymax':
 				case 'marker':
-					$this->$matches[1] = $matches[2];
+					$this->{$matches[1]} = $matches[2];
 					break;
 				case 'fill':
 				case 'markerfill':
 				case 'fontbackground':
 				case 'fontfill':
-					$this->$matches[1] = $matches[2];
+					$this->{$matches[1]} = $matches[2];
 					if (!isset($this->colors[$matches[2]])) {
 						$this->addcolor($matches[2]);
 					}

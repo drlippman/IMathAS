@@ -314,11 +314,13 @@ $placeinhead .= '</script>';
 	<a href="importstu.php?cid=admin">Import Students from File</a>
 	</span>
 	<?php if ($allowmacroinstall) {
+		/* removed from production - security risk
 		echo '<span class="column">';
 		echo "<a href=\"forms.php?action=importmacros\">Install Macro File</a><br/>\n";
 		echo "<a href=\"forms.php?action=importqimages\">Install Question Images</a><br/>\n";
 		echo "<a href=\"forms.php?action=importcoursefiles\">Install Course Files</a><br/>\n";
 		echo '</span>';
+		*/
 	}
 	echo '<span class="column">';
 	if ($enablebasiclti) {
