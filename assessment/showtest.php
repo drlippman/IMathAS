@@ -3293,7 +3293,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 
 	function shownavbar($questions,$scores,$current,$showcat,$extrefs) {
-		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;
+		global $imasroot,$isteacher,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
@@ -3305,7 +3305,12 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo '<h3>'._('Resources').'</h3>';
 			echo '<ul class=qlist>';
 			foreach ($extrefs as $extref) {
-				echo '<li><a target="_blank" href="'.Sanitize::url($extref['link']).'">'.Sanitize::encodeStringForDisplay($extref['label']).'</a></li>';
+				if (!$isteacher) {
+					$rec = "data-base=\"assessintro-{$testsettings['id']}\"";
+				} else {
+					$rec = '';
+				}
+				echo '<li><a target="_blank" '.$rec.' href="'.Sanitize::url($extref['link']).'">'.Sanitize::encodeStringForDisplay($extref['label']).'</a></li>';
 			}
 			echo '</ul>';
 		}
