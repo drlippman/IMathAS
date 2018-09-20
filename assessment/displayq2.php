@@ -7272,14 +7272,13 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("decimal", $ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!is_numeric($totest) || !preg_match('/^[\d\.]+$/',$totest)) {
+		if (!is_numeric($totest) || !preg_match('/^\-?[\d\.]+$/',$totest)) {
 			return false;
 		}
 	}
 	if (in_array("scinotordec",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
 		if (!is_numeric($totest) && !preg_match('/^\-?[1-9](\.\d*)?(\*|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
-			echo "here: $totest";
 			return false;
 		}
 	}
