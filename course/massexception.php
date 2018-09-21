@@ -314,7 +314,11 @@
 					if ($lasts!=0) {
 						natsort($assessarr);
 						foreach ($assessarr as $id=>$val) {
-							echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val)."</li>";
+							echo "<li><input type=checkbox name=\"clears[]\" value=\"" . Sanitize::onlyInt($id) . "\" />".Sanitize::encodeStringForDisplay($val);
+							if ($notesarr[$id]!='') {
+								echo ' <em class=small>'.Sanitize::encodeStringForDisplay($notesarr[$id]).'</em>';
+							}
+							echo "</li>";
 						}
 						echo "</ul></li>";
 						$assessarr = array();
