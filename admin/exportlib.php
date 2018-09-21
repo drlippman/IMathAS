@@ -68,6 +68,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 			array_unshift($rootlibs,$_POST['rootlib']);
 		}
 		$rootlist = implode(',', array_map('intval', $rootlibs));
+		if (trim($rootlist)=='') {
+			exit;
+		}
 
 		$libcnt = 1;
 		$libs = Array();
@@ -152,6 +155,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 
 		$libarray = array_keys($libs);
 
+		if (count($libarray)==0) {
+			exit;
+		}
 		$liblist = implode(',', array_map('intval', $libarray));
 		//set question id array
 		//$qassoc is systemqsetid=>newqsetid
@@ -186,91 +192,93 @@ if (!(isset($teacherid)) && $myrights<20) {
 
 		$imgfiles = array();
 		$qlist = implode(',', array_map('intval', array_unique(array_keys($qassoc))));
-		//first, lets pull any questions that have include__from so we can lookup backrefs
-		$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
-		//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
-		//$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 ";
-		if ($nonpriv) {
-			$query .= " AND userights>0";
-		}
-		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		$stm = $DBH->query($query);
-		$includedqs = array();
-		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
+		if (trim($qlist) != '') {
+			//first, lets pull any questions that have include__from so we can lookup backrefs
+			$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
+			//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
+			//$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 ";
+			if ($nonpriv) {
+				$query .= " AND userights>0";
 			}
-			if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
+			$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
+			$stm = $DBH->query($query);
+			$includedqs = array();
+			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
+				}
+				if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
+				}
 			}
-		}
-		$includedbackref = array();
-		if (count($includedqs)>0) {
-			$includedlist = implode(',', array_map('intval', $includedqs));
-			$stm = $DBH->query("SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)");
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$includedbackref[$row[0]] = $row[1];
+			$includedbackref = array();
+			if (count($includedqs)>0) {
+				$includedlist = implode(',', array_map('intval', $includedqs));
+				$stm = $DBH->query("SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)");
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$includedbackref[$row[0]] = $row[1];
+				}
 			}
-		}
-
-		//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
-		//$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
-		$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
-		if ($nonpriv) {
-			$query .= " AND userights>0";
-		}
-		$query .= " ORDER BY uniqueid";
-		$stm = $DBH->query($query);
-		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-      $line['control'] = preg_replace_callback('/includecodefrom\((\d+)\)/', function($matches) use ($includedbackref) {
-          return "includecodefrom(UID".$includedbackref[$matches[1]].")";
-        }, $line['control']);
-      $line['qtext'] = preg_replace_callback('/includeqtextfrom\((\d+)\)/', function($matches) use ($includedbackref) {
-          return "includeqtextfrom(UID".$includedbackref[$matches[1]].")";
-        }, $line['qtext']);
-			echo "\nSTART QUESTION\n";
-			echo "QID\n";
-			echo Sanitize::forRawExport(rtrim($qassoc[$line['id']])) . "\n";
-			echo "\nUQID\n";
-			echo Sanitize::forRawExport(rtrim($line['uniqueid'])) . "\n";
-			echo "\nLASTMOD\n";
-			echo Sanitize::forRawExport(rtrim($line['lastmoddate'])) . "\n";
-			echo "\nDESCRIPTION\n";
-			echo Sanitize::forRawExport(rtrim($line['description'])) . "\n";
-			echo "\nAUTHOR\n";
-			echo Sanitize::forRawExport(rtrim($line['author'])) . "\n";
-			echo "\nOWNERID\n";
-			echo Sanitize::forRawExport(rtrim($line['ownerid'])) . "\n";
-			echo "\nUSERIGHTS\n";
-			echo Sanitize::forRawExport(rtrim($line['userights'])) . "\n";
-			echo "\nCONTROL\n";
-			echo Sanitize::forRawExport(rtrim($line['control'])) . "\n";
-			echo "\nQCONTROL\n";
-			echo Sanitize::forRawExport(rtrim($line['qcontrol'])) . "\n";
-			echo "\nQTYPE\n";
-			echo Sanitize::forRawExport(rtrim($line['qtype'])) . "\n";
-			echo "\nQTEXT\n";
-			echo Sanitize::forRawExport(rtrim($line['qtext'])) . "\n";
-			echo "\nANSWER\n";
-			echo Sanitize::forRawExport(rtrim($line['answer'])) . "\n";
-			echo "\nSOLUTION\n";
-			echo Sanitize::forRawExport(rtrim($line['solution'])) . "\n";
-			echo "\nSOLUTIONOPTS\n";
-			echo Sanitize::forRawExport(rtrim($line['solutionopts'])) . "\n";
-			echo "\nEXTREF\n";
-			echo Sanitize::forRawExport(rtrim($line['extref'])) . "\n";
-			echo "\nLICENSE\n";
-			echo Sanitize::forRawExport(rtrim($line['license'])) . "\n";
-			echo "\nANCESTORAUTHORS\n";
-			echo Sanitize::forRawExport(rtrim($line['ancestorauthors'])) . "\n";
-			echo "\nOTHERATTRIBUTION\n";
-			echo Sanitize::forRawExport(rtrim($line['otherattribution'])) . "\n";
-			if ($line['hasimg']==1) {
-				echo "\nQIMGS\n";
-				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
-				$stm2->execute(array(':qsetid'=>$line['id']));
-				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo Sanitize::forRawExport($row[0].','.getqimageurl($row[1],true).','.$row[2]). "\n";
+	
+			//$query = "SELECT imas_questionset.* FROM imas_questionset,imas_library_items ";
+			//$query .= "WHERE imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
+			$query = "SELECT * FROM imas_questionset WHERE id IN ($qlist)";
+			if ($nonpriv) {
+				$query .= " AND userights>0";
+			}
+			$query .= " ORDER BY uniqueid";
+			$stm = $DBH->query($query);
+			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$line['control'] = preg_replace_callback('/includecodefrom\((\d+)\)/', function($matches) use ($includedbackref) {
+						return "includecodefrom(UID".$includedbackref[$matches[1]].")";
+				}, $line['control']);
+				$line['qtext'] = preg_replace_callback('/includeqtextfrom\((\d+)\)/', function($matches) use ($includedbackref) {
+						return "includeqtextfrom(UID".$includedbackref[$matches[1]].")";
+				}, $line['qtext']);
+				echo "\nSTART QUESTION\n";
+				echo "QID\n";
+				echo Sanitize::forRawExport(rtrim($qassoc[$line['id']])) . "\n";
+				echo "\nUQID\n";
+				echo Sanitize::forRawExport(rtrim($line['uniqueid'])) . "\n";
+				echo "\nLASTMOD\n";
+				echo Sanitize::forRawExport(rtrim($line['lastmoddate'])) . "\n";
+				echo "\nDESCRIPTION\n";
+				echo Sanitize::forRawExport(rtrim($line['description'])) . "\n";
+				echo "\nAUTHOR\n";
+				echo Sanitize::forRawExport(rtrim($line['author'])) . "\n";
+				echo "\nOWNERID\n";
+				echo Sanitize::forRawExport(rtrim($line['ownerid'])) . "\n";
+				echo "\nUSERIGHTS\n";
+				echo Sanitize::forRawExport(rtrim($line['userights'])) . "\n";
+				echo "\nCONTROL\n";
+				echo Sanitize::forRawExport(rtrim($line['control'])) . "\n";
+				echo "\nQCONTROL\n";
+				echo Sanitize::forRawExport(rtrim($line['qcontrol'])) . "\n";
+				echo "\nQTYPE\n";
+				echo Sanitize::forRawExport(rtrim($line['qtype'])) . "\n";
+				echo "\nQTEXT\n";
+				echo Sanitize::forRawExport(rtrim($line['qtext'])) . "\n";
+				echo "\nANSWER\n";
+				echo Sanitize::forRawExport(rtrim($line['answer'])) . "\n";
+				echo "\nSOLUTION\n";
+				echo Sanitize::forRawExport(rtrim($line['solution'])) . "\n";
+				echo "\nSOLUTIONOPTS\n";
+				echo Sanitize::forRawExport(rtrim($line['solutionopts'])) . "\n";
+				echo "\nEXTREF\n";
+				echo Sanitize::forRawExport(rtrim($line['extref'])) . "\n";
+				echo "\nLICENSE\n";
+				echo Sanitize::forRawExport(rtrim($line['license'])) . "\n";
+				echo "\nANCESTORAUTHORS\n";
+				echo Sanitize::forRawExport(rtrim($line['ancestorauthors'])) . "\n";
+				echo "\nOTHERATTRIBUTION\n";
+				echo Sanitize::forRawExport(rtrim($line['otherattribution'])) . "\n";
+				if ($line['hasimg']==1) {
+					echo "\nQIMGS\n";
+					$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
+					$stm2->execute(array(':qsetid'=>$line['id']));
+					while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
+						echo Sanitize::forRawExport($row[0].','.getqimageurl($row[1],true).','.$row[2]). "\n";
+					}
 				}
 			}
 		}
