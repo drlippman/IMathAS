@@ -684,7 +684,7 @@
 		$exceptionrow = $stm2->fetch(PDO::FETCH_NUM);
 		if ($exceptionrow != null) {
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $testsettings, true);
-			$ltiexception = ($row[3]>0 && $row[2]==0);
+			$ltiexception = ($exceptionrow[3]>0 && $exceptionrow[2]==0);
 		} else if (isset($_SESSION['lti_duedate']) && $isteacher && $_SESSION['lti_duedate']!=$testsettings['enddate']) {
 			//teacher launch with lti duedate that's different than default
 			//do a pseudo-exception
@@ -704,7 +704,7 @@
 					}
 				}
 			} else { //in exception
-				if ($testsettings['enddate']<$now && ($row[3]==0 || $row[2]>0)) { //exception is for past-due-date
+				if ($testsettings['enddate']<$now && ($exceptionrow[3]==0 || $exceptionrow[2]>0)) { //exception is for past-due-date
 					$inexception = true;
 					$exceptiontype = $exceptionrow[2];
 					if ($exceptionrow[4]!==null) {
