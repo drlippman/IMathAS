@@ -61,7 +61,7 @@
 			$message .= "Phone: {$_POST['phone']} <br/>\n";
 			$message .= "Username: {$_POST['SID']} <br/>\n";
 			
-			require_once("../includes/email.php");
+			require_once("./includes/email.php");
 			
 			send_email($sendfrom, $sendfrom, $subject, $message, array(), array(), 10); 
 
