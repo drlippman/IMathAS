@@ -1634,8 +1634,8 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 				echo "<p>", _('Answers saved, but not submitted for grading.  You may continue with the assessment, or come back to it later. ');
 				if ($testsettings['timelimit']>0) {echo _('The timelimit will continue to count down');}
-				echo "</p><p>", _('<a href="showtest.php">Return to assessment</a> or'), ' ';
-				leavetestmsg();
+				echo "</p>";
+				leavetestmsg(_('<a href="showtest.php">Return to assessment</a>'));
 
 			} else {
 				recordtestdata();
@@ -3651,15 +3651,24 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 		//unset($sessiondata['sessiontestid']);
 	}
-	function leavetestmsg() {
+	function leavetestmsg($or = '') {
 		global $isdiag, $diagid, $sessiondata, $testsettings;
 		$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
+		echo '<p>';
+		echo $or;
 		if ($isdiag) {
-			echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a></p>\n";
+			if ($or != '') {
+				echo ' '._('or').' ';
+			}
+			echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a>\n";
 		} else if ($isltilimited || $sessiondata['intreereader']) {
 
 		} else {
-			echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">", _('Return to Course Page'), "</a></p>\n";
+			if ($or != '') {
+				echo ' '._('or').' ';
+			}
+			echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">", _('Return to Course Page'), "</a>\n";
 		}
+		echo '</p>';
 	}
 ?>
