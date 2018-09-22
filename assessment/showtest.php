@@ -930,7 +930,7 @@
 				}
 			}
 		}
-		recordtestdata();
+		recordtestdata(false, false);
 	}
 	if (isset($_GET['regen']) && $allowregen && $qi[$questions[$_GET['regen']]]['allowregen']==1) {
 		if (!isset($sessiondata['regendelay'])) {
@@ -1000,7 +1000,7 @@
 		if (isset($qi[$questions[$toregen]]['answeights'])) {
 			$reloadqi = true;
 		}
-		recordtestdata();
+		recordtestdata(false, false);
 	}
 	if (isset($_GET['regenall']) && $allowregen) {
 		srand();
@@ -1086,7 +1086,7 @@
 			exit;
 		}
 
-		recordtestdata();
+		recordtestdata(false, false);
 
 	}
 	if (isset($_GET['jumptoans']) && $testsettings['showans']==='J') {
@@ -2602,7 +2602,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 			}
 			$reattempting = array();
-			recordtestdata();
+			
 			if ($numdisplayed > 0) {
 				echo '<br/><input type="submit" class="btn" value="', _('Submit'), '" />';
 				echo '<input type="submit" class="btn" name="saveforlater" value="', _('Save answers'), '" onclick="var c=confirm(\'', _('This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'), '\');if (c){$(this).attr(\'data-clicked\',1);};return c;" />';

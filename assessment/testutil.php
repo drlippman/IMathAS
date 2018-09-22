@@ -559,7 +559,7 @@ function scorequestion($qn, $rectime=true) {
 
 //records everything but questions array
 //if limit=true, only records lastanswers
-function recordtestdata($limit=false) {
+function recordtestdata($limit=false, $updateLTI=true) {
 	global $DBH,$isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
 
 	if ($noraw) {
@@ -613,7 +613,7 @@ function recordtestdata($limit=false) {
 				':bestlastanswers'=>$bestlalist, ':endtime'=>$now, ':reattempting'=>$reattemptinglist, ':timeontask'=>$timeslist,
 				':questions'=>$questionlist);
 			
-			if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) {
+			if ($updateLTI && isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) {
 				//update lti record.  We only do this for single assessment placements
 	
 				require_once("../includes/ltioutcomes.php");
