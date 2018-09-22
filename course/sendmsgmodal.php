@@ -8,6 +8,7 @@ $flexwidth = true;
 $nologo = true;
 
 if (isset($_POST['message'])) {
+	require_once("../includes/email.php");
 	
 	$message = Sanitize::incomingHtml($_POST['message']);
 	$subject = Sanitize::stripHtmlTags($_POST['subject']);
@@ -20,6 +21,21 @@ if (isset($_POST['message'])) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':title'=>$subject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
 			':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
+		$msgid = $DBH->lastInsertId();
+		
+		$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$msgto));
+		list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
+		if ($msgnotify==1) {
+			send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subject, $cid, $coursename, $msgid);
+		}
+		if ($FCMtokenTo != '') {
+			require_once("../includes/FCM.php");
+			$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cid)."&msgid=$msgid";
+			sendFCM($FCMtokenTo,_("Msg from:").' '.Sanitize::encodeStringForDisplay($userfullname),
+					Sanitize::encodeStringForDisplay($subject), $url);
+		}
+		
 		$success = _('Message sent');
 	} else if ($_POST['sendtype']=='email') {
 		$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
@@ -33,14 +49,13 @@ if (isset($_POST['message'])) {
 			require("../filter/filter.php");
 			$message = filter($message);
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$self = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1]) ."<". Sanitize::emailAddress($row[2]).">";
-			$headers .= "From: $self\r\n";
-			mail($addy,$subject,$message,$headers);
+			
+			send_email($addy, $sendfrom, $subject, $message, array($self), array(), 5); 
+			
 			$success = _('Email sent');
 		} else {
 			$error = _('Unable to send: Invalid email address');

@@ -158,32 +158,20 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$stm->execute(array(':baseid'=>$baseid, ':parent'=>$_GET['replyto'], ':id'=>$msgid));
 			}
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_POST['courseid']));
+			$stm->execute(array(':id'=>$cidP));
 			$cname = $stm->fetchColumn(0);
 			$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_POST['to']));
-      list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
-      if ($msgnotify==1) {
-				/*$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
-				$stm->execute(array(':id'=>$userid));
-				$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));*/
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From: $sendfrom\r\n";
-				$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
-				$message .= "<p>You've received a new message</p><p>From: $userfullname<br />Course: $cname.</p>\r\n";
-				$message .= "<p>Subject: ". Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
-				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=" . Sanitize::courseId($_POST['courseid']) . "&msgid=$msgid\">";
-				$message .= "View Message</a></p>\r\n";
-				$message .= "<p>If you do not wish to receive email notification of new messages, please ";
-				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=chguserinfo\">click here to change your ";
-				$message .= "user preferences</a></p>\r\n";
-				mail($email,'New message notification',$message,$headers);
+			list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
+			if ($msgnotify==1) {
+      	  		require_once("../includes/email.php");
+      	  		send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subjectPost, $cidP, $cname, $msgid);
 			}
 			if ($FCMtokenTo != '') {
 				require_once("../includes/FCM.php");
-				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($_POST['courseid'])."&msgid=$msgid";
-				sendFCM($FCMtokenTo,"Msg from: $userfullname", $_POST['subject'], $url);
+				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cidP)."&msgid=$msgid";
+				sendFCM($FCMtokenTo,_("Msg from:").' '.Sanitize::encodeStringForDisplay($userfullname),
+					Sanitize::encodeStringForDisplay($subjectPost), $url);
 			}
 			if ($type=='new') {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());

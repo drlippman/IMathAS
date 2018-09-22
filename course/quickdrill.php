@@ -90,13 +90,15 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 		} else {
 			$stuname = $userfullname;
 		}
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		$headers .= "From: $sendfrom\r\n";
+		
 		$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 		$message .= "<p>Quick Drill Results for ".Sanitize::encodeStringForDisplay($stuname)."</p>";
 		$message .= "<p>$out</p>";
-		mail(Sanitize::emailAddress($_GET['email']),'QuickDrill Results',$message,$headers);
+		
+		require_once("../includes/email.php");
+		
+		send_email(Sanitize::emailAddress($_GET['email']), $sendfrom, 'QuickDrill Results', $message, array(), array(), 8); 
+
 		echo "<p>Email Sent</p>";
 	}
 	exit;

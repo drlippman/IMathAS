@@ -82,15 +82,16 @@
 
 			if ($emailconfirmation) {
 				$id = $DBH->lastInsertId();
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From: $sendfrom\r\n";
+				
 				$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 				$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 				$message .= "and paste it into your webbrowser:</p>\r\n";
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
-				mail(Sanitize::emailAddress($_POST['email']), $installname.' Confirmation',$message,$headers);
+				
+				require_once("./includes/email.php");
+				send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $installname.' Confirmation', $message, array(), array(), 10); 
+
 				echo "<html><body>\n";
 				echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
 				echo "<a href=\"$imasroot/directaccess.php?cid=$cid\">Back to login page</a>\n";

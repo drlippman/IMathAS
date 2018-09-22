@@ -227,14 +227,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if ($sendemail) {
+			require_once("../includes/email.php");
+				
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid=:forumid AND iu.id<>:userid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':forumid'=>$forumid, ':userid'=>$userid));
 			if ($stm->rowCount()>0) {
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From: $sendfrom\r\n";
 				$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 				$message .= "<p>A new post has been made in forum $forumname in course ".Sanitize::encodeStringForDisplay($coursename)."</p>\r\n";
 				$message .= "<p>Subject:".Sanitize::encodeStringForDisplay($_POST['subject'])."</p>";
@@ -245,7 +244,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$row[0] = trim($row[0]);
 				if ($row[0]!='' && $row[0]!='none@none.com') {
-					mail($row[0],'New forum post notification',$message,$headers);
+					send_email(Sanitize::emailAddress($row[0]), $sendfrom, _('New forum post notification'), $message, array(), array(), 1); 
 				}
 			}
 		}

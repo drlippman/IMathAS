@@ -55,10 +55,6 @@ $keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:4;
 
 //run notifications 10 in a batch
 
-$headers  = 'MIME-Version: 1.0' . "\r\n";
-$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-$headers .= "From: $sendfrom\r\n";
-
 $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 $query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 $msgins = $DBH->prepare($query);
@@ -110,10 +106,12 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		':courseid' => $row['id']
 	));
 	
+	require_once("../includes/email.php");
+			
 	if ($row['msgnotify'] == 1 && $row['email'] != 'none@none.com' && $row['email'] != '') { //send email notification
 		$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 		$message .= $msg;
-		mail($row['email'], _('New message notification'), $message, $headers);
+		send_email(Sanitize::emailAddress($row['email']), $sendfrom, _('New message notification'), $message, array(), array(), 10); 
 	}	
 	$updcrs->execute(array($cleanupdate, $row['id']));
 	$num++;

@@ -44,14 +44,15 @@
 			}
 		}
 		require_once("../includes/htmLawed.php");
-		$_POST['message'] = myhtmLawed($_POST['message']);
-		$_POST['subject'] = strip_tags($_POST['subject']);
+		$messagePost = myhtmLawed($_POST['message']);
+		$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
 
 		if ($_GET['masssend']=="Message") {
 			$now = time();
 			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
-			$stm = $DBH->query("SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)");
+			$stm = $DBH->query("SELECT FirstName,LastName,id,msgnotify,email,FCMtoken FROM imas_users WHERE id IN ($tolist)");
 			$emailaddys = array();
+			$FCMtokens = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!in_array($row[2],$toignore)) {
 					$fullnames[$row[2]] = strip_tags($row[1]. ', '.$row[0]);
@@ -60,6 +61,9 @@
 
 					if ($row[3]==1 && $row[4]!='' && $row[4]!='none@none.com') {
 						$emailaddys[$row[2]] = Sanitize::simpleASCII("{$row[0]} {$row[1]}"). ' <'. Sanitize::emailAddress($row[4]) .'>';
+					}
+					if ($row[5]!='') {
+						$FCMtokens[$row[2]] = $row[5];
 					}
 				}
 			}
@@ -74,31 +78,27 @@
 			$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: $sendfrom\r\n";
-			$messagep1 = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
-			$messagep1 .= "<p>You've received a new message</p><p>From: ".Sanitize::encodeStringForDisplay($from)."<br />Course: ".Sanitize::encodeStringForDisplay($coursename).".</p>\r\n";
-			$messagep1 .= "<p>Subject: ".$_POST['subject']."</p>"; // Sanitized by htmLawed near line 40.
-			$messagep1 .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=$cid&msgid=";
-			$messagep2 = "\">";
-			$messagep2 .= "View Message</a></p>\r\n";
-			$messagep2 .= "<p>If you do not wish to receive email notification of new messages, please ";
-			$messagep2 .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=chguserinfo\">click here to change your ";
-			$messagep2 .= "user preferences</a></p>\r\n";
 
+			require_once("../includes/email.php");
+			require_once("../includes/FCM.php");
+			
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
-					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
+					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]), $messagePost);
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
+					$stm->execute(array(':title'=>$subjectPost, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
 						':senddate'=>$now, ':isread'=>$isread, ':courseid'=>$cid));
 					$msgid = $DBH->lastInsertId();
 					if (isset($emailaddys[$msgto])) {
 						//email address is sanitized above
-						mail($emailaddys[$msgto],'New message notification',$messagep1.$msgid.$messagep2,$headers);
+						send_msg_notification($emailaddys[$msgto], $from, $subjectPost, $cid, $coursename, $msgid);
+					}
+					if (isset($FCMtokens[$msgto])) {
+						$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cid)."&msgid=$msgid";
+						sendFCM($FCMtokens[$msgto], "Msg from: ".Sanitize::encodeStringForDisplay($from), 
+							Sanitize::encodeStringForDisplay($subjectPost), $url);
 					}
 				}
 			}
@@ -115,7 +115,7 @@
 			}
 			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
 			// $_POST['message'] is sanitized by htmlLawed near line 40.
-			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".$sentto." </p>\n";
+			$message = $messagePost . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".$sentto." </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_tutors,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ");
@@ -128,7 +128,7 @@
 				$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 				$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
+				$stm->execute(array(':title'=>$subjectPost, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
 			}
 
 		} else {
@@ -147,31 +147,31 @@
 					$fullnames[] = $row[1].', '.$row[0];
 				}
 			}
-			$subject = $_POST['subject']; // Sanitized by strip_tags near line 40.
-			$message = $_POST['message']; // Sanitized by myhtmLawed near line 40.
+
 			$sessiondata['mathdisp']=2;
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
-			$message = filter($message);
+			$message = filter($messagePost);
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$GLOBALS['basesiteurl'] .'/',$message);
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+			
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$self = Sanitize::simpleASCII("{$row[0]} {$row[1]}"). ' <'. Sanitize::emailAddress($row[2]) .'>';
-			//$headers .= "From: $self\r\n";
-			$headers .= "From: $sendfrom\r\n";
-			//$self is sanitized above
-			$headers .= "Reply-To: ".$self."\r\n";
+			
 			$message = "<p><b>Note:</b>This email was sent by ".htmlentities($self)." from $installname. If you need to reply, make sure your reply goes to their email address.</p><p></p>".$message;
 			$teacheraddys = array();
 			if ($_POST['self']!="none") {
 				$teacheraddys[] = $self;
 			}
+			
+			require_once("../includes/email.php");
+		
 			foreach ($emailaddys as $k=>$addy) {
 				//$addy is sanitized above
-				mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
+				send_email($addy, $sendfrom, $subjectPost, 
+					str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),
+					array($self), array(), 5); 
 			}
 
 			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
@@ -203,12 +203,10 @@
 					}
 				}
 			}
-			//$headers  = 'MIME-Version: 1.0' . "\r\n";
-			//$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			//$headers .= "From: $sendfrom\r\n";
+			
 			foreach ($teacheraddys as $addy) {
 				//$teacheraddys sanitized above
-				mail($addy,$subject,$message,$headers);
+				send_email($addy, $sendfrom, $subjectPost, $message, array($self), array(), 5); 
 			}
 		}
 		if ($calledfrom=='lu') {

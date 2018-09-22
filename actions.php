@@ -120,15 +120,14 @@ require_once("includes/sanitize.php");
 
 		if ($emailconfirmation) {
 			$id = $newuserid;
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: $sendfrom\r\n";
 			$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 			$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 			$message .= "and paste it into your webbrowser:</p>\r\n";
 			$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 			$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
-			mail(Sanitize::emailAddress($_POST['email']),$installname.' Confirmation',$message,$headers);
+			require_once("./includes/email.php");
+			send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $installname.' Confirmation', $message, array(), array(), 10);
+			
 			require("header.php");
 			if ($gb == '') {
 				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
@@ -249,9 +248,6 @@ require_once("includes/sanitize.php");
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':code'=>$code, ':id'=>$id));
 
-				$headers  = 'MIME-Version: 1.0' . "\r\n";
-				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-				$headers .= "From:".$sendfrom."\r\n";
 				$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
 				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
@@ -259,11 +255,8 @@ require_once("includes/sanitize.php");
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code\">";
 				$message .= $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code</a>\r\n";
 
-				if (isset($CFG['GEN']['useSESmail'])) {
-					SESmail(Sanitize::emailAddress($email), $sendfrom, $installname.' Password Reset Request',$message);
-				} else {
-					mail(Sanitize::emailAddress($email), $installname.' Password Reset Request',$message,$headers);
-				}
+				require_once("./includes/email.php");
+				send_email(Sanitize::emailAddress($email), $sendfrom, $installname._(' Password Reset Request'), $message, array(), array(), 10);
 
 				require("header.php");
 				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.Sanitize::emailAddress($email).'.</b><br/> ';
@@ -321,9 +314,7 @@ require_once("includes/sanitize.php");
 		if ($stm->rowCount() > 0) {
 			echo $stm->rowCount();
 			echo " usernames match this email address and were emailed.  <a href=\"index.php\">Return to login page</a>";
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: $sendfrom\r\n";
+			
 			$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 			$message .= "<p>Your email was entered in the Username Lookup page on $installname.  If you did not do this, you may ignore and delete this message.  ";
 			$message .= "All usernames using this email address are listed below</p><p>";
@@ -336,11 +327,9 @@ require_once("includes/sanitize.php");
 				$message .= "Username: <b>{$row['SID']}</b>.  Last logged in: $lastlogin<br/>";
 			}
 			$message .= "</p><p>If you forgot your password, use the Lost Password link at the login page.</p>";
-			if (isset($CFG['GEN']['useSESmail'])) {
-				SESmail(Sanitize::emailAddress($_POST['email']), $sendfrom, "$installname Username Request",$message);
-			} else {
-				mail(Sanitize::emailAddress($_POST['email']),"$installname Username Request",$message,$headers);
-			}
+			
+			require_once("./includes/email.php");
+			send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $installname._(' Username Request'), $message, array(), array(), 10);
 
 			exit;
 		} else {

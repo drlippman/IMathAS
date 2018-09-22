@@ -56,17 +56,15 @@ if (!empty($newStatus)) {
 		$stm->execute(array(':id'=>$instId));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		$headers .= "From: $accountapproval\r\n";
 		$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row[0]).'</p>';
 		$message .= '<p>Welcome to '.$installname.'.  Your account has been activated, and you\'re all set to log in as an instructor using the username <b>'.Sanitize::encodeStringForDisplay($row[1]).'</b> and the password you provided.</p>';
 
-		if (isset($CFG['GEN']['useSESmail'])) {
-			SESmail($row[2], $accountapproval, $installname . ' Account Approval', $message);
-		} else {
-			mail($row[2],$installname . ' Account Approval',$message,$headers);
-		}
+		require_once("../includes/email.php");
+		send_email(Sanitize::emailAddress($row[2]), !empty($accountapproval)?$accountapproval:$sendfrom, 
+			$installname._(' Account Approval'), $message, 
+			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(), 
+			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
+		
 	}
 	echo "OK";
 	exit;

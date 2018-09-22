@@ -54,16 +54,16 @@
 
 				$stm = $DBH->query("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits)); //known INTs - safe
 			}
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= "From: $installname <$sendfrom>\r\n";
 			$subject = "New Instructor Account Request";
 			$message = "Name: {$_POST['firstname']} {$_POST['lastname']} <br/>\n";
 			$message .= "Email: {$_POST['email']} <br/>\n";
 			$message .= "School: {$_POST['school']} <br/>\n";
 			$message .= "Phone: {$_POST['phone']} <br/>\n";
 			$message .= "Username: {$_POST['SID']} <br/>\n";
-			mail($sendfrom,$subject,$message,$headers);
+			
+			require_once("../includes/email.php");
+			
+			send_email($sendfrom, $sendfrom, $subject, $message, array(), array(), 10); 
 
 			$now = time();
 			//DB $query = "INSERT INTO imas_log (time, log) VALUES ($now, 'New Instructor Request: $newuserid:: School: {$_POST['school']} <br/> Phone: {$_POST['phone']} <br/>')";
@@ -77,7 +77,8 @@
 
 			$message = "<p>Your new account request has been sent.</p>  ";
 			$message .= "<p>This request is processed by hand, so please be patient.</p>";
-			mail($_POST['email'],$subject,$message,$headers);
+			
+			send_email($_POST['email'], $sendfrom, $subject, $message, array(), array(), 10); 
 
 			echo $message;
 			require("footer.php");
