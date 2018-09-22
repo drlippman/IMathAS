@@ -409,9 +409,11 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 				$newitemorder = implode(',',$newaitems);
 				$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$newitemorder, ':id'=>$newtypeid));
-				if ($needToUpdatePtsPoss) {
+				//Temporary: force recalculation of points possible on copying, 
+				// to fix any lingering buggy ptsposs values
+				//if ($needToUpdatePtsPoss) {
 					$newptsposs = updatePointsPossible($newtypeid, $newitemorder, $srcdefpoints);
-				}
+				//}
 			}
 		}
 	} else if ($itemtype == "Calendar") {
