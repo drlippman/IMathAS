@@ -126,7 +126,7 @@ require_once("includes/sanitize.php");
 			$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 			$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
 			require_once("./includes/email.php");
-			send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $installname.' Confirmation', $message, array(), array(), 10);
+			send_email($_POST['email'], $sendfrom, $installname.' Confirmation', $message, array(), array(), 10);
 			
 			require("header.php");
 			if ($gb == '') {
@@ -256,7 +256,7 @@ require_once("includes/sanitize.php");
 				$message .= $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code</a>\r\n";
 
 				require_once("./includes/email.php");
-				send_email(Sanitize::emailAddress($email), $sendfrom, $installname._(' Password Reset Request'), $message, array(), array(), 10);
+				send_email($email, $sendfrom, $installname._(' Password Reset Request'), $message, array(), array(), 10);
 
 				require("header.php");
 				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.Sanitize::emailAddress($email).'.</b><br/> ';
@@ -329,7 +329,7 @@ require_once("includes/sanitize.php");
 			$message .= "</p><p>If you forgot your password, use the Lost Password link at the login page.</p>";
 			
 			require_once("./includes/email.php");
-			send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $installname._(' Username Request'), $message, array(), array(), 10);
+			send_email($_POST['email'], $sendfrom, $installname._(' Username Request'), $message, array(), array(), 10);
 
 			exit;
 		} else {

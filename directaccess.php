@@ -90,7 +90,7 @@
 				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
 				
 				require_once("./includes/email.php");
-				send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $installname.' Confirmation', $message, array(), array(), 10); 
+				send_email($_POST['email'], $sendfrom, $installname.' Confirmation', $message, array(), array(), 10); 
 
 				echo "<html><body>\n";
 				echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";

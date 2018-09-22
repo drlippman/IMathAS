@@ -97,7 +97,7 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 		
 		require_once("../includes/email.php");
 		
-		send_email(Sanitize::emailAddress($_GET['email']), $sendfrom, 'QuickDrill Results', $message, array(), array(), 8); 
+		send_email($_GET['email'], $sendfrom, 'QuickDrill Results', $message, array(), array(), 8); 
 
 		echo "<p>Email Sent</p>";
 	}

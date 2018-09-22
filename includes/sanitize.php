@@ -418,6 +418,29 @@ class Sanitize
 	{
 		return filter_var($address, FILTER_SANITIZE_EMAIL);
 	}
+	
+	/**
+	 * Sanitize an email address, including one with display name.
+	 *
+	 * @param $address string An email address.
+	 * @return string The sanitized email address, or empty string if invalid
+	 */
+	public static function fullEmailAddress($address)
+	{
+		if (preg_match('/^\s*(.*?)\s+<(.*?)>\s*$/', $address, $match)) {
+			if (!filter_var($match[2], FILTER_VALIDATE_EMAIL)) {
+				return '';
+			}
+			$displayname = str_replace(array('\\','"'),'',trim($match[1]));
+			$displayname = filter_var($displayname, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_NO_ENCODE_QUOTES);
+			$email = filter_var($match[2], FILTER_SANITIZE_EMAIL);
+			return '"'.$displayname.'" <'.$email.'>';
+		} else if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+			return '';
+		} else {
+			return filter_var($address, FILTER_SANITIZE_EMAIL);
+		}
+	}
 
 	/**
 	 * Sanitize a course ID. Valid values are either an integer

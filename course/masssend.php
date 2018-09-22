@@ -168,7 +168,6 @@
 			require_once("../includes/email.php");
 		
 			foreach ($emailaddys as $k=>$addy) {
-				//$addy is sanitized above
 				send_email($addy, $sendfrom, $subjectPost, 
 					str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),
 					array($self), array(), 5); 
@@ -205,7 +204,6 @@
 			}
 			
 			foreach ($teacheraddys as $addy) {
-				//$teacheraddys sanitized above
 				send_email($addy, $sendfrom, $subjectPost, $message, array($self), array(), 5); 
 			}
 		}

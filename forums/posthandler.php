@@ -244,7 +244,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$row[0] = trim($row[0]);
 				if ($row[0]!='' && $row[0]!='none@none.com') {
-					send_email(Sanitize::emailAddress($row[0]), $sendfrom, _('New forum post notification'), $message, array(), array(), 1); 
+					send_email($row[0], $sendfrom, _('New forum post notification'), $message, array(), array(), 1); 
 				}
 			}
 		}

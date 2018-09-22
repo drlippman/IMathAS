@@ -111,7 +111,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if ($row['msgnotify'] == 1 && $row['email'] != 'none@none.com' && $row['email'] != '') { //send email notification
 		$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 		$message .= $msg;
-		send_email(Sanitize::emailAddress($row['email']), $sendfrom, _('New message notification'), $message, array(), array(), 10); 
+		send_email($row['email'], $sendfrom, _('New message notification'), $message, array(), array(), 10); 
 	}	
 	$updcrs->execute(array($cleanupdate, $row['id']));
 	$num++;

@@ -47,7 +47,7 @@ if (isset($_GET['go'])) {
 		$message .= '<p>Welcome to '.$installname.'.  Your account has been activated, and you\'re all set to log in as an instructor using the username <b>'.Sanitize::encodeStringForDisplay($row[1]).'</b> and the password you provided.</p>';
 
 		require_once("../includes/email.php");
-		send_email(Sanitize::emailAddress($row[2]), !empty($accountapproval)?$accountapproval:$sendfrom, 
+		send_email($row[2], !empty($accountapproval)?$accountapproval:$sendfrom, 
 			$installname._(' Account Approval'), $message, 
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(), 
 			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);

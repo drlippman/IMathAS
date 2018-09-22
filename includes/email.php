@@ -40,6 +40,29 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 			$replyto = array($replyto);
 		}
 	}
+	foreach ($email as $k=>$v) {
+		$email[$k] = Sanitize::fullEmailAddress(trim($v));
+		if ($email[$k] == '' || $email[$k] == 'none@none.com') {
+			unset($email[$k]);
+		}
+	}
+	if (count($email)==0) { //if no valid To addresses, bail
+		return;
+	}
+	foreach ($replyto as $k=>$v) {
+		$replyto[$k] = Sanitize::fullEmailAddress(trim($v));
+		if ($replyto[$k] == '' || $replyto[$k] == 'none@none.com') {
+			unset($replyto[$k]);
+		}
+	}
+	foreach ($bccList as $k=>$v) {
+		$bccList[$k] = Sanitize::fullEmailAddress(trim($v));
+		if ($bccList[$k] == '' || $bccList[$k] == 'none@none.com') {
+			unset($bccList[$k]);
+		}
+	}
+	$subject = Sanitize::simpleASCII($subject);
+
 	if (!isset($CFG['email']['handlerpriority'])) {
 		$CFG['email']['handlerpriority'] = 0;
 	}
