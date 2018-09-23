@@ -3,10 +3,16 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 // 
-// File Version : 26
+// File Version : 27
 //
 
 global $allowedmacros;
+
+// COMMENT OUT BEFORE UPLOADING
+if(!is_array($allowedmacros)) {
+	$allowedmacros = array();	
+}
+
 array_push($allowedmacros, "simplex", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
 
 include_once("fractions.php");  // fraction routine
@@ -19,11 +25,10 @@ include_once("fractions.php");  // fraction routine
 //
 // type: a string that contains either "max" or "min"
 // objective: list or array of the coefficients 
-// constraints: an array that contains the inequality information. Constraints are composed of
-//			  three parts:
-//				  first  part is a list or array of the coefficients in the inequality
-//				  second part is the inequality '<=' or '>='
-//				  third  part is the right hand number
+// constraints: an array that contains the inequality information. Constraints are composed of three parts:
+// &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first  part is a list or array of the coefficients in the inequality
+// &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;second part is the inequality '<=' or '>='
+// &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;third  part is the right hand number
 //
 // Examples
 //
@@ -740,7 +745,7 @@ function simplexdefaultheaders($sm, $type){
 }
 
 
-//simplexdisplaycolortable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), tabletextcolor = "black"]) 
+//simplexdisplaycolortable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), tabletextcolor = "black", ShowObjectiveColumn=1]) 
 //
 // Create a string that is a valid HTML table syntax for display.
 //
@@ -771,6 +776,9 @@ function simplexdefaultheaders($sm, $type){
 //   default none
 // tabletextcolor: text color for the table
 //	  default black
+// showobjective : either 0 or 1
+//                0 hide column
+//                1 show column (default)
 //
 // RETURNS: a string that is a valid HTML table syntax for display.
 function simplexdisplaycolortable() {
@@ -784,6 +792,7 @@ function simplexdisplaycolortable() {
 	//  5 = circle pivot point, if supplied
 	//  6 = header column names, default is not to show
 	//  7 = CSS tablestyle for the table.
+	//  8 = Show Objective Column - Default yes/no
 	
 	// process arguments -----------------------------------------------
 	$args = func_get_args();
@@ -884,6 +893,14 @@ function simplexdisplaycolortable() {
 		$tabletextcolor = "black";
 	}
 	
+	// show objective ;
+	if((count($args)>8)&&(!is_null($args[8]))) {
+		$ShowObjective  = verifyshowobjective("simplexdisplaycolortable",$args[8],1,1);
+	}
+	else {
+		$ShowObjective = 1;
+	}
+	
 	// now create custom border styles to change the color of the table text
 	$matrixtopborder = "border-top:1px solid $tabletextcolor;";
 	$matrixtopleftborder = "border-left:1px solid $tabletextcolor;border-top:1px solid $tabletextcolor;";
@@ -900,6 +917,7 @@ function simplexdisplaycolortable() {
 	
 	$lastrow = $rows-1;
 	$lastcol = $cols-1;
+	$ObjectiveColumn = $lastcol-1;
 	
 	$Tableau = "<table class='paddedtable' style='border:none;border-spacing: 0;border-collapse: collapse;text-align:right;border-spacing: 0px 0px;color:$tabletextcolor'>\r\n";
 	$Tableau .= "<tbody>\r\n";	
@@ -910,11 +928,16 @@ function simplexdisplaycolortable() {
 			$Tableau .= "<tr class='onepixel'>\r\n";
 			$Tableau .= "<td style='$matrixleftborder'></td>";
 			for ($cloop=0;$cloop<$cols; $cloop++) {
-				$Tableau.= "<td style='$matrixtopborder'></td>\r\n"; 
+				if((!$ShowObjective)and($ObjectiveColumn==$cloop)){
+					// skip objective column	
+				}
+				else {
+					$Tableau.= "<td style='$matrixtopborder'></td>\r\n"; 
+				}
 			}
 			$Tableau .= "<td style='$matrixtopleftborder'></td><td style='$matrixtopborder'></td><td style='$matrixrightborder'></td>\r\n</tr>\r\n";
 		}
-	  
+	
 	  $Tableau .= "<tr>\r\n";
 	  if($rloop==0) { 
 	  
@@ -936,18 +959,26 @@ function simplexdisplaycolortable() {
 			  $Tableau.= "<td>".$tick.$headers[$cloop].$tick."</td>";
 			}
 			else {
-			  $Tableau.= "<td>&nbsp;</td>";
+				if((!$ShowObjective)and($ObjectiveColumn==$cloop)){
+					// skip objective column	
+				}
+				else {
+			  		$Tableau.= "<td>&nbsp;</td>";
+				}
 			}
 		  }
 		  $Tableau.= "<td $nopad>&nbsp;</td></tr>\r\n<tr>\r\n";  // for the right table border
 		}
 	  } 
 	
+	//TODO: use $ShowObjective
+	
 	  for ($cloop=0;$cloop<$cols; $cloop++) {
 		
 		if($showfractions==-1) {
 		  $Element = $sm[$rloop][$cloop];					// ignore the denominator and show the string numerator
-		} elseif($showfractions==1) {
+		} 
+		elseif($showfractions==1) {
 		  $Element = fractionreduce($sm[$rloop][$cloop]);   // convert to fraction
 		}
 		else {
@@ -971,7 +1002,12 @@ function simplexdisplaycolortable() {
 			 $Tableau.= "<td $pivotsyle>$TableElement</td><td style='$matrixtoprightborder'>&nbsp;</td>\r\n";
 			}
 			else {
-			  $Tableau.= "<td $pivotsyle>$TableElement</td>\r\n";
+				if((!$ShowObjective)and($ObjectiveColumn==$cloop)){
+					// skip objective column	
+				}
+				else {
+			  		$Tableau.= "<td $pivotsyle>$TableElement</td>\r\n";
+				}
 			}
 		}
 		elseif ($rloop==$lastrow) {
@@ -987,7 +1023,12 @@ function simplexdisplaycolortable() {
 			$Tableau.= "<td $pivotsyle>$TableElement</td><td style='$matrixbottomrightborder'>&nbsp;</td>\r\n";
 		  }
 		  else {
-			$Tableau.= "<td $pivotsyle>$TableElement</td>\r\n";
+		  	if((!$ShowObjective)and($ObjectiveColumn==$cloop)){
+					// skip objective column	
+				}
+			else {
+				$Tableau.= "<td $pivotsyle>$TableElement</td>\r\n";
+			}
 		  }   
 		}
 		else {
@@ -1000,7 +1041,12 @@ function simplexdisplaycolortable() {
 			$Tableau.= "<td $pivotsyle>$TableElement</td><td style='$matrixrightborder'>&nbsp;</td>\r\n";			
 		  }
 		  else {
-			$Tableau.= "<td $pivotsyle>$TableElement</td>\r\n";
+		  	if((!$ShowObjective)and($ObjectiveColumn==$cloop)){
+				// skip objective column	
+			}
+			else {
+				$Tableau.= "<td $pivotsyle>$TableElement</td>\r\n";
+			}
 		  }
 		}
 	  }
@@ -1012,8 +1058,7 @@ function simplexdisplaycolortable() {
 	return $Tableau;
   }
 
-
-//simplexdisplaylatex(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1)])
+//simplexdisplaylatex(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1), , ShowObjectiveColumn=1])
 //
 // Create a string that is a valid latex syntax for display.
 //
@@ -1029,6 +1074,9 @@ function simplexdisplaycolortable() {
 // pivot: list or array that contains the row, column.  This puts a circle around the cell at (row,col). 
 //		  Both row and column are ZERO based.
 //		default point none
+// showobjective : either 0 or 1
+//                0 hide column
+//                1 show column (default)
 //
 // RETURNS: a valid latex string
 function simplexdisplaylatex() {
@@ -1038,6 +1086,7 @@ function simplexdisplaylatex() {
 	//  1 = simplex matrix name
 	//  2 = show fractions (string)
 	//  3 = circle pivot point, if supplied
+	//  4 = Show Objective Column - Default yes/no
 	
 	// process arguments -----------------------------------------------
 	$args = func_get_args();
@@ -1048,6 +1097,10 @@ function simplexdisplaylatex() {
 	//   this function CANNOT use	 
 	// as it will mess up when a string is sent to this procedure and is to be displayed
 	$sm = $args[0];
+	if(is_null($sm)){
+		echo "Simplex is NULL - nothing to display.<br/>\r\n";
+		return "";
+	}
 	
 	$rows = count($sm);
 	if($rows==1)  {
@@ -1057,26 +1110,36 @@ function simplexdisplaylatex() {
 	}
 	$cols = count($sm[0]);
 	
-  // simplex matrixname
-  if((count($args)>1)&&(!is_null($args[1]))) { $simplexmatrixname = $args[1]; } else { $simplexmatrixname = ""; } 
+  	// simplex matrixname
+  	if((count($args)>1)&&(!is_null($args[1]))) { $simplexmatrixname = $args[1]; } else { $simplexmatrixname = ""; } 
+  	
+  	//showfractions=1
+  	if((count($args)>2)&&(!is_null($args[2]))) {
+  		$showfractions = verifyshowfraction("simplexdisplaylatex",$args[2],1,1);
+	} 
+  	else { $showfractions=1; }
   
-  //showfractions=1
-  if((count($args)>2)&&(!is_null($args[2]))) {
-  	$showfractions = verifyshowfraction("simplexdisplaylatex",$args[2],1,1);
-  } 
-  else { $showfractions=1; }
-  
-  //pivot
-  if((count($args)>3)&&(!is_null($args[3]))) {
-	if (!is_array($args[3])) { $args[3]=explode(',',$args[3]); } 
-	$pivots = $args[3];
-  } else {
-  	$pivots = NULL;
-  }
-  
+  	//pivot
+  	if((count($args)>3)&&(!is_null($args[3]))) {
+		if (!is_array($args[3])) { $args[3]=explode(',',$args[3]); } 
+		$pivots = $args[3];
+  	} else {
+  		$pivots = NULL;
+  	}
+  	
+	// show objective ;
+	if((count($args)>4)&&(!is_null($args[4]))) {
+		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[4],1,1);
+	}
+	else {
+		$ShowObjective = 1;
+	}
+	
 	// Done processing arguments ---------------------------------------
 	$lastrow = $rows-1;
 	$lastcol = $cols-1;
+	$ObjectiveColumn = $lastcol-1;
+	
 	if($simplexmatrixname=="") {
 		$Tableau = "$\begin{bmatrix}[";
 	} else {
@@ -1088,8 +1151,13 @@ function simplexdisplaylatex() {
 		if($cloop==$cols-1) {
 			$Tableau .= "|c";
 		} else {
-			$Tableau .= "c";
-			$ExtraLine .= "&"; 
+			if((!$ShowObjective)and($ObjectiveColumn==$cloop)){
+				// skip objective column	
+			}
+			else {
+				$Tableau .= "c";
+				$ExtraLine .= "&"; 	
+			}
 		}
 		
 	}
@@ -1142,11 +1210,16 @@ function simplexdisplaylatex() {
 				}
 			}
 			
-			// is this a pivot point
-			if($isPivot) {
-				$Tableau.= $amp." \\numcircledtikz{\$".$Element."\$} ";
-			} else {
-				$Tableau.= $amp." $Element ";
+			if((!$ShowObjective)and($ObjectiveColumn==$cloop)){
+				// skip objective column	
+			}
+			else {
+				// is this a pivot point
+				if($isPivot) {
+					$Tableau.= $amp." \\numcircledtikz{\$".$Element."\$} ";
+				} else {
+					$Tableau.= $amp." $Element ";
+				}
 			}
 		}
 		$Tableau.= "\\\\";		
@@ -1162,7 +1235,7 @@ function simplexdisplaylatex() {
   }
 
 
-//simplexdisplaylatex2(simplex solution sets [, show$pivot=1, showentriesfractions=1]) 
+//simplexdisplaylatex2(simplex solution sets [, show$pivot=1, showentriesfractions=1, ShowObjectiveColumn=1]) 
 //
 // Creates an array of strings that is valid latex syntax for display.
 //
@@ -1177,6 +1250,11 @@ function simplexdisplaylatex() {
 // showfractions: either 0 or 1
 //				 0 convert simplex element to a decimal
 //		 default 1 convert simplex element to a \displaystyle\frac{}{}
+//
+// showobjective : either 0 or 1
+//                0 hide column
+//                1 show column (default)
+//
 // RETURNS: a solution sets of valid latex
 function simplexdisplaylatex2() {
 	
@@ -1184,6 +1262,7 @@ function simplexdisplaylatex2() {
 	//  0 = simplex solution sets
 	//  1 = show pivot
 	//  2 = show fractions (string)
+	//  3 = Show Objective Column - Default yes/no
 
 	// process arguments -----------------------------------------------
 	$args = func_get_args();
@@ -1212,7 +1291,15 @@ function simplexdisplaylatex2() {
   		$showfractions = verifyshowfraction("simplexdisplaylatex2",$args[2],1,1);
 	}
 	else { $showfractions=1; }
-  
+  	
+  	// show objective ;
+	if((count($args)>3)&&(!is_null($args[3]))) {
+		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[3],1,1);
+	}
+	else {
+		$ShowObjective = 1;
+	}
+	
 	// Done processing arguments ---------------------------------------
 	
 	$solutionsetsreturn = array();
@@ -1255,7 +1342,7 @@ function simplexdisplaylatex2() {
 				$mypivot = NULL;
 			}
 			
-			$smtable = simplexdisplaylatex($sm, "", $showfractions, $mypivot);
+			$smtable = simplexdisplaylatex($sm, "", $showfractions, $mypivot,$ShowObjective);
 		}
 		
 	  	$solutionsetsreturn[$r][$c] = $smtable;
@@ -1266,7 +1353,7 @@ function simplexdisplaylatex2() {
   }
 
 
-//simplexdisplaytable2(simplex solution sets[, ASCII tick marks,mode,show fractions,header column names,CSS tabletextcolor=black, multiple solution pivot border color=red, multiple solution pivot text color=blue, pivot border color=blue, pivot text color=black)
+//simplexdisplaytable2(simplex solution sets[, ASCII tick marks,mode,show fractions,header column names,CSS tabletextcolor=black, multiple solution pivot border color=red, multiple solution pivot text color=blue, pivot border color=blue, pivot text color=black, ShowObjectiveColumn=1])
 //
 // Create a 1 or two dimensional array (depends on the input) that each element either contains a valid valid HTML table syntax or 
 //		 a nbsp; for displaying in a browser.
@@ -1290,6 +1377,10 @@ function simplexdisplaylatex2() {
 //   default none
 // tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
 //	  default none
+//
+// showobjective : either 0 or 1
+//                0 hide column
+//                1 show column (default)
 //
 // RETURNS: an array
 function simplexdisplaytable2() {
@@ -1319,6 +1410,7 @@ function simplexdisplaytable2() {
 	//  7 = Multiple Solution pivot text color
 	//  8 = pivot border color
 	//  9 = pivot text color
+	// 10 = Show Objective Column - Default yes/no
 
 	// process arguments -----------------------------------------------
 	$args = func_get_args();
@@ -1407,6 +1499,15 @@ function simplexdisplaytable2() {
 		$pivottextcolor = $defaultpivottextcolor;
 	}
 	
+	// show objective ;
+	if((count($args)>10)&&(!is_null($args[10]))) {
+		$ShowObjective  = verifyshowobjective("simplexdisplaylatex",$args[10],1,1);
+	}
+	else {
+		$ShowObjective = 1;
+	}
+	
+	
 	// Done processing arguments ---------------------------------------
 
 	$solutionsetsreturn = array();
@@ -1464,7 +1565,7 @@ function simplexdisplaytable2() {
 				else {
 					$pivotwithcolor = array();
 				}
-				$smtable = simplexdisplaycolortable($sm, "", $tick, $mode, $showfractions, $pivotwithcolor, $headers, $tabletextcolor);
+				$smtable = simplexdisplaycolortable($sm, "", $tick, $mode, $showfractions, $pivotwithcolor, $headers, $tabletextcolor,$ShowObjective);
 			}
 		
 			$solutionsetsreturn[$r][$c] = $smtable;
@@ -2546,10 +2647,20 @@ function verifymode($from,$mode,$default) {
 	} 
 }
 
+function verifyshowobjective($from,$ShowObjective,$default) {
+	if(($ShowObjective!=0)&&($ShowObjective!=1)) { 
+		echo "In $from - the supplied show objective value ($ShowObjective) is invalid.  Valid values are 0 or 1.<br/>\r\n";
+		return $default;  
+	}
+	else { 
+		return $ShowObjective;  
+	}
+}
+
 function verifyshowfraction($from,$showfractions,$default,$override=0) {
 	if($override==1) {
 		if(($showfractions!=-1)&&($showfractions!=0)&&($showfractions!=1)) { 
-			echo "The supplied showfractions value ($showfractions) is invalid.  Valid values are -1, 0 or 1.<br/>\r\n";
+			echo "In $from - the supplied showfractions value ($showfractions) is invalid.  Valid values are -1, 0 or 1.<br/>\r\n";
 			return $default;  
 		}
 		else { 
@@ -2558,7 +2669,7 @@ function verifyshowfraction($from,$showfractions,$default,$override=0) {
 	}
 	else {
 		if(($showfractions!=0)&&($showfractions!=1)) { 
-			echo "The supplied showfractions value ($showfractions) is invalid.  Valid values are 0 or 1.<br/>\r\n";
+			echo "In $from - the supplied showfractions value ($showfractions) is invalid.  Valid values are 0 or 1.<br/>\r\n";
 			return $default;  
 		}
 		else { 
@@ -2569,7 +2680,7 @@ function verifyshowfraction($from,$showfractions,$default,$override=0) {
 
 function verifyASCIIticks($from,$displayASCII,$default) {
 	if(($displayASCII!=0)&&($displayASCII!=1)) { 
-		echo "The supplied displayASCII value ($displayASCII) is invalid.  Valid values are 0 or 1.<br/>\r\n";
+		echo "In $from - the supplied displayASCII value ($displayASCII) is invalid.  Valid values are 0 or 1.<br/>\r\n";
 		return $default;  
 	}
 	else {
@@ -2706,52 +2817,14 @@ function simplexhasmixedconstrants($sm){
 }
 
 
-// ***** DEPRECIATED *****
-//
-// list of all DEPRECIATED functions are below
-//
-// ***** DEPRECIATED *****
-//
 //simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), $tablestyle = ""]) 
 //
 // ***** DEPRECIATED *****
 //
 // USE simplexdisplaycolortable instead
-//
-// Create a string that is a valid HTML table syntax for display.
-//
-// INPUTS
-//
-// simplexmatrix: a valid simplex matrix.
-//
-// OPTIONAL
-// simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
-//					are creating a simplex display
-// displayASCII: either 0 or 1
-//				0 do not use math ticks
-//		default 1		use math ticks
-// mode: either 0, 1 or 2
-//		0 show no lines
-//		1 show aumented line
-//		2 show simplex  lines
-// showfractions: either -1, 0 or 1
-//				-1 show as string 
-//				 0 convert simplex element to a decimal
-//		 default 1 convert simplex element to a fraction using "/" as the fraction bar
-// pivot: list or array that contains the row, column, border color, and text color.  This puts a  
-//		 border around the cell at (row,col). Both row and column are ZERO based.
-//	default point none
-//	default border color = blue
-//	default text  color  = black
-// headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
-//   default none
-// tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
-//	  default none
-//
-// RETURNS: a string that is a valid HTML table syntax for display.
 function simplexdisplaytable() {
 	
-	//  arguments lise --------------------------------------------------
+	//  arguments list ------------------------------------------------
 	//  0 = simplex matrix
 	//  1 = simplex matrix name
 	//  2 = display ASCII tick marks (yes/no)
@@ -2761,7 +2834,7 @@ function simplexdisplaytable() {
 	//  6 = header column names, default is not to show
 	//  7 = CSS tablestyle for the table.
 	
-	// process arguments -----------------------------------------------
+	// process arguments ---------------------------------------------
 	$args = func_get_args();
 	if (count($args)==0) {
 		echo "Nothing to display - no simplex matrix supplied.<br/>\r\n";
@@ -2976,19 +3049,6 @@ function simplexdisplaytable() {
 	return $Tableau;
   }
 
-
-// simplexnumberofsolutions(solutionlist)
-//
-// ***** DEPRECIATED *****
-//
-// solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
-//			
-//			solutionlist[0] = array(solution values for matrix[0], IsOptimized)
-//			solutionlist[1] = array(solution values for matrix[1], IsOptimized)
-//			etc.
-//			This is returned from simplexsolve
-//
-// returns:  the number of solutions
 function simplexnumberofsolutions($solutionlist) {
   $solutioncount = 0;
   for($r=0,$size = count($solutionlist);$r<$size;$r++) {
@@ -3001,41 +3061,10 @@ function simplexnumberofsolutions($solutionlist) {
   return $solutioncount;
 }
 
-
 //simplexsolve(simplexmatrix,type)
 //
 // ***** DEPRECIATED *****
 // use simplexsolve2
-//
-// this method solves the standard maximization problem which has the following conditions
-// 1) The objective function is to be maximized.
-// 2) All variables are nonnegative.
-// 3) The constraints are of the form: a1x1+ a2x2+ ... + anxn <= b  where b >0
-//
-// INPUTS
-// simplexmatrix: a valid simplex matrix.
-//  type: a string that contains either "max" or "min" 
-//
-// RETURNS array(solutionlist, smlist, pivotlist)
-// 
-// solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
-//			
-//			solutionlist[0] = array(solution values for matrix[0], IsOptimized)
-//			solutionlist[1] = array(solution values for matrix[1], IsOptimized)
-//			etc.
-// smlist:	an array of simplex matrix with 
-//			sma[0] = initial simplex matrix
-//			sma[1] = the result of the first pivot
-//			sma[2] = the result of the second pivot
-//			sma[3] = the result of the third pivot
-//			etc.
-//
-// pivotlist: an array of pivot points
-//			pivotlist[0][0] = the pivot used for the first pivot
-//			pivotlist[0][1] = if exists, another possible pivot point for this step
-//			pivotlist[1][0] = the pivot used for the second pivot
-//			pivotlist[2][0] = the pivot used for the third pivot
-//			etc.
 function simplexsolve($sm,$type,$showfractions=1) {
 	$starttime = microtime(true);  //  for function timing
 
@@ -3123,7 +3152,12 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change Log
-
+// 2019-07-28 Add the ability to suppress the objective column in the following: 
+//			simplexdisplaylatex, 
+//			simplexdisplaylatex2, 
+//			simplexdisplaycolortable, 
+//			simplexdisplaytable2
+//
 // 2016-03-30 Found bug in simplexfindpivotpoint when a element in the matrix was zero could be used as a pivot point.
 //
 // 2016-02-27 standardizing the variable names and created a color display table function
