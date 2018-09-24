@@ -3975,7 +3975,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$anarr = array();
 		$NCdepth = 0;
 		$lastcut = 0;
+		$inor = false;
 		$answer = makepretty($answer);
+
 		for ($i=0; $i<strlen($answer); $i++) {
 			$dec = false;
 			if ($answer{$i}=='(' || $answer{$i}=='[' || $answer{$i}=='<' || $answer{$i}=='{') {
@@ -3986,52 +3988,63 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else if ($answer{$i}==')' || $answer{$i}==']' || $answer{$i}=='>' || $answer{$i}=='}') {
 				$NCdepth--;
 				if ($NCdepth==0) {
-					$anarr[] = array('',$answer{$lastcut},substr($answer,$lastcut+1,$i-$lastcut-1),$answer{$i});
+					if ($inor) {
+						$anarr[count($anarr)-1][] = array('',$answer{$lastcut},substr($answer,$lastcut+1,$i-$lastcut-1),$answer{$i});
+					} else {
+						$anarr[] = array(array('',$answer{$lastcut},substr($answer,$lastcut+1,$i-$lastcut-1),$answer{$i}));
+					}
+					$inor = (substr($answer, $i+1, 2)==='or');
 				}
 			}
 		}
-		foreach ($anarr as $k=>$v) {
-			$ansparts = explode(',',$v[2]);
-			foreach ($ansparts as $j=>$v) {
-				if (!is_numeric($v)) {
-					$ansparts[$j] = evalMathPHP($v,null); //eval('return('.mathphp($v,null).');');
+		
+		foreach ($anarr as $k=>$listans) {
+			foreach ($listans as $ork=>$orv) {
+				$ansparts = explode(',',$orv[2]);
+				foreach ($ansparts as $j=>$v) {
+					if (!is_numeric($v)) {
+						$ansparts[$j] = evalMathPHP($v,null); //eval('return('.mathphp($v,null).');');
+					}
 				}
+				$listans[$ork][2] = $ansparts;
 			}
-			$anarr[$k][2] = $ansparts;
+			$anarr[$k] = $listans;
 		}
-
+ 	
 		if (count($gaarr)==0) {
 			return 0;
 		}
 		$gaarrcnt = count($gaarr);
 		$extrapennum = count($gaarr)+count($anarr);
 		$correct = 0;
-		foreach ($anarr as $i=>$answer) {
+		foreach ($anarr as $i=>$ansors) {
 			$foundloc = -1;
-			foreach ($gaarr as $j=>$givenans) {
-				if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
-					break;
-				}
-				//$ansparts = explode(',',$answer[2]);
-				$ansparts = $answer[2];
-				$gaparts = explode(',',$givenans[2]);
-
-				if (count($ansparts)!=count($gaparts)) {
-					break;
-				}
-				for ($i=0; $i<count($ansparts); $i++) {
-					if (is_numeric($ansparts[$i]) && is_numeric($gaparts[$i])) {
-						if (isset($abstolerance)) {
-							if (abs($ansparts[$i]-$gaparts[$i]) >= $abstolerance + 1E-12) {break;}
-						} else {
-							if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;}
-						}
-					} else {
+			foreach ($ansors as $answer) {  //each of the "or" options
+				foreach ($gaarr as $j=>$givenans) {
+					if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
 						break;
 					}
-				}
-				if ($i==count($ansparts)) {
-					$correct += 1; $foundloc = $j; break;
+					
+					$ansparts = $answer[2];
+					$gaparts = explode(',',$givenans[2]);
+	
+					if (count($ansparts)!=count($gaparts)) {
+						break;
+					}
+					for ($i=0; $i<count($ansparts); $i++) {
+						if (is_numeric($ansparts[$i]) && is_numeric($gaparts[$i])) {
+							if (isset($abstolerance)) {
+								if (abs($ansparts[$i]-$gaparts[$i]) >= $abstolerance + 1E-12) {break;}
+							} else {
+								if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;}
+							}
+						} else {
+							break;
+						}
+					}
+					if ($i==count($ansparts)) {
+						$correct += 1; $foundloc = $j; break 2;
+					}
 				}
 			}
 			if ($foundloc>-1) {
