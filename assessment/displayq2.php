@@ -4014,6 +4014,47 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (count($gaarr)==0) {
 			return 0;
 		}
+		
+		if (in_array('scalarmult',$ansformats)) {
+			//normalize the vectors
+			foreach ($anarr as $k=>$listans) {
+				foreach ($listans as $ork=>$orv) {
+					$mag = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $orv[2])));
+					foreach ($orv[2] as $j=>$v) {
+						if (abs($v)>1e-10) {
+							if ($v<0) { 
+								$mag *= -1;
+							}
+							break;
+						}
+					}
+					if (abs($mag)>0) {
+						foreach ($orv[2] as $j=>$v) {
+							$anarr[$k][$ork][2][$j] = $v/$mag;
+						}
+					}
+				}
+			}
+			foreach ($gaarr as $k=>$givenans) {
+				$gaparts = explode(',',$givenans[2]);
+				$mag = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $gaparts)));
+				foreach ($gaparts as $j=>$v) {
+					if (abs($v)>1e-10) {
+						if ($v<0) { 
+							$mag *= -1;
+						}
+						break;
+					}
+				}
+				if (abs($mag)>0) {
+					foreach ($gaparts as $j=>$v) {
+						$gaparts[$j] = $v/$mag;
+					}
+					$gaarr[$k][2] = implode(',', $gaparts);
+				}
+			}
+		}
+		
 		$gaarrcnt = count($gaarr);
 		$extrapennum = count($gaarr)+count($anarr);
 		$correct = 0;
