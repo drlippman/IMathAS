@@ -224,13 +224,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 		}
-	}
-
-	if (isset($addedfile) || count($filestoremove)>0 || isset($_GET['movefile'])) {
-		if (!isset($newtextid) && isset($_GET['id'])) {
-			$newtextid = Sanitize::onlyInt($_GET['id']);
-		}
-		if (isset($newtextid)) {
+		if (isset($addedfile) || count($filestoremove)>0 || isset($_POST['movefile'])) {
 			$stm = $DBH->prepare("SELECT fileorder FROM imas_inlinetext WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($newtextid)));
 			$fileorder = explode(',',$stm->fetchColumn(0));
@@ -248,9 +242,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
-			if (isset($_GET['movefile'])) {
-				$from = $_GET['movefile'];
-				$to = $_GET['movefileto'];
+			if (isset($_POST['movefile'])) {
+				$from = Sanitize::onlyInt($_POST['movefile']);
+				$to = Sanitize::onlyInt($_POST['movefileto']);
 				$itemtomove = $fileorder[$from-1];  //-1 to adjust for 0 indexing vs 1 indexing
 				array_splice($fileorder,$from-1,1);
 				array_splice($fileorder,$to-1,0,$itemtomove);
@@ -260,6 +254,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$newtextid));
 		}
 	}
+
+	
 	if ($_POST['submitbtn']=='Submit') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."&r=" .Sanitize::randomQueryStringParam());
 		exit;
@@ -404,9 +400,10 @@ function movefile(from) {
 	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . $gid ?>";
 
 	if (to != from) {
- 	var toopen = address + '&movefile=' + from + '&movefileto=' + to;
-  	window.location = toopen;
-  }
+		$("#ms-"+from).after('<input type=hidden name=movefile value="'+from+'" />')
+			.after('<input type=hidden name=movefileto value="'+to+'" />');
+		$("form")[0].submit();
+	}
 }
 function chghidetitle() {
 	var titleinput = $("input[name=title]");
