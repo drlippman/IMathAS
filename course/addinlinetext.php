@@ -227,33 +227,38 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	if (isset($addedfile) || count($filestoremove)>0 || isset($_GET['movefile'])) {
-		$stm = $DBH->prepare("SELECT fileorder FROM imas_inlinetext WHERE id=:id");
-		$stm->execute(array(':id'=>Sanitize::onlyInt($newtextid)));
-		$fileorder = explode(',',$stm->fetchColumn(0));
-		if ($fileorder[0]=='') {
-			$fileorder = array();
+		if (!isset($newtextid) && isset($_GET['id'])) {
+			$newtextid = Sanitize::onlyInt($_GET['id']);
 		}
-		if (isset($addedfile)) {
-			$fileorder[] = $addedfile;
-		}
-		if (count($filestoremove)>0) {
-			for ($i=0; $i<count($filestoremove); $i++) {
-				$k = array_search($filestoremove[$i],$fileorder);
-				if ($k!==FALSE) {
-					array_splice($fileorder,$k,1);
+		if (isset($newtextid)) {
+			$stm = $DBH->prepare("SELECT fileorder FROM imas_inlinetext WHERE id=:id");
+			$stm->execute(array(':id'=>Sanitize::onlyInt($newtextid)));
+			$fileorder = explode(',',$stm->fetchColumn(0));
+			if ($fileorder[0]=='') {
+				$fileorder = array();
+			}
+			if (isset($addedfile)) {
+				$fileorder[] = $addedfile;
+			}
+			if (count($filestoremove)>0) {
+				for ($i=0; $i<count($filestoremove); $i++) {
+					$k = array_search($filestoremove[$i],$fileorder);
+					if ($k!==FALSE) {
+						array_splice($fileorder,$k,1);
+					}
 				}
 			}
+			if (isset($_GET['movefile'])) {
+				$from = $_GET['movefile'];
+				$to = $_GET['movefileto'];
+				$itemtomove = $fileorder[$from-1];  //-1 to adjust for 0 indexing vs 1 indexing
+				array_splice($fileorder,$from-1,1);
+				array_splice($fileorder,$to-1,0,$itemtomove);
+			}
+			$fileorder = implode(',',$fileorder);
+			$stm = $DBH->prepare("UPDATE imas_inlinetext SET fileorder=:fileorder WHERE id=:id");
+			$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$newtextid));
 		}
-		if (isset($_GET['movefile'])) {
-			$from = $_GET['movefile'];
-			$to = $_GET['movefileto'];
-			$itemtomove = $fileorder[$from-1];  //-1 to adjust for 0 indexing vs 1 indexing
-			array_splice($fileorder,$from-1,1);
-			array_splice($fileorder,$to-1,0,$itemtomove);
-		}
-		$fileorder = implode(',',$fileorder);
-		$stm = $DBH->prepare("UPDATE imas_inlinetext SET fileorder=:fileorder WHERE id=:id");
-		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$newtextid));
 	}
 	if ($_POST['submitbtn']=='Submit') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."&r=" .Sanitize::randomQueryStringParam());
