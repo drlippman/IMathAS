@@ -3944,8 +3944,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 			if ($answer != 'DNE' && $answer != 'oo') {
 				foreach($tocheck as $chkme) {
-					if (!checkanswerformat($chkme,$ansformats)) {
-						return 0; //perhaps should just elim bad answer rather than all?
+					if ($chkme != 'oo' && $chkme != '-oo') {
+						if (!checkanswerformat($chkme,$ansformats)) {
+							return 0; //perhaps should just elim bad answer rather than all?
+						}
 					}
 				}
 			}
@@ -4002,7 +4004,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($listans as $ork=>$orv) {
 				$ansparts = explode(',',$orv[2]);
 				foreach ($ansparts as $j=>$v) {
-					if (!is_numeric($v)) {
+					if (!is_numeric($v) && $v != 'oo' && $v != '-oo') {
 						$ansparts[$j] = evalMathPHP($v,null); //eval('return('.mathphp($v,null).');');
 					}
 				}
@@ -4079,6 +4081,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							} else {
 								if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;}
 							}
+						} else if (($ansparts[$i]=='oo' && $gaparts[$i]=='oo') || ($ansparts[$i]=='-oo' && $gaparts[$i]=='-oo')) {
+							//is ok		
 						} else {
 							break;
 						}

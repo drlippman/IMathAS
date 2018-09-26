@@ -510,20 +510,24 @@ function ntuplecalc(inputId,outputId,format) {
 			if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
 				sub = fullstr.substring(lastcut,i);
 				res = NaN;
-				err += singlevalsyntaxcheck(sub, format);
-				err += syntaxcheckexpr(sub, format);
-				try {
-					if (format.indexOf('mixed')!=-1) {
-						sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
-					}
-					var res = eval(prepWithMath(mathjs(sub)));
-				} catch(e) {
-					err += _("syntax incomplete")+". ";
-				}
-				if (!isNaN(res) && res!="Infinity") {
-					outcalced += res;
+				if (sub=='oo' || sub=='-oo') {
+					outcalced += sub;
 				} else {
-					outcalced += _("undefined");
+					err += singlevalsyntaxcheck(sub, format);
+					err += syntaxcheckexpr(sub, format);
+					try {
+						if (format.indexOf('mixed')!=-1) {
+							sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
+						}
+						var res = eval(prepWithMath(mathjs(sub)));
+					} catch(e) {
+						err += _("syntax incomplete")+". ";
+					}
+					if (!isNaN(res) && res!="Infinity") {
+						outcalced += res;
+					} else {
+						outcalced += _("undefined");
+					}
 				}
 				outcalced += fullstr.charAt(i);
 				lastcut = i+1;
