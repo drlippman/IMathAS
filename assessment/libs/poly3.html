@@ -1,0 +1,106 @@
+<html>
+<body>
+<h1>Macro Library poly3</h1>
+<p>
+Polynomial Division <br/>
+Mike Jenck, Originally developed July 25-27, 2018 <br/>
+licensed under GPL version 2 or later <br/>
+File Version : 4
+</p>
+<ul>
+<li><a href="#formpoly3fromstring">formpoly3fromstring</a></li>
+<li><a href="#writepoly3">writepoly3</a></li>
+<li><a href="#dividepoly3">dividepoly3</a></li>
+<li><a href="#longdivisionpoly3">longdivisionpoly3</a></li>
+</ul>
+
+<h3><a name="formpoly3fromstring">formpoly3fromstring</a></h3>
+<p>
+function formpolyfromstring(variable, polynomialstring, [IsFraction=TRUE])<br/>
+Creates an array of coefficients whose position in the array 
+corresponds to the power of the variable
+Each element is stored in the form of an array(numerator, denominator).
+</p>
+<p>
+INPUTS:<br/>
+variable: a string that contains the variable<br/>
+polynomialstring: a string that contains the polynomial <br/>
+<br/>
+Optional <br/>
+IsFraction: a boolan that stores the the coeificients as fractions
+</p>
+<p>
+Example: $dividend = formpolyfromstring("x","3x^4+2x^2+1") <br/>
+$dividend = array("1,0,2,0,3")
+</p>
+
+<h3><a name="writepoly3">writepoly3</a></h3>
+<p>
+writepoly3(poly3, [variable="x", IsFraction=TRUE, HideZero=TRUE])<br/>
+Creates a string that represents the polynomial<br/>
+<br/>
+Each element is stored in the form of an array(numerator, denominator).
+</p>
+<p>
+INPUTS: <br/>
+variable: a string that contains the variable <br/>
+poly3: an array of coeficients to build the polynomial <br/>
+ <br/>
+Optional <br/>
+IsFraction: a boolan that stores the the coeificients as fractions <br/>
+HideZero: a boolean that stores a flag to show zero coefinents
+</p>
+<p>
+Example: $dividend = writepoly3("x",array("1,0,2,0,3")) <br/>
+$dividend = "3x^4+2x^2+1"
+</p>
+
+<h3><a name="dividepoly3">dividepoly3</a></h3>
+<p>
+dividepoly3(dividend, divisor [, IsFraction=TRUE]) <br/>
+Does the polynomial long division and returns an array of results
+</p>
+<p>
+INPUTS: <br/>
+dividend: a poly3 formed dividend <br/>
+divisor: a poly3 formed divisor <br/>
+ <br/>
+Optional <br/>
+IsFraction: a boolan that stores the the coeificients as fractions
+</p>
+<p>
+Example: $result  = dividepoly3($dividend, $divisor); <br/>
+ <br/>
+$result will contain an array in the following form <br/>
+ $result[0][0] = $dividend <br/>
+ $result[0][1] = the power, array(numerator, denominator) <br/>
+ $result[0][2] = a poly3 polynomial by multipling $result[0][1] and the divisor <br/>
+ $result[0][3] = the poly3 polynomial that needs to be subtracted (-$result[0][2]) <br/>
+ $result[0][1] = the resultant divided (at least 1 power smaller than the previous <br/>
+ etc.
+</p>
+
+<h3><a name="longdivisionpoly3">longdivisionpoly3</a></h3>
+<p>
+longdivisionpoly3(dividend, divisor, variable="x", [displayASCIIticks=TRUE, IsFraction=TRUE, HideZero=TRUE]) <br/>
+ <br/>
+Does the long division and returns a string of the results
+</p>
+<p>
+ INPUTS: <br/>
+
+ dividend: a poly3 formed dividend <br/>
+ divisor: a poly3 formed divisor <br/>
+ variable: a string that contains the variable <br/>
+ <br/>
+ Optional <br/>
+ displayASCIIticks: a boolean flag to put tick marks around each monomial <br/>
+ IsFraction: a boolan that stores the the coeificients as fractions <br/>
+ HideZero: a boolean that stores a flag to show zero coefinents
+</p>
+<p>
+ Example: $result  = longdivisionpoly3($dividend, $divisor); <br/>
+ $result will contain a string of HTML table code that can be displayed in the answer.
+</p>
+</body>
+</html>
