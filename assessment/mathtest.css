@@ -200,6 +200,31 @@ div.right {
 	text-align: right;
 }
 
+table.p3longdiv {
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+table.p3longdiv td.right {
+	text-align: right;
+	padding: 0px;
+}
+table.p3longdiv td.bottomborder {
+	border-bottom:1px solid black; 
+	text-align: right; 
+	padding: 0px;
+}
+table.p3longdiv td.topborder {
+	border-top:1px solid black; 
+	text-align: right; 
+	padding: 0px;
+}
+table.p3longdiv td.topleftborder { 
+	border-left: 1px solid black;
+	border-top: 1px solid black; 
+	text-align: right;
+	padding: 0px;
+}
+
 ul.qlist {list-style-type: none; margin: 0px; padding: 0px;}
 ul.qlist li {margin-top: .2em; margin-left: 10px; padding: 0px;}
 ul.navlist {list-style-type: none; margin: 0px; margin-left: -10px; padding: 0px;}
