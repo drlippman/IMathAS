@@ -1770,7 +1770,13 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 	
 		$v = floor(-log10($a)-1e-12);
 		if ($v+$sigfig <= 0) {
-			$out[] = $sign.number_format(round($a,$v+$sigfig),0,'.',$comma).$scinot;
+			if ($v<-16 && $scinot=='') { //special handling of really huge numbers
+				$multof3 = floor(-($v+$sigfig)/3);
+				$tmp = round($a/pow(10,$multof3*3), $v+$sigfig+$multof3*3);
+				$out[] = $sign.number_format($tmp,0,'.',$comma).str_repeat(',000',$multof3).$scinot;
+			} else {
+				$out[] = $sign.number_format(round($a,$v+$sigfig),0,'.',$comma).$scinot;
+			}
 		} else {
 			$nv = round($a, $v+$sigfig);
 			$n = number_format($a,$v+$sigfig,'.',$comma);
