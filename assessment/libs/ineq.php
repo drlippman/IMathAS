@@ -186,10 +186,10 @@ function ineqbetweenplot($funcs) {
 			}
 		}
 	}
-	$path = 'path([';
+	$path = '';
 	for ($i=0;$i<count($shape);$i++) {
-		if ($i>0) {
-			$path .= ']);path([';
+		if (count($shape[$i])>0) {
+			$path .= 'path([';
 		}
 		for ($j=0;$j<count($shape[$i]);$j++) {
 			if ($j>0) { $path .= ',';}
@@ -203,8 +203,10 @@ function ineqbetweenplot($funcs) {
 			$y = $shape[$i][$j][2];
 			$path .= ",[$x,$y]";
 		}
+		if (count($shape[$i])>0) {
+			$path .= ']);';
+		}
 	}
-	$path .= '])';
 	
 	$p = showplot($newfuncstr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
