@@ -185,14 +185,14 @@ function apportion_info($pop, $seats, $method) {
 			//proceed as in adams
 			foreach ($quotas as $s=>$q) {
 				for ($i=0;$i<5;$i++) {
-					if ($luq[$s]-$i-.5001 <= 0) { break;}
-					$tochange[] = $pop[$s]/($luq[$s]-$i-.5001); //need it under #.5
+					if ($luq[$s]-$i-.50000001 <= 0) { break;}
+					$tochange[] = $pop[$s]/($luq[$s]-$i-.5); //need it under #.5
 				}
 			}
 			asort($tochange);
 		}
-		
 		$moddivs = array_values($tochange);
+
 		//if the next value is the same, then the divisor that adds $toadd additional
 		//seats would add $toadd+1 additional seats, so the method fails.
 		if ($toadd==0) {
