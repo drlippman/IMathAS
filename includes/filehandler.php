@@ -183,7 +183,11 @@ function storeuploadedfile($id,$key,$sec="private") {
 function downsizeimage($fileinfo) {
 	if (preg_match('/\.(jpg|jpeg)/', $fileinfo['name'])) {
 		$imgdata = getimagesize($fileinfo['tmp_name']);
-		$exif = exif_read_data($fileinfo['tmp_name']);
+		try {
+			$exif = exif_read_data($fileinfo['tmp_name']);
+		} catch (Exception $exp) {
+			$exif = false;	
+		}
 		$changed = false;
 		if ($imgdata!==false && $imgdata['mime'] == 'image/jpeg' && 
 		   (min($imgdata[0],$imgdata[1])>1000 || (isset($exif['Orientation']) && $exif['Orientation']>1)) &&
