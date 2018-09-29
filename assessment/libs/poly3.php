@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed July 25-27, 2018
 // licensed under GPL version 2 or later
 // 
-// File Version : 5
+// File Version : 6
 //
 
 global $allowedmacros;
@@ -17,7 +17,7 @@ array_push($allowedmacros, "formpoly3fromstring", "dividepoly3", "longdivisionpo
 
 include_once("fractions.php");  // fraction routine
 
-// function formpoly3fromstring(variable, polynomialstring, [IsFraction=TRUE])
+// function formpoly3fromstring(variable, polynomialstring, [IsFraction=true])
 // Creates an array of coefficients whose position in the array
 // corresponds to the power of the variable
 // Each element is stored in the form of an array(numerator, denominator).
@@ -34,7 +34,7 @@ include_once("fractions.php");  // fraction routine
 //
 //		    $dividend = array("1,0,2,0,3")
 //
-function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
+function formpoly3fromstring($variable, $polynomialstring, $IsFraction=true)
 {
 	if(is_null($variable)) {
 		$variable = "x";
@@ -52,6 +52,9 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 	} 
 	
 	if($polynomialstring != "") {
+		// make sure there are no spaces
+		$polynomialstring = str_replace(" ","",$polynomialstring);
+		
 		// make sure there is something to do
 		$results = array();       // the results upon parsing
 		
@@ -167,7 +170,7 @@ function poly3_breakmonomial($variable, $monominal)
 	return $numbers;
 }
 
-// writepoly3(poly3, [variable="x", IsFraction=TRUE, HideZero=TRUE])
+// writepoly3(poly3, [variable="x", IsFraction=true, HideZero=true])
 // Creates a string that represents the polynomial
 
 // Each element is stored in the form of an array(numerator, denominator).
@@ -186,7 +189,7 @@ function poly3_breakmonomial($variable, $monominal)
 //
 //		    $dividend = "3x^4+2x^2+1"
 //
-function writepoly3($poly3, $variable="x", $IsFraction=TRUE, $HideZero=TRUE)
+function writepoly3($poly3, $variable="x", $IsFraction=true, $HideZero=true)
 {		
 	if(is_null($poly3)) {
 		echo "writepoly3 - the polynomial is null - FAIL.<br/>\r\n";
@@ -436,7 +439,7 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 	return $result;
 }
 
-// dividepoly3(dividend, divisor [, IsFraction=TRUE])
+// dividepoly3(dividend, divisor [, IsFraction=true])
 //
 // Does the polynomial long division and returns an array of results
 //
@@ -459,7 +462,7 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 //  etc.
 //
 //
-function dividepoly3($dividend, $divisor, $IsFraction=TRUE) {
+function dividepoly3($dividend, $divisor, $IsFraction=true) {
 	if($IsFraction){
 		return poly3_dividefractions($dividend, $divisor);
 	}
@@ -597,7 +600,7 @@ function poly3_variablepower($quotientPower,$variable) {
 }
 
 
-// longdivisionpoly3(dividend, divisor, variable="x", [displayASCIIticks=TRUE, IsFraction=TRUE, HideZero=TRUE, ShowAsSubtraction=FALSE])
+// longdivisionpoly3(dividend, divisor, variable="x", [displayASCIIticks=true, IsFraction=true, HideZero=true, ShowAsSubtraction=false])
 //
 // Does the long division and returns a string of the results
 //
@@ -611,15 +614,15 @@ function poly3_variablepower($quotientPower,$variable) {
 // displayASCIIticks: a boolean flag to put tick marks around each monomial
 // IsFraction: a boolan that stores the the coeificients as fractions
 // HideZero: a boolean that stores a flag to show zero coefinents
-// ShowAsSubtraction : a boolean that when set to TRUE show the subtraction
+// ShowAsSubtraction : a boolean that when set to true show the subtraction
 //
 // Example: $result  = longdivisionpoly3($dividend, $divisor);
 //
 //          $result will contain a string of HTML table code that can be displayed in the answer.
 //
-function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=TRUE, $displayASCIIticks=TRUE, $HideZero=TRUE, $ShowAsSubtraction=FALSE) {
-	$HideZeroMinus = TRUE;
-	$HideZeroDifference = TRUE;
+function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=true, $displayASCIIticks=true, $HideZero=true, $ShowAsSubtraction=false) {
+	$HideZeroMinus = true;
+	$HideZeroDifference = true;
 	
 	if($displayASCIIticks) {
 		$MathSymbol = "`";
@@ -746,7 +749,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=TRUE,
 			$subtrahendRight = "";
 		}
 		
-		$subtrahendLeftShow = TRUE;		
+		$subtrahendLeftShow = true;		
 		
 		$j = $i+1;  // get the results from the next line
 		$difference = $TableResults[$j][0];
@@ -798,7 +801,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=TRUE,
 						} else {
 							$line1 .= "<td class='bottomborder'>$MathSymbol$subtrahendLeft 0".poly3_variablepower($k,$variable)."$MathSymbol</td>";
 						}						
-						$subtrahendLeftShow = FALSE;
+						$subtrahendLeftShow = false;
 					} else {
 						if($LastColumn == $k){
 							$line1 .= "<td class='bottomborder'>$MathSymbol+0".poly3_variablepower($k,$variable)."$subtrahendRight$MathSymbol</td>";
@@ -816,7 +819,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=TRUE,
 					} else {
 						$linetext = "$MathSymbol$subtrahendLeft$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$MathSymbol";
 					}
-					$subtrahendLeftShow = FALSE;
+					$subtrahendLeftShow = false;
 				} else {
 					if($LastColumn == $k){
 						$linetext = "$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$subtrahendRight$MathSymbol";
@@ -827,15 +830,15 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=TRUE,
 				$line1.= "<td class='bottomborder'>$linetext</td>";
 			}
 			
-			
-			
+			// remainder
 			if($k==$columns){
 				// the answer is 0 so leave blank
 				$line2 .= "<td class='right'>&nbsp;</td>";
 			}
 			else {
 				if (!array_key_exists($k,$difference)) {
-  					$line2 .= "<td class='right'>&nbsp;</td>";	
+					// test
+  					$line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";	
   				}
 				else {
 					if($IsFraction) {
@@ -877,6 +880,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=TRUE,
 	return $Table;
 }
 
+// File version : 6		- added str_replace() to eliminate space in the formpoly3fromstring 
 // File version : 5		- added the ability to subtract in longdivisionpoly3
 // File version : 4		- renamed internval functions to start with poly3_, added 3 back to formpoly3fromstring
 // File version : 3		- fixed bug in formpoly3fromstring when a / was entered

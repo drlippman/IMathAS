@@ -5,7 +5,7 @@
 Polynomial Division <br/>
 Mike Jenck, Originally developed July 25-27, 2018 <br/>
 licensed under GPL version 2 or later <br/>
-File Version : 4
+File Version : 6
 </p>
 <ul>
 <li><a href="#formpoly3fromstring">formpoly3fromstring</a></li>
@@ -16,7 +16,7 @@ File Version : 4
 
 <h3><a name="formpoly3fromstring">formpoly3fromstring</a></h3>
 <p>
-function formpolyfromstring(variable, polynomialstring, [IsFraction=TRUE])<br/>
+function formpolyfromstring(variable, polynomialstring, [IsFraction=true])<br/>
 Creates an array of coefficients whose position in the array 
 corresponds to the power of the variable
 Each element is stored in the form of an array(numerator, denominator).
@@ -36,7 +36,7 @@ $dividend = array("1,0,2,0,3")
 
 <h3><a name="writepoly3">writepoly3</a></h3>
 <p>
-writepoly3(poly3, [variable="x", IsFraction=TRUE, HideZero=TRUE])<br/>
+writepoly3(poly3, [variable="x", IsFraction=true, HideZero=true])<br/>
 Creates a string that represents the polynomial<br/>
 <br/>
 Each element is stored in the form of an array(numerator, denominator).
@@ -57,7 +57,7 @@ $dividend = "3x^4+2x^2+1"
 
 <h3><a name="dividepoly3">dividepoly3</a></h3>
 <p>
-dividepoly3(dividend, divisor [, IsFraction=TRUE]) <br/>
+dividepoly3(dividend, divisor [, IsFraction=true]) <br/>
 Does the polynomial long division and returns an array of results
 </p>
 <p>
@@ -82,7 +82,7 @@ $result will contain an array in the following form <br/>
 
 <h3><a name="longdivisionpoly3">longdivisionpoly3</a></h3>
 <p>
-longdivisionpoly3(dividend, divisor, variable="x", [displayASCIIticks=TRUE, IsFraction=TRUE, HideZero=TRUE]) <br/>
+longdivisionpoly3(dividend, divisor, variable="x", [displayASCIIticks=true, IsFraction=true, HideZero=true, ShowAsSubtraction=false]) <br/>
  <br/>
 Does the long division and returns a string of the results
 </p>
@@ -96,7 +96,8 @@ Does the long division and returns a string of the results
  Optional <br/>
  displayASCIIticks: a boolean flag to put tick marks around each monomial <br/>
  IsFraction: a boolan that stores the the coeificients as fractions <br/>
- HideZero: a boolean that stores a flag to show zero coefinents
+ HideZero: a boolean that stores a flag to show zero coefinents <br/>
+ ShowAsSubtraction : a boolean that when set to true show the subtraction
 </p>
 <p>
  Example: $result  = longdivisionpoly3($dividend, $divisor); <br/>
