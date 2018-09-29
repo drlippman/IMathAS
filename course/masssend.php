@@ -46,7 +46,9 @@
 		require_once("../includes/htmLawed.php");
 		$messagePost = myhtmLawed($_POST['message']);
 		$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
-
+		if (trim($subjectPost)=='') {
+			$subjectPost = '('._('none').')';
+		}
 		if ($_GET['masssend']=="Message") {
 			$now = time();
 			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));

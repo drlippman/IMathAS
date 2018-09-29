@@ -12,6 +12,9 @@ if (isset($_POST['message'])) {
 	
 	$message = Sanitize::incomingHtml($_POST['message']);
 	$subject = Sanitize::stripHtmlTags($_POST['subject']);
+	if (trim($subject)=='') {
+		$subject = '('._('none').')';
+	}
 	$msgto = Sanitize::onlyInt($_POST['sendto']);
 	$error = '';
 	if ($_POST['sendtype']=='msg') {

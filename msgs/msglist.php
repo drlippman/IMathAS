@@ -130,6 +130,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
       $messagePost = Sanitize::incomingHtml($_POST['message']);
 			$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
+			if (trim($subjectPost)=='') {
+				$subjectPost = '('._('none').')';
+			}
 			$msgToPost = Sanitize::onlyInt($_POST['to']);
 
       $now = time();
