@@ -917,7 +917,7 @@ function gbtable() {
 			$gb[$ln][0][] = $line['code'];
 		}
 		if ($lastlogin) {
-			$gb[$ln][0][] = date("n/j/y",$line['lastaccess']);
+			$gb[$ln][0][] = ($line['lastaccess']>0)?date("n/j/y",$line['lastaccess']):_('Never');
 		}
 
 		$sturow[$line['id']] = $ln;
