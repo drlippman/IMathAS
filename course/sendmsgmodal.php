@@ -46,7 +46,7 @@ if (isset($_POST['message'])) {
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$row[2] = trim($row[2]);
 		if ($row[2]!='' && $row[2]!='none@none.com') {
-			$addy = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1])." <".Sanitize::emailAddress($row[2]).">";
+			$addy = Sanitize::simpleASCII("{$row[0]} {$row[1]}")." <".Sanitize::emailAddress($row[2]).">";
 			$sessiondata['mathdisp']=2;
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
@@ -55,7 +55,7 @@ if (isset($_POST['message'])) {
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$self = Sanitize::encodeStringForDisplay($row[0])." ".Sanitize::encodeStringForDisplay($row[1]) ."<". Sanitize::emailAddress($row[2]).">";
+			$self = Sanitize::simpleASCII("{$row[0]} {$row[1]}") ." <". Sanitize::emailAddress($row[2]).">";
 			
 			send_email($addy, $sendfrom, $subject, $message, array($self), array(), 5); 
 			

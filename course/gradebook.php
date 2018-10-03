@@ -653,7 +653,9 @@ function gbstudisp($stu) {
 		if ($isteacher) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
 			//echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
-			echo "<a href=\"#\" onclick=\"GB_show('Send Email','$imasroot/course/sendmsgmodal.php?to=" . Sanitize::onlyInt($stu) . "&sendtype=email&cid=" . Sanitize::courseId($cid) . "',800,'auto')\" title=\"Send Email\">", _('Email'), "</a> | ";
+			if (!isset($CFG['GEN']['noEmailButton'])) {
+				echo "<a href=\"#\" onclick=\"GB_show('Send Email','$imasroot/course/sendmsgmodal.php?to=" . Sanitize::onlyInt($stu) . "&sendtype=email&cid=" . Sanitize::courseId($cid) . "',800,'auto')\" title=\"Send Email\">", _('Email'), "</a> | ";
+			}
 
 			//echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
 			echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=" . Sanitize::onlyInt($stu) . "&sendtype=msg&cid=" . Sanitize::courseId($cid) . "',800,'auto')\" title=\"Send Message\">", _('Message'), "</a> | ";
