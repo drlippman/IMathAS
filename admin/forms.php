@@ -304,6 +304,10 @@ switch($_GET['action']) {
 
 		$isadminview = false;
 		if ($_GET['action']=='modify') {
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
+			$stm->execute(array($groupid));
+			$hasGroupLTI = ($stm->fetchColumn() !== false);
+			
 			$stm = $DBH->prepare("SELECT * FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			if ($stm->rowCount()==0) {break;}
@@ -626,14 +630,28 @@ switch($_GET['action']) {
 			echo '<p>For integration setup instructions, visit the Course Items: Export page inside your course</p>';
 			
 			if (isset($_GET['id'])) {
-				echo '<span class="form">LTI Key:</span>';
-				echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
-				echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
-				echo '</span><br class="form" />';
-				
-				echo '<span class="form">LTI Secret (max 10 chars)</span>';
-				echo '<span class="formright"><input name="ltisecret" type="text" value="'.Sanitize::encodeStringForDisplay($ltisecret).'" maxlength="10"/> ';
-				echo '</span><br class="form" />';
+				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
+					echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+				} else {
+					if ($hasGroupLTI) {
+						echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+						echo 'If so, you will not need to set up a course-level configuration. ';
+						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">Show course level key/secret</a></p>';
+						echo '<div id="courselevelkey" style="display:none">';
+					} else {
+						echo '<div>';
+					}
+					
+					echo '<span class="form">LTI Key:</span>';
+					echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
+					echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
+					echo '</span><br class="form" />';
+					
+					echo '<span class="form">LTI Secret (max 10 chars)</span>';
+					echo '<span class="formright"><input name="ltisecret" type="text" value="'.Sanitize::encodeStringForDisplay($ltisecret).'" maxlength="10"/> ';
+					echo '</span><br class="form" />';
+					echo '</div>';
+				}
 			}
 			
 			echo '<span class="form">Allow the LMS to set assessment due dates?<br/><span class="small">(Only supported by Canvas)</span></span>';

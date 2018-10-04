@@ -45,23 +45,29 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 	$stm->execute(array($groupid));
 	$hasGroupLTI = ($stm->fetchColumn() !== false);
-	if ($hasGroupLTI) {
-		$groupLTInote = '<p>It looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
-		$groupLTInote .= 'If so, you will not need to set up a course-level configuration. ';
-		$groupLTInote .= 'If you do need to set up a course-level configuration, you will need this information:</p>';
+	if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel']) && $myrights<100) {
+		$groupLTInote = '<p>Your school already has a school-wide LTI key and secret established.  You do not need to set up a course-level configuration.</p>';
 	} else {
-		$groupLTInote = '<p>Your school does not appear to have a school-wide LTI key and secret established. ';
-		$groupLTInote .= 'To set up a course-level configuration, you will need this information:</p>';
+		if ($hasGroupLTI) {
+			$groupLTInote = '<p>It looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
+			$groupLTInote .= 'If so, you will not need to set up a course-level configuration.<br/> ';
+			$groupLTInote .= 'If you do need to set up a course-level configuration, <a href="#" onclick="$(\'#ltikeyinfo\').slideDown();return false;">show course level key/secret</a></p>';
+			$groupLTInote .= '<ul id="ltikeyinfo" style="display:none;">';
+		} else {
+			$groupLTInote = '<p>Your school does not appear to have a school-wide LTI key and secret established. ';
+			$groupLTInote .= 'To set up a course-level configuration, you will need this information:</p>';
+			$groupLTInote .= '<ul id="ltikeyinfo">';
+		}
+		$groupLTInote .= '<li>Key: LTIkey_'.$cid.'_1</li>';
+		$groupLTInote .= '<li>Secret: ';
+		if ($ltisecret=='') {
+			$groupLTInote .= 'You have not yet set up an LTI secret for your course.  To do so, visit the ';
+			$groupLTInote .= '<a href="forms.php?action=modify&id='.$cid.'&cid='.$cid.'">Course Settings</a> page.';
+		} else {
+			$groupLTInote .= Sanitize::encodeStringForDisplay($ltisecret);
+		}
+		$groupLTInote .= '</li></ul>';
 	}
-	$keyInfo = '<li>Key: LTIkey_'.$cid.'_1</li>';
-	$keyInfo .= '<li>Secret: ';
-	if ($ltisecret=='') {
-		$keyInfo .= 'You have not yet set up an LTI secret for your course.  To do so, visit the ';
-		$keyInfo .= '<a href="forms.php?action=modify&id='.$cid.'&cid='.$cid.'">Course Settings</a> page.';
-	} else {
-		$keyInfo .= Sanitize::encodeStringForDisplay($ltisecret);
-	}
-	$keyInfo .= '</li>';
 
 	
 	
@@ -179,7 +185,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		<fieldset>
 		<legend>Canvas Export Options</legend>
 		<ul class="nomark canvasoptlist">
-		<li><input type=checkbox name=includeappconfig value=1 checked /> Include App Config? Do not include it if you have site-wide credentials,
+		<li><input type=checkbox name=includeappconfig value=1 <?php if (!$hasGroupLTI) { echo 'checked';}?> /> Include App Config? Do not include it if you have site-wide credentials,
 			or if you are doing a second import into a course that already has a configuration.</li>
 		<li><input type=checkbox name=includegbcats value=1 checked /> Include <?php echo $installname;?> gradebook setup and categories</li>
 		<li><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname;?> due dates for assessments</li>
@@ -192,9 +198,6 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		<p><button type="submit">Download Export Cartridge</button></p>
 		<p><a href="../help.php?section=lticanvas" target="_blank">Canvas Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
-		<ul>
-		<?php echo $keyInfo; ?>
-		</ul>
 	</div>
 	<div id="lmsbb" style="display:none" class="lmsblock">
 		<fieldset>
