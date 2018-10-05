@@ -92,21 +92,21 @@ function hidegroupdup(el) {  //el.checked = one per group
 				 } else { divs[i].style.display = "block"; }
 		 }
 		}
-		var hfours = document.getElementsByTagName("h4");
-	 for (var i=0;i<hfours.length;i++) {
-		 if (hfours[i].className=="person") {
-			hfours[i].style.display = el.checked?"none":"";
-		 } else if (hfours[i].className=="group") {
-			hfours[i].style.display = el.checked?"":"none";
-		 }
+		var paras = document.getElementsByTagName("p");
+		for (var i=0;i<paras.length;i++) {
+			 if (paras[i].className=="person") {
+				paras[i].style.display = el.checked?"none":"";
+			 } else if (paras[i].className=="group") {
+				paras[i].style.display = el.checked?"":"none";
+			 }
 		}
 		var spans = document.getElementsByTagName("span");
-	 for (var i=0;i<spans.length;i++) {
-		 if (spans[i].className=="person") {
-			spans[i].style.display = el.checked?"none":"";
-		 } else if (spans[i].className=="group") {
-			spans[i].style.display = el.checked?"":"none";
-		 }
+		for (var i=0;i<spans.length;i++) {
+			 if (spans[i].className=="person") {
+				spans[i].style.display = el.checked?"none":"";
+			 } else if (spans[i].className=="group") {
+				spans[i].style.display = el.checked?"":"none";
+			 }
 		}
 }
 function clearfeedback() {

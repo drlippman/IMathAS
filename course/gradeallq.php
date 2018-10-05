@@ -396,23 +396,24 @@
 			}
 			echo '>';
 
-			echo "<p><span class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).'</b></span>';
 			if ($page != -1) {
-				echo '.  Jump to <select id="stusel" onchange="jumptostu()">';
+				echo '<p>Jump to <select id="stusel" onchange="jumptostu()">';
 				foreach ($stulist as $i=>$st) {
 					echo '<option value="'.$i.'" ';
 					if ($i==$page) {echo 'selected="selected"';}
 					echo '>'.Sanitize::encodeStringForDisplay($st).'</option>';
 				}
-				echo '</select>';
+				echo '</select></p>';
 			}
-			echo '</p>';
+			
+			echo "<p class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></p>';
+			    
 			if (!$groupdup) {
-				echo '<h3 class="group" style="display:none">'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
+				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
-					echo ' ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</h3>';
+					echo '</b> ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</p>';
 				} else {
-					echo ' (empty)</h3>';
+					echo '</b> (empty)</p>';
 				}
 			}
 
