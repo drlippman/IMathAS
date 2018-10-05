@@ -160,8 +160,9 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 		if (is_array($item)) {
 			if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
 				$mod_depth_change = 1;
+				$blockid = uniqid();
 				if ($mod_depth>0 || strlen($ind)>2) {
-					$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
+					$canvout .= '<item identifier="BLOCK'.$blockid.'">'."\n";
 					$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 					$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$canvout .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
@@ -182,7 +183,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 						$module_meta .= '</items></module>';
 					}
 					$inmodule = true;
-					$module_meta .= '<module identifier="BLOCK'.$item['id'].'">'."\n";
+					$module_meta .= '<module identifier="BLOCK'.$blockid.'">'."\n";
 					$module_meta .= '  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$module_meta .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
 					if ($item['avail'] == 1 && $item['SH']{0} == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
@@ -190,7 +191,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					}
 					$module_meta .= '  <items>';
 				}
-				$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
+				$out .= $ind.'<item identifier="BLOCK'.$blockid.'">'."\n";
 				$out .= $ind.'  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $mod_depth+$mod_depth_change);
 				$out .= $ind.'</item>'."\n";
