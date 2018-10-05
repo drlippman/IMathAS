@@ -1175,20 +1175,8 @@ if ($overwriteBody==1) {
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
-		/*document.getElementById("curqtbl").innerHTML = generateTable();
-		initeditor("selector","div.textsegment",null,true ,editorSetup);
-		tinymce.init({
-			selector: "h4.textsegment",
-			inline: true,
-			menubar: false,
-			statusbar: false,
-			branding: false,
-			plugins: ["charmap"],
-			toolbar: "charmap saveclose",
-			setup: editorSetup
-		});
-		*/
-		$(refreshTable);
+		//$(refreshTable);
+		refreshTable();
 	</script>
 <?php
 	}
