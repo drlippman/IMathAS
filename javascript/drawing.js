@@ -21,6 +21,7 @@ var curTPcurve = null;
 var curIneqcurve = null; //inequalities
 var ineqcolors = ["rgb(0,0,255)","rgb(255,0,0)","rgb(0,255,0)"];
 var ineqacolors = ["rgba(0,0,255,.4)","rgba(255,0,0,.4)","rgba(0,255,0,.4)"];
+var asymcolor = "rgb(0,200,0)";
 var dragObj = null;
 var oldpointpos = null;
 var curTarget = null;
@@ -30,6 +31,15 @@ var hasTouch = false;
 var didMultiTouch = false;
 var clickmightbenewcurve = false;
 var hasTouchTimer = null;
+var tpModeN = {
+	"5": 2, "5.2": 2, "5.3": 2, "5.4": 2,
+	"6": 2, "6.1": 2, "6.5": 2,
+	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
+	"8": 2, "8.2": 2, "8.3": 2, "8.4": 2, "8.5": 3, "8.6": 3,
+	"9": 2, "9.1": 2,
+	"10": 3, "10.2": 3, "10.3": 3, "10.4": 3};
+var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
+
 /*
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
@@ -80,7 +90,11 @@ var hasTouchTimer = null;
 	8: abs value
 	8.2: linear/linear rational
 	8.3: exponential (unshifted)
-	9: cosine/sine
+	8.4: log (unshifted)
+	8.5: exponential (shifted)
+	8.6: log (shifted)
+	9: sine
+	9.1: cosine
    ineqtypes
    	10: linear >= or <=
    	10.2: linear < or >
@@ -164,6 +178,9 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"abs": [{"mode":8, "descr":_("Absolute value"), inN: 2, "input":_("Enter the corner point of the absolute value, then another point on the graph")}],
 			"rational": [{"mode":8.2, "descr":_("Rational"), inN: 2, "input":_("Enter the point where the vertical and horizontal asymptote cross, then a point on the graph")}],
 			"exp": [{"mode":8.3, "descr":_("Exponential"), inN: 2, "input":_("Enter two points on the graph")}],
+			"log": [{"mode":8.4, "descr":_("Logarithm"), inN: 2, "input":_("Enter two points on the graph")}],
+			"genexp": [{"mode":8.5, "descr":_("Shifted Exponential"), inN: 3, "input":_("Enter a point on the asymptote, then enter two points on the graph")}],
+			"genlog": [{"mode":8.6, "descr":_("Shifted Logarithm"), inN: 3, "input":_("Enter a point on the asymptote, then enter two points on the graph")}],
 			"circle": [{"mode":7, "descr":_("Circle"), inN: 2, "input":_("Enter the center point of the circle, then a point on the graph")}],
 			"ellipse": [{"mode":7.2, "descr":_("Ellipse"), inN: 2, "input":_("Enter the center point of the ellipse, then a point offset from the center by the horizontal radius and vertical radius")}],
 			"hyperbola": [
@@ -404,7 +421,7 @@ function drawTarget(x,y) {
 			nocanvaswarning = true;
 			alert("Your browser does not support drawing answer entry.  Please try again using Internet Explorer 6+ (Windows), FireFox 1.5+ (Win/Mac), Safari 1.3+ (Mac), Opera 9+ (Win/Mac), or Camino (Mac)");
 		}
-	}
+	}                       
 
 	ctx.fillStyle = "rgb(0,0,255)";
 	ctx.lineWidth = 2;
@@ -792,7 +809,7 @@ function drawTarget(x,y) {
 					var b = Math.abs(x2-tplines[curTarget][i][0][0]);
 					var a = Math.abs(y2-tplines[curTarget][i][0][1]);
 					var m = Math.abs(a/b);
-					ctx.strokeStyle = "rgb(0,255,0)";
+					ctx.strokeStyle = asymcolor;
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]+m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]-m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
@@ -834,7 +851,7 @@ function drawTarget(x,y) {
 					var a = Math.abs(x2-tplines[curTarget][i][0][0]);
 					var b = Math.abs(y2-tplines[curTarget][i][0][1]);
 					var m = Math.abs(b/a);
-					ctx.strokeStyle = "rgb(0,255,0)";
+					ctx.strokeStyle = asymcolor;
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]+m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]-m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
 					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
@@ -986,6 +1003,108 @@ function drawTarget(x,y) {
 				}
 
 			}
+		} else if (tptypes[curTarget][i]==8.5) {//if a 3p exponential (shifted)
+			var y2 = null;
+			var x2 = null;
+			var y3 = null;
+			var x3 = null;
+			if (tplines[curTarget][i].length==3) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+				x3 = tplines[curTarget][i][2][0];
+				y3 = tplines[curTarget][i][2][1];
+			} else if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+				x3 = x;
+				y3 = y;
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			var y1 = tplines[curTarget][i][0][1];
+			ctx.strokeStyle = asymcolor;
+			ctx.dashedLine(5,y1,targets[curTarget].imgwidth,y1);
+			ctx.beginPath();
+			ctx.strokeStyle = "rgb(0,0,255)";
+			if (x3 != null && x3!=x2) {
+				if (y3==y2) {
+					ctx.moveTo(0,y3);
+					ctx.lineTo(targets[curTarget].imgwidth,y3);
+				} else {
+					// (x2, y2-y1) (x3, y3-y1)
+					// b^(x3-x2) = (y3-y1)/(y2-y1)
+					// a = (y3-y1)/b^x3
+
+					var adjy2 = y1 - y2;
+					var adjy3 = y1 - y3;
+					if (adjy2*adjy3>0 && x3 != x2) {
+						var expbase = safepow(adjy3/adjy2, 1/(x3-x2));
+						var stretch = adjy3/safepow(expbase,x3);
+						ctx.moveTo(x2,y2);
+						var cury = 0;
+						for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
+							cury = y1 - stretch*safepow(expbase,curx);
+							if (cury<-100) { cury = -100;}
+							if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+							if (curx==0) {
+								ctx.moveTo(curx,cury);
+							} else {
+								ctx.lineTo(curx,cury);
+							}
+						}
+					}
+				}
+			}
+		} else if (tptypes[curTarget][i]==8.6) {//if a 3p log (shifted)
+			var y2 = null;
+			var x2 = null;
+			var y3 = null;
+			var x3 = null;
+			if (tplines[curTarget][i].length==3) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+				x3 = tplines[curTarget][i][2][0];
+				y3 = tplines[curTarget][i][2][1];
+			} else if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+				x3 = x;
+				y3 = y;
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			var x1 = tplines[curTarget][i][0][0];
+			ctx.strokeStyle = asymcolor;
+			ctx.dashedLine(x1,5,x1,targets[curTarget].imgheight);
+			ctx.beginPath();
+			ctx.strokeStyle = "rgb(0,0,255)";
+			if (x3 != null && x3!=x2 && y3!=y2) {
+				// treat as x = ab^y + c
+				// (x2-x1, y2) (x3-x1, y3)
+				// b^(y3-y2) = (x3-x1)/(x2-x1)
+				// a = (x2-x1)/b^y2
+
+				var adjx2 = x2 - x1;
+				var adjx3 = x3 - x1;
+				if (adjx2*adjx3>0) {
+					var expbase = safepow(adjx3/adjx2, 1/(y3-y2));
+					var stretch = adjx3/safepow(expbase,y3);
+					ctx.moveTo(x2,y2);
+					var curx = 0;
+					for (var cury=0;cury < targets[curTarget].imgheight+4;cury += 3) {
+						curx = x1 + stretch*safepow(expbase,cury);
+						if (curx<-100) { curx = -100;}
+						if (curx>targets[curTarget].imgwidth+100) { curx=targets[curTarget].imgwidth+100;}
+						if (cury==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				}
+			}
 		} else if (tptypes[curTarget][i]==8.2) {//if a tp linear/linear rational
 			var y2 = null;
 			var x2 = null;
@@ -996,7 +1115,7 @@ function drawTarget(x,y) {
 				x2 = x;
 				y2 = y;
 			}
-			ctx.strokeStyle = "rgb(0,255,0)";
+			ctx.strokeStyle = asymcolor;
 			ctx.dashedLine(5,tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]);
 			ctx.dashedLine(tplines[curTarget][i][0][0],5,tplines[curTarget][i][0][0],targets[curTarget].imgheight);
 			ctx.beginPath();
@@ -1070,6 +1189,26 @@ function drawTarget(x,y) {
 		ctx.stroke();
 		ctx.beginPath();
 	}
+	if (curTPcurve === null && tpHasAsymp.hasOwnProperty(targets[curTarget].mode)) { //has asymptotes
+		ctx.strokeStyle = "rgb(200,200,200)";
+			
+		if (targets[curTarget].mode == 8.5) { //shifted exp, no current curve
+			ctx.dashedLine(5,y,targets[curTarget].imgwidth,y);
+		} else if (targets[curTarget].mode == 8.6) { //shifted log, no current curve
+			ctx.dashedLine(x,5,x,targets[curTarget].imgwidth);
+		} else if (targets[curTarget].mode == 8.2) { //rational
+			ctx.dashedLine(5,y,targets[curTarget].imgwidth,y);
+			ctx.dashedLine(x,5,x,targets[curTarget].imgheight);
+		} else if (targets[curTarget].mode == 7.4 || targets[curTarget].mode == 7.5) { //hyperbola
+			ctx.dashedLine(x,y,targets[curTarget].imgwidth,y+(targets[curTarget].imgwidth-x));
+			ctx.dashedLine(x,y,targets[curTarget].imgwidth,y-(targets[curTarget].imgwidth-x));
+			ctx.dashedLine(x,y,0,y-x);
+			ctx.dashedLine(x,y,0,y+x);
+		}
+		ctx.beginPath();
+		ctx.strokeStyle = "rgb(0,0,255)";
+	}
+	
 	var linefirstx, linefirsty, linelastx, linelasty;
 	ctx.fillStyle = 'rgba(0,0,255,.5)';
 	for (var i=0;i<lines[curTarget].length; i++) {
@@ -1174,7 +1313,7 @@ function drawTarget(x,y) {
 			for (var j=0; j<tplines[curTarget][i].length; j++) {
 				ctx.fillRect(tplines[curTarget][i][j][0]-3,tplines[curTarget][i][j][1]-3,6,6);
 			}
-			if (tplines[curTarget][i].length==1 && x!=null && curTPcurve==i) {
+			if (tplines[curTarget][i].length<tpModeN[targets[curTarget].mode] && x!=null && curTPcurve==i) {
 				ctx.fillRect(x-3,y-3,6,6);
 			}
 			ctx.fillStyle = "rgb(0,0,255)";
@@ -1216,12 +1355,14 @@ function encodeDraw() {
 	}
 	out += ';;';
 	var tplineout = [];
+	var tpoutstr = '';
 	for (var i=0; i<tplines[curTarget].length; i++) {
-		//if (i!=0) {
-		//	out += ',';
-		//}
-		if (tplines[curTarget][i].length>1) {
-			tplineout.push('('+tptypes[curTarget][i]+','+tplines[curTarget][i][0][0]+','+tplines[curTarget][i][0][1]+','+tplines[curTarget][i][1][0]+','+tplines[curTarget][i][1][1]+')');
+		if (tplines[curTarget][i].length==tpModeN[tptypes[curTarget][i]]) {
+			tpoutstr = '('+tptypes[curTarget][i];
+			for (var j=0; j<tplines[curTarget][i].length; j++) {
+				tpoutstr += ','+tplines[curTarget][i][j][0]+','+tplines[curTarget][i][j][1];
+			}
+			tplineout.push(tpoutstr + ')');
 		}
 	}
 	out += tplineout.join(",");
@@ -1260,6 +1401,7 @@ function drawMouseDown(ev) {
 	}
 	if (hasTouch) {
 		window.clearTimeout(hasTouchTimer);
+		$(document).off("mousemove.imathasdraw");
 		$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 		$(".drawcanvas").on("touchmove.imathasdraw", drawMouseMove);
 		$(document).on("touchend.imathasdraw", drawMouseUp);
@@ -1347,7 +1489,7 @@ function drawMouseDown(ev) {
 						mouseisdown = false;
 					} else {//in existing line
 						tplines[curTarget][curTPcurve].push([mouseOff.x,mouseOff.y]);
-						if (tplines[curTarget][curTPcurve].length==2) {
+						if (tplines[curTarget][curTPcurve].length==tpModeN[targets[curTarget].mode]) {
 							//second point is set.  switch to drag and end line
 							dragObj = {mode: targets[curTarget].mode, num: curTPcurve, subnum: 1};
 							curTPcurve = null;
@@ -1440,7 +1582,7 @@ function drawMouseDown(ev) {
 				//targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), auto';
 			}
 			if (curTPcurve != null) {
-				if (tplines[curTarget][curTPcurve].length<2) {
+				if (tplines[curTarget][curTPcurve].length<tpModeN[targets[curTarget].mode]) {
 					tplines[curTarget].splice(curTPcurve,1);
 				}
 				setCursor('pen');
@@ -1696,6 +1838,7 @@ function drawMouseUp(ev) {
 	}
 }
 
+var mouseintarget = -1;
 function drawMouseMove(ev) {
 	var tempTarget = null;
 	clickmightbenewcurve = false;
@@ -1712,6 +1855,7 @@ function drawMouseMove(ev) {
 		}
 	//}
 	if (tempTarget!=null) {
+		mouseintarget = tempTarget;
 		var tarelpos = getPosition(targets[tempTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[tempTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,tempTarget);}
@@ -1732,7 +1876,23 @@ function drawMouseMove(ev) {
 				}
 			}
 		}
+	} else {
+		if (mouseintarget != null && mouseintarget != -1) {
+			if (curTarget != null) {
+				drawTarget();
+			} else {
+				curTarget = mouseintarget;
+				drawTarget();
+				curTarget = null;
+			}
+			mouseintarget = -1;
+		}
 	}
+	/*
+	$("#curtarget").text(curTarget);
+	$("#temptarget").text(tempTarget);
+	$("#mouseintarget").text(mouseintarget);
+	*/
 	if (curTarget!=null) {
 		if (ev.originalEvent.touches && ev.originalEvent.touches.length>1) {
 			didMultiTouch = true;
@@ -1799,10 +1959,16 @@ function drawMouseMove(ev) {
 					if (foundpt==null) {
 						setCursor('pen');
 						//targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), auto';
+						
+						if (tpHasAsymp.hasOwnProperty(targets[curTarget].mode) && tempTarget !== null) {
+							drawTarget(mouseOff.x,mouseOff.y);
+						}
 					} else {
+						drawTarget();
 						setCursor('move');
 						//targets[curTarget].el.style.cursor = 'move';
 					}
+					 
 				}
 			} else { //dragging
 				setCursor('move');
@@ -1824,6 +1990,12 @@ function drawMouseMove(ev) {
 		} else if (curIneqcurve!=null && !mouseisdown) {
 			drawTarget();
 		}
+	} else if (tempTarget != null && mouseintarget != -1) {
+		curTarget = tempTarget;
+		if (tpHasAsymp.hasOwnProperty(targets[curTarget].mode)) {
+				drawTarget(mouseOff.x,mouseOff.y);
+		}
+		curTarget = null;
 	}
 
 }
@@ -1923,7 +2095,7 @@ function clearAllDrawListners() {
 }
 function initCanvases(k) {
 	clearAllDrawListners();
-	$(".drawcanvas").on("mousemove.imathasdraw", drawMouseMove);
+	$(document).on("mousemove.imathasdraw", drawMouseMove);
 	$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 	$(document).on("mousedown.imathasdraw", drawMouseDown);
 	
@@ -1966,7 +2138,10 @@ function initCanvases(k) {
 				if (drawla[i].length>3 && drawla[i][3].length>0) {
 					for (var j=0; j<drawla[i][3].length;j++) {
 						tptypes[canvases[i][0]][j] = drawla[i][3][j][0];
-						tplines[canvases[i][0]][j] = [drawla[i][3][j].slice(1,3),drawla[i][3][j].slice(3)];
+						tplines[canvases[i][0]][j] = [];
+						for (var ptidx=0; ptidx<tpModeN[tptypes[canvases[i][0]][j]]; ptidx++) {
+							tplines[canvases[i][0]][j].push(drawla[i][3][j].slice(1+2*ptidx,3+2*ptidx));
+						}
 					}
 				}
 				ineqtypes[canvases[i][0]] = [];

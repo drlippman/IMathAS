@@ -2988,10 +2988,20 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='exp') { $out .= 'class="sel" '; $def = 8.3;}
 						$out .= ' alt="Exponential"/>';
 					}
+					if (in_array('genexp',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpgenexp.png\" onclick=\"imathasDraw.settool(this,$qn,8.5)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='genexp') { $out .= 'class="sel" '; $def = 8.5;}
+						$out .= ' alt="General Exponential"/>';
+					}
 					if (in_array('log',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tplog.png\" onclick=\"imathasDraw.settool(this,$qn,8.4)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='log') { $out .= 'class="sel" '; $def = 8.4;}
 						$out .= ' alt="Logarithm"/>';
+					}
+					if (in_array('genlog',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpgenlog.png\" onclick=\"imathasDraw.settool(this,$qn,8.6)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='genlog') { $out .= 'class="sel" '; $def = 8.6;}
+						$out .= ' alt="General Logarithm"/>';
 					}
 					if ($settings[6]*($settings[3]-$settings[2]) == $settings[7]*($settings[1]-$settings[0])) {
 						//only circles if equal spacing in x and y
@@ -5531,7 +5541,69 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$xop = $x2p;
 					}
 					$settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
-					if (strpos($function[0],'log')!==false || strpos($function[0],'ln')!==false) { //is log
+					if (($logloc = strpos($function[0],'log'))!==false || 
+						($lnloc = strpos($function[0],'ln'))!==false) { //is log
+					
+						$nestd = 0; $vertasy = 0;
+						$startloc = ($logloc!==false)?($logloc+3):($lnloc+2);
+						for ($i = $startloc; $i<strlen($function[0]); $i++) {
+							if ($function[0][$i]=='(') {
+								$nestd++;
+							} else if ($function[0][$i]==')') {
+								$nestd--;
+								if ($nestd == 0 && $i>$startloc) {
+									$loginside = substr($function[0], $startloc, $i-$startloc+1);
+									if (strpos($loginside,'x')===false) { //found a log w/o variable
+										//look for another one
+										if (($logloc = strpos($function[0],'log', $i))!==false || 
+											($lnloc = strpos($function[0],'ln', $i))!==false) { //is another log
+											$startloc = ($logloc!==false)?($logloc+3):($lnloc+2);
+											continue;
+										}
+									}
+									$inlogfunc = mathphp(makepretty($loginside),'x');
+									$inlogfunc = str_replace("(x)",'($x)',$inlogfunc);
+									$inlogfunc = create_function('$x', 'return ('.$inlogfunc.');');
+									//We're going to assume inside is linear
+									//Calculate (0,y0), (1,y1).  m=(y1-y0), y=(y1-y0)x+y0
+									//solve for when this is =0
+									// x = -y0/(y1-y0)
+									$inlogy0 = $inlogfunc(0);
+									$inlogy1 = $inlogfunc(1);
+									$vertasy = -$inlogy0/($inlogy1 - $inlogy0);
+									break;
+								}
+							} else if ($nestd == 0) {
+								$startloc = $i+1; //reset start to handle log_2(x-5) and such
+							}
+						}
+						
+						//treat like x=ab^y+vertasy
+						//is a pos or neg?
+						if ($x1<$vertasy) {  //x1 to the left of VA
+							if (!is_nan($y1)) {  //if y1 is defined, a is neg
+								$asign = -1;
+							} else {
+								$asign = 1;
+							}
+						} else {  //x1 is to the right of VA
+							if (!is_nan($y1)) { //if y1 is defined, a is pos
+								$asign = 1;
+							} else {
+								$asign = -1;
+							}
+						}
+						$xa = $vertasy + $asign*1;
+						$xb = $vertasy + $asign*2;
+						$ya = @$func($xa);
+						$yb = @$func($xb);
+						$xap = $xtopix($xa);
+						$xbp = $xtopix($xb);
+						$vertasyp = $xtopix($vertasy);
+						$yap = $ytopix($ya);
+						$ybp = $ytopix($yb);
+						
+						/*old without shift
 						//treat like x=ab^y
 						if (!is_nan($y1)) {
 							$yap = $y1p;
@@ -5545,14 +5617,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$xbp = $x3p + $pixelsperx;
 						}
 						$ybp = $settings[7] - ($yb-$settings[2])*$pixelspery - $imgborder;
-
+						*/
 						if ($ybp>$yap) {
-							$base = safepow(($xop-$xbp)/($xop-$xap), 1/($ybp-$yap));
+							$base = safepow(($vertasyp-$xbp)/($vertasyp-$xap), 1/($ybp-$yap));
 						} else {
-							$base = safepow(($xop-$xap)/($xop-$xbp), 1/($yap-$ybp));
+							$base = safepow(($vertasyp-$xap)/($vertasyp-$xbp), 1/($yap-$ybp));
 						}
-						$str = ($xop-$xbp)/safepow($base,$ybp-$yop);
-						$anslogs[$key] = array($str,$base);
+						$str = ($vertasyp-$xbp)/safepow($base,$ybp-$yop);
+						
+						$anslogs[$key] = array($str, $base, $vertasyp);
 
 					} else if (strpos($function[0],'abs')!==false) { //is abs
 						$y0 = $func($x0);
@@ -5627,10 +5700,31 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							}
 						}
 					} else if (preg_match('/\^[^2]/',$function[0])) { //exponential
-
+						/*
+						To do general exponential, we'll need 3 points. 
+						Need to solve y = ab^x + c for a, b, c
+						If x1, x2, and x3 are equally spaced, then
+						b = ((y3-y2)/(y2-y1))^(1/(x3-x2))
+						
+						y1 = ab^x1 + c,  y2 = ab^x2 + c
+						y1 - ab^x1 = y2 - ab^x2
+						a(b^x2 - b^x1) = y2 - y1
+						a = (y2 - y1)/(b^x2 - b^x1)
+						c = y1 - a*b^x1
+						
+						y = ab^x
+						*/
+						
+						$base = safepow(($y3p-$y2p)/($y2p-$y1p), 1/($x3p-$x2p));
+						$str = ($y1p - $y2p)/(safepow($base, $x2p-$xop) - safepow($base, $x1p-$xop));
+						$asy = $y1p + $str*safepow($base, $x1p-$xop);
+						
+						/* old version
 						$base = safepow(($yop-$y3p)/($yop-$y1p), 1/($x3p-$x1p));
 						$str = ($yop-$y3p)/safepow($base,$x3p-$xop);
-						$ansexps[$key] = array($str,$base);
+						*/
+						
+						$ansexps[$key] = array($str, $base, $asy);
 
 					} else if (strpos($function[0],'/x')!==false || preg_match('|/\([^\)]*x|', $function[0])) {
 						$h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
@@ -5774,30 +5868,53 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							}
 						}
 						$abs[] = array($pts[1],$pts[2], $slope);
-					} else if ($pts[0]==8.3) {
-						$adjy2 = $yop - $pts[4];
-						$adjy1 = $yop - $pts[2];
-						if ($adjy1*$adjy2>0 && $pts[1]!=$pts[3]) {
-							$base = safepow($adjy2/$adjy1,1/($pts[3]-$pts[1]));
-							if (abs($pts[1]-$xop)<abs($pts[3]-$xop)) {
-								$str = $adjy1/safepow($base,$pts[1]-$xop);
+					} else if ($pts[0]==8.3 || $pts[0]==8.5) {
+						if ($pts[0]==8.3) {
+							$horizasy = $yop;
+							$adjy2 = $horizasy - $pts[4];
+							$adjy1 = $horizasy - $pts[2];
+							$x1p = $pts[1];
+							$x2p = $pts[3];
+						} else if ($pts[0]==8.5) {
+							$horizasy = $pts[2];
+							$adjy2 = $horizasy - $pts[6];
+							$adjy1 = $horizasy - $pts[4];
+							$x1p = $pts[3];
+							$x2p = $pts[5];
+						}
+							
+						if ($adjy1*$adjy2>0 && $x1p!=$x2p) {
+							$base = safepow($adjy2/$adjy1,1/($x2p-$x1p));
+							if (abs($x1p-$xop)<abs($x2p-$xop)) {
+								$str = $adjy1/safepow($base,$x1p-$xop);
 							} else {
-								$str = $adjy2/safepow($base,$pts[3]-$xop);
+								$str = $adjy2/safepow($base,$x2p-$xop);
 							}
 							//$exps[] = array($str,$base);
-							$exps[] = array($pts[1]-$xop, $adjy1, $pts[3]-$xop, $adjy2, $base);
+							$exps[] = array($x1p-$xop, $adjy1, $x2p-$xop, $adjy2, $base, $horizasy);
 						}
-					} else if ($pts[0]==8.4) {
-						$adjx2 = $xop - $pts[3];
-						$adjx1 = $xop - $pts[1];
-						if ($adjx1*$adjx2>0 && $pts[2]!=$pts[4]) {
-							$base = safepow($adjx2/$adjx1,1/($pts[4]-$pts[2]));
-							if (abs($pts[2]-$yop)<abs($pts[4]-$yop)) {
-								$str = $adjx1/safepow($base,$pts[2]-$yop);
+					} else if ($pts[0]==8.4 || $pts[0]==8.6) {
+						if ($pts[0]==8.4) {
+							$vertasy = $xop;
+							$adjx2 = $vertasy - $pts[3];
+							$adjx1 = $vertasy - $pts[1];
+							$y1p = $pts[2];
+							$y2p = $pts[4];
+						} else if ($pts[0]==8.6) {
+							$vertasy = $pts[1];
+							$adjx2 = $vertasy - $pts[5];
+							$adjx1 = $vertasy - $pts[3];
+							$y1p = $pts[4];
+							$y2p = $pts[6];
+						}
+						if ($adjx1*$adjx2>0 && $y1p!=$y2p) {
+							$base = safepow($adjx2/$adjx1,1/($y2p-$y1p));
+							if (abs($pts[2]-$yop)<abs($y2p-$yop)) {
+								$str = $adjx1/safepow($base,$y1p-$yop);
 							} else {
-								$str = $adjx2/safepow($base,$pts[4]-$yop);
+								$str = $adjx2/safepow($base,$y2p-$yop);
 							}
-							$logs[] = array($pts[2]-$yop, $adjx1, $pts[4]-$yop, $adjx2, $base);
+							$logs[] = array($y1p-$yop, $adjx1, $y2p-$yop, $adjx2, $base, $vertasy);
 						}
 					} else if ($pts[0]==8.2) { //rational
 						if ($pts[1]!=$pts[3] && $pts[2]!=$pts[4]) {
@@ -6117,13 +6234,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					break;
 				}
 			}
+			
 			foreach ($ansexps as $key=>$ansexp) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($exps); $i++) {
 					//if (abs($ansexp[0]-$exps[$i][0])>$defpttol*$reltolerance) {
 					//	continue;
 					//}
+					//check base
 					if (abs($ansexp[1]-$exps[$i][4])/(abs($ansexp[1]-1)+1e-18)>$deftol*$reltolerance) {
+						continue;
+					}
+					//check asymptote
+					if (abs($ansexp[2]-$exps[$i][5])>$defpttol*$reltolerance) {
 						continue;
 					}
 					//check left point if base>1
@@ -6145,6 +6268,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				for ($i=0; $i<count($logs); $i++) {
 					//check base
 					if (abs($anslog[1]-$logs[$i][4])/(abs($anslog[1]-1)+1e-18)>$deftol*$reltolerance) {
+						continue;
+					}
+					//check asymptote
+					if (abs($anslog[2]-$logs[$i][5])>$defpttol*$reltolerance) {
 						continue;
 					}
 					//check bottom point if base>1
