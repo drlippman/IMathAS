@@ -750,6 +750,9 @@ jQuery(document).ready(function($) {
 });
 
 jQuery(document).ready(function($) {
+	if (typeof isImathasAssessment != 'undefined') {
+		$('a:not([target])').attr("target", "_blank");
+	}
 	$('a').each(setuptracklinks).each(addNoopener);
 	$('a[href*="youtu"]').each(setupvideoembeds);
 	$('a[href*="vimeo"]').each(setupvideoembeds);

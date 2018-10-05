@@ -917,7 +917,8 @@ a.attach {
     background: url(../tinymce4/plugins/attach/ed_attach.gif) center left no-repeat;
     padding-left: 20px;
 }
-a[target=_blank]:after {
+
+a[rel*=noopener]:after {
 	content: "";
 	width:16px;
 	height:1em;
