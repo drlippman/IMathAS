@@ -98,13 +98,13 @@ echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=100418" type
 /*
 
 /assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
-echo '<script src="' . $imasroot . '/javascript/general.js?v=060618" type="text/javascript"></script>';
+
+echo '<script src="' . $imasroot . '/javascript/general.js?v=100418" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=050918" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=092518" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/drawing.js?v=062218" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/eqntips.js?v=082616" type="text/javascript"></script>';
-
 
 */
 
@@ -218,7 +218,7 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	} else {
 		echo 'var filePickerCallBackFunc = null;';
 	}
-	echo 'initeditor("textareas","mceEditor");';
+	echo 'initeditor("textareas","mceEditor",1);';
 	echo '</script>';
 } else {
 	echo '<script type="text/javascript">var usingTinymceEditor = false;</script>';
