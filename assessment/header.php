@@ -128,7 +128,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=042318\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}});
 		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/javascript/mathjax";
@@ -144,7 +144,7 @@ if (!isset($sessiondata['mathdisp'])) {
 } else if ($sessiondata['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=042318\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
 
 	echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}, skipStartupTypeset: true});

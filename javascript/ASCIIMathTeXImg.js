@@ -720,7 +720,8 @@ function AMTparseIexpr(str) {
     }
     if (typeof sym1.func != 'undefined' && sym1.func) {
     	sym2 = AMgetSymbol(str);
-    	if (sym2.ttype != INFIX && sym2.ttype != RIGHTBRACKET) {
+    	if (sym2.ttype != INFIX && sym2.ttype != RIGHTBRACKET &&
+    	    (sym1.input.length>1 || sym2.ttype == LEFTBRACKET)) {
     		result = AMTparseIexpr(str);
     		node = '{'+node+result[0]+'}';
     		str = result[1];
@@ -903,7 +904,8 @@ function AMparseMath(str) {
   } else {
 	  texstring = "\\textstyle" + texstring;
   }
-  texstring = texstring.replace('$','\\$');
+
+  texstring = texstring.replace(/\$/g,'\\$');
 
   var node = document.createElement("img");
   if (typeof encodeURIComponent == "function") {
