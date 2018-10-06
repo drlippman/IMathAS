@@ -302,8 +302,18 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 
 //use this if we know the grade, or want to delete
 function updateLTIgrade($action,$sourcedid,$aid,$grade=0,$sendnow=false) {
-	global $DBH,$sessiondata,$testsettings,$cid,$CFG;
+	global $DBH,$sessiondata,$testsettings,$cid,$CFG,$userid;
 	
+	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
+		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
+		if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k
+			$logFile = fopen($logfilename, "w+");
+		} else {
+			$logFile = fopen($logfilename, "a+");
+		}
+		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$userid,$grade,$sourcedid\n");
+		fclose($logFile);
+	}
 	//if we're using the LTI message queue, and it's an update, queue it
 	if (isset($CFG['LTI']['usequeue']) && $action=='update') {
 		return addToLTIQueue($sourcedid, $grade, $sendnow);
