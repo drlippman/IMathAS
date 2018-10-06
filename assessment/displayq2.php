@@ -891,11 +891,12 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 		if (is_array($reqdecimals)) {
 			foreach ($reqdecimals as $kidx=>$vval) {
+				if (substr((string)$vval,0,1)=='=') {continue;} //skip '=2' style $reqdecimals
 				if (($hasGlobalAbstol || !isset($abstolerance[$kidx])) && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
 					$abstolerance[$kidx] = 0.5/(pow(10,$vval));
 				}
 			}
-		} else {
+		} else if (substr((string)$reqdecimals,0,1)!='=') { //skip '=2' style $reqdecimals
 			if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
 				$abstolerance = 0.5/(pow(10,$reqdecimals));
 			} else if (isset($anstypes) && !isset($reltolerance)) {
@@ -913,6 +914,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	if (isset($answer)) {$optionsPack['answer'] = $answer;}
 	if (isset($reltolerance)) {$optionsPack['reltolerance'] = $reltolerance;}
 	if (isset($abstolerance)) {$optionsPack['abstolerance'] = $abstolerance;}
+	if (isset($reqdecimals)) {$optionsPack['reqdecimals'] = $reqdecimals;}
 	if (isset($answerformat)) {$answerformat = str_replace(' ','',$answerformat); $optionsPack['answerformat'] = $answerformat;}
 	if (isset($questions)) {$optionsPack['questions'] = $questions;}
 	if (isset($answers)) {$optionsPack['answers'] = $answers;}
@@ -1087,8 +1089,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
 		}
 		if (isset($reqdecimals)) {
-			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to %d decimal places.'), $reqdecimals);
-			$shorttip .= sprintf(_(", accurate to %d decimal places"), $reqdecimals);
+			if (substr((string)$reqdecimals,0,1)=='=') {
+				$exactdec = true;
+				$reqdecimals = substr($reqdecimals,1);
+				$tip .= "<br/>" . sprintf(_('Your answer should include exactly %d decimal places.'), $reqdecimals);
+				$shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
+				$answer = prettyreal($answer, $reqdecimals);
+			} else {
+				$tip .= "<br/>" . sprintf(_('Your answer should be accurate to at least %d decimal places.'), $reqdecimals);
+				$shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);
+			}
 		}
 		if (isset($reqsigfigs)) {
 			if ($reqsigfigs{0}=='=') {
@@ -3337,6 +3347,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
+		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$qn];} else {$reqsigfigs = $options['reqsigfigs'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
@@ -3378,6 +3389,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$altweights[] = floatval($partialcredit[$i+1]);
 			}
 		}
+		
+		$exactreqdec = false;
+		if (isset($reqdecimals)) {
+			list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
+			if ($exactreqdec) {
+				if ($reqdecscoretype[0] == 'rel') {
+					$reltolerance = $reqdecscoretype[1];
+				} else if ($reqdecscoretype[0] == 'abs') {
+					$abstolerance = $reqdecscoretype[1];
+				}
+			}
+		}
+				
+				
 
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($reqsigfigs)) {
@@ -3515,6 +3540,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else {//{if (is_numeric($givenans)) {
 						//$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
 						if (is_numeric($givenans)) {
+							if ($exactreqdec) {
+								//check number of decimal places in givenans
+								if ($reqdecimals != (($p = strpos($givenans,'.'))===false?0:(strlen($givenans)-$p-1))) {
+									continue;
+								}
+								$anans = round($anans, $reqdecimals);
+							}
 							if (isset($reqsigfigs)) {
 								if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
 									$correct += 1; $foundloc = $j; break 2;

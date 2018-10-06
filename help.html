@@ -2660,9 +2660,15 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$reqdecimals = a number </dt>
-	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	<dd>Defines the minimum decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
-	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+	will be used (even if it doesn't agree with the $reqdecimal setting).<br/><br/>
+	$reqdecimals = "=2" can be used to require exactly 2 decimal places in the answer, regardless of how the value rounds (so 3.5 would get marked
+	wrong when the answer is 3.50 if "=2" is used).  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
+	<br/>When the "=2" form is used, it overrides both $reltolerance and $abstolerance, and by default tests that the student answer exactly matches
+	the correct answer ($abstolerance=0).  To override the tolerance use +- in the setting, like this:
+	<br/>$reqdecimals = "=2+-.01" checks for exactly 2 decimals, but allows the answer to have an absolute error of .01
+	<br/>$reqdecimals = "=2+-1%" checks for exactly 2 decimals, but allows the answer to have an relative error of 1% (equivalent to $relatolerance = .01)</dd>
 <dt>$reqsigfigs = a number </dt>
 	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
