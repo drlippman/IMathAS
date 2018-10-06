@@ -1686,7 +1686,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					}
 				}
 				if ($allowregen && $qi[$questions[$last]]['allowregen']==1) {
-					echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;regen=$last\">", _('Try another similar question'), "</a></p>\n";
+					$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=shownext&amp;to=$last&amp;regen=$last";
+					echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+					//echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;regen=$last\">", _('Try another similar question'), "</a></p>\n";
 				}
 				//show next
 				unset($toshow);
@@ -1813,7 +1815,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					if ($reattemptsremain && !$immediatereattempt && $reattemptduring) {
 						echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">", _('Reattempt last question'), "</a>, ";
 					}
-					echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a>";
+					$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=skip&amp;to=$qn&amp;regen=$qn";
+					echo '<button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button>';
+					//echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a>";
 					if ($immediatereattempt) {
 						echo _(", reattempt last question below, or select another question.");
 					} else {
@@ -1965,7 +1969,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						$reattemptsremain = true;
 					}
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
-						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">", _('Try another similar question'), "</a></p>\n";
+						$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=skip&amp;to=$next&amp;regen=$next";
+						echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+						//echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">", _('Try another similar question'), "</a></p>\n";
 					}
 					if ($lefttodo == 0 && $testsettings['testtype']!="NoScores") {
 						echo "<a href=\"showtest.php?action=skip&amp;done=true\">", _('When you are done, click here to see a summary of your score'), "</a>\n";
@@ -2049,7 +2055,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					}
 				}
 				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-					echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a></p>\n";
+					$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=seq&amp;to=$qn&amp;regen=$qn";
+					echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+					//echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a></p>\n";
 				}
 				unset($toshow);
 				if (canimprove($qn) && $showeachscore) {
@@ -2254,7 +2262,10 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 			}
 			if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-				echo "<p><a href=\"showtest.php?regen=$qn&page=$page#embedqwrapper$qn\">", _('Try another similar question'), "</a></p>\n";
+				$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$qn&amp;page=$page&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$qn";
+				echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+					
+				//echo "<p><a href=\"showtest.php?regen=$qn&page=$page#embedqwrapper$qn\">", _('Try another similar question'), "</a></p>\n";
 			}
 			if (hasreattempts($qn)) {
 				if ($divopen) { echo '</div>';}
@@ -2897,7 +2908,10 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						echo '<div class="prequestion">';
 						echo "<p>", _('No attempts remain on this problem.'), "</p>";
 						if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
-							echo "<p><a href=\"showtest.php?regen=$i#embedqwrapper$i\">", _('Try another similar question'), "</a></p>\n";
+							$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$i&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$i";
+							echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+				
+							//echo "<p><a href=\"showtest.php?regen=$i#embedqwrapper$i\">", _('Try another similar question'), "</a></p>\n";
 						}
 						if ($showeachscore) {
 							//TODO i18n
