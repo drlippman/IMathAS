@@ -632,6 +632,8 @@ switch($_GET['action']) {
 			if (isset($_GET['id'])) {
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
 					echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
+					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
 				} else {
 					if ($hasGroupLTI) {
 						echo '<p>Your school may already have a school-wide LTI key and secret established. ';

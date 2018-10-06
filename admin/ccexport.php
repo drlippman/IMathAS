@@ -47,6 +47,8 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	$hasGroupLTI = ($stm->fetchColumn() !== false);
 	if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel']) && $myrights<100) {
 		$groupLTInote = '<p>Your school already has a school-wide LTI key and secret established.  You do not need to set up a course-level configuration.</p>';
+	} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
+		$groupLTInote = '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
 	} else {
 		if ($hasGroupLTI) {
 			$groupLTInote = '<p>It looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
