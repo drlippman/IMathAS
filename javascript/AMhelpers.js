@@ -966,7 +966,16 @@ function AMnumfuncPrepVar(qn,str) {
   }
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
-
+  
+  //Correct rendering when f or g is a variable not a function
+  if (vl.match(/\bf\b/) && !fl.match(/\bf\b/)) {
+  	  dispstr = dispstr.replace(/([^a-zA-Z])f\^([\d\.]+)([^\d\.])/g, "$1f^$2{::}$3");
+  	  dispstr = dispstr.replace(/([^a-zA-Z])f\(/g, "$1f{::}(");
+  }
+  if (vl.match(/\bg\b/) && !fl.match(/\bg\b/)) {
+  	  dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
+  	  dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
+  }
   return [str,dispstr,vars.join("|")];
 }
 
