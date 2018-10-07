@@ -1724,6 +1724,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$sa = '`'.decimaltofraction($answer).'`';
 			} else if (in_array("scinot",$ansformats) || (in_array("scinotordec",$ansformats) && (abs($answer)>1000 || abs($answer)<.001))) {
 				$sa = '`'.makescinot($answer,-1,'*').'`';
+			} else if (is_numeric($answer) && $answer!=0 && abs($answer)<.001 && abs($answer)>1e-9) {
+				$sa = prettysmallnumber($answer);
 			} else {
 				$sa = $answer;
 			}
