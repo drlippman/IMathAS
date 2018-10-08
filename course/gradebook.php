@@ -99,6 +99,7 @@ if ($canviewall) {
 	//Gbmode : Links NC Dates
 	$hidesection = (((floor($gbmode/100000)%10)&1)==1);
 	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
+	$showpercents = (((floor($gbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
 	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
 	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($gbmode/1000)%10)&2) ; //0 bottom, 2 top
@@ -120,6 +121,7 @@ if ($canviewall) {
 	$totonleft = 0;
 	$avgontop = 0;
 	$hidelocked = 0;
+	$showpercents = 0;
 	$lastlogin = false;
 	$includeduedate = false;
 	$includelastchange = false;
@@ -257,10 +259,11 @@ var gbmod = {
 	"availshow": '.Sanitize::onlyInt($availshow).',
 	"hidelocked": '.Sanitize::onlyInt($hidelocked).',
 	"links": '.Sanitize::onlyInt($links).',
+	"pts": '.Sanitize::onlyInt($showpercents).',
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=041218"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=100718"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -407,6 +410,10 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$togglehtml .= '<li class="dropdown-header">'._('Headers').'</li>';
 	$togglehtml .= '<li><a data-hdrs="1">'._('Locked').'</a></li>';
 	$togglehtml .= '<li><a data-hdrs="0">'._('Unlocked').'</a></li>';
+	
+	$togglehtml .= '<li class="dropdown-header">'._('Scores').'</li>';
+	$togglehtml .= '<li><a data-pts="0">'._('Points').'</a></li>';
+	$togglehtml .= '<li><a data-pts="1">'._('Percents').'</a></li>';
 
 	$togglehtml .= '<li class="dropdown-header">'. _('Links'). '</li>';
 	$togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
@@ -498,6 +505,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<script type="text/javascript">
 	$(function() {
 		$("a[data-hdrs='.($headerslocked?1:0).']").parent().addClass("active");
+		$("a[data-pts='.($showpercents?1:0).']").parent().addClass("active");
 		$("a[data-links='.Sanitize::onlyInt($links).']").parent().addClass("active");
 		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
 		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
@@ -1271,7 +1279,7 @@ function gbstudisp($stu) {
 
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
-	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode;
+	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
@@ -1607,11 +1615,17 @@ function gbinstrdisp() {
 						if ($availshow==3) {
 							if ($gbt[$i][0][0]=='Averages') {
 								echo $gbt[$i][2][$j][3].'%';//echo '-';
+							} else if ($showpercents) {
+								if ($gbt[$i][2][$j][4] > 0) {
+									echo round(100*$gbt[$i][2][$j][3]/$gbt[$i][2][$j][4],1).'%';
+								} else {
+									echo '0%';
+								}
 							} else {
 								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
 							}
 						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
+							if (isset($gbt[$i][3][8]) && !$showpercents) { //using points based
 								echo $gbt[$i][2][$j][$availshow];
 							} else {
 								if ($gbt[0][2][$j][3+$availshow]>0) {
@@ -1675,7 +1689,12 @@ function gbinstrdisp() {
 						if ($gbt[$i][1][$j][3]>9) {
 							$gbt[$i][1][$j][3] -= 10;
 						}
-						echo $gbt[$i][1][$j][0];
+
+						if ($showpercents && $gbt[0][1][$j][2]>0) {
+							echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
+						} else {
+							echo $gbt[$i][1][$j][0];
+						}
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						} else if ($gbt[$i][1][$j][3]==2) {
@@ -1733,7 +1752,11 @@ function gbinstrdisp() {
 						}
 					}
 					if (isset($gbt[$i][1][$j][0])) {
-						echo $gbt[$i][1][$j][0];
+						if ($showpercents && $gbt[0][1][$j][2]>0) {
+							echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
+						} else {
+							echo $gbt[$i][1][$j][0];
+						}
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						}
@@ -1756,7 +1779,11 @@ function gbinstrdisp() {
 							$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
 							echo "<span onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\"> ";
-							echo $gbt[$i][1][$j][0];
+							if ($showpercents && $gbt[0][1][$j][2]>0) {
+								echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
+							} else {
+								echo $gbt[$i][1][$j][0];
+							}
 							echo '</span>';
 						}
 						if ($gbt[$i][1][$j][1]==1) {
@@ -1789,7 +1816,11 @@ function gbinstrdisp() {
 						}
 					}
 					if (isset($gbt[$i][1][$j][0])) {
-						echo $gbt[$i][1][$j][0];
+						if ($showpercents && $gbt[0][1][$j][2]>0) {
+							echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
+						} else {
+							echo $gbt[$i][1][$j][0];
+						}
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						}
@@ -1839,11 +1870,17 @@ function gbinstrdisp() {
 						if ($availshow==3) {
 							if ($gbt[$i][0][0]=='Averages') {
 								echo $gbt[$i][2][$j][3].'%';
+							} else if ($showpercents) {
+								if ($gbt[$i][2][$j][4] > 0) {
+									echo round(100*$gbt[$i][2][$j][3]/$gbt[$i][2][$j][4],1).'%';
+								} else {
+									echo '0%';
+								}
 							} else {
 								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
 							}
 						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
+							if (isset($gbt[$i][3][8]) && !$showpercents) { //using points based
 								echo $gbt[$i][2][$j][$availshow];
 							} else {
 								if ($gbt[0][2][$j][3+$availshow]>0) {

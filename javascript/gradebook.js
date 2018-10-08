@@ -39,6 +39,12 @@ $(function() {
 		gbmode += 100*$(this).attr("data-links");;
 		window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
 	});
+	$("a[data-pts]").on("click",function(e) {
+		e.preventDefault();
+		var gbmode = gbmodebase - 400000*gbmod.pts;
+		gbmode += 400000*$(this).attr("data-pts");;
+		window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
+	});
 	$("a[data-pics]").on("click",function(e) {
 		e.preventDefault();
 		var gbmode = gbmodebase - 10000*gbmod.showpics;
