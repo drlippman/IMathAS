@@ -42,6 +42,10 @@ if ($canviewall) {
 		$gbmode = $_GET['gbmode'];
 		$sessiondata[$cid.'gbmode'] = $gbmode;
 		writesessiondata();
+		if (isset($_GET['setgbmodeonly'])) {
+			echo "DONE";
+			exit;
+		}
 	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
@@ -263,7 +267,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=100718"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=100818"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -1615,17 +1619,11 @@ function gbinstrdisp() {
 						if ($availshow==3) {
 							if ($gbt[$i][0][0]=='Averages') {
 								echo $gbt[$i][2][$j][3].'%';//echo '-';
-							} else if ($showpercents) {
-								if ($gbt[$i][2][$j][4] > 0) {
-									echo round(100*$gbt[$i][2][$j][3]/$gbt[$i][2][$j][4],1).'%';
-								} else {
-									echo '0%';
-								}
 							} else {
 								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
 							}
 						} else {
-							if (isset($gbt[$i][3][8]) && !$showpercents) { //using points based
+							if (isset($gbt[$i][3][8])) { //using points based
 								echo $gbt[$i][2][$j][$availshow];
 							} else {
 								if ($gbt[0][2][$j][3+$availshow]>0) {
@@ -1690,11 +1688,8 @@ function gbinstrdisp() {
 							$gbt[$i][1][$j][3] -= 10;
 						}
 
-						if ($showpercents && $gbt[0][1][$j][2]>0) {
-							echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
-						} else {
-							echo $gbt[$i][1][$j][0];
-						}
+						echo $gbt[$i][1][$j][0];
+						
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						} else if ($gbt[$i][1][$j][3]==2) {
@@ -1752,11 +1747,8 @@ function gbinstrdisp() {
 						}
 					}
 					if (isset($gbt[$i][1][$j][0])) {
-						if ($showpercents && $gbt[0][1][$j][2]>0) {
-							echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
-						} else {
-							echo $gbt[$i][1][$j][0];
-						}
+						echo $gbt[$i][1][$j][0];
+						
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						}
@@ -1779,11 +1771,8 @@ function gbinstrdisp() {
 							$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
 							echo "<span onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\"> ";
-							if ($showpercents && $gbt[0][1][$j][2]>0) {
-								echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
-							} else {
-								echo $gbt[$i][1][$j][0];
-							}
+							echo $gbt[$i][1][$j][0];
+							
 							echo '</span>';
 						}
 						if ($gbt[$i][1][$j][1]==1) {
@@ -1816,11 +1805,8 @@ function gbinstrdisp() {
 						}
 					}
 					if (isset($gbt[$i][1][$j][0])) {
-						if ($showpercents && $gbt[0][1][$j][2]>0) {
-							echo round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%';
-						} else {
-							echo $gbt[$i][1][$j][0];
-						}
+						echo $gbt[$i][1][$j][0];
+						
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						}
@@ -1870,17 +1856,11 @@ function gbinstrdisp() {
 						if ($availshow==3) {
 							if ($gbt[$i][0][0]=='Averages') {
 								echo $gbt[$i][2][$j][3].'%';
-							} else if ($showpercents) {
-								if ($gbt[$i][2][$j][4] > 0) {
-									echo round(100*$gbt[$i][2][$j][3]/$gbt[$i][2][$j][4],1).'%';
-								} else {
-									echo '0%';
-								}
 							} else {
 								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
 							}
 						} else {
-							if (isset($gbt[$i][3][8]) && !$showpercents) { //using points based
+							if (isset($gbt[$i][3][8])) { //using points based
 								echo $gbt[$i][2][$j][$availshow];
 							} else {
 								if ($gbt[0][2][$j][3+$availshow]>0) {
