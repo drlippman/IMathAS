@@ -267,7 +267,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=100818"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=100918"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -513,6 +513,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$("a[data-links='.Sanitize::onlyInt($links).']").parent().addClass("active");
 		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
 		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
+		$(setupGBpercents);
 	});
 	</script>';
 

@@ -32,7 +32,7 @@ function chglinktoggle() {
 	gbmode += 100*$("#linktoggle").val();
 	window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
 }
-$(function() {
+function setupGBpercents() {
   var colpts = [];
   $("thead th").each(function(i,el) { 
   	if (p = el.innerHTML.match(/(\d+)(\s*|&nbsp;)pts/)) {
@@ -57,7 +57,7 @@ $(function() {
         text: gbmod.pts==0?p[0]:pct+"%",
         title: gbmod.pts==1?p[0]+"pts":pct+"%"
       }));    
-    } else if (p = el.textContent.match(/^\s*(\d+(\.\d*)?)\s*/)) {
+    } else if (p = el.textContent.match(/^\s*(\d+(\.\d*)?)\s*$/)) {
       var pct = colpts[i%colpts.length]>0?Math.round( 1000*p[1]/colpts[i%colpts.length] )/10:0;
       $(el).empty().append($("<span/>", {
         "data-ptv": p[0],
@@ -67,7 +67,7 @@ $(function() {
       }));  
     }
  });
-});
+};
 $(function() {
 	$("a[data-links]").on("click",function(e) {
 		e.preventDefault();
