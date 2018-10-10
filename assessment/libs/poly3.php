@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed July 25-27, 2018
 // licensed under GPL version 2 or later
 // 
-// File Version : 7
+// File Version : 7.1
 //
 
 global $allowedmacros;
@@ -686,7 +686,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 			}
 		} 		
 		
-		if($quotientPower != NULL) {
+		if(!is_null($quotientPower)) {
 			if($IsFraction){
 				$coefarray = $TableResults[$index][1][1];
 				$coef = $coefarray[0]/$coefarray[1];
@@ -942,6 +942,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 	return $Table;
 }
 
+// File version : 7.1	- Changed ($quotientPower != NULL) to !is_null($quotientPower) - the former would skip constants.
 // File version : 7		- fixed crash when terms were missing or zero - fixed writepoly3 and longdivisionpoly3.
 // File version : 6		- added str_replace() to eliminate space in the formpoly3fromstring,  update the longdivisionpoly3 to use 0 and 1 instead of true 
 //                        and false, as WAMAP treated them as strings.  Added a remainder of 0 when it was.
