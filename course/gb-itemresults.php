@@ -266,7 +266,11 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 		}
 	}
 	$res = array_count_values($res);
-	$restot = max($res);
+	if (count($res)>0) {
+		$restot = max($res);
+	} else {
+		$restot = 1;
+	}
 	if ($part>-1) {echo "Part ".($part+1);}
 	echo '<table class="gridded">';
 	echo '<thead>';

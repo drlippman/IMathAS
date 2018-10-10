@@ -1463,7 +1463,7 @@ function arraytolist($a, $sp=false) {
 	}
 }
 
-function joinarray($a,$s) {
+function joinarray($a,$s=',') {
 	return (implode($s,$a));
 }
 

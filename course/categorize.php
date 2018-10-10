@@ -212,13 +212,15 @@ END;
 			}
 		}
 		if ($ingrp) { echo '</optgroup>';}
-		echo '<optgroup label="Libraries">';
-		foreach ($questionlibs[$qid] as $qlibid) {
-			echo "<option value=\"" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "\" ";
-			if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
-			echo ">" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "</option>\n";
+		if (isset($questionlibs[$qid])) {
+			echo '<optgroup label="Libraries">';
+			foreach ($questionlibs[$qid] as $qlibid) {
+				echo "<option value=\"" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "\" ";
+				if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
+				echo ">" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "</option>\n";
+			}
+			echo '</optgroup>\n';
 		}
-		echo '</optgroup>\n';
 
 		if (isset($qsetidassessment[$qsetids[$qid]])) {
 			echo '<optgroup label="Assessments">';

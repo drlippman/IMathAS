@@ -115,11 +115,13 @@
 							$scores[$loc] = $sv;
 						}
 					}
-					foreach ($grpfeedback[$line['agroupid']] as $loc=>$sv) {
-						if (trim(strip_tags($sv))=='') {
-							unset($feedback["Q".$loc]);
-						} else {
-							$feedback["Q".$loc] = $sv;
+					if (isset($grpfeedback[$line['agroupid']])) {
+						foreach ($grpfeedback[$line['agroupid']] as $loc=>$sv) {
+							if (trim(strip_tags($sv))=='') {
+								unset($feedback["Q".$loc]);
+							} else {
+								$feedback["Q".$loc] = $sv;
+							}
 						}
 					}
 				} else {
@@ -130,11 +132,13 @@
 							$scores[$loc] = $sv;
 						}
 					}
-					foreach ($allfeedbacks[$line['id']] as $loc=>$sv) {
-						if (trim(strip_tags($sv))=='') {
-							unset($feedback["Q".$loc]);
-						} else {
-							$feedback["Q".$loc] = $sv;
+					if (isset($allfeedbacks[$line['id']])) {
+						foreach ($allfeedbacks[$line['id']] as $loc=>$sv) {
+							if (trim(strip_tags($sv))=='') {
+								unset($feedback["Q".$loc]);
+							} else {
+								$feedback["Q".$loc] = $sv;
+							}
 						}
 					}
 					//$feedback = $_POST['feedback-'.$line['id']];

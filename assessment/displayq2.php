@@ -322,7 +322,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 
 	//create hintbuttons
-	if (isset($hints) && $showhints) {
+	if (isset($hints) && is_array($hints) && count($hints)>0 && $showhints) {
 		//$hintkeys = array_keys($hints);
 		//$lastkey = array_pop($hintkeys);
 		$lastkey = max(array_keys($hints));

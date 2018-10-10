@@ -490,6 +490,14 @@ function scorequestion($qn, $rectime=true) {
 	global $regenonreattempt, $sessiondata;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
+	
+	if (!isset($questions[$qn]) || $questions[$qn]===0) {
+		echo "Something went wrong... (TU-SQ1)";
+		return 0;
+	} else if (!isset($qi[$questions[$qn]])) { //shouldn't happen, but we'll deal
+		$qithis = getquestioninfo($questions[$qn], $testsettings);
+		$qi[$questions[$qn]] = $qithis[$questions[$qn]];
+	}
 
 	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$attempts[$qn],$qi[$questions[$qn]]['points']);
 

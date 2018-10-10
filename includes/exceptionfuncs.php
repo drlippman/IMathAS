@@ -13,6 +13,9 @@ class ExceptionFuncs {
 	private $courseenddate = 2000000000;
 
 	function __construct($uid, $cid, $isstu, $latepasses=0, $latepasshrs=24) {
+		if ($latepasshrs==0) {
+			$latepasshrs = 1e-9;
+		}
 		$this->uid = $uid;
 		$this->cid = $cid;
 		$this->latepasses = $latepasses;
@@ -24,6 +27,9 @@ class ExceptionFuncs {
 		$this->latepasses = $lp;
 	}
 	public function setLatepasshrs($lph) {
+		if ($lph==0) {
+			$lph = 1e-9;
+		}
 		$this->latepasshrs = $lph;
 	}
 	

@@ -479,7 +479,7 @@ function AStextInternal($p,$st,$pos,$angle) {
 	}
 }
 
-function ASinitPicture($arg) {
+function ASinitPicture($arg=array()) {
 
 	//$arg = explode(',',$arg);
 	if (isset($arg[0]) && $arg[0]!='') { $this->xmin = $this->evalifneeded($arg[0]);}
@@ -1054,7 +1054,7 @@ function ASslopefield($arg) {
 	for ($x = $x_min; $x<= $this->xmax; $x+= $dx) {
 		for ($y = $y_min; $y<= $this->ymax; $y+= $dy) {
 			$gxy = @$efunc($x,$y);
-			if ($gxy!=null && !is_nan($gxy)) {
+			if ($gxy!=null && !is_infinite($gxy) && !is_nan($gxy)) {
 				if ($gxy===false) {
 					$u = 0; $v = $dz;
 				} else {
@@ -1131,12 +1131,12 @@ function ASplot($function) {
 			if (in_array($t,$avoid)) { continue;}
 			$x = $exfunc($t);
 			$y = $eyfunc($t);
-			if (is_nan($x) || is_nan($y)) { continue; }
+			if (is_infinite($x) || is_infinite($y) || is_nan($x) || is_nan($y)) { continue; }
 		} else {
 			$x = $xmin + $dx*$i;
 			if (in_array($x,$avoid)) { continue;}
 			$y = $efunc($x);
-			if (is_nan($y)) { continue;}
+			if (is_infinite($y) || is_nan($y)) { continue;}
 		}
 		if ($i<2 || $i==$stopat-2) {
 			$fx[$i] = $x;

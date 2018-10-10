@@ -45,8 +45,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$pagetitle = "Confirm Page Contents Delete";
 		}
 	} else if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
+		require_once("../includes/parsedatetime.php");
 		if ($_POST['avail']==1) {
-			require_once("../includes/parsedatetime.php");
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
 			} else {

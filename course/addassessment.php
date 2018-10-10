@@ -729,7 +729,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                         }
                     }
                 }
-                flattenarr($outcomearr);
+                if ($outcomearr !== false) {
+                	flattenarr($outcomearr);
+                }
             }
 
             $page_groupsets = array();
