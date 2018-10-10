@@ -747,15 +747,16 @@ function normalcdf($ztest,$dec=4) {
 		}
 	}
 	$fact = 1;
-	while (abs($ds)>$eps2) {
+	while (abs($ds)>$eps2 && $i<50) {
 		$ds = pow(-1,$i)*pow($z,2.0*$i+1.0)/(pow(2.0,$i)*$fact*(2.0*$i+1.0));
 		$s += $ds;
 		$i++;
 		$fact *= $i;
-		if (abs($s)<$eps && $i>2) {
+		if (abs($s)<$eps && $i>2 && abs($ds)<1) {
 			break;
 		}
 	}
+
 	$s *= 0.3989422804014327;
 	$s = round($s,$dec);
 	if ($ztest > 0) {
