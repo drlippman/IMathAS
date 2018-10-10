@@ -17,7 +17,7 @@
 			$error .= "<p>You must agree to the Terms and Conditions to set up an account</p>";
 		}
 
-		$error .= checkNewUserValidation($extrarequired);
+		$error .= checkNewUserValidation(array_merge($extrarequired, array('SID','firstname','lastname','email','pw1','pw2')));
 
 		if ($error != '') {
 			echo $error;
