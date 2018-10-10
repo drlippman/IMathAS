@@ -1677,7 +1677,11 @@ function gbinstrdisp() {
 						if ($istutor && $gbt[$i][1][$j][4]=='average') {
 
 						} else if ($gbt[$i][1][$j][4]=='average') {
-							$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+							if ($gbt[0][1][$j][2]>0) {
+								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+							} else {
+								$avgtip = '';
+							}
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
 							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
 							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";

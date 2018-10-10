@@ -767,7 +767,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   }
 					   if ($deffb[0]=='NoScores' || $deffb[0]=='EndScore' || $deffb[0]=='EachAtEnd') {
 						   //don't show score 	   
-					   } else {
+					   } else if ($line['ptsposs']>0) {
 						   $scoremsg .= '. '._('Score: ').round(100*$line['ptsearned']/$line['ptsposs'],1).'%';
 					   }
 				   } else {

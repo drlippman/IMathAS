@@ -767,6 +767,9 @@ function showarrays() {
 		if ($alist[2*$i]!='') {
 			$hashdr = true;
 		}
+		if (!is_array($alist[2*$i+1])) {
+			$alist[2*$i+1] = explode(',', $alist[2*$i+1]);
+		}
 		if (count($alist[2*$i+1])>$maxlength) {
 			$maxlength = count($alist[2*$i+1]);
 		}
@@ -838,6 +841,9 @@ function horizshowarrays() {
 
 	$maxlength = 0;
 	for ($i=0; $i<count($alist)/2; $i++) {
+		if (!is_array($alist[2*$i+1])) {
+			$alist[2*$i+1] = explode(',', $alist[2*$i+1]);
+		}
 		if (count($alist[2*$i+1])>$maxlength) {
 			$maxlength = count($alist[2*$i+1]);
 		}
@@ -1720,7 +1726,7 @@ function unionarrays($a1,$a2) {
 function prettyint($n) {
 	return number_format($n);
 }
-function prettyreal($n,$d,$comma=',') {
+function prettyreal($n,$d=0,$comma=',') {
 	return number_format($n,$d,'.',$comma);
 }
 function prettysmallnumber($n) {
