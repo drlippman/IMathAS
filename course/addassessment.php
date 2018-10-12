@@ -294,7 +294,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
             }
 
-            if ($_POST['isgroup']>0 && isset($grpsetid) && $grpsetid==0) {
+            if ($_POST['isgroup']>0 && isset($_POST['groupsetid']) && $grpsetid==0) {
                 //create new groupset
                 $stm = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
                 $stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$assessName));
