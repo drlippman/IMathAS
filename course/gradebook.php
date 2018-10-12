@@ -1008,7 +1008,8 @@ function gbstudisp($stu) {
 			}
 			if ($stu>0) {
 				if ($includeduedate) {
-					if ($gbt[0][1][$i][11]<2000000000) {
+					if ($gbt[0][1][$i][6]!=1 &&  //skip offline
+						$gbt[0][1][$i][11]<2000000000 && $gbt[0][1][$i][11]>0) {
 						echo '<td>'.tzdate('n/j/y g:ia',$gbt[0][1][$i][11]);
 					} else {
 						echo '<td>-';
