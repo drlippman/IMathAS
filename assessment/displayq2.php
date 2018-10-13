@@ -1746,6 +1746,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
 		}
 		if (isset($answersize)) {
+			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
+			$shorttip = _('Enter an integer or decimal number');
+			if (isset($reqdecimals)) {
+				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
+				$shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);
+			}
 			if (!isset($sz)) { $sz = 3;}
 			if ($colorbox=='') {
 				$out .= '<table id="qnwrap'.$qn.'">';
@@ -1760,7 +1766,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			for ($row=0; $row<$answersize[0]; $row++) {
 				$out .= "<tr>";
 				for ($col=0; $col<$answersize[1]; $col++) {
-					$out .= "<td><input class=\"text\" type=\"text\" size=\"$sz\" name=\"qn$qn-$count\" value=\"".Sanitize::encodeStringForDisplay($las[$count])."\"  autocomplete=\"off\" /></td>\n";
+					$out .= "<td><input class=\"text\" type=\"text\" size=\"$sz\" name=\"qn$qn-$count\" id=\"qn$qn-$count\" value=\"".Sanitize::encodeStringForDisplay($las[$count])."\"  autocomplete=\"off\" ";
+					if ($showtips==2) {
+						if ($multi==0) {
+							$qnref = "$qn-0";
+						} else {
+							$qnref = ($multi-1).'-'.($qn%1000);
+						}
+						$out .= "onfocus=\"showehdd('qn$qn-$count','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn-$count')\" ";
+					}
+					$out .= "/></td>\n";
 					$count++;
 				}
 				$out .= "</tr>";
@@ -1768,10 +1783,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "</table>\n";
 			$out .= getcolormark($colorbox);
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
-			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
-			if (isset($reqdecimals)) {
-				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
-			}
+			
 		} else {
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1821,6 +1833,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
 		}
 		if (isset($answersize)) {
+			list($tip,$shorttip) = formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix',false,true);
+			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
+
 			if (!isset($sz)) { $sz = 3;}
 			$answersize = explode(",",$answersize);
 			if ($colorbox=='') {
@@ -1835,7 +1850,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			for ($row=0; $row<$answersize[0]; $row++) {
 				$out .= "<tr>";
 				for ($col=0; $col<$answersize[1]; $col++) {
-					$out .= "<td><input class=\"text\" type=\"text\" size=\"$sz\" name=\"qn$qn-$count\" id=\"qn$qn-$count\" value=\"".Sanitize::encodeStringForDisplay($las[$count])."\" autocomplete=\"off\" /></td>\n";
+					$out .= "<td><input class=\"text\" type=\"text\" size=\"$sz\" name=\"qn$qn-$count\" id=\"qn$qn-$count\" value=\"".Sanitize::encodeStringForDisplay($las[$count])."\" autocomplete=\"off\" ";
+					if ($showtips==2) {
+						if ($multi==0) {
+							$qnref = "$qn-0";
+						} else {
+							$qnref = ($multi-1).'-'.($qn%1000);
+						}
+						$out .= "onfocus=\"showehdd('qn$qn-$count','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn-$count')\" ";
+					}
+					$out .= "/></td>\n";
 					$count++;
 				}
 				$out .= "</tr>";
@@ -1846,8 +1870,6 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (!isset($hidepreview)) {$preview .= "<input type=button id=\"pbtn$qn\" class=btn value=\"" . _('Preview') . "\" onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
 			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
-			$tip .= formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix');
-			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
 			if ($multi==0) {
 				$qnref = "$qn-0";
