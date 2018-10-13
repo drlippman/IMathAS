@@ -742,7 +742,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   if ($nothidden) {
 					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if (round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+					   	   if ($line['reqscoreptsposs']>0 && 
+					   	   	   round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
 							   $nothidden = false;
 						   }
 					   } else { //points based
