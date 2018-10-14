@@ -1233,14 +1233,14 @@ switch($_GET['action']) {
 		if ($from=='admin2') {
 			echo '<tr class="even"><td><a href="admin2.php?groupdetails=0">'._('Default Group').'</a></td><td></td><td></td></tr>';
 		}
-		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
+		$stm = $DBH->query("SELECT ig.id,ig.name,COUNT(iu.id) as ucnt FROM imas_groups AS ig LEFT JOIN imas_users AS iu ON ig.id=iu.groupid GROUP BY ig.id ORDER BY ig.name");
 		$alt = 1;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($alt==0) {echo "<tr class=\"even\">"; $alt=1;} else {echo "<tr class=\"odd\">"; $alt=0;}
 			if ($from=='admin2') {
-				echo '<td><a href="admin2.php?groupdetails='.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</a></td>';
+				echo '<td><a href="admin2.php?groupdetails='.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</a> ('.Sanitize::onlyInt($row[2]).')</td>';
 			} else {
-				echo "<td>".Sanitize::encodeStringForDisplay($row[1])."</td>";
+				echo "<td>".Sanitize::encodeStringForDisplay($row[1]).' ('.Sanitize::onlyInt($row[2]).')</td>';
 			}
 			printf("<td><a href=\"forms.php?action=modgroup&id=%s\">Modify</a></td>\n",
 				Sanitize::encodeUrlParam($row[0]));
