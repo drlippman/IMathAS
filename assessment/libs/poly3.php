@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed July 25-27, 2018
 // licensed under GPL version 2 or later
 // 
-// File Version : 7.1
+// File Version : 7.2
 //
 
 global $allowedmacros;
@@ -482,7 +482,10 @@ function poly3_dividefractions($dividendstart, $divisor) {
 	for($i = $power; $i >=$divisorposition; $i--){
 		$dividend = $results[$resultindex][0];
 		$dividendposition = count($dividend)-1;
-		if($dividendposition ==-1) {
+		
+		if($dividendposition <$i) {
+            // fixed bug 2018-10-14
+            // divisor power is greater then the dividend power
 			// position is suppose to be a zero
 			$results[$resultindex][0][0] = array(0,1);
 			$dividend = array(0,1);
@@ -525,11 +528,17 @@ function poly3_dividedecimal($dividendstart, $divisor) {
 	for($i = $power; $i >=$divisorposition; $i--){
 		$dividend = $results[$resultindex][0];
 		$dividendposition = count($dividend)-1;
-		if($dividend[$dividendposition]==0) {
+		
+		if($dividend[$dividendposition] < $i) {
+			// divisor power is greater then the dividend power			
 			// position is suppose to be a zero
 			$results[$resultindex][0] = 0;
 			$dividend = 0;
 			$dividendposition = 0;
+		}
+		
+		if($dividend[$dividendposition][0]==0) {
+			// nothing to do - skip a zero entry
 		}
 		else {
 			$quotientposition = $i-$divisorposition;
@@ -942,6 +951,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 	return $Table;
 }
 
+// File version : 7.2	- Bug in the divide fraction routine were I was not stopping when the divisor had a greater powere then the dividend.
 // File version : 7.1	- Changed ($quotientPower != NULL) to !is_null($quotientPower) - the former would skip constants.
 // File version : 7		- fixed crash when terms were missing or zero - fixed writepoly3 and longdivisionpoly3.
 // File version : 6		- added str_replace() to eliminate space in the formpoly3fromstring,  update the longdivisionpoly3 to use 0 and 1 instead of true 
