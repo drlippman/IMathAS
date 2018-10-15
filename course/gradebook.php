@@ -14,6 +14,7 @@
 //   exceptions
 
 // TODO:
+//	Rewrite stu disp based on revamped gbtable2
 
 
 
@@ -1075,66 +1076,66 @@ function gbstudisp($stu) {
 					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}
 				echo '</td>';
-				if (($show&1)==1) {
+				if (($show&1)==1) { //past
 					echo '<td>';
-					//show points if not averaging or if points possible scoring
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][0]).'/'.Sanitize::onlyFloat($gbt[0][2][$i][3]).' (';
-					}
-					if ($gbt[0][2][$i][3]>0) {
-						echo round(100*$gbt[1][2][$i][0]/$gbt[0][2][$i][3],1).'%';
-					} else {
-						echo '0%';
-					}
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo ')</td>';
-					} else {
-						echo '</td>';
-					}
-				}
-				if (($show&2)==2) {
-					echo '<td>';
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][3]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][4]).' (';
+					//show points if not averaging percents and in points-based mode
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
+						echo Sanitize::onlyFloat($gbt[1][2][$i][0]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][4]).' (';
 					}
 					if ($gbt[1][2][$i][4]>0) {
-						echo round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][4],1).'%';
+						echo round(100*$gbt[1][2][$i][0]/$gbt[1][2][$i][4],1).'%';
 					} else {
 						echo '0%';
 					}
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
 						echo ')</td>';
 					} else {
 						echo '</td>';
 					}
 				}
-				if (($show&4)==4) {
+				if (($show&2)==2) { //past and attempted
 					echo '<td>';
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][1]).'/'.Sanitize::onlyFloat($gbt[0][2][$i][4]).' (';
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
+						echo Sanitize::onlyFloat($gbt[1][2][$i][3]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][7]).' (';
 					}
-					if ($gbt[0][2][$i][4]>0) {
-						echo round(100*$gbt[1][2][$i][1]/$gbt[0][2][$i][4],1).'%';
+					if ($gbt[1][2][$i][7]>0) {
+						echo round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][7],1).'%';
 					} else {
 						echo '0%';
 					}
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
 						echo ')</td>';
 					} else {
 						echo '</td>';
 					}
 				}
-				if (($show&8)==8) {
+				if (($show&4)==4) { //past and avail
 					echo '<td>';
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[0][2][$i][5]).' (';
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
+						echo Sanitize::onlyFloat($gbt[1][2][$i][1]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][5]).' (';
 					}
-					if ($gbt[0][2][$i][5]>0) {
-						echo round(100*$gbt[1][2][$i][2]/$gbt[0][2][$i][5],1).'%';
+					if ($gbt[1][2][$i][5]>0) {
+						echo round(100*$gbt[1][2][$i][1]/$gbt[1][2][$i][5],1).'%';
+					} else {                          
+						echo '0%';
+					}
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
+						echo ')</td>';
+					} else {
+						echo '</td>';
+					}
+				}
+				if (($show&8)==8) { //all
+					echo '<td>';
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
+						echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).' (';
+					}
+					if ($gbt[1][2][$i][6]>0) {
+						echo round(100*$gbt[1][2][$i][2]/$gbt[1][2][$i][6],1).'%';
 					} else {
 						echo '0%';
 					}
-					if ($gbt[0][2][$i][13]==0 || isset($gbt[0][3][0])) {
+					if ($gbt[0][2][$i][13]==0 && $gbt[0][4][0]==0) {
 						echo ')</td>';
 					} else {
 						echo '</td>';
@@ -1147,32 +1148,36 @@ function gbstudisp($stu) {
 		//Totals
 		if ($catfilter<0) {
 			echo '<tr class="grid">';
-			if (isset($gbt[0][3][0])) { //using points based
+			if ($gbt[0][4][0]==0) { //using points based
 				echo '<td>', _('Total'), '</td>';
 				if (($show&1)==1) {
-					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'/'.Sanitize::onlyFloat($gbt[0][3][0]).' ('.Sanitize::onlyFloat($gbt[1][3][3]).'%)</td>';
+					$pct = round(100*$gbt[1][3][0]/$gbt[1][3][4], 1);
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'/'.Sanitize::onlyFloat($gbt[0][3][4]).' ('.$pct.'%)</td>';
 				}
 				if (($show&2)==2) {
-					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][6]).'/'.Sanitize::onlyFloat($gbt[1][3][7]).' ('.Sanitize::onlyFloat($gbt[1][3][8]).'%)</td>';
+					$pct = round(100*$gbt[1][3][3]/$gbt[1][3][7], 1);
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][3]).'/'.Sanitize::onlyFloat($gbt[1][3][7]).' ('.$pct.'%)</td>';
 				}
 				if (($show&4)==4) {
-					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'/'.Sanitize::onlyFloat($gbt[0][3][1]).' ('.Sanitize::onlyFloat($gbt[1][3][4]).'%)</td>';
+					$pct = round(100*$gbt[1][3][1]/$gbt[1][3][5], 1);
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'/'.Sanitize::onlyFloat($gbt[0][3][5]).' ('.$pct.'%)</td>';
 				}
 				if (($show&8)==8) {
-					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'/'.Sanitize::onlyFloat($gbt[0][3][2]).' ('.Sanitize::onlyFloat($gbt[1][3][5]).'%)</td>';
+					$pct = round(100*$gbt[1][3][2]/$gbt[1][3][6], 1);
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'/'.Sanitize::onlyFloat($gbt[0][3][6]).' ('.$pct.'%)</td>';
 				}
 
 			} else {
 				echo '<td>', _('Weighted Total'), '</td>';
-				if (($show&1)==1) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'%</td>';}
-				if (($show&2)==2) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][6]).'%</td>';}
-				if (($show&4)==4) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'%</td>';}
-				if (($show&8)==8) {echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'%</td>';}
+				if (($show&1)==1) {echo '<td>'.round(100*$gbt[1][3][0]/$gbt[1][3][4], 1).'%</td>';}
+				if (($show&2)==2) {echo '<td>'.round(100*$gbt[1][3][3]/$gbt[1][3][7], 1).'%</td>';}
+				if (($show&4)==4) {echo '<td>'.round(100*$gbt[1][3][1]/$gbt[1][3][5], 1).'%</td>';}
+				if (($show&8)==8) {echo '<td>'.round(100*$gbt[1][3][2]/$gbt[1][3][6], 1).'%</td>';}
 			}
 			echo '</tr>';
 			/*if ($availshow==2) {
 				echo '<tr class="grid">';
-				if (isset($gbt[0][3][0])) { //using points based
+				if ($gbt[0][4][0]==0) { //using points based
 					echo '<td>Total All</td>';
 					echo '<td>'.$gbt[0][3][2].'&nbsp;pts</td>';
 					echo '<td>'.$gbt[1][3][2].'</td>';
@@ -1189,7 +1194,7 @@ function gbstudisp($stu) {
 				echo '</tr>';
 			}
 			echo '<tr class="grid">';
-			if (isset($gbt[0][3][0])) { //using points based
+			if ($gbt[0][4][0]==0) { //using points based
 				echo '<td>Total Past & Current</td>';
 				echo '<td>'.$gbt[0][3][1].'&nbsp;pts</td>';
 				echo '<td>'.$gbt[1][3][1].'</td>';
@@ -1206,7 +1211,7 @@ function gbstudisp($stu) {
 			}
 			echo '</tr>';
 			echo '<tr class="grid">';
-			if (isset($gbt[0][3][0])) { //using points based
+			if ($gbt[0][4][0]==0) { //using points based
 				echo '<td>Total Past Due</td>';
 				echo '<td>'.$gbt[0][3][0].'&nbsp;pts</td>';
 				echo '<td>'.$gbt[1][3][0].'</td>';
@@ -1225,7 +1230,7 @@ function gbstudisp($stu) {
 
 			echo '</tr>';
 			echo '<tr class="grid">';
-			if (isset($gbt[0][3][0])) { //using points based
+			if ($gbt[0][4][0]==0) { //using points based
 				echo '<td>Total Past &amp; Attempted</td>';
 				echo '<td>'.$gbt[1][3][7].'&nbsp;pts</td>';
 				echo '<td>'.$gbt[1][3][6].'</td>';
@@ -1363,7 +1368,7 @@ function gbinstrdisp() {
 	if ($totonleft && !$hidepast) {
 		//total totals
 		if ($catfilter<0) {
-			if (isset($gbt[0][3][0])) { //using points based
+			if ($gbt[0][4][0]==0) { //using points based
 				if ($availshow<3) {
 					echo '<th><div><span class="cattothdr">', _('Total'), '<br/>'.$gbt[0][3][$availshow].'&nbsp;', _('pts'), '</span></div></th>';
 				} else {
@@ -1386,7 +1391,7 @@ function gbinstrdisp() {
 				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
-					if (isset($gbt[0][3][0])) { //using points based
+					if ($gbt[0][4][0]==0) { //using points based
 						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
 					} else {
 						echo $gbt[0][2][$i][11].'%';
@@ -1483,7 +1488,7 @@ function gbinstrdisp() {
 				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 				if ($availshow<3) {
 					echo $gbt[0][2][$i][0].'<br/>';
-					if (isset($gbt[0][3][0])) { //using points based
+					if ($gbt[0][4][0]==0) { //using points based
 						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
 					} else {
 						echo $gbt[0][2][$i][11].'%';
@@ -1502,7 +1507,7 @@ function gbinstrdisp() {
 		}
 		//total totals
 		if ($catfilter<0) {
-			if (isset($gbt[0][3][0])) { //using points based
+			if ($gbt[0][4][0]==0) { //using points based
 				if ($availshow<3) {
 					echo '<th><div><span class="cattothdr">', _('Total'), '<br/>'.$gbt[0][3][$availshow].'&nbsp;', _('pts'), '</span></div></th>';
 				} else {
@@ -1555,39 +1560,44 @@ function gbinstrdisp() {
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
 			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
 		}
-
+		//TODO: Copy for totonright, or find a way to consolidate code
 		if ($totonleft && !$hidepast) {
 			//total totals
 			if ($catfilter<0) {
 				$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
-				if ($availshow==3) {
+				if ($gbt[$i][3][4+$availshow]>0) {
+					$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
+				} else {
+					$pct = 0;
+				}
+				if ($availshow==3 || $gbt[0][4][0]==0) { //attempted or using points based
 					if ($gbt[$i][0][0]=='Averages') {
-						if (isset($gbt[$i][3][8])) { //using points based
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
+						if ($gbt[0][4][0]==0) { //using points based
+							echo '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
 						}
-						echo '<td class="c">'.$insdiv.$fivenum.$gbt[$i][3][6].'%</span>'.$enddiv .'</td>';
+						echo '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
 					} else {
-						if (isset($gbt[$i][3][8])) { //using points based
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
+						if ($gbt[0][4][0]==0) { //using points based
+							echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'/'.$gbt[$i][3][4+$availshow].$enddiv.'</td>';
+							echo '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
 
 						} else {
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
+							echo '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
 						}
 					}
 				} else {
-					if (isset($gbt[0][3][0])) { //using points based
+					if ($gbt[0][4][0]==0) { //using points based
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
 						if ($gbt[$i][0][0]=='Averages') {
-							echo '<td class="c">'.$insdiv.$fivenum.$gbt[$i][3][$availshow+3] .'%</span>'.$enddiv .'</td>';
+							echo '<td class="c">'.$insdiv.$fivenum.$pct .'%</span>'.$enddiv .'</td>';
 						} else {
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow+3] .'%'.$enddiv .'</td>';
+							echo '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
 						}
 					} else {
 						if ($gbt[$i][0][0]=='Averages') {
-							echo '<td class="c">'.$insdiv.$fivenum.$gbt[$i][3][$availshow].'%</span>'.$enddiv .'</td>';
+							echo '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
 						} else {
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'%'.$enddiv .'</td>';
+							echo '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
 						}
 					}
 				}
@@ -1600,13 +1610,24 @@ function gbinstrdisp() {
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 						continue;
 					}
+					if ($gbt[$i][2][$j][4+$availshow]>0) {
+						$pct = round(100*$gbt[$i][2][$j][$availshow]/$gbt[$i][2][$j][4+$availshow],1);
+					} else {
+						$pct = 0;
+					}
 					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
 						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
 						echo '<td class="c">'.$insdiv;
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
 							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
-						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
+						if ($gbt[$i][0][0]=='Averages') {
+							echo $gbt[$i][2][$j][$availshow].'%';
+						} else if ($gbt[0][2][$j][13]==0) { //w/o percent scaling
+							echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow].' ('.$pct.'%)';
+						} else {
+							echo $pct.'%';
+						}
 
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
 							echo '</span>';
@@ -1618,22 +1639,14 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
 							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
-						if ($availshow==3) {
+						if ($availshow==3 || ($gbt[0][4][0]==0 && $gbt[0][2][$j][13]==0)) {  //attempted or points based w/o percent scaling
 							if ($gbt[$i][0][0]=='Averages') {
-								echo $gbt[$i][2][$j][3].'%';//echo '-';
+								echo $gbt[$i][2][$j][$availshow].'%';//echo '-';
 							} else {
-								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
+								echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
 							}
 						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
-								echo $gbt[$i][2][$j][$availshow];
-							} else {
-								if ($gbt[0][2][$j][3+$availshow]>0) {
-									echo round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
-								} else {
-									echo '0%';
-								}
-							}
+							echo $pct.'%';
 						}
 						if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
 							echo '</span>';
@@ -1916,7 +1929,7 @@ function gbinstrdisp() {
 						}
 					}
 				} else {
-					if (isset($gbt[0][3][0])) { //using points based
+					if ($gbt[0][4][0]==0) { //using points based
 						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '<td class="c">'.$insdiv.$fivenum.$gbt[$i][3][$availshow+3] .'%</span>'.$enddiv .'</td>';

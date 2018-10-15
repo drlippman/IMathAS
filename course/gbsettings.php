@@ -201,8 +201,8 @@
 		$("select:disabled").prop("disabled",false);
 	}
 	function calctypechange(id,val) {
-		$("#calctype"+id).val(val);
-		$("#calctype"+id).prop("disabled", val>0);
+		//$("#calctype"+id).val(val);
+		//$("#calctype"+id).prop("disabled", val>0);
 	}
 
 	</script>';
@@ -443,7 +443,7 @@
 		echo "\"/>%</td>";
 		echo "<td>";
 		echo 'Calc total: <select name="calctype['.$id.']" id="calctype'.$id.'" ';
-		if ($row['dropn']!=0) { echo 'disabled="true"';}
+		//if ($row['dropn']!=0) { echo 'disabled="true"';}
 		echo '><option value="0" ';
 		if ($row['calctype']==0) {echo 'selected="selected"';}
 		echo '>point total</option><option value="1" ';
