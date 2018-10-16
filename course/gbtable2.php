@@ -2,11 +2,6 @@
 //IMathAS: gradebook table generating function
 //(c) 2007 David Lippman
 
-/*
-TODO:
- - Fix 5-number summary to use percents
- 
-*/
 
 require_once("../includes/exceptionfuncs.php");
 
@@ -99,6 +94,7 @@ row[0][2][0][10] = gbcat id
 row[0][2][0][11] = category weight (if weighted grades)
 row[0][2][0][12] = default show (0 expanded, 2 collapsed)
 row[0][2][0][13] = calctype
+row[0][2][0][14] = hasdrops
 
 row[0][3][0] = total possible past
 row[0][3][1] = total possible past&current
@@ -1466,30 +1462,31 @@ function gbtable() {
 		$catpossattempted[$cat] = $catposscur[$cat];  //a copy of the current for later use with attempted
 		$catpossattemptedec[$cat] = $catposscurec[$cat];
 
-		/* don't drop now - we'll drop for each student later
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposspast[$cat])) { //if drop is set and have enough items
 			asort($catposspast[$cat],SORT_NUMERIC);
-			$catposspast[$cat] = array_slice($catposspast[$cat],$cats[$cat][4]);
+			$gb[0][2][$pos][3] = array_sum(array_slice($catposspast[$cat],$cats[$cat][4]));
+		} else {
+			$gb[0][2][$pos][3] = array_sum($catposspast[$cat]);
 		}
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposscur[$cat])) { //same for past&current
 			asort($catposscur[$cat],SORT_NUMERIC);
-			$catposscur[$cat] = array_slice($catposscur[$cat],$cats[$cat][4]);
+			$gb[0][2][$pos][4] = array_sum(array_slice($catposscur[$cat],$cats[$cat][4]));
+		} else {
+			$gb[0][2][$pos][4] = array_sum($catposscur[$cat]);
 		}
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catpossfuture[$cat])) { //same for all items
 			asort($catpossfuture[$cat],SORT_NUMERIC);
-			$catpossfuture[$cat] = array_slice($catpossfuture[$cat],$cats[$cat][4]);
+			$gb[0][2][$pos][5] = array_sum(array_slice($catpossfuture[$cat],$cats[$cat][4]));
+		} else {
+			$gb[0][2][$pos][5] = array_sum($catpossfuture[$cat]);
 		}
-		
-		$catposspast[$cat] = array_sum($catposspast[$cat]);
-		$catposscur[$cat] = array_sum($catposscur[$cat]);
-		$catpossfuture[$cat] = array_sum($catpossfuture[$cat]);
-		*/
 
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][8];
 		$gb[0][2][$pos][10] = $cat;
 		$gb[0][2][$pos][12] = $cats[$cat][6];
 		$gb[0][2][$pos][13] = $cats[$cat][7];
+		$gb[0][2][$pos][14] = ($cats[$cat][4]!=0);
 		if ($catposspast[$cat]>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];
@@ -1521,10 +1518,6 @@ function gbtable() {
 			} else {
 				$gb[0][2][$pos][5] = 0; //fix to 0 if no scores in future yet
 			}
-		} else {
-			$gb[0][2][$pos][3] = array_sum($catposspast[$cat]);
-			$gb[0][2][$pos][4] = array_sum($catposscur[$cat]);
-			$gb[0][2][$pos][5] = array_sum($catpossfuture[$cat]);
 		}
 		if ($useweights==1) {
 			$gb[0][2][$pos][11] = $cats[$cat][5];
@@ -1544,6 +1537,11 @@ function gbtable() {
 		$gb[0][3][2] = $overallptsfuture;
 	}
 
+	$catposs = array();
+	$catposs[0] = $catposspast;
+	$catposs[1] = $catposscur;
+	$catposs[2] = $catpossfuture;
+	
 	//create category totals
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals
 
@@ -1654,23 +1652,34 @@ function gbtable() {
 							} else {  //doing drop n
 								$ntodrop = $cats[$cat][4];// - ($catitemcntattempted[$cat]-count($cattotstu[$stype][$cat]));
 							}
+							//adjust for missing assignments - shouldn't happen since zero'ed out?
+							if (count($cattotstu[$stype][$cat])<count($catpossstu[$stype][$cat])) {
+								$ntodrop -= (count($catpossstu[$stype][$cat]) - count($cattotstu[$stype][$cat]));
+							}
 	
 							if ($ntodrop>0) {
-								//this will drop the ones with the lowest scores, which may not be the most beneficial
-								//TODO: come up with a better decision algorithm
-								asort($cattotstu[$stype][$cat],SORT_NUMERIC);
-								$ndropcnt = 0;
+								//this will figure out how much dropping each score will help the grade
+								//then drop the one(s) that help the most
+								$dropbenefit = array();
+								$predroptot = array_sum($cattotstu[$stype][$cat]);
+								$predropposs = array_sum($catpossstu[$stype][$cat]);
 								foreach ($cattotstu[$stype][$cat] as $col=>$v) {
-									$gb[$ln][1][$col][5] += pow(2,$stype);// 8; //mark as dropped
+									if ($catpossstu[$stype][$cat][$col] < $predropposs) {
+										$dropbenefit[$col] = ($predroptot*$catpossstu[$stype][$cat][$col] - $predropposs*$v)/($predropposs*($predropposs-$catpossstu[$stype][$cat][$col]));
+									} else {
+										$dropbenefit[$col] = 0;
+									}
+								}
+								arsort($dropbenefit, SORT_NUMERIC);
+								$ndropcnt = 0;
+								foreach ($dropbenefit as $col=>$v) {
+									$gb[$ln][1][$col][5] += pow(2,$stype); //mark as dropped
 									unset($catpossstu[$stype][$cat][$col]); //remove from category possible
+									unset($cattotstu[$stype][$cat][$col]); //remove from category total
 									$ndropcnt++;
 									if ($ndropcnt==$ntodrop) { break;}
 								}
 							}
-							while (count($cattotstu[$stype][$cat])<count($catpossstu[$stype][$cat])) { //fill in 0's for missing assignments
-								array_unshift($cattotstu[$stype][$cat],0);
-							}
-							$cattotstu[$stype][$cat] = array_slice($cattotstu[$stype][$cat],$cats[$cat][4]);
 						}
 						$cattotstu[$stype][$cat] = array_sum($cattotstu[$stype][$cat]);
 						if (isset($cattotstuec[$stype][$cat])) {
@@ -1791,96 +1800,100 @@ function gbtable() {
 		//cat avgs
 		$catavgs = array();
 		for ($j=0;$j<count($gb[0][2]);$j++) { //category headers
-			$catavgs[$j][0] = array();
-			$catavgs[$j][1] = array();
-			$catavgs[$j][2] = array();
-			$catavgs[$j][3] = array();
+			$catavgs[0] = array();
+			$catavgs[1] = array();
+			$catavgs[2] = array();
+			$catavgs[3] = array();
 			for ($i=1;$i<$ln;$i++) { //foreach student
-				if ($gb[$i][4][1]==0) {
-					$catavgs[$j][0][] = $gb[$i][2][$j][0];
-					$catavgs[$j][1][] = $gb[$i][2][$j][1];
-					$catavgs[$j][2][] = $gb[$i][2][$j][2];
-					if ($gb[$i][2][$j][4]>0) {
-						$catavgs[$j][3][] = round(100*$gb[$i][2][$j][3]/$gb[$i][2][$j][4],1);
-					} else {
-						//$catavgs[$j][3][] = 0;
+				if ($gb[$i][4][1]==0) { //if not locked
+					for ($k=0;$k<4;$k++) {
+						if ($k<3 && $gb[0][2][$j][13]==0 && $gb[0][2][$j][14]==0) {
+							//if not averaged percents, and no drops
+							$catavgs[$k][] = $gb[$i][2][$j][$k];
+						} else if ($gb[$i][2][$j][4+$k]>0) {
+							$catavgs[$k][] = round(100*$gb[$i][2][$j][$k]/$gb[$i][2][$j][4+$k],1);
+						}
 					}
 				}
 			}
 			for ($i=0; $i<4; $i++) {
-				if (count($catavgs[$j][$i])>0) {
-					sort($catavgs[$j][$i], SORT_NUMERIC);
+				if (count($catavgs[$i])>0) {
+					sort($catavgs[$i], SORT_NUMERIC);
 					$fivenum = array();
 					$fivenumsum = '';
 					for ($k=0; $k<5; $k++) {
-						$fivenum[] = gbpercentile($catavgs[$j][$i],$k*25);
+						$fivenum[] = gbpercentile($catavgs[$i],$k*25);
 					}
-					if ($useweights==0) {
-						if ($i==3) {
-							$fivenumsum = implode('%,&nbsp;',$fivenum).'%';
-						} else {
+					
+					if ($i<3 && $gb[0][2][$j][13]==0 && $gb[0][2][$j][14]==0) {
+						//if not attempted, and not using averaged percents, and no drops
+						//then we'll show scores in 5-num. Otherwise just show percents
+						if ($useweights==0) {
 							$fivenumsum = implode(',&nbsp;',$fivenum);
+							if ($gb[0][2][$j][3+$i]>0) {
+								$fivenumsum .= '<br/>';
+							}
 						}
 						if ($i<3 && $gb[0][2][$j][3+$i]>0) {
-							$fivenumsum .= '<br/>';
+							for ($k=0; $k<5; $k++) {
+								$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][2][$j][3+$i],1);
+							}
+							$fivenumsum .= implode('%,&nbsp;',$fivenum).'%';
 						}
-					}
-					if ($i<3 && $gb[0][2][$j][3+$i]>0) {
-						for ($k=0; $k<5; $k++) {
-							$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][2][$j][3+$i],1);
-						}
-						$fivenumsum .= implode('%,&nbsp;',$fivenum).'%';
+					} else {
+						$fivenumsum = implode('%,&nbsp;',$fivenum).'%';
 					}
 				} else {
 					$fivenumsum = '';
 				}
 				$gb[0][2][$j][6+$i] = $fivenumsum;
-			}
-		}
-		//tot avgs
-		$totavgs = array();
-		for ($j=0;$j<count($gb[1][3]);$j++) {
-			if ($gb[1][3][$j]===null) {continue;}
-			$totavgs[$j] = array();
-			for ($i=1;$i<$ln;$i++) { //foreach student
-				if ($gb[$i][4][1]==0) {
-					$totavgs[$j][] = $gb[$i][3][$j];
+				
+				//averages row
+				if (count($catavgs[$i])>0) {
+					$gb[$ln][2][$j][$i] = round(array_sum($catavgs[$i])/count($catavgs[$i]),1);
+				} else {
+					$gb[$ln][2][$j][$i] = 0;
+				}
+				if ($i<3 && $gb[0][2][$j][13]==0 && $gb[0][2][$j][14]==0) {
+					//average is points - grab points possible
+					$gb[$ln][2][$j][4+$i] = $gb[0][2][$j][3+$i];
+				} else {
+					//average is percent
+					$gb[$ln][2][$j][4+$i] = 0;
 				}
 			}
 		}
-		for ($i=0; $i<4; $i++) {
-			if ($useweights==1 || $i==3) {
-				$c2 = ($i==3)?6:$i; //column that has percent total
-			} else {
-				$c2 = 3+$i;
+
+		//tot avgs
+		for ($j=0;$j<4;$j++) {
+			if ($gb[1][3][$j]===null) {continue;}
+			$totavgs = array();
+			for ($i=1;$i<$ln;$i++) { //foreach student
+				if ($gb[$i][4][1]==0) { //if not locked
+					$totavgs[] = round(100*$gb[$i][3][$j]/$gb[$i][3][4+$j],1);
+				}
 			}
 			$fivenumsum = '';
-			if (count($totavgs[$c2])>0) {
-				sort($totavgs[$c2], SORT_NUMERIC);
+			if (count($totavgs)>0) {
+				sort($totavgs, SORT_NUMERIC);
 				$fivenum = array();
 
 				for ($k=0; $k<5; $k++) {
-					$fivenum[] = gbpercentile($totavgs[$c2],$k*25);
+					$fivenum[] = gbpercentile($totavgs,$k*25);
 				}
 				$fivenumsum .= implode('%,&nbsp;',$fivenum).'%';
 			}
-			$gb[0][3][3+$i] = $fivenumsum;
-		}
-
-		foreach ($catavgs as $j=>$avg) {
-			for ($m=0;$m<4;$m++) {
-				if (count($avg[$m])>0) {
-					$gb[$ln][2][$j][$m] = round(array_sum($avg[$m])/count($avg[$m]),1);
-				} else {
-					$gb[$ln][2][$j][$m] = 0;
-				}
+			$gb[0][3][3+$j] = $fivenumsum;
+			
+			//averages row
+			if (count($totavgs)>0) {
+				$gb[$ln][3][$j] = round(array_sum($totavgs)/count($totavgs),1);
+			} else {
+				$gb[$ln][3][$j] = 0;
 			}
+			$gb[$ln][3][4+$j] = 100;
 		}
-		foreach ($totavgs as $j=>$avg) {
-			if (count($avg)>0) {
-				$gb[$ln][3][$j] = round(array_sum($avg)/count($avg),1);
-			}
-		}
+		
 		$gb[$ln][4][0] = -1;
 	}
 	if ($limuser>0) { //mark reqscoreaid

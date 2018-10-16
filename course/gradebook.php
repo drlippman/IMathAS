@@ -1405,47 +1405,47 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 			if ($gbt[$i][2][$j][4+$availshow]>0) {
 				$pct = round(100*$gbt[$i][2][$j][$availshow]/$gbt[$i][2][$j][4+$availshow],1);
 			} else {
-				$pct = 0;
+				$pct = $gbt[$i][2][$j][$availshow];
 			}
+			echo '<td class="c">'.$insdiv;
+			if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
+				echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+			} 
 			if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
-				//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
-				echo '<td class="c">'.$insdiv;
-				if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
-					echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
-				}
+			
 				if ($gbt[$i][0][0]=='Averages') {
-					echo $gbt[$i][2][$j][$availshow].'%';
-				} else if ($gbt[0][2][$j][13]==0) { //w/o percent scaling
+					if ($gbt[$i][2][$j][4+$availshow] == 0) {
+						echo $gbt[$i][2][$j][$availshow].'%';
+					} else {
+						echo $gbt[$i][2][$j][$availshow];
+					}
+				} else if ($gbt[$i][2][$j][4+$availshow]>0) { //category total has points poss listed
 					echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow].' ('.$pct.'%)';
 				} else {
 					echo $pct.'%';
 				}
 
-				if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
-					echo '</span>';
-				}
-				echo $enddiv .'</td>';
 			} else {
-				//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
-				echo '<td class="c">'.$insdiv;
-				if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
-					echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
-				}
 				if ($availshow==3 || ($gbt[0][4][0]==0 && $gbt[0][2][$j][13]==0)) {  //attempted or points based w/o percent scaling
 					if ($gbt[$i][0][0]=='Averages') {
-						echo $gbt[$i][2][$j][$availshow].'%';//echo '-';
-					} else {
+						if ($gbt[$i][2][$j][4+$availshow] == 0) {
+							echo $gbt[$i][2][$j][$availshow].'%';
+						} else {
+							echo $gbt[$i][2][$j][$availshow];
+						}
+					} else if ($gbt[0][2][$j][14]==true) { //if has drops
 						echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
+					} else {
+						echo $gbt[$i][2][$j][$availshow];
 					}
 				} else {
 					echo $pct.'%';
 				}
-				if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
-					echo '</span>';
-				}
-				echo $enddiv .'</td>';
 			}
-
+			if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
+				echo '</span>';
+			}
+			echo $enddiv .'</td>';
 		}
 	}
 	if (!$totonleft) {
