@@ -13,8 +13,6 @@
 //   stu view links
 //   exceptions
 
-// TODO:
-//	Rewrite stu disp based on revamped gbtable2
 
 
 
@@ -699,11 +697,15 @@ function gbstudisp($stu) {
 				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";
 			}
 		}
-		//TODO i18n
 		if ($showlatepass==1) {
-			if ($latepasses==0) { $latepasses = 'No';}
+			if ($latepasses==0) { 
+				$lpmsg = _('No LatePasses available');
+			} else if ($latepasses>1) {
+				$lpmsg = sprintf(_('%d LatePasses available'), $latepasses);
+			} else {
+				$lpmsg = _('One LatePass available');
+			}
 			if ($isteacher || $istutor) {echo '<br/>';}
-			$lpmsg = "$latepasses LatePass".($latepasses!=1?"es":"").' available';
 		}
 		if (!$isteacher && !$istutor) {
 			echo Sanitize::encodeStringForDisplay($lpmsg);
@@ -1288,6 +1290,169 @@ function gbstudisp($stu) {
 
 }
 
+function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
+	global $catfilter, $availshow, $totonleft, $cid;
+	
+	$n = 0;
+	$tots = '';
+	if ($catfilter<0) {
+		if ($gbt[0][4][0]==0) { //using points based
+			if ($availshow<3) {
+				$tots .= '<th><div><span class="cattothdr">'. _('Total'). '<br/>'.$gbt[0][3][$availshow].'&nbsp;'. _('pts'). '</span></div></th>';
+			} else {
+				$tots .= '<th><div><span class="cattothdr">'. _('Total').'</span></div></th>';
+			}
+			$tots .= '<th><div>%</div></th>';
+			$n+=2;
+		} else {
+			$tots .= '<th><div><span class="cattothdr">'. _('Weighted Total %'). '</span></div></th>';
+			$n++;
+		}
+	}
+	if ($totonleft) {
+		echo $tots;
+	}
+	if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+		for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
+			if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
+				continue;
+			} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
+				continue;
+			}
+			echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
+			if ($availshow<3) {
+				echo $gbt[0][2][$i][0].'<br/>';
+				if ($gbt[0][4][0]==0) { //using points based
+					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+				} else {
+					echo $gbt[0][2][$i][11].'%';
+				}
+			} else if ($availshow==3) { //past and attempted
+				echo $gbt[0][2][$i][0];
+				if (isset($gbt[0][2][$i][11])) {
+					echo '<br/>'.$gbt[0][2][$i][11].'%';
+				}
+			}
+			if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
+				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
+			} else {
+				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
+			}
+			echo '</span></div></th>';
+			$n++;
+		}
+	}
+	if (!$totonleft) {
+		echo $tots;
+	}
+	return $n;
+}
+function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
+	global $catfilter, $availshow, $totonleft, $cid;
+	
+	//total totals
+	$tot = '';
+	if ($catfilter<0) {
+		$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
+		if ($gbt[$i][3][4+$availshow]>0) {
+			$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
+		} else {
+			$pct = 0;
+		}
+		if ($availshow==3 || $gbt[0][4][0]==0) { //attempted or using points based
+			if ($gbt[$i][0][0]=='Averages') {
+				if ($gbt[0][4][0]==0) { //using points based
+					$tot .= '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
+				}
+				$tot .= '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
+			} else {
+				if ($gbt[0][4][0]==0) { //using points based
+					$tot .= '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'/'.$gbt[$i][3][4+$availshow].$enddiv.'</td>';
+					$tot .= '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
+
+				} else {
+					$tot .= '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
+				}
+			}
+		} else {
+			if ($gbt[0][4][0]==0) { //using points based
+				$tot .= '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
+				if ($gbt[$i][0][0]=='Averages') {
+					$tot .= '<td class="c">'.$insdiv.$fivenum.$pct .'%</span>'.$enddiv .'</td>';
+				} else {
+					$tot .= '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
+				}
+			} else {
+				if ($gbt[$i][0][0]=='Averages') {
+					$tot .= '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
+				} else {
+					$tot .= '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
+				}
+			}
+		}
+	}
+	if ($totonleft) {
+		echo $tot;
+	}
+	//category totals
+	if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+		for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
+			if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
+				continue;
+			} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
+				continue;
+			}
+			if ($gbt[$i][2][$j][4+$availshow]>0) {
+				$pct = round(100*$gbt[$i][2][$j][$availshow]/$gbt[$i][2][$j][4+$availshow],1);
+			} else {
+				$pct = 0;
+			}
+			if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
+				//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
+				echo '<td class="c">'.$insdiv;
+				if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
+					echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+				}
+				if ($gbt[$i][0][0]=='Averages') {
+					echo $gbt[$i][2][$j][$availshow].'%';
+				} else if ($gbt[0][2][$j][13]==0) { //w/o percent scaling
+					echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow].' ('.$pct.'%)';
+				} else {
+					echo $pct.'%';
+				}
+
+				if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
+					echo '</span>';
+				}
+				echo $enddiv .'</td>';
+			} else {
+				//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
+				echo '<td class="c">'.$insdiv;
+				if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
+					echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+				}
+				if ($availshow==3 || ($gbt[0][4][0]==0 && $gbt[0][2][$j][13]==0)) {  //attempted or points based w/o percent scaling
+					if ($gbt[$i][0][0]=='Averages') {
+						echo $gbt[$i][2][$j][$availshow].'%';//echo '-';
+					} else {
+						echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
+					}
+				} else {
+					echo $pct.'%';
+				}
+				if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
+					echo '</span>';
+				}
+				echo $enddiv .'</td>';
+			}
+
+		}
+	}
+	if (!$totonleft) {
+		echo $tot;
+	}	
+}
+
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
 	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents;
@@ -1366,52 +1531,7 @@ function gbinstrdisp() {
 	}
 
 	if ($totonleft && !$hidepast) {
-		//total totals
-		if ($catfilter<0) {
-			if ($gbt[0][4][0]==0) { //using points based
-				if ($availshow<3) {
-					echo '<th><div><span class="cattothdr">', _('Total'), '<br/>'.$gbt[0][3][$availshow].'&nbsp;', _('pts'), '</span></div></th>';
-				} else {
-					echo '<th><div><span class="cattothdr">', _('Total'), '</span></div></th>';
-				}
-				echo '<th><div>%</div></th>';
-				$n+=2;
-			} else {
-				echo '<th><div><span class="cattothdr">', _('Weighted Total %'), '</span></div></th>';
-				$n++;
-			}
-		}
-		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
-					continue;
-				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
-					continue;
-				}
-				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
-				if ($availshow<3) {
-					echo $gbt[0][2][$i][0].'<br/>';
-					if ($gbt[0][4][0]==0) { //using points based
-						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
-					} else {
-						echo $gbt[0][2][$i][11].'%';
-					}
-				} else if ($availshow==3) { //past and attempted
-					echo $gbt[0][2][$i][0];
-					if (isset($gbt[0][2][$i][11])) {
-						echo '<br/>'.$gbt[0][2][$i][11].'%';
-					}
-				}
-				if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
-					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
-				} else {
-					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
-				}
-				echo '</span></div></th>';
-				$n++;
-			}
-		}
-
+		$n += gbInstrCatHdrs($gbt, $collapsegbcat);
 	}
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
@@ -1478,48 +1598,7 @@ function gbinstrdisp() {
 		}
 	}
 	if (!$totonleft && !$hidepast) {
-		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
-					continue;
-				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
-					continue;
-				}
-				echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
-				if ($availshow<3) {
-					echo $gbt[0][2][$i][0].'<br/>';
-					if ($gbt[0][4][0]==0) { //using points based
-						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
-					} else {
-						echo $gbt[0][2][$i][11].'%';
-					}
-				} else if ($availshow==3) { //past and attempted
-					echo $gbt[0][2][$i][0];
-				}
-				if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
-					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
-				} else {
-					echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
-				}
-				echo '</span></div></th>';
-				$n++;
-			}
-		}
-		//total totals
-		if ($catfilter<0) {
-			if ($gbt[0][4][0]==0) { //using points based
-				if ($availshow<3) {
-					echo '<th><div><span class="cattothdr">', _('Total'), '<br/>'.$gbt[0][3][$availshow].'&nbsp;', _('pts'), '</span></div></th>';
-				} else {
-					echo '<th><div><span class="cattothdr">', _('Total'), '</span></div></th>';
-				}
-				echo '<th><div>%</div></th>';
-				$n+=2;
-			} else {
-				echo '<th><div><span class="cattothdr">', _('Weighted Total %'), '</span></div></th>';
-				$n++;
-			}
-		}
+		$n += gbInstrCatHdrs($gbt, $collapsegbcat);
 	}
 	echo '</tr></thead><tbody>';
 	//create student rows
@@ -1560,102 +1639,9 @@ function gbinstrdisp() {
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
 			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
 		}
-		//TODO: Copy for totonright, or find a way to consolidate code
+ 
 		if ($totonleft && !$hidepast) {
-			//total totals
-			if ($catfilter<0) {
-				$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
-				if ($gbt[$i][3][4+$availshow]>0) {
-					$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
-				} else {
-					$pct = 0;
-				}
-				if ($availshow==3 || $gbt[0][4][0]==0) { //attempted or using points based
-					if ($gbt[$i][0][0]=='Averages') {
-						if ($gbt[0][4][0]==0) { //using points based
-							echo '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
-						}
-						echo '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
-					} else {
-						if ($gbt[0][4][0]==0) { //using points based
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'/'.$gbt[$i][3][4+$availshow].$enddiv.'</td>';
-							echo '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
-
-						} else {
-							echo '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
-						}
-					}
-				} else {
-					if ($gbt[0][4][0]==0) { //using points based
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
-						if ($gbt[$i][0][0]=='Averages') {
-							echo '<td class="c">'.$insdiv.$fivenum.$pct .'%</span>'.$enddiv .'</td>';
-						} else {
-							echo '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
-						}
-					} else {
-						if ($gbt[$i][0][0]=='Averages') {
-							echo '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
-						} else {
-							echo '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
-						}
-					}
-				}
-			}
-			//category totals
-			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
-						continue;
-					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
-						continue;
-					}
-					if ($gbt[$i][2][$j][4+$availshow]>0) {
-						$pct = round(100*$gbt[$i][2][$j][$availshow]/$gbt[$i][2][$j][4+$availshow],1);
-					} else {
-						$pct = 0;
-					}
-					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
-						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
-						echo '<td class="c">'.$insdiv;
-						if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
-							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
-						}
-						if ($gbt[$i][0][0]=='Averages') {
-							echo $gbt[$i][2][$j][$availshow].'%';
-						} else if ($gbt[0][2][$j][13]==0) { //w/o percent scaling
-							echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow].' ('.$pct.'%)';
-						} else {
-							echo $pct.'%';
-						}
-
-						if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
-							echo '</span>';
-						}
-						echo $enddiv .'</td>';
-					} else {
-						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
-						echo '<td class="c">'.$insdiv;
-						if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
-							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
-						}
-						if ($availshow==3 || ($gbt[0][4][0]==0 && $gbt[0][2][$j][13]==0)) {  //attempted or points based w/o percent scaling
-							if ($gbt[$i][0][0]=='Averages') {
-								echo $gbt[$i][2][$j][$availshow].'%';//echo '-';
-							} else {
-								echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
-							}
-						} else {
-							echo $pct.'%';
-						}
-						if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
-							echo '</span>';
-						}
-						echo $enddiv .'</td>';
-					}
-
-				}
-			}
+			gbInstrCatCols($gbt, $i, $insdiv, $enddiv);
 		}
 		//assessment values
 		if ($catfilter>-2) {
@@ -1858,93 +1844,7 @@ function gbinstrdisp() {
 			}
 		}
 		if (!$totonleft && !$hidepast) {
-			//category totals
-			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
-						continue;
-					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
-						continue;
-					}
-					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
-						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
-						echo '<td class="c">'.$insdiv;
-						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
-							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
-						}
-						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
-
-						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
-							echo '</span>';
-						}
-						echo $enddiv .'</td>';
-					} else {
-						//echo '<td class="c">'.$gbt[$i][2][$j][$availshow].'</td>';
-						echo '<td class="c">'.$insdiv;
-						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
-							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
-						}
-						if ($availshow==3) {
-							if ($gbt[$i][0][0]=='Averages') {
-								echo $gbt[$i][2][$j][3].'%';
-							} else {
-								echo $gbt[$i][2][$j][3].'/'.$gbt[$i][2][$j][4];
-							}
-						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
-								echo $gbt[$i][2][$j][$availshow];
-							} else {
-								if ($gbt[0][2][$j][3+$availshow]>0) {
-									echo round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
-								} else {
-									echo '0%';
-								}
-							}
-						}
-						if ($gbt[$i][0][0]=='Averages' && $availshow<3) {
-							echo '</span>';
-						}
-						echo $enddiv .'</td>';
-					}
-
-				}
-			}
-
-			//total totals
-			if ($catfilter<0) {
-				$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
-				if ($availshow==3) {
-					if ($gbt[$i][0][0]=='Averages') {
-						if (isset($gbt[$i][3][8])) { //using points based
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
-						}
-						echo '<td class="c">'.$insdiv.$fivenum.$gbt[$i][3][6].'%</span>'.$enddiv .'</td>';
-					} else {
-						if (isset($gbt[$i][3][8])) { //using points based
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
-
-						} else {
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
-						}
-					}
-				} else {
-					if ($gbt[0][4][0]==0) { //using points based
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
-						if ($gbt[$i][0][0]=='Averages') {
-							echo '<td class="c">'.$insdiv.$fivenum.$gbt[$i][3][$availshow+3] .'%</span>'.$enddiv .'</td>';
-						} else {
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow+3] .'%'.$enddiv .'</td>';
-						}
-					} else {
-						if ($gbt[$i][0][0]=='Averages') {
-							echo '<td class="c">'.$insdiv.$fivenum.$gbt[$i][3][$availshow].'%</span>'.$enddiv .'</td>';
-						} else {
-							echo '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'%'.$enddiv .'</td>';
-						}
-					}
-				}
-			}
+			gbInstrCatCols($gbt, $i, $insdiv, $enddiv);
 		}
 		echo '</tr>';
 	}
