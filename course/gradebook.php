@@ -1154,7 +1154,7 @@ function gbstudisp($stu) {
 				echo '<td>', _('Total'), '</td>';
 				if (($show&1)==1) {
 					$pct = round(100*$gbt[1][3][0]/$gbt[1][3][4], 1);
-					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'/'.Sanitize::onlyFloat($gbt[0][3][4]).' ('.$pct.'%)</td>';
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'/'.Sanitize::onlyFloat($gbt[1][3][4]).' ('.$pct.'%)</td>';
 				}
 				if (($show&2)==2) {
 					$pct = round(100*$gbt[1][3][3]/$gbt[1][3][7], 1);
@@ -1162,11 +1162,11 @@ function gbstudisp($stu) {
 				}
 				if (($show&4)==4) {
 					$pct = round(100*$gbt[1][3][1]/$gbt[1][3][5], 1);
-					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'/'.Sanitize::onlyFloat($gbt[0][3][5]).' ('.$pct.'%)</td>';
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'/'.Sanitize::onlyFloat($gbt[1][3][5]).' ('.$pct.'%)</td>';
 				}
 				if (($show&8)==8) {
 					$pct = round(100*$gbt[1][3][2]/$gbt[1][3][6], 1);
-					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'/'.Sanitize::onlyFloat($gbt[0][3][6]).' ('.$pct.'%)</td>';
+					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'/'.Sanitize::onlyFloat($gbt[1][3][6]).' ('.$pct.'%)</td>';
 				}
 
 			} else {
@@ -1177,80 +1177,7 @@ function gbstudisp($stu) {
 				if (($show&8)==8) {echo '<td>'.round(100*$gbt[1][3][2]/$gbt[1][3][6], 1).'%</td>';}
 			}
 			echo '</tr>';
-			/*if ($availshow==2) {
-				echo '<tr class="grid">';
-				if ($gbt[0][4][0]==0) { //using points based
-					echo '<td>Total All</td>';
-					echo '<td>'.$gbt[0][3][2].'&nbsp;pts</td>';
-					echo '<td>'.$gbt[1][3][2].'</td>';
-					echo '<td>'.$gbt[1][3][5] .'%</td>';
-				} else {
-					echo '<td>Weighted Total All %</td>';
-					echo '<td></td>';
-					echo '<td>'.$gbt[1][3][2].'%</td>';
-					echo '<td></td>';
-				}
-				if ($stu>0) {
-					echo '<td></td>';
-				}
-				echo '</tr>';
-			}
-			echo '<tr class="grid">';
-			if ($gbt[0][4][0]==0) { //using points based
-				echo '<td>Total Past & Current</td>';
-				echo '<td>'.$gbt[0][3][1].'&nbsp;pts</td>';
-				echo '<td>'.$gbt[1][3][1].'</td>';
-				echo '<td>'.$gbt[1][3][4] .'%</td>';
-			} else {
-				echo '<td>Weighted Total Past & Current %</td>';
-				echo '<td></td>';
-				echo '<td>'.$gbt[1][3][1].'%</td>';
-				echo '<td></td>';
-			}
-			if ($stu>0) {
-				echo '<td></td>';
-				echo '<td></td>';
-			}
-			echo '</tr>';
-			echo '<tr class="grid">';
-			if ($gbt[0][4][0]==0) { //using points based
-				echo '<td>Total Past Due</td>';
-				echo '<td>'.$gbt[0][3][0].'&nbsp;pts</td>';
-				echo '<td>'.$gbt[1][3][0].'</td>';
-				echo '<td>'.$gbt[1][3][3] .'%</td>';
-			} else {
-				echo '<td>Weighted Total Past Due %</td>';
-				echo '<td></td>';
-				echo '<td>'.$gbt[1][3][0].'%</td>';
-				echo '<td></td>';
-			}
-			if ($stu>0) {
-				echo '<td></td>';
-				echo '<td></td>';
-			}
-			echo '</tr>';
-
-			echo '</tr>';
-			echo '<tr class="grid">';
-			if ($gbt[0][4][0]==0) { //using points based
-				echo '<td>Total Past &amp; Attempted</td>';
-				echo '<td>'.$gbt[1][3][7].'&nbsp;pts</td>';
-				echo '<td>'.$gbt[1][3][6].'</td>';
-				echo '<td>'.$gbt[1][3][8] .'%</td>';
-			} else {
-				echo '<td>Weighted Total ast &amp; Attempted</td>';
-				echo '<td></td>';
-				echo '<td>'.$gbt[1][3][6].'%</td>';
-				echo '<td></td>';
-			}
-			if ($stu>0) {
-				echo '<td></td>';
-				echo '<td></td>';
-			}
-			echo '</tr>';
-			*/
-
-
+			
 		}
 		echo '</tbody></table><br/>';
 		echo '<p>';
