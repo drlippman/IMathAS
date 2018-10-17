@@ -1616,12 +1616,17 @@ function gbinstrdisp() {
 						} else {
 							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
 						}
+						
+						echo $gbt[$i][1][$j][0];
+						
+						if ($istutor && $gbt[$i][1][$j][4]=='average') {
+						} else {
+							echo '</a>';
+						}
+						
 						if ($gbt[$i][1][$j][3]>9) {
 							$gbt[$i][1][$j][3] -= 10;
 						}
-
-						echo $gbt[$i][1][$j][0];
-						
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						} else if ($gbt[$i][1][$j][3]==2) {
@@ -1631,10 +1636,7 @@ function gbinstrdisp() {
 						} else if ($gbt[$i][1][$j][3]==4) {
 							echo ' (PT)';
 						}
-						if ($istutor && $gbt[$i][1][$j][4]=='average') {
-						} else {
-							echo '</a>';
-						}
+						
 						if ($gbt[$i][1][$j][1]==1) {
 							echo '<sup>*</sup>';
 						}
