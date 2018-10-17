@@ -1408,10 +1408,10 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 				$pct = $gbt[$i][2][$j][$availshow];
 			}
 			echo '<td class="c">'.$insdiv;
-			if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
+			if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
 				echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 			} 
-			if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
+			if ($catfilter!=-1) { //single category view
 			
 				if ($gbt[$i][0][0]=='Averages') {
 					if ($gbt[$i][2][$j][4+$availshow] == 0) {
@@ -1433,7 +1433,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 						} else {
 							echo $gbt[$i][2][$j][$availshow];
 						}
-					} else if ($gbt[0][2][$j][14]==true) { //if has drops
+					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops or attempted
 						echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
 					} else {
 						echo $gbt[$i][2][$j][$availshow];

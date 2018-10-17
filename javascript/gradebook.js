@@ -40,7 +40,7 @@ function setupGBpercents() {
     }
   });
   $("tbody td").each(function(i,el) {
-    if (el.innerHTML.match(/tipshow/)) {continue;}
+    if (el.innerHTML.match(/tipshow/)) {return;}
   	var a = $(el).find("a");
   	if (a.length>0) {
   	  el = a[0];
