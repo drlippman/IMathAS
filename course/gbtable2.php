@@ -2,13 +2,7 @@
 //IMathAS: gradebook table generating function
 //(c) 2007 David Lippman
 
-/*TODO:
-Check and update:
-  claimbadge / verifybadge
-  gb-export
-  gb-testing
-  report-commonstu-funcs
-*/
+
 require_once("../includes/exceptionfuncs.php");
 
 if ($GLOBALS['canviewall']) {
