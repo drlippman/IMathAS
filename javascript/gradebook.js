@@ -195,7 +195,7 @@ function conditionalColor(table,type,low,high) {
 					} else {
 						var v = tds[i].textContent;
 					}
-					if (k = v.match(/\(([\d\.]+)%\)/)) {
+					if (k = v.match(/([\d\.]+)%/)) {
 						var perc = parseFloat(k[1]);
 					} else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
 						if (k[2]==0) { var perc = 0;} else { var perc= Math.round(1000*parseFloat(k[1])/parseFloat(k[2]))/10;}
