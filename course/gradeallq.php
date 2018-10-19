@@ -247,7 +247,7 @@
 	if ($sessiondata['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
 	}
-	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px;}</style>';
+	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}</style>';
 	require("../includes/rubric.php");
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
