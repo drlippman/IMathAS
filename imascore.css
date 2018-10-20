@@ -1623,6 +1623,10 @@ a.dropdown-toggle.arrow-down:hover {
   margin-top: -5px;
   z-index: 1;
   min-width: 100px;
+
+}
+.dd-list .collapsed{
+  max-width: 400px;
 }
 
 .dd-list .qType {

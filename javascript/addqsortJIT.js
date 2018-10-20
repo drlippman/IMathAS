@@ -404,6 +404,9 @@ function expandTextSegment(selector) {
   // middle height and avoid race condition
 
   //smoothly set the height to the natural height
+  $(selector).closest(".dd3-content").animate({
+    height: natural_height+60
+  },200);
   $(selector).animate({
     height: natural_height,
     width: natural_width
@@ -450,6 +453,9 @@ function collapseTextSegment(selector) {
   $(selector).addClass("collapsingsemaphore");
 
   //smoothly set the height to the collapsed height
+  $(selector).closest(".dd3-content").animate({
+    height: 30
+  },200);
   $(selector).animate({
     height: collapsed_height
   }, 200, function() {
