@@ -1,5 +1,12 @@
 Upgrade Notes
 
+****************************
+** JustInTime assignments **
+****************************
+// by Ondrej Zjevik
+Database change:
+	ALTER TABLE  `imas_assessments` ADD `justintimeorder` MEDIUMTEXT NULL DEFAULT NULL;
+
 *********************
 ** IMathAS 1.8     **
 *********************
@@ -7,10 +14,10 @@ Upgrade Notes
 All database changes are now in upgrade.php.  Run that file to apply updates
 to the database.
 
-SimpleLTI has been deprecated and replaced with BasicLTI.  If you have 
+SimpleLTI has been deprecated and replaced with BasicLTI.  If you have
 $enablesimplelti in your config.php, change it to enablebasiclti.
 
-If you do not have either currently in your config.php and want to allow 
+If you do not have either currently in your config.php and want to allow
 imathas to act as a BasicLTI producer, add $enablebasiclti = true to config.php
 
 *********************
@@ -20,7 +27,7 @@ imathas to act as a BasicLTI producer, add $enablebasiclti = true to config.php
 *** Database Changes ***
 
 All database changes are now in upgrade.php.  Run that file to apply updates
-to the database.  
+to the database.
 
 *********************
 ** IMathAS 1.6     **
@@ -31,8 +38,8 @@ Added $enablesimplelti
 Added $mathchaturl
 
 *** Loginpage Changes ***
-Reference loginpage.php.dist for changes. 
-	
+Reference loginpage.php.dist for changes.
+
 *** Database Changes ***
 ALTER TABLE `imas_msgs` ADD `parent` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0' ,
 ADD `baseid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0' ;
@@ -66,7 +73,7 @@ CREATE TABLE `imas_ltiusers` (
 `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `org` VARCHAR( 32 ) NOT NULL ,
 `ltiuserid` VARCHAR( 32 ) NOT NULL ,
-`userid` INT( 10 ) UNSIGNED NOT NULL 
+`userid` INT( 10 ) UNSIGNED NOT NULL
 ) TYPE = innodb;
 
 CREATE TABLE `imas_ltiaccess` (
@@ -75,13 +82,13 @@ CREATE TABLE `imas_ltiaccess` (
 `userid` INT( 10 ) UNSIGNED NOT NULL ,
 `itemid` INT( 10 ) UNSIGNED NOT NULL ,
 `itemtype` TINYINT( 1 ) UNSIGNED NOT NULL ,
-`created` INT( 10 ) UNSIGNED NOT NULL 
+`created` INT( 10 ) UNSIGNED NOT NULL
 ) TYPE = innodb;
 
 CREATE TABLE `imas_ltinonces` (
 `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `nonce` TEXT NOT NULL ,
-`time` INT( 10 ) UNSIGNED NOT NULL 
+`time` INT( 10 ) UNSIGNED NOT NULL
 ) TYPE = innodb;
 
 ALTER TABLE `imas_assessments` CHANGE `timelimit` `timelimit` INT( 10 ) NOT NULL DEFAULT '0' ;
@@ -112,7 +119,7 @@ CREATE TABLE `imas_calitems` (
 `date` INT( 10 ) UNSIGNED NOT NULL ,
 `title` VARCHAR( 254 ) NOT NULL ,
 `tag` CHAR( 1 ) NOT NULL ,
-INDEX ( `courseid` ), INDEX(`date`) 
+INDEX ( `courseid` ), INDEX(`date`)
 ) TYPE = innodb COMMENT = 'Calendar Items';
 
 
@@ -142,7 +149,7 @@ ALTER TABLE `imas_forums` ADD INDEX ( `postby` ) ;
 *** Database Changes ***
 
 ALTER TABLE `imas_sessions` ADD INDEX ( `time` ) ;
-ALTER TABLE `imas_users` ADD INDEX ( `rights` ); 
+ALTER TABLE `imas_users` ADD INDEX ( `rights` );
 
 ALTER TABLE `imas_grades` CHANGE `score` `score` DECIMAL( 6, 1 ) UNSIGNED NULL DEFAULT '0.0';
 
@@ -289,7 +296,7 @@ CREATE TABLE `imas_msgs` (
 `msgto` INT( 10 ) NOT NULL ,
 `msgfrom` INT( 10 ) NOT NULL ,
 `senddate` INT( 10 ) NOT NULL ,
-`isread` TINYINT( 1 ) NOT NULL 
+`isread` TINYINT( 1 ) NOT NULL
 ) TYPE = innodb COMMENT = 'Internal messages';
 
 ALTER TABLE `imas_students` ADD `section` VARCHAR( 10 ) NULL ,
@@ -303,9 +310,9 @@ CREATE TABLE `imas_forum_subscriptions` (
 `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `forumid` INT( 10 ) UNSIGNED NOT NULL ,
 `userid` INT( 10 ) UNSIGNED NOT NULL ,
-INDEX ( `forumid` , `userid` ) 
+INDEX ( `forumid` , `userid` )
 ) TYPE = innodb COMMENT = 'Forum subscriptions';
-	
+
 CREATE TABLE `imas_gbscheme` (
 `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `courseid` INT( 10 ) UNSIGNED NOT NULL ,
@@ -323,7 +330,7 @@ CREATE TABLE `imas_gbitems` (
 `points` SMALLINT( 4 ) NOT NULL DEFAULT '0',
 `showdate` INT( 10 ) UNSIGNED NOT NULL ,
 `gbcategory` INT( 10 ) UNSIGNED NOT NULL ,
-INDEX ( `courseid` , `showdate` ) 
+INDEX ( `courseid` , `showdate` )
 ) TYPE = innodb COMMENT = 'Gradebook offline items';
 
 CREATE TABLE `imas_grades` (
@@ -331,7 +338,7 @@ CREATE TABLE `imas_grades` (
 `gbitemid` INT( 10 ) UNSIGNED NOT NULL ,
 `userid` INT( 10 ) UNSIGNED NOT NULL ,
 `score` DECIMAL( 6, 1 ) UNSIGNED NOT NULL ,
-INDEX ( `userid` ) 
+INDEX ( `userid` )
 ) TYPE = innodb COMMENT = 'Offline grades';
 
 CREATE TABLE `imas_gbcats` (
@@ -343,7 +350,7 @@ CREATE TABLE `imas_gbcats` (
 `chop` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '1',
 `dropn` TINYINT( 2 ) NOT NULL DEFAULT '0',
 `weight` SMALLINT( 4 ) NOT NULL DEFAULT '-1',
-INDEX ( `courseid` ) 
+INDEX ( `courseid` )
 ) TYPE = innodb COMMENT = 'Gradebook Categories';
 
 ALTER TABLE `imas_assessments` ADD `password` VARCHAR( 15 ) NOT NULL ;
@@ -366,22 +373,22 @@ UPDATE imas_forums SET settings=2 WHERE settings=0;
 
 ALTER TABLE `imas_msgs` ADD INDEX ( `msgto` );
 ALTER TABLE `imas_msgs` ADD INDEX ( `isread` );
-ALTER TABLE `imas_exceptions` ADD INDEX ( `assessmentid` ); 
+ALTER TABLE `imas_exceptions` ADD INDEX ( `assessmentid` );
 ALTER TABLE `imas_items` ADD INDEX ( `typeid` ) ;
 ALTER TABLE `imas_items` ADD INDEX ( `itemtype` );
-ALTER TABLE `imas_assessments` ADD INDEX ( `startdate` ); 
+ALTER TABLE `imas_assessments` ADD INDEX ( `startdate` );
 ALTER TABLE `imas_assessments` ADD INDEX ( `enddate` ) ;
 ALTER TABLE `imas_forum_posts` ADD INDEX ( `threadid` ) ;
 ALTER TABLE `imas_forum_views` ADD INDEX ( `threadid` ) ;
-ALTER TABLE `imas_assessment_sessions` ADD INDEX ( `assessmentid` ); 
-ALTER TABLE `imas_assessments` ADD INDEX ( `cntingb` ); 
-ALTER TABLE `imas_courses` ADD INDEX ( `ownerid` ); 
+ALTER TABLE `imas_assessment_sessions` ADD INDEX ( `assessmentid` );
+ALTER TABLE `imas_assessments` ADD INDEX ( `cntingb` );
+ALTER TABLE `imas_courses` ADD INDEX ( `ownerid` );
 ALTER TABLE `imas_diags` ADD INDEX (`cid`);
 ALTER TABLE `imas_grades` ADD INDEX ( `gbitemid` );
 
 ALTER TABLE `imas_assessments` ADD `minscore` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_courses` ADD `cploc` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
-ALTER TABLE `imas_gbscheme` ADD INDEX ( `courseid` ) 
+ALTER TABLE `imas_gbscheme` ADD INDEX ( `courseid` )
 
 ALTER TABLE `imas_assessments` CHANGE `defpoints` `defpoints` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '10',
 CHANGE `defattempts` `defattempts` SMALLINT( 4 ) UNSIGNED NOT NULL DEFAULT '1';
@@ -417,7 +424,7 @@ while ($row = mysql_fetch_row($result)) {
 	$items = explode(',',$row[1]);
 	foreach ($items as $item) {
 		if (strpos($item,'~')===FALSE) {
-			$newarray[] = $item;	
+			$newarray[] = $item;
 		} else {
 			$sub = explode('~',$item);
 			$newblock = array();
@@ -435,9 +442,9 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$newitemorder = addslashes(serialize($newarray));
 	$query = "UPDATE imas_courses SET itemorder='$newitemorder',blockcnt='$blockcnt' WHERE id='{$row[0]}'";
-	mysql_query($query) or die("Query failed : " . mysql_error());	
-	
-	
+	mysql_query($query) or die("Query failed : " . mysql_error());
+
+
 }
 
 echo "Done";
@@ -447,7 +454,7 @@ echo "Done";
 ** IMathAS 1.0     **
 *********************
 
-Create subdirectory "qimages" in "assessment" directory.  Set permissions to 
+Create subdirectory "qimages" in "assessment" directory.  Set permissions to
 allow server to write to this directory.
 
 *** Database Changes ***
@@ -459,7 +466,7 @@ CREATE TABLE `imas_qimages` (
 `var` VARCHAR( 50 ) NOT NULL ,
 `filename` VARCHAR( 100 ) NOT NULL ,
 `alttext` VARCHAR( 254 ) NOT NULL ,
-INDEX ( `qsetid` ) 
+INDEX ( `qsetid` )
 );
 ALTER TABLE `imas_questionset` ADD `hasimg` INT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
 
@@ -473,10 +480,10 @@ CREATE TABLE `imas_instr_files` (
 `description` VARCHAR( 254 ) NOT NULL ,
 `filename` VARCHAR( 100 ) NOT NULL ,
 `itemid` INT( 10 ) UNSIGNED NOT NULL ,
-INDEX ( `itemid` ) 
+INDEX ( `itemid` )
 ) TYPE = innodb;
 
-ALTER TABLE `imas_inlinetext` ADD `fileorder` TEXT NOT NULL ; 
+ALTER TABLE `imas_inlinetext` ADD `fileorder` TEXT NOT NULL ;
 
 ALTER TABLE `imas_courses` ADD `allowunenroll` INT( 1 ) UNSIGNED NOT NULL DEFAULT '0',
 ADD `copyrights` INT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
@@ -488,7 +495,7 @@ ADD `copyrights` INT( 1 ) UNSIGNED NOT NULL DEFAULT '0';
 *** Database Changes ***
 Required changes.
 
-ALTER TABLE `imas_assessment_sessions` 
+ALTER TABLE `imas_assessment_sessions`
 ADD `bestseeds` TEXT NOT NULL ,
 ADD `bestattempts` TEXT NOT NULL ,
 ADD `bestscores` TEXT NOT NULL ,
@@ -521,7 +528,7 @@ CREATE TABLE `imas_diags` (
 `aidlist` TEXT NOT NULL ,
 `sel2name` VARCHAR( 254 ) NOT NULL ,
 `sel2list` TEXT NOT NULL ,
-INDEX ( `ownerid` , `public` ) 
+INDEX ( `ownerid` , `public` )
 ) TYPE = innodb;
 
 
@@ -537,8 +544,8 @@ None
   //if you do not have a local install, feel free to use:
   // $mathimgurl = "http://www.imathas.com/cgi-bin/mimetex.cgi"
   $mathimgurl = "/mimetex/mimetex.exe";
-  
-  //set to true if you have FreeType library installed 
+
+  //set to true if you have FreeType library installed
   $freetypeinstalled = true;
 
 
@@ -550,11 +557,11 @@ CourseCreator rights level was removed.  Any existing CourseCreators need to hav
 rights reassigned before upgrading.
 
 *** Database Changes ***
-Required changes. 
+Required changes.
 
 CREATE TABLE `imas_groups` (
 `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`name` VARCHAR( 255 ) NOT NULL 
+`name` VARCHAR( 255 ) NOT NULL
 );
 
 ALTER TABLE `imas_users` ADD `groupid` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
@@ -574,7 +581,7 @@ Required changes.  Add to config.php:
 //use the Groups features, set to false
 $allownongrouplibs = false;
 
-//should anyone be allowed to import/export questions and libraries from the 
+//should anyone be allowed to import/export questions and libraries from the
 //course page?  Intended for easy sharing between systems, but the course page
 //is cleaner if turned off.
 $allowcourseimport = false;
@@ -585,7 +592,7 @@ $allowcourseimport = false;
 *********************
 
 *** Database Changes ***
-Required changes. 
+Required changes.
 
 ALTER TABLE `imas_sessions` ADD `sessiondata` TEXT NOT NULL ;
 
@@ -599,7 +606,7 @@ Recommended changes (to allow assessments with more than ~50 questions)
 ALTER TABLE `imas_assessment_sessions` CHANGE `scores` `scores` TEXT NOT NULL;
 ALTER TABLE `imas_assessment_sessions` CHANGE `questions` `questions` TEXT NOT NULL;
 
-Required changes.  
+Required changes.
 
 ALTER TABLE `imas_library_items` ADD `ownerid` INT( 10 ) UNSIGNED NOT NULL;
 
@@ -628,7 +635,7 @@ No changes required
 *********************
 
 *** Database Changes ***
-Required changes.  
+Required changes.
 
 ALTER TABLE `imas_users` ADD `lastaccess` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_users` ADD INDEX ( `lastaccess` ) ;
@@ -674,7 +681,7 @@ Added $sessionpath.  No change required if things are working fine already.
 ********************
 
 *** Database Changes ****
-First change is required.  New tables are needed if you want to use forums.  
+First change is required.  New tables are needed if you want to use forums.
 
 ALTER TABLE `imas_sessions` ADD `tzoffset` INT( 4 ) NOT NULL DEFAULT '0';
 
@@ -727,5 +734,5 @@ Generalized database name.  No changed needed for existing installs.
 *** Database changes: (required, backwards compatible) ***
 ALTER TABLE `imas_libraries` ADD `parent` INT( 10 ) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `imas_questionset` ADD `author` VARCHAR( 254 ) NOT NULL DEFAULT 'unknown' AFTER `ownerid` ;
-	
+
 *** No changes to config.php ***

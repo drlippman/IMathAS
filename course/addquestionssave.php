@@ -130,9 +130,9 @@
 			}
 		}
 	}
-	
-	$qarr = array(':itemorder'=>$_REQUEST['order'], ':viddata'=>$viddata, ':intro'=>$new_intro, ':id'=>$aid, ':courseid'=>$cid);
-	$query = "UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata,intro=:intro";
+
+	$qarr = array(':itemorder'=>$_REQUEST['order'], ':viddata'=>$viddata, ':intro'=>$new_intro, ':id'=>$aid, ':courseid'=>$cid, ':jitorder'=>$_REQUEST['jitorder']);
+	$query = "UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata,intro=:intro,justintimeorder=:jitorder";
 	if (isset($_POST['defpts'])) {
 		$defpoints = Sanitize::onlyInt($_POST['defpts']);
 		$query .= ",defpoints=:defpts";

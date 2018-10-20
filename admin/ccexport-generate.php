@@ -565,7 +565,7 @@ if ($linktype=='canvas') {
 		fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
 		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
-		fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
+		fwrite($fp,' <lticm:property name="domain">'.$domain.'</lticm:property>');
 		fwrite($fp,' <lticm:options name="resource_selection">
 			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</lticm:property>
 			<lticm:property name="text">Pick an Assessment</lticm:property>
