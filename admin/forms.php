@@ -692,7 +692,7 @@ switch($_GET['action']) {
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
 	
-			echo '<p>For integration setup instructions, visit the Course Items: Export page inside your course</p>';
+			echo '<p>View <a target="_blank" href="../help.php?section=lti">integration setup instructions</a></p>';
 			
 			if (isset($_GET['id'])) {
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
