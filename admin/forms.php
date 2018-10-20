@@ -363,6 +363,11 @@ switch($_GET['action']) {
 					
 					echo '<span class="form">LTI Secret:</span>';
 					echo '<span class="formright">'.Sanitize::encodeStringForDisplay($line['ltisecret']).'</span><br class="form" />';
+					
+					if (!empty($CFG['LTI']['showURLinSettings'])) {
+						echo '<span class="form">LTI Launch URL (if needed):</span>';
+						echo '<span class="formright">'.Sanitize::encodeStringForDisplay($basesiteurl).'/bltilaunch.php</span><br class="form" />';
+					}
 					echo '</div>';
 				}
 				echo '</div>'; //end LTI grouping
@@ -717,7 +722,12 @@ switch($_GET['action']) {
 					echo '<span class="form">LTI Secret (max 10 chars)</span>';
 					echo '<span class="formright"><input name="ltisecret" type="text" value="'.Sanitize::encodeStringForDisplay($ltisecret).'" maxlength="10"/> ';
 					echo '</span><br class="form" />';
+					
 					echo '</div>';
+				}
+				if (!empty($CFG['LTI']['showURLinSettings'])) {
+					echo '<span class="form">LTI Launch URL (if needed):</span>';
+					echo '<span class="formright">'.Sanitize::encodeStringForDisplay($basesiteurl).'/bltilaunch.php</span><br class="form" />';
 				}
 			}
 			
