@@ -348,6 +348,13 @@ function encodea11ydraw() {
 
 function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky,snaptogrid) {
 	var tarel = document.getElementById(target);
+	
+	if ($(tarel).is(":hidden")) {
+		$(tarel).on("mouseover.imathasdrawwait touchstart.imathasdrawwait", function() {
+				$(tarel).off("mouseover.imathasdrawwait touchstart.imathasdrawwait");
+				initCanvases(tarnum);
+		});
+	}
 	tarel.style.userSelect = "none";
 	tarel.style.webkitUserSelect = "none";
 	tarel.style.MozUserSelect = "none";
