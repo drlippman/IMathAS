@@ -69,7 +69,7 @@ if (isset($_POST['snippets'])) {
 	$placeinhead .= '<script type="text/javascript">
 	var pageIsDirty = false;
 	$(function() {
-		initeditor("selector","div.snipcont",0,1,editorSetup);
+		initeditor("selector","div.snipcont",0,true,editorSetup);
 		$(".grouplist").sortable({
 			isValidTarget: function($item, container) {
 				return $item.parent("ul").attr("class")==$(container.el[0]).attr("class");
@@ -106,7 +106,7 @@ if (isset($_POST['snippets'])) {
 		.appendTo($(event.target).parent().find(".snipgroup"));
 		markDirty();
 		newsnipcnt++;
-		initeditor("selector","div.snipcont",0,1,editorSetup);
+		initeditor("selector","div.snipcont",0,true,editorSetup);
 	}
 	function addgrp() {
 		$("<li>", {class:"grpwrap"}).html("<span class=icon style=\"background-color:#66f\">G</span> '._('Group Title').': ")
