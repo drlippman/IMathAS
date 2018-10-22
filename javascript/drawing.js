@@ -201,8 +201,8 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"freehand": [{"mode":0.7, "descr":_("Freehand"), inN: "list", "input":_("Enter list of points to connect with lines")}],
 			"dot": [{"mode":1, "descr":_("Solid dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
-			"polygon": [{"mode":1, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":1}],
-			"closedpolygon": [{"mode":1, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":2}],
+			"polygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":1}],
+			"closedpolygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":2}],
 		}
 	};
 

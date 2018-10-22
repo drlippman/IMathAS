@@ -2939,6 +2939,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '<p>'._('Elements to draw:').'</p>';
 				$out .= '<ul id="a11ydraw'.$qn.'"></ul>';
 				$out .= '<p><button type="button" class="a11ydrawadd" onclick="imathasDraw.adda11ydraw('.$qn.')">'._('Add new drawing element').'</button></p>';
+				if ($answerformat[0]=="polygon") {
+					$dotline = 1;
+				} else if ($answerformat[0]=="closedpolygon") {
+					$answerformat[0]="polygon";
+					$dotline = 2;
+				}
 			} else {
 				$bg = getgraphfilename($plot);
 				/*
