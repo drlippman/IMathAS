@@ -209,7 +209,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $labelkeys = preg_grep('/extreflabel/', array_keys($_POST));
             foreach ($labelkeys as $extkey) {
             	$linkkey = str_replace('label','link',$extkey);
-            	$_POST[$extkey] = trim(Sanitize::simpleString($_POST[$extkey]));
+            	$_POST[$extkey] = trim(Sanitize::stripHtmlTags($_POST[$extkey]));
             	$_POST[$linkkey] = trim(Sanitize::url($_POST[$linkkey]));
             	if ($_POST[$extkey] != '' && $_POST[$linkkey] != '') {
             		$extrefs[] = array(
@@ -357,7 +357,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $query .= ",defpenalty=:defpenalty";
                     $qarr[':defpenalty'] = $defpenalty;	
                 } 
-                if (!empty($defpoints)) {
+                if (isset($_POST['defpoints']) && $defpoints>0) {
                     $query .= ",defpoints=:defpoints";
                     $qarr[':defpoints'] = $defpoints;
                 }
