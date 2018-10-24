@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MathQuill</title>
+<script type="text/javascript">
+	var params;
+	function init() {
+		params = top.tinymce.activeEditor.windowManager.getParams();
+		document.getElementById("tb").value = params.mqAM;
+	}
+	function update() {
+		top.tinymce.activeEditor.windowManager.setParams({
+			mqAM: document.getElementById("tb").value
+		});
+	}
+</script>
+</head>
+<body onload="init()">
+<textarea rows=4 cols=50 id=tb oninput="update()"></textarea>
+</body>
+</html>
