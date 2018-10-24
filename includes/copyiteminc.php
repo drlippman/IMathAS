@@ -18,6 +18,7 @@ $qrubrictrack = array();
 $frubrictrack = array();
 $assessnewid = array();
 $exttooltrack = array();
+$itemtypemap = array();
 if (!isset($replacebyarr)) {
 	$replacebyarr = array();
 }
@@ -32,7 +33,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	global $DBH;
 	global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
-	global $posttoforumtrack, $forumtrack, $datesbylti;
+	global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -419,6 +420,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	} else if ($itemtype == "Calendar") {
 		$newtypeid = 0;
 	}
+	$itemtypemap[$itemtype.$typeid] = $newtypeid;
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES (:courseid, :itemtype, :typeid)";
 	$stm = $DBH->prepare($query);
