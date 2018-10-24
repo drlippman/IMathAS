@@ -300,18 +300,20 @@ switch($_GET['action']) {
 		break;
 	case "modify":
 	case "addcourse":
-		$query = "SELECT ic.*,iu.FirstName,iu.LastName FROM imas_courses AS ic ";
-		$query .= "JOIN imas_users AS iu on ic.ownerid=iu.id WHERE ic.id=:id";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$_GET['id']));
-		if ($stm->rowCount()==0) {break;}
-		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		
+		if ($_GET['action']=='modify') {
+			$query = "SELECT ic.*,iu.FirstName,iu.LastName FROM imas_courses AS ic ";
+			$query .= "JOIN imas_users AS iu on ic.ownerid=iu.id WHERE ic.id=:id";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':id'=>$_GET['id']));
+			if ($stm->rowCount()==0) {break;}
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
+		}
+
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 		$stm->execute(array($groupid));
 		$hasGroupLTI = ($stm->fetchColumn() !== false);
-			
-		if (($myrights < 40 || ($line['ownerid']!=$userid && $myrights<75)) && $_GET['action']=='modify') {
+
+		if ($_GET['action']=='modify' && ($myrights < 40 || ($line['ownerid']!=$userid && $myrights<75))) {
 			//show limited info version
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=? AND userid=?");
 			$stm->execute(array($_GET['id'], $userid));
@@ -374,6 +376,7 @@ switch($_GET['action']) {
 			}
 			break;
 		}
+		
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
 
 		$isadminview = false;
