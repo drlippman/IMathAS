@@ -682,7 +682,39 @@ input[type=submit]:hover, button:hover,input[type=button]:hover {
   filter:alpha(opacity=65); /* For IE6&7 */
   background-color: #000;
 }
-
+#GB_frameoverlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  opacity: 0.01;
+  -moz-opacity: 0.01;
+  filter:alpha(opacity=1); /* For IE6&7 */
+  background-color: #fff;
+}
+#GB_resizehandle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  cursor: nwse-resize;
+  z-index: 1001;
+}
+#GB_resizehandle::after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 50px;
+  height: 0;
+  box-shadow: 0 10px 0 1px black, 0 17px 0 1px black, 0 24px 0 1px black;
+  transform: translate(-50%, -50%) rotate(-45deg) scale(0.5);
+  top: 50%;
+  left: 50%;
+}
 #GB_window {
   top: 10px;
   left: 0px;
@@ -691,7 +723,7 @@ input[type=submit]:hover, button:hover,input[type=button]:hover {
   position: fixed;
   background: #fff;
   border: 3px solid #369;
-  overflow: auto;
+  overflow: hidden;/*auto;*/
   width: 400px;
   height: 400px;
   z-index: 150;
@@ -711,7 +743,13 @@ input[type=submit]:hover, button:hover,input[type=button]:hover {
   padding: 2px 0 2px 5px;
   margin: 0;
   text-align: left;
+  cursor: pointer;
 }
+#GB_caption a, #GB_caption a:hover, #GB_caption a:focus {
+	color: #fff;
+	text-decoration: none;
+}
+
 .floatright {
 	float:right;
 }

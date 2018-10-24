@@ -251,7 +251,59 @@ function setupFormLimiters() {
 }
 addLoadEvent(setupFormLimiters);
 
+function GB_move(e) {
+	e.preventDefault();
+	if (e.type == 'touchmove') {
+		var touch = e.originalEvent.changedTouches[0] || e.originalEvent.touches[0];
+		var X = touch.pageX;
+		var Y = touch.pageY;
+	} else {
+		X = e.pageX;
+		Y = e.pageY;
+	}
+	var gbwin = jQuery("#GB_window");
 
+	gbwin.css("left", Math.max(0,gbwin.data("original_x") + (X - gbwin.data("original_mouse_x"))))
+	 .css("top", Math.max(0,gbwin.data("original_y") + (Y - gbwin.data("original_mouse_y"))));
+}
+function GB_drop(e) {
+	jQuery(window).off("touchmove.GBmove touchend.GBmove mousemove.GBmove mouseup.GBmove");
+	jQuery("#GB_frameoverlay").remove();
+	jQuery("body").css("user-select","");
+}
+function GB_resize(e) {
+	e.preventDefault();
+	if (e.type == 'touchmove') {
+		var touch = e.originalEvent.changedTouches[0] || e.originalEvent.touches[0];
+		var X = touch.pageX;
+		var Y = touch.pageY;
+	} else {
+		X = e.pageX;
+		Y = e.pageY;
+	}
+	X = Math.max(0, Math.min(X, document.documentElement.clientWidth-5));
+	Y = Math.max(0, Math.min(Y, document.documentElement.clientHeight-5));
+	var gbwin = jQuery("#GB_window");
+	var dx = (X - gbwin.data("original_mouse_x"));
+	var dy = (Y - gbwin.data("original_mouse_y"));
+	if (gbwin[0].hasAttribute("data-lockratio")) {
+		var ratio = gbwin.data("original_h")/gbwin.data("original_w");
+		if ((gbwin.data("original_h") + dy)/(gbwin.data("original_w") + dx) > ratio) { //too tall
+			dy = ratio*(gbwin.data("original_w") + dx) - gbwin.data("original_h");
+		} else {
+			dx = (gbwin.data("original_h") + dy)/ratio - gbwin.data("original_w");
+		}
+	}
+
+	gbwin.css("width", Math.max(0,gbwin.data("original_w") + dx))
+	 .css("height", Math.max(0,gbwin.data("original_h") + dy));
+	$("#GB_frame").css("height", Math.max(0,gbwin.data("original_h") + dy) - 36);
+}
+function GB_endresize(e) {
+	jQuery(window).off("touchmove.GBresize touchend.GBresize mousemove.GBresize mouseup.GBresize");
+	jQuery("#GB_frameoverlay").remove();
+	jQuery("body").css("user-select","");
+}
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
 function GB_show(caption,url,width,height) {
@@ -265,11 +317,72 @@ function GB_show(caption,url,width,height) {
 		gb_window.setAttribute("aria-labelledby","GB_title");
 		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
-		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div>';
+		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_resizehandle"></div>';
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
 		GB_loaded  = true;
+		jQuery("#GB_caption").on('mousedown touchstart', function(e) {
+			if (e.target.nodeName.toLowerCase()=='input' || e.target.nodeName.toLowerCase()=='button'
+				|| e.target.nodeName.toLowerCase()=='a') {
+				return;
+			}
+			var gbwin = document.getElementById("GB_window");
+
+			if (e.type == 'touchstart') {
+				var touch = e.originalEvent.changedTouches[0] || e.originalEvent.touches[0];
+			}
+			jQuery("#GB_window").data("original_x", gbwin.getBoundingClientRect().left)
+			  .data("original_y", gbwin.getBoundingClientRect().top)
+			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
+			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY)
+			  .css("left", gbwin.getBoundingClientRect().left)
+			  .css("top", gbwin.getBoundingClientRect().top)
+			  .css("margin", 0);
+			jQuery("#GB_window").append($("<div/>", {id: "GB_frameoverlay"}));
+			jQuery("body").css("user-select","none");
+			
+			if (e.type == 'touchstart') {
+				jQuery(window).on('touchmove.GBmove', GB_move)
+				 .on('touchend.GBmove', GB_drop);
+			} else {
+				jQuery(window).on('mousemove.GBmove', GB_move)
+				 .on('mouseup.GBmove', GB_drop);
+			}
+		});
+		jQuery("#GB_resizehandle").on('mousedown touchstart', function(e) {
+			if (e.type == 'touchstart') {
+				var touch = e.originalEvent.changedTouches[0] || e.originalEvent.touches[0];
+			}
+			var gbwin = document.getElementById("GB_window");
+			
+			jQuery("#GB_window").css("left", gbwin.getBoundingClientRect().left)
+			  .css("top", gbwin.getBoundingClientRect().top)
+			  .css("margin", 0)
+			  .data("original_w", $(gbwin).width())
+			  .data("original_h", $(gbwin).height())
+			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
+			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY);
+			  
+			jQuery("#GB_window").append($("<div/>", {id: "GB_frameoverlay"}));
+			jQuery("body").css("user-select","none");
+			
+			if (e.type == 'touchstart') {
+				jQuery(window).on('touchmove.GBresize', GB_resize)
+				 .on('touchend.GBresize', GB_endresize);
+			} else {
+				jQuery(window).on('mousemove.GBresize', GB_resize)
+				 .on('mouseup.GBresize', GB_endresize);
+			}
+		});
 	}
-	document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+	if (url.charAt(0)=='<') {
+		document.getElementById("GB_frameholder").innerHTML = '<div>'+url+'</div>';
+		if (url.match(/data-enlarged/)) {
+			jQuery("#GB_window").attr("data-lockratio", 1);
+		}
+		setTimeout(GB_doneload, 50);
+	} else {
+		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+	}
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
@@ -295,11 +408,13 @@ function GB_show(caption,url,width,height) {
 	if (width > w-20) {
 		width = w-20;
 	}
+	$("#GB_window").css("margin","").css("left","").css("top","");
 	document.getElementById("GB_window").style.width = width + "px";
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-	document.getElementById("GB_frame").style.height = (h - 30 -36)+"px";
-
+	if (url.charAt(0)!='<') {
+		document.getElementById("GB_frame").style.height = (h - 30 -36)+"px";
+	}
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {
