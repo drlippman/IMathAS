@@ -4,6 +4,8 @@
 function showNewUserValidation($formname, $extrarequired=array(), $requiredrules=array(), $options=array()) {
   global $loginformat, $CFG;
 
+  $extrarequired = array_diff($extrarequired,array('SID','firstname','lastname','email','pw1','pw2'));
+  
   if (is_array($loginformat)) {
     $loginformat = '['.implode(',', $loginformat).']';
   }

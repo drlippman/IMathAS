@@ -9,7 +9,7 @@
 	require("header.php");
 	$pagetitle = "Instructor Account Request";
 	require("infoheader.php");
-	$extrarequired = array('school','phone','agree');
+	$required = array('SID','firstname','lastname','email','pw1','pw2','school','phone','agree');
 
 	if (isset($_POST['firstname'])) {
 		$error = '';
@@ -17,7 +17,7 @@
 			$error .= "<p>You must agree to the Terms and Conditions to set up an account</p>";
 		}
 
-		$error .= checkNewUserValidation(array_merge($extrarequired, array('SID','firstname','lastname','email','pw1','pw2')));
+		$error .= checkNewUserValidation($required);
 
 		if ($error != '') {
 			echo $error;
@@ -87,7 +87,7 @@
 		}
 	}
 	if (isset($_POST['firstname'])) {$firstname=Sanitize::encodeStringForDisplay($_POST['firstname']);} else {$firstname='';}
-	if (isset($_POST['lastname'])) {$lasname=Sanitize::encodeStringForDisplay($_POST['lastname']);} else {$lastname='';}
+	if (isset($_POST['lastname'])) {$lastname=Sanitize::encodeStringForDisplay($_POST['lastname']);} else {$lastname='';}
 	if (isset($_POST['email'])) {$email=Sanitize::encodeStringForDisplay($_POST['email']);} else {$email='';}
 	if (isset($_POST['phone'])) {$phone=Sanitize::encodeStringForDisplay($_POST['phone']);} else {$phone='';}
 	if (isset($_POST['school'])) {$school=Sanitize::encodeStringForDisplay($_POST['school']);} else {$school='';}
@@ -113,6 +113,6 @@
 	echo "<p><em>Copyrighted materials should not be posted or used in questions without the permission of the copyright owner.  You shall be solely ";
 	echo "responsible for your own user created content and the consequences of posting or publishing them.  This site expressly disclaims any and all liability in ";
 	echo "connection with user created content.</em></p>";
-	showNewUserValidation('newinstrform',$extrarequired);
+	showNewUserValidation('newinstrform',$required);
 	require("footer.php");
 ?>
