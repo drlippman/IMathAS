@@ -3079,8 +3079,22 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
 						$out .= ' alt="Open dot"/>';
 					}
-
-
+				} else if ($answerformat[0]=='numberline') {
+					if (in_array('lineseg',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/numlines.png\" onclick=\"imathasDraw.settool(this,$qn,0.5)\" ";
+						if (count($answerformat)==1 || $answerformat[1]=='lineseg') { $out .= 'class="sel" '; $def = 0.5;}
+						$out .= ' alt="Line segments and rays" title="Line segments and rays"/>';
+					}
+					if (count($answerformat)==1 || in_array('dot',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpdot.gif\" onclick=\"imathasDraw.settool(this,$qn,1)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='dot') { $out .= 'class="sel" '; $def = 1;}
+						$out .= ' alt="Closed dot" title="Closed dot"/>';
+					}
+					if (in_array('opendot',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpodot.gif\" onclick=\"imathasDraw.settool(this,$qn,2)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
+						$out .= ' alt="Open dot" title="Open dot"/>';
+					}
 				} else {
 					if ($answerformat[0]=='numberline') {
 						array_shift($answerformat);
@@ -3233,9 +3247,29 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($function)>2) {
 							if ($function[1] == '-oo') { $function[1] = $settings[0]-.1*($settings[1]-$settings[0]);}
 							if ($function[2] == 'oo') { $function[2] = $settings[1]+.1*($settings[1]-$settings[0]);}
+							if ($locky && $function[1] < $settings[0]) {
+								$function[1] = $settings[0]-10*($settings[1]-$settings[0])/($settings[6]-10);
+							}
+							if ($locky && $function[2] > $settings[1]) {
+								$function[2] = $settings[1] + 10*($settings[1]-$settings[0])/($settings[6]-10);
+							}
 							$saarr[$k] .= ','.$function[1].','.$function[2];
+							if ($locky) {
+								if ($function[1] == '-oo' || $function[1] < $settings[0]) { //left arrow
+									$saarr[$k] .= ',arrow';
+								} else {
+									$saarr[$k] .= ',';
+								}
+								if ($function[2] == 'oo' || $function[2] > $settings[1]) { //right arrow
+									$saarr[$k] .= ',arrow';
+								} else {
+									$saarr[$k] .= ',';
+								}
+							} else {
+								$saarr[$k] .= ',,';
+							}
 							if ($locky==1) {
-								$saarr[$k] .=',,,3';
+								$saarr[$k] .=',3';
 							}
 						} else if ($locky==1) {
 							$saarr[$k] .=',,,,,3';
