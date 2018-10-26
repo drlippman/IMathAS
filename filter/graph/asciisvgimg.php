@@ -1047,7 +1047,7 @@ function ASslopefield($arg) {
 	*/
 	$func = mathphp($func,"x|y");
 	$func = str_replace(array('(x)','(y)'),array('($x)','($y)'),$func);
-	$efunc = create_function('$x,$y','return ('.$func.');');
+	$efunc = my_create_function('$x,$y','return ('.$func.');');
 	$dz = sqrt($dx*$dx + $dy*$dy)/6;
 	$x_min = ceil($this->xmin/$dx);
 	$y_min = ceil($this->ymin/$dy);
@@ -1085,16 +1085,16 @@ function ASplot($function) {
 		$xfunc = str_replace("[","",$funcp[0]);
 		$xfunc = mathphp($xfunc,"t");
 		$xfunc = str_replace("(t)",'($t)',$xfunc);
-		$exfunc = create_function('$t','return ('.$xfunc.');');
+		$exfunc = my_create_function('$t','return ('.$xfunc.');');
 		$yfunc = str_replace("]","",$funcp[1]);
 		$yfunc = mathphp($yfunc,"t");
 		$yfunc = str_replace("(t)",'($t)',$yfunc);
-		$eyfunc = create_function('$t','return ('.$yfunc.');');
+		$eyfunc = my_create_function('$t','return ('.$yfunc.');');
 	} else {
 		$isparametric = false;
 		$func = mathphp($function[0],"x");
 		$func = str_replace("(x)",'($x)',$func);
-		$efunc = create_function('$x','return ('.$func.');');
+		$efunc = my_create_function('$x','return ('.$func.');');
 	}
 	$avoid = array();
 	if (isset($function[1]) && $function[1]!='' && $function[1]!='null') {

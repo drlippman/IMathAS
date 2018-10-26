@@ -19,7 +19,7 @@ function bisectionsolve($func, $xmin, $xmax) {
 	$func = makepretty($func);
 	$func = mathphp($func,"x");
 	$func = str_replace("(x)",'($x)',$func);
-	$f = create_function('$x','return ('.$func.');');
+	$f = my_create_function('$x','return ('.$func.');');
 	$fleft = $f($left);
 	if ($fleft*$f($right)>0) {
 		echo "error: function is same sign at both endpoints";

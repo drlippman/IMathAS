@@ -313,7 +313,7 @@ function countif($a,$ifcond) {
 	$ifcond = mathphp($ifcond,'x');
 	$ifcond = str_replace('#=','!=',$ifcond);
 	$ifcond = str_replace('(x)','($x)',$ifcond);
-	$iffunc = create_function('$x','return('.$ifcond.');');
+	$iffunc = my_create_function('$x','return('.$ifcond.');');
 
 	$cnt = 0;
 	foreach ($a as $v) {
@@ -1069,7 +1069,7 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 	}
 	$linec = mathphp(makepretty($line),$var);
 	$linec = str_replace("($var)",'($t)',$linec);
-	$linefunc = create_function('$t','return('.$linec.');');
+	$linefunc = my_create_function('$t','return('.$linec.');');
 
 	$xmin = min($xarr);
 	$xmax = max($xarr);

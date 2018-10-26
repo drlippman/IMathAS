@@ -37,7 +37,7 @@ function calculusnumint($func,$var,$a,$b,$n,$method) {
 	$func = mathphp($func,$var);
 	if ($func=='0;') { return 0;}
 	$func = str_replace("($var)","(\$$var)",$func);
-	$evalfunc = create_function("\$$var",'return('.$func.');');
+	$evalfunc = my_create_function("\$$var",'return('.$func.');');
 	$dx = ($b-$a)/$n;
 	if ($method=='right') {
 		$x = $a+$dx;

@@ -231,8 +231,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$yfunc = mathphp($yfunc,"t");
 			$yfunc = str_replace("(t)",'($t)',$yfunc);
 			array_shift($function);
-			$evalxfunc = create_function('$t','return('.$xfunc.');');
-			$evalyfunc = create_function('$t','return('.$yfunc.');');
+			$evalxfunc = my_create_function('$t','return('.$xfunc.');');
+			$evalyfunc = my_create_function('$t','return('.$yfunc.');');
 			if ($evalxfunc===false || $evalyfunc===false) {continue;}
 		} else if ($function[0]{0}=='<' || $function[0]{0}=='>') {
 			$isineq = true;
@@ -245,7 +245,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
-			$evalfunc = create_function('$x','return('.$func.');');
+			$evalfunc = my_create_function('$x','return('.$func.');');
 			if ($evalfunc===false) {continue;}
 		} else if (strlen($function[0])>1 && $function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>' || $function[0]{1}=='=')) {
 			$isxequals = true;
@@ -265,7 +265,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$func = makepretty($function[0]);
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
-			$evalfunc = create_function('$x','return('.$func.');');
+			$evalfunc = my_create_function('$x','return('.$func.');');
 			if ($evalfunc===false) {continue;}
 		}
 
@@ -1615,7 +1615,7 @@ function calconarray($array,$todo) {
 	*/
 	$todo = mathphp($todo,'x',false,false);
 	$todo = str_replace('(x)','($x)',$todo);
-	return array_map(create_function('$x','return('.$todo.');'),$array);
+	return array_map(my_create_function('$x','return('.$todo.');'),$array);
 }
 
 function multicalconarray() {
@@ -1636,7 +1636,7 @@ function multicalconarray() {
 	}
 	$todo = str_replace("'","\'",$todo);
 	$varlist = '$'.implode(',$',$vars);
-	$evalstr = "return(array_map(create_function('$varlist','return($todo);')";
+	$evalstr = "return(array_map(my_create_function('$varlist','return($todo);')";
 	$cnt = count($args[0]);
 	for ($i=0; $i<count($args); $i++) {
 		$evalstr .= ',$args['.$i.']';
@@ -1691,9 +1691,9 @@ function calconarrayif($array,$todo,$ifcond) {
 	//$ifcond = str_replace('#=','!=',$ifcond);
 	$ifcond = str_replace('(x)','($x)',$ifcond);
 
-	$iffunc = create_function('$x','return('.$ifcond.');');
+	$iffunc = my_create_function('$x','return('.$ifcond.');');
 
-	$tmpfunc = create_function('$x','return('.$todo.');');
+	$tmpfunc = my_create_function('$x','return('.$todo.');');
 	foreach($array as $k=>$x) {
 		if ($iffunc($x)) {
 			$array[$k] = $tmpfunc($x);
