@@ -515,8 +515,6 @@ if ($overwriteBody==1) {
 		if ($allowcourseimport) {
 ?>
 		<p><b><?php echo _('Export/Import'); ?></b><br/>
-			<a href="../admin/export.php?cid=<?php echo $cid ?>"><?php echo _('Export Question Set'); ?></a><br/>
-			<a href="../admin/import.php?cid=<?php echo $cid ?>"><?php echo _('Import Question Set'); ?></a><br/>
 			<a href="../admin/exportlib.php?cid=<?php echo $cid ?>"><?php echo _('Export Libraries'); ?></a><br/>
 			<a href="../admin/importlib.php?cid=<?php echo $cid ?>"><?php echo _('Import Libraries'); ?></a>
 		</p>
