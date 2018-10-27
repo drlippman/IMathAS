@@ -1,8 +1,17 @@
 <?php
 
 function send_SESemail($email, $from, $subject, $message, $replyto=array(), $bccList=array()) {
-	require_once(__DIR__ . "/../includes/mailses.php");
-	$ses = new SimpleEmailService(getenv('SES_KEY_ID'), getenv('SES_SECRET_KEY'), 'email.us-west-2.amazonaws.com');
+	global $CFG;
+	if (!isset($CFG['email']['SES_KEY_ID'])) {
+		$CFG['email']['SES_KEY_ID'] = getenv('SES_KEY_ID');
+	}
+	if (!isset($CFG['email']['SES_SECRET_KEY'])) {
+		$CFG['email']['SES_SECRET_KEY'] = getenv('SES_SECRET_KEY');
+	} 
+	if (!isset($CFG['email']['SES_SERVER'])) {
+		$CFG['email']['SES_SERVER'] = 'email.us-west-2.amazonaws.com';
+	} 
+	$ses = new SimpleEmailService($CFG['email']['SES_KEY_ID'], $CFG['email']['SES_SECRET_KEY'], $CFG['email']['SES_SERVER']);
 	$m = new SimpleEmailServiceMessage();
 	
 	foreach ($email as $address) {
