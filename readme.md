@@ -71,7 +71,7 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['domainlevel']`:  Used to set the appropriate specificity for cookies.  By default, only the last two parts of the domain are used for cookies, for example `sitename.com` would be used from `www.sitename.com`.  If you are running your site on a subdomain, you may need to include more parts.  Specify the number, with a negative, so `$CFG['GEN']['domainlevel'] = -3` to keep 3 parts.
 - `$CFG['GEN']['doSafeCourseDelete']`: If set to true, deleting a course will hide it instead of actually deleting it.  An admin can un-delete it later if needed.
 - `$CFG['coursebrowser']`:  If you wish to use the course browser feature, copy `/javascript/coursebrowserprops.js.dist` to `/javascript/coursebrowserprops.js`, edit it, then set:
-    -  `$CFG['coursebrowser'] = 'coursebrowserprops.js'`.
+    - `$CFG['coursebrowser'] = 'coursebrowserprops.js'`.
     - `$CFG['coursebrowsermsg']`: Optionally set this to override the default "Copy a template or promoted course" message.
 - `$CFG['GEN']['enrollonnewinstructor']`:  Set to an array of course IDs that new instructors should automatically be enrolled in (like a support course or training course).
 - `$CFG['GEN']['guesttempaccts']`: Set to true to allow logging on as `guest` with no password.  Also enables the "guest access" option in course settings, which defines which courses a guest will get auto-enrolled in.
@@ -100,24 +100,20 @@ These provide additional validation options beyond `$loginformat`.
 ### Access Limits
 - `$CFG['GEN']['addteachersrights']`: Set to the minimum rights level needed to Add/Remove Teachers in a course.  Defaults to 40 (Limited Course Creator rights).
 - `$CFG['GEN']['noimathasexportfornonadmins']`: Set to true to prevent non-admins from exporting a course in IMathAS backup/transfer format.
-- `$CFG['coursebrowserRightsToPromote']`: Set to the minimum rights level needed to Promote a course into the course browser.  Defaults to 40 (Limited Course Creator rights).  Requires setting up the course browser.`
+- `$CFG['coursebrowserRightsToPromote']`: Set to the minimum rights level needed to Promote a course into the course browser.  Defaults to 40 (Limited Course Creator rights).  Requires setting up the course browser.
 - `$CFG['GEN']['noInstrExternalTools']`:  Set to true to prevent instructors from setting up new LTI tools (where IMathAS would be acting as consumer).  They'll still be able to use any LTI tools set up by an Admin.
 - `$CFG['GEN']['noimathasimportfornonadmins']`:  Set to true to prevent non-admins from using the "Import Course Items" feature.
 - `$CFG['GEN']['noInstrUnenroll']`: Set to true to prevent instructors from Unenrolling students; they will only be able to lock out students.
 - `$CFG['GEN']['allowinstraddstus']`: Set to true to allow instructors to create new student accounts or import students from a file.  Default to true.  Generally not recommended on multi-school installs.
 - `$CFG['GEN']['allowinstraddbyusername']`: Set to true to prevent instructors from adding students to their course using usernames.  Defaults to false.
 - `$CFG['GEN']['allowinstraddtutors']`:  Set to false to prevent teachers from adding tutors.  Default to true.
-- `
-
-
 
 ### Personalization
 
 In addition to the `$CFG['CPS']['theme']` option described above for setting the default theme and even forcing the use of the default theme, you can also provide users with a limited selection of themes by defining the following:
 
 - `$CFG['CPS']['themelist']`: a comma-separated list of theme css files to allow as themes.
--`$CFG['CPS']['themenames']`: a comma-separated list of display names for the theme css files you included in `themelist`.
-
+- `$CFG['CPS']['themenames']`: a comma-separated list of display names for the theme css files you included in `themelist`.
 - `$CFG['GEN']['favicon']`:  Set this to override the default `/favicon.ico` path for a site favicon.
 - `$CFG['GEN']['headerscriptinclude']`:  Set to a file path, relative to web root.  This file is included at the end of the `<head>` on every page.  Handy for including custom script tags or additional CSS files.
 - `$CFG['GEN']['headerinclude']`:  Set to a file path, relative to web root.  This file is included in the `<div class="headerwrapper">` at the top of the body on all pages.  Handy for custom headers.
@@ -126,7 +122,6 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 - `$CFG['GEN']['hidedefindexmenu']`: Set to anything to hide the "Change User Info" and "Change password" links from the upper right of the Home page.
 - `$CFG['GEN']['hometitle']`:  Set to a message to display at the top of the Home page, in place of "Welcome to _____, ______" 
 - `$CFG['CPS']['leftnavtools']`:  Set to `"limited"` to remove from the course left navigation tools that are also in the top navigation.  Set to false to remove the entire Tools block from the course left navigation.
-
 - `$CFG['GEN']['deflicense']`:  The default license for new questions.  See `/course/moddataset.php` for valid values.  Defaults to 1 (IMathAS community license).
  
 ### LTI
@@ -169,6 +164,23 @@ The student side of the system is pretty well set up for i18n, but the instructo
 
 ### Development
 - `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.
+
+### Course Cleanup
+Automated course cleanup (unenrolling students from a course) can be enabled.  To use this, you'll need to set up a cron job or scheduled web call to run:
+- `/util/tagcoursecleanup.php`:  Run this once a day
+- `/util/runcoursecleanup.php`:  Run this about every 10 minutes. Can be limited to slow usage periods.
+
+If using a scheduled web call, you'll need to define:
+- `$CFG['cleanup']['authcode']`:  define this and pass it in the query string, like `runcoursecleanup.php?authcode=####`
+
+Options:
+- `$CFG['cleanup']['old']`:  a number of days after which a course is tagged for deletion.  Measured from the course end date or last date of student activity (def: 610)
+- `$CFG['cleanup']['delay']`:    a number of days to delay after notifying the teacher before emptying the course (def: 120)
+- `$CFG['cleanup']['msgfrom']`:  the userid to send notification message from (def: 0)
+- `$CFG['cleanup']['keepsent']`:   set =0 to keep a copy of sent notifications in sent list
+- `$CFG['cleanup']['allowoptout']`:   (default: true) set to false to prevent teachers opting out 
+- `$CFG['cleanup']['groups']`: You can specify different old/delay values for different groups by defining
+`$CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));`
 
 ### Additional Feature Setup
 #### LivePoll
