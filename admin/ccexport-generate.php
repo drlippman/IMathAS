@@ -567,12 +567,26 @@ if ($linktype=='canvas') {
 		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
 		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
 		fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
+		/*
+		//Canvas-specific extension
 		fwrite($fp,' <lticm:options name="resource_selection">
 			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</lticm:property>
 			<lticm:property name="text">Pick an Assessment</lticm:property>
 			<lticm:property name="selection_width">500</lticm:property>
 			<lticm:property name="selection_height">300</lticm:property>
 		      </lticm:options>');
+		*/
+		//Deep Linking extension
+		fwrite($fp,' <lticm:options name="assignment_selection">
+			<lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=assn</lticm:property>
+		     </lticm:options>
+		     <lticm:options name="link_selection">
+			<lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=link</lticm:property>
+		     </lticm:options>
+		     <lticm:property name="selection_width">500</lticm:property>
+		     <lticm:property name="selection_height">300</lticm:property>');
 		fwrite($fp,'</blti:extensions>');
 		fwrite($fp,'<blti:custom>');
 		fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');

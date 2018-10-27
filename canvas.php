@@ -34,12 +34,16 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
       <lticm:property name="domain"><?php echo $shorthost; ?></lticm:property>
       <lticm:property name="tool_id">resource_selection</lticm:property>
       <lticm:property name="privacy_level">public</lticm:property>
-      <lticm:options name="resource_selection">
-        <lticm:property name="url"><?php echo $urlmode.$host . $imasroot . '/bltilaunch.php';?></lticm:property>
-        <lticm:property name="text">Pick an Assessment</lticm:property>
-        <lticm:property name="selection_width">500</lticm:property>
-        <lticm:property name="selection_height">300</lticm:property>
+      <lticm:options name="assignment_selection">
+        <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+        <lticm:property name="url"><?php echo $urlmode.$host . $imasroot . '/bltilaunch.php?ltiseltype=assn';?></lticm:property>
       </lticm:options>
+      <lticm:options name="link_selection">
+        <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+        <lticm:property name="url"><?php echo $urlmode.$host . $imasroot . '/bltilaunch.php?ltiseltype=link';?></lticm:property>
+      </lticm:options>
+      <lticm:property name="selection_width">500</lticm:property>
+      <lticm:property name="selection_height">300</lticm:property>
       <lticm:property name="session_setup_url"><?php echo $urlmode.$host . $imasroot . '/ltisessionsetup.php';?></lticm:property>
     </blti:extensions>
     <blti:custom>
