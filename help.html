@@ -2314,8 +2314,8 @@ The following macros create graphs or tables:
   question and pulls out the two-point line data.  Returns an array of lines, each of form array(x1,y1,x2,y2) giving the coordinates
   of the two points used.</li>
   <li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing question
-  and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'parab', 'sqrt',
-  'sin', 'cos', 'abs', 'vector', 'circle'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
+  and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'lineseg', 'ray', 'parab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
+  'rationa', 'exp', 'log', 'sin', 'cos', 'abs', 'vector', 'circle'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
   the two points used.  They are returned in the order clicked.  For example, with 'parab' type, the first point is the vertex and the
   second point is an arbitrary point.</li>
 <li><strong>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing
@@ -3266,19 +3266,23 @@ drawn line from the correct line.
 	        	<li>ray (rays)</li>
 	        	<li>parab (vertical parabolas)</li>
 	        	<li>horizparab (horizontal parabolas)</li>
+	        	<li>cubic (a(x-h)^3+k style cubics)</li>
 	        	<li>abs (absolute value)</li>
 	        	<li>circle (circles)</li>
 	        	<li>dot (open and closed dots)</li>
 	        	<li>sqrt (square root)</li>
+	        	<li>cuberoot (cube root)</li>
 	        	<li>trig (sin and cos)</li>
 	        	<li>vector (position or displacement vectors)</li>
 	        	<li>exp (exponential with horizontal asymptote at y=0)</li>
+	        	<li>genexp (exponential with any horizontal asymptote)</li>
 	        	<li>log (logarithm with vertical asymptote at x=0)</li>
+	        	<li>genlog (logarithm with any vertical asymptote)</li>
 	        	<li>rational (linear/linear rational)</li>
 	        	<li>ellipse (ellipses)</li>
 	        	<li>hyperbola (vertical or horizontal hyperbolas)</li>
 	        	</ul></li>
-	        <li>For lines, vertical parabolas, absolute values, square roots, sines, cosines, exponentials, logs, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
+	        <li>For lines, vertical parabolas, absolute values, square roots, cubics, cuberoots, sines, cosines, exponentials, logs, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
 	        <li>For line segments and rays, given $answers as a function with domain, like "2x+4,-oo,3", or for vertical line segments use x= and give the range, like "x=4,-2,3"</li>
 	        <li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
 	        <li>For circles, give $answers as "circle,x,y,radius", like "circle,2,-1,3"</li>

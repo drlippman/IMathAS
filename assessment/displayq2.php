@@ -3028,10 +3028,20 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='horizparab') { $out .= 'class="sel" '; $def = 6.1;}
 						$out .= ' alt="Horizontal parabola"/>';
 					}
+					if (in_array('cubic',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpcubic.png\" onclick=\"imathasDraw.settool(this,$qn,6.3)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='cubic') { $out .= 'class="sel" '; $def = 6.3;}
+						$out .= ' alt="Cubic"/>';
+					}
 					if (in_array('sqrt',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpsqrt.png\" onclick=\"imathasDraw.settool(this,$qn,6.5)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='sqrt') { $out .= 'class="sel" '; $def = 6.5;}
 						$out .= ' alt="Square root"/>';
+					}
+					if (in_array('cuberoot',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpcuberoot.png\" onclick=\"imathasDraw.settool(this,$qn,6.6)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='cuberoot') { $out .= 'class="sel" '; $def = 6.6;}
+						$out .= ' alt="Cube Root"/>';
 					}
 					if (count($answerformat)==1 || in_array('abs',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpabs.gif\" onclick=\"imathasDraw.settool(this,$qn,8)\" ";
@@ -5510,6 +5520,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$anshparabs = array();
 			$ansabs = array();
 			$anssqrts = array();
+			$anscubics = array();
+			$anscuberoots = array();
 			$ansexps = array();
 			$anslogs = array();
 			$anscoss = array();
@@ -5816,6 +5828,36 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								$anscoss[$key] = array($secxp,$xintp,$secyp,$yintp);
 							}
 						}
+					} else if (strpos($function[0],'^3')!==false) { //cubic
+						$y4p = $ytopix($func($x4));
+						$a1 = safepow($x3p,3)-2*safepow($x2p,3)+safepow($x1p,3);
+						$a2 = safepow($x4p,3)-2*safepow($x3p,3)+safepow($x2p,3);
+						$b1 = safepow($x3p,2)-2*safepow($x2p,2)+safepow($x1p,2);
+						$b2 = safepow($x4p,2)-2*safepow($x3p,2)+safepow($x2p,2);
+						$c1 = $y3p - 2*$y2p + $y1p;
+						$c2 = $y4p - 2*$y3p + $y2p;
+						$a = ($c1*$b2 - $c2*$b1)/($a1*$b2-$a2*$b1);
+						$b = ($a1*$c2 - $a2*$c1)/($a1*$b2-$a2*$b1);
+						$h = -$b/(3*$a);
+						$str = ($y2p - $y1p)/(safepow($x2p-$h,3)-safepow($x1p-$h,3));
+						$k = $y2p - $str*safepow($x2p-$h,3);
+						$anscubics[$key] = array($h, $k, safepow($str,1/3));
+					} else if (strpos($function[0],'root(3)')!==false || strpos($function[0],'^(1/3)')!==false) { //cube root
+						//y=str*cuberoot(x-h)^3+k is equiv to x=(1/str^3)(y-k)^3+h
+						$y4p = $ytopix($func($x4));
+						$a1 = safepow($y3p,2)-safepow($y1p,2)+ $y3p*$y2p - $y1p*$y2p;
+						$a2 = safepow($y4p,2)-safepow($y2p,2)+ $y4p*$y3p - $y2p*$y3p;
+						$b1 = $y3p - $y1p;
+						$b2 = $y4p - $y2p;
+						$c1 = ($x3p - $x2p)/($y3p - $y2p) - ($x2p - $x1p)/($y2p - $y1p);
+						$c2 = ($x4p - $x3p)/($y4p - $y3p) - ($x3p - $x2p)/($y3p - $y2p);
+						$a = ($c1*$b2 - $c2*$b1)/($a1*$b2-$a2*$b1);
+						$b = ($a1*$c2 - $a2*$c1)/($a1*$b2-$a2*$b1);
+						$k = -$b/(3*$a);
+						$invstr = ($x2p - $x1p)/(safepow($y2p-$k,3)-safepow($y1p-$k,3));
+						$h = $x2p - $invstr*safepow($y2p-$k,3);
+						//$str = 1/safepow($invstr,1/3);
+						$anscuberoots[$key] = array($h, $k, 1/$invstr);
 					} else if (preg_match('/\^[^2]/',$function[0])) { //exponential
 						/*
 						To do general exponential, we'll need 3 points. 
@@ -5900,6 +5942,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$rats = array();
 			$ellipses = array();
 			$hyperbolas = array();
+			$cubics = array();
+			$cuberoots = array();
 			if ($tplines=='') {
 				$tplines = array();
 			} else {
@@ -5956,6 +6000,23 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$secxp = $pts[1] + ($x4p-$x0p)/5*$flip;  //over 1/5 of grid width
 						$secyp = $stretch*sqrt($flip*($secxp - $pts[1]))+($pts[2]);
 						$sqrts[] = array($pts[1],$pts[2],$secyp);
+					} else if ($pts[0]==6.3) {
+						//cubic
+						if ($pts[4]==$pts[2]) {
+							$lines[] = array('y',0,$pts[4]);
+						} else if ($pts[3]!=$pts[1]) {
+							//this is the cube root of the stretch factor
+							$a = safepow($pts[4]-$pts[2], 1/3)/($pts[3]-$pts[1]);
+							$cubics[] = array($pts[1],$pts[2], $a);
+						}
+					} else if ($pts[0]==6.6) {
+						//cube root
+						if ($pts[4]==$pts[2]) {
+							$lines[] = array('y',0,$pts[4]);
+						} else if ($pts[3]!=$pts[1]) {
+							$a = safepow($pts[4]-$pts[2],3)/($pts[3]-$pts[1]);
+							$cuberoots[] = array($pts[1],$pts[2],$a);
+						}
 					} else if ($pts[0]==7) {
 						//circle
 						$rad = sqrt(($pts[3]-$pts[1])*($pts[3]-$pts[1]) + ($pts[4]-$pts[2])*($pts[4]-$pts[2]));
@@ -6314,6 +6375,41 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if (abs($ansparab[3]-$hparabs[$i][2])>$defpttol*$reltolerance) {
 							continue;
 						}
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			foreach ($anscubics as $key=>$anscubic) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($cubics); $i++) {
+					if (abs($anscubic[0]-$cubics[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anscubic[1]-$cubics[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anscubic[2]-$cubics[$i][2])/abs($anscubic[2]) > $deftol*$reltolerance) {
+						continue;
+					}
+					
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			//print_r($anscuberoots);
+			//print_r($cuberoots);
+			foreach ($anscuberoots as $key=>$anscuberoot) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($cuberoots); $i++) {
+					if (abs($anscuberoot[0]-$cuberoots[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anscuberoot[1]-$cuberoots[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anscuberoot[2]-$cuberoots[$i][2])/abs($anscuberoot[2]) > $deftol*$reltolerance) {
+						continue;
 					}
 					$scores[$key] = 1;
 					break;

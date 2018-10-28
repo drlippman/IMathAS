@@ -1,45 +1,3 @@
-var canvases = new Array();
-var drawla = new Array();
-
-var imathasDraw = (function($) {
-var mouseisdown = false;
-var targets = new Array();
-var imgs = new Array();
-var targetOuts = new Array();
-var a11ytargets = new Array();
-var lines = new Array();
-var dots = new Array();
-var odots = new Array();
-var tplines = new Array();
-var tptypes = new Array();
-var ineqlines = new Array();
-var ineqtypes = new Array();
-var curLine = null;
-var drawstyle = [];
-var drawlocky = [];
-var curTPcurve = null;
-var curIneqcurve = null; //inequalities
-var ineqcolors = ["rgb(0,0,255)","rgb(255,0,0)","rgb(0,255,0)"];
-var ineqacolors = ["rgba(0,0,255,.4)","rgba(255,0,0,.4)","rgba(0,255,0,.4)"];
-var asymcolor = "rgb(0,200,0)";
-var dragObj = null;
-var oldpointpos = null;
-var curTarget = null;
-var curCursor = null;
-var nocanvaswarning = false;
-var hasTouch = false;
-var didMultiTouch = false;
-var clickmightbenewcurve = false;
-var hasTouchTimer = null;
-var tpModeN = {
-	"5": 2, "5.2": 2, "5.3": 2, "5.4": 2,
-	"6": 2, "6.1": 2, "6.5": 2,
-	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
-	"8": 2, "8.2": 2, "8.3": 2, "8.4": 2, "8.5": 3, "8.6": 3,
-	"9": 2, "9.1": 2,
-	"10": 3, "10.2": 3, "10.3": 3, "10.4": 3};
-var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
-
 /*
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
@@ -82,7 +40,9 @@ var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
 	5.4:  vector
 	6: parabola
 	6.1: horiz parabola
+	6.3: cubic
 	6.5: square root
+	6.6: cube root
 	7: circle (only works on square grids)
 	7.2: ellipse
 	7.4: vertical hyperbola
@@ -102,6 +62,50 @@ var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
 	10.4: quadratic < or >
 
 */
+
+var canvases = new Array();
+var drawla = new Array();
+
+var imathasDraw = (function($) {
+var mouseisdown = false;
+var targets = new Array();
+var imgs = new Array();
+var targetOuts = new Array();
+var a11ytargets = new Array();
+var lines = new Array();
+var dots = new Array();
+var odots = new Array();
+var tplines = new Array();
+var tptypes = new Array();
+var ineqlines = new Array();
+var ineqtypes = new Array();
+var curLine = null;
+var drawstyle = [];
+var drawlocky = [];
+var curTPcurve = null;
+var curIneqcurve = null; //inequalities
+var ineqcolors = ["rgb(0,0,255)","rgb(255,0,0)","rgb(0,255,0)"];
+var ineqacolors = ["rgba(0,0,255,.4)","rgba(255,0,0,.4)","rgba(0,255,0,.4)"];
+var asymcolor = "rgb(0,200,0)";
+var dragObj = null;
+var oldpointpos = null;
+var curTarget = null;
+var curCursor = null;
+var nocanvaswarning = false;
+var hasTouch = false;
+var didMultiTouch = false;
+var clickmightbenewcurve = false;
+var hasTouchTimer = null;
+var tpModeN = {
+	"5": 2, "5.2": 2, "5.3": 2, "5.4": 2,
+	"6": 2, "6.1": 2, "6.3": 2, "6.5": 2, "6.6": 2,
+	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
+	"8": 2, "8.2": 2, "8.3": 2, "8.4": 2, "8.5": 3, "8.6": 3,
+	"9": 2, "9.1": 2,
+	"10": 3, "10.2": 3, "10.3": 3, "10.4": 3};
+var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
+
+
 function clearcanvas(tarnum) {
 	lines[tarnum].length = 0;
 	dots[tarnum].length = 0;
@@ -174,7 +178,8 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"ray": [{"mode":5.2, "descr":_("Ray"), inN: 2, "input":_("Enter the starting point of the ray and another point on the ray")}],
 			"parab": [{"mode":6, "descr":_("Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
 			"horizparab": [{"mode":6.1, "descr":_("Parabola opening right or left"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
-			"sqrt": [{"mode":6.5, "descr":_("Square root"), inN: 2, "input":_("Enter the starting point of the square root, then another point on the graph")}],
+			"cubic": [{"mode":6.3, "descr":_("Cubic"), inN: 2, "input":_("Enter the inflection point, then another point on the cubic")}],
+			"cuberoot": [{"mode":6.6, "descr":_("Cube root"), inN: 2, "input":_("Enter the inflection point of the cube root, then another point on the graph")}],
 			"abs": [{"mode":8, "descr":_("Absolute value"), inN: 2, "input":_("Enter the corner point of the absolute value, then another point on the graph")}],
 			"rational": [{"mode":8.2, "descr":_("Rational"), inN: 2, "input":_("Enter the point where the vertical and horizontal asymptote cross, then a point on the graph")}],
 			"exp": [{"mode":8.3, "descr":_("Exponential"), inN: 2, "input":_("Enter two points on the graph")}],
@@ -777,6 +782,65 @@ function drawTarget(x,y) {
 						curx += flip*3;
 						ctx.lineTo(curx, stretch*Math.sqrt(flip*(curx - tplines[curTarget][i][0][0])) + tplines[curTarget][i][0][1]);
 					} while (curx > 0 && curx < targets[curTarget].imgwidth && cury > 0 && cury < targets[curTarget].imgheight);
+				}
+			}
+		} else if (tptypes[curTarget][i]==6.3) {//if a tp cubic
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
+				if (y2==tplines[curTarget][i][0][1]) {
+					ctx.moveTo(0,y2);
+					ctx.lineTo(targets[curTarget].imgwidth,y2);
+				} else {
+					var stretch = (y2-tplines[curTarget][i][0][1])/safepow(x2-tplines[curTarget][i][0][0], 3);
+					var cury = 0;
+					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 1) {
+						cury = stretch*safepow(curx-tplines[curTarget][i][0][0],3) + tplines[curTarget][i][0][1];
+						if (cury<-100) { cury = -100;}
+						if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+						if (curx==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				}
+			}
+		} else if (tptypes[curTarget][i]==6.6) {//if a tp cube root
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
+				if (y2==tplines[curTarget][i][0][1]) {
+					ctx.moveTo(0,y2);
+					ctx.lineTo(targets[curTarget].imgwidth,y2);
+				} else {
+					var stretch = (y2-tplines[curTarget][i][0][1])/safepow(x2-tplines[curTarget][i][0][0], 1/3);
+					var cury = 0;				
+					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 1) {
+						cury = stretch*safepow(curx-tplines[curTarget][i][0][0], 1/3) + tplines[curTarget][i][0][1];
+						if (curx==90) {console.log(originy+","+tplines[curTarget][i][0][0]+","+tplines[curTarget][i][0][1]+","+curx+","+cury)};
+						if (cury<-100) { cury = -100;}
+						if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+						if (curx==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
 				}
 			}
 		} else if (tptypes[curTarget][i]>=7 && tptypes[curTarget][i]<8) {//if a tp circle

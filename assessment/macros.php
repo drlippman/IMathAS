@@ -3478,14 +3478,22 @@ function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=
 		$code = 5.2;
 	} else if ($type=='parab') {
 		$code = 6;
+	} else if ($type=='horizparab') {
+		$code = 6.1;
+	} else if ($type=='cubic') {
+		$code = 6.3;
 	} else if ($type=='sqrt') {
 		$code = 6.5;
+	} else if ($type=='cuberoot') {
+		$code = 6.6;
 	} else if ($type=='abs') {
 		$code = 8;
 	} else if ($type=='rational') {
 		$code = 8.2;
 	} else if ($type=='exp') {
 		$code = 8.3;
+	} else if ($type=='log') {
+		$code = 8.4;
 	} else if ($type=='circle') {
 		$code = 7;
 	} else if ($type=='sin') {
