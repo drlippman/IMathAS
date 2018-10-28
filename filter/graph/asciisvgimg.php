@@ -1262,7 +1262,11 @@ function evalifneeded($str) {
 	} else if (trim($str)=='' || preg_match('/[^\(\)\d+\-\/\*\.]/',$str)) {
 		return 0; //return a value to prevent errors
 	} else {
-		eval("\$ret = $str;");
+		try {
+			eval("\$ret = $str;");
+		} catch (Throwable $thrownerror) {
+			return 1;
+		}
 		return $ret;
 	}
 }

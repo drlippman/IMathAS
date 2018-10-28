@@ -1366,8 +1366,15 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
-
-	eval($code);
+	try {
+		eval($code);
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 	if (!isset($answeights)) {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);

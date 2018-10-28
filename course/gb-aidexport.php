@@ -34,11 +34,18 @@ function getpts($sc) {
 function evalqsandbox($seed,$qqqcontrol,$qqqanswer) {
 	$sa = '';
 	global $RND;
-	$RND->srand($seed);
-	eval($qqqcontrol);
-	$RND->srand($seed+1);
-	eval($qqqanswer);
-
+	try {
+		$RND->srand($seed);
+		eval($qqqcontrol);
+		$RND->srand($seed+1);
+		eval($qqqanswer);
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 	if (isset($anstypes) && !is_array($anstypes)) {
 		$anstypes = explode(",",$anstypes);
 	}
