@@ -1198,6 +1198,7 @@ function generateTable() {
 					} else {
 						html += '<li><span><span class=noticetext>Withdrawn</span></span></li>';
 					}
+					html += "<li><a href=\"gb-rescoreq.php?cid="+curcid+"&aid="+curaid+"&qid="+curitems[j][0]+"&qsid="+curitems[j][1]+"\">Re-score Question</a></li>";
 				} else {
 					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></li>"; //add link
 					html += "<li><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></li>"; //add link and checkbox
