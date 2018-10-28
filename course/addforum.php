@@ -160,7 +160,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$gradebookcategory = Sanitize::onlyInt($_POST['gbcat']);
 		$available = Sanitize::onlyInt($_POST['avail']);
 		$sortby = Sanitize::onlyInt($_POST['sortby']);
-		$forumtype = Sanitize::onlyInt($_POST['forumtype']);
+		if (!isset($_POST['forumtype'])) {
+			$forumtype = 0;
+		} else {
+			$forumtype = Sanitize::onlyInt($_POST['forumtype']);
+		}
 		$forumid = Sanitize::onlyInt($_GET['id']);
 
 		if (!empty($forumid)) {  //already have id; update
@@ -513,7 +517,7 @@ if ($overwriteBody==1) {
 		</div>
 		
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
-			Posting Options
+			Basic Options
 		</div>
 		<div class="blockitems">
 		<span class=form>Group forum?</span><span class=formright>
@@ -575,10 +579,10 @@ if ($overwriteBody==1) {
 			<input type="radio" name="sortby" value="1" <?php writeHtmlChecked($sortby,1);?>/> Most recent reply date
 		</span><br class="form" />
 
-		<span class="form">Forum type:</span>
+		<span class="form">File sharing:</span>
 		<span class="formright">
-			<input type=radio name="forumtype" value="0" <?php if ($line['forumtype']==0) { echo 'checked=1';}?>/>Regular forum<br/>
-			<input type=radio name="forumtype" value="1" <?php if ($line['forumtype']==1) { echo 'checked=1';}?>/>File sharing forum
+			<input type=checkbox name=forumtype value=1 <?php if ($line['forumtype']==1) { echo 'checked=1';}?> />
+			Provide separate file upload option when posting
 		</span><br class="form"/>
 		
 		<span class="form">Categorize posts?</span>
