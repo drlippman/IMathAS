@@ -157,8 +157,13 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
 		$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	} catch (Throwable $t) {
-		$res1 = false;
-		$res2 = false;
+		$res1 = 'caught';
+		$res2 = 'caught';
+		if ($myrights>10) {
+			echo '<p>Caught error in evaluating the code in this question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
 	} catch (Exception $e) {
 		$res1 = false;
 		$res2 = false;
@@ -192,7 +197,17 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($doshowans) {
 		$RND->srand($seed+1);
 		$preevalerror = error_get_last();
-		$res1 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+		try {
+			$res1 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+		} catch (Throwable $t) {
+			$res1 = 'caught';
+			if ($myrights>10) {
+				echo '<p>Caught error in evaluating a function in this question: ';
+				echo Sanitize::encodeStringForDisplay($t->getMessage());
+				echo '</p>';
+			}
+		}
+		
 
 		if ($res1===false) {
 			if ($myrights>10) {
@@ -844,8 +859,13 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		$RND->srand($seed+1);
 		$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
 	} catch (Throwable $t) {
-		$res1 = false;
-		$res2 = false;
+		$res1 = 'caught';
+		$res2 = 'caught';
+		if ($myrights>10) {
+			echo '<p>Caught error in evaluating the code in this question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
 	} catch (Exception $e) {
 		$res1 = false;
 		$res2 = false;
@@ -4848,7 +4868,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$tp[$j] = $tps[$i][$j];
 				}
 				$realans = evalReturnValue("return ($answer);", $origanswer, array('tp'=>$tp));  //eval("return ($answer);");
-
+				
 				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 				if (in_array('equation',$ansformats)) {  //if equation, store ratios
