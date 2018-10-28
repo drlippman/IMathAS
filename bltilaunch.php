@@ -577,6 +577,20 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
+		$_SESSION['selection_return_format'] = "Canvas";
+	}
+	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
+		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
+		$_SESSION['selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
+		$_SESSION['selection_return_format'] = "IMSdeeplink";
+		if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='assn') {
+			$_SESSION['selection_type'] = 'assn';
+		} else if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='link') {
+			$_SESSION['selection_type'] = 'link';
+		} else {
+			$_SESSION['selection_type'] = 'all';
+		}
+		$_SESSION['selection_data'] = @$_REQUEST['data'];
 	}
 	unset($_SESSION['lti_duedate']);
 	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
@@ -1486,6 +1500,10 @@ $sessiondata['lti_keylookup'] = $SESS['ltilookup'];
 $sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
 if (isset($SESS['selection_return'])) {
 	$sessiondata['lti_selection_return'] = $SESS['selection_return'];
+	$sessiondata['lti_selection_targets'] = $SESS['selection_targets'];
+	$sessiondata['lti_selection_return_format'] = $SESS['selection_return_format'];
+	$sessiondata['lti_selection_type'] = $SESS['selection_type'];
+	$sessiondata['lti_selection_data'] = $SESS['selection_data'];
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {
@@ -2046,6 +2064,20 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
+		$_SESSION['selection_return_format'] = "Canvas";
+	}
+	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
+		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
+		$_SESSION['selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
+		$_SESSION['selection_return_format'] = "IMSdeeplink";
+		if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='assn') {
+			$_SESSION['selection_type'] = 'assn';
+		} else if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='link') {
+			$_SESSION['selection_type'] = 'link';
+		} else {
+			$_SESSION['selection_type'] = 'all';
+		}
+		$_SESSION['selection_data'] = @$_REQUEST['data'];
 	}
 
 	//look if we know this student
@@ -2546,6 +2578,10 @@ $sessiondata['lti_keylookup'] = $SESS['ltilookup'];
 $sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
 if (isset($SESS['selection_return'])) {
 	$sessiondata['lti_selection_return'] = $SESS['selection_return'];
+	$sessiondata['lti_selection_targets'] = $SESS['selection_targets'];
+	$sessiondata['lti_selection_return_format'] = $SESS['selection_return_format'];
+	$sessiondata['lti_selection_type'] = $SESS['selection_type'];
+	$sessiondata['lti_selection_data'] = $SESS['selection_data'];
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {

@@ -661,7 +661,7 @@
 		unset($exped);
 		
 		require_once("../includes/exceptionfuncs.php");
-		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP);
+		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP, $latepasshrs);
 		$excepadata = array(
 			'id'=>$line['assessmentid'], 
 			'allowlate'=>$line['allowlate'],
@@ -705,7 +705,7 @@
 			if ($LPblocked) {
 				echo '<p>Use of a LatePass is currently blocked because the student viewed the assessment in review mode. ';
 				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&aid=$aid&asid=$asid&from=$from&uid=$get_uid&clearreviewview=true\">";
-				echo 'Clear review view</a> to allow use of a LatePass</p>';
+				echo 'Clear review view</a> to allow use of a LatePass.</p>';
 			}
 		}
 		if ($isteacher) {
@@ -1366,8 +1366,15 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
-
-	eval($code);
+	try {
+		eval($code);
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 	if (!isset($answeights)) {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);

@@ -480,6 +480,10 @@ function ntuplecalc(inputId,outputId,format) {
 		fullstr = fullstr.toUpperCase();
 		outcalced = 'DNE';
 		outstr = 'DNE';
+	} else if (fullstr.match(/^\s*oo\s*$/i)) {
+		fullstr = fullstr.toLowerCase();
+		outcalced = 'oo';
+		outstr = '`oo`';
 	} else {
 		var outcalced = '';
 		var NCdepth = 0;

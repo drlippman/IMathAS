@@ -3,7 +3,7 @@
 //IMathAS (c) 2018 David Lippman for Lumen Learning
 
 function copyStuData($destcid, $sourcecid = null) {
-	global $DBH;
+	global $DBH, $itemtypemap;
 	
 	if ($sourcecid===null) {
 		$stm = $DBH->prepare("SELECT ancestors FROM imas_courses WHERE id=?");
@@ -111,6 +111,48 @@ function copyStuData($destcid, $sourcecid = null) {
 		$ph = Sanitize::generateQueryPlaceholdersGrouped($execarr, count($fields));
 		$stm = $DBH->prepare("INSERT IGNORE INTO imas_assessment_sessions ($fieldlist) VALUES $ph");
 		$stm->execute($execarr);
+	}
+	
+	//copy content tracking data
+	if (count($itemtypemap)>0) {
+		$execarr = array();
+		//$itemtypemap[$itemtype.$typeid] = $newtypeid;
+		$stm = $DBH->prepare("SELECT * FROM imas_content_track WHERE courseid=?");
+		$stm->execute(array($sourcecid));
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$adding = false;
+			if (strpos($row['type'], 'inline')!==false && 
+				isset($itemtypemap['InlineText'.$row['typeid']])) {
+				$execarr[] = $itemtypemap['InlineText'.$row['typeid']];
+			} else if (strpos($row['type'], 'linked')!==false && 
+				isset($itemtypemap['LinkedText'.$row['typeid']])) {
+				$execarr[] = $itemtypemap['LinkedText'.$row['typeid']];
+			} else if (strpos($row['type'], 'extref')!==false && 
+				isset($qmap[$row['typeid']])) {
+				$execarr[] = $qmap[$row['typeid']];
+			} else if (strpos($row['type'], 'assess')!==false && 
+				isset($itemtypemap['Assessment'.$row['typeid']])) {
+				$execarr[] = $itemtypemap['Assessment'.$row['typeid']];
+			} else if (strpos($row['type'], 'wiki')!==false && 
+				isset($itemtypemap['Wiki'.$row['typeid']])) {
+				$execarr[] = $itemtypemap['Wiki'.$row['typeid']];
+			} else if (strpos($row['type'], 'forum')!==false && 
+				isset($itemtypemap['Forum'.$row['typeid']])) {
+				$execarr[] = $itemtypemap['Forum'.$row['typeid']];
+			} else if (strpos($row['type'], 'drill')!==false && 
+				isset($itemtypemap['Drill'.$row['typeid']])) {
+				$execarr[] = $itemtypemap['Drill'.$row['typeid']];
+			} else {
+				continue;
+			}
+			array_push($execarr, $row['userid'], $destcid, $row['type'], $row['viewtime'], $row['info']);
+		}
+		//insert content track data
+		if (count($execarr)>0) {
+			$ph = Sanitize::generateQueryPlaceholdersGrouped($execarr, 6);
+			$stm = $DBH->prepare("INSERT IGNORE INTO imas_content_track (typeid, userid, courseid, type, viewtime, info) VALUES $ph");
+			$stm->execute($execarr);
+		}
 	}
 
 	return 1;

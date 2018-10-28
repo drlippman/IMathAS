@@ -1,23 +1,22 @@
 <?php
-// Polynomial Division 
+// Polynomial Division
 // Mike Jenck, Originally developed July 25-27, 2018
 // licensed under GPL version 2 or later
-// 
-// File Version : 7.2
+//
+// File Version : 7.3
 //
 
 global $allowedmacros;
 
-// COMMENT OUT BEFORE UPLOADING
 if(!is_array($allowedmacros)) {
-	$allowedmacros = array();	
+	$allowedmacros = array();
 }
 
 array_push($allowedmacros, "formpoly3fromstring", "dividepoly3", "longdivisionpoly3", "writepoly3");
 
 include_once("fractions.php");  // fraction routine
 
-// function formpoly3fromstring(variable, polynomialstring, [IsFraction=true])
+// function formpoly3fromstring(variable, polynomialstring, [IsFraction=TRUE])
 // Creates an array of coefficients whose position in the array
 // corresponds to the power of the variable
 // Each element is stored in the form of an array(numerator, denominator).
@@ -33,36 +32,36 @@ include_once("fractions.php");  // fraction routine
 // Example: $dividend = formpoly3fromstring("x","3x^4+ 2x^2+1")
 //
 //
-function formpoly3fromstring($variable, $polynomialstring, $IsFraction=true)
+function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 {
 	if(is_null($variable)) {
 		$variable = "x";
 		echo "formpoly3fromstring - variable is null - using x.<br/>\r\n";
-	} 
-	else { 
+	}
+	else {
     	if($variable == "") {
         	$variable = "x";
 			echo "formpoly3fromstring - variable is an empty string - using x.<br/>\r\n";
-		} 
+		}
 	}
-		
+
 	if(is_null($polynomialstring)) {
 		echo "formpoly3fromstring - the polynomial is null - FAIL.<br/>\r\n";
-	} 
-	
+	}
+
 	if($polynomialstring != "") {
 		// make sure there are no spaces
 		$polynomialstring = str_replace(" ","",$polynomialstring);
-		
+
 		// make sure there is something to do
 		$results = array();       // the results upon parsing
-		
+
 		$coefficients = array();  // holds each term in a fractional form
 		$powers  = array();       // holds the power for each term
-		
+
 		$monoresults = array();   // the results of any operations from the $coefficients and $powers arrays
 		$parts = array();         // string array of each term
-		
+
 		// parse to a array of string terms
 		$start = 0;
 		$index = 0;
@@ -77,7 +76,7 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=true)
 		}
 		$end = strlen($polynomialstring)-$start;
 		$parts[$index] = substr($polynomialstring,$start,$end);
-		
+
 		// parse each term into powers and fractional coefficient
 		//
 		$highestpower = -1;
@@ -89,34 +88,34 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=true)
 			if($highestpower<$powers[$i]) {
 				$highestpower=$powers[$i];
 			}
-			
-			// process the $rawcoefficientreturn into a fraction 
+
+			// process the $rawcoefficientreturn into a fraction
 			$slash = strpos($rawcoefficientreturn,"/");
 			$temp = substr($rawcoefficientreturn,0,$slash);
 			if($slash>-2) {
 				$length = strlen($rawcoefficientreturn);
 				$coefficients[$i][0] = substr($rawcoefficientreturn,0,$slash); // top
 				$coefficients[$i][1] = substr($rawcoefficientreturn,($slash+1),$length);; // bot
-			} 
+			}
 			else {
 				$coefficients[$i][0] = $rawcoefficientreturn; // top
 				$coefficients[$i][1] = 1; // bot
 			}
 		}
-		
+
 		// Now add any like terms coefficient
 		for ($i = 0; $i < count($parts); $i++) {
 			$currentpower = $powers[$i];
-			
+
 			// does the power exist?
 			if (!isset($monoresults[$currentpower])) {
 				$monoresults[$currentpower]=$coefficients[$i];
-			} 
+			}
 			else {
-				$monoresults[$currentpower]=fractionadd($monoresults[$currentpower],$coefficients[$i]);	
-			}			
+				$monoresults[$currentpower]=fractionadd($monoresults[$currentpower],$coefficients[$i]);
+			}
 		}
-		
+
 		// now set the return array to all zeros
 		for($i=0;$i<=$highestpower; $i++) {
 			if($IsFraction){
@@ -132,9 +131,9 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=true)
 				}
 			}
 		}
-		
-		return $results; 
-	} 
+
+		return $results;
+	}
 	else {
 		echo "formpoly3fromstring - the polynomial string is empty - FAIL.<br/>\r\n";
 		return null;
@@ -148,28 +147,29 @@ function poly3_breakmonomial($variable, $monominal)
 	if($position>-1){
 		$numbers = explode($variable,$monominal);
 		if($numbers[0]=="-") {
-			$numbers[0]= -1;	
+			$numbers[0]= -1;
 		}
-		if($numbers[0]=="") {
+        // bug fix 2018-10-17
+		if(($numbers[0]=="")||($numbers[0]=="+")) {
 			$numbers[0]= 1;
 		}
 		// strip off the + sign
 		$numbers[0]= str_replace("+","",$numbers[0]);
-		
-		// stip off the exponent ^ symbol 
+
+		// stip off the exponent ^ symbol
 		$numbers[1]= str_replace("^","",$numbers[1]);
 		if($numbers[1]=="") {
 			$numbers[1]= 1;
 		}
-	} 
+	}
 	else {
-		$numbers[0]= str_replace("+","",$monominal);	
+		$numbers[0]= str_replace("+","",$monominal);
 		$numbers[1]= 0;
 	}
 	return $numbers;
 }
 
-// writepoly3(poly3, [variable="x", IsFraction=true, HideZero=true])
+// writepoly3(poly3, [variable="x", IsFraction=TRUE, HideZero=TRUE])
 // Creates a string that represents the polynomial
 
 // Each element is stored in the form of an array(numerator, denominator).
@@ -182,18 +182,18 @@ function poly3_breakmonomial($variable, $monominal)
 // Optional
 // IsFraction: a boolan that stores the the coeificients as fractions
 // HideZero: a boolean that stores a flag to show zero coefinents
-// 
+//
 //
 // Example: $dividend = writepoly3("x",array("1,0,2,0,3"))
 //
 //		    $dividend = "3x^4+2x^2+1"
 //
-function writepoly3($poly3, $variable="x", $IsFraction=true, $HideZero=true)
-{		
+function writepoly3($poly3, $variable="x", $IsFraction=TRUE, $HideZero=TRUE)
+{
 	if(is_null($poly3)) {
 		echo "writepoly3 - the polynomial is null - FAIL.<br/>\r\n";
-	} 
-	
+	}
+
 	if(is_array($poly3) and count($poly3)>0) {
 		// make sure there is something to do
 		$results = "";
@@ -205,9 +205,9 @@ function writepoly3($poly3, $variable="x", $IsFraction=true, $HideZero=true)
 				}
 				else {
 					if(($i!=$start)and($poly3[$i][0]>=0)) {
-						$results .= "+";	
+						$results .= "+";
 					}
-					
+
 					if($i==$start) {
 						$coef = $poly3[$i][0]/$poly3[$i][1];
 						if($coef == 1) {
@@ -221,7 +221,7 @@ function writepoly3($poly3, $variable="x", $IsFraction=true, $HideZero=true)
 						}
 					}
 					else {
-						$results .= poly3_fractiontostring($poly3[$i]).poly3_variablepower($i,$variable);	
+						$results .= poly3_fractiontostring($poly3[$i]).poly3_variablepower($i,$variable);
 					}
 				}
 			}
@@ -231,9 +231,9 @@ function writepoly3($poly3, $variable="x", $IsFraction=true, $HideZero=true)
 				}
 				else {
 					if(($i!=$start)and($poly3[$i]>0)) {
-							$results .= "+";	
+							$results .= "+";
 						}
-					
+
 					if($i==$start) {
 						if($poly3[$i] == 1) {
 							$results .= poly3_variablepower($i,$variable);
@@ -246,12 +246,12 @@ function writepoly3($poly3, $variable="x", $IsFraction=true, $HideZero=true)
 						}
 					}
 					else {
-						$results .= $poly3[$i].poly3_variablepower($i,$variable);	
+						$results .= $poly3[$i].poly3_variablepower($i,$variable);
 					}
 				}
-			}			
+			}
 		}
-		
+
 		return $results;
 	} else {
 		echo "writepoly3 - the polynomial is an empty array - FAIL.<br/>\r\n";
@@ -264,7 +264,7 @@ function poly3_reducefraction($top, $bot){
 	$gcf = gcd($top,$bot);
   	$top /= $gcf;
   	$bot /= $gcf;
-	
+
 	return array($top,$bot);
 }
 
@@ -272,7 +272,7 @@ function poly3_reducefraction($top, $bot){
 function poly3_fractiondivide($numerator, $denominator){
 	$top = $numerator[0]*$denominator[1];
 	$bot = $numerator[1]*$denominator[0];
-	
+
 	if($bot < 0) {
 		$top*=-1;
 		$bot*=-1;  // must be positive
@@ -283,12 +283,12 @@ function poly3_fractiondivide($numerator, $denominator){
 // internal only
 function poly3_fractionmonominalmultiply($monominal,$divisor){
 	$power = count($divisor)-1;
-	
+
 	// zero out positions that are not used
 	for($i = 0; $i < $monominal[0]; $i++){
-	  $result[$i] = array(0,1);	
+	  $result[$i] = array(0,1);
 	}
-	
+
 	// multiply
     for($i = 0; $i <= $power; $i++){
 		$position = $monominal[0]+$i;
@@ -298,7 +298,7 @@ function poly3_fractionmonominalmultiply($monominal,$divisor){
 		$d = $divisor[$i][1];
 		$top = $a*$c;
 		$bot = $b*$d;
-		
+
 		$result[$position] = poly3_reducefraction($top, $bot);
 	}
 	return $result;
@@ -309,15 +309,15 @@ function poly3_fractionnegative($poly3){
 	$power = count($poly3)-1;
 	for($i = 0; $i <= $power; $i++){
 		if($poly3[$i][0]!=0) {
-			$poly3[$i][0] *=-1; 	
+			$poly3[$i][0] *=-1;
 		}
-		
+
 	}
-	
+
 	return $poly3;
 }
 
-// internal only	
+// internal only
 function poly3_fractionsubtract($minuend,$subtrahend){
 	// minuend − subtrahend = difference
 	$powerminuend = count($minuend)-1;
@@ -325,7 +325,7 @@ function poly3_fractionsubtract($minuend,$subtrahend){
 	if($powerminuend!=$powersubtrahend) {
     	echo "poly3_fractionsubtract - polynomials are different - ERROR.<br/>\r\n minuend=".var_dump($minuend)."<br/>\r\n subtrahend=".var_dump($subtrahend)."<br/>\r\n";
 	}
-	
+
 	$power = max($powerminuend,$powersubtrahend);
 	for($i = 0; $i <= $power; $i++){
 		if($i<=$powerminuend) {
@@ -346,43 +346,43 @@ function poly3_fractionsubtract($minuend,$subtrahend){
 		}
 		$top = $a*$d-$b*$c;
 		$bot = $b*$d;
-		
+
 		$result[$i] = poly3_reducefraction($top, $bot);
 	}
-	
+
 	// now eliminate any leading terms that are 0
 	for($i = $power; $i >=0; $i--){
 	  if($result[$i][0]==0) {
 	  	 unset($result[$i]);
-	  }	
+	  }
 	  else {
 	  	break;
 	  }
 	}
-	
+
 	return $result;
 }
 
 // internal only
 function poly3_decimaldivide($numerator, $denominator){
   	return $numerator/$denominator;
-}                                                    
+}
 
 // internal only
 function poly3_decimalmonominalmultiply($monominal,$divisor){
 	$power = count($divisor)-1;
-	
+
 	// zero out positions that are not used
 	for($i = 0; $i < $monominal[0]; $i++){
 	  $result[$i] = 0;
 	}
-	
+
 	// multiply
     for($i = 0; $i <= $power; $i++){
 		$position = $monominal[0]+$i;
 		$a = $monominal[1];
 		$c = $divisor[$i];
-		
+
 		$result[$position] = $a*$c;
 	}
 	return $result;
@@ -392,13 +392,13 @@ function poly3_decimalmonominalmultiply($monominal,$divisor){
 function poly3_decimalnegative($poly3){
 	$power = count($poly3)-1;
 	for($i = 0; $i <= $power; $i++){
-		$poly3[$i] *=-1; 
+		$poly3[$i] *=-1;
 	}
-	
+
 	return $poly3;
 }
 
-// internal only	
+// internal only
 function poly3_decimalsubtract($minuend,$subtrahend){
 	// minuend − subtrahend = difference
 	$powerminuend = count($minuend)-1;
@@ -406,7 +406,7 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 	if($powerminuend!=$powersubtrahend) {
     	echo "poly3_fractionsubtract - polynomials are different - ERROR.<br/>\r\n minuend=".var_dump($minuend)."<br/>\r\n subtrahend=".var_dump($subtrahend)."<br/>\r\n";
 	}
-	
+
 	$power = max($powerminuend,$powersubtrahend);
 	for($i = 0; $i <= $power; $i++){
 		if($i<=$powerminuend) {
@@ -421,24 +421,24 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 		else {
 			$c = 0;
 		}
-		
+
 		$result[$i] = $a-$c;
 	}
-	
+
 	// now eliminate any leading terms that are 0
 	for($i = $power; $i >=0; $i--){
 	  if($result[$i]==0) {
 	  	 unset($result[$i]);
-	  }	
+	  }
 	  else {
 	  	break;
 	  }
 	}
-	
+
 	return $result;
 }
 
-// dividepoly3(dividend, divisor [, IsFraction=true])
+// dividepoly3(dividend, divisor [, IsFraction=TRUE])
 //
 // Does the polynomial long division and returns an array of results
 //
@@ -461,8 +461,8 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 //  etc.
 //
 //
-function dividepoly3($dividend, $divisor, $IsFraction=true) {
-	
+function dividepoly3($dividend, $divisor, $IsFraction=TRUE) {
+
 	if($IsFraction){
 		return poly3_dividefractions($dividend, $divisor);
 	}
@@ -473,7 +473,7 @@ function dividepoly3($dividend, $divisor, $IsFraction=true) {
 
 // internal only
 function poly3_dividefractions($dividendstart, $divisor) {
-	
+
 	$power = count($dividendstart)-1;
 	$divisorposition = count($divisor)-1;
 	$results[0][0] = $dividendstart;
@@ -482,44 +482,47 @@ function poly3_dividefractions($dividendstart, $divisor) {
 	for($i = $power; $i >=$divisorposition; $i--){
 		$dividend = $results[$resultindex][0];
 		$dividendposition = count($dividend)-1;
-		
+
 		if($dividendposition <$i) {
             // fixed bug 2018-10-14
             // divisor power is greater then the dividend power
 			// position is suppose to be a zero
-			$results[$resultindex][0][0] = array(0,1);
-			$dividend = array(0,1);
-			$dividendposition = 0;
-		}
-		if($dividend[$dividendposition][0]==0) {
-			// nothing to do - skip a zero entry
-		}
-		else {
-			$quotientposition = $i-$divisorposition;
-			$results[$resultindex][1] = array($quotientposition, poly3_fractiondivide($dividend[$dividendposition],$divisor[$divisorposition]));
-			$resultsfor2 = poly3_fractionmonominalmultiply($results[$resultindex][1],$divisor);
-			$count0 = count($results[$resultindex][0]);
-			$count2 = count($resultsfor2);
-			if($count0!=$count2) {
-				// Crashed fix - 2018-10-08
-				//skip this as the exponents don't line up
-			} else {
-				$results[$resultindex][2] = $resultsfor2;
-				$results[$resultindex][3] = poly3_fractionnegative($results[$resultindex][2]);
-				$nextstep = $resultindex +1;
-				$results[$nextstep][0] = poly3_fractionsubtract($results[$resultindex][0],$results[$resultindex][2]);	
-			}
-			
-			// move counter forward 
-			$resultindex++;
-		}
+            if(!isset($results[$resultindex][0][0])){
+                $results[$resultindex][0][0] = array(0,1);
+                $dividend = array(0,1);
+                $dividendposition = 0;
+            }
+		} else {
+            if($dividend[$dividendposition][0]==0) {
+                // nothing to do - skip a zero entry
+            }
+            else {
+                $quotientposition = $i-$divisorposition;
+                $results[$resultindex][1] = array($quotientposition, poly3_fractiondivide($dividend[$dividendposition],$divisor[$divisorposition]));
+                $resultsfor2 = poly3_fractionmonominalmultiply($results[$resultindex][1],$divisor);
+                $count0 = count($results[$resultindex][0]);
+                $count2 = count($resultsfor2);
+                if($count0!=$count2) {
+                    // Crashed fix - 2018-10-08
+                    //skip this as the exponents don't line up
+                } else {
+                    $results[$resultindex][2] = $resultsfor2;
+                    $results[$resultindex][3] = poly3_fractionnegative($results[$resultindex][2]);
+                    $nextstep = $resultindex +1;
+                    $results[$nextstep][0] = poly3_fractionsubtract($results[$resultindex][0],$results[$resultindex][2]);
+                }
+
+                // move counter forward
+                $resultindex++;
+            }
+        }
 	}
 	return $results;
 }
 
 // internal only
 function poly3_dividedecimal($dividendstart, $divisor) {
-	
+
 	$power = count($dividendstart)-1;
 	$divisorposition = count($divisor)-1;
 	$results[0][0] = $dividendstart;
@@ -528,36 +531,38 @@ function poly3_dividedecimal($dividendstart, $divisor) {
 	for($i = $power; $i >=$divisorposition; $i--){
 		$dividend = $results[$resultindex][0];
 		$dividendposition = count($dividend)-1;
-		
+
 		if($dividend[$dividendposition] < $i) {
-			// divisor power is greater then the dividend power			
+			// divisor power is greater then the dividend power
 			// position is suppose to be a zero
-			$results[$resultindex][0] = 0;
-			$dividend = 0;
-			$dividendposition = 0;
-		}
-		
-		if($dividend[$dividendposition][0]==0) {
-			// nothing to do - skip a zero entry
-		}
-		else {
-			$quotientposition = $i-$divisorposition;
-			$results[$resultindex][1] = array($quotientposition, poly3_decimaldivide($dividend[$dividendposition],$divisor[$divisorposition]));
-			$resultsfor2 = poly3_decimalmonominalmultiply($results[$resultindex][1],$divisor);
-			$count0 = count($results[$resultindex][0]);
-			$count2 = count($resultsfor2);
-			if($count0!=$count2) {
-				// Crashed fix - 2018-10-08
-				//skip this as the exponents don't line up
-			} else {
-				$results[$resultindex][2] = $resultsfor2;
-				$results[$resultindex][3] = poly3_decimalnegative($results[$resultindex][2]);	
-				$nextstep = $resultindex +1;
-				$results[$nextstep][0] = poly3_decimalsubtract($results[$resultindex][0],$results[$resultindex][2]);
-			}
-			// move counter forward 
-			$resultindex++;
-		}
+            if(!isset($results[$resultindex][0][0])){
+                $results[$resultindex][0] = 0;
+                $dividend = 0;
+                $dividendposition = 0;
+            }
+		} else {
+            if($dividend[$dividendposition][0]==0) {
+                // nothing to do - skip a zero entry
+            }
+            else {
+                $quotientposition = $i-$divisorposition;
+                $results[$resultindex][1] = array($quotientposition, poly3_decimaldivide($dividend[$dividendposition],$divisor[$divisorposition]));
+                $resultsfor2 = poly3_decimalmonominalmultiply($results[$resultindex][1],$divisor);
+                $count0 = count($results[$resultindex][0]);
+                $count2 = count($resultsfor2);
+                if($count0!=$count2) {
+                    // Crashed fix - 2018-10-08
+                    //skip this as the exponents don't line up
+                } else {
+                    $results[$resultindex][2] = $resultsfor2;
+                    $results[$resultindex][3] = poly3_decimalnegative($results[$resultindex][2]);
+                    $nextstep = $resultindex +1;
+                    $results[$nextstep][0] = poly3_decimalsubtract($results[$resultindex][0],$results[$resultindex][2]);
+                }
+                // move counter forward
+                $resultindex++;
+            }
+        }
 	}
 	return $results;
 }
@@ -588,11 +593,11 @@ function poly3_htmlcellspaces($number){
 
 // internal only
 function poly3_coefficientstring($coefarray,$coef,$quotientPower){
-	
+
 	if($coef==-1) {
 		if($quotientPower>0) {
 			$coefstring = "-";
-		} 
+		}
 		else {
 			$coefstring = "-1";
 		}
@@ -600,22 +605,22 @@ function poly3_coefficientstring($coefarray,$coef,$quotientPower){
 	elseif ($coef==1){
 		if($quotientPower>0) {
 			$coefstring = "";
-		} 
+		}
 		else {
 			$coefstring = "1";
 		}
 	}
 	else {
 		if(is_null($coefarray)){
-			$coefstring = $coef;	
+			$coefstring = $coef;
 		}
 		else {
 		  $coefstring = poly3_fractiontostring($coefarray);
 		}
 	}
-	
+
 	return $coefstring;
-	
+
 }
 
 // internal only
@@ -629,7 +634,7 @@ function poly3_variablepower($quotientPower,$variable) {
 	else {
 		return "";
 	}
-	
+
 }
 
 
@@ -656,7 +661,7 @@ function poly3_variablepower($quotientPower,$variable) {
 // 1 = don't show zero coefficients
 // 0 = show all
 //
-// ShowAsSubtraction : a boolean that when set to true show the subtraction
+// ShowAsSubtraction : a boolean that when set to TRUE show the subtraction
 // 1 = use -() notation
 // 0 = multiply the negative and show the results
 //
@@ -665,9 +670,9 @@ function poly3_variablepower($quotientPower,$variable) {
 //          $result will contain a string of HTML table code that can be displayed in the answer.
 //
 function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $displayASCIIticks=1, $HideZero=1, $ShowAsSubtraction=0) {
-	$HideZeroMinus = true;
-	$HideZeroDifference = true;
-	
+	$HideZeroMinus = TRUE;
+	$HideZeroDifference = TRUE;
+
 	if($displayASCIIticks) {
 		$MathSymbol = "`";
 	}
@@ -675,7 +680,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 		$MathSymbol = "";
 	}
 	$TableResults = dividepoly3($dividend, $divisor, $IsFraction);  // this does the polynomial long division
-	
+
 	// ---------------------------------------------------------------------------------------------------------------
 	// quotient ------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------
@@ -685,7 +690,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 	$number = $dividendposition-$quotientposition;
 	$quotient = "<tr>\r\n<td>&nbsp;</td>";  // position for the divisor.
 	$quotient .= poly3_htmlcellspaces($number);
-	
+
 	for ($i = $quotientposition; $i>=0; $i--) {
 		$index = $quotientposition-$i;
 		$quotientPower = NULL;
@@ -693,8 +698,8 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 			if(array_key_exists(0,$TableResults[$index][1])) {
 				$quotientPower = $TableResults[$index][1][0];
 			}
-		} 		
-		
+		}
+
 		if(!is_null($quotientPower)) {
 			if($IsFraction){
 				$coefarray = $TableResults[$index][1][1];
@@ -704,10 +709,10 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 				$coefarray = NULL;
 				$coef = $TableResults[$index][1][1];
 			}
-			
+
 			if($coef==0){
 				if($HideZero) {
-					$quotient .= "<td>&nbsp;</td>";	
+					$quotient .= "<td>&nbsp;</td>";
 				}
 				else {
 					$quotient .= "<td class='right'>$MathSymbol+0".poly3_variablepower($quotientPower,$variable)."$MathSymbol</td>";
@@ -721,15 +726,15 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 				$sign = "";
 			}
 				$quotient.= "<td class='right'>$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$quotientPower).poly3_variablepower($quotientPower,$variable)."$MathSymbol</td>";
-			}			
+			}
 		}
 	}
-	
+
 	// ---------------------------------------------------------------------------------------------------------------
 	// question ------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------
 	$question = "<tr>\r\n<td>$MathSymbol".writepoly3($divisor,$variable,$IsFraction,$HideZero)."$MathSymbol</td>";
-		
+
 	// create the dividend into a html table
 	for ($i = $dividendposition; $i>=0; $i--) {
 		// border
@@ -739,7 +744,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 		else {
 			$question .= "<td class='topborder'>";
 		}
-		
+
 		// elements
 		if($IsFraction){
 			$coefarray = $dividend[$i];
@@ -749,10 +754,10 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 			$coefarray = NULL;
 			$coef = $dividend[$i];
 		}
-		
+
 		if($coef==0){
 			if($HideZero) {
-				$question .= "&nbsp;</td>";	
+				$question .= "&nbsp;</td>";
 			}
 			else {
 				$question .= "$MathSymbol+0".poly3_variablepower($i,$variable)."$MathSymbol</td>";
@@ -765,64 +770,65 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 			else {
 				$sign = "";
 			}
-			$question.= "$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$i).poly3_variablepower($i,$variable)."$MathSymbol</td>";			
-		}	
-		$remainderColumn = $i;	
+			$question.= "$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$i).poly3_variablepower($i,$variable)."$MathSymbol</td>";
+		}
+		$remainderColumn = $i;
 	}
 	// now add for the remainder column
 	$question .= "<td>&nbsp;</td></tr>";
 	$quotient.= "</tr>\r\n";
-	
+
 	// ---------------------------------------------------------------------------------------------------------------
 	// Create the Table ----------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------
-	
+
 	$Table  = "<table class='p3longdiv'>\r\n";
 	$Table .= $quotient;
 	$Table .= $question;
-	
+
 	// ---------------------------------------------------------------------------------------------------------------
 	// Start the polynomial long division  ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------
     $rows = count($TableResults)-1;
 	for($i = 0; $i < $rows; $i++){
+        $showZeroRemainder = true;
 		// line 1 is the line we subtract and underline
 		$line1= "<tr>\r\n<td>&nbsp;</td>".poly3_htmlcellspaces($i);  // position for the divisor and the missing
-		
+
 		// loop through all columns
 		if($ShowAsSubtraction){
 			$subtrahend = $TableResults[$i][2];
 			$subtrahendLeft = "-(";
 			$subtrahendRight = ")";
-		} 
+		}
 		else {
 			$subtrahend = NULL;
 			if(array_key_exists(3,$TableResults[$i])) {
 				$subtrahend = $TableResults[$i][3];
 			}
-			
+
 			$subtrahendLeft = "";
 			$subtrahendRight = "";
 		}
-		
+
 		if($subtrahend != NULL) {
-			$subtrahendLeftShow = true;		
-		
+			$subtrahendLeftShow = TRUE;
+
 			$j = $i+1;  // get the results from the next line
 			$difference = $TableResults[$j][0];
-		
+
 			// line 2 is the result of the subtraction
 			// calculate the starting position by taking the difference of the powers
 			//$temp = $highestpower-count($difference)+1;
 			$line2= "<tr>\r\n<td>&nbsp;</td>".poly3_htmlcellspaces($i);  // position for the divisor and the missing
-				
+
 			// Find the last column
 			$columns = count($subtrahend)-1;
 			$LastColumn = $columns;
 			for($k = 0; $k<= $columns; $k++){
 				if($IsFraction) {
 					$coefarray = $subtrahend[$k];
-					$test = $coefarray[0]/$coefarray[1];	
+					$test = $coefarray[0]/$coefarray[1];
 				}
 				else {
 					$coefarray = NULL;
@@ -833,129 +839,140 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 					break;
 				}
 			}
-		
+
 			$columns = count($subtrahend)-1;
 			for($k = $columns; $k >= 0; $k--){
 				if($IsFraction) {
 					$coefarray = $subtrahend[$k];
-					$coef = $coefarray[0]/$coefarray[1];	
+					$coef = $coefarray[0]/$coefarray[1];
 				}
 				else {
 					$coefarray = NULL;
 					$coef = $subtrahend[$k];
 				}
-			
+
 				if(($k != $columns)and($coef>0)) {
 					$sign = "+";
 				}
 				else {
 					$sign = "";
 				}
-					
+
 				if($coef==0){
 					if($HideZeroMinus) {
-						$line1 .= "<td class='bottomborder'>&nbsp;</td>";	
+						$line1 .= "<td class='bottomborder'>&nbsp;</td>";
 					}
 					else {
 						if($subtrahendLeftShow){
 							if($LastColumn == $k){
-								$line1 .= "<td class='bottomborder'>$MathSymbol$subtrahendLeft 0".poly3_variablepower($k,$variable)."$subtrahendRight$MathSymbol</td>";	
-							} 
+								$line1 .= "<td class='bottomborder'>$MathSymbol$subtrahendLeft 0".poly3_variablepower($k,$variable)."$subtrahendRight$MathSymbol</td>";
+							}
 							else {
 								$line1 .= "<td class='bottomborder'>$MathSymbol$subtrahendLeft 0".poly3_variablepower($k,$variable)."$MathSymbol</td>";
-							}						
-							$subtrahendLeftShow = false;
-						} 
+							}
+							$subtrahendLeftShow = FALSE;
+						}
 						else {
 							if($LastColumn == $k){
 								$line1 .= "<td class='bottomborder'>$MathSymbol+0".poly3_variablepower($k,$variable)."$subtrahendRight$MathSymbol</td>";
-							} 
+							}
 							else {
 								$line1 .= "<td class='bottomborder'>$MathSymbol+0".poly3_variablepower($k,$variable)."$MathSymbol</td>";
 							}
-						}	
+						}
 					}
 				}
 				else {
 					if($subtrahendLeftShow){
 						if($LastColumn == $k){
 							$linetext = "$MathSymbol$subtrahendLeft$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$subtrahendRight$MathSymbol";
-						} 
+						}
 						else {
 							$linetext = "$MathSymbol$subtrahendLeft$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$MathSymbol";
 						}
-						$subtrahendLeftShow = false;
+						$subtrahendLeftShow = FALSE;
 					}
 					else {
 						if($LastColumn == $k){
 							$linetext = "$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$subtrahendRight$MathSymbol";
-						} 
+						}
 						else {
 							$linetext = "$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$MathSymbol";
 						}
 					}
 					$line1.= "<td class='bottomborder'>$linetext</td>";
 				}
-			
+
 				if (!array_key_exists($k,$difference)) {
 					// remainder
 					if(($k==$remainderColumn)&&($i ==($rows-1))) {
-  						$line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";	
-					} 
-					else {
-						$line2 .= "<td class='right'>&nbsp;</td>";	
+						if($showZeroRemainder){
+						    $line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";
+						} else {
+						    $line2 .= "<td class='right'>&nbsp;</td>";
+						}
 					}
-  				}
+					else {
+						$line2 .= "<td class='right'>&nbsp;</td>";
+					}
+				}
 				else {
 					if($IsFraction) {
-						$coefarray = $difference[$k];						
+						$coefarray = $difference[$k];
 						$coef = $coefarray[0]/$coefarray[1];
 					}
 					else {
 						$coefarray = NULL;
 						$coef = $difference[$k];
 					}
-  					
+
 					if(($k != $columns)and($coef>0)) {
 						$sign = "+";
 					}
 					else {
 						$sign = "";
-					}	
+					}
 					if($coef==0){
-					if($HideZeroDifference) {
-						if(($k==$remainderColumn)&&($i ==($rows-1))){
-							$line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";	
+						if($HideZeroDifference) {
+						    if(($k==$remainderColumn)&&($i ==($rows-1))){
+							if($showZeroRemainder){
+							    $line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";
+							} else {
+							    $line2 .= "<td class='right'>&nbsp;</td>";
+							}
+			
+						    }
+						    else {
+							$line2 .= "<td class='right'>&nbsp;</td>";
+						    }
+			
 						}
 						else {
-							$line2 .= "<td class='right'>&nbsp;</td>";		
+						    $line2 .= "<td class='right'>$MathSymbol+0".poly3_variablepower($k,$variable)."$MathSymbol</td>";
 						}
-						
 					}
 					else {
-						$line2 .= "<td class='right'>$MathSymbol+0".poly3_variablepower($k,$variable)."$MathSymbol</td>";
+						$showZeroRemainder = false;
+						$line2.= "<td class='right'>$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$MathSymbol</td>";
 					}
-				}
-					else {
-					$line2.= "<td class='right'>$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$MathSymbol</td>";
-					}	
-					}
-				}				
-				$Table .= $line1."</tr>\r\n";	
-				$Table .= $line2."</tr>\r\n";	
 			}
+		    }
+		    $Table .= $line1."</tr>\r\n";
+		    $Table .= $line2."</tr>\r\n";
+		}
 	}
-	
+
 	$Table .= "</table>\r\n";
-	
+
 	return $Table;
 }
 
+// File version : 7.3	- Bug in the poly3_breakmonomial - missing th "+" sign, bug in the divide when the Remiander constant was 0 but the first degree remainder was not
 // File version : 7.2	- Bug in the divide fraction routine were I was not stopping when the divisor had a greater powere then the dividend.
 // File version : 7.1	- Changed ($quotientPower != NULL) to !is_null($quotientPower) - the former would skip constants.
 // File version : 7		- fixed crash when terms were missing or zero - fixed writepoly3 and longdivisionpoly3.
-// File version : 6		- added str_replace() to eliminate space in the formpoly3fromstring,  update the longdivisionpoly3 to use 0 and 1 instead of true 
-//                        and false, as WAMAP treated them as strings.  Added a remainder of 0 when it was.
+// File version : 6		- added str_replace() to eliminate space in the formpoly3fromstring,  update the longdivisionpoly3 to use 0 and 1 instead of TRUE
+//                        and FALSE, as WAMAP treated them as strings.  Added a remainder of 0 when it was.
 // File version : 5		- added the ability to subtract in longdivisionpoly3
 // File version : 4		- renamed internval functions to start with poly3_, added 3 back to formpoly3fromstring
 // File version : 3		- fixed bug in formpoly3fromstring when a / was entered

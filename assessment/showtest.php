@@ -1139,7 +1139,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead = '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
-		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=102316"></script>';
+		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=102518"></script>';
 		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher'] ? 'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
@@ -3016,13 +3016,17 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo '<div class="inset" id="livepollinstrq">';
 				echo '<div id="LPsettings">';
 				echo '<p><label><input type="checkbox" id="LPsettings-dispq" onclick="livepoll.updateSettings()" checked> ';
-				echo ' ' . _("Show question on this computer before it is opened for student input") . '</label><br/>';
+				echo ' ' . _("Show question on this computer before it is opened for student input") . '</label></p>';
 				echo '<p><label><input type="checkbox" id="LPsettings-liveres" onclick="livepoll.updateSettings()"> ';
-				echo ' ' . _("Show results live as students submit answers") . '</label><br/>';
+				echo ' ' . _("Show results live as students submit answers") . '</label></p>';
 				echo '<p><label><input type="checkbox" id="LPsettings-resafter" onclick="livepoll.updateSettings()" checked> ';
-				echo ' ' . _("Show results automatically after closing student input") . '</label><br/>';
+				echo ' ' . _("Show results automatically after closing student input") . '</label></p>';
 				echo '<p><label><input type="checkbox" id="LPsettings-showans" onclick="livepoll.updateSettings()" checked> ';
-				echo ' ' . _("Show answers automatically after closing student input") . '</label>';
+				echo ' ' . _("Show answers automatically after closing student input") . '</label></p>';
+				echo '<p><label><input type="checkbox" id="LPsettings-docountdown" onclick="livepoll.updateSettings()" > ';
+				echo ' ' . _("Use per-question time limit") . '</label>';
+				echo '<span id="LPsettings-timelimitwrap" style="display:none">: ';
+				echo ' <input size=3 id="LPsettings-timelimit" value=60 onchange="livepoll.updateSettings()" /> seconds</span></p>';
 				echo ' <p><button id="LPhidesettings">' . _("Hide Settings") . '</button></p>';
 				echo '</div>';
 				echo ' <div>';

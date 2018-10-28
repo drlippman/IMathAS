@@ -580,4 +580,36 @@ function tann($n,$x) { return safepow(tan($x), $n);}
 function cscn($n,$x) { return 1/safepow(sin($x), $n);}
 function secn($n,$x) { return 1/safepow(cos($x), $n);}
 function cotn($n,$x) { return 1/safepow(tan($x), $n);}
+
+function my_create_function($args, $code) {
+	global $myrights;
+	$preevalerror = error_get_last();
+	try {  
+		$res = eval('return function('.$args.'){'.$code.'};');
+	} catch (Throwable $t) {
+		if ($myrights>10) {
+			echo '<p>Caught error in evaluating a function in this question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+			return function(){};
+		}
+	}
+	
+	if ($res===false) {
+		if ($myrights>10) {
+			$error = error_get_last();
+			echo '<p>Caught error in evaluating a function in this question: ',Sanitize::encodeStringForDisplay($error['message']);
+			echo '</p>';
+			return function(){};
+		}
+	} else {
+		$error = error_get_last();
+		if ($error && $error!=$preevalerror && $error['type']==E_ERROR && $myrights>10) {
+			echo '<p>Caught error in evaluating a function in this question: ',Sanitize::encodeStringForDisplay($error['message']);
+			echo '</p>';
+			return function(){};
+		}
+	}
+	return $res;	
+}
 ?>

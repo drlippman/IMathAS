@@ -169,14 +169,14 @@ if (!empty($createcourse)) {
 		$placementtype = 'assess';
 		$typeid = $_POST['setplacement'];
 	}
-	if (isset($sessiondata['lti_selection_return'])) {
-		//Canvas custom LTI selection return
+	if (isset($sessiondata['lti_selection_return']) && $sessiondata['lti_selection_return_format'] == "Canvas") {
+		//Canvas custom LTI selection return or IMS deeplink LTI selection return
 		if ($placementtype=='assess') {
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$atitle = $stm->fetchColumn(0);
 			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid";
-			
+
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 
@@ -188,6 +188,99 @@ if (!empty($createcourse)) {
 			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 		}
+	} else if (isset($sessiondata['lti_selection_return']) && $sessiondata['lti_selection_return_format'] == "IMSdeeplink") {
+		require_once 'includes/OAuth.php';
+		require_once 'includes/ltioauthstore.php';
+		if ($placementtype=='assess') {
+			$stm = $DBH->prepare("SELECT name,summary,ptsposs FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$typeid));
+			list($title,$text,$ptsposs) = $stm->fetch(PDO::FETCH_NUM);
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid";
+		} else {
+			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$typeid));
+			$title = $stm->fetchColumn(0);
+			$text = '';
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0";
+		}
+		$target = 'iframe';
+		if (!empty($sessiondata['lti_selection_targets'])) {
+			$allowedtargets = explode(',',$sessiondata['lti_selection_targets']);
+			$desiredtargets = array('iframe','frame','window');
+			foreach ($desiredtargets as $t) {
+				if (in_array($t, $allowedtargets)) {
+					$target = $t;
+					break;
+				}
+			}
+		}
+		/**
+		BB doesn't seem to allow the array @context
+		'@context' => array(
+				'http://purl.imsglobal.org/ctx/lti/v1/ContentItem',
+				array(
+					"lineItem" => "http://purl.imsglobal.org/ctx/lis/v2/LineItem",
+					"res" => "http://purl.imsglobal.org/ctx/lis/v2p1/Result#"
+				)
+			),
+		**/
+		$contentitems = array(
+			'@context' => 'http://purl.imsglobal.org/ctx/lti/v1/ContentItem',
+			'@graph' => array(
+				array(
+					'@type' => 'LtiLinkItem',
+					'mediaType' => 'application/vnd.ims.lti.v1.ltilink',
+					'url' => $url,
+					'title' => $title,
+					'placementAdvice' => array(
+						'presentationDocumentTarget' => $target
+					)
+				)	
+			)
+		);
+		if ($placementtype=='assess' && $ptsposs>0) {
+			$contentitems['@graph'][0]['lineItem'] = array(
+				'@type' => 'LineItem',
+				'label' => $title,
+				'reportingMethod' => 'res:totalScore',
+				'maximumScore' => $ptsposs,
+				'scoreConstraints' => array(
+					'@type' => 'NumericLimits',
+					'normalMaximum' => $ptsposs,
+					'totalMaximum' => $ptsposs
+				)
+			);
+		}
+		echo '<html><head><script type="text/javascript"> 
+			window.onload = function() { 
+				document.getElementById("theform").submit();
+			}
+			</script></head>';
+		$params = array(
+			'lti_message_type' => 'ContentItemSelection',
+			'lti_version' => 'LTI-1p0',
+			'content_items' => json_encode($contentitems)
+		);
+		if (!empty($sessiondata['lti_selection_data'])) {
+			$params['data'] = $sessiondata['lti_selection_data'];
+		}
+		$store = new IMathASLTIOAuthDataStore();
+		$consumer = $store->lookup_consumer($sessiondata['lti_origkey']);
+		$hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
+		$acc_req = OAuthRequest::from_consumer_and_token($consumer, false, 'POST', $sessiondata['lti_selection_return'], $params);
+		$acc_req->sign_request($hmac_method, $consumer, false);
+		$newparms = $acc_req->get_parameters();
+		
+		echo '<body><form id="theform" method="post" action="'.Sanitize::encodeStringForDisplay($sessiondata['lti_selection_return']).'">';
+		//output form fields
+		foreach($newparms as $key => $value ) {
+			$key = Sanitize::encodeStringForDisplay($key);
+			$value = Sanitize::encodeStringForDisplay($value);
+			echo '<input type="hidden" name="'.$key.'" value="'.$value.'" />';
+		}
+		echo '<input type="submit" value="Continue" />';
+		echo '</form></body></html>';
+		exit;
 	}
 	if ($hasplacement) {
 		$stm = $DBH->prepare("UPDATE imas_lti_placements SET placementtype=:placementtype,typeid=:typeid WHERE id=:id");
@@ -226,7 +319,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	</script>';
 	echo '<h2>Link courses</h2>';
 	echo '<form method="post" action="ltihome.php">';
-	echo "<p>This course on your LMS has not yet been linked to a course on $installname.";
+	echo "<p>This course on your LMS has not yet been linked to a course on $installname. ";
 	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse" onchange="updateCourseSelector(this)"> ';
 	$stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid=:userid AND ic.available<4 ORDER BY ic.name");
 	$stm->execute(array(':userid'=>$userid));
@@ -268,31 +361,46 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	
 	echo '</select>';
 	echo '<p id="termsbox" style="display:none;">This course has special <a id="termsurl">Terms of Use</a>.  By copying this course, you agree to these terms.</p>';
-	echo '<input type="Submit" value="Create"/>';
+	echo '<input type="Submit" value="Link Course"/>';
 	echo "<p>If you want to create a new course, log directly into $installname to create new courses</p>";
 	echo '</form>';
 } else if (!$hasplacement || isset($_GET['chgplacement'])) {
-	echo '<h2>Link courses</h2>';
+	if (isset($sessiondata['lti_selection_type']) && $sessiondata['lti_selection_type']=='assn') {
+		echo '<h2>Link Assignment</h2>';
+	} else {
+		echo '<h2>Link Resource</h2>';
+	}
 	echo '<form method="post" action="ltihome.php">';
 	echo "<p>This placement on your LMS has not yet been linked to content on $installname. ";
-	//if (!isset($sessiondata['lti_selection_return'])) {
+	if (isset($sessiondata['lti_selection_type']) && $sessiondata['lti_selection_type']=='assn') {
+		echo 'Select the assessment you\'d like to use: ';
+	} else if (isset($sessiondata['lti_selection_type']) && $sessiondata['lti_selection_type']=='link') {
+		echo 'You can either do a full course placement, in which case all content of the course is available from this one placement, or ';
+		echo 'you can place an individual assessment. In both cases, grades will not be returned if you set up the link in this way. ';
+		echo 'For grade return, you need to create a new assignment link instead.</p>';
+		echo '<p>Select the placement you\'d like to make: ';
+	} else {
 		echo 'You can either do a full course placement, in which case all content of the course is available from this one placement (but no grades are returned), or ';
 		echo 'you can place an individual assessment (and grades will be returned, if supported by your LMS).  Select the placement you\'d like to make: ';
-	//} else {
-	//	echo 'Select the assessment you\'d like to use: ';
-	//}
+	}
 
 	echo '<br/> <select name="setplacement"> ';
-	//if (!isset($sessiondata['lti_selection_return'])) {
-		echo '<option value="course">Whole course Placement</option>';
-	//}
+	
+	if (isset($sessiondata['lti_selection_type']) && $sessiondata['lti_selection_type']=='link') {
+		echo '<option value="course">Whole Course Placement</option>';
+	}
 	$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	if ($stm->rowCount()>0) {
-		echo '<optgroup label="Assessment">';
+		echo '<optgroup label="Assessments">';
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			printf('<option value="%d">%s</option>', Sanitize::onlyInt($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 		}
+		echo '</optgroup>';
+	}
+	if (!isset($sessiondata['lti_selection_type']) || $sessiondata['lti_selection_type']=='all') {
+		echo '<optgroup label="Course">';
+		echo '<option value="course">Whole Course Placement</option>';
 		echo '</optgroup>';
 	}
 	echo '</select>';

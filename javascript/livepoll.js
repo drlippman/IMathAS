@@ -59,6 +59,13 @@ var livepoll = new function() {
 		settings.showreslive = $("#LPsettings-liveres").is(":checked");
 		settings.showresonclose = $("#LPsettings-resafter").is(":checked");
 		settings.showansonclose = $("#LPsettings-showans").is(":checked");
+		if ($("#LPsettings-docountdown").is(":checked")) {
+			$("#LPsettings-timelimitwrap").show();
+			settings.countdown = $("#LPsettings-timelimit").val();
+		} else {
+			$("#LPsettings-timelimitwrap").hide();
+			settings.countdown = 0;
+		}
 	}
 
 	function setupInstructorPanel() {
@@ -557,6 +564,15 @@ var livepoll = new function() {
 			LPtimestart = now;
 		}
 		var elapsed = Math.round((now - LPtimestart)/1000);
+		if (settings.countdown > 0) {
+			elapsed = settings.countdown - elapsed;
+			if (elapsed <= 0) {
+				elapsed = 0;
+				if (isteacher) {
+					stopQuestion();
+				}
+			}
+		}
 		var sec = elapsed%60;
 		var min = (Math.floor(elapsed/60))%60;
 		var hrs = Math.floor(elapsed/3600);

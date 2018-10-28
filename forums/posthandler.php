@@ -537,6 +537,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<input type=checkbox name=\"postanon\" value=1 ";
 				if ($line['isanon']==1) {echo "checked=1";}
 				echo "></span><br class=form/>";
+			} else if ($allowanon==1 && $line['isanon']==1) { //teacher editing an anonymous post, perhaps
+				echo '<input type=hidden name=postanon value=1 />';
 			}
 			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
 				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";

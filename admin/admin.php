@@ -293,7 +293,6 @@ $placeinhead .= '</script>';
 	if($myrights<75 && isset($CFG['GEN']['allowteacherexport'])) {
 ?>
 	<div class=cp>
-	<a href="export.php?cid=admin">Export Question Set</a><BR>
 	<a href="exportlib.php?cid=admin">Export Libraries</a>
 	</div>
 <?php

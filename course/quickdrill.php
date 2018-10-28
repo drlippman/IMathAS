@@ -432,7 +432,15 @@ function getansweights($code,$seed) {
 
 function sandboxgetweights($code,$seed) {
 	srand($seed);
-	eval(interpret('control','multipart',$code));
+	try {
+		eval(interpret('control','multipart',$code));
+	} catch (Throwable $thrownerror) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($thrownerror->getMessage());
+			echo '</p>';
+		}
+	}
 	if (!isset($answeights)) {
 		return false;
 	} else if (is_array($answeights)) {

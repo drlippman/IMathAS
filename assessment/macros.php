@@ -231,8 +231,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$yfunc = mathphp($yfunc,"t");
 			$yfunc = str_replace("(t)",'($t)',$yfunc);
 			array_shift($function);
-			$evalxfunc = create_function('$t','return('.$xfunc.');');
-			$evalyfunc = create_function('$t','return('.$yfunc.');');
+			$evalxfunc = my_create_function('$t','return('.$xfunc.');');
+			$evalyfunc = my_create_function('$t','return('.$yfunc.');');
 			if ($evalxfunc===false || $evalyfunc===false) {continue;}
 		} else if ($function[0]{0}=='<' || $function[0]{0}=='>') {
 			$isineq = true;
@@ -245,7 +245,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
-			$evalfunc = create_function('$x','return('.$func.');');
+			$evalfunc = my_create_function('$x','return('.$func.');');
 			if ($evalfunc===false) {continue;}
 		} else if (strlen($function[0])>1 && $function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>' || $function[0]{1}=='=')) {
 			$isxequals = true;
@@ -265,7 +265,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$func = makepretty($function[0]);
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
-			$evalfunc = create_function('$x','return('.$func.');');
+			$evalfunc = my_create_function('$x','return('.$func.');');
 			if ($evalfunc===false) {continue;}
 		}
 
@@ -1471,7 +1471,7 @@ function joinarray($a,$s=',') {
 function calclisttoarray($l) {
 	$l = explode(",",$l);
 	foreach ($l as $k=>$tocalc) {
-		eval('$l[$k] = ' . mathphp($tocalc,null).';');
+		$l[$k] = evalMathPHP($tocalc,null);
 	}
 	return $l;
 }
@@ -1615,7 +1615,7 @@ function calconarray($array,$todo) {
 	*/
 	$todo = mathphp($todo,'x',false,false);
 	$todo = str_replace('(x)','($x)',$todo);
-	return array_map(create_function('$x','return('.$todo.');'),$array);
+	return array_map(my_create_function('$x','return('.$todo.');'),$array);
 }
 
 function multicalconarray() {
@@ -1624,9 +1624,23 @@ function multicalconarray() {
 	$todo = array_shift($args);
 	$vars = array_shift($args);
 	$vars = explode(',',$vars);
+	foreach ($vars as $k=>$v) {
+		$vars[$k] = preg_replace('/[^\w]/','',$v);
+		if ($vars[$k]=='') {
+			echo "Invalid variable";
+			return false;
+		}
+	}
 	if ($nargs-2 != count($vars)) {
 		echo "incorrect number of data arrays";
 		return false;
+	}
+	$cnt = count($args[0]);
+	for ($i=1; $i<count($args); $i++) {
+		if (count($args[$i]) != $cnt) {
+			echo "Unequal array lengths";
+			return false;
+		}
 	}
 
 	$todo = mathphp($todo,implode('|',$vars),false,false);
@@ -1634,19 +1648,17 @@ function multicalconarray() {
 	for ($i=0;$i<count($vars);$i++) {
 		$todo = str_replace('('.$vars[$i].')','($'.$vars[$i].')',$todo);
 	}
-	$todo = str_replace("'","\'",$todo);
 	$varlist = '$'.implode(',$',$vars);
-	$evalstr = "return(array_map(create_function('$varlist','return($todo);')";
-	$cnt = count($args[0]);
-	for ($i=0; $i<count($args); $i++) {
-		$evalstr .= ',$args['.$i.']';
-		if (count($args[$i])!=$cnt) {
-			echo "unequal element count in arrays";
-			return false;
+	$func = my_create_function($varlist, 'return('.$todo.');');
+	$out = array();
+	for ($j=0;$j<count($args[0]);$j++) {
+		$inputs = array();
+		for ($i=0; $i<count($args); $i++) {
+			$inputs[] = $args[$i][$j];
 		}
+		$out[] = call_user_func_array($func, $inputs);
 	}
-	$evalstr .= '));';
-	return eval($evalstr);
+	return $out;
 }
 
 
@@ -1691,9 +1703,9 @@ function calconarrayif($array,$todo,$ifcond) {
 	//$ifcond = str_replace('#=','!=',$ifcond);
 	$ifcond = str_replace('(x)','($x)',$ifcond);
 
-	$iffunc = create_function('$x','return('.$ifcond.');');
+	$iffunc = my_create_function('$x','return('.$ifcond.');');
 
-	$tmpfunc = create_function('$x','return('.$todo.');');
+	$tmpfunc = my_create_function('$x','return('.$todo.');');
 	foreach($array as $k=>$x) {
 		if ($iffunc($x)) {
 			$array[$k] = $tmpfunc($x);
@@ -2248,20 +2260,24 @@ function evalfunc($farr) {
 			$isnum = false;
 		}
 	}
-
+	foreach ($vars as $k=>$v) {
+		$vars[$k] = preg_replace('/[^\w]/','',$v);
+		if ($vars[$k]=='') {
+			echo "Invalid variable";
+			return false;
+		}
+	}
 	$toparen = implode('|',$vars);
 
 	if ($isnum) {
 		$func = mathphp($func,$toparen);
 		if ($func=='0;') { return 0;}
-		$toeval = '';
+		$varvals = array();
 		foreach ($vars as $i=>$var) {
 			$func = str_replace("($var)","(\$$var)",$func);
-			$toeval .= "\$$var = {$args[$i]};";
+			$varvals[$var] = $args[$i];
 		}
-		$toeval .= "\$out = $func;\n";
-		eval($toeval);
-		return $out;
+		return evalReturnValue('return('.$func.');', $func, $varvals);
 	} else { //just replacing
 		if ($toparen != '') { // && !$skipextracleanup) {
 			  $reg = "/(" . $toparen . ")(" . $toparen . ')$/';
@@ -2435,6 +2451,8 @@ function makenumberrequiretimes($arr) {
 }
 
 function evalbasic($str) {
+	global $myrights;
+	
 	$str = str_replace(',','',$str);
 	$str = str_replace('pi','3.141592653',$str);
 	$str = clean($str);
@@ -2443,7 +2461,15 @@ function evalbasic($str) {
 	} else if (preg_match('/[^\d+\-\/\*\.]/',$str)) {
 		return $str;
 	} else {
-		eval("\$ret = $str;");
+		try {
+			eval("\$ret = $str;");
+		} catch (Throwable $t) {
+			if ($myrights>10) {
+				echo '<p>Caught error in evaluating '.Sanitize::encodeStringForDisplay($str).' in this question: ';
+				echo Sanitize::encodeStringForDisplay($t->getMessage());
+				echo '</p>';
+			}
+		}
 		return $ret;
 	}
 }
@@ -2913,10 +2939,10 @@ function comparenumbers($a,$b,$tol='.001') {
 		$abstolerance = floatval(substr($tol,1));
 	}
 	if (!is_numeric($a)) {
-		$a = @eval('return('.mathphp($a,null).');');
+		$a = evalMathPHP($a,null);
 	}
 	if (!is_numeric($b)) {
-		$b = @eval('return('.mathphp($b,null).');');
+		$b = evalMathPHP($b,null);
 	}
 	//echo "comparing $a and $b ";
 	if (isset($abstolerance)) {
@@ -2981,8 +3007,9 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		for($j=0; $j < count($variables); $j++) {
 			$tp[$j] = $tps[$i][$j];
 		}
-		$ansa = @eval("return ($a);");
-		$ansb = @eval("return ($b);");
+		$ansa = evalReturnValue('return('.$a.');','',array('tp'=>$tp));
+		$ansb = evalReturnValue('return('.$b.');','',array('tp'=>$tp));
+
 		if ($ansa===false || $ansb===false) {
 			$evalerr = true;
 			break;
@@ -3060,7 +3087,7 @@ function getnumbervalue($a) {
 	if (is_numeric($a)) {
 		return $a*1;
 	} else {
-		$a = @eval('return('.mathphp($a,null).');');
+		$a = evalMathPHP($a,null);
 		return $a;
 	}
 }
@@ -3181,7 +3208,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		if (!is_array($partial)) { $partial = explode(',',$partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
 			if (!is_numeric($partial[$i])) {
-				$partial[$i] = @eval('return('.mathphp($partial[$i],null).');');
+				$partial[$i] = evalMathPHP($partial[$i],null);
 			}
 			if ($abstol) {
 				if (abs($stu-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
@@ -3246,7 +3273,7 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 				}
 			}
 			if (!is_numeric($partial[$i])) {
-				$partial[$i] = @eval('return('.mathphp($partial[$i],null).');');
+				$partial[$i] = evalMathPHP($partial[$i],null);
 			}
 			if ($abstol) {
 				if (abs($stunum-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
@@ -3323,7 +3350,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			for($j=0; $j < count($variables); $j++) {
 				$tp[$j] = $tps[$i][$j];
 			}
-			$stupts[$i] = evalReturnValue("return ($stu);", $origstu, array('tp'=>$tp));//@eval("return ($stu);");
+			$stupts[$i] = evalReturnValue("return ($stu);", $origstu, array('tp'=>$tp));
 			if (isNaN($stupts[$i])) {$cntnana++;}
 			if ($stupts[$i]===false) {$correct = false; break;}
 		}
@@ -3451,14 +3478,22 @@ function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=
 		$code = 5.2;
 	} else if ($type=='parab') {
 		$code = 6;
+	} else if ($type=='horizparab') {
+		$code = 6.1;
+	} else if ($type=='cubic') {
+		$code = 6.3;
 	} else if ($type=='sqrt') {
 		$code = 6.5;
+	} else if ($type=='cuberoot') {
+		$code = 6.6;
 	} else if ($type=='abs') {
 		$code = 8;
 	} else if ($type=='rational') {
 		$code = 8.2;
 	} else if ($type=='exp') {
 		$code = 8.3;
+	} else if ($type=='log') {
+		$code = 8.4;
 	} else if ($type=='circle') {
 		$code = 7;
 	} else if ($type=='sin') {
@@ -3909,14 +3944,25 @@ function evalMathPHP($str,$vl) {
 	return evalReturnValue('return ('.mathphp($str,$vl).');', $str);
 }
 function evalReturnValue($str,$errordispstr='',$vars=array()) {
-	global $myrights;
 	$preevalerror = error_get_last();
 	foreach ($vars as $v=>$val) {
 		${$v} = $val;
 	}
-	$res = @eval($str);
+	try {
+		$res = @eval($str);
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in this question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			if ($errordispstr!='') {
+				echo ' while evaluating '.htmlspecialchars($errordispstr);
+			}
+			echo '</p>';
+		}
+		return false;
+	}
 	if ($res===false) {
-		if ($myrights>10) {
+		if ($GLOBALS['myrights']>10) {
 			$error = error_get_last();
 			echo '<p>Caught error in evaluating a function in this question: ',$error['message'];
 			if ($errordispstr!='') {
@@ -3926,7 +3972,7 @@ function evalReturnValue($str,$errordispstr='',$vars=array()) {
 		}
 	} else {
 		$error = error_get_last();
-		if ($error && $error!=$preevalerror && $error['type']==E_ERROR && $myrights>10) {
+		if ($error && $error!=$preevalerror && $error['type']==E_ERROR && $GLOBALS['myrights']>10) {
 			echo '<p>Caught error in evaluating a function in this question: ',$error['message'];
 			if ($errordispstr!='') {
 				echo ' while evaluating '.htmlspecialchars($errordispstr);

@@ -107,7 +107,7 @@ function ineqbetweenplot($funcs) {
 			$func = makepretty($function[0]);
 			$func = mathphp($func,"x");
 			$func = str_replace("(x)",'($x)',$func);
-			$xfunc = create_function('$x','return ('.$func.');');
+			$xfunc = my_create_function('$x','return ('.$func.');');
 			for ($i = 0; $i<$stopat;$i++) {
 				$x = $xmin + $dx*$i;
 				$y = $xfunc($x);
@@ -268,7 +268,7 @@ function ineqplot($funcs) {
 		$func = makepretty($function[0]);
 		$func = mathphp($func,"x");
 		$func = str_replace("x",'$x',$func);
-		$xfunc = create_function('$x','return ('.$func.');');
+		$xfunc = my_create_function('$x','return ('.$func.');');
 		//even though ASCIIsvg has a plot function, we'll calculate it here to hide the function
 		//  function of x,filltype,fillcolor,linecolor,dash,strokewidth
 		
@@ -423,7 +423,7 @@ function ineqbetweenplot($funcs) {
 		$func = makepretty($function[0]);
 		$func = mathphp($func,"x");
 		$func = str_replace("x",'$x',$func);
-		$xfunc = create_function('$x','return ('.$func.');');
+		$xfunc = my_create_function('$x','return ('.$func.');');
 		//even though ASCIIsvg has a plot function, we'll calculate it here to hide the function
 		//  function of x,filltype,fillcolor,linecolor,dash,strokewidth
 		

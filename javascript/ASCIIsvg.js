@@ -177,6 +177,32 @@ function right_listener(evt) {
   svgpicture.setAttribute("xbase",evt.clientX-width+1);
 }
 
+function asciisvgexpand(evt) {
+	var el = evt.currentTarget.parentNode;
+	var aspect = el.getAttribute("width")/el.getAttribute("height");
+	var w = Math.min(800,$(window).width()*0.8);
+	var h = $(window).height()*0.9-30;
+	if ((aspect>=1 && w/aspect<h)) { //wider than tall
+		h = Math.min(h, w/aspect);
+	} else { //taller than wide
+		w = Math.min(w, h*aspect);
+	}
+	h = Math.floor(h);
+	w = Math.floor(w);
+	
+	var html = '<div style="text-align:center"><embed data-enlarged="true" type="image/svg+xml" width="'+w+'" height="'+h+'" ';
+	if (el.hasAttribute("data-script")) {
+		html += 'script="' + el.getAttribute("data-script").replace(/"/g,"&quot;") + '"';
+	} else if (el.hasAttribute("data-sscr")) {
+		var sscrarr = el.getAttribute("data-sscr").split(',');
+		sscrarr[9] = w;
+		sscrarr[10] = h;
+		html += 'sscr="' + sscrarr.join(',') + '"';
+	}
+	html += ' /></div>';
+	GB_show(_("Enlarged Graph"), html, w+6, h+66);
+	setTimeout(drawPics, 500);
+}
 
 function switchTo(id) {
 //alert(id);
@@ -323,16 +349,27 @@ function initPicture(x_min,x_max,y_min,y_max) {
 	var picid = picture.getAttribute("id");
 	picture.setAttribute("id",picid+'-embed');
       qnode.setAttribute("id", picid);
-      qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
-      qnode.setAttribute("width",picture.getAttribute("width"));
-      qnode.setAttribute("height",picture.getAttribute("height"));
+      
+      if (picture.hasAttribute("data-enlarged")) {
+      	      qnode.setAttribute("viewBox","0 0 "+picture.getAttribute("width")+" "+picture.getAttribute("height"));
+      } else {
+      	      qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
+      	      qnode.setAttribute("width",picture.getAttribute("width"));
+      	      qnode.setAttribute("height",picture.getAttribute("height"));
+      }
       qnode.setAttribute("alt",picture.getAttribute("alt"));
       if (picture.parentNode!=null) {
         //picture.parentNode.replaceChild(qnode,picture);
 				picture.parentNode.insertBefore(qnode,picture);
 				picture.style.display="none";
-				picture.removeAttribute("sscr");
-				picture.removeAttribute("script");
+				if (picture.hasAttribute("sscr")) {
+					qnode.setAttribute("data-sscr", picture.getAttribute("sscr"));
+					picture.removeAttribute("sscr");
+				}
+				if (picture.hasAttribute("script")) {
+					qnode.setAttribute("data-script", picture.getAttribute("script"));
+					picture.removeAttribute("script");
+				}				
       } else {
         svgpicture.parentNode.replaceChild(qnode,svgpicture);
       }
@@ -348,6 +385,9 @@ function initPicture(x_min,x_max,y_min,y_max) {
         pointerpos.setAttribute("r",0.5);
         pointerpos.setAttribute("fill","red");
         svgpicture.appendChild(pointerpos);
+      }
+      if (!picture.hasAttribute("data-enlarged")) {
+      	  //svgpicture.addEventListener("click", asciisvgexpand);
       }
     }
 //  } else {
@@ -387,10 +427,14 @@ function initPicture(x_min,x_max,y_min,y_max) {
 		 svgpicture.removeChild(svgpicture.lastChild);
 	 }
  }
- svgpicture.setAttribute("height", height);
- svgpicture.style.height = height+"px";
- svgpicture.setAttribute("width", width);
- svgpicture.style.width = width+"px";
+ if (svgpicture.hasAttribute("viewBox")) {
+ 	 svgpicture.setAttribute("viewBox", "0 0 "+width+" "+height);
+ } else {
+ 	 svgpicture.setAttribute("height", height);
+	 svgpicture.style.height = height+"px";
+	 svgpicture.setAttribute("width", width);
+	 svgpicture.style.width = width+"px";
+ }
  svgpicture.setAttribute("xunitlength",xunitlength);
  svgpicture.setAttribute("yunitlength",yunitlength);
  svgpicture.setAttribute("xmin",xmin);
@@ -818,6 +862,46 @@ function arrowhead(p,q) { // draw arrowhead at q (in units)
   }
 }
 
+function addMagGlass() {
+  node = myCreateElementSVG("circle");
+  node.setAttribute("id", "magglass1");
+  node.setAttribute("cx",width-10);
+  node.setAttribute("cy",height-10);
+  node.setAttribute("r",5);
+  node.setAttribute("stroke-width", 2);
+  node.setAttribute("stroke", "grey");
+  node.setAttribute("stroke-opacity", 0.5);
+  node.setAttribute("fill", "none");
+  svgpicture.appendChild(node);
+  node = myCreateElementSVG("line");
+  node.setAttribute("id", "magglass2");
+  node.setAttribute("x1",width-1);
+  node.setAttribute("y1",height-1);
+  node.setAttribute("x2",width-6);
+  node.setAttribute("y2",height-6);
+  node.setAttribute("stroke-width", 2);
+  node.setAttribute("stroke", "grey");
+  node.setAttribute("stroke-opacity", 0.5);
+  node.setAttribute("fill", "none");
+  svgpicture.appendChild(node);
+  node = myCreateElementSVG("rect");
+  node.setAttribute("id", "magglass3");
+  node.setAttribute("x",width-20);
+  node.setAttribute("y",height-20);
+  node.setAttribute("width",20);
+  node.setAttribute("height",20);
+  node.setAttribute("stroke", "none");
+  node.setAttribute("fill", "white");
+  node.setAttribute("fill-opacity", 0.01);
+  node.style.cursor = "pointer";
+  svgpicture.appendChild(node);
+  node.setAttribute("tabindex", 0);
+  node.setAttribute("aria-label", "Expand Graph");
+  node.addEventListener("click", asciisvgexpand);
+  node.addEventListener("keydown", function(e) {
+  	if (e.keyCode === 13) {asciisvgexpand(e);}	  
+  });
+}
 
 function chopZ(st) {
   var k = st.indexOf(".");
@@ -1024,10 +1108,14 @@ function parseShortScript(sscript,gw,gh) {
 		sscript = sa.join(",");
 		picture.setAttribute("sscr", sscript);
 	}
-	picture.setAttribute("width", sa[9]);
-	picture.setAttribute("height", sa[10]);
-	picture.style.width = sa[9] + "px";
-	picture.style.height = sa[10] + "px";
+	if (picture.hasAttribute("viewBox")) {
+		picture.setAttribute("viewBox", "0 0 "+sa[9]+" "+sa[10]);
+	} else {
+		picture.setAttribute("width", sa[9]);
+		picture.setAttribute("height", sa[10]);
+		picture.style.width = sa[9] + "px";
+		picture.style.height = sa[10] + "px";
+	}
 
 	if (sa.length > 10) {
 		commands = 'setBorder(5);';
@@ -1110,6 +1198,9 @@ function parseShortScript(sscript,gw,gh) {
 
 		try {
 			eval(commands);
+			if (!svgpicture.hasAttribute("viewBox")) {
+				addMagGlass();
+			}
 		} catch (e) {
 			if (picture.hasAttribute("data-failedrenders")) {
 				var fails = picture.getAttribute("data-failedrenders");
@@ -1180,6 +1271,9 @@ function drawPics() {
 			  if ((src!=null) && (src != "")) {
 				  try {
 					  with (Math) eval(src);
+					  if (!picture.hasAttribute("data-enlarged")) {
+					  	  addMagGlass();
+					  }
 				  } catch(err) {alert(err+"\n"+src)}
 			  }
 		  }
