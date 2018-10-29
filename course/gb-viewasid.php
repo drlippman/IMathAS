@@ -1376,6 +1376,10 @@ function sandboxgetweights($code,$seed) {
 		}
 	}
 	if (!isset($answeights)) {
+		if (!isset($anstypes)) { 
+			//this shouldn't happen unless the code crashed
+			return array(1);
+		}
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}

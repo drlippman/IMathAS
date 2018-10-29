@@ -352,7 +352,7 @@ function sandboxgetweights($code,$seed) {
 		}
 	}
 	if (!isset($answeights)) {
-		return false;
+		return array(1);
 	} else if (is_array($answeights)) {
 		return $answeights;
 	} else {
