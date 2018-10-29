@@ -8,7 +8,6 @@ require('migrator.php');
 //old approach: change counter; increase by 1 each time a change is made
 $latest_oldstyle = 119;
 
-@set_time_limit(0);
 ini_set("max_input_time", "6000");
 ini_set("max_execution_time", "6000");
 ini_set("memory_limit", "104857600");

@@ -1,10 +1,5 @@
 <?php
 
-@set_time_limit(0);
-ini_set("max_input_time", "600");
-ini_set("max_execution_time", "600");
-
-
 function getfilehandlertype($filetype) {
 	if ($filetype=='filehandlertype' || $filetype=='filehandlertypecfiles') {
 		if (isset($GLOBALS[$filetype])) {

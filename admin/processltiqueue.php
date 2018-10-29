@@ -32,7 +32,6 @@ if (php_sapi_name() == "cli") {
 }
 
 //limit run to not run longer than 50 sec
-@set_time_limit(50);
 ini_set("max_execution_time", "50");
 //since set_time_limit doesn't count time doing stream/socket calls, we'll
 //measure execution time ourselves too
