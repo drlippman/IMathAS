@@ -88,7 +88,8 @@ if ($_GET['showans']==3) {//show always
 }
 $qcol = array();
 if (isset($_POST['seed']) && isset($_POST['check'])) {
-	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
+	$rawscores = array();
+	list($score,$rawscores[0]) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
 	if (strpos($score,'~')===false) {
 		$after = round($score,1);
 		if ($after < 0) { $after = 0;}
@@ -102,7 +103,7 @@ if (isset($_POST['seed']) && isset($_POST['check'])) {
 		$after = implode('~',$after);
 	}
 	if (empty($_GET['noresults'])) {
-		$qcol = explode('~',$rawscores);
+		$qcol = explode('~',$rawscores[0]);
 	}
 	$lastanswers[0] = $lastanswers[0];
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);

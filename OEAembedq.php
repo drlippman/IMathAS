@@ -152,14 +152,15 @@ if (isset($QS['showscored'])) {
 	//DE is requesting that the question be redisplayed with right/wrong markers
 
 	$lastanswers = array();
-	list($seed, $rawscores, $lastanswers[0]) = explode(';', $QS['showscored'], 3);
-	$rawscores = explode('~',$rawscores);
+	$rawscores = array();
+	list($seed, $rawscores[0], $lastanswers[0]) = explode(';', $QS['showscored'], 3);
+	$colors = explode('~',$rawscores[0]);
 	$seed = intval($seed);
 
 	$showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
 
 
-	displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
+	displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$colors);
 
 } else if (isset($_POST['seed'])) {
 	//time to score the question
@@ -191,8 +192,8 @@ if (isset($QS['showscored'])) {
 	}
 
 	$lastanswers = array();
-
-	list($score,$rawscores) = scoreq(0,$qsetid,$seed,$_POST['qn0'],1);
+	$rawscores = array()
+	list($score,$rawscores[0]) = scoreq(0,$qsetid,$seed,$_POST['qn0'],1);
 	if (strpos($score,'~')===false) {
 		$after = round($score,1);
 		if ($after < 0) { $after = 0;}
@@ -205,11 +206,11 @@ if (isset($QS['showscored'])) {
 		}
 		$after = implode('~',$after);
 	}
-	if (strpos($rawscores,'~')===false) {
-		$rawafter = round($rawscores,1);
+	if (strpos($rawscores[0],'~')===false) {
+		$rawafter = round($rawscores[0],1);
 		if ($rawafter < 0) { $rawafter = 0;}
 	} else {
-		$fparts = explode('~',$rawscores);
+		$fparts = explode('~',$rawscores[0]);
 		$rawafter = array();
 		foreach ($fparts as $k=>$fpart) {
 			$rawafter[$k] = round($fpart,2);
@@ -234,21 +235,22 @@ if (isset($QS['showscored'])) {
 	});
 	</script>';
 	if ($scoredonsubmit) {
-		$rawscores = explode('~',$rawafter);
+		$colors = explode('~',$rawafter);
 
 		// set above
     // $showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
 
-		displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
+		displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$colors);
 	} else {
 		echo '<p>Saving score... <img src="img/updating.gif" alt="Saving"/></p>';
 	}
 
 } else {
 	$lastanswers = array();
+	$rawscores = array();
 	if (isset($QS['redisplay']) && trim($QS['redisplay'])!='') {
 		//DE is requesting that the question be redisplayed
-		list($seed, $rawscores, $lastanswers[0]) = explode(';', $QS['redisplay'],3);
+		list($seed, $rawscores[0], $lastanswers[0]) = explode(';', $QS['redisplay'],3);
 		$rawscores = array();
 	} else {
 		if (isset($QS['auth'])) { //is signed
