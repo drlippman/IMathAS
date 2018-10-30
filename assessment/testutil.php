@@ -407,19 +407,22 @@ function printscore($sc,$qn) {
 		$pts = Sanitize::onlyFloat($sc);
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
+		$pts = getpts($sc);
+		$sc = str_replace('-1','N/A',$sc);
+		$scarr = explode('~',$sc);
+		
 		$ptposs = $qi[$questions[$qn]]['answeights'];
+		if (!is_array($ptposs)) {
+			//this shouldn't happen, but handle code breaking issues
+			$ptposs = array_fill(0, count($scarr), 1/count($scarr));
+		}
 		for ($i=0; $i<count($ptposs)-1; $i++) {
 			$ptposs[$i] = round($ptposs[$i]*$poss,2);
 		}
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-
-		$pts = getpts($sc);
-		$sc = str_replace('-1','N/A',$sc);
-
-		//$sc = str_replace('~',', ',$sc);
-		$scarr = explode('~',$sc);
+		
 		if (strpos($thisraw,'-2')!==false) {
 			$rawarr = explode('~',$thisraw);
 			foreach ($rawarr as $k=>$v) {

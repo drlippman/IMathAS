@@ -282,6 +282,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$qcolors = array();
 	}
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
+		if (!isset($anstypes) && $GLOBALS['myrights']>10) {
+			echo 'Error in question: missing $anstypes for multipart or conditional question';
+			$anstypes = array("number");
+		}
 		if ($qdata['qtype']=="multipart") {
 			if (isset($answeights)) {
 				if (!is_array($answeights)) {

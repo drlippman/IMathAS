@@ -51,9 +51,21 @@ function fractiondiffdrandsfrom($list,$n) {
 function fractionparse($f) {
 	if (is_array($f)) {return $f;}
 	$p = explode('/',trim($f));
+	if (trim($p[0])=='') {
+		if ($GLOBALS['myrights']>10) {
+			echo "Error in fraction: undefined numerator";
+		}
+		$p[0]=0;
+	}
 	if (count($p)==1) {
 		return array($p[0],1);
 	} else {
+		if (trim($p[1])=='') {
+			if ($GLOBALS['myrights']>10) {
+				echo "Error in fraction: undefined denominator";
+			}
+			$p[1]=1;
+		}
 		$wp = explode(' ',$p[0]);
 		if (count($wp)==1) {
 			return array($p[0],$p[1]);
