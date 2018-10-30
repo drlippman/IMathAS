@@ -192,7 +192,7 @@ if (isset($QS['showscored'])) {
 	}
 
 	$lastanswers = array();
-	$rawscores = array()
+	$rawscores = array();
 	list($score,$rawscores[0]) = scoreq(0,$qsetid,$seed,$_POST['qn0'],1);
 	if (strpos($score,'~')===false) {
 		$after = round($score,1);

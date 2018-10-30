@@ -367,8 +367,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$xrnd = 6;
 			$yrnd = 6;
 		} else {
-			$xrnd = intval(floor(-log10(abs($xmax-$xmin))-1e-12))+4;
-			$yrnd = intval(floor(-log10(abs($ymax-$ymin))-1e-12))+4;
+			$xrnd = max(0,intval(floor(-log10(abs($xmax-$xmin))-1e-12))+4);
+			$yrnd = max(0,intval(floor(-log10(abs($ymax-$ymin))-1e-12))+4);
 		}
 
 		$lasty = 0;
@@ -389,7 +389,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
 				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
 				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
-				if ($xmax != $xmin) {
+				if ($xmax != $xmin && $y>$yymin && $y<$yymax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			} else {
@@ -402,7 +402,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
 				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
-				if ($xmax != $xmin) {
+				if ($xmax != $xmin && $y>$yymin && $y<$yymax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			}
