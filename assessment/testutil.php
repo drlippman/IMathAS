@@ -192,6 +192,9 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 	}
 	if ($penalty == 9999) {
 		$penalty = $testsettings['defpenalty'];
+		if (!is_numeric($penalty)) {
+			$penalty = 0;
+		}
 		if ($penalty{0}==='L') {
 			$lastonly = true;
 			$penalty = substr($penalty,1);
