@@ -3931,6 +3931,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if ($answer==='DNE' || $answer==='oo') {
 			return 0;
 		}
+		foreach ($givenanslist as $j=>$v) {
+			if (!is_numeric($v)) {
+				return 0;
+			}
+		}
 
 		$ansr = substr($answer,2,-2);
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
@@ -3943,6 +3948,25 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//$v = eval('return ('.mathphp($v,null).');');
 			$v = evalMathPHP($v,null);
 			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
+		}
+		
+		if (in_array('scalarmult',$ansformats)) {
+			//scale givenanslist to the magnitude of $answerlist
+			$mag = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $answerlist)));
+			$mag2 = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $givenanslist)));
+			if ($mag > 0 && $mag2 > 0) {
+				foreach ($answerlist as $j=>$v) {
+					if (abs($v)>1e-10) {
+						if ($answerlist[$j]*$givenanslist[$j]<0) { 
+							$mag *= -1;
+						}
+						break;
+					}
+				}
+				foreach ($givenanslist as $j=>$v) {
+					$givenanslist[$j] = $mag/$mag2*$v;
+				}
+			}
 		}
 
 		for ($i=0; $i<count($answerlist); $i++) {
@@ -4010,6 +4034,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansr = substr($answer,2,-2);
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
 		$answerlist = explode(',',$ansr);
+		
 		foreach ($answerlist as $k=>$v) {
 			//$v = eval('return ('.mathphp($v,null).');');
 			$v = evalMathPHP($v,null);
@@ -4039,8 +4064,34 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 
 		$givenanslist = explode(",",preg_replace('/[^\d\.,\-]/','',$givenans));
+		foreach ($givenanslist as $j=>$v) {
+			if (!is_numeric($v)) {
+				return 0;
+			}
+		}
+		if (count($answerlist) != count($givenanslist)) {
+			return 0;
+		}
 
-
+		if (in_array('scalarmult',$ansformats)) {
+			//scale givenanslist to the magnitude of $answerlist
+			$mag = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $answerlist)));
+			$mag2 = sqrt(array_sum(array_map(function($x) {return $x*$x;}, $givenanslist)));
+			if ($mag > 0 && $mag2 > 0) {
+				foreach ($answerlist as $j=>$v) {
+					if (abs($v)>1e-10) {
+						if ($answerlist[$j]*$givenanslist[$j]<0) { 
+							$mag *= -1;
+						}
+						break;
+					}
+				}
+				foreach ($givenanslist as $j=>$v) {
+					$givenanslist[$j] = $mag/$mag2*$v;
+				}
+			}
+		}			
+		
 		for ($i=0; $i<count($answerlist); $i++) {
 			if (isset($abstolerance)) {
 				if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance-1E-12) {
