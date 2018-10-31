@@ -4582,7 +4582,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			asort($tmp);
 			$lastval = null;
 			foreach ($tmp as $i=>$v) {
-				if ($lastval===null) {
+				if ($lastval===null || !is_numeric($lastval)) {
 					$gaarr[] = $tmp[$i];
 					$orarr[] = $tmpor[$i];
 				} else if (is_numeric($v)) {

@@ -106,6 +106,12 @@ function fractiontodecimal($f) {
 	if (!is_array($f)) {
 		$f = fractionparse($f);
 	}
+	if ($f[1]==0) {
+		if ($GLOBALS['myrights']>10) {
+			echo "Error: fraction with denominator 0";
+		}
+		return 0;
+	}
 	return $f[0]/$f[1];
 }
 

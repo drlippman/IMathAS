@@ -83,8 +83,32 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$fqonlyy = true;
 		$settings[2] = substr($settings[2],2);
 	}
-	$ymin = $settings[2];
-	$ymax = $settings[3];
+	$yminauto = false;
+	$ymaxauto = false;
+	if (substr($settings[2],0,4)=='auto') {
+		$yminauto = true;
+		if (strpos($settings[2],':')!==false) {
+			$ypts = explode(':',$settings[2]);
+			$settings[2] = $ypts[1];
+		} else {
+			$settings[2] = -5;
+		}
+	}
+	if (substr($settings[3],0,4)=='auto') {
+		$ymaxauto = true;
+		if (strpos($settings[3],':')!==false) {
+			$ypts = explode(':',$settings[3]);
+			$settings[3] = $ypts[1];
+		} else {
+			$settings[3] = 5;
+		}
+	}
+	$winxmin = is_numeric($settings[0])?$settings[0]:-5;
+	$winxmax = is_numeric($settings[1])?$settings[1]:5;
+	$ymin = is_numeric($settings[2])?$settings[2]:-5;
+	$ymax = is_numeric($settings[3])?$settings[3]:5;
+	$plotwidth = is_numeric($settings[6])?$settings[6]:200;
+	$plotheight = is_numeric($settings[7])?$settings[7]:200;
 	$noyaxis = false;
 	if (is_numeric($ymin) && is_numeric($ymax) && $ymin==0 && $ymax==0) {
 		$ymin = -0.5;
@@ -93,30 +117,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$settings[2] = -0.5;
 		$settings[3] = 0.5;
 	}
-	$xxmin = $settings[0] - 5*($settings[1] - $settings[0])/$settings[6];
-	$xxmax = $settings[1] + 5*($settings[1] - $settings[0])/$settings[6];
-	$yymin = $settings[2] - 5*($settings[3] - $settings[2])/$settings[7];
-	$yymax = $settings[3] + 5*($settings[3] - $settings[2])/$settings[7];
-	$yminauto = false;
-	$ymaxauto = false;
-	if (substr($ymin,0,4)=='auto') {
-		$yminauto = true;
-		if (strpos($ymin,':')!==false) {
-			$ypts = explode(':',$ymin);
-			$ymin = $ypts[1];
-		} else {
-			$ymin = -5;
-		}
-	}
-	if (substr($ymax,0,4)=='auto') {
-		$ymaxauto = true;
-		if (strpos($ymax,':')!==false) {
-			$ypts = explode(':',$ymax);
-			$ymax = $ypts[1];
-		} else {
-			$ymax = 5;
-		}
-	}
+	$xxmin = $winxmin - 5*($winxmax - $winxmin)/$plotwidth;
+	$xxmax = $winxmax + 5*($winxmax - $winxmin)/$plotwidth;
+	$yymin = $ymin - 5*($ymax - $ymin)/$plotheight;
+	$yymax = $ymax + 5*($ymax - $ymin)/$plotheight;
+	
 	//$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});";
 	//$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.";
 	$commands = '';
@@ -162,8 +167,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$commands .= ');';
 	}
 	if (isset($lbl) && count($lbl)>3) {
-		$commands .= "text([{$settings[1]},0],\"{$lbl[2]}\",\"aboveleft\");";
-		$commands .= "text([0,{$settings[3]}],\"{$lbl[3]}\",\"belowright\");";
+		$commands .= "text([{$winxmax},0],\"{$lbl[2]}\",\"aboveleft\");";
+		$commands .= "text([0,{$ymax}],\"{$lbl[3]}\",\"belowright\");";
 	}
 	$absymin = 1E10;
 	$absymax = -1E10;
@@ -332,16 +337,20 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		$avoid = array();
 		$domainlimited = false;
-		if (isset($function[2]) && $function[2]!='') {
+		if (isset($function[2]) && $function[2]!='' && is_numeric($function[2])) {
 			$xmin = $function[2];
 			$domainlimited = true;
-		} else {$xmin = $settings[0];}
+		} else {$xmin = $winxmin;}
 		if (isset($function[3]) && $function[3]!='') {
 			$xmaxarr = explode('!',$function[3]);
-			$xmax = $xmaxarr[0];
+			if (is_numeric($xmaxarr[0])) {
+				$xmax = $xmaxarr[0];
+			} else {
+				$xmax = $winxmax;
+			}
 			$avoid = array_slice($xmaxarr,1);
 			$domainlimited = true;
-		} else {$xmax = $settings[1];}
+		} else {$xmax = $winxmax;}
 
 		if ($GLOBALS['sessiondata']['graphdisp']==0) {
 			if ($xmax-$xmin>2 || $xmax==$xmin) {
@@ -357,7 +366,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$alt .= '. ';
 			}
 		} else {
-			$dx = ($xmax - $xmin + ($domainlimited?0:10*($xmax-$xmin)/$settings[6]) )/100;
+			$dx = ($xmax - $xmin + ($domainlimited?0:10*($xmax-$xmin)/$plotwidth) )/100;
 			$stopat = ($domainlimited?101:102);
 			if ($xmax==$xmin) {
 				$stopat = 1;
@@ -393,7 +402,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			} else {
-				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$settings[6]);
+				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
 				$y = $evalfunc($x);
@@ -556,18 +565,18 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$commands .= $path;
 	}
 	if ($yminauto) {
-		$settings[2] = max($absymin,$ymin);
+		$ymin = max($absymin,$ymin);
 	}
 	if ($ymaxauto) {
-		$settings[3] = min($absymax,$ymax);
+		$ymax = min($absymax,$ymax);
 	}
-	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});".$commands;
-	$alt = "Graphs with window x: {$settings[0]} to {$settings[1]}, y: {$settings[2]} to {$settings[3]}. ".$alt;
+	$commands = "setBorder(5); initPicture({$winxmin},{$winxmax},{$ymin},{$ymax});".$commands;
+	$alt = "Graphs with window x: {$winxmin} to {$winxmax}, y: {$ymin} to {$ymax}. ".$alt;
 
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	} else {
-		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' script='$commands' />\n";
+		return "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
 	}
 }
 
@@ -1465,6 +1474,12 @@ function listtoarray($l) {
 
 
 function arraytolist($a, $sp=false) {
+	if (!is_array($a)) {
+		if ($GLOBALS['myrights']>10) {
+			echo "Error: arraytolist expect an array as input";
+		}
+		return $a;
+	}
 	if ($sp) {
 		return (implode(', ',$a));
 	} else {
@@ -1473,6 +1488,12 @@ function arraytolist($a, $sp=false) {
 }
 
 function joinarray($a,$s=',') {
+	if (!is_array($a)) {
+		if ($GLOBALS['myrights']>10) {
+			echo "Error: joinarray expect an array as input";
+		}
+		return $a;
+	}
 	return (implode($s,$a));
 }
 
@@ -2477,6 +2498,9 @@ function evalbasic($str) {
 				echo '<p>Caught error in evaluating '.Sanitize::encodeStringForDisplay($str).' in this question: ';
 				echo Sanitize::encodeStringForDisplay($t->getMessage());
 				echo '</p>';
+			}
+			if (!isset($ret) || !is_numeric($ret)) {
+				return 0;
 			}
 		}
 		return $ret;
