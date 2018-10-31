@@ -37,7 +37,9 @@ function setupGBpercents() {
   $("thead th").each(function(i,el) { 
   	if (p = el.innerHTML.match(/(\d+)(\s*|&nbsp;)pts/)) {
   		colpts[i] = p[1];
-    }
+  	} else {
+  		colpts[i] = 100;
+  	}
   });
   $("tbody td").each(function(i,el) {
   	var a = $(el).find("a");
