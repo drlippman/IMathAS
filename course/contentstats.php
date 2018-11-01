@@ -87,7 +87,7 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 	$stus = array();
 	$query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu ";
 	$query .= "JOIN imas_students AS istu ON iu.id=istu.userid AND istu.courseid=:courseid ";
-	$query .= "ORDER BY iu.LastName,iu.FirstName";
+	$query .= "WHERE istu.locked=0 ORDER BY iu.LastName,iu.FirstName";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
