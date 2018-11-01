@@ -121,6 +121,7 @@ $(function() {
 		var val=$(this).attr("data-hdrs");
 		if (val==0) {
 			ts.unlock();
+			document.cookie = "skiplhdrwarn_"+cid+"=0";
 		} else {
 			ts.lock();
 		}
