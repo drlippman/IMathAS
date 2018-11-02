@@ -26,6 +26,8 @@ if (isset($_POST['anontype']) && is_numeric($_POST['months'])) {
 		$query .= "WHERE lastaccess<? ";
 		if ($_POST['usertype']=='stu') {
 			$query .= "AND rights<11 ";
+		} else {
+			$query .= "AND (rights<11 OR lastaccess>0) ";
 		}
 		$stm = $DBH->prepare($query);
 		$oldtime = time() - $months*31*24*60*60;
