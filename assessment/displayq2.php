@@ -560,6 +560,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	if ($showhints && ($qdata['extref']!='' || (($qdata['solutionopts']&2)==2 && $qdata['solution']!=''))) {
 		echo '<div><p class="tips">', _('Get help: ');
+		$extrefwidth = isset($GLOBALS['CFG']['GEN']['extrefsize'])?$GLOBALS['CFG']['GEN']['extrefsize'][0]:700;
+		$extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize'])?$GLOBALS['CFG']['GEN']['extrefsize'][1]:500;
+		$vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize'])?$GLOBALS['CFG']['GEN']['vidextrefsize'][0]:873;
+		$vidextrefheight = isset($GLOBALS['CFG']['GEN']['vidextrefsize'])?$GLOBALS['CFG']['GEN']['vidextrefsize'][1]:500;
 		if ($qdata['extref']!= '') {
 			$extref = explode('~~',$qdata['extref']);
 
@@ -573,11 +577,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
 					$extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
 					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
-					echo formpopup($extrefpt[0],$extrefpt[1],873,500,"button",true,"video",$qref);
+					echo formpopup($extrefpt[0],$extrefpt[1],$vidextrefwidth,$vidextrefheight,"button",true,"video",$qref);
 				} else if ($extrefpt[0]=='read') {
-					echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text",$qref);
+					echo formpopup("Read",$extrefpt[1],$extrefwidth,$extrefheight,"button",true,"text",$qref);
 				} else {
-					echo formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text",$qref);
+					echo formpopup($extrefpt[0],$extrefpt[1],$extrefwidth,$extrefheight,"button",true,"text",$qref);
 				}
 			}
 		}
@@ -587,7 +591,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			if ($GLOBALS['cid']=='embedq' && isset($GLOBALS['theme'])) {
 				$addr .= '&theme='.Sanitize::encodeUrlParam($GLOBALS['theme']);
 			}
-			echo formpopup(_("Written Example"),$addr,730,500,"button",true,"soln",$qref);
+			echo formpopup(_("Written Example"),$addr,$extrefwidth,$extrefheight,"button",true,"soln",$qref);
 		}
 		echo '</p></div>';
 	}

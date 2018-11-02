@@ -85,6 +85,8 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['meanstogetcode']`:  To comply with the IMathAS Community License, a means to get a copy of question code must be provided.  By default the system says to email the `$sendfrom` email address.  You can define this variable to display a different message on the license info page.
 - `$CFG['GEN']['LTIorgid']`:  A value to use as the LTI organization ID when IMathAS is acting as an LTI consumer.  Defaults to the domain name.
 - `$CFG['UP']`:  An associative array overriding the default User Preference values.  See the `$prefdefaults` definition in `/includes/userprefs.php` for the appropriate format.
+- `$CFG['GEN']['extrefsize']`: Set to an array of (width,height) to set the popup size for Text and Written Solution question help buttons
+- `$CFG['GEN']['vidextrefsize']`: Set to an array of (width,height) to set the popup size for Video question help buttons
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
