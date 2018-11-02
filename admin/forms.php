@@ -409,8 +409,6 @@ switch($_GET['action']) {
 			$courseid = $line['id'];
 			$name = $line['name'];
 			$ekey = $line['enrollkey'];
-			$hideicons = $line['hideicons'];
-			$picicons = $line['picicons'];
 			$allowunenroll = $line['allowunenroll'];
 			$copyrights = $line['copyrights'];
 			$msgset = $line['msgset'];
@@ -442,8 +440,6 @@ switch($_GET['action']) {
 			$courseid = _("Will be assigned when the course is created");
 			$name = "";
 			$ekey = "";
-			$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
-			$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
 			$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
 			//0 no un, 1 allow un;  0 allow enroll, 2 no enroll
 
