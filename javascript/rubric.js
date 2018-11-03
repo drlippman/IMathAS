@@ -292,8 +292,11 @@ function markallfullscore() {
 	$('.quickgrade').click();
 }
 
-function revealfb(qn) {
+function revealfb(qn,dofocus) {
 	$("#fb-"+qn+"-wrap").show();
 	$("#fb-"+qn+"-add").hide();
+	if (dofocus) {
+		$("#fb-"+qn).focus();
+	}
 	return false;
 }
