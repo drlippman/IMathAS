@@ -93,6 +93,9 @@ function setupLivePreview(qn) {
 			  		if (format.indexOf('scinot')!=-1) {
 			  			text = text.replace(/(x|X|\u00D7)/,"xx");
 			  		}
+			  		if (format.indexOf('mixed')==-1) {
+			  			text = text.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
+			  		}
 			  	}
 			  	return text;
 			  },
@@ -1117,7 +1120,7 @@ function singlevalsyntaxcheck(str,format) {
 			return (_(" invalid entry format")+". ");
 		  }
 	} else if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
-		  str = str.replace(/\s/g,'');
+		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
 		 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 		  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 			return (_("not a valid fraction")+". ");
