@@ -101,6 +101,16 @@ function apportion_info($pop, $seats, $method) {
 			$luq[$s] = floor($q);
 			$other[$s] = $q - $luq[$s];
 		}
+		$totest = array_values($other);
+		sort($totest);
+		$last = -1;
+		foreach ($totest as $v) {
+			if (abs($v-$last)<1e-9) {
+				$outdiv = 'fail';
+				break;
+			}
+			$last = $v;
+		}
 	} else if ($method=='jefferson') {
 		$toraiseup = array();
 		foreach ($quotas as $s=>$q) {
@@ -278,6 +288,16 @@ function apportion_info($pop, $seats, $method) {
 		foreach ($quotas as $s=>$q) {
 			$luq[$s] = floor($q);
 			$other[$s] = ($luq[$s]==0?1e100:($q - $luq[$s])/$luq[$s]);
+		}
+		$totest = array_values($other);
+		sort($totest);
+		$last = -1;
+		foreach ($totest as $v) {
+			if (abs($v-$last)<1e-9) {
+				$outdiv = 'fail';
+				break;
+			}
+			$last = $v;
 		}
 	}
 	return array($divisor, $quotas, $luq, $other, $outdiv);
