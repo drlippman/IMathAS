@@ -11,7 +11,7 @@
           setStopAddingTime(time): a time limit after which don't add additional requests
           setPostdataCallback: a function that will transform the request post data
           	This function should take an associative array as input, and output
-          	an associate array of post parameters
+          	an associate array of (body, header)
 */
 
 Class RollingCurlX {
