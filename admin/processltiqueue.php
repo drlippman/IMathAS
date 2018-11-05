@@ -60,10 +60,16 @@ if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
 
 $batchsize = isset($CFG['LTI']['queuebatch'])?$CFG['LTI']['queuebatch']:10;
 $RCX = new RollingCurlX($batchsize);
-$RCX->setTimeout(3000); //3 second timeout on each request
+$RCX->setTimeout(5000); //3 second timeout on each request
 $RCX->setStopAddingTime(45); //stop adding new request after 50 seconds
 $RCX->setCallback('LTIqueueCallback'); //callback after response
 $RCX->setPostdataCallback('LTIqueuePostdataCallback'); //pre-send callback
+/*  sometimes needed on localhost
+$RCX->setOptions(array(
+	CURLOPT_SSL_VERIFYPEER => 0,
+	CURLOPT_SSL_VERIFYHOST => 0
+));
+*/
 
 //pull all lti queue items ready to send; we'll process until we're done or timeout
 $stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<3 ORDER BY sendon');
@@ -87,7 +93,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			),
 			null, //no special callback
 			array( 	  //user-data; will get passed to response
-				'hash' => $row['hash'];
+				'hash' => $row['hash']
 			)
 		);
 	}
@@ -95,8 +101,10 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 $RCX->execute();
 
-LTIqueuePostdataCallback($data) {
-	global $LTIsecrets;
+echo "Done in ".(time() - $scriptStartTime);
+
+function LTIqueuePostdataCallback($data) {
+	global $DBH, $LTIsecrets;
 	
 	$secret = '';
 	if (isset($LTIsecrets[$data['key']])) {
@@ -117,6 +125,7 @@ LTIqueuePostdataCallback($data) {
 				$LTIsecrets[$data['key']] = $secret;
 		}
 	}
+	//echo 'prepping w grade '.$data['grade'].'<br/>';
 	return prepLTIOutcomePost(
 		$data['action'], 
 		$data['key'], 
@@ -127,7 +136,11 @@ LTIqueuePostdataCallback($data) {
 	);
 }
 
-LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
+function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
+	global $DBH;
+	//echo 'got response with hash'.$user_data['hash'].'<br/>';
+	//echo htmlentities($response);
+	//var_dump($request_info);
 	if ($reponse === false || strpos($response, 'success')===false) { //failed
 		//on call failure, we'll update failure count and push back sendon
 		$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*600,failures=failures+1 WHERE hash=?');

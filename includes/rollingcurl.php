@@ -163,8 +163,8 @@ Class RollingCurlX {
         $individual_opts = $request['options'];
         $individual_headers = $request['headers'];
         
-        if ($post_data !== null && $requests['post_callback'] !== null) {
-			$proc = call_user_func($requests['post_callback'], $post_data);	
+        if ($post_data !== null && $request['post_callback'] !== null) {
+			$proc = call_user_func($request['post_callback'], $post_data);	
 			if ($proc !== false) {
 				if (isset($proc['body'])) {
 					$post_data = $proc['body'];
