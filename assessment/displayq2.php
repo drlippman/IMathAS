@@ -7486,6 +7486,9 @@ function isNaN( $var ) {
      //return ($var!==$var || $var*2==$var);
 }
 
+function ltrimzero($v,$k) {
+	return ltrim($v, ' 0');
+}
 function checkreqtimes($tocheck,$rtimes) {
 	global $mathfuncs;
 	if ($rtimes=='') {return 1;}
@@ -7529,8 +7532,10 @@ function checkreqtimes($tocheck,$rtimes) {
 					if (!isset($all_numbers)) {
 						preg_match_all('/[\d\.]+/',$cleanans,$matches);
 						$all_numbers = $matches[0];
+						array_walk($all_numbers, 'ltrimzero');
 					}
-					$nummatch = count(array_keys($all_numbers,str_replace(array('-', ' '),'',substr($lookfor,1))));
+					$lookfor = ltrim(str_replace(array('-', ' '),'',substr($lookfor,1)), ' 0');
+					$nummatch = count(array_keys($all_numbers,$lookfor));
 				} else if (strlen($lookfor)>6 && substr($lookfor,0,6)=='regex:') {
 					$regex = str_replace('/','\\/',substr($lookfor,6));
 					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
