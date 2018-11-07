@@ -258,6 +258,12 @@
 				exit;
 			}
 		}
+		if (!$isreview && trim($adata['password'])!='' && isset($_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'])) {
+			$testhash = hash("sha256", $urlmode.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($adata['password']));
+			if ($testhash == $_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH']) {
+				$adata['password'] = '';
+			}
+		}
 		if (!$isreview && trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
