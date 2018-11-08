@@ -4,6 +4,7 @@
 
 require("../init.php");
 require("../assessment/displayq2.php");
+require("../includes/ltioutcomes.php");
 
 if (!isset($teacherid) && !isset($tutorid)) {
 	require("../header.php");
@@ -60,7 +61,10 @@ if (isset($_POST['record'])) {
 	$query .= "reattempting=:reattempting WHERE id=:id LIMIT 1";
 	$updstm = $DBH->prepare($query);
 		
-	$stm = $DBH->prepare("SELECT id,ver,questions,seeds,scores,attempts,lastanswers,reattempting,bestseeds,bestscores,bestattempts,bestlastanswers  FROM imas_assessment_sessions WHERE assessmentid=?");
+	$query = "SELECT id,ver,questions,seeds,scores,attempts,lastanswers,reattempting,";
+	$query .= "bestseeds,bestscores,bestattempts,bestlastanswers,lti_sourcedid ";
+	$query .= "FROM imas_assessment_sessions WHERE assessmentid=?"
+	$stm = $DBH->prepare($query);
 	$stm->execute(array($aid));
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($qnref[$row['id']])) {
@@ -116,6 +120,12 @@ if (isset($_POST['record'])) {
 		$updstm->execute(array(':id'=>$row['id'], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':seeds'=>$seedslist, 
 			':lastanswers'=>$lalist, ':bestattempts'=>$bestattemptslist, ':bestscores'=>$bestscorelist,
 			':bestlastanswers'=>$bestlalist, ':reattempting'=>$reattemptinglist));
+		
+		if (strlen($row['lti_sourcedid'])>1) {
+			$bsarr = explode(';', $bestscorelist);
+			$bs = explode(',', $bsarr[0]);
+			calcandupdateLTIgrade($row['lti_sourcedid'],$aid,$bs);
+		}
 	}
 	
 	header('Location: ' . $GLOBALS['basesiteurl'] ."/course/addquestions.php?cid=$cid&aid=$aid");
