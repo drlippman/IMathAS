@@ -54,7 +54,7 @@ require_once('../includes/ltioutcomes.php');
 */
 
 //we'll call this when send is successful
-$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=?');
+$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
 //on call failure, we'll update failure count and push back sendon
 $setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*600,failures=failures+1 WHERE hash=?');
 
@@ -92,7 +92,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		list($ok, $response) = sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade, true);
 		if ($ok && strpos($response, 'success')!==false) {
 			//echo "Processed ".$row['hash'].'<br/>';
-			$delfromqueue->execute(array($row['hash']));
+			$delfromqueue->execute(array($row['hash'], $row['sendon']));
 		} else {
 			//echo "Failure on ".$row['hash'].'<br/>';
 			$setfailed->execute(array($row['hash']));
