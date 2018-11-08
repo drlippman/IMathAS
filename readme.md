@@ -125,7 +125,8 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 - `$CFG['GEN']['hometitle']`:  Set to a message to display at the top of the Home page, in place of "Welcome to _____, ______" 
 - `$CFG['CPS']['leftnavtools']`:  Set to `"limited"` to remove from the course left navigation tools that are also in the top navigation.  Set to false to remove the entire Tools block from the course left navigation.
 - `$CFG['GEN']['deflicense']`:  The default license for new questions.  See `/course/moddataset.php` for valid values.  Defaults to 1 (IMathAS community license).
- 
+- `$CFG['GEN']['defGroupType']`: Set to change the default group type for newly created groups (def: 0)
+
 ### LTI
 
 - `$CFG['LTI']['noCourseLevel']`: set to true to hide course level LTI key and secret from users. Use this if you want to require use of global LTI key/secrets.
