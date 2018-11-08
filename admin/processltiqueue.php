@@ -93,7 +93,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			),
 			null, //no special callback
 			array( 	  //user-data; will get passed to response
-				'hash' => $row['hash']
+				'hash' => $row['hash'],
+				'sendon' => $row['sendon']
 			)
 		);
 	}
@@ -147,7 +148,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 		$setfailed->execute(array($user_data['hash']));
 	} else { //success
 		//we'll call this when send is successful
-		$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=?');
-		$delfromqueue->execute(array($user_data['hash']));
+		$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
+		$delfromqueue->execute(array($user_data['hash'], $user_data['sendon']));
 	}
 }
