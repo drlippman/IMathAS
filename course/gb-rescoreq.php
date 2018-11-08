@@ -37,6 +37,25 @@ function overwriteval($list, $loc, $val, $delim=',', $delim2='') {
 	return implode($delim2, $arr);
 }
 
+function getpts($sc) {
+	if (strpos($sc,'~')===false) {
+		if ($sc>0) {
+			return $sc;
+		} else {
+			return 0;
+		}
+	} else {
+		$sc = explode('~',$sc);
+		$tot = 0;
+		foreach ($sc as $s) {
+			if ($s>0) {
+				$tot+=$s;
+			}
+		}
+		return round($tot,1);
+	}
+}
+
 if (isset($_POST['record'])) {
 	$qnref = array();
 	$attemptref = array();
@@ -63,7 +82,7 @@ if (isset($_POST['record'])) {
 		
 	$query = "SELECT id,ver,questions,seeds,scores,attempts,lastanswers,reattempting,";
 	$query .= "bestseeds,bestscores,bestattempts,bestlastanswers,lti_sourcedid ";
-	$query .= "FROM imas_assessment_sessions WHERE assessmentid=?"
+	$query .= "FROM imas_assessment_sessions WHERE assessmentid=?";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($aid));
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
