@@ -387,6 +387,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$pathstr = '';
 		$firstpoint = false;
 		$fx = array();  $fy = array();
+		$yyaltmin = $yymin-.5*($yymax-$yymin);
+		$yyaltmax = $yymax+.5*($yymax-$yymin);
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
 				$t = $xmin + $dx*$i + 1E-10;
@@ -398,7 +400,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
 				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
 				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
-				if ($xmax != $xmin && $y>$yymin && $y<$yymax) {
+				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			} else {
@@ -411,7 +413,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
 				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
-				if ($xmax != $xmin && $y>$yymin && $y<$yymax) {
+				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			}
