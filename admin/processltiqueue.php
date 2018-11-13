@@ -60,8 +60,8 @@ if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
 
 $batchsize = isset($CFG['LTI']['queuebatch'])?$CFG['LTI']['queuebatch']:10;
 $RCX = new RollingCurlX($batchsize);
-$RCX->setTimeout(5000); //3 second timeout on each request
-$RCX->setStopAddingTime(45); //stop adding new request after 50 seconds
+$RCX->setTimeout(5000); //5 second timeout on each request
+$RCX->setStopAddingTime(45); //stop adding new request after 45 seconds
 $RCX->setCallback('LTIqueueCallback'); //callback after response
 $RCX->setPostdataCallback('LTIqueuePostdataCallback'); //pre-send callback
 /*  sometimes needed on localhost
