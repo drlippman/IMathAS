@@ -258,6 +258,12 @@
 				exit;
 			}
 		}
+		if (!$isreview && trim($adata['password'])!='' && isset($_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'])) {
+			$testhash = hash("sha256", $urlmode.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($adata['password']));
+			if ($testhash == $_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH']) {
+				$adata['password'] = '';
+			}
+		}
 		if (!$isreview && trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
@@ -664,6 +670,7 @@
 			$LPinf = $stm->fetch(PDO::FETCH_ASSOC);
 		}
 		$testsettings['shuffle'] = $testsettings['shuffle'] | 4; //force all students same seed
+		$hideAllHeaderNav = true; //hide header nav to expand real estate for questions / results
 	}
 
 	$now = time();
@@ -3039,6 +3046,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo ' <div id="livepollqcontent"></div>';
 				echo ' <div id="livepollrwrapper"><p id="livepollrcnt"></p>';
 				echo ' <div id="livepollrcontent" style="display:none"></div></div>';
+				echo ' <p>&nbsp;</p><p>&nbsp;</p>';
 				echo '</div>';
 				//pull any existing result data
 				$LPdata = array();

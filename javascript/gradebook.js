@@ -37,7 +37,9 @@ function setupGBpercents() {
   $("thead th").each(function(i,el) { 
   	if (p = el.innerHTML.match(/(\d+)(\s*|&nbsp;)pts/)) {
   		colpts[i] = p[1];
-    }
+  	} else {
+  		colpts[i] = 100;
+  	}
   });
   $("tbody td").each(function(i,el) {
     if (el.innerHTML.match(/tipshow/)) {return;}
@@ -121,6 +123,7 @@ $(function() {
 		var val=$(this).attr("data-hdrs");
 		if (val==0) {
 			ts.unlock();
+			document.cookie = "skiplhdrwarn_"+cid+"=0";
 		} else {
 			ts.lock();
 		}

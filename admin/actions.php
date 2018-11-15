@@ -108,8 +108,9 @@ switch($_POST['action']) {
 					$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', trim($_POST['newgroupname']))).'[[:space:]]*$'));
 					$newgroup = $stm->fetchColumn(0);
 					if ($newgroup === false) {
-						$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-						$stm->execute(array(':name'=>$_POST['newgroupname']));
+						$defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
+						$stm = $DBH->prepare("INSERT INTO imas_groups (name,grouptype) VALUES (:name,:grouptype)");
+						$stm->execute(array(':name'=>Sanitize::stripHtmlTags(trim($_POST['newgroupname'])), ':grouptype'=>$defGrouptype));
 						$newgroup = $DBH->lastInsertId();
 					}
 				} else {
@@ -319,8 +320,10 @@ switch($_POST['action']) {
 					$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', trim($_POST['newgroupname']))).'[[:space:]]*$'));
 					$newgroup = $stm->fetchColumn(0);
 					if ($newgroup === false) {
-						$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-						$stm->execute(array(':name'=>$_POST['newgroupname']));
+						$newGroupName = Sanitize::stripHtmlTags(trim($_POST['newgroupname']));
+						$defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
+						$stm = $DBH->prepare("INSERT INTO imas_groups (name,grouptype) VALUES (:name,:grouptype)");
+						$stm->execute(array(':name'=>$newGroupName, ':grouptype'=>$defGrouptype));
 						$newgroup = $DBH->lastInsertId();
 					}
 				} else {
@@ -1306,8 +1309,10 @@ switch($_POST['action']) {
 			echo "<html><body>Group name already exists.  <a href=\"forms.php?action=listgroups\">Try again</a></body></html>\n";
 			exit;
 		}
-		$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-		$stm->execute(array(':name'=>$_POST['gpname']));
+		$newGroupName = Sanitize::stripHtmlTags(trim($_POST['gpname']));
+		$defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
+		$stm = $DBH->prepare("INSERT INTO imas_groups (name,grouptype) VALUES (:name,:grouptype)");
+		$stm->execute(array(':name'=>$newGroupName, ':grouptype'=>$defGrouptype));
 		break;
 	case "modgroup":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}

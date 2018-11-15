@@ -5,6 +5,8 @@
 function updateeeddpos() {}
 function updateehpos() {}
 
+var onlyAscii = /^[\u0000-\u007f]*$/;
+
 var LivePreviews = [];
 function setupLivePreview(qn) {
 	if (!LivePreviews.hasOwnProperty(qn)) {
@@ -73,6 +75,7 @@ function setupLivePreview(qn) {
 			  },
 
 			  preformat: function(text) {
+			  	text = normalizemathunicode(text);
 			  	if (intcalctoproc.hasOwnProperty(qn)) {
 			  		if (!calcformat[qn].match(/inequality/)) {
 			  			text = text.replace(/U/g,"uu");
@@ -94,6 +97,7 @@ function setupLivePreview(qn) {
 			  			text = text.replace(/(x|X|\u00D7)/,"xx");
 			  		}
 			  	}
+			  	text = text.replace(/[^\u0000-\u007f]/g, '?');
 			  	return text;
 			  },
 
@@ -212,8 +216,8 @@ function calculate(inputId,outputId,format) {
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/(x|X|\u00D7)/,"xx");
 		  } else {
-		  	  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
-		  	  str = str.replace(/\s/g,'');
+		  	  //str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
+		  	  str = str.replace(/^\s+/,'').replace(/\s+$/,'');
 		  }
 		  err += syntaxcheckexpr(str,format);
 		  try {
@@ -233,6 +237,7 @@ function calculate(inputId,outputId,format) {
 		  	  err = _("syntax incomplete")+'. '+err;
 		  	  res = NaN;
 		  }
+		  str = str.replace(/[^\u0000-\u007f]/g, '?');
 		  if (!isNaN(res) && res!="Infinity") {
 			  if (format.indexOf('showval')==-1) {
 				  str = "`"+str+"` " + wrapAMnotice(err);
@@ -309,7 +314,7 @@ function intcalculate(inputId,outputId,format) {
   if (format.indexOf('mixed')!=-1) {
 	  fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
   } else {
-	  fullstr = fullstr.replace(/\s+/g,'');
+	  fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
   }
   fullstr = normalizemathunicode(fullstr);
   if (fullstr.match(/DNE/i)) {
@@ -369,9 +374,9 @@ function intcalculate(inputId,outputId,format) {
 				  res = NaN;
 				  err += singlevalsyntaxcheck(vals[j], format);
 				  if (format.indexOf('mixed')!=-1) {
-					  vals[j] = vals[j].replace(/_/g,' ');
+					  vals[j] = vals[j].replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 				  } else {
-					  vals[j] = vals[j].replace(/\s/g,'');
+					  vals[j] = vals[j].replace(/^\s+/,'').replace(/\s+$/,'');
 				  }
 				  err += syntaxcheckexpr(vals[j], format);
 
@@ -451,7 +456,7 @@ function intcalculate(inputId,outputId,format) {
 		 }
 	 }
   }
-
+  fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
   var qn = outputId.substr(1);
   setupLivePreview(qn);
   LivePreviews[qn].RenderNow(fullstr);
@@ -474,7 +479,7 @@ function ntuplecalc(inputId,outputId,format) {
 	if (format.indexOf('mixed')!=-1) {
 		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
-		fullstr = fullstr.replace(/\s+/g,'');
+		fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
 	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -543,6 +548,7 @@ function ntuplecalc(inputId,outputId,format) {
 		if (notationok==false) {
 			err += _("Invalid notation")+". ";
 		}
+		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
 		//outstr = '`'+fullstr+'` = '+outcalced;
 		if (format.indexOf('showval')==-1 || notationok==false) {
 			 outstr = '`'+fullstr+'`'+". " + wrapAMnotice(err);
@@ -575,7 +581,7 @@ function complexcalc(inputId,outputId,format) {
 	if (format.indexOf('mixed')!=-1) {
 		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
-		fullstr = fullstr.replace(/\s+/g,'');
+		fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
 	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -624,6 +630,7 @@ function complexcalc(inputId,outputId,format) {
 				break;
 			}
 		}
+		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
 		if (format.indexOf('showval')==-1) {
 			outstr = '`'+fullstr+'`'+". "+wrapAMnotice(err);
 		} else {
@@ -858,6 +865,7 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 		calcstr = '[('+calclist.join('),(')+')]';
 	}
 	//calcstr = calcstr.replace(/([^\[\(\)\],]+)/g, calced);
+	str = str.replace(/[^\u0000-\u007f]/g, '?');
 	if (format.indexOf("showval")==-1) {
 		str = "`"+str+"`. "+err;
 	} else {
@@ -1024,6 +1032,7 @@ function AMpreview(inputId,outputId) {
   var str = strprocess[0];
   var dispstr = strprocess[1];
   var vl = strprocess[2];
+
   //the following does a quick syntax check of the formula
 
   var fl = flist[qn];
@@ -1065,6 +1074,7 @@ function AMpreview(inputId,outputId) {
 	  }
 	  tstpt++;
   }
+
   var formaterr = syntaxcheckexpr(str,"",vl);
   if (isNaN(res) || res=="Infinity") {
   	  err = _("syntax error");
@@ -1076,6 +1086,12 @@ function AMpreview(inputId,outputId) {
   	  	  err += ". "+formaterr;
   	  }
   }
+  
+  if (!onlyAscii.test(str)) {
+  	  err += ". "+_("Your answer contains an unrecognized symbol");
+  	  dispstr = dispstr.replace(/[^\u0000-\u007f]/g, '?');
+  }
+
   if (iseqn[qn]==1 && isnoteqn) { err = _("syntax error: this is not an equation");}
   else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression");}
   //outnode.appendChild(document.createTextNode(" " + err));
@@ -1111,13 +1127,17 @@ function singlevalsyntaxcheck(str,format) {
 		 return '';
 	} else if (str.match(/oo$/) || str.match(/oo\W/)) {
 		 return '';
+	} else if (format.indexOf('allowmixed')!=-1 &&
+		str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))\s*$/)) {
+		//if allowmixed and it's mixed, stop checking
+		return '';
 	} else if (format.indexOf('fracordec')!=-1) {
-		  str = str.replace(/\s/g,'');
+		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
 		  if (!str.match(/^\-?\(?\d+\s*\/\s*\-?\d+\)?$/) && !str.match(/^\-?\d+$/) && !str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
 			return (_(" invalid entry format")+". ");
 		  }
 	} else if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
-		  str = str.replace(/\s/g,'');
+		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
 		 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 		  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 			return (_("not a valid fraction")+". ");
@@ -1141,7 +1161,9 @@ function singlevalsyntaxcheck(str,format) {
 		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
 			return (_(" not a valid integer or decimal number")+". ");
 		}
-	}
+	} else if (!onlyAscii.test(str)) {
+		return _("Your answer contains an unrecognized symbol")+". ";
+  	}
 	return '';
 }
 
@@ -1151,6 +1173,9 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += _("no trig functions allowed")+". ";
 	  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
 		  err += _("no decimals allowed")+". ";
+	  } else if (format.indexOf('mixed')==-1 &&
+		str.match(/\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/)) {
+		err += _("mixed numbers are not allowed")+". ";
 	  }
 	  var Pdepth = 0; var Bdepth = 0; var Adepth = 0;
 	  for (var i=0; i<str.length; i++) {

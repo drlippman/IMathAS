@@ -282,6 +282,12 @@ if ($overwriteBody==1) {
 
 	$out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'/', $out);
 
+	if (substr($CFG['GEN']['pandocserver'],0,4)=='http') {
+		$pandocurl = $CFG['GEN']['pandocserver'];
+	} else {
+		$pandocurl = 'http://'.$CFG['GEN']['pandocserver'];
+	}
+	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
@@ -292,9 +298,12 @@ if ($overwriteBody==1) {
 	echo '<p>'._('Assessment is prepared, and ready for conversion').'.</p>';
 	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
 	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
-	echo '<form id="theform" method="post" action="http://'.$CFG['GEN']['pandocserver'].'/html2docx.php">';
-	echo '<input type="submit" value="'._("Convert to Word").'"/> ';
-	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">'._('Change print settings').'</a>';
+	echo '<form id="theform" method="post" action="'.$pandocurl.'/html2docx.php">';
+	echo '<p><label><input type="checkbox" name="darkgrid"> '._('Darken graph grid lines').'</label><br/>';
+	echo '<label><input type="checkbox" name="doubleimgs"> '._('Double image sizes').'</label></p>';
+	
+	echo '<p><input type="submit" value="'._("Convert to Word").'"/> ';
+	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">'._('Change print settings').'</a></p>';
 	echo '<textarea name="html" style="visibility:hidden">'.Sanitize::encodeStringForDisplay($out).'</textarea>';
 	echo '</form>';
 

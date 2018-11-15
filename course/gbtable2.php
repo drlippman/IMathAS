@@ -1415,6 +1415,9 @@ function gbtable() {
 		$catposspast[$cat] = array();
 		$catposscur[$cat] =array();
 		$catpossfuture[$cat] = array();
+		$catposspastec[$cat] = array();
+		$catposscurec[$cat] =array();
+		$catpossfutureec[$cat] = array();
 		$catkeys = array_keys($category,$cat);
 		foreach ($catkeys as $k) {
 			if ($avail[$k]<1) { //is past

@@ -1332,7 +1332,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
+			initSortTable('myTable',[false,'S','S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','N','S',false<?php echo ($searchall==0) ? ",false" : ""; ?>],true);
 		    $(".dropdown-toggle").dropdown();
 		</script>
 	</form>

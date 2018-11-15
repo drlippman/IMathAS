@@ -393,3 +393,12 @@ function adjustiFrame(pickerDiv, iFrameDiv)
  
 }
 
+$(function() {
+	$("input[name=sdate],input[name=stime]").on("input", function() {$("input[name=sdatetype][value=sdate]").prop("checked", true);});
+	$("input[name=edate],input[name=etime]").on("input", function() {$("input[name=edatetype][value=edate]").prop("checked", true);});
+	$("input[name=postbydate],input[name=postbytime]").on("input", function() {$("input[name=postby][value=Date]").prop("checked", true);});
+	$("input[name=replybydate],input[name=replybytime]").on("input", function() {$("input[name=replyby][value=Date]").prop("checked", true);});
+});
+function datePickerClosed(el) {
+	$(el).trigger("input");
+}

@@ -6,6 +6,8 @@ if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
 $newStatus = Sanitize::onlyInt($_POST['newstatus']);
 $instId = Sanitize::onlyInt($_POST['userid']);
+$defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
+
 //handle ajax postback
 if (!empty($newStatus)) {
 	$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
@@ -41,8 +43,8 @@ if (!empty($newStatus)) {
 			$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', $newGroupName)).'[[:space:]]*$'));
 			$group = $stm->fetchColumn(0);
 			if ($group === false) {
-				$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-				$stm->execute(array(':name'=>$newGroupName));
+				$stm = $DBH->prepare("INSERT INTO imas_groups (name,grouptype) VALUES (:name,:grouptype)");
+				$stm->execute(array(':name'=>$newGroupName, ':grouptype'=>$defGrouptype));
 				$group = $DBH->lastInsertId();
 			}
 		} else {

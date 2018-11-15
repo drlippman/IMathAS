@@ -5,7 +5,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs","dechex","hexdec","print_r","replacealttext","randpythag");
-array_push($allowedmacros,"numtowords","randname","randnamewpronouns","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbackbasic","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates","prettysmallnumber","makeprettynegative");
+array_push($allowedmacros,"numtowords","randname","randnamewpronouns","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbackbasic","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","getopendotsdata","gettwopointdata","getlinesdata","adddrawcommand","mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates","prettysmallnumber","makeprettynegative");
 function mergearrays() {
 	$args = func_get_args();
 	foreach ($args as $k=>$arg) {
@@ -83,8 +83,32 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$fqonlyy = true;
 		$settings[2] = substr($settings[2],2);
 	}
-	$ymin = $settings[2];
-	$ymax = $settings[3];
+	$yminauto = false;
+	$ymaxauto = false;
+	if (substr($settings[2],0,4)=='auto') {
+		$yminauto = true;
+		if (strpos($settings[2],':')!==false) {
+			$ypts = explode(':',$settings[2]);
+			$settings[2] = $ypts[1];
+		} else {
+			$settings[2] = -5;
+		}
+	}
+	if (substr($settings[3],0,4)=='auto') {
+		$ymaxauto = true;
+		if (strpos($settings[3],':')!==false) {
+			$ypts = explode(':',$settings[3]);
+			$settings[3] = $ypts[1];
+		} else {
+			$settings[3] = 5;
+		}
+	}
+	$winxmin = is_numeric($settings[0])?$settings[0]:-5;
+	$winxmax = is_numeric($settings[1])?$settings[1]:5;
+	$ymin = is_numeric($settings[2])?$settings[2]:-5;
+	$ymax = is_numeric($settings[3])?$settings[3]:5;
+	$plotwidth = is_numeric($settings[6])?$settings[6]:200;
+	$plotheight = is_numeric($settings[7])?$settings[7]:200;
 	$noyaxis = false;
 	if (is_numeric($ymin) && is_numeric($ymax) && $ymin==0 && $ymax==0) {
 		$ymin = -0.5;
@@ -93,30 +117,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$settings[2] = -0.5;
 		$settings[3] = 0.5;
 	}
-	$xxmin = $settings[0] - 5*($settings[1] - $settings[0])/$settings[6];
-	$xxmax = $settings[1] + 5*($settings[1] - $settings[0])/$settings[6];
-	$yymin = $settings[2] - 5*($settings[3] - $settings[2])/$settings[7];
-	$yymax = $settings[3] + 5*($settings[3] - $settings[2])/$settings[7];
-	$yminauto = false;
-	$ymaxauto = false;
-	if (substr($ymin,0,4)=='auto') {
-		$yminauto = true;
-		if (strpos($ymin,':')!==false) {
-			$ypts = explode(':',$ymin);
-			$ymin = $ypts[1];
-		} else {
-			$ymin = -5;
-		}
-	}
-	if (substr($ymax,0,4)=='auto') {
-		$ymaxauto = true;
-		if (strpos($ymax,':')!==false) {
-			$ypts = explode(':',$ymax);
-			$ymax = $ypts[1];
-		} else {
-			$ymax = 5;
-		}
-	}
+	$xxmin = $winxmin - 5*($winxmax - $winxmin)/$plotwidth;
+	$xxmax = $winxmax + 5*($winxmax - $winxmin)/$plotwidth;
+	$yymin = $ymin - 5*($ymax - $ymin)/$plotheight;
+	$yymax = $ymax + 5*($ymax - $ymin)/$plotheight;
+	
 	//$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});";
 	//$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.";
 	$commands = '';
@@ -162,8 +167,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$commands .= ');';
 	}
 	if (isset($lbl) && count($lbl)>3) {
-		$commands .= "text([{$settings[1]},0],\"{$lbl[2]}\",\"aboveleft\");";
-		$commands .= "text([0,{$settings[3]}],\"{$lbl[3]}\",\"belowright\");";
+		$commands .= "text([{$winxmax},0],\"{$lbl[2]}\",\"aboveleft\");";
+		$commands .= "text([0,{$ymax}],\"{$lbl[3]}\",\"belowright\");";
 	}
 	$absymin = 1E10;
 	$absymax = -1E10;
@@ -332,16 +337,20 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		$avoid = array();
 		$domainlimited = false;
-		if (isset($function[2]) && $function[2]!='') {
+		if (isset($function[2]) && $function[2]!='' && is_numeric($function[2])) {
 			$xmin = $function[2];
 			$domainlimited = true;
-		} else {$xmin = $settings[0];}
+		} else {$xmin = $winxmin;}
 		if (isset($function[3]) && $function[3]!='') {
 			$xmaxarr = explode('!',$function[3]);
-			$xmax = $xmaxarr[0];
+			if (is_numeric($xmaxarr[0])) {
+				$xmax = $xmaxarr[0];
+			} else {
+				$xmax = $winxmax;
+			}
 			$avoid = array_slice($xmaxarr,1);
 			$domainlimited = true;
-		} else {$xmax = $settings[1];}
+		} else {$xmax = $winxmax;}
 
 		if ($GLOBALS['sessiondata']['graphdisp']==0) {
 			if ($xmax-$xmin>2 || $xmax==$xmin) {
@@ -357,7 +366,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$alt .= '. ';
 			}
 		} else {
-			$dx = ($xmax - $xmin + ($domainlimited?0:10*($xmax-$xmin)/$settings[6]) )/100;
+			$dx = ($xmax - $xmin + ($domainlimited?0:10*($xmax-$xmin)/$plotwidth) )/100;
 			$stopat = ($domainlimited?101:102);
 			if ($xmax==$xmin) {
 				$stopat = 1;
@@ -367,8 +376,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$xrnd = 6;
 			$yrnd = 6;
 		} else {
-			$xrnd = floor(-log10(abs($xmax-$xmin))-1e-12)+4;
-			$yrnd = floor(-log10(abs($ymax-$ymin))-1e-12)+4;
+			$xrnd = max(0,intval(floor(-log10(abs($xmax-$xmin))-1e-12))+4);
+			$yrnd = max(0,intval(floor(-log10(abs($ymax-$ymin))-1e-12))+4);
 		}
 
 		$lasty = 0;
@@ -378,22 +387,33 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$pathstr = '';
 		$firstpoint = false;
 		$fx = array();  $fy = array();
+		$yyaltmin = $yymin-.5*($yymax-$yymin);
+		$yyaltmax = $yymax+.5*($yymax-$yymin);
 		for ($i = 0; $i<$stopat;$i++) {
 			if ($isparametric) {
 				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
-				$x = round($evalxfunc($t),$xrnd);//round(eval("return ($xfunc);"),3);
-				$y = round($evalyfunc($t),$yrnd);//round(eval("return ($yfunc);"),3);
-				if ($xmax != $xmin) {
+				$x = $evalxfunc($t);
+				$y = $evalyfunc($t);
+				if (!is_numeric($x) || !is_numeric($y)) {
+					continue;
+				}
+				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
+				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
+				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			} else {
-				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$settings[6]);
+				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-				$y = round($evalfunc($x),$yrnd);//round(eval("return ($func);"),3);
+				$y = $evalfunc($x);
+				if (!is_numeric($y)) {
+					continue;
+				}
+				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
-				if ($xmax != $xmin) {
+				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			}
@@ -547,18 +567,18 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$commands .= $path;
 	}
 	if ($yminauto) {
-		$settings[2] = max($absymin,$ymin);
+		$ymin = max($absymin,$ymin);
 	}
 	if ($ymaxauto) {
-		$settings[3] = min($absymax,$ymax);
+		$ymax = min($absymax,$ymax);
 	}
-	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});".$commands;
-	$alt = "Graphs with window x: {$settings[0]} to {$settings[1]}, y: {$settings[2]} to {$settings[3]}. ".$alt;
+	$commands = "setBorder(5); initPicture({$winxmin},{$winxmax},{$ymin},{$ymax});".$commands;
+	$alt = "Graphs with window x: {$winxmin} to {$winxmax}, y: {$ymin} to {$ymax}. ".$alt;
 
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	} else {
-		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' script='$commands' />\n";
+		return "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
 	}
 }
 
@@ -1456,6 +1476,12 @@ function listtoarray($l) {
 
 
 function arraytolist($a, $sp=false) {
+	if (!is_array($a)) {
+		if ($GLOBALS['myrights']>10) {
+			echo "Error: arraytolist expect an array as input";
+		}
+		return $a;
+	}
 	if ($sp) {
 		return (implode(', ',$a));
 	} else {
@@ -1464,6 +1490,12 @@ function arraytolist($a, $sp=false) {
 }
 
 function joinarray($a,$s=',') {
+	if (!is_array($a)) {
+		if ($GLOBALS['myrights']>10) {
+			echo "Error: joinarray expect an array as input";
+		}
+		return $a;
+	}
 	return (implode($s,$a));
 }
 
@@ -2469,6 +2501,9 @@ function evalbasic($str) {
 				echo Sanitize::encodeStringForDisplay($t->getMessage());
 				echo '</p>';
 			}
+			if (!isset($ret) || !is_numeric($ret)) {
+				return 0;
+			}
 		}
 		return $ret;
 	}
@@ -2589,7 +2624,7 @@ function cleanbytoken($str,$funcs = array()) {
 		}
 		$primeoff = $p+1;
 	}
-	$parts = preg_split('/(<=|>=|=|,|<|>|&gt;|&lt;|&ge;|&le;|&ne;|\blt\b|\bgt\b|\ble\b|\bge\b|\bne\b)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
+	$parts = preg_split('/(<=|>=|=|,|<|>|&gt;|&lt;|&ge;|&le;|&ne;|\blt\b|\bgt\b|\ble\b|\bge\b|\bne\b|\bor\b)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	$finalout = array();
 	for ($k=0;$k<count($parts);$k+=2) {
 		$finalout = array();
@@ -3538,7 +3573,21 @@ function getdotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 		 $dots[$k] = $pt;
 	}
 	return $dots;
-
+}
+function getopendotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+	$imgborder = 5;
+	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
+	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
+	list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$str);
+	if ($odots=='') { return array();}
+	$dots = explode('),(', substr($odots,1,strlen($odots)-2));
+	foreach ($dots as $k=>$pt) {
+		 $pt =  explode(',',$pt);
+		 $pt[0] = ($pt[0] - $imgborder)/$pixelsperx + $xmin;
+		 $pt[1] = ($h - $pt[1] - $imgborder)/$pixelspery + $ymin;
+		 $dots[$k] = $pt;
+	}
+	return $dots;
 }
 function getlinesdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	$imgborder = 5;

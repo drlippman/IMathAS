@@ -124,6 +124,7 @@
 
 		}
 	}
+	
 
 	if (isset($_POST['assesssnap'])) {
 		$assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
@@ -196,7 +197,7 @@
 					$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':gradetype'=>'offline', ':gradetypeid'=>$gbItem, ':userid'=>$k, ':score'=>$sc, ':feedback'=>$_POST['feedback'.$k]));
-				} else if (trim($_POST['feedback'][$k])!='') {
+				} else if (trim($_POST['feedback'.$k])!='') {
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 					$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 					$stm = $DBH->prepare($query);

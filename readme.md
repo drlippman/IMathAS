@@ -37,25 +37,25 @@ IMathAS can be configured through variables set in `config.php`.
 
 These are all added to the `config.php` by the install script.
 
--   $dbserver: The address of your database server. Probably www.yoursite.edu or localhost
--   $dbname: The name of the IMathAS database
--   $dbusername: The username of the IMathAS database user.
--   $dbpassword: The password for the IMathAS database user. 
--   $installname: The name of your installation, for personalization.
--   $longloginprompt: How you want to prompt new students for a username
--   $loginprompt: How you want to prompt students for a username.  
--   \$loginformat: Enforce a format requirement on the username. This should be a regular expression string, like `'/^\w+$/'`
--   $emailconfirmation: If set to true, new users will have to respond to an email sent by the system before being able to enroll in any classes.
--   $sendfrom: An email address to send confirmation and notification emails from.
--   $imasroot: The web root of the imathas install.  An empty string if installed at the web root, or something like `'/imathas'` if installed in a directory.
--   $mathimgurl: An absolute path or full url to a [Mimetex](http://www.forkosh.com/mimetex.html) installation, for math image fallback
--   $colorshift: Whether icons should change colors as due date approaches. I thought this was cute, but others might find it annoying.
--   $smallheaderlogo: Text or an HTML image tag for a small (120 x 80) logo to display at the top right of course pages.
--   $allownongrouplibs: Whether non-admins should be allowed to create non-group libraries. On a single-school install, set to true; for larger installs that plan to use the Groups features, set to false.
--   $allowcourseimport: Whether anyone should be able to import/export questions and libraries from the course page. Intended for easy sharing between systems, but the course page is cleaner if turned off.
--   $enablebasiclti: Set to true to enable use of IMathAS as an LTI producer (tool).
--   $AWSkey, $AWSsecret, $AWSbucket: To allow students and teachers to upload files through the text editor, and to enable file upload questions, this specifies an Amazon S3 key, secret, and bucket to use for file storage. If not specified, local storage will be used instead.
-- $CFG['GEN']['newpasswords']:  all new installations should set this to `'only'` to use good-quality password security.  It can be set to `'transition'` for very old systems to transition to the new storage.  If omitted the system will use md5 for passwords, which is highly discouraged.
+-   `$dbserver`: The address of your database server. Probably www.yoursite.edu or localhost
+-   `$dbname`: The name of the IMathAS database
+-   `$dbusername`: The username of the IMathAS database user.
+-   `$dbpassword`: The password for the IMathAS database user. 
+-   `$installname`: The name of your installation, for personalization.
+-   `$longloginprompt`: How you want to prompt new students for a username
+-   `$loginprompt`: How you want to prompt students for a username.  
+-   `$loginformat`: Enforce a format requirement on the username. This should be a regular expression string, like `'/^\w+$/'`
+-   `$emailconfirmation`: If set to true, new users will have to respond to an email sent by the system before being able to enroll in any classes.
+-   `$sendfrom`: An email address to send confirmation and notification emails from.
+-   `$imasroot`: The web root of the imathas install.  An empty string if installed at the web root, or something like `'/imathas'` if installed in a directory.
+-   `$mathimgurl`: An absolute path or full url to a [Mimetex](http://www.forkosh.com/mimetex.html) installation, for math image fallback
+-   `$colorshift`: Whether icons should change colors as due date approaches. I thought this was cute, but others might find it annoying.
+-   `$smallheaderlogo`: Text or an HTML image tag for a small (120 x 80) logo to display at the top right of course pages.
+-   `$allownongrouplibs`: Whether non-admins should be allowed to create non-group libraries. On a single-school install, set to true; for larger installs that plan to use the Groups features, set to false.
+-   `$allowcourseimport`: Whether anyone should be able to import/export questions and libraries from the course page. Intended for easy sharing between systems, but the course page is cleaner if turned off.
+-   `$enablebasiclti`: Set to true to enable use of IMathAS as an LTI producer (tool).
+-   `$AWSkey, $AWSsecret, $AWSbucket`: To allow students and teachers to upload files through the text editor, and to enable file upload questions, this specifies an Amazon S3 key, secret, and bucket to use for file storage. If not specified, local storage will be used instead.
+- `$CFG['GEN']['newpasswords']`:  all new installations should set this to `'only'` to use good-quality password security.  It can be set to `'transition'` for very old systems to transition to the new storage.  If omitted the system will use md5 for passwords, which is highly discouraged.
 
 ### System Defaults
 
@@ -85,6 +85,8 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['meanstogetcode']`:  To comply with the IMathAS Community License, a means to get a copy of question code must be provided.  By default the system says to email the `$sendfrom` email address.  You can define this variable to display a different message on the license info page.
 - `$CFG['GEN']['LTIorgid']`:  A value to use as the LTI organization ID when IMathAS is acting as an LTI consumer.  Defaults to the domain name.
 - `$CFG['UP']`:  An associative array overriding the default User Preference values.  See the `$prefdefaults` definition in `/includes/userprefs.php` for the appropriate format.
+- `$CFG['GEN']['extrefsize']`: Set to an array of (width,height) to set the popup size for Text and Written Solution question help buttons
+- `$CFG['GEN']['vidextrefsize']`: Set to an array of (width,height) to set the popup size for Video question help buttons
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
@@ -123,7 +125,8 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 - `$CFG['GEN']['hometitle']`:  Set to a message to display at the top of the Home page, in place of "Welcome to _____, ______" 
 - `$CFG['CPS']['leftnavtools']`:  Set to `"limited"` to remove from the course left navigation tools that are also in the top navigation.  Set to false to remove the entire Tools block from the course left navigation.
 - `$CFG['GEN']['deflicense']`:  The default license for new questions.  See `/course/moddataset.php` for valid values.  Defaults to 1 (IMathAS community license).
- 
+- `$CFG['GEN']['defGroupType']`: Set to change the default group type for newly created groups (def: 0)
+
 ### LTI
 
 - `$CFG['LTI']['noCourseLevel']`: set to true to hide course level LTI key and secret from users. Use this if you want to require use of global LTI key/secrets.
@@ -166,7 +169,7 @@ The student side of the system is pretty well set up for i18n, but the instructo
 - `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.
 
 ### Course Cleanup
-Automated course cleanup (unenrolling students from a course) can be enabled.  To use this, you'll need to set up a cron job or scheduled web call to run:
+Automated course cleanup (unenrolling students from a course) can be enabled.  To use this, you'll need to set up a cron job (good on a single server setup) or scheduled web call (better for multi-server environments) to run:
 - `/util/tagcoursecleanup.php`:  Run this once a day
 - `/util/runcoursecleanup.php`:  Run this about every 10 minutes. Can be limited to slow usage periods.
 

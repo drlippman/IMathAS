@@ -651,13 +651,13 @@ function ASaxes($arg) {
 			if (!$fqonlyy) {
 				for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
 					if ($y>=$this->winymin) {
-						imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxin),$y,$this->winxmax,$y,$this->colors[$gc]);
+						imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxmin),$y,$this->winxmax,$y,$this->colors[$gc]);
 					}
 				}
 			}
 			for ($y=$this->height - $this->origin[1]-$ygrid; $y>$this->winymin; $y -= $ygrid) {
 				if ($y<=$this->winymax) {
-					imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxin),$y,$this->winxmax,$y,$this->colors[$gc]);
+					imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxmin),$y,$this->winxmax,$y,$this->colors[$gc]);
 				}
 			}
 		}
@@ -711,7 +711,7 @@ function ASaxes($arg) {
 	}
 	if ($dox && $xscl>0) {
 		if ($this->origin[1]>=$this->winymin && $this->origin[1]<=$this->winymax) {
-			imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxin),$this->height-$this->origin[1],$this->winxmax,$this->height-$this->origin[1],$this->colors[$ac]);
+			imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxmin),$this->height-$this->origin[1],$this->winxmax,$this->height-$this->origin[1],$this->colors[$ac]);
 			//ticks
 			for ($x=$this->origin[0]; $x<=$this->winxmax; $x += $xscl) {
 				if ($x>=$this->winxmin) {

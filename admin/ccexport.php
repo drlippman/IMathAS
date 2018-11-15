@@ -53,12 +53,12 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		if ($hasGroupLTI) {
 			$groupLTInote = '<p>It looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
 			$groupLTInote .= 'If so, you will not need to set up a course-level configuration.<br/> ';
-			$groupLTInote .= 'If you do need to set up a course-level configuration, <a href="#" onclick="$(\'#ltikeyinfo\').slideDown();return false;">show course level key/secret</a></p>';
-			$groupLTInote .= '<ul id="ltikeyinfo" style="display:none;">';
+			$groupLTInote .= 'If you do need to set up a course-level configuration, <a href="#" onclick="$(\'ul.ltikeyinfo\').slideDown();return false;">show course level key/secret</a></p>';
+			$groupLTInote .= '<ul class="ltikeyinfo" style="display:none;">';
 		} else {
 			$groupLTInote = '<p>Your school does not appear to have a school-wide LTI key and secret established. ';
 			$groupLTInote .= 'To set up a course-level configuration, you will need this information:</p>';
-			$groupLTInote .= '<ul id="ltikeyinfo">';
+			$groupLTInote .= '<ul class="ltikeyinfo">';
 		}
 		$groupLTInote .= '<li>Key: LTIkey_'.$cid.'_1</li>';
 		$groupLTInote .= '<li>Secret: ';

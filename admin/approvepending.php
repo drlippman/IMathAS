@@ -28,8 +28,10 @@ if (isset($_GET['go'])) {
 		if ($_POST['group']>-1) {
 			$group = intval($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
-			$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-			$stm->execute(array(':name'=>$_POST['newgroup']));
+			$newGroupName = Sanitize::stripHtmlTags(trim($_POST['newgroup']));
+			$defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0;
+			$stm = $DBH->prepare("INSERT INTO imas_groups (name,grouptype) VALUES (:name,:grouptype)");
+			$stm->execute(array(':name'=>$newGroupName, ':grouptype'=>$defGrouptype));
 			$group = $DBH->lastInsertId();
 		} else {
 			$group = 0;

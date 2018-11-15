@@ -17,9 +17,17 @@ function redirect() {
 }
 </script>
 </head>
+<?php
+if (empty($redir)) {  
+	echo '<body>Session established. Go back to your LMS and try again.</body>';
+} else {
+?>
 <body onload="redirect()">
 Redirecting you back to your LMS...<br/>
 If you aren't redirected in 5 seconds, 
 <a href="<?php echo $redir; ?>">click here</a>.
 </body>
+<?php
+}
+?>
 </html>

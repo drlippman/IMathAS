@@ -266,7 +266,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=100918"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=103118"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -371,7 +371,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=091217\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=103118\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
@@ -981,7 +981,7 @@ function gbstudisp($stu) {
 				echo '<sub>d</sub>';
 			}
 			echo '</td><td>';
-			if (isset($gbt[1][1][$i][0])) {
+			if (isset($gbt[1][1][$i][0]) && is_numeric($gbt[1][1][$i][0])) {
 				if ($gbt[0][1][$i][2]>0) {
 					echo round(100*$gbt[1][1][$i][0]/$gbt[0][1][$i][2],1).'%';
 				}
