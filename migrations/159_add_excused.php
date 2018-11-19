@@ -6,7 +6,7 @@ $DBH->beginTransaction();
 
 //Add tables and columns for library federation
 $query = 'CREATE TABLE `imas_excused` (
-	  `id` INT(10) UNSIGNED NOT NULL PRIMARY KEY,
+	  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	  `userid` INT(10) UNSIGNED NOT NULL,
 	  `courseid` INT(10) UNSIGNED NOT NULL,
 	  `type` CHAR(1) NOT NULL,
@@ -14,7 +14,8 @@ $query = 'CREATE TABLE `imas_excused` (
 	  `dateset` INT(10) UNSIGNED NOT NULL,
 	  INDEX (`userid`),
 	  INDEX (`courseid`),
-	  INDEX (`type`, `typeid`)
+	  INDEX (`type`, `typeid`),
+	  UNIQUE (`userid`, `type`, `typeid`)
 	) ENGINE=InnoDB;';
  $res = $DBH->query($query);
  if ($res===false) {

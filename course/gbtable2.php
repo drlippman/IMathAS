@@ -1821,7 +1821,7 @@ function gbtable() {
 					$gb[$ln][2][$pos][4+$stype] = 0;
 					$catpossstu[$stype][$cat] =0;
 				}
-				if ($catpossstu[$stype][$cat]>0 || count($catpossstuec[$cat])>0) {
+				if ($catpossstu[$stype][$cat]>0 || count($catpossstuec[$stype][$cat])>0) {
 					$cattotweightstu[$stype] += $cats[$cat][5];
 				}
 			}
