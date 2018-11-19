@@ -192,9 +192,6 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 	}
 	if ($penalty == 9999) {
 		$penalty = $testsettings['defpenalty'];
-		if (!is_numeric($penalty)) {
-			$penalty = 0;
-		}
 		if ($penalty{0}==='L') {
 			$lastonly = true;
 			$penalty = substr($penalty,1);
@@ -202,6 +199,9 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 			$skipsome = $penalty{1};
 			$penalty = substr($penalty,2);
 		}
+	}
+	if (!is_numeric($penalty)) {
+		$penalty = 0;
 	}
 	$rowatt = $qi['attempts'];
 
