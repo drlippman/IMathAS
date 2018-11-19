@@ -1115,6 +1115,7 @@
 	$isdiag = isset($sessiondata['isdiag']);
 	if ($isdiag) {
 		$diagid = $sessiondata['isdiag'];
+		$hideAllHeaderNav = true;
 	}
 	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
 
@@ -1244,6 +1245,17 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'">';
 				echo _('View your scored assessment'), '</a></p>';
 			}
+		}
+		echo '</div>';
+	} else if ($isdiag) {
+		echo '<div class="floatright">';
+		if ($userfullname != ' ') {
+			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
+			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
+			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a></p>";
+		} else {
+			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
+			echo "<span id=\"myname\">".('User Preferences')."</span></p>";
 		}
 		echo '</div>';
 	}
