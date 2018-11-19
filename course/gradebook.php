@@ -373,7 +373,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "</div>";
 	}
 	gbstudisp($stu);
-	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
+	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>x</sup> Excused score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
 
 	require("../footer.php");
 
@@ -562,7 +562,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo _('Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score,  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
+	echo _('Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
 	require("../footer.php");
 
 	/*if ($isteacher) {

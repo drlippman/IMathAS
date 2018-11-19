@@ -1669,20 +1669,26 @@ function gbtable() {
 		}
 		foreach($gradeidx as $aid=>$i) {
 			$col = $gradecol[$aid];
-			for ($j=0;$j<4;$j++) {
-				unset($catpossstu[$j][$category[$i]][$col]);
+			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
+				for ($j=0;$j<4;$j++) {
+					unset($catpossstu[$j][$category[$i]][$col]);
+				}
 			}
 		}
 		foreach($exttoolidx as $aid=>$i) {
 			$col = $exttoolcol[$aid];
-			for ($j=0;$j<4;$j++) {
-				unset($catpossstu[$j][$category[$i]][$col]);
+			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
+				for ($j=0;$j<4;$j++) {
+					unset($catpossstu[$j][$category[$i]][$col]);
+				}
 			}
 		}
 		foreach($discussidx as $aid=>$i) {
 			$col = $discusscol[$aid];
-			for ($j=0;$j<4;$j++) {
-				unset($catpossstu[$j][$category[$i]][$col]);
+			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
+				for ($j=0;$j<4;$j++) {
+					unset($catpossstu[$j][$category[$i]][$col]);
+				}
 			}
 		}
 
