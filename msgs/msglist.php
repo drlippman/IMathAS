@@ -841,11 +841,13 @@ function chgfilter() {
 		}
 
 		echo "</td><td>";
+		echo '<a href="#" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');return false;">';
 		if (($line['isread']&8)==8) {
-			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(".Sanitize::onlyInt($line['id']).");return false;\" alt=\"Flagged\"/>";
+			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" alt=\"Flagged\"/>";
 		} else {
-			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(".Sanitize::onlyInt($line['id']).");return false;\" alt=\"Not flagged\"/>";
+			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" alt=\"Not flagged\"/>";
 		}
+		echo '</a>';
 		echo '</td>';
 		printf('<td>%s</td>', Sanitize::encodeStringForDisplay($line['fullname']));
 
