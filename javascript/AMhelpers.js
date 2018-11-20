@@ -232,13 +232,13 @@ function calculate(inputId,outputId,format) {
 			  if (format.indexOf('scinot')!=-1) {
 			  	  evalstr = evalstr.replace("xx","*");
 			  }
-			  var res = eval(prepWithMath(mathjs(evalstr)));
+			  var res = scopedmatheval(evalstr);
 		  } catch(e) {
 		  	  err = _("syntax incomplete")+'. '+err;
 		  	  res = NaN;
 		  }
 		  str = str.replace(/[^\u0000-\u007f]/g, '?');
-		  if (!isNaN(res) && res!="Infinity") {
+		  if (!isNaN(res) && res!="Infinity" && res!='') {
 			  if (format.indexOf('showval')==-1) {
 				  str = "`"+str+"` " + wrapAMnotice(err);
 			  } else {
@@ -386,12 +386,12 @@ function intcalculate(inputId,outputId,format) {
 					  	if (format.indexOf('mixed')!=-1) {
 					  		toeval = toeval.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 					  	}
-					  	var res = eval(prepWithMath(mathjs(toeval)));
+					  	var res = scopedmatheval(toeval);
 					  } catch(e) {
 					  	err = _("syntax incomplete")+". ";
 					  }
 				  }
-				  if (!isNaN(res) && res!="Infinity") {
+				  if (!isNaN(res) && res!="Infinity" && res!='') {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
 						  vals[j] = vals[j];
 						  calcvals[j] = (Math.abs(res)<1e-15?0:res).toString();//+wrapAMnotice(err);
@@ -528,11 +528,11 @@ function ntuplecalc(inputId,outputId,format) {
 						if (format.indexOf('mixed')!=-1) {
 							sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 						}
-						var res = eval(prepWithMath(mathjs(sub)));
+						var res = scopedmatheval(sub);
 					} catch(e) {
 						err += _("syntax incomplete")+". ";
 					}
-					if (!isNaN(res) && res!="Infinity") {
+					if (!isNaN(res) && res!="Infinity" && res!='') {
 						outcalced += res;
 					} else {
 						outcalced += _("undefined");
@@ -775,11 +775,11 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 	function calced(estr) {
 		var err='';
 		try {
-			var res = eval(prepWithMath(mathjs(estr)));
+			var res = scopedmatheval(estr);
 		} catch(e) {
 			err = _("syntax incomplete")+". ";
 		}
-		if (!isNaN(res) && res!="Infinity") {
+		if (!isNaN(res) && res!="Infinity" && res!='') {
 			estr = (Math.abs(res)<1e-15?0:res)+err;
 		} else if (estr!="") {
 			err = _("undefined")+". ";
@@ -1320,11 +1320,11 @@ function doonsubmit(form,type2,skipconfirm) {
 							  	  if (calcformat[qn].indexOf('mixed')!=-1) {
 							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 							  	  }
-							  	  var res = eval(prepWithMath(mathjs(vals[j])));
+							  	  var res = scopedmatheval(vals[j]);
 							  } catch(e) {
 							  	  err = "syntax incomplete";
 							  }
-							  if (!isNaN(res) && res!="Infinity") {
+							  if (!isNaN(res) && res!="Infinity" && res!='') {
 								  vals[j] = (Math.abs(res)<1e-15?0:res)+err;
 							  }
 						  }
@@ -1381,11 +1381,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			} else if (str.match(/DNE/i)) {
 				var res = str.toUpperCase();
 			} else {
-				try {
-					var res = eval(prepWithMath(mathjs(str)));
-				} catch(e) {
-					var res = '';
-				}
+				var res = scopedmatheval(str);
 			}
 			strarr[sc] = res;
 		}
@@ -1468,12 +1464,21 @@ function doonsubmit(form,type2,skipconfirm) {
 }
 
 function scopedeval(c) {
-	var res;
 	try {
-		res = eval(c);
-		return res;
+		return eval(c);
 	} catch(e) {
 		return "synerr";
+	}
+}
+
+function scopedmatheval(c) {
+	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
+		return '';
+	}
+	try {
+		return eval(prepWithMath(mathjs(c)));
+	} catch(e) {
+		return '';
 	}
 }
 
