@@ -1924,7 +1924,8 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 				}
 				if ($testsettings['testtype']!="NoScores") {
-					echo "<br/><p>". _("When you are done, ") . " <a href=\"showtest.php?action=skip&amp;done=true\">" . _("click here to see a summary of your scores") . "</a>.</p>\n";
+					echo "<br/><p>". _("When you are done, ") . " <a href=\"showtest.php?action=skip&amp;done=true\" ".getSummaryConfirm().">";
+					echo  _("click here to see a summary of your scores") . "</a>.</p>\n";
 				}
 
 				echo "</div>\n";
@@ -2992,7 +2993,8 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 			echo '</div>'; //ends either inset or formcontents div
 			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue"  && $testsettings['testtype']!="NoScores") {
-				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
+				echo "<p><a href=\"showtest.php?action=embeddone\" ".getSummaryConfirm().">";
+				echo _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 			}
 			if (!$introhaspages && $testsettings['displaymethod'] != "VideoCue") {
 				echo '</div>';
@@ -3483,14 +3485,28 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		return $todo;
 	}
 
-	function showscores($questions,$attempts,$testsettings) {
-		global $DBH,$regenonreattempt,$isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend;
+	function showscores($questions,&$attempts,$testsettings) {
+		global $DBH,$regenonreattempt,$reattempting,$isdiag,$allowregen,$isreview,$noindivscores,$reattemptduring,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend;
 
 		$total = 0;
 		$lastattempttotal = 0;
 		for ($i =0; $i < count($bestscores);$i++) {
 			if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
 			if (getpts($scores[$i])>0) { $lastattempttotal += getpts($scores[$i]);}
+			if (!$reattemptduring) {
+				if ($scores[$i]=='-1' || amreattempting($i)) {
+					//burn attempt
+					$attempts[$i]++;
+					$scores[$i] = 0;
+					$loc = array_search($i,$reattempting);
+					if ($loc!==false) {
+						array_splice($reattempting,$loc,1);
+					}
+				} else {
+					//clear out unans for multipart
+					$scores[$i] = str_replace('-1','0',$scores[$i]);
+				}
+			}
 		}
 		$totpossible = totalpointspossible($qi);
 		$average = round(100*((float)$total)/((float)$totpossible),1);
@@ -3708,5 +3724,16 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">", _('Return to Course Page'), "</a>\n";
 		}
 		echo '</p>';
+	}
+	function getSummaryConfirm() {
+		global $reattemptduring, $scores;
+		if (!$reattemptduring && in_array(-1,$scores)) {
+			$oc = ' onclick="return confirm(\'';
+			$oc .= _('Viewing the score summary will use up an attempt on any unanswered questions. Continue?');
+			$oc .= '\')" ';
+			return $oc;
+		} else {
+			return '';
+		}
 	}
 ?>
