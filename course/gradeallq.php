@@ -510,7 +510,7 @@
 					echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
 			} else {
-				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($points).');return false;">Full credit</a>';
+				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($points).',this);return false;">Full credit</a> <span class=quickfb></span>';
 			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {

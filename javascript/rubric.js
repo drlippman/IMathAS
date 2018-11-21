@@ -284,10 +284,27 @@ function quickgrade(qn,type,prefix,todo,vals) {
 		}
 	}
 }
-function quicksetscore(el,score) {
+function quicksetscore(el,score,clickel) {
 	document.getElementById(el).value = score;
+	if (clickel != null) {
+		var html = " | "+_('Quick feedback: ');
+		html += '<a href="#" onclick="return quicksetfb(this)">'+_('Good!')+'</a> | ';
+		html += '<a href="#" onclick="return quicksetfb(this)">'+_('Great work.')+'</a> | ';
+		html += '<a href="#" onclick="return quicksetfb(this)">'+_('Excellent!')+'</a> ';
+		$(clickel).siblings(".quickfb").html(html);
+	}
 }
 
+function quicksetfb(el) {
+	var feedback = $(el).text();
+	var feedbackid = $(el).closest(".review").find(".fbbox").attr("id");
+	if (window.tinymce) {
+		tinymce.get(feedbackid).setContent(feedback);
+	} else {
+		document.getElementById(feedbackid).value = feedback;
+	}
+	return false;
+}
 function markallfullscore() {
 	$('.quickgrade').click();
 }
