@@ -238,7 +238,7 @@ function calculate(inputId,outputId,format) {
 		  	  res = NaN;
 		  }
 		  str = str.replace(/[^\u0000-\u007f]/g, '?');
-		  if (!isNaN(res) && res!="Infinity" && res!='') {
+		  if (!isNaN(res) && res!="Infinity" && res!=='') {
 			  if (format.indexOf('showval')==-1) {
 				  str = "`"+str+"` " + wrapAMnotice(err);
 			  } else {
@@ -391,7 +391,7 @@ function intcalculate(inputId,outputId,format) {
 					  	err = _("syntax incomplete")+". ";
 					  }
 				  }
-				  if (!isNaN(res) && res!="Infinity" && res!='') {
+				  if (!isNaN(res) && res!="Infinity" && res!=='') {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
 						  vals[j] = vals[j];
 						  calcvals[j] = (Math.abs(res)<1e-15?0:res).toString();//+wrapAMnotice(err);
@@ -495,6 +495,7 @@ function ntuplecalc(inputId,outputId,format) {
 		var lastcut = 0;
 		var err = "";
 		var notationok = true;
+		var res = NaN;
 		if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
 			notationok=false;
 		}
@@ -528,11 +529,11 @@ function ntuplecalc(inputId,outputId,format) {
 						if (format.indexOf('mixed')!=-1) {
 							sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 						}
-						var res = scopedmatheval(sub);
+						res = scopedmatheval(sub);
 					} catch(e) {
 						err += _("syntax incomplete")+". ";
 					}
-					if (!isNaN(res) && res!="Infinity" && res!='') {
+					if (!isNaN(res) && res!="Infinity" && res!=='') {
 						outcalced += res;
 					} else {
 						outcalced += _("undefined");
@@ -779,7 +780,7 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 		} catch(e) {
 			err = _("syntax incomplete")+". ";
 		}
-		if (!isNaN(res) && res!="Infinity" && res!='') {
+		if (!isNaN(res) && res!="Infinity" && res!=='') {
 			estr = (Math.abs(res)<1e-15?0:res)+err;
 		} else if (estr!="") {
 			err = _("undefined")+". ";
@@ -1324,7 +1325,7 @@ function doonsubmit(form,type2,skipconfirm) {
 							  } catch(e) {
 							  	  err = "syntax incomplete";
 							  }
-							  if (!isNaN(res) && res!="Infinity" && res!='') {
+							  if (!isNaN(res) && res!="Infinity" && res!=='') {
 								  vals[j] = (Math.abs(res)<1e-15?0:res)+err;
 							  }
 						  }
