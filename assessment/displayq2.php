@@ -4327,9 +4327,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
 		}
+		$givenans = normalizemathunicode($givenans);
 		if ($anstype=='complex') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calccomplex') {
+			$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 			//test for correct format, if specified
 			if (($answer!='DNE'&&$answer!='oo') && checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
@@ -4781,7 +4783,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
 		$_POST["tc$qn"] = trim($_POST["tc$qn"]);
-
+		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
+		
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, '', $answer, $ansprompt);
 		}
@@ -5042,6 +5045,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
+		$givenans = normalizemathunicode($givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 
 		if (isset($scoremethod) && $scoremethod=='takeanything' && trim($givenans)!='') {
