@@ -578,16 +578,18 @@ if ($linktype=='canvas') {
 		*/
 		//Deep Linking extension
 		fwrite($fp,' <lticm:options name="assignment_selection">
-			<lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
-			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=assn</lticm:property>
-		     </lticm:options>
-		     <lticm:options name="link_selection">
-			<lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
-			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=link</lticm:property>
-		     </lticm:options>
+			 <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+			 <lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=assn</lticm:property>
 		     <lticm:property name="selection_width">500</lticm:property>
 		     <lticm:property name="selection_height">300</lticm:property>
-		     <lticm:property name="session_setup_url">' . $GLOBALS['basesiteurl'] . '/ltisessionsetup.php</lticm:property>');
+		    </lticm:options>
+		    <lticm:options name="link_selection">
+			 <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+			 <lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=link</lticm:property>
+			 <lticm:property name="selection_width">500</lticm:property>
+		     <lticm:property name="selection_height">300</lticm:property>
+		    </lticm:options>
+		    <lticm:property name="session_setup_url">' . $GLOBALS['basesiteurl'] . '/ltisessionsetup.php</lticm:property>');
 		fwrite($fp,'</blti:extensions>');
 		fwrite($fp,'<blti:custom>');
 		fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');

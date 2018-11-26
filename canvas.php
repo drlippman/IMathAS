@@ -37,13 +37,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
       <lticm:options name="assignment_selection">
         <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
         <lticm:property name="url"><?php echo $urlmode.$host . $imasroot . '/bltilaunch.php?ltiseltype=assn';?></lticm:property>
+        <lticm:property name="selection_width">500</lticm:property>
+        <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
       <lticm:options name="link_selection">
         <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
         <lticm:property name="url"><?php echo $urlmode.$host . $imasroot . '/bltilaunch.php?ltiseltype=link';?></lticm:property>
+        <lticm:property name="selection_width">500</lticm:property>
+        <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
-      <lticm:property name="selection_width">500</lticm:property>
-      <lticm:property name="selection_height">300</lticm:property>
       <lticm:property name="session_setup_url"><?php echo $urlmode.$host . $imasroot . '/ltisessionsetup.php';?></lticm:property>
     </blti:extensions>
     <blti:custom>
