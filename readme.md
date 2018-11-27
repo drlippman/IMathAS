@@ -173,6 +173,9 @@ Automated course cleanup (unenrolling students from a course) can be enabled.  T
 - `/util/tagcoursecleanup.php`:  Run this once a day
 - `/util/runcoursecleanup.php`:  Run this about every 10 minutes. Can be limited to slow usage periods.
 
+If allowing guest logins:
+- `/util/deloldguests.php`:  Run about once a day (once for every 50 guests)
+
 If using a scheduled web call, you'll need to define:
 - `$CFG['cleanup']['authcode']`:  define this and pass it in the query string, like `runcoursecleanup.php?authcode=####`
 
