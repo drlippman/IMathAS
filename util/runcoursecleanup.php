@@ -33,6 +33,8 @@ ini_set("memory_limit", "104857600");
 
 require("../init_without_validate.php");
 require("../includes/AWSSNSutil.php");
+require("../includes/unenroll.php");
+require("../includes/delcourse.php");
 
 if (php_sapi_name() == "cli") { 
 	//running command line - no need for auth code
@@ -52,7 +54,6 @@ $now = time();
 $delay = 24*60*60*(isset($CFG['cleanup']['delay'])?$CFG['cleanup']['delay']:120);
 $msgfrom = isset($CFG['cleanup']['msgfrom'])?$CFG['cleanup']['msgfrom']:0;
 $keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:4;
-
 //run notifications 10 in a batch
 
 $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -61,14 +62,22 @@ $msgins = $DBH->prepare($query);
 
 $updcrs = $DBH->prepare("UPDATE imas_courses SET cleanupdate=? WHERE id=?");
 $stuchk = $DBH->prepare("SELECT count(id) FROM imas_students WHERE courseid=?");
-	
-$query = "SELECT ic.id,ic.name,ic.ownerid,iu.FirstName,iu.LastName,iu.email,iu.msgnotify,iu.groupid,ic.enddate ";
+
+$query = "SELECT ic.id,ic.name,ic.ownerid,iu.FirstName,iu.LastName,iu.email,iu.msgnotify,iu.groupid,ic.enddate,ic.available ";
 $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id ";
 $query .= "WHERE ic.cleanupdate=1 ORDER BY ic.id LIMIT 10";
 $stm = $DBH->query($query);
 $num = 0;
+$didDelete = false;
 $allowoptout = (!isset($CFG['cleanup']['allowoptout']) || $CFG['cleanup']['allowoptout']==true);
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	if ($row['available']==4) { //soft-deleted course; now we'll hard delete it
+		if (!$didDelete) { //one per run
+			deleteCourse($row['id']);
+			$didDelete = true;
+		}
+		continue;
+	}
 	if ($row['enddate']<2000000000) { //check to ensure course isn't alredy empty
 		$stuchk->execute(array($row['id']));
 		if ($stuchk->fetchColumn(0) == 0) {
@@ -128,7 +137,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$stus[] = $row['userid'];
 }
 if (count($stus)>0) {
-	require("../includes/unenroll.php");
 	$DBH->beginTransaction();
 	unenrollstu($cidtoclean, $stus, true, false, true, 2);
 	$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");

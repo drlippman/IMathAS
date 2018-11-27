@@ -910,189 +910,31 @@ switch($_POST['action']) {
 			}
 			break;
 		} else {
-
-			if ($myrights == 75) {
-				$stm = $DBH->prepare("SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id=:id AND imas_courses.ownerid=imas_users.id AND imas_users.groupid=:groupid");
-				$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
-				if ($stm->rowCount()>0) {
-					$stm = $DBH->prepare("DELETE FROM imas_courses WHERE id=:id");
-					$stm->execute(array(':id'=>$_GET['id']));
-				} else {
-					break;
-				}
-			} else if ($myrights == 100) {
-				$stm = $DBH->prepare("DELETE FROM imas_courses WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['id']));
+			require("../includes/delcourse.php");
+			$stm = $DBH->prepare("SELECT ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$userdata = $stm->fetch(PDO::FETCH_ASSOC);
+			$isOK = false;
+			if ($userdata === false) {
+				$isOK = false;
+			} else if ($userdata['ownerid'] == $userid) {
+				//own course
+				$isOK = true;
+			} else if ($myrights==75 && $userdata['groupid'] == $groupid) {
+				//group course of group admin
+				$isOK = true;
+			} else if ($myrights==100) {
+				//is full admin
+				$isOK = true;
 			} else {
-				$stm = $DBH->prepare("DELETE FROM imas_courses WHERE id=:id AND ownerid=:ownerid");
-				$stm->execute(array(':id'=>$_GET['id'], ':ownerid'=>$userid));
+				//no rights
+				$isOK = false;
 			}
-			if ($stm->rowCount()==0) { break;}
-
-			$DBH->beginTransaction();
-			$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			require_once("../includes/filehandler.php");
-			while ($line = $stm->fetch(PDO::FETCH_NUM)) {
-				deleteallaidfiles($line[0]);
-				$stm2 = $DBH->prepare("DELETE FROM imas_questions WHERE assessmentid=:assessmentid");
-				$stm2->execute(array(':assessmentid'=>$line[0]));
-				$stm2 = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
-				$stm2->execute(array(':assessmentid'=>$line[0]));
-				$stm2 = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
-				$stm2->execute(array(':assessmentid'=>$line[0]));
-				$stm2 = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
-				$stm2->execute(array(':assessmentid'=>$line[0]));
+			if ($isOK) {
+				deleteCourse($_GET['id']);
+			} else {
+				break;
 			}
-
-			$stm = $DBH->prepare("DELETE FROM imas_assessments WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-
-			$stm = $DBH->prepare("SELECT id FROM imas_drillassess WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			while ($line = $stm->fetch(PDO::FETCH_NUM)) {
-				$stm2 = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
-				$stm2->execute(array(':drillassessid'=>$line[0]));
-			}
-			$stm = $DBH->prepare("DELETE FROM imas_drillassess WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			$stm = $DBH->prepare("SELECT id FROM imas_forums WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$stm2 = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE forumid=:forumid AND files<>''");
-				$stm2->execute(array(':forumid'=>$row[0]));
-				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					deleteallpostfiles($row[0]);
-				}
-				/*$q2 = "SELECT id FROM imas_forum_threads WHERE forumid='{$row[0]}'";
-				$r2 = mysql_query($q2) or die("Query failed : " . mysql_error());
-				while ($row2 = mysql_fetch_row($r2)) {
-					$query = "DELETE FROM imas_forum_views WHERE threadid='{$row2[0]}'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
-				}
-				*/
-				$query = "DELETE imas_forum_views FROM imas_forum_views JOIN ";
-				$query .= "imas_forum_threads ON imas_forum_views.threadid=imas_forum_threads.id ";
-				$query .= "WHERE imas_forum_threads.forumid=:forumid";
-				$stm2 = $DBH->prepare($query);
-				$stm2->execute(array(':forumid'=>$row[0]));
-
-				$stm2 = $DBH->prepare("DELETE FROM imas_forum_posts WHERE forumid=:forumid");
-				$stm2->execute(array(':forumid'=>$row[0]));
-
-				$stm2 = $DBH->prepare("DELETE FROM imas_forum_threads WHERE forumid=:forumid");
-				$stm2->execute(array(':forumid'=>$row[0]));
-
-				$stm2 = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:assessmentid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
-				$stm2->execute(array(':assessmentid'=>$row[0]));
-
-			}
-			$stm = $DBH->prepare("DELETE FROM imas_forums WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			$stm2 = $DBH->prepare("SELECT id FROM imas_wikis WHERE courseid=:courseid");
-			$stm2->execute(array(':courseid'=>$_GET['id']));
-			while ($wid = $stm2->fetch(PDO::FETCH_NUM)) {
-				$stm3 = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
-				$stm3->execute(array(':wikiid'=>$wid));
-				$stm3 = $DBH->prepare("DELETE FROM imas_wiki_views WHERE wikiid=:wikiid");
-				$stm3->execute(array(':wikiid'=>$wid));
-			}
-			$stm = $DBH->prepare("DELETE FROM imas_wikis WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			//delete inline text files
-			$stm3 = $DBH->prepare("SELECT id FROM imas_inlinetext WHERE courseid=:courseid");
-			$stm3->execute(array(':courseid'=>$_GET['id']));
-			while ($ilid = $stm3->fetch(PDO::FETCH_NUM)) {
-				$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
-				$stm = $DBH->prepare("SELECT filename FROM imas_instr_files WHERE itemid=:itemid");
-				$stm->execute(array(':itemid'=>$ilid[0]));
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					if (substr($row[0],0,4)!='http') {
-						$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
-						$stm2->execute(array(':filename'=>$row[0]));
-						if ($stm2->rowCount()==1) {
-							//unlink($uploaddir . $row[0]);
-							deletecoursefile($row[0]);
-						}
-					}
-				}
-				$stm = $DBH->prepare("DELETE FROM imas_instr_files WHERE itemid=:itemid");
-				$stm->execute(array(':itemid'=>$ilid[0]));
-			}
-			$stm = $DBH->prepare("DELETE FROM imas_inlinetext WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			//delete linked text files
-			$stm = $DBH->prepare("SELECT text,points,id FROM imas_linkedtext WHERE courseid=:courseid AND text LIKE 'file:%'");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$stm2 = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
-				$stm2->execute(array(':text'=>$row[0]));
-				if ($stm2->rowCount()==1) {
-					//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
-					$filename = substr($row[0],5);
-					//unlink($uploaddir . $filename);
-					deletecoursefile($filename);
-				}
-				if ($row[1]>0) {
-					$stm2 = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
-					$stm2->execute(array(':gradetypeid'=>$row[2]));
-				}
-			}
-
-
-			$stm = $DBH->prepare("DELETE FROM imas_linkedtext WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			$stm = $DBH->prepare("DELETE FROM imas_items WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			$stm = $DBH->prepare("DELETE FROM imas_students WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			$stm = $DBH->prepare("SELECT id FROM imas_gbitems WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$stm2 = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
-				$stm2->execute(array(':gradetypeid'=>$row[0]));
-			}
-			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			$stm = $DBH->prepare("DELETE FROM imas_gbscheme WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			$stm = $DBH->prepare("DELETE FROM imas_calitems WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			$stm = $DBH->prepare("SELECT id FROM imas_stugroupset WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$stm2 = $DBH->prepare("SELECT id FROM imas_stugroups WHERE groupsetid=:groupsetid");
-				$stm2->execute(array(':groupsetid'=>$row[0]));
-				while ($row2 = $stm2->fetch(PDO::FETCH_NUM)) {
-					$stm3 = $DBH->prepare("DELETE FROM imas_stugroupmembers WHERE stugroupid=:stugroupid");
-					$stm3->execute(array(':stugroupid'=>$row2[0]));
-				}
-				$stm4 = $DBH->prepare("DELETE FROM imas_stugroups WHERE groupsetid=:groupsetid");
-				$stm4->execute(array(':groupsetid'=>$row[0]));
-			}
-			$stm = $DBH->prepare("DELETE FROM imas_stugroupset WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			$stm = $DBH->prepare("DELETE FROM imas_external_tools WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-			$stm = $DBH->prepare("DELETE FROM imas_content_track WHERE courseid=:courseid");
-			$stm->execute(array(':courseid'=>$_GET['id']));
-
-			$DBH->commit();
 		}
 		break;
 	/*
