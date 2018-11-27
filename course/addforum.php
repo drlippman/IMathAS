@@ -553,6 +553,12 @@ if ($overwriteBody==1) {
 			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
 		
+		
+		<span class=form>Get email notification of new posts:</span>
+		<span class=formright>
+			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
+		</span><br class="form"/>
+		
 		</div>
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
 			Display Options
@@ -595,10 +601,6 @@ if ($overwriteBody==1) {
 			  </span>
 		</span><br class="form"/>
 
-		<span class=form>Get email notify of new posts:</span>
-		<span class=formright>
-			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
-		</span><br class="form"/>
 		
 		</div>
 		
