@@ -297,7 +297,7 @@ function GB_resize(e) {
 
 	gbwin.css("width", Math.max(0,gbwin.data("original_w") + dx))
 	 .css("height", Math.max(0,gbwin.data("original_h") + dy));
-	$("#GB_frame").css("height", Math.max(0,gbwin.data("original_h") + dy) - 36);
+	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - 36);
 }
 function GB_endresize(e) {
 	jQuery(window).off("touchmove.GBresize touchend.GBresize mousemove.GBresize mouseup.GBresize");
@@ -413,7 +413,7 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
-		document.getElementById("GB_frame").style.height = (h - 30 -36)+"px";
+		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
 	}
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {

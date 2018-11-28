@@ -817,14 +817,20 @@ input[type=submit]:disabled:hover,input[type=button]:disabled:hover {
   width: 400px;
   height: 400px;
   z-index: 150;
-  -webkit-overflow-scrolling: touch;
 }
 
+#GB_frameholder {
+	position: absolute;
+	overflow: auto;
+	width: 100%;
+	height: 500px;
+	-webkit-overflow-scrolling: touch;
+}
 #GB_frame {
   border: 0;
-  overflow: auto;
   width: 100%;
-  height: 378px;
+  height: 100%;
+  position: absolute;
 }
 
 #GB_caption {
