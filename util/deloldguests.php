@@ -10,6 +10,7 @@ ini_set("memory_limit", "104857600");
 
 require("../init_without_validate.php");
 require("../includes/unenroll.php");
+require("../includes/AWSSNSutil.php");
 
 if (php_sapi_name() == "cli") { 
 	//running command line - no need for auth code
