@@ -18,7 +18,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=112718";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=112918";?>" type="text/css" />
 <?php
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
