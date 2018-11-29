@@ -3,6 +3,11 @@
 //(c) 2006 David Lippman
 
 	require("../init.php");
+	
+	//Look to see if a hook file is defined, and include if it is
+	if (isset($CFG['hooks']['assessment/showtest'])) {
+		require($CFG['hooks']['assessment/showtest']);
+	}
 
 	if (!isset($CFG['TE']['navicons'])) {
 		 $CFG['TE']['navicons'] = array(
