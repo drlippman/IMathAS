@@ -25,6 +25,7 @@ if (!empty($_GET['embed'])) {
 	$flexwidth = true;
 	$nologo = true;
 }
+$now = time();
 	
 //special "page"s
 //-1 new posts from forum page
@@ -280,6 +281,98 @@ if ($oktoshow) {
 	if (count($files)>0) {
 		require_once('../includes/filehandler.php');
 	}
+	
+	//get next/prev before marked as read
+	$prevth = '';
+	$nextth = '';
+	if ($page==-3 || $page==-5) { //came from new threads or flagged threads
+		if ($page==-3) {
+			$query = "SELECT imas_forums.id,imas_forum_threads.id as threadid FROM imas_forum_threads ";
+			$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
+			$array = array(':now'=>$now);
+			if (!isset($teacherid)) {
+			  $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+			}
+			$query .= "LEFT JOIN imas_forum_views AS mfv ";
+			$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid WHERE imas_forums.courseid=:courseid ";
+			$array[':userid']=  $userid;
+			$array[':courseid']=$cid;
+			if (!isset($teacherid)) {
+			  $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
+			  $array[':userid2']=$userid;
+			}
+			$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";
+		} else {
+			$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
+			$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
+			$array = array(':now'=>$now);
+			if (!isset($teacherid)) {
+			  $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+			}
+			$query .= "LEFT JOIN imas_forum_views AS mfv ";
+			$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid WHERE imas_forums.courseid=:courseid ";
+			$array[':userid']=  $userid;
+			$array[':courseid']=$cid;
+			if (!isset($teacherid)) {
+			  $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
+			  $array[':userid2']=$userid;
+			}
+			$query .= "AND (mfv.tagged=1) ORDER BY imas_forum_threads.lastposttime DESC";
+		}
+		$stm = $DBH->prepare($query);
+		$stm->execute($array);
+		$lastrow = array();
+		$atcur = false;
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($atcur) {
+				$nextth = $row['threadid'];
+				$nextthforum = $row['id'];
+				break;
+			}
+			if ($row['id']==$forumid && $row['threadid']==$threadid) { //found current 
+				if (count($lastrow)>1) {
+					$prevth = $lastrow['threadid'];
+					$prevthforum = $lastrow['id'];
+				}
+				$atcur = true;
+			}
+			$lastrow = $row;
+		}
+	} else {
+		$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid AND lastposttime<:now ";
+		$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
+		if ($groupset>0 && $groupid!=-1) {
+			$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
+			$array[':stugroupid']=$groupid;
+		}
+		$query .= "ORDER BY id DESC LIMIT 1";
+		//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid<'$threadid' AND parent=0 ORDER BY threadid DESC LIMIT 1";
+		$stm = $DBH->prepare($query);
+		$stm->execute($array);
+		// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
+		if ($stm->rowCount()>0) {
+			$prevth = $stm->fetchColumn(0);
+			$prevthforum = $forumid;
+		} 
+		$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid AND lastposttime<:now ";
+		$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
+		if ($groupset>0 && $groupid!=-1) {
+			$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
+			$array[':stugroupid']=$groupid;
+		}
+		$query .= "ORDER BY id LIMIT 1";
+		$stm = $DBH->prepare($query);
+		$stm->execute($array);
+		//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
+		// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		
+		if ($stm->rowCount()>0) {
+			$nextth = $stm->fetchColumn(0);
+			$nextthforum = $forumid;
+		}
+	}
+	
 	//update view count
 	$stm = $DBH->prepare("UPDATE imas_forum_posts SET views=:views WHERE id=:id");
 	$stm->execute(array(':views'=>$newviews, ':id'=>$threadid));
@@ -289,7 +382,7 @@ if ($oktoshow) {
 	//mark as read
 	$stm = $DBH->prepare("SELECT lastview,tagged FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	$now = time();
+	
 	if ($stm->rowCount()>0) {
 		list($lastview, $tagged) = $stm->fetch(PDO::FETCH_NUM);
 		$stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE userid=:userid AND threadid=:threadid");
@@ -320,42 +413,19 @@ if (!$oktoshow) {
 } else {
 	echo '<div id="headerposts" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
-	$query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid AND lastposttime<:now ";
-	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
-	if ($groupset>0 && $groupid!=-1) {
-		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
-		$array[':stugroupid']=$groupid;
-	}
-	$query .= "ORDER BY id DESC LIMIT 1";
-	//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid<'$threadid' AND parent=0 ORDER BY threadid DESC LIMIT 1";
-	$stm = $DBH->prepare($query);
-	$stm->execute($array);
-	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$prevth = '';
-	if ($stm->rowCount()>0) {
-		$prevth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($prevth)."&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
+	
+	if ($prevth != '') {
+		echo "<a href=\"posts.php?cid=$cid&forum=$prevthforum&thread=".Sanitize::onlyInt($prevth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
-	}
-	$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid AND lastposttime<:now ";
-	$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
-	if ($groupset>0 && $groupid!=-1) {
-		$query .= "AND (stugroupid=:stugroupid OR stugroupid=0) ";
-		$array[':stugroupid']=$groupid;
-	}
-	$query .= "ORDER BY id LIMIT 1";
-	$stm = $DBH->prepare($query);
-	$stm->execute($array);
-	//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
-	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	$nextth = '';
-	if ($stm->rowCount()>0) {
-		$nextth = $stm->fetchColumn(0);
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($nextth)."&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
+	}	
+	
+	if ($nextth != '') {
+		echo "<a href=\"posts.php?cid=$cid&forum=$nextthforum&thread=".Sanitize::onlyInt($nextth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
 	} else {
 		echo "Next";
 	}
+	
 	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a>";
 	if ($tagged) {
 		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
