@@ -811,14 +811,28 @@ function rotateimg(el) {
 	} else {
 		var r = 90;
 	}
+	var bnd, sc;
+	$(el).parent().css("height", "auto");
+	var parentwidth = $(el).parent().width();
 	$(el).data('rotation', r).css({transform: 'rotate('+r+'deg)'});
 	if (r%180==90) {
-		var d = ($(el).width() - $(el).height())/2;
-		if (d>0) {
-			$(el).parent().css({'padding-top':d, 'padding-bottom':d});
+		$(el).css("transform-origin", "0 0").css("max-width","none");
+		bnd = el.getBoundingClientRect();
+		if (bnd.width>parentwidth) {
+			sc = .95*parentwidth/bnd.width;
+		} else {
+			sc = 1;
 		}
+		if (r==90) {
+			$(el).data('rotation', r).css({transform: 'rotate('+r+'deg) scale('+sc+') translateY('+(-bnd.width)+'px) '});
+		} else {
+			$(el).data('rotation', r).css({transform: 'rotate('+r+'deg) scale('+sc+') translateX('+(-bnd.height)+'px) '});
+		}
+		bnd = el.getBoundingClientRect();
+		$(el).parent().css("height", bnd.height);
 	} else {
-		$(el).parent().css({'padding-top':0, 'padding-bottom':0});
+		$(el).css("transform-origin", "").css("max-width", "80%");
+		$(el).parent().css("height", "");
 	}
 }
 
