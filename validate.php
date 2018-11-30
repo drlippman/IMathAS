@@ -9,6 +9,10 @@
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);
  ini_set('auto_detect_line_endings',true);
+ //Look to see if a hook file is defined, and include if it is
+ if (isset($CFG['hooks']['validate'])) {
+	require($CFG['hooks']['validate']);
+ }
 
  $hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
  if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
@@ -160,14 +164,14 @@
 	 	$stm = $DBH->prepare($query);
 	 	$stm->execute(array(':guestcnt'=>"guestacct$guestcnt", ':homelayout'=>$homelayout));
 	 	$userid = $DBH->lastInsertId();
-    $query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
+	 	$query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
 		if (isset($_GET['cid'])) { $query.= ' AND id=:id'; }
 		$stm = $DBH->prepare($query);
-    if (isset($_GET['cid'])) {
+		if (isset($_GET['cid'])) {
 		    $stm->execute(array(':id'=>$_GET['cid']));
-    } else {
-      $stm->execute(array());
-    }
+		} else {
+			$stm->execute(array());
+		}
 		if ($stm->rowCount()>0) {
 			$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
 			$i = 0;
@@ -176,7 +180,7 @@
 				$query .= "($userid,{$row[0]})";  //INT's from DB - safe
 				$i++;
 			}
-      $DBH->query($query);
+			$DBH->query($query);
 		}
 
 	 	$line['id'] = $userid;
@@ -251,6 +255,11 @@
 		 	 $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 		 	 $stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 		 }
+		 
+		 //call hook, if defined
+		 if (function_exists('onLogin')) {
+			onLogin();
+		 }
 
 		 if (!empty($_SERVER['QUERY_STRING'])) {
 		 	 $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . (isset($addtoquerystring) ? '&' . Sanitize::fullQueryString($addtoquerystring) : '');
@@ -268,11 +277,11 @@
 		 	 }
 		 } 
 		 // checks if the array $querys is empty
-         if (!empty($querys)){
-             $rqp = "&r=" .Sanitize::randomQueryStringParam();
-         } else {
-             $rqp = "?r=" .Sanitize::randomQueryStringParam();
-         }
+		 if (!empty($querys)){
+		     $rqp = "&r=" .Sanitize::randomQueryStringParam();
+		 } else {
+		     $rqp = "?r=" .Sanitize::randomQueryStringParam();
+		 }
 		 
 		 if ($needToForcePasswordReset) {
 		 	 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd&r='.Sanitize::randomQueryStringParam());
@@ -425,7 +434,12 @@
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
 			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
-			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php'))) {
+			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php');
+			//call hook, if defined
+			if (function_exists('allowedInAssessment')) {
+				$allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());
+			}
+			if (!in_array(basename($urlparts['path']),$allowedinLTI)) {
 			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
 				$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$sessiondata['ltiitemid']));

@@ -2263,7 +2263,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						
 						//call hook, if defined
 						if (function_exists('onAddCourse')) {
-							onAddCourse($destcid, $userid, $myrights, $groupid);
+							onAddCourse($destcid, $userid);
 						}
 				
 						$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");

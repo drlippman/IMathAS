@@ -57,6 +57,47 @@ After a student enrolls in a new course:
 `onEnroll(course ID)`
 Include exit to prevent display of default message
 
+## assessment/showtest
+
+Include via `$CFG['hooks']['assessment/showtest']`
+
+## bltilaunch
+
+Include via `$CFG['hooks']['bltilaunch']`
+
+On creation of a new course:
+`onAddCourse(course ID, user ID)`
+
+## ltihome
+
+Include via `$CFG['hooks']['ltihome']`
+
+On creation of a new course:
+`onAddCourse(course ID, user ID)`
+
+## init
+
+Include via `$CFG['hooks']['init']`
+Included immediately after config.php load
+
+## validate
+
+Include via `$CFG['hooks']['validate']`
+
+Called after login is successful, before redirect back to requested page
+`onLogin()`
+
+Called when checking if LTI user can access the requested page
+`allowedInAssessment()`
+return an array of base filenames that are allowed to be accessed by a user
+accessing an assessment via LTI.  This is merged with the default list.
+
+## util/batchcreateinstr
+
+Include via `$CFG['hooks']['util/batchcreateinstr']`
+
+On creation of a new course:
+`onAddCourse(course ID, owner ID)`
 
 
 
