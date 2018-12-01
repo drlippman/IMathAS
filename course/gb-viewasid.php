@@ -714,6 +714,9 @@
 				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$asid}&from=$from&uid=$get_uid&breakfromgroup=true\">Separate from Group</a></p>";
 			}
 		}
+		if ($myrights == 100 && $line['lti_sourcedid']!='') {
+			echo '<p class=small>LTI sourced_id: '.Sanitize::encodeStringForDisplay($line['lti_sourcedid']).'</p>';
+		}	
 		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$asid}&update=true\">\n";
 
 		if ($isteacher) {
