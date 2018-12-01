@@ -3372,6 +3372,10 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" </dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+<dt>$scoremethod = "byelement" </dt>
+	<dd>By default, the whole n-tuple must be correct to receive any credit.  
+	Set $scoremethod = "byelement" to give partial credit if only some elements of
+	the n-tuple are correct.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3420,6 +3424,10 @@ rather than just numbers, such as (5/3, 2/3).
 	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
 	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
+<dt>$scoremethod = "byelement" </dt>
+	<dd>By default, the whole n-tuple must be correct to receive any credit.  
+	Set $scoremethod = "byelement" to give partial credit if only some elements of
+	the n-tuple are correct.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>

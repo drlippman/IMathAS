@@ -4116,9 +4116,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$qn];} else {$abstolerance = $options['abstolerance'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}}
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
+		if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$givenans = normalizemathunicode($givenans);
@@ -4181,7 +4183,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$lastcut = 0;
 		$inor = false;
 		$answer = makepretty($answer);
-
+		
 		for ($i=0; $i<strlen($answer); $i++) {
 			$dec = false;
 			if ($answer{$i}=='(' || $answer{$i}=='[' || $answer{$i}=='<' || $answer{$i}=='{') {
@@ -4262,10 +4264,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$gaarrcnt = count($gaarr);
 		$extrapennum = count($gaarr)+count($anarr);
 		$correct = 0;
-		foreach ($anarr as $i=>$ansors) {
+		$partialmatches = array();
+		$matchedans = array();
+		$matchedgivenans = array();
+		foreach ($anarr as $ai=>$ansors) {
 			$foundloc = -1;
 			foreach ($ansors as $answer) {  //each of the "or" options
 				foreach ($gaarr as $j=>$givenans) {
+					if (isset($matchedgivenans[$j])) {continue;}
+					
 					if ($answer[1]!=$givenans[1] || $answer[3]!=$givenans[3]) {
 						break;
 					}
@@ -4276,28 +4283,56 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if (count($ansparts)!=count($gaparts)) {
 						break;
 					}
+					$matchedparts = 0;
 					for ($i=0; $i<count($ansparts); $i++) {
 						if (is_numeric($ansparts[$i]) && is_numeric($gaparts[$i])) {
 							if (isset($abstolerance)) {
-								if (abs($ansparts[$i]-$gaparts[$i]) >= $abstolerance + 1E-12) {break;}
+								if (abs($ansparts[$i]-$gaparts[$i]) < $abstolerance + 1E-12) {
+									$matchedparts++;
+								}
 							} else {
-								if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;}
+								if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) < $reltolerance+ 1E-12) {
+									$matchedparts++;
+								}
 							}
 						} else if (($ansparts[$i]=='oo' && $gaparts[$i]=='oo') || ($ansparts[$i]=='-oo' && $gaparts[$i]=='-oo')) {
+							$matchedparts++;
 							//is ok		
-						} else {
-							break;
 						}
 					}
-					if ($i==count($ansparts)) {
+					if ($matchedparts==count($ansparts)) { //if totally correct
 						$correct += 1; $foundloc = $j; break 2;
-					}
+					} else if ($scoremethod=='bypart' && $matchedparts>0) { //if partially correct
+						$fraccorrect = $matchedparts/count($ansparts);
+						if (!isset($partialmatches["$ai-$j"]) || $fraccorrect>$partialmatches["$ai-$j"]) {
+							$partialmatches["$ai-$j"] = $fraccorrect;
+						}
+					}	
 				}
 			}
 			if ($foundloc>-1) {
-				array_splice($gaarr,$foundloc,1); // remove from list
-				if (count($gaarr)==0) {
+				//array_splice($gaarr,$foundloc,1); // remove from list
+				$matchedgivenans[$foundloc] = 1;
+				$matchedans[$ai] = 1;
+				if (count($gaarr)==count($matchedgivenans)) {
 					break;
+				}
+			}
+		}
+		if ($scoremethod=='bypart') {
+			arsort($partialmatches);
+			foreach ($partialmatches as $k=>$v) {
+				$kp = explode('-', $k);
+				if (isset($matchedans[$kp[0]]) || isset($matchedgivenans[$kp[1]])) {
+					//already used this ans or stuans
+					continue;
+				} else {
+					$correct += $v;
+					$matchedans[$kp[0]] = 1;
+					$matchedgivenans[$kp[1]] = 1;
+					if (count($gaarr)==count($matchedgivenans)) {
+						break;
+					}
 				}
 			}
 		}
