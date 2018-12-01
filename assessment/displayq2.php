@@ -4302,7 +4302,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 					if ($matchedparts==count($ansparts)) { //if totally correct
 						$correct += 1; $foundloc = $j; break 2;
-					} else if ($scoremethod=='bypart' && $matchedparts>0) { //if partially correct
+					} else if ($scoremethod=='byelement' && $matchedparts>0) { //if partially correct
 						$fraccorrect = $matchedparts/count($ansparts);
 						if (!isset($partialmatches["$ai-$j"]) || $fraccorrect>$partialmatches["$ai-$j"]) {
 							$partialmatches["$ai-$j"] = $fraccorrect;
@@ -4319,7 +4319,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-		if ($scoremethod=='bypart') {
+		if ($scoremethod=='byelement') {
 			arsort($partialmatches);
 			foreach ($partialmatches as $k=>$v) {
 				$kp = explode('-', $k);
