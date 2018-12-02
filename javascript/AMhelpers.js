@@ -12,7 +12,7 @@ function setupLivePreview(qn) {
 	if (!LivePreviews.hasOwnProperty(qn)) {
 		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
 			LivePreviews[qn] = {
-			  delay: (mathRenderer=="MathJax"?100:20),   // delay after keystroke before updating
+			  delay: (mathRenderer=="MathJax"?100:0),   // delay after keystroke before updating
 			  finaldelay: 1000,
 			  preview: null,     // filled in by Init below
 			  buffer: null,      // filled in by Init below
@@ -62,7 +62,7 @@ function setupLivePreview(qn) {
 				      );
 			      } else if (mathRenderer=="Katex") {
 			      	      renderMathInElement(this.buffer);
-				      if ($(this.buffer).children(".mj").length>0) {//has MathJax elements
+				      if (typeof MathJax != "undefined" && $(this.buffer).children(".mj").length>0) {//has MathJax elements
 					      MathJax.Hub.Queue(["PreviewDone",this]);
 				      } else {
 					      this.PreviewDone();
@@ -129,8 +129,12 @@ function setupLivePreview(qn) {
 			  }
 
 			};
-			LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
-			LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
+			if (typeof MathJax != "undefined") {
+				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
+			} else {
+				LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
+			}
 			LivePreviews[qn].Init();
 		} else {
 			LivePreviews[qn] = {

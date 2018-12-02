@@ -1185,6 +1185,10 @@ a.dropdown-toggle.arrow-down:hover {
 	text-decoration: none;
 }
 
+.katex {
+	font-size: 1.1em !important;
+}
+
 .fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper, .fw1000 .midwrapper {
 	max-width: 1000px;
 	margin: auto;

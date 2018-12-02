@@ -170,8 +170,10 @@ var renderMathInText = function(text, delimiters) {
                 } else {
                 	span.innerHTML = "\\("+data[i].data+"\\)";
                 }
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,span]);
-                usedMathJax = true;
+                if (typeof MathJax != "undefined") {
+                	MathJax.Hub.Queue(["Typeset",MathJax.Hub,span]);
+                	usedMathJax = true;
+                }
             }
             fragment.appendChild(span);
         }
@@ -247,7 +249,7 @@ var renderMathInElement = function(elem, options) {
     
     renderElem(elem, options.delimiters, options.ignoredTags, options.ignoreClassRegex);
     if (window.hasOwnProperty("katexDoneCallback")) {
-    	    if (usedMathJax) {
+    	    if (usedMathJax && typeof MathJax != "undefined") {
     	    	    MathJax.Hub.Queue(window.katexDoneCallback);
     	    } else {
     	    	    window.katexDoneCallback();
