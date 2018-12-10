@@ -35,6 +35,14 @@
 	} else {
 		$page = -1;
 	}
+	
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid) = $stm->fetch(PDO::FETCH_NUM);
+	if ($assesscourseid != $cid) {
+		echo "Invalid assessment ID";
+		exit;
+	}
 
 	if (isset($_GET['update'])) {
 		$allscores = array();
@@ -189,10 +197,6 @@
 
 	require("../assessment/displayq2.php");
 
-
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = $stm->fetch(PDO::FETCH_NUM);
 
 	if ($isgroup>0) {
 		$groupnames = array();

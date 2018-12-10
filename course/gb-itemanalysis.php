@@ -48,6 +48,14 @@
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
+	
+	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid) = $stm->fetch(PDO::FETCH_NUM);
+	if ($assesscourseid != $cid) {
+		echo "Invalid assessment ID";
+		exit;
+	}
 
 	$pagetitle = "Gradebook";
 	$placeinhead = '<script type="text/javascript">';
@@ -82,9 +90,6 @@
 	$timeontask = array();
 	$attempts = array();
 	$regens = array();
-	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = $stm->fetch(PDO::FETCH_NUM);
 	echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
 
 

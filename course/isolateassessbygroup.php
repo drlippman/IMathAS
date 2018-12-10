@@ -22,6 +22,17 @@
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
 	}
+	
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
+	if ($stm->rowCount()==0) {
+		echo "Invalid ID";
+		exit;
+	}
+	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = $stm->fetch(PDO::FETCH_NUM);
+	$deffeedback = explode('-',$deffeedback);
+	$assessmenttype = $deffeedback[0];
+
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
@@ -31,11 +42,6 @@
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Group Scores</div>";
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = $stm->fetch(PDO::FETCH_NUM);
-	$deffeedback = explode('-',$deffeedback);
-	$assessmenttype = $deffeedback[0];
 
 	$aitems = explode(',',$itemorder);
 	foreach ($aitems as $k=>$v) {
