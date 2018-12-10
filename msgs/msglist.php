@@ -81,6 +81,25 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$msgset = $stm->fetchColumn(0);
 		$msgmonitor = (floor($msgset/5)&1);
 		$msgset = $msgset%5;
+		
+		$isauth = false;
+		$isteacher = false;
+		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=? AND courseid=?");
+		$stm->execute(array($userid, $cid));
+		if ($stm->rowCount()>0) {
+			$isteacher = true;
+			$isauth = true;
+		} else {
+			$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=? AND courseid=? UNION SELECT id FROM imas_tutors WHERE userid=? AND courseid=?");
+			$stm->execute(array($userid, $cid, $userid, $cid));
+			if ($stm->rowCount()>0) {
+				$isauth = true;
+			}
+		}
+		if (!$isauth) {
+			echo '[]'; 
+			exit;
+		}
 
 		$opts = array();
 		if ($isteacher || $msgset<2) {
@@ -95,22 +114,20 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
 			$query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";
 			$query .= "imas_tutors.courseid=:courseid ";
-      if (!$isteacher && $studentinfo['section']!=null) {
+			if (!$isteacher && $studentinfo['section']!=null) {
 			     $query .= "AND (imas_tutors.section=:section OR imas_tutors.section='') ";
-      }
+			}
 			$query .= "ORDER BY imas_users.LastName";
 			$stm = $DBH->prepare($query);
-      if (!$isteacher && $studentinfo['section']!=null) {
+			if (!$isteacher && $studentinfo['section']!=null) {
 			   $stm->execute(array(':courseid'=>$cid, ':section'=>$studentinfo['section']));
-      } else {
-         $stm->execute(array(':courseid'=>$cid));
-      }
+			} else {
+				$stm->execute(array(':courseid'=>$cid));
+			}
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$opts[] = sprintf('<option value="%d">%s, %s</option>', $row[0],
                     Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
-
-
 		}
 		if ($isteacher || $msgset==0 || $msgset==2) {
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";

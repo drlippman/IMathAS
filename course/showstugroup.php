@@ -9,6 +9,10 @@ require("../init.php");
 $cid = intval($_GET['cid']);
 $sgid = intval($_GET['gid']);
 
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	exit;
+}
+
 $out = '<ul>';
 $userfound = false;
 $query = "SELECT iu.id,iu.LastName,iu.FirstName FROM imas_users AS iu JOIN imas_stugroupmembers AS isg ";
@@ -25,7 +29,6 @@ $out .= '</ul>';
 if ($userfound || isset($teacherid) || isset($tutorid)) {
 	echo $out;
 } else {
-	echo "user ".Sanitize::encodeStringForDisplay($userid)." not found";
-	echo $out;
+	echo "You were not found in this group";
 }
 ?>
