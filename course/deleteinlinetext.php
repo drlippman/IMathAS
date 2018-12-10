@@ -73,8 +73,8 @@ if (!(isset($teacherid))) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else {
-		$stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
-		$stm->execute(array(':id'=>$textid));
+		$stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$textid, ':cid'=>$cid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

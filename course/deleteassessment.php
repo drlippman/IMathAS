@@ -71,8 +71,8 @@ if (!(isset($teacherid))) {
 
 		exit;
 	} else {
-		$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$aid));
+		$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

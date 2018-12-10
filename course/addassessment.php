@@ -40,6 +40,14 @@ if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Add Assessment\n";
 }
 
+if (isset($_GET['id'])) {
+	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+	$stm->execute(array(intval($_GET['id'])));
+	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $_GET['cid']) {
+		echo "Invalid ID";
+		exit;
+	}
+}
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -47,7 +55,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
-    } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+} else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
         $assessmentId = Sanitize::onlyInt($_GET['id']);
         $cid = Sanitize::courseId($_GET['cid']);
         $block = $_GET['block'];

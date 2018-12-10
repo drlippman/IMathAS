@@ -14,6 +14,7 @@ $body = "";
 $pagetitle = "Delete Forum";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Forum";
 $useeditor = "description";
+$forumid = Sanitize::onlyInt($_GET['id']);
 
 if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
@@ -26,7 +27,6 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 
 	if ($_POST['remove']=="really") {
-		$forumid = Sanitize::onlyInt($_GET['id']);
 		$DBH->beginTransaction();
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='Forum' AND courseid=:courseid");
 		$stm->execute(array(':typeid'=>$forumid, ':courseid'=>$cid));
@@ -58,8 +58,8 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 
 		exit;
 	} else {
-		$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
-		$stm->execute(array(':id'=>$forumid));
+		$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$forumid, ':cid'=>$cid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

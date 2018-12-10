@@ -69,7 +69,10 @@
 			$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			$adata = $stm->fetch(PDO::FETCH_ASSOC);
-
+			if ($adata['courseid'] != $cid) {
+				echo "Invalid assessment ID";
+				exit;
+			}
 			$stugroupmem = array();
 			$agroupid = 0;
 			$doadd = true;

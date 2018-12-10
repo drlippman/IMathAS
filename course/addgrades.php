@@ -51,9 +51,13 @@
 			exit;
 		} else {
 			require("../header.php");
-			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
+			$stm = $DBH->prepare("SELECT name,courseid FROM imas_gbitems WHERE id=:id");
 			$stm->execute(array(':id'=>$delItem));
-			$itemname = $stm->fetchColumn(0);
+			list($itemname,$itemcourseid) = $stm->fetch(PDO::FETCH_NUM);
+			if ($itemcourseid != $cid) {
+				echo "Invalid ID";
+				exit;
+			}
 
 			echo "<p>Are you SURE you want to delete <strong>".Sanitize::encodeStringForDisplay($itemname);
 			echo "</strong> and all associated grades from the gradebook?</p>";
@@ -70,6 +74,16 @@
 		}
 
 	}
+	
+	if ($gbItem != 'new') {
+		$stm = $DBH->prepare("SELECT courseid FROM imas_gbitems WHERE id=?");
+		$stm->execute(array($gbItem));
+		if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
+			echo "Invalid ID";
+			exit;
+		}
+	}
+	
 	if (isset($_POST['name']) && $isteacher) {
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
