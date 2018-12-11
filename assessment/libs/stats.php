@@ -551,7 +551,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 //labels: array of labels for each pie piece
 //uses Google Charts API
 function piechart($pcts,$labels,$w=350,$h=150) {
-	$out = "<img src=\"http://chart.apis.google.com/chart?cht=p&amp;chd=t:";
+	$out = "<img src=\"https://chart.apis.google.com/chart?cht=p&amp;chd=t:";
 	$out .= implode(',',$pcts);
 	$out .= "&amp;chs={$w}x{$h}&amp;chl=";
 	$out .= implode('|',$labels);
