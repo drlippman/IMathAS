@@ -159,7 +159,7 @@ div.spacer {
 
 div.navbar {
 	float: left;
-	width:120px;
+	max-width: 160px;
 	padding:10px;
 	margin-top:0px;
 	background-color: #e0ffe0;

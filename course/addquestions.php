@@ -1199,7 +1199,11 @@ if ($overwriteBody==1) {
 		*/
 		<?php
 			if($displaymethod == "JustInTime"){
-				echo "var justintimeorder = ".$justintimeorder.";";
+				if($justintimeorder != ""){
+					echo "var justintimeorder = ".$justintimeorder.";";
+				} else{
+					echo "var justintimeorder = [];";
+				}
 			}
 		?>
 		$(refreshTable);

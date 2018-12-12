@@ -136,7 +136,8 @@ function refreshTable() {
     listClass: 'dd-list',
     itemClass: 'dd-item dd3-item',
     handleClass: 'dd-handle dd3-handle',
-    contentClass: 'dd3-content'
+    contentClass: 'dd3-content',
+    maxDepth: 10
   });
   $('.dd').on('change', function() {
     //console.log($('.dd').nestable('serialize'));
@@ -149,13 +150,13 @@ function refreshTable() {
         if (Number.isInteger(element[0])) {
           itemarray_old_dic[element[0]] = element;
         } else {
-          itemarray_old_dic[element[1].replace(/&nbsp;/g, ' ').normalize('NFKC')] = element;
+          itemarray_old_dic[htmlEntities(element[1])] = element;
         }
       })
       nestableArrayOrder = $('.dd').nestable('toArray');
       for (i = 0; i < nestableArrayOrder.length; i++) {
         item = nestableArrayOrder[i];
-        key = Number.isInteger(item.id) ? item.id : item.id.normalize('NFKC');
+        key = Number.isInteger(item.id) ? item.id : htmlEntities(item.id);
         itemarray.push(itemarray_old_dic[key]);
       }
 
@@ -204,10 +205,10 @@ function refreshTable() {
   })
 
   //Nestable checkbox correction hack
-  $(".dd3-content input[type='checkbox']").each(function(i,el){
+  $(".dd3-content input[type='checkbox']").each(function(i, el) {
     //console.log(el);
-    el.id = "qc"+i;
-    el.value = i+el.value.substr(el.value.indexOf(":"));
+    el.id = "qc" + i;
+    el.value = i + el.value.substr(el.value.indexOf(":"));
   })
   $(".dd3-content input[type='checkbox']").on('change', function() {
     event.stopPropagation();
@@ -405,8 +406,8 @@ function expandTextSegment(selector) {
 
   //smoothly set the height to the natural height
   $(selector).closest(".dd3-content").animate({
-    height: natural_height+60
-  },200);
+    height: natural_height + 60
+  }, 200);
   $(selector).animate({
     height: natural_height,
     width: natural_width
@@ -455,7 +456,7 @@ function collapseTextSegment(selector) {
   //smoothly set the height to the collapsed height
   $(selector).closest(".dd3-content").animate({
     height: 30
-  },200);
+  }, 200);
   $(selector).animate({
     height: collapsed_height
   }, 200, function() {
@@ -767,8 +768,8 @@ function removeSelected() {
           chgcnt++;
         }
       }
-      removeIDs.forEach(function(el){
-        $('.dd').nestable('remove',el)
+      removeIDs.forEach(function(el) {
+        $('.dd').nestable('remove', el)
       })
       if (chgcnt > 0) {
         submitChanges();
@@ -1127,7 +1128,8 @@ function generateTable() {
       if (curitems[j][0] != "text") {
         html += "<li class='dd-item dd3-item tr " + curclass + "' data-id='" + curitems[j][0] + "'><div class='dd-handle dd3-handle'>Drag</div><div class='dd3-content'>";
       } else {
-        html += "<li class='dd-item dd3-item tr " + curclass + "' data-id='" + curitems[j][1] + "'><div class='dd-handle dd3-handle'>Drag</div><div class='dd3-content'>";
+        id = htmlEntities(curitems[j][1]);
+        html += "<li class='dd-item dd3-item tr " + curclass + "' data-id='" + id + "'><div class='dd-handle dd3-handle'>Drag</div><div class='dd3-content'>";
       }
 
       if (curisgroup) {
@@ -1494,6 +1496,10 @@ function submitChanges() {
       itemarray = olditemarray;
       refreshTable();
     })
+}
+
+function htmlEntities(str) {
+  return String(str).replace(/"/g, '');
 }
 
 /*

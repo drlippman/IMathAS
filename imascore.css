@@ -1571,7 +1571,7 @@ a.dropdown-toggle.arrow-down:hover {
 #nestable {
   display: block;
   width: 100%;
-  max-width: 1200px;
+  max-width: 3000px;
 }
 
 #nestable .topRow {
