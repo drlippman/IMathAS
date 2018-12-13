@@ -8,6 +8,9 @@ body {
 a:link {
 	text-decoration: none;
 }
+.inset a{
+	border-bottom: 1px solid;
+}
 a:visited {
 	text-decoration: none;
 }
@@ -61,7 +64,7 @@ div.icon {
 }
 
 /*Breadcrumb bar*/
-div.breadcrumb {
+div.breadcrumb, div.grouptoggle {
 	border: 1px solid #000;
 	background-color: #081e3f;
   color: white;
