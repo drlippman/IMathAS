@@ -1965,6 +1965,15 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
 					}
 					echo "</form>\n";
+					if (isset($intropieces) && $next==count($questions)-1) {
+						foreach ($introdividers as $k=>$v) {
+							if ($v[1]==$next+2) {//right divider
+								echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
+								echo _('Hide Question Information'), '</a></div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';								
+							}
+						}
+					}
 					echo "</div>\n";
 				} else {
 					echo "<div class=inset>\n";
@@ -2727,6 +2736,16 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$i.'&amp;to='.$i.'\'}"/>';
 				}
 				echo "</form>\n";
+				if (isset($intropieces) && $i==count($questions)-1) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+2) {//right divider
+							echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
+							echo _('Hide Question Information'), '</a></div>';
+							echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				echo "</div>\n";
 
 			}
