@@ -134,8 +134,20 @@ function sandboxgetweights($code,$seed,$attemptn) {
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
-	eval($code);
+	try {
+		eval($code);
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating the code in a question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 	if (!isset($answeights)) {
+		if (!isset($anstypes)) { 
+			//this shouldn't happen unless the code crashed
+			return array(1);
+		}
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}
@@ -188,6 +200,9 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 			$penalty = substr($penalty,2);
 		}
 	}
+	if (!is_numeric($penalty)) {
+		$penalty = 0;
+	}
 	$rowatt = $qi['attempts'];
 
 	if ($attempts<$rowatt || $rowatt==0) { //has remaining attempts
@@ -205,12 +220,20 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 			$penalty = 0;
 		}
 		if (strpos($frac,'~')===false) {
-			$after = round($frac*$points - $points*$attempts*$penalty/100.0,1);
+			if (is_numeric($frac)) {
+				$after = round($frac*$points - $points*$attempts*$penalty/100.0,1);
+			} else {
+				$after = 0;
+			}
 			if ($after < 0) { $after = 0;}
 		} else {
 			$fparts = explode('~',$frac);
 			foreach ($fparts as $k=>$fpart) {
-				$after[$k] = round($fpart*$points*(1 - $attempts*$penalty/100.0),2);
+				if (is_numeric($fpart)) {
+					$after[$k] = round($fpart*$points*(1 - $attempts*$penalty/100.0),2);
+				} else {
+					$after[$k] = 0;
+				}
 				if ($after[$k]<0) {$after[$k]=0;}
 			}
 			$after = implode('~',$after);
@@ -239,7 +262,7 @@ function totalpointspossible($qi) {
 function getremainingpossible($qn,$qi,$testsettings,$attempts) {
 	global $scores;
 	global $regenonreattempt;
-	if (isset($qi['answeights']) && $scores[$qn]!=-1) {
+	if (isset($qi['answeights']) && is_array($qi['answeights']) && $scores[$qn]!=-1) {
 		$possible = calcpointsafterpenalty(implode('~',$qi['answeights']),$qi,$testsettings,$attempts);
 		$appts = explode('~',$possible);
 		$curs = explode('~',$scores[$qn]);
@@ -384,19 +407,22 @@ function printscore($sc,$qn) {
 		$pts = Sanitize::onlyFloat($sc);
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
+		$pts = getpts($sc);
+		$sc = str_replace('-1','N/A',$sc);
+		$scarr = explode('~',$sc);
+		
 		$ptposs = $qi[$questions[$qn]]['answeights'];
+		if (!is_array($ptposs)) {
+			//this shouldn't happen, but handle code breaking issues
+			$ptposs = array_fill(0, count($scarr), 1/count($scarr));
+		}
 		for ($i=0; $i<count($ptposs)-1; $i++) {
 			$ptposs[$i] = round($ptposs[$i]*$poss,2);
 		}
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-
-		$pts = getpts($sc);
-		$sc = str_replace('-1','N/A',$sc);
-
-		//$sc = str_replace('~',', ',$sc);
-		$scarr = explode('~',$sc);
+		
 		if (strpos($thisraw,'-2')!==false) {
 			$rawarr = explode('~',$thisraw);
 			foreach ($rawarr as $k=>$v) {
@@ -490,6 +516,14 @@ function scorequestion($qn, $rectime=true) {
 	global $regenonreattempt, $sessiondata;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
+	
+	if (!isset($questions[$qn]) || $questions[$qn]===0) {
+		echo "Something went wrong... (TU-SQ1)";
+		return 0;
+	} else if (!isset($qi[$questions[$qn]])) { //shouldn't happen, but we'll deal
+		$qithis = getquestioninfo($questions[$qn], $testsettings);
+		$qi[$questions[$qn]] = $qithis[$questions[$qn]];
+	}
 
 	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$attempts[$qn],$qi[$questions[$qn]]['points']);
 

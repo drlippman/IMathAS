@@ -88,7 +88,8 @@ if ($_GET['showans']==3) {//show always
 }
 $qcol = array();
 if (isset($_POST['seed']) && isset($_POST['check'])) {
-	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
+	$rawscores = array();
+	list($score,$rawscores[0]) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
 	if (strpos($score,'~')===false) {
 		$after = round($score,1);
 		if ($after < 0) { $after = 0;}
@@ -102,7 +103,7 @@ if (isset($_POST['seed']) && isset($_POST['check'])) {
 		$after = implode('~',$after);
 	}
 	if (empty($_GET['noresults'])) {
-		$qcol = explode('~',$rawscores);
+		$qcol = explode('~',$rawscores[0]);
 	}
 	$lastanswers[0] = $lastanswers[0];
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
@@ -237,9 +238,17 @@ function getansweights($code,$seed) {
 
 function sandboxgetweights($code,$seed) {
 	srand($seed);
-	eval(interpret('control','multipart',$code));
+	try {
+		eval(interpret('control','multipart',$code));
+	} catch (Throwable $thrownerror) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($thrownerror->getMessage());
+			echo '</p>';
+		}
+	}
 	if (!isset($answeights)) {
-		return false;
+		return array(1);
 	} else if (is_array($answeights)) {
 		return $answeights;
 	} else {

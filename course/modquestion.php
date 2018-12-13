@@ -331,15 +331,20 @@ if (!isset($_GET['id'])) {
 	echo '<span class="form">Restricted question seed list:</span>';
 	echo '<span class="formright"><input size=30 name="fixedseeds" id="fixedseeds" value="'.$line['fixedseeds'].'"/></span><br class="form"/>';
 	echo '</div>';
-	if ($line['fixedseeds']!='' && $beentaken) {
+	if ($line['fixedseeds']!='' && isset($_GET['id'])) {
 		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
+	}
+	if (isset($_GET['id'])) {
+		echo '<div class="advanced" style="display:none">';
+		echo '<span class="form">Replace this question with question ID: ';
+		if ($beentaken) {
+			echo '<br/><span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span>';
+		}
+		echo '</span><span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
+		echo '</div>';
 	}
 	if ($beentaken) {
 		echo '<div class="advanced" style="display:none">';
-		echo '<span class="form">Replace this question with question ID: <br/>';
-		echo '<span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
-		echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
-		
 		echo '<span class=form>Points for this problem: <br/>';
 		echo '<span class=noticetext>WARNING: you generally should not change point values after students have started the assessment, as the points already earned by students will not be re-calculated.</span></span>';
 		echo '<span class=formright> <input type=text size=4 name=points value="'.Sanitize::encodeStringForDisplay($line['points']).'"> (blank for default)</span><BR class=form>';		

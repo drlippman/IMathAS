@@ -69,7 +69,10 @@
 			$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			$adata = $stm->fetch(PDO::FETCH_ASSOC);
-
+			if ($adata['courseid'] != $cid) {
+				echo "Invalid assessment ID";
+				exit;
+			}
 			$stugroupmem = array();
 			$agroupid = 0;
 			$doadd = true;
@@ -661,7 +664,7 @@
 		unset($exped);
 		
 		require_once("../includes/exceptionfuncs.php");
-		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP);
+		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP, $latepasshrs);
 		$excepadata = array(
 			'id'=>$line['assessmentid'], 
 			'allowlate'=>$line['allowlate'],
@@ -705,7 +708,7 @@
 			if ($LPblocked) {
 				echo '<p>Use of a LatePass is currently blocked because the student viewed the assessment in review mode. ';
 				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&aid=$aid&asid=$asid&from=$from&uid=$get_uid&clearreviewview=true\">";
-				echo 'Clear review view</a> to allow use of a LatePass</p>';
+				echo 'Clear review view</a> to allow use of a LatePass.</p>';
 			}
 		}
 		if ($isteacher) {
@@ -714,6 +717,9 @@
 				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$asid}&from=$from&uid=$get_uid&breakfromgroup=true\">Separate from Group</a></p>";
 			}
 		}
+		if ($myrights == 100 && $line['lti_sourcedid']!='') {
+			echo '<p class=small>LTI sourced_id: '.Sanitize::encodeStringForDisplay($line['lti_sourcedid']).'</p>';
+		}	
 		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$asid}&update=true\">\n";
 
 		if ($isteacher) {
@@ -927,7 +933,7 @@
 			echo "in {$attempts[$i]} attempt(s) ";
 			if ($isteacher || $istutor) {
 				if (empty($feedback["Q$i"])) {
-					echo '<a href="#" onclick="return revealfb('.$i.');" id="fb-'.$i.'-add">Add Feedback</a>';
+					echo '<a href="#" onclick="return revealfb('.$i.',true);" id="fb-'.$i.'-add">Add Feedback</a>';
 					echo '<span id="fb-'.$i.'-wrap" style="display:none;">';
 				} else {
 					echo '<span id="fb-'.$i.'-wrap">';
@@ -1366,9 +1372,20 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
-
-	eval($code);
+	try {
+		eval($code);
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 	if (!isset($answeights)) {
+		if (!isset($anstypes)) { 
+			//this shouldn't happen unless the code crashed
+			return array(1);
+		}
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}

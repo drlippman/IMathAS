@@ -97,7 +97,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 	}
 
-	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line == null) {
@@ -515,8 +515,6 @@ if ($overwriteBody==1) {
 		if ($allowcourseimport) {
 ?>
 		<p><b><?php echo _('Export/Import'); ?></b><br/>
-			<a href="../admin/export.php?cid=<?php echo $cid ?>"><?php echo _('Export Question Set'); ?></a><br/>
-			<a href="../admin/import.php?cid=<?php echo $cid ?>"><?php echo _('Import Question Set'); ?></a><br/>
 			<a href="../admin/exportlib.php?cid=<?php echo $cid ?>"><?php echo _('Export Libraries'); ?></a><br/>
 			<a href="../admin/importlib.php?cid=<?php echo $cid ?>"><?php echo _('Import Libraries'); ?></a>
 		</p>

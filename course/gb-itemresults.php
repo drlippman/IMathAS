@@ -158,7 +158,15 @@ foreach ($itemarr as $k=>$q) {
 require("../footer.php");
 
 function sandboxeval($control, $qtype) {
-	eval(interpret('control', $qtype, $control));
+	try {
+		eval(interpret('control', $qtype, $control));
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 	if ($qtype=='multipart' && !is_array($anstypes)) {
 		$anstypes = explode(',',$anstypes);
 	}
@@ -266,7 +274,11 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 		}
 	}
 	$res = array_count_values($res);
-	$restot = max($res);
+	if (count($res)>0) {
+		$restot = max($res);
+	} else {
+		$restot = 1;
+	}
 	if ($part>-1) {echo "Part ".($part+1);}
 	echo '<table class="gridded">';
 	echo '<thead>';

@@ -93,7 +93,7 @@
 				$stm->execute(array(':name'=>$name, ':scale'=>$scale, ':scaletype'=>$st, ':chop'=>$chop, ':dropn'=>$drop, ':weight'=>$weight, ':hidden'=>$hide, ':calctype'=>$calctype, ':id'=>$id));
 			}
 		}
-		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'];
+		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'] + 400000*$_POST['gbmode400000'];
 		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
 		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
 		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
@@ -217,6 +217,7 @@
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = $stm->fetch(PDO::FETCH_NUM);
 	$hidesection = (((floor($defgbmode/100000)%10)&1)==1);
 	$hidecode = (((floor($defgbmode/100000)%10)&2)==2);
+	$showpercents = (((floor($defgbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
 	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
 	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
 	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
@@ -226,7 +227,6 @@
 	$hidenc = (floor($defgbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$includelastchange = (((floor($defgbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all
-
 
 	$colorval = array(0);
 	$colorlabel = array("No Color");
@@ -275,6 +275,13 @@
 		?>
 	</span><br class=form />
 
+	<span class=form>Show scores as: </span>
+	<span class=formright>
+		<?php
+		writeHtmlSelect("gbmode400000", array(0,1), array(_('Points'), _('Percents')), $showpercents);
+		?>
+	</span><br class=form />
+	
 	<span class=form>Links show:</span>
 	<span class=formright>
 		<?php
@@ -304,8 +311,9 @@
 
 	<span class=form>Locked Students:</span>
 	<span class=formright>
-		<input type=radio name="gbmode200" value="0"  id="lockstu0" <?php writeHtmlChecked($hidelocked,0);?>/><label for="lockstu0">Show</label>
-		<input type=radio name="gbmode200" value="2"  id="lockstu2" <?php writeHtmlChecked($hidelocked,2);?>/><label for="lockstu2">Hide</label>
+		<?php
+		writeHtmlSelect("gbmode200", array(0,2), array(_('Show'), _('Hide')), $hidelocked);
+		?>
 	</span><br class=form />
 
 	<span class=form>Default Colorization:</span>
@@ -313,17 +321,18 @@
 	<?php writeHtmlSelect("colorize",$colorval,$colorlabel,$colorize); ?>
 	</span><br class=form />
 
-	</span><br class=form />
 	<span class=form>Totals columns show on:</span>
 	<span class=formright>
-		<input type=radio name="gbmode1000" value="0" id="totside0" <?php writeHtmlChecked($totonleft,0);?>/><label for="totside0">Right</label>
-		<input type=radio name="gbmode1000" value="1" id="totside1" <?php writeHtmlChecked($totonleft,1);?>/><label for="totside1">Left</label>
+		<?php
+		writeHtmlSelect("gbmode1000", array(0,1), array(_('Right'), _('Left')), $totonleft);
+		?>
 	</span><br class=form />
 
 	<span class=form>Average row shows on:</span>
 	<span class=formright>
-		<input type=radio name="gbmode1002" value="0" id="avgloc0" <?php writeHtmlChecked($avgontop,0);?>/><label for="avgloc0">Bottom</label>
-		<input type=radio name="gbmode1002" value="2" id="avgloc2" <?php writeHtmlChecked($avgontop,2);?>/><label for="avgloc2">Top</label>
+		<?php
+		writeHtmlSelect("gbmode1002", array(0,2), array(_('Bottom'), _('Top')), $avgontop);
+		?>
 	</span><br class=form />
 
 	<span class=form>Include details:</span>

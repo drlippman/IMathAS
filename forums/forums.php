@@ -121,8 +121,11 @@
 			$itemsimporder[] = $row[0];
 		}
 	}
-
-	$maxitemnum = max($itemsimporder) + 1;
+	if (count($itemsimporder)==0) {
+		$maxitemnum = 1;
+	} else {
+		$maxitemnum = max($itemsimporder) + 1;
+	}
 	//capture any forums that are not in imas_items
 	foreach ($forumdata as $fid=>$line) {
 		if (in_array($fid,$itemsassoc)) { continue; }

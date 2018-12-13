@@ -35,6 +35,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
+	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+	$stm->execute(array($aid));
+	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
+		echo "Invalid ID";
+		exit;
+	}
+
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
 		$sessiondata['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
@@ -1206,7 +1213,8 @@ if ($overwriteBody==1) {
 				}
 			}
 		?>
-		$(refreshTable);
+		//$(refreshTable);
+		refreshTable();
 	</script>
 <?php
 	}
@@ -1362,7 +1370,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
+			initSortTable('myTable',[false,'S','S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','N','S',false<?php echo ($searchall==0) ? ",false" : ""; ?>],true);
 		    $(".dropdown-toggle").dropdown();
 		</script>
 	</form>

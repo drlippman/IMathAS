@@ -148,11 +148,14 @@ dd {
 	<li><a href="#importexportitems">Import/Export Course Items</a></li>
 	<li><a href="#lti">LTI Integration</a>
 		<ul>
-		<li><a href="#lticanvas">Canvas Integration</a></li>
-		<li><a href="#ltibb">Blackboard Integration</a></li>
+		<li><a href="#lticanvas">Canvas Integration - Using Import (recommended)</a></li>
+		<li><a href="#lticanvas2">Canvas Integration - Manual Setup</a></li>
+		<li><a href="#ltibb">Blackboard Integration - Using Import (recommended)</a></li>
+		<li><a href="#ltibb2">Blackboard Integration - Manual Setup</a></li>
 		<li><a href="#ltid2l">D2L Brightspace Integration</a></li>
 		<li><a href="#ltimoodle">Moodle Integration</a></li>
-		<li><a href="#ltiother">LTI Integration for Other LMSs</a></li>
+		<li><a href="#ltiother">LTI Integration for Other LMSs - Using Import</a></li>
+		<li><a href="#ltiother2">LTI Integration for Other LMSs - Manual Setup</a></li>
 		</ul></li>
 	</ul></li>
 
@@ -1406,6 +1409,8 @@ the designated library.  Select the items to import, and click "Import Items".</
 
 <p>IMathAS can be used as a LTI tool using a course-level configuration or a global college-wide configuration.</p>
 
+<p><b>Key Types</b></p>
+
 <p>For a course-level configuration, your LTI key will take the form LTKkey_###_#.  The first number, ###, is your course ID.
 The last number determines how authentication is handled.
 If that last digit is 0, then when the student accesses the LTI placement, the first time they will be asked to sign into their
@@ -1416,20 +1421,32 @@ student accesses any LTI placement, they will not need to sign in again.  They w
 accesses the LTI placement, and that account will be linked with the host LMS account.  The student will not be provided an IMathAS
 username or password, so they will only be able to access IMathAS resources through the LMS LTI placements.</p>
 
-<p>Note that grade return ONLY works with the _1 type keys, so that type of key is recommended.</p>
+<p>Note that grade return ONLY works reliably with the _1 type keys, so that type of key is recommended.</p>
+
+<p><b>LTI Connection Options</b></p>
+
+<p>IMathAS supports several types of LTI integration, including whole course single-signon,
+   and new links created from the LMS.</p>
+   
+<p>The recommended integration technique is to setup individual LTI links for each 
+   assessment.  This is necessary if you want the grade to be returned from IMathAS
+   to your LMS.  The easiest way to set up LTI links in the LMS is to use the
+   Export feature in IMathAS to create links and import those into your LMS. To do this, 
+   go to Course Items -> Export, select the items you want to export, 
+   your LMS, and Download the CC Export.  Then follow the appropriate instructions below.</p>
+   
+<p>Alternatively, you can manually create individual links to assignments, or you
+   can create a single link that launches your entire IMathAS course.  Be aware
+   that in many LMSs, manually created links to assignments will lose their association
+   with IMathAS assessments when the course is copied in the LMS, so using the Import
+   process is recommened when supported by the LMS.</p>
 
 <p>IMathAS can also be an LTI consumer, using the External Tool option for Link items.</p>
 
-<p>IMathAS supports several types of LTI integration, including whole course single-signon,
-   and new links created from the LMS.  For most cases, though, a tight integration is
-   recommended, and the easiest way to set up LTI links in the LMS is to use the
-   Export feature in IMathAS to create links and import those into your LMS.</p>
-   
-<p>To do this, go to Course Items -> Export, select the items you want to export, 
-   your LMS, and Download the CC Export.  Then follow the appropriate instructions below.</p>
+
 
 <div class=h3>
-<h3 id="lticanvas">Canvas Integration</h3>
+<h3 id="lticanvas">Canvas Integration - Using Import</h3>
 	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
 	   and Download the Export Cartridge</p>
 	<p>To import the cartridge in Canvas:</p>
@@ -1484,6 +1501,58 @@ username or password, so they will only be able to access IMathAS resources thro
 	   into IMathAS while allowing direct login to IMathAS as well, then you can 
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
+<div class=h3>
+<h3 id="lticanvas2">Canvas Integration - Manual Process</h3>
+	<p>If you have a global college-wide key and secret, you do not need to set
+	   up a course-level configuration.  If you need to set up a course level
+	   configuration, in your Canvas course:</p>
+	<ul>
+		<li>Go to Settings, then click the Apps tab</li>
+		<li>Click on View App Configurations, then the +App button
+		<li>For Configuration type, select "By URL"</li>
+		<li>For Name, enter IMathAS, or whatever you'd like<li>
+		<li>For Consumer Key, enter: <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+		<li>For Shared Secret enter the secret shown in your IMathAS Course Settings</li>
+		<li>For the Config URL, enter <code>https://yourIMathASsite/canvas.php</code></li>
+		<li>Click Submit</li>
+	</ul>
+	
+	<p>To create a link to an individual assessment, in Canvas:</p>
+	<ul>
+		<li>Go to the Assignments page, and click +Assignment</li>
+		<li>Under Submission Type, select "External Tool"</li>
+		<li>Click on the "Find" button, then on the IMathAS tool 
+		    (or whatever name you used when you created the tool)</li>
+		<li>If this is your first time using this key and secret, IMathAS will
+			ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+			establish a connection between your LMS account and your IMathAS account.  
+			You will not need to do this step again, and students will not be asked to sign in 
+			and will not need a IMathAS account.</li>
+		<li>If this is your first link from this course, IMathAS will ask you to 
+			select the IMathAS course you want to connect your LMS course with.</li>
+		<li>Select the assignment you want to link to, and click Make Placement.</li>
+		<li>Click the Select button</li>
+		<li>Finish setting up the assignment in Canvas</li>
+		<li>Assignments set up this way will receive grade return from IMathAS</li>
+	</ul>
+	
+	<p>To create a single link to your entire IMathAS course, in Canvas:</p>
+	<ul>
+		<li>On the Modules page, click on the + button inside a module</li>
+		<li>In the "Add" dropdown, select "External Tool"</li>
+		<li>Click on the IMathAS tool (or whatever name you used when you created the tool)</li>
+		<li>If this is your first time using this key and secret, IMathAS will
+			ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+			establish a connection between your LMS account and your IMathAS account.  
+			You will not need to do this step again, and students will not be asked to sign in 
+			and will not need a IMathAS account.</li>
+		<li>If this is your first link from this course, IMathAS will ask you to 
+			select the IMathAS course you want to connect your LMS course with.</li>
+		<li>Select "Whole Course Placement" and click Make Placement.</li>
+		<li>Click Add Item</li>
+		<li>Note that there is no grade return from IMathAS from a whole course placement.</li>
+	</ul>
 </div> <!-- h3 -->
 <div class=h3 style="display:none">
 <h3 id="ltibbold">Blackboard Integration - older Common Cartridge Instructions</h3>
@@ -1554,7 +1623,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
 <div class=h3>
-<h3 id="ltibb">Blackboard Integration</h3>
+<h3 id="ltibb">Blackboard Integration - Using Import</h3>
 	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
 	   and Download the Export Cartridge</p>
 	<p>To import the cartridge in BlackBoard:</p>
@@ -1620,6 +1689,46 @@ username or password, so they will only be able to access IMathAS resources thro
 	   into IMathAS while allowing direct login to IMathAS as well, then you can 
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
+</div> <!-- h3 -->
+<div class=h3>
+<h3 id="ltibb2">Blackboard Integration - Manual Process</h3>
+	<p>To manually create a link to IMathAS, in Blackboard:</p>
+	<ul>
+		<li>Under the Build Content dropdown, select Web Link</li>
+		<li>Give the link a Name</li>
+		<li>For URL, enter <code>https://yourIMathASsite/bltilaunch.php</code></li>
+		<li>Click the checkbox for "This link is to a Tool Provider"</li>
+		<li>If you have a global college-wide key and secret, you will not see
+			or need to fill out the following two entries.
+			<ul>
+				<li>For Key, enter <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+				<li>For Secret, enter the secret shown in your IMathAS Course Settings</li>
+			</ul></li>
+		<li>If you are setting up a link to an individual assessment, set
+			"Enabled Evaluation" to Yes, and enter the points possible.  Whole
+			course links to not return grades, so there is no need to enabled 
+			evaluation for those.</li>
+		<li>Click Submit</li>
+		<li>If the link you just created shows "(invalid link)" next to the name,
+			they you'll need to ask your BlackBoard administrator to approve 
+			LTI connections to IMathAS.</li>
+		<li>Click on the link you just created.</li>
+		<li>If this is your first time using this key and secret, IMathAS will
+			ask you, the teacher, to sign into your IMathAS account.  This is necessary to
+			establish a connection between your LMS account and your IMathAS account.  
+			You will not need to do this step again, and students will not be asked to sign in 
+			and will not need a IMathAS account.</li>
+		<li>If this is your first link from this course, IMathAS will ask you to 
+			select the IMathAS course you want to connect your LMS course with.</li>
+		<li>Select the assignment you want to link with, or select "Whole Course Placement"
+			if you want a single link to your entire IMathAS course, then 
+			click Make Placement.</li>
+	</ul>
+	
+	
+	<p>Be aware assessment links created manually in this way will lose their association
+   with IMathAS assessments when the course is copied in BlackBoard, so using the 
+   Export/Import process is recommened if you are creating individual assessment links.</p>
 </div> <!-- h3 -->
 <div class=h3>
 <h3 id="ltid2l">D2L Brightspace Integration</h3>
@@ -1757,7 +1866,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
 <div class=h3>
-<h3 id="ltiother">LTI Integration for Other LMSs</h3>
+<h3 id="ltiother">LTI Integration for Other LMSs - Using Import</h3>
 	<p>Go to Course Items &rarr; Export, select the items you want to export, select your LMS,
 	   and Download the Export Cartridge.  The cartridge is an IMS Common Cartridge format.</p>
 	<p>Import the cartridge into your LMS. If your school has a global key and secret setup, skip ahead.
@@ -1798,6 +1907,28 @@ username or password, so they will only be able to access IMathAS resources thro
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
+<div class=h3>
+<h3 id="ltiother2">LTI Integration for Other LMSs - Manual Process</h3>
+	<p>If you have a global college-wide key and secret, you do not need to set
+	   up a course-level configuration.  Otherwise, you will need to set up a
+	   course-level LTI configuration.  Consult your LMS's help for how to do this;
+	   some LMSs configure an LTI took at the course settings level, while some
+	   have you enter the credentials with each link.</p>
+	<p>If you need to set up a course-level LTI configuration, you will need:</p>
+	<ul>
+		<li>A Consumer/Tool Key:  <code>LTIkey_####_1</code>, where #### is your Course ID</li>
+		<li>A Secret:  use the LTI secret shown in your IMathAS Course Settings</li>
+		<li>Launch/Tool URL:  <code>https://yourIMathASsite/bltilaunch.php</code></li>
+	</ul>
+	
+	<p>The process to set up LTI links varies by LMS, so consult your LMS for
+		details.</p>
+	
+	<p>Be aware assessment links created manually in this way will lose their association
+   with IMathAS assessments when the course is copied in the LMS, so using the 
+   Export/Import process is recommened if you are creating individual assessment links
+   and your LMS supports it.</p>
+</div>  <!-- h3 -->
 </div> <!-- h2 -->
 </div> <!-- h1 -->
 <div class=h1>
@@ -2183,12 +2314,15 @@ The following macros create graphs or tables:
   question and pulls out the two-point line data.  Returns an array of lines, each of form array(x1,y1,x2,y2) giving the coordinates
   of the two points used.</li>
   <li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing question
-  and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'parab', 'sqrt',
-  'sin', 'cos', 'abs', 'vector', 'circle'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
+  and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'lineseg', 'ray', 'parab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
+  'rationa', 'exp', 'log', 'sin', 'cos', 'abs', 'vector', 'circle'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
   the two points used.  They are returned in the order clicked.  For example, with 'parab' type, the first point is the vertex and the
   second point is an arbitrary point.</li>
 <li><strong>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing
   question and pulls out the closed dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
+  of the dot.</li>
+<li><strong>getopendotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing
+  question and pulls out the open dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
   of the dot.</li>
 <li><strong>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing
   question and pulls out the lines data, which includes polygons.  Returns an array, with an element for each line/curve draw.  Each of those
@@ -2439,6 +2573,7 @@ available in each library</p>
 <tr><td>abs</td><td>Absolute Value.  Note that while abs() is used for calculations, you may prefer to use | brackets for display</td></tr>
 <tr><td>round(n,d)</td><td>round number n to d decimal places</td></tr>
 <tr><td>floor,ceil</td><td>floor/ceiling: integer below/above given number</td></tr>
+<tr><td>min,max</td><td>min or max of the passed values. Can be used as min($a,$b,$c) or min($arrayvariable).</td></tr>
 </tbody>
 </table>
 
@@ -2660,9 +2795,15 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
 <dt>$reqdecimals = a number </dt>
-	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	<dd>Defines the minimum decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
-	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+	will be used (even if it doesn't agree with the $reqdecimal setting).<br/><br/>
+	$reqdecimals = "=2" can be used to require exactly 2 decimal places in the answer, regardless of how the value rounds (so 3.5 would get marked
+	wrong when the answer is 3.50 if "=2" is used).  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
+	<br/>When the "=2" form is used, it overrides both $reltolerance and $abstolerance, and by default tests that the student answer exactly matches
+	the correct answer ($abstolerance=0).  To override the tolerance use +- in the setting, like this:
+	<br/>$reqdecimals = "=2+-.01" checks for exactly 2 decimals, but allows the answer to have an absolute error of .01
+	<br/>$reqdecimals = "=2+-1%" checks for exactly 2 decimals, but allows the answer to have an relative error of 1% (equivalent to $relatolerance = .01)</dd>
 <dt>$reqsigfigs = a number </dt>
 	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
@@ -2944,7 +3085,7 @@ A student is asked to enter a function
 <dl>
 <dt>$answer = string </dt>
 	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)".  You can
-	specify multiple acceptable answers by separating with a comma, like $answer="x^2 or x^4"<br/>
+	specify multiple acceptable answers by separating with "or", like $answer="x^2 or x^4"<br/>
 	Note: The system will accept any algebraically equivalent answer. To only allow answers of a 
 	specific format, you'll also need to define $requiretimes (see below).</dd>
 </dl>
@@ -3129,19 +3270,23 @@ drawn line from the correct line.
 	        	<li>ray (rays)</li>
 	        	<li>parab (vertical parabolas)</li>
 	        	<li>horizparab (horizontal parabolas)</li>
+	        	<li>cubic (a(x-h)^3+k style cubics)</li>
 	        	<li>abs (absolute value)</li>
 	        	<li>circle (circles)</li>
 	        	<li>dot (open and closed dots)</li>
 	        	<li>sqrt (square root)</li>
+	        	<li>cuberoot (cube root)</li>
 	        	<li>trig (sin and cos)</li>
 	        	<li>vector (position or displacement vectors)</li>
 	        	<li>exp (exponential with horizontal asymptote at y=0)</li>
+	        	<li>genexp (exponential with any horizontal asymptote)</li>
 	        	<li>log (logarithm with vertical asymptote at x=0)</li>
+	        	<li>genlog (logarithm with any vertical asymptote)</li>
 	        	<li>rational (linear/linear rational)</li>
 	        	<li>ellipse (ellipses)</li>
 	        	<li>hyperbola (vertical or horizontal hyperbolas)</li>
 	        	</ul></li>
-	        <li>For lines, vertical parabolas, absolute values, square roots, sines, cosines, exponentials, logs, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
+	        <li>For lines, vertical parabolas, absolute values, square roots, cubics, cuberoots, sines, cosines, exponentials, logs, and rationals (linear/linear only) give $answers as a function of x, like "2(x-1)^2+3"</li>
 	        <li>For line segments and rays, given $answers as a function with domain, like "2x+4,-oo,3", or for vertical line segments use x= and give the range, like "x=4,-2,3"</li>
 	        <li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
 	        <li>For circles, give $answers as "circle,x,y,radius", like "circle,2,-1,3"</li>
@@ -3227,6 +3372,10 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" </dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+<dt>$scoremethod = "byelement" </dt>
+	<dd>By default, the whole n-tuple must be correct to receive any credit.  
+	Set $scoremethod = "byelement" to give partial credit if only some elements of
+	the n-tuple are correct.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3275,6 +3424,10 @@ rather than just numbers, such as (5/3, 2/3).
 	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
 	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
+<dt>$scoremethod = "byelement" </dt>
+	<dd>By default, the whole n-tuple must be correct to receive any credit.  
+	Set $scoremethod = "byelement" to give partial credit if only some elements of
+	the n-tuple are correct.</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3389,6 +3542,8 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
+<dt>$answerformat = "scalarmult"</dt>
+	<dd>If used, any scalar multiple of the correct matrix will be accepted</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -3429,10 +3584,11 @@ The entries are compared to a given tolerance.
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
+<dt>$answerformat = "scalarmult","fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
 	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	If "scalarmult" is used, any scalar multiple of the correct matrix will be accepted.
 	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is

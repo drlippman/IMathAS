@@ -120,12 +120,17 @@ this.preinit = function(try2) {
 		var trs = document.getElementsByTagName("tr");
 		var theads = trs[0].getElementsByTagName("th");
 		if (trs.length > 130 || theads.length * trs.length > 8000) {
+			var lockcookie = readCookie("skiplhdrwarn_"+cid);
 			if (try2!=true) {
 				return;
+			} else if (lockcookie == 1) {
+				
 			} else {
 				if (!confirm("This might take a minute... header locking is really slow with a big gradebook.  Continue?")) {
 					cancellockcol();	
 					return;
+				} else {
+					document.cookie = "skiplhdrwarn_"+cid+"=1";
 				}
 			}
 		}

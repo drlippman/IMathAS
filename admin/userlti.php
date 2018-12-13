@@ -49,11 +49,11 @@ if ($myrights < 100) {
 } else if (!empty($_GET['contextid'])) {
   $contextid = Sanitize::simpleString($_GET['contextid']);
   $query = "SELECT ilp.id,ilp.linkid,ilp.typeid,ilp.placementtype,ia.name FROM ";
-  $query .= "imas_lti_placements AS ilp LEFT JOIN imas_assessments AS ia ON ilp.typeid=ia.id AND ilp.placementtype='assess' ";
-  $query .= "WHERE ilp.contextid=? UNION ";
+  $query .= "imas_lti_placements AS ilp LEFT JOIN imas_assessments AS ia ON ilp.typeid=ia.id ";
+  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='assess' UNION ";
   $query .= "SELECT ilp.id,ilp.linkid,ilp.typeid,ilp.placementtype,ic.name FROM ";
-  $query .= "imas_lti_placements AS ilp LEFT JOIN imas_courses AS ic ON ilp.typeid=ic.id AND ilp.placementtype='course'";
-  $query .= "WHERE ilp.contextid=?";
+  $query .= "imas_lti_placements AS ilp LEFT JOIN imas_courses AS ic ON ilp.typeid=ic.id ";
+  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='course'";
   $stm = $DBH->prepare($query);
   $stm->execute(array($contextid, $contextid));
   echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC), JSON_HEX_TAG);

@@ -4,10 +4,8 @@
 
 require_once(__DIR__ . "/../includes/sanitize.php");
 
-
-@set_time_limit(0);
-ini_set("max_input_time", "600");
-ini_set("max_execution_time", "600");
+ini_set("max_input_time", "60");
+ini_set("max_execution_time", "60");
 ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
@@ -537,6 +535,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<input type=checkbox name=\"postanon\" value=1 ";
 				if ($line['isanon']==1) {echo "checked=1";}
 				echo "></span><br class=form/>";
+			} else if ($allowanon==1 && $line['isanon']==1) { //teacher editing an anonymous post, perhaps
+				echo '<input type=hidden name=postanon value=1 />';
 			}
 			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
 				echo "<span class=form id=posttypelabel>Post Type:</span><span class=formright role=radiogroup aria-labelledby=posttypelabel>\n";

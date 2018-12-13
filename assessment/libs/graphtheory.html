@@ -39,6 +39,7 @@ A library of graph theory and scheduling functions.  Version 1.1, April 3, 2012
 <li><a href="#graphgetpathlength">graphgetpathlength</a></li>
 <li><a href="#graphshortestpath">graphshortestpath</a></li>
 <li><a href="#graphcircuittoarray">graphcircuittoarray</a></li>
+<li><a href="#graphcircuittostringans">graphcircuittostringans</a></li>
 <li><a href="#graphgetedges">graphgetedges</a></li>
 <li><a href="#graphgetedgesarray">graphgetedgesarray</a></li>
 <li><a href="#graphgettotalcost">graphgettotalcost</a></li>
@@ -126,8 +127,11 @@ graphdijkstra(g,[dest])
 graphkruskal(g) 
 <BR>return a minimum cost spanning tree graph from graph g
 <BR><h3><a name="graphrepeatednearestneighbor">graphrepeatednearestneighbor</a></h3>
-graphrepeatednearestneighbor(g)
-<BR>returns a hamiltonian circuit graph using repeated nearest neighbor
+graphrepeatednearestneighbor(g, [multi])
+<BR>returns an array (graph,mincostarr), where graph is the
+<BR>hamiltonian circuit graph using repeated nearest neighbor, and mincostarr
+<BR>is an array of starting vertex indices that gave that graph.
+<BR>If multi is set to true, an array of graphs is returned rather than just one
 <BR><h3><a name="graphnearestneighbor">graphnearestneighbor</a></h3>
 graphnearestneighbor(g,start)
 <BR>returns a hamiltonian circuit graph using nearest neighbor
@@ -160,6 +164,12 @@ graphshortestpath(g,op,start,end,[type])
 <BR>for path,
 <BR>type=0 returns labeledpath, like ABCD
 <BR>type=1 returns array of vertex indices
+<BR><h3><a name="graphcircuittostringans">graphcircuittostringans</a></h3>
+graphcircuittostringans(gs,[lbl, start])
+<BR>converts graph or array of graphs containing circuits to
+<BR>a string of labels that can be used as an $answer.
+<BR>lbl is an array of labels (defaults to A,B,C,etc.)
+<BR>start is the index of the vertex to start the string circuits with
 <BR><h3><a name="graphcircuittoarray">graphcircuittoarray</a></h3>
 graphcircuittoarray(g,[start])
 <BR>converts graph containing a circuit to an array

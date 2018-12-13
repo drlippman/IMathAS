@@ -258,6 +258,12 @@
 				exit;
 			}
 		}
+		if (!$isreview && trim($adata['password'])!='' && isset($_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'])) {
+			$testhash = hash("sha256", $urlmode.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($adata['password']));
+			if ($testhash == $_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH']) {
+				$adata['password'] = '';
+			}
+		}
 		if (!$isreview && trim($adata['password'])!='' && !isset($teacherid) && !isset($tutorid)) { //has passwd
 			$pwfail = true;
 			if (isset($_POST['password'])) {
@@ -668,6 +674,7 @@
 			$LPinf = $stm->fetch(PDO::FETCH_ASSOC);
 		}
 		$testsettings['shuffle'] = $testsettings['shuffle'] | 4; //force all students same seed
+		$hideAllHeaderNav = true; //hide header nav to expand real estate for questions / results
 	}
 
 	$now = time();
@@ -1193,6 +1200,7 @@
 	$isdiag = isset($sessiondata['isdiag']);
 	if ($isdiag) {
 		$diagid = $sessiondata['isdiag'];
+		$hideAllHeaderNav = true;
 	}
 	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
 
@@ -1224,7 +1232,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead = '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
-		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=102316"></script>';
+		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=102518"></script>';
 		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher'] ? 'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
@@ -1322,6 +1330,17 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'">';
 				echo _('View your scored assessment'), '</a></p>';
 			}
+		}
+		echo '</div>';
+	} else if ($isdiag) {
+		echo '<div class="floatright">';
+		if ($userfullname != ' ') {
+			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
+			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
+			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a></p>";
+		} else {
+			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
+			echo "<span id=\"myname\">".('User Preferences')."</span></p>";
 		}
 		echo '</div>';
 	}
@@ -1771,7 +1790,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					}
 				}
 				if ($allowregen && $qi[$questions[$last]]['allowregen']==1) {
-					echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;regen=$last\">", _('Try another similar question'), "</a></p>\n";
+					$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=shownext&amp;to=$last&amp;regen=$last";
+					echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+					//echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;regen=$last\">", _('Try another similar question'), "</a></p>\n";
 				}
 				//show next
 				unset($toshow);
@@ -1898,7 +1919,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					if ($reattemptsremain && !$immediatereattempt && $reattemptduring) {
 						echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">", _('Reattempt last question'), "</a>, ";
 					}
-					echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a>";
+					$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=skip&amp;to=$qn&amp;regen=$qn";
+					echo '<button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button>';
+					//echo "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a>";
 					if ($immediatereattempt) {
 						echo _(", reattempt last question below, or select another question.");
 					} else {
@@ -1986,7 +2009,8 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 				}
 				if ($testsettings['testtype']!="NoScores") {
-					echo "<br/><p>". _("When you are done, ") . " <a href=\"showtest.php?action=skip&amp;done=true\">" . _("click here to see a summary of your scores") . "</a>.</p>\n";
+					echo "<br/><p>". _("When you are done, ") . " <a href=\"showtest.php?action=skip&amp;done=true\" ".getSummaryConfirm().">";
+					echo  _("click here to see a summary of your scores") . "</a>.</p>\n";
 				}
 
 				echo "</div>\n";
@@ -2050,7 +2074,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						$reattemptsremain = true;
 					}
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
-						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">", _('Try another similar question'), "</a></p>\n";
+						$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=skip&amp;to=$next&amp;regen=$next";
+						echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+						//echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">", _('Try another similar question'), "</a></p>\n";
 					}
 					if ($lefttodo == 0 && $testsettings['testtype']!="NoScores") {
 						echo "<a href=\"showtest.php?action=skip&amp;done=true\">", _('When you are done, click here to see a summary of your score'), "</a>\n";
@@ -2421,7 +2447,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					}
 				}
 				if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-					echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a></p>\n";
+					$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?action=seq&amp;to=$qn&amp;regen=$qn";
+					echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+					//echo "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">", _('Try another similar question'), "</a></p>\n";
 				}
 				unset($toshow);
 				if (canimprove($qn) && $showeachscore) {
@@ -2626,7 +2654,10 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 			}
 			if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-				echo "<p><a href=\"showtest.php?regen=$qn&page=$page#embedqwrapper$qn\">", _('Try another similar question'), "</a></p>\n";
+				$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$qn&amp;page=$page&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$qn";
+				echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+					
+				//echo "<p><a href=\"showtest.php?regen=$qn&page=$page#embedqwrapper$qn\">", _('Try another similar question'), "</a></p>\n";
 			}
 			if (hasreattempts($qn)) {
 				if ($divopen) { echo '</div>';}
@@ -3313,7 +3344,10 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						echo '<div class="prequestion">';
 						echo "<p>", _('No attempts remain on this problem.'), "</p>";
 						if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
-							echo "<p><a href=\"showtest.php?regen=$i#embedqwrapper$i\">", _('Try another similar question'), "</a></p>\n";
+							$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$i&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$i";
+							echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
+				
+							//echo "<p><a href=\"showtest.php?regen=$i#embedqwrapper$i\">", _('Try another similar question'), "</a></p>\n";
 						}
 						if ($showeachscore) {
 							//TODO i18n
@@ -3375,7 +3409,8 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 			echo '</div>'; //ends either inset or formcontents div
 			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue"  && $testsettings['testtype']!="NoScores") {
-				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
+				echo "<p><a href=\"showtest.php?action=embeddone\" ".getSummaryConfirm().">";
+				echo _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 			}
 			if (!$introhaspages && $testsettings['displaymethod'] != "VideoCue") {
 				echo '</div>';
@@ -3418,13 +3453,17 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo '<div class="inset" id="livepollinstrq">';
 				echo '<div id="LPsettings">';
 				echo '<p><label><input type="checkbox" id="LPsettings-dispq" onclick="livepoll.updateSettings()" checked> ';
-				echo ' ' . _("Show question on this computer before it is opened for student input") . '</label><br/>';
+				echo ' ' . _("Show question on this computer before it is opened for student input") . '</label></p>';
 				echo '<p><label><input type="checkbox" id="LPsettings-liveres" onclick="livepoll.updateSettings()"> ';
-				echo ' ' . _("Show results live as students submit answers") . '</label><br/>';
+				echo ' ' . _("Show results live as students submit answers") . '</label></p>';
 				echo '<p><label><input type="checkbox" id="LPsettings-resafter" onclick="livepoll.updateSettings()" checked> ';
-				echo ' ' . _("Show results automatically after closing student input") . '</label><br/>';
+				echo ' ' . _("Show results automatically after closing student input") . '</label></p>';
 				echo '<p><label><input type="checkbox" id="LPsettings-showans" onclick="livepoll.updateSettings()" checked> ';
-				echo ' ' . _("Show answers automatically after closing student input") . '</label>';
+				echo ' ' . _("Show answers automatically after closing student input") . '</label></p>';
+				echo '<p><label><input type="checkbox" id="LPsettings-docountdown" onclick="livepoll.updateSettings()" > ';
+				echo ' ' . _("Use per-question time limit") . '</label>';
+				echo '<span id="LPsettings-timelimitwrap" style="display:none">: ';
+				echo ' <input size=3 id="LPsettings-timelimit" value=60 onchange="livepoll.updateSettings()" /> seconds</span></p>';
 				echo ' <p><button id="LPhidesettings">' . _("Hide Settings") . '</button></p>';
 				echo '</div>';
 				echo ' <div>';
@@ -3437,6 +3476,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo ' <div id="livepollqcontent"></div>';
 				echo ' <div id="livepollrwrapper"><p id="livepollrcnt"></p>';
 				echo ' <div id="livepollrcontent" style="display:none"></div></div>';
+				echo ' <p>&nbsp;</p><p>&nbsp;</p>';
 				echo '</div>';
 				//pull any existing result data
 				$LPdata = array();
@@ -4122,14 +4162,28 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		return $todo;
 	}
 
-	function showscores($questions,$attempts,$testsettings) {
-		global $DBH,$regenonreattempt,$isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend;
+	function showscores($questions,&$attempts,$testsettings) {
+		global $DBH,$regenonreattempt,$reattempting,$isdiag,$allowregen,$isreview,$noindivscores,$reattemptduring,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend;
 
 		$total = 0;
 		$lastattempttotal = 0;
 		for ($i =0; $i < count($bestscores);$i++) {
 			if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
 			if (getpts($scores[$i])>0) { $lastattempttotal += getpts($scores[$i]);}
+			if (!$reattemptduring) {
+				if ($scores[$i]=='-1' || amreattempting($i)) {
+					//burn attempt
+					$attempts[$i]++;
+					$scores[$i] = 0;
+					$loc = array_search($i,$reattempting);
+					if ($loc!==false) {
+						array_splice($reattempting,$loc,1);
+					}
+				} else {
+					//clear out unans for multipart
+					$scores[$i] = str_replace('-1','0',$scores[$i]);
+				}
+			}
 		}
 		$totpossible = totalpointspossible($qi);
 		$average = round(100*((float)$total)/((float)$totpossible),1);
@@ -4347,5 +4401,16 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">", _('Return to Course Page'), "</a>\n";
 		}
 		echo '</p>';
+	}
+	function getSummaryConfirm() {
+		global $reattemptduring, $scores;
+		if (!$reattemptduring && in_array(-1,$scores)) {
+			$oc = ' onclick="return confirm(\'';
+			$oc .= _('Viewing the score summary will use up an attempt on any unanswered questions. Continue?');
+			$oc .= '\')" ';
+			return $oc;
+		} else {
+			return '';
+		}
 	}
 ?>

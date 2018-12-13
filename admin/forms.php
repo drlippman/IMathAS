@@ -300,6 +300,83 @@ switch($_GET['action']) {
 		break;
 	case "modify":
 	case "addcourse":
+		if ($_GET['action']=='modify') {
+			$query = "SELECT ic.*,iu.FirstName,iu.LastName FROM imas_courses AS ic ";
+			$query .= "JOIN imas_users AS iu on ic.ownerid=iu.id WHERE ic.id=:id";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':id'=>$_GET['id']));
+			if ($stm->rowCount()==0) {break;}
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
+		}
+
+		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
+		$stm->execute(array($groupid));
+		$hasGroupLTI = ($stm->fetchColumn() !== false);
+
+		if ($_GET['action']=='modify' && ($myrights < 40 || ($line['ownerid']!=$userid && $myrights<75))) {
+			//show limited info version
+			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=? AND userid=?");
+			$stm->execute(array($_GET['id'], $userid));
+			if ($stm->rowCount()==0) { 
+				echo "You don't have the authority for this action"; 
+				break;
+			}
+			if (isset($_GET['cid'])) {
+				$cid = Sanitize::courseId($_GET['cid']);
+				echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Course Settings</div>";
+			}
+			echo '<div id="headerforms" class="pagetitle"><h1>';
+			echo _('Course Settings');
+			echo '</h1></div>';
+			if ($line['ownerid']!=$userid) {
+				echo '<p>'.sprintf('You are a teacher in this course, but <b>%s</b> is the course owner, and the only one who can modify the course settings', 
+				  Sanitize::encodeStringForDisplay($line['FirstName'].' '.$line['LastName'])).'</p>';
+			}
+			echo "<div><span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($line['id'])."</span><br class=form>\n";
+			echo "<span class=form>Enrollment key:</span><span class=formright>".Sanitize::encodeStringForDisplay($line['enrollkey'])."</span><br class=form></div>\n";
+			if (isset($enablebasiclti) && $enablebasiclti==true) {
+				//Start grouping: LMS Integration
+				echo '<div class="block grouptoggle">';
+				echo '<img class="mida" src="../img/expand.gif" /> ';
+				echo 'LMS Integration (LTI)';
+				echo '</div>';
+				echo '<div class="blockitems hidden">';
+		
+				echo '<p>For integration setup instructions, visit the Course Items: Export page inside your course</p>';
+				
+				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
+					echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
+					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
+				} else {
+					if ($hasGroupLTI) {
+						echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+						echo 'If so, you will not need to set up a course-level configuration. ';
+						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">Show course level key/secret</a></p>';
+						echo '<div id="courselevelkey" style="display:none">';
+					} else {
+						echo '<div>';
+					}
+					
+					echo '<span class="form">LTI Key:</span>';
+					echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
+					echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
+					echo '</span><br class="form" />';
+					
+					echo '<span class="form">LTI Secret:</span>';
+					echo '<span class="formright">'.Sanitize::encodeStringForDisplay($line['ltisecret']).'</span><br class="form" />';
+					
+					if (!empty($CFG['LTI']['showURLinSettings'])) {
+						echo '<span class="form">LTI Launch URL (if needed):</span>';
+						echo '<span class="formright">'.Sanitize::encodeStringForDisplay($basesiteurl).'/bltilaunch.php</span><br class="form" />';
+					}
+					echo '</div>';
+				}
+				echo '</div>'; //end LTI grouping
+			}
+			break;
+		}
+		
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
 
 		$isadminview = false;
@@ -332,8 +409,6 @@ switch($_GET['action']) {
 			$courseid = $line['id'];
 			$name = $line['name'];
 			$ekey = $line['enrollkey'];
-			$hideicons = $line['hideicons'];
-			$picicons = $line['picicons'];
 			$allowunenroll = $line['allowunenroll'];
 			$copyrights = $line['copyrights'];
 			$msgset = $line['msgset'];
@@ -365,8 +440,6 @@ switch($_GET['action']) {
 			$courseid = _("Will be assigned when the course is created");
 			$name = "";
 			$ekey = "";
-			$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
-			$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
 			$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
 			//0 no un, 1 allow un;  0 allow enroll, 2 no enroll
 
@@ -623,17 +696,38 @@ switch($_GET['action']) {
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
 	
-			echo '<p>For integration setup instructions, visit the Course Items: Export page inside your course</p>';
+			echo '<p>View <a target="_blank" href="../help.php?section=lti">integration setup instructions</a></p>';
 			
 			if (isset($_GET['id'])) {
-				echo '<span class="form">LTI Key:</span>';
-				echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
-				echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
-				echo '</span><br class="form" />';
-				
-				echo '<span class="form">LTI Secret (max 10 chars)</span>';
-				echo '<span class="formright"><input name="ltisecret" type="text" value="'.Sanitize::encodeStringForDisplay($ltisecret).'" maxlength="10"/> ';
-				echo '</span><br class="form" />';
+				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
+					echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
+					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
+				} else {
+					if ($hasGroupLTI) {
+						echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+						echo 'If so, you will not need to set up a course-level configuration. ';
+						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">Show course level key/secret</a></p>';
+						echo '<div id="courselevelkey" style="display:none">';
+					} else {
+						echo '<div>';
+					}
+					
+					echo '<span class="form">LTI Key:</span>';
+					echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
+					echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
+					echo '</span><br class="form" />';
+					
+					echo '<span class="form">LTI Secret (max 10 chars)</span>';
+					echo '<span class="formright"><input name="ltisecret" type="text" value="'.Sanitize::encodeStringForDisplay($ltisecret).'" maxlength="10"/> ';
+					echo '</span><br class="form" />';
+					
+					echo '</div>';
+				}
+				if (!empty($CFG['LTI']['showURLinSettings'])) {
+					echo '<span class="form">LTI Launch URL (if needed):</span>';
+					echo '<span class="formright">'.Sanitize::encodeStringForDisplay($basesiteurl).'/bltilaunch.php</span><br class="form" />';
+				}
 			}
 			
 			echo '<span class="form">Allow the LMS to set assessment due dates?<br/><span class="small">(Only supported by Canvas)</span></span>';
@@ -1213,14 +1307,14 @@ switch($_GET['action']) {
 		if ($from=='admin2') {
 			echo '<tr class="even"><td><a href="admin2.php?groupdetails=0">'._('Default Group').'</a></td><td></td><td></td></tr>';
 		}
-		$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
+		$stm = $DBH->query("SELECT ig.id,ig.name,COUNT(iu.id) as ucnt FROM imas_groups AS ig LEFT JOIN imas_users AS iu ON ig.id=iu.groupid GROUP BY ig.id ORDER BY ig.name");
 		$alt = 1;
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($alt==0) {echo "<tr class=\"even\">"; $alt=1;} else {echo "<tr class=\"odd\">"; $alt=0;}
 			if ($from=='admin2') {
-				echo '<td><a href="admin2.php?groupdetails='.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</a></td>';
+				echo '<td><a href="admin2.php?groupdetails='.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</a> ('.Sanitize::onlyInt($row[2]).')</td>';
 			} else {
-				echo "<td>".Sanitize::encodeStringForDisplay($row[1])."</td>";
+				echo "<td>".Sanitize::encodeStringForDisplay($row[1]).' ('.Sanitize::onlyInt($row[2]).')</td>';
 			}
 			printf("<td><a href=\"forms.php?action=modgroup&id=%s\">Modify</a></td>\n",
 				Sanitize::encodeUrlParam($row[0]));

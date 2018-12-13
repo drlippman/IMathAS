@@ -171,8 +171,14 @@
 			}
 		}
 	}
+	
 	echo "</td></tr><tr><td><b>Sent:</b></td><td>$senddate</td></tr>";
-	echo "<tr><td><b>Subject:</b></td><td>".Sanitize::encodeStringForDisplay($line['title'])."</td></tr>";
+	echo "<tr><td><b>Subject:</b></td><td>".Sanitize::encodeStringForDisplay($line['title']);
+	if ($myrights>=20 && preg_match('/Question\s+ID\s+(\d+),\s+seed\s+(\d+)/',$line['message'],$matches)) {
+		echo " <span class=small><a href=\"$imasroot/course/testquestion.php?cid=0&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
+		echo " | <a href=\"$imasroot/course/moddataset.php?cid=0&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
+	}
+	echo "</td></tr>";
 	echo "</tbody></table>";
 	echo "<div style=\"border: 1px solid #000; margin: 10px; padding: 10px;\">";
 	if (($p = strpos($line['message'],'<hr'))!==false) {

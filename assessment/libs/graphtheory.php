@@ -21,7 +21,7 @@
 //    position of vertex labels.
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable","graphgetcriticalpath");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphcircuittostringans","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable","graphgetcriticalpath");
 
 ///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
@@ -330,9 +330,10 @@ function graphkruskal($g) {
 	return $g;
 }
 
-//graphrepeatednearestneighbor(g)
+//graphrepeatednearestneighbor(g, [multi])
 //returns a hamiltonian circuit graph using repeated nearest neighbor
-function graphrepeatednearestneighbor($g) {
+//set multi to true to return an array of graphs if found
+function graphrepeatednearestneighbor($g, $multi=false) {
 	$n = count($g[0]);
 	$minval = 1e16;
 	for ($i=0; $i<$n; $i++) {
@@ -340,9 +341,16 @@ function graphrepeatednearestneighbor($g) {
 		if ($v<$minval) {
 			$minat = array($i);
 			$minval = $v;
-			$curming = $ng;
+			if ($multi) {
+				$curming = array($ng);
+			} else {
+				$curming = $ng;
+			}
 		} else if ($v==$minval) {
 			$minat[] = $i;
+			if ($multi) {
+				$curming[] = $ng;
+			}
 		}
 	}
 	return array($curming,$minat);
@@ -585,6 +593,45 @@ function graphshortestpath($g,$op,$start,$end,$type=0) {
 		}
 		return array($path,$dist[$start]);
 	}
+}
+
+//graphcircuittostringans(g, [labels, start])
+//converts graph or array of graphs containing a circuit to
+//a string of labels that can be used as an $answer
+function graphcircuittostringans($gs, $lbl='', $start=0) {
+	if ($lbl=='') {
+		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	}
+	if (!is_array($gs[0][0])) {//is not array of graphs
+		$gs = array($gs);
+	}
+	$out = array();
+	foreach ($gs as $g) {
+		$n = count($g[0]);
+		$order = array($lbl[$start]);
+		$cur = $start;
+		$last = -1;
+		while (count($order)<$n) {
+			for ($i=0;$i<$n;$i++) {
+				if (($g[$cur][$i]>0 || $g[$i][$cur]>0)&& $i!=$last) {
+					$order[] = $lbl[$i];
+					$last = $cur;
+					$cur = $i;
+					break;
+				}
+			}
+			if ($i==$n) {
+				break;
+			}
+		}
+		$order[] = $lbl[$start];
+		$str = implode("",$order);
+		if (!in_array($str, $out)) {
+			$out[] = $str;
+			$out[] = strrev($str);
+		}
+	}
+	return implode(' or ', $out);
 }
 
 //graphcircuittoarray(g,[start])

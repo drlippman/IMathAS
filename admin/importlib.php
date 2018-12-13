@@ -3,7 +3,6 @@
 //(c) 2006 David Lippman
 
 //boost operation time
-@set_time_limit(0);
 ini_set("max_input_time", "3600");
 ini_set("max_execution_time", "3600");
 ini_set("memory_limit", "104857600");
@@ -546,8 +545,7 @@ if ($myrights < 100) {
 		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($uploadfile);
 
 		if (!isset($parents)) {
-			$page_fileErrorMsg .=  "<p>This file does not appear to contain a library structure.  It may be a question set export. ";
-			$page_fileErrorMsg .=  "Try the <a href=\"import.php?cid=$cid\">Import Question Set</a> page</p>\n";
+			$page_fileErrorMsg .=  "<p>This file does not appear to contain a library structure.</p>";
 		}
 
 	}
@@ -614,10 +612,7 @@ if ($overwriteBody==1) {
 			} else {
 				echo $page_fileHiddenInput;
 ?>
-			<p>This page will import entire questions libraries with heirarchy structure.
-			To import specific questions into existing libraries, use the
-			<a href="import.php?cid=<?php echo $cid ?>">Question Import</a> page
-			</p>
+			<p>This page will import entire questions libraries with heirarchy structure.</p>
 
 <?php echo Sanitize::encodeStringForDisplay($packname); ?>
 

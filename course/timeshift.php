@@ -3,9 +3,9 @@
 //(c) 2006 David Lippman
 
 //boost operation time
-@set_time_limit(0);
-ini_set("max_input_time", "3600");
-ini_set("max_execution_time", "3600");
+
+ini_set("max_input_time", "120");
+ini_set("max_execution_time", "120");
 
 /*** master php includes *******/
 require("../init.php");

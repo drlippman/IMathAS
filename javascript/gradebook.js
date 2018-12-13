@@ -32,12 +32,77 @@ function chglinktoggle() {
 	gbmode += 100*$("#linktoggle").val();
 	window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
 }
+function setupGBpercents() {
+  var colpts = [];
+  $("thead th").each(function(i,el) { 
+  	if (p = el.innerHTML.match(/(\d+)(\s*|&nbsp;)pts/)) {
+  		colpts[i] = p[1];
+  	} else {
+  		colpts[i] = 100;
+  	}
+  });
+  $("tbody td").each(function(i,el) {
+  	var a = $(el).find("a");
+  	if (a.length>0) {
+  	  el = a[0];
+  	} else {
+  		a = $(el).find("div");
+  		if (a.length>0) {
+  			el = a[0];
+  		}
+  	}
+    if (p = el.textContent.match(/^\s*(\d+\.?\d*)\s*\/\s*(\d+\.?\d*)\s*$/)) {
+      var pct = p[2]>0?Math.round( 1000*p[1]/p[2] )/10:0;
+      $(el).empty().append($("<span/>", {
+        "data-ptv": p[0],
+        "data-pct": pct,
+        text: gbmod.pts==0?p[0]:pct+"%",
+        title: gbmod.pts==1?p[0]+"pts":pct+"%"
+      }));    
+    } else if (p = el.textContent.match(/^\s*(\d+(\.\d*)?)\s*$/)) {
+      var pct = colpts[i%colpts.length]>0?Math.round( 1000*p[1]/colpts[i%colpts.length] )/10:0;
+      $(el).empty().append($("<span/>", {
+        "data-ptv": p[0],
+        "data-pct": pct,
+        text: gbmod.pts==0?p[0]:pct+"%",
+        title: gbmod.pts==1?p[0]+"pts":pct+"%",
+      }));  
+    }
+ });
+};
 $(function() {
 	$("a[data-links]").on("click",function(e) {
 		e.preventDefault();
 		var gbmode = gbmodebase - 100*gbmod.links;
-		gbmode += 100*$(this).attr("data-links");;
+		gbmode += 100*$(this).attr("data-links");
 		window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
+	});
+	$("a[data-pts]").on("click",function(e) {
+		e.preventDefault();
+		var val = 1*$(this).attr("data-pts");
+		if (val != gbmod.pts) {
+			var gbmode = gbmodebase - 400000*gbmod.pts;
+			gbmode += 400000*val;
+			$("a[data-pts]").parent().removeClass("active");
+			$(this).parent().addClass("active");
+			if (val == 0) { //show points
+				$("span[data-ptv]").each(function() {
+					$(this).text($(this).attr("data-ptv"))
+					 .attr("title", $(this).attr("data-pct")+"%");
+				});                            
+			} else { //show percents
+				$("span[data-pct]").each(function() {
+					$(this).text($(this).attr("data-pct")+"%")
+					 .attr("title", $(this).attr("data-ptv")+"pts");
+				});
+			}
+			$.ajax({
+				url: basesite+"?cid="+cid+"&setgbmodeonly=true&gbmode="+gbmode,
+				type: "GET"
+			}).done(function( data ) {
+				gbmod.pts = val;
+			});
+		}
 	});
 	$("a[data-pics]").on("click",function(e) {
 		e.preventDefault();
@@ -56,6 +121,7 @@ $(function() {
 		var val=$(this).attr("data-hdrs");
 		if (val==0) {
 			ts.unlock();
+			document.cookie = "skiplhdrwarn_"+cid+"=0";
 		} else {
 			ts.lock();
 		}
@@ -132,7 +198,7 @@ function conditionalColor(table,type,low,high) {
 					} else {
 						var v = tds[i].textContent;
 					}
-					if (k = v.match(/\(([\d\.]+)%\)/)) {
+					if (k = v.match(/([\d\.]+)%/)) {
 						var perc = parseFloat(k[1]);
 					} else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
 						if (k[2]==0) { var perc = 0;} else { var perc= Math.round(1000*parseFloat(k[1])/parseFloat(k[2]))/10;}

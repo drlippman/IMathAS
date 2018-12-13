@@ -3,7 +3,7 @@
 //  This file is always included from listusers.php or gradebook.php
 //  The isset($teacherid) check blocks access if accessed directly
 //(c) 2013 David Lippman
-@set_time_limit(0);
+
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 

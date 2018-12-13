@@ -420,7 +420,7 @@
 				$stm->execute(array(':groupid'=>$groupid, ':qsetid'=>$qsetid));
 			} else {
 				//unassigned, or owner and lib not closed or mine
-				$query = "SELECT ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
+				$query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
 				$query .= "ili.libid=il.id AND il.deleted=0 WHERE ili.qsetid=:qsetid AND ili.deleted=0 AND ";
 				$query .= "(ili.libid=0 OR (ili.ownerid=:ownerid AND (il.ownerid=:ownerid2 OR il.userights%3<>1)))";
 

@@ -130,7 +130,7 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['aid'])) {
-		$aid = Sanitize::onlyInt($_GET['aid']);
+		$aid = Sanitize::onlyInt($_POST['aid']);
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
 		$stm->execute(array($aid));
 		$destcid = $stm->fetchColumn(0);

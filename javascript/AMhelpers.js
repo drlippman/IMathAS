@@ -5,12 +5,14 @@
 function updateeeddpos() {}
 function updateehpos() {}
 
+var onlyAscii = /^[\u0000-\u007f]*$/;
+
 var LivePreviews = [];
 function setupLivePreview(qn) {
 	if (!LivePreviews.hasOwnProperty(qn)) {
 		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
 			LivePreviews[qn] = {
-			  delay: (mathRenderer=="MathJax"?100:20),   // delay after keystroke before updating
+			  delay: (mathRenderer=="MathJax"?100:0),   // delay after keystroke before updating
 			  finaldelay: 1000,
 			  preview: null,     // filled in by Init below
 			  buffer: null,      // filled in by Init below
@@ -60,7 +62,7 @@ function setupLivePreview(qn) {
 				      );
 			      } else if (mathRenderer=="Katex") {
 			      	      renderMathInElement(this.buffer);
-				      if ($(this.buffer).children(".mj").length>0) {//has MathJax elements
+				      if (typeof MathJax != "undefined" && $(this.buffer).children(".mj").length>0) {//has MathJax elements
 					      MathJax.Hub.Queue(["PreviewDone",this]);
 				      } else {
 					      this.PreviewDone();
@@ -73,6 +75,7 @@ function setupLivePreview(qn) {
 			  },
 
 			  preformat: function(text) {
+			  	text = normalizemathunicode(text);
 			  	if (intcalctoproc.hasOwnProperty(qn)) {
 			  		if (!calcformat[qn].match(/inequality/)) {
 			  			text = text.replace(/U/g,"uu");
@@ -94,6 +97,7 @@ function setupLivePreview(qn) {
 			  			text = text.replace(/(x|X|\u00D7)/,"xx");
 			  		}
 			  	}
+			  	text = text.replace(/[^\u0000-\u007f]/g, '?');
 			  	return text;
 			  },
 
@@ -125,8 +129,12 @@ function setupLivePreview(qn) {
 			  }
 
 			};
-			LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
-			LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
+			if (typeof MathJax != "undefined") {
+				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
+			} else {
+				LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
+			}
 			LivePreviews[qn].Init();
 		} else {
 			LivePreviews[qn] = {
@@ -212,8 +220,8 @@ function calculate(inputId,outputId,format) {
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/(x|X|\u00D7)/,"xx");
 		  } else {
-		  	  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
-		  	  str = str.replace(/\s/g,'');
+		  	  //str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
+		  	  str = str.replace(/^\s+/,'').replace(/\s+$/,'');
 		  }
 		  err += syntaxcheckexpr(str,format);
 		  try {
@@ -228,12 +236,13 @@ function calculate(inputId,outputId,format) {
 			  if (format.indexOf('scinot')!=-1) {
 			  	  evalstr = evalstr.replace("xx","*");
 			  }
-			  var res = eval(prepWithMath(mathjs(evalstr)));
+			  var res = scopedmatheval(evalstr);
 		  } catch(e) {
 		  	  err = _("syntax incomplete")+'. '+err;
 		  	  res = NaN;
 		  }
-		  if (!isNaN(res) && res!="Infinity") {
+		  str = str.replace(/[^\u0000-\u007f]/g, '?');
+		  if (!isNaN(res) && res!="Infinity" && res!=='') {
 			  if (format.indexOf('showval')==-1) {
 				  str = "`"+str+"` " + wrapAMnotice(err);
 			  } else {
@@ -309,7 +318,7 @@ function intcalculate(inputId,outputId,format) {
   if (format.indexOf('mixed')!=-1) {
 	  fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
   } else {
-	  fullstr = fullstr.replace(/\s+/g,'');
+	  fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
   }
   fullstr = normalizemathunicode(fullstr);
   if (fullstr.match(/DNE/i)) {
@@ -369,9 +378,9 @@ function intcalculate(inputId,outputId,format) {
 				  res = NaN;
 				  err += singlevalsyntaxcheck(vals[j], format);
 				  if (format.indexOf('mixed')!=-1) {
-					  vals[j] = vals[j].replace(/_/g,' ');
+					  vals[j] = vals[j].replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 				  } else {
-					  vals[j] = vals[j].replace(/\s/g,'');
+					  vals[j] = vals[j].replace(/^\s+/,'').replace(/\s+$/,'');
 				  }
 				  err += syntaxcheckexpr(vals[j], format);
 
@@ -381,12 +390,12 @@ function intcalculate(inputId,outputId,format) {
 					  	if (format.indexOf('mixed')!=-1) {
 					  		toeval = toeval.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 					  	}
-					  	var res = eval(prepWithMath(mathjs(toeval)));
+					  	var res = scopedmatheval(toeval);
 					  } catch(e) {
 					  	err = _("syntax incomplete")+". ";
 					  }
 				  }
-				  if (!isNaN(res) && res!="Infinity") {
+				  if (!isNaN(res) && res!="Infinity" && res!=='') {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
 						  vals[j] = vals[j];
 						  calcvals[j] = (Math.abs(res)<1e-15?0:res).toString();//+wrapAMnotice(err);
@@ -451,7 +460,7 @@ function intcalculate(inputId,outputId,format) {
 		 }
 	 }
   }
-
+  fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
   var qn = outputId.substr(1);
   setupLivePreview(qn);
   LivePreviews[qn].RenderNow(fullstr);
@@ -474,18 +483,23 @@ function ntuplecalc(inputId,outputId,format) {
 	if (format.indexOf('mixed')!=-1) {
 		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
-		fullstr = fullstr.replace(/\s+/g,'');
+		fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
 	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
 		outcalced = 'DNE';
 		outstr = 'DNE';
+	} else if (fullstr.match(/^\s*oo\s*$/i)) {
+		fullstr = fullstr.toLowerCase();
+		outcalced = 'oo';
+		outstr = '`oo`';
 	} else {
 		var outcalced = '';
 		var NCdepth = 0;
 		var lastcut = 0;
 		var err = "";
 		var notationok = true;
+		var res = NaN;
 		if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
 			notationok=false;
 		}
@@ -519,11 +533,11 @@ function ntuplecalc(inputId,outputId,format) {
 						if (format.indexOf('mixed')!=-1) {
 							sub = sub.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 						}
-						var res = eval(prepWithMath(mathjs(sub)));
+						res = scopedmatheval(sub);
 					} catch(e) {
 						err += _("syntax incomplete")+". ";
 					}
-					if (!isNaN(res) && res!="Infinity") {
+					if (!isNaN(res) && res!="Infinity" && res!=='') {
 						outcalced += res;
 					} else {
 						outcalced += _("undefined");
@@ -539,6 +553,7 @@ function ntuplecalc(inputId,outputId,format) {
 		if (notationok==false) {
 			err += _("Invalid notation")+". ";
 		}
+		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
 		//outstr = '`'+fullstr+'` = '+outcalced;
 		if (format.indexOf('showval')==-1 || notationok==false) {
 			 outstr = '`'+fullstr+'`'+". " + wrapAMnotice(err);
@@ -571,7 +586,7 @@ function complexcalc(inputId,outputId,format) {
 	if (format.indexOf('mixed')!=-1) {
 		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
-		fullstr = fullstr.replace(/\s+/g,'');
+		fullstr = fullstr.replace(/^\s+/,'').replace(/\s+$/,'');
 	}
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -620,6 +635,7 @@ function complexcalc(inputId,outputId,format) {
 				break;
 			}
 		}
+		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
 		if (format.indexOf('showval')==-1) {
 			outstr = '`'+fullstr+'`'+". "+wrapAMnotice(err);
 		} else {
@@ -759,20 +775,29 @@ function parsecomplex(v) {
 	}
 }
 
-function matrixcalc(inputId,outputId,rows,cols) {
+function matrixcalc(inputId,outputId,rows,cols,format) {
 
 	function calced(estr) {
 		var err='';
 		try {
-			var res = eval(prepWithMath(mathjs(estr)));
+			var res = scopedmatheval(estr);
 		} catch(e) {
-			err = _("syntax incomplete");
+			err = _("syntax incomplete")+". ";
 		}
-		if (!isNaN(res) && res!="Infinity")
+		if (!isNaN(res) && res!="Infinity" && res!=='') {
 			estr = (Math.abs(res)<1e-15?0:res)+err;
-		else if (estr!="") estr = _("undefined");
-		return estr;
+		} else if (estr!="") {
+			err = _("undefined")+". ";
+			estr = err;
+		}
+		return [estr, err];
 	}
+	var err = "";
+	var calcout;
+	if (typeof format != 'string') {
+		format = '';
+	}
+
 	if (rows!=null && cols!=null) {
 		var count=0;
 		var str = "[";
@@ -785,7 +810,18 @@ function matrixcalc(inputId,outputId,rows,cols) {
 				if (col>0) {str += ","; calcstr += ",";}
 				val = normalizemathunicode(document.getElementById(inputId+'-'+count).value);
 				str += val;
-				calcstr += calced(val);
+				//calcstr += calced(val);
+				calcout = calced(val);
+				
+				calcout[1] += syntaxcheckexpr(val,format);
+				if (calcout[1] == '') {
+					calcout[1] += singlevalsyntaxcheck(val,format);
+				}
+				if (err=='') {
+					err = calcout[1];
+				}
+				
+				calcstr += calcout[0];
 				count++;
 			}
 			str += ")";
@@ -817,14 +853,29 @@ function matrixcalc(inputId,outputId,rows,cols) {
 		for (var i=0; i<calclist.length; i++) {
 			calclist2 = calclist[i].split(',');
 			for (var j=0; j<calclist2.length; j++) {
-				calclist2[j] = calced(calclist2[j]);
+				//calclist2[j] = calced(calclist2[j]);
+				calcout = calced(calclist2[j]);
+				calcout[1] += syntaxcheckexpr(calclist2[j],format);
+				if (calcout[1] == '') {
+					calcout[1] += singlevalsyntaxcheck(calclist2[j],format);
+				}
+				if (err=='') { 
+					err = calcout[1];
+				}
+				
+				calclist2[j] = calcout[0];
 			}
 			calclist[i] = calclist2.join(',');
 		}
 		calcstr = '[('+calclist.join('),(')+')]';
 	}
 	//calcstr = calcstr.replace(/([^\[\(\)\],]+)/g, calced);
-	str = "`"+str+"` = `"+calcstr+"`";
+	str = str.replace(/[^\u0000-\u007f]/g, '?');
+	if (format.indexOf("showval")==-1) {
+		str = "`"+str+"`. "+err;
+	} else {
+		str = "`"+str+"` = `"+calcstr+"`. "+err;
+	}
 
 	if (outputId != null) {
 		var outnode = document.getElementById(outputId);
@@ -966,7 +1017,16 @@ function AMnumfuncPrepVar(qn,str) {
   }
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
-
+  
+  //Correct rendering when f or g is a variable not a function
+  if (vl.match(/\bf\b/) && !fl.match(/\bf\b/)) {
+  	  dispstr = dispstr.replace(/([^a-zA-Z])f\^([\d\.]+)([^\d\.])/g, "$1f^$2{::}$3");
+  	  dispstr = dispstr.replace(/([^a-zA-Z])f\(/g, "$1f{::}(");
+  }
+  if (vl.match(/\bg\b/) && !fl.match(/\bg\b/)) {
+  	  dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
+  	  dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
+  }
   return [str,dispstr,vars.join("|")];
 }
 
@@ -977,6 +1037,7 @@ function AMpreview(inputId,outputId) {
   var str = strprocess[0];
   var dispstr = strprocess[1];
   var vl = strprocess[2];
+
   //the following does a quick syntax check of the formula
 
   var fl = flist[qn];
@@ -1018,6 +1079,7 @@ function AMpreview(inputId,outputId) {
 	  }
 	  tstpt++;
   }
+
   var formaterr = syntaxcheckexpr(str,"",vl);
   if (isNaN(res) || res=="Infinity") {
   	  err = _("syntax error");
@@ -1029,6 +1091,12 @@ function AMpreview(inputId,outputId) {
   	  	  err += ". "+formaterr;
   	  }
   }
+  
+  if (!onlyAscii.test(str)) {
+  	  err += ". "+_("Your answer contains an unrecognized symbol");
+  	  dispstr = dispstr.replace(/[^\u0000-\u007f]/g, '?');
+  }
+
   if (iseqn[qn]==1 && isnoteqn) { err = _("syntax error: this is not an equation");}
   else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression");}
   //outnode.appendChild(document.createTextNode(" " + err));
@@ -1064,13 +1132,17 @@ function singlevalsyntaxcheck(str,format) {
 		 return '';
 	} else if (str.match(/oo$/) || str.match(/oo\W/)) {
 		 return '';
+	} else if (format.indexOf('allowmixed')!=-1 &&
+		str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))\s*$/)) {
+		//if allowmixed and it's mixed, stop checking
+		return '';
 	} else if (format.indexOf('fracordec')!=-1) {
-		  str = str.replace(/\s/g,'');
+		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
 		  if (!str.match(/^\-?\(?\d+\s*\/\s*\-?\d+\)?$/) && !str.match(/^\-?\d+$/) && !str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
 			return (_(" invalid entry format")+". ");
 		  }
 	} else if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1) {
-		  str = str.replace(/\s/g,'');
+		  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2").replace(/\s/g,'');
 		 // if (!str.match(/^\s*\-?\(?\d+\s*\/\s*\-?\d+\)?\s*$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 		  if (!str.match(/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/) && !str.match(/^\(?\d+\)?\/\(?\-?\d+\)?$/) && !str.match(/^\s*?\-?\d+\s*$/)) {
 			return (_("not a valid fraction")+". ");
@@ -1094,7 +1166,9 @@ function singlevalsyntaxcheck(str,format) {
 		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
 			return (_(" not a valid integer or decimal number")+". ");
 		}
-	}
+	} else if (!onlyAscii.test(str)) {
+		return _("Your answer contains an unrecognized symbol")+". ";
+  	}
 	return '';
 }
 
@@ -1104,6 +1178,9 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += _("no trig functions allowed")+". ";
 	  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
 		  err += _("no decimals allowed")+". ";
+	  } else if (format.indexOf('mixed')==-1 &&
+		str.match(/\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/)) {
+		err += _("mixed numbers are not allowed")+". ";
 	  }
 	  var Pdepth = 0; var Bdepth = 0; var Adepth = 0;
 	  for (var i=0; i<str.length; i++) {
@@ -1248,11 +1325,11 @@ function doonsubmit(form,type2,skipconfirm) {
 							  	  if (calcformat[qn].indexOf('mixed')!=-1) {
 							  	  	  vals[j] = vals[j].replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
 							  	  }
-							  	  var res = eval(prepWithMath(mathjs(vals[j])));
+							  	  var res = scopedmatheval(vals[j]);
 							  } catch(e) {
 							  	  err = "syntax incomplete";
 							  }
-							  if (!isNaN(res) && res!="Infinity") {
+							  if (!isNaN(res) && res!="Infinity" && res!=='') {
 								  vals[j] = (Math.abs(res)<1e-15?0:res)+err;
 							  }
 						  }
@@ -1309,11 +1386,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			} else if (str.match(/DNE/i)) {
 				var res = str.toUpperCase();
 			} else {
-				try {
-					var res = eval(prepWithMath(mathjs(str)));
-				} catch(e) {
-					var res = '';
-				}
+				var res = scopedmatheval(str);
 			}
 			strarr[sc] = res;
 		}
@@ -1396,12 +1469,21 @@ function doonsubmit(form,type2,skipconfirm) {
 }
 
 function scopedeval(c) {
-	var res;
 	try {
-		res = eval(c);
-		return res;
+		return eval(c);
 	} catch(e) {
 		return "synerr";
+	}
+}
+
+function scopedmatheval(c) {
+	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
+		return '';
+	}
+	try {
+		return eval(prepWithMath(mathjs(c)));
+	} catch(e) {
+		return '';
 	}
 }
 

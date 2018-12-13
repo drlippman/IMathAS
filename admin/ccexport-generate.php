@@ -160,8 +160,9 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 		if (is_array($item)) {
 			if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
 				$mod_depth_change = 1;
+				$blockid = uniqid();
 				if ($mod_depth>0 || strlen($ind)>2) {
-					$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
+					$canvout .= '<item identifier="BLOCK'.$blockid.'">'."\n";
 					$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 					$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$canvout .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
@@ -182,7 +183,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 						$module_meta .= '</items></module>';
 					}
 					$inmodule = true;
-					$module_meta .= '<module identifier="BLOCK'.$item['id'].'">'."\n";
+					$module_meta .= '<module identifier="BLOCK'.$blockid.'">'."\n";
 					$module_meta .= '  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$module_meta .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
 					if ($item['avail'] == 1 && $item['SH']{0} == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
@@ -190,7 +191,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					}
 					$module_meta .= '  <items>';
 				}
-				$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
+				$out .= $ind.'<item identifier="BLOCK'.$blockid.'">'."\n";
 				$out .= $ind.'  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $mod_depth+$mod_depth_change);
 				$out .= $ind.'</item>'."\n";
@@ -398,7 +399,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row[8]==-1) {
 					require_once("../includes/updateptsposs.php");
-					$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);	
+					$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);
 				}
 				//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
 				$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
@@ -429,7 +430,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 							$aitemcnt[$k] = 1;
 						}
 					}
-					
+
 					mkdir($newdir.'/assn'.$iteminfo[$item][1]);
 					$fp = fopen($newdir.'/assn'.$iteminfo[$item][1].'/assignment_settings.xml','w');
 					fwrite($fp,'<assignment xmlns="http://canvas.instructure.com/xsd/cccv1p0" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">'."\n");
@@ -565,13 +566,30 @@ if ($linktype=='canvas') {
 		fwrite($fp,'<blti:vendor><lticp:code>IMathAS</lticp:code><lticp:name>'.$installname.'</lticp:name></blti:vendor>');
 		fwrite($fp,'<blti:extensions platform="canvas.instructure.com">');
 		fwrite($fp,' <lticm:property name="privacy_level">public</lticm:property>');
-		fwrite($fp,' <lticm:property name="domain">'.$domain.'</lticm:property>');
+		fwrite($fp,' <lticm:property name="domain">'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']).'</lticm:property>');
+		/*
+		//Canvas-specific extension
 		fwrite($fp,' <lticm:options name="resource_selection">
 			<lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php</lticm:property>
 			<lticm:property name="text">Pick an Assessment</lticm:property>
 			<lticm:property name="selection_width">500</lticm:property>
 			<lticm:property name="selection_height">300</lticm:property>
 		      </lticm:options>');
+		*/
+		//Deep Linking extension
+		fwrite($fp,' <lticm:options name="assignment_selection">
+			 <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+			 <lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=assn</lticm:property>
+		     <lticm:property name="selection_width">500</lticm:property>
+		     <lticm:property name="selection_height">300</lticm:property>
+		    </lticm:options>
+		    <lticm:options name="link_selection">
+			 <lticm:property name="message_type">ContentItemSelectionRequest</lticm:property>
+			 <lticm:property name="url">' . $GLOBALS['basesiteurl'] . '/bltilaunch.php?ltiseltype=link</lticm:property>
+			 <lticm:property name="selection_width">500</lticm:property>
+		     <lticm:property name="selection_height">300</lticm:property>
+		    </lticm:options>
+		    <lticm:property name="session_setup_url">' . $GLOBALS['basesiteurl'] . '/ltisessionsetup.php</lticm:property>');
 		fwrite($fp,'</blti:extensions>');
 		fwrite($fp,'<blti:custom>');
 		fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');
@@ -586,7 +604,7 @@ if ($linktype=='canvas') {
 	mkdir($newdir.'/non_cc_assessments');
 	mkdir($newdir.'/course_settings');
 	file_put_contents($newdir.'/course_settings/canvas_export.txt', "Q: Why do pandas prefer Cartesian coordinates? A: Because they're not polar bears");
-	
+
 	$fp = fopen($newdir.'/course_settings/assignment_groups.xml','w');
 	fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>'."\n");
 	fwrite($fp, '<assignmentGroups xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">'."\n");
@@ -621,9 +639,9 @@ if ($linktype=='canvas') {
 	}
 	fwrite($fp, '</course>');
 	fclose($fp);
-	
+
 	if (dir_is_empty($newdir.'/web_resources')) {
-		rmdir($newdir.'/web_resources');	
+		rmdir($newdir.'/web_resources');
 	}
 }
 
@@ -731,10 +749,10 @@ rrmdir($newdir);
 $archive_file_name = 'CCEXPORT'.$cid.'.imscc';
 //echo "<br/><a href=\"$imasroot/course/files/CCEXPORT$cid.imscc\">Download</a><br/>";
 //echo "Once downloaded, keep things clean and <a href=\"ccexport.php?cid=$cid&delete=true\">Delete</a> the export file off the server.";
-header("Content-type: application/vnd.ims.imsccv1p1"); 
+header("Content-type: application/vnd.ims.imsccv1p1");
 header("Content-Disposition: attachment; filename=$archive_file_name");
 header("Content-length: " . filesize($path.'/'.$archive_file_name));
-header("Pragma: no-cache"); 
-header("Expires: 0"); 
+header("Pragma: no-cache");
+header("Expires: 0");
 readfile($path.'/'.$archive_file_name);
 unlink($path.'/'.$archive_file_name);

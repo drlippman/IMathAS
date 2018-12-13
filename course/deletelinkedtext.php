@@ -83,8 +83,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		exit;
 	} else {
-		$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
-		$stm->execute(array(':id'=>$textid));
+		$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$textid, ':cid'=>$cid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

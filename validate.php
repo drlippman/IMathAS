@@ -390,9 +390,12 @@
 		$sessiondata['graphdisp'] = $_GET['graphdisp'];
 		writesessiondata();
 	}
-	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?r=".Sanitize::randomQueryStringParam());
-		exit;
+	if (isset($sessiondata['isdiag'])) { // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+		$urlparts = parse_url($_SERVER['PHP_SELF']);
+		if (!in_array(basename($urlparts['path']),array('showtest.php','ltiuserprefs.php'))) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?r=".Sanitize::randomQueryStringParam());
+			exit;
+		}
 	}
 
 	if (isset($sessiondata['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {

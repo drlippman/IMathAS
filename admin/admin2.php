@@ -86,8 +86,8 @@ if ($myrights < 75) {
     foreach ($words as $v) {
       $likearr[] = '%'.$v.'%';
     }
-    $likes = implode(' OR ', array_fill(0, count($words), 'name LIKE ?'));
-    $stm = $DBH->prepare("SELECT id,name FROM imas_groups WHERE $likes");
+    $likes = implode(' OR ', array_fill(0, count($words), 'ig.name LIKE ?'));                                                                                              
+    $stm = $DBH->prepare("SELECT ig.id,ig.name,COUNT(iu.id) as ucnt FROM imas_groups AS ig LEFT JOIN imas_users AS iu ON ig.id=iu.groupid WHERE $likes GROUP BY ig.id ORDER BY ig.name");
     $stm->execute($likearr);
     $possible_groups = array();
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -244,14 +244,23 @@ if ($overwriteBody==1) {
 	echo '<table class="gb" id="myTable">';
         echo '<thead><tr>';
         echo '<th>'._('Group').'</th>';
+        echo '<th>'._('Modify').'</th>';
+        echo '<th>'._('Delete').'</th>';
         echo '</tr></thead>';
         echo '<tbody>';
         $alt = 0;
         foreach ($possible_groups as $group) {
+          $grpid = Sanitize::onlyInt($group['id']);
           $priorityclass = "p".Sanitize::onlyInt($group['priority']);
           if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-          echo '<td class="'.$priorityclass.'"><a href="admin2.php?groupdetails='.Sanitize::encodeUrlParam($group['id']).'">';
-          echo Sanitize::encodeStringForDisplay($group['name']).'</a></td></tr>';
+          echo '<td class="'.$priorityclass.'"><a href="admin2.php?groupdetails='.$grpid.'">';
+          echo Sanitize::encodeStringForDisplay($group['name']).'</a> ';
+          echo '('.Sanitize::onlyInt($group['ucnt']).')';
+          echo '</td>';
+          echo '<td><a href="forms.php?action=modgroup&id='.$grpid.'">'._('Modify').'</a></td>';
+          echo '<td><a href="forms.php?action=delgroup&from=admin2&id='.$grpid.'">'._('Delete').'</a></td>';
+          echo '</tr>';
+          
         }
         echo '</tbody>';
         echo '</table>';

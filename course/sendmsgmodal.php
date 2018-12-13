@@ -74,20 +74,9 @@ if (isset($_POST['message'])) {
 	require("../footer.php");
 	exit;
 } else {
-	$msgto = Sanitize::onlyInt($_GET['to']);
-	$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
-	$stm->execute(array(':id'=>$msgto));
-	list($firstname, $lastname, $email) = $stm->fetch(PDO::FETCH_NUM);
 	$useeditor = "message";
 	require("../header.php");
-	if ($_GET['sendtype']=='msg') {
-		echo '<h1>New Message</h1>';
-		$to = Sanitize::stripHtmlTags("$lastname, $firstname");
-	} else if ($_GET['sendtype']=='email') {
-		echo '<h1>New Email</h1>';
-		$to = Sanitize::stripHtmlTags("$lastname, $firstname ($email)");
-	}
-
+	
 	if (isset($_GET['quoteq'])) {
 		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
 		require("../assessment/displayq2.php");
@@ -99,7 +88,21 @@ if (isset($_POST['message'])) {
 
 		$message = '<p> </p><br/><hr/>'.$message;
 		$courseid = $cid;
-		if (isset($parts[3])) {  //sending to instructor
+		if (isset($parts[3]) && $parts[3] === 'reperr') {
+			$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
+			
+			if (isset($CFG['GEN']['qerrorsendto'])) {
+				if (is_array($CFG['GEN']['qerrorsendto'])) {
+					list($_GET['to'],$sendtype,$sendtitle) = $CFG['GEN']['qerrorsendto'];
+				} else {
+					$_GET['to'] = $CFG['GEN']['qerrorsendto'];
+				}
+			} else {
+				$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
+				$stm->execute(array(':id'=>$parts[1]));
+				$_GET['to'] = $stm->fetchColumn(0);
+			}
+		} else if (isset($parts[3])) {  //sending to instructor
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($parts[3])));
 			$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',$stm->fetchColumn(0));
@@ -119,7 +122,19 @@ if (isset($_POST['message'])) {
 		$message = '';
 		$courseid=$cid;
 	}
-
+	
+	$msgto = Sanitize::onlyInt($_GET['to']);
+	$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+	$stm->execute(array(':id'=>$msgto));
+	list($firstname, $lastname, $email) = $stm->fetch(PDO::FETCH_NUM);
+	
+	if ($_GET['sendtype']=='msg') {
+		echo '<h1>New Message</h1>';
+		$to = Sanitize::stripHtmlTags("$lastname, $firstname");
+	} else if ($_GET['sendtype']=='email') {
+		echo '<h1>New Email</h1>';
+		$to = Sanitize::stripHtmlTags("$lastname, $firstname ($email)");
+	}
 
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';

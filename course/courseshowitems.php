@@ -742,7 +742,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   if ($nothidden) {
 					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if (round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+					   	   if ($line['reqscoreptsposs']>0 && 
+					   	   	   round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
 							   $nothidden = false;
 						   }
 					   } else { //points based
@@ -767,7 +768,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   }
 					   if ($deffb[0]=='NoScores' || $deffb[0]=='EndScore' || $deffb[0]=='EachAtEnd') {
 						   //don't show score 	   
-					   } else {
+					   } else if ($line['ptsposs']>0) {
 						   $scoremsg .= '. '._('Score: ').round(100*$line['ptsearned']/$line['ptsposs'],1).'%';
 					   }
 				   } else {

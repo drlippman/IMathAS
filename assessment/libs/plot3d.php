@@ -35,7 +35,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax,$disc=20,$width=300,$height=300,$a
 			$func[$k] = mathphp($v,'u|v');;
 			$func[$k] = str_replace('(u)','($u)',$func[$k]);
 			$func[$k] = str_replace('(v)','($v)',$func[$k]);
-			$usefunc[$k] = create_function('$u,$v','return('.$func[$k].');');
+			$usefunc[$k] = my_create_function('$u,$v','return('.$func[$k].');');
 		}
 
 	} else {
@@ -43,7 +43,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax,$disc=20,$width=300,$height=300,$a
 		$func = mathphp($func,'x|y');
 		$func = str_replace('(x)','($u)',$func);
 		$func = str_replace('(y)','($v)',$func);
-		$zfunc = create_function('$u,$v','return('.$func.');');
+		$zfunc = my_create_function('$u,$v','return('.$func.');');
 	}
 	$count = 0;
 	$du = ($umax-$umin)/($disc-1);
@@ -195,7 +195,7 @@ function spacecurve($func,$tmin,$tmax) {
 			$func[$k] = mathphp($v,'u|t');
 			$func[$k] = str_replace('(u)','($u)',$func[$k]);
 			$func[$k] = str_replace('(t)','($t)',$func[$k]);
-			$usefunc[$k] = create_function('$u,$t','return('.$func[$k].');');
+			$usefunc[$k] = my_create_function('$u,$t','return('.$func[$k].');');
 		}
 
 		$count = 0;
@@ -250,7 +250,7 @@ function spacecurve($func,$tmin,$tmax) {
 		foreach ($func as $k=>$v) {
 			$func[$k] = mathphp($v,'t');
 			$func[$k] = str_replace('(t)','($t)',$func[$k]);
-			$usefunc[$k] = create_function('$t','return('.$func[$k].');');
+			$usefunc[$k] = my_create_function('$t','return('.$func[$k].');');
 		}
 
 		$count = 0;

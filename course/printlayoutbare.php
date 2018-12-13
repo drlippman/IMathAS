@@ -338,13 +338,21 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 			}
 		}
 	}
-	eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
-	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
-	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
-	$toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
-	$RND->srand($seed+1);
-	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	try {
+		eval(interpret('control',$qdata['qtype'],$qdata['control']));
+		eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+		$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
+		$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
+		$toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
+		$RND->srand($seed+1);
+		eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	} catch (Throwable $thrownerror) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($thrownerror->getMessage());
+			echo '</p>';
+		}
+	}
 	$RND->srand($seed+2);
 	$la = '';
 

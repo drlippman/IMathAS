@@ -35,6 +35,14 @@
 	} else {
 		$page = -1;
 	}
+	
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid) = $stm->fetch(PDO::FETCH_NUM);
+	if ($assesscourseid != $cid) {
+		echo "Invalid assessment ID";
+		exit;
+	}
 
 	if (isset($_GET['update'])) {
 		$allscores = array();
@@ -115,11 +123,13 @@
 							$scores[$loc] = $sv;
 						}
 					}
-					foreach ($grpfeedback[$line['agroupid']] as $loc=>$sv) {
-						if (trim(strip_tags($sv))=='') {
-							unset($feedback["Q".$loc]);
-						} else {
-							$feedback["Q".$loc] = $sv;
+					if (isset($grpfeedback[$line['agroupid']])) {
+						foreach ($grpfeedback[$line['agroupid']] as $loc=>$sv) {
+							if (trim(strip_tags($sv))=='') {
+								unset($feedback["Q".$loc]);
+							} else {
+								$feedback["Q".$loc] = $sv;
+							}
 						}
 					}
 				} else {
@@ -130,11 +140,13 @@
 							$scores[$loc] = $sv;
 						}
 					}
-					foreach ($allfeedbacks[$line['id']] as $loc=>$sv) {
-						if (trim(strip_tags($sv))=='') {
-							unset($feedback["Q".$loc]);
-						} else {
-							$feedback["Q".$loc] = $sv;
+					if (isset($allfeedbacks[$line['id']])) {
+						foreach ($allfeedbacks[$line['id']] as $loc=>$sv) {
+							if (trim(strip_tags($sv))=='') {
+								unset($feedback["Q".$loc]);
+							} else {
+								$feedback["Q".$loc] = $sv;
+							}
 						}
 					}
 					//$feedback = $_POST['feedback-'.$line['id']];
@@ -185,10 +197,6 @@
 
 	require("../assessment/displayq2.php");
 
-
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = $stm->fetch(PDO::FETCH_NUM);
 
 	if ($isgroup>0) {
 		$groupnames = array();
@@ -241,9 +249,9 @@
 	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForDisplay($deffbtext).'";';
 	$placeinhead .= '</script>';
 	if ($sessiondata['useed']!=0) {
-		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
+		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
 	}
-	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px;}</style>';
+	$placeinhead .= '<style type="text/css"> .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}</style>';
 	require("../includes/rubric.php");
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
@@ -396,23 +404,24 @@
 			}
 			echo '>';
 
-			echo "<p><span class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).'</b></span>';
 			if ($page != -1) {
-				echo '.  Jump to <select id="stusel" onchange="jumptostu()">';
+				echo '<p>Jump to <select id="stusel" onchange="jumptostu()">';
 				foreach ($stulist as $i=>$st) {
 					echo '<option value="'.$i.'" ';
 					if ($i==$page) {echo 'selected="selected"';}
 					echo '>'.Sanitize::encodeStringForDisplay($st).'</option>';
 				}
-				echo '</select>';
+				echo '</select></p>';
 			}
-			echo '</p>';
+			
+			echo "<p class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></p>';
+			    
 			if (!$groupdup) {
-				echo '<h3 class="group" style="display:none">'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
+				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
-					echo ' ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</h3>';
+					echo '</b> ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</p>';
 				} else {
-					echo ' (empty)</h3>';
+					echo '</b> (empty)</p>';
 				}
 			}
 
@@ -505,7 +514,7 @@
 					echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
 			} else {
-				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($points).');return false;">Full credit</a>';
+				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($points).',this);return false;">Full credit</a> <span class=quickfb></span>';
 			}
 			$laarr = explode('##',$la[$loc]);
 			if (count($laarr)>1) {
@@ -666,8 +675,20 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
-	eval($code);
+	try {
+		eval($code);
+	} catch (Throwable $t) {
+		if ($GLOBALS['myrights']>10) {
+			echo '<p>Caught error in evaluating a function in a question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 	if (!isset($answeights)) {
+		if (!isset($anstypes)) { 
+			//this shouldn't happen unless the code crashed
+			return array(1);
+		}
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
 		}

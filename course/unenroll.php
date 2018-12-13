@@ -2,7 +2,7 @@
 //IMathAS:  Unenroll students; called from List Users or Gradebook
 //Included from listusers or gradebook - not called directly
 //(c) 2007 David Lippman
-@set_time_limit(0);
+
 ini_set("max_input_time", "600");
 ini_set("max_execution_time", "600");
 

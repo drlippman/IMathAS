@@ -61,8 +61,8 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 
 		exit;
 	} else {
-		$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE id=:id");
-		$stm->execute(array(':id'=>$wikiid));
+		$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$wikiid, ':cid'=>$cid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

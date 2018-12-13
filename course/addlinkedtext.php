@@ -7,9 +7,9 @@ require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 
-@set_time_limit(0);
-ini_set("max_input_time", "600");
-ini_set("max_execution_time", "600");
+
+ini_set("max_input_time", "120");
+ini_set("max_execution_time", "120");
 ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
@@ -35,6 +35,15 @@ if (isset($_GET['tb'])) {
 	$totb = Sanitize::encodeStringForDisplay($_GET['tb']);
 } else {
 	$totb = 'b';
+}
+
+if (isset($_GET['id'])) {
+	$stm = $DBH->prepare("SELECT courseid FROM imas_linkedtext WHERE id=?");
+	$stm->execute(array($linkid));
+	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
+		echo "Invalid ID";
+		exit;
+	}
 }
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher

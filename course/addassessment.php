@@ -42,6 +42,14 @@ if (isset($_GET['id'])) {
 	$curBreadcrumb .= "&gt; Add Assessment\n";
 }
 
+if (isset($_GET['id'])) {
+	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+	$stm->execute(array(intval($_GET['id'])));
+	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $_GET['cid']) {
+		echo "Invalid ID";
+		exit;
+	}
+}
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -49,7 +57,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
-    } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+} else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
         $assessmentId = Sanitize::onlyInt($_GET['id']);
         $cid = Sanitize::courseId($_GET['cid']);
         $block = $_GET['block'];
@@ -211,7 +219,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $labelkeys = preg_grep('/extreflabel/', array_keys($_POST));
             foreach ($labelkeys as $extkey) {
             	$linkkey = str_replace('label','link',$extkey);
-            	$_POST[$extkey] = trim(Sanitize::simpleString($_POST[$extkey]));
+            	$_POST[$extkey] = trim(Sanitize::stripHtmlTags($_POST[$extkey]));
             	$_POST[$linkkey] = trim(Sanitize::url($_POST[$linkkey]));
             	if ($_POST[$extkey] != '' && $_POST[$linkkey] != '') {
             		$extrefs[] = array(
@@ -296,7 +304,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
             }
 
-            if ($_POST['isgroup']>0 && isset($grpsetid) && $grpsetid==0) {
+            if ($_POST['isgroup']>0 && isset($_POST['groupsetid']) && $grpsetid==0) {
                 //create new groupset
                 $stm = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
                 $stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$assessName));
@@ -359,7 +367,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                     $query .= ",defpenalty=:defpenalty";
                     $qarr[':defpenalty'] = $defpenalty;	
                 } 
-                if (!empty($defpoints)) {
+                if (isset($_POST['defpoints']) && $defpoints>0) {
                     $query .= ",defpoints=:defpoints";
                     $qarr[':defpoints'] = $defpoints;
                 }
@@ -731,7 +739,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                         }
                     }
                 }
-                flattenarr($outcomearr);
+                if ($outcomearr !== false) {
+                	flattenarr($outcomearr);
+                }
             }
 
             $page_groupsets = array();
@@ -1025,10 +1035,10 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<select id="deffeedback" name="deffeedback" onChange="chgfb()" >
 					<option value="NoScores" <?php if ($testtype=="NoScores") {echo "SELECTED";} ?>>No scores shown (last attempt is scored)</option>
-					<option value="EndScore" <?php if ($testtype=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points &amp; average) - only whole test can be reattemped</option>
+					<option value="EndScore" <?php if ($testtype=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points &amp; average) - only whole test can be reattempted</option>
 					<option value="EachAtEnd" <?php if ($testtype=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
 					<option value="EndReview" <?php if ($testtype=="EndReview") {echo "SELECTED";} ?>>Reshow question with score at the end of the test </option>
-					<option value="EndReviewWholeTest" <?php if ($testtype=="EndReviewWholeTest") {echo "SELECTED";} ?>>Reshow question with score at the end of the test  - only whole test can be reattemped </option>
+					<option value="EndReviewWholeTest" <?php if ($testtype=="EndReviewWholeTest") {echo "SELECTED";} ?>>Reshow question with score at the end of the test  - only whole test can be reattempted </option>
 
 					<option value="AsGo" <?php if ($testtype=="AsGo") {echo "SELECTED";} ?>>Show score on each question as it's submitted (does not apply to Full test at once display)</option>
 					<option value="Practice" <?php if ($testtype=="Practice") {echo "SELECTED";} ?>>Practice test: Show score on each question as it's submitted &amp; can restart test; scores not saved</option>

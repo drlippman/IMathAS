@@ -67,7 +67,7 @@ if (count($lastpost)>0) {
   $threadids = implode(',', array_map('intval', array_keys($lastpost)));
   $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
-  $query .= "imas_forum_posts.threadid IN ($threadids) imas_forum_threads.lastposttime<$now AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
+  $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_threads.lastposttime<$now AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
   $stm = $DBH->query($query);
   $alt = 0;
   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {

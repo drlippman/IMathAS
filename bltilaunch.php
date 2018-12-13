@@ -64,6 +64,8 @@ $sessionid = session_id();
 $atstarthasltiuserid = isset($_SESSION['ltiuserid']);
 $askforuserinfo = false;
 
+$now = time();
+	
 //use new behavior for place_aid requests that don't come from a placein_###_# key
 if (
     (isset($_SESSION['place_aid']) && isset($_SESSION['lti_keytype']) && $_SESSION['lti_keytype']=='cc-a' && !isset($_REQUEST['oauth_consumer_key']))
@@ -93,7 +95,6 @@ if (isset($_GET['launch'])) {
 
 	$enc = base64_encode(serialize($sessiondata));
 
-	$now = time();
 	$stm = $DBH->prepare('UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id');
 	$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
@@ -576,6 +577,20 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
+		$_SESSION['selection_return_format'] = "Canvas";
+	}
+	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
+		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
+		$_SESSION['selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
+		$_SESSION['selection_return_format'] = "IMSdeeplink";
+		if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='assn') {
+			$_SESSION['selection_type'] = 'assn';
+		} else if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='link') {
+			$_SESSION['selection_type'] = 'link';
+		} else {
+			$_SESSION['selection_type'] = 'all';
+		}
+		$_SESSION['selection_data'] = @$_REQUEST['data'];
 	}
 	unset($_SESSION['lti_duedate']);
 	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
@@ -1228,8 +1243,9 @@ if ($linkparts[0]=='cid') {
 			$newdatebylti = 3; //mark as student-set
 		}
 		//no default due date set yet, or is the instructor:  set the default due date
-		$stm = $DBH->prepare("UPDATE imas_assessments SET enddate=:enddate,date_by_lti=:datebylti WHERE id=:id");
-		$stm->execute(array(':enddate'=>$_SESSION['lti_duedate'], ':datebylti'=>$newdatebylti, ':id'=>$aid));
+		$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,date_by_lti=:datebylti WHERE id=:id");
+		$stm->execute(array(':startdate'=>min($now, $_SESSION['lti_duedate']), 
+			':enddate'=>$_SESSION['lti_duedate'], ':datebylti'=>$newdatebylti, ':id'=>$aid));
 		$line['enddate'] = $_SESSION['lti_duedate'];
 	}
 	if (!isset($_SESSION['lti_duedate']) && $line['date_by_lti']==1) {
@@ -1264,15 +1280,17 @@ if ($linkparts[0]=='cid') {
 			if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$exceptionrow[1]) {
 				//if new due date is later, or no latepass used, then update
 				if ($exceptionrow[2]==0 || $_SESSION['lti_duedate']>$exceptionrow[1]) {
-					$stm = $DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-					$stm->execute(array(':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
+					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $exceptionrow[0]),
+						':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
 				}
 			}
 			require_once("./includes/exceptionfuncs.php");
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line, true);
-		} else if ($line['date_by_lti']==3 && $line['enddate']!=$_SESSION['lti_duedate']) {
+		} else if ($line['date_by_lti']==3 && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
 			//default dates already set by LTI, and users's date doesn't match - create new exception
+			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
 			$exceptionrow = array(min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1);
 			$stm = $DBH->prepare("INSERT INTO imas_exceptions (startdate,enddate,islatepass,is_lti,userid,assessmentid,itemtype) VALUES (?,?,?,?,?,?,'A')");
 			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
@@ -1482,6 +1500,10 @@ $sessiondata['lti_keylookup'] = $SESS['ltilookup'];
 $sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
 if (isset($SESS['selection_return'])) {
 	$sessiondata['lti_selection_return'] = $SESS['selection_return'];
+	$sessiondata['lti_selection_targets'] = $SESS['selection_targets'];
+	$sessiondata['lti_selection_return_format'] = $SESS['selection_return_format'];
+	$sessiondata['lti_selection_type'] = $SESS['selection_type'];
+	$sessiondata['lti_selection_data'] = $SESS['selection_data'];
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {
@@ -2042,6 +2064,20 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
+		$_SESSION['selection_return_format'] = "Canvas";
+	}
+	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
+		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
+		$_SESSION['selection_targets'] = $_REQUEST['accept_presentation_document_targets'];
+		$_SESSION['selection_return_format'] = "IMSdeeplink";
+		if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='assn') {
+			$_SESSION['selection_type'] = 'assn';
+		} else if (isset($_REQUEST['ltiseltype']) && $_REQUEST['ltiseltype']=='link') {
+			$_SESSION['selection_type'] = 'link';
+		} else {
+			$_SESSION['selection_type'] = 'all';
+		}
+		$_SESSION['selection_data'] = @$_REQUEST['data'];
 	}
 
 	//look if we know this student
@@ -2542,6 +2578,10 @@ $sessiondata['lti_keylookup'] = $SESS['ltilookup'];
 $sessiondata['lti_origkey'] = $SESS['ltiorigkey'];
 if (isset($SESS['selection_return'])) {
 	$sessiondata['lti_selection_return'] = $SESS['selection_return'];
+	$sessiondata['lti_selection_targets'] = $SESS['selection_targets'];
+	$sessiondata['lti_selection_return_format'] = $SESS['selection_return_format'];
+	$sessiondata['lti_selection_type'] = $SESS['selection_type'];
+	$sessiondata['lti_selection_data'] = $SESS['selection_data'];
 }
 
 if (isset($setstuviewon) && $setstuviewon==true) {

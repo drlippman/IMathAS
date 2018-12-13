@@ -43,6 +43,16 @@
 			$secfilter = -1;
 		}
 	}
+	
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
+	if ($stm->rowCount()==0) {
+		echo "Invalid ID";
+		exit;
+	}
+	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	
+	
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
@@ -81,9 +91,7 @@
 	} else {
 		$sortorder = "name";
 	}
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 

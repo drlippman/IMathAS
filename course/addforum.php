@@ -29,6 +29,15 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
+if (isset($_GET['id'])) {
+	$stm = $DBH->prepare("SELECT courseid FROM imas_forums WHERE id=?");
+	$stm->execute(array(intval($_GET['id'])));
+	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $_GET['cid']) {
+		echo "Invalid ID";
+		exit;
+	}
+}
+
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
