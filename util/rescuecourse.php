@@ -69,14 +69,26 @@ if (count($recovereditems)>0) {
 	$block['items'] = $recovereditems;
 	array_push($items,$block);
 	echo "recovered ". count($recovereditems) . "items";
-	$itemorder = serialize($items);
-	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=blockcnt+1 WHERE id=:id");
-	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$_REQUEST['cid']));
-} else {
-	$itemorder = serialize($items);
-	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$_REQUEST['cid']));
+} 
+
+$blockcnt = 1;
+
+function fixblocks(&$itemlist) {
+	global $blockcnt;
+	foreach ($itemlist as $k=>$v) {
+		if (is_array($v)) { //is block
+			$itemlist[$k]['id'] = $blockcnt;
+			$blockcnt++;
+			fixblocks($itemlist[$k]['items']);
+		}
+	}
 }
+
+fixblocks($items);
+
+$itemorder = serialize($items);
+$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
+$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$_REQUEST['cid']));
 
 echo "Done";
 
