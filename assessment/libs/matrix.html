@@ -93,9 +93,10 @@ matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, header, tab
 <BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
 <BR><h3><a name="matrixsystemdisp">matrixsystemdisp</a></h3>
-matrixsystemdisp(matrix,[variables])
+matrixsystemdisp(matrix,[variables,leftbracket])
 <BR>Writes out a matrix as an equivalent system of equations
 <BR>variables is optional array of variables to use
+<BR>leftbracket can be set to false to hide the left bracket
 <BR><h3><a name="matrixgetentry">matrixgetentry</a></h3>
 matrixgetentry(matrix,row,col)
 <BR>get entry from a matrix at given row and col
