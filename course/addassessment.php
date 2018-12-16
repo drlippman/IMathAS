@@ -1108,6 +1108,8 @@ if ($overwriteBody==1) {
 ?>
 			</span><br class=form>
 	
+		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
+		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
 		   <img class="mida" src="../img/expand.gif" />
 		   Additional Display Options

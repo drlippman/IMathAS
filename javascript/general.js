@@ -950,6 +950,10 @@ function randID() {
 }
 
 //generic grouping block toggle
+function groupToggleAll(dir) {
+	$(".grouptoggle").attr("aria-expanded", dir==1?false:true)
+	 .trigger("click");
+}
 jQuery(document).ready(function($) {
 	$(".grouptoggle").each(function() {
 		var id = randID();
