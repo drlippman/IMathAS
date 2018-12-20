@@ -24,6 +24,9 @@ $CFG['cleanup']['deloldstus']:
    (default: true) delete old student accounts that are no longer enrolled in
    any courses and lastaccess is more than 
    $CFG['cleanup']['old']+$CFG['cleanup']['delay'] days ago.
+$CFG['cleanup']['clearoldpw']:
+   a number of days since lastaccess that a users's password should be cleared
+   forcing a reset.  Set =0 to not use. (def: 365)
    
 You can specify different old/delay values for different groups by defining
 $CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));
@@ -59,6 +62,8 @@ $old = 24*60*60*(isset($CFG['cleanup']['old'])?$CFG['cleanup']['old']:610);
 $delay = 24*60*60*(isset($CFG['cleanup']['delay'])?$CFG['cleanup']['delay']:120);
 $msgfrom = isset($CFG['cleanup']['msgfrom'])?$CFG['cleanup']['msgfrom']:0;
 $keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:4;
+$clearpw = 24*60*60*(isset($CFG['cleanup']['clearoldpw'])?$CFG['cleanup']['clearoldpw']:365);
+
 //run notifications 10 in a batch
 
 $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -157,4 +162,12 @@ if (!isset($CFG['cleanup']['deloldstus']) || $CFG['cleanup']['deloldstus']==true
 	$query .= 'imas_users.lastaccess<?';
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($now-$old-$delay));
+}
+
+//clear out any old pw
+if ($clearpw>0) {
+	$query = "UPDATE imas_users SET password=CONCAT('cleared_',MD5(CONCAT(SID, UUID()))) ";
+	$query .= "WHERE lastaccess<?";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array($now - $clearpw));
 }
