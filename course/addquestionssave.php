@@ -71,16 +71,18 @@
 
 		$qorder = explode(',',$_REQUEST['order']);
 		$newbynum = array();
-		for ($i=0;$i<count($qorder);$i++) {
-			if (strpos($qorder[$i],'~')!==false) {
-				$qids = explode('~',$qorder[$i]);
-				if (strpos($qids[0],'|')!==false) { //pop off nCr
-					$newbynum[$i] = $qids[1];
+		if (trim($_REQUEST['order'])!='') {
+			for ($i=0;$i<count($qorder);$i++) {
+				if (strpos($qorder[$i],'~')!==false) {
+					$qids = explode('~',$qorder[$i]);
+					if (strpos($qids[0],'|')!==false) { //pop off nCr
+						$newbynum[$i] = $qids[1];
+					} else {
+						$newbynum[$i] = $qids[0];
+					}
 				} else {
-					$newbynum[$i] = $qids[0];
+					$newbynum[$i] = $qorder[$i];
 				}
-			} else {
-				$newbynum[$i] = $qorder[$i];
 			}
 		}
 
