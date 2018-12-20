@@ -19,7 +19,11 @@ $CFG['cleanup']['msgfrom']
 $CFG['cleanup']['keepsent']
    set =0 to keep a copy of sent notifications in sent list
 $CFG['cleanup']['allowoptout']:
-   (default: true) set to false to prevent teachers opting out 
+   (default: true) set to false to prevent teachers opting out
+$CFG['cleanup']['deloldstus']:
+   (default: true) delete old student accounts that are no longer enrolled in
+   any courses and lastaccess is more than 
+   $CFG['cleanup']['old']+$CFG['cleanup']['delay'] days ago.
    
 You can specify different old/delay values for different groups by defining
 $CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));
@@ -51,6 +55,7 @@ if (php_sapi_name() != "cli") {
 }
 
 $now = time();
+$old = 24*60*60*(isset($CFG['cleanup']['old'])?$CFG['cleanup']['old']:610);
 $delay = 24*60*60*(isset($CFG['cleanup']['delay'])?$CFG['cleanup']['delay']:120);
 $msgfrom = isset($CFG['cleanup']['msgfrom'])?$CFG['cleanup']['msgfrom']:0;
 $keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:4;
@@ -142,4 +147,14 @@ if (count($stus)>0) {
 	$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
 	$stm->execute(array($cidtoclean));
 	$DBH->commit();
+}
+
+//delete old students
+if (!isset($CFG['cleanup']['deloldstus']) || $CFG['cleanup']['deloldstus']==true) {
+	$query = 'DELETE imas_users FROM imas_users ';
+	$query .= 'LEFT JOIN imas_students ON imas_users.id=imas_students.userid ';
+	$query .= 'WHERE imas_users.rights<11 AND imas_students.id IS NULL AND ';
+	$query .= 'imas_users.lastaccess<?';
+	$stm = $DBH->prepare($query);
+	$stm->execute(array($now-$old-$delay));
 }
