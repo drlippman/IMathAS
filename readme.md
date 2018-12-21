@@ -137,7 +137,8 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 - `$CFG['LTI']['usequeue']`:  By default, LTI grade updates are sent immediately after the submission is scored.  Set this option to true to use a delayed queue to reduce the number of grade updates sent.  _This option requires additional setup._
     - To operate properly, the `/admin/processltiqueue.php` script needs to be called regularly, ideally once a minute.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to  `/admin/processltiqueue.php?authcode=####` using the code you define.
     - `$CFG['LTI']['queuedelay']` defines the delay (in minutes) between the students' last submission and when the score is sent to the LMS.  Defaults to 5.
-
+    - `$CFG['LTI']['logltiqueue']` set to true to log LTI queue results in /admin/import/ltiqueue.log
+ 
 ### Email
 By default, emails are sent using the built-in PHP `mail()` function.  This can sometimes have reliability issue, so there are options to override the mail sender or reduce the use of email in the system.
 - `$CFG['GEN']['noEmailButton']`:  Set to true to remove the "Email" option from the Roster and Gradebook

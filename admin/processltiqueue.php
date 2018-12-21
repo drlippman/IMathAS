@@ -31,8 +31,8 @@ if (php_sapi_name() == "cli") {
 	exit;
 }
 
-//limit run to not run longer than 50 sec
-ini_set("max_execution_time", "50");
+//limit run to not run longer than 60 sec
+ini_set("max_execution_time", "60");
 //since set_time_limit doesn't count time doing stream/socket calls, we'll
 //measure execution time ourselves too
 $scriptStartTime = time();
@@ -62,6 +62,9 @@ $setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*
 $stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<3 ORDER BY sendon');
 $stm->execute(array(time()));
 $LTIsecrets = array();
+$cntsuccess = 0;
+$cntfailure = 0;
+$cntgiveup = 0;
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	//echo "reading record ".$row['hash'].'<br/>';
 	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:', $row['sourcedid']);
@@ -92,14 +95,31 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		list($ok, $response) = sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade, true);
 		if ($ok && strpos($response, 'success')!==false) {
 			//echo "Processed ".$row['hash'].'<br/>';
+			$cntsuccess++;
 			$delfromqueue->execute(array($row['hash'], $row['sendon']));
 		} else {
 			//echo "Failure on ".$row['hash'].'<br/>';
+			if ($row['failures']<2) {
+				$cntfailure++;
+			} else {
+				$cntgiveup++;
+			}
 			$setfailed->execute(array($row['hash']));
 		}
 	}
-	//stop execution if we've been running for 50 seconds
-	if (time() - $scriptStartTime > 50) {
-		exit;
+	//stop execution if we've been running for 45 seconds
+	if (time() - $scriptStartTime > 45) {
+		break;
 	}
+}
+if (!empty($CFG['LTI']['logltiqueue'])) {
+	$logfilename = __DIR__ . '/import/ltiqueue.log';
+	if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k
+		$logFile = fopen($logfilename, "w+");
+	} else {
+		$logFile = fopen($logfilename, "a+");
+	}
+	$timespent = time() - $scriptStartTime;
+	fwrite($logFile, date("j-m-y,H:i:s",time()). ":$cntsuccess succ,$cntfailure fail,$cntgiveup giveup,in $timespent\n");
+	fclose($logFile);
 }
