@@ -15,6 +15,9 @@ if (isset($_POST['message'])) {
 	if (trim($subject)=='') {
 		$subject = '('._('none').')';
 	}
+	if ($myrights>10 && isset($_POST['markbroken'])) {
+		$subject .= ' - Marked Broken';
+	}
 	$msgto = Sanitize::onlyInt($_POST['sendto']);
 	$error = '';
 	if ($_POST['sendtype']=='msg') {
@@ -64,6 +67,11 @@ if (isset($_POST['message'])) {
 			$error = _('Unable to send: Invalid email address');
 		}
 	}
+	if ($error == '' && $myrights>10 && isset($_POST['markbroken'])) {
+		$stm = $DBH->prepare("UPDATE imas_questionset SET broken=1 WHERE id=?");
+		$stm->execute(array(Sanitize::onlyInt($_POST['markbroken'])));
+		$success .= '<script>$(function(){window.parent.$("#brokenmsgbad").show();});</script>';
+	}
 	require("../header.php");
 	if ($error=='') {
 		echo $success;
@@ -77,6 +85,8 @@ if (isset($_POST['message'])) {
 	$useeditor = "message";
 	require("../header.php");
 	
+	$iserrreport = false;
+	
 	if (isset($_GET['quoteq'])) {
 		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
 		require("../assessment/displayq2.php");
@@ -84,13 +94,21 @@ if (isset($_POST['message'])) {
 		$GLOBALS['assessver'] = $parts[4];
 		$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
 		$message = printfilter(forcefiltergraph($message));
+		if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
+			require_once("../includes/filehandler.php");
+			$message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
+				$curdir = rtrim(dirname(__FILE__), '/\\');
+				return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
+				}, $message);
+		}
 		$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-
-		$message = '<p> </p><br/><hr/>'.$message;
+		
+		$qinfo = 'Question ID '.Sanitize::onlyInt($parts[1]).', seed '.Sanitize::onlyInt($parts[2]);
+		$message = '<p> </p><br/><hr/>'.$qinfo.'<br/><br/>'.$message;
 		$courseid = $cid;
 		if (isset($parts[3]) && $parts[3] === 'reperr') {
 			$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
-			
+			$iserrreport = true;
 			if (isset($CFG['GEN']['qerrorsendto'])) {
 				if (is_array($CFG['GEN']['qerrorsendto'])) {
 					list($_GET['to'],$sendtype,$sendtitle) = $CFG['GEN']['qerrorsendto'];
@@ -144,6 +162,12 @@ if (isset($_POST['message'])) {
 	echo "Message: <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 	echo htmlentities($message);
 	echo "</textarea></div><br/>\n";
+	if ($iserrreport) {
+		echo '<label><input type=checkbox name=markbroken value="'.Sanitize::onlyInt($parts[1]).'"> ';
+		echo _("Mark question as broken. Only do this if there is a serious issue in the display or scoring of the question.").' ';
+		echo _("If you are reporting a typo, suggestion for a change, or an issue that only rarely occurs, please leave this un-checked.");
+		echo '</label><br/>';
+	}
 	if ($_GET['sendtype']=='msg') {
 		echo '<div class="submit"><input type="submit" value="'._('Send Message').'"></div>';
 	} else if ($_GET['sendtype']=='email') {

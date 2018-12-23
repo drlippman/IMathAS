@@ -287,19 +287,19 @@ if ($overwriteBody==1) {
 			$sendtype = 'email';
 			$sendtitle = _('Contact support');
 		}
-		printf("<p>Question id: %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));
-		echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($cid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> to report problems</p>";
-		
+		$sendcid = $cid;
 	} else if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-		printf("<p>Question ID: %d, seed: %d.  ", Sanitize::onlyInt($_GET['qsetid']), Sanitize::onlyInt($seed));//<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
-		echo "<a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&";
-		echo "quoteq=".Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}")."\" target=\"reperr\">Message owner</a> to report problems</p>";
-			
+		$sendtype = 'msg';
+		$sendtitle = ('Message owner');
+		$sendcid = $CFG['GEN']['sendquestionproblemsthroughcourse'];
 	} else {
-		echo "<p>Question id: ".Sanitize::encodeStringForDisplay($_GET['qsetid']).".  <a href=\"mailto:".Sanitize::emailAddress($line['email'])
-            ."?subject=" . Sanitize::encodeUrlParam("Problem with question id " . $_GET['qsetid'])
-			. "\">E-mail owner</a> to report problems</p>";
+		$sendtype = 'email';
+		$sendtitle = ('Email owner');
+		$sendcid = $cid;
 	}
+	printf("<p>Question id: %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));
+	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> to report problems</p>";
+	
 	printf("<p>Description: %s</p><p>Author: %s</p>", Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
 	echo "<p>Last Modified: $lastmod</p>";
@@ -312,9 +312,9 @@ if ($overwriteBody==1) {
 	  echo 'by searching all libraries with the ID number as the search term</p>';
 	}
 
-	echo '<p id="brokenmsgbad" class=noticetext style="display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
+	echo '<p id="brokenmsgbad" class=noticetext style="display:'.(($line['broken']==1)?"block":"none").'">This question has been marked as broken.  This indicates ';
 	echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
-	echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
+	//echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
 
 	echo '<p>'._('License').': ';
 	$license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike','Creative Commons Attribution-ShareAlike');
