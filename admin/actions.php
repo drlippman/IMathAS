@@ -48,6 +48,9 @@ switch($_POST['action']) {
 		if ($row === false) {
 			echo "invalid id";
 			exit;
+		} else if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
+			echo "You don't have the authority for this action"; 
+			exit;
 		}
 
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
