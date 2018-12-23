@@ -121,6 +121,17 @@ function clearcanvas(tarnum) {
 	dragObj = null;
 }
 
+function clearlastline(tarnum) {
+	if (lines[tarnum].length>0) {
+		lines[tarnum].length = lines[tarnum].length-1;
+	}
+	curTarget = tarnum;
+	drawTarget();
+	curTarget = null;
+	curLine = null;
+	dragObj = null;
+}
+
 function addA11yTarget(canvdata, thisdrawla) {
 	var tarnum = canvdata[0];
 	a11ytargets.push(tarnum);
@@ -1396,17 +1407,38 @@ function drawTarget(x,y) {
 
 }
 
+function deleteCurve(curveType,num) {
+	if (curveType==1) { //if dot, delete dot
+		dots[curTarget].splice(num,1);
+	} else if (curveType==2) { //if open dot, delete dot
+		odots[curTarget].splice(num,1);
+	} else if (curveType>=0 && curveType<1) {
+		lines[curTarget].splice(num,1);
+	} else if (curveType>=5 && curveType<10) { //if twopoint, delete line
+		tplines[curTarget].splice(num,1);
+		tptypes[curTarget].splice(num,1);
+		curTPcurve = null;
+	} else if (curveType>=10 && curveType<11) { //if ineq, delete ineq
+		ineqlines[curTarget].splice(num,1);
+		ineqtypes[curTarget].splice(num,1);
+		curIneqcurve = null;
+	}
+	drawTarget();
+}
 function encodeDraw() {
 	var out = '';
+	var outline = [];
 	for (var i=0;i<lines[curTarget].length; i++) {
+		var prevlen = lines[curTarget][i].length;
+		outline = pathsimplify(lines[curTarget][i]);
 		if (i!=0) {
 			out += ';';
 		}
-		for (var j=0;j<lines[curTarget][i].length; j++) {
+		for (var j=0;j<outline.length; j++) {
 			if (j!=0) {
 				out += ',';
 			}
-			out +=	'('+lines[curTarget][i][j][0]+','+lines[curTarget][i][j][1]+')';
+			out +=	'('+outline[j][0]+','+outline[j][1]+')';
 
 		}
 	}
@@ -1516,6 +1548,10 @@ function drawMouseDown(ev) {
 
 			var foundpt = findnearpoint(curTarget,mouseOff);
 			if (foundpt!=null) {
+				if (targets[curTarget].mode==-1) { //if in erase 
+					deleteCurve(foundpt[0], foundpt[1]);
+					return;
+				}
 				if (curLine!=null && foundpt[0]<1 && curLine!=foundpt[1]) {
 					foundpt = null;
 				} else if (curTPcurve!=null & foundpt[0]>=5 && foundpt[0]<10 && curTPcurve!=foundpt[1]) {
@@ -1655,6 +1691,7 @@ function drawMouseDown(ev) {
 			if (curTPcurve != null) {
 				if (tplines[curTarget][curTPcurve].length<tpModeN[targets[curTarget].mode]) {
 					tplines[curTarget].splice(curTPcurve,1);
+					tptypes[curTarget].splice(curTPcurve,1);
 				}
 				setCursor('pen');
 				//targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), auto';
@@ -1662,6 +1699,7 @@ function drawMouseDown(ev) {
 			if (curIneqcurve != null) {
 				if (ineqlines[curTarget][curIneqcurve].length<3) {
 					ineqlines[curTarget].splice(curIneqcurve,1);
+					ineqtypes[curTarget].splice(curIneqcurve,1);
 				}
 				setCursor('pen');
 				//targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), auto';
@@ -1683,82 +1721,59 @@ function findnearpoint(thetarget,mouseOff) {
 	if (hasTouch) {
 		var chkdist = Math.max(15*window.innerWidth/screen.width,15);
 		chkdist *= chkdist;
+	} else if (targets[thetarget].mode==-1) {
+		var chkdist = 50;
 	} else {
 		var chkdist = 25;
 	}
-	if (drawstyle[thetarget]==0) {
-		if (targets[thetarget].mode==0 || targets[thetarget].mode==0.5) { //if in line mode
-			for (var i=0;i<lines[thetarget].length;i++) { //check lines
-				for (var j=lines[thetarget][i].length-1; j>=0;j--) {
-					var dist = Math.pow(lines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(lines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<chkdist) {
-						return [targets[thetarget].mode,i,j];
-					}
-				}
-			}
-		} else if (targets[thetarget].mode==1) {
-			for (var i=0; i<dots[thetarget].length;i++) { //check dots
-				if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
-					return [1,i];
-				}
-			}
-		} else if (targets[thetarget].mode==2) {
-			for (var i=0; i<odots[thetarget].length;i++) { //check opendots
-				if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
-					return [2,i];
-				}
-			}
-		} else if (targets[thetarget].mode>=5 && targets[thetarget].mode<10) { //if in twopoint mode
-			for (var i=0;i<tplines[thetarget].length;i++) { //check lines
-				if (tptypes[thetarget][i]!=targets[thetarget].mode) {continue;}
-				for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
-					var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<chkdist) {
-						return [tptypes[thetarget][i],i,j];
-					}
-				}
-			}
-		} else if (targets[thetarget].mode>=10 && targets[thetarget].mode<11) { //if in ineqline mode
-			for (var i=0;i<ineqlines[thetarget].length;i++) { //check lines
-				for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
-					var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<chkdist) {
-						return [ineqtypes[thetarget][i],i,j];
-					}
+	
+	if (targets[thetarget].mode==0 || targets[thetarget].mode==0.5 || targets[thetarget].mode==-1) { //if in line mode
+		for (var i=0;i<lines[thetarget].length;i++) { //check lines
+			for (var j=lines[thetarget][i].length-1; j>=0;j--) {
+				var dist = Math.pow(lines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(lines[thetarget][i][j][1]-mouseOff.y,2);
+				if (dist<chkdist) {
+					return [targets[thetarget].mode==-1?0:targets[thetarget].mode,i,j];
 				}
 			}
 		}
-	} else {
-		if (targets[thetarget].mode==1) {
-			for (var i=0; i<dots[thetarget].length;i++) { //check dots
-				if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
-					return [1,i];
-				}
+	} 
+	if (targets[thetarget].mode==1 || targets[thetarget].mode==-1) {
+		for (var i=0; i<dots[thetarget].length;i++) { //check dots
+			if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
+				return [1,i];
 			}
-		} else if (targets[thetarget].mode==2) {
-			for (var i=0; i<odots[thetarget].length;i++) { //check opendots
-				if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
-					return [2,i];
-				}
+		}
+	} 
+	if (targets[thetarget].mode==2 || targets[thetarget].mode==-1) {
+		for (var i=0; i<odots[thetarget].length;i++) { //check opendots
+			if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
+				return [2,i];
 			}
-		} else if (targets[thetarget].mode>=5 && targets[thetarget].mode<10) { //if in tpline mode
-			for (var i=0;i<tplines[thetarget].length;i++) { //check lines
-				for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
-					if (tptypes[thetarget][i]!=targets[thetarget].mode) {continue;}
+		}
+	} 
+	if ((targets[thetarget].mode>=5 && targets[thetarget].mode<10) || targets[thetarget].mode==-1) { //if in tpline mode
+		for (var i=0;i<tplines[thetarget].length;i++) { //check lines
+			for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
+				if (tptypes[thetarget][i]!=targets[thetarget].mode && targets[thetarget].mode!=-1) {
+					continue;
+				}
 
-					var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<chkdist) {
-						return [tptypes[thetarget][i],i,j];
-					}
+				var dist = Math.pow(tplines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(tplines[thetarget][i][j][1]-mouseOff.y,2);
+				if (dist<chkdist) {
+					return [tptypes[thetarget][i],i,j];
 				}
 			}
-		} else if (targets[thetarget].mode>=10 && targets[thetarget].mode<11) { //if in ineqline mode
-			for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
-				for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
-					var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
-					if (dist<chkdist) {
-						return [ineqtypes[thetarget][i],i,j];
-					}
+		}
+	} 
+	if ((targets[thetarget].mode>=10 && targets[thetarget].mode<11) || targets[thetarget].mode==-1) { //if in ineqline mode
+		for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
+			for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
+				if (ineqtypes[thetarget][i]!=targets[thetarget].mode && targets[thetarget].mode!=-1) {
+					continue;
+				}
+				var dist = Math.pow(ineqlines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(ineqlines[thetarget][i][j][1]-mouseOff.y,2);
+				if (dist<chkdist) {
+					return [ineqtypes[thetarget][i],i,j];
 				}
 			}
 		}
@@ -1813,6 +1828,7 @@ function drawMouseUp(ev) {
 		if (curTPcurve!=null && tplines[curTarget][curTPcurve].length==1) {
 			if (didMultiTouch || !releaseInTarget) {
 				tplines[curTarget].splice(curTPcurve,1);
+				tptypes[curTarget].splice(curTPcurve,1);
 				curTPcurve = null;
 				drawTarget();
 			} else if (findnearpoint(curTarget,mouseOff)==null) {
@@ -1824,6 +1840,7 @@ function drawMouseUp(ev) {
 		if (curIneqcurve!=null && ineqlines[curTarget][curIneqcurve].length==1) {
 			if (didMultiTouch || !releaseInTarget) {
 				ineqlines[curTarget].splice(curIneqcurve,1);
+				ineqtypes[curTarget].splice(curIneqcurve,1);
 				curIneqcurve = null;
 				drawTarget();
 			} else if (findnearpoint(curTarget,mouseOff)==null) {
@@ -1881,10 +1898,12 @@ function drawMouseUp(ev) {
 				lines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
 			} else if (dragObj.mode>=5 && dragObj.mode<10) { //if twopoint, delete line
 				tplines[curTarget].splice(dragObj.num,1);
+				tptypes[curTarget].splice(dragObj.num,1);
 				//tplines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
 				curTPcurve = null;
 			} else if (dragObj.mode>=10 && dragObj.mode<11) { //if ineq, delete ineq
 				ineqlines[curTarget].splice(dragObj.num,1);
+				ineqtypes[curTarget].splice(dragObj.num,1);
 				//ineqlines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
 				curIneqcurve = null;
 			}
@@ -1941,7 +1960,9 @@ function drawMouseMove(ev) {
 						setCursor('pen', tempTarget);
 						//targets[tempTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), auto';
 					} else {
-						setCursor('move', tempTarget);
+						if (targets[tempTarget].mode != -1) {
+							setCursor('move', tempTarget);
+						}
 						//targets[tempTarget].el.style.cursor = 'move';
 					}
 				}
@@ -1980,7 +2001,14 @@ function drawMouseMove(ev) {
 		}
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
-			if (dragObj==null) { //notdragging
+			if (dragObj==null) { //notdragging{
+				if (mouseisdown && targets[curTarget].mode==-1) { //erasing
+					var foundpt = findnearpoint(curTarget,mouseOff);
+					if (foundpt!=null) {
+						deleteCurve(foundpt[0], foundpt[1]);
+					}
+					return;
+				}
 				if (curLine!=null) {
 					if (mouseisdown && (targets[curTarget].mode==0 || targets[curTarget].mode==0.7)) {
 						var last = lines[curTarget][curLine].length-1;
@@ -2036,7 +2064,9 @@ function drawMouseMove(ev) {
 						}
 					} else {
 						drawTarget();
-						setCursor('move');
+						if (targets[curTarget].mode != -1) {
+							setCursor('move');
+						}
 						//targets[curTarget].el.style.cursor = 'move';
 					}
 					 
@@ -2603,6 +2633,7 @@ function shadeParabola(ctx,Vx,Vy,x,y,shX,shY,sw,sh){
 var drawexport = {
 	initCanvases:initCanvases,
 	clearcanvas:clearcanvas,
+	clearlastline:clearlastline,
 	settool:settool,
 	addnormslider:addnormslider,
 	chgnormtype:chgnormtype,
@@ -2613,3 +2644,122 @@ var drawexport = {
 };
 return drawexport;
 }(jQuery));
+
+
+/*
+ The following code is (c) 2017, Vladimir Agafonkin
+ Simplify.js, a high-performance JS polyline simplification library
+ mourner.github.io/simplify-js
+*/
+
+(function () { 'use strict';
+
+// to suit your point format, run search/replace for '[0]' and '[1]';
+// for 3D version, see 3d branch (configurability would draw significant performance overhead)
+
+// square distance between 2 points
+function getSqDist(p1, p2) {
+
+    var dx = p1[0] - p2[0],
+        dy = p1[1] - p2[1];
+
+    return dx * dx + dy * dy;
+}
+
+// square distance from a point to a segment
+function getSqSegDist(p, p1, p2) {
+
+    var x = p1[0],
+        y = p1[1],
+        dx = p2[0] - x,
+        dy = p2[1] - y;
+
+    if (dx !== 0 || dy !== 0) {
+
+        var t = ((p[0] - x) * dx + (p[1] - y) * dy) / (dx * dx + dy * dy);
+
+        if (t > 1) {
+            x = p2[0];
+            y = p2[1];
+
+        } else if (t > 0) {
+            x += dx * t;
+            y += dy * t;
+        }
+    }
+
+    dx = p[0] - x;
+    dy = p[1] - y;
+
+    return dx * dx + dy * dy;
+}
+// rest of the code doesn't care about point format
+
+// basic distance-based simplification
+function simplifyRadialDist(points, sqTolerance) {
+
+    var prevPoint = points[0],
+        newPoints = [prevPoint],
+        point;
+
+    for (var i = 1, len = points.length; i < len; i++) {
+        point = points[i];
+
+        if (getSqDist(point, prevPoint) > sqTolerance) {
+            newPoints.push(point);
+            prevPoint = point;
+        }
+    }
+
+    if (prevPoint !== point) newPoints.push(point);
+
+    return newPoints;
+}
+
+function simplifyDPStep(points, first, last, sqTolerance, simplified) {
+    var maxSqDist = sqTolerance,
+        index;
+
+    for (var i = first + 1; i < last; i++) {
+        var sqDist = getSqSegDist(points[i], points[first], points[last]);
+
+        if (sqDist > maxSqDist) {
+            index = i;
+            maxSqDist = sqDist;
+        }
+    }
+
+    if (maxSqDist > sqTolerance) {
+        if (index - first > 1) simplifyDPStep(points, first, index, sqTolerance, simplified);
+        simplified.push(points[index]);
+        if (last - index > 1) simplifyDPStep(points, index, last, sqTolerance, simplified);
+    }
+}
+
+// simplification using Ramer-Douglas-Peucker algorithm
+function simplifyDouglasPeucker(points, sqTolerance) {
+    var last = points.length - 1;
+
+    var simplified = [points[0]];
+    simplifyDPStep(points, 0, last, sqTolerance, simplified);
+    simplified.push(points[last]);
+
+    return simplified;
+}
+
+// both algorithms combined for awesome performance
+function simplify(points, tolerance, highestQuality) {
+
+    if (points.length <= 2) return points;
+
+    var sqTolerance = tolerance !== undefined ? tolerance * tolerance : 1;
+
+    points = highestQuality ? points : simplifyRadialDist(points, sqTolerance);
+    points = simplifyDouglasPeucker(points, sqTolerance);
+
+    return points;
+}
+
+window.pathsimplify = simplify;
+
+})();

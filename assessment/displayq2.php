@@ -2986,7 +2986,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 
 				$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
-				$out .= "<span onclick=\"imathasDraw.clearcanvas($qn)\">" . _('Clear All') . "</span> " . _('Draw:') . " ";
+				$out .= "<span onclick=\"imathasDraw.clearcanvas($qn)\">" . _('Clear All') . "</span> ";
+				//if ($answerformat[0]=='freehand' && count($answerformat)==1) {
+				//	$out .= "<span onclick=\"imathasDraw.clearlastline($qn)\">" . _('Clear Last') . "</span> ";
+				//}
+				$out .= _('Draw:') . " ";
 				if ($answerformat[0]=='inequality') {
 					if (in_array('both',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"imathasDraw.settool(this,$qn,10)\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
@@ -3150,6 +3154,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							$out .= "onclick=\"imathasDraw.settool(this,$qn,0.5)\">" . _('Line Segment') . "</span>";
 						} else if ($answerformat[$i]=='freehand') {
 							$out .= "onclick=\"imathasDraw.settool(this,$qn,0.7)\">" . _('Freehand Draw') . "</span>";
+							if ($answerformat[0]=='freehand' && count($answerformat)==1) {
+								$out .= "<span onclick=\"imathasDraw.settool(this,$qn,-1)\">" . _('Eraser') . "</span>";
+							}
 						} else if ($answerformat[$i]=='dot') {
 							$out .= "onclick=\"imathasDraw.settool(this,$qn,1)\">" . _('Dot') . "</span>";
 						} else if ($answerformat[$i]=='opendot') {
