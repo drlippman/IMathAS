@@ -13,13 +13,21 @@
      
   The delay between getting an update request and sending it on (def: 5min)
      $CFG['LTI']['queuedelay'] = (# of minutes);
+     
+  The number of simultaneous curl calls to make (def: 10)
+  	 $CFG['LTI']['queuebatch'] = (# of calls);
   
   Authcode to pass in query string if calling as scheduled web service;
   Call processltiqueue.php?authcode=thiscode
      $CFG['LTI']['authcode'] = "thecode";
+     
+  To log results in /admin/import/ltiqueue.log:
+     $CFG['LTI']['logltiqueue'] = true;
 */
 
 require("../init_without_validate.php");
+require("../includes/rollingcurl.php");
+require_once('../includes/ltioutcomes.php');
 
 if (php_sapi_name() == "cli") { 
 	//running command line - no need for auth code
@@ -31,8 +39,8 @@ if (php_sapi_name() == "cli") {
 	exit;
 }
 
-//limit run to not run longer than 60 sec
-ini_set("max_execution_time", "60");
+//limit run to not run longer than 55 sec
+ini_set("max_execution_time", "55");
 //since set_time_limit doesn't count time doing stream/socket calls, we'll
 //measure execution time ourselves too
 $scriptStartTime = time();
@@ -43,7 +51,7 @@ if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
 	respondOK();
 }
 
-require_once('../includes/ltioutcomes.php');
+
 
 /*
   table imas_ltiqueue
@@ -53,10 +61,19 @@ require_once('../includes/ltioutcomes.php');
   Pull all the items from the queue with sendon < now
 */
 
-//we'll call this when send is successful
-$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
-//on call failure, we'll update failure count and push back sendon
-$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*600,failures=failures+1 WHERE hash=?');
+$batchsize = isset($CFG['LTI']['queuebatch'])?$CFG['LTI']['queuebatch']:10;
+$RCX = new RollingCurlX($batchsize);
+$RCX->setTimeout(5000); //5 second timeout on each request
+$RCX->setStopAddingTime(45); //stop adding new request after 45 seconds
+$RCX->setCallback('LTIqueueCallback'); //callback after response
+$RCX->setPostdataCallback('LTIqueuePostdataCallback'); //pre-send callback
+//  sometimes needed on localhost
+if (strpos($_SERVER['HTTP_HOST'],'localhost')!==false) {
+	$RCX->setOptions(array(
+		CURLOPT_SSL_VERIFYPEER => 0,
+		CURLOPT_SSL_VERIFYHOST => 0
+	));
+}
 
 //pull all lti queue items ready to send; we'll process until we're done or timeout
 $stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<3 ORDER BY sendon');
@@ -70,48 +87,31 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:', $row['sourcedid']);
 	$secret = '';
 	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
-		if (isset($LTIsecrets[$ltikey])) {
-			$secret = $LTIsecrets[$ltikey];
-		} else if ($keytype=='c') {
-			$keyparts = explode('_',$ltikey);
-			$stm = $DBH->prepare("SELECT ltisecret FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$keyparts[1]));
-			if ($stm->rowCount()>0) {
-				$secret = $stm->fetchColumn(0);
-				$LTIsecrets[$ltikey] = $secret;
-			}
-		} else {
-			$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
-			$stm->execute(array(':SID'=>$ltikey));
-			if ($stm->rowCount()>0) {
-					$secret = $stm->fetchColumn(0);
-					$LTIsecrets[$ltikey] = $secret;
-			}
-		}
-	}
-	if ($secret != '') {
 		$grade = min(1, max(0, $row['grade']));
-		//send grade and wait for response
-		list($ok, $response) = sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade, true);
-		if ($ok && strpos($response, 'success')!==false) {
-			//echo "Processed ".$row['hash'].'<br/>';
-			$cntsuccess++;
-			$delfromqueue->execute(array($row['hash'], $row['sendon']));
-		} else {
-			//echo "Failure on ".$row['hash'].'<br/>';
-			if ($row['failures']<2) {
-				$cntfailure++;
-			} else {
-				$cntgiveup++;
-			}
-			$setfailed->execute(array($row['hash']));
-		}
-	}
-	//stop execution if we've been running for 45 seconds
-	if (time() - $scriptStartTime > 45) {
-		break;
+		$RCX->addRequest(
+			$ltiurl,  //url to request
+			array( 		//post data; will get transformed before send
+				'action' => 'update',
+				'key' => $ltikey,
+				'keytype' => $keytype,
+				'url' => $ltiurl,
+				'sourcedid' => $lti_sourcedid,
+				'grade' => $grade
+			),
+			null, //no special callback
+			array( 	  //user-data; will get passed to response
+				'hash' => $row['hash'],
+				'sendon' => $row['sendon'],
+				'lasttry' => ($row['failures']>=2)
+			)
+		);
 	}
 }
+
+$RCX->execute();
+
+echo "Done in ".(time() - $scriptStartTime);
+
 if (!empty($CFG['LTI']['logltiqueue'])) {
 	$logfilename = __DIR__ . '/import/ltiqueue.log';
 	if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k
@@ -120,6 +120,62 @@ if (!empty($CFG['LTI']['logltiqueue'])) {
 		$logFile = fopen($logfilename, "a+");
 	}
 	$timespent = time() - $scriptStartTime;
-	fwrite($logFile, date("j-m-y,H:i:s",time()). ":$cntsuccess succ,$cntfailure fail,$cntgiveup giveup,in $timespent\n");
+	fwrite($logFile, date("j-m-y,H:i:s",time()). ". $cntsuccess succ, $cntfailure fail, $cntgiveup giveup, in $timespent\n");
 	fclose($logFile);
+}
+
+function LTIqueuePostdataCallback($data) {
+	global $DBH, $LTIsecrets;
+	
+	$secret = '';
+	if (isset($LTIsecrets[$data['key']])) {
+		$secret = $LTIsecrets[$data['key']];
+	} else if ($data['keytype']=='c') {
+		$keyparts = explode('_',$data['key']);
+		$stm = $DBH->prepare("SELECT ltisecret FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$keyparts[1]));
+		if ($stm->rowCount()>0) {
+			$secret = $stm->fetchColumn(0);
+			$LTIsecrets[$data['key']] = $secret;
+		}
+	} else {
+		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
+		$stm->execute(array(':SID'=>$data['key']));
+		if ($stm->rowCount()>0) {
+				$secret = $stm->fetchColumn(0);
+				$LTIsecrets[$data['key']] = $secret;
+		}
+	}
+	//echo 'prepping w grade '.$data['grade'].'<br/>';
+	return prepLTIOutcomePost(
+		$data['action'], 
+		$data['key'], 
+		$secret, 
+		$data['url'], 
+		$data['sourcedid'],
+		$data['grade']
+	);
+}
+
+function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
+	global $DBH,$cntsuccess,$cntfailure,$cntgiveup;
+	
+	//echo 'got response with hash'.$user_data['hash'].'<br/>';
+	//echo htmlentities($response);
+	//var_dump($request_info);
+	if ($reponse === false || strpos($response, 'success')===false) { //failed
+		//on call failure, we'll update failure count and push back sendon
+		$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*600,failures=failures+1 WHERE hash=?');
+		$setfailed->execute(array($user_data['hash']));
+		if ($user_data['lasttry']===true) {
+			$cntgiveup++;
+		} else {
+			$cntfailure++;
+		}
+	} else { //success
+		//we'll call this when send is successful
+		$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
+		$delfromqueue->execute(array($user_data['hash'], $user_data['sendon']));
+		$cntsuccess++;
+	}
 }

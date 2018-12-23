@@ -467,6 +467,98 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResp
 	return $response;
 }
 
+
+function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
+	$body = '<?xml version = "1.0" encoding = "UTF-8"?>
+	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+		<imsx_POXHeader>
+			<imsx_POXRequestHeaderInfo>
+				<imsx_version>V1.0</imsx_version>
+				<imsx_messageIdentifier>MESSAGE</imsx_messageIdentifier>
+			</imsx_POXRequestHeaderInfo>
+		</imsx_POXHeader>
+		<imsx_POXBody>
+			<OPERATION>
+				<resultRecord>
+					<sourcedGUID>
+						<sourcedId>SOURCEDID</sourcedId>
+					</sourcedGUID>
+					<result>
+						<resultScore>
+							<language>en-us</language>
+							<textString>GRADE</textString>
+						</resultScore>
+					</result>
+				</resultRecord>
+			</OPERATION>
+		</imsx_POXBody>
+	</imsx_POXEnvelopeRequest>';
+
+	$shortBody = '<?xml version = "1.0" encoding = "UTF-8"?>
+	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+		<imsx_POXHeader>
+			<imsx_POXRequestHeaderInfo>
+				<imsx_version>V1.0</imsx_version>
+				<imsx_messageIdentifier>MESSAGE</imsx_messageIdentifier>
+			</imsx_POXRequestHeaderInfo>
+		</imsx_POXHeader>
+		<imsx_POXBody>
+			<OPERATION>
+				<resultRecord>
+					<sourcedGUID>
+						<sourcedId>SOURCEDID</sourcedId>
+					</sourcedGUID>
+				</resultRecord>
+			</OPERATION>
+		</imsx_POXBody>
+	</imsx_POXEnvelopeRequest>';
+
+	if ($action=='update') {
+	    $operation = 'replaceResultRequest';
+	    $postBody = str_replace(
+		array('SOURCEDID', 'GRADE', 'OPERATION','MESSAGE'),
+		array($sourcedid, $grade, $operation, uniqid()),
+		$body);
+	} else if ($action=='read') {
+	    $operation = 'readResultRequest';
+	    $postBody = str_replace(
+		array('SOURCEDID', 'OPERATION','MESSAGE'),
+		array($sourcedid, $operation, uniqid()),
+		$shortBody);
+	} else if ($action=='delete') {
+	    $operation = 'deleteResultRequest';
+	    $postBody = str_replace(
+		array('SOURCEDID', 'OPERATION','MESSAGE'),
+		array($sourcedid, $operation, uniqid()),
+		$shortBody);
+	} else {
+	    return false;
+	}
+	
+	$hash = base64_encode(sha1($postBody, TRUE));
+
+    $parms = array('oauth_body_hash' => $hash);
+
+    $test_token = '';
+    $hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
+    $test_consumer = new OAuthConsumer($key, $secret, NULL, 11);
+
+    $acc_req = OAuthRequest::from_consumer_and_token($test_consumer, $test_token, "POST", $url, $parms);
+    $acc_req->sign_request($hmac_method, $test_consumer, $test_token);
+
+    // Pass this back up "out of band" for debugging
+    global $LastOAuthBodyBaseString;
+    $LastOAuthBodyBaseString = $acc_req->get_signature_base_string();
+    // echo($LastOAuthBodyBaseString."\n");
+
+    $header = array($acc_req->to_header());
+    $header[] = "Content-Type: application/xml";
+	
+    return array('body'=>$postBody, 'header'=>$header);
+}
+
+
+
 /*
   table imas_ltiqueue
      hash, sourcedid, grade, sendon
