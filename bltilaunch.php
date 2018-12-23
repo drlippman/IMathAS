@@ -605,7 +605,7 @@ if (isset($_GET['launch'])) {
 	//look if we know this user
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when LMS GUID change, while still storing it
 	$shortorg = $orgparts[0];	   //we'll only use the part from the lti key
-	$query = "SELECT lti.userid FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
+	$query = "SELECT lti.userid,iu.FirstName,iu.LastName,iu.email FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
 	$query .= "WHERE lti.org LIKE :org AND lti.ltiuserid=:ltiuserid ";
 	if ($ltirole!='learner') {
 		//if they're a teacher, make sure their imathas account is too. If not, we'll act like we don't know them
@@ -618,7 +618,28 @@ if (isset($_GET['launch'])) {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':org'=>"$shortorg:%", ':ltiuserid'=>$ltiuserid));
 	if ($stm->rowCount()>0) { //yup, we know them
-		$userid = $stm->fetchColumn(0);
+		$userrow = $stm->fetch(PDO::FETCH_ASSOC);
+		$userid = $userrow['userid'];
+		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
+		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner') )) {
+			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
+				$firstname = $_REQUEST['lis_person_name_given'];
+				$lastname = $_REQUEST['lis_person_name_family'];
+			} else {
+				$firstname = '';
+				$lastname = $_REQUEST['lis_person_name_full'];
+			}
+			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
+				$email = $_REQUEST['lis_person_contact_email_primary'];
+			} else {
+				$email = 'none@none.com';
+			}
+			if ($firstname != $userrow['FirstName'] || $lastname != $userrow['LastName'] || $email != $userrow['email']) {
+				//update imas_users record
+				$stm2 = $DBH->prepare("UPDATE imas_users SET FirstName=?,LastName=?,email=? WHERE id=?");
+				$stm2->execute(array($firstname, $lastname, $email, $userid));
+			}
+		}
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
 
