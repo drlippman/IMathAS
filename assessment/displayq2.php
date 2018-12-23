@@ -32,6 +32,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	$GLOBALS['inquestiondisplay'] = true;
 
 	$RND->srand($seed);
+	
 	if (is_int($doshowans) && $doshowans==2) {
 		$doshowans = true;
 		$nosabutton = true;
