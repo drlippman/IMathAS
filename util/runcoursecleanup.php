@@ -53,7 +53,7 @@ if (php_sapi_name() == "cli") {
 	exit;
 }
 
-if (php_sapi_name() != "cli") {
+if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
 	respondOK(); //send 200 response now
 }
 

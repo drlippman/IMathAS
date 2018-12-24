@@ -21,10 +21,17 @@ if (php_sapi_name() == "cli") {
 	echo 'No authcode or invalid authcode provided';
 	exit;
 }
-
+$starttime = time();
+$batchsize = 50;
+if (isset($_GET['batchsize']) && is_numeric($_GET['batchsize'])) {
+	$batchsize = Sanitize::onlyInt($_GET['batchsize']);
+	if ($batchsize < 1) {
+		$batchsize = 50;
+	}
+}
 $query = "SELECT istu.courseid,istu.userid FROM imas_students AS istu JOIN imas_users AS iu ";
 $query .= "ON istu.userid=iu.id WHERE iu.rights=5 AND iu.lastaccess<? ";
-$query .= "ORDER BY istu.courseid LIMIT 50";
+$query .= "ORDER BY istu.courseid LIMIT $batchsize ";
 $stm = $DBH->prepare($query);
 $stm->execute(array(time()-7*24*60*60)); //a week old
 $stus = array();
@@ -40,5 +47,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 foreach ($stus as $cid=>$cstus) {
 	unenrollstu($cid, $cstus);
 }
-echo "DONE w $n";
+$timespent = time() - $starttime;
+echo "DONE w $n in $timespent";
 ?>
