@@ -169,7 +169,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$gradebookcategory = Sanitize::onlyInt($_POST['gbcat']);
 		$available = Sanitize::onlyInt($_POST['avail']);
 		$sortby = Sanitize::onlyInt($_POST['sortby']);
-		$forumtype = Sanitize::onlyInt($_POST['forumtype']);
+		if (!isset($_POST['forumtype'])) {
+			$forumtype = 0;
+		} else {
+			$forumtype = Sanitize::onlyInt($_POST['forumtype']);
+		}
 		$forumid = Sanitize::onlyInt($_GET['id']);
 
 		if (!empty($forumid)) {  //already have id; update
@@ -489,24 +493,6 @@ if ($overwriteBody==1) {
 		<?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>
 		</div><br/>
 
-		<?php if ($line['postinstr']=='' && $line['replyinstr']=='') {
-			echo '<div><script type="text/javascript"> function showpostreply(el) { $("#postreplyinstr").show(); $(el).remove();}</script>';
-			echo '<a href="#" onclick="showpostreply(this);return false">'._('Add Posting / Reply Instructions').'</a>';
-			echo '<div id="postreplyinstr" style="display:none;">';
-		}?>
-		Posting Instructions: <em>Displays on Add New Thread</em><br/>
-		<div class=editor>
-		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%">
-		<?php echo Sanitize::encodeStringForDisplay($line['postinstr']);?></textarea>
-		</div><br/>
-		Reply Instructions: <em>Displays on Add Reply</em><br/>
-		<div class=editor>
-		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%">
-		<?php echo Sanitize::encodeStringForDisplay($line['replyinstr']);?></textarea>
-		</div>
-		<?php if ($line['postinstr']=='' && $line['replyinstr']=='') {
-			echo '</div></div>';
-		}?>
 		<br class="form"/>
 		<span class=form>Show:</span>
 		<span class=formright>
@@ -538,6 +524,13 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		</div>
+		
+		<div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
+		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
+		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+			Basic Options
+		</div>
+		<div class="blockitems">
 		<span class=form>Group forum?</span><span class=formright>
 <?php
 	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$groupsetid,"Not group forum",0);
@@ -546,8 +539,6 @@ if ($overwriteBody==1) {
 	}
 ?>
 		</span><br class="form"/>
-
-
 		<span class=form>Allow anonymous posts:</span>
 		<span class=formright>
 			<input type=checkbox name="allowanon" value="1" <?php if ($allowanon) { echo "checked=1";}?>/>
@@ -572,12 +563,19 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
+		
+		</div>
+		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+			Display Options
+		</div>
+		<div class="blockitems">
 
-		<span class=form>Get email notify of new posts:</span>
-		<span class=formright>
-			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
-		</span><br class="form"/>
-
+		<span class="form">Calendar icon:</span>
+		<span class="formright">
+			New Threads: <input name="caltagpost" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($posttag);?>"/>,
+			Replies: <input name="caltagreply" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($replytag);?>"/>
+		</span><br class="form" />
+		
 		<span class=form>Default display:</span>
 		<span class=formright>
 			<select name="defdisplay">
@@ -592,6 +590,49 @@ if ($overwriteBody==1) {
 			<input type="radio" name="sortby" value="1" <?php writeHtmlChecked($sortby,1);?>/> Most recent reply date
 		</span><br class="form" />
 
+		<span class="form">File sharing:</span>
+		<span class="formright">
+			<input type=checkbox name=forumtype value=1 <?php if ($line['forumtype']==1) { echo 'checked=1';}?> />
+			Provide separate file upload option when posting
+		</span><br class="form"/>
+		
+		<span class="form">Categorize posts?</span>
+		<span class="formright">
+			<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
+			  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
+			  <span id="tagholder" style="display:<?php echo ($line['taglist']=='')?"none":"inline"; ?>">
+			  Enter in format CategoryDescription:category,category,category<br/>
+			  <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
+			  </span>
+		</span><br class="form"/>
+
+		<span class=form>Get email notify of new posts:</span>
+		<span class=formright>
+			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
+		</span><br class="form"/>
+		
+		</div>
+		
+		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+			Posting and Reply Instructions
+		</div>
+		<div class="blockitems">
+		Posting Instructions: <em>Displays on Add New Thread</em><br/>
+		<div class=editor>
+		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%">
+		<?php echo Sanitize::encodeStringForDisplay($line['postinstr']);?></textarea>
+		</div><br/>
+		Reply Instructions: <em>Displays on Add Reply</em><br/>
+		<div class=editor>
+		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%">
+		<?php echo Sanitize::encodeStringForDisplay($line['replyinstr']);?></textarea>
+		</div>
+		</div>
+		
+		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+			Grading and Access Control
+		</div>
+		<div class="blockitems">
 		<span class=form>Students can create new threads:</span><span class=formright>
 			<input type=radio name="postby" value="Always" <?php if ($postby==2000000000) { echo "checked=1";}?>/>Always<br/>
 			<input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never<br/>
@@ -612,7 +653,6 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=replybytime value="<?php echo Sanitize::encodeStringForDisplay($replybytime);?>">
 		</span><br class="form" />
-
 		<span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
 				<?php
@@ -621,15 +661,7 @@ if ($overwriteBody==1) {
 				writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],floor($line['allowlate']/10)%10);
 				?>
 				<br/><label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>100,true); ?>> Allow LatePasses after due date</label>
-			</span><BR class=form>
-
-		<span class="form">Calendar icon:</span>
-		<span class="formright">
-			New Threads: <input name="caltagpost" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($posttag);?>"/>,
-			Replies: <input name="caltagreply" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($replytag);?>"/>
-		</span><br class="form" />
-
-
+		</span><BR class=form>
 		<span class="form">Count in gradebook?</span>
 		<span class="formright">
 			<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
@@ -672,21 +704,7 @@ if ($overwriteBody==1) {
 
 ?>
 		</div>
-		<span class="form">Forum type:</span>
-		<span class="formright">
-			<input type=radio name="forumtype" value="0" <?php if ($line['forumtype']==0) { echo 'checked=1';}?>/>Regular forum<br/>
-			<input type=radio name="forumtype" value="1" <?php if ($line['forumtype']==1) { echo 'checked=1';}?>/>File sharing forum
-		</span><br class="form"/>
-		<span class="form">Categorize posts?</span>
-		<span class="formright">
-			<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
-			  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
-			  <span id="tagholder" style="display:<?php echo ($line['taglist']=='')?"none":"inline"; ?>">
-			  Enter in format CategoryDescription:category,category,category<br/>
-			  <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
-			  </span>
-		</span><br class="form"/>
-
+		</div>
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 	<p>&nbsp;</p>
