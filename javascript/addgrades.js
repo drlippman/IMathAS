@@ -558,6 +558,7 @@ function togglefeedback(btn) {
 
 function doonblur(value) {
 	if (value=='') {return ('');}
+	if (value.match(/^\s*X\s*$/i)) {return 'X';}
 	try {
 		return (eval(mathjs(value)));
 	} catch (e) {

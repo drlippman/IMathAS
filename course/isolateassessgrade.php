@@ -15,6 +15,17 @@
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
+	
+	if ($isteacher) {
+		if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
+			$calledfrom='isolateassess';
+			include("gb-excuse.php");
+		}
+		if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
+			$calledfrom='isolateassess';
+			include("gb-excuse.php");
+		}
+	}
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
@@ -145,6 +156,14 @@
 		require_once("../includes/exceptionfuncs.php");
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, !$isteacher && !$istutor);
 	}
+	//get excusals
+	$stm = $DBH->prepare("SELECT userid FROM imas_excused WHERE type='A' AND typeid=:assessmentid");
+	$stm->execute(array(':assessmentid'=>$aid));
+	$excused = array();
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$excused[$row[0]] = 1;
+	}
+
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
 	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
 	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
@@ -168,7 +187,11 @@
 
 
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-
+	echo '<form method="post" action="isolateassessgrade?cid='.$cid.'&aid='.$aid.'">';
+	echo '<p>',_('With selected:');
+	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
+	echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
+	echo '</p>';
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
 	if ($hassection && !$hidesection) {
 		echo '<th>Section</th>';
@@ -195,14 +218,16 @@
 			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
 		}
 		$lc++;
+		echo '<td><input type=checkbox name="stus[]" value="'.Sanitize::onlyInt($line['userid']).'"> ';
 		if ($line['locked']>0) {
-			echo '<td><span style="text-decoration: line-through;">';
-			printf("%s, %s</span></td>", Sanitize::encodeStringForDisplay($line['LastName']),
+			echo '<span style="text-decoration: line-through;">';
+			printf("%s, %s</span>", Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		} else {
-			printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+			printf("%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),
 				Sanitize::encodeStringForDisplay($line['FirstName']));
 		}
+		echo '</td>';
 		if ($hassection && !$hidesection) {
 			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['section']));
 		}
@@ -245,6 +270,9 @@
 				} else {
 					echo '<sup>e</sup>';
 				}
+			}
+			if (!empty($excused[$line['userid']])) {
+				echo '<sup>x</sup>';
 			}
 			echo "</td><td>-</td><td></td>";
 			if ($includeduedate) {
@@ -290,6 +318,9 @@
 				} else {
 					echo '<sup>e</sup>';
 				}
+			}
+			if (!empty($excused[$line['userid']])) {
+				echo '<sup>x</sup>';
 			}
 			echo '</td>';
 			if ($totalpossible>0) {
@@ -375,8 +406,8 @@
 		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
-	echo "<sup>e</sup> Has exception <sup>LP</sup> Used latepass  </p>\n";
-
+	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";
+	echo '</form>';
 	require("../footer.php");
 
 

@@ -84,6 +84,17 @@
 		}
 	}
 	
+		
+	//get excusals
+	$excused = array();
+	if ($gbItem != 'new') {
+		$stm = $DBH->prepare("SELECT userid FROM imas_excused WHERE type='O' AND typeid=:id");
+		$stm->execute(array(':id'=>$gbItem));	
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$excused[$row[0]] = 1;
+		}
+	}
+	
 	if (isset($_POST['name']) && $isteacher) {
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
@@ -135,11 +146,9 @@
 				$_POST['score'][$row[0]] = $_POST['newscore'][$row[0]];
 				unset($_POST['newscore'][$row[0]]);
 			}
-
 		}
 	}
 	
-
 	if (isset($_POST['assesssnap'])) {
 		$assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
 		$post_points = Sanitize::onlyFloat($_POST['points']);
@@ -179,11 +188,18 @@
 		}
 	} else {
 		///regular submit
+		$submittedexcusals = array();
+		$submittedstu = array();
 		if (isset($_POST['score'])) {
 
 			foreach($_POST['score'] as $k=>$sc) {
 				if (trim($k)=='') { continue;}
+				$submittedstu[] = $k;
 				$sc = trim($sc);
+				if (strtolower($sc)=='x') {
+					$submittedexcusals[] = $k;
+					$sc = '';
+				}
 				$_POST['feedback'.$k] = Sanitize::incomingHtml(trim($_POST['feedback'.$k]));
 				if ($_POST['feedback'.$k] == '<p></p>') {
 					$_POST['feedback'.$k] = '';
@@ -192,16 +208,26 @@
 					$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE userid=:userid AND gradetype='offline' AND gradetypeid=:gradetypeid");
 					$stm->execute(array(':score'=>$sc, ':feedback'=>$_POST['feedback'.$k], ':userid'=>$k, ':gradetypeid'=>$gbItem));
 				} else {
+					if ($_POST['feedback'.$k] == '') {
+						$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid AND userid=:userid");
+						$stm->execute(array(':userid'=>$k, ':gradetypeid'=>$gbItem));
+					} else {
 					$stm = $DBH->prepare("UPDATE imas_grades SET score=NULL,feedback=:feedback WHERE userid=:userid AND gradetype='offline' AND gradetypeid=:gradetypeid");
 					$stm->execute(array(':feedback'=>$_POST['feedback'.$k], ':userid'=>$k, ':gradetypeid'=>$gbItem));
-					//$query = "DELETE FROM imas_grades WHERE gbitemid='{$_GET['gbitem']}' AND userid='$k'";
 				}
 			}
+		}
 		}
 
 		if (isset($_POST['newscore'])) {
 			foreach($_POST['newscore'] as $k=>$sc) {
 				if (trim($k)=='') {continue;}
+				$submittedstu[] = $k;
+				$sc = trim($sc);
+				if (strtolower($sc)=='x') {
+					$submittedexcusals[] = $k;
+					$sc = '';
+				}
 				$_POST['feedback'.$k] = Sanitize::incomingHtml(trim($_POST['feedback'.$k]));
 				if ($_POST['feedback'.$k] == '<p></p>') {
 					$_POST['feedback'.$k] = '';
@@ -218,6 +244,26 @@
 					$stm->execute(array(':gradetype'=>'offline', ':gradetypeid'=>$gbItem, ':userid'=>$k, ':score'=>NULL, ':feedback'=>$_POST['feedback'.$k]));
 				}
 			}
+		}
+		if (count($submittedexcusals)>0) {
+			$vals = array();
+			$now = time();
+			foreach($submittedexcusals as $stu) {
+				array_push($vals, $stu, $cid, 'O', $gbItem, $now);
+	}
+			if (count($vals)>0) {
+				$ph = Sanitize::generateQueryPlaceholdersGrouped($vals, 5);
+				$stm = $DBH->prepare("REPLACE INTO imas_excused (userid, courseid, type, typeid, dateset) VALUES $ph");
+				$stm->execute($vals);
+			}
+		}
+		//delete any excusals
+		$todel = array_diff($submittedstu, $submittedexcusals);
+		if (count($todel)>0) {
+			$ph = Sanitize::generateQueryPlaceholders($todel);
+			$delstm = $DBH->prepare("DELETE FROM imas_excused WHERE type='O' AND typeid=? AND userid IN ($ph)");
+			array_unshift($todel, $gbItem);
+			$delstm->execute($todel);
 		}
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
@@ -611,7 +657,9 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			}
 
 			while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-				if ($row[1]!=null) {
+				if (isset($excused[$row[0]])) {
+					$score[$row[0]] = 'X';
+				} else if ($row[1]!=null) {
 					$score[$row[0]] = $row[1];
 				} else {
 					$score[$row[0]] = '';
@@ -665,6 +713,9 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			} else {
 				printf('<td><input type="text" size="3" autocomplete="off" name="newscore[%d]" id="score%d" value="',
                     Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]));
+                if (isset($excused[$row[0]])) {
+                	echo 'X';
+			}
 			}
 			echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
 			if ($rubric != 0) {
@@ -693,6 +744,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 ?>
 <div class=submit><input type=submit value="Submit"></div></div>
 </form>
+<p>To Excuse a grade, enter X in the grade column</p>
 
 <?php
 	$placeinfooter = '<div id="autosuggest"><ul></ul></div>';

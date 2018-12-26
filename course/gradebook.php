@@ -163,6 +163,14 @@ if ($isteacher) {
 		$calledfrom='gb';
 		include("massexception.php");
 	}
+	if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
+		$calledfrom='gb';
+		include("gb-excuse.php");
+	}
+	if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
+		$calledfrom='gb';
+		include("gb-excuse.php");
+	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -365,7 +373,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "</div>";
 	}
 	gbstudisp($stu);
-	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
+	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>x</sup> Excused score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
 
 	require("../footer.php");
 
@@ -554,7 +562,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo _('Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score,  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
+	echo _('Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
 	require("../footer.php");
 
 	/*if ($isteacher) {
@@ -717,7 +725,10 @@ function gbstudisp($stu) {
 	if ($isteacher && $stu>0) {
 		echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
-		echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.Sanitize::encodeStringForDisplay($lpmsg).'';
+		echo _('With selected:');
+		echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
+		echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
+		echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> '.Sanitize::encodeStringForDisplay($lpmsg).'';
 	}
 	echo '<table id="myTable" class="gb" style="position:relative;">';
 	echo '<thead><tr>';
@@ -772,6 +783,12 @@ function gbstudisp($stu) {
 			if ($stu>0 && $isteacher) {
 				if ($gbt[0][1][$i][6]==0) {
 					echo '<td><input type="checkbox" name="assesschk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+				} else if ($gbt[0][1][$i][6]==1) {
+					echo '<td><input type="checkbox" name="offlinechk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+				} else if ($gbt[0][1][$i][6]==2) {
+					echo '<td><input type="checkbox" name="discusschk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
+				} else if ($gbt[0][1][$i][6]==3) {
+					echo '<td><input type="checkbox" name="exttoolchk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
 				} else {
 					echo '<td></td>';
 				}
@@ -976,6 +993,9 @@ function gbstudisp($stu) {
 					$exceptionnote = '<sup>e</sup>';
 				}
 				echo $exceptionnote;
+			}
+			if (!empty($gbt[1][1][$i][14])) { //excused
+				echo '<sup>x</sup>';	
 			}
 			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
 				echo '<sub>d</sub>';
@@ -1765,6 +1785,9 @@ function gbinstrdisp() {
 					if ($gbt[$i][1][$j][1]==1) {
 						echo '<sup>*</sup>';
 					}
+				}
+				if (!empty($gbt[$i][1][$j][14])) { //excused
+					echo '<sup>x</sup>';	
 				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';
