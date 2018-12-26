@@ -101,7 +101,19 @@
 		echo '</body></html>';
 		exit;
 	} else {
-		$gb = gbinstrexport();
+		//grab HTML version, then strip out all the tags and reformat as CSV
+		ob_start();
+		gbinstrdisp();
+		$gb = ob_get_clean();
+		$gb = str_replace(array("<BR>",'<br>','<br/>',"\r\n","\n",'&nbsp;'), ' ',$gb);
+		$gb = preg_replace('/<su(p|b)>.*?<\/su(p|b)>/', '', $gb);
+		$gb = preg_replace('/<\/tr>.*?<tr.*?>/',';;tr;;', $gb);
+		$gb = preg_replace('/<\/t(d|h)>\s*<t(d|h).*?>/',';;td;;', $gb);
+		$gb = strip_tags($gb);
+		$gb = explode(';;tr;;', $gb);
+		foreach ($gb as $k=>$row) {
+			$gb[$k] = explode(';;td;;', $row);
+		}
 		if (isset($_GET['export']) && $_GET['export']=="true") {
 			header('Content-type: text/csv');
 			header("Content-Disposition: attachment; filename=\"gradebook-$cid.csv\"");
@@ -110,12 +122,6 @@
 			foreach ($gb as $gbline) {
 				$line = '';
 				foreach ($gbline as $val) {
-					 # remove any windows new lines, as they interfere with the parsing at the other end
-					  $val = str_replace("\r\n", "\n", $val);
-					  $val = str_replace("\n", " ", $val);
-					  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
-					  $val = str_replace("&nbsp;"," ",$val);
-
 					  # if a deliminator char, a double quote char or a newline are in the field, add quotes
 					  if(preg_match("/[\,\"\n\r]/", $val)) {
 						  $val = '"'.str_replace('"', '""', $val).'"';
@@ -180,396 +186,165 @@
 	}
 
 
-
-
-function gbinstrexport() {
-	global $DBH,$hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin,$logincnt,$includetimes;
-	$gbt = gbtable();
-	$gbo = array();
-	//print_r($gbt);
-	$n=0;
-	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
-		$gbo[0][$n] = $gbt[0][0][$i];
-		$n++;
+//HTML formatted, for Excel import?
+function gbInstrCatHdrs(&$gbt) {
+	global $catfilter, $availshow, $totonleft, $cid;
+	
+	$n = 0;
+	$tots = '';
+	if ($catfilter<0) {
+		if ($gbt[0][4][0]==0) { //using points based
+			if ($availshow<3) {
+				$tots .= '<th><div><span class="cattothdr">'. _('Total'). '<br/>'.$gbt[0][3][$availshow].'&nbsp;'. _('pts'). '</span></div></th>';
+			} else {
+				$tots .= '<th><div><span class="cattothdr">'. _('Total').'</span></div></th>';
+			}
+			$tots .= '<th><div>%</div></th>';
+			$n+=2;
+		} else {
+			$tots .= '<th><div><span class="cattothdr">'. _('Weighted Total %'). '</span></div></th>';
+			$n++;
+		}
 	}
 	if ($totonleft) {
-		//total totals
-		if ($catfilter<0) {
-			if (isset($gbt[0][3][0])) { //using points based
-				$gbo[0][$n] = "Total: ".$gbt[0][3][$availshow]." pts";
-				$n++;
-				$gbo[0][$n] = "%";
-				$n++;
-			} else {
-				$gbo[0][$n] = "Weighted Total %";
-				$n++;
-			}
-		}
-		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
-					continue;
-				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
-					continue;
-				}
-				if ($availshow<3) {
-					if (isset($gbt[0][3][0])) { //using points based
-						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
-					} else {
-						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][11].'%';
-					}
-				} else if ($availshow==3) {
-					if (isset($gbt[0][2][$i][11])) {
-						$gbo[0][$n] = $gbt[0][2][$i][11].'%';
-					}
-				}
-				$n++;
-			}
-		}
-
+		echo $tots;
 	}
-	if ($catfilter>-2) {
-		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-			if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
+	if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+		for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
+			if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
+				continue;
+			} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 				continue;
 			}
-			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
-				continue;
-			} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
-				continue;
-			}
-			if ($gbt[0][1][$i][3]>$availshow) {
-				continue;
-			}
-			//name and points
-			$gbo[0][$n] = $gbt[0][1][$i][0].': ';
-			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
-				$gbo[0][$n] .=' (Not Counted)';
-			} else {
-				$gbo[0][$n] .= $gbt[0][1][$i][2].'&nbsp;pts';
-				if ($gbt[0][1][$i][4]==2) {
-					$gbo[0][$n] .= ' (EC)';
+			echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
+			if ($availshow<3) {
+				echo $gbt[0][2][$i][0].'<br/>';
+				if ($gbt[0][4][0]==0) { //using points based
+					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+				} else {
+					echo $gbt[0][2][$i][11].'%';
+				}
+			} else if ($availshow==3) { //past and attempted
+				echo $gbt[0][2][$i][0];
+				if (isset($gbt[0][2][$i][11])) {
+					echo '<br/>'.$gbt[0][2][$i][11].'%';
 				}
 			}
-			if ($gbt[0][1][$i][5]==1) {
-				$gbo[0][$n] .= ' (PT)';
-			}
+			
+			echo '</span></div></th>';
 			$n++;
-			if ($commentloc==0) {
-				$gbo[0][$n] = $gbt[0][1][$i][0].': Comments';
-				$n++;
-			}
-			if ($includetimes>0 && $gbt[0][1][$i][6]==0) {
-				if ($includetimes==1) {
-					$gbo[0][$n] = $gbt[0][1][$i][0].': Time spent';
-				} else if ($includetimes==2) {
-					$gbo[0][$n] = $gbt[0][1][$i][0].': Time spent in questions';
-				}
-				$n++;
-			}
 		}
 	}
 	if (!$totonleft) {
-		//total totals
-		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
-					continue;
-				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
-					continue;
-				}
-				if ($availshow<3) {
-					if (isset($gbt[0][3][0])) { //using points based
-						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][3+$availshow].' pts';
-					} else {
-						$gbo[0][$n] = $gbt[0][2][$i][0].': '.$gbt[0][2][$i][11].'%';
-					}
-				} else if ($availshow==3) {
-					if (isset($gbt[0][2][$i][11])) {
-						$gbo[0][$n] = $gbt[0][2][$i][11].'%';
-					}
-				}
-				$n++;
-			}
-		}
-		if ($catfilter<0) {
-			if (isset($gbt[0][3][0])) { //using points based
-				$gbo[0][$n] = "Total: ".$gbt[0][3][$availshow]." pts";
-				$n++;
-				$gbo[0][$n] = "%";
-				$n++;
-			} else {
-				$gbo[0][$n] = "Weighted Total %";
-				$n++;
-			}
-		}
+		echo $tots;
 	}
-	$gbo[0][$n] = "Comment";
-	$gbo[0][$n+1] = "Instructor Note";
-	$n+=2;
-	if ($commentloc == 1) {
-		if ($catfilter>-2) {
-			for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment comment headers
-				if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
-					continue;
-				}
-				if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
-					continue;
-				} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
-					continue;
-				}
-				if ($gbt[0][1][$i][3]>$availshow) {
-					continue;
-				}
-				//name and points
-				$gbo[0][$n] = $gbt[0][1][$i][0].': Comments';
-				$n++;
-			}
-		}
-	}
-
-	//get gb comments;
-	$gbcomments = array();
-	$stm = $DBH->prepare("SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid=:courseid");
-	$stm->execute(array(':courseid'=>$cid));
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$gbcomments[$row[0]] = array($row[1],$row[2]);
-	}
-	//create student rows
-	for ($i=1;$i<count($gbt);$i++) {
-		$n=0;
-
-		for ($j=0;$j<count($gbt[0][0]);$j++) {
-			$gbo[$i][$n] = $gbt[$i][0][$j];
-			$n++;
-		}
-		if ($totonleft) {
-			//total totals
-			if ($catfilter<0) {
-				if ($availshow==3) {
-					if (isset($gbt[$i][3][8])) { //using points based
-						$gbo[$i][$n] = $gbt[$i][3][6].'/'.$gbt[$i][3][7];
-						$n++;
-						$gbo[$i][$n] = $gbt[$i][3][8] ;
-						$n++;
-					} else {
-						$gbo[$i][$n] = $gbt[$i][3][6];
-						$n++;
-					}
-				} else {
-					if (isset($gbt[0][3][0])) { //using points based
-						$gbo[$i][$n] = $gbt[$i][3][$availshow];
-						$n++;
-						$gbo[$i][$n] = $gbt[$i][3][$availshow+3] ;
-						$n++;
-					} else {
-						$gbo[$i][$n] = $gbt[$i][3][$availshow];
-						$n++;
-					}
-				}
-			}
-			//category totals
-			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
-						continue;
-					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
-						continue;
-					}
-					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
-						$gbo[$i][$n] = $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
-					} else {
-						if ($availshow==3) {
-							$gbo[$i][$n] = $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
-						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
-								$gbo[$i][$n] = $gbt[$i][2][$j][$availshow];
-							} else {
-								if ($gbt[0][2][$j][3+$availshow]>0) {
-									$gbo[$i][$n] = round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
-								} else {
-									$gbo[$i][$n] = '0%';
-								}
-							}
-						}
-
-					}
-					$n++;
-				}
-			}
-		}
-		//assessment values
-		if ($catfilter>-2) {
-			for ($j=0;$j<count($gbt[0][1]);$j++) {
-				if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden
-					continue;
-				}
-				if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
-					continue;
-				} else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
-					continue;
-				}
-				if ($gbt[0][1][$j][3]>$availshow) {
-					continue;
-				}
-				if ($gbt[0][1][$j][6]==0) {//online
-					if (isset($gbt[$i][1][$j][0])) {
-						$gbo[$i][$n] = $gbt[$i][1][$j][0];
-						if ($gbt[$i][1][$j][3]==1) {
-							$gbo[$i][$n] .=  ' (NC)';
-						} else if ($gbt[$i][1][$j][3]==2) {
-							$gbo[$i][$n] .=  ' (IP)';
-						} else if ($gbt[$i][1][$j][3]==3) {
-							$gbo[$i][$n] .= ' (OT)';
-						} else if ($gbt[$i][1][$j][3]==4) {
-							$gbo[$i][$n] .=  ' {PT)';
-						}
-
-					} else { //no score
-						$gbo[$i][$n]  = '-';
-					}
-				} else if ($gbt[0][1][$j][6]==1) { //offline
-					if (isset($gbt[$i][1][$j][0])) {
-						$gbo[$i][$n] =  $gbt[$i][1][$j][0];
-						if ($gbt[$i][1][$j][3]==1) {
-							$gbo[$i][$n] .=  ' (NC)';
-						}
-					} else {
-						$gbo[$i][$n] = '-';
-					}
-
-				} else if ($gbt[0][1][$j][6]==2) { //discuss
-					if (isset($gbt[$i][1][$j][0])) {
-						$gbo[$i][$n] = $gbt[$i][1][$j][0];
-					} else {
-						$gbo[$i][$n] =  '-';
-					}
-				}
-				$n++;
-				if ($commentloc==0) {
-					if (isset($gbt[$i][1][$j][1])) {
-						$gbo[$i][$n] = $gbt[$i][1][$j][1];
-					} else {
-						$gbo[$i][$n] = '';
-					}
-					$n++;
-				}
-				if ($includetimes>0 && $gbt[0][1][$j][6]==0) {
-					if ($includetimes==1) {
-						$gbo[$i][$n] = $gbt[$i][1][$j][7];
-					} else if ($includetimes==2) {
-						$gbo[$i][$n] = $gbt[$i][1][$j][8];
-					}
-					$n++;
-				}
-			}
-		}
-		if (!$totonleft) {
-			//category totals
-			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
-						continue;
-					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
-						continue;
-					}
-					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
-						$gbo[$i][$n] = $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
-					} else {
-						if ($availshow==3) {
-							$gbo[$i][$n] = $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
-						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
-								$gbo[$i][$n] = $gbt[$i][2][$j][$availshow];
-							} else {
-								if ($gbt[0][2][$j][3+$availshow]>0) {
-									$gbo[$i][$n] = round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
-								} else {
-									$gbo[$i][$n] = '0%';
-								}
-							}
-						}
-
-					}
-					$n++;
-				}
-			}
-			//total totals
-			if ($catfilter<0) {
-				if ($availshow==3) {
-					if (isset($gbt[$i][3][8])) { //using points based
-						$gbo[$i][$n] = $gbt[$i][3][6].'/'.$gbt[$i][3][7];
-						$n++;
-						$gbo[$i][$n] = $gbt[$i][3][8] ;
-						$n++;
-					} else {
-						$gbo[$i][$n] = $gbt[$i][3][6];
-						$n++;
-					}
-				} else {
-					if (isset($gbt[0][3][0])) { //using points based
-						$gbo[$i][$n] = $gbt[$i][3][$availshow];
-						$n++;
-						$gbo[$i][$n] = $gbt[$i][3][$availshow+3] ;
-						$n++;
-					} else {
-						$gbo[$i][$n] = $gbt[$i][3][$availshow];
-						$n++;
-					}
-				}
-			}
-
-		}
-		if (isset($gbcomments[$gbt[$i][4][0]])) {
-			$gbo[$i][$n] = $gbcomments[$gbt[$i][4][0]][0];
-			$gbo[$i][$n+1] = $gbcomments[$gbt[$i][4][0]][1];
-		} else {
-			$gbo[$i][$n] = '';
-			$gbo[$i][$n+1] = '';
-		}
-		$n+=2;
-		if ($commentloc == 1) {
-			if ($catfilter>-2) {
-				for ($j=0;$j<count($gbt[0][1]);$j++) {
-					if (!$isteacher && $gbt[0][1][$j][4]==0) { //skip if hidden
-						continue;
-					}
-					if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
-						continue;
-					} else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
-						continue;
-					}
-					if ($gbt[0][1][$j][3]>$availshow) {
-						continue;
-					}
-					if (isset($gbt[$i][1][$j][1])) {
-						$gbo[$i][$n] = $gbt[$i][1][$j][1];
-					} else {
-						$gbo[$i][$n] = '';
-					}
-					$n++;
-				}
-			}
-		}
-	}
-	if ($pointsln==1) {
-		$ins = array();
-
-		for ($i=0; $i<count($gbo[0]);$i++) {
-			if (preg_match('/(-?[\d\.]+)(\s*|&nbsp;)pts.*/',$gbo[0][$i],$matches)) {
-				$ins[$i] = $matches[1];
-			} else {
-				$ins[$i] = '';
-			}
-		}
-		$ins[0] = "Points Possible";
-		array_splice($gbo,1,0,array($ins));
-	}
-	return $gbo;
+	return $n;
 }
+function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
+	global $catfilter, $availshow, $totonleft, $cid;
+	
+	//total totals
+	$tot = '';
+	if ($catfilter<0) {
+		$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
+		if ($gbt[$i][3][4+$availshow]>0) {
+			$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
+		} else {
+			$pct = 0;
+		}
+		if ($availshow==3 || $gbt[0][4][0]==0) { //attempted or using points based
+			if ($gbt[$i][0][0]=='Averages') {
+				if ($gbt[0][4][0]==0) { //using points based
+					$tot .= '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
+				}
+				$tot .= '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
+			} else {
+				if ($gbt[0][4][0]==0) { //using points based
+					$tot .= '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].'/'.$gbt[$i][3][4+$availshow].$enddiv.'</td>';
+					$tot .= '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
 
+				} else {
+					$tot .= '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
+				}
+			}
+		} else {
+			if ($gbt[0][4][0]==0) { //using points based
+				$tot .= '<td class="c">'.$insdiv.$gbt[$i][3][$availshow].$enddiv .'</td>';
+				if ($gbt[$i][0][0]=='Averages') {
+					$tot .= '<td class="c">'.$insdiv.$fivenum.$pct .'%</span>'.$enddiv .'</td>';
+				} else {
+					$tot .= '<td class="c">'.$insdiv.$pct .'%'.$enddiv .'</td>';
+				}
+			} else {
+				if ($gbt[$i][0][0]=='Averages') {
+					$tot .= '<td class="c">'.$insdiv.$fivenum.$pct.'%</span>'.$enddiv .'</td>';
+				} else {
+					$tot .= '<td class="c">'.$insdiv.$pct.'%'.$enddiv .'</td>';
+				}
+			}
+		}
+	}
+	if ($totonleft) {
+		echo $tot;
+	}
+	//category totals
+	if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
+		for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
+			if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
+				continue;
+			} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
+				continue;
+			}
+			if ($gbt[$i][2][$j][4+$availshow]>0) {
+				$pct = round(100*$gbt[$i][2][$j][$availshow]/$gbt[$i][2][$j][4+$availshow],1);
+			} else {
+				$pct = $gbt[$i][2][$j][$availshow];
+			}
+			echo '<td class="c">'.$insdiv;
+			if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
+				echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+			} 
+			if ($catfilter!=-1) { //single category view
+			
+				if ($gbt[$i][0][0]=='Averages') {
+					if ($gbt[$i][2][$j][4+$availshow] == 0) {
+						echo $gbt[$i][2][$j][$availshow].'%';
+					} else {
+						echo $gbt[$i][2][$j][$availshow];
+					}
+				} else if ($gbt[$i][2][$j][4+$availshow]>0) { //category total has points poss listed
+					echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow].' ('.$pct.'%)';
+				} else {
+					echo $pct.'%';
+				}
 
-//HTML formatted, for Excel import?
+			} else {
+				if ($availshow==3 || ($gbt[0][4][0]==0 && $gbt[0][2][$j][13]==0)) {  //attempted or points based w/o percent scaling
+					if ($gbt[$i][0][0]=='Averages') {
+						if ($gbt[$i][2][$j][4+$availshow] == 0) {
+							echo $gbt[$i][2][$j][$availshow].'%';
+						} else {
+							echo $gbt[$i][2][$j][$availshow];
+						}
+					} else if ($gbt[0][2][$j][14]==true || $availshow==3) { //if has drops or attempted
+						echo $gbt[$i][2][$j][$availshow].'/'.$gbt[$i][2][$j][4+$availshow];
+					} else {
+						echo $gbt[$i][2][$j][$availshow];
+					}
+				} else {
+					echo $pct.'%';
+				}
+			}
+			if ($gbt[$i][0][0]=='Averages' && $availshow!=3 && $gbt[0][2][$j][6+$availshow]!='') {
+				echo '</span>';
+			}
+			echo $enddiv .'</td>';
+		}
+	}
+	if (!$totonleft) {
+		echo $tot;
+	}	
+}
 function gbinstrdisp() {
 	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
 
@@ -596,54 +371,9 @@ function gbinstrdisp() {
 		$n++;
 	}
 	if ($totonleft && !$hidepast) {
-		//total totals
-		if ($catfilter<0) {
-			if (isset($gbt[0][3][0])) { //using points based
-				echo '<th><span class="cattothdr">Total';
-				if ($pointsln==1) {
-					echo '<br/>';
-				} else {
-					echo '&nbsp;';
-				}
-				echo $gbt[0][3][$availshow].'&nbsp;pts</span></th>';
-				echo '<th>%</th>';
-				$n+=2;
-			} else {
-				echo '<th><span class="cattothdr">Weighted Total %</span></th>';
-				$n++;
-			}
-		}
-		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
-					continue;
-				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
-					continue;
-				}
-				echo '<th class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">';
-				echo $gbt[0][2][$i][0];
-				if ($pointsln==1) {
-					echo '<br/>';
-				} else {
-					echo '&nbsp;';
-				}
-				if ($availshow<3) {
-					if (isset($gbt[0][3][0])) { //using points based
-						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
-					} else {
-						echo $gbt[0][2][$i][11].'%';
-					}
-				} else {
-					if (isset($gbt[0][2][$i][11])) {
-						echo $gbt[0][2][$i][11].'%';
-					}
-				}
-				echo '</span></th>';
-				$n++;
-			}
-		}
-
+		$n += gbInstrCatHdrs($gbt);
 	}
+	
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
 			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden
@@ -696,52 +426,7 @@ function gbinstrdisp() {
 		}
 	}
 	if (!$totonleft && !$hidepast) {
-		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
-					continue;
-				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
-					continue;
-				}
-				echo '<th class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">';
-				echo $gbt[0][2][$i][0];
-				if ($pointsln==1) {
-					echo '<br/>';
-				} else {
-					echo '&nbsp;';
-				}
-				if ($availshow<3) {
-					if (isset($gbt[0][3][0])) { //using points based
-						echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
-					} else {
-						echo $gbt[0][2][$i][11].'%';
-					}
-				} else {
-					if (isset($gbt[0][2][$i][11])) {
-						echo $gbt[0][2][$i][11].'%';
-					}
-				}
-				echo '</span></th>';
-				$n++;
-			}
-		}
-		//total totals
-		if ($catfilter<0) {
-			if (isset($gbt[0][3][0])) { //using points based
-				echo '<th><span class="cattothdr">Total';
-				if ($pointsln==1) {
-					echo '<br/>';
-				} else {
-					echo '&nbsp;';
-				}
-				echo $gbt[0][3][$availshow].'&nbsp;pts</span></th>';
-				echo '<th>%</th>';
-				$n+=2;
-			} else {
-				echo '<th><span class="cattothdr">Weighted Total %</span></th>';
-				$n++;
-			}
-		}
+		$n += gbInstrCatHdrs($gbt);
 	}
 	echo '<th>Comment</th>';
 	echo '<th>Instructor Note</th>';
@@ -784,59 +469,13 @@ function gbinstrdisp() {
 		}
 		echo '<td class="locked" scope="row">';
 		echo $gbt[$i][0][0];
+		echo '</td>';
 		for ($j=1;$j<count($gbt[0][0]);$j++) {
 			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';
 		}
 		if ($totonleft && !$hidepast) {
-			//total totals
-			if ($catfilter<0) {
-				if ($availshow==3) {
-					if (isset($gbt[$i][3][8])) { //using points based
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
-
-					} else {
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
-					}
-				} else {
-					if (isset($gbt[0][3][0])) { //using points based
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
-						echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
-					} else {
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
-					}
-				}
-			}
-			//category totals
-			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
-						continue;
-					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
-						continue;
-					}
-					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
-					} else {
-						echo '<td class="c">';
-						if ($availshow==3) {
-							echo $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
-						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
-								echo $gbt[$i][2][$j][$availshow];
-							} else {
-								if ($gbt[0][2][$j][3+$availshow]>0) {
-									echo round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
-								} else {
-									echo '0%';
-								}
-							}
-						}
-						echo '</td>';
-					}
-				}
-			}
-		}
+			gbInstrCatCols($gbt, $i);
+		} 
 		//assessment values
 		if ($catfilter>-2) {
 			for ($j=0;$j<count($gbt[0][1]);$j++) {
@@ -934,55 +573,7 @@ function gbinstrdisp() {
 			}
 		}
 		if (!$totonleft && !$hidepast) {
-			//category totals
-			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
-					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
-						continue;
-					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
-						continue;
-					}
-					if ($catfilter!=-1 && $availshow<3 && $gbt[0][2][$j][$availshow+3]>0) {
-						echo '<td class="c">'.$gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)</td>';
-					} else {
-						echo '<td class="c">';
-						if ($availshow==3) {
-							echo $gbt[$i][2][$j][3].' of '.$gbt[$i][2][$j][4];
-						} else {
-							if (isset($gbt[$i][3][8])) { //using points based
-								echo $gbt[$i][2][$j][$availshow];
-							} else {
-								if ($gbt[0][2][$j][3+$availshow]>0) {
-									echo round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][3+$availshow],1).'%';
-								} else {
-									echo '0%';
-								}
-							}
-						}
-						echo '</td>';
-					}
-				}
-			}
-
-			//total totals
-			if ($catfilter<0) {
-				if ($availshow==3) {
-					if (isset($gbt[$i][3][8])) { //using points based
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
-
-					} else {
-						echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
-					}
-				} else {
-					if (isset($gbt[0][3][0])) { //using points based
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'</td>';
-						echo '<td class="c">'.$gbt[$i][3][$availshow+3] .'%</td>';
-					} else {
-						echo '<td class="c">'.$gbt[$i][3][$availshow].'%</td>';
-					}
-				}
-			}
+			gbInstrCatCols($gbt, $i);
 		}
 		if (isset($gbcomments[$gbt[$i][4][0]])) {
 			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][0]) . '</td>';
