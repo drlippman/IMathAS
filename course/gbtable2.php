@@ -316,6 +316,7 @@ function gbtable() {
 	$tutoredit = array();
 	$isgroup = array();
 	$avail = array();
+	$availstu = array();
 	$sa = array();
 	$category = array();
 	$name = array();
@@ -933,6 +934,20 @@ function gbtable() {
 						$avail[$assessidx[$r['typeid']]] = 0;
 					}
 					$gb[0][1][$assesscol[$r['typeid']]][3] = $avail[$assessidx[$r['typeid']]];
+				}
+			} else { //main view; possible by-stu avail override
+				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$r['typeid']][$r['userid']], $r, true);
+				if ($useexception) {
+					if (!isset($availstu[$sturow[$r['userid']]])) {
+						$availstu[$sturow[$r['userid']]] = array();
+					}
+					if ($now<$r['exceptionstartdate']) {
+						$availstu[$sturow[$r['userid']]][$r['typeid']] = 2;
+					} else if ($now<$r['exceptionenddate']) {
+						$availstu[$sturow[$r['userid']]][$r['typeid']] = 1;
+					} else {
+						$availstu[$sturow[$r['userid']]][$r['typeid']] = 0;
+					}	
 				}
 			}
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
@@ -1563,6 +1578,35 @@ function gbtable() {
 		
 		foreach($assessidx as $aid=>$i) {
 			$col = $assesscol[$aid];
+			if (isset($availstu[$ln][$aid]) && $availstu[$ln][$aid]!=$gb[0][1][$col][3]) {
+				//if we have a per-stu override of avail
+				//add to correct one
+				if ($gb[0][1][$col][4]==1) { 
+					$catpossstu[$availstu[$ln][$aid]][$category[$i]][$col] = $catpossstu[$gb[0][1][$col][3]][$category[$i]][$col];
+				} else if ($gb[0][1][$col][4]==2) {
+					$catpossstuec[$availstu[$ln][$aid]][$category[$i]][$col] = $catpossstuec[$gb[0][1][$col][3]][$category[$i]][$col];
+				}
+				if ($availstu[$ln][$aid]==1) { //also copy into attempted if now cur
+					if ($gb[0][1][$col][4]==1) { 
+						$catpossstu[3][$category[$i]][$col] = $catpossstu[$gb[0][1][$col][3]][$category[$i]][$col];
+					} else if ($gb[0][1][$col][4]==2) {
+						$catpossstuec[3][$category[$i]][$col] = $catpossstuec[$gb[0][1][$col][3]][$category[$i]][$col];
+					}
+				}
+				//remove from original
+				if ($gb[0][1][$col][4]==1) { 
+					unset($catpossstu[$gb[0][1][$col][3]][$category[$i]][$col]);
+				} else if ($gb[0][1][$col][4]==2) {
+					unset($catpossstuec[$gb[0][1][$col][3]][$category[$i]][$col]);
+				}
+				if ($gb[0][1][$col][3]==1) { //need extra unset for attempted if was cur
+					if ($gb[0][1][$col][4]==1) {
+						unset($catpossstu[3][$category[$i]][$col]);
+					} else if ($gb[0][1][$col][4]==2) {
+						unset($catpossstuec[3][$category[$i]][$col]);
+					}
+				} 
+			}
 			if (!isset($gb[$ln][1][$col][0])) {
 				if ($gb[0][1][$col][3]==1) {  //if cur , clear out of cattotattempted
 					if ($gb[0][1][$col][4]==1) {
