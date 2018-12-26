@@ -135,6 +135,20 @@ if (isset($_POST['checked'])) { //form submitted
 			$qarr[':points'] = $_POST['points'];
 		}
 	}
+	if (isset($_POST['chgautoscore'])) {
+		$autopostpts = Sanitize::onlyInt($_POST['autopostpts']);
+		$autopostn = Sanitize::onlyInt($_POST['autopostn']);
+		$autoreplypts = Sanitize::onlyInt($_POST['autoreplypts']);
+		$autoreplyn = Sanitize::onlyInt($_POST['autoreplyn']);
+		if (($autopostpts>0 && $autopostn>0) || 
+			($autoreplypts>0 && $autoreplyn>0)) {
+			$autoscore = "$autopostpts,$autopostn,$autoreplypts,$autoreplyn";
+		} else {
+			$autoscore = '';
+		}
+		$sets[] = "autoscore=:autoscore";
+		$qarr[':autoscore'] = $autoscore;
+	}
 	if (isset($_POST['chggbcat'])) {
 		$sets[] = "gbcategory=:gbcategory";
 		$qarr[':gbcategory'] = $_POST['gbcat'];
@@ -443,6 +457,16 @@ foreach($forumitems as $id=>$name) {
 	<input name="cntingb" value="4" type="radio"> Yes, but hide from students for now<br/>
 	<input name="cntingb" value="2" type="radio"> Yes, as extra credit<br/>
 	If yes, for: <input type=text size=4 name="points" value=""/> points (leave blank to not change)
+	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chgautoscore" class="chgbox"/></td>
+	<td class="r">Autoscoring:</td>
+	<td>
+	Auto-award <input type="text" size="2" name="autopostpts" value="0"> points
+	for the first <input type="text" size="2" name="autopostn" value="0"> posts<br/>
+	Auto-award <input type="text" size="2" name="autoreplypts" value="0"> points
+	for the first <input type="text" size="2" name="autoreplyn" value="0"> replies
 	</td>
 </tr>
 <tr class="coptr">

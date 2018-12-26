@@ -115,7 +115,19 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'forumpost', ':typeid'=>$threadid, ':viewtime'=>$now, ':info'=>$forumid));
 			}
-
+			if (isset($studentid) && $autoscore != '' && strlen(strip_tags($_POST['message']))>1) {
+				$autoscore = explode(',',$autoscore);
+				if ($autoscore[0]>0) { //assigning points
+					$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent=0");
+					$stm->execute(array($forumid, $userid));
+					if ($stm->fetchColumn(0) <= $autoscore[1]) {
+						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+						$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
+						$stm = $DBH->prepare($query);
+						$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$threadid, ':score'=>$autoscore[0]));
+					} 
+				}
+			} 
 			$_GET['modify'] = $threadid;
 			$files = array();
 		} else if ($_GET['modify']=="reply") { //new reply post
@@ -136,7 +148,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				exit;
 			} else {
 				$uid = $stm->fetchColumn(0);
-		    $query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
+				$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
 				$query .= "(:forumid, :threadid, :subject, :message, :userid, :postdate, :parent, :posttype, :isanon)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':forumid'=>$forumid, ':threadid'=>$threadid, ':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':userid'=>$userid, ':postdate'=>$now, ':parent'=>$_GET['replyto'], ':posttype'=>0, ':isanon'=>$isanon));
@@ -149,6 +161,19 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$query .= "(:userid, :courseid, :type, :typeid, :viewtime, :info)";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'forumreply', ':typeid'=>$_GET['modify'], ':viewtime'=>$now, ':info'=>"$forumid;$threadid"));
+				}
+				if (isset($studentid) && $autoscore != '' && strlen(strip_tags($_POST['message']))>1) {
+					$autoscore = explode(',',$autoscore);
+					if ($autoscore[2]>0) { //assigning points
+						$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");
+						$stm->execute(array($forumid, $userid));
+						if ($stm->fetchColumn(0) <= $autoscore[3]) {
+							$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
+							$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
+							$stm = $DBH->prepare($query);
+							$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$_GET['modify'], ':score'=>$autoscore[2]));
+						}
+					}
 				}
 				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
 					$stm = $DBH->prepare("SELECT id FROM imas_grades WHERE gradetype='forum' AND refid=:refid");

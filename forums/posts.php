@@ -77,7 +77,9 @@ if (isset($_GET['marktagged'])) {
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
-
+$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate,autoscore FROM imas_forums WHERE id=:id");
+$stm->execute(array(':id'=>$forumid));
+list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore) = $stm->fetch(PDO::FETCH_NUM);
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 	$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
@@ -433,7 +435,7 @@ if (!$oktoshow) {
 		echo "<a href=\"posts.php?cid=$cid&forum=$prevthforum&thread=".Sanitize::onlyInt($prevth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
-	}	
+	}
 	
 	if ($nextth != '') {
 		echo "<a href=\"posts.php?cid=$cid&forum=$nextthforum&thread=".Sanitize::onlyInt($nextth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";

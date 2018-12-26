@@ -132,6 +132,9 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 	}
 	exit;
 }
+$stm = $DBH->prepare("SELECT name,postby,replyby,settings,groupsetid,sortby,taglist,enddate,avail,postinstr,replyinstr,allowlate,autoscore FROM imas_forums WHERE id=:id");
+$stm->execute(array(':id'=>$forumid));
+list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $postinstr,$replyinstr, $allowlate, $autoscore) = $stm->fetch(PDO::FETCH_NUM);
 
 $duedates = '';
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {

@@ -97,19 +97,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
 		}
 
+		if (intval($_POST['points'])==0) {
+			$_POST['cntingb'] = 0;
+		}
+		
 		if ($_POST['cntingb']==0) {
 			$_POST['points'] = 0;
 			$tutoredit = 0;
 			$_POST['gbcat'] = 0;
+			$autoscore = "";
 		} else {
 			$tutoredit = Sanitize::onlyInt($_POST['tutoredit']);
 			if ($_POST['cntingb']==4) {
 				$_POST['cntingb'] = 0;
 			}
-		}
-
-		if (intval($_POST['points'])==0) {
-			$_POST['cntingb'] = 0;
+			$autopostpts = Sanitize::onlyInt($_POST['autopostpts']);
+			$autopostn = Sanitize::onlyInt($_POST['autopostn']);
+			$autoreplypts = Sanitize::onlyInt($_POST['autoreplypts']);
+			$autoreplyn = Sanitize::onlyInt($_POST['autoreplyn']);
+			$autoscore = "$autopostpts,$autopostn,$autoreplypts,$autoreplyn";
 		}
 
 		$caltagpost = Sanitize::stripHtmlTags($_POST['caltagpost']);
@@ -187,25 +193,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$query = "UPDATE imas_forums SET name=:name,description=:description,postinstr=:postinstr,replyinstr=:replyinstr,startdate=:startdate,enddate=:enddate,settings=:settings,caltag=:caltag,";
 			$query .= "defdisplay=:defdisplay,replyby=:replyby,postby=:postby,groupsetid=:groupsetid,points=:points,cntingb=:cntingb,tutoredit=:tutoredit,";
-			$query .= "gbcategory=:gbcategory,avail=:avail,sortby=:sortby,forumtype=:forumtype,taglist=:taglist,rubric=:rubric,outcomes=:outcomes,allowlate=:allowlate ";
+			$query .= "gbcategory=:gbcategory,avail=:avail,sortby=:sortby,forumtype=:forumtype,taglist=:taglist,rubric=:rubric,outcomes=:outcomes,allowlate=:allowlate,autoscore=:autoscore ";
 			$query .= "WHERE id=:id;";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':name'=>$forumname, ':description'=>$forumdesc, ':postinstr'=>$postinstruction, ':replyinstr'=>$replyinstruction,
 				':startdate'=>$startdate, ':enddate'=>$enddate, ':settings'=>$fsets, ':caltag'=>$caltag, ':defdisplay'=>$defaultdisplay, ':replyby'=>$replyby,
 				':postby'=>$postby, ':groupsetid'=>$groupsetid, ':points'=>$points, ':cntingb'=>$graded, ':tutoredit'=>$tutoredit,
 				':gbcategory'=>$gradebookcategory, ':avail'=>$available, ':sortby'=>$sortby, ':forumtype'=>$forumtype, ':taglist'=>$taglist,
-				':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate, ':id'=>$forumid));
+				':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate, ':autoscore'=>$autoscore, ':id'=>$forumid));
 			$newforumid = $_GET['id'];
 
 		} else { //add new
-			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes,allowlate) VALUES ";
-			$query .= "(:courseid, :name, :description, :postinstr, :replyinstr, :startdate, :enddate, :settings, :defdisplay, :replyby, :postby, :groupsetid, :points, :cntingb, :tutoredit, :gbcategory, :avail, :sortby, :caltag, :forumtype, :taglist, :rubric, :outcomes, :allowlate);";
+			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes,allowlate,autoscore) VALUES ";
+			$query .= "(:courseid, :name, :description, :postinstr, :replyinstr, :startdate, :enddate, :settings, :defdisplay, :replyby, :postby, :groupsetid, :points, :cntingb, :tutoredit, :gbcategory, :avail, :sortby, :caltag, :forumtype, :taglist, :rubric, :outcomes, :allowlate, :autoscore);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':name'=>$forumname, ':description'=>$forumdesc, ':postinstr'=>$postinstruction,
 				':replyinstr'=>$replyinstruction, ':startdate'=>$startdate, ':enddate'=>$enddate, ':settings'=>$fsets, ':defdisplay'=>$defaultdisplay,
 				':replyby'=>$replyby, ':postby'=>$postby, ':groupsetid'=>$groupsetid, ':points'=>$points, ':cntingb'=>$graded,
 				':tutoredit'=>$tutoredit, ':gbcategory'=>$gradebookcategory, ':avail'=>$available, ':sortby'=>$sortby, ':caltag'=>$caltag,
-				':forumtype'=>$forumtype, ':taglist'=>$taglist, ':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate));
+				':forumtype'=>$forumtype, ':taglist'=>$taglist, ':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate, ':autoscore'=>$autoscore));
 			$newforumid = $DBH->lastInsertId();
 			$stm = $DBH->prepare("INSERT INTO imas_items (courseid,itemtype,typeid) VALUES (:courseid, :itemtype, :typeid);");
 			$stm->execute(array(':courseid'=>$cid, ':itemtype'=>'Forum', ':typeid'=>$newforumid));
@@ -278,6 +284,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$hasgroupthreads = false;
 				}
 			}
+			if ($line['autoscore']=="") {
+				$autopostpts = 0;
+				$autopostn = 0;
+				$autoreplypts = 0;
+				$autoreplyn = 0;
+			} else {
+				list($autopostpts,$autopostn,$autoreplypts,$autoreplyn) = explode(',', $line['autoscore']);
+			}
 			$points = $line['points'];
 			$cntingb = $line['cntingb'];
 			$gbcat = $line['gbcategory'];
@@ -318,6 +332,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$gbcat = 0;
 			$sortby = 0;
 			$cntingb = 0;
+			$autopostpts = 0;
+			$autopostn = 0;
+			$autoreplypts = 0;
+			$autoreplyn = 0;
 			$line['tutoredit'] = 0;
 			$savetitle = _("Create Forum");
 		}
@@ -470,7 +488,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
  /******* begin html output ********/
  $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
- $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { document.getElementById("gbdetail").style.display = v?"block":"none";}</script>';
+ $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { if (v) {$("#gbdetail").slideDown();} else {$("#gbdetail").slideUp();} }</script>';
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -564,6 +582,12 @@ if ($overwriteBody==1) {
 			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
 		
+		<span class=form>New post notifcation:</span>
+		<span class=formright>
+			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
+			Get email notification of new posts
+		</span><br class="form" />
+		
 		</div>
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
 			Display Options
@@ -604,11 +628,6 @@ if ($overwriteBody==1) {
 			  Enter in format CategoryDescription:category,category,category<br/>
 			  <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
 			  </span>
-		</span><br class="form"/>
-
-		<span class=form>Get email notify of new posts:</span>
-		<span class=formright>
-			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
 		</span><br class="form"/>
 		
 		</div>
@@ -674,6 +693,12 @@ if ($overwriteBody==1) {
 		<span class="formright">
 			<input type=text size=4 name="points" value="<?php echo Sanitize::encodeStringForDisplay($points);?>"/> points
 		</span><br class="form"/>
+		<span class="form">Autoscoring:</span>
+		<span class="formright">Auto-award <input type="text" size="2" name="autopostpts" value="<?php echo Sanitize::onlyInt($autopostpts);?>"> points
+		  for the first <input type="text" size="2" name="autopostn" value="<?php echo Sanitize::onlyInt($autopostn);?>"> posts<br/>
+		  Auto-award <input type="text" size="2" name="autoreplypts" value="<?php echo Sanitize::onlyInt($autoreplypts);?>"> points
+		  for the first <input type="text" size="2" name="autoreplyn" value="<?php echo Sanitize::onlyInt($autoreplyn);?>"> replies
+		 </span><br class=form />
 		<span class=form>Gradebook Category:</span>
 			<span class=formright>
 
