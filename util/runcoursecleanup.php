@@ -166,8 +166,13 @@ if (!isset($CFG['cleanup']['deloldstus']) || $CFG['cleanup']['deloldstus']==true
 
 //clear out any old pw
 if ($clearpw>0) {
+	/*
+	As is, this will disable newly created accounts if they're not enrolled in anything,
+	which probably isn't ideal
+	
 	$query = "UPDATE imas_users SET password=CONCAT('cleared_',MD5(CONCAT(SID, UUID()))) ";
-	$query .= "WHERE lastaccess<?";
+	$query .= "WHERE lastaccess<? AND rights<>11 AND rights<>76 AND rights<>77";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($now - $clearpw));
+	*/
 }
