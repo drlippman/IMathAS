@@ -1865,18 +1865,37 @@ function gbtable() {
 			$pos++;
 
 		}
-		// $overallptsattempted = array_sum($catpossattemptedstu);
-
-		for ($stype=0;$stype<4;$stype++) {  //for each of past, cur, future, and attempted
-			if (!isset($cattotstu[$stype]) || !is_array($cattotstu[$stype])) {
-				$gb[$ln][3][$stype] = 0;
-			} else {
-				$gb[$ln][3][$stype] = round(array_sum($cattotstu[$stype]), 1);
-			}
-			if (!isset($catpossstu[$stype]) || !is_array($catpossstu[$stype])) {
+		
+		//calculate totals
+		if ($useweights==1) {  //weighted grades
+			for ($stype=0;$stype<4;$stype++) {  //for each of past, cur, future, and attempted
 				$gb[$ln][3][4+$stype] = 0;
-			} else {
-				$gb[$ln][3][4+$stype] = round(array_sum($catpossstu[$stype]),1);
+				$gb[$ln][3][$stype] = 0;
+				if (isset($cattotstu[$stype]) && is_array($cattotstu[$stype])) {
+					foreach ($cattotstu[$stype] as $cat=>$v) {
+						$gb[$ln][3][$stype] += $cats[$cat][5]*$v/$catpossstu[$stype][$cat];
+					}
+					$gb[$ln][3][$stype] = round($gb[$ln][3][$stype], 1);	
+				}
+				if (isset($catpossstu[$stype]) && is_array($catpossstu[$stype])) {
+					foreach ($catpossstu[$stype] as $cat=>$v) {
+						$gb[$ln][3][4+$stype] += $cats[$cat][5];
+					}
+					$gb[$ln][3][4+$stype] = round($gb[$ln][3][4+$stype], 1);
+				}
+			}
+		} else {  //points possible grades
+			for ($stype=0;$stype<4;$stype++) {  //for each of past, cur, future, and attempted
+				if (!isset($cattotstu[$stype]) || !is_array($cattotstu[$stype])) {
+					$gb[$ln][3][$stype] = 0;
+				} else {
+					$gb[$ln][3][$stype] = round(array_sum($cattotstu[$stype]), 1);
+				}
+				if (!isset($catpossstu[$stype]) || !is_array($catpossstu[$stype])) {
+					$gb[$ln][3][4+$stype] = 0;
+				} else {
+					$gb[$ln][3][4+$stype] = round(array_sum($catpossstu[$stype]),1);
+				}
 			}
 		}
 	}
@@ -2002,7 +2021,11 @@ function gbtable() {
 			$totavgs = array();
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if ($gb[$i][4][1]==0) { //if not locked
-					$totavgs[] = round(100*$gb[$i][3][$j]/$gb[$i][3][4+$j],1);
+					if ($gb[$i][3][4+$j]>0) {
+						$totavgs[] = round(100*$gb[$i][3][$j]/$gb[$i][3][4+$j],1);
+					} else {
+						$totavgs[] = 0;
+					}
 				}
 			}
 			$fivenumsum = '';
