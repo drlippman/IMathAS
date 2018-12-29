@@ -326,6 +326,19 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
 }
+
+if ($showmessagesgadget) {
+	$topullcoursenames = array_values(array_diff(array_keys($newmsgcnt), array_keys($page_coursenames)));
+	if (count($topullcoursenames)>0) {
+		$ph = Sanitize::generateQueryPlaceholders($topullcoursenames);
+		$stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN ($ph)");
+		$stm->execute($topullcoursenames);
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$page_coursenames[$row[0]] = $row[1];
+		}
+	}
+}
+
 if ($myrights==100) {
 	$brokencnt = array();
 	$stm = $DBH->query("SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights");
