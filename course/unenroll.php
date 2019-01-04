@@ -43,7 +43,11 @@ ini_set("max_execution_time", "600");
 		$DBH->beginTransaction();
 		unenrollstu($cid,$tounenroll,($get_uid=="all" || isset($_POST['delforumposts'])),($get_uid=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev, isset($_POST['usereplaceby']));
 		$DBH->commit();
-
+		
+		if ($get_uid=="all") {
+			$updcrs = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
+			$updcrs->execute(array($cid));
+		}
 
 		if ($calledfrom=='lu') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=".Sanitize::courseId($cid) . "&r=" . Sanitize::randomQueryStringParam());
@@ -69,8 +73,9 @@ ini_set("max_execution_time", "600");
 					$get_uid = 'selected';
 				}
 			}*/
-			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
+			$stm = $DBH->prepare("SELECT COUNT(imas_students.id) FROM imas_students,imas_users WHERE imas_students.userid=imas_users.id AND imas_students.courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
+
 			if (count($_POST['checked']) == $stm->fetchColumn(0)) {
 				$get_uid = 'all';
 			} else {
