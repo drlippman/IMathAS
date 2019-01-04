@@ -4,6 +4,10 @@ body {
 	/*font-size: 90%;*/
 }
 
+div.jitQuestionName{
+	font-size: 0.8vw
+}
+
 /*Link styles*/
 a:link {
 	text-decoration: none;
@@ -171,6 +175,7 @@ span.link {
 		background:#081e3f15;
 		border:1px solid #000;
 		color:#000;
+		margin-left: 15px;
 }
 
 #centercontent {
@@ -813,9 +818,52 @@ iframe {
     background: #f1f1f1!important
 }
 
-body {
-    overflow-x: hidden;
-    /*background-image: url(/imathas/img/background.jpg); */
+
+body.fw1000{
+	background: url("fiu_background.jpg") no-repeat right top fixed;
+	background-size: cover;
+	margin: 0px;
+}
+
+@keyframes bounceRight {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+  }
+  40% {
+    -ms-transform: translateX(-5px);
+    transform: translateX(-5px);
+  }
+  60% {
+    -ms-transform: translateX(-2px);
+    transform: translateX(-2px);
+  }
+}
+
+.arrow-right {
+  animation: bounceRight 2s infinite;
+}
+
+body.fw1000 .midwrapper{
+	background-color: rgba(255, 255, 255, 0.98);
+	padding: 15px;
+	overflow-x: auto;
+}
+
+*{
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+
+body.fw1000 .midwrapper .breadcrumb {
+	margin-left: -15px;
+	margin-right: -15px;
+	margin-top: -14px;
+	border: 0;
 }
 
 #homepage #banner {

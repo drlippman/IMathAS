@@ -2298,9 +2298,12 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					echo "</form>\n";
 
 				}
+				//Hide 'See summary of your scores'
+				/*
 				if ($testsettings['testtype']!="NoScores") {
 					echo "<br/><p>". _("When you are done, ") . " <a href=\"showtest.php?action=jitskip&amp;done=true\">" . _("click here to see a summary of your scores") . "</a>.</p>\n";
 				}
+				*/
 
 				echo "</div>\n";
 			    }
@@ -2370,7 +2373,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					}
 					if ($testsettings['showans']!='N') {// && $showeachscore) {  //(!$reattemptsremain || $regenonreattempt) &&
 						unset($GLOBALS['nocolormark']);
-						echo "<p>", _('Question with last attempt is displayed for your review only'), "</p>";
+						//echo "<p>", _('Question with last attempt is displayed for your review only'), "</p>";
+						echo "<h3>"._('It looks like you had difficulty with the problem. Please select the next question from the menu on the left to help you acquire the necessary knowledge.').'</h3>';
+						echo "<h3>"._('If you continue to have trouble, please visit the Math Lab for additional help.').'</h3>';
 
 						if (!$noraw && $showeachscore) {
 							//$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
@@ -2656,7 +2661,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
 				$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$qn&amp;page=$page&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$qn";
 				echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
-					
+
 				//echo "<p><a href=\"showtest.php?regen=$qn&page=$page#embedqwrapper$qn\">", _('Try another similar question'), "</a></p>\n";
 			}
 			if (hasreattempts($qn)) {
@@ -3346,7 +3351,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
 							$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$i&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$i";
 							echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
-				
+
 							//echo "<p><a href=\"showtest.php?regen=$i#embedqwrapper$i\">", _('Try another similar question'), "</a></p>\n";
 						}
 						if ($showeachscore) {
@@ -3935,6 +3940,22 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					//			1.3.1
 					//			1.3.2
 					//				1.3.2.1
+
+					$animateIMG = false;
+					//TODO: change the number of attempts to oo if the question doesn't have
+					//  children or all children are completed
+					//  and we use all atempts
+					if( $qi[$questions[$i]]['attempts'] <= $attempts[$i] && (!in_array($questions[$i],$jitHasChildren) ||
+						areChildrenCompleted($questions[$i],$jitHasChildren,$jitChildren,$jitQuestionsFlip)
+					)){
+						//$qi[$questions[$i]]['attempts'] = 0;
+						//$qi[$questions[$qn]]['attempts'] = 0;
+						$attempts[$i] = 0;
+						$bestattempts[$i] = 0;
+						$animateIMG = true;
+					}
+					//echo " :".$questions[$i];
+
 					if($scores[$i] != -1 ||
 						($i > 0 && !hasreattempts($i-1)) ||
 						($i>0 && isPrevQOnSameLevelIsCorrect($i) &&
@@ -3943,23 +3964,16 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					){
 						//Question is clickable
 						//echo "<a href=\"showtest.php?action=jitskip&amp;to=$i\">". ($i+1) . "</a>";
-						echo "<a href=\"showtest.php?action=jitskip&amp;to=$i\">". $itemLabel . "</a>";
+						echo "<a ";
+						if ($thisscore==0 && $animateIMG || (unans($scores[$i]) && $attempts[$i]==0) && getpts($bestscores[$i]) != $qi[$questions[$i]]['points']){
+							echo " class='".$animateIMG." has-arrow-right' ";
+						}
+						echo " href=\"showtest.php?action=jitskip&amp;to=$i\">". $itemLabel . "</a>";
 					} else{
 						//Question is not clickable
 						echo "<span href=\"showtest.php?action=jitskip&amp;to=$i\">". $itemLabel . "</span>";
 					}
-					//TODO: change the number of attempts to oo if the question doesn't have
-					//  children or all children are completed
-					//  and we use all atrempts
-					if( $qi[$questions[$i]]['attempts'] <= $attempts[$i] && (!in_array($questions[$i],$jitHasChildren) ||
-						areChildrenCompleted($questions[$i],$jitHasChildren,$jitChildren,$jitQuestionsFlip)
-					)){
-						//$qi[$questions[$i]]['attempts'] = 0;
-						//$qi[$questions[$qn]]['attempts'] = 0;
-						$attempts[$i] = 0;
-						$bestattempts[$i] = 0;
-					}
-					//echo " :".$questions[$i];
+
 
 				}
 			}

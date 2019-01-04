@@ -130,7 +130,7 @@ function refreshTable() {
   }
 
   //Set nestable
-  $('.dd').nestable({
+  $('.dd3').nestable({
     includeContent: true,
     contentNodeName: 'div',
     listClass: 'dd-list',
@@ -139,7 +139,7 @@ function refreshTable() {
     contentClass: 'dd3-content',
     maxDepth: 10
   });
-  $('.dd').on('change', function() {
+  $('.dd3').on('change', function() {
     //console.log($('.dd').nestable('serialize'));
     if (confirm_textseg_dirty()) {
       //Change order of elements in itemarray
@@ -153,7 +153,7 @@ function refreshTable() {
           itemarray_old_dic[htmlEntities(element[1])] = element;
         }
       })
-      nestableArrayOrder = $('.dd').nestable('toArray');
+      nestableArrayOrder = $('.dd3').nestable('toArray');
       for (i = 0; i < nestableArrayOrder.length; i++) {
         item = nestableArrayOrder[i];
         key = Number.isInteger(item.id) ? item.id : htmlEntities(item.id);
@@ -186,17 +186,17 @@ function refreshTable() {
   justintimeorder.forEach(function(el) {
     getChildID(el);
   })
-  $('.dd').nestable('serialize').forEach(function(el) {
+  $('.dd3').nestable('serialize').forEach(function(el) {
     originalIDs.push(el.id)
   })
   childID.forEach(function(id) {
-    $('.dd').nestable('remove', id);
+    $('.dd3').nestable('remove', id);
   })
 
   //replace displayed list's elements from justintimeorder
   justintimeorder.forEach(function(el) {
     if (originalIDs.includes(el.id) && Number.isInteger(el.id) && parentList.includes(el.id)) {
-      $('.dd').nestable('replace', el);
+      $('.dd3').nestable('replace', el);
     }
   })
   //replace text items with original item
@@ -769,7 +769,7 @@ function removeSelected() {
         }
       }
       removeIDs.forEach(function(el) {
-        $('.dd').nestable('remove', el)
+        $('.dd3').nestable('remove', el)
       })
       if (chgcnt > 0) {
         submitChanges();
@@ -1075,7 +1075,7 @@ function generateTable() {
   var html = '';
   var totalcols = 10;
 
-  html += "<div class='table dd' id='nestable'><ol class='dd-list'><div class='tr topRow'>";
+  html += "<div class='table dd3' id='nestable'><ol class='dd-list'><div class='tr topRow'>";
   if (!beentaken) {
     html += "<div class='td'></div>";
   }
@@ -1250,9 +1250,9 @@ function generateTable() {
         //}
       } else {
         if (beentaken && curitems[j][6] == 1) {
-          html += '<div class="td" class="greystrike" title="Question Withdrawn">';
+          html += '<div class="td jitQuestionName" class="greystrike" title="Question Withdrawn">';
         } else {
-          html += '<div class="td">';
+          html += '<div class="td jitQuestionName">';
         }
         html += "<input type=hidden name=\"curq[]\" id=\"oqc" + ln + "\" value=\"" + curitems[j][1] + "\"/>";
         html += curitems[j][2] + "</div>"; //description
@@ -1464,7 +1464,7 @@ function submitChanges() {
   var outdata = {
     order: data[0],
     text_order: JSON.stringify(data[1]),
-    jitorder: JSON.stringify($('.dd').nestable('serialize'))
+    jitorder: JSON.stringify($('.dd3').nestable('serialize'))
   };
   if (!beentaken) {
     outdata["pts"] = JSON.stringify(data[2]);
@@ -1480,7 +1480,7 @@ function submitChanges() {
       if (!beentaken) {
         defpoints = $("#defpts").val();
       }
-      justintimeorder = $('.dd').nestable('serialize');
+      justintimeorder = $('.dd3').nestable('serialize');
       document.getElementById(target).innerHTML = '';
       refreshTable();
       updateSaveButtonDimming();

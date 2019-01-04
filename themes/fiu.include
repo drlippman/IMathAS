@@ -1,7 +1,10 @@
 <script>
 var slideIndex = 1;
 $(document).ready(function() {
-showSlides(slideIndex);
+  showSlides(slideIndex);
+
+  //Arrow movement for JIT assignment
+  $('a.has-arrow-right').parent().children().filter("img").addClass("arrow-right")
 });
 function plusSlides(n) {
   showSlides(slideIndex += n);
@@ -45,7 +48,10 @@ function showSlides(n) {
     margin-bottom: 10px;
 }
 
-.mySlides {display: none}
+.mySlides {
+  display: none;
+  padding-right: 100px;
+}
 
 /* Slideshow container */
 .slideshow-container {
@@ -138,5 +144,13 @@ function showSlides(n) {
 /* On smaller screens, decrease text size */
 @media only screen and (max-width: 300px) {
   .prev, .next,.text {font-size: 11px}
+}
+
+a[rel*=noopener]:after {
+	content: "";
+	width:0px;
+	height:1em;
+	display: inline-block;
+	background: none;
 }
 </style>
