@@ -1555,23 +1555,22 @@ function gbtable() {
 		} else {
 			$gb[0][2][$pos][5] = array_sum($catpossfuture[$cat]);
 		}
-
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][8];
 		$gb[0][2][$pos][10] = $cat;
 		$gb[0][2][$pos][12] = $cats[$cat][6];
 		$gb[0][2][$pos][13] = $cats[$cat][7];
 		$gb[0][2][$pos][14] = ($cats[$cat][4]!=0);
-		if ($catposspast[$cat]>0 || count($catposspastec[$cat])>0) {
+		if (count($catposspast[$cat])>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];
 			$cattotweightcur += $cats[$cat][5];
 			$cattotweightfuture += $cats[$cat][5];
-		} else if ($catposscur[$cat]>0 || count($catposscurec[$cat])>0) {
+		} else if (count($catposscur[$cat])>0 || count($catposscurec[$cat])>0) {
 			$gb[0][2][$pos][2] = 1; //scores in cur
 			$cattotweightcur += $cats[$cat][5];
 			$cattotweightfuture += $cats[$cat][5];
-		} else if ($catpossfuture[$cat]>0 || count($catpossfutureec[$cat])>0) {
+		} else if (count($catpossfuture[$cat])>0 || count($catpossfutureec[$cat])>0) {
 			$gb[0][2][$pos][2] = 2; //scores in future
 			$cattotweightfuture += $cats[$cat][5];
 		} else {
