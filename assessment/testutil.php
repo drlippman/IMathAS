@@ -653,12 +653,16 @@ function recordtestdata($limit=false, $updateLTI=true) {
 				require_once("../includes/ltioutcomes.php");
 	
 				$total = 0;
+				$allans = true;
 				for ($i =0; $i < count($bestscores);$i++) {
+					if ($allans && strpos($scores[$i],'-1')!==FALSE) {
+						$allans = false;
+					}
 					if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
 				}
 				$totpossible = totalpointspossible($qi);
 				$grade = round($total/$totpossible,8);
-				$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade);
+				$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade,$allans);
 			}
 		}
 	}

@@ -292,12 +292,16 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 		$aidtotalpossible[$aid] = $line['ptsposs'];
 	}
 	$total = 0;
+	$allans = true;
 	for ($i =0; $i < count($scores);$i++) {
+		if ($allans && strpos($scores[$i],'-1')!==FALSE) {
+			$allans = false;
+		}
 		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
 	}
 	$grade = min(1, max(0,$total/$aidtotalpossible[$aid]));
 	$grade = number_format($grade,8);
-	return updateLTIgrade('update',$sourcedid,$aid,$grade);
+	return updateLTIgrade('update',$sourcedid,$aid,$grade,$allans);
 }
 
 //use this if we know the grade, or want to delete
