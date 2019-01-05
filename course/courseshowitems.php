@@ -111,7 +111,7 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	$out .= " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">" . _ ( 'Modify' ) . "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$blockid}');\">" . _ ( 'Move' ) . '</a></li>';
 	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">" . _ ( 'Delete' ) . "</a></li>";
-	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">" . _('Copy') . "</a></li>";
+	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum&backref=blockhead{$blockid}\">" . _('Copy') . "</a></li>";
 	$out .= " <li><a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">" . _('Toggle NewFlag') . "</a></li>";
 	$out .= '</ul>';
 	$out .= '</div>';
@@ -128,7 +128,7 @@ function getAssessDD($i, $typeid, $parent, $itemid) {
 	$out .= " <li><a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" .  _('Move') .  '</a></li>';
 	$out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" .  _('Delete') .  "</a></li>";
-	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid\">" .  _('Copy') .  "</a></li>";
+	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" .  _('Copy') .  "</a></li>";
 	$out .= " <li><a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">" .  _('Grades') .  "</a></li>";
 	$out .= " <li><a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">" . _('Stats') . '</a></li>';
 	$out .= '</ul>';
@@ -145,7 +145,7 @@ function getDrillDD($i, $typeid, $parent, $itemid) {
 	$out .= " <li><a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" . _('Move') . '</a></li>';
 	$out .= " <li><a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" . _('Delete') . "</a></li>";
-	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid\">" . _('Copy') . "</a></li>";
+	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" . _('Copy') . "</a></li>";
 	$out .= " <li><a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">" . _('Scores') . '</a></li>';
 	$out .= '</ul>';
 	$out .= '</div>';
@@ -161,7 +161,11 @@ function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $sho
 	$out .= " <li><a href=\"add$typename.php?id=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" . _('Move') . '</a></li>';
 	$out .= " <li><a href=\"delete$typename.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" . _('Delete') . "</a></li>";
-	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid\">" . _('Copy') . "</a></li>";
+	if ($typename=='inlinetext') {
+		$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=inline{$typeid}\">" . _('Copy') . "</a></li>";
+	} else {
+		$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" . _('Copy') . "</a></li>";
+	}
 	if ($showstats) {
 		$out .= " <li><a href=\"contentstats.php?cid=$cid&type=$statsletter&id=$typeid\">" . _('Stats') . '</a></li>';
 	}
