@@ -832,7 +832,7 @@ function updateTextShowN(i,old_i) {
 		//if aborted, restore old value
 		$("#showforn"+i).val(old_i);
 	} else {
-		itemarray[i][2] = $("#showforn"+i).val();
+		itemarray[i][2] = 1.0*$("#showforn"+i).val();
 		submitChanges();
 	}
 }
@@ -882,6 +882,7 @@ function generateOutput() {
 	var text_segments = [];
 	var pts = {};
 	var qcnt = 0;
+
 	for (var i=0; i<itemarray.length; i++) {
 		if (itemarray[i][0]=='text') { //is text item
 			//itemarray[i] is ['text',text,displayforN]
@@ -1275,7 +1276,11 @@ function check_textseg_itemarray() {
 			numq = 0;
 			j = i+1;
 			while (j<itemarray.length && itemarray[j][0]!="text") {
-				numq++;
+				if (itemarray[j].length<5) { //is group
+					numq += parseInt(itemarray[j][0]);
+				} else {
+					numq++;
+				}
 				j++;
 			}
 			//make sure isn't bigger than number of q, but is at least 1
