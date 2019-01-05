@@ -1561,6 +1561,7 @@ function gbtable() {
 		$gb[0][2][$pos][12] = $cats[$cat][6];
 		$gb[0][2][$pos][13] = $cats[$cat][7];
 		$gb[0][2][$pos][14] = ($cats[$cat][4]!=0);
+
 		if (count($catposspast[$cat])>0 || count($catposspastec[$cat])>0) {
 			$gb[0][2][$pos][2] = 0; //scores in past
 			$cattotweightpast += $cats[$cat][5];
@@ -1576,6 +1577,7 @@ function gbtable() {
 		} else {
 			$gb[0][2][$pos][2] = 3; //no items
 		}
+		
 		if ($useweights==0 && $cats[$cat][5]>-1) { //if scaling cat total to point value
 			if ($catposspast[$cat]>0) {
 				$gb[0][2][$pos][3] = $cats[$cat][5]; //score for past
@@ -1596,7 +1598,9 @@ function gbtable() {
 		if ($useweights==1) {
 			$gb[0][2][$pos][11] = $cats[$cat][5];
 		}
-
+if ($cats[$cat][0]=='HW') {
+			echo $gb[0][2][$pos][2];
+		}
 
 		$overallptspast += $gb[0][2][$pos][3];
 		$overallptscur += $gb[0][2][$pos][4];
@@ -1677,21 +1681,16 @@ function gbtable() {
 					}
 				} 
 			}
-			if (!isset($gb[$ln][1][$col][0])) {
-				if ($gb[0][1][$col][3]==1) {  //if cur , clear out of cattotattempted
-					if ($gb[0][1][$col][4]==1) {
-						$atloc = array_search($gb[0][1][$col][2],$catpossstu[3][$category[$i]]);
-						if ($atloc!==false) {
-							unset($catpossstu[3][$category[$i]][$atloc]);
-						}
-					} else if ($gb[0][1][$col][4]==2) {
-						$atloc = array_search($gb[0][1][$col][2],$catpossstuec[3][$category[$i]]);
-						if ($atloc!==false) {
-							unset($catpossstuec[3][$category[$i]][$atloc]);
-						}
-					}
+			if (!isset($gb[$ln][1][$col][0]) && 
+				((isset($availstu[$ln][$aid]) && $availstu[$ln][$aid]==1) || 
+				(!isset($availstu[$ln][$aid]) && $gb[0][1][$col][3]==1))) { //if cur , clear out of cattotattempted
+				if ($gb[0][1][$col][4]==1) {
+					unset($catpossstu[3][$category[$i]][$col]);
+				} else if ($gb[0][1][$col][4]==2) {
+					unset($catpossstuec[3][$category[$i]][$col]);
 				}
-			} else if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) { //excused; remove from poss
+			}
+			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) { //excused; remove from poss
 				for ($j=0;$j<4;$j++) {
 					unset($catpossstu[$j][$category[$i]][$col]);
 				}

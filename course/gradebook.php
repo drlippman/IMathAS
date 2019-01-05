@@ -1263,8 +1263,10 @@ function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
 		for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 			if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 				continue;
-			} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
+			} else if ($availshow==2 && $gbt[0][2][$i][2]==3) { //don't show future in cur view
 				continue;
+			} else if ($availshow==0 && $gbt[0][2][$i][2]==1) { //don't show cur in past view
+				continue;	
 			}
 			echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 			if ($availshow<3) {
@@ -1348,6 +1350,8 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 				continue;
 			} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
 				continue;
+			} else if ($availshow==0 && $gbt[0][2][$j][2]==1) { //don't show cur in past view
+				continue;	
 			}
 			if ($gbt[$i][2][$j][4+$availshow]>0) {
 				$pct = round(100*$gbt[$i][2][$j][$availshow]/$gbt[$i][2][$j][4+$availshow],1);
