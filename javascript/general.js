@@ -916,14 +916,14 @@ jQuery(document).ready(function($) {
 			initialtop[i] = -1;
 		}
 	}
-	if (fixedonscrollel.length>0 && $(fixedonscrollel[0]).css('float')=="left") {
+	if (fixedonscrollel.length>0) { // && $(fixedonscrollel[0]).css('float')=="left") {
 		$(window).scroll(function() {
 			var winscrolltop = $(window).scrollTop();
 			for (var i=0;i<fixedonscrollel.length;i++) {
 				if (winscrolltop > initialtop[i] && initialtop[i]>0) {
-					$(fixedonscrollel[i]).css('position','fixed').css('top','5px');
+					$(fixedonscrollel[i]).css('position','fixed').css('top','5px').attr("data-fixed",true);
 				} else {
-					$(fixedonscrollel[i]).css('position','static');
+					$(fixedonscrollel[i]).css('position','static').attr("data-fixed",false);
 				}
 			}
 		});

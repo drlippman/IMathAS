@@ -163,7 +163,7 @@ $caller = "posts";
 include("posthandler.php");
 
 $pagetitle = "Posts";
-$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=022410" type="text/css" />';
+$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=010619" type="text/css" />';
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/posts.js?v=011517"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 if ($caneditscore && $sessiondata['useed']!=0) {
@@ -431,6 +431,7 @@ if (!$oktoshow) {
 	echo '<div id="headerposts" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
 	
+	echo '<div class="fixedonscroll">';
 	if ($prevth != '') {
 		echo "<a href=\"posts.php?cid=$cid&forum=$prevthforum&thread=".Sanitize::onlyInt($prevth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
@@ -443,7 +444,7 @@ if (!$oktoshow) {
 		echo "Next";
 	}
 	
-	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a>";
+	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a> ";
 	if ($tagged) {
 		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
 	} else {
@@ -454,7 +455,7 @@ if (!$oktoshow) {
 	echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
 	echo '<button onclick="showall()">'._('Show All').'</button>';
 	echo '<button onclick="hideall()">'._('Hide All').'</button>';
-
+	echo '</div>';
 
 	/*if ($view==2) {
 	echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=0\">View Expanded</a>";
