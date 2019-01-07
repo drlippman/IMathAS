@@ -677,19 +677,31 @@ switch($_POST['action']) {
 			for ($i=0;$i<8;$i++) {
 				$ltisecret .= substr($chars,rand(0,56),1);
 			}
+			$courseownerid = $userid;
+			if ($myrights >= 75 && isset($_POST['for']) && $_POST['for']>0) {
+				if ($myrights == 75) {
+					$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+					$stm->execute(array($_POST['for']));
+					if ($groupid == $stm->fetchColumn(0)) {
+						$courseownerid = Sanitize::onlyInt($_POST['for']);
+					}
+				} else if ($myrights == 100) {
+					$courseownerid = Sanitize::onlyInt($_POST['for']);
+				}
+			}
 			
 			$DBH->beginTransaction();
 			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,ltisecret,dates_by_lti,blockcnt) VALUES ";
 			$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :ltisecret, :ltidates, :blockcnt);";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$userid, ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':picicons'=>$picicons,
+			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$courseownerid, ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':picicons'=>$picicons,
 				':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':toolset'=>$toolset, ':showlatepass'=>$showlatepass,
 				':itemorder'=>$itemorder, ':available'=>$avail, ':istemplate'=>$istemplate, ':deftime'=>$deftime, ':startdate'=>$startdate, ':enddate'=>$enddate,
 				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt));
 			$cid = $DBH->lastInsertId();
 			//if ($myrights==40) {
 				$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
-				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+				$stm->execute(array(':userid'=>$courseownerid, ':courseid'=>$cid));
 			//}
 			$useweights = intval(isset($CFG['GBS']['useweights'])?$CFG['GBS']['useweights']:0);
 			$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
@@ -706,7 +718,7 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$ctc));
 				$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
-				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $userid) || 
+				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $courseownerid) || 
 					($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
 					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {
 						//did not provide valid enrollment key

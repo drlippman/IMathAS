@@ -460,6 +460,18 @@ switch($_GET['action']) {
 			$dates_by_lti = 0;
 			$startdate = 0;
 			$enddate = 2000000000;
+			$for = 0;
+			if ($myrights >= 75 && isset($_POST['for']) && $_POST['for']>0) {
+				$for = Sanitize::onlyInt($_POST['for']);
+				$stm = $DBH->prepare("SELECT FirstName,LastName,groupid FROM imas_users WHERE id=?");
+				$stm->execute(array($for));
+				$forinfo = $stm->fetch(PDO::FETCH_ASSOC);
+				if ($myrights<100 && $forinfo['groupid']!=$groupid) {
+					$for = 0;
+				} else {
+					$forname = $forinfo['LastName'].', '.$forinfo['FirstName'];
+				}
+			}
 			if (isset($_POST['ctc']) || isset($_POST['coursebrowserctc'])) {
 				if (!empty($_POST['coursebrowserctc'])) {                                           
 					$ctc = Sanitize::onlyInt($_POST['coursebrowserctc']);
@@ -526,6 +538,7 @@ switch($_GET['action']) {
 			echo _('Add New Course');
 		}
 		echo '</h1></div>';
+		
 		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
 		if (isset($_GET['cid'])) {
 			echo "&cid=$cid";
@@ -563,6 +576,12 @@ switch($_GET['action']) {
 		</script>';
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']) .'" />';
 		if ($_GET['action']=='addcourse') {
+			if ($for != 0) {
+				echo '<span class=form>'._('Creating course for:').'</span>';
+				echo '<span class=formright>'.Sanitize::encodeStringForDisplay($forname);
+				echo '<input type=hidden name=for value="'.Sanitize::onlyInt($for).'" />';
+				echo '</span><br class=form>';
+			}
 			if ($ctc==0) {
 				echo '<span class=form>'._('Starting with:').'</span><span class=formright>';
 				echo _('A blank course');
@@ -573,7 +592,7 @@ switch($_GET['action']) {
 				echo '<input type=hidden name=ekey value="'.Sanitize::encodeStringForDisplay($ctcekey).'"/>';
 				echo '<input type=hidden name=termsagree value="1"/>';
 			}
-			echo ' <a class=small href="addcourse.php">Change</a>';
+			echo ' <a class=small href="addcourse.php?for='.Sanitize::onlyInt($for).'">Change</a>';
 			echo '</span><br class=form>';
 		} else {
 			echo "<span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($courseid)."</span><br class=form>\n";
