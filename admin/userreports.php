@@ -136,7 +136,7 @@ if ($overwriteBody==1) {
   	echo '<div class=cpmid>';
   	echo '<span class="column">';
   	echo '<a href="userreports.php?listgroups=true">',_('Groups List'),'</a> <br/>';
-  	echo '<a href="../utils/listnewteachers.php">',_('New Instructors Report');
+  	echo '<a href="../util/listnewteachers.php">',_('New Instructors Report');
   	echo '</span><span class="column">';
   	echo '<a href="forms.php?from=userreports&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
     echo '<br/><a href="../util/batchcreateinstr.php?from=userreports">'._('Batch Add Instructors').'</a>';
