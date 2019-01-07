@@ -98,7 +98,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     }
     //only one match - redirect to user details page
     if (count($possible_groups)==1) {
-      header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userreports.php?groupdetails=".Sanitize::encodeUrlParam($possible_groups[0]['id']). "&r=" .Sanitize::randomQueryStringParam());
+      header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/groupreportdetails.php?id=".Sanitize::encodeUrlParam($possible_groups[0]['id']). "&r=" .Sanitize::randomQueryStringParam());
       exit;
     }
     //sort by priority
@@ -120,26 +120,6 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     $curBreadcrumb = $curBreadcrumb  . _('User Reports');
   }
 
-  //load group details data (shows on group admin too)
-  if ($page=='groupdetails') {
-    if ($showgroup==-1) {
-      $stm = $DBH->query("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName,FirstName");
-    } else {
-
-      if ($myrights==100) { //include pending users
-        $stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 11 AND rights<>76 AND rights<>77 AND groupid=:groupid ORDER BY LastName,FirstName");
-      } else {
-        $stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 12 AND rights<>76 AND rights<>77 AND groupid=:groupid ORDER BY LastName,FirstName");
-      }
-      $stm->execute(array(':groupid'=>$showgroup));
-    }
-    $groupdata = array();
-    while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-      $line['role'] = getRoleNameByRights($line['rights']);
-      $line['lastaccess'] = ($line['lastaccess']>0) ? date("n/j/y g:i a",$line['lastaccess']) : "never";
-      $groupdata[] = $line;
-    }
-  }
 }
 
 /******* begin html output ********/
@@ -155,7 +135,9 @@ if ($overwriteBody==1) {
   	//top navigation
   	echo '<div class=cpmid>';
   	echo '<span class="column">';
-  	echo '<a href="userreports.php?listgroups=true">',_('Groups'),'</a> <br/>';
+  	echo '<a href="userreports.php?listgroups=true">',_('Groups List'),'</a> <br/>';
+  	echo '<a href="../utils/listnewteachers.php">',_('New Instructors Report');
+  	echo '</span><span class="column">';
   	echo '<a href="forms.php?from=userreports&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
     echo '<br/><a href="../util/batchcreateinstr.php?from=userreports">'._('Batch Add Instructors').'</a>';
   	echo '</span>';
@@ -219,7 +201,7 @@ if ($overwriteBody==1) {
           $grpid = Sanitize::onlyInt($group['id']);
           $priorityclass = "p".Sanitize::onlyInt($group['priority']);
           if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-          echo '<td class="'.$priorityclass.'"><a href="userreports.php?groupdetails='.$grpid.'">';
+          echo '<td class="'.$priorityclass.'"><a href="groupreportdetails.php?id='.$grpid.'">';
           echo Sanitize::encodeStringForDisplay($group['name']).'</a> ';
           echo '('.Sanitize::onlyInt($group['ucnt']).')';
           echo '</td>';

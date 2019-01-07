@@ -10,6 +10,8 @@ if (isset($_GET['from'])) {
 		$from = 'home';
 	} else if ($_GET['from']=='admin2') {
 		$from = 'admin2';
+	} else if ($_GET['from']=='userreports') {
+		$from = 'userreports';
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'ud'.$userdetailsuid;
@@ -24,6 +26,8 @@ if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
 } else if ($from == 'admin2') {
 	$breadcrumbbase .= '<a href="admin2.php">Admin</a> &gt; ';
+} else if ($from == 'userreports') {
+	$breadcrumbbase .= '<a href="userreports.php">'._('User Reports').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='ud') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='gd') {
@@ -1248,6 +1252,8 @@ if ($myrights<75 || $from=='home') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 } else if ($from=='admin2') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
+} else if ($from=='userreports') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userreports.php");
 } else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {

@@ -241,11 +241,23 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     }
   }
 
-  echo '<p>Done. <a href="../admin/admin2.php">Admin page</a></p>';
+  echo '<p>Done. ';
+  if ($_POST['from']=='userreports') {
+  	  echo '<a href="../admin/userreports.php">User Reports</a>';
+  } else if ($_POST['from']=='admin') {
+  	  echo '<a href="../admin/admin2.php">Admin page</a>';
+  } else {
+  	  echo '<a href="utils.php">Utilities</a>';
+  }
+  
+  echo '</p>';
 } else {
   require("../header.php");
-  $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</a>\n";
-  if ($_GET['from'] != 'admin') {
+  if ($_GET['from']=='userreports') {
+  	  $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/userreports.php\">User Reports</a>\n";
+  } else if ($_GET['from'] == 'admin') {
+	  $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin2.php\">Admin</a>\n";
+  } else {
   	  $curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
   }
   echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Batch Create Instructors</div>';
@@ -266,6 +278,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   	  echo '<input type=hidden name=groupid value="'.Sanitize::onlyInt($groupid).'" />';
   }
   echo 'CSV file: <input type=file name=uploadedfile /><br/>';
+  echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($_GET['from']).'">';
   echo '<input type="submit" value="Go"/>';
   echo '</form>';
   require("../footer.php");

@@ -26,6 +26,10 @@ if (isset($_GET['end'])) {
 
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js"></script>';
 require("../header.php");
+echo '<div class=breadcrumb>';
+echo $breadcrumbbase .' <a href="../admin/userreports.php">'._('User Reports').'</a> &gt; ';
+echo _('New Instructor Accounts').'</div>';
+  	
 
 echo '<h1>New Instructor Account Requests from ';
 echo date('M j, Y',$start).' to '.date('M j, Y',$end).'</h1>';
