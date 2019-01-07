@@ -4011,8 +4011,8 @@ function evalReturnValue($str,$errordispstr='',$vars=array()) {
 		return false;
 	}
 	if ($res===false) {
-		if ($GLOBALS['myrights']>10) {
-			$error = error_get_last();
+		$error = error_get_last();
+		if ($GLOBALS['myrights']>10 && $error!=$preevalerror) {
 			echo '<p>Caught error in evaluating a function in this question: ',$error['message'];
 			if ($errordispstr!='') {
 				echo ' while evaluating '.htmlspecialchars($errordispstr);
