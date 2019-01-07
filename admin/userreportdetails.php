@@ -87,7 +87,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       $newrow['id'] = $row['id'];
       $newrow['available'] = $row['available'];
       $newrow['owner'] = ($row['ownerid']!=$uid)?$row['LastName'].', '.$row['FirstName']:'';
-      $newrow['canedit'] = ($row['ownerid']==$uid || $myrights==100 || $row['groupid']==$groupid);
+      $newrow['canedit'] = ($row['ownerid']==$userid || $myrights==100 || ($myrights>=75 && $row['groupid']==$groupid));
       $newrow['deleted'] = ($row['available']==4);
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       if ($row['available']==4) {
@@ -308,14 +308,13 @@ if ($overwriteBody==1) {
       if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
       echo '<td ';
       echo 'data-cid='.Sanitize::onlyInt($course['id']).' ';
-      if (!$course['canedit']) {
-      	  echo 'data-noedit=1 ';    
-      }
       if ($course['hidden']) {
         echo 'class="hocptd" ';
       }
       echo '>';
-      echo '<img src="../img/gears.png"/> ';
+      if ($course['canedit']) {
+      	  echo '<img src="../img/gears.png"/> ';
+      }
       echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
       if ($course['available']!=0) {
         echo '<i>';
@@ -495,18 +494,12 @@ if ($overwriteBody==1) {
       var thishtml = html + \' <li class="unhide"><a href="#" onclick="unhidecourse(this);return false;">'._('Return to home page course list').'</a></li>\';
       thishtml += \' <li class="hide"><a href="#" onclick="hidecourse(this);return false;">'._('Hide from home page course list').'</a></li>\';
 
-      if ($(el).attr("data-noedit")!=1) {  
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
         thishtml += \' <li><a href="addremoveteachers.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
         thishtml += \' <li><a href="transfercourse.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
         thishtml += \'</ul></span> \';
         $(el).find("img").replaceWith(thishtml);
-      } else {
-      	thishtml += \' <li><a href="#" onclick="removeSelfAsCoteacher(this,\'+cid+\',\\\'tr\\\','.$uid.');return false;">'._('Remove as a co-teacher').'</a></li>\';
-      	thishtml += \'</ul></span> \';
-      	$(el).find("img").replaceWith(thishtml);
-      }
     });
     $(".dropdown-toggle").dropdown();
     });

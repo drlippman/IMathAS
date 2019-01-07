@@ -39,10 +39,11 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     }
     
 	//pull active courses for this group
+	//exclude selfenroll and guestaccess courses
 	$query = 'SELECT ic.id,ic.ownerid,count(istu.id) AS stucnt,MAX(istu.lastaccess) AS lastactivity 
 	  FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id 
 	  JOIN imas_students AS istu ON istu.courseid=ic.id WHERE
-	  ic.enddate=2000000000 AND ic.available<4 AND iu.groupid=?
+	  ic.enddate=2000000000 AND ic.available<4 AND iu.groupid=? AND (ic.istemplate&12)=0
 	  GROUP BY istu.courseid
 	  HAVING MAX(istu.lastaccess)>?
 	UNION
@@ -50,6 +51,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 	  FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id 
 	  JOIN imas_students AS istu ON istu.courseid=ic.id WHERE
 	  iu.groupid=? AND ic.available<4 AND ic.enddate<2000000000 AND ic.enddate>?
+	  AND (ic.istemplate&12)=0
 	  GROUP BY istu.courseid';
 	  
 	$stm = $DBH->prepare($query);
@@ -94,7 +96,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 	}
 	
 	//pull teachers
-	//TODO:  add in joined list of non-deleted course IDs
+
 	$query = "SELECT iu.id,iu.SID,iu.FirstName,iu.LastName,iu.email,iu.rights,";
 	$query .= "iu.lastaccess,it.courselist ";
 	$query .= "FROM imas_users AS iu LEFT JOIN ";
