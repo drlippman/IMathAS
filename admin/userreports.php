@@ -181,7 +181,7 @@ if ($overwriteBody==1) {
         foreach ($possible_users as $user) {
           $priorityclass = "p".Sanitize::onlyInt($user['priority']);
           if ($alt==0) {echo "<tr class=\"even $priorityclass\">"; $alt=1;} else {echo "<tr class=\"odd $priorityclass\">"; $alt=0;}
-          echo '<td><a href="userdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'">';
+          echo '<td><a href="userreportdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'">';
           echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']) . '</a></td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['SID']).'</td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['email']).'</td>';
