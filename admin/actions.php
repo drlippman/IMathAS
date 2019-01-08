@@ -749,7 +749,7 @@ switch($_POST['action']) {
 						':chop'=>$row['chop'], ':dropn'=>$row['dropn'], ':weight'=>$row['weight'], ':hidden'=>$row['hidden'], ':calctype'=>$row['calctype']));
 					$gbcats[$frid] = $DBH->lastInsertId();
 				}
-				$copystickyposts = true;
+				$copystickyposts = !empty($_POST['copystickyposts']);
 				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$_POST['usetemplate']));
 				$r = $stm->fetch(PDO::FETCH_NUM);
@@ -763,6 +763,7 @@ switch($_POST['action']) {
 				}
 				$outcomes = array();
 
+				$replacebyarr = array();
 				$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
 				$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
 				$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
@@ -773,7 +774,7 @@ switch($_POST['action']) {
 					$replacebyarr[$row[0]] = $row[1];
 				}
 
-				if ($outcomesarr!='') {
+				if ($outcomesarr!='' && !empty($_POST['copyoutcomes'])) {
 					$stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
 					$stm->execute(array(':courseid'=>$_POST['usetemplate']));
 					$out_ins_stm = null;
@@ -818,30 +819,33 @@ switch($_POST['action']) {
 				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':id'=>$cid));
 				//copy offline
 				$offlinerubrics = array();
-				$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_POST['usetemplate']));
-				$gbi_ins_stm = null;
-				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					$rubric = $row['rubric'];
-					unset($row['rubric']);
-					if (isset($gbcats[$row['gbcategory']])) {
-						$row['gbcategory'] = $gbcats[$row['gbcategory']];
-					} else {
-						$row['gbcategory'] = 0;
-					}
-					if ($gbi_ins_stm === null) {
-						$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
-						$query .= "(:courseid,:name,:points,:showdate,:gbcategory,:cntingb,:tutoredit)";
-						$gbi_ins_stm = $DBH->prepare($query);
-					}
-					$row[':courseid'] = $cid;
-					$gbi_ins_stm->execute($row);
-					if ($rubric>0) {
-						$offlinerubrics[$DBH->lastInsertId()] = $rubric;
+				if (!empty($_POST['copyoffline'])) {
+					$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid=:courseid");
+					$stm->execute(array(':courseid'=>$_POST['usetemplate']));
+					$gbi_ins_stm = null;
+					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+						$rubric = $row['rubric'];
+						unset($row['rubric']);
+						if (isset($gbcats[$row['gbcategory']])) {
+							$row['gbcategory'] = $gbcats[$row['gbcategory']];
+						} else {
+							$row['gbcategory'] = 0;
+						}
+						if ($gbi_ins_stm === null) {
+							$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
+							$query .= "(:courseid,:name,:points,:showdate,:gbcategory,:cntingb,:tutoredit)";
+							$gbi_ins_stm = $DBH->prepare($query);
+						}
+						$row[':courseid'] = $cid;
+						$gbi_ins_stm->execute($row);
+						if ($rubric>0) {
+							$offlinerubrics[$DBH->lastInsertId()] = $rubric;
+						}
 					}
 				}
-				copyrubrics();
-
+				if (!empty($_POST['copyrubrics'])) {
+					copyrubrics();
+				}
 			}
 			if ($setdatesbylti==1) {
 				$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");

@@ -504,6 +504,9 @@ switch($_GET['action']) {
 					$name = $ctcinfo['name'];
 					$latepasshrs = $ctcinfo['latepasshrs'];
 					$deflatepass = $ctcinfo['deflatepass'];
+					$showlatepass = $ctcinfo['showlatepass'];
+					$theme = $ctcinfo['theme'];
+					$msgset = $ctcinfo['msgset'];
 				}
 			} else {
 				$ctc = 0;
@@ -626,10 +629,32 @@ switch($_GET['action']) {
 				echo 'opt out of having the student data deleted. </p>';
 			}
 		}
+		//Start grouping: copy options
+		if ($_GET['action']=='addcourse' && $ctc>0) {
+			echo '<div class="block grouptoggle">';
+			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo _('Course Copy Options');
+			echo '</div>';
+			echo '<div class="blockitems hidden">';
+			echo '<span class=form><label for=copyoffline>'._('Copy offline grade items?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyoffline" id="copyoffline" value="1"/>';
+			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyrubrics>'._('Copy rubrics?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyrubrics" id="copyrubrics" value="1" checked/>';
+			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyoutcomes>'._('Copy outcomes?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyoutcomes" id="copyoutcomes" value="1"/>';
+			echo '</span><br class=form>';
+			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
+			echo '</span><br class=form>';
+			echo '</div>';
+			//TODO:  FINISH ME ****
+		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';
 		echo '<img class="mida" src="../img/expand.gif" /> ';
-		echo 'Availability and Access';
+		echo _('Availability and Access');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
 		
