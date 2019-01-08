@@ -20,22 +20,24 @@ echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('Add New Course').'</div>';
 echo '<div class="pagetitle"><h1>'._('Add New Course').'</h1></div>';
 
 echo '<form method="POST" action="forms.php?from=home&action=addcourse">';
+$dispgroup = '';
 if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_GET['for']) && $_GET['for']>0 && $_GET['for'] != $userid) {
 	$stm = $DBH->prepare("SELECT FirstName,LastName,groupid FROM imas_users WHERE id=?");
 	$stm->execute(array($_GET['for']));
 	$forinfo = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($myrights==100 || $forinfo['groupid']!=$groupid) {
+	if ($myrights==100 || ($myspecialrights&32)==32 || $forinfo['groupid']==$groupid) {
 		echo '<p>'._('Adding Course For').': ';
 		echo Sanitize::encodeStringforDisplay($forinfo['LastName'].', '.$forinfo['FirstName']);
 		echo '<input type=hidden name=for value="'.Sanitize::onlyInt($_GET['for']).'" />';
 		echo '</p>';
+		$dispgroup = $forinfo['groupid'];
 	}
 }
 echo '<p>'._('How would you like to start this course?').'</p>';
 echo '<p><button type=submit name=copytype value=0>'._('Start with a blank course').'</button></p>';
 if (isset($CFG['coursebrowser'])) {
 		//use the course browser
-		echo '<p><button type="button" onclick="showCourseBrowser()">';
+		echo '<p><button type="button" onclick="showCourseBrowser('.Sanitize::encodeStringForDisplay($dispgroup).')">';
 		if (isset($CFG['coursebrowsermsg'])) {
 			echo $CFG['coursebrowsermsg'];
 		} else {

@@ -44,9 +44,13 @@ $(function() {
 		}
 	});
 });
-function showCourseBrowser() {
+function showCourseBrowser(grpid) {
+	var grpstr = '';
+	if (grpid) {
+		grpstr = '&forgrp='+grpid;
+	}
 	$("#copyoptions").slideUp();
-	GB_show("Course Browser",imasroot+"/admin/coursebrowser.php?embedded=true",800,"auto");
+	GB_show("Course Browser",imasroot+"/admin/coursebrowser.php?embedded=true"+grpstr,800,"auto");
 }
 function setCourse(course) {
 	$("#coursebrowserctc").val(course.id).prop("checked",true);
