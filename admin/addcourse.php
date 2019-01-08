@@ -20,7 +20,7 @@ echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('Add New Course').'</div>';
 echo '<div class="pagetitle"><h1>'._('Add New Course').'</h1></div>';
 
 echo '<form method="POST" action="forms.php?from=home&action=addcourse">';
-if ($myrights >= 75 && isset($_GET['for']) && $_GET['for']>0 && $_GET['for'] != $userid) {
+if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_GET['for']) && $_GET['for']>0 && $_GET['for'] != $userid) {
 	$stm = $DBH->prepare("SELECT FirstName,LastName,groupid FROM imas_users WHERE id=?");
 	$stm->execute(array($_GET['for']));
 	$forinfo = $stm->fetch(PDO::FETCH_ASSOC);

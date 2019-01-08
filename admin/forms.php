@@ -288,6 +288,12 @@ switch($_GET['action']) {
 			echo ' <input name=newgroupname size=20 onblur="checkgroupisnew()"/></span>';
 			echo "</span><br class=form />\n";
 		}
+		if ($myrights >= 75 || ($myspecialrights&32)==32) {
+			echo '<span class=form>'._('Add a course').'</span>';
+			echo '<span class=formright><label><input type=checkbox name=addnewcourse value=1> ';
+			echo _('Add a new course for this user').'</span><br class=form>';
+		}
+		
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		if ($_GET['action'] == "newadmin") {
 			require_once("../includes/newusercommon.php");
@@ -461,12 +467,12 @@ switch($_GET['action']) {
 			$startdate = 0;
 			$enddate = 2000000000;
 			$for = 0;
-			if ($myrights >= 75 && isset($_POST['for']) && $_POST['for']>0) {
+			if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_POST['for']) && $_POST['for']>0) {
 				$for = Sanitize::onlyInt($_POST['for']);
 				$stm = $DBH->prepare("SELECT FirstName,LastName,groupid FROM imas_users WHERE id=?");
 				$stm->execute(array($for));
 				$forinfo = $stm->fetch(PDO::FETCH_ASSOC);
-				if ($myrights<100 && $forinfo['groupid']!=$groupid) {
+				if ($myrights<100 && ($myspecialrights&32)!=32 && $forinfo['groupid']!=$groupid) {
 					$for = 0;
 				} else {
 					$forname = $forinfo['LastName'].', '.$forinfo['FirstName'];

@@ -385,6 +385,10 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
 			$stm->execute(array($newuserid, $now, json_encode($reqdata)));
 		}
+		if ($_POST['newrights']>=20 && !empty($_POST['addnewcourse'])) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/addcourse.php?for=".Sanitize::onlyInt($newuserid));	
+			exit;
+		}
 		break;
 	case "logout":
 		$sessionid = session_id();
@@ -678,15 +682,15 @@ switch($_POST['action']) {
 				$ltisecret .= substr($chars,rand(0,56),1);
 			}
 			$courseownerid = $userid;
-			if ($myrights >= 75 && isset($_POST['for']) && $_POST['for']>0) {
-				if ($myrights == 75) {
+			if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_POST['for']) && $_POST['for']>0) {
+				if ($myrights == 100 || ($myspecialrights&32)==32) {
+					$courseownerid = Sanitize::onlyInt($_POST['for']);
+				} else if ($myrights == 75) {
 					$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
 					$stm->execute(array($_POST['for']));
 					if ($groupid == $stm->fetchColumn(0)) {
 						$courseownerid = Sanitize::onlyInt($_POST['for']);
 					}
-				} else if ($myrights == 100) {
-					$courseownerid = Sanitize::onlyInt($_POST['for']);
 				}
 			}
 			
