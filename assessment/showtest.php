@@ -2148,8 +2148,8 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							}
 						}
 					}
-					//echo "score!".$rawscore;
-					if($rawscore == $qi[$questions[$qn]]['points']){
+					//cho "score!".array_sum(explode("~",$rawscore))."<br>point: ".$qi[$questions[$qn]]['points'];
+					if($rawscore == $qi[$questions[$qn]]['points'] || array_sum(explode("~",$rawscore))){
 						//Find all children and mark them as correct
 						jitMarkChildrenCorrect($questions[$qn]);
 
