@@ -1137,6 +1137,9 @@ switch($_GET['action']) {
 
 
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
+		if ($myrights==100 && $_GET['action']=='modify' && $line['ancestors'] != '') {
+			echo '<p class=small>'._('Course Ancestors').': '.Sanitize::encodeStringForDisplay($line['ancestors']).'</p>';
+		}
 		break;
 	case "importmacros":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
