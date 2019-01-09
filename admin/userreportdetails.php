@@ -144,7 +144,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     			}
     		}
     		if ($courses_teaching[$row['id']]['active']==1) { //if active
-    			if (!empty($courses_teaching[$row['courseid']]['isLTI'])) {
+    			if (!empty($courses_teaching[$row['id']]['isLTI'])) {
     				$totalactivestuLTI += $row['stucnt'];
     			} else {
     				$totalactivestudirect += $row['stucnt'];
