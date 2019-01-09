@@ -605,7 +605,7 @@ if (isset($_GET['launch'])) {
 	//look if we know this user
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when LMS GUID change, while still storing it
 	$shortorg = $orgparts[0];	   //we'll only use the part from the lti key
-	$query = "SELECT lti.userid,iu.FirstName,iu.LastName,iu.email FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
+	$query = "SELECT lti.userid,iu.FirstName,iu.LastName,iu.email,lti.id FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
 	$query .= "WHERE lti.org LIKE :org AND lti.ltiuserid=:ltiuserid ";
 	if ($ltirole!='learner') {
 		//if they're a teacher, make sure their imathas account is too. If not, we'll act like we don't know them
@@ -634,7 +634,13 @@ if (isset($_GET['launch'])) {
 			} else {
 				$email = 'none@none.com';
 			}
-			if ($firstname != $userrow['FirstName'] || $lastname != $userrow['LastName'] || $email != $userrow['email']) {
+			if ($userrow['FirstName'] === null) { //accidentally deleted the imas_users record!  Restore it
+				$query = "INSERT INTO imas_users (id,SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+				$query .= '(:userid,:SID,:password,:rights,:FirstName,:LastName,:email,0)';
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':userid'=>$userid, ':SID'=>'lti-'.$userrow['id'], ':password'=>'pass' ,':rights'=>10,
+					':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email));
+			} else if ($firstname != $userrow['FirstName'] || $lastname != $userrow['LastName'] || $email != $userrow['email']) {
 				//update imas_users record
 				$stm2 = $DBH->prepare("UPDATE imas_users SET FirstName=?,LastName=?,email=? WHERE id=?");
 				$stm2->execute(array($firstname, $lastname, $email, $userid));

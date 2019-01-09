@@ -155,6 +155,7 @@ if (count($stus)>0) {
 }
 
 //delete old students
+/* this appears to be broken :(
 if (!isset($CFG['cleanup']['deloldstus']) || $CFG['cleanup']['deloldstus']==true) {
 	$query = 'DELETE imas_users FROM imas_users ';
 	$query .= 'LEFT JOIN imas_students ON imas_users.id=imas_students.userid ';
@@ -163,6 +164,7 @@ if (!isset($CFG['cleanup']['deloldstus']) || $CFG['cleanup']['deloldstus']==true
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($now-$old-$delay));
 }
+*/
 
 //clear out any old pw
 if ($clearpw>0) {
