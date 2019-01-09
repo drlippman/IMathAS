@@ -3,6 +3,7 @@
 //(c) 2017 David Lippman
 
 require("../init.php");
+require("../includes/newusercommon.php");
 
 function getRoleNameByRights($rights) {
   switch ($rights) {
@@ -19,63 +20,74 @@ function getRoleNameByRights($rights) {
 
 $overwriteBody = 0;
 $body = "";
+$old = 30; //old courses: no activity in __ days.
 
-$curBreadcrumb = $breadcrumbbase .' <a href="admin2.php">'._('Admin').'</a> &gt; ';
-if (isset($_GET['group'])) {
-  $curBreadcrumb .= '<a href="admin2.php?groupdetails='.Sanitize::onlyInt($_GET['group']).'">'._('Group Details').'</a> &gt; ';
-}
+$curBreadcrumb = $breadcrumbbase .' <a href="userreports.php">'._('User Reports').'</a> &gt; ';
 $curBreadcrumb .= _('User Detail');
 
-if ($myrights < 75) {
+if ($myrights < 100 && (($myspecialrights&32)!=32)) {
  	$overwriteBody = 1;
 	$body = "You don't have authority to view this page.";
-}  if (empty($_GET['id'])) {
+} else if (empty($_GET['id'])) {
   $overwriteBody = 1;
   $body = 'No id provided';
 } else {
+  $now = time();
+  
   //pull basic user info
   $uid = Sanitize::onlyInt($_GET['id']);
-  $query = "SELECT iu.FirstName,iu.LastName,iu.email,iu.rights,iu.lastaccess,ig.name AS gname,iu.specialrights,ig.parent ";
+  $query = "SELECT iu.SID,iu.FirstName,iu.LastName,iu.email,iu.rights,iu.lastaccess,iu.groupid,ig.name AS gname,iu.specialrights,ig.parent ";
   $query .= "FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.id=:id";
-  if ($myrights<100) {
-    $query .= " AND iu.groupid=:groupid";
-  }
   $stm = $DBH->prepare($query);
-  if ($myrights<100) {
-    $stm->execute(array(':id'=>$uid, ':groupid'=>$groupid));
-  } else {
-    $stm->execute(array(':id'=>$uid));
-  }
+  $stm->execute(array(':id'=>$uid));
+ 
   $userinfo = $stm->fetch(PDO::FETCH_ASSOC);
-  if ($userinfo !== false) {
-	  $userinfo['role'] = getRoleNameByRights($userinfo['rights']);
-	  $userinfo['lastaccess'] = ($userinfo['lastaccess']>0) ? date("n/j/y g:i a",$userinfo['lastaccess']) : "never";
-	  if ($userinfo['parent']>0) {
-		$group_stm = $DBH->prepare('SELECT name FROM imas_groups WHERE id=:id');
-		$group_stm->execute(array(':id'=>$userinfo['parent']));
-		$r = $group_stm->fetch(PDO::FETCH_NUM);
-		$userinfo['parentgroup'] = $r[0];
-	  }
+  $userinfo['role'] = getRoleNameByRights($userinfo['rights']);
+  $userinfo['lastaccess'] = ($userinfo['lastaccess']>0) ? date("n/j/y g:i a",$userinfo['lastaccess']) : "never";
+  if ($userinfo['parent']>0) {
+    $group_stm = $DBH->prepare('SELECT name FROM imas_groups WHERE id=:id');
+    $group_stm->execute(array(':id'=>$userinfo['parent']));
+    $r = $group_stm->fetch(PDO::FETCH_NUM);
+    $userinfo['parentgroup'] = $r[0];
   }
 
   if ($userinfo===false) {
     $overwriteBody = 1;
     $body = 'Invalid id provided';
   } else {
+  	$errors = '';
+	if (isset($_POST['pw1'])) {
+		  $errors = checkNewUserValidation(array('pw1'));
+		  if ($errors == '') {
+			if (isset($CFG['GEN']['newpasswords'])) {
+				require_once("../includes/password.php");
+				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+			} else {
+				$newpw = md5($_POST['pw1']);
+			} 
+			$stm = $DBH->prepare("UPDATE imas_users SET password=:pw,forcepwreset=1 WHERE id=:uid");
+			$stm->execute(array(':pw'=>$newpw, ':uid'=>$uid));
+			$errors = _('Password Reset');
+		  }
+	}
+	  
     //courses teaching list
-    $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_teachers.hidefromcourselist ";
+    $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_teachers.hidefromcourselist,";
+    $query .= "imas_courses.startdate,imas_courses.enddate ";
     $query .= "FROM imas_courses JOIN imas_users ON imas_courses.ownerid=imas_users.id ";
     $query .= "JOIN imas_teachers ON imas_teachers.courseid=imas_courses.id WHERE imas_teachers.userid=:uid ";
     $query .= " ORDER BY imas_courses.name";
     $stm = $DBH->prepare($query);
   	$stm->execute(array(':uid'=>$uid));
     $courses_teaching = array();
+    $totalactivecourses = 0;
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
       $newrow = array();
       $newrow['name'] = $row['name'];
       $newrow['id'] = $row['id'];
       $newrow['available'] = $row['available'];
       $newrow['owner'] = ($row['ownerid']!=$uid)?$row['LastName'].', '.$row['FirstName']:'';
+      $newrow['canedit'] = ($row['ownerid']==$userid || $myrights==100 || ($myrights>=75 && $row['groupid']==$groupid));
       $newrow['deleted'] = ($row['available']==4);
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       if ($row['available']==4) {
@@ -89,8 +101,68 @@ if ($myrights < 75) {
           $newrow['status'][] = '<span class="hocp">'._("Hidden on User's Home Page").'</span>';
         }
       }
-      $courses_teaching[] = $newrow;
+      if ($row['enddate']<2000000000) { //if we have an enddate, use it
+      	  if ($now<$row['startdate'] && $now>$row['enddate']) {
+      	  	  $newrow['active'] = 1;
+      	  	  $totalactivecourses++;
+      	  } else {
+      	  	  $newrow['active'] = 0;
+      	  }
+      } else {
+      	  $newrow['active'] = -1;
+      }
+      $newrow['stucnt'] = 0;
+      $newrow['lastactivity'] = 0;
+      $courses_teaching[$row['id']] = $newrow;
     }
+    
+    $totalactivestudirect = 0;
+    $totalactivestuLTI = 0;
+    if (count($courses_teaching)>0) {
+    	//pull LTI/not
+    	$courseids = array_keys($courses_teaching);
+    	$ph = Sanitize::generateQueryPlaceholders($courseids);
+    	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE courseid IN ($ph)");
+    	$stm->execute($courseids);
+    	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    		$courses_teaching[$row['courseid']]['isLTI'] = 1;
+    	}
+    	
+    	//pull last student access and stucnt
+    	$query = "SELECT ic.id,COUNT(istu.id) AS stucnt,MAX(istu.lastaccess) AS lastactivity ";
+    	$query .= "FROM imas_courses AS ic JOIN imas_students AS istu ";
+    	$query .= "ON ic.id=istu.courseid WHERE ic.id IN ($ph) GROUP BY ic.id";
+    	$stm = $DBH->prepare($query);
+    	$stm->execute($courseids);
+    	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    		if ($courses_teaching[$row['id']]['active']==-1) {//don't know if it's active
+    			if ($row['lastactivity']<$now-$old*24*60*60) {
+    				$courses_teaching[$row['id']]['active'] = 0;
+    			} else {
+    				$courses_teaching[$row['id']]['active'] = 1;
+    				$totalactivecourses++;
+    			}
+    		}
+    		if ($courses_teaching[$row['id']]['active']==1) { //if active
+    			if (!empty($courses_teaching[$row['courseid']]['isLTI'])) {
+    				$totalactivestuLTI += $row['stucnt'];
+    			} else {
+    				$totalactivestudirect += $row['stucnt'];
+    			}
+    		}
+    		$courses_teaching[$row['id']]['lastactivity'] = $row['lastactivity'];
+    		$courses_teaching[$row['id']]['stucnt'] = $row['stucnt'];
+    	}
+    }
+    
+    function sortteaching($a,$b) {
+    	if ($a['active']==$b['active']) {
+    		return ($a['id']-$b['id']);
+    	} else {
+    		return ($b['active']-$a['active']);
+    	}
+    }
+    uasort($courses_teaching, 'sortteaching');
 
     //pull courses tutoring
     $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_tutors.hidefromcourselist ";
@@ -148,6 +220,7 @@ if ($myrights < 75) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 $placeinhead .= '<style type="text/css">
 li.unhide {
   display: none;
@@ -170,28 +243,38 @@ if ($overwriteBody==1) {
   echo '</h1></div>';
 
 
-  //sub nav links
-  echo '<div class="cpmid"><a href="forms.php?from=ud'.$uid.'&action=chgrights&id='.$uid.'">'._('Edit User').'</a>';
-  echo ' | <a href="addcourse.php?for='.$uid.'">'. _('Add Course').'</a>';
-  echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
-  if ($myrights==100) {
-    echo ' | <a href="userlti.php?id='.$uid.'">'. _('LTI Connections').'</a>';
-  }
-  if ($userinfo['rights']==100 || ($userinfo['specialrights']&4)==4) {
-    echo ' | <a href="listdiag.php?show=u'.$uid.'">'. _('Diagnostics').'</a>';
-  }
-  echo '</div>';
-
   //basic user info
-  echo '<p>'._('Role').': '.Sanitize::encodeStringForDisplay($userinfo['role']);
+  echo '<p>';
+  echo _('Username').': '.Sanitize::encodeStringForDisplay($userinfo['SID']).'<br/>';
+  echo _('Role').': '.Sanitize::encodeStringForDisplay($userinfo['role']);
   if ($userinfo['gname']!==null) {
-    echo '<br/>'._('Group').': '.Sanitize::encodeStringForDisplay($userinfo['gname']);
+    echo '<br/>'._('Group').': ';
+    echo '<a href="groupreportdetails.php?id='.Sanitize::onlyInt($userinfo['groupid']).'">';
+    echo Sanitize::encodeStringForDisplay($userinfo['gname']);
+    echo '</a>';
     if (isset($userinfo['parentgroup'])) {
       echo ' ('._('Subgroup of').': '.Sanitize::encodeStringForDisplay(trim($userinfo['parentgroup'])).')';
     }
   }
   echo '<br/>'._('Email').': '.Sanitize::encodeStringForDisplay($userinfo['email']);
-  echo '<br/>'._('Last Login').': '.Sanitize::encodeStringForDisplay($userinfo['lastaccess']).'</p>';
+  echo '<br/>'._('Last Login').': '.Sanitize::encodeStringForDisplay($userinfo['lastaccess']);
+  echo '<br/>'._('Active Courses').': '.Sanitize::onlyInt($totalactivecourses);
+  echo '<br/>'._('Total Active Students').': ';
+  echo Sanitize::onlyInt($totalactivestudirect).' '. _('direct').', ';
+  echo Sanitize::onlyInt($totalactivestuLTI).' '. _('via LTI');
+  echo '</p>';
+  
+  if ($errors != '') {
+  	  echo '<p class=noticetext>'.$errors.'</p>';
+  }
+  echo '<form method="post" id="pwform" class=limitaftervalidate>';
+  echo '<p><a href="#" onclick="$(\'#pwreset\').show();return false;">';
+  echo _('Reset Password').'</a>';
+  echo ' <span style="display:none;" id="pwreset"><label>'._('Set temporary password to: ');
+  echo '<input id="pw1" name="pw1" type="text" /></label> ';
+  echo '<input type=submit><span>';
+  echo '</p></form>';
+  showNewUserValidation('pwform');
 
   if ((count($courses_teaching)>0 || count($courses_tutoring)>0) && count($courses_taking)>0) {
     //jump nav
@@ -213,6 +296,10 @@ if ($overwriteBody==1) {
     echo '<table class="gb" id="courses-teaching"><thead><tr>';
     echo '<th>'._('Name').'</th>';
     echo '<th>'._('Course ID').'</th>';
+    echo '<th>'._('Active').'</th>';
+    echo '<th>'._('Student Count').'</th>';
+    echo '<th>'._('Last Activity').'</th>';
+    echo '<th>'._('LTI?').'</th>';
     echo '<th>'._('Status').'</th>';
     echo '<th>'._('Owner (if not user)').'</th>';
     echo '</tr></thead><tbody>';
@@ -225,7 +312,9 @@ if ($overwriteBody==1) {
         echo 'class="hocptd" ';
       }
       echo '>';
-      echo '<img src="../img/gears.png"/> ';
+      if ($course['canedit']) {
+      	  echo '<img src="../img/gears.png"/> ';
+      }
       echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
       if ($course['available']!=0) {
         echo '<i>';
@@ -243,13 +332,25 @@ if ($overwriteBody==1) {
       echo '</a>';
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
+      echo '<td>'.($course['active']==1?_('Active'):_('Old')).'</td>';
+      if ($course['stucnt']>0) {
+      	  echo '<td>'.Sanitize::onlyInt($course['stucnt']).'</td>';
+      } else {
+      	  echo '<td>-</td>';
+      }
+      if ($course['lastactivity']>0) {
+      	  echo '<td>'.date("n/j/y",$course['lastactivity']).'</td>';
+      } else {
+      	  echo '<td>-</td>';
+      }
+      echo '<td>'.(!empty($course['isLTI'])?_('LTI'):_('No')).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
     echo '<script type="text/javascript">
-      initSortTable("courses-teaching",Array("S","N","S","S"),true);
+      initSortTable("courses-teaching",Array("S","N","S","N","D","S","S","S"),true);
       </script>';
   }
   if (count($courses_tutoring)>0) {

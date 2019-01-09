@@ -16,6 +16,9 @@ if (!empty($_GET['from'])) {
 	} else if ($_GET['from']=='admin2') {
 		$from = 'admin2';
 		$backloc = 'admin2.php';
+	} else if ($_GET['from']=='userreports') {
+		$from = 'userreports';
+		$backloc = 'userreports.php';
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'ud'.$userdetailsuid;
@@ -32,6 +35,8 @@ if (!isset($_GET['cid'])) {
 		echo "<a href=\"admin2.php\">Admin</a> &gt; ";
 	} else if ($from == 'admin2') {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; ';
+	} else if ($from == 'userreports') {
+		echo '<a href="userreports.php">'._('User Reports').'</a> &gt; ';
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 	} else if (substr($_GET['from'],0,2)=='gd') {
@@ -138,6 +143,10 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($myrights < 100 && ($myspecialrights&32)!=32 && $line['groupid']!=$groupid) {
+				echo "You do not have access to edit this user";
+				break;
+			}
 			printf("<div class=pagetitle><h1>%s %s</h1></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
 				Sanitize::encodeStringForDisplay($line['LastName']));
 			$oldgroup = $line['groupid'];

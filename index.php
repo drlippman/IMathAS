@@ -373,6 +373,14 @@ if (!isset($CFG['GEN']['homelinkbox'])) {
 	} else if (($myspecialrights&4)==4) {
 		echo '<br/><a href="admin/listdiag.php">'._('Diagnostics').'</a>';
 	}
+	if ((($myspecialrights&32)==32) || $myrights == 100) {
+		if ($myrights >=75 || ($myspecialrights&4)==4) {
+			echo ' | ';
+		} else {
+			echo '<br/>';
+		}
+		echo '<a href="admin/userreports.php">'._('User Reports').'</a>';
+	}
 	echo '</div>';
 }
 
