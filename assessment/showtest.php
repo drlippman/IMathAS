@@ -131,7 +131,7 @@
 			echo '<p>'.sprintf(_('You have %d LatePass(es) available which you could use to re-open the assignment for scored work.'), $latepasses).'</p>';
 			echo '<p><button type="button" onclick="window.location.href=\'../course/redeemlatepass.php?cid='.$cid.'&aid='.$aid.'\'">'._('Use LatePass').'</button> ';
 			echo _('This will re-open the assessment for graded work').'</p>';
-			echo '<p><button type="button" onclick="window.location.href=\'showtest.php?cid='.$cid.'&id='.$aid.'&goreview=true\'">'.('Continue in Review Mode').'</button> ';
+			echo '<p><a href="showtest.php?cid='.$cid.'&id='.$aid.'&goreview=true">'.('Continue in Review Mode').'</a> ';
 			echo '<span class="noticetext">'._('If you open the assessment in un-graded review mode now, you will not be able to use a LatePass later').'</span></p>';
 			require("../footer.php");
 			exit;
