@@ -119,6 +119,8 @@
 		$viddata = serialize($newviddata);
 	}
 	
+	$DBH->beginTransaction();
+	
 	//update question point values
 	$ptschanged = false;
 	if (isset($_POST['pts'])) {
@@ -162,5 +164,6 @@
 	} else {
 		echo "error: not saved";
 	}
+	$DBH->commit();
 
 ?>
