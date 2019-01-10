@@ -74,15 +74,18 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 
 	//pull LTI/not for these courses
 	$totalLTICourses = 0;
+	$totalActiveStuLTI = 0;
 	if (count($coursedetails)>0) {
 		$stm = $DBH->prepare("SELECT DISTINCT courseid FROM imas_lti_courses WHERE courseid IN ($ph)");
 		$stm->execute($activecourseids);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$coursedetails[$row['courseid']]['isLTI'] = 1;
 			$totalLTICourses++;
+			$totalActiveStuLTI += $coursedetails[$row['courseid']]['stucnt'];
 		}
 	}
 	
+	/*
 	//get Group Templates
 	$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_users AS iu ";
 	$query .= "ON ic.ownerid=iu.id WHERE iu.groupid=? AND ";
@@ -94,9 +97,35 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$grptemplates[$row['id']] = $row['name'];
 	}
+	*/
+	//pull template courses
+	$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&1)=1 OR (istemplate&2)=2 ORDER BY name");
+	$templates = array();
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$templates[$row[0]] = $row[1];
+	}
+	$templateids = array_keys($templates);
+	
+	
+	//pull templates used for these courses
+	$templatecnt = array();
+	if (count($coursedetails)>0) {
+		$stm = $DBH->prepare("SELECT ancestors FROM imas_courses WHERE id IN ($ph)");
+		$stm->execute($activecourseids);
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$templatematches = array_intersect(explode(',', $row['ancestors']), $templateids);
+			if (count($templatematches)>0) {
+			  $last = $templatematches[count($templatematches)-1];
+			  if (!isset($templatecnt[$last])) {
+				  $templatecnt[$last] = 1;
+			  } else {
+				  $templatecnt[$last]++;
+			  }
+			}
+		}
+	}
 	
 	//pull teachers
-
 	$query = "SELECT iu.id,iu.SID,iu.FirstName,iu.LastName,iu.email,iu.rights,";
 	$query .= "iu.lastaccess,it.courselist ";
 	$query .= "FROM imas_users AS iu LEFT JOIN ";
@@ -148,11 +177,13 @@ if ($overwriteBody==1) {
   	echo '<h2>'.Sanitize::encodeStringForDisplay($groupname).'</h2>';
   	
   	echo '<p>';
-  	echo _('Active Courses') . ': ' . Sanitize::onlyInt($totalActiveCourses) . '<br/>';
-  	echo _('Active Courses using LTI') . ': ' . Sanitize::onlyInt($totalLTICourses) . '<br/>';
+  	echo _('Active Courses') . ': ' . Sanitize::onlyInt($totalActiveCourses);
+  	echo ' ('.sprintf(_('%d using LTI'), Sanitize::onlyInt($totalLTICourses)).')<br/>';
   	echo _('Students in Active Courses') . ': ' . Sanitize::onlyInt($totalActiveStu);
+  	echo ' ('.sprintf(_('%d in LTI courses'), Sanitize::onlyInt($totalActiveStuLTI)).')';
   	echo '</p>';
-  	
+  	          
+  	/*
   	if (count($grptemplates)>0) {
   		echo '<p>'._('Group Templates').'</p>';
   		echo '<ul>';
@@ -162,7 +193,20 @@ if ($overwriteBody==1) {
   			echo '</a></li>';
   		}
   		echo '</ul>';
-  	}
+  	}	
+  	*/
+  	if (count($templatecnt)>0) {
+   		echo '<p>'._('Templates Used in Active Courses').'</p>';
+   		echo '<ul>';
+   		foreach ($templatecnt as $tid=>$cnt) {
+  			echo '<li><a href="../course/course.php?cid='.Sanitize::onlyInt($tid).'">';
+  			echo Sanitize::encodeStringForDisplay($templates[$tid]);
+  			echo '</a>';
+  			echo ' ('.Sanitize::onlyInt($cnt).')</li>';
+  		}
+  		echo '</ul>';
+  	}	
+
   	
   	echo '<table class=gb id="myTable">';
   	echo '<thead><tr>';

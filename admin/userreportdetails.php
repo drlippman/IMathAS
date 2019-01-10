@@ -70,9 +70,19 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 			$errors = _('Password Reset');
 		  }
 	}
+	
+	//pull template courses
+	$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&1)=1 OR (istemplate&2)=2 ORDER BY name");
+	$templates = array();
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$templates[$row[0]] = $row[1];
+	}
+	$templateids = array_keys($templates);
 	  
     //courses teaching list
-    $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_users.FirstName,imas_users.LastName,imas_users.groupid,imas_teachers.hidefromcourselist,";
+    $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,";
+    $query .= "imas_courses.lockaid,imas_courses.copyrights,imas_users.FirstName,imas_users.LastName,";
+    $query .= "imas_users.groupid,imas_teachers.hidefromcourselist,imas_courses.ancestors,";
     $query .= "imas_courses.startdate,imas_courses.enddate ";
     $query .= "FROM imas_courses JOIN imas_users ON imas_courses.ownerid=imas_users.id ";
     $query .= "JOIN imas_teachers ON imas_teachers.courseid=imas_courses.id WHERE imas_teachers.userid=:uid ";
@@ -90,6 +100,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       $newrow['canedit'] = ($row['ownerid']==$userid || $myrights==100 || ($myrights>=75 && $row['groupid']==$groupid));
       $newrow['deleted'] = ($row['available']==4);
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
+      $newrow['showlink'] = ($row['copyrights']==2 || ($row['groupid']==$groupid && $row['copyrights']==1) || $myrights == 100); 
       if ($row['available']==4) {
         $newrow['status'] = array(_('Deleted'));
       } else {
@@ -113,6 +124,11 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       }
       $newrow['stucnt'] = 0;
       $newrow['lastactivity'] = 0;
+      $newrow['template'] = '';
+      $templatematches = array_intersect(explode(',', $row['ancestors']), $templateids);
+      if (count($templatematches)>0) {
+      	  $newrow['template'] = $templates[$templatematches[count($templatematches)-1]];
+      }
       $courses_teaching[$row['id']] = $newrow;
     }
     
@@ -302,6 +318,7 @@ if ($overwriteBody==1) {
     echo '<th>'._('LTI?').'</th>';
     echo '<th>'._('Status').'</th>';
     echo '<th>'._('Owner (if not user)').'</th>';
+    echo '<th>'._('Based on').'</th>';
     echo '</tr></thead><tbody>';
     $alt = 0;
     foreach ($courses_teaching as $course) {
@@ -315,7 +332,9 @@ if ($overwriteBody==1) {
       if ($course['canedit']) {
       	  echo '<img src="../img/gears.png"/> ';
       }
-      echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
+      if ($course['showlink']) {
+      	  echo '<a href="../course/course.php?cid='.Sanitize::encodeUrlParam($course['id']).'">';
+      }
       if ($course['available']!=0) {
         echo '<i>';
       }
@@ -329,7 +348,9 @@ if ($overwriteBody==1) {
       if ($course['available']!=0) {
         echo '</i>';
       }
-      echo '</a>';
+      if ($course['showlink']) {
+      	  echo '</a>';
+      }
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.($course['active']==1?_('Active'):_('Old')).'</td>';
@@ -346,6 +367,7 @@ if ($overwriteBody==1) {
       echo '<td>'.(!empty($course['isLTI'])?_('LTI'):_('No')).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td>'.Sanitize::encodeStringForDisplay($course['template']).'</td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
