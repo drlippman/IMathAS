@@ -18,8 +18,17 @@ $DBH->beginTransaction();
 	$DBH->rollBack();
 	return false;
  }
+ 
+ $query = "CREATE INDEX startdate ON imas_courses(startdate)";
+ $res = $DBH->query($query);
+ if ($res===false) {
+ 	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
+	$DBH->rollBack();
+	return false;
+ }
+ 
 $DBH->commit();
 
-echo "<p style='color: green;'>✓ Added linketext text index, LTI courseid index</p>";
+echo "<p style='color: green;'>✓ Added linketext text index, LTI courseid index, course startdate index</p>";
 
 return true;
