@@ -45,7 +45,7 @@ function initcell() {
 }
 function setCode(code) {
 	//update existing sagecell with new command
-	if ( $("#mycell").find(".CodeMirror").size() > 0 ) {
+	if ( $("#mycell").find(".CodeMirror").length > 0 ) {
 		$("#mycell").find(".CodeMirror").get(0).CodeMirror.setValue(code);
 	}
 	$("#mycell").find(".sagecell_evalButton").click();
