@@ -344,7 +344,7 @@
 			$starttime = time();
 
 			$stugroupid = 0;
-			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid) && !isset($tutorid)) {
+			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid) && !isset($tutorid) && $isRealStudent) {
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 				$stm = $DBH->prepare($query);
