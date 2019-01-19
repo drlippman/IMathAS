@@ -849,7 +849,7 @@ img.scoreicon:hover {
 	border-bottom:2px solid #f00;
 }
 
-div.question img {
+div.question img, div.intro img {
 	max-width: 90%;
 	height: auto;
 }
