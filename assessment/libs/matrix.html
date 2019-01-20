@@ -10,8 +10,8 @@
 
 <body>
 <h1>Macro Library matrix</h1>
-Matrix functions.  Version 1.5, Dec 2017
-<br>Contributors: David Lippman, Larry Green
+Matrix functions.  Version 1.6, Jan 19
+<br>Contributors: David Lippman, Mike Jenck, Larry Green
 <BR><ul>
 <li><a href="#matrix">matrix</a></li>
 <li><a href="#matrixformat">matrixformat</a></li>
@@ -74,7 +74,7 @@ matrix(vals,rows,cols)
 matrixformat(matrix)
 <BR>Formats a matrix item into an ASCIIMath string for display or $answer
 <BR><h3><a name="matrixdisplaytable">matrixdisplaytable</a></h3>
-matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, header, tablestyle]) 
+matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
 <BR>&nbsp;Create a string that is a valid HTML table syntax for display.
 <BR>&nbsp;matrix: a matrix to be displayed in a HTML table
 <BR>&nbsp;matrixname: a string that holds the matrix name, like A or B.  This does not contain 
@@ -88,9 +88,15 @@ matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, header, tab
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;0 show no lines  (default)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;1 show aumented line
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;2 show simplex  lines
-<BR>&nbsp;header: list or array of the variables "x1,x2,x3" that are used for the column titles.
+<BR>&nbsp;headernames: list or array of the variables "x1,x2,x3" that are used for the column titles.
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
 <BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
+<BR>&nbsp;rownames: list or array of the variables "x1,x2,x3" that are used for the row titles.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
+<BR>&nbsp;rowheader: string that is entered into the row name column in the header row
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
+<BR>&nbsp;caption: string - caption for the table
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
 <BR><h3><a name="matrixsystemdisp">matrixsystemdisp</a></h3>
 matrixsystemdisp(matrix,[variables,leftbracket])
