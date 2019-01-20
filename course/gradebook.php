@@ -274,7 +274,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=103118"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=011919"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view

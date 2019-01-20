@@ -184,7 +184,9 @@ function conditionalColor(table,type,low,high) {
 				}
 			}
 		}
+
 		var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+		var v, perc;
 		for (var j=0;j<trs.length;j++) {
 			var tds = trs[j].getElementsByTagName("td");
 			for (var i=startat;i<tds.length;i++) {
@@ -196,17 +198,25 @@ function conditionalColor(table,type,low,high) {
 					}
 				} else {
 					if (tds[i].innerText) {
-						var v = tds[i].innerText;
+						v = tds[i].innerText;
 					} else {
-						var v = tds[i].textContent;
+						v = tds[i].textContent;
 					}
 					if (k = v.match(/([\d\.]+)%/)) {
-						var perc = parseFloat(k[1]);
+						perc = parseFloat(k[1]);
+					} else if (v.match(/\d+\/\d+\/\d+/)) {
+						continue;	
 					} else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
-						if (k[2]==0) { var perc = 0;} else { var perc= Math.round(1000*parseFloat(k[1])/parseFloat(k[2]))/10;}
+						if (k[2]==0) { perc = 0;} else { perc= Math.round(1000*parseFloat(k[1])/parseFloat(k[2]))/10;}
+					} else if (v.replace(/[^\d\.\-]/g,"")=="-") {
+						perc = 0;
 					} else {
 						v = v.replace(/[^\d\.]/g,"");
-						var perc = Math.round(1000*parseFloat(v)/poss[i])/10;
+						if (v=="") {
+							continue;
+						} else {
+							perc = Math.round(1000*parseFloat(v)/poss[i])/10;
+						}
 					}
 
 					if (perc<low) {
