@@ -686,6 +686,11 @@ require_once("includes/sanitize.php");
 	}
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="parent.GB_hide()" value="Done" /></body></html>';
+	} else if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
+		$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
+		$cid = Sanitize::courseId($stm->fetchColumn(0));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
 	} else {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=" . Sanitize::randomQueryStringParam());
 	}
