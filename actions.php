@@ -5,6 +5,11 @@ ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['actions'])) {
+	require($CFG['hooks']['actions']);
+}
+
 require_once("includes/sanitize.php");
 
 	if (isset($_GET['greybox'])) {
@@ -48,7 +53,12 @@ require_once("includes/sanitize.php");
 			}
 			echo '<div id="headerforms" class="pagetitle"><h1>New User Signup</h1></div>';
 			echo $error;
-			echo '<p><a href="forms.php?action=newuser">Try Again</a></p>';
+			//call hook, if defined
+			if (function_exists('onNewUserError')) {
+				onNewUserError();
+			} else {
+				echo '<p><a href="forms.php?action=newuser">Try Again</a></p>';
+			}
 			require("footer.php");
 			exit;
 		}
@@ -492,6 +502,12 @@ require_once("includes/sanitize.php");
 								':msgto'=>$tuid, ':msgfrom'=>$userid, ':senddate'=>time()));
 						}
 					}
+					
+					//call hook, if defined
+					if (function_exists('onEnroll')) {
+						onEnroll($_POST['cid']);
+					}
+					
 					require("header.php");
 					echo $pagetopper;
 					echo '<p>You have been enrolled in course ID '.Sanitize::courseId($_POST['cid']).'</p>';

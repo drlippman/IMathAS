@@ -11,6 +11,10 @@ ini_set("post_max_size", "10485760");
 
 require("../init.php");
 require_once("../includes/copyiteminc.php");
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['util/batchcreateinstr'])) {
+	require($CFG['hooks']['util/batchcreateinstr']);
+}
 
 if ($myrights < 100 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
   echo "You're not authorized for this page";
@@ -236,7 +240,10 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
 
 
       $DBH->commit();
-
+      //call hook, if defined
+      if (function_exists('onAddCourse')) {
+      	  onAddCourse($cid, $uid);
+      }
       $i++;
     }
   }

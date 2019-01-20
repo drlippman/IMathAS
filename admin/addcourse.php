@@ -34,7 +34,13 @@ if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_GET['for']) && $_G
 	}
 }
 echo '<p>'._('How would you like to start this course?').'</p>';
-echo '<p><button type=submit name=copytype value=0>'._('Start with a blank course').'</button></p>';
+echo '<p><button type=submit name=copytype value=0>';
+if (isset($CFG['addcourse']['blankbutton'])) {
+	echo $CFG['addcourse']['blankbutton'];
+} else {
+	echo _('Start with a blank course');
+}
+echo '</button></p>';
 if (isset($CFG['coursebrowser'])) {
 		//use the course browser
 		echo '<p><button type="button" onclick="showCourseBrowser('.Sanitize::encodeStringForDisplay($dispgroup).')">';
@@ -48,7 +54,9 @@ if (isset($CFG['coursebrowser'])) {
 		echo '</p>';
 }
 echo '<p><button type=button onclick="showCopyOpts()">';
-if (isset($CFG['coursebrowser'])) {
+if (isset($CFG['addcourse']['copybutton'])) {
+	echo $CFG['addcourse']['copybutton'];
+} else if (isset($CFG['coursebrowser'])) {
 	echo _('Copy from my or a colleague\'s course');
 } else {
 	echo _('Copy from my, a colleague\'s, or template course');

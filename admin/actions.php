@@ -4,6 +4,11 @@
 require("../init.php");
 require_once("../includes/password.php");
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['admin/actions'])) {
+	require($CFG['hooks']['admin/actions']);
+}
+
 $from = 'admin';
 if (isset($_GET['from'])) {
 	if ($_GET['from']=='home') {
@@ -656,6 +661,12 @@ switch($_POST['action']) {
 			}
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
+			
+			//call hook, if defined
+			if (function_exists('onModCourse')) {
+				onModCourse($_GET['id'], $userid, $myrights, $groupid);
+			}
+			
 			if ($stm->rowCount()>0) {
 				if ($setdatesbylti==1) {
 					$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");
@@ -710,6 +721,12 @@ switch($_POST['action']) {
 				':itemorder'=>$itemorder, ':available'=>$avail, ':istemplate'=>$istemplate, ':deftime'=>$deftime, ':startdate'=>$startdate, ':enddate'=>$enddate,
 				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt));
 			$cid = $DBH->lastInsertId();
+			
+			//call hook, if defined
+			if (function_exists('onAddCourse')) {
+				onAddCourse($cid, $userid, $myrights, $groupid);
+			}
+			
 			//if ($myrights==40) {
 				$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
 				$stm->execute(array(':userid'=>$courseownerid, ':courseid'=>$cid));
@@ -1194,6 +1211,12 @@ switch($_POST['action']) {
 		$grptype = (isset($_POST['iscust'])?1:0);
 		$stm = $DBH->prepare("UPDATE imas_groups SET name=:name,parent=:parent,grouptype=:grouptype WHERE id=:id");
 		$stm->execute(array(':name'=>$_POST['gpname'], ':parent'=>$_POST['parentid'], ':grouptype'=>$grptype, ':id'=>$_GET['id']));
+		
+		//call hook, if defined
+		if (function_exists('onModGroup')) {
+			onModGroup($_GET['id'], $userid, $myrights, $groupid);
+		}
+		
 		break;
 	case "delgroup":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}

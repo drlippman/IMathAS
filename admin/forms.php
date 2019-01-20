@@ -2,10 +2,24 @@
 //IMathAS:  Admin forms
 //(c) 2006 David Lippman
 require("../init.php");
+
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['admin/forms'])) {
+	require($CFG['hooks']['admin/forms']);
+}
+
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+
+//call hook, if defined
+if (function_exists('getHeaderCode')) {
+	$placeinhead .= getHeaderCode();
+}
+
 require("../header.php");
 require("../includes/htmlutil.php");
+
+
 
 $from = 'admin2';
 $backloc = 'admin2.php';
@@ -677,6 +691,12 @@ switch($_GET['action']) {
 		echo '<input type="checkbox" name="stuavail" value="1" ';
 		if (($avail&1)==0) { echo 'checked="checked"';}
 		echo '/>Available to students</span><br class="form" />';
+		
+		//call hook, if defined
+		if (function_exists('getCourseSettingsForm')) {
+			getCourseSettingsForm($_GET['action'], $myrights, $_GET['action']=="modify"?$courseid:null);
+		}
+		
 		if ($_GET['action']=="modify") {
 			echo '<span class=form>Lock for assessment:</span><span class=formright><select name="lockaid">';
 			echo '<option value="0" ';
@@ -1414,9 +1434,9 @@ switch($_GET['action']) {
 	case "modgroup":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle"><h1>Rename Instructor Group</h1></div>';
-		$stm = $DBH->prepare("SELECT name,parent FROM imas_groups WHERE id=:id");
+		$stm = $DBH->prepare("SELECT name,parent,grouptype FROM imas_groups WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
-		list($gpname,$parent) = $stm->fetch(PDO::FETCH_NUM);
+		list($gpname,$parent,$grptype) = $stm->fetch(PDO::FETCH_NUM);
 
 		printf("<form method=post action=\"actions.php?from=%s&id=%s\">\n",
 			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']));
@@ -1432,6 +1452,12 @@ switch($_GET['action']) {
 			echo '>'.Sanitize::encodeStringForDisplay($r[1]).'</option>';
 		}
 		echo '</select><br/>';
+		
+		//call hook, if defined
+		if (function_exists('getModGroupForm')) {
+			getModGroupForm($_GET['id'], $grptype, $myrights);
+		}
+			
 		echo "<input type=submit value=\"Update Group\">\n";
 		echo "</form>\n";
 		break;

@@ -31,6 +31,11 @@ $init_skip_csrfp = true;
 include("init_without_validate.php");
 unset($init_skip_csrfp);
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['bltilaunch'])) {
+	require($CFG['hooks']['bltilaunch']);
+}
+
 $curdir = rtrim(dirname(__FILE__), '/\\');
 
 
@@ -593,6 +598,11 @@ if (isset($_GET['launch'])) {
 		$_SESSION['selection_data'] = @$_REQUEST['data'];
 	}
 	unset($_SESSION['lti_duedate']);
+	if (!isset($_REQUEST['custom_canvas_assignment_due_at'])) {
+		if (isset($_REQUEST['custom_assignment_due_at'])) {
+			$_REQUEST['custom_canvas_assignment_due_at'] = $_REQUEST['custom_assignment_due_at'];
+		}
+        }
 	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
 		$duedate = strtotime($_REQUEST['custom_canvas_assignment_due_at']);
 		if ($duedate !== false) {
@@ -914,6 +924,12 @@ if ($stm->rowCount()==0) {
 					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 					':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 				$destcid = $DBH->lastInsertId();
+				
+				//call hook, if defined
+				if (function_exists('onAddCourse')) {
+					onAddCourse($destcid, $userid, $myrights, $groupid);
+				}
+		
 				$stm = $DBH->prepare('INSERT INTO imas_teachers (userid,courseid) VALUES (:userid,:destcid)');
 				$stm->execute(array(':userid'=>$userid, ':destcid'=>$destcid));
 
@@ -2271,6 +2287,12 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 							':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 						$destcid  = $DBH->lastInsertId();
+						
+						//call hook, if defined
+						if (function_exists('onAddCourse')) {
+							onAddCourse($destcid, $userid);
+						}
+				
 						$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
 						$stm->execute(array(':userid'=>$userid, ':courseid'=>$destcid));
 
