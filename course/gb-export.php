@@ -187,27 +187,38 @@
 
 
 //HTML formatted, for Excel import?
-function gbInstrCatHdrs(&$gbt) {
-	global $catfilter, $availshow, $totonleft, $cid;
+function gbInstrCatHdrs(&$gbt, &$pointsrow) {
+	global $catfilter, $availshow, $totonleft, $cid, $pointsln;
 	
 	$n = 0;
 	$tots = '';
+	$pointstots = '';
 	if ($catfilter<0) {
 		if ($gbt[0][4][0]==0) { //using points based
 			if ($availshow<3) {
-				$tots .= '<th><div><span class="cattothdr">'. _('Total'). '<br/>'.$gbt[0][3][$availshow].'&nbsp;'. _('pts'). '</span></div></th>';
+				$tots .= '<th><div><span class="cattothdr">'. _('Total');
+				if ($pointsln==1) {
+					$pointstots .= '<th>'.$gbt[0][3][$availshow].'&nbsp;'. _('pts').'</th>';
+				} else {
+					$tots .= '&nbsp;'.$gbt[0][3][$availshow].'&nbsp;'. _('pts');
+				}
+				$tots .= '</span></div></th>';
 			} else {
 				$tots .= '<th><div><span class="cattothdr">'. _('Total').'</span></div></th>';
+				$pointstots .= '<th></th>';
 			}
 			$tots .= '<th><div>%</div></th>';
+			$pointstots .= '<th></th>';
 			$n+=2;
 		} else {
 			$tots .= '<th><div><span class="cattothdr">'. _('Weighted Total %'). '</span></div></th>';
+			$pointstots .= '<th></th>';
 			$n++;
 		}
 	}
 	if ($totonleft) {
 		echo $tots;
+		$pointsrow .= $pointstots;
 	}
 	if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 		for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
@@ -218,16 +229,25 @@ function gbInstrCatHdrs(&$gbt) {
 			}
 			echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
 			if ($availshow<3) {
-				echo $gbt[0][2][$i][0].'<br/>';
+				echo $gbt[0][2][$i][0];
 				if ($gbt[0][4][0]==0) { //using points based
-					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
+					$v = $gbt[0][2][$i][3+$availshow].'&nbsp;'. _('pts');
 				} else {
-					echo $gbt[0][2][$i][11].'%';
+					$v = $gbt[0][2][$i][11].'%';
+				}
+				if ($pointsln==1) {
+					$pointsrow .= '<th>'.$v.'</th>';
+				} else {
+					echo '&nbsp;'.$v;
 				}
 			} else if ($availshow==3) { //past and attempted
 				echo $gbt[0][2][$i][0];
 				if (isset($gbt[0][2][$i][11])) {
-					echo '<br/>'.$gbt[0][2][$i][11].'%';
+					if ($pointsln==1) {
+						$pointsrow .= '<th>'.$gbt[0][2][$i][11].'</th>';
+					} else {
+						echo '<br/>'.$gbt[0][2][$i][11].'%';
+					}
 				}
 			}
 			
@@ -237,6 +257,7 @@ function gbInstrCatHdrs(&$gbt) {
 	}
 	if (!$totonleft) {
 		echo $tots;
+		$pointsrow .= $pointstots;
 	}
 	return $n;
 }
@@ -355,23 +376,24 @@ function gbinstrdisp() {
 	$gbt = gbtable();
 	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
+	$pointsrow = '';
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		//if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
+		$pointsrow .= '<th>';
 		if ($gbt[0][0][$i]=='Name') {
 			if ($pointsln==1) {
-					echo '<br/>';
-				} else {
-					echo '&nbsp;';
-				}
-			echo '<span class="small">N='.(count($gbt)-2).'</span>';
+				$pointsrow .= 'N='.(count($gbt)-2);
+			} else {
+				echo '&nbsp;<span class="small">N='.(count($gbt)-2).'</span>';
+			}
 		}
 		echo '</th>';
-
+		$pointsrow .= '</th>';
 		$n++;
 	}
 	if ($totonleft && !$hidepast) {
-		$n += gbInstrCatHdrs($gbt);
+		$n += gbInstrCatHdrs($gbt, $pointsrow);
 	}
 	
 	if ($catfilter>-2) {
@@ -392,27 +414,30 @@ function gbinstrdisp() {
 			}
 			//name and points
 			echo '<th class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0];
-			if ($pointsln==1) {
-					echo '<br/>';
-				} else {
-					echo '&nbsp;';
-				}
+			
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
-				echo $gbt[0][1][$i][2].' (Not Counted)';
+				$v = $gbt[0][1][$i][2].' (Not Counted)';
 			} else {
-				echo $gbt[0][1][$i][2].'&nbsp;pts';
+				$v = $gbt[0][1][$i][2].'&nbsp;pts';
 				if ($gbt[0][1][$i][4]==2) {
-					echo ' (EC)';
+					$v .= ' (EC)';
 				}
 			}
 			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
-				echo ' (PT)';
+				$v .= ' (PT)';
 			}
-
+			if ($pointsln==1) {
+				$pointsrow .= '<th>'.$v.'</th>';
+			} else {
+				echo '&nbsp;'.$v;
+			}
 			echo '</th>';
 			$n++;
 			if ($commentloc==0) {
 				echo '<th>'. $gbt[0][1][$i][0].': Comments'.'</th>';
+				if ($pointsln==1) {
+					$pointsrow .= '<th></th>';
+				}
 				$n++;
 			}
 			if ($includetimes>0 && $gbt[0][1][$i][6]==0) {
@@ -421,15 +446,17 @@ function gbinstrdisp() {
 				} else if ($includetimes==2) {
 					echo '<th>'. $gbt[0][1][$i][0].': Time spent in questions'.'</th>';
 				}
+				$pointsrow .= '<th></th>';
 				$n++;
 			}
 		}
 	}
 	if (!$totonleft && !$hidepast) {
-		$n += gbInstrCatHdrs($gbt);
+		$n += gbInstrCatHdrs($gbt, $pointsrow);
 	}
 	echo '<th>Comment</th>';
 	echo '<th>Instructor Note</th>';
+	$pointsrow .= '<th></th><th></th>';
 
 	$n+=2;
 	if ($commentloc == 1) {
@@ -448,11 +475,16 @@ function gbinstrdisp() {
 				}
 				//name and points
 				echo '<th>'.$gbt[0][1][$i][0].': Comments'.'</th>';
+				$pointsrow .= '<th></th>';
 				$n++;
 			}
 		}
 	}
-	echo '</tr></thead><tbody>';
+	echo '</tr>';
+	if ($pointsln==1) {
+		echo '<tr>'.$pointsrow.'</tr>';
+	}
+	echo '</thead><tbody>';
 	//get gb comments;
 	$gbcomments = array();
 	$stm = $DBH->prepare("SELECT userid,gbcomment,gbinstrcomment FROM imas_students WHERE courseid=:courseid");
