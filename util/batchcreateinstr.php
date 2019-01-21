@@ -13,7 +13,7 @@ require("../init.php");
 require_once("../includes/copyiteminc.php");
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['util/batchcreateinstr'])) {
-	require($CFG['hooks']['util/batchcreateinstr']);
+	require(__DIR__.'/../'.$CFG['hooks']['util/batchcreateinstr']);
 }
 
 if ($myrights < 100 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {

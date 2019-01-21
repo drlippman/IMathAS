@@ -1,5 +1,7 @@
 # Hooks
 
+Hook includes should be provided relative to the main directory.
+
 ## admin/actions
 
 Include via `$CFG['hooks']['admin/actions']`

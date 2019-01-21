@@ -5,7 +5,7 @@ require("../init.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/forms'])) {
-	require($CFG['hooks']['admin/forms']);
+	require(__DIR__.'/../'.$CFG['hooks']['admin/forms']);
 }
 
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';

@@ -6,7 +6,7 @@ if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/approvepending'])) {
-	require($CFG['hooks']['admin/approvepending']);
+	require(__DIR__.'/../'.$CFG['hooks']['admin/approvepending']);
 }
 
 $newStatus = Sanitize::onlyInt($_POST['newstatus']);
