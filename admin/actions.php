@@ -1208,9 +1208,8 @@ switch($_POST['action']) {
 			echo "<html><body>Group name already exists.  <a href=\"forms.php?action=modgroup&id=".Sanitize::encodeUrlParam($_GET['id'])."\">Try again</a></body></html>\n";
 			exit;
 		}
-		$grptype = (isset($_POST['iscust'])?1:0);
-		$stm = $DBH->prepare("UPDATE imas_groups SET name=:name,parent=:parent,grouptype=:grouptype WHERE id=:id");
-		$stm->execute(array(':name'=>$_POST['gpname'], ':parent'=>$_POST['parentid'], ':grouptype'=>$grptype, ':id'=>$_GET['id']));
+		$stm = $DBH->prepare("UPDATE imas_groups SET name=:name,parent=:parent WHERE id=:id");
+		$stm->execute(array(':name'=>$_POST['gpname'], ':parent'=>$_POST['parentid'], ':id'=>$_GET['id']));
 		
 		//call hook, if defined
 		if (function_exists('onModGroup')) {
