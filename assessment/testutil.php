@@ -603,7 +603,7 @@ function recordtestdata($limit=false, $updateLTI=true) {
 	}
 	$bestattemptslist = implode(',',$bestattempts);
 	$bestseedslist = implode(',',$bestseeds);
-	$bestlastanswers = str_replace('~','',$bestlastanswers);
+	$bestlastanswers = str_replace('~','&tilde;',$bestlastanswers);
 	$bestlalist = implode('~',$bestlastanswers);
 
 	if ($noraw) {
@@ -613,7 +613,7 @@ function recordtestdata($limit=false, $updateLTI=true) {
 	}
 	$attemptslist = implode(',',$attempts);
 	$seedslist = implode(',',$seeds);
-	$lastanswers = str_replace('~','',$lastanswers);
+	$lastanswers = str_replace('~','&tilde;',$lastanswers);
 	$lalist = implode('~',$lastanswers);
 	$timeslist = implode(',',$timesontask);
 
