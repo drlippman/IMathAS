@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<head>
+  <script>
+    var imasroot = "";
+    function changetheme() {
+    	var theme = document.getElementById("themeselect").value;
+    	document.getElementById("theme").setAttribute('href', '../themes/'+theme+'.css');
+    }
+    function setfw(el) {
+    	if (el.checked) {
+    		$("body").addClass("fw1000");
+    	} else {
+    		$("body").removeClass("fw1000");
+    	}
+    }
+  </script>
+  <link href="../imascore.css" rel="stylesheet">
+  <link id="theme" href="../themes/modern.css" rel="stylesheet">
+  <link rel="stylesheet" href="../handheld.css?v=042217" media="only screen and (max-width:480px)"/>
+  <link id="theme" href="../iconfonts/imathasfont.css" rel="stylesheet">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="../javascript/general.js"></script>
+  <script type="text/javascript">
+   $(function() {
+   	$(".dropdown-toggle").dropdown();
+   });
+  </script>
+  <style type="text/css">
+    h1.pattern {
+    	margin-top: 20px;
+    	border-bottom: 1px #ccc;
+    }
+    div.patterntitle {
+    	margin-left: 20px;
+    	padding: 5px;
+    	border: 1px solid #ccc;
+    	background-color: #ddd;
+    }
+    div.patternbox {
+    	position: relative;
+    	margin-left: 20px;
+    	padding: 5px;
+    	border: 1px solid #ccc;
+    	background-color: #fff;
+    	margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class=mainbody>
+<div class=midwrapper>
+<h1>IMathAS Design Pattern Reference</h1>
+<p>Theme to use:
+  <select id=themeselect>
+  <option value="modern" selected>Modern (IMathAS Default)</option>
+  <option value="otbs">MyOpenMath</option>
+  <option value="wamap">WAMAP</option>
+  <option value="lumen">OHM</option>
+  <option value="highcontrast">High Contrast</option>
+  </select> <button type=button onclick="changetheme()">Load</button>
+  <input type=checkbox value=1 onclick="setfw(this)"> Fixed Width
+</p>
+
+
+<h1 class=pattern>Colors and sizes</h1>
+
+	<div class="patterntitle">Headers</div>
+	<div class="patternbox">
+		<h1>H1 header</h1>
+		<h2>H2 header</h2>
+		<div class=pagetitle><h1>H1 header in div.pagetitle</h1></div>
+		<div class=pagetitle><h2>H2 header in div.pagetitle</h2></div>
+		<h3>H3 header</h3>
+		<h4>H4 header</h3>
+		<h5>H5 header</h3>
+	</div>
+	
+	<div class="patterntitle">Basic link with href</div>
+	<div class="patternbox">
+		<a href="http://somewhere.com">blah blah blah</a>
+	</div>
+	
+	<div class="patterntitle">Basic link without href</div>
+	<div class="patternbox">
+		<a>blah blah blah</a>
+	</div>
+	
+	<div class="patterntitle">.info</div>
+	<div class="patternbox">
+		<p class=info>blah blah blah</p>
+	</div>
+	
+	<div class="patterntitle">.noticetext</div>
+	<div class="patternbox">
+		<p class=noticetext>blah blah blah</p>
+	</div>
+	
+	<div class="patterntitle">.red</div>
+	<div class="patternbox">
+		<p class=red>blah blah blah</p>
+	</div>
+	
+	<div class="patterntitle">.newnote</div>
+	<div class="patternbox">
+		<p class=newnote>blah blah blah</p>
+	</div>
+	
+	<div class="patterntitle">.grey</div>
+	<div class="patternbox">
+		<p class=grey>blah blah blah</p>
+	</div>
+	
+	<div class="patterntitle">label.error</div>
+	<div class="patternbox">
+		<label class=error>blah blah blah</label>
+	</div>
+	
+	<div class="patterntitle">Small text:  .small</div>
+	<div class="patternbox">
+		<span class=small> Small text</span>
+	</div>
+
+	<div class="patterntitle">.itemgrey (opacity 50%)</div>
+	<div class="patternbox">
+		<p class=itemgrey>blah <span class=noticetext>blah</span> blah</p>
+	</div>
+	
+	<div class="patterntitle">span.boxed</div>
+	<div class="patternbox">
+		<p>blah <span class=boxed>boxed</span> blah</p>
+	</div>
+	
+	<div class="patterntitle">.greystrike</div>
+	<div class="patternbox">
+		<p class=greystrike>blah blah blah</p>
+	</div>
+	
+	<div class="patterntitle">a.attach</div>
+	<div class="patternbox">
+		<a class=attach href="http://somewhere.com">blah blah blah</a>
+	</div>
+	
+	<div class="patterntitle">a target=_blank</div>
+	<div class="patternbox">
+		<a target="_blank" href="http://somewhere.com">blah blah blah</a>
+	</div>
+	
+	<div class="patterntitle">.videoembedbtn</div>
+	<div class="patternbox">
+		<span class=videoembedbtn>[+]</span>
+	</div>
+	
+	<div class="patterntitle">.delx</div>
+	<div class="patternbox">
+		<span class=delx>X</span>
+	</div>
+	
+<h1 class=pattern>Common Layout</h1>
+
+	<div class="patterntitle">div.block followed by div.blockitems</div>
+	<div class="patternbox">
+		<div class="block">div.block</div>
+		<div class="blockitems">
+			<p>div.blockitems</p>
+			<div class="block">sub div.block</div>
+			<div class="blockitems">sub div.blockitems</div>
+		
+		</div>
+	</div>
+	
+	<div class="patterntitle">div.block.grouptoggle followed by div.blockitems</div>
+	<div class="patternbox">
+		<div class="block grouptoggle">
+		  <img class="mida" src="../img/expand.gif" />
+		  div.block.grouptoggle
+		</div>
+		<div class="blockitems">div.blockitems</div>
+	</div>
+	
+	<div class="patterntitle">Course page item</div>
+	<div class="patternbox">
+	  <div class=item>
+	    <div class=itemhdr>
+	      <div class=itemhdricon>
+		<img src="../img/assess.png">
+	      </div>
+	      <div class=title>
+		Title
+		<br/>
+		<span class=instrdates>span.instrdates</span>
+	      </div>
+	      <div class="itemhdrdd dropdown" >
+		<a class="dropdown-toggle"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		  <img src="../img/gearsdd.png">
+		</a>
+		<ul class="dropdown-menu dropdown-menu-right">
+		 <li><a href="#">Option 1</a></li>
+		 <li><a href="#">Option 2</a></li>
+		</ul>
+	      </div>
+	    </div>
+	    <div class="itemsum">
+	      <p>Text in the div.itemsum</p>
+	    </div>
+	    <div class=clear></div>
+	  </div>
+	</div>
+	
+	<div class="patterntitle">Breadcrumb</div>
+	<div class="patternbox">
+	 <div class="breadcrumb">
+	   <a href="#">Home</a> &gt; Page
+	 </div>
+	</div>
+	
+	<div class="patterntitle">Control Link Box: div.cp</div>
+	<div class="patternbox">
+	 <div class="cp">
+	   Blah blah blah
+	 </div>
+	</div>
+	
+	<div class="patterntitle">Control Link Box: div.cpmid</div>
+	<div class="patternbox">
+	 <div class="cpmid">
+	   Blah blah blah
+	 </div>
+	</div>
+	
+	<div class="patterntitle">View control buttons</div>
+	<div class="patternbox">
+	 <div id="viewbuttoncont">
+	   <a href="#" class="buttonactive buttoncurveleft">Instructor</a>
+	   <a href="#" class="buttoninactive">Student</a>
+	   <a href="#" class="buttoninactive buttoncurveright">Quick Rearrange</a>
+	 </div>
+	 <br class=clear>
+	</div>
+	
+	<div class="patterntitle">Form layout</div>
+	<div class="patternbox">
+	 <span class=form>span.form</span>
+	 <span class=formright>span.formright</span>
+	 <br class=form>
+	 
+	 <span class=form>span.form again</span>
+	 <span class=wideformright>span.wideformright</span>
+	 <br class=form>
+	 
+	 <span class=form>span.form</span>
+	 <input class=form value="input.form">
+	 <br class=form>
+	 
+	 <div class="submit">div.submit</div>
+	</div>
+	
+	<div class="patterntitle">Columns in a link bar; span.column</div>
+	<div class="patternbox">
+	    <span class=column>
+	      Item 1<br/>
+	      Item 2
+	    </span>
+	    <span class=column>
+	      Item 3<br/>
+	      Item 4
+	    </span>
+	    <span class=column>
+	      Item 5<br/>
+	      Item 6
+	    </span>
+	    <br class=clear>
+	</div>
+	
+	
+	<div class="patterntitle">Main course page payout</div>
+	<div class="patternbox">
+	   <div id=leftcontent>
+	     <p>Left bar content</p>
+	     <p>Left bar content</p>
+	   </div>
+	   <div id=centercontent>
+	     <p>Center content</p>
+	     <p>Center content</p>
+	   </div>
+ 	   <br class=clear>
+	</div>
+	
+	<div class="patterntitle">Home page payout</div>
+	<div class="patternbox">
+	   <div id=leftcolumn>
+	     <p>Left column content</p>
+	     <p>Left column content</p>
+	   </div>
+	   <div id=righcolumn>
+	     <p>Right column content</p>
+	     <p>Right column content</p>
+	   </div>
+ 	   <br class=clear>
+	</div>
+	
+	<div class="patterntitle">My Classes dropdown</div>
+	<div class="patternbox">
+	  <span onmouseover="$('#homemenu').css('visibility','visible');" onmouseout="$('#homemenu').css('visibility','hidden');">Hover to show</span>
+	  <div id=homemenu class=ddmenu>
+	    Dropdown content
+	  </div>
+	</div>
+	
+	<div class="patterntitle">Floats:  .floatleft or .floatright.  .clear clears</div>
+	<div class="patternbox">
+	  <span class=floatright>.floatright</span>
+	  <span>Other content</span>
+	</div>
+	
+	<div class="patterntitle">text-align: center</div>
+	<div class="patternbox">
+	  <div class=center>div.center</div>
+	</div>
+	
+	<div class="patterntitle">Calendar item</div>
+	<div class="patternbox">
+	  <span class=calitem>span.calitem</span>
+	</div>
+	
+	<div class="patterntitle">Tabs</div>
+	<div class="patternbox">
+	  <div class=tabwrap>
+	    <ul class=tablist role=tablist>
+	      <li class=active>
+	        <a href="#" role=tab id=tab0 aria-controls=tabpanel0 aria-select=true onclick="setActiveTab(this);return false;">Tab 1</a>
+	      </li>
+	      <li>
+	        <a href="#" role=tab id=tab1 aria-controls=tabpanel1 aria-select=true onclick="setActiveTab(this);return false;">Tab 2</a>
+	      </li>
+	    </ul>
+	    <div class=tabpanel id=tabpanel0 aria-labeledby=tab0 aria-hidden=false>
+	      <p>Tab content 1</p>
+	    </div>
+	    <div class=tabpanel id=tabpanel1 aria-labeledby=tab1 aria-hidden=true style="display:none;">
+	      <p>Tab content 2</p>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="patterntitle">Tool tips</div>
+	<div class="patternbox">
+	  <span tabindes=0 data-tip="This is the tooltip text" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
+	    Hover for tip
+	  </span>
+	</div>
+	
+	<div class="patterntitle">Indents</div>
+	<div class="patternbox">
+	  <div class=ind1>div.ind1</div>
+	  <div class=ind2>div.ind2</div>
+	  <div class=ind3>div.ind3</div>
+	  <div class=ind4>div.ind4</div>
+	</div>
+
+
+<h1 class=pattern>Display</h1>
+
+	<div class="patterntitle">div.hidden</div>
+	<div class="patternbox">
+		<div class="hidden">this won't show</div>
+	</div>
+	
+	<div class="patterntitle">.showinmobile</div>
+	<div class="patternbox">
+		<div class="showinmobile">This will only show in mobile / small windows</div>
+	</div>
+
+	<div class="patterntitle">.hideinmobile</div>
+	<div class="patternbox">
+		<div class="hideinmobile">This will be hidden in mobile / small windows</div>
+	</div>
+	
+	<div class="patterntitle">img.mida: vertical-align: middle</div>
+	<div class="patternbox">
+		<img class=mida src="../img/graph.gif"> And some text
+	</div>
+	
+	<div class="patterntitle">img.faded</div>
+	<div class="patternbox">
+		<img class=faded src="../img/graph.gif">
+	</div>
+	
+	<div class="patterntitle">white-space: nowrap</div>
+	<div class="patternbox">
+		<span class=nowrap>This content has class .nowrap set</span>
+	</div>
+
+
+<h1 class=pattern>Form Controls</h1>
+
+	<div class="patterntitle">input type=text</div>
+	<div class="patternbox">
+		<input type=text size=20 />
+	</div>
+	
+	<div class="patterntitle">input type=radio</div>
+	<div class="patternbox">
+		<input type=radio size=20 />
+	</div>
+	
+	<div class="patterntitle">input type=checkbox</div>
+	<div class="patternbox">
+		<input type=checkbox size=20 />
+	</div>
+	
+	<div class="patterntitle">select</div>
+	<div class="patternbox">
+		<select>
+		 <option>Option 1</option>
+		 <option>Option 2</option>
+		 <optgroup label="Optgroup">
+		   <option>Option 3</option>
+		   <option>Option 4</option>
+		 </optgroup>
+		</select>
+	</div>
+	
+	<div class="patterntitle">input type=button, button, a.abutton</div>
+	<div class="patternbox">
+		<input type=button value="Input" />
+		<button>Button</button>
+		<a class=abutton href="#">a.button</a>
+	</div>
+
+	<div class="patterntitle">button.secondarybtn</div>
+	<div class="patternbox">
+		<button class=secondarybtn>Button</button>
+	</div>
+	
+	<div class="patterntitle">input type=button disabled</div>
+	<div class="patternbox">
+		<input type=button value="Input" disabled />
+	</div>
+	
+	
+<h1 class=pattern>Lists</h1>
+
+	<div class="patterntitle">Default ul</div>
+	<div class="patternbox">
+	 <ul>
+	   <li>List item 1</li>
+	   <li>List item 2
+	   <ul>
+	     <li>Nested list item 1</li>
+	     <li>Nested list item 2</li>
+	   </ul></li>
+	   <li>List item 3</li>
+	 </ul>
+	</div>
+	
+	<div class="patterntitle">Default ol</div>
+	<div class="patternbox">
+	 <ol>
+	   <li>List item 1</li>
+	   <li>List item 2
+	   <ol>
+	     <li>Nested list item 1</li>
+	     <li>Nested list item 2</li>
+	   </ol></li>
+	   <li>List item 3</li>
+	 </ol>
+	</div>
+	
+	<div class="patterntitle">ul.nomark</div>
+	<div class="patternbox">
+	 <ul class=nomark>
+	   <li>List item 1</li>
+	   <li>List item 2
+	   <ul class=nomark>
+	     <li>Nested list item 1</li>
+	     <li>Nested list item 2</li>
+	   </ul></li>
+	   <li>List item 3</li>
+	 </ul>
+	</div>
+	
+	<div class="patterntitle">ul.qview</div>
+	<div class="patternbox">
+	 <ul class=qview>
+	   <li>List item 1</li>
+	   <li>List item 2
+	   <ul class=qview>
+	     <li>Nested list item 1</li>
+	     <li>Nested list item 2</li>
+	   </ul></li>
+	   <li>List item 3</li>
+	 </ul>
+	</div>
+	
+	<div class="patterntitle">ul#navlist</div>
+	<div class="patternbox">
+	 <ul id=navlist>
+	   <li><a>List item 1</a></li>
+	   <li><a>List item 2</a></li>
+	   <li><a>List item 3</a></li>
+	 </ul>
+	 <br class=clear>
+	</div>
+	
+	<div class="patterntitle">ul.courselist</div>
+	<div class="patternbox">
+	 <ul class=qview>
+	   <li><a>List item 1</a></li>
+	   <li><a>List item 2</a>
+	   <ul class=qview>
+	     <li><a>Nested list item 1</a></li>
+	     <li><a>Nested list item 2</a></li>
+	   </ul></li>
+	   <li><a>List item 3</a></li>
+	 </ul>
+	</div>
+
+<h1 class=pattern>Tables</h1>
+
+	<div class="patterntitle">Default table</div>
+	<div class="patternbox">
+	  <table>
+	   <thead>
+	    <tr><th></th><th>Hdr 1</th><th>Hdr 2</th></tr>
+	   </thead>
+	   <tbody>
+	    <tr><th>Row hdr 1</th><td>Cell 1</td><td>Cell 2</td></tr>
+	    <tr><th>Row hdr 2</th><td>Cell 3</td><td>Cell 4</td></tr>
+	   </tbody>
+	  </table>
+	</div>
+	
+	<div class="patterntitle">table.gb</div>
+	<div class="patternbox">
+	  <table class=gb>
+	    <thead>
+	    <tr><th></th><th>Hdr 1</th><th>Hdr 2</th></tr>
+	   </thead>
+	   <tbody>
+	    <tr class=odd><th>tr.odd</th><td>Cell 1</td><td>Cell 2</td></tr>
+	    <tr class=even><th>tr.even</th><td>Cell 3</td><td>Cell 4</td></tr>
+	   </tbody>
+	  </table>
+	</div>
+	
+	<div class="patterntitle">table.gridded</div>
+	<div class="patternbox">
+	  <table class=gridded>
+	    <thead>
+	    <tr><th></th><th>Hdr 1</th><th>Hdr 2</th></tr>
+	   </thead>
+	   <tbody>
+	    <tr><th>Row hdr 1</th><td>Cell 1</td><td>Cell 2</td></tr>
+	    <tr><th>Row hdr 2</th><td>Cell 3</td><td>Cell 4</td></tr>
+	   </tbody>
+	  </table>
+	</div>
+	
+	<div class="patterntitle">table.gridded.centered</div>
+	<div class="patternbox">
+	  <table class="gridded centered">
+	    <thead>
+	    <tr><th></th><th>Hdr 1</th><th>Hdr 2</th></tr>
+	   </thead>
+	   <tbody>
+	    <tr><th>Row hdr 1</th><td>Cell 1</td><td>Cell 2</td></tr>
+	    <tr><th>Row hdr 2</th><td>Cell 3</td><td>Cell 4</td></tr>
+	   </tbody>
+	  </table>
+	</div>
+	
+	<div class="patterntitle">cell text-align</div>
+	<div class="patternbox">
+	  <table>
+	    <tr><th>Header 1</th><th>Header 2</th></tr>
+	    <tr><td class=c>td.c</td><td class=r>td.r</td></tr>
+	    <tr><td>3</td><td>4</td></tr>
+	  </table>
+	</div>
+
+<h1 class=pattern>Icons</h1>
+<p>Loaded via iconfonts/imathasfont.css</p>
+
+	<div class="patterntitle">For Add Questions</div>
+	<div class="patternbox">
+		<span class="icon-pencil">.icon-pencil</span><br/>
+		<span class="icon-enlarge2">.icon-enlarge2</span><br/>
+		<span class="icon-shrink2">.icon-shrink2</span><br/>
+		<span class="icon-plus">.icon-plus</span>
+	</div>
+	
+	<div class="patterntitle">For Calendar Editing</div>
+	<div class="patternbox">
+		<span class="icon-enddate">.icon-enddate</span><br/>
+		<span class="icon-startdate">.icon-startdate</span><br/>
+		<span class="icon-startdatealt">.icon-startdatealt</span><br/>
+		<span class="icon-eye2">.icon-eye2</span><br/>
+		<span class="icon-assessreview">.icon-assessreview</span><br/>
+		<span class="icon-forumreply">.icon-forumreply</span><br/>
+		<span class="icon-forumpost">.icon-forumpost</span>
+	</div>
+	
+	<div class="patterntitle">For TinyMCE</div>
+	<div class="patternbox">
+		<span class="icon-graph">.icon-graph</span><br/>
+		<span class="icon-sigma">.icon-sigma</span><br/>
+		<span class="icon-sigma2">.icon-sigma2</span><br/>
+		<span class="icon-attachment">.icon-attachment</span>
+	</div>
+	
+	<div class="patterntitle">Others</div>
+	<div class="patternbox">
+		<span class="icon-cog2">.icon-cog2</span><br/>
+		<span class="icon-gear">.icon-gear</span><br/>
+		<span class="icon-repeat">.icon-repeat</span><br/>
+		<span class="icon-rotate-right">.icon-rotate-right</span><br/>
+		<span class="icon-flag">.icon-flag</span><br/>
+		<span class="icon-flag-o">.icon-flag-o</span><br/>
+		<span class="icon-cc">.icon-cc</span><br/>
+		<span class="icon-copy">.icon-copy</span><br/>
+		<span class="icon-drawer">.icon-drawer</span><br/>
+		<span class="icon-enlarge">.icon-enlarge</span><br/>
+		<span class="icon-shrink">.icon-shrink</span><br/>
+		<span class="icon-equalizer">.icon-equalizer</span><br/>
+		<span class="icon-equalizer2">.icon-equalizer2</span><br/>
+		<span class="icon-cogs">.icon-cogs</span><br/>
+		<span class="icon-bin">.icon-bin</span><br/>
+		<span class="icon-tree">.icon-tree</span><br/>
+		<span class="icon-minus">.icon-minus</span><br/>
+		<span class="icon-cancel-circle">.icon-cancel-circle</span><br/>
+		<span class="icon-cross2">.icon-cross2</span><br/>
+		<span class="icon-insert-template">.icon-insert-template</span><br/>
+		<span class="icon-embed">.icon-embed</span><br/>
+		<span class="icon-libreoffice">.icon-libreoffice</span><br/>
+		<span class="icon-home3">.icon-home3</span><br/>
+		<span class="icon-film">.icon-film</span><br/>
+		<span class="icon-clock">.icon-clock</span><br/>
+		<span class="icon-calendar">.icon-calendar</span><br/>
+		<span class="icon-menu">.icon-menu</span><br/>
+		<span class="icon-menu3">.icon-menu3</span><br/>
+		<span class="icon-menu4">.icon-menu4</span><br/>
+		<span class="icon-eye">.icon-eye</span><br/>
+		<span class="icon-eye-blocked">.icon-eye-blocked</span><br/>
+		<span class="icon-star-empty">.icon-star-empty</span><br/>
+		<span class="icon-star-full">.icon-star-full</span><br/>
+		<span class="icon-cross">.icon-cross</span><br/>
+		<span class="icon-checkmark">.icon-checkmark</span><br/>
+		<span class="icon-checkmark2">.icon-checkmark2</span><br/>
+		<span class="icon-play3">.icon-play3</span><br/>
+		<span class="icon-pause2">.icon-pause2</span><br/>
+		<span class="icon-stop2">.icon-stop2</span><br/>
+		<span class="icon-backward2">.icon-backward2</span><br/>
+		<span class="icon-forward3">.icon-forward3</span><br/>
+		<span class="icon-first">.icon-first</span><br/>
+		<span class="icon-last">.icon-last</span><br/>
+		<span class="icon-previous2">.icon-previous2</span><br/>
+		<span class="icon-next2">.icon-next2</span><br/>
+		<span class="icon-arrow-up2">.icon-arrow-up2</span><br/>
+		<span class="icon-arrow-right2">.icon-arrow-right2</span><br/>
+		<span class="icon-arrow-down2">.icon-arrow-down2</span><br/>
+		<span class="icon-arrow-left2">.icon-arrow-left2</span><br/>
+		<span class="icon-new-tab">.icon-new-tab</span>
+	</div>
+	
+	
+</div>
+</div>
+</body>
+</html>
+
+
