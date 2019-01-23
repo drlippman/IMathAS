@@ -14,6 +14,7 @@
     	}
     }
   </script>
+
   <link href="../imascore.css" rel="stylesheet">
   <link id="theme" href="../themes/modern.css" rel="stylesheet">
   <link rel="stylesheet" href="../handheld.css?v=042217" media="only screen and (max-width:480px)"/>
@@ -44,6 +45,14 @@
     	border: 1px solid #ccc;
     	background-color: #fff;
     	margin-bottom: 10px;
+    }
+    div.patternbox.flexcol {
+    	    display: flex;
+    	    flex-flow: row wrap;
+    }
+    div.patternbox.flexcol span {
+    	    min-width: 200px;
+    	    padding: 4px 0;
     }
   </style>
 </head>
@@ -84,6 +93,16 @@
 	<div class="patterntitle">Basic link without href</div>
 	<div class="patternbox">
 		<a>blah blah blah</a>
+	</div>
+	
+	<div class="patterntitle">Basic markup</div>
+	<div class="patternbox">
+		<p>Regular text, 
+		<b>In b tag</b>, 
+		<strong>in strong tag</strong>, 
+		<i>in i tag</i>,
+		<u>in u tag</u>,  
+		</p>
 	</div>
 	
 	<div class="patterntitle">.info</div>
@@ -301,7 +320,9 @@
 	
 	<div class="patterntitle">My Classes dropdown</div>
 	<div class="patternbox">
-	  <span onmouseover="$('#homemenu').css('visibility','visible');" onmouseout="$('#homemenu').css('visibility','hidden');">Hover to show</span>
+	  <span onmouseover="$('#homemenu').css('visibility','visible');" onmouseout="$('#homemenu').css('visibility','hidden');">
+	   Hover to show (aligns right by default)
+	  </span>
 	  <div id=homemenu class=ddmenu>
 	    Dropdown content
 	  </div>
@@ -579,91 +600,182 @@
 	  </table>
 	</div>
 
-<h1 class=pattern>Icons</h1>
+<h1 class=pattern>Font Icons</h1>
 <p>Loaded via iconfonts/imathasfont.css</p>
 
 	<div class="patterntitle">For Add Questions</div>
-	<div class="patternbox">
-		<span class="icon-pencil">.icon-pencil</span><br/>
-		<span class="icon-enlarge2">.icon-enlarge2</span><br/>
-		<span class="icon-shrink2">.icon-shrink2</span><br/>
+	<div class="patternbox flexcol">
+		<span class="icon-pencil">.icon-pencil</span>
+		<span class="icon-enlarge2">.icon-enlarge2</span>
+		<span class="icon-shrink2">.icon-shrink2</span>
 		<span class="icon-plus">.icon-plus</span>
 	</div>
 	
 	<div class="patterntitle">For Calendar Editing</div>
-	<div class="patternbox">
-		<span class="icon-enddate">.icon-enddate</span><br/>
-		<span class="icon-startdate">.icon-startdate</span><br/>
-		<span class="icon-startdatealt">.icon-startdatealt</span><br/>
-		<span class="icon-eye2">.icon-eye2</span><br/>
-		<span class="icon-assessreview">.icon-assessreview</span><br/>
-		<span class="icon-forumreply">.icon-forumreply</span><br/>
+	<div class="patternbox flexcol">
+		<span class="icon-enddate">.icon-enddate</span>
+		<span class="icon-startdate">.icon-startdate</span>
+		<span class="icon-startdatealt">.icon-startdatealt</span>
+		<span class="icon-eye2">.icon-eye2</span>
+		<span class="icon-assessreview">.icon-assessreview</span>
+		<span class="icon-forumreply">.icon-forumreply</span>
 		<span class="icon-forumpost">.icon-forumpost</span>
 	</div>
 	
 	<div class="patterntitle">For TinyMCE</div>
-	<div class="patternbox">
-		<span class="icon-graph">.icon-graph</span><br/>
-		<span class="icon-sigma">.icon-sigma</span><br/>
-		<span class="icon-sigma2">.icon-sigma2</span><br/>
+	<div class="patternbox flexcol">
+		<span class="icon-graph">.icon-graph</span>
+		<span class="icon-sigma">.icon-sigma</span>
+		<span class="icon-sigma2">.icon-sigma2</span>
 		<span class="icon-attachment">.icon-attachment</span>
 	</div>
 	
 	<div class="patterntitle">Others</div>
-	<div class="patternbox">
-		<span class="icon-cog2">.icon-cog2</span><br/>
-		<span class="icon-gear">.icon-gear</span><br/>
-		<span class="icon-repeat">.icon-repeat</span><br/>
-		<span class="icon-rotate-right">.icon-rotate-right</span><br/>
-		<span class="icon-flag">.icon-flag</span><br/>
-		<span class="icon-flag-o">.icon-flag-o</span><br/>
-		<span class="icon-cc">.icon-cc</span><br/>
-		<span class="icon-copy">.icon-copy</span><br/>
-		<span class="icon-drawer">.icon-drawer</span><br/>
-		<span class="icon-enlarge">.icon-enlarge</span><br/>
-		<span class="icon-shrink">.icon-shrink</span><br/>
-		<span class="icon-equalizer">.icon-equalizer</span><br/>
-		<span class="icon-equalizer2">.icon-equalizer2</span><br/>
-		<span class="icon-cogs">.icon-cogs</span><br/>
-		<span class="icon-bin">.icon-bin</span><br/>
-		<span class="icon-tree">.icon-tree</span><br/>
-		<span class="icon-minus">.icon-minus</span><br/>
-		<span class="icon-cancel-circle">.icon-cancel-circle</span><br/>
-		<span class="icon-cross2">.icon-cross2</span><br/>
-		<span class="icon-insert-template">.icon-insert-template</span><br/>
-		<span class="icon-embed">.icon-embed</span><br/>
-		<span class="icon-libreoffice">.icon-libreoffice</span><br/>
-		<span class="icon-home3">.icon-home3</span><br/>
-		<span class="icon-film">.icon-film</span><br/>
-		<span class="icon-clock">.icon-clock</span><br/>
-		<span class="icon-calendar">.icon-calendar</span><br/>
-		<span class="icon-menu">.icon-menu</span><br/>
-		<span class="icon-menu3">.icon-menu3</span><br/>
-		<span class="icon-menu4">.icon-menu4</span><br/>
-		<span class="icon-eye">.icon-eye</span><br/>
-		<span class="icon-eye-blocked">.icon-eye-blocked</span><br/>
-		<span class="icon-star-empty">.icon-star-empty</span><br/>
-		<span class="icon-star-full">.icon-star-full</span><br/>
-		<span class="icon-cross">.icon-cross</span><br/>
-		<span class="icon-checkmark">.icon-checkmark</span><br/>
-		<span class="icon-checkmark2">.icon-checkmark2</span><br/>
-		<span class="icon-play3">.icon-play3</span><br/>
-		<span class="icon-pause2">.icon-pause2</span><br/>
-		<span class="icon-stop2">.icon-stop2</span><br/>
-		<span class="icon-backward2">.icon-backward2</span><br/>
-		<span class="icon-forward3">.icon-forward3</span><br/>
-		<span class="icon-first">.icon-first</span><br/>
-		<span class="icon-last">.icon-last</span><br/>
-		<span class="icon-previous2">.icon-previous2</span><br/>
-		<span class="icon-next2">.icon-next2</span><br/>
-		<span class="icon-arrow-up2">.icon-arrow-up2</span><br/>
-		<span class="icon-arrow-right2">.icon-arrow-right2</span><br/>
-		<span class="icon-arrow-down2">.icon-arrow-down2</span><br/>
-		<span class="icon-arrow-left2">.icon-arrow-left2</span><br/>
+	<div class="patternbox flexcol">
+		<span class="icon-cog2">.icon-cog2</span>
+		<span class="icon-gear">.icon-gear</span>
+		<span class="icon-repeat">.icon-repeat</span>
+		<span class="icon-rotate-right">.icon-rotate-right</span>
+		<span class="icon-flag">.icon-flag</span>
+		<span class="icon-flag-o">.icon-flag-o</span>
+		<span class="icon-cc">.icon-cc</span>
+		<span class="icon-copy">.icon-copy</span>
+		<span class="icon-drawer">.icon-drawer</span>
+		<span class="icon-enlarge">.icon-enlarge</span>
+		<span class="icon-shrink">.icon-shrink</span>
+		<span class="icon-equalizer">.icon-equalizer</span>
+		<span class="icon-equalizer2">.icon-equalizer2</span>
+		<span class="icon-cogs">.icon-cogs</span>
+		<span class="icon-bin">.icon-bin</span>
+		<span class="icon-tree">.icon-tree</span>
+		<span class="icon-minus">.icon-minus</span>
+		<span class="icon-cancel-circle">.icon-cancel-circle</span>
+		<span class="icon-cross2">.icon-cross2</span>
+		<span class="icon-insert-template">.icon-insert-template</span>
+		<span class="icon-embed">.icon-embed</span>
+		<span class="icon-libreoffice">.icon-libreoffice</span>
+		<span class="icon-home3">.icon-home3</span>
+		<span class="icon-film">.icon-film</span>
+		<span class="icon-clock">.icon-clock</span>
+		<span class="icon-calendar">.icon-calendar</span>
+		<span class="icon-menu">.icon-menu</span>
+		<span class="icon-menu3">.icon-menu3</span>
+		<span class="icon-menu4">.icon-menu4</span>
+		<span class="icon-eye">.icon-eye</span>
+		<span class="icon-eye-blocked">.icon-eye-blocked</span>
+		<span class="icon-star-empty">.icon-star-empty</span>
+		<span class="icon-star-full">.icon-star-full</span>
+		<span class="icon-cross">.icon-cross</span>
+		<span class="icon-checkmark">.icon-checkmark</span>
+		<span class="icon-checkmark2">.icon-checkmark2</span>
+		<span class="icon-play3">.icon-play3</span>
+		<span class="icon-pause2">.icon-pause2</span>
+		<span class="icon-stop2">.icon-stop2</span>
+		<span class="icon-backward2">.icon-backward2</span>
+		<span class="icon-forward3">.icon-forward3</span>
+		<span class="icon-first">.icon-first</span>
+		<span class="icon-last">.icon-last</span>
+		<span class="icon-previous2">.icon-previous2</span>
+		<span class="icon-next2">.icon-next2</span>
+		<span class="icon-arrow-up2">.icon-arrow-up2</span>
+		<span class="icon-arrow-right2">.icon-arrow-right2</span>
+		<span class="icon-arrow-down2">.icon-arrow-down2</span>
+		<span class="icon-arrow-left2">.icon-arrow-left2</span>
 		<span class="icon-new-tab">.icon-new-tab</span>
 	</div>
+
+<h1 class=pattern>Images</h1>
+<p>Some images in the /img/ directory</p>
+
+	<div class="patterntitle">General Icons</div>
+	<div class="patternbox flexcol">
+		<span><img src="../img/1day.png" /> 1day.png</span>
+		<span><img src="../img/cal.gif" /> cal.gif</span>
+		<span><img src="../img/expand.gif" /> expand.gif</span>
+		<span><img src="../img/collapse.gif" /> collapse.gif</span>
+		<span><img src="../img/extlink.png" /> extlink.png</span>
+		<span><img src="../img/flagempty.gif" /> flagempty.gif</span>
+		<span><img src="../img/flagfilled.gif" /> flagfilled.gif</span>
+		<span><img src="../img/gears.png" /> gears.png</span>
+		<span><img src="../img/gearsdd.png" /> gearsdd.png</span>
+		<span><img src="../img/help.gif" /> help.gif</span>
+		<span><img src="../img/menu.png" /> menu.png</span>
+	</div>
 	
+	<div class="patterntitle">Course Item Type Icons</div>
+	<div class="patternbox flexcol">
+		<span><img src="../img/assess.png" /> assess.png</span>
+		<span><img src="../img/doc.png" /> doc.png</span>
+		<span><img src="../img/drill.png" /> drill.png</span>
+		<span><img src="../img/folder.png" /> folder.png</span>
+		<span><img src="../img/folder_tree.png" /> folder_tree.png</span>
+		<span><img src="../img/forum.png" /> forum.png</span>
+		<span><img src="../img/html.png" /> html.png</span>
+		<span><img src="../img/image.png" /> image.png</span>
+		<span><img src="../img/inline.png" /> inline.png</span>
+		<span><img src="../img/maple.png" /> maple.png</span>
+		<span><img src="../img/mathnb.png" /> mathnb.png</span>
+		<span><img src="../img/pdf.png" /> pdf.png</span>
+		<span><img src="../img/ppt.png" /> ppt.png</span>
+		<span><img src="../img/sound.png" /> sound.png</span>
+		<span><img src="../img/video.png" /> video.png</span>
+		<span><img src="../img/web.png" /> web.png</span>
+		<span><img src="../img/wiki.png" /> wiki.png</span>
+		<span><img src="../img/xls.png" /> xls.png</span>
+		<span><img src="../img/zip.png" /> zip.png</span>
+	</div>
 	
+	<div class="patterntitle">Small Course Item Type Icons</div>
+	<div class="patternbox flexcol">
+		<span><img src="../img/assess_tiny.png" /> assess_tiny.png</span>
+		<span><img src="../img/assess_tiny_no.png" /> assess_tiny_no.png</span>
+		<span><img src="../img/doc_tiny.png" /> doc_tiny.png</span>
+		<span><img src="../img/drill_tiny.png" /> drill_tiny.png</span>
+		<span><img src="../img/folder_tiny.png" /> folder_tiny.png</span>
+		<span><img src="../img/folder_tree_tiny.png" /> folder_tree_tiny.png</span>
+		<span><img src="../img/forum_tiny.png" /> forum_tiny.png</span>
+		<span><img src="../img/html_tiny.png" /> html_tiny.png</span>
+		<span><img src="../img/html_tiny_no.png" /> html_tiny_no.png</span>
+		<span><img src="../img/inline_tiny.png" /> inline_tiny.png</span>
+		<span><img src="../img/video_tiny.png" /> video_tiny.png</span>
+		<span><img src="../img/video_tiny_no.png" /> video_tiny_no.png</span>
+		<span><img src="../img/wiki_tiny.png" /> wiki_tiny.png</span>
+	</div>
+	
+	<div class="patterntitle">Assessment/Question Progress Icons</div>
+	<div class="patternbox flexcol">
+		<span><img src="../img/fullcircle.png" /> fullcircle.png</span>
+		<span><img src="../img/halfcircle.png" /> halfcircle.png</span>
+		<span><img src="../img/emptycircle.png" /> emptycircle.png</span>
+		<span><img src="../img/gchk.gif" /> gchk.gif</span>
+		<span><img src="../img/ychk.gif" /> ychk.gif</span>
+		<span><img src="../img/orgx.gif" /> orgx.gif</span>
+		<span><img src="../img/redx.gif" /> redx.gif</span>
+		<span><img src="../img/q_emptybox.gif" /> q_emptybox.gif</span>
+		<span><img src="../img/q_fullbox.gif" /> q_fullbox.gif</span>
+		<span><img src="../img/q_halfbox.gif" /> q_halfbox.gif</span>
+		<span><img src="../img/te_blue_arrow.png" /> te_blue_arrow.png</span>
+		<span><img src="../img/te_blue_empty_arrow.png" /> te_blue_empty_arrow.png</span>
+		<span><img src="../img/te_green_check.png" /> te_green_check.png</span>
+		<span><img src="../img/te_red_ex.png" /> te_red_ex.png</span>
+		<span><img src="../img/te_red_redo.png" /> te_red_redo.png</span>
+		<span><img src="../img/te_yellow_check.png" /> te_yellow_check.png</span>
+		<span><img src="../img/te_yellow_redo.png" /> te_yellow_redo.png</span>
+	</div>
+	
+	<div class="patterntitle">Misc Icons</div>
+	<div class="patternbox flexcol">
+		<span><img src="../img/liked.png" /> liked.png</span>
+		<span><img src="../img/likedgray.png" /> likedgray.png</span>
+		<span><img src="../img/cc.png" /> cc.png</span>
+		<span><img src="../img/lock.png" /> lock.png</span>
+		<span><img src="../img/noview.png" /> noview.png</span>
+		<span><img src="../img/swap.gif" /> swap.gif</span>
+		<span><img src="../img/time.png" /> time.png</span>
+		<span><img src="../img/tinyarrow.gif" /> tinyarrow.gif</span>
+		<span><img src="../img/updating.gif" /> updating.gif</span>
+	</div>
+
 </div>
 </div>
 </body>
