@@ -7,12 +7,11 @@
 var vidPlayerWidth, videoWidth, vidPlayerHeight, vidPlayerHeight;
 (function(){
 	var ar = vidAspectRatio.split(":");
-	videoWidth = 710;
-	videoHeight = ar[1]/ar[0] * videoWidth;
+	videoHeight = window.innerHeight;
+	videoWidth = ar[0]/ar[1] * videoHeight;
 })();
 vidPlayerWidth = videoWidth;
 vidPlayerHeight = videoHeight;
-
 
 function onYouTubePlayerAPIReady() {
 	//called automatically by youtube API when the API is loaded
@@ -62,6 +61,7 @@ var initVideoObject = function (VidId, breaktimesarray) {
 		//skipSecQ: -1,
 		lastTime: -1,
 		curQ: -1,
+		fullScreenState: false,
 
 		getVidID: function() {
 		    vidName = VidId;
@@ -73,8 +73,11 @@ var initVideoObject = function (VidId, breaktimesarray) {
 
 		// add player to the page
 		createPlayer: function () {
+			
+		    var supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
 
-		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':2, 'rel':0, 'modestbranding':1, 'showinfo':0};
+
+		    var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen?1:0, 'controls':2, 'rel':0, 'modestbranding':1, 'showinfo':0};
 
 		    //console.log(pVarsInternal);
 		    var aspectRatioPercent = Math.round(1000*vidPlayerHeight/vidPlayerWidth)/10;
@@ -153,6 +156,21 @@ var initVideoObject = function (VidId, breaktimesarray) {
 
 		showQuestion: function (curTime) {
 		    if (ytplayer && ytplayer.pauseVideo) {
+		    	    var isInFullScreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+				(document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
+				(document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
+				(document.msFullscreenElement && document.msFullscreenElement !== null);
+			    if (isInFullScreen) {
+			    	if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.webkitExitFullscreen) {
+					document.webkitExitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.msExitFullscreen) {
+					document.msExitFullscreen();
+				}
+			    }
 		    	    ytplayer.pauseVideo();
 		    }
 
