@@ -116,6 +116,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else {
 					$pts = explode('~',$data[5]);
 					$lpdate = parsedatetime($pts[0],$pts[1]);
+					if ($lpdate <= $enddate) {
+						$lpdate = 0;
+					}
 				}
 			}
 

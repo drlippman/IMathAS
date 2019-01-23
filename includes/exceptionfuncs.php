@@ -211,11 +211,11 @@ class ExceptionFuncs {
 		} else {
 			$latepassesAllowed = $adata['allowlate']%10-1;
 		}
-		if (!isset($adata['LPcutoff'])) {
+		if (!isset($adata['LPcutoff']) || $adata['LPcutoff']<$adata['enddate']) { //ignore nonsensical LPcutoff
 			$adata['LPcutoff'] = 0;
 		}
 		if ((!in_array($adata['id'],$this->viewedassess) || $skipViewedCheck) &&
-			($adata['LPcutoff']==0 || ($now<$adata['LPcutoff'] && $adata['enddate']<$adata['LPcutoff'])) &&
+			($adata['LPcutoff']==0 || $now<$adata['LPcutoff']) &&
 			$this->latepasses>0 && $this->isstu && $adata['enddate'] < $this->courseenddate) { //basic checks
 			if ($now<$adata['enddate'] && $latepassesAllowed > $latepasscnt) { //before due date and use is allowed
 				$canuselatepass = true;

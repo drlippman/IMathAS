@@ -142,8 +142,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
             if (isset($_POST['dolpcutoff']) && trim($_POST['lpdate']) != '' && trim($_POST['lptime']) != '') {
             	$LPcutoff = parsedatetime($_POST['lpdate'],$_POST['lptime']);
-            	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $LPcutoff)) {
-            		$LPcutoff = 0; //don't really set if it matches course end date
+            	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $LPcutoff) || $LPcutoff<$enddate) {
+            		$LPcutoff = 0; //don't really set if it matches course end date or is before
             	}
             } else {
             	$LPcutoff = 0;
