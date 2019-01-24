@@ -7407,7 +7407,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		foreach ($anstypes as $i=>$anst) {
 			$qnt = 1000*($qn+1)+$i;
 			if (isset($_POST["tc$qnt"])) {
-				if ($anst=='calculated') {
+				if ($anst=='calculated' || $anst=='calcmatrix') {
 					$la[$i] = $_POST["tc$qnt"].'$#$'.$_POST["qn$qnt"];
 				} else {
 					$la[$i] = $_POST["tc$qnt"];
@@ -7436,6 +7436,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$spc++;
 				}
 				$la[$i] = implode('|', $tmp);
+				if (isset($_POST["qn$qnt"])) {
+					$stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$qnt"]);
+					$la[$i] .= '$#$'.str_replace(',','|',$stuav);
+				}
 			} else {
 				$la[$i] = $_POST["qn$qnt"];
 			}
