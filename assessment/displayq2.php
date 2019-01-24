@@ -5699,13 +5699,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$func = mathphp($func,'y');
 						$func = str_replace("(y)",'($y)',$func);
 						$func = my_create_function('$y', 'return ('.$func.');');
-						$x1p = $xtopix(@$func($y1));
-						$x2p = $xtopix(@$func($y2));
-						$x3p = $xtopix(@$func($y3));
+						$Lx1p = $Lxtopix(@$func($y1));
+						$Lx2p = $Lxtopix(@$func($y2));
+						$Lx3p = $Lxtopix(@$func($y3));
 						$denom = ($y1p - $y2p)*($y1p - $y3p)*($y2p - $y3p);
-						$A = ($y3p * ($x2p - $x1p) + $y2p * ($x1p - $x3p) + $y1p * ($x3p - $x2p)) / $denom;
-						$B = ($y3p*$y3p * ($x1p - $x2p) + $y2p*$y2p * ($x3p - $x1p) + $y1p*$y1p * ($x2p - $x3p)) / $denom;
-						$C = ($y2p * $y3p * ($y2p - $y3p) * $x1p + $y3p * $y1p * ($y3p - $y1p) * $x2p + $y1p * $y2p * ($y1p - $y2p) * $x3p) / $denom;
+						$A = ($y3p * ($Lx2p - $Lx1p) + $y2p * ($Lx1p - $Lx3p) + $y1p * ($Lx3p - $Lx2p)) / $denom;
+						$B = ($y3p*$y3p * ($Lx1p - $Lx2p) + $y2p*$y2p * ($Lx3p - $Lx1p) + $y1p*$y1p * ($Lx2p - $Lx3p)) / $denom;
+						$C = ($y2p * $y3p * ($y2p - $y3p) * $Lx1p + $y3p * $y1p * ($y3p - $y1p) * $Lx2p + $y1p * $y2p * ($y1p - $y2p) * $Lx3p) / $denom;
 
 						$yv = -$B/(2*$A);
 						$xv = $C-$B*$B/(4*$A);
@@ -5777,6 +5777,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
 					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
 					$yop = $imgborder + $settings[3]*$pixelspery;
+
 					if ($settings[0]<0 && $settings[1]>0) {
 						$xop = $xtopix(0);
 					} else {
@@ -6164,48 +6165,48 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$horizasy = $yop;
 							$adjy2 = $horizasy - $pts[4];
 							$adjy1 = $horizasy - $pts[2];
-							$x1p = $pts[1];
-							$x2p = $pts[3];
+							$Lx1p = $pts[1];
+							$Lx2p = $pts[3];
 						} else if ($pts[0]==8.5) {
 							$horizasy = $pts[2];
 							$adjy2 = $horizasy - $pts[6];
 							$adjy1 = $horizasy - $pts[4];
-							$x1p = $pts[3];
-							$x2p = $pts[5];
+							$Lx1p = $pts[3];
+							$Lx2p = $pts[5];
 						}
 							
-						if ($adjy1*$adjy2>0 && $x1p!=$x2p) {
-							$base = safepow($adjy2/$adjy1,1/($x2p-$x1p));
-							if (abs($x1p-$xop)<abs($x2p-$xop)) {
-								$str = $adjy1/safepow($base,$x1p-$xop);
+						if ($adjy1*$adjy2>0 && $Lx1p!=$Lx2p) {
+							$base = safepow($adjy2/$adjy1,1/($Lx2p-$Lx1p));
+							if (abs($Lx1p-$xop)<abs($Lx2p-$xop)) {
+								$str = $adjy1/safepow($base,$Lx1p-$xop);
 							} else {
-								$str = $adjy2/safepow($base,$x2p-$xop);
+								$str = $adjy2/safepow($base,$Lx2p-$xop);
 							}
 							//$exps[] = array($str,$base);
-							$exps[] = array($x1p-$xop, $adjy1, $x2p-$xop, $adjy2, $base, $horizasy);
+							$exps[] = array($Lx1p-$xop, $adjy1, $Lx2p-$xop, $adjy2, $base, $horizasy);
 						}
 					} else if ($pts[0]==8.4 || $pts[0]==8.6) {
 						if ($pts[0]==8.4) {
 							$vertasy = $xop;
 							$adjx2 = $vertasy - $pts[3];
 							$adjx1 = $vertasy - $pts[1];
-							$y1p = $pts[2];
-							$y2p = $pts[4];
+							$Ly1p = $pts[2];
+							$Ly2p = $pts[4];
 						} else if ($pts[0]==8.6) {
 							$vertasy = $pts[1];
 							$adjx2 = $vertasy - $pts[5];
 							$adjx1 = $vertasy - $pts[3];
-							$y1p = $pts[4];
-							$y2p = $pts[6];
+							$Ly1p = $pts[4];
+							$Ly2p = $pts[6];
 						}
-						if ($adjx1*$adjx2>0 && $y1p!=$y2p) {
-							$base = safepow($adjx2/$adjx1,1/($y2p-$y1p));
-							if (abs($pts[2]-$yop)<abs($y2p-$yop)) {
-								$str = $adjx1/safepow($base,$y1p-$yop);
+						if ($adjx1*$adjx2>0 && $Ly1p!=$Ly2p) {
+							$base = safepow($adjx2/$adjx1,1/($Ly2p-$Ly1p));
+							if (abs($pts[2]-$yop)<abs($Ly2p-$yop)) {
+								$str = $adjx1/safepow($base,$Ly1p-$yop);
 							} else {
-								$str = $adjx2/safepow($base,$y2p-$yop);
+								$str = $adjx2/safepow($base,$Ly2p-$yop);
 							}
-							$logs[] = array($y1p-$yop, $adjx1, $y2p-$yop, $adjx2, $base, $vertasy);
+							$logs[] = array($Ly1p-$yop, $adjx1, $Ly2p-$yop, $adjx2, $base, $vertasy);
 						}
 					} else if ($pts[0]==8.2) { //rational
 						if ($pts[1]!=$pts[3] && $pts[2]!=$pts[4]) {
