@@ -891,8 +891,8 @@ function showquestioncontactlinks($qn) {
 	if (($testsettings['msgtoinstr']&2)==2) {
 		if ($out != '') {
 			$out .= "<br/>";
-		}
-		$out .= '<a href="#" onclick="return copyQtoClipboard(this,'.Sanitize::onlyInt($qn).')">';
+		}			
+		$out .= "<a href=\"#\" onclick=\"GB_show('"._('Copy question to clipboard')."','$imasroot/assessment/copyableq.php?qn=$qn',800,'auto');return false;\">";
 		$out .= _('Copy question to clipboard'). '</a>';
 	}
 	if ($testsettings['posttoforum']>0) {

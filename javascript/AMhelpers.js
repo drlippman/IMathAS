@@ -2314,54 +2314,6 @@ function prepWithMath(str) {
 	return str;
 }
 
-function copyQtoClipboard(el,qn) {
-	var btnel = el;
-	var resp = '';
-	$(btnel).text(_("Copying...")).attr("data-copied",0);
-	$.ajax({
-		type:"GET", 
-		url: window.location.origin+imasroot+'/assessment/copyableq.php', 
-		data: {qn: qn}
-	}).done(function(msg){
-		$(btnel).attr("data-copied",1);
-		resp = msg;
-	}).fail(function() {
-		$(btnel).attr("data-copied",-1);
-	});
-	setTimeout(function() {
-		if ($(btnel).attr("data-copied")==1) {
-			$(btnel).text(_("Copied"));
-			copyToClipboard(resp);
-		} else if ($(btnel).attr("data-copied")==-1) {
-			$(btnel).text(_("Unable to Copy"));
-		}
-		if ($(btnel).attr("data-copied")!=0) {
-			$(btnel).attr("data-copied",0);
-		}
-	}, 1000);
-	
-	return false;
-}
-
-function copyToClipboard(str) {
-  var el = document.createElement('textarea');
-  el.value = str;
-  el.setAttribute('readonly', '');
-  el.style.position = 'absolute';
-  el.style.left = '-1000px';
-  document.body.appendChild(el);
-  var selected =            
-    document.getSelection().rangeCount > 0        // Check if there is any content selected previously
-      ? document.getSelection().getRangeAt(0)     // Store selection if found
-      : false;                                    // Mark as false to know no selection existed before
-  el.select();                                    // Select the <textarea> content
-  document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
-  //document.body.removeChild(el);
-  if (selected) {                                 // If a selection existed before copying
-    document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
-    document.getSelection().addRange(selected);   // Restore the original selection
-  }
-}
 
 var assessFormIsDirty = [];
 function trackDirty() {
