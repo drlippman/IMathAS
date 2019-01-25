@@ -884,9 +884,16 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 function showquestioncontactlinks($qn) {
 	global $testsettings,$imasroot,$qi,$seeds,$questions;
 	$out = '';
-	if ($testsettings['msgtoinstr']==1) {
+	if (($testsettings['msgtoinstr']&1)==1) {
 		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=".Sanitize::encodeUrlParam($testsettings['courseid']);
 		$out .= "&add=new&quoteq=".Sanitize::encodeUrlParam("$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}")."&to=instr\">". _('Message instructor about this question'). "</a>";
+	}
+	if (($testsettings['msgtoinstr']&2)==2) {
+		if ($out != '') {
+			$out .= "<br/>";
+		}
+		$out .= '<a href="#" onclick="return copyQtoClipboard(this,'.Sanitize::onlyInt($qn).')">';
+		$out .= _('Copy question to clipboard'). '</a>';
 	}
 	if ($testsettings['posttoforum']>0) {
 		if ($out != '') {

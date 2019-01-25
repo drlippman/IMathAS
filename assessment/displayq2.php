@@ -12,7 +12,18 @@ require("interpret5.php");
 require("macros.php");
 require_once(__DIR__ . "/../includes/sanitize.php");
 
-
+//displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array())
+//  $qnidx:  The index into imas_assessment_sessions.questions - aka the question order # in the assessment
+//  $qidx:   The imas_questionset.id
+//  $seed:   Seed for randomization
+//  $doshowans:  boolean - show answer with question 
+//  $showhints:  boolean - show hints and help buttons
+//  $attemptn:   attempt number - used for hints
+//  $returnqtxt: boolean - returns question text as string rather than displaying
+//  $clearla:    boolean - set yes to not redisplay previously entered student answers
+//  $seqinactive:   boolean - disables input fields and changes div class to inactive
+//  $qcolors:    An array of values corresponding to parts to determine correct/incorrect coloring
+//               -1: unans, otherwise 0-1
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
 	global $DBH, $RND, $imasroot, $myrights, $showtips, $urlmode, $CFG;
@@ -55,6 +66,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	} else {
 		$seqinactive = false;
 	}*/
+	
 	if (isset($GLOBALS['qdatafordisplayq'])) {
 		$qdata = $GLOBALS['qdatafordisplayq'];
 	} else if (isset($GLOBALS['qi']) && isset($GLOBALS['qi'][$GLOBALS['questions'][$qnidx]]['qtext'])) {

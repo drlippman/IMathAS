@@ -205,6 +205,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             } else {
                 $msgtoinstr = 0;
             }
+            if (isset($_POST['msgtoinstr2'])) {
+                $msgtoinstr += 2;
+            } 
             $defpenalty = Sanitize::onlyFloat($_POST['defpenalty']);
             $skippenalty_post = Sanitize::onlyInt($_POST['skippenalty']);
             if ($skippenalty_post==10) {
@@ -1228,7 +1231,8 @@ if ($overwriteBody==1) {
 
 			<span class=form>Show "ask question" links?</span>
 			<span class=formright>
-				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr'],1); ?>/> Show "Message instructor about this question" links<br/>
+				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr']&1,1); ?>/> Show "Message instructor about this question" links<br/>
+				<input type="checkbox" name="msgtoinstr2" <?php writeHtmlChecked($line['msgtoinstr']&2,2); ?>/> Show "Copy question to clipboard" links<br/>
 				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> Show "Post this question to forum" links, to forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
 			</span><br class=form>
 			
