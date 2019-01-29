@@ -175,7 +175,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
 
-		$function = explode(",",$function);
+		$function = listtoarray($function);
 		//correct for parametric
 		$isparametric = false;
 		$isineq = false;
@@ -788,7 +788,7 @@ function showarrays() {
 			$hashdr = true;
 		}
 		if (!is_array($alist[2*$i+1])) {
-			$alist[2*$i+1] = explode(',', $alist[2*$i+1]);
+			$alist[2*$i+1] = listtoarray($alist[2*$i+1]);
 		}
 		if (count($alist[2*$i+1])>$maxlength) {
 			$maxlength = count($alist[2*$i+1]);
@@ -862,7 +862,7 @@ function horizshowarrays() {
 	$maxlength = 0;
 	for ($i=0; $i<count($alist)/2; $i++) {
 		if (!is_array($alist[2*$i+1])) {
-			$alist[2*$i+1] = explode(',', $alist[2*$i+1]);
+			$alist[2*$i+1] = listtoarray($alist[2*$i+1]);
 		}
 		if (count($alist[2*$i+1])>$maxlength) {
 			$maxlength = count($alist[2*$i+1]);
@@ -1181,7 +1181,7 @@ function rrands($min,$max,$p=0,$n=0) {
 function randfrom($lst) {
 	if (func_num_args()!=1) { echo "randfrom expects 1 argument"; return 1;}
 	if (!is_array($lst)) {
-		$lst = explode(",",$lst);
+		$lst = listtoarray($lst);
 	}
 	return $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
 }
@@ -1190,7 +1190,7 @@ function randfrom($lst) {
 function randsfrom($lst,$n) {
 	if (func_num_args()!=2) { echo "randsfrom expects 2 arguments"; return 1;}
 	if (!is_array($lst)) {
-		$lst = explode(",",$lst);
+		$lst = listtoarray($lst);
 	}
 	for ($i=0; $i<$n;$i++) {
 		$r[$i] = $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
@@ -1202,10 +1202,10 @@ function randsfrom($lst,$n) {
 function jointrandfrom($lst1,$lst2) {
 	if (func_num_args()!=2) { echo "jointrandfrom expects 2 arguments"; return array(1,1);}
 	if (!is_array($lst1)) {
-		$lst1 = explode(",",$lst1);
+		$lst1 = listtoarray($lst1);
 	}
 	if (!is_array($lst2)) {
-		$lst2 = explode(",",$lst2);
+		$lst2 = listtoarray($lst2);
 	}
 	$l = $GLOBALS['RND']->rand(0,min(count($lst1)-1,count($lst2)-1));
 	return array($lst1[$l],$lst2[$l]);
@@ -1215,7 +1215,7 @@ function jointrandfrom($lst1,$lst2) {
 function diffrandsfrom($lst,$n) {
 	if (func_num_args()!=2) { echo "diffrandsfrom expects 2 arguments"; return array();}
 	if (!is_array($lst)) {
-		$lst = explode(",",$lst);
+		$lst = listtoarray($lst);
 	}
 	$GLOBALS['RND']->shuffle($lst);
 	return array_slice($lst,0,$n);
@@ -1431,7 +1431,7 @@ function nonzerodiffrrands($min,$max,$p=0,$n=0) {
 
 function singleshuffle($a) {
 	if (!is_array($a)) {
-		$a = explode(",",$a);
+		$a = listtoarray($a);
 	}
 	$GLOBALS['RND']->shuffle($a);
 	if (func_num_args()>1) {
@@ -1445,10 +1445,10 @@ function singleshuffle($a) {
 
 function jointshuffle($a1,$a2) {  //optional third & fourth params $n1 and $n2
 	if (!is_array($a1)) {
-		$a1 = explode(",",$a1);
+		$a1 = listtoarray($a1);
 	}
 	if (!is_array($a2)) {
-		$a2 = explode(",",$a2);
+		$a2 = listtoarray($a2);
 	}
 	$r = $GLOBALS['RND']->array_rand($a1,count($a1));
 	$GLOBALS['RND']->shuffle($r);
@@ -1471,7 +1471,7 @@ function listtoarray($l) {
 	if (func_num_args()>1 && ($GLOBALS['sessiondata']['isteacher'] || isset($GLOBALS['teacherid']))) {
 		echo "Warning:  listtoarray expects one argument, more than one provided";
 	}
-	return (explode(",",$l));
+	return array_map('trim',explode(',',$l));
 }
 
 
@@ -1501,7 +1501,7 @@ function joinarray($a,$s=',') {
 
 
 function calclisttoarray($l) {
-	$l = explode(",",$l);
+	$l = listtoarray($l);
 	foreach ($l as $k=>$tocalc) {
 		$l[$k] = evalMathPHP($tocalc,null);
 	}
@@ -1511,7 +1511,7 @@ function calclisttoarray($l) {
 
 function sortarray($a) {
 	if (!is_array($a)) {
-		$a = explode(",",$a);
+		$a = listtoarray($a);
 	}
 	if (func_num_args()>1) {
 		$dir = func_get_arg(1);
@@ -1655,7 +1655,7 @@ function multicalconarray() {
 	$nargs = count($args);
 	$todo = array_shift($args);
 	$vars = array_shift($args);
-	$vars = explode(',',$vars);
+	$vars = listtoarray($vars);
 	foreach ($vars as $k=>$v) {
 		$vars[$k] = preg_replace('/[^\w]/','',$v);
 		if ($vars[$k]=='') {
@@ -2230,7 +2230,7 @@ function prettytime($time,$in,$out) {
 }
 
 function definefunc($func,$varlist) {
-	$vars = explode(',',$varlist);
+	$vars = listtoarray($varlist);
 	/*$toparen = implode('|',$vars);
 	if ($toparen != '') {
 		$reg = "/(" . $toparen . ")(" . $toparen . ')$/';
@@ -2279,7 +2279,7 @@ function evalfunc($farr) {
 	}
 	$skipextracleanup = false;
 	$func = makepretty($func);
-	$vars = explode(',',$varlist);
+	$vars = listtoarray($varlist);
 	if (count($args)==count($vars)+1) {
 		$skipextracleanup = true;
 		array_pop($args);
@@ -2465,7 +2465,7 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 
 function makenumberrequiretimes($arr) {
 	if (!is_array($arr)) {
-		$arr = explode(',',$arr);
+		$arr = listtoarray($arr);
 	} 
 	if (count($arr)==0) {
 		return "";
@@ -2998,8 +2998,8 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	if (strpos($a, '=')!==false && strpos($b, '=')!==false) {
 		$type = "equation";
 	}
-	$fromto = explode(',',$domain);
-	$variables = explode(',',$vars);
+	$fromto = listtoarray($domain);
+	$variables = listtoarray($vars);
 	$vlist = implode("|",$variables);
 	for ($i = 0; $i < 20; $i++) {
 		for($j=0; $j < count($variables); $j++) {
@@ -3240,7 +3240,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 			$abstol =false;
 		}
 		$match = -1;
-		if (!is_array($partial)) { $partial = explode(',',$partial);}
+		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
 			if (!is_numeric($partial[$i])) {
 				$partial[$i] = evalMathPHP($partial[$i],null);
@@ -3278,7 +3278,7 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 			$abstol =false;
 		}
 		$match = -1;
-		if (!is_array($partial)) { $partial = explode(',',$partial);}
+		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
 			$idx = $i/2;
 			if (is_array($requiretimes)) {
@@ -3353,8 +3353,8 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			$stu = preg_replace('/(.*)=(.*)/','$1-($2)',$stu);
 		}
 
-		$fromto = explode(',',$domain);
-		$variables = explode(',',$vars);
+		$fromto = listtoarray($domain);
+		$variables = listtoarray($vars);
 		$vlist = implode("|",$variables);
 		$origstu = $stu;
 		$stu = mathphp(makepretty(mathphppre($stu)), $vlist);
@@ -3394,7 +3394,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 		}
 
 		$match = -1;
-		if (!is_array($partial)) { $partial = explode(',',$partial);}
+		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($k=0;$k<count($partial);$k+=2) {
 			$correct = true;
 			$b = $partial[$k];
@@ -3675,7 +3675,7 @@ function ABarray($s,$n) {
 function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=true) {
 	$wc = array();
 	if (!is_array($words)) {
-		$words = explode(',',$words);
+		$words = listtoarray($words);
 	}
 	/*
 	foreach ($words as $w) {
@@ -3748,7 +3748,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string') {
 	foreach ($swap as $k=>$sw) {
 		$swap[$k] = explode(';', $sw);
 		foreach ($swap[$k] as $i=>$s) {
-			$swap[$k][$i] = explode(',', $s);
+			$swap[$k][$i] = listtoarray($s);
 		}
 	}
 	foreach ($swap as $sw) {
@@ -3811,7 +3811,7 @@ function parsereqsigfigs($reqsigfigs) {
 		$reqsigfigs = substr($reqsigfigs,1);
 	} else if ($reqsigfigs{0}=='[') {
 		$exactsigfig = false;
-		$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
+		$reqsigfigparts = listtoarray(substr($reqsigfigs,1,-1));
 		$reqsigfigs = $reqsigfigparts[0];
 		$reqsigfigoffset = $reqsigfigparts[1] - $reqsigfigparts[0];
 	} else {
