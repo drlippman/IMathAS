@@ -50,11 +50,23 @@ so if you want that, use the CalcPlot3Dlink function instead.</p>
     	<br/>Example: "psurf,cos(u),sin(u),v"
     	<br/>Defaults: umin=0, umax=2pi, vmin=0, vmax=pi, usteps=30, vsteps=15</li>
     <li>Region 1: <code>region,y=f(x) bottom func,y=g(x) top func,z top function,[xmin,xmax]</code>
-    	<br/>Example: "region,y=1,y=2-x^2,z=x^2+y^2
+    	<br/>Example: "region,y=1,y=2-x^2,z=x^2+y^2"
     	<br/>Defaults: xmin=-1, xmax=1</li>
     <li>Region 2: <code>region,x=f(y) left func,x=g(y) right func,z top function,[ymin,ymax]</code>
-    	<br/>Example: "region,x=1,x=4-y^2,z=x^2+y^2,-2,2
+    	<br/>Example: "region,x=1,x=4-y^2,z=x^2+y^2,-2,2"
     	<br/>Defaults: ymin=-1, ymax=1</li>
+    <li>Vector Field: <code>vectorfield, M(x,y,z), N(x,y,z), P(x,y,z), [scale, Nx, Ny, Nz, fixedlen]</code>
+    	<br/>Example: "vectorfield,x,x-y,z,8,4,4,4,true"
+    	<br/>Defaults: scale defaults to dividing by 8
+    	<br/>Nx, Ny, Nz is number of vectors along each axis; defaults to 6
+    	<br/>fixedlen defaults to false (fixed length for vectors)
+    	</li>
+    <li>Vector: <code>vector, vx, vy, vz, [color, width, x0, y0, z0]</code>
+    	<br/>Example: "vector,1,3,-2,ff0000"
+    	<br/>Defaults: color: hex color string like "FF0000", default "000000" (black)
+    	<br/>width: default 2
+    	<br/>x0,y0,z0: base point of vector, default 0,0,0
+    	</li>
   </ul></li>
   <li>width, height: the size for the embed. Defaults to 500 by 500</li>
   <li>xmin, xmax, ymin, ymax, zmin, zmax: the graphing window. Defaults to -2 to 2 for each.</li>

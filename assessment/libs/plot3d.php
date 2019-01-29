@@ -356,6 +356,15 @@ function CalcPlot3Dquerystring($funcs, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax,
 //				xmin,xmax defaults to -1,1
 //          			Example:  region,y=1,y=2-x^2,z=x^2+y^2
 //         		region,x=f(y) left func,x=g(y) right func,z top function,[ymin,ymax]
+//  Vector field:       vectorfield, M(x,y,z), N(x,y,z), P(x,y,z), [scale, Nx, Ny, Nz, fixedlen]
+//				scale defaults to dividing by 8
+//				Nx, Ny, Nz is vectors along each axis; defaults to 6
+//				fixedlen defaults to false (fixed length for vectors)
+//  Vector:		vector, vx, vy, vz, [color, width, x0, y0, z0]
+//				vx, vy, vz are components of the vector
+//				color: hex color string like "FF0000", default "000000" (black)
+//				width: default 2
+//				x0,y0,z0: base point of vector, default 0,0,0
 function CalcPlot3DprepFunc($str,$gxmin=-2,$gxmax=2,$gymin=-2,$gymax=2,$gzmin=-2,$gzmax=2) {
 	$bits = array_map('trim', explode(',', $str));
 	$out = array();
@@ -398,6 +407,31 @@ function CalcPlot3DprepFunc($str,$gxmin=-2,$gxmax=2,$gymin=-2,$gymax=2,$gzmin=-2
 		$out[] = 'y='.$bits[2];
 		$out[] = 'z='.$bits[3];
 		$def = array(array('umin','umax','vmin','vmax','usteps','vsteps'), array(0,"2pi",0,"pi",30,15));
+		$start = 4;
+	} else if ($bits[0]=='vectorfield') {
+		if (count($bits)<4) {
+			echo 'Insufficient information provided for CalcPlot3D parametric surface';
+			return '';
+		}
+		$out[] = 'type=vectorfield';
+		$out[] = 'vectorfield=vf';
+		$out[] = 'm='.$bits[1];
+		$out[] = 'n='.$bits[2];
+		$out[] = 'p='.$bits[3];
+		$def = array(array('scale','nx','ny','nz','norm'), array(8, 6, 6, 6, 'false'));
+		$start = 4;
+	} else if ($bits[0]=='vector') {
+		if (count($bits)<4) {
+			echo 'Insufficient information provided for CalcPlot3D parametric surface';
+			return '';
+		}
+		$out[] = 'type=vector';
+		$out[] = 'vector=<'.$bits[1].','.$bits[2].','.$bits[3].'>';
+		if (count($bits)>8) {
+			$bits[6] = '('.$bits[6].','.$bits[7].','.$bits[8].')';
+			array_splice($bits, 7, 2);	
+		}
+		$def = array(array('color','size','initialpt'), array('000000', 2, '(0,0,0)'));
 		$start = 4;
 	} else {
 		$funcparts = explode('=',$bits[0]);
