@@ -49,7 +49,7 @@ require("../header.php");
 
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 echo '<h1>View Hidden Courses You\'re '.$typename.'</h1>';
-$query = 'SELECT ic.name,ic.id,ic.ownerid,ic.available FROM imas_courses AS ic JOIN '.$table.' AS istu ON ic.id=istu.courseid ';
+$query = 'SELECT ic.name,ic.id,ic.ownerid,ic.available,ic.cleanupdate FROM imas_courses AS ic JOIN '.$table.' AS istu ON ic.id=istu.courseid ';
 $query .= "WHERE istu.userid=:userid AND istu.hidefromcourselist=1 ";
 if ($type=='take') {
 	$query .= "AND ic.available=0 ";
@@ -59,6 +59,7 @@ if ($type=='take') {
 $query .= "ORDER BY ic.name";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':userid'=>$userid));
+$hascleanup = false;
 echo '<ul class="nomark courselist">';
 if ($stm->rowCount()==0) {
 	echo '<li>No hidden courses</li>';
@@ -81,6 +82,10 @@ if ($stm->rowCount()==0) {
 			}
 			echo '</ul></span> ';
 			echo '<a href="../course/course.php?cid='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['name']).'</a> ';
+			if ($row['cleanupdate']>1) {
+				echo ' <span style="color:orange;" title="'._('course is scheduled for cleanup').'">**</span>';	
+				$hascleanup = true;
+			}
 			if (isset($row['available']) && (($row['available']&1)==1)) {
 				echo ' <em style="color:green;">', _('Unavailable'), '</em>';
 			}
@@ -93,7 +98,11 @@ if ($stm->rowCount()==0) {
 	}
 }
 echo '</ul>';
-echo '<a href="../index.php">Back to Home Page</a>';
+if ($hascleanup) {
+	echo '<p class="small info"><span style="color:orange;">**</span> ';
+	echo _('course is scheduled for cleanup').'</p>';
+}
+echo '<p><a href="../index.php">Back to Home Page</a></p>';
 require("../footer.php");
 
 ?>

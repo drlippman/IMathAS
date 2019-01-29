@@ -501,7 +501,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 		}
 		if ($hasCleanup) {
 			echo '<p class="small info"><span style="color:orange;">**</span> ';
-			echo _('course is schedule for cleanup').'</p>';
+			echo _('course is scheduled for cleanup').'</p>';
 		}
 	}
 	if ($type=='take') {
@@ -556,7 +556,7 @@ function printCourseLine($data, $type=null) {
 		echo Sanitize::encodeStringForDisplay($data['name']);
 	}
 	if ($type=='teach' && $data['cleanupdate']>1) {
-		echo ' <span style="color:orange;" title="'._('course is schedule for cleanup').'">**</span>';	
+		echo ' <span style="color:orange;" title="'._('course is scheduled for cleanup').'">**</span>';	
 	}
 	if (isset($data['available']) && (($data['available']&1)==1)) {
 		echo ' <em style="color:green;" class=small>', _('Unavailable'), '</em>';
