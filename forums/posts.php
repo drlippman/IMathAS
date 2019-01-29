@@ -304,7 +304,7 @@ if ($oktoshow) {
 	$nextth = '';
 	if ($page==-3 || $page==-5) { //came from new threads or flagged threads
 		if ($page==-3) {
-			$query = "SELECT imas_forums.id,imas_forum_threads.id as threadid FROM imas_forum_threads ";
+			$query = "SELECT imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
 			$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
 			$array = array(':now'=>$now);
 			if (!isset($teacherid)) {
@@ -352,6 +352,14 @@ if ($oktoshow) {
 					$prevthforum = $lastrow['id'];
 				}
 				$atcur = true;
+			} else if (isset($_GET['olpt']) && $_GET['olpt']>$row['lastposttime']) {
+				if (count($lastrow)>1) {
+					$prevth = $lastrow['threadid'];
+					$prevthforum = $lastrow['id'];
+				}
+				$nextth = $row['threadid'];
+				$nextthforum = $row['id'];
+				break;
 			}
 			$lastrow = $row;
 		}
