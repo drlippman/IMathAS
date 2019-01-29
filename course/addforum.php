@@ -55,12 +55,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
 			} else {
-				$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+				$startdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
 			}
 			if ($_POST['edatetype']=='2000000000') {
 				$enddate = 2000000000;
 			} else {
-				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+				$enddate = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
 			}
 		} else {
 			$startdate = 0;
@@ -87,14 +87,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if ($_POST['replyby']=="Never") {
 			$replyby = 0;
 		} else {
-			$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
+			$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime'],2000000000);
 		}
 		if ($_POST['postby']=="Always") {
 			$postby = 2000000000;
 		} else if ($_POST['postby']=="Never") {
 			$postby = 0;
 		} else {
-			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
+			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime'],2000000000);
 		}
 
 		if (intval($_POST['points'])==0) {

@@ -100,7 +100,7 @@
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
 		} else {
-			$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+			$showdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
 		}
 		$tutoredit = intval($_POST['tutoredit']);
 		$rubric = intval($_POST['rubric']);

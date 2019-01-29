@@ -54,7 +54,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$replyby = 0;
 			} else {
 				require_once("../includes/parsedatetime.php");
-				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
+				$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime'],null);
 			}
 		} else {
 			$type = 0;
@@ -77,7 +77,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if ($isteacher) {
 			if ($_POST['releaseon']=='Date') {
 				require_once("../includes/parsedatetime.php");
-				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime']);
+				$thisposttime = parsedatetime($_POST['releasedate'],$_POST['releasetime'],$now-1);
 			}
 		}
 		if ($_GET['modify']=="new") { //new thread

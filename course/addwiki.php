@@ -59,12 +59,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
 			} else {
-				$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+				$startdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
 			}
 			if ($_POST['edatetype']=='2000000000') {
 				$enddate = 2000000000;
 			} else {
-				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+				$enddate = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
 			}
 		} else {
 			$startdate = 0;
@@ -75,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if ($_POST['rdatetype']=='Never') {
 			$revisedate = 0;
 		} else {
-			$revisedate = parsedatetime($_POST['rdate'],$_POST['rtime']);
+			$revisedate = parsedatetime($_POST['rdate'],$_POST['rtime'],2000000000);
 		}
 
 		$settings = intval($_POST['settings']);

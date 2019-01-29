@@ -28,7 +28,7 @@ if (isset($_POST['checked'])) { //form submitted
 		} else if ($_POST['replyby']=="Never") {
 			$replyby = 0;
 		} else {
-			$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
+			$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime'],2000000000);
 		}
 		$sets[] = "replyby=:replyby";
 		$qarr[':replyby'] = $replyby;
@@ -39,7 +39,7 @@ if (isset($_POST['checked'])) { //form submitted
 		} else if ($_POST['postby']=="Never") {
 			$postby = 0;
 		} else {
-			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
+			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime'],2000000000);
 		}
 		$sets[] = "postby=:postby";
 		$qarr[':postby'] = $postby;

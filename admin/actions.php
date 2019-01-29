@@ -624,12 +624,12 @@ switch($_POST['action']) {
 		if (trim($_POST['sdate'])=='') {
 			$startdate = 0;
 		} else {
-			$startdate = parsedatetime($_POST['sdate'],'12:01am');
+			$startdate = parsedatetime($_POST['sdate'],'12:01am',0);
 		}
 		if (trim($_POST['edate'])=='') {
 			$enddate = 2000000000;
 		} else {
-			$enddate = parsedatetime($_POST['edate'],'11:59pm');
+			$enddate = parsedatetime($_POST['edate'],'11:59pm',2000000000);
 		}
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		if (isset($_POST['setdatesbylti']) && $_POST['setdatesbylti']==1) {

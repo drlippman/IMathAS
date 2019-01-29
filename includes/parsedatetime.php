@@ -1,5 +1,5 @@
 <?php
-function parsedatetime($date,$time) {
+function parsedatetime($date,$time, $failureDefault=0) {
 	global $tzoffset, $tzname;
 	/*
 	preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
@@ -23,6 +23,9 @@ function parsedatetime($date,$time) {
 	if ($tzname=='') {
 		$serveroffset = date('Z') + $tzoffset*60;  //sec
 		$t += $serveroffset;
+	}
+	if ($t === false) {
+		$t = $failureDefault;
 	}
 	return $t;
 }
