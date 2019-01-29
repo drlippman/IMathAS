@@ -843,7 +843,7 @@ function drawTarget(x,y) {
 					var cury = 0;				
 					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 1) {
 						cury = stretch*safepow(curx-tplines[curTarget][i][0][0], 1/3) + tplines[curTarget][i][0][1];
-						if (curx==90) {console.log(originy+","+tplines[curTarget][i][0][0]+","+tplines[curTarget][i][0][1]+","+curx+","+cury)};
+						//if (curx==90) {console.log(originy+","+tplines[curTarget][i][0][0]+","+tplines[curTarget][i][0][1]+","+curx+","+cury)};
 						if (cury<-100) { cury = -100;}
 						if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
 						if (curx==0) {
@@ -2124,7 +2124,6 @@ function mouseCoords(ev){
 	if(ev.pageX || ev.pageY){
 		return {x:ev.pageX, y:ev.pageY};
 	}
-
 	var dd = document.documentElement, db = document.body;
 	if (dd && (dd.scrollTop || dd.scrollLeft)) {
 		var SL = dd.scrollLeft;
@@ -2174,7 +2173,7 @@ function getPosition(e){
 		return {x:-10000, y:-10000};
 	}
 	while (e.offsetParent){
-		left += e.offsetLeft;
+		left += e.offsetLeft-e.scrollLeft;
 		top  += e.offsetTop;
 		e     = e.offsetParent;
 		if (e.className.match(/hidden/)) {
@@ -2182,8 +2181,9 @@ function getPosition(e){
 		}
 	}
 
-	left += e.offsetLeft;
+	left += e.offsetLeft-e.scrollLeft;;
 	top  += e.offsetTop;
+
 	return {x:left, y:top};
 
 }
