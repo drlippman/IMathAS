@@ -185,10 +185,11 @@ function flattenitems($items,&$addto) {
 function gbtable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
 	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs,$includeendmsg;
-	global $hidesection,$hidecode,$exceptionfuncs;
+	global $hidesection,$hidecode,$exceptionfuncs,$courseenddate;
 
 	if (!isset($hidesection)) {$hidesection = false;}
 	if (!isset($hidecode)) {$hidecode= false;}
+	if (!isset($courseenddate)) {$courseenddate=2000000000;}
 
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
@@ -925,6 +926,9 @@ function gbtable() {
 			if (!isset($assesscol[$r['typeid']])) {
 				continue; //assessment is hidden
 			}
+			if ($r['exceptionenddate'] > $courseenddate && $now > $courseenddate) { //for grading purposes, cutoff exceptions at courseenddate
+				$r['exceptionenddate'] = $courseenddate;
+			}
 			$exceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
 			if ($limuser>0) {
 				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$r['typeid']][$r['userid']], $r, true);
@@ -1124,19 +1128,37 @@ function gbtable() {
 		}
 		if ($countthisone) {
 			if ($cntingb[$i] == 1) {
-				if ($gb[0][1][$col][3]<1) { //past
-					$cattotpast[$row][$category[$i]][$col] = $pts;
-				}
-				if ($gb[0][1][$col][3]<2) { //past or cur
-					$cattotcur[$row][$category[$i]][$col] = $pts;
+				if (isset($availstu[$row][$l['assessmentid']])) { //has per-stu avail override
+					if ($availstu[$row][$l['assessmentid']]<1) { //past
+						$cattotpast[$row][$category[$i]][$col] = $pts;
+					}
+					if ($availstu[$row][$l['assessmentid']]<2) { //past or cur
+						$cattotcur[$row][$category[$i]][$col] = $pts;
+					}
+				} else {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$row][$category[$i]][$col] = $pts;
+					}
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$row][$category[$i]][$col] = $pts;
+					}
 				}
 				$cattotfuture[$row][$category[$i]][$col] = $pts;
 			} else if ($cntingb[$i] == 2) {
-				if ($gb[0][1][$col][3]<1) { //past
-					$cattotpastec[$row][$category[$i]][$col] = $pts;
-				}
-				if ($gb[0][1][$col][3]<2) { //past or cur
-					$cattotcurec[$row][$category[$i]][$col] = $pts;
+				if (isset($availstu[$row][$l['assessmentid']])) { //has per-stu avail override
+					if ($availstu[$row][$l['assessmentid']]<1) { //past
+						$cattotpastec[$row][$category[$i]][$col] = $pts;
+					}
+					if ($availstu[$row][$l['assessmentid']]<2) { //past or cur
+						$cattotcurec[$row][$category[$i]][$col] = $pts;
+					}
+				} else {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpastec[$row][$category[$i]][$col] = $pts;
+					}
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcurec[$row][$category[$i]][$col] = $pts;
+					}
 				}
 				$cattotfutureec[$row][$category[$i]][$col] = $pts;
 			}
@@ -1598,9 +1620,9 @@ function gbtable() {
 		if ($useweights==1) {
 			$gb[0][2][$pos][11] = $cats[$cat][5];
 		}
-if ($cats[$cat][0]=='HW') {
+		/*if ($cats[$cat][0]=='HW') {
 			echo $gb[0][2][$pos][2];
-		}
+		}*/
 
 		$overallptspast += $gb[0][2][$pos][3];
 		$overallptscur += $gb[0][2][$pos][4];
