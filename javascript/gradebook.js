@@ -35,14 +35,16 @@ function chglinktoggle() {
 function setupGBpercents() {
   var colpts = [];
   $("thead th").each(function(i,el) { 
-  	if (p = el.innerHTML.match(/(\d+)(\s*|&nbsp;)pts/)) {
+  	if (el.className.match(/nocolorize/)) {
+  		colpts[i] = -1;
+  	} else if (p = el.innerHTML.match(/(\d+)(\s*|&nbsp;)pts/)) {
   		colpts[i] = p[1];
   	} else {
   		colpts[i] = 100;
   	}
   });
   $("tbody td").each(function(i,el) {
-    if (el.innerHTML.match(/tipshow/)) {return;}
+    if (el.innerHTML.match(/tipshow/) || colpts[i%colpts.length]==-1) {return;}
   	var a = $(el).find("a");
   	if (a.length>0) {
   	  el = a[0];
