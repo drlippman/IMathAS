@@ -35,6 +35,15 @@
 	} else {
 		$page = -1;
 	}
+	if (isset($_GET['secfilter'])) {
+		$secfilter = $_GET['secfilter'];
+		$sessiondata[$cid.'secfilter'] = $secfilter;
+		writesessiondata();
+	} else if (isset($sessiondata[$cid.'secfilter'])) {
+		$secfilter = $sessiondata[$cid.'secfilter'];
+	} else {
+		$secfilter = -1;
+	}
 	
 	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
@@ -196,7 +205,7 @@
 
 
 	require("../assessment/displayq2.php");
-
+	require("../includes/htmlutil.php");
 
 	if ($isgroup>0) {
 		$groupnames = array();
@@ -220,6 +229,10 @@
 		}
 
 	}
+	
+	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
+	$stm->execute(array(':courseid'=>$cid));
+	$sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 
 	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
@@ -242,11 +255,17 @@
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
-	$address = $GLOBALS['basesiteurl'] . "/course/gradeallq.php?stu=$stu&cid=$cid&gbmode=$gbmode&aid=$aid&qid=$qid&ver=$ver";
+	$address = $GLOBALS['basesiteurl'] . "/course/gradeallq.php?";
+	$address .= Sanitize::generateQueryStringFromMap(array('stu'=>$stu, 'cid'=>$cid, 'gbmode'=>$gbmode, 'aid'=>$aid, 'qid'=>$qid, 'ver'=>$ver));
 	$placeinhead .= "       var toopen = '$address&page=' + stun;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
 	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForDisplay($deffbtext).'";';
+	$placeinhead .= 'function chgsecfilter() {
+		var sec = document.getElementById("secfiltersel").value;
+		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);
+		window.location = toopen;
+		}';
 	$placeinhead .= '</script>';
 	if ($sessiondata['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
@@ -267,6 +286,11 @@
 		echo "<a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=0\">Grade one student at a time</a> (Do not use for group assignments)";
 	} else {
 		echo "<a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=-1\">Grade all students at once</a>";
+	}
+	if (count($sections)>1) {
+		echo '<br/>';
+		echo _('Limit to section').': ';
+		writeHtmlSelect('secfiltersel', $sections, $sections, $secfilter, _('All'), '-1', 'onchange="chgsecfilter()"');
 	}
 	echo '</div>';
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
@@ -314,22 +338,32 @@
 
 	if ($page!=-1) {
 		$stulist = array();
+		$qarr = array(':courseid'=>$cid, ':assessmentid'=>$aid);
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		if ($hidelocked) {
 			$query .= "AND imas_students.locked=0 ";
 		}
+		if ($secfilter != -1) {
+			$query .= "AND imas_students.section=:section ";
+			$qarr[':section'] = $secfilter;
+		}
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+		$stm->execute($qarr);
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$stulist[] = $row[0].', '.$row[1];
 		}
 	}
+	$qarr = array(':courseid'=>$cid, ':assessmentid'=>$aid);
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 	if ($hidelocked) {
 		$query .= "AND imas_students.locked=0 ";
+	}
+	if ($secfilter != -1) {
+		$query .= "AND imas_students.section=:section ";
+		$qarr[':section'] = $secfilter;
 	}
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	if ($page != -1) {
@@ -337,7 +371,7 @@
 		$query .= " LIMIT $page,1";
 	}
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+	$stm->execute($qarr);
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
@@ -607,6 +641,8 @@
 		}
 	}
 	echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+	} else {
+		echo '<p><b>'._('No submission to show').'</b></p>';
 	}
 
 	echo "</form>";
