@@ -352,7 +352,7 @@
 					':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':bestseeds'=>$bestseedlist, ':reattempting'=>$reattemptinglist));
 				if (strlen($line['lti_sourcedid'])>1) {
 					require_once("../includes/ltioutcomes.php");
-					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores,true);
 				}
 
 				header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
@@ -465,7 +465,7 @@
 				if (strlen($row[1])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
-					calcandupdateLTIgrade($row[1],$row[0],$scores);
+					calcandupdateLTIgrade($row[1],$row[0],$scores,true);
 				}
 			} else {
 				echo "No authority to change scores.";

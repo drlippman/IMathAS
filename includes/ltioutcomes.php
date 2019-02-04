@@ -280,7 +280,7 @@ function newXMLoverPost($url, $request, $requestHeaders, $method = 'POST') {
 
 $aidtotalpossible = array();
 //use this if we don't know the total possible
-function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
+function calcandupdateLTIgrade($sourcedid,$aid,$scores,$sendnow=false) {
 	global $DBH, $aidtotalpossible;
 	if (!isset($aidtotalpossible[$aid])) {
 		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
@@ -301,7 +301,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 	}
 	$grade = min(1, max(0,$total/$aidtotalpossible[$aid]));
 	$grade = number_format($grade,8);
-	return updateLTIgrade('update',$sourcedid,$aid,$grade,$allans);
+	return updateLTIgrade('update',$sourcedid,$aid,$grade,$allans||$sendnow);
 }
 
 //use this if we know the grade, or want to delete

@@ -286,23 +286,28 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
+			
+			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
+				//update points possible
+				require_once("../includes/updateptsposs.php");
+				updatePointsPossible($aid, $itemorder, $defpoints);
+			}
 
 			//update assessment sessions
-			$stm = $DBH->prepare("SELECT id,questions,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+			$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				//$qarr = explode(',',$row[1]);
-				if (strpos($row[1],';')===false) {
-					$qarr = explode(",",$row[1]);
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (strpos($row['questions'],';')===false) {
+					$qarr = explode(",",$row['questions']);
 				} else {
-					list($questions,$bestquestions) = explode(";",$row[1]);
+					list($questions,$bestquestions) = explode(";",$row['questions']);
 					$qarr = explode(",",$bestquestions);
 				}
-				if (strpos($row[2],';')===false) {
-					$bestscores = explode(',',$row[2]);
+				if (strpos($row['bestscores'],';')===false) {
+					$bestscores = explode(',',$row['bestscores']);
 					$doraw = false;
 				} else {
-					list($bestscorelist,$bestrawscorelist,$firstscorelist) = explode(';',$row[2]);
+					list($bestscorelist,$bestrawscorelist,$firstscorelist) = explode(';',$row['bestscores']);
 					$bestscores = explode(',', $bestscorelist);
 					$bestrawscores = explode(',', $bestrawscorelist);
 					$firstscores = explode(',', $firstscorelist);
@@ -323,13 +328,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$slist = implode(',',$bestscores );
 				}
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores WHERE id=:id");
-				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row[0]));
-			}
-
-			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
-				//update points possible
-				require_once("../includes/updateptsposs.php");
-				updatePointsPossible($aid, $itemorder, $defpoints);
+				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row['id']));
+				
+				if (strlen($row['lti_sourcedid'])>1) {
+					//update LTI score
+					require_once("../includes/ltioutcomes.php");
+					calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $bestscores, true);
+				}
 			}
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());

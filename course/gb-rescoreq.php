@@ -143,7 +143,7 @@ if (isset($_POST['record'])) {
 		if (strlen($row['lti_sourcedid'])>1) {
 			$bsarr = explode(';', $bestscorelist);
 			$bs = explode(',', $bsarr[0]);
-			calcandupdateLTIgrade($row['lti_sourcedid'],$aid,$bs);
+			calcandupdateLTIgrade($row['lti_sourcedid'],$aid,$bs,true);
 		}
 	}
 	
