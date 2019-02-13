@@ -10,7 +10,7 @@ $nologo = true;
 if (isset($_POST['message'])) {
 	require_once("../includes/email.php");
 	
-	$message = Sanitize::incomingHtml($_POST['message']);
+	$origmessage = Sanitize::incomingHtml($_POST['message']);
 	$subject = Sanitize::stripHtmlTags($_POST['subject']);
 	if (trim($subject)=='') {
 		$subject = '('._('none').')';
@@ -18,53 +18,70 @@ if (isset($_POST['message'])) {
 	if ($myrights>10 && isset($_POST['markbroken'])) {
 		$subject .= ' - Marked Broken';
 	}
-	$msgto = Sanitize::onlyInt($_POST['sendto']);
+	$sendlist = array(array('to'=>$_POST['sendto'], 'sendtype'=>$_POST['sendtype']));
+	
+	//if it's an error report, and we've said we want a copy elsewhere, add that to the send list
+	if (isset($_POST['iserrreport']) && isset($CFG['GEN']['qerrorsendto']) && !empty($CFG['GEN']['qerrorsendto'][3])) {
+		$sendlist[] = array('to'=>$CFG['GEN']['qerrorsendto'][0], 'sendtype'=>$CFG['GEN']['qerrorsendto'][1]);
+	}
 	$error = '';
-	if ($_POST['sendtype']=='msg') {
-		$now = time();
-		$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-		$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':title'=>$subject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
-			':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
-		$msgid = $DBH->lastInsertId();
+	foreach ($sendlist as $sendcnt=>$sendinfo) {
+		$msgto = Sanitize::onlyInt($sendinfo['to']);
 		
-		$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$msgto));
-		list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
-		if ($msgnotify==1) {
-			send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subject, $cid, $coursename, $msgid);
-		}
-		if ($FCMtokenTo != '') {
-			require_once("../includes/FCM.php");
-			$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cid)."&msgid=$msgid";
-			sendFCM($FCMtokenTo,_("Msg from:").' '.Sanitize::encodeStringForDisplay($userfullname),
-					Sanitize::encodeStringForDisplay($subject), $url);
-		}
-		
-		$success = _('Message sent');
-	} else if ($_POST['sendtype']=='email') {
-		$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$msgto));
-		$row = $stm->fetch(PDO::FETCH_NUM);
-		$row[2] = trim($row[2]);
-		if ($row[2]!='' && $row[2]!='none@none.com') {
-			$addy = Sanitize::simpleASCII("{$row[0]} {$row[1]}")." <".Sanitize::emailAddress($row[2]).">";
-			$sessiondata['mathdisp']=2;
-			$sessiondata['graphdisp']=2;
-			require("../filter/filter.php");
-			$message = filter($message);
-			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);
-			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$userid));
-			$row = $stm->fetch(PDO::FETCH_NUM);
-			$self = Sanitize::simpleASCII("{$row[0]} {$row[1]}") ." <". Sanitize::emailAddress($row[2]).">";
-			
-			send_email($addy, $sendfrom, $subject, $message, array($self), array(), 5); 
-			
-			$success = _('Email sent');
+		if (isset($_POST['iserrreport']) && $sendcnt>0) { //copy going to specified
+			$message = '<p><b>This message was also sent to the question owner.</b></p>'.$origmessage;	
 		} else {
-			$error = _('Unable to send: Invalid email address');
+			$message = $origmessage;
+		}
+		if ($sendinfo['sendtype']=='msg') {
+			$now = time();
+			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
+			$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':title'=>$subject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
+				':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
+			$msgid = $DBH->lastInsertId();
+			
+			$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$msgto));
+			list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
+			if ($msgnotify==1) {
+				send_msg_notification(Sanitize::emailAddress($email), $userfullname, $subject, $cid, $coursename, $msgid);
+			}
+			if ($FCMtokenTo != '') {
+				require_once("../includes/FCM.php");
+				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cid)."&msgid=$msgid";
+				sendFCM($FCMtokenTo,_("Msg from:").' '.Sanitize::encodeStringForDisplay($userfullname),
+						Sanitize::encodeStringForDisplay($subject), $url);
+			}
+			if ($sendcnt == 0) {
+				$success = _('Message sent');
+			}
+		} else if ($sendinfo['sendtype']=='email') {
+			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$msgto));
+			$row = $stm->fetch(PDO::FETCH_NUM);
+			$row[2] = trim($row[2]);
+			if ($row[2]!='' && $row[2]!='none@none.com') {
+				$addy = Sanitize::simpleASCII("{$row[0]} {$row[1]}")." <".Sanitize::emailAddress($row[2]).">";
+				$sessiondata['mathdisp']=2;
+				$sessiondata['graphdisp']=2;
+				require("../filter/filter.php");
+				$message = filter($message);
+				$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);
+				$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+				$stm->execute(array(':id'=>$userid));
+				$row = $stm->fetch(PDO::FETCH_NUM);
+				$self = Sanitize::simpleASCII("{$row[0]} {$row[1]}") ." <". Sanitize::emailAddress($row[2]).">";
+				
+				send_email($addy, $sendfrom, $subject, $message, array($self), array(), 5); 
+				
+				if ($sendcnt == 0) {
+					$success = _('Email sent');
+				}
+			} else if ($sendcnt == 0) {
+				$error = _('Unable to send: Invalid email address');
+			}
 		}
 	}
 	if ($error == '' && $myrights>10 && isset($_POST['markbroken'])) {
@@ -109,13 +126,18 @@ if (isset($_POST['message'])) {
 		if (isset($parts[3]) && $parts[3] === 'reperr') {
 			$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
 			$iserrreport = true;
+			$_GET['to'] = 0;
 			if (isset($CFG['GEN']['qerrorsendto'])) {
 				if (is_array($CFG['GEN']['qerrorsendto'])) {
-					list($_GET['to'],$sendtype,$sendtitle) = $CFG['GEN']['qerrorsendto'];
+					if (empty($CFG['GEN']['qerrorsendto'][3])) { //if not also sending to owner
+						$_GET['to'] = $CFG['GEN']['qerrorsendto'][0];
+						$sendtype = $CFG['GEN']['qerrorsendto'][1];
+					}
 				} else {
 					$_GET['to'] = $CFG['GEN']['qerrorsendto'];
 				}
-			} else {
+			}
+			if ($_GET['to'] == 0) {
 				$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
 				$stm->execute(array(':id'=>$parts[1]));
 				$_GET['to'] = $stm->fetchColumn(0);
@@ -163,6 +185,7 @@ if (isset($_POST['message'])) {
 	echo htmlentities($message);
 	echo "</textarea></div><br/>\n";
 	if ($iserrreport) {
+		echo '<input type=hidden name=iserrreport value=1 />';
 		echo '<label><input type=checkbox name=markbroken value="'.Sanitize::onlyInt($parts[1]).'"> ';
 		echo _("Mark question as broken. Only do this if there is a serious issue in the display or scoring of the question.").' ';
 		echo _("If you are reporting a typo, suggestion for a change, or an issue that only rarely occurs, please leave this un-checked.");

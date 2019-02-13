@@ -279,16 +279,7 @@ if ($overwriteBody==1) {
 	echo htmlentities($message);
 	echo '</code>';
 
-	if (isset($CFG['GEN']['qerrorsendto'])) {
-		if (is_array($CFG['GEN']['qerrorsendto'])) {
-			list($sendto,$sendtype,$sendtitle) = $CFG['GEN']['qerrorsendto'];
-		} else {
-			$sendto = $CFG['GEN']['qerrorsendto'];
-			$sendtype = 'email';
-			$sendtitle = _('Contact support');
-		}
-		$sendcid = $cid;
-	} else if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
 		$sendtype = 'msg';
 		$sendtitle = ('Message owner');
 		$sendcid = $CFG['GEN']['sendquestionproblemsthroughcourse'];
@@ -297,6 +288,18 @@ if ($overwriteBody==1) {
 		$sendtitle = ('Email owner');
 		$sendcid = $cid;
 	}
+	if (isset($CFG['GEN']['qerrorsendto'])) {
+		if (is_array($CFG['GEN']['qerrorsendto'])) {
+			if (empty($CFG['GEN']['qerrorsendto'][3])) { //if not also sending to owner
+				$sendtype = $CFG['GEN']['qerrorsendto'][1];
+			}
+			$sendtitle = $CFG['GEN']['qerrorsendto'][2];
+		} else {
+			$sendtype = 'email';
+			$sendtitle = _('Contact support');
+		}
+	}
+
 	printf("<p>Question id: %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));
 	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> to report problems</p>";
 	
