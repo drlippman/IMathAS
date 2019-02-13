@@ -2369,6 +2369,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+		
+		$la = preg_replace('/%(\w+;)/',"&$1",$la);
+		$la = str_replace('&tilde;', '~', $la);
 
 		if ($answerformat=='list') {
 			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
@@ -2502,7 +2505,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if ($GLOBALS['useeditor']=='review' || ($GLOBALS['useeditor']=='reviewifneeded' && trim($la)=='')) {
 			$la = str_replace('&quot;','"',$la);
-			$la = preg_replace('/%(\w+;)/',"&$1",$la);
+			$la = preg_replace('/%(\w+;)/','&$1',$la);
+			$la = str_replace('&tilde;', '~', $la);
 			//$la = str_replace('nbsp;','&nbsp;',$la);
 			if ($displayformat!='editor') {
 				$la = preg_replace('/\n/','<br/>',$la);
@@ -2557,7 +2561,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= getcolormark($colorbox);
 			$out .= "</div>";
 		} else {
-			$la = preg_replace('/%(\w+;)/',"&$1",$la);
+			$la = preg_replace('/%(\w+;)/','&$1',$la);
+			$la = str_replace('&tilde;', '~', $la);
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
 				$la = str_replace('&quot;','"',$la);
 			}
@@ -5089,7 +5094,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$givenans = normalizemathunicode($givenans);
-		$GLOBALS['partlastanswer'] = $givenans;
+		$tostoreans = str_replace('~', '&tilde;', $givenans);
+		$tostoreans = preg_replace('/&(\w+;)/','%$1',$tostoreans);
+		$tostoreans = preg_replace('/&/','%amp;',$tostoreans);
+		$GLOBALS['partlastanswer'] = $tostoreans;
 
 		if (isset($scoremethod) && (($scoremethod=='takeanything'  && trim($givenans)!='') || $scoremethod=='takeanythingorblank')) {
 			return 1;
@@ -5243,6 +5251,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	} else if ($anstype == "essay") {
 		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
 		$givenans = myhtmLawed($givenans);
+		$givenans = str_replace('~', '&tilde;', $givenans);
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
