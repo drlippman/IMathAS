@@ -187,7 +187,7 @@
 
 
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-	echo '<form method="post" action="isolateassessgrade?cid='.$cid.'&aid='.$aid.'">';
+	echo '<form method="post" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
 	echo '<p>',_('With selected:');
 	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
 	echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
