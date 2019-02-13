@@ -25,9 +25,9 @@ if (!isset($_GET['page']) || $_GET['page']=='') {
 	$page = Sanitize::onlyInt($_GET['page']);
 }
 
-$stm = $DBH->prepare("SELECT name,postby,replyby,settings,groupsetid,sortby,taglist,enddate,avail,postinstr,replyinstr,allowlate,courseid FROM imas_forums WHERE id=:id");
+$stm = $DBH->prepare("SELECT name,postby,replyby,settings,groupsetid,sortby,taglist,enddate,avail,description,postinstr,replyinstr,allowlate,autoscore, courseid FROM imas_forums WHERE id=:id");
 $stm->execute(array(':id'=>$forumid));
-list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $postinstr,$replyinstr, $allowlate, $forumcourseid) = $stm->fetch(PDO::FETCH_NUM);
+list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $description, $postinstr,$replyinstr, $allowlate, $autoscore, $forumcourseid) = $stm->fetch(PDO::FETCH_NUM);
 
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";
@@ -132,9 +132,6 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 	}
 	exit;
 }
-$stm = $DBH->prepare("SELECT name,postby,replyby,settings,groupsetid,sortby,taglist,enddate,avail,postinstr,replyinstr,allowlate,autoscore FROM imas_forums WHERE id=:id");
-$stm->execute(array(':id'=>$forumid));
-list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $postinstr,$replyinstr, $allowlate, $autoscore) = $stm->fetch(PDO::FETCH_NUM);
 
 $duedates = '';
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
@@ -392,18 +389,13 @@ if ($duedates!='') {
 	//$duedates contains HTML from above
 	echo '<p id="forumduedates">'.$duedates.'</p>';
 }
-
+if ($description != '' && $description != '<p></p>') {
+	echo '<div id="description" style="display:none;margin-bottom:10px;" class="intro">';
+	echo Sanitize::outgoingHtml($description);
+	echo '</div>';
+}
 if ($postinstr != '' || $replyinstr != '') {
-	echo '<a href="#" onclick="$(\'#postreplyinstr\').show();$(this).remove();return false;">';
-	if ($postinstr != '' && $replyinstr != '') {
-		echo _('View Post and Reply Instructions');
-	} else if ($postinstr != '') {
-		echo _('View Post Instructions');
-	} else if ($replyinstr != '') {
-		echo _('View Reply Instructions');
-	}
-	echo '</a>';
-	echo '<div id="postreplyinstr" style="display:none;" class="intro">';
+	echo '<div id="postreplyinstr" style="display:none;margin-bottom:10px;" class="intro">';
 	if ($postinstr != '') {
 		echo '<h3>'._('Posting Instructions').'</h3>';
 		// $postinstr contains HTML.
@@ -414,8 +406,25 @@ if ($postinstr != '' || $replyinstr != '') {
 		// $postinstr contains HTML.
 		echo Sanitize::outgoingHtml($replyinstr);
 	}
-	echo '</div><br/>';
+	echo '</div>';
 }
+if ($description != '' && $description != '<p></p>') {
+	echo '<a href="#" onclick="$(\'#description\').show();$(this).remove();return false;">';
+	echo _('View Forum Description');
+	echo '</a> ';
+}
+if ($postinstr != '' || $replyinstr != '') {
+	echo '<a href="#" onclick="$(\'#postreplyinstr\').show();$(this).remove();return false;">';
+	if ($postinstr != '' && $replyinstr != '') {
+		echo _('View Post and Reply Instructions');
+	} else if ($postinstr != '') {
+		echo _('View Post Instructions');
+	} else if ($replyinstr != '') {
+		echo _('View Reply Instructions');
+	}
+	echo '</a>';
+}
+
 $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
 $query .= "WHERE forumid=:forumid ";
 if ($dofilter) {
