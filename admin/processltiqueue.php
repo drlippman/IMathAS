@@ -76,7 +76,7 @@ if (strpos($_SERVER['HTTP_HOST'],'localhost')!==false) {
 }
 
 //pull all lti queue items ready to send; we'll process until we're done or timeout
-$stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<3 ORDER BY sendon');
+$stm = $DBH->prepare('SELECT * FROM imas_ltiqueue WHERE sendon<? AND failures<7 ORDER BY sendon');
 $stm->execute(array(time()));
 $LTIsecrets = array();
 $cntsuccess = 0;
@@ -165,7 +165,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 	//var_dump($request_info);
 	if ($reponse === false || strpos($response, 'success')===false) { //failed
 		//on call failure, we'll update failure count and push back sendon
-		$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*600,failures=failures+1 WHERE hash=?');
+		$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*(failures+1)*300,failures=failures+1 WHERE hash=?');
 		$setfailed->execute(array($user_data['hash']));
 		if ($user_data['lasttry']===true) {
 			$cntgiveup++;
