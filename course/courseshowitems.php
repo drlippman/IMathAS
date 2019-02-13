@@ -757,6 +757,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					   }
 				   }
 			   }
+			   $preReqNote = '';
+			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0) {
+			   	$preReqNote = '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
+				$preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
+			   }
 			   
 			   //calc status icon
 			   
@@ -832,6 +837,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 						 }
 				   }
 				   echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>";
+				   
+				   if ($viewall) {
+				   	   echo $preReqNote;
+				   }
+				   
 				   if ($line['enddate']!=2000000000) {
 					   echo "<BR> $endname $enddate \n";
 				   }
@@ -897,21 +907,25 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['enddate']<$now && $canuselatepass) {
-					 //not available but can use latepass - show greyed w latepass link
-					  beginitem($canedit,$items[$i]);
-						echo '<div class="itemhdr">';
-						echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
-						echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
- 				   	echo "<br/> "._('This assessment was due').' '.$enddate;
-						echo ". <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
-						echo '</div>'; //title
-						if ($canedit) {
- 				   	   echo getAssessDD($i, $typeid, $parent, $items[$i]);
- 				   	}
- 				   	echo '</div>'; //itemhdr
- 				   	echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
- 				 		enditem($canedit);
-				 } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['startdate']<$now && $line['enddate']>$now && $showgreyedout) {  //greyedout view for conditional items
+				//not available but can use latepass - show greyed w latepass link
+				beginitem($canedit,$items[$i]);
+				echo '<div class="itemhdr">';
+				echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
+				echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
+				echo "<br/> "._('This assessment was due').' '.$enddate;
+				echo ". <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
+				if ($viewall) {
+				   echo $preReqNote;
+				}
+				echo '</div>'; //title
+				if ($canedit) {
+					echo getAssessDD($i, $typeid, $parent, $items[$i]);
+				}
+				
+				echo '</div>'; //itemhdr
+				echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
+ 				enditem($canedit);
+ 			   } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['startdate']<$now && $line['enddate']>$now && $showgreyedout) {  //greyedout view for conditional items
 			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 			   	   echo '<div class="itemhdr">';
 
@@ -925,8 +939,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
 				   //echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
-				   echo '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
-				   echo _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
+				   
+				   echo $preReqNote;
 
 				   if ($line['enddate']!=2000000000) {
 					   echo "<br/> $endname $enddate \n";
@@ -951,6 +965,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 				   echo "<div class=\"title grey\"><i>".Sanitize::encodeStringForDisplay($line['name'])."</i>";
 				   echo "<br/><i>$show</i>\n";
+				   if ($viewall) {
+				   	   echo $preReqNote;
+				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
 				   	echo getAssessDD($i, $typeid, $parent, $items[$i]);
@@ -976,6 +993,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 
 				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >".Sanitize::encodeStringForDisplay($line['name'])."</a></i>";
+				   if ($viewall) {
+				   	   echo $preReqNote;
+				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show</i>\n";
 				   echo '</span>';
