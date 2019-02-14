@@ -274,7 +274,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=013119"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=021319"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -395,6 +395,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 			$usefullwidth = true;
 		}
 	}
+	if (isset($_COOKIE["gbfullw-$cid"]) && $_COOKIE["gbfullw-$cid"]==1) {
+		$usefullwidth = true;
+	}
+	$showwidthtoggle = (strpos($coursetheme, '_fw')!==false);
+	
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } td.trld {display:table-cell;vertical-align:middle;} </style>";
 	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
@@ -422,6 +427,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$togglehtml .= '<li><a data-hdrs="1">'._('Locked').'</a></li>';
 	$togglehtml .= '<li><a data-hdrs="0">'._('Unlocked').'</a></li>';
 	
+	if ($showwidthtoggle && $headerslocked) {
+		$togglehtml .= '<li class="dropdown-header" data-pgw="hdr">'._('Width').'</li>';
+		$togglehtml .= '<li><a data-pgw="0">'._('Fixed').'</a></li>';
+		$togglehtml .= '<li><a data-pgw="1">'._('Full').'</a></li>';	
+	}
 	$togglehtml .= '<li class="dropdown-header">'._('Scores').'</li>';
 	$togglehtml .= '<li><a data-pts="0">'._('Points').'</a></li>';
 	$togglehtml .= '<li><a data-pts="1">'._('Percents').'</a></li>';
@@ -520,6 +530,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$("a[data-links='.Sanitize::onlyInt($links).']").parent().addClass("active");
 		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
 		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
+		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
 		$(setupGBpercents);
 	});
 	</script>';

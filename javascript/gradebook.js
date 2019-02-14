@@ -123,15 +123,29 @@ $(function() {
 	$("a[data-hdrs]").on("click",function(e) {
 		e.preventDefault();
 		var val=$(this).attr("data-hdrs");
+		document.cookie = "gblhdr-"+cid+"="+val;
 		if (val==0) {
+			if ($("body").attr("class").match(/^fw/)) {
+				location.reload();
+				return;
+			}
 			ts.unlock();
 			document.cookie = "skiplhdrwarn_"+cid+"=0";
+			$("[data-pgw]").hide();
 		} else {
 			ts.lock();
+			$("[data-pgw]").show();
 		}
-		document.cookie = "gblhdr-"+cid+"="+val;
 		$("a[data-hdrs]").parent().removeClass("active");
 		$(this).parent().addClass("active");
+	});
+	$("a[data-pgw]").on("click",function(e) {
+		e.preventDefault();
+		$("a[data-pgw]").parent().removeClass("active");
+		$(this).parent().addClass("active");
+		var val=$(this).attr("data-pgw");
+		document.cookie = "gbfullw-"+cid+"="+val;
+		location.reload();
 	});
 	$(".gbtoggle a").attr("href","#");
 });
