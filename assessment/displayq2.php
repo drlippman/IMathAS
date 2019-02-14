@@ -475,8 +475,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 
 	//echo $toevalqtext;
-	eval("\$evaledqtext = \"$toevalqtxt\";");
-	eval("\$evaledsoln = \"$toevalsoln\";");
+	try {
+		eval("\$evaledqtext = \"$toevalqtxt\";");
+		eval("\$evaledsoln = \"$toevalsoln\";");
+	} catch (Throwable $t) {
+		if ($myrights>10) {
+			echo '<p>Caught error in evaluating the question text or solution text in this question: ';
+			echo Sanitize::encodeStringForDisplay($t->getMessage());
+			echo '</p>';
+		}
+	}
 
 	if ($returnqtxt===2) {
 		return '<div id="writtenexample" class="review" role=region aria-label="'._('Written Example').'">'.$evaledsoln.'</div>';
