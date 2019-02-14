@@ -2159,33 +2159,11 @@ function getMouseOffset(target, ev){
 }
 
 function getPosition(e){
-	var left = 0;
-	var top  = 0;
-
-	//seems to be causing issues
-	/*if (e.getBoundingClientRect) {
-		var box = e.getBoundingClientRect();
-		var scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-                var scrollLeft = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
-                return {x: box.left + scrollLeft, y: box.top + scrollTop};
-	}*/
 	if (e.className.match(/hidden/)) {
 		return {x:-10000, y:-10000};
 	}
-	while (e.offsetParent){
-		left += e.offsetLeft-e.scrollLeft;
-		top  += e.offsetTop;
-		e     = e.offsetParent;
-		if (e.className.match(/hidden/)) {
-			return {x:-10000, y:-10000};
-		}
-	}
-
-	left += e.offsetLeft-e.scrollLeft;;
-	top  += e.offsetTop;
-
-	return {x:left, y:top};
-
+	var pos = $(e).offset();
+	return {x: pos.left, y: pos.top};
 }
 
 
