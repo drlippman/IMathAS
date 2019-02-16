@@ -49,10 +49,14 @@ if ($enablebasiclti!=true) {
 	exit;
 }
 
-function reporterror($err) {
+function reporterror($err, $rawhtml = false) {
 	global $imasroot;
 	require("header.php");
-	printf('<p>%s</p>', Sanitize::encodeStringForDisplay($err));
+	if ($rawhtml) {
+		echo $err;
+	} else {
+		printf('<p>%s</p>', Sanitize::encodeStringForDisplay($err));
+	}
 	require("footer.php");
 	exit;
 }
@@ -86,7 +90,11 @@ if (isset($_GET['launch'])) {
 	$stm = $DBH->prepare('SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid');
 	$stm->execute(array(':sessionid'=>$sessionid));
 	if ($stm->rowCount()==0) {
-		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
+		$err = _('No authorized session exists.');
+		$err .= ' '._('This is most likely caused by your browser blocking third-party cookies.');
+		$err .= ' '.sprintf(_('Try <a %s>following this link</a> then try again.'), 'href="'.$GLOBALS['basesiteurl'].'/ltisessionsetup.php" target="_blank"');
+		$err .= ' '._('If that does not work, please adjust your browser settings and try again.');
+		reporterror('<p>'.$err.'</p>', true);
 	}
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
@@ -143,7 +151,11 @@ if (isset($_GET['launch'])) {
 	$stm = $DBH->prepare('SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid');
 	$stm->execute(array(':sessionid'=>$sessionid));
 	if ($stm->rowCount()==0) {
-		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
+		$err = _('No authorized session exists.');
+		$err .= ' '._('This is most likely caused by your browser blocking third-party cookies.');
+		$err .= ' '.sprintf(_('Try <a %s>following this link</a> then try again.'), 'href="'.$GLOBALS['basesiteurl'].'/ltisessionsetup.php" target="_blank"');
+		$err .= ' '._('If that does not work, please adjust your browser settings and try again.');
+		reporterror('<p>'.$err.'</p>', true);
 	}
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
@@ -1607,7 +1619,11 @@ if (isset($_GET['launch'])) {
 	$stm = $DBH->prepare("SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid");
 	$stm->execute(array(':sessionid'=>$sessionid));
 	if ($stm->rowCount()==0) {
-		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
+		$err = _('No authorized session exists.');
+		$err .= ' '._('This is most likely caused by your browser blocking third-party cookies.');
+		$err .= ' '.sprintf(_('Try <a %s>following this link</a> then try again.'), 'href="'.$GLOBALS['basesiteurl'].'/ltisessionsetup.php" target="_blank"');
+		$err .= ' '._('If that does not work, please adjust your browser settings and try again.');
+		reporterror('<p>'.$err.'</p>', true);
 	}
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));
@@ -1665,7 +1681,11 @@ if (isset($_GET['launch'])) {
 	$stm = $DBH->prepare("SELECT sessiondata,userid FROM imas_sessions WHERE sessionid=:sessionid");
 	$stm->execute(array(':sessionid'=>$sessionid));
 	if ($stm->rowCount()==0) {
-		reporterror("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.");
+		$err = _('No authorized session exists.');
+		$err .= ' '._('This is most likely caused by your browser blocking third-party cookies.');
+		$err .= ' '.sprintf(_('Try <a %s>following this link</a> then try again.'), 'href="'.$GLOBALS['basesiteurl'].'/ltisessionsetup.php" target="_blank"');
+		$err .= ' '._('If that does not work, please adjust your browser settings and try again.');
+		reporterror('<p>'.$err.'</p>', true);
 	}
 	list($enc,$userid) = $stm->fetch(PDO::FETCH_NUM);
 	$sessiondata = unserialize(base64_decode($enc));

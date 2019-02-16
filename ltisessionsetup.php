@@ -19,7 +19,7 @@ function redirect() {
 </head>
 <?php
 if (empty($redir)) {  
-	echo '<body>Session established. Go back to your LMS and try again.</body>';
+	echo '<body>Session established. Go close this tab or window and go back to your LMS and try again.</body>';
 } else {
 ?>
 <body onload="redirect()">
