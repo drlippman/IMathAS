@@ -1,10 +1,13 @@
 <?php
 require_once(__DIR__ . "/init_without_validate.php");
 header('P3P: CP="ALL CUR ADM OUR"');
+if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',86400);
-if ($_SERVER['HTTP_HOST'] != 'localhost') {
-	session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
+$hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
+if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
+	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
 }
+
 session_start();
 $redir = Sanitize::url($_GET['redirect_url']);
 ?>
