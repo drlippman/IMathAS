@@ -973,6 +973,16 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	if (isset($ansprompt)) {$optionsPack['ansprompt'] = $ansprompt;}
 	if (isset($anstypes)) {$optionsPack['anstypes'] = $anstypes;}
 
+	//look to see if we should splice off some autosaved answers
+	if ($GLOBALS['lastanswers'][$qnidx] != '') {
+		$templastans = explode('##', $GLOBALS['lastanswers'][$qnidx]);
+		$countregens = count(array_keys($templastans, 'ReGen', true));
+		$tosplice = ($countregens + $attemptn) - count($templastans);
+		if ($tosplice < 0) {
+			array_splice($templastans, $tosplice);
+			$GLOBALS['lastanswers'][$qnidx] = implode('##', $templastans);
+		}
+	}
 	$score = 0;
 	if ($qdata['qtype']=="multipart") {
 		$partla = array();
