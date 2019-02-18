@@ -677,7 +677,7 @@ require_once("includes/sanitize.php");
 			$mfasecret = $_POST['mfasecret'];
 			
 			if ($MFA->verifyCode($mfasecret, $_POST['mfaverify'])) {
-				$mfadata = array('secret'=>$mfasecret);
+				$mfadata = array('secret'=>$mfasecret, 'last'=>'', 'laston'=>0);
 				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
 			} else {

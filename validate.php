@@ -339,9 +339,9 @@
 	$userHasAdminMFA = false;
 	if (($myrights>40 || $myspecialrights>0) && $line['mfa'] != '' && empty($sessiondata['mfaverified'])) {
 		$mfadata = json_decode($line['mfa'], true);
-		if (isset($_COOKIE['mfa_token']) && isset($mfadata['trusted'])) {
+		if (isset($_COOKIE['gat']) && isset($mfadata['trusted'])) {
 			foreach ($mfadata['trusted'] as $mfatoken) {
-				if ($mfatoken == $_COOKIE['mfa_token']) {
+				if ($mfatoken == $_COOKIE['gat']) {
 					$sessiondata['mfaverified'] = true;
 					writesessiondata();
 					break;

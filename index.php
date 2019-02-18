@@ -373,7 +373,7 @@ if (!isset($CFG['GEN']['homelinkbox'])) {
 	} else if (($myspecialrights&4)==4) {
 		echo '<br/><a href="admin/listdiag.php">'._('Diagnostics').'</a>';
 	} else if (!empty($userHasAdminMFA)) {
-		echo '<br/><a href="admin/entermfa.php">'._('Enable Admin Features').'</a>';
+		echo '<br/><a href="admin/forms.php?action=entermfa">'._('Enable Admin Features').'</a>';
 	}
 	if ((($myspecialrights&32)==32) || $myrights == 100) {
 		if ($myrights >=75 || ($myspecialrights&4)==4) {
