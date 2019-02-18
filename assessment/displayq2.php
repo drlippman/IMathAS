@@ -4145,6 +4145,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$givenans = normalizemathunicode($givenans);
+		$givenans = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $givenans);
 
 		$ansformats = array_map('trim',explode(',',$answerformat));
 		$answer = str_replace(' ','',$answer);
@@ -4156,6 +4157,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($anstype=='ntuple') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calcntuple') {
+			$_POST["tc$qn"] = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $_POST["tc$qn"]);
 			$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
 			//test for correct format, if specified

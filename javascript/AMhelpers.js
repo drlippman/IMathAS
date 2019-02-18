@@ -88,6 +88,8 @@ function setupLivePreview(qn) {
 			  	} else if (vlist.hasOwnProperty(qn)) {
 			  		text = AMnumfuncPrepVar(qn, text)[1];
 
+			  	} else if (ntupletoproc.hasOwnProperty(qn)) {
+			  		text = text.replace(/</g, '(:').replace(/>/g, ':)');	
 			  	} else if (calcformat.hasOwnProperty(qn)) {
 			  		var format = calcformat[qn];
 			  		if (format.indexOf('list')==-1 && format.indexOf('set')==-1) {
@@ -96,7 +98,7 @@ function setupLivePreview(qn) {
 			  		if (format.indexOf('scinot')!=-1) {
 			  			text = text.replace(/(x|X|\u00D7)/,"xx");
 			  		}
-			  	}
+			  	} 
 			  	text = text.replace(/[^\u0000-\u007f]/g, '?');
 			  	return text;
 			  },
@@ -480,6 +482,7 @@ function intcalculate(inputId,outputId,format) {
 function ntuplecalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = normalizemathunicode(fullstr);
+	fullstr = fullstr.replace(/\(:|<</g, '<').replace(/:\)|>>/g, '>');
 	if (format.indexOf('mixed')!=-1) {
 		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
@@ -554,6 +557,7 @@ function ntuplecalc(inputId,outputId,format) {
 			err += _("Invalid notation")+". ";
 		}
 		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
+		fullstr = fullstr.replace(/</g, '(:').replace(/>/g, ':)');
 		//outstr = '`'+fullstr+'` = '+outcalced;
 		if (format.indexOf('showval')==-1 || notationok==false) {
 			 outstr = '`'+fullstr+'`'+". " + wrapAMnotice(err);
