@@ -7575,7 +7575,7 @@ function ltrimzero($v,$k) {
 	return ltrim($v, ' 0');
 }
 function checkreqtimes($tocheck,$rtimes) {
-	global $mathfuncs;
+	global $mathfuncs, $myrights;
 	if ($rtimes=='') {return 1;}
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
@@ -7594,20 +7594,36 @@ function checkreqtimes($tocheck,$rtimes) {
 	if ($rtimes != '') {
 		$list = array_map('trim',explode(",",$rtimes));
 		for ($i=0;$i < count($list);$i+=2) {
-			if ($list[$i]=='' || ($list[$i]!='ignore_case' && strlen($list[$i+1])<2)) {continue;}
+			if ($list[$i]=='') {continue;}
+			if (!isset($list[$i+1]) || 
+			   (strlen($list[$i+1])<2 && $list[$i]!='ignore_case' && $list[$i]!='ignore_commas' && $list[$i]!='ignore_symbol')) {
+				if ($myrights>10) {
+					echo "Invalid requiretimes - check format";
+				}
+				continue;
+			}
 			$list[$i+1] = trim($list[$i+1]);
 			if ($list[$i]=='ignore_case') {
 				$ignore_case = ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1');
 				continue;
-			} else if ($list[$i]=='ignore_commas' && ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1')) {
-				$cleanans = str_replace(',','',$cleanans);
+			} else if ($list[$i]=='ignore_commas') {
+				if ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1') {
+					$cleanans = str_replace(',','',$cleanans);
+				}
 				continue;
 			} else if ($list[$i]=='ignore_symbol') {
 				$cleanans = str_replace($list[$i+1],'',$cleanans);
 				continue;
 			}
 			$comp = substr($list[$i+1],0,1);
-			$num = intval(substr($list[$i+1],1));
+			if (substr($list[$i+1],1,1)==='=') { //<=, >=, ==, !=
+				if ($comp=='<' || $comp=='>') {
+					$comp .= '=';
+				}
+				$num = intval(substr($list[$i+1],2));
+			} else {
+				$num = intval(substr($list[$i+1],1));
+			}
 			$grouptocheck = array_map('trim', explode('||',$list[$i]));
 			$okingroup = false;
 			foreach ($grouptocheck as $lookfor) {
@@ -7642,8 +7658,18 @@ function checkreqtimes($tocheck,$rtimes) {
 						$okingroup = true;
 						break;
 					}
+				} else if ($comp == "<=") {
+					if ($nummatch<=$num) {
+						$okingroup = true;
+						break;
+					}
 				} else if ($comp == ">") {
 					if ($nummatch>$num) {
+						$okingroup = true;
+						break;
+					}
+				} else if ($comp == ">=") {
+					if ($nummatch>=$num) {
 						$okingroup = true;
 						break;
 					}
@@ -7652,6 +7678,8 @@ function checkreqtimes($tocheck,$rtimes) {
 						$okingroup = true;
 						break;
 					}
+				} else if ($myrights>10) {
+					echo "Invalid requiretimes - check format";
 				}
 			}
 			if (!$okingroup) {
