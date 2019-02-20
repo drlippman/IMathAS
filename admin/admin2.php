@@ -176,8 +176,7 @@ if ($overwriteBody==1) {
       }
       echo '</span>';
       echo '<span class="column">';
-      echo '<a href="forms.php?action=findstudent">',_('Find Student'),'</a><br/>';
-      echo '<a href="../util/crosscoursedata.php">',_('Cross-Course Data'),'</a><br/>';
+      echo '<a href="forms.php?action=findstudent">',_('Find Student'),'</a>';
       echo '</span>';
 
       echo '<div class=clear></div></div>';

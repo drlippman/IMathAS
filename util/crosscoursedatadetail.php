@@ -24,7 +24,7 @@ function reporterror($err) {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
 	require("../header.php");
 	echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
-	echo '<h1>Cross-Course Assessment Results</h1>';
+	echo '<h1>Cross-Course Question Results</h1>';
 	echo '<p class=noticetext>'.$err.'</p>';
 	require("../footer.php");
 	exit;

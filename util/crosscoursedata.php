@@ -8,7 +8,7 @@ ini_set("memory_limit", "104857600");
 
 require("../init.php");
 
-if ($myrights<75) {
+if ($myrights<100) {
 	echo 'You do not have the authority for this action';
 	exit;
 }
