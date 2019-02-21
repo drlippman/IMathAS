@@ -4865,7 +4865,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$variables = array_map('trim',explode(",",$variables));
 		$ofunc = array();
 		for ($i = 0; $i < count($variables); $i++) {
-			$variables[$i] = trim($variables[$i]);
+			if ($variables[$i]=='lambda') { //correct lamda/lambda
+				$_POST["tc$qn"] = str_replace('lamda', 'lambda', $_POST["tc$qn"]);	
+			}
 			//find f() function variables
 			if (strpos($variables[$i],'(')!==false) {
 				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));

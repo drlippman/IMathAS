@@ -922,6 +922,10 @@ function AMnumfuncPrepVar(qn,str) {
   var fl = flist[qn];
   var vars = vl.split("|");
   vars.push("DNE");
+  
+  if (vl.match(/lambda/)) {
+  	  str = str.replace(/lamda/, 'lambda');
+  }
 
   str = str.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
   str = normalizemathunicode(str);
