@@ -1643,9 +1643,7 @@ function gbinstrdisp() {
 				}
 				if ($gbt[0][1][$j][6]==0) {//online
 					if (isset($gbt[$i][1][$j][0])) {
-						if ($istutor && $gbt[$i][1][$j][4]=='average') {
-
-						} else if ($gbt[$i][1][$j][4]=='average') {
+						if ($gbt[$i][1][$j][4]=='average') {
 							if ($gbt[0][1][$j][2]>0) {
 								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							} else {
@@ -1661,10 +1659,7 @@ function gbinstrdisp() {
 						
 						echo $gbt[$i][1][$j][0];
 						
-						if ($istutor && $gbt[$i][1][$j][4]=='average') {
-						} else {
-							echo '</a>';
-						}
+						echo '</a>';
 						
 						if ($gbt[$i][1][$j][3]>9) {
 							$gbt[$i][1][$j][3] -= 10;

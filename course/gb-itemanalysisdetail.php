@@ -9,13 +9,22 @@ require("../header.php");
 
 
 $isteacher = isset($teacherid);
+$istutor = isset($tutorid);
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $qid = $_GET['qid'];
 $type = $_GET['type'];
-if (!$isteacher) {
+if (!$isteacher && !$istutor) {
 	echo "This page not available to students";
 	exit;
+}
+if ($istutor) {
+	$stm = $DBH->prepare("SELECT tutoredit FROM imas_assessments WHERE id=?");
+	$stm->execute(array($aid));
+	if ($stm->fetchColumn(0)==2) {
+		echo 'You do not have access to view this assessment';
+		exit;
+	}
 }
 $catfilter = -1;
 if (isset($tutorsection) && $tutorsection!='') {

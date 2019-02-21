@@ -3,10 +3,11 @@
 //(c) 2007 David Lippman
 	require("../init.php");
 
-
-	if (!(isset($teacherid))) {
+	$isteacher = isset($teacherid);
+	$istutor = isset($tutorid);
+	if (!$isteacher && !$istutor) {
 		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
+		echo "You need to log in as a teacher or tutor to access this page";
 		require("../footer.php");
 		exit;
 	}
@@ -35,7 +36,9 @@
 	} else {
 		$page = -1;
 	}
-	if (isset($_GET['secfilter'])) {
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
+	} else if (isset($_GET['secfilter'])) {
 		$secfilter = $_GET['secfilter'];
 		$sessiondata[$cid.'secfilter'] = $secfilter;
 		writesessiondata();
@@ -45,15 +48,25 @@
 		$secfilter = -1;
 	}
 	
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
 	}
+	if ($istutor && $tutoredit==2) {
+		require("../header.php");
+		echo "You not have access to view scores for this assessment";
+		require("../footer.php");
+		exit;
+	} else if ($isteacher || ($istutor && $tutoredit==1)) {
+		$canedit = 1;
+	} else {
+		$canedit = 0;
+	}
 
-	if (isset($_GET['update'])) {
+	if (isset($_GET['update']) && $canedit) {
 		$allscores = array();
 		$allfeedbacks = array();
 		$grpscores = array();
@@ -313,9 +326,11 @@
 	if ($deffbtext != '') {
 		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
 	}
-	echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
-	echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
-	if ($page==-1) {
+	if ($canedit) {
+		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
+		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
+	}
+	if ($page==-1 && $canedit) {
 		echo '<div class="fixedbottomright">';
 		echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
 		echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
@@ -509,9 +524,13 @@
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
-				echo "<input type=text size=4 id=\"scorebox$cnt\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
-				if ($rubric != 0) {
-					echo printrubriclink($rubric,$points,"scorebox$cnt","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1));
+				if ($canedit) {
+					echo "<input type=text size=4 id=\"scorebox$cnt\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
+					if ($rubric != 0) {
+						echo printrubriclink($rubric,$points,"scorebox$cnt","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1));
+					}
+				} else {
+					echo Sanitize::encodeStringForDisplay($pt);
 				}
 			}
 			if ($parts!='') {
@@ -521,11 +540,17 @@
 					if ($prts[$j]==-1) {
 						$prts[$j] = 'N/A';
 					}
-					echo "<input type=text size=2 id=\"scorebox$cnt-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
-					if ($rubric != 0) {
-						echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
+					if ($canedit) {
+						echo "<input type=text size=2 id=\"scorebox$cnt-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
+						if ($rubric != 0) {
+							echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
+						}
+						echo ' ';
+					} else {
+						if ($j>0) { echo ', ';}
+						echo Sanitize::encodeStringForDisplay($prts[$j]);
 					}
-					echo ' ';
+					
 				}
 
 			}
@@ -536,7 +561,7 @@
 				echo "(parts: $answeights) ";
 			}
 			printf("in %s attempt(s)\n", Sanitize::encodeStringForDisplay($attempts[$loc]));
-			if ($parts!='') {
+			if ($parts!='' && $canedit) {
 				$togr = array();
 				foreach ($qtypes as $k=>$t) {
 					if ($t=='essay' || $t=='file') {
@@ -548,7 +573,7 @@
 					$togr = implode(',',$togr);
 					echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
-			} else {
+			} else if ($canedit) {
 				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($points).',this);return false;">Full credit</a> <span class=quickfb></span>';
 			}
 			$laarr = explode('##',$la[$loc]);
@@ -620,7 +645,11 @@
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>"._("Question Feedback").": ";
 			//<textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-".Sanitize::onlyInt($line['id'])."\" name=\"feedback-".Sanitize::onlyInt($line['id'])."\">".Sanitize::encodeStringForDisplay($line['feedback'])."</textarea>";
-			if ($sessiondata['useed']==0) {
+			if (!$canedit) {
+				echo '<div>';
+				echo Sanitize::outgoingHtml($feedback["Q$loc"]);
+				echo '</div>';
+			} else if ($sessiondata['useed']==0) {
 				echo '<br/><textarea cols="60" rows="2" class="fbbox" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'" name="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'">';
 				echo Sanitize::encodeStringForDisplay($feedback["Q$loc"], true);
 				echo '</textarea>';
@@ -641,7 +670,9 @@
 			$cnt++;
 		}
 	}
-	echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+	if ($canedit) {
+		echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+	}
 	} else {
 		echo '<p><b>'._('No submission to show').'</b></p>';
 	}

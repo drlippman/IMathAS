@@ -117,10 +117,15 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize:
 echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
 echo '<div id="headergb-itemanalysis" class="pagetitle"><h1>Item Results: ';
-$stm = $DBH->prepare("SELECT defpoints,name,itemorder FROM imas_assessments WHERE id=:id");
+$stm = $DBH->prepare("SELECT defpoints,name,itemorder,tutoredit FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
-list ($defpoints, $aname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
+list ($defpoints, $aname, $itemorder,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
 echo Sanitize::encodeStringForDisplay($aname) . '</h1></div>';
+if (isset($tutorid) && $tutoredit==2) {
+	echo 'You do not have access to view scores for this assessment.';
+	require("../footer.php");
+	exit;
+}
 $itemarr = array();
 $itemnum = array();
 foreach (explode(',',$itemorder) as $k=>$itel) {
