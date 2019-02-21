@@ -36,7 +36,9 @@
 	} else {
 		$page = -1;
 	}
-	if (isset($_GET['secfilter'])) {
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
+	} else if (isset($_GET['secfilter'])) {
 		$secfilter = $_GET['secfilter'];
 		$sessiondata[$cid.'secfilter'] = $secfilter;
 		writesessiondata();

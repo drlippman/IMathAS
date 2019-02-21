@@ -387,10 +387,12 @@
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}
-	echo '<div class="cpmid">Experimental:<br/>';
-	echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
-
-	echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
+	if ($isteacher) {
+		echo '<div class="cpmid">Experimental:<br/>';
+		echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
+	
+		echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
+	}
 	require("../footer.php");
 
 function getpts($sc) {
