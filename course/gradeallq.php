@@ -543,10 +543,12 @@
 						if ($rubric != 0) {
 							echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
 						}
+						echo ' ';
 					} else {
+						if ($j>0) { echo ', ';}
 						echo Sanitize::encodeStringForDisplay($prts[$j]);
 					}
-					echo ' ';
+					
 				}
 
 			}
