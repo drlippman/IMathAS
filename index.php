@@ -465,7 +465,7 @@ require('./footer.php');
 
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $courseListOrder;
-	if (count($data)==0 && $type=='tutor') {return;}
+	if (count($data)==0 && $type=='tutor' && !$hashiddencourses) {return;}
 	
 	echo '<div role="navigation" aria-label="'.$title.'">';
 	echo '<div class="block"><h2>'.$title.'</h2></div>';
