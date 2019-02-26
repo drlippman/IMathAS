@@ -1,6 +1,9 @@
 <?php
 require_once('../includes/exceptionfuncs.php');
 
+/**
+ * Primary class for working with assessment settings
+ */
 class AssessInfo
 {
   private $curAid = null;
@@ -17,6 +20,14 @@ class AssessInfo
   *  $questions: questions to load settings for. false for no load,
   *              'all' for all, or array of question IDs
   */
+ /**
+  * Construct object and lookup settings.
+  * @param object  $DBH       Database Handler
+  * @param integer  $aid      Assessment ID
+  * @param mixed $questions   questions to load settings for.
+  *                           accepts false for no load, 'all' for all,
+  *                           or an array of question IDs.
+  */
   function __construct($DBH, $aid, $questions = false) {
     $this->DBH = $DBH;
     $this->curAid = $aid;
@@ -26,10 +37,10 @@ class AssessInfo
     }
   }
 
-  /*
-   * Loads the assessment settings from the DB and normalizes them
-   *
-  */
+  /**
+   * Load and normalize assessment settings.  Typically called internally.
+   * @return void
+   */
   public function loadAssessSettings() {
       $stm = $this->DBH->prepare("SELECT * FROM imas_assessments WHERE id=?");
       $stm->execute(array($this->curAid));
@@ -43,9 +54,13 @@ class AssessInfo
       $this->assessData = self::normalizeSettings($assessData);
   }
 
-  /*
-   * Looks up and applies an exception
-   * $userid: the userid to look up the exception for
+  /**
+   * Looks up and applies an exception, if one exists.
+   * @param  integer   $uid       User ID to look up exception for
+   * @param  boolean  $isstu      Whether the user is a student
+   * @param  integer $latepasses  The number of latepasses the user has
+   * @param  integer $latepasshrs How many hours latepasses extend due dates
+   * @return void
    */
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24) {
     $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty ";
@@ -74,11 +89,13 @@ class AssessInfo
     }
   }
 
-  /*
-   * Loads question settings from the DB
-   *
-   * $qids: The questions to load.  Either 'all' to load all, or
-   *        an array of question IDs to load
+ /**
+  * Load question settings from the DB.
+  * @param mixed $qids   Optional. questions to load settings for.
+  *                      accepts false for no load, 'all' for all,
+  *                      or an array of question IDs.
+  *                      Default 'all'.
+  * @return void
   */
   public function loadQuestionSettings($qids = 'all') {
     if (is_array($qids)) {
@@ -94,9 +111,9 @@ class AssessInfo
     }
   }
 
-  /*
-   * Gets a flattened array of all question IDs for the assessment
-   *
+ /**
+  * Gets a flattened array of all question IDs for the assessment.
+  * @return array Array of all question IDs in assessment.
   */
   public function getAllQuestionIds() {
     $out = array();
@@ -110,9 +127,9 @@ class AssessInfo
     return $out;
   }
 
-  /*
-   * Gets the number of questions in the assessment
-   *
+ /**
+  * Gets the number of questions in the assessment.
+  * @return integer number of questions
   */
   public function getQuestionCount() {
     $cnt = 0;
@@ -128,14 +145,18 @@ class AssessInfo
     return $cnt;
   }
 
-  /*
-   * Select an initial set of questions and seeds for an assessment record
-   * $ispractice: set true if generating for practice mode
-   * $take: the take # for by-assessment retakes
-   * $oldquestions: if regenerating a new take, provide the old $questions array
-   * $oldseeds: if regenerating a new take, provide the old $seeds array
-   *
-   * returns array($questions, $seeds), where each is an array of values
+  /**
+  * Select an initial set of questions and seeds for an assessment record.
+  * @param  boolean $ispractice   Optional. Set true if generating for practice mode.
+  *                               Default false.
+  * @param  integer $take         Optional.  The take # for by-assessment retakes.
+  *                               Default 0.
+  * @param  boolean $oldquestions Optional. An array of previous questions
+  *                               used in the asessment.
+  * @param  boolean $oldseeds     Optional. An array of previous seeds
+  **                              used in the asessment.
+  * @return array                 array($questions, $seeds), where each is
+  *                               an array of values
   */
   public function assignQuestionsAndSeeds($ispractice = false, $take = 0, $oldquestions = false, $oldseeds = false) {
     $qout = array();
@@ -241,17 +262,18 @@ class AssessInfo
     return array($qout, $seeds);
   }
 
-  /*
-   * Regen the question ID and seed
-   * $oldquestion: the old assigned question
-   * $oldseeds: an array of previous seeds for this question, last being most recent
-   * $oldquestions: an array of the rest of the questions in the assessment
-   *
-   * Only changes the question if it was pooled
-   *
-   * returns array($question, $seed)
+
+  /**
+  * Regen the question ID and seed.  Only changes the question if it was pooled.
+  * Attempts to ensure the new question ID from a pool is previously unused.
+  *
+  * @param  boolean $oldquestion  The previous assigned question.
+  * @param  boolean $oldseeds     An array of previous seeds used for this question.
+  * @param  boolean $oldquestions Optional. An array of previous questions
+  *                               used in the asessment.
+  * @return array                 array($question, $seed)
   */
-  public function regenQuestionAndSeed($oldquestion, $oldseeds, $oldquestions) {
+  public function regenQuestionAndSeed($oldquestion, $oldseeds, $oldquestions=array()) {
     $newq = $oldquestion;  //by default, reuse same question
     if (!in_array($oldquestion, $this->assessData['itemorder'])) {
       //the question must be in a grouping.  Find the group.
@@ -303,12 +325,13 @@ class AssessInfo
     return array($newq, $newseed);
   }
 
-  /*
-   * Normalizes question settings pulled from the database
-   *  and replaces them with defaults when appropriate
-   *
-   * $settings: an associative array of question settings from DB
-   * $defaults: an already-normalized set of assessment default settings
+ /**
+  * Normalizes question settings pulled from the database
+  * and replaces them with defaults when appropriate.
+  *
+  * @param  array $settings  Question settings assoc array from database.
+  * @param  array $defaults  Assessment settings assoc array.
+  * @return array            Normalized $settings array.
   */
   static function normalizeQuestionSettings($settings, $defaults) {
     if ($settings['points'] == 9999) {
@@ -383,10 +406,11 @@ class AssessInfo
     return $settings;
   }
 
-  /*
-   * Normalizes assessment settings pulled from the database
-   *
-   * $settings: an associative array of assessment settings
+
+ /**
+  * Normalizes assessment settings pulled from the database
+  * @param  array $settings   Assessment settings assoc array from the database.
+  * @return array             Normalized $settings.
   */
   static function normalizeSettings($settings) {
     //break apara defpenalty, defregenpenalty
@@ -492,12 +516,16 @@ class AssessInfo
     return $settings;
   }
 
-  /*
+  /**
    * Check if the given IP address is in the desired range
-   * $userip: the IP address to check
-   * $range: the IP range to try.  This is a comma-separated list of IPs,
-   *         and elements may include * for wildcard or value-value for ranges
-   *         like 12.3.5.*, or 12.34.6.12-35
+   *
+   * @param  string  $userip The user's IP address to check
+   * @param  string  $range  The IP range to try.
+   *                         This is a comma-separated list of IPs,
+   *                         and elements may include * for wildcard or
+   *                         value-value for ranges like
+   *                         12.3.5.*, or 12.34.6.12-35
+   * @return boolean         true if userip is in the range
    */
   static function isIPinRange($userip, $range) {
     $ips = array_map('trim', explode(',', $range));
