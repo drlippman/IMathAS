@@ -1,4 +1,9 @@
 <?php
+/*
+ * IMathAS: Assessment Settings Class
+ * (c) 2019 David Lippman
+ */
+
 require_once('../includes/exceptionfuncs.php');
 
 /**
@@ -7,30 +12,27 @@ require_once('../includes/exceptionfuncs.php');
 class AssessInfo
 {
   private $curAid = null;
+  private $cid = null;
   private $DBH = null;
   private $assessData = null;
   private $questionData = array();
   private $exception = null;
   private $exceptionfunc = null;
 
-  /*  Constructor
-  *
-  *  $DBH: The PDO database handle
-  *  $aid: Assessment ID to load
-  *  $questions: questions to load settings for. false for no load,
-  *              'all' for all, or array of question IDs
-  */
+
  /**
   * Construct object and lookup settings.
-  * @param object  $DBH       Database Handler
+  * @param object   $DBH      PDO Database Handler
   * @param integer  $aid      Assessment ID
+  * @param integer  $cid      Course ID
   * @param mixed $questions   questions to load settings for.
   *                           accepts false for no load, 'all' for all,
   *                           or an array of question IDs.
   */
-  function __construct($DBH, $aid, $questions = false) {
+  function __construct($DBH, $aid, $cid, $questions = false) {
     $this->DBH = $DBH;
     $this->curAid = $aid;
+    $this->cid = $cid;
     $this->loadAssessSettings();
     if ($questions !== false) {
       $this->loadQuestionSettings($questions);
@@ -42,16 +44,17 @@ class AssessInfo
    * @return void
    */
   public function loadAssessSettings() {
-      $stm = $this->DBH->prepare("SELECT * FROM imas_assessments WHERE id=?");
-      $stm->execute(array($this->curAid));
+      $stm = $this->DBH->prepare("SELECT * FROM imas_assessments WHERE id=? AND courseid=?");
+      $stm->execute(array($this->curAid, $this->cid));
       $assessData = $stm->fetch(PDO::FETCH_ASSOC);
 
       if ($assessData === false) {
-        echo "Invalid assessment ID";
+        echo '{error: "Invalid assessment ID"}';
         exit;
       }
 
       $this->assessData = self::normalizeSettings($assessData);
+      $this->setAvailable();
   }
 
   /**
@@ -69,12 +72,12 @@ class AssessInfo
     $stm->execute(array($uid, $this->curAid));
     $this->exception = $stm->fetch(PDO::FETCH_NUM);
 
-    if ($this->exception !== null) {
+    if ($this->exception !== null && $this->exception[4] !== null) {
+      //override default exception penalty
       $this->assessData['exceptionpenalty'] = $this->exception[4];
     }
 
-    $cid = $this->assessData['courseid'];
-    $this->exceptionfunc = new ExceptionFuncs($uid, $cid, $isstu, $latepasses, $latepasshrs);
+    $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
     list($useexception, $canundolatepass, $canuselatepass) =
       $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
@@ -82,10 +85,30 @@ class AssessInfo
     if ($useexception) {
       if (empty($this->exception[3])) { //if not LTI-set, show orig due date
         $this->assessData['original_enddate'] = $this->assessData['enddate'];
+        if ($this->exception[2] == 0) {
+          $this->assessData['extended_with'] = array('type'=>'manual');
+        } else {
+          $this->assessData['extended_with'] = array(
+            'latepass' => 'manual',
+            'n' => $this->exception[2]
+          );
+        }
       }
       $this->assessData['startdate'] = $this->exception[0];
       $this->assessData['enddate'] = $this->exception[1];
-      $this->assessData['islatepass'] = $this->exception[2];
+      $this->setAvailable();
+    }
+
+    //determine if latepasses can be used, and how many are needed
+    if ($canuselatepass) {
+      if (time() > $this->assessData['enddate']) {
+        //past the end date - calc how many to reopen
+        $this->assessData['can_use_latepass'] = $this->exceptionfunc->calcLPneeded($this->assessData['enddate']);
+      } else {
+        $this->assessData['can_use_latepass'] = 1;
+      }
+    } else {
+      $this->assessData['can_use_latepass'] = 0;
     }
   }
 
@@ -109,6 +132,30 @@ class AssessInfo
     while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
       $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
     }
+  }
+
+  /**
+   * Applies a time limit multiplier
+   * @param  array $multiplier  Time limit multiplier
+   * @return void
+   */
+  public function applyTimelimitMultiplier($multiplier) {
+    $this->assessData['timelimit_multiplier'] = $multiplier;
+  }
+
+  /**
+   * Extracts settings from assessData
+   * @param  array $keys  Array of string keys into assessData to return
+   * @return array        Associative array of extracted settings
+   */
+  public function extractSettings($keys) {
+    $out = array();
+    foreach ($keys as $key) {
+      if (isset($this->assessData[$key])) {
+        $out[$key] = $this->assessData[$key];
+      }
+    }
+    return $out;
   }
 
  /**
@@ -143,6 +190,34 @@ class AssessInfo
       }
     }
     return $cnt;
+  }
+
+  /**
+   * Get whether the assessment has a password
+   * @return boolean true if requires a password
+   */
+  public function hasPassword() {
+    return ($this->assessData['password'] != '');
+  }
+
+  private function setAvailable() {
+    $now = time();
+    if ($this->assessData['avail'] == 0) {
+      //hard hidden
+      $available = 0;
+    } else if ($now < $this->assessData['startdate']) {
+      //before start date
+      $available = 1;
+    } else if ($now < $this->assessData['enddate']) {
+      //currently available
+      $available = 2;
+    } else if ($this->assessData['allow_practice']) {
+      //past due, allow late
+      $available = 3;
+    } else {
+      $available = 4;
+    }
+    $this->assessData['available'] = $available;
   }
 
   /**
@@ -351,17 +426,14 @@ class AssessInfo
         $settings['penalty_n'] = $settings['penalty'][1];
         $settings['penalty'] = substr($settings['penalty'], 2);
       } else {
-        $settings['penalty_n'] = 0;
+        $settings['penalty_n'] = 1;
       }
     }
     if ($settings['regenpenalty'] == 9999) {
       $settings['regenpenalty'] = $defaults['defregenpenalty'];
       $settings['regenpenalty_n'] = $defaults['defregenpenalty_n'];
     } else {
-      if ($settings['regenpenalty'][0]==='L') {
-        $settings['regenpenalty_n'] = 'last';
-        $settings['regenpenalty'] = substr($settings['regenpenalty'], 1);
-      } else if ($settings['regenpenalty'][0]==='S') {
+      if ($settings['regenpenalty'][0]==='S') {
         $settings['regenpenalty_n'] = $settings['regenpenalty'][1];
         $settings['regenpenalty'] = substr($settings['regenpenalty'], 2);
       } else {
@@ -403,6 +475,13 @@ class AssessInfo
       $settings['fixedseeds'] = null;
     }
 
+    foreach ($settings as $k=>$v) {
+      //convert numeric strings to numbers
+      if (is_string($v) && is_numeric($v)) {
+        $settings[$k] = $v + 0;
+      }
+    }
+
     return $settings;
   }
 
@@ -421,17 +500,23 @@ class AssessInfo
       $settings['defpenalty_n'] = $settings['defpenalty'][1];
       $settings['defpenalty'] = substr($settings['defpenalty'], 2);
     } else {
-      $settings['defpenalty_n'] = 0;
+      $settings['defpenalty_n'] = 1;
     }
 
-    if ($settings['defregenpenalty'][0]==='L') {
-      $settings['defregenpenalty_n'] = 'last';
-      $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 1);
-    } else if ($settings['defregenpenalty'][0]==='S') {
+    if ($settings['defregenpenalty'][0]==='S') {
       $settings['defregenpenalty_n'] = intval($settings['defregenpenalty'][1]);
       $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 2);
     } else {
-      $settings['defregenpenalty_n'] = 0;
+      $settings['defregenpenalty_n'] = 1;
+    }
+
+    //if by-assessment, define take values
+    if ($settings['submitby'] == 'by_assessment') {
+      $settings['allowed_takes'] = $settings['defregens'];
+      $settings['retake_penalty'] = array(
+        'penalty' => $settings['defregenpenalty'],
+        'n' => $settings['defregenpenalty_n']
+      );
     }
 
     //unpack showans after_#
@@ -455,6 +540,7 @@ class AssessInfo
     } else {
       $settings['timelimit_type'] = 'allow_overtime';
     }
+    $settings['timelimit_multiplier'] = 1;
 
     //unpack intro
     $introjson = json_decode($settings['intro'], true);
@@ -466,7 +552,12 @@ class AssessInfo
     }
 
     //unpack resources
-    $settings['extrefs'] = json_decode($settings['extrefs']);
+    $settings['resources'] = json_decode($settings['extrefs']);
+    unset($settings['extrefs']);
+
+    //rename points possible
+    $settings['points_possible'] = $settings['ptsposs'];
+    unset($settings['ptsposs']);
 
     //unpack practice mode
     if ($settings['reviewdate'] == 2000000000) {
@@ -511,6 +602,13 @@ class AssessInfo
       $settings['itemorder'] = $order;
     } else {
       $settings['itemorder'] = $itemorder;
+    }
+
+    foreach ($settings as $k=>$v) {
+      //convert numeric strings to numbers
+      if (is_string($v) && is_numeric($v)) {
+        $settings[$k] = $v + 0;
+      }
     }
 
     return $settings;
