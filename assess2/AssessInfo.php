@@ -1,0 +1,489 @@
+<?php
+
+class AssessInfo
+{
+  private $curAid = null;
+  private $DBH = null;
+  private $assessData = null;
+  private $questionData = array();
+
+  /*  Constructor
+  *
+  *  $DBH: The PDO database handle
+  *  $aid: Assessment ID to load
+  *  $questions: questions to load settings for. false for no load,
+  *              'all' for all, or array of question IDs
+  */
+  function __construct($DBH, $aid, $questions = false) {
+    $this->DBH = $DBH;
+    $this->curAid = $aid;
+    $this->loadAssessSettings();
+    if ($questions !== false) {
+      $this->loadQuestionSettings($questions);
+    }
+  }
+
+  public function dumpSettings() {
+    print_r($this->assessData);
+    print_r($this->questionData);
+  }
+
+  /*
+   * Loads the assessment settings from the DB and normalizes them
+   *
+  */
+  public function loadAssessSettings() {
+      $stm = $this->DBH->prepare("SELECT * FROM imas_assessments WHERE id=?");
+      $stm->execute(array($this->curAid));
+      $assessData = $stm->fetch(PDO::FETCH_ASSOC);
+
+      if ($assessData === false) {
+        echo "Invalid assessment ID";
+        exit;
+      }
+
+      $this->assessData = self::normalizeSettings($assessData);
+  }
+
+  /*
+   * Loads question settings from the DB
+   *
+   * $qids: The questions to load.  Either 'all' to load all, or
+   *        an array of question IDs to load
+  */
+  public function loadQuestionSettings($qids = 'all') {
+    if (is_array($qids)) {
+      $ph = Sanitize::generateQueryPlaceholders($qids);
+      $stm = $this->DBH->prepare("SELECT * FROM imas_questions WHERE id IN ($ph)");
+      $stm->execute($qids);
+    } else {
+      $stm = $this->DBH->prepare('SELECT * FROM imas_questions WHERE assessmentid = ?');
+      $stm->execute(array($this->curAid));
+    }
+    while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
+      $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
+    }
+  }
+
+  /*
+   * Gets a flattened array of all question IDs for the assessment
+   *
+  */
+  public function getAllQuestionIds() {
+    $out = array();
+    foreach ($this->assessData['itemorder'] as $qid) {
+      if (is_array($qid)) {
+        $out = array_merge($out, $qid['qids']);
+      } else {
+        $out[] = $qid;
+      }
+    }
+    return $out;
+  }
+
+  /*
+   * Gets the number of questions in the assessment
+   *
+  */
+  public function getQuestionCount() {
+    $cnt = 0;
+    foreach ($this->assessData['itemorder'] as $qid) {
+      if (is_array($qid)) {
+        if ($qid['type'] == 'pool') {
+          $cnt += $qid['n'];
+        }
+      } else {
+        $cnt++;
+      }
+    }
+    return $cnt;
+  }
+
+  /*
+   * Select an initial set of questions and seeds for an assessment record
+   * $ispractice: set true if generating for practice mode
+   * $take: the take # for by-assessment retakes
+   * $oldquestions: if regenerating a new take, provide the old $questions array
+   * $oldseeds: if regenerating a new take, provide the old $seeds array
+   *
+   * returns array($questions, $seeds), where each is an array of values
+  */
+  public function assignQuestionsAndSeeds($ispractice = false, $take = 0, $oldquestions = false, $oldseeds = false) {
+    $qout = array();
+    $seeds = array();
+
+    if ($oldquestions !== false && $oldseeds !== false) {
+      $oldseeds = array_combine($oldquestions, $oldseeds);
+    }
+    foreach ($this->assessData['itemorder'] as $qid) {
+      //if is some type of grouping of questions
+      if (is_array($qid)) {
+        if ($qid['type'] == 'pool') {
+          if ($qid['replace'] == true) {
+            //select with replacement
+            for ($i=0; $i < $qid['n']; $i++) {
+              $qout[] = $qid['qids'][array_rand($qid['qids'], 1)];
+            }
+          } else {
+            //select without replacement
+            if ($oldquestions !== false) {
+              //if we have old questions, put the unused questions first
+              //in selection
+              $unused = array_diff($qid['qids'], $oldquestions);
+              $used = array_intersect($qid['qids'], $oldquestions);
+              shuffle($unused);
+              shuffle($used);
+              $qid['qids'] = array_merge($unused, $used);
+            } else {
+              shuffle($qid['qids']);
+            }
+
+            for ($i=0; $i < min($qid['n'], count($qid['qids'])); $i++) {
+              $qout[] = $qid['qids'][$i];
+            }
+            //if we want more than there are questions
+            if ($qid['n'] > count($qid['qids'])) {
+              for ($i = count($qid['qids']); $i < $qid['n']; $i++) {
+                $qout[] = $qid['qids'][array_rand($qid['qids'], 1)];
+              }
+            }
+          }
+        }
+      } else {
+        $qout[] = $qid;
+      }
+    }
+
+    if ($this->assessData['shuffle']&1) {
+      //shuffle all
+      shuffle($qout);
+    } else if ($this->assessData['shuffle']&16) {
+      //shuffle all but first
+      $firstq = array_shift($qout);
+      shuffle($qout);
+      array_unshift($qout, $firstq);
+    }
+
+    //pick seeds
+    if ($this->assessData['shuffle']&2) { //all questions same seed
+      if ($this->assessData['shuffle']&4) { //all students same seed
+        $seeds = array_fill(0, count($qout), $ispractice?$this->curAid+100:$this->curAid);
+      } else {
+        do {
+          $newseed = rand(1,9999);
+        } while ($oldseeds !== false && $newseed == $oldseeds[$oldquestions[0]]);
+
+        $seeds = array_fill(0, count($qout), $newseed);
+      }
+    } else {
+      if ($this->assessData['shuffle']&4) { //all students same seed
+        foreach ($qout as $i=>$qid) {
+          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+            //using fixed seed list
+            $n = count($this->questionData[$qid]['fixedseeds']);
+            $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
+          } else {
+            //pick seed based on assessment ID
+            $seeds[] = $i + $this->curAid + $take + $ispractice?100:0;
+          }
+        }
+      } else { //regular selection
+        foreach ($qout as $i=>$qid) {
+          if ($this->questionData[$qid]['fixedseeds'] !== null) {
+            //using fixed seed list
+            if ($oldseeds !== false && count($this->questionData[$qid]['fixedseeds']) > 1) {
+              //if we have oldseeds, remove it from selection
+              $unused = array_diff($this->questionData[$qid]['fixedseeds'], $oldseeds[$qid]);
+              $newseed = $unused[array_rand($unused, 1)];
+            } else {
+              $newseed = $this->questionData[$qid]['fixedseeds'][rand(0, $n-1)];
+            }
+          } else {
+            //random seed
+            $looplimit = 0;
+            do {
+              $newseed = rand(1,9999);
+            } while ($looplimit < 10 && $oldseeds !== false && $oldseeds[$qid] == $newseed);
+          }
+          $seeds[] = $newseed;
+        }
+      }
+    }
+    return array($qout, $seeds);
+  }
+
+  /*
+   * Regen the question ID and seed
+   * $oldquestion: the old assigned question
+   * $oldseeds: an array of previous seeds for this question, last being most recent
+   * $oldquestions: an array of the rest of the questions in the assessment
+   *
+   * Only changes the question if it was pooled
+   *
+   * returns array($question, $seed)
+  */
+  public function regenQuestionAndSeed($oldquestion, $oldseeds, $oldquestions) {
+    $newq = $oldquestion;  //by default, reuse same question
+    if (!in_array($oldquestion, $this->assessData['itemorder'])) {
+      //the question must be in a grouping.  Find the group.
+      foreach ($this->assessData['itemorder'] as $qid) {
+        if (is_array($qid) && in_array($oldquestion, $qid['qids'])) {
+          $group = $qid['qids'];
+          $grouptype = $qid['type'];
+          break;
+        }
+      }
+      //if it's a pool, pick an unused question from the pool
+      if (isset($group) && $grouptype == 'pool') {
+        $unused = array_diff($pool, $oldquestions);
+        if (count($unused) == 0) {
+          //if all of them have been used, just make sure we don't pick
+          //the current one again
+          $unused = array_diff($pool, array($oldquestion));
+        }
+        $newq = $unused[array_rand($unused,1)];
+      }
+    }
+
+    if ($this->assessData['shuffle']&4 || $this->assessData['shuffle']&2) {
+      //all students same seed or all questions same seed - don't regen
+      $newseed = $oldseeds[0];
+    } else {
+      if ($this->questionData[$newq]['fixedseeds'] !== null) {
+        //using fixed seed list. find any unused seeds
+        if (count($this->questionData[$newq]['fixedseeds']) == 1) {
+          //only one seed so use it
+          $newseed = $this->questionData[$newq]['fixedseeds'][0];
+        } else {
+          $unused = array_diff($this->questionData[$newq]['fixedseeds'], $oldseeds);
+          if (count($unused) == 0) {
+            //if all used, just make sure it's not the same as the last
+            $unused = array_diff($this->questionData[$newq]['fixedseeds'], array($oldseeds[count($oldseeds)-1]));
+          }
+          $newseed = $unused[array_rand($unused, 1)];
+        }
+      } else {
+        //regular seed pick
+        $looplimit = 0;
+        do {
+          $newseed = rand(1,9999);
+          $looplimit++;
+        } while ($looplimit < 10 && in_array($newseed, $oldseeds));
+      }
+    }
+    return array($newq, $newseed);
+  }
+
+  /*
+   * Normalizes question settings pulled from the database
+   *  and replaces them with defaults when appropriate
+   *
+   * $settings: an associative array of question settings from DB
+   * $defaults: an already-normalized set of assessment default settings
+  */
+  static function normalizeQuestionSettings($settings, $defaults) {
+    if ($settings['points'] == 9999) {
+      $settings['points'] = $defaults['defpoints'];
+    }
+    if ($settings['attempts'] == 9999) {
+      $settings['attempts'] = $defaults['defattempts'];
+    }
+    if ($settings['penalty'] == 9999) {
+      $settings['penalty'] = $defaults['defpenalty'];
+      $settings['penalty_n'] = $defaults['defpenalty_n'];
+    } else {
+      if ($settings['penalty'][0]==='L') {
+        $settings['penalty_n'] = 'last';
+        $settings['penalty'] = substr($settings['penalty'], 1);
+      } else if ($settings['penalty'][0]==='S') {
+        $settings['penalty_n'] = $settings['penalty'][1];
+        $settings['penalty'] = substr($settings['penalty'], 2);
+      } else {
+        $settings['penalty_n'] = 0;
+      }
+    }
+    if ($settings['regenpenalty'] == 9999) {
+      $settings['regenpenalty'] = $defaults['defregenpenalty'];
+      $settings['regenpenalty_n'] = $defaults['defregenpenalty_n'];
+    } else {
+      if ($settings['regenpenalty'][0]==='L') {
+        $settings['regenpenalty_n'] = 'last';
+        $settings['regenpenalty'] = substr($settings['regenpenalty'], 1);
+      } else if ($settings['regenpenalty'][0]==='S') {
+        $settings['regenpenalty_n'] = $settings['regenpenalty'][1];
+        $settings['regenpenalty'] = substr($settings['regenpenalty'], 2);
+      } else {
+        $settings['regenpenalty_n'] = 0;
+      }
+    }
+    if ($settings['regen'] == 1 || $defaults['submitby'] == 'by_assessment') {
+      $settings['regens'] = 1;
+    } else {
+      $settings['regens'] = $defaults['defregens'];
+    }
+    unset($settings['regen']);
+
+    if ($settings['showans'] == '0') {
+      $settings['showans'] = $defaults['showans'];
+      if ($settings['showans'] == 'after_n') {
+        $settings['showans_aftern'] = $defaults['showans_aftern'];
+      }
+    } else if (is_numeric($settings['showans'])) {
+      $settings['showans'] = 'after_n';
+      $settings['showans_aftern'] = intval($settings['showans']);
+    } else if ($settings['showans'] == 'N') {
+      $settings['showans'] = 'never';
+    } else if ($settings['showans'] == 'L') {
+      $settings['showans'] = 'after_lastattempt';
+    } else if ($settings['showans'] == 'T') {
+      $settings['showans'] = 'after_take';
+    } else if ($settings['showans'] == 'W') {
+      $settings['showans'] = 'with_score';
+    }
+
+    if ($settings['showans'] == -1) {
+      $settings['showans'] = $defaults['showans'];
+    }
+
+    if (!empty($settings['fixedseeds'])) {
+      $settings['fixedseeds'] = explode(',', $settings['fixedseeds']);
+    } else {
+      $settings['fixedseeds'] = null;
+    }
+
+    return $settings;
+  }
+
+  /*
+   * Normalizes assessment settings pulled from the database
+   *
+   * $settings: an associative array of assessment settings
+  */
+  static function normalizeSettings($settings) {
+    //break apara defpenalty, defregenpenalty
+    if ($settings['defpenalty'][0]==='L') {
+      $settings['defpenalty_n'] = 'last';
+      $settings['defpenalty'] = substr($settings['defpenalty'], 1);
+    } else if ($settings['defpenalty'][0]==='S') {
+      $settings['defpenalty_n'] = $settings['defpenalty'][1];
+      $settings['defpenalty'] = substr($settings['defpenalty'], 2);
+    } else {
+      $settings['defpenalty_n'] = 0;
+    }
+
+    if ($settings['defregenpenalty'][0]==='L') {
+      $settings['defregenpenalty_n'] = 'last';
+      $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 1);
+    } else if ($settings['defregenpenalty'][0]==='S') {
+      $settings['defregenpenalty_n'] = intval($settings['defregenpenalty'][1]);
+      $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 2);
+    } else {
+      $settings['defregenpenalty_n'] = 0;
+    }
+
+    //unpack showans after_#
+    if (strlen($settings['showans']) == 7) {
+      $settings['showans_aftern'] = intval(substr($settings['showans'], 6));
+      $settings['showans'] = 'after_n';
+    }
+
+    //unpack minscore
+    if ($settings['minscore'] > 10000) {
+      $settings['minscore'] = $settings['minscore'] - 10000;
+      $settings['minscore_type'] = 'percent';
+    } else {
+      $settings['minscore_type'] = 'points';
+    }
+
+    //unpack timelimit
+    if ($settings['timelimit'] < 0) {
+      $settings['timelimit'] = abs($settings['timelimit']);
+      $settings['timelimit_type'] = 'kick_out';
+    } else {
+      $settings['timelimit_type'] = 'allow_overtime';
+    }
+
+    //unpack intro
+    $introjson = json_decode($settings['intro'], true);
+    if ($introjson === null) {
+      $settings['interquestion_text'] = array();
+    } else {
+      $settings['intro'] = $introjson[0];
+      $settings['interquestion_text'] = array_slice($introjson, 1);
+    }
+
+    //unpack practice mode
+    if ($settings['reviewdate'] == 2000000000) {
+      $settings['allow_practice'] = true;
+    } else {
+      $settings['allow_practice'] = false;
+    }
+
+    //handle IP-form passwords
+    if ($settions['password'] != '' &&
+      preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/', $settions['password']) &&
+      self::isIPinRange($_SERVER['REMOTE_ADDR'], $settings['password'])
+    ) {
+      $settions['password'] = '';
+    }
+
+    //unpack itemorder
+    $itemorder = json_decode($settings['itemorder'], true);
+    //temp handling of old format
+    if ($itemorder === null) {
+      $order = explode(',', $settings['itemorder']);
+      foreach ($order as $k=>$v) {
+        $sub = explode('~', $v);
+        if (count($sub)>1) {
+          $pts = explode('|', $sub[0]);
+          $order[$k] = array(
+            'type' => 'pool',
+            'n' => $pts[0],
+            'replace' => ($pts[1]==1),
+            'qids' => array_slice($sub, 1)
+          );
+        }
+      }
+      $settings['itemorder'] = $order;
+    } else {
+      $settings['itemorder'] = $itemorder;
+    }
+
+    return $settings;
+  }
+
+  /*
+   * Check if the given IP address is in the desired range
+   * $userip: the IP address to check
+   * $range: the IP range to try.  This is a comma-separated list of IPs,
+   *         and elements may include * for wildcard or value-value for ranges
+   *         like 12.3.5.*, or 12.34.6.12-35
+   */
+  static function isIPinRange($userip, $range) {
+    $ips = array_map('trim', explode(',', $range));
+    $userip = explode('.', $userip);
+		$isoneIPok = false;
+    foreach ($ips as $ip) {
+      $ip = explode('.', $ip);
+      $thisIPok = true;
+      for ($i=0;$i<3;$i++) {
+        $pts = explode('-', $ip[$i]);
+        if (count($pts) == 2 && $userip[$i] >= $pts[0] && $userip[$i] <= $pts[0]) {
+          continue;
+        } else if ($ip[$i] == '*') {
+          continue;
+        } else if ($ip[$i] == $userip[$i]) {
+          continue;
+        } else {
+          $thisIPok = false;
+          break;
+        }
+      }
+      if ($thisIPok) {
+				$isoneIPok = true;
+				break;
+			}
+    }
+    return $isoneIPok;
+  }
+}
