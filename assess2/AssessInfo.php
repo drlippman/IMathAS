@@ -1,4 +1,5 @@
 <?php
+require_once('../includes/exceptionfuncs.php');
 
 class AssessInfo
 {
@@ -6,6 +7,8 @@ class AssessInfo
   private $DBH = null;
   private $assessData = null;
   private $questionData = array();
+  private $exception = null;
+  private $exceptionfunc = null;
 
   /*  Constructor
   *
@@ -23,11 +26,6 @@ class AssessInfo
     }
   }
 
-  public function dumpSettings() {
-    print_r($this->assessData);
-    print_r($this->questionData);
-  }
-
   /*
    * Loads the assessment settings from the DB and normalizes them
    *
@@ -43,6 +41,37 @@ class AssessInfo
       }
 
       $this->assessData = self::normalizeSettings($assessData);
+  }
+
+  /*
+   * Looks up and applies an exception
+   * $userid: the userid to look up the exception for
+   */
+  public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24) {
+    $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty ";
+    $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
+    $stm = $this->DBH->prepare($query);
+    $stm->execute(array($uid, $this->curAid));
+    $this->exception = $stm->fetch(PDO::FETCH_NUM);
+
+    if ($this->exception !== null) {
+      $this->assessData['exceptionpenalty'] = $this->exception[4];
+    }
+
+    $cid = $this->assessData['courseid'];
+    $this->exceptionfunc = new ExceptionFuncs($uid, $cid, $isstu, $latepasses, $latepasshrs);
+
+    list($useexception, $canundolatepass, $canuselatepass) =
+      $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
+
+    if ($useexception) {
+      if (empty($this->exception[3])) { //if not LTI-set, show orig due date
+        $this->assessData['original_enddate'] = $this->assessData['enddate'];
+      }
+      $this->assessData['startdate'] = $this->exception[0];
+      $this->assessData['enddate'] = $this->exception[1];
+      $this->assessData['islatepass'] = $this->exception[2];
+    }
   }
 
   /*
@@ -412,6 +441,9 @@ class AssessInfo
       $settings['interquestion_text'] = array_slice($introjson, 1);
     }
 
+    //unpack resources
+    $settings['extrefs'] = json_decode($settings['extrefs']);
+
     //unpack practice mode
     if ($settings['reviewdate'] == 2000000000) {
       $settings['allow_practice'] = true;
@@ -420,11 +452,19 @@ class AssessInfo
     }
 
     //handle IP-form passwords
-    if ($settions['password'] != '' &&
-      preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/', $settions['password']) &&
+    if ($settings['password'] != '' &&
+      preg_match('/^\d{1,3}\.(\*|\d{1,3})\.(\*|\d{1,3})\.[\d\*\-]+/', $settings['password']) &&
       self::isIPinRange($_SERVER['REMOTE_ADDR'], $settings['password'])
     ) {
-      $settions['password'] = '';
+      $settings['password'] = '';
+    }
+
+    //handle safe exam browser passwords
+    if ($settings['password'] != '' && !empty($_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'])) {
+      $testhash = hash("sha256", 'https//'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($settings['password']));
+      if ($testhash == $_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH']) {
+        $settings['password'] = '';
+      }
     }
 
     //unpack itemorder

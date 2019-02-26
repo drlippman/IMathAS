@@ -5,7 +5,7 @@ include('AssessInfo.php');
 
 $t = new AssessInfo($DBH, 527357, 'all');
 
-    echo '<pre>';
+echo '<pre>';
 
 $t->dumpSettings();
 
