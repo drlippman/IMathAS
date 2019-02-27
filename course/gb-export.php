@@ -376,17 +376,13 @@ function gbinstrdisp() {
 	$gbt = gbtable();
 	echo '<table class="gb" id="myTable"><thead><tr>';
 	$n=0;
-	$pointsrow = '';
+	$pointsrow = '<th>Points Possible</th>';
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		//if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
 		$pointsrow .= '<th>';
 		if ($gbt[0][0][$i]=='Name') {
-			if ($pointsln==1) {
-				$pointsrow .= 'N='.(count($gbt)-2);
-			} else {
-				echo '&nbsp;<span class="small">N='.(count($gbt)-2).'</span>';
-			}
+			echo '&nbsp;<span class="small">N='.(count($gbt)-2).'</span>';
 		}
 		echo '</th>';
 		$pointsrow .= '</th>';
@@ -482,6 +478,8 @@ function gbinstrdisp() {
 	}
 	echo '</tr>';
 	if ($pointsln==1) {
+		//remove "pts" from points possible row
+		$pointsrow = str_replace('&nbsp;'. _('pts'), '', $pointsrow);
 		echo '<tr>'.$pointsrow.'</tr>';
 	}
 	echo '</thead><tbody>';
