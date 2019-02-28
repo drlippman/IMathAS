@@ -260,7 +260,7 @@ if ($overwriteBody==1) {
     echo '</tbody>';
     echo '</table>';
     echo '<script type="text/javascript">
-      initSortTable("courses-teaching",Array("S","S","S","S","D","N","N"),true);
+      initSortTable("myTable",Array("S","S","S","S","D","N","N","N"),true);
       </script>';
     
     echo '<p><sup>*</sup> '._('as course owner').'</p>';
