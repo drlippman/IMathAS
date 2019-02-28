@@ -278,6 +278,27 @@ function newXMLoverPost($url, $request, $requestHeaders, $method = 'POST') {
 	return array($ok,$resp);
 }
 
+if (!function_exists("getpts")) {
+	function getpts($sc) {
+		if (strpos($sc,'~')===false) {
+			if ($sc>0) {
+				return $sc;
+			} else {
+				return 0;
+			}
+		} else {
+			$sc = explode('~',$sc);
+			$tot = 0;
+			foreach ($sc as $s) {
+				if ($s>0) {
+					$tot+=$s;
+				}
+			}
+			return round($tot,1);
+		}
+	}
+}
+
 $aidtotalpossible = array();
 //use this if we don't know the total possible
 function calcandupdateLTIgrade($sourcedid,$aid,$scores,$sendnow=false) {
