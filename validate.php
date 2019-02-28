@@ -337,7 +337,7 @@
 	$myrights = $line['rights'];
 	$myspecialrights = $line['specialrights'];
 	$userHasAdminMFA = false;
-	if (($myrights>40 || $myspecialrights>0) && $line['mfa'] != '' && empty($sessiondata['mfaverified'])) {
+	if (($myrights>40 || $myspecialrights>0) && !empty($line['mfa']) && empty($sessiondata['mfaverified'])) {
 		$mfadata = json_decode($line['mfa'], true);
 		if (isset($_COOKIE['gat']) && isset($mfadata['trusted'])) {
 			foreach ($mfadata['trusted'] as $mfatoken) {
