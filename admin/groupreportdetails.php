@@ -142,22 +142,32 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       $thisstucnt = 0;
       $thisownerstucnt = 0;
       $thiscoursecnt = 0;
+      $thisLTIcoursecnt = 0;
       $thisownercoursecnt = 0;
+      $thisownerLTIcoursecnt = 0;
       if ($line['courselist']!== null && $line['courselist']!=='') {
       	  $courses = explode(',', $line['courselist']);
       	  foreach ($courses as $courseid) {
       	  	  $thisstucnt += $coursedetails[$courseid]['stucnt'];
       	  	  $thiscoursecnt++;
+      	  	  if (!empty($coursedetails[$courseid]['isLTI'])) {
+      	  	  	 $thisLTIcoursecnt++; 
+      	  	  }
       	  	  if ($coursedetails[$courseid]['ownerid']==$line['id']) {
       	  	  	  $thisownerstucnt += $coursedetails[$courseid]['stucnt'];
       	  	  	  $thisownercoursecnt++;
+      	  	  	  if (!empty($coursedetails[$courseid]['isLTI'])) {
+      	  	  	  	  $thisownerLTIcoursecnt++; 
+      	  	  	  }
       	  	  }
       	  }
       }
       $line['stucnt'] = $thisstucnt;
       $line['coursecnt'] = $thiscoursecnt;
+      $line['lticoursecnt'] = $thisLTIcoursecnt;
       $line['ownerstucnt'] = $thisownerstucnt;
       $line['ownercoursecnt'] = $thisownercoursecnt;
+      $line['ownerlticoursecnt'] = $thisownerLTIcoursecnt;
       $groupdata[] = $line;
     }
 }
@@ -216,6 +226,7 @@ if ($overwriteBody==1) {
     echo '<th>'._('Role').'</th>';
     echo '<th>'._('Last Login').'</th>';
     echo '<th>'._('Active Courses').'</th>';
+    echo '<th>'._('Using LTI').'</th>';
     echo '<th>'._('Students').'</th>';
     echo '</tr><thead>';
     
@@ -232,6 +243,11 @@ if ($overwriteBody==1) {
     	echo '<td>'.Sanitize::onlyInt($r['coursecnt']);
     	if ($r['coursecnt'] != $r['ownercoursecnt']) {
     		echo ' ('.Sanitize::onlyInt($r['ownercoursecnt']).'<sup>*</sup>)';
+    	}
+    	echo '</td>';
+    	echo '<td>'.Sanitize::onlyInt($r['lticoursecnt']);
+    	if ($r['lticoursecnt'] != $r['ownerlticoursecnt']) {
+    		echo ' ('.Sanitize::onlyInt($r['ownerlticoursecnt']).'<sup>*</sup>)';
     	}
     	echo '</td>';
     	echo '<td>'.Sanitize::onlyInt($r['stucnt']);
