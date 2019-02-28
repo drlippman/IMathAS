@@ -2824,6 +2824,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (!is_array($answers)) {
 			settype($answers,"array");
 		}
+		$answers = array_map('clean', $answers);
 		if (!isset($snaptogrid)) {
 			$snaptogrid = 0;
 		}
@@ -5569,6 +5570,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!is_array($answers)) {
 			settype($answers,"array");
 		}
+		$answers = array_map('clean', $answers);
+		
 		if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
 			foreach ($answers as $key=>$function) {
 				$function = array_map('trim',explode(',',$function));
