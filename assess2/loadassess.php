@@ -43,7 +43,8 @@ $include_from_assess_info = array(
   'name', 'summary', 'available', 'startdate', 'enddate', 'original_enddate',
   'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
-  'can_use_latepass', 'allowed_takes', 'retake_penalty'
+  'can_use_latepass', 'allowed_takes', 'retake_penalty', 'exceptionpenalty',
+  'timelimit_multiplier'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -69,8 +70,27 @@ if ($assessInfoOut['submitby'] == 'by_assessment') {
 //load group members, if applicable
 if ($assessInfoOut['isgroup'] > 0) {
   $assessInfoOut['group_members'] = $assess_record->getGroupMembers();
+  if (count($assessInfoOut['group_members']) == 0) {
+    //no members yet - add self
+    //TODO:  Handle case $uid != $userid?
+    $assessInfoOut['group_members'][] = $userfullname;
+  }
+  if ($assessInfoOut['isgroup'] == 2) {
+    //if can add group members, get available people
+    $query = 'SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
+    $query .= 'JOIN imas_students AS istu ON istu.userid=iu.id AND istu.courseid=? ';
+    $query .= 'WHERE iu.id NOT IN (SELECT isgm.id FROM imas_stugroupmembers AS isgm ';
+    $query .= 'JOIN imas_stugroups as isg ON isg.id=isgm.stugroupid AND ';
+    $query .= 'isg.groupsetid=?) AND iu.id<>? ORDER BY iu.FirstName, iu.LastName';
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($cid, $assess_info->getSetting('groupsetid'), $uid));
+    $assessInfoOut['group_avail'] = array();
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+      $assessInfoOut['group_avail'][$row['id']] = $row['FirstName'] . ' ' . $row['LastName'];
+    }
+  }
 }
 
 //output JSON object
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 echo json_encode($assessInfoOut);

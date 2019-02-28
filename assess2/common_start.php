@@ -31,3 +31,11 @@ function check_for_required($method, $required) {
     }
   }
 }
+
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+  //to help with development, while vue runs on 8080
+  header('Access-Control-Allow-Origin: http://localhost:8080');
+  header("Access-Control-Allow-Credentials: true");
+  header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+  header("Access-Control-Allow-Headers: Origin");
+}

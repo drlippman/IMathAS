@@ -158,6 +158,19 @@ class AssessInfo
     return $out;
   }
 
+  /**
+   * Gets a setting from assessData by key
+   * @param  string $key  Key into assessData to return
+   * @return mixed        value of assessData[key]
+   */
+  public function getSetting($key) {
+    if (isset($this->assessData[$key])) {
+      return $this->assessData[$key];
+    } else {
+      return false;
+    }
+  }
+
  /**
   * Gets a flattened array of all question IDs for the assessment.
   * @return array Array of all question IDs in assessment.
