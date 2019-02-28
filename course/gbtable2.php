@@ -1678,11 +1678,13 @@ function gbtable() {
 			$col = $assesscol[$aid];
 			if (isset($availstu[$ln][$aid]) && $availstu[$ln][$aid]!=$gb[0][1][$col][3]) {
 				//if we have a per-stu override of avail
-				//add to correct one
-				if ($gb[0][1][$col][4]==1) { 
-					$catpossstu[$availstu[$ln][$aid]][$category[$i]][$col] = $catpossstu[$gb[0][1][$col][3]][$category[$i]][$col];
-				} else if ($gb[0][1][$col][4]==2) {
-					$catpossstuec[$availstu[$ln][$aid]][$category[$i]][$col] = $catpossstuec[$gb[0][1][$col][3]][$category[$i]][$col];
+				//add to correct ones, when availstu < original
+				for ($k=$availstu[$ln][$aid]; $k<$gb[0][1][$col][3]; $k++) {
+					if ($gb[0][1][$col][4]==1) { 
+						$catpossstu[$k][$category[$i]][$col] = $catpossstu[$gb[0][1][$col][3]][$category[$i]][$col];
+					} else if ($gb[0][1][$col][4]==2) {
+						$catpossstuec[$k][$category[$i]][$col] = $catpossstuec[$gb[0][1][$col][3]][$category[$i]][$col];
+					}
 				}
 				if ($availstu[$ln][$aid]==1) { //also copy into attempted if now cur
 					if ($gb[0][1][$col][4]==1) { 
@@ -1691,11 +1693,14 @@ function gbtable() {
 						$catpossstuec[3][$category[$i]][$col] = $catpossstuec[$gb[0][1][$col][3]][$category[$i]][$col];
 					}
 				}
-				//remove from original
-				if ($gb[0][1][$col][4]==1) { 
-					unset($catpossstu[$gb[0][1][$col][3]][$category[$i]][$col]);
-				} else if ($gb[0][1][$col][4]==2) {
-					unset($catpossstuec[$gb[0][1][$col][3]][$category[$i]][$col]);
+				
+				//remove from originals if needed, when availstu > original
+				for ($k=$gb[0][1][$col][3]; $k<$availstu[$ln][$aid]; $k++) {
+					if ($gb[0][1][$col][4]==1) { 
+						unset($catpossstu[$k][$category[$i]][$col]);
+					} else if ($gb[0][1][$col][4]==2) {
+						unset($catpossstuec[$k][$category[$i]][$col]);
+					}
 				}
 				if ($gb[0][1][$col][3]==1) { //need extra unset for attempted if was cur
 					if ($gb[0][1][$col][4]==1) {
