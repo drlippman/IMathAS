@@ -50,6 +50,17 @@ function exportcopysub($items,$parent,&$addtoarr) {
 	}
 }
 
+$storebase = $imasroot.'/filestore/';
+$storebaseenc = str_replace('/', '\\/', $storebase);
+$absbase = $GLOBALS['basesiteurl'].'/filestore/';
+$absbaseenc = str_replace('/', '\\/', $absbase);
+function makeFilestoreAbs($str) {
+	global $imasroot, $storebase, $storebaseenc, $absbase, $absbaseenc;
+	$str = str_replace('"'.$storebase, '"'.$absbase, $str);
+	$str = str_replace('"'.$storebaseenc, '"'.$absbaseenc, $str);
+	return $str;
+}
+
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Item Export";
@@ -153,6 +164,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				}
 				$line['fileorder'] = $newfileorder;
 			}
+			$line['text'] = makeFilestoreAbs($line['text']);
 			$output['items'][$output_item_id] = array('type'=>'InlineText', 'data'=>$line);
 		}
 	}
@@ -181,7 +193,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					}
 					$line['text'] = 'exttool:'.implode('~~',$parts);
 				}
+			} else {
+				$line['text'] = makeFilestoreAbs($line['text']);
 			}
+			$line['summary'] = makeFilestoreAbs($line['summary']);
 			$output['items'][$output_item_id] = array('type'=>'LinkedText', 'data'=>$line, 'rehostfile'=>$rehostfile);
 		}
 	}
@@ -203,6 +218,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			} else {
 				$line['gbcategory'] = 0;
 			}
+			$line['description'] = makeFilestoreAbs($line['description']);
+			$line['postinstr'] = makeFilestoreAbs($line['postinstr']);
+			$line['replyinstr'] = makeFilestoreAbs($line['replyinstr']);
 			$output['items'][$output_item_id] = array('type'=>'Forum', 'data'=>$line);
 		}
 
@@ -220,6 +238,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					}
 					$line['files'] = $files;
 				}
+				$line['message'] = makeFilestoreAbs($line['message']);
 				//remap forum id
 				$line['forumid'] = $forummap[$line['forumid']];
 				$output['stickyposts'][] = $line;
@@ -355,6 +374,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					}
 				}
 			}
+			$line['summary'] = makeFilestoreAbs($line['summary']);
+			$line['intro'] = makeFilestoreAbs($line['intro']);
 			$line['itemorder'] = $neworder;
 			$output['items'][$output_item_id] = array('type'=>'Assessment', 'data'=>$line);
 		}
@@ -476,6 +497,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$line['dependencies'] = $dependencies[$line['id']];
 			}
 			unset($line['id']);
+			$line['qtext'] = makeFilestoreAbs($line['qtext']);
+			$line['solution'] = makeFilestoreAbs($line['solution']);
 
 			//rewrite includecodefrom
 			$line['control'] = preg_replace_callback('/includecodefrom\((\d+)\)/', function($matches) use ($qsmap) {
