@@ -327,7 +327,7 @@
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-		$query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken,forcepwreset';
+		$query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken,forcepwreset,mfa';
 	}
 	$query .= " FROM imas_users WHERE id=:id";
 	$stm = $DBH->prepare($query);
@@ -336,6 +336,24 @@
 	$username = $line['SID'];
 	$myrights = $line['rights'];
 	$myspecialrights = $line['specialrights'];
+	$userHasAdminMFA = false;
+	if (($myrights>40 || $myspecialrights>0) && $line['mfa'] != '' && empty($sessiondata['mfaverified'])) {
+		$mfadata = json_decode($line['mfa'], true);
+		if (isset($_COOKIE['gat']) && isset($mfadata['trusted'])) {
+			foreach ($mfadata['trusted'] as $mfatoken) {
+				if ($mfatoken == $_COOKIE['gat']) {
+					$sessiondata['mfaverified'] = true;
+					writesessiondata();
+					break;
+				}
+			}
+		}
+		if (empty($sessiondata['mfaverified'])) {
+			$userHasAdminMFA = true;
+			$myrights = 40;
+			$myspecialrights = 0;
+		}
+	}	
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];

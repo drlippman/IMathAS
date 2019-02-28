@@ -1283,6 +1283,47 @@ switch($_POST['action']) {
 			$stm->execute(array(':diag'=>$_GET['id']));
 		}
 		break;
+	case "entermfa":
+		$stm = $DBH->prepare("SELECT mfa FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$userid));
+		$mfadata = $stm->fetchColumn(0);
+		$error = '';
+		if ($mfadata != '') {
+			$mfadata = json_decode($mfadata, true);
+			require('../includes/GoogleAuthenticator.php');
+			$MFA = new GoogleAuthenticator();
+			//check that code is valid and not a replay
+			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
+			   ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
+				$sessiondata['mfaverified'] = true;
+				writesessiondata();
+				$mfadata['last'] = $_POST['mfatoken'];
+				$mfadata['laston'] = time();
+				if (isset($_POST['mfatrust'])) {
+					$trusttoken = $MFA->createSecret();
+					setcookie('gat', $trusttoken, time()+60*60*24*365*10, $imasroot.'/', '', true, true);
+					if (!isset($mfadata['trusted'])) {
+						$mfadata['trusted'] = array();
+					}
+					$mfadata['trusted'][] = $trusttoken;
+				}
+				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
+				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
+				if (isset($_POST['mfatrust'])) {
+					require("../header.php");
+					echo '<p>This device is now trusted; you will not be asked for your 2-factor authentication on this device again.</p>';
+					echo '<p>If you ever need to un-trust this device, you can clear all cookies, or disable 2-factor authentication in your account settings.</p>';
+					echo '<p><a href="../index.php">Continue</a></p>';
+					require("../footer.php");
+					exit;
+				}
+					
+			} else {
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=entermfa&error=true");
+				exit;
+			}
+		}
+		break;
 }
 
 session_write_close();
