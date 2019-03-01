@@ -63,9 +63,10 @@ class AssessInfo
    * @param  boolean  $isstu      Whether the user is a student
    * @param  integer $latepasses  The number of latepasses the user has
    * @param  integer $latepasshrs How many hours latepasses extend due dates
+   * @param  integer $courseenddate The course end date
    * @return void
    */
-  public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24) {
+  public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
     $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty ";
     $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
     $stm = $this->DBH->prepare($query);
@@ -103,10 +104,27 @@ class AssessInfo
     if ($canuselatepass) {
       if (time() > $this->assessData['enddate']) {
         //past the end date - calc how many to reopen
-        $this->assessData['can_use_latepass'] = $this->exceptionfunc->calcLPneeded($this->assessData['enddate']);
+        $LPneeded = $this->exceptionfunc->calcLPneeded($this->assessData['enddate']);
       } else {
-        $this->assessData['can_use_latepass'] = 1;
+        $LPneeded = 1;
       }
+      $this->assessData['can_use_latepass'] = $LPneeded;
+      $this->assessData['latepasses_avail'] = $latepasses;
+
+      $LPcutoff = $this->assessData['LPcutoff'];
+      if ($LPcutoff<$this->assessData['enddate']) {
+        $LPcutoff = 0;  //ignore nonsensical values
+      }
+      $limitedByCourseEnd = (strtotime("+".($latepasshrs*$LPneeded)." hours", $this->assessData['enddate']) > $courseenddate && ($LPcutoff==0 || $LPcutoff>$courseenddate));
+      $limitedByLPcutoff = ($LPcutoff>0 && strtotime("+".($latepasshrs*$LPneeded)." hours", $this->assessData['enddate']) > $LPcutoff && $LPcutoff<$courseenddate);
+      if ($limitedByCourseEnd) {
+        $this->assessData['latepass_extendto'] = $courseenddate;
+      } else if ($limitedByLPcutoff) {
+        $this->assessData['latepass_extendto'] = $LPcutoff;
+      } else {
+        $this->assessData['latepass_extendto'] = strtotime("+".($latepasshrs*$LPneeded)." hours", $this->assessData['enddate']);
+      }
+
     } else {
       $this->assessData['can_use_latepass'] = 0;
     }

@@ -29,7 +29,7 @@ if ($isteacher && isset($_GET['uid'])) {
 
 //load settings without questions
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
-$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs);
+$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
@@ -44,7 +44,7 @@ $include_from_assess_info = array(
   'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
   'can_use_latepass', 'allowed_takes', 'retake_penalty', 'exceptionpenalty',
-  'timelimit_multiplier'
+  'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
