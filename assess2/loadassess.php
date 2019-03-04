@@ -36,7 +36,7 @@ if ($isstudent) {
 
 //load user's assessment record
 $assess_record = new AssessRecord($DBH);
-$assess_record->loadByUserid($uid, $aid);
+$assess_record->loadRecord($uid, $aid);
 
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(
@@ -64,7 +64,10 @@ if ($assessInfoOut['has_active_take'] && $assessInfoOut['timelimit'] > 0) {
 //get prev take info
 if ($assessInfoOut['submitby'] == 'by_assessment') {
   $showPrevTakeScores = ($assessInfoOut['showscores'] != 'none');
-  $assessInfoOut['prev_takes'] = $assess_record->getPrevTakes($showPrevTakeScores);
+  $assessInfoOut['prev_takes'] = $assess_record->getSubmittedTakes($showPrevTakeScores);
+  if ($showPrevTakeScores) {
+    $assessInfoOut['kept_take'] = $assess_record->getKeptTake();
+  }
 }
 
 //load group members, if applicable
