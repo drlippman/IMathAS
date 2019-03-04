@@ -31,4 +31,22 @@
      }
      return array($stugroupid, $users);
    }
+   /**
+    * Get the group members
+    * @param  int $groupid    The imas_stugroups ID
+    * @return array           array of userid=>array(firstname, lastname)
+    */
+   public static function getGroupMembersByGroupId($groupid) {
+     global $DBH;
+     $query = 'SELECT iu.id,iu.FirstName,iu.LastName
+              FROM imas_stugroupmembers AS isgm JOIN imas_users AS iu
+              ON isgm.userid=iu.id WHERE isgm.stugroupid=?';
+     $stm = $DBH->prepare($query);
+     $users = array();
+     $stm->execute(array($groupid));
+     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+       $users[$row['id']] = array($row['FirstName'], $row['LastName']);
+     }
+     return $users;
+   }
  }

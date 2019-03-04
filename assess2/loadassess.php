@@ -16,6 +16,7 @@ require("../init.php");
 require("./common_start.php");
 require("./AssessInfo.php");
 require("./AssessRecord.php");
+require('./AssessUtils.php');
 
 //validate inputs
 check_for_required('GET', array('aid', 'cid'));
@@ -72,13 +73,14 @@ if ($assessInfoOut['submitby'] == 'by_assessment') {
 
 //load group members, if applicable
 if ($assessInfoOut['isgroup'] > 0) {
-  $assessInfoOut['group_members'] = $assess_record->getGroupMembers();
-  if (count($assessInfoOut['group_members']) == 0) {
-    //no members yet - add self
-    //TODO:  Handle case $uid != $userid?
-    $assessInfoOut['group_members'][] = $userfullname;
-  }
+  $assessInfoOut['group_members'] = array_values(
+    AssessUtils::getGroupMembers($uid, $assess_info->getSetting('groupsetid'))
+  );
   if ($assessInfoOut['isgroup'] == 2) {
+    if (count($assessInfoOut['group_members']) === 0) {
+      // no group members yet - add self
+      $assessInfoOut['group_members'][] = $userfullname;
+    }
     //if can add group members, get available people
     $query = 'SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
     $query .= 'JOIN imas_students AS istu ON istu.userid=iu.id AND istu.courseid=? ';

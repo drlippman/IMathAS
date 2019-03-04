@@ -250,7 +250,7 @@ class AssessRecord
   }
 
   /**
-   * Get group members
+   * Get group members. Only works if group record is loaded.
    *
    * @return array        An array of group member names
    */
@@ -259,22 +259,9 @@ class AssessRecord
       //no assessment record at all
       return array();
     }
-    if ($this->assessRecord['agroupid'] == 0) {
-      return array();
-    }
-    // TODO:  This function isn't correct if no assess records exist
-    // FIXME!!!!!
-    $query = 'SELECT iu.FirstName,iu.LastName FROM imas_users AS iu ';
-    $query .= 'JOIN imas_assessment_records AS iar ON iar.userid=iu.id AND ';
-    $query .= 'iar.assessmentid=? AND iar.agroupid=? ';
-    $query .= 'ORDER BY iu.FirstName, iu.LastName';
-    $stm = $this->DBH->prepare($query);
-    $stm->execute(array($this->curAid, $this->assessRecord['agroupid']));
-    $out = array();
-    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-      $out[] =  $row['FirstName'] . ' ' . $row['LastName'];
-    }
-    return $out;
+    $names = AssessUtils::getGroupMembersByGroupId($this->assessRecord['agroupid']);
+
+    return $names;
   }
 
   /**
