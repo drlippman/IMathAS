@@ -189,6 +189,14 @@ class AssessInfo
     }
   }
 
+  /**
+   * Returns time limit adjusted with time limit multiplier
+   * @return [type] [description]
+   */
+  public function getAdjustedTimelimit() {
+    return $this->assessData['timelimit_multiplier'] * $this->assessData['timelimit'];
+  }
+
  /**
   * Gets a flattened array of all question IDs for the assessment.
   * @return array Array of all question IDs in assessment.

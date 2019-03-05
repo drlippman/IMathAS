@@ -15,30 +15,34 @@ class AssessRecord
   private $curUid = null;
   private $curAid = null;
   private $assessRecord = null;
+  private $assess_info = null;
   private $hasRecord = false;
   private $scoredData = null;
   private $practiceData = null;
   private $status = 'no_record';
+  private $now = 0;
 
   /**
    * Construct object
    * @param object $DBH PDO Database Handler
+   * @param object $assess_info  AssessInfo instance
    */
-  function __construct($DBH) {
+  function __construct($DBH, $assess_info = null) {
     $this->DBH = $DBH;
+    $this->assess_info = $assess_info;
+    $this->curAid = $assess_info->getSetting('id');
+    $this->$now = time();
   }
 
   /**
    * Load an assessment record given the user id and assessment id.
    * @param  integer $userid  The user ID
-   * @param  integer $aid     The assessment ID
    * @return void
    */
-  public function loadRecord($userid, $aid) {
-    $this->curAid = $aid;
+  public function loadRecord($userid) {
     $this->curUid = $userid;
     $stm = $this->DBH->prepare("SELECT * FROM imas_assessment_records WHERE userid=? AND assessmentid=?");
-    $stm->execute(array($userid, $aid));
+    $stm->execute(array($userid, $this->curAid));
     $this->assessRecord = $stm->fetch(PDO::FETCH_ASSOC);
     if ($this->assessRecord === false) {
       $this->hasRecord = false;
@@ -104,9 +108,10 @@ class AssessRecord
    * @param  integer $groupsetid    The groupsetid for the assessment, if group (def: 0, not group)
    * @param  boolean $recordStart   true to record the starttime now (def: true)
    * @param  string  $lti_sourcedid The LTI sourcedid (def: '')
+   * @param  boolean $inpractice    True if in practice mode, to gen practice data (def: false)
    * @return void
    */
-  public function createRecord($groupsetid = 0, $recordStart = true, $lti_sourcedid = '') {
+  public function createRecord($groupsetid = 0, $recordStart = true, $lti_sourcedid = '', $inpractice = false) {
     // if group, lookup group members. Otherwise just use current user
     if ($groupsetid > 0) {
       list($agroupid, $userinfo) = AssessUtils::getGroupMembers($this->curUid, $groupsetid);
@@ -117,7 +122,6 @@ class AssessRecord
     }
 
     //initiale a blank record
-    $now = time();
     $this->assessRecord = array(
       'assessmentid' => $this->curAid,
       'userid' => $this->curUid,
@@ -125,7 +129,7 @@ class AssessRecord
       'lti_sourcedid' => $lti_sourcedid,
       'ver' => 2,
       'timeontask' => 0,
-      'starttime' => $recordStart ? $now : 0,
+      'starttime' => $recordStart ? $this->now : 0,
       'lastchange' => 0,
       'score' => 0,
       'status' => 0,
@@ -133,8 +137,14 @@ class AssessRecord
       'practicedata' => ''
     )
 
-    //TODO:  initialize data? might need to know if practice
+    // initialize scoredData
+    $this->scoredData = $this->buildAssessData(false, $recordStart);
+    // if in practice, initialize practiceData
+    if ($inpractice) {
+      $this->practiceData = $this->buildAssessData(true, $recordStart);
+    }
 
+    // Save to Database
     $qarr = array();
     $vals = array();
     $scoredtosave = ($this->scoredData !== null) ? gzencode(json_encode($this->scoredData)) : '';
@@ -146,7 +156,7 @@ class AssessRecord
         $this->curAid,
         $agroupid,
         ($uid==$this->curUid) ? $lti_sourcedid : '',
-        $recordStart ? $now : 0,
+        $recordStart ? $this->now : 0,
         2,
         $this->assessRecord['status'],
         $scoredtosave,
@@ -160,6 +170,87 @@ class AssessRecord
     $stm->execute($qarr);
 
     $this->hasRecord = true;
+  }
+
+  /**
+   * Build scoredData or practiceData from scratch
+   * @param  boolean $ispractice  True if generating practiceData (def: false)
+   * @param  boolean $recordStart True to record starttime now
+   * @return array for scoredData or practiceData
+   */
+  public function buildAssessData($ispractice = false, $recordStart = true) {
+    return array(
+      'submissions' => array(),
+      'autosaves' => array(),
+      'scored_version' => 0,
+      'assess_versions' => array(
+        $this->buildNewAssessVersion($inpractice, 0, $recordStart)
+      )
+    )
+  }
+
+  /**
+   * Build a new assess_versions record
+   * @param  boolean $ispractice  True if building practice data
+   * @param  integer $take        The take number
+   * @param  boolean $recordStart True to record starttime now
+   * @return array of assessment data
+   */
+  public function buildNewAssessVersion($ispractice = false, $take = 0, $recordStart = true) {
+    // build base framework
+    $out = array(
+      'starttime' => $recordStart ? $this->now : 0,
+      'lastchange' => 0,
+      'status' => 0,
+      'score' => 0,
+      'questions' => array();
+    )
+    if ($recordStart && $this->assess_info->getSetting('timelimit') > 0) {
+      //recording start and has time limit, so record end time
+      $out['timelimit_end'] = $this->now + $this->assess_info->getAdjustedTimelimit();
+    }
+
+    // generate the questions and seeds
+    list($oldquestions, $oldseeds) = $this->getOldQuestions($ispractice);
+    list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($ispractice, $take);
+    // build question data
+    for ($k = 0; $k < count($questions), $k++) {
+      $out['questions'][] = array(
+        'scored_version' => 0,
+        'question_versions' => array(
+          array(
+            'qid' => $questions[$k],
+            'seed' => $seeds[$k],
+            'attempts' => array()
+          )
+        )
+      );
+    }
+    return $out;
+  }
+
+  /**
+   * Get old questions and seeds previously used in assessment record
+   * @param  boolean $inpractice    True if in practice mode, to get practice data (def: false)
+   * @return array array($questions, $seeds), where each is an array of values
+   */
+  public function getOldQuestions($ispractice = false) {
+    $questions = array();
+    $seeds = array();
+    if ($ispractice) {
+      $data = $this->practiceData;
+    } else {
+      $data = $this->scoredData;
+    }
+    if ($data !== null) {
+      foreach ($data['assess_versions'] as $ver) {
+        foreach ($ver['question_versions'] as $qver) {
+          $questions[] = $qver['qid'];
+          $seeds[] = $qver['seed'];
+        }
+      }
+    }
+    return array($questions, $seeds);
   }
 
   /**

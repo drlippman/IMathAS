@@ -36,8 +36,8 @@ if ($isstudent) {
 }
 
 //load user's assessment record
-$assess_record = new AssessRecord($DBH);
-$assess_record->loadRecord($uid, $aid);
+$assess_record = new AssessRecord($DBH, $assess_info);
+$assess_record->loadRecord($uid);
 
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(
