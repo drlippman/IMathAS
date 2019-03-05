@@ -789,16 +789,16 @@
 
 	$placeinhead .= '
 	   var controlEditor;
-	   var qEditor;
+	   var qEditor = [];
 	
 	  function toggleeditor(el) {
 	     var qtextbox =  document.getElementById(el);
 	     if ((el=="qtext" && editoron==0) || (el=="solution" && seditoron==0)) {
-	        if (el=="qtext" && typeof qEditor != "undefined") {
-	     		qEditor.toTextArea();
+	        if (typeof qEditor[el] != "undefined") {
+	     		qEditor[el].toTextArea();
 	     	}
 	        qtextbox.rows += 3;
-		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
+	        qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g,\'<span class="AM" title="$1">`$1`</span>\');
 	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>\n");
 
@@ -812,9 +812,9 @@
 	        initeditor("exact",toinit.join(","),1);
 	     } else {
 	     	tinymce.remove("#"+el);
-		qtextbox.rows -= 3;
-		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
-		if (el=="qtext") {setupQtextEditor();}
+	     	qtextbox.rows -= 3;
+	     	qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
+	     	setupQtextEditor(el);        
 	     }    
 	     if (el.match(/qtext/)) {
 	     	editoron = 1 - editoron;
@@ -829,23 +829,25 @@
 	   	if (document.cookie.match(/seditoron=1/)) {
 	   		var val = document.getElementById("solution").value;
 	   		if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("solution");}
-	   	}
+	   		else {setupQtextEditor("solution");}
+	   	}else {setupQtextEditor("solution");}
 	   	*/
 	   }
 
-	   addLoadEvent(function(){setupQtextEditor();});
+	   addLoadEvent(function(){setupQtextEditor("qtext");setupQtextEditor("solution");});
 	   /*
 	   if (document.cookie.match(/qeditoron=1/)) {
 	   	var val = document.getElementById("qtext").value;
 	   	if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("qtext");}
-	   	else {setupQtextEditor();}
-	   }else {setupQtextEditor();}});
+	   	else {setupQtextEditor("qtext");}
+	   }else {setupQtextEditor("qtext");}});
 	   */
 
-	   function setupQtextEditor() {
-	   	var qtextbox = document.getElementById("qtext");
-			qtextbox.value = qtextbox.value.replace(/\s*<br\s*\/>\s*<br\s*\/>\s*/g, "\n<br /><br />\n");
-	   	qEditor = CodeMirror.fromTextArea(qtextbox, {
+	   function setupQtextEditor(id) {
+	   	var qtextbox = document.getElementById(id);
+	   	if (!qtextbox) { return; }
+		qtextbox.value = qtextbox.value.replace(/\s*<br\s*\/>\s*<br\s*\/>\s*/g, "\n<br /><br />\n");
+	   	qEditor[id] = CodeMirror.fromTextArea(qtextbox, {
 			matchTags: true,
 			mode: "imathasqtext",
 			smartIndent: true,
@@ -854,9 +856,8 @@
 			tabSize: 2,
 			'.(!$myq?'readOnly:true,':'').'
 			styleSelectedText:true
-		      });
-			for (var i=0;i<qEditor.lineCount();i++) { qEditor.indentLine(i); }
-		//qEditor.setSize("100%",6+14*qtextbox.rows);
+		  });
+		  for (var i=0;i<qEditor[id].lineCount();i++) { qEditor[id].indentLine(i); }
 	   }
 
 	   $(function() {
@@ -897,18 +898,18 @@
 	  	 $("#ccbox").find(".CodeMirror-scroll").css("min-height",0).css("max-height","none");
 	   	controlEditor.setSize("100%",$(controlEditor.getWrapperElement()).height()-28);
 	   }
-	   function incqtboxsize() {
+	   function incqtboxsize(id) {
 	   	if (!editoron) {
-	   		$("#qtbox").find(".CodeMirror-scroll").css("min-height",0).css("max-height","none");
-	   		qEditor.setSize("100%",$(qEditor.getWrapperElement()).height()+28);
-	   		document.getElementById("qtext").rows += 2;
+	   		$("#"+id).parent().find(".CodeMirror-scroll").css("min-height",0).css("max-height","none");
+	   		qEditor[id].setSize("100%",$(qEditor[id].getWrapperElement()).height()+28);
+	   		document.getElementById(id).rows += 2;
 	   	}
 	   }
-	   function decqtboxsize() {
+	   function decqtboxsize(id) {
 	   	if (!editoron) {
-	   		$("#qtbox").find(".CodeMirror-scroll").css("min-height",0).css("max-height","none");
-	   		qEditor.setSize("100%",$(qEditor.getWrapperElement()).height()-28);
-	   		document.getElementById("qtext").rows -= 2;
+	   		$("#"+id).parent().find(".CodeMirror-scroll").css("min-height",0).css("max-height","none");
+	   		qEditor[id].setSize("100%",$(qEditor[id].getWrapperElement()).height()-28);
+	   		document.getElementById(id).rows -= 2;
 	   	}
 	   }
 	   </script>';
@@ -1145,7 +1146,7 @@ if ($line['solution']=='') {
 }
 ?>
 Detailed Solution:
-<span class="noselect"><span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span></span>
+<span class="noselect"><span class=pointer onclick="incqtboxsize('solution')">[+]</span><span class=pointer onclick="decqtboxsize('solution')">[-]</span></span>
 <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
@@ -1253,7 +1254,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		$(".quickSaveNotice").html("Saving...");
 		// Save codemirror and tinyMCE data
 		try {
-			if (qEditor) qEditor.save();
+			for (i in qEditor) { qEditor[i].save(); }
 			tinyMCE.triggerSave();
 			if (controlEditor) controlEditor.save();
 		} catch (err){
