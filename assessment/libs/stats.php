@@ -545,17 +545,68 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	return showasciisvg($outst,$width,$height);
 }
 
-//piechart(percents, labels, {width, height})
+//piechart(percents, labels, {width, height, data label})
 //create a piechart
 //percents: array of pie percents (should total 100%)
 //labels: array of labels for each pie piece
 //uses Google Charts API
 function piechart($pcts,$labels,$w=350,$h=150) {
+	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		$out .= '<table><caption>'._('Pie Chart').'</caption>';
+		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
+		$out .= '<th>'._('Percent').'</th></tr>';
+		foreach ($labels as $k=>$label) {
+			$out .= '<tr><td>'.Sanitize::encodeStringForDisplay($label).'<td>';
+			$out .= '<td>'.Sanitize::encodeStringForDisplay($pcts[$k]).'%</td></tr>';
+		}
+		$out .= '</table>';
+		return $out;
+	}
+	$uniqueid = uniqid('pie');
+	$out = '<div id="'.$uniqueid.'" style="width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
+	//load google charts loader if needed
+	$out .= '<script type="text/javascript">
+		if (typeof window.chartqueue == "undefined") {
+			window.chartqueue = [];
+			jQuery.getScript("https://www.gstatic.com/charts/loader.js")
+			.done(function() {
+				google.charts.load("current", {packages: ["corechart"]});
+				for (i in window.chartqueue) {
+					google.charts.setOnLoadCallback(window.chartqueue[i]);
+				}
+			});
+		};';
+	$rows = array();
+	foreach ($labels as $k=>$label) {
+		$row = '["'.Sanitize::encodeStringForJavascript($label);
+		$row .= '",' . floatval($pcts[$k]) . ']';
+		$rows[] = $row;
+	}
+	
+	$out .= 'function '.$uniqueid.'() {
+		var data = new google.visualization.DataTable();
+		data.addColumn("string", "Data");
+		data.addColumn("number", "Percentage");
+		data.addRows(['.implode(',', $rows).']);
+		var chart = new google.visualization.PieChart(document.getElementById("'.$uniqueid.'"));
+		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}});
+	}';
+	
+	//load it
+	$out .= 'if (typeof google == "undefined" || typeof google.charts == "undefined") {
+			window.chartqueue.push('.$uniqueid.');
+		} else {
+			google.charts.load("current", {packages: ["corechart"]});
+			google.charts.setOnLoadCallback('.$uniqueid.');
+		}
+		</script>';
+	/*
 	$out = "<img src=\"https://chart.apis.google.com/chart?cht=p&amp;chd=t:";
 	$out .= implode(',',$pcts);
 	$out .= "&amp;chs={$w}x{$h}&amp;chl=";
 	$out .= implode('|',$labels);
 	$out .= '" alt="Pie Chart" />';
+	*/
 	return $out;
 }
 
