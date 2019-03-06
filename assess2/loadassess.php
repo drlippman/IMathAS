@@ -44,7 +44,7 @@ $include_from_assess_info = array(
   'name', 'summary', 'available', 'startdate', 'enddate', 'original_enddate',
   'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
-  'can_use_latepass', 'allowed_takes', 'retake_penalty', 'exceptionpenalty',
+  'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
@@ -55,19 +55,19 @@ $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']);
 //set has password
 $assessInfoOut['has_password'] = $assess_info->hasPassword();
 
-//get take info
-$assessInfoOut['has_active_take'] = $assess_record->hasActiveTake();
-//get time limit expiration of current take, if appropriate
-if ($assessInfoOut['has_active_take'] && $assessInfoOut['timelimit'] > 0) {
+//get attempt info
+$assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+//get time limit expiration of current attempt, if appropriate
+if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
 }
 
-//get prev take info
+//get prev attempt info
 if ($assessInfoOut['submitby'] == 'by_assessment') {
-  $showPrevTakeScores = ($assessInfoOut['showscores'] != 'none');
-  $assessInfoOut['prev_takes'] = $assess_record->getSubmittedTakes($showPrevTakeScores);
-  if ($showPrevTakeScores) {
-    $assessInfoOut['kept_take'] = $assess_record->getKeptTake();
+  $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
+  $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
+  if ($showPrevAttemptScores) {
+    $assessInfoOut['kept_attempt'] = $assess_record->getKeptAttempt();
   }
 }
 

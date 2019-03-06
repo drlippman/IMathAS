@@ -192,11 +192,11 @@ class AssessRecord
   /**
    * Build a new assess_versions record
    * @param  boolean $ispractice  True if building practice data
-   * @param  integer $take        The take number
+   * @param  integer $attempt        The attempt number
    * @param  boolean $recordStart True to record starttime now
    * @return array of assessment data
    */
-  public function buildNewAssessVersion($ispractice = false, $take = 0, $recordStart = true) {
+  public function buildNewAssessVersion($ispractice = false, $attempt = 0, $recordStart = true) {
     // build base framework
     $out = array(
       'starttime' => $recordStart ? $this->now : 0,
@@ -212,7 +212,7 @@ class AssessRecord
 
     // generate the questions and seeds
     list($oldquestions, $oldseeds) = $this->getOldQuestions($ispractice);
-    list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($ispractice, $take);
+    list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($ispractice, $attempt);
     // build question data
     for ($k = 0; $k < count($questions), $k++) {
       $out['questions'][] = array(
@@ -221,7 +221,7 @@ class AssessRecord
           array(
             'qid' => $questions[$k],
             'seed' => $seeds[$k],
-            'attempts' => array()
+            'tries' => array()
           )
         )
       );
@@ -262,10 +262,10 @@ class AssessRecord
   }
 
   /**
-   * Determine if there is an active assessment take
-   * @return boolean true if there is an active assessment take
+   * Determine if there is an active assessment attempt
+   * @return boolean true if there is an active assessment attempt
    */
-  public function hasActiveTake() {
+  public function hasActiveAttempt() {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
@@ -276,10 +276,10 @@ class AssessRecord
   }
 
   /**
-   * Determine if there is an active practice take
-   * @return boolean true if there is an active practice take
+   * Determine if there is an active practice attempt
+   * @return boolean true if there is an active practice attempt
    */
-  public function hasPracticeTake() {
+  public function hasPracticeAttempt() {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
@@ -289,14 +289,14 @@ class AssessRecord
   }
 
   /**
-   * Get data on submitted takes
+   * Get data on submitted attempts
    *
    * @param boolean $includeScores  Whether to include scores. Default: false
-   * @return array        An array of previous take info.  Each element is an
+   * @return array        An array of previous attempt info.  Each element is an
    *                      array containing key 'date', and 'score' if the
    *                      settings allow it
    */
-  public function getSubmittedTakes($includeScores = false) {
+  public function getSubmittedAttempts($includeScores = false) {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return array();
@@ -319,12 +319,12 @@ class AssessRecord
   }
 
   /**
-   * Get the scored take version and score
+   * Get the scored attempt version and score
    * @return array  'kept': version # or 'override' if instructor override
    *                        may not be set if using average
    *                'score': the final assessment score
    */
-  public function getScoredTake() {
+  public function getScoredAttempt() {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return array();
@@ -356,9 +356,9 @@ class AssessRecord
   }
 
   /**
-   * Get the timestamp for when the current take time limit expires
+   * Get the timestamp for when the current attempt time limit expires
    *
-   * @return integer  timestamp for when  the current take time limit expires
+   * @return integer  timestamp for when  the current attempt time limit expires
    *                  will be 0 if there is no time limit
    */
   public function getTimeLimitExpires() {
@@ -369,7 +369,7 @@ class AssessRecord
     if (count($this->scoredData['assess_versions']) == 0) {
       return false;
     }
-    //grab value from last (current) retake
+    //grab value from last (current) assess attempt
     $lastvernum = count($this->scoredData['assess_versions']) - 1;
     $lastver = $this->scoredData['assess_versions'][$lastvernum];
     return $lastver['timelimit_end'];

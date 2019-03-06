@@ -263,7 +263,7 @@ class AssessInfo
   * Select an initial set of questions and seeds for an assessment record.
   * @param  boolean $ispractice   Optional. Set true if generating for practice mode.
   *                               Default false.
-  * @param  integer $take         Optional.  The take # for by-assessment retakes.
+  * @param  integer $attempt      Optional.  The attempt # for by-assessment attempts.
   *                               Default 0.
   * @param  boolean $oldquestions Optional. An array of previous questions
   *                               used in the asessment.
@@ -272,7 +272,7 @@ class AssessInfo
   * @return array                 array($questions, $seeds), where each is
   *                               an array of values
   */
-  public function assignQuestionsAndSeeds($ispractice = false, $take = 0, $oldquestions = false, $oldseeds = false) {
+  public function assignQuestionsAndSeeds($ispractice = false, $attempt = 0, $oldquestions = false, $oldseeds = false) {
     $qout = array();
     $seeds = array();
 
@@ -348,7 +348,7 @@ class AssessInfo
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
           } else {
             //pick seed based on assessment ID
-            $seeds[] = $i + $this->curAid + $take + $ispractice?100:0;
+            $seeds[] = $i + $this->curAid + $attempt + $ispractice?100:0;
           }
         }
       } else { //regular selection
@@ -499,7 +499,7 @@ class AssessInfo
     } else if ($settings['showans'] == 'L') {
       $settings['showans'] = 'after_lastattempt';
     } else if ($settings['showans'] == 'T') {
-      $settings['showans'] = 'after_take';
+      $settings['showans'] = 'after_attempt';
     } else if ($settings['showans'] == 'W') {
       $settings['showans'] = 'with_score';
     }
@@ -549,9 +549,9 @@ class AssessInfo
       $settings['defregenpenalty_n'] = 1;
     }
 
-    //if by-assessment, define take values
+    //if by-assessment, define attempt values
     if ($settings['submitby'] == 'by_assessment') {
-      $settings['allowed_takes'] = $settings['defregens'];
+      $settings['allowed_attempts'] = $settings['defregens'];
       $settings['retake_penalty'] = array(
         'penalty' => $settings['defregenpenalty'],
         'n' => $settings['defregenpenalty_n']
