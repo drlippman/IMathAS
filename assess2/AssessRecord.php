@@ -105,43 +105,41 @@ class AssessRecord
   /**
    * Create a new record in the database.  Call after loadRecord.
    *
-   * @param  integer $groupsetid    The groupsetid for the assessment, if group (def: 0, not group)
+   * @param  array   $users         Array of users to create record for.
+   *                                If false, current userid will be used. (def: false)
+   * @param  int     $stugroupid    The stugroup ID, or 0 if not group (def: 0)
    * @param  boolean $recordStart   true to record the starttime now (def: true)
    * @param  string  $lti_sourcedid The LTI sourcedid (def: '')
    * @param  boolean $inpractice    True if in practice mode, to gen practice data (def: false)
    * @return void
    */
-  public function createRecord($groupsetid = 0, $recordStart = true, $lti_sourcedid = '', $inpractice = false) {
+  public function createRecord($users = false, $stugroupid = 0, $recordStart = true, $lti_sourcedid = '', $inpractice = false) {
     // if group, lookup group members. Otherwise just use current user
-    if ($groupsetid > 0) {
-      list($agroupid, $userinfo) = AssessUtils::getGroupMembers($this->curUid, $groupsetid);
-      $users = array_keys($userinfo);
-    } else {
+    if ($users === false) {
       $users = array($this->curUid);
-      $agroupid = 0;
     }
 
     //initiale a blank record
     $this->assessRecord = array(
       'assessmentid' => $this->curAid,
       'userid' => $this->curUid,
-      'agroupid' => $agroupid,
+      'agroupid' => $stugroupid,
       'lti_sourcedid' => $lti_sourcedid,
       'ver' => 2,
       'timeontask' => 0,
       'starttime' => $recordStart ? $this->now : 0,
       'lastchange' => 0,
       'score' => 0,
-      'status' => 0,
+      'status' => 0,   //TODO: this might not always be 0
       'scoreddata' => '',
       'practicedata' => ''
     )
 
     // initialize scoredData
-    $this->scoredData = $this->buildAssessData(false, $recordStart);
+    $this->buildAssessData(false, $recordStart);
     // if in practice, initialize practiceData
     if ($inpractice) {
-      $this->practiceData = $this->buildAssessData(true, $recordStart);
+      $this->buildAssessData(true, $recordStart);
     }
 
     // Save to Database
@@ -154,7 +152,7 @@ class AssessRecord
       array_push($qarr,
         $uid,
         $this->curAid,
-        $agroupid,
+        $stugroupid,
         ($uid==$this->curUid) ? $lti_sourcedid : '',
         $recordStart ? $this->now : 0,
         2,
@@ -176,27 +174,40 @@ class AssessRecord
    * Build scoredData or practiceData from scratch
    * @param  boolean $ispractice  True if generating practiceData (def: false)
    * @param  boolean $recordStart True to record starttime now
-   * @return array for scoredData or practiceData
+   * @return void
    */
   public function buildAssessData($ispractice = false, $recordStart = true) {
-    return array(
+    if ($ispractice && $this->practiceData !== null) {
+      return false;
+    } else if (!$ispractice && $this->scoredData !== null) {
+      return false;
+    }
+    $data = array(
       'submissions' => array(),
       'autosaves' => array(),
       'scored_version' => 0,
-      'assess_versions' => array(
-        $this->buildNewAssessVersion($inpractice, 0, $recordStart)
-      )
-    )
+      'assess_versions' => array()
+    );
+    if ($ispractice) {
+      $this->practiceData = $data;
+    } else {
+      $this->scoredData = $data;
+    }
+    $this->buildNewAssessVersion($inpractice, $recordStart);
   }
 
   /**
-   * Build a new assess_versions record
+   * Build a new assess_versions record in scoredData / practiceData
    * @param  boolean $ispractice  True if building practice data
-   * @param  integer $attempt        The attempt number
    * @param  boolean $recordStart True to record starttime now
-   * @return array of assessment data
+   * @return void
    */
-  public function buildNewAssessVersion($ispractice = false, $attempt = 0, $recordStart = true) {
+  public function buildNewAssessVersion($ispractice = false, $recordStart = true) {
+    if ($ispractice) {
+      $attempt = count($this->practiceData['assess_versions']);
+    } else {
+      $attempt = count($this->scoredData['assess_versions']);
+    }
     // build base framework
     $out = array(
       'starttime' => $recordStart ? $this->now : 0,
@@ -226,7 +237,11 @@ class AssessRecord
         )
       );
     }
-    return $out;
+    if ($ispractice) {
+      $this->practiceData['assess_versions'][] = $out;
+    } else {
+      $this->scoredData['assess_versions'][] = $out;
+    }
   }
 
   /**
@@ -263,30 +278,79 @@ class AssessRecord
 
   /**
    * Determine if there is an active assessment attempt
+   * @param boolean $ispractice  True if looking at practice attempts (def: false)
    * @return boolean true if there is an active assessment attempt
    */
-  public function hasActiveAttempt() {
+  public function hasActiveAttempt($ispractice = false) {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
     }
-    // status has bitwise 1: active by-assess attempt
-    // status has bitwise 2: active by-question attempt
-    return ($this->assessRecord['status']&3 !== 0);
+    if ($ispractice) {
+      return ($this->assessRecord['status']&16 !== 0);
+    } else {
+      // status has bitwise 1: active by-assess attempt
+      // status has bitwise 2: active by-question attempt
+      return ($this->assessRecord['status']&3 !== 0);
+    }
   }
 
   /**
-   * Determine if there is an active practice attempt
-   * @return boolean true if there is an active practice attempt
+   * Determine if there is an unsubmitted assessment attempt
+   * This includes not-yet-opened assessment attempts
+   * @param boolean $ispractice  True if looking at practice attempts (def: false)
+   * @return boolean true if there is an unsubmitted assessment attempt
    */
-  public function hasPracticeAttempt() {
+  public function hasUnsubmittedAttempt($ispractice = false) {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
     }
-    // status has bitwise 16: active practice attempt
-    return ($this->assessRecord['status']&16 !== 0);
+    if ($ispractice) {
+      $data = $this->practiceData;
+    } else {
+      $data = $this->scoredData;
+    }
+    if ($data === null) {
+      return false;
+    }
+    if (count($data['assess_versions']) == 0) {
+      return false;
+    }
+    $last_attempt = $data['assess_versions'][count($data['assess_versions'])-1];
+    return ($last_attempt['status'] === 0);
   }
+
+  /**
+   * Check whether user is allowed to create a new assessment version
+   * @param  boolean $is_practice True if in practice mode
+   * @return boolean              True if OK to create a new assess version
+   */
+  public function canMakeNewAttempt($is_practice) {
+    if ($is_practice) {
+      // if in practice, can make new if we don't have one
+      return ($this->practiceData === null);
+    } else {
+      if ($this->scoredData === null) {
+        // if no data, can make new
+        return true;
+      }
+      $submitby = $this->assess_info->getSetting('submitby');
+      $prev_attempt_cnt = count($this->scoredData['assess_versions']);
+      // if by-question, then we can if we have no versions yet
+      if ($submitby == 'by_question' && $prev_attempt_cnt == 0) {
+        return true;
+      }
+      if ($submitby == 'by_assessment') {
+        $allowed = $this->assess_info->getSettings('allowed_attempts');
+        if ($prev_attempt_cnt < $allowed) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
 
   /**
    * Get data on submitted attempts
@@ -373,6 +437,83 @@ class AssessRecord
     $lastvernum = count($this->scoredData['assess_versions']) - 1;
     $lastver = $this->scoredData['assess_versions'][$lastvernum];
     return $lastver['timelimit_end'];
+  }
+
+
+  /**
+   * Generate the question API object
+   * @param  int  $qn            Question number (0 indexed)
+   * @param  boolean $is_practice Whether to use practice data (def: false)
+   * @param  boolean $include_scores Whether to include scores (def: false)
+   * @param  boolean $generate_html Whether to generate question HTML (def: false)
+   * @return array  The question object
+   */
+  public function getQuestionObject($qn, $is_practice, $include_scores = false, $generate_html = false) {
+    // get data structure for this question
+    if ($is_practice) {
+      $assessver = $this->practiceData['assess_versions'][0]
+    } else {
+      $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
+    }
+    $question_versions = $assessver['questions'][$qn]['question_versions'];
+    $curq = $question_versions[count($question_versions) - 1];
+
+    // get basic settings
+    $out = $this->assess_info->getQuestionSettings($curq['qid']);
+
+    if ($this->assess_info->getSetting('submitby') == 'by_question') {
+      $out['regen'] = count($question_versions);
+    }
+
+    // set tries
+    $parts = array();
+    $score = 0;
+    if (count($curq['tries']) == 0) {
+      // no tries yet
+      $parts[0] = array('try' => 0);
+      if ($include_scores) {
+        $parts[0]['score'] = 0;
+        $parts[0]['rawscore'] = 0;
+      }
+    } else {
+      // treat everything like multipart
+      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
+        $parts[$pn] = array('try' => count($curq['tries'][$pn]));
+        if ($include_scores && $parts[$pn]['try'] > 0) {
+          $lasttry = $curq['tries'][$pn][$parts[$pn]['try']-1];
+          $parts[$pn]['score'] = $lasttry['score'];
+          $parts[$pn]['rawscore'] = $lasttry['rawscore'];
+          $score += $lasttry['score'];
+        }
+      }
+    }
+    $out['parts'] = $parts;
+    if ($include_scores) {
+      $out['score'] = $score;
+      // TODO:  Do we want to return score saved in gb too?
+    }
+    return $out;
+  }
+
+  /**
+   * Generate the question API object for all questions
+   * @param  boolean $is_practice Whether to use practice data (def: false)
+   * @param  boolean $include_scores Whether to include scores (def: false)
+   * @param  boolean $generate_html Whether to generate question HTML (def: false)
+   * @return array  The question object
+   */
+  getAllQuestionObjects($is_practice, $include_scores = false, $generate_html = false) {
+    $out = array();
+    // get data structure for current version
+    if ($is_practice) {
+      $assessver = $this->practiceData['assess_versions'][0]
+    } else {
+      $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
+    }
+    for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
+      $out["qn$qn"] = this->getQuestionObject($qn, $is_practice, $include_scores, $generate_html);
+    }
+    return $out;
   }
 
   /**
