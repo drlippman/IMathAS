@@ -57,6 +57,7 @@ class AssessInfo
       $this->setAvailable();
   }
 
+
   /**
    * Looks up and applies an exception, if one exists.
    * @param  integer   $uid       User ID to look up exception for
@@ -67,7 +68,7 @@ class AssessInfo
    * @return void
    */
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
-    $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty ";
+    $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
     $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
     $stm = $this->DBH->prepare($query);
     $stm->execute(array($uid, $this->curAid));
@@ -130,6 +131,18 @@ class AssessInfo
     }
   }
 
+  /**
+   * Look up whether prereq has been waived
+   * @return boolean true if prereq is waived
+   */
+  private function waiveReqScore () {
+      if ($this->exception === null) {
+        return false;
+      } else {
+        return $this->exception[5];
+      }
+  }
+
  /**
   * Load question settings from the DB.
   * @param mixed $qids   Optional. questions to load settings for.
@@ -171,6 +184,25 @@ class AssessInfo
     foreach ($keys as $key) {
       if (isset($this->assessData[$key])) {
         $out[$key] = $this->assessData[$key];
+      }
+    }
+    return $out;
+  }
+
+  /**
+   * Gets question settings that will be output in question object
+   * @return array        Associative array of extracted settings
+   */
+  public function getQuestionSettings($id) {
+    $by_q = array('regens_max','regen_penalty','regen_penalty_after');
+    $base = array('tries_max','retry_penalty','retry_penalty_after','showans','showans_aftern');
+    $out = array();
+    foreach ($base as $field) {
+      $out[$field] = $this->questionData[$id][$field];
+    }
+    if ($this->assessData['submitby'] == 'by_question') {
+      foreach ($by_q as $field) {
+        $out[$field] = $this->questionData[$id][$field];
       }
     }
     return $out;
@@ -239,24 +271,87 @@ class AssessInfo
     return ($this->assessData['password'] != '');
   }
 
+  /**
+   * Check if the password is correct.
+   *
+   * @param  string $pw The password entered by the user
+   * @return boolean    True if password is correct, or if there is
+   *                    no password on the assessment
+   *
+   * Note: IP-based passwords are handled in the initial load setting
+   * normalization, so those aren't checked here.
+   */
+  public function checkPassword($pw) {
+    return ($this->assessData['password'] == '' ||
+        $this->assessData['password'] == trim($pw)
+    );
+  }
+
+  /**
+   * Set the 'available' assessData based on other settings
+   */
   private function setAvailable() {
     $now = time();
     if ($this->assessData['avail'] == 0) {
       //hard hidden
-      $available = 0;
+      $available = 'hidden';
     } else if ($now < $this->assessData['startdate']) {
       //before start date
-      $available = 1;
+      $available = 'notyet';
     } else if ($now < $this->assessData['enddate']) {
       //currently available
-      $available = 2;
+      $available = 'yes';
     } else if ($this->assessData['allow_practice']) {
       //past due, allow late
-      $available = 3;
+      $available = 'practice';
     } else {
-      $available = 4;
+      $available = 'pastdue';
     }
     $this->assessData['available'] = $available;
+  }
+
+  /**
+   * Check whether a prereq exists and if the requirements have been met
+   * Updates assessData['available'] if not.
+   *
+   * @param  int $uid   The user ID
+   * @return void
+   */
+  public function checkPrereq($uid) {
+    if ($this->assessData['reqscore'] > 0 &&
+        $this->assessData['reqscoreaid'] > 0 &&
+        !$this->waiveReqScore()
+    ) {
+      $query = "SELECT iar.score,ia.ptsposs FROM imas_assessments AS ia LEFT JOIN ";
+			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND ias.userid=:userid ";
+			$query .= "WHERE ia.id=:assessmentid";
+      $stm = $this->DBH->prepare($query);
+      $stm->execute(array($uid, $this->curAid));
+      list($prereqscore,$reqscoreptsposs) = $stm->fetch(PDO::FETCH_NUM);
+      if ($prereqscore === null) {
+				$isBlocked = true;
+			} else {
+        $isBlocked = false;
+        if ($this->assessData['reqscoretype']&2) { //using percent-based
+					if (round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
+						$isBlocked = true;
+					}
+				} else if ($prereqscoretot+.02<abs($this->assessData['reqscore'])) { //points based
+					$isBlocked = true;
+				}
+      }
+      if ($isBlocked) {
+        $this->assessData['available'] = 'needprereq';
+      }
+    }
+  }
+
+  /**
+   * Determine whether we are showing scores during the assessment
+   * @return boolean  true if showing scores during
+   */
+  public function showScoresDuring() {
+    return ($this->assessInfo['showscores'] == 'during');
   }
 
   /**
@@ -452,39 +547,42 @@ class AssessInfo
       $settings['points'] = $defaults['defpoints'];
     }
     if ($settings['attempts'] == 9999) {
-      $settings['attempts'] = $defaults['defattempts'];
+      $settings['tries_max'] = $defaults['deftries'];
+    } else {
+      $settings['tries_max'] = $settings['attempts'];
     }
     if ($settings['penalty'] == 9999) {
-      $settings['penalty'] = $defaults['defpenalty'];
-      $settings['penalty_n'] = $defaults['defpenalty_n'];
+      $settings['retry_penalty'] = $defaults['defpenalty'];
+      $settings['retry_penalty_after'] = $defaults['defpenalty_n'];
     } else {
       if ($settings['penalty'][0]==='L') {
-        $settings['penalty_n'] = 'last';
-        $settings['penalty'] = substr($settings['penalty'], 1);
+        $settings['retry_penalty_after'] = 'last';
+        $settings['retry_penalty'] = substr($settings['penalty'], 1);
       } else if ($settings['penalty'][0]==='S') {
-        $settings['penalty_n'] = $settings['penalty'][1];
-        $settings['penalty'] = substr($settings['penalty'], 2);
+        $settings['retry_penalty_after'] = $settings['penalty'][1];
+        $settings['retry_penalty'] = substr($settings['penalty'], 2);
       } else {
-        $settings['penalty_n'] = 1;
+        $settings['retry_penalty_after'] = 1;
+        $settings['retry_penalty'] = $settings['penalty'];
       }
     }
     if ($settings['regenpenalty'] == 9999) {
-      $settings['regenpenalty'] = $defaults['defregenpenalty'];
-      $settings['regenpenalty_n'] = $defaults['defregenpenalty_n'];
+      $settings['regen_penalty'] = $defaults['defregenpenalty'];
+      $settings['regen_penalty_n'] = $defaults['defregenpenalty_n'];
     } else {
-      if ($settings['regenpenalty'][0]==='S') {
-        $settings['regenpenalty_n'] = $settings['regenpenalty'][1];
-        $settings['regenpenalty'] = substr($settings['regenpenalty'], 2);
+      if ($settings['regen_penalty'][0]==='S') {
+        $settings['regen_penalty_n'] = $settings['regenpenalty'][1];
+        $settings['regen_penalty'] = substr($settings['regenpenalty'], 2);
       } else {
-        $settings['regenpenalty_n'] = 0;
+        $settings['regen_penalty_n'] = 0;
+        $settings['regen_penalty'] = $settings['regenpenalty'];
       }
     }
     if ($settings['regen'] == 1 || $defaults['submitby'] == 'by_assessment') {
-      $settings['regens'] = 1;
+      $settings['regens_max'] = 1;
     } else {
-      $settings['regens'] = $defaults['defregens'];
+      $settings['regens_max'] = $defaults['defregens'];
     }
-    unset($settings['regen']);
 
     if ($settings['showans'] == '0') {
       $settings['showans'] = $defaults['showans'];
@@ -531,6 +629,9 @@ class AssessInfo
   * @return array             Normalized $settings.
   */
   static function normalizeSettings($settings) {
+    // adjust for language change
+    $settings['deftries'] = $settings['defattempts'];
+
     //break apara defpenalty, defregenpenalty
     if ($settings['defpenalty'][0]==='L') {
       $settings['defpenalty_n'] = 'last';
@@ -593,6 +694,14 @@ class AssessInfo
     //unpack resources
     $settings['resources'] = json_decode($settings['extrefs']);
     unset($settings['extrefs']);
+
+    // handle help features
+    $settings['help_features'] = array(
+      'message' => ($settings['msgtoinstr'] == 1),
+      'forum' => $settings['posttoforum']
+    );
+    unset($settings['msgtoinstr']);
+    unset($settings['posttoforum']);
 
     //rename points possible
     $settings['points_possible'] = $settings['ptsposs'];

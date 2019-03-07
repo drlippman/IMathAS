@@ -18,6 +18,8 @@ require("./AssessInfo.php");
 require("./AssessRecord.php");
 require('./AssessUtils.php');
 
+header('Content-Type: application/json; charset=utf-8');
+
 //validate inputs
 check_for_required('GET', array('aid', 'cid'));
 $cid = Sanitize::onlyInt($_GET['cid']);
@@ -34,6 +36,9 @@ $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $late
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
+
+//check to see if prereq has been met
+$assess_info->checkPrereq($uid);
 
 //load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info);
@@ -73,9 +78,9 @@ if ($assessInfoOut['submitby'] == 'by_assessment') {
 
 //load group members, if applicable
 if ($assessInfoOut['isgroup'] > 0) {
-  $assessInfoOut['group_members'] = array_values(
-    AssessUtils::getGroupMembers($uid, $assess_info->getSetting('groupsetid'))
-  );
+  list ($stugroupid, $groupmembers) = AssessUtils::getGroupMembers($uid, $assess_info->getSetting('groupsetid'));
+  $assessInfoOut['group_members'] = array_values($groupmembers);
+  $assessInfoOut['stugroupid'] = $stugroupid;
   if ($assessInfoOut['isgroup'] == 2) {
     if (count($assessInfoOut['group_members']) === 0) {
       // no group members yet - add self
@@ -94,8 +99,9 @@ if ($assessInfoOut['isgroup'] > 0) {
       $assessInfoOut['group_avail'][$row['id']] = $row['FirstName'] . ' ' . $row['LastName'];
     }
   }
+} else {
+  $assessInfoOut['stugroupid'] = 0;
 }
 
 //output JSON object
-header('Content-Type: application/json; charset=utf-8');
 echo json_encode($assessInfoOut);
