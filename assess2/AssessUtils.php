@@ -104,4 +104,43 @@ class AssessUtils
     }
     return $users;
   }
+
+  /**
+   * Check if the given IP address is in the desired range
+   *
+   * @param  string  $userip The user's IP address to check
+   * @param  string  $range  The IP range to try.
+   *                         This is a comma-separated list of IPs,
+   *                         and elements may include * for wildcard or
+   *                         value-value for ranges like
+   *                         12.3.5.*, or 12.34.6.12-35
+   * @return boolean         true if userip is in the range
+   */
+  public static function isIPinRange($userip, $range) {
+    $ips = array_map('trim', explode(',', $range));
+    $userip = explode('.', $userip);
+		$isoneIPok = false;
+    foreach ($ips as $ip) {
+      $ip = explode('.', $ip);
+      $thisIPok = true;
+      for ($i=0;$i<3;$i++) {
+        $pts = explode('-', $ip[$i]);
+        if (count($pts) == 2 && $userip[$i] >= $pts[0] && $userip[$i] <= $pts[0]) {
+          continue;
+        } else if ($ip[$i] == '*') {
+          continue;
+        } else if ($ip[$i] == $userip[$i]) {
+          continue;
+        } else {
+          $thisIPok = false;
+          break;
+        }
+      }
+      if ($thisIPok) {
+				$isoneIPok = true;
+				break;
+			}
+    }
+    return $isoneIPok;
+  }
 }
