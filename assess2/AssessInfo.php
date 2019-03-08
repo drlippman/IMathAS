@@ -195,7 +195,8 @@ class AssessInfo
    */
   public function getQuestionSettings($id) {
     $by_q = array('regens_max','regen_penalty','regen_penalty_after');
-    $base = array('tries_max','retry_penalty','retry_penalty_after','showans','showans_aftern');
+    $base = array('tries_max','retry_penalty','retry_penalty_after',
+      'showans','showans_aftern','points_possible');
     $out = array();
     foreach ($base as $field) {
       $out[$field] = $this->questionData[$id][$field];
@@ -351,7 +352,7 @@ class AssessInfo
    * @return boolean  true if showing scores during
    */
   public function showScoresDuring() {
-    return ($this->assessInfo['showscores'] == 'during');
+    return ($this->assessData['showscores'] == 'during');
   }
 
   /**
@@ -544,8 +545,11 @@ class AssessInfo
   */
   static function normalizeQuestionSettings($settings, $defaults) {
     if ($settings['points'] == 9999) {
-      $settings['points'] = $defaults['defpoints'];
+      $settings['points_possible'] = $defaults['defpoints'];
+    } else {
+      $settings['points_possible'] = $settings['points'];
     }
+    unset($settings['points']);
     if ($settings['attempts'] == 9999) {
       $settings['tries_max'] = $defaults['deftries'];
     } else {
@@ -553,7 +557,7 @@ class AssessInfo
     }
     if ($settings['penalty'] == 9999) {
       $settings['retry_penalty'] = $defaults['defpenalty'];
-      $settings['retry_penalty_after'] = $defaults['defpenalty_n'];
+      $settings['retry_penalty_after'] = $defaults['defpenalty_after'];
     } else {
       if ($settings['penalty'][0]==='L') {
         $settings['retry_penalty_after'] = 'last';
@@ -568,13 +572,13 @@ class AssessInfo
     }
     if ($settings['regenpenalty'] == 9999) {
       $settings['regen_penalty'] = $defaults['defregenpenalty'];
-      $settings['regen_penalty_n'] = $defaults['defregenpenalty_n'];
+      $settings['regen_penalty_after'] = $defaults['defregenpenalty_after'];
     } else {
       if ($settings['regen_penalty'][0]==='S') {
-        $settings['regen_penalty_n'] = $settings['regenpenalty'][1];
+        $settings['regen_penalty_after'] = $settings['regenpenalty'][1];
         $settings['regen_penalty'] = substr($settings['regenpenalty'], 2);
       } else {
-        $settings['regen_penalty_n'] = 0;
+        $settings['regen_penalty_after'] = 1;
         $settings['regen_penalty'] = $settings['regenpenalty'];
       }
     }
@@ -634,20 +638,20 @@ class AssessInfo
 
     //break apara defpenalty, defregenpenalty
     if ($settings['defpenalty'][0]==='L') {
-      $settings['defpenalty_n'] = 'last';
+      $settings['defpenalty_after'] = 'last';
       $settings['defpenalty'] = substr($settings['defpenalty'], 1);
     } else if ($settings['defpenalty'][0]==='S') {
-      $settings['defpenalty_n'] = $settings['defpenalty'][1];
+      $settings['defpenalty_after'] = $settings['defpenalty'][1];
       $settings['defpenalty'] = substr($settings['defpenalty'], 2);
     } else {
-      $settings['defpenalty_n'] = 1;
+      $settings['defpenalty_after'] = 1;
     }
 
     if ($settings['defregenpenalty'][0]==='S') {
-      $settings['defregenpenalty_n'] = intval($settings['defregenpenalty'][1]);
+      $settings['defregenpenalty_after'] = intval($settings['defregenpenalty'][1]);
       $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 2);
     } else {
-      $settings['defregenpenalty_n'] = 1;
+      $settings['defregenpenalty_after'] = 1;
     }
 
     //if by-assessment, define attempt values

@@ -31,7 +31,7 @@ class AssessRecord
     $this->DBH = $DBH;
     $this->assess_info = $assess_info;
     $this->curAid = $assess_info->getSetting('id');
-    $this->$now = time();
+    $this->now = time();
   }
 
   /**
@@ -133,7 +133,7 @@ class AssessRecord
       'status' => 0,   //TODO: this might not always be 0
       'scoreddata' => '',
       'practicedata' => ''
-    )
+    );
 
     // initialize scoredData
     $this->buildAssessData(false, $recordStart);
@@ -204,8 +204,10 @@ class AssessRecord
    */
   public function buildNewAssessVersion($ispractice = false, $recordStart = true) {
     if ($ispractice) {
+      $this->parsePractice();
       $attempt = count($this->practiceData['assess_versions']);
     } else {
+      $this->parseScored();
       $attempt = count($this->scoredData['assess_versions']);
     }
     // build base framework
@@ -214,8 +216,9 @@ class AssessRecord
       'lastchange' => 0,
       'status' => 0,
       'score' => 0,
-      'questions' => array();
-    )
+      'questions' => array()
+    );
+
     if ($recordStart && $this->assess_info->getSetting('timelimit') > 0) {
       //recording start and has time limit, so record end time
       $out['timelimit_end'] = $this->now + $this->assess_info->getAdjustedTimelimit();
@@ -225,7 +228,7 @@ class AssessRecord
     list($oldquestions, $oldseeds) = $this->getOldQuestions($ispractice);
     list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($ispractice, $attempt);
     // build question data
-    for ($k = 0; $k < count($questions), $k++) {
+    for ($k = 0; $k < count($questions); $k++) {
       $out['questions'][] = array(
         'scored_version' => 0,
         'question_versions' => array(
@@ -242,6 +245,7 @@ class AssessRecord
     } else {
       $this->scoredData['assess_versions'][] = $out;
     }
+    $this->setStatus(true, $ispractice);
   }
 
   /**
@@ -253,8 +257,10 @@ class AssessRecord
     $questions = array();
     $seeds = array();
     if ($ispractice) {
+      $this->parsePractice();
       $data = $this->practiceData;
     } else {
+      $this->parseScored();
       $data = $this->scoredData;
     }
     if ($data !== null) {
@@ -296,6 +302,39 @@ class AssessRecord
   }
 
   /**
+   * Sets overall status as active/not
+   * @param boolean $active     Set true to mark as active
+   * @param boolean $ispractice Set true if practice (def: false)
+   * @return void
+   */
+  public function setStatus($active, $ispractice = false) {
+    if (empty($this->assessRecord)) {
+      //no assessment record at all
+      return false;
+    }
+    if ($ispractice) {
+      if ($active) {
+        $this->assessRecord['status'] |= 16;
+      } else {
+        $this->assessRecord['status'] = $this->assessRecord['status'] & ~16;
+      }
+    } else {
+      // turn off both
+      $this->assessRecord['status'] = $this->assessRecord['status'] & ~3;
+      // status has bitwise 1: active by-assess attempt
+      // status has bitwise 2: active by-question attempt
+      if ($active) {
+        $submitby = $this->assess_info->getSetting('submitby');
+        if ($submitby == 'by_assessment') {
+          $this->assessRecord['status'] |= 1;
+        } else if ($submitby == 'by_question') {
+          $this->assessRecord['status'] |= 2;
+        }
+      }
+    }
+  }
+
+  /**
    * Determine if there is an unsubmitted assessment attempt
    * This includes not-yet-opened assessment attempts
    * @param boolean $ispractice  True if looking at practice attempts (def: false)
@@ -307,8 +346,10 @@ class AssessRecord
       return false;
     }
     if ($ispractice) {
+      $this->parsePratice();
       $data = $this->practiceData;
     } else {
+      $this->parseScored();
       $data = $this->scoredData;
     }
     if ($data === null) {
@@ -335,6 +376,7 @@ class AssessRecord
         // if no data, can make new
         return true;
       }
+      $this->parseScored();
       $submitby = $this->assess_info->getSetting('submitby');
       $prev_attempt_cnt = count($this->scoredData['assess_versions']);
       // if by-question, then we can if we have no versions yet
@@ -451,8 +493,10 @@ class AssessRecord
   public function getQuestionObject($qn, $is_practice, $include_scores = false, $generate_html = false) {
     // get data structure for this question
     if ($is_practice) {
-      $assessver = $this->practiceData['assess_versions'][0]
+      $this->parsePractice();
+      $assessver = $this->practiceData['assess_versions'][0];
     } else {
+      $this->parseScored();
       $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
     }
     $question_versions = $assessver['questions'][$qn]['question_versions'];
@@ -468,6 +512,7 @@ class AssessRecord
     // set tries
     $parts = array();
     $score = 0;
+    $try = 0;
     if (count($curq['tries']) == 0) {
       // no tries yet
       $parts[0] = array('try' => 0);
@@ -477,21 +522,32 @@ class AssessRecord
       }
     } else {
       // treat everything like multipart
+      $try = 1e10;
       for ($pn = 0; $pn < count($curq['tries']); $pn++) {
         $parts[$pn] = array('try' => count($curq['tries'][$pn]));
         if ($include_scores && $parts[$pn]['try'] > 0) {
           $lasttry = $curq['tries'][$pn][$parts[$pn]['try']-1];
+          $try = min($lasttry,$try);
           $parts[$pn]['score'] = $lasttry['score'];
           $parts[$pn]['rawscore'] = $lasttry['rawscore'];
           $score += $lasttry['score'];
+          // TODO: Set part points
         }
       }
     }
+    $out['try'] = $try;
     $out['parts'] = $parts;
     if ($include_scores) {
       $out['score'] = $score;
       // TODO:  Do we want to return score saved in gb too?
     }
+
+    if ($generate_html) {
+      $out['html'] = '';
+    } else {
+      $out['html'] = null;
+    }
+
     return $out;
   }
 
@@ -502,16 +558,18 @@ class AssessRecord
    * @param  boolean $generate_html Whether to generate question HTML (def: false)
    * @return array  The question object
    */
-  getAllQuestionObjects($is_practice, $include_scores = false, $generate_html = false) {
+  public function getAllQuestionObjects($is_practice, $include_scores = false, $generate_html = false) {
     $out = array();
     // get data structure for current version
     if ($is_practice) {
-      $assessver = $this->practiceData['assess_versions'][0]
+      $this->parsePractice();
+      $assessver = $this->practiceData['assess_versions'][0];
     } else {
+      $this->parseScored();
       $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
     }
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
-      $out["qn$qn"] = this->getQuestionObject($qn, $is_practice, $include_scores, $generate_html);
+      $out[$qn] = $this->getQuestionObject($qn, $is_practice, $include_scores, $generate_html);
     }
     return $out;
   }

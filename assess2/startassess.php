@@ -17,11 +17,12 @@
  *          may also return {error: message} if start fails
  */
 
-require("../init.php");
-require("./common_start.php");
-require("./AssessInfo.php");
-require("./AssessRecord.php");
-require('./AssessUtils.php');
+$init_skip_csrfp = true; // TODO: get CSRFP to work
+require_once("../init.php");
+require_once("./common_start.php");
+require_once("./AssessInfo.php");
+require_once("./AssessRecord.php");
+require_once('./AssessUtils.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -172,7 +173,7 @@ if ($assessInfoOut['submitby'] == 'by_assessment') {
   $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
   $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
   if ($showPrevAttemptScores) {
-    $assessInfoOut['kept_attempt'] = $assess_record->getKeptAttempt();
+    $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
   }
 }
 
