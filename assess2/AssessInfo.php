@@ -16,6 +16,7 @@ class AssessInfo
   private $DBH = null;
   private $assessData = null;
   private $questionData = array();
+  private $questionSetData = array();
   private $exception = null;
   private $exceptionfunc = null;
 
@@ -35,7 +36,8 @@ class AssessInfo
     $this->cid = $cid;
     $this->loadAssessSettings();
     if ($questions !== false) {
-      $this->loadQuestionSettings($questions);
+      $get_code = ($this->assessData['displaymethod'] === 'full');
+      $this->loadQuestionSettings($questions, $get_code);
     }
   }
 
@@ -149,9 +151,11 @@ class AssessInfo
   *                      accepts false for no load, 'all' for all,
   *                      or an array of question IDs.
   *                      Default 'all'.
+  * @param boolean $get_code  set True to load the question code and other fields
+  *                           from imas_questionset.  Gets stored in $questionSetData
   * @return void
   */
-  public function loadQuestionSettings($qids = 'all') {
+  public function loadQuestionSettings($qids = 'all', $get_code = false) {
     if (is_array($qids)) {
       $ph = Sanitize::generateQueryPlaceholders($qids);
       $stm = $this->DBH->prepare("SELECT * FROM imas_questions WHERE id IN ($ph)");
@@ -160,8 +164,18 @@ class AssessInfo
       $stm = $this->DBH->prepare('SELECT * FROM imas_questions WHERE assessmentid = ?');
       $stm->execute(array($this->curAid));
     }
+    $qsids = array();
     while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
       $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
+      $qsids[] = $qrow['questionsetid'];
+    }
+    if ($get_code && count($qsids) > 0) {
+      $ph = Sanitize::generateQueryPlaceholders($qsids);
+      $stm = $this->DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
+      $stm->execute($qsids);
+      while ($qsrow = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $this->questionSetData[$qsrow['id']] = $qsrow;
+      }
     }
   }
 
@@ -196,7 +210,7 @@ class AssessInfo
   public function getQuestionSettings($id) {
     $by_q = array('regens_max','regen_penalty','regen_penalty_after');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
-      'showans','showans_aftern','points_possible');
+      'showans','showans_aftern','points_possible','questionsetid');
     $out = array();
     foreach ($base as $field) {
       $out[$field] = $this->questionData[$id][$field];
@@ -220,6 +234,25 @@ class AssessInfo
     } else {
       return false;
     }
+  }
+
+  /**
+   * Get a setting value from the question Data
+   * @param  int $id    The question ID
+   * @param  string $field  The setting field to grab
+   * @return mixed  the setting value
+   */
+  public function getQuestionSetting($id, $field) {
+    return $this->questionData[$id][$field];
+  }
+
+  /**
+   * Get the questionset code data
+   * @param  int $qsid   questionset ID
+   * @return array of data for the question code
+   */
+  public function getQuestionSetData($qsid) {
+    return $this->questionSetData[$qsid];
   }
 
   /**
@@ -596,7 +629,8 @@ class AssessInfo
     } else if (is_numeric($settings['showans'])) {
       $settings['showans'] = 'after_n';
       $settings['showans_aftern'] = intval($settings['showans']);
-    } else if ($settings['showans'] == 'N') {
+    }
+    if ($settings['showans'] == 'N') {
       $settings['showans'] = 'never';
     } else if ($settings['showans'] == 'L') {
       $settings['showans'] = 'after_lastattempt';
@@ -606,8 +640,8 @@ class AssessInfo
       $settings['showans'] = 'with_score';
     }
 
-    if ($settings['showans'] == -1) {
-      $settings['showans'] = $defaults['showans'];
+    if ($settings['showhints'] == -1) {
+      $settings['showhints'] = $defaults['showhints'];
     }
 
     if (!empty($settings['fixedseeds'])) {

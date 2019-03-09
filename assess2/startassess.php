@@ -12,6 +12,7 @@
  * POST parameters:
  *  password            Password for the assessment, if needed
  *  new_group_members   Comma separated list of userids to add to the group, if allowed
+ *  practice            Set true if starting practice
  *
  * Returns: partial assessInfo object, adding question data if launch successful
  *          may also return {error: message} if start fails
@@ -50,17 +51,25 @@ $assess_record = new AssessRecord($DBH, $assess_info);
 $assess_record->loadRecord($uid);
 
 // reject if not available
-// TODO
-$in_practice = false;
+if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
+  $in_practice = true;
+} else if ($assess_info->getSetting('available') === 'yes') {
+  $in_practice = false;
+} else {
+  echo '{"error": "not_avail"}';
+  exit;
+}
+
 
 // check password, if needed
-if (!$assess_info->checkPassword($_POST['password'])) {
+if (!$in_practice && !$assess_info->checkPassword($_POST['password'])) {
   echo '{"error": "invalid_password"}';
   exit;
 }
 
 // reject start if has current attempt, time limit expired, and is kick out
-if ($assess_record->hasActiveAttempt() &&
+if (!$in_practice &&
+  $assess_record->hasActiveAttempt() &&
   $assess_info->getSetting('timelimit') > 0 &&
   $assess_info->getSetting('timelimit_type') == 'kick_out' &&
   $assess_record->getTimeLimitExpires() < $now
