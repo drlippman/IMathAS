@@ -231,6 +231,8 @@ class AssessInfo
   public function getSetting($key) {
     if (isset($this->assessData[$key])) {
       return $this->assessData[$key];
+    } else if ($key === 'original_enddate' && isset($this->assessData['enddate'])) {
+      return $this->assessData['enddate'];
     } else {
       return false;
     }
@@ -244,6 +246,14 @@ class AssessInfo
    */
   public function getQuestionSetting($id, $field) {
     return $this->questionData[$id][$field];
+  }
+
+  public function getAllQuestionPoints() {
+    $out = array();
+    foreach ($this->questionData as $qid=>$v) {
+      $out[$qid] = $v['points_possible'];
+    }
+    return $out;
   }
 
   /**
