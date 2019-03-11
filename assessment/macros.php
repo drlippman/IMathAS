@@ -767,8 +767,12 @@ function showarrays() {
 				$caption = $opts['caption'];
 			}
 		} else {
-			$format = substr($alist[count($alist)-1],0,1);
+			$format = $alist[count($alist)-1];
 		}
+	}
+	$ncol = floor(count($alist)/2);
+	if ($format !== 'default' && strlen($format) < $ncol) {
+		$format = str_repeat($format[0], $ncol);
 	}
 	if (count($alist)<4 && is_array($alist[0])) {
 		for ($i=0;$i<count($alist[0]);$i++) {
@@ -783,7 +787,7 @@ function showarrays() {
 	}
 	$hashdr = false;
 	$maxlength = 0;
-	for ($i = 0; $i<floor(count($alist)/2); $i++) {
+	for ($i = 0; $i<$ncol; $i++) {
 		if ($alist[2*$i]!='') {
 			$hashdr = true;
 		}
@@ -805,11 +809,13 @@ function showarrays() {
 	for ($j = 0; $j<$maxlength; $j++) {
 		$out .="<tr>";
 		for ($i = 0; $i<floor(count($alist)/2); $i++) {
-			if ($format=='c' || $format=='C') {
+			if ($format == 'default') {
+				$out .= '<td>';
+			} else if ($format[$i]=='c' || $format[$i]=='C') {
 				$out .= '<td class="c">';
-			} else if ($format=='r' || $format=='R') {
+			} else if ($format[$i]=='r' || $format[$i]=='R') {
 				$out .= '<td class="r">';
-			} else if ($format=='l' || $format=='L') {
+			} else if ($format[$i]=='l' || $format[$i]=='L') {
 				$out .= '<td class="l">';
 			} else {
 				$out .= '<td>';
