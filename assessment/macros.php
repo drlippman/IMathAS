@@ -1066,6 +1066,7 @@ function makeprettynegative($exp) {
 }
 
 function randpythag($min=1,$max=100) {
+	list($min,$max) = checkMinMax($min, $max, 'randpythag');
 	$m = $GLOBALS['RND']->rand(ceil(sqrt($min+1)), floor(sqrt($max-1)));
 	$n = $GLOBALS['RND']->rand(1, floor(min($m-1, sqrt($m*$m-$min), sqrt($max-$m*$m))));
 	$v = array($m*$m-$n*$n, 2*$m*$n, $m*$m+$n*$n);
@@ -1140,8 +1141,8 @@ function prettynegs($a) {
 
 function rrand($min,$max,$p=0) {
 	if (func_num_args()!=3) { echo "Error: rrand expects 3 arguments"; return $min;}
-	if ($max < $min) {echo "rrand: Need min&lt;max"; return $min;}
 	if ($p<=0) {echo "Error with rrand: need to set positive step size"; return false;}
+	list($min,$max) = checkMinMax($min, $max, false, 'rrand');
 	
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 	$out = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
@@ -1152,14 +1153,7 @@ function rrand($min,$max,$p=0) {
 
 function rands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "rands expects 3 arguments"; return $min;}
-	if (floor($min)!=$min || floor($max)!=$max) {
-		if ($GLOBALS['myrights']>10) {
-			echo "rands expects integer min and max";
-		}
-		$min = ceil($min);
-		$max = floor($max);
-	}
-	if ($max < $min) {echo "Need min&lt;max"; return $min;}
+	list($min,$max) = checkMinMax($min, $max, true, 'rands');
 	$n = floor($n);
 	if ($n==0) { echo "Need n &gt; 0";}
 	for ($i = 0; $i < $n; $i++) {
@@ -1171,8 +1165,8 @@ function rands($min,$max,$n=0) {
 
 function rrands($min,$max,$p=0,$n=0) {
 	if (func_num_args()!=4) { echo "rrands expects 4 arguments"; return $min;}
-	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	if ($p<=0) {echo "Error with rrands: need to set positive step size"; return false;}
+	list($min,$max) = checkMinMax($min, $max, false, 'rrands');
 	
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
@@ -1230,17 +1224,8 @@ function diffrandsfrom($lst,$n) {
 
 function nonzerorand($min,$max) {
 	if (func_num_args()!=2) { echo "nonzerorand expects 2 arguments"; return $min;}
-	if (floor($min)!=$min || floor($max)!=$max) {
-		if ($GLOBALS['myrights']>10) {
-			echo "nonzerorand expects integer min and max";
-		}
-		$min = ceil($min);
-		$max = floor($max);
-	}
-	if ($max < $min) {echo "Need min&lt;max"; return $min;}
-	if ($min==0 && $max==0) {
-		echo "min=0, max=0 bad."; return 0;
-	}
+	list($min,$max) = checkMinMax($min, $max, true, 'nonzerorand');
+	if ($min == 0 && $max == 0) { return 0; }
 	do {
 		$ret = $GLOBALS['RND']->rand($min,$max);
 	} while ($ret == 0);
@@ -1250,14 +1235,12 @@ function nonzerorand($min,$max) {
 
 function nonzerorrand($min,$max,$p=0) {
 	if (func_num_args()!=3) { echo "nonzerorrand expects 3 arguments"; return $min;}
-	if ($max < $min) {echo "Need min&lt;max"; return $min;}
-	if ($min==0 && $max==0) {
-		echo "min=0, max=0 bad."; return 0;
-	}
+	list($min,$max) = checkMinMax($min, $max, false, 'nonzerorrand');
+	if ($min == 0 && $max == 0) { return 0; }
+	if ($p<=0) {echo "Error with nonzerorrand: need to set positive step size"; return $min;}
 	if (floor(($max-$min)/$p)==0) {
 		return $min;
 	}
-	if ($p<=0) {echo "Error with nonzerorrand: need to set positive step size"; return $min;}
 	
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
@@ -1271,19 +1254,9 @@ function nonzerorrand($min,$max,$p=0) {
 
 function nonzerorands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "nonzerorands expects 3 arguments"; return $min;}
-	if (floor($min)!=$min || floor($max)!=$max) {
-		if ($GLOBALS['myrights']>10) {
-			echo "nonzerorands expects integer min and max";
-		}
-		$min = ceil($min);
-		$max = floor($max);
-	}
-	$min = ceil($min);
-	$max = floor($max);
-	if ($max < $min) {echo "Need min&lt;max"; return array_fill(0,$n,$min);}
-	if ($min==0 && $max==0) {
-		echo "min=0, max=0 bad."; return 0;
-	}
+	list($min,$max) = checkMinMax($min, $max, true, 'nonzerorands');
+	if ($min == 0 && $max == 0) { return 0; }
+	
 	for ($i = 0; $i < $n; $i++) {
 		do {
 			$r[$i] = $GLOBALS['RND']->rand($min,$max);
@@ -1295,11 +1268,9 @@ function nonzerorands($min,$max,$n=0) {
 
 function nonzerorrands($min,$max,$p=0,$n=0) {
 	if (func_num_args()!=4) { echo "nonzerorrands expects 4 arguments"; return $min;}
-	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	$n = floor($n);
-	if ($min==0 && $max==0) {
-		echo "min=0, max=0 bad."; return 0;
-	}
+	list($min,$max) = checkMinMax($min, $max, false, 'nonzerorrands');
+	
 	if ($p<=0) {echo "Error with nonzerorrands: need to set positive step size"; return array_fill(0,$n,$min);}
 	if (floor(($max-$min)/$p)==0) {
 		return array_fill(0, $n, $min);
@@ -1319,15 +1290,15 @@ function nonzerorrands($min,$max,$p=0,$n=0) {
 
 function diffrands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "diffrands expects 3 arguments"; return $min;}
-	if (floor($min)!=$min || floor($max)!=$max) {
+	list($min,$max) = checkMinMax($min, $max, true, 'diffrands');
+	if ($max == $min) {echo "diffrands: Need min&lt;max"; return array_fill(0,$n,$min);}
+	if ($n > $max-$min+1) {
 		if ($GLOBALS['myrights']>10) {
-			echo "diffrands expects integer min and max";
+			echo "diffrands: min-max not far enough for n requested";
 		}
-		$min = ceil($min);
-		$max = floor($max);
 	}
+	
 	$n = floor($n);
-	if ($max < $min) {echo "Need min&lt;max"; return array_fill(0,$n,$min);}
 	if ($n<.1*($max-$min)) {
 		$out = array();
 		while (count($out)<$n) {
@@ -1351,10 +1322,8 @@ function diffrands($min,$max,$n=0) {
 function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 	if (func_num_args()<4) { echo "diffrrands expects 4 arguments"; return $min;}
 	$n = floor($n);
-	if ($max < $min) {echo "Need min&lt;max"; return array_fill(0,$n,$min);}
-	if ($min==0 && $max==0) {
-		echo "min=0, max=0 bad."; return array_fill(0,$n,0);
-	}
+	list($min,$max) = checkMinMax($min, $max, false, 'diffrrands');
+	
 	if ($p<=0) {echo "Error with diffrrands: need to set positive step size"; return array_fill(0,$n,$min);}
 
 	if (floor(($max-$min)/$p)==0) {
@@ -1399,17 +1368,14 @@ function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 
 function nonzerodiffrands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "nonzerodiffrands expects 3 arguments"; return $min;}
-	if (floor($min)!=$min || floor($max)!=$max) {
+	list($min,$max) = checkMinMax($min, $max, true, 'nonzerodiffrands');
+	if ($max == $min) {echo "nonzerodiffrands: Need min&lt;max"; return array_fill(0,$n,$min);}
+	if ($n > $max-$min+1 || ($min*$max<=0 && $n>$max-$min)) {
 		if ($GLOBALS['myrights']>10) {
-			echo "nonzerodiffrands expects integer min and max";
+			echo "nonzerodiffrands: min-max not far enough for n requested";
 		}
-		$min = ceil($min);
-		$max = floor($max);
 	}
-	if ($max < $min) {echo "Need min&lt;max"; return array_fill(0,$n,$min);}
-	if ($min==0 && $max==0) {
-		echo "min=0, max=0 bad."; return array_fill(0,$n,$min);
-	}
+	
 	if ($n<.1*($max-$min)) {
 		$out = array();
 		while (count($out)<$n) {
@@ -1423,6 +1389,9 @@ function nonzerodiffrands($min,$max,$n=0) {
 		$r = range($min,$max);
 		if ($min <= 0 && $max >= 0) {
 			array_splice($r,-1*$min,1);
+		}
+		while ($n>count($r)) {
+			$r = array_merge($r,$r);
 		}
 		$GLOBALS['RND']->shuffle($r);
 		return array_slice($r,0,$n);
@@ -4064,5 +4033,43 @@ function getRoundNumber($val) {
 		return (strlen($str) - $s - 1);
 	}
 }
+
+function checkMinMax($min, $max, $isint, $funcname) {
+	$err = '';
+	if (!is_numeric($min) || !is_numeric($max)) {
+		$err .= "min and max need to be numbers. ";
+	} else if (is_infinite($min) || is_infinite($max)) {
+		$err .= "min and max need to be finite values. ";
+		$min = 1;
+		$max = 10;
+	} else if ($isint && (floor($min)!=$min || floor($max)!=$max)) {
+		$err .= "rands expects integer min and max. ";
+		$min = ceil($min);
+		$max = floor($max);
+	}
+	if ($isint) {
+		$min = intval($min);
+		$max = intval($max);
+	} else {
+		$min = floatval($min);
+		$max = floatval($max);
+	}
+	if ($max < $min) {
+		$err .= "Need min&lt;max. "; 
+		$t = $max;
+		$max = $min;
+		$min = $t;
+	}
+	if ($max == 0 && $min == 0) {
+		$err .= "min=0 and max=0. May suggest a problem. ";
+	}
+	if ($GLOBALS['myrights']>10 && $err!='') {
+		echo "Possible error in ".Sanitize::encodeStringForDisplay($funcname).': ';
+		echo $err;
+	}
+	return array($min,$max);
+}
+	
+	
 
 ?>

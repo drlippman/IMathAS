@@ -1001,6 +1001,7 @@ jQuery(document).ready(function($) {
       $allVideos.each(function(){
         var $this = $(this);
         if ($this.closest(".textsegment").length>0) {return true;}
+        if ($this.closest(".fluid-width-video-wrapper").length>0) {return true;}
         $this.parentsUntil(".intro","table").each(function() {
         	$(this).css('width','100%');
         });

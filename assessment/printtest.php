@@ -26,8 +26,8 @@
 	}
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("header.php");
-	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn, button.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;} .question, .review {background-color:#fff;}</style>\n";
-	echo "<style type=\"text/css\">p.tips {	display: none;} input.sabtn { display: none;}</style>\n";
+	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn, button.btn {display: none;}\n textarea {display: none;}\n .question, .review {background-color:#fff;}</style>\n";
+	echo "<style type=\"text/css\">p.tips {	display: none;} input.sabtn,input.dsbtn {display: none;}</style>\n";
 	echo '<script type="text/javascript">
 		function rendersa() { 
 			$(".sabtn + span").prepend("<span>Answer: </span>").removeClass("hidden");

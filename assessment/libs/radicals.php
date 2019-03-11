@@ -16,7 +16,13 @@ function reduceradical($in,$root=2,$format="string") {
 	if ($in<0 && ($root%2==0)) {
 		echo "even roots of negatives can't be handled";
 		return;
-	} if ($root==0) {
+	} else if ($root < 0) {
+		echo 'negative roots not supported in reduceradical';
+		return;
+	} else if (is_infinite($in) || is_infinite($root)) {
+		echo 'infinte values not supported in reduceradical';
+		return;
+	} else if ($root==0) {
 		if (is_string($root)) {
 			echo "can't provide a string as the root value - check your parameters";
 			return;
@@ -29,6 +35,7 @@ function reduceradical($in,$root=2,$format="string") {
 	} else {
 		$sign = '';
 	}
+	$root = intval($root);
 	$in = abs($in);
 	$max = 	pow($in,1/$root);
 	$out = 1;

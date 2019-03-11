@@ -43,7 +43,7 @@ if ($myrights<20) {
 			$chk = "&checked=0";
 		} else {
 			$chk = '';
-		}
+		}                                      
 		if ($onlychk==1) {
 		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','$loc',true);";
 		} else {
@@ -159,7 +159,7 @@ if ($overwriteBody==1) {
 		}
 		
 		$(window).on('beforeunload', function() { 
-			if (window.opener && !window.opener.closed) {
+			if (window.opener && !window.opener.closed  && window.opener.sethighlightrow) {
 				window.opener.sethighlightrow(-1);
 			}
 		});
@@ -169,7 +169,7 @@ if ($overwriteBody==1) {
 		echo '<p>';
 		echo "<script type=\"text/javascript\">";
 		echo "var numchked = -1;";
-		echo "if (window.opener && !window.opener.closed) {";
+		echo "if (window.opener && !window.opener.closed && window.opener.sethighlightrow && window.opener.getnextprev) {";
 		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
 		echo " if (prevnext[0][1]>0){
@@ -195,12 +195,17 @@ if ($overwriteBody==1) {
 	}
 
 	if (isset($_GET['checked'])) {
-		echo "<p><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
+		echo "<p id=usecheckwrap><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
 		echo "/> Mark Question for Use</p>";
 		echo "
 		  <script type=\"text/javascript\">
 		  var parentcbox = opener.document.getElementById(\"$loc\");
-		  document.getElementById(\"usecheck\").checked = parentcbox.checked;
+		  if (!parentcbox) {
+		  	$('#usecheckwrap').hide();
+		  } else {
+		  	$('#usecheckwrap').show();
+		  	document.getElementById(\"usecheck\").checked = parentcbox.checked;
+		  }
 		  function togglechk(ischk) {
 			  if (numchked!=-1) {
 				if (ischk) {
