@@ -508,7 +508,7 @@ class AssessRecord
 
     // set tries
     $parts = array();
-    $score = 0;
+    $score = -1;
     $try = 0;
     if (count($curq['tries']) == 0) {
       // no tries yet
@@ -520,13 +520,14 @@ class AssessRecord
     } else {
       // treat everything like multipart
       $try = 1e10;
+      $score = 0;
       for ($pn = 0; $pn < count($curq['tries']); $pn++) {
         $parts[$pn] = array('try' => count($curq['tries'][$pn]));
+        $try = min($try,$parts[$pn]['try']);
         if ($include_scores && $parts[$pn]['try'] > 0) {
           $lasttry = $curq['tries'][$pn][$parts[$pn]['try']-1];
-          $try = min($lasttry,$try);
-          $parts[$pn]['score'] = $lasttry['score'];
-          $parts[$pn]['rawscore'] = $lasttry['rawscore'];
+          $parts[$pn]['score'] = floatval($lasttry['score']);
+          $parts[$pn]['rawscore'] = floatval($lasttry['raw']);
           $score += $lasttry['score'];
           // TODO: Set part points?
         }
@@ -534,7 +535,7 @@ class AssessRecord
     }
     $out['try'] = $try;
     $out['parts'] = $parts;
-    if ($include_scores) {
+    if ($include_scores && $score != -1) {
       $out['score'] = $score;
       // TODO:  Do we want to return score saved in gb too?
     }
@@ -700,11 +701,13 @@ class AssessRecord
     // TODO need better way to get student's answer and unrand and such
     // TODO: rework this to handle singlescore questions
     $rawparts = explode('~', $rawscores);
+    $scores = explode('~', $scores);
     foreach ($rawparts as $k=>$v) {
       if ($parts_to_score === true || $parts_to_score[$k] === true) {
         $data[$k] = array(
           'sub' => $submission,
-          'score' => $v,
+          'score' => $scores[$k],
+          'raw' => $v,
           'time' => 0, // TODO
           'stuans' => $_POST['qn'.$qn]   // TODO: this is wrong for most types
         );

@@ -159,7 +159,7 @@ class AssessInfo
     if (is_array($qids)) {
       $ph = Sanitize::generateQueryPlaceholders($qids);
       $stm = $this->DBH->prepare("SELECT * FROM imas_questions WHERE id IN ($ph)");
-      $stm->execute($qids);
+      $stm->execute(array_values($qids));
     } else {
       $stm = $this->DBH->prepare('SELECT * FROM imas_questions WHERE assessmentid = ?');
       $stm->execute(array($this->curAid));
@@ -172,7 +172,7 @@ class AssessInfo
     if ($get_code && count($qsids) > 0) {
       $ph = Sanitize::generateQueryPlaceholders($qsids);
       $stm = $this->DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
-      $stm->execute($qsids);
+      $stm->execute(array_values($qsids));
       while ($qsrow = $stm->fetch(PDO::FETCH_ASSOC)) {
         $this->questionSetData[$qsrow['id']] = $qsrow;
       }
