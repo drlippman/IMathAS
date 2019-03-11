@@ -1262,10 +1262,18 @@ function chi2teststat($m) {
 //Computes the area to the left of x under the chi-squared disribution
 //with df degrees of freedom
 function chi2cdf($x,$a) {
+	if ($x<0 || !is_finite($x) || $a < 1) {
+		echo 'Invalid input to chi2cdf';
+		return 0;
+	}
 	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
 }
 
 function chicdf($x,$a) {
+	if ($x<0 || !is_finite($x) || $a < 1) {
+		echo 'Invalid input to chi2cdf';
+		return 0;
+	}
 	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
 }
 
