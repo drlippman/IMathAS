@@ -823,6 +823,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$stuanswers[$thisq][$kidx] = implode('|',$tmp);
 			}
 		}
+		ksort($stuanswers[$thisq]);
+		ksort($stuanswersval[$thisq]);
 	} else {
 		if (isset($_POST["tc$qnidx"])) {
 			$stuanswers[$thisq] = $_POST["tc$qnidx"];
@@ -871,6 +873,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$stuanswers[$thisq] = implode('|',$tmp);
 		}
 	}
+
 	$preevalerror = error_get_last();
 	try {
 		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
