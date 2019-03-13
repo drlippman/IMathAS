@@ -21,6 +21,7 @@ class AssessRecord
   private $hasRecord = false;
   private $scoredData = null;
   private $practiceData = null;
+  private $in_practice = false;
   private $status = 'no_record';
   private $now = 0;
   private $penalties = array();
@@ -53,6 +54,14 @@ class AssessRecord
     } else {
       $this->hasRecord = true;
     }
+  }
+
+  /**
+   * Sets whether we're working in practice mode
+   * @param boolean $in_practice  True if working in practice mode
+   */
+  public function setInPractice($in_practice) {
+    $this->in_practice = $in_practice;
   }
 
   /**
@@ -113,10 +122,9 @@ class AssessRecord
    * @param  int     $stugroupid    The stugroup ID, or 0 if not group (def: 0)
    * @param  boolean $recordStart   true to record the starttime now (def: true)
    * @param  string  $lti_sourcedid The LTI sourcedid (def: '')
-   * @param  boolean $inpractice    True if in practice mode, to gen practice data (def: false)
    * @return void
    */
-  public function createRecord($users = false, $stugroupid = 0, $recordStart = true, $lti_sourcedid = '', $inpractice = false) {
+  public function createRecord($users = false, $stugroupid = 0, $recordStart = true, $lti_sourcedid = '') {
     // if group, lookup group members. Otherwise just use current user
     if ($users === false) {
       $users = array($this->curUid);
@@ -141,7 +149,7 @@ class AssessRecord
     // initialize scoredData
     $this->buildAssessData(false, $recordStart);
     // if in practice, initialize practiceData
-    if ($inpractice) {
+    if ($this->in_practice) {
       $this->buildAssessData(true, $recordStart);
     }
 
@@ -233,6 +241,8 @@ class AssessRecord
     // build question data
     for ($k = 0; $k < count($questions); $k++) {
       $out['questions'][] = array(
+        'score' => 0,
+        'rawscore' => 0,
         'scored_version' => 0,
         'question_versions' => array(
           array(
@@ -398,7 +408,7 @@ class AssessRecord
 
 
   /**
-   * Get data on submitted attempts
+   * Get data on submitted assessment attempts
    *
    * @param boolean $includeScores  Whether to include scores. Default: false
    * @return array        An array of previous attempt info.  Each element is an
@@ -490,26 +500,56 @@ class AssessRecord
    * @param  int  $qn            Question number (0 indexed)
    * @param  boolean $is_practice Whether to use practice data (def: false)
    * @param  boolean $include_scores Whether to include scores (def: false)
+   * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
    * @param  boolean $generate_html Whether to generate question HTML (def: false)
    * @param int  $ver               Which version to grab data for, or 'last' for most recent
    * @return array  The question object
    */
-  public function getQuestionObject($qn, $is_practice, $include_scores = false, $generate_html = false, $ver = 'last') {
+  public function getQuestionObject($qn, $is_practice = false, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $due_date = $this->assess_info->getSetting('original_enddate');
+
     // get data structure for this question
-    $curq = $this->getQuestionVer($qn, $is_practice, $ver);
+    $aver = $this->getAssessVer($is_practice, $ver);
+    $question_versions = $aver['questions'][$qn]['question_versions'];
+    if (!$by_question || $ver === 'last') {
+      $curq = $question_versions[count($question_versions) - 1];
+    } else {
+      $curq = $question_versions[$ver];
+    }
+
+    if ($is_practice) {
+      $data = &$this->practiceData;
+    } else {
+      $data = &$this->scoredData;
+    }
 
     // get basic settings
     $out = $this->assess_info->getQuestionSettings($curq['qid']);
 
+    // get regen number, and gradebook score for by_question
     if ($by_question) {
-      $out['regen'] = count($question_versions);
+      if ($ver === 'last') {
+        $regen = count($aver['questions'][$qn]['question_versions']);
+      } else {
+        $regen = $ver;
+      }
+      $out['regen'] = $regen;
+      $out['gbscore'] = $aver['questions'][$qn]['score'];
+      $out['gbrawscore'] = $aver['questions'][$qn]['rawscore'];
+    } else {
+      if ($ver === 'last') {
+        $regen = count($data['assess_versions']);
+      } else {
+        $regen = $ver;
+      }
     }
 
     // set tries
     $parts = array();
     $score = -1;
     $try = 0;
+    $status = 'unattempted';
     if (count($curq['tries']) == 0) {
       // no tries yet
       $parts[0] = array('try' => 0);
@@ -521,20 +561,45 @@ class AssessRecord
       // treat everything like multipart
       $try = 1e10;
       $score = 0;
+      $raw = 0;
+      $status = 'attempted';
+      if ($include_scores) {
+        list($score, $raw, $parts) = $this->getQuestionPartScores($qn, $is_practice, $ver, 'last');
+      } else if ($include_parts) {
+        $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
+        $answeightTot = array_sum($answeights);
+      }
       for ($pn = 0; $pn < count($curq['tries']); $pn++) {
-        $parts[$pn] = array('try' => count($curq['tries'][$pn]));
-        $try = min($try,$parts[$pn]['try']);
-        if ($include_scores && $parts[$pn]['try'] > 0) {
-          $lasttry = $curq['tries'][$pn][$parts[$pn]['try']-1];
-          $parts[$pn]['score'] = floatval($lasttry['score']);
-          $parts[$pn]['rawscore'] = floatval($lasttry['raw']);
-          $score += $lasttry['score'];
-          // TODO: Set part points?
+        // get part details
+        $parttry = count($curq['tries'][$pn]);
+        $try = min($try, $parttry);
+        if ($parttry === 0) {
+          // if any parts are unattempted, mark question as such
+          $status = 'unattempted';
+        }
+        if ($include_scores) {
+          if ($status != 'unattempted') {
+            if ($parts[$pn]['rawscore'] > .99) {
+              $status = ($status === 'incorrect' || $status === 'partial') ? 'partial': 'correct';
+            } else if ($parts[$pn]['rawscore'] < .01) {
+              $status = ($status === 'correct' || $status === 'partial') ? 'partial': 'incorrect';
+            } else {
+              $status = 'partial';
+            }
+          }
+        } else if ($include_parts) {
+          $parts = array(
+            'try' => $parttry,
+            'points_possible' => $out['points_possible'] * $answeights[$pn]/$answeightTot
+          );
         }
       }
     }
     $out['try'] = $try;
-    $out['parts'] = $parts;
+    if ($include_parts) {
+      $out['parts'] = $parts;
+    }
+    $out['status'] = $status;
     if ($include_scores && $score != -1) {
       $out['score'] = $score;
       // TODO:  Do we want to return score saved in gb too?
@@ -553,18 +618,121 @@ class AssessRecord
    * Generate the question API object for all questions
    * @param  boolean $is_practice Whether to use practice data (def: false)
    * @param  boolean $include_scores Whether to include scores (def: false)
+   * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
    * @param  boolean $generate_html Whether to generate question HTML (def: false)
    * @param int  $ver               Which version to grab data for, or 'last' for most recent
    * @return array  The question object
    */
-  public function getAllQuestionObjects($is_practice, $include_scores = false, $generate_html = false, $ver = 'last') {
+  public function getAllQuestionObjects($is_practice = false, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
     $out = array();
     // get data structure for current version
     $assessver = $this->getAssessVer($is_practice, $ver);
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
-      $out[$qn] = $this->getQuestionObject($qn, $is_practice, $include_scores, $generate_html, $ver);
+      $out[$qn] = $this->getQuestionObject($qn, $is_practice, $include_scores, $include_parts, $generate_html, $ver);
     }
     return $out;
+  }
+
+  /**
+   * get question part score details
+   * @param  int  $qn             The question number
+   * @param  boolean $is_practice Whether using practice data
+   * @param  string  $ver         The attempt to use, or 'last' for most recent
+   * @param  string  $try         'last' for last try, or 'all' to pick best try per-part
+   * @return array (question Score, question Rawscore, parts details)
+   *    Where part details is array by part, with (try, score, rawscore, penalties, points_possible)
+   */
+  public function getQuestionPartScores ($qn, $is_practice, $ver = 'last', $try = 'last') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $due_date = $this->assess_info->getSetting('original_enddate');
+    $starttime = $this->assessRecord['starttime'];
+
+    if ($is_practice) {
+      $assessver = $this->practiceData['assess_versions'][0];
+    } else {
+      if ($by_question || $ver === 'last') {
+        $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
+        if (!$by_question) {
+          $regen = count($this->scoredData['assess_versions']);
+        }
+      } else {
+        $assessver = $this->scoredData['assess_versions'][$ver];
+        $regen = $ver;
+      }
+    }
+
+    // get data structure for this question
+    $question_versions = $assessver['questions'][$qn]['question_versions'];
+    if (!$by_question || $ver === 'last') {
+      $qver = $question_versions[count($question_versions) - 1];
+      if ($by_question) {
+        $regen = count($question_versions);
+      }
+    } else {
+      $qver = $question_versions[$ver];
+      $regen = $ver;
+    }
+
+    $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
+    $this->penalties = array(
+      'retry_penalty' => $qsettings['retry_penalty'],
+      'retry_penalty_after' => $qsettings['retry_penalty_after'],
+      'regen_penalty' => $qsettings['regen_penalty'],
+      'regen_penalty_after' => $qsettings['regen_penalty_after'],
+      'exceptionpenalty' => $this->assess_info->getSetting('exceptionpenalty')
+    );
+    $answeights = isset($qver['answeights']) ? $qver['answeights'] : array(1);
+    $answeightTot = array_sum($answeights);
+    $partscores = array_fill(0, count($answeights), 0);
+    $partrawscores = array_fill(0, count($answeights), 0);
+    $parts = array();
+    // loop over each part
+    for ($pn = 0; $pn < count($qver['tries']); $pn++) {
+      $max = count($qver['tries'][$pn]) - 1;
+      if ($max == -1) {
+        // no tries yet
+        $parts[$pn] = array(
+          'try' => 0,
+          'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
+        );
+        continue;
+      }
+      if ($try === 'last') {
+        $min = $max;
+      } else {
+        $min = 0;
+      }
+      $penaltyList = array();
+      for ($pa = $min; $pa <= $max; $pa++) {
+        $parttry = $qver['tries'][$pn][$pa];
+        if ($parttry['raw'] > 0) {
+          list($scoreAfterPenalty,$penaltyList) = $this->scoreAfterPenalty(
+            $parttry['raw'],   // score
+            $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,
+                                // points possible
+            $pa,                 // the try number
+            $regen,             // the regen number
+            $due_date,           // the due date
+            $starttime + $data['submissions'][$parttry['sub']], // submission time
+            true
+          );
+          if ($scoreAfterPenalty > $partscores[$pn]) {
+            $partscores[$pn] = $scoreAfterPenalty;
+            $partrawscores[$pn] = $parttry['raw']*1;
+          }
+        }
+      }
+      $parts[$pn] = array(
+        'try' => count($qver['tries'][$pn]),
+        'score' => $partscores[$pn],
+        'rawscore' => $partrawscores[$pn],
+        'penalties' => $penaltyList,
+        'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
+      );
+    }
+    $qScore = array_sum($partscores);
+    $qRawscore = array_sum($partrawscores);
+    return array($qScore, $qRawscore, $parts);
   }
 
   /**
@@ -706,7 +874,6 @@ class AssessRecord
       if ($parts_to_score === true || $parts_to_score[$k] === true) {
         $data[$k] = array(
           'sub' => $submission,
-          'score' => $scores[$k],
           'raw' => $v,
           'time' => 0, // TODO
           'stuans' => $_POST['qn'.$qn]   // TODO: this is wrong for most types
@@ -790,16 +957,12 @@ class AssessRecord
   /**
    * Recalculate the assessment total score, updating the record
    * @param  boolean $in_practice Whether to total practice data
+   * @param  mixed  $rescoreQs   'all' to rescore all, or array of question numbers to re-score
    * @return float   The final assessment total
    */
-  public function reTotalAssess($in_practice) {
+  public function reTotalAssess($in_practice, $rescoreQs = 'all') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-    $due_date = $this->assess_info->getSetting('original_enddate');
-    $starttime = $this->assessRecord['starttime'];
-    $this->penalties = $this->assess_info->extractSettings(array(
-      'retry_penalty', 'retry_penalty_after', 'regen_penalty',
-      'regen_penalty_after', 'exceptionpenalty'
-    ));
+
     $points = $this->assess_info->getAllQuestionPoints();
     if ($is_practice) {
       $this->parsePractice();
@@ -818,46 +981,33 @@ class AssessRecord
       // loop through the question numbers
       $aVerScore = 0;
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
+        if ($rescoreQs !== 'all' && !in_array($qn, $rescoreQs)) {
+          $aVerScore += $curAver['questions'][$qn]['score'];
+          continue;
+        }
         // loop through the question versions
         $maxQscore = 0;
+        $maxQrawscore = 0;
         $qScoredVer = 0;
         for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
           $curQver = &$curAver['questions'][$qn]['question_versions'][$qv];
           if (isset($curQver['scoreoverride'])) {
             $qScore = $curQver['scoreoverride'];
           } else {
-            $answeights = isset($curQver['answeights']) ? $curQver['answeights'] : array(1);
-            $answeightTot = array_sum($answeights);
-            $partscores = array_fill(0, count($answeights), 0);
-            // loop over each part
-            for ($pn = 0; $pn < count($curQver['tries']); $pn++) {
-              foreach ($curQver['tries'][$pn] as $pa => $parttry) {
-                if ($parttry['score'] > 0) {
-                  $scoreAfterPenalty = $this->scoreAfterPenalty(
-                    $parttry['score'],   // score
-                    $points[$curQver['qid']] * $answeights[$pn]/$answeightTot,
-                                        // points possible
-                    $pa,                 // the try number
-                    max($av, $qv),       // the regen number
-                    $due_date,           // the due date
-                    $starttime + $data['submissions'][$parttry['sub']] // submission time
-                  );
-                  if ($scoreAfterPenalty > $partscores[$pn]) {
-                    $partscores[$pn] = $scoreAfterPenalty;
-                  }
-                }
-              }
-            }
-            $qScore = array_sum($partscores);
+            list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, $in_practice, max($av,$qv), 'all');
           }
           if ($qScore >= $maxQscore) {
             $maxQscore = $qScore;
+            $maxQrawscore = $qRawscore;
             $qScoredVer = $qv;
           }
+
         } // end loop over question versions
         if ($by_question) {
           $curAver['questions'][$qn]['scoredversion'] = $qScoredVer;
         }
+        $curAver['questions'][$qn]['score'] = $maxQscore;
+        $curAver['questions'][$qn]['rawscore'] = $maxQrawscore;
         $aVerScore += $maxQscore;
       } // end loop over questions
       $curAver['score'] = $aVerScore;
@@ -872,6 +1022,7 @@ class AssessRecord
     if (!$in_practice) {
       $this->assessRecord['score'] = $maxAscore;
     }
+
     return $maxAscore;
   }
 
@@ -913,31 +1064,41 @@ class AssessRecord
   /**
    * Calculate the score on a question after applying penalties
    * @param  float $score    Raw score, 0-1
-   * @param  flaat $points   Points possible
+   * @param  float $points   Points possible
    * @param  int $try        The try number
    * @param  int $regen      The regen number
    * @param  int $duedate    Original due date timestamp
    * @param  int $subtime    Timestamp question was submitted
-   * @return float  score after penalties
+   * @param boolean $returnPenalties  Set true to return array of penalties applied (def: false)
+   * @return float  score after penalties if $returnPenalties = false
+   *         array(score, array of penalties) if $returnPenalties = true
    */
-  private function scoreAfterPenalty($score, $points, $try, $regen, $duedate, $subtime) {
+  private function scoreAfterPenalty($score, $points, $try, $regen, $duedate, $subtime, $returnPenalties = false) {
     $base = $score * $points;
+    $penalties = array();
     if ($this->penalties['retry_penalty'] > 0) {
       $triesOver = $try + 1 - (isset($this->penalties['retry_penalty_after']) ? $this->penalties['retry_penalty_after'] : 1);
       if ($triesOver > 0) {
         $base *= (1 - $triesOver * $this->penalties['retry_penalty']/100);
+        $penalties[] = array('retry', $triesOver * $this->penalties['retry_penalty']);
       }
     }
     if ($this->penalties['regen_penalty'] > 0) {
       $regensOver = $regen + 1 - (isset($this->penalties['regen_penalty_after']) ? $this->penalties['regen_penalty_after'] : 1);
       if ($regensOver > 0) {
         $base *= (1 - $regenOver * $this->penalties['regen_penalty']/100);
+        $penalties[] = array('regen', $regenOver * $this->penalties['regen_penalty']);
       }
     }
     if ($this->penalties['exceptionpenalty'] > 0 && $subtime > $duedate) {
       $base *= (1 - $this->penalties['exceptionpenalty'] / 100);
+      $penalties[] = array('late', $this->penalties['exceptionpenalty']);
     }
-    return $base;
+    if ($returnPenalties) {
+      return array($base, $penalties);
+    } else {
+      return $base;
+    }
   }
 
 

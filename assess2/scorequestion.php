@@ -144,7 +144,7 @@ $assess_record->saveRecord(!$in_practice, $in_practice);
 $showscores = $assess_info->showScoresDuring();
 $assessInfoOut['questions'] = array();
 foreach ($qns as $qn) {
-  $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $in_practice, $showscores, true);
+  $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $in_practice, $showscores, true, true);
 }
 
 //output JSON object

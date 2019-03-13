@@ -189,7 +189,7 @@ if ($assessInfoOut['submitby'] == 'by_assessment') {
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
 $generate_html = ($assess_info->getSetting('displaymethod') == 'full');
-$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, $generate_html);
+$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, $generate_html, $generate_html);
 
 //output JSON object
 echo json_encode($assessInfoOut);

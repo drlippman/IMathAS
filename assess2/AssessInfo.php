@@ -210,7 +210,8 @@ class AssessInfo
   public function getQuestionSettings($id) {
     $by_q = array('regens_max','regen_penalty','regen_penalty_after');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
-      'showans','showans_aftern','points_possible','questionsetid');
+      'showans','showans_aftern','points_possible','questionsetid',
+      'category');
     $out = array();
     foreach ($base as $field) {
       $out[$field] = $this->questionData[$id][$field];
@@ -652,6 +653,10 @@ class AssessInfo
 
     if ($settings['showhints'] == -1) {
       $settings['showhints'] = $defaults['showhints'];
+    }
+
+    if ($settings['category'] === '0') {
+      $settings['category'] = '';
     }
 
     if (!empty($settings['fixedseeds'])) {

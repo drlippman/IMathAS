@@ -112,7 +112,7 @@ $assess_info->loadQuestionSettings(array($qid), true);
 // grab question settings data with HTML
 $showscores = $assess_info->showScoresDuring();
 $assessInfoOut['questions'] = array(
-  $qn => $assess_record->getQuestionObject($qn, $in_practice, $showscores, true)
+  $qn => $assess_record->getQuestionObject($qn, $in_practice, $showscores, true, true)
 );
 
 //output JSON object
