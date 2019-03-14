@@ -865,7 +865,7 @@ class AssessRecord
         $showans = false;
       }
       if ($showscores && $partattemptn[$pn] > 0) {
-        $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['score'];
+        $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
       }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : min($partattemptn);
