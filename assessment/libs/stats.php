@@ -486,8 +486,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
 function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
-	if (!is_array($label) || !is_array($freq)) {echo "labels and freqarray must be arrays"; return 0;}
-	if (count($label) != count($freq)) { echo "labels and freqarray must have same length"; return 0;}
+	if (!is_array($freq)) {echo "freqarray must be an array"; return 0;}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	$x = $start;
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
