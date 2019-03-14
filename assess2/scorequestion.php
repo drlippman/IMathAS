@@ -139,6 +139,7 @@ if (count($qns) > 0) {
 
   // Recalculate scores
   $assess_record->reTotalAssess($in_practice);
+  // TODO: if by-question and all questions attempted, update status
 } else {
   $assess_info->loadQuestionSettings('all', false);
 }
@@ -148,7 +149,7 @@ if ($end_attempt) {
 }
 
 // Record record
-$assess_record->saveRecord(!$in_practice, $in_practice);
+//$assess_record->saveRecord(!$in_practice, $in_practice);
 
 if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
@@ -164,6 +165,9 @@ if ($end_attempt) {
     $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $in_practice, $showscores, true, true);
   }
 }
+
+// save record if needed
+$assess_record->saveRecordIfNeeded(!$in_practice, $in_practice);
 
 //output JSON object
 echo json_encode($assessInfoOut);

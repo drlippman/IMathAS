@@ -282,6 +282,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['nocolormark'])) {  //no colors
 		$qcolors = array();
 	}
+	$GLOBALS['lastansweights'] = array();
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		if (!isset($anstypes) && $GLOBALS['myrights']>10) {
 			echo 'Error in question: missing $anstypes for multipart or conditional question';
@@ -310,6 +311,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					$answeights = array(1);
 				}
 			}
+			$GLOBALS['lastansweights'] = $answeights;
 		}
 		$laparts = explode("&",$la);
 
@@ -334,7 +336,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$showanswer = _('Answers may vary');
 		}
 	}
-
 
 	if ($returnqtxt) {
 		//$toevalqtxt = preg_replace('/\$answerbox(\[\d+\])?/','',$toevalqtxt);

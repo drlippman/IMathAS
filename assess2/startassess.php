@@ -197,5 +197,8 @@ $showscores = $assess_info->showScoresDuring();
 $generate_html = ($assess_info->getSetting('displaymethod') == 'full');
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, $generate_html, $generate_html);
 
+// save record if needed
+$assess_record->saveRecordIfNeeded(!$in_practice, $in_practice);
+
 //output JSON object
 echo json_encode($assessInfoOut);

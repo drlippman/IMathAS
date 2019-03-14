@@ -24,6 +24,7 @@ class AssessRecord
   private $in_practice = false;
   private $status = 'no_record';
   private $now = 0;
+  private $need_to_record = false;
   private $penalties = array();
 
   /**
@@ -65,6 +66,18 @@ class AssessRecord
   }
 
   /**
+   * Save the record to the database, if something has changed
+   * @param  boolean $saveScored   Whether to save scored data (def: true)
+   * @param  boolean $savePractice Whether to save practice data (def: false)
+   * @return void
+   */
+  public function saveRecordIfNeeded($saveScored = true, $savePractice = false) {
+    if ($this->need_to_record) {
+      $this->saveRecord($saveScored, $savePractice);
+    }
+  }
+
+  /**
    * Save the record to the database
    * @param  boolean $saveScored   Whether to save scored data (def: true)
    * @param  boolean $savePractice Whether to save practice data (def: false)
@@ -75,6 +88,7 @@ class AssessRecord
       // bail if the userid isn't set
       return false;
     }
+
     $qarr = array();
     $fields = array('lti_sourcedid', 'timeontask', 'starttime', 'lastchange',
                     'score', 'status');
@@ -541,6 +555,7 @@ class AssessRecord
     // get data structure for this question
     $aver = $this->getAssessVer($is_practice, $ver);
     $question_versions = $aver['questions'][$qn]['question_versions'];
+
     if (!$by_question || $ver === 'last') {
       $curq = $question_versions[count($question_versions) - 1];
     } else {
@@ -548,9 +563,9 @@ class AssessRecord
     }
 
     if ($is_practice) {
-      $data = &$this->practiceData;
+      $data = $this->practiceData;
     } else {
-      $data = &$this->scoredData;
+      $data = $this->scoredData;
     }
 
     // get basic settings
@@ -636,11 +651,44 @@ class AssessRecord
 
     if ($generate_html) {
       list($out['html'], $out['answeights']) = $this->getQuestionHtml($qn, $is_practice, $ver);
+      $this->setAnsweights($qn, $out['answeights'], $is_practice, $ver);
     } else {
       $out['html'] = null;
     }
 
     return $out;
+  }
+
+  /**
+   * Sets the answeights for a question if needed
+   * @param int  $qn          Question number
+   * @param array $answeights   Answeights array
+   * @param boolean $is_practice Whether practice
+   * @param string  $ver         attempt number, or 'last'
+   */
+  private function setAnsweights($qn, $answeights, $is_practice = false, $ver = 'last') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    if ($is_practice) {
+      $this->parsePractice();
+      $assessver = &$this->practiceData['assess_versions'][0];
+    } else {
+      $this->parseScored();
+      if ($by_question || $ver === 'last') {
+        $assessver = &$this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
+      } else {
+        $assessver = &$this->scoredData['assess_versions'][$ver];
+      }
+    }
+    $question_versions = &$assessver['questions'][$qn]['question_versions'];
+    if (!$by_question || $ver === 'last') {
+      $curq = &$question_versions[count($question_versions) - 1];
+    } else {
+      $curq = &$question_versions[$ver];
+    }
+    if ($answeights !== $curq['answeights']) {
+      $curq['answeights'] = $answeights;
+      $this->need_to_record = true;
+    }
   }
 
   /**
@@ -825,6 +873,8 @@ class AssessRecord
     // TODO: move this to displayq input
     // TODO: pass stuanswers, stuanswersval
     $GLOBALS['qdatafordisplayq'] = $this->assess_info->getQuestionSetData($qsettings['questionsetid']);
+    // TODO:  pass as input
+    $GLOBALS['lastanswers'] = array($qn => implode('&', $lastans));
     $qout = displayq(
         $qn,                            // question number
         $qsettings['questionsetid'],    // questionset ID
@@ -838,7 +888,7 @@ class AssessRecord
         $qcolors                        // array of part scores for score marking
     );
     // need to extract answeights to provide to frontend
-    $answeights = array(1);
+    $answeights = $GLOBALS['lastansweights'];
     return array($qout, $answeights);
   }
 
@@ -899,13 +949,14 @@ class AssessRecord
     // TODO: rework this to handle singlescore questions
     $rawparts = explode('~', $rawscores);
     $scores = explode('~', $scores);
+    $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
     foreach ($rawparts as $k=>$v) {
       if ($parts_to_score === true || $parts_to_score[$k] === true) {
         $data[$k] = array(
           'sub' => $submission,
           'raw' => $v,
           'time' => 0, // TODO
-          'stuans' => $_POST['qn'.$qn]   // TODO: this is wrong for most types
+          'stuans' => $partla[$k]   // TODO: this is wrong for most types
         );
       }
     }
@@ -1051,7 +1102,6 @@ class AssessRecord
     if (!$in_practice) {
       $this->assessRecord['score'] = $maxAscore;
     }
-
     return $maxAscore;
   }
 
