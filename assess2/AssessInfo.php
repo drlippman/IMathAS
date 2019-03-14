@@ -400,6 +400,25 @@ class AssessInfo
   }
 
   /**
+   * Determine whether we are showing detailed scores at end of assessment attempt
+   * @return boolean  true if showing scores at end
+   */
+  public function showScoresAtEnd() {
+    $showscores = $this->assessData['showscores'];
+    return ($showscores == 'during' || $showscores == 'at_end');
+  }
+  
+  /**
+   * Determine whether we are reshowing scored questions at end
+   * @return boolean  true if showing scores during
+   */
+  public function reshowQuestionsAtEnd() {
+    $showscores = $this->assessData['showscores'];
+    return ($showscores == 'at_end');
+  }
+
+
+  /**
   * Select an initial set of questions and seeds for an assessment record.
   * @param  boolean $ispractice   Optional. Set true if generating for practice mode.
   *                               Default false.

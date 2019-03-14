@@ -258,7 +258,7 @@ class AssessRecord
     } else {
       $this->scoredData['assess_versions'][] = $out;
     }
-    $this->setStatus(true, $ispractice);
+    $this->setStatus(true, false, $ispractice);
   }
 
   /**
@@ -317,10 +317,11 @@ class AssessRecord
   /**
    * Sets overall status as active/not
    * @param boolean $active     Set true to mark as active
+   * @param boolean $setattempt  True to set last attempt as submitted/unsubmitted (def: false)
    * @param boolean $ispractice Set true if practice (def: false)
    * @return void
    */
-  public function setStatus($active, $ispractice = false) {
+  public function setStatus($active, $setattempt = false, $ispractice = false) {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
@@ -330,6 +331,11 @@ class AssessRecord
         $this->assessRecord['status'] |= 16;
       } else {
         $this->assessRecord['status'] = $this->assessRecord['status'] & ~16;
+      }
+      if ($setattempt) {
+        $this->parsePratice();
+        $lastver = count($this->practiceData['assess_versions']) - 1;
+        $this->practiceData['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
       }
     } else {
       // turn off both
@@ -343,6 +349,11 @@ class AssessRecord
         } else if ($submitby == 'by_question') {
           $this->assessRecord['status'] |= 2;
         }
+      }
+      if ($setattempt) {
+        $this->parseScored();
+        $lastver = count($this->scoredData['assess_versions']) - 1;
+        $this->scoredData['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
       }
     }
   }
@@ -457,6 +468,24 @@ class AssessRecord
       $out['kept'] = $this->scoredData['scored_version'];
     }
     return $out;
+  }
+
+  /**
+   * Get the score on an assessment version
+   * @param boolean $is_practice  Whether looking for practice score (def: false)
+   * @param  string $ver   Attempt #, or 'last'
+   * @return float score on assessment
+   */
+  public function getAttemptScore($is_practice = false, $ver = 'last') {
+    if ($is_practice) {
+      $this->parsePratice();
+      $lastver = count($this->practiceData['assess_versions']) - 1;
+      return $this->practiceData['assess_versions'][$lastver]['score'];
+    } else {
+      $this->parseScored();
+      $lastver = count($this->scoredData['assess_versions']) - 1;
+      return $this->scoredData['assess_versions'][$lastver]['score'];
+    }
   }
 
   /**

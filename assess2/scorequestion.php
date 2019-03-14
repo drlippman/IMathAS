@@ -29,7 +29,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
-check_for_required('POST', array('toscoreqn', 'lastloaded', 'autosave'));
+check_for_required('POST', array('toscoreqn', 'lastloaded'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($isteacher && isset($_GET['uid'])) {
@@ -41,16 +41,20 @@ if ($isteacher && isset($_GET['uid'])) {
 if (is_array($_POST['toscoreqn'])) {
   $qns = array_map('Sanitize::onlyInt', $_POST['toscoreqn']);
   $lastloaded = array_map('Sanitize::onlyInt', $_POST['lastloaded']);
+} else if ($_POST['toscoreqn'] == -1) {
+  $qns = array();
+  $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
 } else {
   $qns = array(Sanitize::onlyInt($_POST['toscoreqn']));
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
 }
-$autosave = !empty($_POST['autosave']);
+$end_attempt = !empty($_POST['endattempt']);
+$autosave = !empty($_POST['autosave']);  // TODO!!
 
 
 $now = time();
 
-// load settings including question info
+// load settings
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
 if ($isstudent) {
@@ -111,40 +115,54 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
 }
 
-// TODO:  Regen
+if (count($qns) > 0) {
+  // get current question version ids
+  $qids = $assess_record->getQuestionIds($qns, $in_practice);
 
-// get current question version ids
-$qids = $assess_record->getQuestionIds($qns, $in_practice);
+  // load question settings and code
+  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $qids, true);
 
-// load question settings and code
-$assess_info->loadQuestionSettings($qids, true);
-
-// TODO:  Verify confirmation values (to ensure it hasn't been submitted since)
+  // TODO:  Verify confirmation values (to ensure it hasn't been submitted since)
 
 
-// Record a submission
-$submission = $assess_record->addSubmission($now);
+  // Record a submission
+  $submission = $assess_record->addSubmission($now);
 
-// Score the questions
-foreach ($qns as $qn) {
-  $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $in_practice);
-  $assess_record->scoreQuestion($qn, $submission, $parts_to_score, $in_practice);
+  // Score the questions
+  foreach ($qns as $qn) {
+    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $in_practice);
+    $assess_record->scoreQuestion($qn, $submission, $parts_to_score, $in_practice);
+  }
+
+  // Update lastchange and status
+  // TODO
+
+  // Recalculate scores
+  $assess_record->reTotalAssess($in_practice);
+} else {
+  $assess_info->loadQuestionSettings('all', false);
 }
 
-// Update lastchange and status
-// TODO
-
-// Recalculate scores
-$assess_record->reTotalAssess($in_practice);
+if ($end_attempt) {
+  $assess_record->setStatus(false, true, $in_practice);
+}
 
 // Record record
 $assess_record->saveRecord(!$in_practice, $in_practice);
 
-// grab question settings data with HTML
-$showscores = $assess_info->showScoresDuring();
-$assessInfoOut['questions'] = array();
-foreach ($qns as $qn) {
-  $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $in_practice, $showscores, true, true);
+if ($end_attempt) {
+  // grab all questions settings and scores, based on end-of-assessment settings
+  $showscores = $assess_info->showScoresAtEnd();
+  $reshowQs = $assess_info->reshowQuestionsAtEnd();
+  $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, true, $reshowQs);
+  $assessInfoOut['score'] = $assess_record->getAttemptScore($in_practice);
+} else {
+  // grab question settings data with HTML
+  $showscores = $assess_info->showScoresDuring();
+  $assessInfoOut['questions'] = array();
+  foreach ($qns as $qn) {
+    $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $in_practice, $showscores, true, true);
+  }
 }
 
 //output JSON object

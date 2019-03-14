@@ -75,6 +75,16 @@ if ($assessInfoOut['submitby'] == 'by_assessment') {
   if ($showPrevAttemptScores) {
     $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
   }
+} else {
+  $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts(false);
+}
+
+if (!$assessInfoOut['has_active_attempt']) {
+  if ($assessInfoOut['submitby'] == 'by_question') {
+    $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) == 0);
+  } else {
+    $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) < $assessInfoOut['allowed_attempts']);
+  }
 }
 
 //load group members, if applicable
