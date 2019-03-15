@@ -15,6 +15,9 @@ if (!$isteacher && !$istutor && !$isstudent) {
   exit;
 }
 
+if (!$isstudent) {
+  $studentinfo = array('latepasses' => 0, 'timelimitmult' => 1);
+}
 /**
  * Check if the required parameters are set
  * @param  string $method   'GET' or 'POST'

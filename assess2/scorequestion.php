@@ -25,6 +25,8 @@ require_once("./AssessInfo.php");
 require_once("./AssessRecord.php");
 require_once('./AssessUtils.php');
 
+//error_reporting(E_ALL);
+
 header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
@@ -105,7 +107,8 @@ if (!$assess_record->hasUnsubmittedAttempt($in_practice)) {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto'
+  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
+  'showscores', 'timelimit'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
@@ -134,11 +137,13 @@ if (count($qns) > 0) {
     $assess_record->scoreQuestion($qn, $submission, $parts_to_score, $in_practice);
   }
 
-  // Update lastchange and status
+  // Update lastchange
+  $assess_record->setLastChange($now, $in_practice);
+  // update status if all questions answered
   // TODO
 
   // Recalculate scores
-  $assess_record->reTotalAssess($in_practice);
+  $assess_record->reTotalAssess($in_practice, $qns);
   // TODO: if by-question and all questions attempted, update status
 } else {
   $assess_info->loadQuestionSettings('all', false);
@@ -149,7 +154,7 @@ if ($end_attempt) {
 }
 
 // Record record
-//$assess_record->saveRecord(!$in_practice, $in_practice);
+$assess_record->saveRecord(!$in_practice, $in_practice);
 
 if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
@@ -157,6 +162,15 @@ if ($end_attempt) {
   $reshowQs = $assess_info->reshowQuestionsAtEnd();
   $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, true, $reshowQs);
   $assessInfoOut['score'] = $assess_record->getAttemptScore($in_practice);
+
+  //get prev attempt info
+  if ($assessInfoOut['submitby'] == 'by_assessment') {
+    $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
+    $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
+    if ($showPrevAttemptScores) {
+      $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
+    }
+  }
 } else {
   // grab question settings data with HTML
   $showscores = $assess_info->showScoresDuring();

@@ -407,7 +407,7 @@ class AssessInfo
     $showscores = $this->assessData['showscores'];
     return ($showscores == 'during' || $showscores == 'at_end');
   }
-  
+
   /**
    * Determine whether we are reshowing scored questions at end
    * @return boolean  true if showing scores during
@@ -637,7 +637,7 @@ class AssessInfo
       $settings['regen_penalty'] = $defaults['defregenpenalty'];
       $settings['regen_penalty_after'] = $defaults['defregenpenalty_after'];
     } else {
-      if ($settings['regen_penalty'][0]==='S') {
+      if ($settings['regenpenalty'][0]==='S') {
         $settings['regen_penalty_after'] = $settings['regenpenalty'][1];
         $settings['regen_penalty'] = substr($settings['regenpenalty'], 2);
       } else {
@@ -655,6 +655,8 @@ class AssessInfo
       $settings['showans'] = $defaults['showans'];
       if ($settings['showans'] == 'after_n') {
         $settings['showans_aftern'] = $defaults['showans_aftern'];
+      } else {
+        $settings['showans_aftern'] = 0;
       }
     } else if (is_numeric($settings['showans'])) {
       $settings['showans'] = 'after_n';
@@ -717,7 +719,7 @@ class AssessInfo
 
     if ($settings['defregenpenalty'][0]==='S') {
       $settings['defregenpenalty_after'] = intval($settings['defregenpenalty'][1]);
-      $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 2);
+      $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 2)*1;
     } else {
       $settings['defregenpenalty_after'] = 1;
     }
@@ -726,8 +728,8 @@ class AssessInfo
     if ($settings['submitby'] == 'by_assessment') {
       $settings['allowed_attempts'] = $settings['defregens'];
       $settings['retake_penalty'] = array(
-        'penalty' => $settings['defregenpenalty'],
-        'n' => $settings['defregenpenalty_n']
+        'penalty' => $settings['defregenpenalty']*1,
+        'n' => $settings['defregenpenalty_after']*1
       );
     }
 
@@ -765,6 +767,9 @@ class AssessInfo
 
     //unpack resources
     $settings['resources'] = json_decode($settings['extrefs']);
+    if ($settings['resources'] === null) {
+      $settings['resources'] = array();
+    }
     unset($settings['extrefs']);
 
     // handle help features
