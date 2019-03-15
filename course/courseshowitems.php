@@ -54,7 +54,7 @@ if (! isset ( $CFG ['CPS'] ['itemicons'] )) {
 			'mpg' => 'video.png',
 			'nb' => 'mathnb.png',
 			'mws' => 'maple.png',
-			'mw' => 'maple.png' 
+			'mw' => 'maple.png'
 	);
 } else {
 	$itemicons = $CFG ['CPS'] ['itemicons'];
@@ -264,7 +264,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			} else {
 				$contentbehavior = 0;
 			}
-			
+
 			if ($items[$i]['colors']=='') {
 				$titlebg = '';
 			} else {
@@ -273,7 +273,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			if (!isset($items[$i]['avail'])) { //backwards compat
 				$items[$i]['avail'] = 1;
 			}
-			
+
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) { //if "available"
 				if ($firstload && (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O')) {
 					echo "<script> oblist = oblist + ',".$items[$i]['id']."';</script>\n";
@@ -702,7 +702,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   	   if ($exceptions[$items[$i]][2]==1) {
 			   	   	   	$duedatewords = _('With LatePass, due');
 			   	   	   } else if (empty($exceptions[$items[$i]][3])) { //is_lti !isset or is 0
-			   	   	   	$duedatewords = _('With extension, due');   
+			   	   	   	$duedatewords = _('With extension, due');
 			   	   	   }
 			   	   }
 			   } else {
@@ -733,7 +733,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   	   $showgreyedout = true;
 			   	   }
 			   	   if (isset($line['reqscoreptsearned'])) {
-			   	   	   $ptsearned = $line['reqscoreptsearned']; 
+			   	   	   $ptsearned = $line['reqscoreptsearned'];
 			   	   } else {
 					   $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
 					   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
@@ -746,7 +746,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   if ($nothidden) {
 					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if ($line['reqscoreptsposs']>0 && 
+					   	   if ($line['reqscoreptsposs']>0 &&
 					   	   	   round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
 							   $nothidden = false;
 						   }
@@ -762,9 +762,14 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	$preReqNote = '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
 				$preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
 			   }
-			   
+
+				 if ($line['ver'] > 1) {
+					 $assessUrl = "http://localhost:8080/#/?cid=$cid&aid=$typeid";
+				 } else {
+					 $assessUrl = "../assessment/showtest.php?id=$typeid&cid=$cid";
+				 }
 			   //calc status icon
-			   
+
 			   if (!$canedit) {
 				   $deffb = explode('-', $line['deffeedback']);
 				   if (isset($line['ptsearned'])) {
@@ -776,7 +781,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   	   $scoremsg = _('All questions attempted');
 				   	   }
 					   if ($deffb[0]=='NoScores' || $deffb[0]=='EndScore' || $deffb[0]=='EachAtEnd') {
-						   //don't show score 	   
+						   //don't show score
 					   } else if ($line['ptsposs']>0) {
 						   $scoremsg .= '. '._('Score: ').round(100*$line['ptsearned']/$line['ptsposs'],1).'%';
 					   }
@@ -827,7 +832,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   } else {
 					   $tlwrds = '';
 				   }
-				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" ";
+				   echo "<div class=title><b><a href=\"$assessUrl\" ";
 
 				   if ($tlwrds != '') {
 						 if ($line['timelimit'] > $line['enddate'] - $now) {
@@ -837,11 +842,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 						 }
 				   }
 				   echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>";
-				   
+
 				   if ($viewall) {
 				   	   echo $preReqNote;
 				   }
-				   
+
 				   if ($line['enddate']!=2000000000) {
 					   echo "<BR> $endname $enddate \n";
 				   }
@@ -879,7 +884,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo getItemIcon('assess', 'assessment', false, $iconstatus, $scoremsg);
 
-				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\"";
+				   echo "<div class=title><b><a href=\"$assessUrl\"";
 
 				   echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate).'.';
 				   if ($line['reviewdate']!=2000000000) {
@@ -921,7 +926,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				if ($canedit) {
 					echo getAssessDD($i, $typeid, $parent, $items[$i]);
 				}
-				
+
 				echo '</div>'; //itemhdr
 				echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
  				enditem($canedit);
@@ -939,7 +944,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
 				   //echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
-				   
+
 				   echo $preReqNote;
 
 				   if ($line['enddate']!=2000000000) {
@@ -954,7 +959,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   enditem($canedit); //echo "</div>\n";
 
 			   } else if (!$viewall && $line['avail']>0 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
-			   	   
+
 			   	   if ($now<$line['startdate']) {
 			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
 			   	   } else {
@@ -975,7 +980,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
 				   enditem($canedit);
-				    				 		
+
 			   } else if ($viewall) { //not avail to stu
 				   if ($line['avail']==0) {
 				   	$show = _('Hidden');
@@ -992,7 +997,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 
-				   echo "<div class=title><i> <a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" >".Sanitize::encodeStringForDisplay($line['name'])."</a></i>";
+				   echo "<div class=title><i> <a href=\"$assessUrl\" >".Sanitize::encodeStringForDisplay($line['name'])."</a></i>";
 				   if ($viewall) {
 				   	   echo $preReqNote;
 				   }
@@ -1238,7 +1243,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   } else if (!$viewall && $line['avail']>0 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
-			   	   
+
 			   	   if ($now<$line['startdate']) {
 			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
 			   	   } else {
@@ -1264,7 +1269,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //itemhdr
 				   enditem($canedit); //echo "</div>\n";
-			   	   
+
 			   } else if ($viewall) {
 				   if ($line['avail']==0) {
 					   $show = _('Hidden');
@@ -1326,7 +1331,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   $ext = substr($filename,strrpos($filename,'.')+1);
 				   switch($ext) {
 				   	  case 'xlsx':
-				   	  case 'xls': $icon = 'xls'; break;     
+				   	  case 'xls': $icon = 'xls'; break;
 					  case 'pdf': $icon = 'pdf'; break;
 					  case 'html': $icon = 'html'; break;
 					  case 'pptx':
@@ -1511,7 +1516,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   enditem($canedit); //echo "</div>\n";
 			   } else if (!$viewall && $line['avail']==1 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate'])) &&
 			   	   (($line['postby']!=2000000000 && $line['postby']!=0) || $line['replyby']!=2000000000 && $line['replyby']!=0)) { //show greyed
-			   	   
+
 			   	   if ($now<$line['startdate']) {
 			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
 			   	   } else {
@@ -1744,7 +1749,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
    function generateadditem($blk,$tb) {
    	global $cid, $CFG,$imasroot;
-   	
+
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
@@ -1754,7 +1759,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
    		} else {
    			$html = '<div class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		}
-		
+
    		$blkUrlParam = Sanitize::encodeUrlParam($blk);
    		$tbUrlParam = Sanitize::encodeUrlParam($tb);
 

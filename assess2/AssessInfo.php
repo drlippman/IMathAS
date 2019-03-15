@@ -368,8 +368,8 @@ class AssessInfo
         !$this->waiveReqScore()
     ) {
       $query = "SELECT iar.score,ia.ptsposs FROM imas_assessments AS ia LEFT JOIN ";
-			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND ias.userid=:userid ";
-			$query .= "WHERE ia.id=:assessmentid";
+			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
+			$query .= "WHERE ia.id=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
       list($prereqscore,$reqscoreptsposs) = $stm->fetch(PDO::FETCH_NUM);
