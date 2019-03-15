@@ -5,7 +5,7 @@ $DBH->beginTransaction();
 
 $query = "ALTER TABLE `imas_questions`
  	ADD COLUMN regenpenalty VARCHAR(6) NOT NULL DEFAULT '9999',
- 	MODIFY showhints TINYINT(1) NOT NULL SIGNED DEFAULT '-1'";
+ 	MODIFY showhints TINYINT(1) NOT NULL DEFAULT -1";
 $res = $DBH->query($query);
 if ($res===false) {
 	echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
