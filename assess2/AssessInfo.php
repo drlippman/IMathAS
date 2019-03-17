@@ -766,11 +766,18 @@ class AssessInfo
     }
 
     //unpack resources
-    $settings['resources'] = json_decode($settings['extrefs']);
-    if ($settings['resources'] === null) {
-      $settings['resources'] = array();
+    $settings['resources'] = array();
+    if ($settings['extrefs'] !== '') {
+      $settings['extrefs'] = json_decode($settings['extrefs']);
+      if ($settings['extrefs'] !== null) {
+        $settings['resources'] = $settings['extrefs'];
+      }
     }
     unset($settings['extrefs']);
+
+    if ($settings['endmsg'] != '') {
+      $settings['endmsg'] = unserialize($settings['endmsg']);
+    }
 
     // handle help features
     $settings['help_features'] = array(

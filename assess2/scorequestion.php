@@ -171,6 +171,9 @@ if ($end_attempt) {
       $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
     }
   }
+
+  // TODO: get endmsg
+
 } else {
   // grab question settings data with HTML
   $showscores = $assess_info->showScoresDuring();

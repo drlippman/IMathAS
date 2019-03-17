@@ -18,7 +18,7 @@ $questionSet = [
   ]
 ];
 
-// ensure each assessment keys a unique key, regardless of the group it's in 
+// ensure each assessment keys a unique key, regardless of the group it's in
 $assessGroups = [
   [
     'name' => 'Basics',
@@ -180,6 +180,43 @@ $assessGroups = [
         ],
         'itemorder' => [0]
       ]
+    ]
+  ],
+  [
+    'name' => 'Features',
+    'assessments' => [
+      9=>[
+        'name' => 'Features 1 with a really long title',
+        'summary' => 'check for: external resources, end messages, between-question text,
+                      long title handling, post to forum, msg instructor,
+                      custom categories and category breakdown, default feedback text',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0, 'category' => 'Cat 1'],
+          1=>['questionsetid' => 1, 'category' => 'Cat 1'],
+          2=>['questionsetid' => 0, 'category' => 'Cat 2']
+        ],
+        'posttoforum' => 1,
+        'msgtoinstr' => 1,
+        'deffeedbacktext' => 'This is default feedback text',
+        'intro' => '["<p>This is the general intro text<\/p>",{"displayBefore":0,"displayUntil":0,"text":"<p>This should show before questions 1 and 2, closed after first<\/p>","ispage":"0","pagetitle":"","forntype":0},{"displayBefore":2,"displayUntil":2,"text":"<p>This should show before question 3<\/p>","ispage":0,"pagetitle":"","forntype":1},{"displayBefore":3,"displayUntil":3,"text":"<p>This should show after question 3<\/p>","ispage":0,"pagetitle":"","forntype":1}]',
+        'extrefs' => '[{"label":"Textbook","link":"https://www.google.com"},{"label":"Calculator","link":"https://www.desmos.com"}]',
+        'endmsg' => 'a:4:{s:4:"type";s:1:"1";s:3:"def";s:15:"Needs more work";s:4:"msgs";a:2:{i:90;s:6:"Great!";i:50;s:13:"Getting there";}s:9:"commonmsg";s:31:"<p>Generic message for all.</p>";}',
+        'itemorder' => [0,1,2]
+      ],
     ]
   ]
 ];

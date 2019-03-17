@@ -84,6 +84,18 @@ $stm->execute(array(':courseid'=>$cid));
 /** Create new stuff **/
 require("testdata.php");
 
+// initialize itemorder
+$itemorder = [];
+
+// create a forum
+$stm = $DBH->prepare("INSERT INTO imas_forums (name, courseid, avail, enddate) VALUES ('A forum', ?, 2, 2000000000)");
+$stm->execute(array($cid));
+$forumid = $DBH->lastInsertId();
+$stm = $DBH->prepare("INSERT INTO imas_items (courseid, itemtype, typeid) VALUES (?,'Forum',?)");
+$stm->execute(array($cid, $forumid));
+$itemorder[] = $DBH->lastInsertId();
+
+
 // add questionset items
 $qsetIds = array();
 $stmsel = $DBH->prepare("SELECT id FROM imas_questionset WHERE uniqueid=?");
@@ -111,6 +123,9 @@ foreach ($assessGroups as $agroup) {
     $questions = $data['questions'];
     unset($data['itemorder']);
     unset($data['questions']);
+    if (isset($data['posttoforum'])) {
+      $data['posttoforum'] = $forumid;
+    }
     $data['startdate'] = $now + $data['startdate']*60*60;
     $data['enddate'] = $now + $data['enddate']*60*60;
     $keys = implode(',', array_keys($data));
@@ -160,7 +175,6 @@ foreach ($addedIds as $n=>$aid) {
   $items[$n] = $DBH->lastInsertId();
 }
 
-$itemorder = [];
 foreach ($assessGroups as $agroup) {
   $group = [
     'name' => $agroup['name'],
