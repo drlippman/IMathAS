@@ -214,7 +214,7 @@ $assessGroups = [
         'questions' => [
           0=>['questionsetid' => 0, 'category' => 'Cat 1'],
           1=>['questionsetid' => 1, 'category' => 'Cat 1'],
-          2=>['questionsetid' => 0, 'category' => 'Cat 2']
+          2=>['questionsetid' => 0, 'category' => 'Category 2 with a long name']
         ],
         'posttoforum' => 1,
         'msgtoinstr' => 1,

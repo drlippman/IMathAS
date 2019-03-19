@@ -744,6 +744,7 @@ class AssessRecord
     if ($generate_html) {
       list($out['html'], $out['answeights']) = $this->getQuestionHtml($qn, $is_practice, $ver);
       $this->setAnsweights($qn, $out['answeights'], $is_practice, $ver);
+      $out['seed'] = $curq['seed'];
     } else {
       $out['html'] = null;
     }
