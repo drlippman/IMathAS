@@ -724,7 +724,7 @@ class AssessRecord
             }
           }
         } else if ($include_parts) {
-          $parts = array(
+          $parts[$pn] = array(
             'try' => $parttry,
             'points_possible' => $out['points_possible'] * $answeights[$pn]/$answeightTot
           );
@@ -855,6 +855,7 @@ class AssessRecord
     $partscores = array_fill(0, count($answeights), 0);
     $partrawscores = array_fill(0, count($answeights), 0);
     $parts = array();
+    $is_singlescore = !empty($qver['singlescore']);
     // loop over each part
     for ($pn = 0; $pn < count($qver['tries']); $pn++) {
       $max = count($qver['tries'][$pn]) - 1;
@@ -896,13 +897,23 @@ class AssessRecord
           }
         }
       }
-      $parts[$pn] = array(
-        'try' => count($qver['tries'][$pn]),
-        'score' => $partscores[$pn],
-        'rawscore' => $partrawscores[$pn],
-        'penalties' => $penaltyList,
-        'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
-      );
+      if ($is_singlescore) {
+        $parts[$pn] = array(
+          'try' => count($qver['tries'][$pn]),
+          'rawscore' => $partrawscores[$pn]
+        );
+        if ($pn==0) {
+          $parts[$pn]['penalties'] = $penaltyList;
+        }
+      } else {
+        $parts[$pn] = array(
+          'try' => count($qver['tries'][$pn]),
+          'score' => $partscores[$pn],
+          'rawscore' => $partrawscores[$pn],
+          'penalties' => $penaltyList,
+          'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
+        );
+      }
     }
     $qScore = array_sum($partscores);
     $qRawscore = array_sum($partrawscores);
@@ -1052,6 +1063,7 @@ class AssessRecord
     $rawparts = explode('~', $rawscores);
     $scores = explode('~', $scores);
     $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
+
     foreach ($rawparts as $k=>$v) {
       if ($parts_to_score === true || $parts_to_score[$k] === true) {
         $data[$k] = array(
@@ -1062,7 +1074,8 @@ class AssessRecord
         );
       }
     }
-    $this->recordTry($qn, $data, $is_practice);
+    $singlescore = (count($rawparts) > 1 && count($scores) == 1);
+    $this->recordTry($qn, $data, $singlescore, $is_practice);
   }
 
   /**
@@ -1391,11 +1404,12 @@ class AssessRecord
    * Record a try on a question
    * @param  int $qn      Question number
    * @param  array $data  Array of part datas
+   * @param  boolean $singlescore  Whether question is multipart showing single score
    * @param  boolean $is_practice Whether we're looking at practice data
    * @param  mixed $ver   Version number to record this on, or 'last'
    * @return void
    */
-  private function recordTry($qn, $data, $is_practice = false, $ver='last') {
+  private function recordTry($qn, $data, $singlescore = false, $is_practice = false, $ver='last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if ($is_practice) {
       $this->parsePractice();
@@ -1413,6 +1427,11 @@ class AssessRecord
       $curq = &$question_versions[count($question_versions) - 1];
     } else {
       $curq = &$question_versions[$ver];
+    }
+    if ($singlescore) {
+      $curq['singlescore'] = true;
+    } else if (isset($curq['singlescore'])) {
+      unset($curq['singlescore']);
     }
     foreach ($data as $pn=>$partdata) {
       $curq['tries'][$pn][] = $partdata;

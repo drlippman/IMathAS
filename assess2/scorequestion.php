@@ -91,7 +91,7 @@ if (!$in_practice &&
   $assess_record->hasActiveAttempt() &&
   $assess_info->getSetting('timelimit') > 0 &&
   $assess_info->getSetting('timelimit_type') == 'kick_out' &&
-  $assess_record->getTimeLimitExpires() < $now + 5  // TODO: adjust
+  $now > $assess_record->getTimeLimitExpires() + 5  // TODO: adjust
 ) {
   echo '{"error": "timelimit_expired"}';
   exit;
