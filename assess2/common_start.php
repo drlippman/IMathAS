@@ -11,7 +11,7 @@ $istutor = isset($tutorid);
 $isstudent = isset($studentid);
 
 if (!$isteacher && !$istutor && !$isstudent) {
-  echo '{error: "No access to this resource"}';
+  echo '{error: "no_access"}';
   exit;
 }
 
@@ -29,7 +29,7 @@ function check_for_required($method, $required) {
     if (($method == 'POST' && !isset($_POST[$r])) ||
       ($method == 'GET' && !isset($_GET[$r]))
     ) {
-      echo '{error: "Missing parameter '.sanitize::encodeStringForJavascript($r).'"}';
+      echo '{error: "missing_param", "error_details": "Missing parameter '.sanitize::encodeStringForJavascript($r).'"}';
       exit;
     }
   }

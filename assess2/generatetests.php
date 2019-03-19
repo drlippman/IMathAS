@@ -116,8 +116,9 @@ foreach ($questionSet as $n=>$data) {
 // create assessments
 $addedIds = array();
 $now = time();
-foreach ($assessGroups as $agroup) {
-  foreach ($agroup['assessments'] as $n=>$data) {
+foreach ($assessGroups as $gn=>$agroup) {
+  foreach ($agroup['assessments'] as $an=>$data) {
+    $n = $gn*100 + $an;
     $data['courseid'] = $cid;
     $itemorder = $data['itemorder'];
     $questions = $data['questions'];
@@ -132,7 +133,7 @@ foreach ($assessGroups as $agroup) {
     $ph = Sanitize::generateQueryPlaceholders($data);
     if (isset($data['reqscoreaid'])) {
       // map reqscoreaid
-      $data['reqscoreaid'] = $addedIds[count($addedIds) + $data['reqscoreaid']];
+      $data['reqscoreaid'] = $addedIds[$n + $data['reqscoreaid']];
     }
     $stm = $DBH->prepare("INSERT INTO imas_assessments ($keys) VALUES ($ph)");
     $stm->execute(array_values($data));
@@ -175,14 +176,15 @@ foreach ($addedIds as $n=>$aid) {
   $items[$n] = $DBH->lastInsertId();
 }
 
-foreach ($assessGroups as $agroup) {
+foreach ($assessGroups as $gn=>$agroup) {
   $group = [
     'name' => $agroup['name'],
     'avail' => 2,
     'SH' => 'SF3',
     'items' => []
   ];
-  foreach ($agroup['assessments'] as $n=>$data) {
+  foreach ($agroup['assessments'] as $an=>$data) {
+    $n = $gn*100 + $an;
     $group['items'][] = $items[$n];
   }
   $courseitemorder[] = $group;
