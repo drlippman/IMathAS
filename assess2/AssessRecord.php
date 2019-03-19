@@ -123,6 +123,8 @@ class AssessRecord
       }
       $stm = $this->DBH->prepare($query);
       $stm->execute($qarr);
+
+      $this->need_to_record = false;
     } else {
 
     }
@@ -276,11 +278,37 @@ class AssessRecord
   }
 
   /**
+   * Build a new question version
+   * @param  int     $qn          Question #
+   * @param  int     $qid         Current Question ID
+   * @param  boolean $ispractice  True if building practice data
+   * @return int   New question ID
+   */
+  public function buildNewQuestionVersion($qn, $qid, $ispractice) {
+    list($oldquestions, $oldseeds) = $this->getOldQuestions($ispractice);
+    list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
+    // build question data
+    $newver = array(
+      'qid' => $question,
+      'seed' => $seed,
+      'tries' => array()
+    );
+    if ($ispractice) {
+      $this->practiceData['assess_versions'][0]['questions'][$qn]['question_versions'][] = $newver;
+    } else {
+      $this->scoredData['assess_versions'][0]['questions'][$qn]['question_versions'][] = $newver;
+    }
+    // note that record needs to be saved
+    $this->need_to_record = true;
+  }
+
+  /**
    * Get old questions and seeds previously used in assessment record
    * @param  boolean $inpractice    True if in practice mode, to get practice data (def: false)
+   * @param  int  $qn    (optional)  Question number to return seeds for. If not set, returns all
    * @return array array($questions, $seeds), where each is an array of values
    */
-  public function getOldQuestions($ispractice = false) {
+  public function getOldQuestions($ispractice = false, $qn = -1) {
     $questions = array();
     $seeds = array();
     if ($ispractice) {
@@ -292,10 +320,12 @@ class AssessRecord
     }
     if ($data !== null) {
       foreach ($data['assess_versions'] as $ver) {
-        foreach ($ver['questions'] as $qdata) {
+        foreach ($ver['questions'] as $thisqn=>$qdata) {
           foreach ($qdata['question_versions'] as $qver) {
             $questions[] = $qver['qid'];
-            $seeds[] = $qver['seed'];
+            if ($qn === -1 || $qn === $thisqn) {
+              $seeds[] = $qver['seed'];
+            }
           }
         }
       }
@@ -321,13 +351,51 @@ class AssessRecord
       //no assessment record at all
       return false;
     }
-    if ($ispractice) {
-      return (($this->assessRecord['status']&16) !== 0);
-    } else {
-      // status has bitwise 1: active by-assess attempt
-      // status has bitwise 2: active by-question attempt
-      return (($this->assessRecord['status']&3) !== 0);
+    $aver = $this->getAssessVer($ispractice);
+    return ($aver['status'] == 0);
+  }
+
+  /**
+   * Update the LTI sourcedid if needed
+   * @param  string $sourcedid  The full IMathAS-format sourcedid
+   * @return void
+   */
+  public function updateLTIsourcedId($sourcedid) {
+    if (empty($this->assessRecord)) {
+      //no assessment record at all
+      return false;
     }
+    if ($sourcedid != $this->assessRecord['lti_sourcedid']) {
+      $this->assessRecord['lti_sourcedid'] = $sourcedid;
+      $this->need_to_record = true;
+    }
+  }
+
+  /**
+   * For by-question submission, check if all questions have been attempted,
+   * and update status if so
+   * @param  boolean $ispractice Whether practice
+   * @return boolean true if all questions attempted
+   */
+  public function checkByQuestionStatus($ispractice = false) {
+    $aver = $this->getAssessVer($ispractice);
+    $allAttempted = true;
+    for ($i=0; $i<count($aver['questions']); $i++) {
+      if (count($aver['questions'][$i]['question_versions'])>1) {
+        // if more than one version, then we've attempted it
+        continue;
+      } else if (count($aver['questions'][$i]['question_versions'][0]['tries']) > 0) {
+        // have tried at least part of the question
+        continue;
+      } else {
+        $allAttempted = false;
+        break;
+      }
+    }
+    if ($allAttempted) {
+      $this->setStatus(false, false, $ispractice);
+    }
+    return $allAttempted;
   }
 
   /**
@@ -945,12 +1013,13 @@ class AssessRecord
   /**
    * Score a question
    * @param  int  $qn             Question number
+   * @param  int  $timeactive     Time the question was active, in ms
    * @param  int  $submission     The submission number, from addSubmission
    * @param  array $parts_to_score  an array, true if part is to be scored/recorded
    * @param  boolean $is_practice True if recording as practice
    * @return void
    */
-  public function scoreQuestion($qn, $submission, $parts_to_score=true, $is_practice=false) {
+  public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true, $is_practice=false) {
     $qver = $this->getQuestionVer($qn, $is_practice);
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
@@ -988,7 +1057,7 @@ class AssessRecord
         $data[$k] = array(
           'sub' => $submission,
           'raw' => $v,
-          'time' => 0, // TODO
+          'time' => round($timeactive/1000),
           'stuans' => $partla[$k]   // TODO: this is wrong for most types
         );
       }
@@ -1176,13 +1245,37 @@ class AssessRecord
   }
 
   /**
+   * Find out if question can be regenerated
+   * @param  int  $qn             Question #
+   * @param  int  $qid            Question ID
+   * @param  boolean $is_practice Whether using practice data
+   * @return boolean true if question can be regenerated
+   */
+  public function canRegenQuestion($qn, $qid, $is_practice = false) {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    if (!$by_question) {
+      return false;
+    }
+    if ($is_practice) {
+      $this->parsePractice();
+      $data = $this->practiceData;
+    } else {
+      $this->parseScored();
+      $data = $this->scoredData;
+    }
+    $regens_max = $this->assess_info->getQuestionSetting($qid, 'regens_max');
+    $regens_used = count($data['assess_versions'][0]['questions'][$qn]['question_versions']);
+    return ($regens_used < $regens_max);
+  }
+
+  /**
    * Calculate the score on a question after applying penalties
    * @param  float $score    Raw score, 0-1
    * @param  float $points   Points possible
-   * @param  int $try        The try number
+   * @param  int $try        The try number (starts at 0)
    * @param  int $retry_penalty
    * @param  int $retry_penalty_after
-   * @param  int $regen      The regen number
+   * @param  int $regen      The regen number (starts at 1)
    * @param  int $regen_penalty
    * @param  int $regen_penalty_after
    * @param  int $duedate    Original due date timestamp
@@ -1198,21 +1291,21 @@ class AssessRecord
     $penalties = array();
     if ($retry_penalty > 0) {
       $triesOver = $try + 1 - $retry_penalty_after;
-      if ($triesOver > 0) {
+      if ($triesOver > 1e-10) {
         $base *= (1 - $triesOver * $retry_penalty/100);
-        $penalties[] = array('retry', $triesOver * $retry_penalty);
+        $penalties[] = array('type'=>'retry', 'pct'=>$triesOver * $retry_penalty);
       }
     }
     if ($regen_penalty > 0) {
-      $regensOver = $regen + 1 - $regen_penalty_after;
-      if ($regensOver > 0) {
-        $base *= (1 - $regenOver * $regen_penalty/100);
-        $penalties[] = array('regen', $regenOver * $regen_penalty);
+      $regensOver = $regen - $regen_penalty_after;
+      if ($regensOver > 1e-10) {
+        $base *= (1 - $regensOver * $regen_penalty/100);
+        $penalties[] = array('type'=>'regen', 'pct'=>$regensOver * $regen_penalty);
       }
     }
     if ($exceptionpenalty > 0 && $subtime > $duedate) {
       $base *= (1 - $exceptionpenalty / 100);
-      $penalties[] = array('late', $exceptionpenalty);
+      $penalties[] = array('type'=>'late', 'pct'=>$exceptionpenalty);
     }
     if ($returnPenalties) {
       return array($base, $penalties);

@@ -37,6 +37,7 @@ if ($isteacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 $qn = Sanitize::onlyInt($_POST['qn']);
+$doRegen = !empty($_POST['regen']);
 
 $now = time();
 
@@ -101,13 +102,22 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
 }
 
-// TODO:  Regen
-
 // get current question version
 $qid = $assess_record->getQuestionId($qn, $in_practice);
 
 // load question settings and code
 $assess_info->loadQuestionSettings(array($qid), true);
+
+// Try a Similar Question, if requested
+if ($doRegen) {
+    if ($assess_record->canRegenQuestion($qn, $qid, $in_practice)) {
+      $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $in_practice);
+      $assess_info->loadQuestionSettings(array($qid), true);
+    } else {
+      echo '{"error": "out_of_regens"}';
+      exit;
+    }
+}
 
 // grab question settings data with HTML
 $showscores = $assess_info->showScoresDuring();

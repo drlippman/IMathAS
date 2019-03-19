@@ -775,10 +775,6 @@ class AssessInfo
     }
     unset($settings['extrefs']);
 
-    if ($settings['endmsg'] != '') {
-      $settings['endmsg'] = unserialize($settings['endmsg']);
-    }
-
     // handle help features
     $settings['help_features'] = array(
       'message' => ($settings['msgtoinstr'] == 1),

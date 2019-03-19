@@ -163,6 +163,11 @@ if (!$assess_record->hasUnsubmittedAttempt($in_practice)) {
   }
 }
 
+// update lti_sourcedid if needed
+if (isset($sessiondata['lti_lis_result_sourcedid'])) {
+  $altltisourcedid = $sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
+  $assess_record->updateLTIsourcedId($altltisourcedid);
+}
 
 
 // grab any assessment info fields that may have updated:

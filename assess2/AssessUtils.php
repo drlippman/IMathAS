@@ -143,4 +143,35 @@ class AssessUtils
     }
     return $isoneIPok;
   }
+
+  public static function getEndMsg($endmsg, $score, $possible) {
+    if ($endmsgs === '') {
+      return '';
+    }
+    $average = round(100*$score/$possible,1);
+
+    $endmsg = unserialize($endmsg);
+    $redirecturl = '';
+    $outmsg = '';
+    if (isset($endmsg['msgs'])) {
+      foreach ($endmsg['msgs'] as $sc=>$msg) { //array must be reverse sorted
+        if (($endmsg['type']==0 && $score>=$sc) || ($endmsg['type']==1 && $average>=$sc)) {
+          $outmsg = $msg;
+          break;
+        }
+      }
+      if ($outmsg=='') {
+        $outmsg = $endmsg['def'];
+      }
+      if (strpos($outmsg,'redirectto:')!==false) {
+        $redirecturl = trim(substr($outmsg,11));
+        $outmsg = "<input type=\"button\" value=\"". _('Continue'). "\" onclick=\"window.location.href='$redirecturl'\"/>";
+      }
+      $outmsg = '<p>'.$outmsg.'</p>';
+      if (!empty($endmsg['commonmsg']) && $endmsg['commonmsg']!='<p></p>') {
+        $outmsg .= $endmsg['commonmsg'];
+      }
+    }
+    return $outmsg;
+  }
 }

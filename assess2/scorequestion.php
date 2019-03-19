@@ -43,12 +43,15 @@ if ($isteacher && isset($_GET['uid'])) {
 if (is_array($_POST['toscoreqn'])) {
   $qns = array_map('Sanitize::onlyInt', $_POST['toscoreqn']);
   $lastloaded = array_map('Sanitize::onlyInt', $_POST['lastloaded']);
+  $timeactive = array_map('Sanitize::onlyInt', $_POST['timeactive']);
 } else if ($_POST['toscoreqn'] == -1) {
   $qns = array();
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
+  $timeactive = array();
 } else {
   $qns = array(Sanitize::onlyInt($_POST['toscoreqn']));
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
+  $timeactive = array(Sanitize::onlyInt($_POST['timeactive']));
 }
 $end_attempt = !empty($_POST['endattempt']);
 $autosave = !empty($_POST['autosave']);  // TODO!!
@@ -132,9 +135,9 @@ if (count($qns) > 0) {
   $submission = $assess_record->addSubmission($now);
 
   // Score the questions
-  foreach ($qns as $qn) {
+  foreach ($qns as $k=>$qn) {
     $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $in_practice);
-    $assess_record->scoreQuestion($qn, $submission, $parts_to_score, $in_practice);
+    $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score, $in_practice);
   }
 
   // Update lastchange
@@ -150,7 +153,11 @@ if (count($qns) > 0) {
 }
 
 if ($end_attempt) {
+  // sets assessment attempt as submitted and updates status
   $assess_record->setStatus(false, true, $in_practice);
+} else if ($assessInfoOut['submitby'] == 'by_question') {
+  // checks to see if all questions are attempted and updates status
+  $assess_record->checkByQuestionStatus($in_practice);
 }
 
 // Record record
@@ -162,6 +169,7 @@ if ($end_attempt) {
   $reshowQs = $assess_info->reshowQuestionsAtEnd();
   $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, true, $reshowQs);
   $assessInfoOut['score'] = $assess_record->getAttemptScore($in_practice);
+  $totalScore = $assessInfoOut['score'];
 
   //get prev attempt info
   if ($assessInfoOut['submitby'] == 'by_assessment') {
@@ -172,7 +180,14 @@ if ($end_attempt) {
     }
   }
 
-  // TODO: get endmsg
+  // get endmsg
+  if ($assessInfoOut['showscores'] != 'none') {
+    $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
+      $assess_info->getSetting('endmsg'),
+      $totalScore,
+      $assess_info->getSetting('points_possible')
+    );
+  }
 
 } else {
   // grab question settings data with HTML

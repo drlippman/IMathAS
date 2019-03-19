@@ -85,7 +85,7 @@ $stm->execute(array(':courseid'=>$cid));
 require("testdata.php");
 
 // initialize itemorder
-$itemorder = [];
+$courseitemorder = [];
 
 // create a forum
 $stm = $DBH->prepare("INSERT INTO imas_forums (name, courseid, avail, enddate) VALUES ('A forum', ?, 2, 2000000000)");
@@ -93,7 +93,7 @@ $stm->execute(array($cid));
 $forumid = $DBH->lastInsertId();
 $stm = $DBH->prepare("INSERT INTO imas_items (courseid, itemtype, typeid) VALUES (?,'Forum',?)");
 $stm->execute(array($cid, $forumid));
-$itemorder[] = $DBH->lastInsertId();
+$courseitemorder[] = $DBH->lastInsertId();
 
 
 // add questionset items
@@ -132,7 +132,7 @@ foreach ($assessGroups as $agroup) {
     $ph = Sanitize::generateQueryPlaceholders($data);
     if (isset($data['reqscoreaid'])) {
       // map reqscoreaid
-      $data['reqscoreaid'] = $addedIds[$data['reqscoreaid']];
+      $data['reqscoreaid'] = $addedIds[count($addedIds) + $data['reqscoreaid']];
     }
     $stm = $DBH->prepare("INSERT INTO imas_assessments ($keys) VALUES ($ph)");
     $stm->execute(array_values($data));
@@ -185,12 +185,12 @@ foreach ($assessGroups as $agroup) {
   foreach ($agroup['assessments'] as $n=>$data) {
     $group['items'][] = $items[$n];
   }
-  $itemorder[] = $group;
+  $courseitemorder[] = $group;
 }
 
 // add to course
 $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=? WHERE id=?");
-$stm->execute(array(serialize($itemorder), $cid));
+$stm->execute(array(serialize($courseitemorder), $cid));
 
 // TODO: Add exceptions, student attempt data, views, etc.
 
