@@ -151,10 +151,6 @@ if (!$assess_record->hasUnsubmittedAttempt($in_practice)) {
     if ($assess_record->canMakeNewAttempt(false)) {
       $assess_record->buildNewAssessVersion(false, true);
       $assess_record->saveRecord(true, false);
-    } else if ($assess_info->getSetting('submitby') == 'by_question') {
-      // reopen for submission. Do we really want to do this?  TODO
-      $assess_record->setStatus(true, true, $in_practice);
-      $assess_record->saveRecord(true, false);
     } else {
       // if we can't make one, report error
       echo '{"error": "out_of_attempts"}';

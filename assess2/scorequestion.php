@@ -40,18 +40,14 @@ if ($isteacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 // if toscoreqn is not an array, make it into one
-if (is_array($_POST['toscoreqn'])) {
-  $qns = array_map('Sanitize::onlyInt', $_POST['toscoreqn']);
-  $lastloaded = array_map('Sanitize::onlyInt', $_POST['lastloaded']);
-  $timeactive = array_map('Sanitize::onlyInt', $_POST['timeactive']);
-} else if ($_POST['toscoreqn'] == -1) {
+if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $qns = array();
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
   $timeactive = array();
 } else {
-  $qns = array(Sanitize::onlyInt($_POST['toscoreqn']));
-  $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
-  $timeactive = array(Sanitize::onlyInt($_POST['timeactive']));
+  $qns = array_map('Sanitize::onlyInt', explode(',', $_POST['toscoreqn']));
+  $lastloaded = array_map('Sanitize::onlyInt', explode(',', $_POST['lastloaded']));
+  $timeactive = array_map('Sanitize::onlyInt', explode(',', $_POST['timeactive']));
 }
 $end_attempt = !empty($_POST['endattempt']);
 $autosave = !empty($_POST['autosave']);  // TODO!!
@@ -170,6 +166,7 @@ if ($end_attempt) {
   $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, true, $reshowQs);
   $assessInfoOut['score'] = $assess_record->getAttemptScore($in_practice);
   $totalScore = $assessInfoOut['score'];
+  $assessInfoOut['has_active_attempt'] = false;
 
   //get prev attempt info
   if ($assessInfoOut['submitby'] == 'by_assessment') {
@@ -178,6 +175,12 @@ if ($end_attempt) {
     if ($showPrevAttemptScores) {
       $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
     }
+  }
+
+  if ($assessInfoOut['submitby'] == 'by_question') {
+    $assessInfoOut['can_retake'] = false;
+  } else {
+    $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) < $assessInfoOut['allowed_attempts']);
   }
 
   // get endmsg

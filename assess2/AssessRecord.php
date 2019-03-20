@@ -438,8 +438,16 @@ class AssessRecord
         $this->parseScored();
         $lastver = count($this->scoredData['assess_versions']) - 1;
         $this->scoredData['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
+        // record now as lastchange on attempt if no submissions have been made
+        if ($this->scoredData['assess_versions'][$lastver]['lastchange'] === 0) {
+          $this->scoredData['assess_versions'][$lastver]['lastchange'] = time();
+        }
+        if ($this->scoredData['lastchange'] === 0) {
+          $this->scoredData['lastchange'] = time();
+        }
       }
     }
+    $this->need_to_record = true;
   }
 
   /**
