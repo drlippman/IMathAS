@@ -414,7 +414,7 @@ class AssessInfo
    */
   public function reshowQuestionsAtEnd() {
     $showscores = $this->assessData['showscores'];
-    return ($showscores == 'at_end');
+    return ($showscores == 'at_end' || $showscores == 'during');
   }
 
 

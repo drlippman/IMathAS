@@ -654,9 +654,14 @@ class AssessRecord
 
     if (!$by_question || $ver === 'last') {
       $curq = $question_versions[count($question_versions) - 1];
+    } else if ($ver === 'scored') {
+      // get scored version when by_question
+      $curq = $question_versions[$aver['questions'][$qn]['scored_version']];
     } else {
       $curq = $question_versions[$ver];
     }
+
+    $tryToGet = ($ver === 'scored') ? 'all' : 'last';
 
     if ($is_practice) {
       $data = $this->practiceData;
@@ -669,14 +674,14 @@ class AssessRecord
 
     // get regen number for by_question
     if ($by_question) {
-      if ($ver === 'last') {
+      if (!is_numeric($ver)) {
         $regen = count($aver['questions'][$qn]['question_versions']);
       } else {
         $regen = $ver;
       }
       $out['regen'] = $regen;
     } else {
-      if ($ver === 'last') {
+      if (!is_numeric($ver)) {
         $regen = count($data['assess_versions']);
       } else {
         $regen = $ver;
@@ -708,7 +713,8 @@ class AssessRecord
       $raw = 0;
       $status = 'attempted';
       if ($include_scores) {
-        list($score, $raw, $parts) = $this->getQuestionPartScores($qn, $is_practice, $ver, 'last');
+        // get scores. Get last try unless doing 'scored'
+        list($score, $raw, $parts) = $this->getQuestionPartScores($qn, $is_practice, $ver, $tryToGet);
       } else if ($include_parts) {
         $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
         $answeightTot = array_sum($answeights);
@@ -750,7 +756,12 @@ class AssessRecord
     }
 
     if ($generate_html) {
-      list($out['html'], $out['answeights']) = $this->getQuestionHtml($qn, $is_practice, $ver);
+      $showscores = $this->assess_info->getSetting('showscores');
+      $force_scores = ($aver['status'] === 1 && $showscores === 'at_end');
+      $showans = $this->assess_info->getSetting('showans');
+      $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt');
+
+      list($out['html'], $out['answeights']) = $this->getQuestionHtml($qn, $is_practice, $ver, false, $force_scores, $force_answers);
       $this->setAnsweights($qn, $out['answeights'], $is_practice, $ver);
       $out['seed'] = $curq['seed'];
     } else {
@@ -774,14 +785,14 @@ class AssessRecord
       $assessver = &$this->practiceData['assess_versions'][0];
     } else {
       $this->parseScored();
-      if ($by_question || $ver === 'last') {
+      if ($by_question || !is_numeric($ver)) {
         $assessver = &$this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
       } else {
         $assessver = &$this->scoredData['assess_versions'][$ver];
       }
     }
     $question_versions = &$assessver['questions'][$qn]['question_versions'];
-    if (!$by_question || $ver === 'last') {
+    if (!$by_question || !is_numeric($ver)) {
       $curq = &$question_versions[count($question_versions) - 1];
     } else {
       $curq = &$question_versions[$ver];
@@ -830,7 +841,7 @@ class AssessRecord
       $submissions = $this->practiceData['submissions'];
     } else {
       $submissions = $this->scoredData['submissions'];
-      if ($by_question || $ver === 'last') {
+      if ($by_question || !is_numeric($ver)) {
         $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
         if (!$by_question) {
           $regen = count($this->scoredData['assess_versions']);
@@ -851,6 +862,9 @@ class AssessRecord
       if ($by_question) {
         $regen = count($question_versions);
       }
+    } else if ($ver === 'scored') {
+      // get scored version when by_question
+      $qver = $question_versions[$assessver['questions'][$qn]['scored_version']];
     } else {
       $qver = $question_versions[$ver];
       $regen = $ver;
@@ -1101,7 +1115,7 @@ class AssessRecord
     $stuanswerval = array();
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
       $question_versions = $assessver['questions'][$qn]['question_versions'];
-      if (!$by_question || $ver === 'last') {
+      if (!$by_question || !is_numeric($ver)) {
         $curq = $question_versions[count($question_versions) - 1];
       } else {
         $curq = $question_versions[$ver];
@@ -1149,7 +1163,7 @@ class AssessRecord
     $out = array();
     foreach ($qns as $qn) {
       $question_versions = $assessver['questions'][$qn]['question_versions'];
-      if (!$by_question || $ver === 'last') {
+      if (!$by_question || !is_numeric($ver)) {
         $curq = $question_versions[count($question_versions) - 1];
       } else {
         $curq = $question_versions[$ver];
@@ -1209,7 +1223,7 @@ class AssessRecord
 
         } // end loop over question versions
         if ($by_question) {
-          $curAver['questions'][$qn]['scoredversion'] = $qScoredVer;
+          $curAver['questions'][$qn]['scored_version'] = $qScoredVer;
         }
         $curAver['questions'][$qn]['score'] = $maxQscore;
         $curAver['questions'][$qn]['rawscore'] = $maxQrawscore;
@@ -1350,7 +1364,7 @@ class AssessRecord
       $assessver = $this->practiceData['assess_versions'][0];
     } else {
       $this->parseScored();
-      if ($by_question || $ver === 'last') {
+      if ($by_question || !is_numeric($ver)) {
         $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
       } else {
         $assessver = $this->scoredData['assess_versions'][$ver];
@@ -1373,14 +1387,14 @@ class AssessRecord
       $assessver = $this->practiceData['assess_versions'][0];
     } else {
       $this->parseScored();
-      if ($by_question || $ver === 'last') {
+      if ($by_question || !is_numeric($ver)) {
         $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
       } else {
         $assessver = $this->scoredData['assess_versions'][$ver];
       }
     }
     $question_versions = $assessver['questions'][$qn]['question_versions'];
-    if (!$by_question || $ver === 'last') {
+    if (!$by_question || !is_numeric($ver)) {
       $curq = $question_versions[count($question_versions) - 1];
     } else {
       $curq = $question_versions[$ver];
@@ -1425,14 +1439,14 @@ class AssessRecord
       $assessver = &$this->practiceData['assess_versions'][0];
     } else {
       $this->parseScored();
-      if ($by_question || $ver === 'last') {
+      if ($by_question || !is_numeric($ver)) {
         $assessver = &$this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
       } else {
         $assessver = &$this->scoredData['assess_versions'][$ver];
       }
     }
     $question_versions = &$assessver['questions'][$qn]['question_versions'];
-    if (!$by_question || $ver === 'last') {
+    if (!$by_question || !is_numeric($ver)) {
       $curq = &$question_versions[count($question_versions) - 1];
     } else {
       $curq = &$question_versions[$ver];
