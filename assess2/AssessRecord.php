@@ -783,13 +783,14 @@ class AssessRecord
       if ($include_scores) {
         // get scores. Get last try unless doing 'scored'
         list($score, $raw, $parts) = $this->getQuestionPartScores($qn, $is_practice, $ver, $tryToGet);
-      } else if ($include_parts) {
-        $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
-        $answeightTot = array_sum($answeights);
       }
-      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
+      $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
+
+      $answeightTot = array_sum($answeights);
+
+      for ($pn = 0; $pn < count($answeights); $pn++) {
         // get part details
-        $parttry = count($curq['tries'][$pn]);
+        $parttry = isset($curq['tries'][$pn]) ? count($curq['tries'][$pn]) : 0;
         $try = min($try, $parttry);
         if ($parttry === 0) {
           // if any parts are unattempted, mark question as such
@@ -948,12 +949,13 @@ class AssessRecord
     $parts = array();
     $is_singlescore = !empty($qver['singlescore']);
     // loop over each part
-    for ($pn = 0; $pn < count($qver['tries']); $pn++) {
-      $max = count($qver['tries'][$pn]) - 1;
+    for ($pn = 0; $pn < count($answeights); $pn++) {
+      $max = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) - 1 : -1;
       if ($max == -1) {
         // no tries yet
         $parts[$pn] = array(
           'try' => 0,
+          'score' => 0,
           'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
         );
         continue;
@@ -1031,7 +1033,7 @@ class AssessRecord
     $autosave = $this->getAutoSaves($qn, $is_practice);
 
     $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
-    
+
     $partattemptn = array();
     $qcolors = array();
     $lastans = array();
@@ -1126,13 +1128,15 @@ class AssessRecord
    */
   public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true, $is_practice=false) {
     $qver = $this->getQuestionVer($qn, $is_practice);
+    $answeights = $qver['answeights'];
+
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
 
     $partattemptn = array();
-    for ($pn = 0; $pn < count($qver['tries']); $pn++) {
+    for ($pn = 0; $pn < count($answeights); $pn++) {
       // figure out try #
-      $partattemptn[$pn] = count($qver['tries'][$pn]);
+      $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : min($partattemptn);
 
@@ -1331,26 +1335,29 @@ class AssessRecord
       $this->parseScored();
       $data = $this->scoredData;
     }
-    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $by_question = ($this->assess_info->getSetting('submitby') === 'by_question');
     if ($by_question) {
-      $qvers = $data['assess_versions'][0]['questions'][$qn];
+      $qvers = $data['assess_versions'][0]['questions'][$qn]['question_versions'];
+      $answeights = $qvers[count($qvers) - 1]['answeights'];
       $tries = $qvers[count($qvers) - 1]['tries'];
     } else {
       $aver = $data['assess_versions'][count($data['assess_versions']) - 1];
+      $answeights = $aver['questions'][$qn]['question_versions'][0]['answeights'];
       $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
     }
-
     $tries_max = $this->assess_info->getQuestionSetting($qid, 'tries_max');
     $out = array();
-    if (count($tries) === 0) {
-      // if no tries yet, just return true to say can record all
-      return true;
+    for ($pn = 0; $pn < count($answeights); $pn++) {
+      if (!isset($tries[$pn])) {
+        $out[$pn] = true;
+      } else {
+        $out[$pn] = (count($tries[$pn]) < $tries_max);
+      }
     }
-    foreach ($tries as $pn=>$data) {
-      $out[$pn] = (count($data) < $tries_max);
-    }
+
     return $out;
   }
+
 
   /**
    * Find out if question can be regenerated

@@ -6,7 +6,7 @@ $questionSet = [
     'description' => 'Simple single-part number question w video',
     'qtype' => 'number',
     'control' => '$a = rand(1,100)'."\n".'$answer = $a',
-    'qtext' => 'Type $a',
+    'qtext' => 'Math test: `2/3`.  Type $a',
     'extref' => 'video!!https://www.youtube.com/watch?v=zc2CpyRtjvY!!1'
   ],
   1=> [

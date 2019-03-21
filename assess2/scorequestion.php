@@ -43,10 +43,12 @@ if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $qns = array();
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
   $timeactive = array();
+  $nonblank = array();
 } else {
   $qns = array_map('Sanitize::onlyInt', explode(',', $_POST['toscoreqn']));
   $lastloaded = array_map('Sanitize::onlyInt', explode(',', $_POST['lastloaded']));
   $timeactive = array_map('Sanitize::onlyInt', explode(',', $_POST['timeactive']));
+  $nonblank = json_decode($_POST['nonblank'], true);
 }
 $end_attempt = !empty($_POST['endattempt']);
 
@@ -132,6 +134,12 @@ if (count($qns) > 0) {
       $timeactive[$k] = 0;
     }
     $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $in_practice);
+    // only score the non-blank ones
+    foreach ($parts_to_score as $pn=>$v) {
+      if ($v === true && !in_array($pn, $nonblank[$qn])) {
+        $parts_to_score[$pn] = false;
+      }
+    }
     $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score, $in_practice);
   }
 
