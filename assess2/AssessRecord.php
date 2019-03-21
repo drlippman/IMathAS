@@ -468,6 +468,74 @@ class AssessRecord
   }
 
   /**
+   * Save relevant POST to autosaves
+   * @param int  $time          Timestamp
+   * @param int  $qn            The question number
+   * @param array $pn           The part number to save
+   * @param boolean $is_practice   true if practice
+   * @return void
+   */
+  public  function setAutoSave($time, $qn, $pn, $is_practice = false) {
+    if ($is_practice) {
+      $this->parsePratice();
+      $data = &$this->practiceData['autosaves'];
+    } else {
+      $this->parseScored();
+      $data = &$this->scoredData['autosaves'];
+    }
+    $seconds = $time - $this->assessRecord['starttime'];
+    if (!isset($data[$qn])) {
+      $data[$qn] = array(
+        'time' => $time,
+        'post' => array(),
+        'stuans' => array()
+      );
+    }
+    $tosave = array();
+    foreach ($_POST as $key=>$val) {
+      if ($pn == 0) {
+        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.(($qn+1)*1000 + $pn).'\\b)/', $key)) {
+          $data[$qn]['post'][$key] = $val;
+        }
+      } else if (preg_match('/^(qn|tc|qs)'.(($qn+1)*1000 + $pn).'\\b/', $key)) {
+        $data[$qn]['post'][$key] = $val;
+      }
+      if (isset($data[$qn]['post'][$key])) {
+        $data[$qn]['stuans'][$pn] = $val; // TODO: fix this
+      }
+    }
+
+    $this->need_to_record = true;
+  }
+
+  /**
+   * Clears the autosave for a question
+   * @param  int  $qn          Question number
+   * @param  int  $pn          Part number.  If -1 clears whole question
+   * @param  boolean $is_practice Whether practice
+   * @return void
+   */
+  private function clearAutoSave($qn, $pn, $is_practice = false) {
+    if ($is_practice) {
+      $this->parsePratice();
+      $data = &$this->practiceData['autosaves'];
+    } else {
+      $this->parseScored();
+      $data = &$this->scoredData['autosaves'];
+    }
+    if ($pn === -1) {
+      unset($data[$qn]);
+    } else {
+      if (count($data[$qn]['stuans']) === 1) {
+        unset($data[$qn]);
+      } else {
+        unset($data[$qn]['stuans'][$pn]);
+      }
+    }
+    $this->need_to_record = true;
+  }
+
+  /**
    * Determine if there is an unsubmitted assessment attempt
    * This includes not-yet-opened assessment attempts
    * @param boolean $ispractice  True if looking at practice attempts (def: false)
@@ -962,6 +1030,8 @@ class AssessRecord
     // see if there is autosaved answers to redisplay
     $autosave = $this->getAutoSaves($qn, $is_practice);
 
+    $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
+    
     $partattemptn = array();
     $qcolors = array();
     $lastans = array();
@@ -969,9 +1039,10 @@ class AssessRecord
     $showans = true;
     $trylimit = $qsettings['tries_max'];
 
-    for ($pn = 0; $pn < count($qver['tries']); $pn++) {
+    for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
       $partattemptn[$pn] = count($qver['tries'][$pn]);
+
       if ($clearans) {
         $lastans[$pn] = '';
       } else if (isset($autosave['stuans'][$pn])) {
@@ -1095,6 +1166,7 @@ class AssessRecord
           'time' => round($timeactive/1000),
           'stuans' => $partla[$k]   // TODO: this is wrong for most types
         );
+        $this->clearAutoSave($qn, $k, $is_practice);
       }
     }
     $singlescore = (count($rawparts) > 1 && count($scores) == 1);

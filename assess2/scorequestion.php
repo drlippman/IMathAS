@@ -12,7 +12,6 @@
  * POST parameters:
  *  toscoreqn           Question number to score, or array of question numbers
  *  lastloaded          Time the question was last displayed
- *  autosave            Set true if autosave (no scoring)
  *
  * Returns: partial assessInfo object, mainly including the scored question
  *          object, but may also update some assessInfo fields
@@ -50,8 +49,6 @@ if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $timeactive = array_map('Sanitize::onlyInt', explode(',', $_POST['timeactive']));
 }
 $end_attempt = !empty($_POST['endattempt']);
-$autosave = !empty($_POST['autosave']);  // TODO!!
-
 
 $now = time();
 
@@ -126,12 +123,14 @@ if (count($qns) > 0) {
 
   // TODO:  Verify confirmation values (to ensure it hasn't been submitted since)
 
-
   // Record a submission
   $submission = $assess_record->addSubmission($now);
 
   // Score the questions
   foreach ($qns as $k=>$qn) {
+    if (!isset($timeactive[$k])) {
+      $timeactive[$k] = 0;
+    }
     $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $in_practice);
     $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score, $in_practice);
   }
