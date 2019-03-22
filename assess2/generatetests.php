@@ -114,13 +114,18 @@ $stmsel = $DBH->prepare("SELECT id FROM imas_questionset WHERE uniqueid=?");
 foreach ($questionSet as $n=>$data) {
   $stmsel->execute(array($data['uniqueid']));
   if ($stmsel->rowCount() > 0) {
-    $qsetIds[$n] = $stmsel->fetchColumn(0);
+    $data['id'] = $stmsel->fetchColumn(0);
+    $qsetIds[$n] = $data['id'];
+    $action = 'REPLACE';
   } else {
-    $data['ownerid'] = $teacher;
-    $keys = implode(',', array_keys($data));
-    $ph = Sanitize::generateQueryPlaceholders($data);
-    $stm = $DBH->prepare("INSERT INTO imas_questionset ($keys) VALUES ($ph)");
-    $stm->execute(array_values($data));
+    $action = 'INSERT';
+  }
+  $data['ownerid'] = $teacher;
+  $keys = implode(',', array_keys($data));
+  $ph = Sanitize::generateQueryPlaceholders($data);
+  $stm = $DBH->prepare("$action INTO imas_questionset ($keys) VALUES ($ph)");
+  $stm->execute(array_values($data));
+  if ($action === 'INSERT') {
     $qsetIds[$n] = $DBH->lastInsertId();
   }
 }
@@ -140,7 +145,6 @@ foreach ($assessGroups as $gn=>$agroup) {
       $data['posttoforum'] = $forumid;
     }
     if (isset($data['defoutcome'])) {
-      echo "here".$data['defoutcome'];
       $data['defoutcome'] = $outcomes[$data['defoutcome']];
     }
     $data['startdate'] = $now + $data['startdate']*60*60;
