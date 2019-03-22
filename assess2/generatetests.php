@@ -81,6 +81,10 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 $stm = $DBH->prepare("DELETE FROM imas_stugroupset WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 
+// delete old outcomes
+$stm = $DBH->prepare("DELETE FROM imas_outcomes WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+
 /** Create new stuff **/
 require("testdata.php");
 
@@ -95,6 +99,14 @@ $stm = $DBH->prepare("INSERT INTO imas_items (courseid, itemtype, typeid) VALUES
 $stm->execute(array($cid, $forumid));
 $courseitemorder[] = $DBH->lastInsertId();
 
+// create an outcome
+$outcomes = array();
+$stm = $DBH->prepare("INSERT INTO imas_outcomes (name, courseid) VALUES (?,?)");
+$stm->execute(array('Default outcome', $cid));
+$outcomes[0] = $DBH->lastInsertId();
+$stm = $DBH->prepare("INSERT INTO imas_outcomes (name, courseid) VALUES (?,?)");
+$stm->execute(array('Demo outcome', $cid));
+$outcomes[1] = $DBH->lastInsertId();
 
 // add questionset items
 $qsetIds = array();
@@ -127,6 +139,10 @@ foreach ($assessGroups as $gn=>$agroup) {
     if (isset($data['posttoforum'])) {
       $data['posttoforum'] = $forumid;
     }
+    if (isset($data['defoutcome'])) {
+      echo "here".$data['defoutcome'];
+      $data['defoutcome'] = $outcomes[$data['defoutcome']];
+    }
     $data['startdate'] = $now + $data['startdate']*60*60;
     $data['enddate'] = $now + $data['enddate']*60*60;
     $keys = implode(',', array_keys($data));
@@ -144,6 +160,11 @@ foreach ($assessGroups as $gn=>$agroup) {
     foreach ($questions as $qn=>$qdata) {
       $qdata['assessmentid'] = $addedIds[$n];
       $qdata['questionsetid'] = $qsetIds[$qdata['questionsetid']];
+      if (is_numeric($qdata['category']) && $qdata['category']>0) {
+        $qdata['category'] = $outcomes[$qdata['category']];
+      } else if (substr($qdata['category'],0,3)==='AID') {
+        $qdata['category'] = 'AID-'.$addedIds[$n + substr($qdata['category'],3)];
+      }
       $keys = implode(',', array_keys($qdata));
       $ph = Sanitize::generateQueryPlaceholders($qdata);
       $stm = $DBH->prepare("INSERT INTO imas_questions ($keys) VALUES ($ph)");

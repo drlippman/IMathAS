@@ -348,7 +348,32 @@ $assessGroups = [
           2=>['questionsetid' => 2]
         ],
         'itemorder' => [0,1,2]
-      ]
+      ],
+      [
+        'name' => 'Category test',
+        'summary' => 'category for question 1 is default outcome, for question 2 is assessment, for question 3 is custom outcome',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'defoutcome' => 0,
+        'questions' => [
+          0=>['questionsetid' => 0, 'category' => 0],
+          1=>['questionsetid' => 1, 'category' => 'AID-1'],
+          2=>['questionsetid' => 0, 'category' => 1]
+        ],
+        'itemorder' => [0,1,2]
+      ],
     ]
   ],
   [

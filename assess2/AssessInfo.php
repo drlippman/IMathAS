@@ -165,9 +165,49 @@ class AssessInfo
       $stm->execute(array($this->curAid));
     }
     $qsids = array();
+    $tolookupAids = array();
+    $tolookupOutcomes = array();
     while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
       $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
       $qsids[] = $qrow['questionsetid'];
+      $category = &$this->questionData[$qrow['id']]['category'];
+      if ($category === '') {
+        // do nothing
+      } else if (is_numeric($category)) {
+        if (intval($category) === 0) {
+          $category = $this->assessData['defoutcome'];
+        }
+        $tolookupOutcomes[$qrow['id']] = $category;
+      } else if (0==strncmp($category,"AID-",4)) {
+        $tolookupAids[$qrow['id']] = substr($category, 4);
+      }
+    }
+    if (count($tolookupAids) > 0) {
+      $uniqAids = array_values(array_unique($tolookupAids));
+      $ph = Sanitize::generateQueryPlaceholders($uniqAids);
+      $stm = $this->DBH->prepare("SELECT id,name FROM imas_assessments WHERE id IN ($ph) AND courseid=?");
+      $stm->execute(array_merge($uniqAids, array($this->cid)));
+      $aidmap = array();
+      while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $aidmap[$row['id']] = $row['name'];
+      }
+      foreach ($tolookupAids as $qid=>$aid) {
+        // TODO: include enough for link to assessment too
+        $this->questionData[$qid]['category'] = $aidmap[$aid];
+      }
+    }
+    if (count($tolookupOutcomes) > 0) {
+      $uniqOutcomes = array_values(array_unique($tolookupOutcomes));
+      $ph = Sanitize::generateQueryPlaceholders($uniqOutcomes);
+      $stm = $this->DBH->prepare("SELECT id,name FROM imas_outcomes WHERE id IN ($ph) AND courseid=?");
+      $stm->execute(array_merge($uniqOutcomes, array($this->cid)));
+      $outcomemap = array();
+      while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $outcomemap[$row['id']] = $row['name'];
+      }
+      foreach ($tolookupOutcomes as $qid=>$oid) {
+        $this->questionData[$qid]['category'] = $outcomemap[$oid];
+      }
     }
     if ($get_code && count($qsids) > 0) {
       $ph = Sanitize::generateQueryPlaceholders($qsids);
@@ -674,10 +714,6 @@ class AssessInfo
 
     if ($settings['showhints'] == -1) {
       $settings['showhints'] = $defaults['showhints'];
-    }
-
-    if ($settings['category'] === '0') {
-      $settings['category'] = '';
     }
 
     if (!empty($settings['fixedseeds'])) {
