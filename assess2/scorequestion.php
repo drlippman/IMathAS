@@ -61,10 +61,6 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-// load user's assessment record
-$assess_record = new AssessRecord($DBH, $assess_info);
-$assess_record->loadRecord($uid);
-
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -75,8 +71,12 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
   exit;
 }
 
+// load user's assessment record
+$assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
+$assess_record->loadRecord($uid);
+
 // make sure a record exists
-if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt($in_practice)) {
+if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
   echo '{"error": "not_ready"}';
   exit;
 }
@@ -93,7 +93,7 @@ if (!$in_practice &&
 }
 
 // if there's no active assessment attempt, exit
-if (!$assess_record->hasUnsubmittedAttempt($in_practice)) {
+if (!$assess_record->hasUnsubmittedAttempt()) {
   echo '{"error": "not_ready"}';
   exit;
 }
@@ -118,7 +118,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 
 if (count($qns) > 0) {
   // get current question version ids
-  $qids = $assess_record->getQuestionIds($qns, $in_practice);
+  $qids = $assess_record->getQuestionIds($qns);
 
   // load question settings and code
   $assess_info->loadQuestionSettings($end_attempt ? 'all' : $qids, true);
@@ -133,23 +133,23 @@ if (count($qns) > 0) {
     if (!isset($timeactive[$k])) {
       $timeactive[$k] = 0;
     }
-    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $in_practice);
+    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn]);
     // only score the non-blank ones
     foreach ($parts_to_score as $pn=>$v) {
       if ($v === true && !in_array($pn, $nonblank[$qn])) {
         $parts_to_score[$pn] = false;
       }
     }
-    $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score, $in_practice);
+    $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score);
   }
 
   // Update lastchange
-  $assess_record->setLastChange($now, $in_practice);
+  $assess_record->setLastChange($now);
   // update status if all questions answered
   // TODO
 
   // Recalculate scores
-  $assess_record->reTotalAssess($in_practice, $qns);
+  $assess_record->reTotalAssess($qns);
   // TODO: if by-question and all questions attempted, update status
 } else {
   $assess_info->loadQuestionSettings('all', false);
@@ -157,21 +157,21 @@ if (count($qns) > 0) {
 
 if ($end_attempt) {
   // sets assessment attempt as submitted and updates status
-  $assess_record->setStatus(false, true, $in_practice);
+  $assess_record->setStatus(false, true);
 } else if ($assessInfoOut['submitby'] == 'by_question') {
   // checks to see if all questions are attempted and updates status
-  $assess_record->checkByQuestionStatus($in_practice);
+  $assess_record->checkByQuestionStatus();
 }
 
 // Record record
-$assess_record->saveRecord(!$in_practice, $in_practice);
+$assess_record->saveRecord();
 
 if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
   $showscores = $assess_info->showScoresAtEnd();
   $reshowQs = $assess_info->reshowQuestionsAtEnd();
-  $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, true, $reshowQs, 'scored');
-  $assessInfoOut['score'] = $assess_record->getAttemptScore($in_practice);
+  $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
+  $assessInfoOut['score'] = $assess_record->getAttemptScore();
   $totalScore = $assessInfoOut['score'];
   $assessInfoOut['has_active_attempt'] = false;
 
@@ -204,12 +204,12 @@ if ($end_attempt) {
   $showscores = $assess_info->showScoresDuring();
   $assessInfoOut['questions'] = array();
   foreach ($qns as $qn) {
-    $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $in_practice, $showscores, true, true);
+    $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
   }
 }
 
 // save record if needed
-$assess_record->saveRecordIfNeeded(!$in_practice, $in_practice);
+$assess_record->saveRecordIfNeeded();
 
 //output JSON object
 echo json_encode($assessInfoOut);

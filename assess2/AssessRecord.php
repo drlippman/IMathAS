@@ -19,8 +19,7 @@ class AssessRecord
   private $assessRecord = null;
   private $assess_info = null;
   private $hasRecord = false;
-  private $scoredData = null;
-  private $practiceData = null;
+  private $data = null;
   private $is_practice = false;
   private $status = 'no_record';
   private $now = 0;
@@ -32,10 +31,11 @@ class AssessRecord
    * @param object $DBH PDO Database Handler
    * @param object $assess_info  AssessInfo instance
    */
-  function __construct($DBH, $assess_info = null) {
+  function __construct($DBH, $assess_info = null, $is_practice = false) {
     $this->DBH = $DBH;
     $this->assess_info = $assess_info;
     $this->curAid = $assess_info->getSetting('id');
+    $this->is_practice = $is_practice;
     $this->now = time();
   }
 
@@ -62,28 +62,27 @@ class AssessRecord
    * @param boolean $is_practice  True if working in practice mode
    */
   public function setInPractice($is_practice) {
+    if ($is_practice !== $this->is_practice) {
+      $this->data = null;
+    }
     $this->is_practice = $is_practice;
   }
 
   /**
    * Save the record to the database, if something has changed
-   * @param  boolean $saveScored   Whether to save scored data (def: true)
-   * @param  boolean $savePractice Whether to save practice data (def: false)
    * @return void
    */
-  public function saveRecordIfNeeded($saveScored = true, $savePractice = false) {
+  public function saveRecordIfNeeded() {
     if ($this->need_to_record) {
-      $this->saveRecord($saveScored, $savePractice);
+      $this->saveRecord();
     }
   }
 
   /**
    * Save the record to the database
-   * @param  boolean $saveScored   Whether to save scored data (def: true)
-   * @param  boolean $savePractice Whether to save practice data (def: false)
    * @return void
    */
-  public function saveRecord($saveScored = true, $savePractice = false) {
+  public function saveRecord() {
     if ($this->curUid === null || $this->curAid === null) {
       // bail if the userid isn't set
       return false;
@@ -95,13 +94,13 @@ class AssessRecord
     foreach ($fields as $field) {
       $qarr[':'.$field] = $this->assessRecord[$field];
     }
-    if ($saveScored && $this->scoredData !== null) {
+    if (!$this->is_practice && $this->data !== null) {
       $fields[] = 'scoreddata';
-      $qarr[':scoreddata'] = gzencode(json_encode($this->scoredData));
+      $qarr[':scoreddata'] = gzencode(json_encode($this->data));
     }
-    if ($savePractice && $this->practiceData !== null) {
+    if ($this->is_practice && $this->data !== null) {
       $fields[] = 'practicedata';
-      $qarr[':practicedata'] = gzencode(json_encode($this->practiceData));
+      $qarr[':practicedata'] = gzencode(json_encode($this->data));
     }
 
     if ($this->hasRecord) {
@@ -125,8 +124,6 @@ class AssessRecord
       $stm->execute($qarr);
 
       $this->need_to_record = false;
-    } else {
-
     }
   }
 
@@ -162,18 +159,28 @@ class AssessRecord
       'practicedata' => ''
     );
 
-    // initialize scoredData
-    $this->buildAssessData(false, $recordStart);
-    // if in practice, initialize practiceData
+    // generate practice data if in practice
+    $waspractice = $this->is_practice;
     if ($this->is_practice) {
-      $this->buildAssessData(true, $recordStart);
+      $this->buildAssessData($recordStart);
+      $practicetosave = ($this->data !== null) ? gzencode(json_encode($this->data)) : '';
+      $this->setInPractice(false);
+    } else {
+      $practicetosave = '';
+    }
+
+    //generate scored data
+    $this->buildAssessData($recordStart);
+    $scoredtosave = ($this->data !== null) ? gzencode(json_encode($this->data)) : '';
+
+    // switch back to practice if started that way
+    if ($waspractice) {
+      $this->setInPractice(true);
     }
 
     // Save to Database
     $qarr = array();
     $vals = array();
-    $scoredtosave = ($this->scoredData !== null) ? gzencode(json_encode($this->scoredData)) : '';
-    $practicetosave = ($this->practiceData !== null) ? gzencode(json_encode($this->practiceData)) : '';
     foreach ($users as $uid) {
       $vals[] = '(?,?,?,?,?,?,?,?,?)';
       array_push($qarr,
@@ -199,44 +206,33 @@ class AssessRecord
 
   /**
    * Build scoredData or practiceData from scratch
-   * @param  boolean $ispractice  True if generating practiceData (def: false)
    * @param  boolean $recordStart True to record starttime now
    * @return void
    */
-  public function buildAssessData($ispractice = false, $recordStart = true) {
-    if ($ispractice && $this->practiceData !== null) {
-      return false;
-    } else if (!$ispractice && $this->scoredData !== null) {
+  public function buildAssessData($recordStart = true) {
+    if ($this->data !== null) {
       return false;
     }
-    $data = array(
+
+    $this->data = array(
       'submissions' => array(),
       'autosaves' => array(),
       'scored_version' => 0,
       'assess_versions' => array()
     );
-    if ($ispractice) {
-      $this->practiceData = $data;
-    } else {
-      $this->scoredData = $data;
-    }
-    $this->buildNewAssessVersion($inpractice, $recordStart);
+
+    $this->buildNewAssessVersion($recordStart);
   }
 
   /**
    * Build a new assess_versions record in scoredData / practiceData
-   * @param  boolean $ispractice  True if building practice data
    * @param  boolean $recordStart True to record starttime now
    * @return void
    */
-  public function buildNewAssessVersion($ispractice = false, $recordStart = true) {
-    if ($ispractice) {
-      $this->parsePractice();
-      $attempt = count($this->practiceData['assess_versions']);
-    } else {
-      $this->parseScored();
-      $attempt = count($this->scoredData['assess_versions']);
-    }
+  public function buildNewAssessVersion($recordStart = true) {
+    $this->parseData();
+    $attempt = count($this->data['assess_versions']);
+
     // build base framework
     $out = array(
       'starttime' => $recordStart ? $this->now : 0,
@@ -252,8 +248,8 @@ class AssessRecord
     }
 
     // generate the questions and seeds
-    list($oldquestions, $oldseeds) = $this->getOldQuestions($ispractice);
-    list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($ispractice, $attempt);
+    list($oldquestions, $oldseeds) = $this->getOldQuestions();
+    list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($attempt);
     // build question data
     for ($k = 0; $k < count($questions); $k++) {
       $out['questions'][] = array(
@@ -269,57 +265,48 @@ class AssessRecord
         )
       );
     }
-    if ($ispractice) {
-      $this->practiceData['assess_versions'][] = $out;
-    } else {
-      $this->scoredData['assess_versions'][] = $out;
-    }
-    $this->setStatus(true, false, $ispractice);
+    $this->data['assess_versions'][] = $out;
+    
+    $this->need_to_record = true;
+
+    $this->setStatus(true, false);
   }
 
   /**
-   * Build a new question version
+   * Build a new question version.  Used in by-question submission to regen
    * @param  int     $qn          Question #
    * @param  int     $qid         Current Question ID
-   * @param  boolean $ispractice  True if building practice data
    * @return int   New question ID
    */
-  public function buildNewQuestionVersion($qn, $qid, $ispractice) {
-    list($oldquestions, $oldseeds) = $this->getOldQuestions($ispractice);
-    list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
+  public function buildNewQuestionVersion($qn, $qid) {
+    list($oldquestions, $oldseeds) = $this->getOldQuestions();
+    list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds);
     // build question data
     $newver = array(
       'qid' => $question,
       'seed' => $seed,
       'tries' => array()
     );
-    if ($ispractice) {
-      $this->practiceData['assess_versions'][0]['questions'][$qn]['question_versions'][] = $newver;
-    } else {
-      $this->scoredData['assess_versions'][0]['questions'][$qn]['question_versions'][] = $newver;
-    }
+
+    $lastaver = count($this->data['assess_versions'])-1;
+    $this->data['assess_versions'][$lastaver]['questions'][$qn]['question_versions'][] = $newver;
+
     // note that record needs to be saved
     $this->need_to_record = true;
   }
 
   /**
    * Get old questions and seeds previously used in assessment record
-   * @param  boolean $inpractice    True if in practice mode, to get practice data (def: false)
    * @param  int  $qn    (optional)  Question number to return seeds for. If not set, returns all
    * @return array array($questions, $seeds), where each is an array of values
    */
-  public function getOldQuestions($ispractice = false, $qn = -1) {
+  public function getOldQuestions($qn = -1) {
     $questions = array();
     $seeds = array();
-    if ($ispractice) {
-      $this->parsePractice();
-      $data = $this->practiceData;
-    } else {
-      $this->parseScored();
-      $data = $this->scoredData;
-    }
-    if ($data !== null) {
-      foreach ($data['assess_versions'] as $ver) {
+    $this->parseData();
+
+    if ($this->data !== null) {
+      foreach ($this->data['assess_versions'] as $ver) {
         foreach ($ver['questions'] as $thisqn=>$qdata) {
           foreach ($qdata['question_versions'] as $qver) {
             $questions[] = $qver['qid'];
@@ -343,16 +330,15 @@ class AssessRecord
 
   /**
    * Determine if there is an active assessment attempt
-   * @param boolean $ispractice  True if looking at practice attempts (def: false)
    * @return boolean true if there is an active assessment attempt
    */
-  public function hasActiveAttempt($ispractice = false) {
+  public function hasActiveAttempt() {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
     }
-    $aver = $this->getAssessVer($ispractice);
-    return ($aver['status'] == 0);
+    $aver = $this->getAssessVer();
+    return ($aver['status'] === 0);
   }
 
   /**
@@ -374,11 +360,10 @@ class AssessRecord
   /**
    * For by-question submission, check if all questions have been attempted,
    * and update status if so
-   * @param  boolean $ispractice Whether practice
    * @return boolean true if all questions attempted
    */
-  public function checkByQuestionStatus($ispractice = false) {
-    $aver = $this->getAssessVer($ispractice);
+  public function checkByQuestionStatus() {
+    $aver = $this->getAssessVer();
     $allAttempted = true;
     for ($i=0; $i<count($aver['questions']); $i++) {
       if (count($aver['questions'][$i]['question_versions'])>1) {
@@ -393,7 +378,7 @@ class AssessRecord
       }
     }
     if ($allAttempted) {
-      $this->setStatus(false, false, $ispractice);
+      $this->setStatus(false, false);
     }
     return $allAttempted;
   }
@@ -402,24 +387,23 @@ class AssessRecord
    * Sets overall status as active/not
    * @param boolean $active     Set true to mark as active
    * @param boolean $setattempt  True to set last attempt as submitted/unsubmitted (def: false)
-   * @param boolean $ispractice Set true if practice (def: false)
    * @return void
    */
-  public function setStatus($active, $setattempt = false, $ispractice = false) {
+  public function setStatus($active, $setattempt = false) {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
     }
-    if ($ispractice) {
+    if ($this->is_practice) {
       if ($active) {
         $this->assessRecord['status'] |= 16;
       } else {
         $this->assessRecord['status'] = $this->assessRecord['status'] & ~16;
       }
       if ($setattempt) {
-        $this->parsePratice();
-        $lastver = count($this->practiceData['assess_versions']) - 1;
-        $this->practiceData['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
+        $this->parseData();
+        $lastver = count($this->data['assess_versions']) - 1;
+        $this->data['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
       }
     } else {
       // turn off both
@@ -435,15 +419,15 @@ class AssessRecord
         }
       }
       if ($setattempt) {
-        $this->parseScored();
-        $lastver = count($this->scoredData['assess_versions']) - 1;
-        $this->scoredData['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
+        $this->parseData();
+        $lastver = count($this->data['assess_versions']) - 1;
+        $this->data['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
         // record now as lastchange on attempt if no submissions have been made
-        if ($this->scoredData['assess_versions'][$lastver]['lastchange'] === 0) {
-          $this->scoredData['assess_versions'][$lastver]['lastchange'] = time();
+        if ($this->data['assess_versions'][$lastver]['lastchange'] === 0) {
+          $this->data['assess_versions'][$lastver]['lastchange'] = time();
         }
-        if ($this->scoredData['lastchange'] === 0) {
-          $this->scoredData['lastchange'] = time();
+        if ($this->data['lastchange'] === 0) {
+          $this->data['lastchange'] = time();
         }
       }
     }
@@ -452,19 +436,15 @@ class AssessRecord
 
   /**
    * Updates the lastchange for the current assessment version
-   * @param boolean $is_practice whether practice
+   * @param int $time   Timestamp to set as last change
    */
-  public function setLastChange($time, $is_practice = false) {
-    if ($is_practice) {
-      $this->parsePratice();
-      $data = &$this->practiceData;
-    } else {
-      $this->parseScored();
-      $data = &$this->scoredData;
+  public function setLastChange($time) {
+    $this->parseData();
+    $lastver = count($this->data['assess_versions']) - 1;
+    $this->data['assess_versions'][$lastver]['lastchange'] = $time;
+    if (!$this->is_practice) {
+      $this->assessRecord['lastchange'] = $time;
     }
-    $lastver = count($data['assess_versions']) - 1;
-    $data['assess_versions'][$lastver]['lastchange'] = $time;
-    $this->assessData['lastchange'] = $time;
   }
 
   /**
@@ -472,17 +452,11 @@ class AssessRecord
    * @param int  $time          Timestamp
    * @param int  $qn            The question number
    * @param array $pn           The part number to save
-   * @param boolean $is_practice   true if practice
    * @return void
    */
-  public  function setAutoSave($time, $qn, $pn, $is_practice = false) {
-    if ($is_practice) {
-      $this->parsePratice();
-      $data = &$this->practiceData['autosaves'];
-    } else {
-      $this->parseScored();
-      $data = &$this->scoredData['autosaves'];
-    }
+  public  function setAutoSave($time, $qn, $pn) {
+    $this->parseData();
+    $data = &$this->data['autosaves'];
     $seconds = $time - $this->assessRecord['starttime'];
     if (!isset($data[$qn])) {
       $data[$qn] = array(
@@ -512,17 +486,11 @@ class AssessRecord
    * Clears the autosave for a question
    * @param  int  $qn          Question number
    * @param  int  $pn          Part number.  If -1 clears whole question
-   * @param  boolean $is_practice Whether practice
    * @return void
    */
-  private function clearAutoSave($qn, $pn, $is_practice = false) {
-    if ($is_practice) {
-      $this->parsePratice();
-      $data = &$this->practiceData['autosaves'];
-    } else {
-      $this->parseScored();
-      $data = &$this->scoredData['autosaves'];
-    }
+  private function clearAutoSave($qn, $pn) {
+    $this->parseData();
+    $data = &$this->data['autosaves'];
     if ($pn === -1) {
       unset($data[$qn]);
     } else {
@@ -538,48 +506,41 @@ class AssessRecord
   /**
    * Determine if there is an unsubmitted assessment attempt
    * This includes not-yet-opened assessment attempts
-   * @param boolean $ispractice  True if looking at practice attempts (def: false)
    * @return boolean true if there is an unsubmitted assessment attempt
    */
-  public function hasUnsubmittedAttempt($ispractice = false) {
+  public function hasUnsubmittedAttempt() {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return false;
     }
-    if ($ispractice) {
-      $this->parsePratice();
-      $data = $this->practiceData;
-    } else {
-      $this->parseScored();
-      $data = $this->scoredData;
-    }
-    if ($data === null) {
+    $this->parseData();
+
+    if ($this->data === null) {
       return false;
     }
-    if (count($data['assess_versions']) == 0) {
+    if (count($this->data['assess_versions']) == 0) {
       return false;
     }
-    $last_attempt = $data['assess_versions'][count($data['assess_versions'])-1];
+    $last_attempt = $this->data['assess_versions'][count($this->data['assess_versions'])-1];
     return ($last_attempt['status'] === 0);
   }
 
   /**
    * Check whether user is allowed to create a new assessment version
-   * @param  boolean $is_practice True if in practice mode
    * @return boolean              True if OK to create a new assess version
    */
-  public function canMakeNewAttempt($is_practice) {
-    if ($is_practice) {
+  public function canMakeNewAttempt() {
+    if ($this->is_practice) {
       // if in practice, can make new if we don't have one
-      return ($this->practiceData === null);
+      return ($this->data === null);
     } else {
-      if ($this->scoredData === null) {
+      if ($this->data === null) {
         // if no data, can make new
         return true;
       }
-      $this->parseScored();
+      $this->parseData();
       $submitby = $this->assess_info->getSetting('submitby');
-      $prev_attempt_cnt = count($this->scoredData['assess_versions']);
+      $prev_attempt_cnt = count($this->data['assess_versions']);
       // if by-question, then we can if we have no versions yet
       if ($submitby == 'by_question' && $prev_attempt_cnt == 0) {
         return true;
@@ -608,11 +569,16 @@ class AssessRecord
       //no assessment record at all
       return array();
     }
-    $this->parseScored();
+    // if in practice, we want to grab scored previous attempts, so switch out
+    $currently_practice = $this->is_practice;
+    if ($currently_practice) {
+      $this->setInPractice(false);
+      $this->parseData();
+    }
 
     $out = array();
 
-    foreach ($this->scoredData['assess_versions'] as $k=>$ver) {
+    foreach ($this->data['assess_versions'] as $k=>$ver) {
       if ($ver['status'] == 1) {  // if it's a submitted version
         $out[$k] = array(
           'date' => $ver['lastchange'],
@@ -622,6 +588,12 @@ class AssessRecord
         }
       }
     }
+
+    if ($currently_practice) {
+      $this->setInPractice(true);
+      $this->parseData();
+    }
+
     return $out;
     //TODO:  Need to report teacher score override somehow
   }
@@ -637,33 +609,35 @@ class AssessRecord
       //no assessment record at all
       return array();
     }
-    $this->parseScored();
+    $currently_practice = $this->is_practice;
+    if ($currently_practice) {
+      $this->setInPractice(false);
+      $this->parseData();
+    }
 
     $out = array('score' => $this->assessRecord['score']*1);
-    if (isset($this->scoredData['scoreoverride'])) {
+    if (isset($this->data['scoreoverride'])) {
       $out['kept'] = 'override';
-    } else if (isset($this->scoredData['scored_version'])) {
-      $out['kept'] = $this->scoredData['scored_version'];
+    } else if (isset($this->data['scored_version'])) {
+      $out['kept'] = $this->data['scored_version'];
+    }
+
+    if ($currently_practice) {
+      $this->setInPractice(true);
+      $this->parseData();
     }
     return $out;
   }
 
   /**
    * Get the score on an assessment version
-   * @param boolean $is_practice  Whether looking for practice score (def: false)
    * @param  string $ver   Attempt #, or 'last'
    * @return float score on assessment
    */
-  public function getAttemptScore($is_practice = false, $ver = 'last') {
-    if ($is_practice) {
-      $this->parsePratice();
-      $lastver = count($this->practiceData['assess_versions']) - 1;
-      return $this->practiceData['assess_versions'][$lastver]['score'];
-    } else {
-      $this->parseScored();
-      $lastver = count($this->scoredData['assess_versions']) - 1;
-      return $this->scoredData['assess_versions'][$lastver]['score'];
-    }
+  public function getAttemptScore($ver = 'last') {
+    $this->parseData();
+    $lastver = count($this->data['assess_versions']) - 1;
+    return $this->data['assess_versions'][$lastver]['score'];
   }
 
   /**
@@ -682,7 +656,7 @@ class AssessRecord
   }
 
   /**
-   * Get the timestamp for when the current attempt time limit expires
+   * Get the timestamp for when the last scored attempt time limit expires
    *
    * @return integer  timestamp for when  the current attempt time limit expires
    *                  will be 0 if there is no time limit
@@ -691,33 +665,46 @@ class AssessRecord
     if (empty($this->assessRecord)) {
       return false;
     }
-    $this->parseScored();
-    if (count($this->scoredData['assess_versions']) == 0) {
-      return false;
+
+    $returnVal = null;
+    // if in practice, we want to grab scored previous attempts, so switch out
+    $currently_practice = $this->is_practice;
+    if ($currently_practice) {
+      $this->setInPractice(false);
+      $this->parseData();
     }
-    //grab value from last (current) assess attempt
-    $lastvernum = count($this->scoredData['assess_versions']) - 1;
-    $lastver = $this->scoredData['assess_versions'][$lastvernum];
-    return $lastver['timelimit_end'];
+
+    if (count($this->data['assess_versions']) == 0) {
+      $returnVal = false;
+    } else {
+      //grab value from last (current) assess attempt
+      $lastvernum = count($this->data['assess_versions']) - 1;
+      $lastver = $this->data['assess_versions'][$lastvernum];
+      $returnVal = $lastver['timelimit_end'];
+    }
+    if ($currently_practice) {
+      $this->setInPractice(true);
+      $this->parseData();
+    }
+    return $returnVal;
   }
 
 
   /**
    * Generate the question API object
    * @param  int  $qn            Question number (0 indexed)
-   * @param  boolean $is_practice Whether to use practice data (def: false)
    * @param  boolean $include_scores Whether to include scores (def: false)
    * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
    * @param  boolean $generate_html Whether to generate question HTML (def: false)
    * @param int  $ver               Which version to grab data for, or 'last' for most recent
    * @return array  The question object
    */
-  public function getQuestionObject($qn, $is_practice = false, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
+  public function getQuestionObject($qn, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $due_date = $this->assess_info->getSetting('original_enddate');
 
     // get data structure for this question
-    $aver = $this->getAssessVer($is_practice, $ver);
+    $aver = $this->getAssessVer($ver);
     $question_versions = $aver['questions'][$qn]['question_versions'];
 
     if (!$by_question || $ver === 'last') {
@@ -730,12 +717,6 @@ class AssessRecord
     }
 
     $tryToGet = ($ver === 'scored') ? 'all' : 'last';
-
-    if ($is_practice) {
-      $data = $this->practiceData;
-    } else {
-      $data = $this->scoredData;
-    }
 
     // get basic settings
     $out = $this->assess_info->getQuestionSettings($curq['qid']);
@@ -750,7 +731,7 @@ class AssessRecord
       $out['regen'] = $regen;
     } else {
       if (!is_numeric($ver)) {
-        $regen = count($data['assess_versions']);
+        $regen = count($this->data['assess_versions']);
       } else {
         $regen = $ver;
       }
@@ -782,7 +763,7 @@ class AssessRecord
       $status = 'attempted';
       if ($include_scores) {
         // get scores. Get last try unless doing 'scored'
-        list($score, $raw, $parts) = $this->getQuestionPartScores($qn, $is_practice, $ver, $tryToGet);
+        list($score, $raw, $parts) = $this->getQuestionPartScores($qn, $ver, $tryToGet);
       }
       $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
 
@@ -830,8 +811,8 @@ class AssessRecord
       $showans = $this->assess_info->getSetting('showans');
       $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt');
 
-      list($out['html'], $out['answeights']) = $this->getQuestionHtml($qn, $is_practice, $ver, false, $force_scores, $force_answers);
-      $this->setAnsweights($qn, $out['answeights'], $is_practice, $ver);
+      list($out['html'], $out['answeights']) = $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
+      $this->setAnsweights($qn, $out['answeights'], $ver);
       $out['seed'] = $curq['seed'];
     } else {
       $out['html'] = null;
@@ -844,22 +825,19 @@ class AssessRecord
    * Sets the answeights for a question if needed
    * @param int  $qn          Question number
    * @param array $answeights   Answeights array
-   * @param boolean $is_practice Whether practice
    * @param string  $ver         attempt number, or 'last'
    */
-  private function setAnsweights($qn, $answeights, $is_practice = false, $ver = 'last') {
+  private function setAnsweights($qn, $answeights, $ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-    if ($is_practice) {
-      $this->parsePractice();
-      $assessver = &$this->practiceData['assess_versions'][0];
+    $this->parseData();
+    if ($this->is_practice) {
+      $assessver = &$this->data['assess_versions'][0];
+    } else if ($by_question || !is_numeric($ver)) {
+      $assessver = &$this->data['assess_versions'][count($this->data['assess_versions']) - 1];
     } else {
-      $this->parseScored();
-      if ($by_question || !is_numeric($ver)) {
-        $assessver = &$this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
-      } else {
-        $assessver = &$this->scoredData['assess_versions'][$ver];
-      }
+      $assessver = &$this->data['assess_versions'][$ver];
     }
+
     $question_versions = &$assessver['questions'][$qn]['question_versions'];
     if (!$by_question || !is_numeric($ver)) {
       $curq = &$question_versions[count($question_versions) - 1];
@@ -874,19 +852,18 @@ class AssessRecord
 
   /**
    * Generate the question API object for all questions
-   * @param  boolean $is_practice Whether to use practice data (def: false)
    * @param  boolean $include_scores Whether to include scores (def: false)
    * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
    * @param  boolean $generate_html Whether to generate question HTML (def: false)
    * @param int  $ver               Which version to grab data for, or 'last' for most recent
    * @return array  The question object
    */
-  public function getAllQuestionObjects($is_practice = false, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
+  public function getAllQuestionObjects($include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
     $out = array();
     // get data structure for current version
-    $assessver = $this->getAssessVer($is_practice, $ver);
+    $assessver = $this->getAssessVer($ver);
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
-      $out[$qn] = $this->getQuestionObject($qn, $is_practice, $include_scores, $include_parts, $generate_html, $ver);
+      $out[$qn] = $this->getQuestionObject($qn, $include_scores, $include_parts, $generate_html, $ver);
     }
     return $out;
   }
@@ -894,32 +871,29 @@ class AssessRecord
   /**
    * get question part score details
    * @param  int  $qn             The question number
-   * @param  boolean $is_practice Whether using practice data
    * @param  string  $ver         The attempt to use, or 'last' for most recent
    * @param  string  $try         'last' for last try, or 'all' to pick best try per-part
    * @return array (question Score, question Rawscore, parts details)
    *    Where part details is array by part, with (try, score, rawscore, penalties, points_possible)
    */
-  public function getQuestionPartScores ($qn, $is_practice, $ver = 'last', $try = 'last') {
+  public function getQuestionPartScores ($qn, $ver = 'last', $try = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $due_date = $this->assess_info->getSetting('original_enddate');
     $starttime = $this->assessRecord['starttime'];
 
-    if ($is_practice) {
-      $assessver = $this->practiceData['assess_versions'][0];
-      $submissions = $this->practiceData['submissions'];
-    } else {
-      $submissions = $this->scoredData['submissions'];
-      if ($by_question || !is_numeric($ver)) {
-        $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
-        if (!$by_question) {
-          $regen = count($this->scoredData['assess_versions']);
-        }
-      } else {
-        $assessver = $this->scoredData['assess_versions'][$ver];
-        $regen = $ver;
+    $submissions = $this->data['submissions'];
+    if ($this->is_practice) {
+      $assessver = $this->data['assess_versions'][0];
+    } else if ($by_question || !is_numeric($ver)) {
+      $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+      if (!$by_question) {
+        $regen = count($this->data['assess_versions']);
       }
+    } else {
+      $assessver = $this->data['assess_versions'][$ver];
+      $regen = $ver;
     }
+
     if (!$by_question) {
       $retakepenalty = $this->assess_info->getSetting('retake_penalty');
     }
@@ -1016,21 +990,20 @@ class AssessRecord
   /**
    * generate the question HTML
    * @param  int  $qn               Question #
-   * @param  boolean $is_practice   Whether to use practice data
    * @param  string  $ver           Version to use, 'last' for current (def: 'last')
    * @param  boolean $clearans      true to clear answer (def: false)
    * @param  boolean $force_scores  force display of scores (def: false)
    * @param  boolean $force_answers force display of answers (def: false)
    * @return array (questionhtml, answeights)
    */
-  public function getQuestionHtml($qn, $is_practice=false, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false) {
+  public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false) {
     // get assessment attempt data for given version
-    $qver = $this->getQuestionVer($qn, $is_practice, $ver);
+    $qver = $this->getQuestionVer($qn, $ver);
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
     $showscores = ($force_scores || ($this->assess_info->getSetting('showscores') === 'during'));
     // see if there is autosaved answers to redisplay
-    $autosave = $this->getAutoSaves($qn, $is_practice);
+    $autosave = $this->getAutoSaves($qn);
 
     $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
 
@@ -1103,18 +1076,14 @@ class AssessRecord
   /**
    * Add a new submission record
    * @param int $time   The current timestamp
-   * @param boolean $is_practice   If practice submission
    * @return int  submission number, to record with try data
    */
-  public function addSubmission($time, $is_practice=false) {
-      $seconds = $time - $this->assessRecord['starttime'];
-      if ($is_practice) {
-        $this->practiceData['submissions'][] = $seconds;
-        return count($this->practiceData['submissions']) - 1;
-      } else {
-        $this->scoredData['submissions'][] = $seconds;
-        return count($this->scoredData['submissions']) - 1;
-      }
+  public function addSubmission($time) {
+    $seconds = $time - $this->assessRecord['starttime'];
+
+    $this->parsedata();
+    $this->data['submissions'][] = $seconds;
+    return count($this->data['submissions']) - 1;
   }
 
   /**
@@ -1123,11 +1092,10 @@ class AssessRecord
    * @param  int  $timeactive     Time the question was active, in ms
    * @param  int  $submission     The submission number, from addSubmission
    * @param  array $parts_to_score  an array, true if part is to be scored/recorded
-   * @param  boolean $is_practice True if recording as practice
    * @return void
    */
-  public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true, $is_practice=false) {
-    $qver = $this->getQuestionVer($qn, $is_practice);
+  public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true) {
+    $qver = $this->getQuestionVer($qn);
     $answeights = $qver['answeights'];
 
     // get the question settings
@@ -1170,23 +1138,22 @@ class AssessRecord
           'time' => round($timeactive/1000),
           'stuans' => $partla[$k]   // TODO: this is wrong for most types
         );
-        $this->clearAutoSave($qn, $k, $is_practice);
+        $this->clearAutoSave($qn, $k);
       }
     }
     $singlescore = (count($rawparts) > 1 && count($scores) == 1);
-    $this->recordTry($qn, $data, $singlescore, $is_practice);
+    $this->recordTry($qn, $data, $singlescore);
   }
 
   /**
    * Generate $stuanswers and $stuanswersval for the last tries
-   * @param  boolean $is_practice Whether to pull from practice data
    * @param  string  $ver         Version to grab from, or 'last' for latest
    * @return array  ($stuanswers, $stuanswersval)
    */
-  public function getStuanswers($is_practice=false, $ver = 'last') {
+  public function getStuanswers($ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     // get data structure for this question
-    $assessver = $this->getAssessVer($is_practice, $ver);
+    $assessver = $this->getAssessVer($ver);
     $stuanswers = array();
     $stuanswerval = array();
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
@@ -1217,25 +1184,23 @@ class AssessRecord
   /**
    * Gets the question ID for the given question number
    * @param  int  $qn             Question Number
-   * @param  boolean $is_practice Whether is from practice data
    * @param  string  $ver         version #, or 'last'
    * @return int  question ID
    */
-  public function getQuestionId($qn, $is_practice = false, $ver = 'last') {
-    $curq = $this->getQuestionVer($qn, $is_practice, $ver);
+  public function getQuestionId($qn, $ver = 'last') {
+    $curq = $this->getQuestionVer($qn, $ver);
     return $curq['qid'];
   }
 
   /**
    * Gets the question IDs for the given question numbers
    * @param  array  $qns           Array of Question Numbers
-   * @param  boolean $is_practice Whether is from practice data
    * @param  string  $ver         version #, or 'last'
    * @return array  question IDs, indexed by question number
    */
-  public function getQuestionIds($qns, $is_practice = false, $ver = 'last') {
+  public function getQuestionIds($qns, $ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-    $assessver = $this->getAssessVer($is_practice, $ver);
+    $assessver = $this->getAssessVer($ver);
     $out = array();
     foreach ($qns as $qn) {
       $question_versions = $assessver['questions'][$qn]['question_versions'];
@@ -1251,27 +1216,20 @@ class AssessRecord
 
   /**
    * Recalculate the assessment total score, updating the record
-   * @param  boolean $is_practice Whether to total practice data
    * @param  mixed  $rescoreQs   'all' to rescore all, or array of question numbers to re-score
    * @return float   The final assessment total
    */
-  public function reTotalAssess($is_practice, $rescoreQs = 'all') {
+  public function reTotalAssess($rescoreQs = 'all') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
 
     $points = $this->assess_info->getAllQuestionPoints();
-    if ($is_practice) {
-      $this->parsePractice();
-      $data = &$this->practiceData;
-    } else {
-      $this->parseScored();
-      $data = &$this->scoredData;
-    }
+    $this->parseData();
 
     $maxAscore = 0;
     $aScoredVer = 0;
     // loop through all the assessment versions
-    for ($av = 0; $av < count($data['assess_versions']); $av++) {
-      $curAver = &$data['assess_versions'][$av];
+    for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
+      $curAver = &$this->data['assess_versions'][$av];
 
       // loop through the question numbers
       $aVerScore = 0;
@@ -1289,7 +1247,7 @@ class AssessRecord
           if (isset($curQver['scoreoverride'])) {
             $qScore = $curQver['scoreoverride'];
           } else {
-            list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, $is_practice, max($av,$qv), 'all');
+            list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, max($av,$qv), 'all');
           }
           if ($qScore >= $maxQscore) {
             $maxQscore = $qScore;
@@ -1312,9 +1270,9 @@ class AssessRecord
       }
     } // end loop over assessment versions
     if (!$by_question) {
-      $data['scored_version'] = $aScoredVer;
+      $this->data['scored_version'] = $aScoredVer;
     }
-    if (!$is_practice) {
+    if (!$this->is_practice) {
       $this->assessRecord['score'] = $maxAscore;
     }
     return $maxAscore;
@@ -1324,24 +1282,18 @@ class AssessRecord
    * Find out if a submission is allowed per-part
    * @param  int  $qn             Question #
    * @param  int  $qid            Question ID
-   * @param  boolean $is_practice Whether using practice data
    * @return array indexed by part number; true if submission allowed
    */
-  public function isSubmissionAllowed($qn, $qid, $is_practice = false) {
-    if ($is_practice) {
-      $this->parsePractice();
-      $data = $this->practiceData;
-    } else {
-      $this->parseScored();
-      $data = $this->scoredData;
-    }
+  public function isSubmissionAllowed($qn, $qid) {
+    $this->parseData();
+
     $by_question = ($this->assess_info->getSetting('submitby') === 'by_question');
     if ($by_question) {
-      $qvers = $data['assess_versions'][0]['questions'][$qn]['question_versions'];
+      $qvers = $this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
       $answeights = $qvers[count($qvers) - 1]['answeights'];
       $tries = $qvers[count($qvers) - 1]['tries'];
     } else {
-      $aver = $data['assess_versions'][count($data['assess_versions']) - 1];
+      $aver = $this->data['assess_versions'][count($data['assess_versions']) - 1];
       $answeights = $aver['questions'][$qn]['question_versions'][0]['answeights'];
       $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
     }
@@ -1363,23 +1315,17 @@ class AssessRecord
    * Find out if question can be regenerated
    * @param  int  $qn             Question #
    * @param  int  $qid            Question ID
-   * @param  boolean $is_practice Whether using practice data
    * @return boolean true if question can be regenerated
    */
-  public function canRegenQuestion($qn, $qid, $is_practice = false) {
+  public function canRegenQuestion($qn, $qid) {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if (!$by_question) {
       return false;
     }
-    if ($is_practice) {
-      $this->parsePractice();
-      $data = $this->practiceData;
-    } else {
-      $this->parseScored();
-      $data = $this->scoredData;
-    }
+    $this->parseData();
+
     $regens_max = $this->assess_info->getQuestionSetting($qid, 'regens_max');
-    $regens_used = count($data['assess_versions'][0]['questions'][$qn]['question_versions']);
+    $regens_used = count($this->data['assess_versions'][0]['questions'][$qn]['question_versions']);
     return ($regens_used < $regens_max);
   }
 
@@ -1432,22 +1378,18 @@ class AssessRecord
 
   /**
    * Get the specified version of assessment data
-   * @param  boolean $is_practice Whether to grab from practice data
    * @param  string  $ver         The assessment attempt to grab, or 'last'
    * @return object  assessment data for that take
    */
-  private function getAssessVer($is_practice=false, $ver = 'last') {
+  private function getAssessVer($ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-    if ($is_practice) {
-      $this->parsePractice();
-      $assessver = $this->practiceData['assess_versions'][0];
+    $this->parseData();
+    if ($this->is_practice) {
+      $assessver = $this->data['assess_versions'][0];
+    } else if ($by_question || !is_numeric($ver)) {
+      $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
     } else {
-      $this->parseScored();
-      if ($by_question || !is_numeric($ver)) {
-        $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
-      } else {
-        $assessver = $this->scoredData['assess_versions'][$ver];
-      }
+      $assessver = $this->data['assess_versions'][$ver];
     }
     return $assessver;
   }
@@ -1455,22 +1397,18 @@ class AssessRecord
   /**
    * Returns the specified version of question attempt data
    * @param  int  $qn          The question number
-   * @param  boolean $is_practice Whether to grab from practice data
    * @param  string  $ver         The assessment attempt to grab, or 'last'
    * @return object   question data for that version
    */
-  private function getQuestionVer($qn, $is_practice = false, $ver = 'last') {
+  private function getQuestionVer($qn, $ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-    if ($is_practice) {
-      $this->parsePractice();
-      $assessver = $this->practiceData['assess_versions'][0];
+    $this->parseData();
+    if ($this->is_practice) {
+      $assessver = $this->data['assess_versions'][0];
+    } else if ($by_question || !is_numeric($ver)) {
+      $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
     } else {
-      $this->parseScored();
-      if ($by_question || !is_numeric($ver)) {
-        $assessver = $this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
-      } else {
-        $assessver = $this->scoredData['assess_versions'][$ver];
-      }
+      $assessver = $this->data['assess_versions'][$ver];
     }
     $question_versions = $assessver['questions'][$qn]['question_versions'];
     if (!$by_question || !is_numeric($ver)) {
@@ -1484,20 +1422,12 @@ class AssessRecord
   /**
    * Get Autosave info for the given question
    * @param  int  $qn         The question number
-   * @param  boolean $is_practice Whether we're looking at practice data
    * @return array of autosave data
    */
-  private function getAutoSaves($qn, $is_practice=false) {
-    if ($is_practice) {
-      $this->parsePractice();
-      if (isset($this->practiceData['autosaves'][$qn])) {
-        return $this->practiceData['autosaves'][$qn];
-      }
-    } else {
-      $this->parseScored();
-      if (isset($this->scoredData['autosaves'][$qn])) {
-        return $this->scoredData['autosaves'][$qn];
-      }
+  private function getAutoSaves($qn) {
+    $this->parseData();
+    if (isset($this->data['autosaves'][$qn])) {
+      return $this->data['autosaves'][$qn];
     }
     return array();
   }
@@ -1507,22 +1437,18 @@ class AssessRecord
    * @param  int $qn      Question number
    * @param  array $data  Array of part datas
    * @param  boolean $singlescore  Whether question is multipart showing single score
-   * @param  boolean $is_practice Whether we're looking at practice data
    * @param  mixed $ver   Version number to record this on, or 'last'
    * @return void
    */
-  private function recordTry($qn, $data, $singlescore = false, $is_practice = false, $ver='last') {
+  private function recordTry($qn, $data, $singlescore = false, $ver='last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-    if ($is_practice) {
-      $this->parsePractice();
-      $assessver = &$this->practiceData['assess_versions'][0];
+    $this->parseData();
+    if ($this->is_practice) {
+      $assessver = &$this->data['assess_versions'][0];
+    } else if ($by_question || !is_numeric($ver)) {
+      $assessver = &$this->data['assess_versions'][count($this->data['assess_versions']) - 1];
     } else {
-      $this->parseScored();
-      if ($by_question || !is_numeric($ver)) {
-        $assessver = &$this->scoredData['assess_versions'][count($this->scoredData['assess_versions']) - 1];
-      } else {
-        $assessver = &$this->scoredData['assess_versions'][$ver];
-      }
+      $assessver = &$this->data['assess_versions'][$ver];
     }
     $question_versions = &$assessver['questions'][$qn]['question_versions'];
     if (!$by_question || !is_numeric($ver)) {
@@ -1541,41 +1467,20 @@ class AssessRecord
   }
 
   /**
-   * uncompress and decode scoredData
+   * uncompress and decode attempt data
    * @return void
    */
-  private function parseScored () {
-    if ($this->scoredData === null) {
-      $this->scoredData = json_decode(gzdecode($this->assessRecord['scoreddata']), true);
-      if ($this->scoredData === null) {
-        $this->scoredData = array();
+  private function parseData () {
+    if ($this->data === null) {
+      if ($this->is_practice) {
+        $this->data = json_decode(gzdecode($this->assessRecord['practicedata']), true);
+      } else {
+        $this->data = json_decode(gzdecode($this->assessRecord['scoreddata']), true);
+      }
+      if ($this->data === null) {
+        $this->data = array();
       }
     }
-  }
-
-  /**
-   * uncompress and decode practiceData
-   * @return void
-   */
-  private function parsePractice () {
-    if ($this->practiceData === null) {
-      $this->practiceData = json_decode(gzdecode($this->assessRecord['practicedata']), true);
-      if ($this->practiceData === null) {
-        $this->practiceData = array();
-      }
-    }
-  }
-
-  /**
-   * Calculate score on an assessment version
-   * @param  int $vernum  The version number (0-index)
-   * @param  array $verdata The attempt data for the version
-   * @return float          The total score on the version, after assessment
-   *                        settings are applied
-   */
-  private function calcAssessVersionScores($vernum, $verdata) {
-    //TODO
-    return 0;
   }
 
 }

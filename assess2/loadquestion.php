@@ -48,10 +48,6 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-// load user's assessment record
-$assess_record = new AssessRecord($DBH, $assess_info);
-$assess_record->loadRecord($uid);
-
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -62,8 +58,12 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
   exit;
 }
 
+// load user's assessment record
+$assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
+$assess_record->loadRecord($uid);
+
 // make sure a record exists
-if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt($in_practice)) {
+if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
   echo '{"error": "not_ready"}';
   exit;
 }
@@ -80,7 +80,7 @@ if (!$in_practice &&
 }
 
 // if there's no active assessment attempt, exit
-if (!$assess_record->hasUnsubmittedAttempt($in_practice)) {
+if (!$assess_record->hasUnsubmittedAttempt()) {
   echo '{"error": "not_ready"}';
   exit;
 }
@@ -103,15 +103,15 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 }
 
 // get current question version
-$qid = $assess_record->getQuestionId($qn, $in_practice);
+$qid = $assess_record->getQuestionId($qn);
 
 // load question settings and code
 $assess_info->loadQuestionSettings(array($qid), true);
 
 // Try a Similar Question, if requested
 if ($doRegen) {
-    if ($assess_record->canRegenQuestion($qn, $qid, $in_practice)) {
-      $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $in_practice);
+    if ($assess_record->canRegenQuestion($qn, $qid)) {
+      $qid = $assess_record->buildNewQuestionVersion($qn, $qid);
       $assess_info->loadQuestionSettings(array($qid), true);
     } else {
       echo '{"error": "out_of_regens"}';
@@ -122,11 +122,11 @@ if ($doRegen) {
 // grab question settings data with HTML
 $showscores = $assess_info->showScoresDuring();
 $assessInfoOut['questions'] = array(
-  $qn => $assess_record->getQuestionObject($qn, $in_practice, $showscores, true, true)
+  $qn => $assess_record->getQuestionObject($qn, $showscores, true, true)
 );
 
 // save record if needed
-$assess_record->saveRecordIfNeeded(!$in_practice, $in_practice);
+$assess_record->saveRecordIfNeeded();
 
 //output JSON object
 echo json_encode($assessInfoOut);

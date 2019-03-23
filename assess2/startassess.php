@@ -46,10 +46,6 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-// load user's assessment record
-$assess_record = new AssessRecord($DBH, $assess_info);
-$assess_record->loadRecord($uid);
-
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -60,6 +56,9 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
   exit;
 }
 
+// load user's assessment record
+$assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
+$assess_record->loadRecord($uid);
 
 // check password, if needed
 if (!$in_practice && !$assess_info->checkPassword($_POST['password'])) {
@@ -133,24 +132,23 @@ if (!$assess_record->hasRecord()) {
   $lti_sourcedid = '';
   if ($assess_info->getSetting('isgroup') > 0) {
     // creating for group
-    $assess_record->createRecord($current_members, $stugroupid, true, $lti_sourcedid, $in_practice);
+    $assess_record->createRecord($current_members, $stugroupid, true, $lti_sourcedid);
   } else {
     // creating for self
-    $assess_record->createRecord(false, 0, true, $lti_sourcedid, $in_practice);
+    $assess_record->createRecord(false, 0, true, $lti_sourcedid);
   }
 }
 
 // if there's no active assessment attempt, generate one
-if (!$assess_record->hasUnsubmittedAttempt($in_practice)) {
+if (!$assess_record->hasUnsubmittedAttempt()) {
   if ($in_practice) {
     // for practice, if we don't have unsubmitted attempt, then
     // we need to create a whole new data
     $assess_record->buildAssessData(true);
   } else {
     // if we can make a new one, do it
-    if ($assess_record->canMakeNewAttempt(false)) {
-      $assess_record->buildNewAssessVersion(false, true);
-      $assess_record->saveRecord(true, false);
+    if ($assess_record->canMakeNewAttempt()) {
+      $assess_record->buildNewAssessVersion(true);
     } else {
       // if we can't make one, report error
       echo '{"error": "out_of_attempts"}';
@@ -197,10 +195,10 @@ if ($assessInfoOut['submitby'] == 'by_assessment') {
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
 $generate_html = ($assess_info->getSetting('displaymethod') == 'full');
-$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, $generate_html, $generate_html);
+$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, $generate_html, $generate_html);
 
 // save record if needed
-$assess_record->saveRecordIfNeeded(!$in_practice, $in_practice);
+$assess_record->saveRecordIfNeeded();
 
 //output JSON object
 echo json_encode($assessInfoOut);

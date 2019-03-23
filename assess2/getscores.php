@@ -40,12 +40,12 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-// load user's assessment record
-$assess_record = new AssessRecord($DBH, $assess_info);
+// load user's assessment record - always looking at scored
+$assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
 
 // if have active scored record end it
-if ($assess_record->hasActiveAttempt(false)) {
+if ($assess_record->hasActiveAttempt()) {
   echo '{"error": "active_attempt"}';
   exit;
 }
@@ -68,8 +68,8 @@ $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 $assess_info->loadQuestionSettings('all', false);
 $showscores = $assess_info->showScoresAtEnd();
 $reshowQs = $assess_info->reshowQuestionsAtEnd();
-$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($in_practice, $showscores, true, $reshowQs, 'scored');
-$assessInfoOut['score'] = $assess_record->getAttemptScore($in_practice);
+$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
+$assessInfoOut['score'] = $assess_record->getAttemptScore();
 $totalScore = $assessInfoOut['score'];
 $assessInfoOut['has_active_attempt'] = false;
 

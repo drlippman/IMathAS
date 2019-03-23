@@ -41,8 +41,8 @@ if ($isstudent) {
 //check to see if prereq has been met
 $assess_info->checkPrereq($uid);
 
-//load user's assessment record
-$assess_record = new AssessRecord($DBH, $assess_info);
+//load user's assessment record - start with scored data
+$assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
 
 //fields to extract from assess info for inclusion in output

@@ -56,10 +56,6 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-// load user's assessment record
-$assess_record = new AssessRecord($DBH, $assess_info);
-$assess_record->loadRecord($uid);
-
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -70,8 +66,13 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
   exit;
 }
 
+
+// load user's assessment record
+$assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
+$assess_record->loadRecord($uid);
+
 // make sure a record exists
-if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt($in_practice)) {
+if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
   echo '{"error": "not_ready"}';
   exit;
 }
@@ -88,12 +89,12 @@ if (!$in_practice &&
 }
 
 // if there's no active assessment attempt, exit
-if (!$assess_record->hasUnsubmittedAttempt($in_practice)) {
+if (!$assess_record->hasUnsubmittedAttempt()) {
   echo '{"error": "not_ready"}';
   exit;
 }
 
-$qids = $assess_record->getQuestionIds(array_keys($qns), $in_practice);
+$qids = $assess_record->getQuestionIds(array_keys($qns));
 
 // load question settings and code
 $assess_info->loadQuestionSettings($qids, false);
@@ -102,16 +103,16 @@ $assess_info->loadQuestionSettings($qids, false);
 
 // autosave the requested parts
 foreach ($qns as $qn=>$parts) {
-  $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $in_practice);
+  $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn]);
   foreach ($parts as $part) {
     if ($ok_to_save === true || $ok_to_save[$part]) {
-      $assess_record->setAutoSave($now, $qn, $part, $in_practice);
+      $assess_record->setAutoSave($now, $qn, $part);
     }
   }
 }
 
 // save record if needed
-$assess_record->saveRecordIfNeeded(!$in_practice, $in_practice);
+$assess_record->saveRecordIfNeeded();
 
 //output JSON object
 echo '{"autosave": "done"}';
