@@ -1,0 +1,176 @@
+<?php
+
+namespace IMathAS\assess2\questions\answerboxes;
+
+require_once(__DIR__ . '/AnswerBox.php');
+
+use Sanitize;
+
+class IntervalAnswerBox implements AnswerBox
+{
+    private $answerBoxParams;
+
+    private $answerBox;
+    private $entryTip;
+    private $correctAnswerForPart;
+    private $previewLocation;
+
+    public function __construct(AnswerBoxParams $answerBoxParams)
+    {
+        $this->answerBoxParams = $answerBoxParams;
+    }
+
+    public function generate(): void
+    {
+        global $RND, $myrights, $useeqnhelper, $showtips, $imasroot;
+
+        $anstype = $this->answerBoxParams->getAnswerType();
+        $qn = $this->answerBoxParams->getQuestionNumber();
+        $multi = $this->answerBoxParams->getIsMultiPartQuestion();
+        $partnum = $this->answerBoxParams->getQuestionPartNumber();
+        $la = $this->answerBoxParams->getStudentLastAnswers();
+        $options = $this->answerBoxParams->getQuestionWriterVars();
+        $colorbox = $this->answerBoxParams->getColorboxKeyword();
+
+        // FIXME: The following code needs to be updated
+        //        - $qn is always the question number (never $qn+1)
+        //        - $multi is now a boolean
+        //        - $partnum is now available
+
+        $out = '';
+        $tip = '';
+        $sa = '';
+        $preview = '';
+
+        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$partnum];} else {$sz = $options['answerboxsize'];}}
+        if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
+        if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
+        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+
+        if (!isset($sz)) { $sz = 20;}
+        if (isset($ansprompt)) {$out .= "<label for=\"qn$partnum\">$ansprompt</label>";}
+        if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+
+        $ansformats = array_map('trim',explode(',',$answerformat));
+
+        if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
+            $top = _('Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve');
+            $shorttip = _('Adjust the sliders');
+        } else {
+
+            $tip = _('Enter your answer using interval notation.  Example: [2.1,5.6172)') . " <br/>";
+            $tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
+            if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+                $tip .= _('Enter DNE for an empty set. Use oo to enter Infinity.');
+            } else {
+                $tip .= _('Use oo to enter Infinity.');
+            }
+            if (isset($reqdecimals)) {
+                $tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
+            }
+            $shorttip = _('Enter an interval using interval notation');
+        }
+        if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
+            $out .=  '<div style="background:#fff;padding:10px;">';
+            $out .=  '<p style="margin:0px";>Shade: <select id="shaderegions'.$qn.'" onchange="imathasDraw.chgnormtype(this.id.substring(12));"><option value="1L">' . _('Left of a value') . '</option><option value="1R">' . _('Right of a value') . '</option>';
+            $out .=  '<option value="2B">' . _('Between two values') . '</option><option value="2O">' . _('2 regions') . '</option></select>. ' . _('Click and drag the arrows to adjust the values.');
+
+            $out .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;">';
+            //for future development of non-standard normal
+            //for ($i=0;$i<9;$i++) {
+            //	$out .= '<div style="position: absolute; left:'.(60*$i).'px; top:150px; height:20px; width:20px; background:#fff;z-index:2;text-align:center">'.($mu+($i-4)*$sig).'</div>';
+            //}
+            $out .=  '<div style="position: absolute; left:0; top:0; height:200px; width:0px; background:#00f;" id="normleft'.$qn.'">&nbsp;</div>';
+            $out .=  '<div style="position: absolute; right:0; top:0; height:200px; width:0px; background:#00f;" id="normright'.$qn.'">&nbsp;</div>';
+            $out .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif" alt="Normal curve" />';
+            $out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid1'.$qn.'" src="'.$imasroot.'/img/uppointer.gif" alt="Interval pointer"/>';
+            $out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif" alt="Interval pointer"/>';
+            $out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid1txt'.$qn.'"></div>';
+            $out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid2txt'.$qn.'"></div>';
+            $out .=  '</div></div>';
+            $out .=  '<script type="text/javascript">imathasDraw.addnormslider('.$qn.');</script>';
+        } else if (in_array('normalcurve',$ansformats)) {
+            $out .= _('Enter an interval corresponding to the region to be shaded');
+        }
+        $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\"  ";
+        if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
+            $out .= 'style="position:absolute;visibility:hidden;" ';
+        }
+        /*if ($showtips==2) { //eqntips: work in progress
+			if ($multi==0) {
+				$qnref = "$qn-0";
+			} else {
+				$qnref = ($multi-1).'-'.($qn%1000);
+			}
+			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+		}*/
+        if ($showtips==2) { //eqntips: work in progress
+            if ($multi==0) {
+                $qnref = "$qn-0";
+            } else {
+                $qnref = ($multi-1).'-'.($qn%1000);
+            }
+            if ($useeqnhelper && $useeqnhelper>2) {
+                $out .= "onfocus=\"showeebasicdd('qn$qn',1);showehdd('qn$qn','$shorttip','$qnref');\" onblur=\"hideebasice();hideebasicedd();hideeh();\" onclick=\"reshrinkeh('qn$qn')\" ";
+            } else {
+                $out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
+            }
+            $out .= 'aria-describedby="tips'.$qnref.'" ';
+        } else if ($useeqnhelper) {
+            $out .= "onfocus=\"showeebasicdd('qn$qn',1)\" onblur=\"hideebasice();hideebasicedd();\" ";
+        }
+        $out .= '/>';
+        $out .= getcolormark($colorbox);
+        if (in_array('nosoln',$ansformats))  {
+            list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, 'interval');
+            $answer = str_replace('"','',$answer);
+        }
+        if (isset($answer)) {
+            if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
+                $sa .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;background:#fff;">';
+                $answer = preg_replace('/\s/','',$answer);
+                if (preg_match('/\(-oo,([\-\d\.]+)\)U\(([\-\d\.]+),oo\)/',$answer,$matches)) {
+                    $sa .=  '<div style="position: absolute; left:0; top:0; height:200px; width:'.(250+60*$matches[1]+1).'px; background:#00f;">&nbsp;</div>';
+                    $sa .=  '<div style="position: absolute; right:0; top:0; height:200px; width:'.(250-60*$matches[2]).'px; background:#00f;">&nbsp;</div>';
+                } else if (preg_match('/\(-oo,([\-\d\.]+)\)/',$answer,$matches)) {
+                    $sa .=  '<div style="position: absolute; left:0; top:0; height:200px; width:'.(250+60*$matches[1]+1).'px; background:#00f;">&nbsp;</div>';
+                } else if (preg_match('/\(([\-\d\.]+),oo\)/',$answer,$matches)) {
+                    $sa .=  '<div style="position: absolute; right:0; top:0; height:200px; width:'.(250-60*$matches[1]).'px; background:#00f;">&nbsp;</div>';
+                } else if (preg_match('/\(([\-\d\.]+),([\-\d\.]+)\)/',$answer,$matches)) {
+                    $sa .=  '<div style="position: absolute; left:'.(250+60*$matches[1]).'px; top:0; height:200px; width:'.(60*($matches[2]-$matches[1])+1).'px; background:#00f;">&nbsp;</div>';
+                }
+                $sa .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif" alt="Normal Curve"/>';
+                $sa .=  '</div>';
+            } else {
+                $sa = $answer;
+            }
+        }
+
+        // Done!
+        $this->answerBox = $out;
+        $this->entryTip = $tip;
+        $this->correctAnswerForPart = $sa;
+        $this->previewLocation = $preview;
+    }
+
+    public function getAnswerBox(): string
+    {
+        return $this->answerBox;
+    }
+
+    public function getEntryTip(): string
+    {
+        return $this->entryTip;
+    }
+
+    public function getCorrectAnswerForPart(): string
+    {
+        return $this->correctAnswerForPart;
+    }
+
+    public function getPreviewLocation(): string
+    {
+        return $this->previewLocation;
+    }
+}
