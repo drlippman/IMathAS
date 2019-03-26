@@ -180,6 +180,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$isparametric = false;
 		$isineq = false;
 		$isxequals = false;
+		//has y= when it shouldn't
+		if ($function[0][0] == 'y') {
+			$function[0] = preg_replace('/^\s*y\s*=?/', '', $function[0]);
+		}
+		
 		if ($function[0]=='dot') {  //dot,x,y,[closed,color,label,labelloc]
 			if (!isset($function[4]) || $function[4]=='') {
 				$function[4] = 'black';
