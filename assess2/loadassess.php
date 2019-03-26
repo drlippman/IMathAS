@@ -68,6 +68,11 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
 }
 
+// if not available, see if there is an unsubmitted scored attempt
+if ($assessInfoOut['available'] !== 'yes') {
+  $assessInfoOut['has_unsubmitted_scored'] = $assess_record->hasUnsubmittedScored();
+}
+
 //get prev attempt info
 if ($assessInfoOut['submitby'] == 'by_assessment') {
   $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');

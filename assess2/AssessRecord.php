@@ -164,6 +164,7 @@ class AssessRecord
     if ($this->is_practice) {
       $this->buildAssessData($recordStart);
       $practicetosave = ($this->data !== null) ? gzencode(json_encode($this->data)) : '';
+      $this->assessRecord['practicedata'] = $practicetosave;
       $this->setInPractice(false);
     } else {
       $practicetosave = '';
@@ -172,6 +173,7 @@ class AssessRecord
     //generate scored data
     $this->buildAssessData($recordStart);
     $scoredtosave = ($this->data !== null) ? gzencode(json_encode($this->data)) : '';
+    $this->assessRecord['scoreddata'] = $scoredtosave;
 
     // switch back to practice if started that way
     if ($waspractice) {
@@ -225,7 +227,7 @@ class AssessRecord
   }
 
   /**
-   * Build a new assess_versions record in scoredData / practiceData
+   * Build a new assess_versions record
    * @param  boolean $recordStart True to record starttime now
    * @return void
    */
@@ -266,7 +268,7 @@ class AssessRecord
       );
     }
     $this->data['assess_versions'][] = $out;
-    
+
     $this->need_to_record = true;
 
     $this->setStatus(true, false);
@@ -523,6 +525,30 @@ class AssessRecord
     }
     $last_attempt = $this->data['assess_versions'][count($this->data['assess_versions'])-1];
     return ($last_attempt['status'] === 0);
+  }
+
+  /**
+   * Determine if there is an unsubmitted assessment attempt
+   * This includes not-yet-opened assessment attempts
+   * @return boolean true if there is an unsubmitted assessment attempt
+   */
+  public function hasUnsubmittedScored() {
+    if (empty($this->assessRecord)) {
+      //no assessment record at all
+      return false;
+    }
+
+    $waspractice = $this->is_practice;
+    if ($waspractice) {
+      $this->setInPractice(false);
+    }
+
+    $hasunsubmitted = $this->hasUnsubmittedAttempt();
+
+    if ($waspractice) {
+      $this->setInPractice(true);
+    }
+    return $hasunsubmitted;
   }
 
   /**
@@ -1473,9 +1499,13 @@ class AssessRecord
   private function parseData () {
     if ($this->data === null) {
       if ($this->is_practice) {
-        $this->data = json_decode(gzdecode($this->assessRecord['practicedata']), true);
+        if ($this->assessRecord['practicedata'] != '') {
+          $this->data = json_decode(gzdecode($this->assessRecord['practicedata']), true);
+        }
       } else {
-        $this->data = json_decode(gzdecode($this->assessRecord['scoreddata']), true);
+        if ($this->assessRecord['scoreddata'] != '') {
+          $this->data = json_decode(gzdecode($this->assessRecord['scoreddata']), true);
+        }
       }
       if ($this->data === null) {
         $this->data = array();

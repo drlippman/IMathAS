@@ -200,5 +200,8 @@ $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores,
 // save record if needed
 $assess_record->saveRecordIfNeeded();
 
+// if practice, add that
+$assessInfoOut['in_practice'] = $in_practice;
+
 //output JSON object
 echo json_encode($assessInfoOut);
