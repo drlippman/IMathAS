@@ -74,21 +74,8 @@ if ($assessInfoOut['available'] !== 'yes') {
 }
 
 //get prev attempt info
-if ($assessInfoOut['submitby'] == 'by_assessment') {
-  $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
-  if ($showPrevAttemptScores) {
-    $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
-  }
-  $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
-} else {
-  // TODO: FIX THIS
-  $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
-  if ($showPrevAttemptScores) {
-    $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
-  }
-  // TODO: have this pull the last change date (and score if alllowed) for submission
-  $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
-}
+$assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts();
+$assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
 
 if (!$assessInfoOut['has_active_attempt']) {
   if ($assessInfoOut['submitby'] == 'by_question') {

@@ -64,6 +64,7 @@ if ($isstudent) {
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
+  $end_attempt = false;
 } else if ($assess_info->getSetting('available') === 'yes') {
   $in_practice = false;
 } else {
@@ -181,13 +182,8 @@ if ($end_attempt) {
   $assessInfoOut['has_active_attempt'] = false;
 
   //get prev attempt info
-  if ($assessInfoOut['submitby'] == 'by_assessment') {
-    $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
-    $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
-    if ($showPrevAttemptScores) {
-      $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
-    }
-  }
+  $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts();
+  $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
 
   if ($assessInfoOut['submitby'] == 'by_question') {
     $assessInfoOut['can_retake'] = false;

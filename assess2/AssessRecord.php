@@ -20,6 +20,7 @@ class AssessRecord
   private $assess_info = null;
   private $hasRecord = false;
   private $data = null;
+  private $tmpdata = null;
   private $is_practice = false;
   private $status = 'no_record';
   private $now = 0;
@@ -63,7 +64,8 @@ class AssessRecord
    */
   public function setInPractice($is_practice) {
     if ($is_practice !== $this->is_practice) {
-      $this->data = null;
+      $this->tmpdata = $this->data;
+      $this->data = $this->tmpdata;
     }
     $this->is_practice = $is_practice;
   }
@@ -212,7 +214,7 @@ class AssessRecord
    * @return void
    */
   public function buildAssessData($recordStart = true) {
-    if ($this->data !== null) {
+    if ($this->data !== null && count($this->data) > 0) {
       return false;
     }
 
@@ -583,14 +585,15 @@ class AssessRecord
 
 
   /**
-   * Get data on submitted assessment attempts
+   * Get data on previous assessment attempts.
+   * Call BEFORE overwriting settings when in practice mode.
    *
-   * @param boolean $includeScores  Whether to include scores. Default: false
+   * @param boolean $force_scores  Whether to force inclusion of scores. Default: false
    * @return array        An array of previous attempt info.  Each element is an
    *                      array containing key 'date', and 'score' if the
    *                      settings allow it
    */
-  public function getSubmittedAttempts($includeScores = false) {
+  public function getSubmittedAttempts($force_scores = false) {
     if (empty($this->assessRecord)) {
       //no assessment record at all
       return array();
@@ -599,17 +602,26 @@ class AssessRecord
     $currently_practice = $this->is_practice;
     if ($currently_practice) {
       $this->setInPractice(false);
-      $this->parseData();
     }
+    $this->parseData();
 
     $out = array();
+    $is_available = ($this->assess_info->getSetting('available') === 'yes');
+    $by_assessment = ($this->assess_info->getSetting('submitby') === 'by_assessment');
+    $showscores = $this->assess_info->getSetting('showscores');
 
     foreach ($this->data['assess_versions'] as $k=>$ver) {
-      if ($ver['status'] == 1) {  // if it's a submitted version
+      if ($ver['status'] == 1 || !$is_available) {  // if it's a submitted version
         $out[$k] = array(
           'date' => $ver['lastchange'],
         );
-        if ($includeScores) {
+        // show score if forced, or
+        // if by_question and not available and showscores is allowed, or
+        // if by_assessment and submitted and showscores is allowed
+        if ($force_scores ||
+          (!$by_assessment && !$is_availble && $showscores === 'during') ||
+          ($by_assessment && $ver['status'] == 1 && $showscores !== 'none')
+        ) {
           $out[$k]['score'] = $ver['score'];
         }
       }
@@ -625,7 +637,9 @@ class AssessRecord
   }
 
   /**
-   * Get the scored attempt version and score
+   * Get the scored attempt version and score. Returns empty array if not allowed
+   * Call BEFORE overwriting settings when in practice mode.
+   *
    * @return array  'kept': version # or 'override' if instructor override
    *                        may not be set if using average
    *                'score': the final assessment score
@@ -635,10 +649,17 @@ class AssessRecord
       //no assessment record at all
       return array();
     }
+
+    // if in practice, we want to grab scored previous attempts, so switch out
     $currently_practice = $this->is_practice;
     if ($currently_practice) {
       $this->setInPractice(false);
       $this->parseData();
+    }
+
+    $showscores = $this->assess_info->getSetting('showscores');
+    if ($showscores === 'none') {
+      return array();
     }
 
     $out = array('score' => $this->assessRecord['score']*1);
@@ -652,6 +673,7 @@ class AssessRecord
       $this->setInPractice(true);
       $this->parseData();
     }
+
     return $out;
   }
 

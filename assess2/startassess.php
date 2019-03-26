@@ -163,6 +163,15 @@ if (isset($sessiondata['lti_lis_result_sourcedid'])) {
   $assess_record->updateLTIsourcedId($altltisourcedid);
 }
 
+// save record if needed
+$assess_record->saveRecordIfNeeded();
+
+$assessInfoOut = array();
+
+//get prev attempt info before switching to practice mode
+$assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts();
+$assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
+
 // If in practice, now we overwrite settings
 if ($in_practice) {
   $assess_info->overridePracticeSettings();
@@ -185,29 +194,18 @@ if ($in_practice) {
     'allowed_attempts'
   );
 }
-$assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
+$assessInfoOut = array_merge($assessInfoOut, $assess_info->extractSettings($include_from_assess_info));
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
 }
-//get prev attempt info
-if ($assessInfoOut['submitby'] == 'by_assessment') {
-  $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
-  $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
-  if ($showPrevAttemptScores) {
-    $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
-  }
-}
 
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
 $generate_html = ($assess_info->getSetting('displaymethod') == 'full');
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, $generate_html, $generate_html);
-
-// save record if needed
-$assess_record->saveRecordIfNeeded();
 
 // if practice, add that
 $assessInfoOut['in_practice'] = $in_practice;
