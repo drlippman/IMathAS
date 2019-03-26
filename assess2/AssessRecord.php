@@ -1319,7 +1319,7 @@ class AssessRecord
       $answeights = $qvers[count($qvers) - 1]['answeights'];
       $tries = $qvers[count($qvers) - 1]['tries'];
     } else {
-      $aver = $this->data['assess_versions'][count($data['assess_versions']) - 1];
+      $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       $answeights = $aver['questions'][$qn]['question_versions'][0]['answeights'];
       $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
     }

@@ -203,6 +203,7 @@ $assessGroups = [
         'allowlate' => 0,
         'displaymethod' => 'skip',
         'submitby' => 'by_question',
+        'defpoints' => 5,
         'ptsposs' => 5,
         'ver' => 2,
         'questions' => [
@@ -219,6 +220,7 @@ $assessGroups = [
         'allowlate' => 11,
         'displaymethod' => 'skip',
         'submitby' => 'by_question',
+        'defpoints' => 5,
         'ptsposs' => 5,
         'ver' => 2,
         'questions' => [
@@ -235,13 +237,21 @@ $assessGroups = [
         'allowlate' => 0,
         'displaymethod' => 'skip',
         'submitby' => 'by_question',
-        'ptsposs' => 5,
+        'defpoints' => 5,
+        'ptsposs' => 10,
+        'defregens' => 3,
+        'defattempts' => 2,
         'ver' => 2,
         'questions' => [
           0=>['questionsetid' => 0],
           1=>['questionsetid' => 1]
         ],
-        'itemorder' => [0,1]
+        'itemorder' => [0,1],
+        'studata' => [
+          'source' => 'q01byq',
+          'starttime' => -4*24,
+          'lastchange' => -3*24
+        ]
       ],
       [
         'name' => 'Closed 6',
@@ -252,12 +262,14 @@ $assessGroups = [
         'allowlate' => 11,
         'displaymethod' => 'skip',
         'submitby' => 'by_question',
-        'ptsposs' => 5,
+        'defpoints' => 5,
+        'ptsposs' => 10,
         'ver' => 2,
         'questions' => [
           0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1]
         ],
-        'itemorder' => [0]
+        'itemorder' => [0,1]
       ],
       [
         'name' => 'Closed 7',
@@ -270,13 +282,40 @@ $assessGroups = [
         'reqscoreaid' => -1,
         'reqscore' => 5,
         'reqscoretype' => 1,
-        'ptsposs' => 5,
+        'ptsposs' => 10,
         'ver' => 2,
         'questions' => [
           0=>['questionsetid' => 0],
         ],
         'itemorder' => [0]
-      ]
+      ],
+      [
+        'name' => 'Closed 8',
+        'summary' => 'past due, practice, no latepasses, was by_assessment with penalties',
+        'startdate' =>  -7*24,
+        'enddate' => -2*24,
+        'reviewdate' => 2000000000,
+        'allowlate' => 0,
+        'displaymethod' => 'full',
+        'submitby' => 'by_assessment',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 30,
+        'ptsposs' => 10,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1]
+        ],
+        'itemorder' => [0,1],
+        'studata' => [
+          'source' => 'q01bya',
+          'starttime' => -4*24,
+          'lastchange' => -3*24
+        ]
+      ],
     ]
   ],
   [
@@ -323,6 +362,30 @@ $assessGroups = [
         'displaymethod' => 'skip',
         'ptsposs' => 15,
         'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 20,
+        'defpoints' => 5,
+        'defattempts' => 4,
+        'defpenalty' => 10,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0, 'category' => 'Cat 1'],
+          1=>['questionsetid' => 1, 'category' => 'Cat 1'],
+          2=>['questionsetid' => 0, 'category' => 'Cat 2']
+        ],
+        'itemorder' => [0,1,2]
+      ],
+      [
+        'name' => 'Penalties 2',
+        'summary' => 'by_assessment with 10% retry penalty, 20% regen penalty',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_assessment',
         'showscores' => 'during',
         'showans' => 'after_lastattempt',
         'defregens' => 3,
@@ -445,3 +508,16 @@ $assessGroups = [
     ]
   ]
 ];
+
+$studatarec = array(
+  'q01byq' => array(
+    'scoreddata' => '{"submissions":[4,7,15,20,29],"autosaves":[],"scored_version":0,"assess_versions":[{"starttime":1553629961,"lastchange":1553629990,"status":0,"score":10,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"8037424","seed":5424,"tries":[[{"sub":0,"raw":"0","time":4,"stuans":"5"},{"sub":1,"raw":"1","time":7,"stuans":"67"}]],"answeights":[1]}]},{"score":5,"rawscore":3,"scored_version":1,"question_versions":[{"qid":"8037425","seed":9190,"tries":[[{"sub":2,"raw":"1","time":5,"stuans":"11"},{"sub":3,"raw":"1","time":9,"stuans":"11"}],[{"sub":2,"raw":"1","time":5,"stuans":"35"},{"sub":3,"raw":"1","time":9,"stuans":"35"}],[{"sub":3,"raw":"0","time":9,"stuans":"78"}]],"answeights":[0.333,0.333,0.334]},{"qid":"8037425","seed":7550,"tries":[[{"sub":4,"raw":"1","time":15,"stuans":"28"}],[{"sub":4,"raw":"1","time":15,"stuans":"97"}],[{"sub":4,"raw":"1","time":15,"stuans":"8"}]],"answeights":[0.333,0.333,0.334]}]}]}]}',
+    'score' => 10,
+    'status' => 0
+  ),
+  'q01bya' => array(
+    'scoreddata' => '{"submissions":[4,12,15,74,81],"autosaves":[],"scored_version":1,"assess_versions":[{"starttime":1553631054,"lastchange":1553631069,"status":1,"score":9.499,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"8037429","seed":629,"tries":[[{"sub":0,"raw":"1","time":0,"stuans":"77"}]],"answeights":[1]}]},{"score":4.499,"rawscore":3,"scored_version":0,"question_versions":[{"qid":"8037430","seed":5417,"tries":[[{"sub":1,"raw":"1","time":0,"stuans":"39"},{"sub":2,"raw":"1","time":0,"stuans":"39"}],[{"sub":1,"raw":"1","time":0,"stuans":"87"},{"sub":2,"raw":"1","time":0,"stuans":"87"}],[{"sub":1,"raw":"0","time":0,"stuans":"3"},{"sub":2,"raw":"1","time":0,"stuans":"46"}]],"answeights":[0.333,0.333,0.334]}]}]},{"starttime":1553631124,"lastchange":1553631135,"status":1,"score":10,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"8037429","seed":4826,"tries":[[{"sub":3,"raw":"1","time":0,"stuans":"28"}]],"answeights":[1]}]},{"score":5,"rawscore":3,"scored_version":0,"question_versions":[{"qid":"8037430","seed":6369,"tries":[[{"sub":4,"raw":"1","time":0,"stuans":"68"}],[{"sub":4,"raw":"1","time":0,"stuans":"29"}],[{"sub":4,"raw":"1","time":0,"stuans":"97"}]],"answeights":[0.333,0.333,0.334]}]}]}]}',
+    'score' => 10,
+    'status' => 0
+  )
+);

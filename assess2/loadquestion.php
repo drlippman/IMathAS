@@ -85,6 +85,11 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
   exit;
 }
 
+// If in practice, now we overwrite settings
+if ($in_practice) {
+  $assess_info->overridePracticeSettings();
+}
+
 // grab any assessment info fields that may have updated:
 // has_active_attempt, timelimit_expires,
 // prev_attempts (if we just closed out a version?)

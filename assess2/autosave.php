@@ -99,6 +99,11 @@ $qids = $assess_record->getQuestionIds(array_keys($qns));
 // load question settings and code
 $assess_info->loadQuestionSettings($qids, false);
 
+// If in practice, now we overwrite settings
+if ($in_practice) {
+  $assess_info->overridePracticeSettings();
+}
+
 // TODO:  Verify confirmation values (to ensure it hasn't been submitted since)
 
 // autosave the requested parts

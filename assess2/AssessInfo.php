@@ -478,6 +478,7 @@ class AssessInfo
     if ($oldquestions !== false && $oldseeds !== false) {
       $oldseeds = array_combine($oldquestions, $oldseeds);
     }
+
     foreach ($this->assessData['itemorder'] as $qid) {
       //if is some type of grouping of questions
       if (is_array($qid)) {
@@ -636,6 +637,29 @@ class AssessInfo
       }
     }
     return array($newq, $newseed);
+  }
+
+  /**
+   * Overrides assessment settings with practice mode defaults
+   * @return void
+   */
+  public function overridePracticeSettings() {
+    $this->assessData['displaymethod'] = 'skip';
+    $this->assessData['submitby'] = 'by_question';
+    $this->assessData['showscores'] = 'during';
+    $this->assessData['showans'] = 'with_score';
+    $this->assessData['deftries'] = 999; // unlimited
+    $this->assessData['defregens'] = 999; // unlimited
+    $this->assessData['shuffle'] &= ~4;  // disable "all stu same version"
+    $this->assessData['timelimit'] = 0;
+    unset($this->assessData['allowed_attempts']);
+    foreach ($this->questionData as $i=>$v) {
+      $this->questionData[$i]['tries_max'] = 999; // unlimited
+      $this->questionData[$i]['regens_max'] = 999; // unlimited
+      $this->questionData[$i]['retry_penalty'] = 0;
+      $this->questionData[$i]['regen_penalty'] = 0;
+      $this->questionData[$i]['showans'] = 'with_score';
+    }
   }
 
  /**
@@ -864,6 +888,8 @@ class AssessInfo
         }
       }
       $settings['itemorder'] = $order;
+    } else if (!is_array($itemorder)) {
+      $settings['itemorder'] = array($itemorder);
     } else {
       $settings['itemorder'] = $itemorder;
     }

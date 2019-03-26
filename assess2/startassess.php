@@ -163,6 +163,10 @@ if (isset($sessiondata['lti_lis_result_sourcedid'])) {
   $assess_record->updateLTIsourcedId($altltisourcedid);
 }
 
+// If in practice, now we overwrite settings
+if ($in_practice) {
+  $assess_info->overridePracticeSettings();
+}
 
 // grab any assessment info fields that may have updated:
 // has_active_attempt, timelimit_expires,
@@ -176,6 +180,11 @@ $include_from_assess_info = array(
   'interquestion_text', 'resources', 'video_id', 'category_urls', 'help_features',
   'points_possible'
 );
+if ($in_practice) {
+  array_push($include_from_assess_info, 'displaymethod', 'showscores',
+    'allowed_attempts'
+  );
+}
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();

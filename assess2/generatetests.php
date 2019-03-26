@@ -139,6 +139,12 @@ foreach ($assessGroups as $gn=>$agroup) {
     $data['courseid'] = $cid;
     $itemorder = $data['itemorder'];
     $questions = $data['questions'];
+    if (isset($data['studata'])) {
+      $studata = $data['studata'];
+      unset($data['studata']);
+    } else {
+      $studata = '';
+    }
     unset($data['itemorder']);
     unset($data['questions']);
     if (isset($data['posttoforum'])) {
@@ -190,6 +196,23 @@ foreach ($assessGroups as $gn=>$agroup) {
     $itemorder = implode(',', $itemorder);
     $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=? WHERE id=?");
     $stm->execute(array($itemorder, $addedIds[$n]));
+
+    if (is_array($studata)) {
+      // record student data for this assessment
+      $query = "INSERT INTO imas_assessment_records (assessmentid, userid, starttime, lastchange, score, status, scoreddata)";
+      $query .= "VALUES (?,?,?,?,?,?,?)";
+      $stm = $DBH->prepare($query);
+      $udata = $studatarec[$studata['source']];
+      $stm->execute(array(
+        $addedIds[$n],
+        $stu,
+        $now + $studata['starttime']*60*60,
+        $now + $studata['lastchange']*60*60,
+        $udata['score'],
+        $udata['status'],
+        gzencode($udata['scoreddata'])
+      ));
+    } 
   }
 }
 
