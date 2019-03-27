@@ -251,7 +251,7 @@ class AssessInfo
     $by_q = array('regens_max','regen_penalty','regen_penalty_after');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
       'showans','showans_aftern','points_possible','questionsetid',
-      'category');
+      'category', 'withdrawn');
     $out = array();
     foreach ($base as $field) {
       $out[$field] = $this->questionData[$id][$field];

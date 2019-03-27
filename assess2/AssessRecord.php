@@ -256,9 +256,10 @@ class AssessRecord
     list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($attempt);
     // build question data
     for ($k = 0; $k < count($questions); $k++) {
-      $out['questions'][] = array(
-        'score' => 0,
-        'rawscore' => 0,
+      $isWithdrawn = ($this->assess_info->getQuestionSetting($questions[$k], 'withdrawn') !== 0);
+      $out['questions'][$k] = array(
+        'score' => $isWithdrawn ? $this->assess_info->getQuestionSetting($questions[$k], 'points_possible') : 0,
+        'rawscore' => $isWithdrawn ? 1 : 0,
         'scored_version' => 0,
         'question_versions' => array(
           array(
@@ -268,6 +269,9 @@ class AssessRecord
           )
         )
       );
+      if ($isWithdrawn) {
+        $out['questions'][$k]['withdrawn'] = 1;
+      }
     }
     $this->data['assess_versions'][] = $out;
 
@@ -848,6 +852,9 @@ class AssessRecord
       $out['parts'] = $parts;
     }
     $out['status'] = $status;
+    if ($out['withdrawn'] !== 0) {
+      $out['status'] = 'attempted';
+    }
     if ($include_scores) {
       $out['score'] = ($score != -1) ? $score : 0;
       // TODO:  Do we want to return score saved in gb too?
@@ -1282,7 +1289,10 @@ class AssessRecord
       // loop through the question numbers
       $aVerScore = 0;
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
-        if ($rescoreQs !== 'all' && !in_array($qn, $rescoreQs)) {
+        // if not rescoring this question, or if withdrawn, use existing score
+        if (($rescoreQs !== 'all' && !in_array($qn, $rescoreQs)) ||
+            !empty($curAver['questions'][$qn]['withdrawn'])
+        ) {
           $aVerScore += $curAver['questions'][$qn]['score'];
           continue;
         }
