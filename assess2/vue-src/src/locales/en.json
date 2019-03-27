@@ -1,0 +1,193 @@
+{
+  "nth": "| first | second | third | fourth | {n}th",
+  "seconds": "1 second | {n} seconds",
+  "minutes": "1 minute | {n} minutes",
+  "hours": "1 hour | {n} hours",
+  "close": "Close",
+  "loading": "Loading...",
+  "intro": "Intro / Instructions",
+  "next": "Next",
+  "previous": "Previous",
+  "question_n": "Question {n}",
+  "launch": {
+    "continue_assess": "Continue Assessment",
+    "retake_assess": "Retake Assessment",
+    "start_assess": "Start Assessment",
+    "timewarning": "This assessment has a time limit. Once you start the assessment, the timer will not pause for any reason.  Are you sure you are ready to start?"
+  },
+  "closed": {
+    "hidden": "This assessment is not currently available.",
+    "notyet": "This assessment is not yet available.  It will be available {sd} until {ed}.",
+    "pastdue": "This assessment was due {ed}.",
+    "needprereq": "You have not yet met the prerequisite requirements to work on this assessment.",
+    "no_attempts": "You have used all your attempts at this assessment.",
+    "latepassn": "You have one LatePass available. | You have {n} LatePass available.",
+    "latepass_needed": "You can redeem one LatePass to reopen this assessment until {date} | You can redeem {n} LatePasses to reopen this assessment until {date}",
+    "practice_no_latepass": "This assessment is now open for un-graded practice.",
+    "practice_w_latepass": "You can also open the assessment for un-graded practice.",
+    "will_block_latepass": "If you do so, you will not be able to later use a LatePass.",
+    "confirm": "Are you SURE you want to do this? If you do, you will not be able to later use a LatePass.",
+    "can_view_scored": "You can review your scored assessment.",
+    "view_scored": "View scored assessment",
+    "use_latepass": "Redeem LatePass | Redeem {n} LatePasses",
+    "do_practice": "Practice",
+    "unsubmitted_pastdue": "You have an unsubmitted assessment attempt.",
+    "unsubmitted_overtime": "You have an unsubmitted assessment attempt whose time limit has expired.",
+    "submit_now": "Submit it now",
+    "exit": "Exit"
+  },
+  "setlist": {
+    "practice": "This assessment is in un-graded practice mode.",
+    "points_possible": "{pts} points possible.",
+    "due_at": "Due {date}.",
+    "originally_due": "Originally due {date}.",
+    "latepass_used": "You used one LatePass. | You used {n} LatePasses.",
+    "extension": "You were granted an extension.",
+    "penalty": "A penalty of {p}% will be applied.",
+    "take": "You can take this assessment one time. | You can take this assessment {n} times.",
+    "take_more": "You can take this assessment one more time. | You can take this assessment {n} more times.",
+    "attempt_inprogress": "You have an assessment attempt in progress.",
+    "cur_attempt_n_of": "You are working on attempt {n} of {nmax}.",
+    "keep_highest_q": "Best attempt on each question recorded as grade.",
+    "keep_highest": "Highest scored attempt recorded as grade.",
+    "keep_average": "Average score recorded as grade.",
+    "keep_last": "Last attempt recorded as grade.",
+    "retake_penalty": "A penalty of {p}% will be applied on the next retake.",
+    "time_expires": "Your current assessment time limit expires at {date}.",
+    "time_expired": "Your current assessment time limit expired at {date}.",
+    "timelimit": "Time limit: {time}.",
+    "timelimit_extend": "Extended from the original {time}."
+  },
+  "group": {
+    "isgroup": "This is a group assessment.",
+    "needpreset": "You are not yet a member of a group.  Contact your instructor to be added to a group.",
+    "members": "Group Members",
+    "max": "max {n}",
+    "remove": "Remove",
+    "add": "Add to group:",
+    "select": "Select...",
+    "addbutton": "Add"
+  },
+  "password": {
+    "requires": "This assessment requires a password.",
+    "label": "Password: "
+  },
+  "qinfo": {
+    "tryn": "Try {n} of {nmax}",
+    "regenn": "Version {n} of {nmax}",
+    "tries_remaining": "1 try on this question remaining | {n} tries on this question remaining",
+    "tries_remaining_range": "{min} to {max} tries remaining depending on the part - see Details",
+    "regens_remaining": "You can Try a Similar Question 1 more time | You can Try a Similar Question {n} more times"
+  },
+  "question": {
+    "submit": "Submit Question",
+    "checkans": "Check Answer",
+    "saveans": "Save Answer",
+    "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question."
+  },
+  "header": {
+    "score": "Score: {pts}/{poss}",
+    "practicescore": "Practice score: {pts}/{poss}",
+    "possible": "{poss} points possible",
+    "answered": "{n}/{tot} answered",
+    "assess_submit": "Submit Assessment",
+    "done": "Done",
+    "resources_header": "Resources",
+    "pts": "1 pt | {n} pts",
+    "details": "Details",
+    "warn_unattempted": "There appears to be unattempted questions. Are you sure you want to submit now?",
+    "withdrawn": "Question withdrawn"
+  },
+  "text": {
+    "hide": "Hide text",
+    "show": "Show question text"
+  },
+  "error": {
+    "error": "Error",
+    "invalid_password": "The password you entered was invalid",
+    "invalid_aid": "Invalid assessment ID",
+    "no_access": "You must be a student, teacher, or tutor to access this assessment",
+    "missing_param": "Missing required parameter on API call",
+    "not_avail": "The assessment is not currently available",
+    "not_ready": "The assessment is not ready for this action",
+    "timelimit_expired": "Timelimit has expired",
+    "out_of_regens": "No more Try a Similar Question remain",
+    "need_group": "Cannot start the assessment until you have been added to a group",
+    "out_of_attempts": "You have used all your assessment attempts"
+  },
+  "scoreresult": {
+    "correct": "Correct",
+    "incorrect": "Incorrect",
+    "partial": "Partially correct",
+    "retry": "Retry this question",
+    "trysimilar": "Try a similar question",
+    "scorepts": "{pts} of {poss} pts | {pts} of {poss} pts",
+    "scorelast": "Score on last try:",
+    "submitted": "Question submitted.",
+    "see_details": "See Details for more."
+  },
+  "summary": {
+    "no_total": "Your assessment has been submitted.",
+    "viewwork_immediately": "You can view your work and scores in the gradebook",
+    "viewwork_after_take": "You can view your work and scores in the gradebook",
+    "viewwork_after_due": "You can view your work and scores in the gradebook after the due date",
+    "viewwork_never": "",
+    "score": "Score",
+    "recordedscore": "Recorded Score",
+    "use_override": "Instructor grade override is recorded",
+    "scorepts": "{pts} of {poss} pt | {pts} of {poss} pts",
+    "retake_penalty": "{n}% retake penalty applied",
+    "late_penalty": "{n}% late work penalty applied",
+    "scorelist": "Score List",
+    "reshowquestions": "Review Questions"
+  },
+  "scorelist": {
+    "question": "Question",
+    "score": "Score",
+    "pts": "{pts} of {poss} pt | {pts} of {poss} pts",
+    "unattempted": "Unattempted"
+  },
+  "catlist": {
+    "category": "Category",
+    "score": "Score",
+    "pts": "{pts} of {poss} pt | {pts} of {poss} pts"
+  },
+  "prev": {
+    "previous_attempts": "Previous Attempts",
+    "scored_attempts": "Scored Attempts",
+    "all_attempts": "All Attempts",
+    "date": "Date",
+    "score": "Score"
+  },
+  "penalties": {
+    "applied": "Penalties applied",
+    "retry": "Retry penalty",
+    "regen": "Assessment retake penalty",
+    "trysimilar": "Try Similar Question penalty",
+    "late": "Late work penalty"
+  },
+  "qdetails": {
+    "question_details": "Question Details",
+    "part": "Part",
+    "lasttry": "Results on last try:",
+    "score": "Score",
+    "try": "Tries Remaining",
+    "penalties": "Penalties",
+    "category": "Category",
+    "gbscore": "Recorded score",
+    "bestpractice": "Best practice score",
+    "lastscore": "Score on last try"
+  },
+  "timer": {
+    "hrs": "hr | hrs",
+    "min": "min | mins"
+  },
+  "helps": {
+    "message_instructor": "Message instructor about this question",
+    "post_to_forum": "Post this question to forum"
+  },
+  "unload": {
+    "unsubmitted_questions": "You have entered answered that have not yet been submitted. Are you sure you want to leave?",
+    "unsubmitted_assessment": "You have attempted every question, but have not submitted your assessment yet. Don't forget to come back and do that."
+  }
+}

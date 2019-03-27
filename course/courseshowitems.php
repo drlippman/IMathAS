@@ -195,6 +195,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 	   require_once("../includes/filehandler.php");
 
+		 $assessUseVueDev = !empty($CFG['assess2-use-vue-dev']);
+
 	   if (isset($teacherid)) {
 		   $canedit = true;
 		   $viewall = true;
@@ -764,7 +766,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 
 				 if ($line['ver'] > 1) {
-					 $assessUrl = "http://localhost:8080/#/?cid=$cid&aid=$typeid";
+					 	if ($assessUseVueDev) {
+					 		$assessUrl = "http://localhost:8080/#/?cid=$cid&aid=$typeid";
+						} else {
+							$assessUrl = "../assess2/index.php/#/?cid=$cid&aid=$typeid";
+						}
 				 } else {
 					 $assessUrl = "../assessment/showtest.php?id=$typeid&cid=$cid";
 				 }
