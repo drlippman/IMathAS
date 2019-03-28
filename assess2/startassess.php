@@ -163,9 +163,6 @@ if (isset($sessiondata['lti_lis_result_sourcedid'])) {
   $assess_record->updateLTIsourcedId($altltisourcedid);
 }
 
-// save record if needed
-$assess_record->saveRecordIfNeeded();
-
 $assessInfoOut = array();
 
 //get prev attempt info before switching to practice mode
@@ -209,6 +206,9 @@ $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores,
 
 // if practice, add that
 $assessInfoOut['in_practice'] = $in_practice;
+
+// save record if needed
+$assess_record->saveRecordIfNeeded();
 
 //output JSON object
 echo json_encode($assessInfoOut);

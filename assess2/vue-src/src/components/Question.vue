@@ -118,12 +118,12 @@ export default {
     },
     addDirtyTrackers () {
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
-      .off('focus.dirtrytrack').off('change.dirtrytrack')
-      .on('focus.dirtrytrack', function() {
+      .off('focus.dirtytrack').off('change.dirtytrack')
+      .on('focus.dirtytrack', function() {
         window.$(this).attr('data-lastval', window.$(this).val());
         actions.clearAutosaveTimer();
       })
-      .on('change.dirtrytrack', function() {
+      .on('change.dirtytrack', function() {
         let val = window.$(this).val();
         if (val != window.$(this).attr('data-lastval')) {
           let name = window.$(this).attr("name");
