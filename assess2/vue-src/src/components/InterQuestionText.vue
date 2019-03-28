@@ -46,6 +46,13 @@ export default {
     if (this.active && this.expanded) {
       this.renderMath();
     }
+  },
+  watch: {
+    active: function (newVal, oldVal) {
+      if (this.active && this.expanded && !this.rendered) {
+        this.renderMath();
+      }
+    }
   }
 }
 </script>

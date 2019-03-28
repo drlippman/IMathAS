@@ -204,6 +204,7 @@ export default {
   padding: 8px 12px;
   background-color: #fff;
   color: #000;
+  text-align: left;
 }
 .menubutton button.nobutton {
   border: 0;

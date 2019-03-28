@@ -180,8 +180,11 @@ export default {
 .bigicon {
   font-size: 130%;
 }
+
+#skip-question-select #qprev, #skip-question-select #qnext {
+    margin: 0;
+}
 #qprev, #qnext {
-  margin: 0;
   padding: 0px 8px;
 }
 #qprev {

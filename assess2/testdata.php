@@ -22,6 +22,22 @@ $questionSet = [
     'qtype' => 'multipart',
     'control' => '$anstypes="number,number,number"'."\n".'$scoremethod = "singlescore"'."\n".'$a = rands(1,100,3)'."\n".'$answer = $a',
     'qtext' => '(singlescore). Math test: `4/6`. Type<br/>$a[0]: $answerbox[0]<br/>$a[1]: $answerbox[1]<br/>$a[2]: $answerbox[2]'
+  ],
+  3=>[
+    'uniqueid' => 1552587894535716,
+    'description' => 'Solve x-a=b',
+    'qtype' => 'number',
+    'control' => '$a,$b = diffrands(1,7,2)'."\n".'$answer = $a+$b',
+    'qtext' => '<p>Solve: `x - $a = $b`</p><p>`x` = $answerbox</p>',
+    'extref' => 'video!!https://www.youtube.com/watch?v=yqdlj0lv7Cc!!1'
+  ],
+  4=>[
+    'uniqueid' => 1552587894535717,
+    'description' => 'Solve x/a=b',
+    'qtype' => 'number',
+    'control' => '$a,$b = diffrands(2,7,2)'."\n".'$answer = $a*$b',
+    'qtext' => '<p>Solve: `x/$a = $b`</p><p>`x` = $answerbox</p>',
+    'extref' => 'video!!https://www.youtube.com/watch?v=zBqIH-E3ero!!1'
   ]
 ];
 
@@ -498,6 +514,32 @@ $assessGroups = [
         ],
         'itemorder' => [0,1,2,3]
       ],
+      [
+        'name' => 'Paged Full Test',
+        'summary' => 'by-question, full, with pages',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'full',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'intro' => '["",{"displayBefore":0,"displayUntil":0,"text":"<p>This is the first page text `2/3`<\/p>","ispage":1,"pagetitle":"The Basics","forntype":1},{"displayBefore":0,"displayUntil":0,"text":"<p>May be a little more just for fun `2/3`<\/p>","ispage":0,"pagetitle":"First Page Title","forntype":1},{"displayBefore":0,"displayUntil":0,"text":"<p>With some text `2/3`<\/p>","ispage":1,"pagetitle":"A second page","forntype":1},{"displayBefore":1,"displayUntil":1,"text":"<p>Between text `2/3`<\/p>","ispage":0,"pagetitle":"","forntype":1},{"displayBefore":2,"displayUntil":2,"text":"<p>After text `2/3`<\/p>","ispage":0,"pagetitle":"","forntype":1},{"displayBefore":2,"displayUntil":2,"text":"<p>The third page text `2/3`<\/p>","ispage":1,"pagetitle":"The third page","forntype":1},{"displayBefore":4,"displayUntil":4,"text":"<p>Conclusion text `2/3`<\/p>","ispage":1,"pagetitle":"Conclusion `2/3`","forntype":1}]',
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1],
+          2=>['questionsetid' => 2],
+          3=>['questionsetid' => 3]
+        ],
+        'itemorder' => [0,1,2,3]
+      ]
     ]
   ],
   [

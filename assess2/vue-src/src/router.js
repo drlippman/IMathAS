@@ -4,6 +4,7 @@ import Launch from './views/Launch.vue';
 import Closed from './views/Closed.vue';
 import Skip from './views/Skip.vue';
 import Full from './views/Full.vue';
+import FullPaged from './views/FullPaged.vue';
 import Summary from './views/Summary.vue';
 import { store, actions } from './basicstore';
 
@@ -60,6 +61,19 @@ const router = new Router({
       path: '/full',
       name: 'full',
       component: Full,
+      beforeEnter: (to, from, next) => {
+        // if no active attempt, route to launch
+        if (store.inProgress) {
+          next();
+        } else {
+          next({path: '/' + store.queryString, replace: true});
+        }
+      }
+    },
+    {
+      path: '/full/page/:page',
+      name: 'fullpaged',
+      component: FullPaged,
       beforeEnter: (to, from, next) => {
         // if no active attempt, route to launch
         if (store.inProgress) {

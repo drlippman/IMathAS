@@ -1,0 +1,67 @@
+<template>
+  <span>
+    <span class="qname-wrap">
+      <icons :name="statusIcon" class="qstatusicon" />
+      {{ nameDisp }}
+      <span class="subdued">
+        {{ qStatus }}
+      </span>
+    </span>
+  </span>
+</template>
+
+<script>
+import Icons from '@/components/Icons.vue';
+
+export default {
+  name: 'PagesListItem',
+  props: ['option'],
+  components: {
+    Icons
+  },
+  computed: {
+    statusIcon () {
+      if (this.option.disppage === 0) {
+        return 'none';
+      } else if (this.option.numquestions === this.option.numattempted) {
+        return 'attempted';
+      } else {
+        return 'unattempted';
+      }
+    },
+    nameDisp () {
+      if (this.option.disppage === 0) {
+        return this.$t('intro');
+      } else {
+        return this.option.title;
+      }
+    },
+    qStatus () {
+      if (this.option.disppage === 0 || this.option.numquestions === 0) {
+        return '';
+      } else {
+        return this.$t('header.answered', {
+          n:this.option.numattempted,
+          tot:this.option.numquestions
+        });
+      }
+    }
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.questionnav {
+  display: inline-block;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+}
+.qname-wrap {
+  display: inline-block;
+  min-width: 12em;
+}
+.qstatusicon {
+  margin-right: 4px;
+}
+</style>

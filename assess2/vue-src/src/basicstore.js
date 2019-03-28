@@ -88,7 +88,15 @@ export const actions = {
               Router.push('/skip/1' + store.queryString);
             }
           } else if (store.assessInfo.displaymethod === 'full') {
-            Router.push('/full' + store.queryString);
+            if (store.assessInfo.hasOwnProperty('interquestion_pages')) {
+              if (store.assessInfo.intro != '') {
+                Router.push('/full/page/0' + store.queryString);
+              } else {
+                Router.push('/full/page/1' + store.queryString);
+              }
+            } else {
+              Router.push('/full' + store.queryString);
+            }
           }
         }
       })
@@ -449,12 +457,42 @@ export const actions = {
       }
     }
     if (data.hasOwnProperty('interquestion_text')) {
+      data.interquestion_pages = [];
+      let lastDisplayBefore = 0;
       // ensure proper data type on these
       for (let i in data.interquestion_text) {
         data.interquestion_text[i].displayBefore = parseInt(data.interquestion_text[i].displayBefore);
         data.interquestion_text[i].displayUntil = parseInt(data.interquestion_text[i].displayUntil);
-        data.interquestion_text[i].forntype = !!data.interquestion_text[i].forntype;
-        data.interquestion_text[i].ispage = !!data.interquestion_text[i].ispage;
+        data.interquestion_text[i].forntype = (parseInt(data.interquestion_text[i].forntype) > 0);
+        data.interquestion_text[i].ispage = (parseInt(data.interquestion_text[i].ispage) > 0);
+        if (data.interquestion_text[i].ispage) {
+          // if a new page, start a new array in interquestion_pages
+          // first, add a question list to the previous page
+          if (data.interquestion_pages.length > 0) {
+            let qs = [];
+            for (let j=lastDisplayBefore; j<data.interquestion_text[i].displayBefore; j++) {
+              qs.push(j);
+            }
+            lastDisplayBefore = data.interquestion_text[i].displayBefore;
+            data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
+          }
+          // now start new page
+          data.interquestion_pages.push([data.interquestion_text[i]]);
+        } else if (data.interquestion_pages.length > 0) {
+          // if we've already started pages, push this to the current page
+          data.interquestion_pages[data.interquestion_pages.length - 1].push(data.interquestion_text[i]);
+        }
+      }
+      // if we have pages, add a question list to the last page
+      if (data.interquestion_pages.length > 0) {
+        let qs = [];
+        for (let j=lastDisplayBefore; j<data.interquestion_text[data.interquestion_text.length - 1].displayBefore; j++) {
+          qs.push(j);
+        }
+        data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
+        delete data.interquestion_text;
+      } else {
+        delete data.interquestion_pages;
       }
     }
     return data;
