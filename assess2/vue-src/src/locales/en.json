@@ -83,7 +83,9 @@
     "submit": "Submit Question",
     "checkans": "Check Answer",
     "saveans": "Save Answer",
-    "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question."
+    "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question.",
+    "jump_to_answer": "Jump to Answer",
+    "jump_warn": "This will use up your remaining tries at this version of the question."
   },
   "header": {
     "score": "Score: {pts}/{poss}",

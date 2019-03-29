@@ -104,7 +104,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  loadQuestion (qn, regen) {
+  loadQuestion (qn, regen, jumptoans) {
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
@@ -113,7 +113,8 @@ export const actions = {
       data: {
         qn: qn,
         practice: store.assessInfo.in_practice,
-        regen: regen?1:0
+        regen: regen?1:0,
+        jumptoans: jumptoans?1:0
       },
       xhrFields: {
         withCredentials: true

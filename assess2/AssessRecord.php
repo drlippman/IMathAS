@@ -859,6 +859,12 @@ class AssessRecord
       $out['score'] = ($score != -1) ? $score : 0;
       // TODO:  Do we want to return score saved in gb too?
     }
+    // if jumped to answer, burn tries
+    if (!empty($curq['jumptoans'])) {
+      $out['try'] = $out['tries_max'];
+      $out['status'] = 'attempted';
+      $out['did_jump_to_ans'] = true;
+    }
 
     if ($generate_html) {
       $showscores = $this->assess_info->getSetting('showscores');
@@ -1054,6 +1060,7 @@ class AssessRecord
   public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false) {
     // get assessment attempt data for given version
     $qver = $this->getQuestionVer($qn, $ver);
+
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
     $showscores = ($force_scores || ($this->assess_info->getSetting('showscores') === 'during'));
@@ -1066,7 +1073,7 @@ class AssessRecord
     $qcolors = array();
     $lastans = array();
     $showansparts = array();
-    $showans = true;
+    $showans = ($numParts > 0); //true by default, unless no answeights or tries yet
     $trylimit = $qsettings['tries_max'];
 
     for ($pn = 0; $pn < $numParts; $pn++) {
@@ -1088,6 +1095,8 @@ class AssessRecord
         $showansparts[$pn] = true;
       } else if ($qsettings['showans'] === 'after_lastattempt' && $partattemptn[$pn] === $trylimit) {
         $showansparts[$pn] = true;  // show after last attempt
+      } else if (!empty($qsettings['jump_to_answer']) && !empty($qver['jumptoans'])) {
+        $showansparts[$pn] = true;  // show after jump to answer pressed
       } else if ($qsettings['showans'] === 'with_score' && $showscores && $partattemptn[$pn] > 0) {
         $showansparts[$pn] = true; // show with score
       } else if ($qsettings['showans'] === 'after_n' && $partattemptn[$pn] > $qsettings['showans_aftern']) {
@@ -1108,18 +1117,21 @@ class AssessRecord
     // TODO:  pass as input
     $GLOBALS['lastanswers'] = array($qn => implode('&', $lastans));
     $GLOBALS['lastansweights'] = array(1);
-    $qout = displayq(
+    ob_start();
+    //$qout = displayq(
+    displayq(
         $qn,                            // question number
         $qsettings['questionsetid'],    // questionset ID
         $qver['seed'],                  // seed
         $showans,                       // whether to show answers
         $qsettings['showhints'],        // whether to show hints
         $attemptn,                      // the attempt number //TODO: make by-part
-        true,                           // return question text rather than echo
+        false, //using ob for now                           // return question text rather than echo
         $clearans,                      // whether to clear last ans //TODO: move here
         false,                          // seqinactive //TODO: deprecate
         $qcolors                        // array of part scores for score marking
     );
+    $qout = ob_get_clean();
     // need to extract answeights to provide to frontend
     $answeights = $GLOBALS['lastansweights'];
     if (empty($answeights)) {
@@ -1350,6 +1362,10 @@ class AssessRecord
       $qvers = $this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
       $answeights = $qvers[count($qvers) - 1]['answeights'];
       $tries = $qvers[count($qvers) - 1]['tries'];
+      if (!empty($qvers[count($qvers)-1]['jumptoans'])) {
+        // jump to answer has been clicked - submission not allowed
+        return array_fill(0, count($answeights), false);
+      }
     } else {
       $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       $answeights = $aver['questions'][$qn]['question_versions'][0]['answeights'];
@@ -1385,6 +1401,30 @@ class AssessRecord
     $regens_max = $this->assess_info->getQuestionSetting($qid, 'regens_max');
     $regens_used = count($this->data['assess_versions'][0]['questions'][$qn]['question_versions']);
     return ($regens_used < $regens_max);
+  }
+
+  /**
+   * Mark a question as "jump to answer" clicked
+   * @param  int $qn      Question #
+   * @param  int $qid     Question ID
+   * @return void
+   */
+  public function doJumpToAnswer($qn, $qid) {
+    // only can do jump to answer for by_question submission
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    if (!$by_question) {
+      return false;
+    }
+    // make sure question settings are correct
+    $allowjump = $this->assess_info->getQuestionSetting($qid, 'jump_to_answer');
+    if (!$allowjump) {
+      return false;
+    }
+    // get last question version
+    $qvers = &$this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
+    $curQver = &$qvers[count($qvers)-1];
+    $curQver['jumptoans'] = true;
+    $this->need_to_record = true;
   }
 
   /**

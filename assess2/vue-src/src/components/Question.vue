@@ -34,6 +34,15 @@
       >
         {{ submitLabel }}
       </button>
+      <button
+        v-if = "canJumpToAnswer"
+        type = "button"
+        @click = "jumpToAnswer"
+        class = "secondary"
+        :disabled = "!canSubmit"
+      >
+        {{ $t('question.jump_to_answer') }}
+      </button>
     </div>
   </div>
 </template>
@@ -64,6 +73,9 @@ export default {
     },
     canSubmit () {
       return (!store.inTransit);
+    },
+    canJumpToAnswer () {
+      return (this.questionData.jump_to_answer);
     },
     questionContentLoaded () {
       return (this.questionData.html !== null);
@@ -101,12 +113,17 @@ export default {
   methods: {
     loadQuestionIfNeeded () {
       if (!this.questionContentLoaded && this.active && store.errorMsg===null) {
-        actions.loadQuestion(this.qn, false);
+        actions.loadQuestion(this.qn, false, false);
       }
     },
     submitQuestion () {
       this.updateTime(false);
       actions.submitQuestion(this.qn, false, this.timeActive);
+    },
+    jumpToAnswer () {
+      if (confirm(this.$t('question.jump_warn'))) {
+        actions.loadQuestion(this.qn, false, true);
+      }
     },
     updateTime (goingActive) {
       if (this.timeActivated === null || goingActive) {

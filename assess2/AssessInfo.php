@@ -251,7 +251,7 @@ class AssessInfo
     $by_q = array('regens_max','regen_penalty','regen_penalty_after');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
       'showans','showans_aftern','points_possible','questionsetid',
-      'category', 'withdrawn');
+      'category', 'withdrawn', 'jump_to_answer');
     $out = array();
     foreach ($base as $field) {
       $out[$field] = $this->questionData[$id][$field];
@@ -715,6 +715,7 @@ class AssessInfo
       $settings['regens_max'] = $defaults['defregens'];
     }
 
+    $settings['jump_to_answer'] = false;
     if ($settings['showans'] == '0') {
       $settings['showans'] = $defaults['showans'];
       if ($settings['showans'] == 'after_n') {
@@ -722,6 +723,7 @@ class AssessInfo
       } else {
         $settings['showans_aftern'] = 0;
       }
+      $settings['jump_to_answer'] = $defaults['jump_to_answer'];
     } else if (is_numeric($settings['showans'])) {
       $settings['showans'] = 'after_n';
       $settings['showans_aftern'] = intval($settings['showans']);
@@ -730,6 +732,9 @@ class AssessInfo
       $settings['showans'] = 'never';
     } else if ($settings['showans'] == 'L') {
       $settings['showans'] = 'after_lastattempt';
+    } else if ($settings['showans'] == 'J') {
+      $settings['showans'] = 'after_lastattempt';
+      $settings['jump_to_answer'] = true;
     } else if ($settings['showans'] == 'T') {
       $settings['showans'] = 'after_attempt';
     } else if ($settings['showans'] == 'W') {
@@ -793,10 +798,14 @@ class AssessInfo
       );
     }
 
+    $settings['jump_to_answer'] = false;
     //unpack showans after_#
-    if (strlen($settings['showans']) == 7) {
+    if (strlen($settings['showans']) === 7) {
       $settings['showans_aftern'] = intval(substr($settings['showans'], 6));
       $settings['showans'] = 'after_n';
+    } else if ($settings['showans'] === 'jump_to_answer') {
+      $settings['jump_to_answer'] = true;
+      $settings['showans'] = 'after_lastattempt';
     }
 
     //unpack minscore

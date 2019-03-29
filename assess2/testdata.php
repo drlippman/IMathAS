@@ -539,6 +539,31 @@ $assessGroups = [
           3=>['questionsetid' => 3]
         ],
         'itemorder' => [0,1,2,3]
+      ],
+      [
+        'name' => 'Jump to Answer',
+        'summary' => 'by-question, skip, Jump to Answer<br>
+                      3 regens, 2 tries per, no penalties',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'jump_to_answer',
+        'defregens' => 100,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1],
+          2=>['questionsetid' => 0]
+        ],
+        'itemorder' => [0,1,2]
       ]
     ]
   ],

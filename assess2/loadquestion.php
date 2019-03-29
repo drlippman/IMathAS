@@ -38,6 +38,7 @@ if ($isteacher && isset($_GET['uid'])) {
 }
 $qn = Sanitize::onlyInt($_POST['qn']);
 $doRegen = !empty($_POST['regen']);
+$jumpToAnswer = !empty($_POST['jumptoans']);
 
 $now = time();
 
@@ -113,6 +114,7 @@ $qid = $assess_record->getQuestionId($qn);
 // load question settings and code
 $assess_info->loadQuestionSettings(array($qid), true);
 
+
 // Try a Similar Question, if requested
 if ($doRegen) {
     if ($assess_record->canRegenQuestion($qn, $qid)) {
@@ -122,6 +124,11 @@ if ($doRegen) {
       echo '{"error": "out_of_regens"}';
       exit;
     }
+}
+
+// jump to answer, if requested
+if ($jumpToAnswer) {
+  $assess_record->doJumpToAnswer($qn, $qid);
 }
 
 // grab question settings data with HTML

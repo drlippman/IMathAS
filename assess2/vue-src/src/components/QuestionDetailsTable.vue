@@ -18,7 +18,7 @@
           {{ index + 1 }}
         </td>
         <td v-if="showScore">{{ part.score }}/{{ part.points_possible }}</td>
-        <td v-if="doShowTries">{{ qinfo.tries_max - part.try }}</td>
+        <td v-if="doShowTries">{{ triesRemaining[index] }}</td>
         <td v-if="hasPenalty">
           <penalties-applied
             :part="part"
@@ -56,6 +56,17 @@ export default {
           this.parts[pn].penalties.length > 0
         ) {
           out.push(pn);
+        }
+      }
+      return out;
+    },
+    triesRemaining () {
+      let out = [];
+      for (let pn=0; pn<this.parts.length; pn++) {
+        if (this.qinfo.hasOwnProperty('did_jump_to_ans')) {
+          out[pn] = 0;
+        } else {
+          out[pn] = this.qinfo.tries_max - this.parts[pn].try;
         }
       }
       return out;
