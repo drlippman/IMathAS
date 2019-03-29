@@ -115,7 +115,8 @@
     "timelimit_expired": "Timelimit has expired",
     "out_of_regens": "No more Try a Similar Question remain",
     "need_group": "Cannot start the assessment until you have been added to a group",
-    "out_of_attempts": "You have used all your assessment attempts"
+    "out_of_attempts": "You have used all your assessment attempts",
+    "already_submitted": "Submission rejected. You have submitted this assessment elsewhere since it was displayed here, so the question(s) you were trying to submit may be out of date."
   },
   "scoreresult": {
     "correct": "Correct",

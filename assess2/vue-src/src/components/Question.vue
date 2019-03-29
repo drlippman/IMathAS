@@ -93,7 +93,8 @@ export default {
     showScore () {
       return (store.inProgress &&
         this.questionData.hasOwnProperty('score') &&
-        this.questionData.status !== 'unattempted' &&
+        (this.questionData.try > 0 ||
+          this.questionData.hasOwnProperty('tries_remaining_range')) &&
         this.questionData.withdrawn === 0
       );
     },

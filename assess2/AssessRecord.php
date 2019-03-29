@@ -1384,6 +1384,41 @@ class AssessRecord
     return $out;
   }
 
+  /**
+   * Checks the tries and regen info from a submission to make sure it's for
+   * the current submission
+   * @param  array  $verification      Array provided by front end, with
+   *                                Question # as keys, given an object with
+   *                                keys 'regen' and 'tries', with the latter
+   *                                an array per-part.
+   */
+  public function checkVerification($verification) {
+    $this->parseData();
+
+    $by_question = ($this->assess_info->getSetting('submitby') === 'by_question');
+    if (!$by_question) {
+      $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+      $regen = count($this->data['assess_versions']);
+    }
+    foreach ($verification as $qn=>$qdata) {
+      if ($by_question) {
+        $qvers = $this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
+        $tries = $qvers[count($qvers) - 1]['tries'];
+        $regen = count($qvers);
+      } else {
+        $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
+      }
+      if ($regen !== $qdata['regen']) {
+        return false;
+      }
+      for ($i = 0; $i < count($qdata['tries']); $i++) {
+        if ($qdata['tries'][$i] !== count($tries[$i])) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
   /**
    * Find out if question can be regenerated

@@ -41,6 +41,7 @@ if ($isteacher && isset($_GET['uid'])) {
 
 $qns = json_decode($_POST['toscoreqn'], true);
 $lastloaded = json_decode($_POST['lastloaded'], true);
+$verification = json_decode($_POST['verification'], true);
 
 if ($qns === null || $lastloaded === null) {
   echo '{"error": "invalid_params"}';
@@ -104,7 +105,18 @@ if ($in_practice) {
   $assess_info->overridePracticeSettings();
 }
 
-// TODO:  Verify confirmation values (to ensure it hasn't been submitted since)
+// Verify confirmation values (to ensure it hasn't been submitted since)
+if (!$assess_record->checkVerification($verification)) {
+  // grab question settings data with HTML to update front-end
+  $showscores = $assess_info->showScoresDuring();
+  $assessInfoOut['questions'] = array();
+  foreach ($qns as $qn) {
+    $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
+  }
+  $assessInfoOut['error'] = "already_submitted";
+  echo json_encode($assessInfoOut);
+  exit;
+}
 
 // autosave the requested parts
 foreach ($qns as $qn=>$parts) {

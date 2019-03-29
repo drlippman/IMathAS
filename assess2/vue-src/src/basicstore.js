@@ -186,6 +186,7 @@ export const actions = {
     data.append('nonblank', JSON.stringify(nonBlank));
     data.append('timeactive', timeactive.join(','));
     data.append('lastloaded', lastLoaded.join(','));
+    data.append('verification', JSON.stringify(this.getVerificationData(qns)));
     if (endattempt) {
       data.append('endattempt', endattempt);
     }
@@ -207,6 +208,12 @@ export const actions = {
       .done(response => {
         if (response.hasOwnProperty('error')) {
           store.errorMsg = response.error;
+          if (response.error === 'already_submitted') {
+            console.log("here");
+            response = this.processSettings(response);
+            this.copySettings(response);
+          }
+          console.log(store.assessInfo.questions);
           return;
         }
 
@@ -288,6 +295,7 @@ export const actions = {
     };
     data.append('toscoreqn', JSON.stringify(store.autosaveQueue));
     data.append('lastloaded', JSON.stringify(lastLoaded));
+    data.append('verification', JSON.stringify(this.getVerificationData(store.autosaveQueue)));
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
     }
@@ -307,6 +315,10 @@ export const actions = {
       .done(response => {
         if (response.hasOwnProperty('error')) {
           store.errorMsg = response.error;
+          if (response.error === 'already_submitted') {
+            response = this.processSettings(response);
+            this.copySettings(response);
+          }
           return;
         }
         // clear autosave queue
@@ -369,6 +381,22 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  getVerificationData(qns) {
+    let out = {};
+    for (let i in qns) {
+      let qn = qns[i];
+      let parttries = [];
+      let qdata = store.assessInfo.questions[qn];
+      for (let pn=0; pn < qdata.parts.length; pn++) {
+        parttries[pn] = qdata.parts[pn].try;
+      }
+      out[qn] = {
+        tries: parttries,
+        regen: qdata.regen
+      };
+    }
+    return out;
   },
   copySettings(response) {
     // overwrite existing questions with new data

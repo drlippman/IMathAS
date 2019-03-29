@@ -44,11 +44,13 @@ if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $lastloaded = array(Sanitize::onlyInt($_POST['lastloaded']));
   $timeactive = array();
   $nonblank = array();
+  $verification = array();
 } else {
   $qns = array_map('Sanitize::onlyInt', explode(',', $_POST['toscoreqn']));
   $lastloaded = array_map('Sanitize::onlyInt', explode(',', $_POST['lastloaded']));
   $timeactive = array_map('Sanitize::onlyInt', explode(',', $_POST['timeactive']));
   $nonblank = json_decode($_POST['nonblank'], true);
+  $verification = json_decode($_POST['verification'], true);
 }
 $end_attempt = !empty($_POST['endattempt']);
 
@@ -129,7 +131,18 @@ if (count($qns) > 0) {
   // load question settings and code
   $assess_info->loadQuestionSettings($end_attempt ? 'all' : $qids, true);
 
-  // TODO:  Verify confirmation values (to ensure it hasn't been submitted since)
+  // Verify confirmation values (to ensure it hasn't been submitted since)
+  if (!$assess_record->checkVerification($verification)) {
+    // grab question settings data with HTML
+    $showscores = $assess_info->showScoresDuring();
+    $assessInfoOut['questions'] = array();
+    foreach ($qns as $qn) {
+      $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
+    }
+    $assessInfoOut['error'] = "already_submitted";
+    echo json_encode($assessInfoOut);
+    exit;
+  }
 
   // Record a submission
   $submission = $assess_record->addSubmission($now);
