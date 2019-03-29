@@ -7,6 +7,12 @@ if (!isset($sessiondata['ltirole']) || $sessiondata['ltirole']!='instructor') {
 	echo "Not authorized to view this page";
 	exit;
 }
+
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['ltihome'])) {
+	require($CFG['hooks']['ltihome']);
+}
+
 //decide what we need to display
 if ($sessiondata['ltiitemtype']==0) {
 	$hascourse = true;
@@ -151,7 +157,11 @@ if (!empty($createcourse)) {
 		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		copyrubrics();
 		$DBH->commit();
-
+		
+		//call hook, if defined
+		if (function_exists('onAddCourse')) {
+			onAddCourse($cid, $userid);
+		}
 	}
 	$stm = $DBH->prepare("UPDATE imas_lti_courses SET courseid=:courseid WHERE org=:org AND contextid=:contextid");
 	$stm->execute(array(':courseid'=>$cid, ':org'=>$sessiondata['ltiorg'], ':contextid'=>$sessiondata['lti_context_id']));

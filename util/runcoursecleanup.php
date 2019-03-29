@@ -19,7 +19,14 @@ $CFG['cleanup']['msgfrom']
 $CFG['cleanup']['keepsent']
    set =0 to keep a copy of sent notifications in sent list
 $CFG['cleanup']['allowoptout']:
-   (default: true) set to false to prevent teachers opting out 
+   (default: true) set to false to prevent teachers opting out
+$CFG['cleanup']['deloldstus']:
+   (default: true) delete old student accounts that are no longer enrolled in
+   any courses and lastaccess is more than 
+   $CFG['cleanup']['old']+$CFG['cleanup']['delay'] days ago.
+$CFG['cleanup']['clearoldpw']:
+   a number of days since lastaccess that a users's password should be cleared
+   forcing a reset.  Set =0 to not use. (def: 365)
    
 You can specify different old/delay values for different groups by defining
 $CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));
@@ -46,14 +53,17 @@ if (php_sapi_name() == "cli") {
 	exit;
 }
 
-if (php_sapi_name() != "cli") {
+if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
 	respondOK(); //send 200 response now
 }
 
 $now = time();
+$old = 24*60*60*(isset($CFG['cleanup']['old'])?$CFG['cleanup']['old']:610);
 $delay = 24*60*60*(isset($CFG['cleanup']['delay'])?$CFG['cleanup']['delay']:120);
 $msgfrom = isset($CFG['cleanup']['msgfrom'])?$CFG['cleanup']['msgfrom']:0;
 $keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:4;
+$clearpw = 24*60*60*(isset($CFG['cleanup']['clearoldpw'])?$CFG['cleanup']['clearoldpw']:365);
+
 //run notifications 10 in a batch
 
 $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -142,4 +152,29 @@ if (count($stus)>0) {
 	$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
 	$stm->execute(array($cidtoclean));
 	$DBH->commit();
+}
+
+//delete old students
+/* this appears to be broken :(
+if (!isset($CFG['cleanup']['deloldstus']) || $CFG['cleanup']['deloldstus']==true) {
+	$query = 'DELETE imas_users FROM imas_users ';
+	$query .= 'LEFT JOIN imas_students ON imas_users.id=imas_students.userid ';
+	$query .= 'WHERE imas_users.rights<11 AND imas_students.id IS NULL AND ';
+	$query .= 'imas_users.lastaccess<?';
+	$stm = $DBH->prepare($query);
+	$stm->execute(array($now-$old-$delay));
+}
+*/
+
+//clear out any old pw
+if ($clearpw>0) {
+	/*
+	As is, this will disable newly created accounts if they're not enrolled in anything,
+	which probably isn't ideal
+	
+	$query = "UPDATE imas_users SET password=CONCAT('cleared_',MD5(CONCAT(SID, UUID()))) ";
+	$query .= "WHERE lastaccess<? AND rights<>11 AND rights<>76 AND rights<>77";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array($now - $clearpw));
+	*/
 }

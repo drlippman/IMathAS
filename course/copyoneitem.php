@@ -94,5 +94,10 @@ $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blo
 $stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
 $DBH->commit();
 
-header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+if (isset($_GET['backref'])) {
+	$backref = '#'.Sanitize::simpleString($_GET['backref']);
+} else {
+	$backref = '';
+}
+header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$backref");
 ?>

@@ -343,6 +343,8 @@ if (isset($_GET['form'])) {
 	echo '<a href="batchcreateinstr.php">Batch Create Instructor Accounts</a><br/>';
 	echo '<a href="batchanon.php">Batch Anonymize Old Accounts</a><br/>';
 	echo '<a href="getstucnt.php">Get Student Count</a><br/>';
+	echo '<a href="crosscoursedata.php">Cross-Course Grade Comparison</a><br/>';
+	echo '<a href="crosscoursedatadetail.php">Cross-Course Question-Level Comparison</a><br/>';
 	echo '<a href="getstucntdet.php">Get Detailed Student Count</a><br/>';
 	echo '<a href="utils.php?debug=true">Enable Debug Mode</a><br/>';
 	echo '<a href="replacevids.php">Replace YouTube videos</a><br/>';

@@ -77,7 +77,9 @@ if (isset($_GET['marktagged'])) {
 	header('Location: ' . $redirecturl . "&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
-
+$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate,autoscore FROM imas_forums WHERE id=:id");
+$stm->execute(array(':id'=>$forumid));
+list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore) = $stm->fetch(PDO::FETCH_NUM);
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 	$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
@@ -161,7 +163,7 @@ $caller = "posts";
 include("posthandler.php");
 
 $pagetitle = "Posts";
-$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=022410" type="text/css" />';
+$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=010619" type="text/css" />';
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/posts.js?v=011517"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 if ($caneditscore && $sessiondata['useed']!=0) {
@@ -302,7 +304,7 @@ if ($oktoshow) {
 	$nextth = '';
 	if ($page==-3 || $page==-5) { //came from new threads or flagged threads
 		if ($page==-3) {
-			$query = "SELECT imas_forums.id,imas_forum_threads.id as threadid FROM imas_forum_threads ";
+			$query = "SELECT imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
 			$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forum_threads.lastposttime<:now ";
 			$array = array(':now'=>$now);
 			if (!isset($teacherid)) {
@@ -350,6 +352,14 @@ if ($oktoshow) {
 					$prevthforum = $lastrow['id'];
 				}
 				$atcur = true;
+			} else if (isset($_GET['olpt']) && $_GET['olpt']>$row['lastposttime']) {
+				if (count($lastrow)>1) {
+					$prevth = $lastrow['threadid'];
+					$prevthforum = $lastrow['id'];
+				}
+				$nextth = $row['threadid'];
+				$nextthforum = $row['id'];
+				break;
 			}
 			$lastrow = $row;
 		}
@@ -429,11 +439,12 @@ if (!$oktoshow) {
 	echo '<div id="headerposts" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
 	
+	echo '<div class="fixedonscroll">';
 	if ($prevth != '') {
 		echo "<a href=\"posts.php?cid=$cid&forum=$prevthforum&thread=".Sanitize::onlyInt($prevth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
-	}	
+	}
 	
 	if ($nextth != '') {
 		echo "<a href=\"posts.php?cid=$cid&forum=$nextthforum&thread=".Sanitize::onlyInt($nextth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
@@ -441,7 +452,7 @@ if (!$oktoshow) {
 		echo "Next";
 	}
 	
-	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a>";
+	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a> ";
 	if ($tagged) {
 		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
 	} else {
@@ -452,7 +463,7 @@ if (!$oktoshow) {
 	echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
 	echo '<button onclick="showall()">'._('Show All').'</button>';
 	echo '<button onclick="hideall()">'._('Hide All').'</button>';
-
+	echo '</div>';
 
 	/*if ($view==2) {
 	echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$threadid&view=0\">View Expanded</a>";

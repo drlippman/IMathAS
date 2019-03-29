@@ -159,7 +159,7 @@ if (!(isset($teacherid))) {
 		$curBreadcrumb .= " &gt; Shift Course Dates ";
 
 		$sdate = tzdate("m/d/Y",time());
-		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid");
+		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid AND enddate<2000000000 ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=0;
 		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {

@@ -52,6 +52,9 @@ function showallans() {
 function previewall() {
 	$('input[value="Preview"]').trigger('click').remove();
 }
+function previewallfiles() {
+	$("span.clickable").trigger("click");
+}
 function allvisfullcred() {
 	$(".fullcredlink").not(function() {return $(this).closest(".pseudohidden").length}).trigger("click");
 }

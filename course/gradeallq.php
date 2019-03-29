@@ -3,10 +3,11 @@
 //(c) 2007 David Lippman
 	require("../init.php");
 
-
-	if (!(isset($teacherid))) {
+	$isteacher = isset($teacherid);
+	$istutor = isset($tutorid);
+	if (!$isteacher && !$istutor) {
 		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
+		echo "You need to log in as a teacher or tutor to access this page";
 		require("../footer.php");
 		exit;
 	}
@@ -35,16 +36,37 @@
 	} else {
 		$page = -1;
 	}
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
+	} else if (isset($_GET['secfilter'])) {
+		$secfilter = $_GET['secfilter'];
+		$sessiondata[$cid.'secfilter'] = $secfilter;
+		writesessiondata();
+	} else if (isset($sessiondata[$cid.'secfilter'])) {
+		$secfilter = $sessiondata[$cid.'secfilter'];
+	} else {
+		$secfilter = -1;
+	}
 	
-	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
 	}
+	if ($istutor && $tutoredit==2) {
+		require("../header.php");
+		echo "You not have access to view scores for this assessment";
+		require("../footer.php");
+		exit;
+	} else if ($isteacher || ($istutor && $tutoredit==1)) {
+		$canedit = 1;
+	} else {
+		$canedit = 0;
+	}
 
-	if (isset($_GET['update'])) {
+	if (isset($_GET['update']) && $canedit) {
 		$allscores = array();
 		$allfeedbacks = array();
 		$grpscores = array();
@@ -167,7 +189,7 @@
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
-					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$scores);
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$scores,true);
 				}
 			}
 		}
@@ -196,7 +218,7 @@
 
 
 	require("../assessment/displayq2.php");
-
+	require("../includes/htmlutil.php");
 
 	if ($isgroup>0) {
 		$groupnames = array();
@@ -220,6 +242,10 @@
 		}
 
 	}
+	
+	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
+	$stm->execute(array(':courseid'=>$cid));
+	$sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 
 	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
@@ -238,15 +264,21 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=120617"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=021519"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
-	$address = $GLOBALS['basesiteurl'] . "/course/gradeallq.php?stu=$stu&cid=$cid&gbmode=$gbmode&aid=$aid&qid=$qid&ver=$ver";
+	$address = $GLOBALS['basesiteurl'] . "/course/gradeallq.php?";
+	$address .= Sanitize::generateQueryStringFromMap(array('stu'=>$stu, 'cid'=>$cid, 'gbmode'=>$gbmode, 'aid'=>$aid, 'qid'=>$qid, 'ver'=>$ver));
 	$placeinhead .= "       var toopen = '$address&page=' + stun;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
 	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForDisplay($deffbtext).'";';
+	$placeinhead .= 'function chgsecfilter() {
+		var sec = document.getElementById("secfiltersel").value;
+		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);
+		window.location = toopen;
+		}';
 	$placeinhead .= '</script>';
 	if ($sessiondata['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
@@ -268,6 +300,11 @@
 	} else {
 		echo "<a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "&page=-1\">Grade all students at once</a>";
 	}
+	if (count($sections)>1) {
+		echo '<br/>';
+		echo _('Limit to section').': ';
+		writeHtmlSelect('secfiltersel', $sections, $sections, $secfilter, _('All'), '-1', 'onchange="chgsecfilter()"');
+	}
 	echo '</div>';
 	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
@@ -283,14 +320,17 @@
 		echo ' <button type=button id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
 		echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
 		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
+		echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
 	}
 	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
 	if ($deffbtext != '') {
 		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
 	}
-	echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
-	echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
-	if ($page==-1) {
+	if ($canedit) {
+		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
+		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
+	}
+	if ($page==-1 && $canedit) {
 		echo '<div class="fixedbottomright">';
 		echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
 		echo '<span class="noticetext" id="quicksavenotice">&nbsp;</span>';
@@ -314,22 +354,32 @@
 
 	if ($page!=-1) {
 		$stulist = array();
+		$qarr = array(':courseid'=>$cid, ':assessmentid'=>$aid);
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		if ($hidelocked) {
 			$query .= "AND imas_students.locked=0 ";
 		}
+		if ($secfilter != -1) {
+			$query .= "AND imas_students.section=:section ";
+			$qarr[':section'] = $secfilter;
+		}
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+		$stm->execute($qarr);
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$stulist[] = $row[0].', '.$row[1];
 		}
 	}
+	$qarr = array(':courseid'=>$cid, ':assessmentid'=>$aid);
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 	if ($hidelocked) {
 		$query .= "AND imas_students.locked=0 ";
+	}
+	if ($secfilter != -1) {
+		$query .= "AND imas_students.section=:section ";
+		$qarr[':section'] = $secfilter;
 	}
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	if ($page != -1) {
@@ -337,7 +387,7 @@
 		$query .= " LIMIT $page,1";
 	}
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+	$stm->execute($qarr);
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
@@ -474,9 +524,13 @@
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
-				echo "<input type=text size=4 id=\"scorebox$cnt\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
-				if ($rubric != 0) {
-					echo printrubriclink($rubric,$points,"scorebox$cnt","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1));
+				if ($canedit) {
+					echo "<input type=text size=4 id=\"scorebox$cnt\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."\" value=\"".Sanitize::encodeStringForDisplay($pt)."\">";
+					if ($rubric != 0) {
+						echo printrubriclink($rubric,$points,"scorebox$cnt","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1));
+					}
+				} else {
+					echo Sanitize::encodeStringForDisplay($pt);
 				}
 			}
 			if ($parts!='') {
@@ -486,11 +540,17 @@
 					if ($prts[$j]==-1) {
 						$prts[$j] = 'N/A';
 					}
-					echo "<input type=text size=2 id=\"scorebox$cnt-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
-					if ($rubric != 0) {
-						echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
+					if ($canedit) {
+						echo "<input type=text size=2 id=\"scorebox$cnt-$j\" name=\"ud-" . Sanitize::onlyInt($line['id']) . "-".Sanitize::onlyFloat($loc)."-$j\" value=\"" . Sanitize::encodeStringForDisplay($prts[$j]) . "\">";
+						if ($rubric != 0) {
+							echo printrubriclink($rubric,$answeights[$j],"scorebox$cnt-$j","fb-". $loc.'-'. Sanitize::onlyInt($line['id']),($loc+1).' pt '.($j+1));
+						}
+						echo ' ';
+					} else {
+						if ($j>0) { echo ', ';}
+						echo Sanitize::encodeStringForDisplay($prts[$j]);
 					}
-					echo ' ';
+					
 				}
 
 			}
@@ -501,7 +561,7 @@
 				echo "(parts: $answeights) ";
 			}
 			printf("in %s attempt(s)\n", Sanitize::encodeStringForDisplay($attempts[$loc]));
-			if ($parts!='') {
+			if ($parts!='' && $canedit) {
 				$togr = array();
 				foreach ($qtypes as $k=>$t) {
 					if ($t=='essay' || $t=='file') {
@@ -513,7 +573,7 @@
 					$togr = implode(',',$togr);
 					echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$answeights.']);return false;">Full credit all manually-graded parts</a>';
 				}
-			} else {
+			} else if ($canedit) {
 				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($points).',this);return false;">Full credit</a> <span class=quickfb></span>';
 			}
 			$laarr = explode('##',$la[$loc]);
@@ -585,7 +645,11 @@
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>"._("Question Feedback").": ";
 			//<textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-".Sanitize::onlyInt($line['id'])."\" name=\"feedback-".Sanitize::onlyInt($line['id'])."\">".Sanitize::encodeStringForDisplay($line['feedback'])."</textarea>";
-			if ($sessiondata['useed']==0) {
+			if (!$canedit) {
+				echo '<div>';
+				echo Sanitize::outgoingHtml($feedback["Q$loc"]);
+				echo '</div>';
+			} else if ($sessiondata['useed']==0) {
 				echo '<br/><textarea cols="60" rows="2" class="fbbox" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'" name="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'">';
 				echo Sanitize::encodeStringForDisplay($feedback["Q$loc"], true);
 				echo '</textarea>';
@@ -606,7 +670,11 @@
 			$cnt++;
 		}
 	}
-	echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+	if ($canedit) {
+		echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+	}
+	} else {
+		echo '<p><b>'._('No submission to show').'</b></p>';
 	}
 
 	echo "</form>";

@@ -124,12 +124,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 if ($_POST['sdatetype']=='0') {
                     $startdate = 0;
                 } else {
-                    $startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+                    $startdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
                 }
                 if ($_POST['edatetype']=='2000000000') {
                     $enddate = 2000000000;
                 } else {
-                    $enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+                    $enddate = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
                 }
 
                 if (empty($_POST['doreview'])) {
@@ -143,9 +143,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $reviewdate = 0;
             }
             if (isset($_POST['dolpcutoff']) && trim($_POST['lpdate']) != '' && trim($_POST['lptime']) != '') {
-            	$LPcutoff = parsedatetime($_POST['lpdate'],$_POST['lptime']);
-            	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $LPcutoff)) {
-            		$LPcutoff = 0; //don't really set if it matches course end date
+            	$LPcutoff = parsedatetime($_POST['lpdate'],$_POST['lptime'],0);
+            	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $LPcutoff) || $LPcutoff<$enddate) {
+            		$LPcutoff = 0; //don't really set if it matches course end date or is before
             	}
             } else {
             	$LPcutoff = 0;
@@ -1111,6 +1111,8 @@ if ($overwriteBody==1) {
 ?>
 			</span><br class=form>
 	
+		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
+		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
 		   <img class="mida" src="../img/expand.gif" />
 		   Additional Display Options

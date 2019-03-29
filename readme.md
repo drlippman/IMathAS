@@ -81,7 +81,7 @@ Many system defaults can be adjusted using config changes.
     - `$GLOBALS['CFG']['GEN']['AWSforcoursefiles']`:   If the variables above are set, by default S3 will be used only for user uploads through the text editor, and local storage will still be used for course files and question images.  Set this option to true to also use S3 for these types of files. 
 - `$CFG['GEN']['noFileBrowser']`: Set this to true to prevent the use of the file and image uploads through the text editor.  Do not define this to allow use of the file browser.
 - `$CFG['GEN']['sendquestionproblemsthroughcourse']`:  By default, clicking the "Report problem with question" will open email.  To send using an IMathAS message instead, set this option to a course ID, ideally one that all instructors are participants in.
-- `$CFG['GEN']['qerrorsendto']`:  Normally question errors are reported to the question author.  To have them sent do a different user, set this option.  Set to a user ID to send to that user.  You can also force the delivery method by defining this is an array of `array(userid, sendmethod, title)`, like `array(2, "email", "Question Error Report")`.  The email address for the specified user ID will be used.
+- `$CFG['GEN']['qerrorsendto']`:  Normally question errors are reported to the question author.  To have them sent do a different user, set this option.  Set to a user ID to send to that user.  You can also force the delivery method by defining this is an array of `array(userid, sendmethod, title, alsosendtoowner)`, like `array(2, "email", "Contact Support", true)`.  The email address for the specified user ID will be used.  If alsosendtoowner is set to true, the message will be sent both to the question owner as well.
 - `$CFG['GEN']['meanstogetcode']`:  To comply with the IMathAS Community License, a means to get a copy of question code must be provided.  By default the system says to email the `$sendfrom` email address.  You can define this variable to display a different message on the license info page.
 - `$CFG['GEN']['LTIorgid']`:  A value to use as the LTI organization ID when IMathAS is acting as an LTI consumer.  Defaults to the domain name.
 - `$CFG['UP']`:  An associative array overriding the default User Preference values.  See the `$prefdefaults` definition in `/includes/userprefs.php` for the appropriate format.
@@ -137,7 +137,8 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 - `$CFG['LTI']['usequeue']`:  By default, LTI grade updates are sent immediately after the submission is scored.  Set this option to true to use a delayed queue to reduce the number of grade updates sent.  _This option requires additional setup._
     - To operate properly, the `/admin/processltiqueue.php` script needs to be called regularly, ideally once a minute.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to  `/admin/processltiqueue.php?authcode=####` using the code you define.
     - `$CFG['LTI']['queuedelay']` defines the delay (in minutes) between the students' last submission and when the score is sent to the LMS.  Defaults to 5.
-
+    - `$CFG['LTI']['logltiqueue']` set to true to log LTI queue results in /admin/import/ltiqueue.log
+ 
 ### Email
 By default, emails are sent using the built-in PHP `mail()` function.  This can sometimes have reliability issue, so there are options to override the mail sender or reduce the use of email in the system.
 - `$CFG['GEN']['noEmailButton']`:  Set to true to remove the "Email" option from the Roster and Gradebook

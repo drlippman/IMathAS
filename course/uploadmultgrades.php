@@ -43,7 +43,7 @@ if (!(isset($teacherid))) {
 		if ($_POST['sdatetype']=='0') {
 			$showdate = 0;
 		} else {
-			$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+			$showdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
 		}
 		$gradestodel = array();
 		foreach ($coltoadd as $col) {

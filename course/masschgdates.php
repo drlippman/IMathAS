@@ -47,7 +47,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$startdate = 0;
 			} else {
 				$pts = explode('~',$data[0]);
-				$startdate = parsedatetime($pts[0],$pts[1]);
+				$startdate = parsedatetime($pts[0],$pts[1],0);
 			}
 			/*
 			if ($_POST['sdatetype'.$i]=='0') {
@@ -61,7 +61,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$enddate = 2000000000;
 			} else {
 				$pts = explode('~',$data[1]);
-				$enddate = parsedatetime($pts[0],$pts[1]);
+				$enddate = parsedatetime($pts[0],$pts[1],2000000000);
 			}
 			/*
 			if ($_POST['edatetype'.$i]=='0') {
@@ -78,7 +78,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$reviewdate = 0;
 				} else {
 					$pts = explode('~',$data[2]);
-					$reviewdate = parsedatetime($pts[0],$pts[1]);
+					$reviewdate = parsedatetime($pts[0],$pts[1],2000000000);
 				}
 			}
 			if ($data[3] != 'NA') {
@@ -88,7 +88,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$fpdate = 0;
 				} else {
 					$pts = explode('~',$data[3]);
-					$fpdate = parsedatetime($pts[0],$pts[1]);
+					$fpdate = parsedatetime($pts[0],$pts[1],2000000000);
 				}
 			}
 			if ($data[4] != 'NA') {
@@ -98,7 +98,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$frdate = 0;
 				} else {
 					$pts = explode('~',$data[4]);
-					$frdate = parsedatetime($pts[0],$pts[1]);
+					$frdate = parsedatetime($pts[0],$pts[1],2000000000);
 				}
 			}
 			/*
@@ -115,7 +115,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$lpdate = 0;
 				} else {
 					$pts = explode('~',$data[5]);
-					$lpdate = parsedatetime($pts[0],$pts[1]);
+					$lpdate = parsedatetime($pts[0],$pts[1],0);
+					if ($lpdate <= $enddate) {
+						$lpdate = 0;
+					}
 				}
 			}
 

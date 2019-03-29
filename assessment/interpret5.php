@@ -6,7 +6,7 @@
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 //require_once("mathphp.php");
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
-$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt','$myrights','$myspecialrights');
+$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
@@ -134,7 +134,7 @@ function interpretline($str,$anstype,$countcnt) {
 				//might be $a..$b or 3.*.4  (remnant of implicit handling)
 				if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
-					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]});{$forcond[0]}<=round(floatval({$forcond[2]}),0);{$forcond[0]}++) ".$todo."}");
+					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]}),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=round(floatval({$forcond[2]}),0) && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}++, \$forloopcnt[{$countcnt}]++) ".$todo."}; if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';

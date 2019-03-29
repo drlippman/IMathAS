@@ -47,13 +47,15 @@ if ($myrights < 75) {
     $stm->execute(array(':id'=>$uid));
   }
   $userinfo = $stm->fetch(PDO::FETCH_ASSOC);
-  $userinfo['role'] = getRoleNameByRights($userinfo['rights']);
-  $userinfo['lastaccess'] = ($userinfo['lastaccess']>0) ? date("n/j/y g:i a",$userinfo['lastaccess']) : "never";
-  if ($userinfo['parent']>0) {
-    $group_stm = $DBH->prepare('SELECT name FROM imas_groups WHERE id=:id');
-    $group_stm->execute(array(':id'=>$userinfo['parent']));
-    $r = $group_stm->fetch(PDO::FETCH_NUM);
-    $userinfo['parentgroup'] = $r[0];
+  if ($userinfo !== false) {
+	  $userinfo['role'] = getRoleNameByRights($userinfo['rights']);
+	  $userinfo['lastaccess'] = ($userinfo['lastaccess']>0) ? date("n/j/y g:i a",$userinfo['lastaccess']) : "never";
+	  if ($userinfo['parent']>0) {
+		$group_stm = $DBH->prepare('SELECT name FROM imas_groups WHERE id=:id');
+		$group_stm->execute(array(':id'=>$userinfo['parent']));
+		$r = $group_stm->fetch(PDO::FETCH_NUM);
+		$userinfo['parentgroup'] = $r[0];
+	  }
   }
 
   if ($userinfo===false) {
@@ -74,7 +76,6 @@ if ($myrights < 75) {
       $newrow['id'] = $row['id'];
       $newrow['available'] = $row['available'];
       $newrow['owner'] = ($row['ownerid']!=$uid)?$row['LastName'].', '.$row['FirstName']:'';
-      $newrow['canedit'] = ($row['ownerid']==$uid || $myrights==100 || $row['groupid']==$groupid);
       $newrow['deleted'] = ($row['available']==4);
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       if ($row['available']==4) {
@@ -171,6 +172,7 @@ if ($overwriteBody==1) {
 
   //sub nav links
   echo '<div class="cpmid"><a href="forms.php?from=ud'.$uid.'&action=chgrights&id='.$uid.'">'._('Edit User').'</a>';
+  echo ' | <a href="addcourse.php?for='.$uid.'">'. _('Add Course').'</a>';
   echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
   if ($myrights==100) {
     echo ' | <a href="userlti.php?id='.$uid.'">'. _('LTI Connections').'</a>';
@@ -219,9 +221,6 @@ if ($overwriteBody==1) {
       if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
       echo '<td ';
       echo 'data-cid='.Sanitize::onlyInt($course['id']).' ';
-      if (!$course['canedit']) {
-      	  echo 'data-noedit=1 ';    
-      }
       if ($course['hidden']) {
         echo 'class="hocptd" ';
       }
@@ -394,18 +393,12 @@ if ($overwriteBody==1) {
       var thishtml = html + \' <li class="unhide"><a href="#" onclick="unhidecourse(this);return false;">'._('Return to home page course list').'</a></li>\';
       thishtml += \' <li class="hide"><a href="#" onclick="hidecourse(this);return false;">'._('Hide from home page course list').'</a></li>\';
 
-      if ($(el).attr("data-noedit")!=1) {  
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
         thishtml += \' <li><a href="addremoveteachers.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
         thishtml += \' <li><a href="transfercourse.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
         thishtml += \'</ul></span> \';
         $(el).find("img").replaceWith(thishtml);
-      } else {
-      	thishtml += \' <li><a href="#" onclick="removeSelfAsCoteacher(this,\'+cid+\',\\\'tr\\\','.$uid.');return false;">'._('Remove as a co-teacher').'</a></li>\';
-      	thishtml += \'</ul></span> \';
-      	$(el).find("img").replaceWith(thishtml);
-      }
     });
     $(".dropdown-toggle").dropdown();
     });

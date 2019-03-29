@@ -31,6 +31,11 @@ $init_skip_csrfp = true;
 include("init_without_validate.php");
 unset($init_skip_csrfp);
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['bltilaunch'])) {
+	require($CFG['hooks']['bltilaunch']);
+}
+
 $curdir = rtrim(dirname(__FILE__), '/\\');
 
 
@@ -593,6 +598,11 @@ if (isset($_GET['launch'])) {
 		$_SESSION['selection_data'] = @$_REQUEST['data'];
 	}
 	unset($_SESSION['lti_duedate']);
+	if (!isset($_REQUEST['custom_canvas_assignment_due_at'])) {
+		if (isset($_REQUEST['custom_assignment_due_at'])) {
+			$_REQUEST['custom_canvas_assignment_due_at'] = $_REQUEST['custom_assignment_due_at'];
+		}
+        }
 	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
 		$duedate = strtotime($_REQUEST['custom_canvas_assignment_due_at']);
 		if ($duedate !== false) {
@@ -605,7 +615,7 @@ if (isset($_GET['launch'])) {
 	//look if we know this user
 	$orgparts = explode(':',$ltiorg);  //THIS was added to avoid issues when LMS GUID change, while still storing it
 	$shortorg = $orgparts[0];	   //we'll only use the part from the lti key
-	$query = "SELECT lti.userid FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
+	$query = "SELECT lti.userid,iu.FirstName,iu.LastName,iu.email,lti.id FROM imas_ltiusers AS lti LEFT JOIN imas_users as iu ON lti.userid=iu.id ";
 	$query .= "WHERE lti.org LIKE :org AND lti.ltiuserid=:ltiuserid ";
 	if ($ltirole!='learner') {
 		//if they're a teacher, make sure their imathas account is too. If not, we'll act like we don't know them
@@ -618,7 +628,34 @@ if (isset($_GET['launch'])) {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':org'=>"$shortorg:%", ':ltiuserid'=>$ltiuserid));
 	if ($stm->rowCount()>0) { //yup, we know them
-		$userid = $stm->fetchColumn(0);
+		$userrow = $stm->fetch(PDO::FETCH_ASSOC);
+		$userid = $userrow['userid'];
+		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
+		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner') )) {
+			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
+				$firstname = $_REQUEST['lis_person_name_given'];
+				$lastname = $_REQUEST['lis_person_name_family'];
+			} else {
+				$firstname = '';
+				$lastname = $_REQUEST['lis_person_name_full'];
+			}
+			if (!empty($_REQUEST['lis_person_contact_email_primary'])) {
+				$email = $_REQUEST['lis_person_contact_email_primary'];
+			} else {
+				$email = 'none@none.com';
+			}
+			if ($userrow['FirstName'] === null) { //accidentally deleted the imas_users record!  Restore it
+				$query = "INSERT INTO imas_users (id,SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
+				$query .= '(:userid,:SID,:password,:rights,:FirstName,:LastName,:email,0)';
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':userid'=>$userid, ':SID'=>'lti-'.$userrow['id'], ':password'=>'pass' ,':rights'=>10,
+					':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email));
+			} else if ($firstname != $userrow['FirstName'] || $lastname != $userrow['LastName'] || $email != $userrow['email']) {
+				//update imas_users record
+				$stm2 = $DBH->prepare("UPDATE imas_users SET FirstName=?,LastName=?,email=? WHERE id=?");
+				$stm2->execute(array($firstname, $lastname, $email, $userid));
+			}
+		}
 	} else {
 		//student is not known.  Bummer.  Better figure out what to do with them :)
 
@@ -783,7 +820,7 @@ if ($stm->rowCount()==0) {
 
 					$query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
 					$query .= "AND imt.userid=:userid JOIN imas_assessments AS ia ON ic.id=ia.courseid ";
-					$query .= "WHERE ic.ancestors REGEXP :cregex AND ia.ancestors REGEXP :aregex ORDER BY ic.name";
+					$query .= "WHERE ic.available<4 AND ic.ancestors REGEXP :cregex AND ia.ancestors REGEXP :aregex ORDER BY ic.name";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(
 						':userid'=>$userid, 
@@ -887,6 +924,12 @@ if ($stm->rowCount()==0) {
 					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 					':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 				$destcid = $DBH->lastInsertId();
+				
+				//call hook, if defined
+				if (function_exists('onAddCourse')) {
+					onAddCourse($destcid, $userid, $myrights, $groupid);
+				}
+		
 				$stm = $DBH->prepare('INSERT INTO imas_teachers (userid,courseid) VALUES (:userid,:destcid)');
 				$stm->execute(array(':userid'=>$userid, ':destcid'=>$destcid));
 
@@ -2244,6 +2287,12 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 							':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 						$destcid  = $DBH->lastInsertId();
+						
+						//call hook, if defined
+						if (function_exists('onAddCourse')) {
+							onAddCourse($destcid, $userid);
+						}
+				
 						$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
 						$stm->execute(array(':userid'=>$userid, ':courseid'=>$destcid));
 

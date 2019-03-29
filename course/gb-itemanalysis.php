@@ -4,9 +4,10 @@
 	require("../init.php");
 
 	$isteacher = isset($teacherid);
+	$istutor = isset($tutorid);
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	if (!$isteacher) {
+	if (!$isteacher && !$istutor) {
 		echo "This page not available to students";
 		exit;
 	}
@@ -49,11 +50,17 @@
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 	
-	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid) = $stm->fetch(PDO::FETCH_NUM);
+	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
+		exit;
+	}
+	if ($istutor && $tutoredit==2) {
+		require("../header.php");
+		echo "You not have access to view scores for this assessment";
+		require("../footer.php");
 		exit;
 	}
 
@@ -380,10 +387,12 @@
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}
-	echo '<div class="cpmid">Experimental:<br/>';
-	echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
-
-	echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
+	if ($isteacher) {
+		echo '<div class="cpmid">Experimental:<br/>';
+		echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
+	
+		echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
+	}
 	require("../footer.php");
 
 function getpts($sc) {

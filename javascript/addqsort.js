@@ -832,7 +832,7 @@ function updateTextShowN(i,old_i) {
 		//if aborted, restore old value
 		$("#showforn"+i).val(old_i);
 	} else {
-		itemarray[i][2] = $("#showforn"+i).val();
+		itemarray[i][2] = 1.0*$("#showforn"+i).val();
 		submitChanges();
 	}
 }
@@ -882,6 +882,7 @@ function generateOutput() {
 	var text_segments = [];
 	var pts = {};
 	var qcnt = 0;
+
 	for (var i=0; i<itemarray.length; i++) {
 		if (itemarray[i][0]=='text') { //is text item
 			//itemarray[i] is ['text',text,displayforN]
@@ -1198,6 +1199,7 @@ function generateTable() {
 					} else {
 						html += '<li><span><span class=noticetext>Withdrawn</span></span></li>';
 					}
+					html += "<li><a href=\"gb-rescoreq.php?cid="+curcid+"&aid="+curaid+"&qid="+curitems[j][0]+"&qsid="+curitems[j][1]+"\">Re-score Question</a></li>";
 				} else {
 					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></li>"; //add link
 					html += "<li><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></li>"; //add link and checkbox
@@ -1274,7 +1276,11 @@ function check_textseg_itemarray() {
 			numq = 0;
 			j = i+1;
 			while (j<itemarray.length && itemarray[j][0]!="text") {
-				numq++;
+				if (itemarray[j].length<5) { //is group
+					numq += parseInt(itemarray[j][0]);
+				} else {
+					numq++;
+				}
 				j++;
 			}
 			//make sure isn't bigger than number of q, but is at least 1

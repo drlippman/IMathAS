@@ -7,6 +7,10 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","
 //nCr(n,r)
 //The Choose function
 function nCr($n,$r){
+   if ($n < 0 || $r < 0 || !is_finite($n) || !is_finite($r)) {
+     echo 'invalid input to nCr';
+     return false;
+   }
    if ($r > $n)
      return false;
    if (($n-$r) < $r)
@@ -21,6 +25,10 @@ function nCr($n,$r){
 //nPr(n,r)
 //The Permutations function
 function nPr($n,$r){
+   if ($n < 0 || $r < 0 || !is_finite($n) || !is_finite($r)) {
+     echo 'invalid input to nPr';
+     return false;
+   }
    if ($r > $n)
      return false;
    if ($r==0)
@@ -36,12 +44,20 @@ function nPr($n,$r){
 //mean(array)
 //Finds the mean of an array of numbers
 function mean($a) {
+	if (!is_array($a)) {
+		echo 'mean expects an array';
+		return false;
+	}
 	return (array_sum($a)/count($a));
 }
 
 //variance(array)
 //the (sample) variance of an array of numbers
 function variance($a) {
+	if (!is_array($a)) {
+		echo 'stdev/variance expects an array';
+		return false;
+	}
 	$v = 0;
 	$mean = mean($a);
 	foreach ($a as $x) {
@@ -59,6 +75,10 @@ function stdev($a) {
 //absmeandev(array)
 //the absolute mean deviation of an array of numbers
 function absmeandev($a) {
+	if (!is_array($a)) {
+		echo 'absmeandev expects an array';
+		return false;
+	}
 	$v = 0;
 	$mean = mean($a);
 	foreach ($a as $x) {
@@ -71,6 +91,14 @@ function absmeandev($a) {
 //example: percentile($a,30) would find the 30th percentile of the data
 //Calculates using the p/100*(N) method (e.g. Triola)
 function percentile($a,$p) {
+	if (!is_array($a)) {
+		echo 'percentile expects an array';
+		return false;
+	}
+	if ($p<0 || $p>100) {
+		echo 'invalid percentage';
+		return false;
+	}
 	sort($a, SORT_NUMERIC);
 	if ($p==0) {
 		return $a[0];
@@ -90,6 +118,14 @@ function percentile($a,$p) {
 //example: percentile($a,30) would find the 30th percentile of the data
 //Calculates using the p/100*(N+1) method (e.g. OpenStax).
 function Nplus1percentile($a,$p) {
+	if (!is_array($a)) {
+		echo 'percentile expects an array';
+		return false;
+	}
+	if ($p<0 || $p>100) {
+		echo 'invalid percentage';
+		return false;
+	}
 	sort($a, SORT_NUMERIC);
 	if ($p==0) {
 		return $a[0];
@@ -111,6 +147,10 @@ function Nplus1percentile($a,$p) {
 //finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 //array of numbers.  Calculates using percentiles.
 function quartile($a,$q) {
+	if ($q<0 || $q>4) {
+		echo 'invalid quartile number';
+		return false;
+	}
 	return percentile($a,$q*25);
 }
 
@@ -118,6 +158,14 @@ function quartile($a,$q) {
 //finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 //array of numbers.  Calculates using the TI-84 method.
 function TIquartile($a,$q) {
+	if (!is_array($a)) {
+		echo 'percentile expects an array';
+		return false;
+	}
+	if ($q<0 || $q>4) {
+		echo 'invalid quartile number';
+		return false;
+	}
 	sort($a, SORT_NUMERIC);
 	$n = count($a);
 	if ($q==0) {
@@ -161,6 +209,14 @@ function TIquartile($a,$q) {
 //finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 //array of numbers.  Calculates using the Excel method.
 function Excelquartile($a,$q) {
+	if (!is_array($a)) {
+		echo 'percentile expects an array';
+		return false;
+	}
+	if ($q<0 || $q>4) {
+		echo 'invalid quartile number';
+		return false;
+	}
 	sort($a, SORT_NUMERIC);
 	$n = count($a);
 	if ($q==0) {
@@ -191,6 +247,10 @@ function Excelquartile($a,$q) {
 //array of numbers.  Calculates using the N+1 method, which is like
 //percentiles, but calculated using N+1 (OpenStax).
 function Nplus1quartile($a,$q) {
+	if ($q<0 || $q>4) {
+		echo 'invalid quartile number';
+		return false;
+	}
 	return Nplus1percentile($a,$q*25);
 }
 
@@ -199,6 +259,14 @@ function Nplus1quartile($a,$q) {
 //array of numbers.  Uses all the quartile methods, and returns an "or" joined
 //string of all unique answers.
 function allquartile($a,$q) {
+	if (!is_array($a)) {
+		echo 'percentile expects an array';
+		return false;
+	}
+	if ($q<0 || $q>4) {
+		echo 'invalid quartile number';
+		return false;
+	}
 	sort($a, SORT_NUMERIC);
 	$n = count($a);
 	if ($q==0) {
@@ -248,6 +316,10 @@ function median($a) {
 // start: first lower class limit
 // classwidth: width of the classes
 function freqdist($a,$label,$start,$cw) {
+	if (!is_array($a)) {
+		echo 'freqdist expects an array';
+		return false;
+	}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	sort($a, SORT_NUMERIC);
 	$x = $start;
@@ -274,6 +346,10 @@ function freqdist($a,$label,$start,$cw) {
 // start: first lower class limit
 // classwidth: width of the classes
 function frequency($a,$start,$cw) {
+	if (!is_array($a)) {
+		echo 'frequency expects an array';
+		return false;
+	}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	sort($a, SORT_NUMERIC);
 	$x = $start;
@@ -296,6 +372,10 @@ function frequency($a,$start,$cw) {
 // condition: a condition, using x for data values
 //Example: countif($a,"x<3 && x>2")
 function countif($a,$ifcond) {
+	if (!is_array($a)) {
+		echo 'countif expects an array';
+		return false;
+	}
 	$rsnoquote = preg_replace('/"[^"]*"/','""',$ifcond);
 	$rsnoquote = preg_replace('/\'[^\']*\'/','\'\'',$rsnoquote);
 	if (preg_match_all('/([$\w]+)\s*\([^\)]*\)/',$rsnoquote,$funcs)) {
@@ -334,6 +414,10 @@ function countif($a,$ifcond) {
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
 function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
+	if (!is_array($a)) {
+		echo 'histogram expects an array';
+		return false;
+	}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	sort($a, SORT_NUMERIC);
 	$x = $start;
@@ -402,6 +486,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 // upper (optional): first upper class limit.  Defaults to start+classwidth
 // width,height (optional): width and height in pixels of graph
 function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$width=300,$height=200) {
+	if (!is_array($freq)) {echo "freqarray must be an array"; return 0;}
 	if ($cw<0) { $cw *= -1;} else if ($cw==0) { echo "Error - classwidth cannot be 0"; return 0;}
 	$x = $start;
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Label on left of box</th><th>Frequency</th></tr></thead>\n<tbody>\n";
@@ -545,17 +630,68 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	return showasciisvg($outst,$width,$height);
 }
 
-//piechart(percents, labels, {width, height})
+//piechart(percents, labels, {width, height, data label})
 //create a piechart
 //percents: array of pie percents (should total 100%)
 //labels: array of labels for each pie piece
 //uses Google Charts API
 function piechart($pcts,$labels,$w=350,$h=150) {
+	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		$out .= '<table><caption>'._('Pie Chart').'</caption>';
+		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
+		$out .= '<th>'._('Percent').'</th></tr>';
+		foreach ($labels as $k=>$label) {
+			$out .= '<tr><td>'.Sanitize::encodeStringForDisplay($label).'<td>';
+			$out .= '<td>'.Sanitize::encodeStringForDisplay($pcts[$k]).'%</td></tr>';
+		}
+		$out .= '</table>';
+		return $out;
+	}
+	$uniqueid = uniqid('pie');
+	$out = '<div id="'.$uniqueid.'" style="width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
+	//load google charts loader if needed
+	$out .= '<script type="text/javascript">
+		if (typeof window.chartqueue == "undefined") {
+			window.chartqueue = [];
+			jQuery.getScript("https://www.gstatic.com/charts/loader.js")
+			.done(function() {
+				google.charts.load("current", {packages: ["corechart"]});
+				for (i in window.chartqueue) {
+					google.charts.setOnLoadCallback(window.chartqueue[i]);
+				}
+			});
+		};';
+	$rows = array();
+	foreach ($labels as $k=>$label) {
+		$row = '["'.Sanitize::encodeStringForJavascript($label);
+		$row .= '",' . floatval($pcts[$k]) . ']';
+		$rows[] = $row;
+	}
+	
+	$out .= 'function '.$uniqueid.'() {
+		var data = new google.visualization.DataTable();
+		data.addColumn("string", "Data");
+		data.addColumn("number", "Percentage");
+		data.addRows(['.implode(',', $rows).']);
+		var chart = new google.visualization.PieChart(document.getElementById("'.$uniqueid.'"));
+		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}});
+	}';
+	
+	//load it
+	$out .= 'if (typeof google == "undefined" || typeof google.charts == "undefined") {
+			window.chartqueue.push('.$uniqueid.');
+		} else {
+			google.charts.load("current", {packages: ["corechart"]});
+			google.charts.setOnLoadCallback('.$uniqueid.');
+		}
+		</script>';
+	/*
 	$out = "<img src=\"https://chart.apis.google.com/chart?cht=p&amp;chd=t:";
 	$out .= implode(',',$pcts);
 	$out .= "&amp;chs={$w}x{$h}&amp;chl=";
 	$out .= implode('|',$labels);
 	$out .= '" alt="Pie Chart" />';
+	*/
 	return $out;
 }
 
@@ -564,6 +700,10 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
 function normrand($mu,$sig,$n,$rnd=null) {
+	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $sig < 0) {
+		echo 'invalid inputs to normrand';
+		return array();
+	}
 	global $RND;
 	for ($i=0;$i<ceil($n/2);$i++) {
 		do {
@@ -717,6 +857,10 @@ function boxplot($arr,$label="",$options = array()) {
 //z-value z, to dec decimals (defaults to 4, max of 10)
 //based on someone else's code - can't remember whose!
 function normalcdf($ztest,$dec=4) {
+	if (!is_finite($ztest)) {
+		echo 'invalid value for z';
+		return 0;
+	}
 	if ($dec>10) { $dec = 10;}
 
 	$eps = pow(.1,$dec);
@@ -777,6 +921,10 @@ function normalcdf($ztest,$dec=4) {
 //to the left of the t-value t
 //based on code from www.math.ucla.edu/~tom/distributions/tDist.html
 function tcdf($X, $df, $dec=4) {
+	if (!is_finite($X) || !is_finite($df)) {
+		echo 'invalid inputs to tcdf';
+		return 0;
+	}
 	if ($df<=0) {
 		echo "Degrees of freedom must be positive";
 		return false;
@@ -877,7 +1025,10 @@ function tcdf($ttest,$df,$dec=4) {
 //finds the z-value with a left-tail area of p, to dec decimals (default 5)
 // from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
 function invnormalcdf($p,$dec=5) {
-
+   if (!is_finite($p) || $p<0 || $p>1) {
+	echo 'invalid inputs to invnormalcdf';
+	return 0;
+   }
       $p0 = -0.322232431088;
       $p1 = -1.0;
       $p2 = -0.342242088547;
@@ -908,6 +1059,10 @@ function invnormalcdf($p,$dec=5) {
 //to dec decimal places (default 4)
 // from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
 function invtcdf($p,$ndf,$dec=4) {
+	if (!is_finite($p) || !is_finite($ndf) || $p<0 || $p>1 || $ndf < 0) {
+		echo 'invalid inputs to invtcdf';
+		return 0;
+	}
 	$half_pi = M_PI/2;
 	$eps = 1e-12;
 	$origp = $p;
@@ -1167,6 +1322,10 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 //Computes the probability of x successes out of N trials
 //where each trial has probability p of success
 function binomialpdf($N,$p,$x) {
+	if (!is_finite($p) || !is_finite($N) || $p<0 || $p>1 || $x < 0) {
+		echo 'invalid inputs to invtcdf';
+		return 0;
+	}
 	return (nCr($N,$x)*pow($p,$x)*pow(1-$p,$N-$x));
 }
 
@@ -1175,6 +1334,10 @@ function binomialpdf($N,$p,$x) {
 //Computes the probably of &lt;=x successes out of N trials
 //where each trial has probability p of success
 function binomialcdf($N,$p,$x) {
+	if (!is_finite($p) || !is_finite($N) || $p<0 || $p>1 || $x < 0) {
+		echo 'invalid inputs to invtcdf';
+		return 0;
+	}
 	$out = 0;
 	for ($i=0;$i<=$x;$i++) {
 		$out += binomialpdf($N,$p,$i);
@@ -1185,6 +1348,10 @@ function binomialcdf($N,$p,$x) {
 //chi2teststat(m)
 //Computes the test stat sum((E-O)^2/E) given a matrix of values
 function chi2teststat($m) {
+	if (!is_array($m) || !is_array($m[0])) {
+		echo 'invalid inputs to chi2teststat';
+		return 0;
+	}
 	$rows = count($m);
 	$cols = count($m[0]);
  	$rowtot = array();
@@ -1211,10 +1378,18 @@ function chi2teststat($m) {
 //Computes the area to the left of x under the chi-squared disribution
 //with df degrees of freedom
 function chi2cdf($x,$a) {
+	if ($x<0 || !is_finite($x) || $a < 1) {
+		echo 'Invalid input to chi2cdf';
+		return 0;
+	}
 	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
 }
 
 function chicdf($x,$a) {
+	if ($x<0 || !is_finite($x) || $a < 1) {
+		echo 'Invalid input to chi2cdf';
+		return 0;
+	}
 	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
 }
 
@@ -1226,6 +1401,10 @@ function invchicdf($cdf,$a) {
 //Compuates the x value with left-tail probability p under the
 //chi-squared distribution with df degrees of freedom
 function invchi2cdf($cdf,$a) {
+	if (!is_finite($cdf) || !is_finite($a) || $cdf < 0 || $cdf > 1 || $a < 1) {
+		echo 'Invalid input to invchicdf';
+		return 0;
+	}
 	$aa = 0.6931471806;
   $c1 = 0.01;
   $c2 = 0.222222;
@@ -1554,6 +1733,10 @@ function gamma_log($x) {
 //with df1 and df2 degrees of freedom (techinically it's 1-CDF)
 //Algorithm is accurate to approximately 4-5 decimals
 function fcdf($x,$df1,$df2) {
+	if (!is_finite($x) || !is_finite($df1) || !is_finite($df2) || $df1 < 1 || $df2 < 1 || $x < 0) {
+		echo 'Invalid input to fcdf';
+		return 0;
+	}
 	$p1 = fcall(fspin($x,$df1,$df2));
 	return $p1;
 }
@@ -1619,6 +1802,10 @@ function LJspin($q,$i,$j,$b) {
 //Algorithm is accurate to approximately 2-4 decimal places
 //Less accurate for smaller p-values
 function invfcdf($p,$df1,$df2) {
+	if (!is_finite($p) || !is_finite($df1) || !is_finite($df2) || $df1 < 1 || $df2 < 1 || $p < 0 || $p > 1) {
+		echo 'Invalid input to invfcdf';
+		return 0;
+	}
 	$v = 0.5;
 	$dv = 0.5;
 	$f = 0;

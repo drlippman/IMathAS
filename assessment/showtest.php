@@ -3,6 +3,11 @@
 //(c) 2006 David Lippman
 
 	require("../init.php");
+	
+	//Look to see if a hook file is defined, and include if it is
+	if (isset($CFG['hooks']['assessment/showtest'])) {
+		require(__DIR__.'/../'.$CFG['hooks']['assessment/showtest']);
+	}
 
 	if (!isset($CFG['TE']['navicons'])) {
 		 $CFG['TE']['navicons'] = array(
@@ -131,7 +136,7 @@
 			echo '<p>'.sprintf(_('You have %d LatePass(es) available which you could use to re-open the assignment for scored work.'), $latepasses).'</p>';
 			echo '<p><button type="button" onclick="window.location.href=\'../course/redeemlatepass.php?cid='.$cid.'&aid='.$aid.'\'">'._('Use LatePass').'</button> ';
 			echo _('This will re-open the assessment for graded work').'</p>';
-			echo '<p><button type="button" onclick="window.location.href=\'showtest.php?cid='.$cid.'&id='.$aid.'&goreview=true\'">'.('Continue in Review Mode').'</button> ';
+			echo '<p><a href="showtest.php?cid='.$cid.'&id='.$aid.'&goreview=true">'.('Continue in Review Mode').'</a> ';
 			echo '<span class="noticetext">'._('If you open the assessment in un-graded review mode now, you will not be able to use a LatePass later').'</span></p>';
 			require("../footer.php");
 			exit;
@@ -344,7 +349,7 @@
 			$starttime = time();
 
 			$stugroupid = 0;
-			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid) && !isset($tutorid)) {
+			if ($adata['isgroup']>0 && !$isreview && !isset($teacherid) && !isset($tutorid) && $isRealStudent) {
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 				$stm = $DBH->prepare($query);
@@ -1304,7 +1309,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo "<span id=\"myname\">".('User Preferences')."</span></p>";
 		}
 		$out = '';
-		if ($testsettings['msgtoinstr']==1) {
+		if ($testsettings['msgtoinstr']==1 && $coursemsgset<4) {
 			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
 			$stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 			$msgcnt = $stm->fetchColumn(0);
@@ -2050,6 +2055,15 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
 					}
 					echo "</form>\n";
+					if (isset($intropieces) && $next==count($questions)-1) {
+						foreach ($introdividers as $k=>$v) {
+							if ($v[1]==$next+2) {//right divider
+								echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
+								echo _('Hide Question Information'), '</a></div>';
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';								
+							}
+						}
+					}
 					echo "</div>\n";
 				} else {
 					echo "<div class=inset>\n";
@@ -3104,6 +3118,16 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					echo ' <input type="button" class="btn" value="', _('Jump to Answer'), '" onclick="if (confirm(\'', _('If you jump to the answer, you must generate a new version to earn credit'), '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$i.'&amp;to='.$i.'\'}"/>';
 				}
 				echo "</form>\n";
+				if (isset($intropieces) && $i==count($questions)-1) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+2) {//right divider
+							echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
+							echo _('Hide Question Information'), '</a></div>';
+							echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				echo "</div>\n";
 
 			}

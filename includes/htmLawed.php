@@ -9,11 +9,12 @@ function convertdatauris($in) {
 	$in = preg_replace('/<img[^>]*src="data:image[^>]*$/','',$in);
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		preg_match_all('/<img[^>]*src="(data:image\/(\w+);base64,([^"]*))"/',$in,$matches);
+		$milliseconds = round(microtime(true) * 1000);
 		foreach ($matches[3] as $k=>$code) {
 			$img = base64_decode($code);
 			$ext = $matches[2][$k];
 			if (!isset($okext[$ext])) { continue;}
-			$key = "ufiles/$userid/pastedimage".tzdate("ymd-His",time()).'-'.$k.$okext[$ext];
+			$key = "ufiles/$userid/pastedimage".$milliseconds.'-'.$k.$okext[$ext];
 			storecontenttofile($img,$key,"public");
 			$in = str_replace($matches[1][$k],getuserfileurl($key),$in);
 		}	

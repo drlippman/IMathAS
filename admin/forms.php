@@ -2,10 +2,24 @@
 //IMathAS:  Admin forms
 //(c) 2006 David Lippman
 require("../init.php");
+
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['admin/forms'])) {
+	require(__DIR__.'/../'.$CFG['hooks']['admin/forms']);
+}
+
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+
+//call hook, if defined
+if (function_exists('getHeaderCode')) {
+	$placeinhead .= getHeaderCode();
+}
+
 require("../header.php");
 require("../includes/htmlutil.php");
+
+
 
 $from = 'admin2';
 $backloc = 'admin2.php';
@@ -16,6 +30,9 @@ if (!empty($_GET['from'])) {
 	} else if ($_GET['from']=='admin2') {
 		$from = 'admin2';
 		$backloc = 'admin2.php';
+	} else if ($_GET['from']=='userreports') {
+		$from = 'userreports';
+		$backloc = 'userreports.php';
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'ud'.$userdetailsuid;
@@ -32,6 +49,8 @@ if (!isset($_GET['cid'])) {
 		echo "<a href=\"admin2.php\">Admin</a> &gt; ";
 	} else if ($from == 'admin2') {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; ';
+	} else if ($from == 'userreports') {
+		echo '<a href="userreports.php">'._('User Reports').'</a> &gt; ';
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		echo '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 	} else if (substr($_GET['from'],0,2)=='gd') {
@@ -138,6 +157,10 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($myrights < 100 && ($myspecialrights&32)!=32 && $line['groupid']!=$groupid) {
+				echo "You do not have access to edit this user";
+				break;
+			}
 			printf("<div class=pagetitle><h1>%s %s</h1></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
 				Sanitize::encodeStringForDisplay($line['LastName']));
 			$oldgroup = $line['groupid'];
@@ -288,6 +311,12 @@ switch($_GET['action']) {
 			echo ' <input name=newgroupname size=20 onblur="checkgroupisnew()"/></span>';
 			echo "</span><br class=form />\n";
 		}
+		if ($myrights >= 75 || ($myspecialrights&32)==32) {
+			echo '<span class=form>'._('Add a course').'</span>';
+			echo '<span class=formright><label><input type=checkbox name=addnewcourse value=1> ';
+			echo _('Add a new course for this user').'</span><br class=form>';
+		}
+		
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		if ($_GET['action'] == "newadmin") {
 			require_once("../includes/newusercommon.php");
@@ -460,6 +489,18 @@ switch($_GET['action']) {
 			$dates_by_lti = 0;
 			$startdate = 0;
 			$enddate = 2000000000;
+			$for = 0;
+			if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_POST['for']) && $_POST['for']>0) {
+				$for = Sanitize::onlyInt($_POST['for']);
+				$stm = $DBH->prepare("SELECT FirstName,LastName,groupid FROM imas_users WHERE id=?");
+				$stm->execute(array($for));
+				$forinfo = $stm->fetch(PDO::FETCH_ASSOC);
+				if ($myrights<100 && ($myspecialrights&32)!=32 && $forinfo['groupid']!=$groupid) {
+					$for = 0;
+				} else {
+					$forname = $forinfo['LastName'].', '.$forinfo['FirstName'];
+				}
+			}
 			if (isset($_POST['ctc']) || isset($_POST['coursebrowserctc'])) {
 				if (!empty($_POST['coursebrowserctc'])) {                                           
 					$ctc = Sanitize::onlyInt($_POST['coursebrowserctc']);
@@ -492,6 +533,9 @@ switch($_GET['action']) {
 					$name = $ctcinfo['name'];
 					$latepasshrs = $ctcinfo['latepasshrs'];
 					$deflatepass = $ctcinfo['deflatepass'];
+					$showlatepass = $ctcinfo['showlatepass'];
+					$theme = $ctcinfo['theme'];
+					$msgset = $ctcinfo['msgset'];
 				}
 			} else {
 				$ctc = 0;
@@ -526,6 +570,7 @@ switch($_GET['action']) {
 			echo _('Add New Course');
 		}
 		echo '</h1></div>';
+		
 		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from);
 		if (isset($_GET['cid'])) {
 			echo "&cid=$cid";
@@ -563,6 +608,12 @@ switch($_GET['action']) {
 		</script>';
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']) .'" />';
 		if ($_GET['action']=='addcourse') {
+			if ($for != 0) {
+				echo '<span class=form>'._('Creating course for:').'</span>';
+				echo '<span class=formright>'.Sanitize::encodeStringForDisplay($forname);
+				echo '<input type=hidden name=for value="'.Sanitize::onlyInt($for).'" />';
+				echo '</span><br class=form>';
+			}
 			if ($ctc==0) {
 				echo '<span class=form>'._('Starting with:').'</span><span class=formright>';
 				echo _('A blank course');
@@ -573,7 +624,7 @@ switch($_GET['action']) {
 				echo '<input type=hidden name=ekey value="'.Sanitize::encodeStringForDisplay($ctcekey).'"/>';
 				echo '<input type=hidden name=termsagree value="1"/>';
 			}
-			echo ' <a class=small href="addcourse.php">Change</a>';
+			echo ' <a class=small href="addcourse.php?for='.Sanitize::onlyInt($for).'">Change</a>';
 			echo '</span><br class=form>';
 		} else {
 			echo "<span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($courseid)."</span><br class=form>\n";
@@ -607,10 +658,32 @@ switch($_GET['action']) {
 				echo 'opt out of having the student data deleted. </p>';
 			}
 		}
+		//Start grouping: copy options
+		if ($_GET['action']=='addcourse' && $ctc>0) {
+			echo '<div class="block grouptoggle">';
+			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo _('Course Copy Options');
+			echo '</div>';
+			echo '<div class="blockitems hidden">';
+			echo '<span class=form><label for=copyoffline>'._('Copy offline grade items?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyoffline" id="copyoffline" value="1"/>';
+			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyrubrics>'._('Copy rubrics?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyrubrics" id="copyrubrics" value="1" checked/>';
+			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyoutcomes>'._('Copy outcomes?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyoutcomes" id="copyoutcomes" value="1"/>';
+			echo '</span><br class=form>';
+			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
+			echo '</span><br class=form>';
+			echo '</div>';
+			//TODO:  FINISH ME ****
+		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';
 		echo '<img class="mida" src="../img/expand.gif" /> ';
-		echo 'Availability and Access';
+		echo _('Availability and Access');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
 		
@@ -618,6 +691,12 @@ switch($_GET['action']) {
 		echo '<input type="checkbox" name="stuavail" value="1" ';
 		if (($avail&1)==0) { echo 'checked="checked"';}
 		echo '/>Available to students</span><br class="form" />';
+		
+		//call hook, if defined
+		if (function_exists('getCourseSettingsForm')) {
+			getCourseSettingsForm($_GET['action'], $myrights, $_GET['action']=="modify"?$courseid:null);
+		}
+		
 		if ($_GET['action']=="modify") {
 			echo '<span class=form>Lock for assessment:</span><span class=formright><select name="lockaid">';
 			echo '<option value="0" ';
@@ -1087,6 +1166,9 @@ switch($_GET['action']) {
 
 
 		echo "<div class=submit><input type=submit value=Submit></div></form>\n";
+		if ($myrights==100 && $_GET['action']=='modify' && $line['ancestors'] != '') {
+			echo '<p class=small>'._('Course Ancestors').': '.Sanitize::encodeStringForDisplay($line['ancestors']).'</p>';
+		}
 		break;
 	case "importmacros":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
@@ -1352,9 +1434,9 @@ switch($_GET['action']) {
 	case "modgroup":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle"><h1>Rename Instructor Group</h1></div>';
-		$stm = $DBH->prepare("SELECT name,parent FROM imas_groups WHERE id=:id");
+		$stm = $DBH->prepare("SELECT name,parent,grouptype FROM imas_groups WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
-		list($gpname,$parent) = $stm->fetch(PDO::FETCH_NUM);
+		list($gpname,$parent,$grptype) = $stm->fetch(PDO::FETCH_NUM);
 
 		printf("<form method=post action=\"actions.php?from=%s&id=%s\">\n",
 			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']));
@@ -1370,6 +1452,12 @@ switch($_GET['action']) {
 			echo '>'.Sanitize::encodeStringForDisplay($r[1]).'</option>';
 		}
 		echo '</select><br/>';
+		
+		//call hook, if defined
+		if (function_exists('getModGroupForm')) {
+			getModGroupForm($_GET['id'], $grptype, $myrights);
+		}
+			
 		echo "<input type=submit value=\"Update Group\">\n";
 		echo "</form>\n";
 		break;
@@ -1381,6 +1469,18 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 
+		break;
+	case "entermfa":
+		if (isset($_GET['error'])) {
+			echo '<p class=noticetext>Invalid code - try again</p>';
+		}
+		echo '<p>Enter the 2-factor authentication code from your device</p>';
+		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'">';
+		echo '<input type=hidden name=action value="entermfa" />';
+		echo '<p>Code: <input size=8 name=mfatoken /></p>';
+		echo '<p><label><input type=checkbox name=mfatrust /> Do not ask again on this device</label></p>';
+		echo '<p><input type=submit value="Verify Code" /></p>';
+		echo '</form>';
 		break;
 	case "findstudent":
 		if ($myrights < 20) { echo "You don't have the authority for this action"; break;}

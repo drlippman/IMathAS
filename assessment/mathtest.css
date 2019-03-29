@@ -188,6 +188,7 @@ span.done {
 }
 
 div.inset {
+	position: relative;
 	padding: 0px;
 	margin-left: 155px;
 	margin-right: 10px;
@@ -849,7 +850,7 @@ img.scoreicon:hover {
 	border-bottom:2px solid #f00;
 }
 
-div.question img {
+div.question img, div.intro img {
 	max-width: 90%;
 	height: auto;
 }

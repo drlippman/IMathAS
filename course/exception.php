@@ -236,7 +236,7 @@ if ($overwriteBody==1) {
 
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
 		$exceptionUrl = "exception.php?" . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-				'aid' => $_GET['aid'], 'uid' => $_GET['uid'], 'asid' => $asid, 'from' => $from,
+				'aid' => $_GET['aid'], 'uid' => $_GET['uid'], 'stu' => $stu, 'asid' => $asid, 'from' => $from,
             ));
 ?>
 	<form method=post action="<?php echo $exceptionUrl; ?>">

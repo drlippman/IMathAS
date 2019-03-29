@@ -28,19 +28,24 @@ if (isset($_GET['embedded'])) {
 	$flexwidth = true;
 }
 
+if (($myrights == 100 || ($myspecialrights&32)==32) && isset($_GET['forgrp'])) {
+	$dispgroupid = Sanitize::onlyInt($_GET['forgrp']);
+} else {
+	$dispgroupid = $groupid;
+}
 
 /*** Utility functions ***/
 function getCourseBrowserJSON() {
-  global $DBH, $browserprops, $groupid;
+  global $DBH, $browserprops, $dispgroupid;
   
   $stm = $DBH->prepare("SELECT parent FROM imas_groups WHERE id=?");
-  $stm->execute(array($groupid));
+  $stm->execute(array($dispgroupid));
   $supergroupid = $stm->fetchColumn(0);
   
   $query = "SELECT ic.id,ic.name,ic.jsondata,iu.FirstName,iu.LastName,ig.name AS groupname,ig.parent,ic.istemplate,iu.groupid ";
   $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id ";
   $query .= "WHERE ((ic.istemplate&17)>0 OR ((ic.istemplate&2)>0 AND iu.groupid=?)";
-  $qarr = array($groupid);
+  $qarr = array($dispgroupid);
   if ($supergroupid>0) {
   	  $query .= " OR ((ic.istemplate&32)>0 AND ig.parent=?)";
   	  array_push($qarr, $supergroupid);
@@ -63,7 +68,7 @@ function getCourseBrowserJSON() {
     	    $jsondata['browser']['name'] = $row['name'];
     }
    
-    if (($row['istemplate']&2)==2 && $row['groupid']==$groupid) { //group template for user's group
+    if (($row['istemplate']&2)==2 && $row['groupid']==$dispgroupid) { //group template for user's group
     	$jsondata['browser']['coursetype'] = 0;	    
     } else if (($row['istemplate']&32)==32 && $row['parent']==$supergroupid) { //super-group template for user's group
     	$jsondata['browser']['coursetype'] = 0;  

@@ -37,9 +37,9 @@
 		}
 		}
 	}
-	$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid FROM imas_forums WHERE id=:id");
+	$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid,autoscore FROM imas_forums WHERE id=:id");
 	$stm->execute(array(':id'=>$forumid));
-	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid) = $stm->fetch(PDO::FETCH_NUM);
+	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid,$autoscore) = $stm->fetch(PDO::FETCH_NUM);
 	$allowanon = (($forumsettings&1)==1);
 	$allowmod = ($isteacher || (($forumsettings&2)==2));
 	$allowdel = ($isteacher || (($forumsettings&4)==4));

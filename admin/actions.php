@@ -4,12 +4,19 @@
 require("../init.php");
 require_once("../includes/password.php");
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['admin/actions'])) {
+	require(__DIR__.'/../'.$CFG['hooks']['admin/actions']);
+}
+
 $from = 'admin';
 if (isset($_GET['from'])) {
 	if ($_GET['from']=='home') {
 		$from = 'home';
 	} else if ($_GET['from']=='admin2') {
 		$from = 'admin2';
+	} else if ($_GET['from']=='userreports') {
+		$from = 'userreports';
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'ud'.$userdetailsuid;
@@ -24,6 +31,8 @@ if ($from=='admin') {
 	$breadcrumbbase .= '<a href="admin.php">Admin</a> &gt; ';
 } else if ($from == 'admin2') {
 	$breadcrumbbase .= '<a href="admin2.php">Admin</a> &gt; ';
+} else if ($from == 'userreports') {
+	$breadcrumbbase .= '<a href="userreports.php">'._('User Reports').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='ud') {
 	$breadcrumbbase .= '<a href="admin2.php">'._('Admin').'</a> &gt; <a href="'.$backloc.'">'._('User Details').'</a> &gt; ';
 } else if (substr($_GET['from'],0,2)=='gd') {
@@ -47,6 +56,9 @@ switch($_POST['action']) {
 		list($oldrights,$oldgroupid) = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
 			echo "invalid id";
+			exit;
+		} else if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
+			echo "You don't have the authority for this action"; 
 			exit;
 		}
 
@@ -385,6 +397,10 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
 			$stm->execute(array($newuserid, $now, json_encode($reqdata)));
 		}
+		if ($_POST['newrights']>=20 && !empty($_POST['addnewcourse'])) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/addcourse.php?for=".Sanitize::onlyInt($newuserid));	
+			exit;
+		}
 		break;
 	case "logout":
 		$sessionid = session_id();
@@ -608,12 +624,12 @@ switch($_POST['action']) {
 		if (trim($_POST['sdate'])=='') {
 			$startdate = 0;
 		} else {
-			$startdate = parsedatetime($_POST['sdate'],'12:01am');
+			$startdate = parsedatetime($_POST['sdate'],'12:01am',0);
 		}
 		if (trim($_POST['edate'])=='') {
 			$enddate = 2000000000;
 		} else {
-			$enddate = parsedatetime($_POST['edate'],'11:59pm');
+			$enddate = parsedatetime($_POST['edate'],'11:59pm',2000000000);
 		}
 		$_POST['ltisecret'] = trim($_POST['ltisecret']);
 		if (isset($_POST['setdatesbylti']) && $_POST['setdatesbylti']==1) {
@@ -645,6 +661,12 @@ switch($_POST['action']) {
 			}
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
+			
+			//call hook, if defined
+			if (function_exists('onModCourse')) {
+				onModCourse($_GET['id'], $userid, $myrights, $groupid);
+			}
+			
 			if ($stm->rowCount()>0) {
 				if ($setdatesbylti==1) {
 					$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");
@@ -677,19 +699,37 @@ switch($_POST['action']) {
 			for ($i=0;$i<8;$i++) {
 				$ltisecret .= substr($chars,rand(0,56),1);
 			}
+			$courseownerid = $userid;
+			if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_POST['for']) && $_POST['for']>0) {
+				if ($myrights == 100 || ($myspecialrights&32)==32) {
+					$courseownerid = Sanitize::onlyInt($_POST['for']);
+				} else if ($myrights == 75) {
+					$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
+					$stm->execute(array($_POST['for']));
+					if ($groupid == $stm->fetchColumn(0)) {
+						$courseownerid = Sanitize::onlyInt($_POST['for']);
+					}
+				}
+			}
 			
 			$DBH->beginTransaction();
 			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,ltisecret,dates_by_lti,blockcnt) VALUES ";
 			$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :ltisecret, :ltidates, :blockcnt);";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$userid, ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':picicons'=>$picicons,
+			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$courseownerid, ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':picicons'=>$picicons,
 				':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':toolset'=>$toolset, ':showlatepass'=>$showlatepass,
 				':itemorder'=>$itemorder, ':available'=>$avail, ':istemplate'=>$istemplate, ':deftime'=>$deftime, ':startdate'=>$startdate, ':enddate'=>$enddate,
 				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt));
 			$cid = $DBH->lastInsertId();
+			
+			//call hook, if defined
+			if (function_exists('onAddCourse')) {
+				onAddCourse($cid, $userid, $myrights, $groupid);
+			}
+			
 			//if ($myrights==40) {
 				$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
-				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+				$stm->execute(array(':userid'=>$courseownerid, ':courseid'=>$cid));
 			//}
 			$useweights = intval(isset($CFG['GBS']['useweights'])?$CFG['GBS']['useweights']:0);
 			$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
@@ -706,7 +746,7 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$ctc));
 				$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
-				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $userid) || 
+				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $courseownerid) || 
 					($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
 					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {
 						//did not provide valid enrollment key
@@ -737,7 +777,7 @@ switch($_POST['action']) {
 						':chop'=>$row['chop'], ':dropn'=>$row['dropn'], ':weight'=>$row['weight'], ':hidden'=>$row['hidden'], ':calctype'=>$row['calctype']));
 					$gbcats[$frid] = $DBH->lastInsertId();
 				}
-				$copystickyposts = true;
+				$copystickyposts = !empty($_POST['copystickyposts']);
 				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$_POST['usetemplate']));
 				$r = $stm->fetch(PDO::FETCH_NUM);
@@ -751,6 +791,7 @@ switch($_POST['action']) {
 				}
 				$outcomes = array();
 
+				$replacebyarr = array();
 				$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
 				$query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
 				$query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
@@ -761,7 +802,7 @@ switch($_POST['action']) {
 					$replacebyarr[$row[0]] = $row[1];
 				}
 
-				if ($outcomesarr!='') {
+				if ($outcomesarr!='' && !empty($_POST['copyoutcomes'])) {
 					$stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
 					$stm->execute(array(':courseid'=>$_POST['usetemplate']));
 					$out_ins_stm = null;
@@ -806,30 +847,33 @@ switch($_POST['action']) {
 				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':id'=>$cid));
 				//copy offline
 				$offlinerubrics = array();
-				$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid=:courseid");
-				$stm->execute(array(':courseid'=>$_POST['usetemplate']));
-				$gbi_ins_stm = null;
-				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					$rubric = $row['rubric'];
-					unset($row['rubric']);
-					if (isset($gbcats[$row['gbcategory']])) {
-						$row['gbcategory'] = $gbcats[$row['gbcategory']];
-					} else {
-						$row['gbcategory'] = 0;
-					}
-					if ($gbi_ins_stm === null) {
-						$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
-						$query .= "(:courseid,:name,:points,:showdate,:gbcategory,:cntingb,:tutoredit)";
-						$gbi_ins_stm = $DBH->prepare($query);
-					}
-					$row[':courseid'] = $cid;
-					$gbi_ins_stm->execute($row);
-					if ($rubric>0) {
-						$offlinerubrics[$DBH->lastInsertId()] = $rubric;
+				if (!empty($_POST['copyoffline'])) {
+					$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid=:courseid");
+					$stm->execute(array(':courseid'=>$_POST['usetemplate']));
+					$gbi_ins_stm = null;
+					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+						$rubric = $row['rubric'];
+						unset($row['rubric']);
+						if (isset($gbcats[$row['gbcategory']])) {
+							$row['gbcategory'] = $gbcats[$row['gbcategory']];
+						} else {
+							$row['gbcategory'] = 0;
+						}
+						if ($gbi_ins_stm === null) {
+							$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
+							$query .= "(:courseid,:name,:points,:showdate,:gbcategory,:cntingb,:tutoredit)";
+							$gbi_ins_stm = $DBH->prepare($query);
+						}
+						$row[':courseid'] = $cid;
+						$gbi_ins_stm->execute($row);
+						if ($rubric>0) {
+							$offlinerubrics[$DBH->lastInsertId()] = $rubric;
+						}
 					}
 				}
-				copyrubrics();
-
+				if (!empty($_POST['copyrubrics'])) {
+					copyrubrics();
+				}
 			}
 			if ($setdatesbylti==1) {
 				$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");
@@ -1164,9 +1208,14 @@ switch($_POST['action']) {
 			echo "<html><body>Group name already exists.  <a href=\"forms.php?action=modgroup&id=".Sanitize::encodeUrlParam($_GET['id'])."\">Try again</a></body></html>\n";
 			exit;
 		}
-		$grptype = (isset($_POST['iscust'])?1:0);
-		$stm = $DBH->prepare("UPDATE imas_groups SET name=:name,parent=:parent,grouptype=:grouptype WHERE id=:id");
-		$stm->execute(array(':name'=>$_POST['gpname'], ':parent'=>$_POST['parentid'], ':grouptype'=>$grptype, ':id'=>$_GET['id']));
+		$stm = $DBH->prepare("UPDATE imas_groups SET name=:name,parent=:parent WHERE id=:id");
+		$stm->execute(array(':name'=>$_POST['gpname'], ':parent'=>$_POST['parentid'], ':id'=>$_GET['id']));
+		
+		//call hook, if defined
+		if (function_exists('onModGroup')) {
+			onModGroup($_GET['id'], $userid, $myrights, $groupid);
+		}
+		
 		break;
 	case "delgroup":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
@@ -1234,6 +1283,47 @@ switch($_POST['action']) {
 			$stm->execute(array(':diag'=>$_GET['id']));
 		}
 		break;
+	case "entermfa":
+		$stm = $DBH->prepare("SELECT mfa FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$userid));
+		$mfadata = $stm->fetchColumn(0);
+		$error = '';
+		if ($mfadata != '') {
+			$mfadata = json_decode($mfadata, true);
+			require('../includes/GoogleAuthenticator.php');
+			$MFA = new GoogleAuthenticator();
+			//check that code is valid and not a replay
+			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
+			   ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
+				$sessiondata['mfaverified'] = true;
+				writesessiondata();
+				$mfadata['last'] = $_POST['mfatoken'];
+				$mfadata['laston'] = time();
+				if (isset($_POST['mfatrust'])) {
+					$trusttoken = $MFA->createSecret();
+					setcookie('gat', $trusttoken, time()+60*60*24*365*10, $imasroot.'/', '', true, true);
+					if (!isset($mfadata['trusted'])) {
+						$mfadata['trusted'] = array();
+					}
+					$mfadata['trusted'][] = $trusttoken;
+				}
+				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
+				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
+				if (isset($_POST['mfatrust'])) {
+					require("../header.php");
+					echo '<p>This device is now trusted; you will not be asked for your 2-factor authentication on this device again.</p>';
+					echo '<p>If you ever need to un-trust this device, you can clear all cookies, or disable 2-factor authentication in your account settings.</p>';
+					echo '<p><a href="../index.php">Continue</a></p>';
+					require("../footer.php");
+					exit;
+				}
+					
+			} else {
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=entermfa&error=true");
+				exit;
+			}
+		}
+		break;
 }
 
 session_write_close();
@@ -1245,6 +1335,8 @@ if ($myrights<75 || $from=='home') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 } else if ($from=='admin2') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
+} else if ($from=='userreports') {
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userreports.php");
 } else if (substr($from,0,2)=='ud' || substr($from,0,2)=='gd') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/$backloc");
 } else {

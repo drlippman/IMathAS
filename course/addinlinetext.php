@@ -78,12 +78,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
 			} else {
-				$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+				$startdate = parsedatetime($_POST['sdate'],$_POST['stime'],0);
 			}
 			if ($_POST['edatetype']=='2000000000') {
 				$enddate = 2000000000;
 			} else {
-				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+				$enddate = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
 			}
 			$oncal = Sanitize::onlyInt($_POST['oncal']);
 		} else if ($_POST['avail']==2) {
@@ -91,8 +91,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$startdate = 0;
 				$oncal = 0;
 			} else {
-				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
-				$oncal = 1;
+				$startdate = parsedatetime($_POST['cdate'],"12:00 pm",0);
+				$oncal = ($startdate>0)?1:0;
 				$caltag = Sanitize::stripHtmlTags($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;

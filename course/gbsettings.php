@@ -62,7 +62,11 @@
 			} else if ($_POST['droptype'][$id]==2) {
 				$drop = -1*$_POST['droph'][$id];
 			}
-			$weight = $_POST['weight'][$id];
+			if ($useweights==1) {
+				$weight = $_POST['weight'][$id];
+			} else {
+				$weight = $_POST['fixedtot'][$id];
+			}
 			$calctype = intval($_POST['calctype'][$id]);
 			if (trim($weight)=='') {
 				if ($useweights==0) {
@@ -111,9 +115,11 @@
 	$sc = '<script type="text/javascript">
 	function swapweighthdr(t) {
 	  if (t==0) {
-	     document.getElementById("weighthdr").innerHTML = "Fixed Category Point Total (optional)<br/>Blank to use point sum";
+	  	$(".weightcell").hide();
+	  	$(".fixedtotcell").show();
 	  } else {
-	     document.getElementById("weighthdr").innerHTML = "Category Weight (%)";
+	  	$(".weightcell").show();
+	  	$(".fixedtotcell").hide();
 	  }
 	}
 	var addrowcnt = 0;
@@ -200,11 +206,7 @@
 		}
 		$("select:disabled").prop("disabled",false);
 	}
-	function calctypechange(id,val) {
-		$("#calctype"+id).val(val);
-		$("#calctype"+id).prop("disabled", val>0);
-	}
-
+	
 	</script>';
 
 	$placeinhead = $sc;
@@ -369,12 +371,20 @@
 	}
 
 	echo "<table class=gb><thead>";
-	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops &amp; Category total</th><th id=weighthdr>";
+	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops &amp; Category total</th>";
 	if ($useweights==0) {
-		echo "Fixed Category Point Total (optional)<br/>Blank to use point sum";
-	} else if ($useweights==1) {
-		echo "Category Weight (%)";
+		echo '<th class=fixedtotcell>';
+	} else {
+		echo '<th class=fixedtotcell style="display:none">';
 	}
+	echo "Fixed Category Point Total (optional)<br/>Blank to use point sum";
+	echo '</th>';
+	if ($useweights==0) {
+		echo '<th class=weightcell style="display:none">';
+	} else {
+		echo '<th class=weightcell>';
+	}
+	echo "Category Weight (%)";
 	echo '</th><th>Remove</th></tr></thead><tbody id="cattbody">';
 
 	disprow(0,$row);
@@ -400,7 +410,7 @@
 	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
 
 	function disprow($id,$row) {
-		global $cid, $hidelabel, $hideval;
+		global $cid, $hidelabel, $hideval, $useweights;
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
@@ -443,29 +453,43 @@
 		echo "\"/>%</td>";
 		echo "<td>";
 		echo 'Calc total: <select name="calctype['.$id.']" id="calctype'.$id.'" ';
-		if ($row['dropn']!=0) { echo 'disabled="true"';}
 		echo '><option value="0" ';
 		if ($row['calctype']==0) {echo 'selected="selected"';}
 		echo '>point total</option><option value="1" ';
 		if ($row['calctype']==1) {echo 'selected="selected"';}
 		echo '>averaged percents</option></select><br/>';
 
-		echo "<input type=radio name=\"droptype[$id]\" value=0 onclick=\"calctypechange($id,0)\" ";
+		echo "<input type=radio name=\"droptype[$id]\" value=0 ";
 		if ($row['dropn']==0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep All<br/><input type=radio name=\"droptype[$id]\" value=1 onclick=\"calctypechange($id,1)\" ";
+		echo "/>Keep All<br/><input type=radio name=\"droptype[$id]\" value=1 ";
 		if ($row['dropn']>0) {
 			echo "checked=1 ";
 		}
 		$absr4=abs($row['dropn']);
-		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 onclick=\"calctypechange($id,1)\" ";
+		echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 ";
 		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}
 		echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</td>";
-		echo "<td><input type=text size=3 name=\"weight[$id]\" value=\"";
-		if ($row['weight']>-1) {
+		if ($useweights==0) {
+			echo '<td class=fixedtotcell>';
+		} else {
+			echo '<td class=fixedtotcell style="display:none">';
+		}
+		echo "<input type=text size=3 name=\"fixedtot[$id]\" value=\"";
+		if ($useweights==0 && $row['weight']>-1) {
+			echo Sanitize::encodeStringForDisplay($row['weight']);
+		}
+		echo '"/></td>';
+		if ($useweights==1) {
+			echo '<td class=weightcell>';
+		} else {
+			echo '<td class=weightcell style="display:none">';
+		}
+		echo "<input type=text size=3 name=\"weight[$id]\" value=\"";
+		if ($useweights==1 && $row['weight']>-1) {
 			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
 		echo "\"/></td>";

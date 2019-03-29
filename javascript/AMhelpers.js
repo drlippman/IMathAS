@@ -88,6 +88,8 @@ function setupLivePreview(qn) {
 			  	} else if (vlist.hasOwnProperty(qn)) {
 			  		text = AMnumfuncPrepVar(qn, text)[1];
 
+			  	} else if (ntupletoproc.hasOwnProperty(qn)) {
+			  		text = text.replace(/</g, '(:').replace(/>/g, ':)');	
 			  	} else if (calcformat.hasOwnProperty(qn)) {
 			  		var format = calcformat[qn];
 			  		if (format.indexOf('list')==-1 && format.indexOf('set')==-1) {
@@ -96,7 +98,7 @@ function setupLivePreview(qn) {
 			  		if (format.indexOf('scinot')!=-1) {
 			  			text = text.replace(/(x|X|\u00D7)/,"xx");
 			  		}
-			  	}
+			  	} 
 			  	text = text.replace(/[^\u0000-\u007f]/g, '?');
 			  	return text;
 			  },
@@ -480,6 +482,7 @@ function intcalculate(inputId,outputId,format) {
 function ntuplecalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
 	fullstr = normalizemathunicode(fullstr);
+	fullstr = fullstr.replace(/\(:|<</g, '<').replace(/:\)|>>/g, '>');
 	if (format.indexOf('mixed')!=-1) {
 		fullstr = fullstr.replace(/_/g,' ').replace(/^\s+/,'').replace(/\s+$/,'');
 	} else {
@@ -554,6 +557,7 @@ function ntuplecalc(inputId,outputId,format) {
 			err += _("Invalid notation")+". ";
 		}
 		fullstr = fullstr.replace(/[^\u0000-\u007f]/g, '?');
+		fullstr = fullstr.replace(/</g, '(:').replace(/>/g, ':)');
 		//outstr = '`'+fullstr+'` = '+outcalced;
 		if (format.indexOf('showval')==-1 || notationok==false) {
 			 outstr = '`'+fullstr+'`'+". " + wrapAMnotice(err);
@@ -918,12 +922,16 @@ function AMnumfuncPrepVar(qn,str) {
   var fl = flist[qn];
   var vars = vl.split("|");
   vars.push("DNE");
+  
+  if (vl.match(/lambda/)) {
+  	  str = str.replace(/lamda/, 'lambda');
+  }
 
   str = str.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
   str = normalizemathunicode(str);
   var foundaltcap = [];
   var dispstr = str;
-  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
 		  str = str.replace("E","varE");
@@ -1203,16 +1211,16 @@ function syntaxcheckexpr(str,format,vl) {
 	  	  err += " ("+_("unmatched absolute value bars")+"). ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*("+vl+"|\\d+)", "i");
+	  	  reg = new RegExp("(sqrt|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*("+vl+"|\\d+)", "i");
 	  } else {
-	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(\\d+)", "i");
+	  	  reg = new RegExp("(sqrt|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(\\d+)", "i");
 	  }
 	  errstuff = str.match(reg);
 	  if (errstuff!=null) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(repvars\\d+|arc|sqrt|root|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|"+vl+")", "ig");
+	  	  reg = new RegExp("(repvars\\d+|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|"+vl+")", "ig");
 	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
 	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";
 	  	  }
@@ -2215,6 +2223,17 @@ function initShowAnswer() {
 		  .off("click.sashow").on("click.sashow", function() {
 			$(this).attr("aria-expanded",true)
 		  	  .siblings("span:first-of-type")
+				.attr("aria-expanded",true).attr("aria-hidden",false)
+				.removeClass("hidden");
+		});
+	});
+	$("input.dsbtn + div.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
+	$("input.dsbtn").each(function() {
+		var idnext = $(this).siblings("div:first-of-type").attr("id");
+		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
+		  .off("click.sashow").on("click.sashow", function() {
+			$(this).attr("aria-expanded",true)
+		  	  .siblings("div:first-of-type")
 				.attr("aria-expanded",true).attr("aria-hidden",false)
 				.removeClass("hidden");
 		});

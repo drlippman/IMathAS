@@ -8,7 +8,7 @@
 //$unwithdraw = unset any withdrawn questions
 //$delwikirev = delete wiki revisions, 1: all, 2: group wikis only
 function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false) {
-	global $DBH;
+	global $DBH, $userid;
 	$cid = intval($cid);
 	$stulist = implode(',', array_map('intval', $tounenroll));
 	$forums = array();
@@ -175,6 +175,11 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		$query = "DELETE FROM imas_content_track WHERE userid IN ($stulist) AND courseid=$cid";
 		$DBH->query($query); //values already sanitized
 	}
+	
+	$lognote = "Unenroll in $cid run by $userid via script ".basename($_SERVER['PHP_SELF']);
+	$lognote .= ". Unenrolled: $stulist";
+	$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
+	$stm->execute(array(time(), $lognote));
 
 }
 

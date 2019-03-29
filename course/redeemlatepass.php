@@ -97,6 +97,9 @@
 		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,LPcutoff FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		list($allowlate,$enddate,$startdate,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM);
+		if ($LPcutoff<$enddate) {
+			$LPcutoff = 0;  //ignore nonsensical values
+		}
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
@@ -173,6 +176,9 @@
 		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit,LPcutoff FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		list($allowlate,$enddate,$startdate,$timelimit,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM);
+		if ($LPcutoff<$enddate) {
+			$LPcutoff = 0;  //ignore nonsensical values
+		}
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$hasexception = false;
