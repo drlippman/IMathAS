@@ -139,6 +139,9 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
+.hidden {
+  display: none;
+}
 
 .slide-left-enter-active,
 .slide-left-leave-active,
