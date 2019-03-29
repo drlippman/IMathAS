@@ -6,6 +6,6 @@
 *.js~
 config.php
 header.php
-bltilaunch.php
+infoheader.php
 .DS_Store
 ._.DS_Store
