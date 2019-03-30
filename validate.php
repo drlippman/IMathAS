@@ -123,6 +123,15 @@
  $hasusername = isset($userid);
  $haslogin = isset($_POST['password']);
  if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
+ 	 if (empty($_SERVER['HTTP_REFERER'])) {
+ 	 	require("header.php");
+ 	 	echo '<p>You have requested guest access to a course.</p>';
+ 	 	$cid = Sanitize::onlyInt($_GET['cid']);
+ 	 	echo '<p><a href="'.$imasroot.'/index.php">Nevermind</a> ';
+ 	 	echo '<a href="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">Continue</a></p>';
+ 	 	require("footer.php");
+ 	 	exit;
+ 	 }
  	 $haslogin = true;
  	 $_POST['username']='guest';
  	 $_POST['mathdisp'] = 0;
