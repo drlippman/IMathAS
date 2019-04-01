@@ -1400,7 +1400,7 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') === 'by_question');
     if (!$by_question) {
       $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
-      $regen = count($this->data['assess_versions']);
+      $regen = count($this->data['assess_versions']) - 1;  //-1 to adjust for current version
     }
     foreach ($verification as $qn=>$qdata) {
       if ($by_question) {
@@ -1411,10 +1411,12 @@ class AssessRecord
         $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
       }
       if ($regen !== $qdata['regen']) {
+        //echo "regen failed: $regen vs ".$qdata['regen'].". ";
         return false;
       }
       for ($i = 0; $i < count($qdata['tries']); $i++) {
         if ($qdata['tries'][$i] !== count($tries[$i])) {
+          //echo "tries failed $i: ".$qdata['tries'][$i]." vs ".count($tries[$i]).". ";
           return false;
         }
       }

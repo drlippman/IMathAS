@@ -55,6 +55,9 @@ $include_from_assess_info = array(
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
+// indicate if teacher user
+$assessInfoOut['can_view_all'] = $canViewAll;
+
 //set is_lti
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']);
 
@@ -86,7 +89,7 @@ if (!$assessInfoOut['has_active_attempt']) {
 }
 
 //load group members, if applicable
-if ($assessInfoOut['isgroup'] > 0) {
+if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
   list ($stugroupid, $groupmembers) = AssessUtils::getGroupMembers($uid, $assess_info->getSetting('groupsetid'));
   $assessInfoOut['group_members'] = array_values($groupmembers);
   $assessInfoOut['stugroupid'] = $stugroupid;

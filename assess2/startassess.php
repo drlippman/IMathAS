@@ -192,6 +192,10 @@ if ($in_practice) {
   );
 }
 $assessInfoOut = array_merge($assessInfoOut, $assess_info->extractSettings($include_from_assess_info));
+
+// indicate if teacher user
+$assessInfoOut['can_view_all'] = $canViewAll;
+
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate

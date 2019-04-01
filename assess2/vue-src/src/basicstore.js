@@ -369,16 +369,17 @@ export const actions = {
   },
   getVerificationData(qns) {
     let out = {};
+    let by_question = (store.assessInfo.submitby === 'by_question');
+    let assessRegen = store.assessInfo.prev_attempts.length;
     for (let qn in qns) {
       let parttries = [];
-      console.log(qn);
       let qdata = store.assessInfo.questions[qn];
       for (let pn=0; pn < qdata.parts.length; pn++) {
         parttries[pn] = qdata.parts[pn].try;
       }
       out[qn] = {
         tries: parttries,
-        regen: qdata.regen
+        regen: by_question ? qdata.regen : assessRegen
       };
     }
     return out;

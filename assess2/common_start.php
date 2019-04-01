@@ -18,6 +18,9 @@ if (!$isteacher && !$istutor && !$isstudent) {
 if (!$isstudent) {
   $studentinfo = array('latepasses' => 0, 'timelimitmult' => 1);
 }
+
+$canViewAll = $isteacher || $istutor;
+
 /**
  * Check if the required parameters are set
  * @param  string $method   'GET' or 'POST'
