@@ -49,7 +49,7 @@ if ($isstudent) {
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
-} else if ($assess_info->getSetting('available') === 'yes') {
+} else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
 } else {
   echo '{"error": "not_avail"}';
@@ -78,7 +78,8 @@ if (!$in_practice &&
 }
 
 // add any new group members, if allowed
-if ($assess_info->getSetting('isgroup') == 2 &&
+if (!$canViewAll &&
+  $assess_info->getSetting('isgroup') == 2 &&
   ($_POST['new_group_members'] != '' || !$assess_record->hasRecord())
 ) {
   $groupsetid = $assess_info->getSetting('groupsetid');
@@ -119,7 +120,7 @@ if ($assess_info->getSetting('isgroup') == 2 &&
 if (!$assess_record->hasRecord()) {
   // if it's a user-created group, we've already gotten group members above
   // Handle pre-created group case
-  if ($assess_info->getSetting('isgroup') == 3) {
+  if (!$canViewAll && $assess_info->getSetting('isgroup') == 3) {
     list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
     if ($stugroupid == 0) {
       // no group yet - can't do anything
@@ -130,7 +131,7 @@ if (!$assess_record->hasRecord()) {
 
   // time to create a new record!
   $lti_sourcedid = '';
-  if ($assess_info->getSetting('isgroup') > 0) {
+  if ($assess_info->getSetting('isgroup') > 0 && !$canViewAll) {
     // creating for group
     $assess_record->createRecord($current_members, $stugroupid, true, $lti_sourcedid);
   } else {

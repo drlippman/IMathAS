@@ -112,6 +112,9 @@ if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
     }
   }
 } else {
+  if ($assessInfoOut['isgroup'] > 0) { // include for teachers to prevent errors
+    $assessInfoOut['group_members'] = array();
+  }
   $assessInfoOut['stugroupid'] = 0;
 }
 

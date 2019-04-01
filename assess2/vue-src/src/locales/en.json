@@ -34,7 +34,9 @@
     "unsubmitted_pastdue": "You have an unsubmitted assessment attempt.",
     "unsubmitted_overtime": "You have an unsubmitted assessment attempt whose time limit has expired.",
     "submit_now": "Submit it now",
-    "exit": "Exit"
+    "exit": "Exit",
+    "teacher_preview": "This assessment is closed to students, but you can preview it.",
+    "teacher_preview_button": "Preview Assessment"
   },
   "setlist": {
     "practice": "This assessment is in un-graded practice mode.",
@@ -60,6 +62,8 @@
   },
   "group": {
     "isgroup": "This is a group assessment.",
+    "teacher_auto": "This assessment allows students to select their own group members, up to {n}.",
+    "teacher_preset": "This assessment uses groups that the instructor must create in advance.",
     "needpreset": "You are not yet a member of a group.  Contact your instructor to be added to a group.",
     "members": "Group Members",
     "max": "max {n}",

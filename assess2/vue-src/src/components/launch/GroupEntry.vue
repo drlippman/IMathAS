@@ -3,7 +3,10 @@
     <div>
       {{ $t('group.isgroup') }}
     </div>
-    <div v-if = "groupMembers.length > 0">
+    <div v-if = "canViewAll">
+      {{ teacherNote }}
+    </div>
+    <div v-else-if = "groupMembers.length > 0">
       {{ $t('group.members') }}
         <span v-if = "showMax">
           ({{ $t('group.max', {n: groupMax}) }})
@@ -67,6 +70,9 @@ export default {
     },
     groupMembers () {
       var out = [];
+      if (!store.assessInfo.hasOwnProperty('group_members')) {
+        return out;
+      }
       for (let i = 0; i < store.assessInfo.group_members.length; i++) {
         out.push({
           name: store.assessInfo.group_members[i],
@@ -98,12 +104,23 @@ export default {
       return (store.assessInfo.isgroup === 2);
     },
     canAddMembers () {
-      return (store.assessInfo.isgroup === 2 &&
+      return (!this.canViewAll &&
+        store.assessInfo.isgroup === 2 &&
         this.groupMembers.length < store.assessInfo.groupmax
       );
     },
     isPresetGroups () {
       return (store.assessInfo.isgroup === 3);
+    },
+    canViewAll () {
+      return store.assessInfo.can_view_all;
+    },
+    teacherNote () {
+      if (this.isPresetGroups) {
+        return this.$t('group.teacher_preset');
+      } else {
+        return this.$t('group.teacher_auto', {n: store.assessInfo.groupmax});
+      }
     }
   },
   methods: {

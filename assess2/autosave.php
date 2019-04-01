@@ -60,7 +60,7 @@ if ($isstudent) {
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
-} else if ($assess_info->getSetting('available') === 'yes') {
+} else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
 } else {
   echo '{"error": "not_avail"}';

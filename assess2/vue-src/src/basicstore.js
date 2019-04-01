@@ -404,6 +404,9 @@ export const actions = {
   },
   getChangedQuestions(qns) {
     if (typeof qns !== 'object') {
+      if (!store.assessInfo.hasOwnProperty('questions')) {
+        return {};
+      }
       qns = [];
       for (let qn=0; qn<store.assessInfo.questions.length; qn++) {
         qns.push(qn);

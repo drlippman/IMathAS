@@ -38,6 +38,11 @@ function check_for_required($method, $required) {
   }
 }
 
+// normalize $_POST['practice'] to boolean
+if (!empty($_POST['practice']) && $_POST['practice'] === 'false') {
+  $_POST['practice'] = false;
+}
+
 if ($_SERVER['HTTP_HOST'] == 'localhost') {
   //to help with development, while vue runs on 8080
   header('Access-Control-Allow-Origin: http://localhost:8080');

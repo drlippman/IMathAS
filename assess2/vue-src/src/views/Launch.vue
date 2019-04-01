@@ -119,7 +119,10 @@ export default {
       }
     },
     okToLaunch () {
-      if (this.aInfo.isgroup === 3 && this.aInfo.group_members.length === 0) {
+      if (!this.canViewAll &&
+        this.aInfo.isgroup === 3 &&
+        this.aInfo.group_members.length === 0
+      ) {
         // If it's instructor-created groups and not in a group yet
         return false;
       }

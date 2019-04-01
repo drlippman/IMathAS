@@ -59,6 +59,21 @@
         </button>
       </p>
 
+      <div v-if = "canViewAll">
+        <p>
+        {{ $t('closed.teacher_preview') }}
+        </p>
+        <p>
+          <button
+            class = "primary"
+            @click = "teacherPreview"
+          >
+            {{ $t('closed.teacher_preview_button') }}
+          </button>
+        </p>
+      </div>
+
+
     </div>
     <div v-if="settings.hasOwnProperty('prev_attempts') && settings.prev_attempts.length > 0" >
       <summary-gb-score />
@@ -152,6 +167,9 @@ export default {
         this.settings.viewingb !== 'never' &&
         (this.settings.available === 'practice' || this.settings.available === 'pastdue')
       );
+    },
+    canViewAll () {
+      return store.assessInfo.can_view_all;
     }
   },
   methods: {
@@ -175,6 +193,9 @@ export default {
           // start practice mode
         }
       }
+    },
+    teacherPreview () {
+      actions.startAssess(false, '', []);
     },
     endAssess () {
       actions.endAssess();

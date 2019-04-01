@@ -666,6 +666,62 @@ $assessGroups = [
         'itemorder' => [0,1,2]
       ]
     ]
+  ],
+  [
+    'name' => 'Group',
+    'assessments' => [
+      [
+        'name' => 'Group 1',
+        'summary' => 'student-created groups',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'isgroup' => 2,
+        'groupmax' => 4,
+        'groupsetid' => 1,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 5],
+          1=>['questionsetid' => 6]
+        ],
+        'itemorder' => [0,1]
+      ],
+      [
+        'name' => 'Group 2',
+        'summary' => 'instructor-set groups',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'isgroup' => 3,
+        'groupsetid' => 1,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 5],
+          1=>['questionsetid' => 6]
+        ],
+        'itemorder' => [0,1]
+      ]
+    ]
   ]
 ];
 
