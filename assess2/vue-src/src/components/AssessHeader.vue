@@ -117,9 +117,10 @@ export default {
     handleSubmit () {
       if (this.ainfo.submitby === 'by_assessment') {
         let qAttempted = 0;
+        let changedQuestions = actions.getChangedQuestions();
         for (let i in this.ainfo.questions) {
           if (this.ainfo.questions[i].try > 0 ||
-            store.assessFormIsDirty.indexOf(i*1) !== -1
+            changedQuestions.hasOwnProperty(i)
           ) {
             qAttempted++;
           }
@@ -128,9 +129,10 @@ export default {
         if (qAttempted === nQuestions ||
           confirm(this.$t('header.warn_unattempted'))
         ) {
+          // TODO: Check if we should always submit all
           if (this.ainfo.showscores === 'during') {
             // check for dirty questions and submit them
-            actions.submitQuestion(store.assessFormIsDirty, true);
+            actions.submitQuestion(Object.keys(changedQuestions), true);
           } else {
             // submit them all
             var qns = [];

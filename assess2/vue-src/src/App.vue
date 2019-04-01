@@ -50,7 +50,7 @@ export default {
           unanswered = false;
         }
       }
-      if (store.assessFormIsDirty.length > 0) {
+      if (Object.keys(actions.getChangedQuestions()).length > 0) {
         return this.$t('unload.unsubmitted_questions');
       } else if (store.assessInfo.submitby === 'by_assessment' && !unanswered) {
         return this.$t('unload.unsubmitted_assessment');

@@ -10,7 +10,7 @@
  *  uid   Optional. Only allowed for teachers, to load student's assessment
  *
  * POST parameters:
- *  toscoreqn           stringified json, keyed by qn, value is array of part numbers
+ *  tosaveqn           stringified json, keyed by qn, value is array of part numbers
  *  lastloaded          stringified json keyed by qn
  *
  * Returns: partial assessInfo object, mainly including the scored question
@@ -30,7 +30,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
-check_for_required('POST', array('toscoreqn', 'lastloaded'));
+check_for_required('POST', array('tosaveqn', 'lastloaded'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($isteacher && isset($_GET['uid'])) {
@@ -39,7 +39,7 @@ if ($isteacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
-$qns = json_decode($_POST['toscoreqn'], true);
+$qns = json_decode($_POST['tosaveqn'], true);
 $lastloaded = json_decode($_POST['lastloaded'], true);
 $verification = json_decode($_POST['verification'], true);
 

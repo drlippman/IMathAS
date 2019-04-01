@@ -138,12 +138,26 @@ export default {
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
       .off('focus.dirtytrack').off('change.dirtytrack')
       .on('focus.dirtytrack', function() {
-        window.$(this).attr('data-lastval', window.$(this).val());
+        // TODO: Does this work for checkboxes/radios?
+        if (this.type === 'radio' || this.type === 'checkbox') {
+          window.$(this).attr('data-lastval', this.checked?1:0);
+        } else {
+          window.$(this).attr('data-lastval', window.$(this).val());
+        }
+
         actions.clearAutosaveTimer();
       })
       .on('change.dirtytrack', function() {
         let val = window.$(this).val();
-        if (val != window.$(this).attr('data-lastval')) {
+        let changed = false;
+        if (this.type === 'radio' || this.type === 'checkbox') {
+          if ((this.checked === true) !== (this.getAttribute('data-initval') === '1')) {
+            changed = true;
+          }
+        } else if (this.type !== 'file' && val != window.$(this).attr('data-lastval')) {
+          changed = true;
+        }
+        if (changed) {
           let name = window.$(this).attr("name");
           let m = name.match(/^(qs|qn|tc)(\d+)/);
           if (m !== null) {
@@ -153,10 +167,7 @@ export default {
               pn = qn%1000;
               qn = Math.floor(qn/1000 + .001)-1;
             }
-            // mark as dirty for later submission
-            if (store.assessFormIsDirty.indexOf(qn)==-1) {
-              store.assessFormIsDirty.push(qn);
-            }
+
             // autosave value
             actions.doAutosave(qn, pn);
           }
@@ -186,8 +197,23 @@ export default {
       setTimeout(window.drawPics, 100);
       window.rendermathnode(document.getElementById('questionwrap' + this.qn));
       this.updateTime(true);
+      this.setInitValues();
       this.addDirtyTrackers();
       this.initShowAnswer();
+    },
+    setInitValues() {
+      var regex = new RegExp("^(qn|tc|qs)\\d");
+      window.$('#questionwrap' + this.qn).find('input,select,textarea')
+        .each(function(index, el) {
+          if (el.name.match(regex)) {
+            console.log(el);
+            if (el.type === 'radio' || el.type === 'checked') {
+              el.setAttribute('data-initval', el.checked?1:0);
+            } else {
+              el.setAttribute('data-initval', $(el).val());
+            }
+          }
+        });
     },
     initShowAnswer() {
       let $ = window.$;

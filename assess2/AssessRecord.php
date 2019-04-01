@@ -872,7 +872,7 @@ class AssessRecord
       $showans = $this->assess_info->getSetting('showans');
       $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt');
 
-      list($out['html'], $out['answeights']) = $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
+      list($out['html'], $out['answeights'], $out['usedautosave']) = $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
       $this->setAnsweights($qn, $out['answeights'], $ver);
       $out['seed'] = $curq['seed'];
     } else {
@@ -1075,6 +1075,7 @@ class AssessRecord
     $showansparts = array();
     $showans = ($numParts > 0); //true by default, unless no answeights or tries yet
     $trylimit = $qsettings['tries_max'];
+    $usedAutosave = array();
 
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
@@ -1084,6 +1085,7 @@ class AssessRecord
         $lastans[$pn] = '';
       } else if (isset($autosave['stuans'][$pn])) {
         $lastans[$pn] = $autosave['stuans'][$pn];
+        $usedAutosave[] = $pn;
       } else if ($partattemptn[$pn] > 0) {
         $lastans[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['stuans'];
       } else {
@@ -1137,7 +1139,7 @@ class AssessRecord
     if (empty($answeights)) {
       $answeights = array(1);
     }
-    return array($qout, $answeights);
+    return array($qout, $answeights, $usedAutosave);
   }
 
   /**

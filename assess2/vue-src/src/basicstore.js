@@ -10,7 +10,6 @@ export const store = Vue.observable({
   errorMsg: null,
   lastLoaded: [],
   inProgress: false,
-  assessFormIsDirty: [],
   autosaveQueue: {},
   autosaveTimer: null,
   timelimit_timer: null,
@@ -149,11 +148,10 @@ export const actions = {
 
     // figure out non-blank questions to submit
     let lastLoaded = [];
-    let nonBlank = {};
+    let changedQuestions = this.getChangedQuestions(qns);
     let data = new FormData();
     for (let k=0; k<qns.length; k++) {
       let qn = qns[k];
-      nonBlank[qn] = [];
       var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
       window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
         if (el.name.match(regex)) {
@@ -161,32 +159,18 @@ export const actions = {
           if ((el.type!=='radio' && el.type!=='checkbox') || el.checked) {
             if (el.type==='file') {
               data.append(el.name, el.files[0]);
-              fieldBlank = (el.files.length === 0);
             } else {
               data.append(el.name, el.value);
-              fieldBlank = (el.value === '');
-            }
-            // add to non-blank question/part list
-            if (!fieldBlank) {
-              if (el.name.length < 6) {
-                nonBlank[qn].push(0);
-              } else {
-                let pn = parseInt(el.name.substring(el.name.length-3));
-                if (nonBlank[qn].indexOf(pn) === -1) {
-                  nonBlank[qn].push(pn);
-                }
-              }
             }
           }
         }
       });
       lastLoaded[k] = store.lastLoaded[qn].getTime();
     };
-    data.append('toscoreqn', qns.join(','));
-    data.append('nonblank', JSON.stringify(nonBlank));
+    data.append('toscoreqn', JSON.stringify(changedQuestions));
     data.append('timeactive', timeactive.join(','));
     data.append('lastloaded', lastLoaded.join(','));
-    data.append('verification', JSON.stringify(this.getVerificationData(qns)));
+    data.append('verification', JSON.stringify(this.getVerificationData(changedQuestions)));
     if (endattempt) {
       data.append('endattempt', endattempt);
     }
@@ -213,19 +197,10 @@ export const actions = {
             response = this.processSettings(response);
             this.copySettings(response);
           }
-          console.log(store.assessInfo.questions);
           return;
         }
 
         response = this.processSettings(response);
-        // un-dirty submitted questions
-        var loc;
-        for (let k=0; k<qns.length; k++) {
-          let qn = qns[k]*1;
-          if ((loc = store.assessFormIsDirty.indexOf(qn)) !== -1) {
-		    	    store.assessFormIsDirty.splice(loc,1);
-		    	}
-        }
         this.copySettings(response);
         if (endattempt) {
           store.inProgress = false;
@@ -279,12 +254,12 @@ export const actions = {
         }
         regexpts.push((qn*1+1)*1000 + pn*1);
       }
-      let regex = new RegExp('^(qn|tc|qs)(' + regexpts.join('\\b|') + '\\b)');
+      var regex = new RegExp('^(qn|tc|qs)(' + regexpts.join('\\b|') + '\\b)');
       window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
         if (el.name.match(regex)) {
           if ((el.type!=='radio' && el.type!=='checkbox') || el.checked) {
             if (el.type==='file') {
-              data.append(el.name, el.files[0]);
+              // don't autosave files
             } else {
               data.append(el.name, el.value);
             }
@@ -293,7 +268,7 @@ export const actions = {
       });
       lastLoaded[qn] = store.lastLoaded[qn].getTime();
     };
-    data.append('toscoreqn', JSON.stringify(store.autosaveQueue));
+    data.append('tosaveqn', JSON.stringify(store.autosaveQueue));
     data.append('lastloaded', JSON.stringify(lastLoaded));
     data.append('verification', JSON.stringify(this.getVerificationData(store.autosaveQueue)));
     if (store.assessInfo.in_practice) {
@@ -331,7 +306,10 @@ export const actions = {
   handleTimelimitUp () {
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
-      let tosub = (store.assessFormIsDirty.length > 0) ? store.assessFormIsDirty : -1;
+      let tosub = Object.keys(this.getChangedQuestions());
+      if (tosub.length === 0) {
+        tosub = -1;
+      }
       this.submitQuestion(tosub, true);
     }
     //store.timelimit_expired = true;
@@ -384,9 +362,9 @@ export const actions = {
   },
   getVerificationData(qns) {
     let out = {};
-    for (let i in qns) {
-      let qn = qns[i];
+    for (let qn in qns) {
       let parttries = [];
+      console.log(qn);
       let qdata = store.assessInfo.questions[qn];
       for (let pn=0; pn < qdata.parts.length; pn++) {
         parttries[pn] = qdata.parts[pn].try;
@@ -397,6 +375,47 @@ export const actions = {
       };
     }
     return out;
+  },
+  getChangedQuestions(qns) {
+    if (typeof qns !== 'object') {
+      qns = [];
+      for (let qn=0; qn<store.assessInfo.questions.length; qn++) {
+        qns.push(qn);
+      }
+    }
+    let changed = {};
+    let m;
+    for (let k=0; k < qns.length; k++) {
+      let qn = qns[k];
+      var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
+      window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
+        if (m = el.name.match(regex)) {
+          let thisChanged = false;
+          if (el.type === 'radio' || el.type === 'checkbox') {
+            if ((el.checked === true) !== (el.getAttribute('data-initval') === '1')) {
+              thisChanged = true;
+            }
+          } else {
+            if (el.value !== el.getAttribute('data-initval')) {
+              thisChanged = true;
+            }
+          }
+          if (thisChanged) {
+            if (!changed.hasOwnProperty(qn)) {
+              changed[qn] = [];
+            }
+            let pn = 0;
+            if (m[2]>1000) {
+              pn = m[2]%1000;
+            }
+            if (changed[qn].indexOf(pn) === -1) {
+              changed[qn].push(pn);
+            }
+          }
+        }
+      });
+    }
+    return changed;
   },
   copySettings(response) {
     // overwrite existing questions with new data
@@ -466,6 +485,11 @@ export const actions = {
             .replace(/<img[^>]*redx.gif[^>]*>/g, svgx);
         }
         store.lastLoaded[i] = new Date();
+        if (data.questions[i].hasOwnProperty('usedautosave')) {
+          //TODO: add these question parts to the dirty tracker
+          // need to track dirty by-part for this to work
+          delete data.questions[i].usedautosave;
+        }
       }
     }
     if (data.hasOwnProperty('showscores')) {
