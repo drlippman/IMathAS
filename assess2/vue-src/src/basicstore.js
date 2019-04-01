@@ -11,6 +11,7 @@ export const store = Vue.observable({
   lastLoaded: [],
   inProgress: false,
   autosaveQueue: {},
+  initValues: {},
   autosaveTimer: null,
   timelimit_timer: null,
   timelimit_expired: false
@@ -193,11 +194,17 @@ export const actions = {
         if (response.hasOwnProperty('error')) {
           store.errorMsg = response.error;
           if (response.error === 'already_submitted') {
-            console.log("here");
             response = this.processSettings(response);
             this.copySettings(response);
           }
           return;
+        }
+        // clear out initValues for this question so they get re-set
+        for (let k=0; k<qns.length; k++) {
+          let qn = qns[k];
+          if (store.initValues.hasOwnProperty(qn)) {
+            delete store.initValues[qn];
+          }
         }
 
         response = this.processSettings(response);
@@ -376,6 +383,24 @@ export const actions = {
     }
     return out;
   },
+  setInitValue(qn, fieldname, val) {
+    if (!store.initValues.hasOwnProperty(qn)) {
+      store.initValues[qn] = {};
+    }
+    // only record initvalue if we don't already have one
+    if (!store.initValues[qn].hasOwnProperty(fieldname)) {
+      store.initValues[qn][fieldname] = val;
+    }
+  },
+  getInitValue(qn, fieldname) {
+    if (!store.initValues.hasOwnProperty(qn)) {
+      return '';
+    } else if (!store.initValues[qn].hasOwnProperty(fieldname)) {
+      return '';
+    } else {
+      return store.initValues[qn][fieldname];
+    }
+  },
   getChangedQuestions(qns) {
     if (typeof qns !== 'object') {
       qns = [];
@@ -392,11 +417,11 @@ export const actions = {
         if (m = el.name.match(regex)) {
           let thisChanged = false;
           if (el.type === 'radio' || el.type === 'checkbox') {
-            if ((el.checked === true) !== (el.getAttribute('data-initval') === '1')) {
+            if ((el.checked === true) !== (actions.getInitValue(qn, el.name) === '1')) {
               thisChanged = true;
             }
           } else {
-            if (el.value !== el.getAttribute('data-initval')) {
+            if (el.value !== actions.getInitValue(qn, el.name)) {
               thisChanged = true;
             }
           }

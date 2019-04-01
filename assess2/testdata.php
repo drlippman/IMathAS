@@ -38,6 +38,27 @@ $questionSet = [
     'control' => '$a,$b = diffrands(2,7,2)'."\n".'$answer = $a*$b',
     'qtext' => '<p>Solve: `x/$a = $b`</p><p>`x` = $answerbox</p>',
     'extref' => 'video!!https://www.youtube.com/watch?v=zBqIH-E3ero!!1'
+  ],
+  5=>[
+    'uniqueid' => 1552587894535718,
+    'description' => 'Simple choices',
+    'qtype' => 'choices',
+    'control' => '$a,$b = diffrands(2,7,2)'."\n".'$questions = array($a+$b, $a-$b, $a*$b)'."\n".'$answer = 0',
+    'qtext' => '<p>Solve: `$a + $b =`</p>'
+  ],
+  6=>[
+    'uniqueid' => 1552587894535719,
+    'description' => 'Simple multians',
+    'qtype' => 'multans',
+    'control' => '$questions = array("sin", "cos", "tan")'."\n".'$answers = "0,1"',
+    'qtext' => '<p>Which of these have a period of `2pi`?</p>'
+  ],
+  7=>[
+    'uniqueid' => 1552587894535720,
+    'description' => 'Simple file',
+    'qtype' => 'file',
+    'control' => '',
+    'qtext' => '<p>Upload your work here</p>'
   ]
 ];
 
@@ -562,6 +583,30 @@ $assessGroups = [
           0=>['questionsetid' => 0],
           1=>['questionsetid' => 1],
           2=>['questionsetid' => 0]
+        ],
+        'itemorder' => [0,1,2]
+      ],
+      [
+        'name' => 'Question types',
+        'summary' => 'choices, multiple-answer, file',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 5],
+          1=>['questionsetid' => 6],
+          2=>['questionsetid' => 7]
         ],
         'itemorder' => [0,1,2]
       ]

@@ -151,7 +151,7 @@ export default {
         let val = window.$(this).val();
         let changed = false;
         if (this.type === 'radio' || this.type === 'checkbox') {
-          if ((this.checked === true) !== (this.getAttribute('data-initval') === '1')) {
+          if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
             changed = true;
           }
         } else if (this.type !== 'file' && val != window.$(this).attr('data-lastval')) {
@@ -206,11 +206,10 @@ export default {
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .each(function(index, el) {
           if (el.name.match(regex)) {
-            console.log(el);
             if (el.type === 'radio' || el.type === 'checked') {
-              el.setAttribute('data-initval', el.checked?1:0);
+              actions.setInitValue(this.qn, el.name, el.checked?1:0);
             } else {
-              el.setAttribute('data-initval', $(el).val());
+              actions.setInitValue(this.qn, el.name, $(el).val());
             }
           }
         });
