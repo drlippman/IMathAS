@@ -9,7 +9,7 @@ import Summary from './views/Summary.vue';
 import { store, actions } from './basicstore';
 
 Vue.use(Router);
-//mode: 'history',
+
 const router = new Router({
   base: process.env.NODE_ENV === 'production' ? window.imasroot + '/assess2/' : '/',
   mode: 'history',
