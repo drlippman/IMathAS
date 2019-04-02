@@ -48,7 +48,7 @@ $assess_record->loadRecord($uid);
 
 // if have active scored record end it
 if ($assess_record->hasActiveAttempt()) {
-
+  $assess_record->scoreAutosaves();
   $assess_record->setStatus(false, true);
   $assess_record->saveRecord();
 } else {

@@ -111,7 +111,7 @@ export default {
       }
     },
     timeLimitExpired () {
-      if (store.timelimit_expired) {
+      if (store.timelimit_expired && this.aInfo.has_active_attempt) {
         let expires = new Date(this.aInfo.timelimit_expires * 1000);
         return this.$t('setlist.time_expired', {date: this.$d(expires, 'long')});
       } else {

@@ -402,6 +402,7 @@ class AssessRecord
       //no assessment record at all
       return false;
     }
+    $submitby = $this->assess_info->getSetting('submitby');
     if ($this->is_practice) {
       if ($active) {
         $this->assessRecord['status'] |= 16;
@@ -419,7 +420,6 @@ class AssessRecord
       // status has bitwise 1: active by-assess attempt
       // status has bitwise 2: active by-question attempt
       if ($active) {
-        $submitby = $this->assess_info->getSetting('submitby');
         if ($submitby == 'by_assessment') {
           $this->assessRecord['status'] |= 1;
         } else if ($submitby == 'by_question') {
@@ -429,7 +429,10 @@ class AssessRecord
       if ($setattempt) {
         $this->parseData();
         $lastver = count($this->data['assess_versions']) - 1;
-        $this->data['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
+        if ($submitby == 'by_assessment') {
+          // only mark as submitted if by_assessment
+          $this->data['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
+        }
         // record now as lastchange on attempt if no submissions have been made
         if ($this->data['assess_versions'][$lastver]['lastchange'] === 0) {
           $this->data['assess_versions'][$lastver]['lastchange'] = time();
@@ -468,7 +471,7 @@ class AssessRecord
     $seconds = $time - $this->assessRecord['starttime'];
     if (!isset($data[$qn])) {
       $data[$qn] = array(
-        'time' => $time,
+        'time' => $seconds,
         'post' => array(),
         'stuans' => array()
       );
@@ -508,6 +511,62 @@ class AssessRecord
         unset($data[$qn]['stuans'][$pn]);
       }
     }
+    $this->need_to_record = true;
+  }
+
+  /**
+   * Score any autosave data.  Records it as a single submission with a date
+   * based on the last autosave time
+   *
+   * @return void
+   */
+  public function scoreAutosaves() {
+    $this->parseData();
+
+    $autosaves = $this->data['autosaves'];
+    if (count($autosaves) === 0) {
+      return; // nothing to do
+    }
+    $maxtime = 0;
+    foreach ($autosaves as $qn=>$qdata) {
+      if ($qdata['time'] > $maxtime) {
+        $maxtime = $qdata['time'];
+      }
+    }
+
+    // Load the question code
+    $qns = array_keys($autosaves);
+    $qids = $this->getQuestionIds($qns);
+    $this->assess_info->loadQuestionSettings($qids, true);
+
+    // add a submission
+    $submission = $this->addSubmission($maxtime + $this->assessRecord['starttime']);
+
+    // score the questions
+    foreach ($autosaves as $qn=>$qdata) {
+      $parts_to_score = array();
+      foreach (array_keys($qdata['stuans']) as $pn) {
+        $parts_to_score[$pn] = true;
+      }
+      // TODO: This is hacky.  Fix it.
+      foreach ($qdata['post'] as $key=>$val) {
+        $_POST[$key] = $val;
+      }
+
+      $this->scoreQuestion(
+          $qn,    // question number
+          0,      // time active.  TODO: record this w autosave
+          $submission,    // submission #
+          $parts_to_score
+      );
+    }
+
+    // clear out all autosaves
+    $this->data['autosaves'] = array();
+
+    // Recalculate scores
+    $this->reTotalAssess($qns);
+
     $this->need_to_record = true;
   }
 
@@ -1192,7 +1251,6 @@ class AssessRecord
       $qsettings['points_possible']   // points possible for the question
     );
 
-
     // TODO need better way to get student's answer and unrand and such
     // TODO: rework this to handle singlescore questions
     $rawparts = explode('~', $rawscores);
@@ -1200,7 +1258,7 @@ class AssessRecord
     $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
 
     foreach ($rawparts as $k=>$v) {
-      if ($parts_to_score === true || $parts_to_score[$k] === true) {
+      if ($parts_to_score === true || !empty($parts_to_score[$k])) {
         $data[$k] = array(
           'sub' => $submission,
           'raw' => $v,
