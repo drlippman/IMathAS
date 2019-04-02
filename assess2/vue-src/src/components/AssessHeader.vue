@@ -41,7 +41,13 @@
     </menu-button>
 
     <div>
-      <icons name="print" size="medium"/>
+      <router-link
+        :to="'/print' + this.queryString"
+        class = "noextlink"
+        target = "_blank"
+      >
+        <icons name="print" size="medium"/>
+      </router-link>
     </div>
   </div>
 </template>
@@ -67,6 +73,9 @@ export default {
   computed: {
     ainfo () {
       return store.assessInfo;
+    },
+    queryString () {
+      return store.queryString;
     },
     canSubmit () {
       return (!store.inTransit);

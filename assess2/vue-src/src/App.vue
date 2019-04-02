@@ -64,6 +64,9 @@ export default {
 </script>
 
 <style>
+a[target=_blank].noextlink::after {
+  display: none;
+}
 input[type=submit],input[type=button], button, a.abutton {
   padding: 3px 12px;
   height: auto;

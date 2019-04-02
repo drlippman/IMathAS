@@ -4,6 +4,7 @@ import Launch from './views/Launch.vue';
 import Closed from './views/Closed.vue';
 import Skip from './views/Skip.vue';
 import Full from './views/Full.vue';
+import Print from './views/Print.vue';
 import FullPaged from './views/FullPaged.vue';
 import Summary from './views/Summary.vue';
 import { store, actions } from './basicstore';
@@ -100,7 +101,29 @@ const router = new Router({
            next({path: '/' + store.queryString, replace: true});
          }
       }
-    }
+    },
+    {
+      path: '/print',
+      name: 'print',
+      component: Print,
+      beforeEnter: (to, from, next) => {
+        // if no active attempt, route to launch
+        if ((store.assessInfo.available === 'yes' ||
+          (store.assessInfo.available === 'practice'))
+          && (store.assessInfo.has_active_attempt)
+        ) {
+          store.inPrintView = true;
+          if (store.assessInfo.hasOwnProperty('questions')) {
+            next();
+          } else {
+            let dopractice = (store.assessInfo.available === 'practice');
+            actions.startAssess(dopractice, '', [], () => next());
+          }
+        } else {
+          next({path: '/' + store.queryString, replace: true});
+        }
+      }
+    },
   ]
 });
 

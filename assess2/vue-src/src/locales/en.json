@@ -199,5 +199,13 @@
   },
   "pages": {
     "next": "Next Page"
+  },
+  "print": {
+    "print_version": "Print Ready Version",
+    "print": "Print",
+    "hide_text": "Hide Intro and Between-Question Text",
+    "show_text": "Show Intro and Between-Question Text",
+    "hide_qs": "Hide Questions",
+    "show_qs": "Show Questions"
   }
 }

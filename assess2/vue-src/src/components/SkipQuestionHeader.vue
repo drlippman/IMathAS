@@ -49,7 +49,11 @@
         <icons name="retake"/>
         {{ curQData.regens_remaining }}
       </span>
-      <dropdown id="question-details" position="right" v-if="showDetails">
+      <dropdown
+        :id="'qd-dd-'+qn"
+        class="question-details" 
+        v-if="showDetails"
+      >
         <template v-slot:button>
           <icons name="info" size="medium"/>
           {{ $t('header.details') }}

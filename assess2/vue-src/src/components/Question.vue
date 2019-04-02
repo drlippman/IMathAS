@@ -83,6 +83,7 @@ export default {
     showSubmit () {
       return (store.inProgress &&
         this.questionContentLoaded &&
+        !store.inPrintView &&
         this.questionData.withdrawn === 0 &&
         this.questionData.canretry && (
         store.assessInfo.submitby === 'by_question' ||

@@ -118,5 +118,7 @@ if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
   $assessInfoOut['stugroupid'] = 0;
 }
 
+$assessInfoOut['userfullname'] = $userfullname;
+
 //output JSON object
 echo json_encode($assessInfoOut);

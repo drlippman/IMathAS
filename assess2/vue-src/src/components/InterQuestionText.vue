@@ -2,7 +2,7 @@
   <div :class="{'interqtext': true, 'right': !expanded}" ref="main">
     <button
       type = "button"
-      :class = "{plain: true, floatright: expanded}"
+      :class = "{plain: true, floatright: expanded, togglebtn: true}"
       :aria-label = "expanded ? $t('text.hide') : $t('text.show')"
       :aria-expanded = "expanded ? 'true' : 'false'"
       @click = "expanded = !expanded"

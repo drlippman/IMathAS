@@ -61,7 +61,10 @@ $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
 
 // check password, if needed
-if (!$in_practice && !$assess_info->checkPassword($_POST['password'])) {
+if (!$in_practice &&
+  (!isset($sessiondata['assess2-'.$cid]) || $sessiondata['assess2-'.$cid] != $in_practice) &&
+  !$assess_info->checkPassword($_POST['password'])
+) {
   echo '{"error": "invalid_password"}';
   exit;
 }
@@ -214,6 +217,11 @@ $assessInfoOut['in_practice'] = $in_practice;
 
 // save record if needed
 $assess_record->saveRecordIfNeeded();
+
+// store assessment start in session data, so we know if they've gotten past
+// password at some point
+$sessiondata['assess2-'.$cid] = $in_practice;
+writesessiondata();
 
 //output JSON object
 echo json_encode($assessInfoOut);

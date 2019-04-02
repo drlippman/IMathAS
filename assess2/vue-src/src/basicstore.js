@@ -14,7 +14,8 @@ export const store = Vue.observable({
   initValues: {},
   autosaveTimer: null,
   timelimit_timer: null,
-  timelimit_expired: false
+  timelimit_expired: false,
+  inPrintView: false
 });
 
 export const actions = {
@@ -49,7 +50,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  startAssess (dopractice, password, newGroupMembers) {
+  startAssess (dopractice, password, newGroupMembers, callback) {
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -81,6 +82,10 @@ export const actions = {
           store.errorMsg = response.error;
         } else if (store.assessInfo.has_active_attempt) {
           store.inProgress = true;
+          if (typeof callback !== 'undefined') {
+            callback();
+            return;
+          }
           if (store.assessInfo.displaymethod === 'skip') {
             if (store.assessInfo.intro != '') {
               Router.push('/skip/0' + store.queryString);
