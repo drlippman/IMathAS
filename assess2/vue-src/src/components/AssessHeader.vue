@@ -42,7 +42,7 @@
 
     <div>
       <router-link
-        :to="'/print' + this.queryString"
+        to="/print"
         class = "noextlink"
         target = "_blank"
       >
@@ -73,9 +73,6 @@ export default {
   computed: {
     ainfo () {
       return store.assessInfo;
-    },
-    queryString () {
-      return store.queryString;
     },
     canSubmit () {
       return (!store.inTransit);

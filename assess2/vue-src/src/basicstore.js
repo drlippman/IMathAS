@@ -88,19 +88,19 @@ export const actions = {
           }
           if (store.assessInfo.displaymethod === 'skip') {
             if (store.assessInfo.intro != '') {
-              Router.push('/skip/0' + store.queryString);
+              Router.push('/skip/0');
             } else {
-              Router.push('/skip/1' + store.queryString);
+              Router.push('/skip/1');
             }
           } else if (store.assessInfo.displaymethod === 'full') {
             if (store.assessInfo.hasOwnProperty('interquestion_pages')) {
               if (store.assessInfo.intro != '') {
-                Router.push('/full/page/0' + store.queryString);
+                Router.push('/full/page/0');
               } else {
-                Router.push('/full/page/1' + store.queryString);
+                Router.push('/full/page/1');
               }
             } else {
-              Router.push('/full' + store.queryString);
+              Router.push('/full');
             }
           }
         }
@@ -216,7 +216,7 @@ export const actions = {
         this.copySettings(response);
         if (endattempt) {
           store.inProgress = false;
-          Router.push('/summary' + store.queryString);
+          Router.push('/summary');
         }
 
       })

@@ -40,7 +40,7 @@ export default {
     },
     retake () {
       store.assessInfo = null;
-      this.$router.push('/' + store.queryString);
+      this.$router.push('/');
     }
   }
 }

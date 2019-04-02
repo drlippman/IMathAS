@@ -56,7 +56,7 @@
           <p>&nbsp;</p>
           <p>
             <router-link
-              :to="'/full/page/'+ (page+2) + queryString"
+              :to="'/full/page/'+ (page+2)"
             >
               {{ $t('pages.next') }}
             </router-link>
@@ -90,9 +90,6 @@ export default {
     },
     allPages () {
       return store.assessInfo.interquestion_pages;
-    },
-    queryString () {
-      return store.queryString;
     },
     intro () {
       return store.assessInfo.intro;

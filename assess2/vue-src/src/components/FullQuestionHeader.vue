@@ -71,9 +71,6 @@ export default {
     dispqn () {
       return parseInt(this.qn) + 1;
     },
-    queryString () {
-      return store.queryString;
-    },
     statusIcon () {
       if (this.dispqn === 0) {
         return 'none';

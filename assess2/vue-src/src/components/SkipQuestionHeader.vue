@@ -14,7 +14,7 @@
         </menu-button>
 
         <router-link
-          :to="'/skip/'+ (dispqn-1) + queryString"
+          :to="'/skip/'+ (dispqn-1)"
           tag="button"
           :disabled="qn < (this.hasIntro ? 0 : 1)"
           class="secondarybtn"
@@ -25,7 +25,7 @@
           <icons name="left"/>
         </router-link>
         <router-link
-          :to="'/skip/' + (dispqn+1) + queryString"
+          :to="'/skip/' + (dispqn+1)"
           tag="button"
           :disabled="qn>=ainfo.questions.length-1"
           class="secondarybtn"
@@ -51,7 +51,7 @@
       </span>
       <dropdown
         :id="'qd-dd-'+qn"
-        class="question-details" 
+        class="question-details"
         v-if="showDetails"
       >
         <template v-slot:button>
@@ -98,9 +98,6 @@ export default {
     dispqn () {
       return parseInt(this.qn) + 1;
     },
-    queryString () {
-      return store.queryString;
-    },
     hasIntro () {
       return (store.assessInfo.intro !== '');
     },
@@ -108,14 +105,14 @@ export default {
       var out = {};
       if (this.hasIntro) {
         out[0] = {
-          internallink: '/skip/0' + this.queryString,
+          internallink: '/skip/0',
           dispqn: 0
         };
       }
       for (let qn in store.assessInfo.questions) {
         let dispqn = parseInt(qn) + 1;
         out[dispqn] = store.assessInfo.questions[qn];
-        out[dispqn].internallink = '/skip/' + dispqn + this.queryString;
+        out[dispqn].internallink = '/skip/' + dispqn;
         out[dispqn].dispqn = dispqn;
       }
       return out;
@@ -158,7 +155,7 @@ export default {
   },
   methods: {
     changeQuestion (newqn) {
-      // this.$router.push({ path: '/skip/' + newqn + store.queryString});
+      // this.$router.push({ path: '/skip/' + newqn});
     }
   }
 };
@@ -186,7 +183,8 @@ export default {
 }
 
 #skip-question-select #qprev, #skip-question-select #qnext {
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 #qprev, #qnext {
   padding: 0px 8px;

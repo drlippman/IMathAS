@@ -11,7 +11,7 @@
     </menu-button>
 
     <router-link
-      :to="'/full/page/'+ (disppage-1) + queryString"
+      :to="'/full/page/'+ (disppage-1)"
       tag="button"
       :disabled="page < (this.hasIntro ? 0 : 1)"
       class="secondarybtn"
@@ -22,7 +22,7 @@
       <icons name="left"/>
     </router-link>
     <router-link
-      :to="'/full/page/'+ (disppage+1) + queryString"
+      :to="'/full/page/'+ (disppage+1)"
       tag="button"
       :disabled="page>=pagesData.length-1"
       class="secondarybtn"
@@ -61,9 +61,6 @@ export default {
     pagesData () {
       return store.assessInfo.interquestion_pages;
     },
-    queryString () {
-      return store.queryString;
-    },
     hasIntro () {
       return (store.assessInfo.intro !== '');
     },
@@ -71,7 +68,7 @@ export default {
       var out = {};
       if (this.hasIntro) {
         out[0] = {
-          internallink: '/full/page/0' + this.queryString,
+          internallink: '/full/page/0',
           disppage: 0
         };
       }
@@ -87,7 +84,7 @@ export default {
         out[disppage] = {
           disppage: disppage,
           title: this.pagesData[pn][0].pagetitle,
-          internallink: '/full/page/' + disppage + this.queryString,
+          internallink: '/full/page/' + disppage,
           numquestions: this.pagesData[pn][0].questions.length,
           numattempted: numAttempted
         };

@@ -13,7 +13,7 @@ Vue.use(Router);
 
 const router = new Router({
   base: process.env.NODE_ENV === 'production' ? window.imasroot + '/assess2/' : '/',
-  mode: 'history',
+  //mode: 'history',
   routes: [
     {
       path: '/',
@@ -27,7 +27,7 @@ const router = new Router({
          ) {
            next();
          } else {
-           next({path: '/closed' + store.queryString, replace: true});
+           next({path: '/closed', replace: true});
          }
       }
     },
@@ -41,7 +41,7 @@ const router = new Router({
           (store.assessInfo.available === 'practice' && store.assessInfo.in_practice))
             && (store.assessInfo.has_active_attempt || store.assessInfo.can_retake)
          ) {
-           next({path: '/' + store.queryString, replace: true});
+           next({path: '/', replace: true});
          } else {
            next();
          }
@@ -56,7 +56,7 @@ const router = new Router({
         if (store.inProgress) {
           next();
         } else {
-          next({path: '/' + store.queryString, replace: true});
+          next({path: '/', replace: true});
         }
       }
     },
@@ -69,7 +69,7 @@ const router = new Router({
         if (store.inProgress) {
           next();
         } else {
-          next({path: '/' + store.queryString, replace: true});
+          next({path: '/', replace: true});
         }
       }
     },
@@ -82,7 +82,7 @@ const router = new Router({
         if (store.inProgress) {
           next();
         } else {
-          next({path: '/' + store.queryString, replace: true});
+          next({path: '/', replace: true});
         }
       }
     },
@@ -98,7 +98,7 @@ const router = new Router({
          ) {
            next();
          } else {
-           next({path: '/' + store.queryString, replace: true});
+           next({path: '/', replace: true});
          }
       }
     },
@@ -120,7 +120,7 @@ const router = new Router({
             actions.startAssess(dopractice, '', [], () => next());
           }
         } else {
-          next({path: '/' + store.queryString, replace: true});
+          next({path: '/', replace: true});
         }
       }
     },
@@ -136,12 +136,15 @@ router.beforeEach((to,from,next) => {
     store.APIbase = process.env.BASE_URL;
   }
   // if no assessinfo, or if cid/aid has changed, load data
+  console.log(window.location.search);
+  let querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
+  let queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
   if (store.assessInfo === null ||
-    store.cid !== to.query.cid ||
-    store.aid !== to.query.aid
+    store.cid !== querycid ||
+    store.aid !== queryaid
   ) {
-    store.cid = to.query.cid;
-    store.aid = to.query.aid;
+    store.cid = querycid;
+    store.aid = queryaid;
     store.queryString = '?cid=' + store.cid + '&aid=' + store.aid;
     actions.loadAssessData(() => next());
   } else {

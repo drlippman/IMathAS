@@ -27,9 +27,6 @@ export default {
     },
     assessName () {
       return store.assessInfo.name;
-    },
-    queryString () {
-      return '?cid=' + store.cid + '&aid=' + store.aid;
     }
   },
   methods: {
