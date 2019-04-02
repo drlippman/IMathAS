@@ -121,7 +121,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$xxmax = $winxmax + 5*($winxmax - $winxmin)/$plotwidth;
 	$yymin = $ymin - 5*($ymax - $ymin)/$plotheight;
 	$yymax = $ymax + 5*($ymax - $ymin)/$plotheight;
-	
+
 	//$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});";
 	//$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.";
 	$commands = '';
@@ -184,12 +184,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		if ($function[0][0] == 'y') {
 			$function[0] = preg_replace('/^\s*y\s*=?/', '', $function[0]);
 		}
-		
+
 		if ($function[0]=='dot') {  //dot,x,y,[closed,color,label,labelloc]
 			if (!isset($function[4]) || $function[4]=='') {
 				$function[4] = 'black';
 			}
-			
+
 			$path = 'stroke="'.$function[4].'";';
 			$path .= 'dot(['.$function[1].','.$function[2].']';
 			$coord = '('.$function[1].','.$function[2].')';
@@ -201,7 +201,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$alt .= sprintf(_('Dot at %s'), $coord);
 			}
 			$alt .= ', color '.$function[4];
-			
+
 			if (isset($function[5]) && $function[5]!='') {
 				if (!isset($function[6])) {
 					$function[6] = 'above';
@@ -1071,7 +1071,7 @@ function makeprettynegative($exp) {
 }
 
 function randpythag($min=1,$max=100) {
-	list($min,$max) = checkMinMax($min, $max, 'randpythag');
+	list($min,$max) = checkMinMax($min, $max, true, 'randpythag');
 	$m = $GLOBALS['RND']->rand(ceil(sqrt($min+1)), floor(sqrt($max-1)));
 	$n = $GLOBALS['RND']->rand(1, floor(min($m-1, sqrt($m*$m-$min), sqrt($max-$m*$m))));
 	$v = array($m*$m-$n*$n, 2*$m*$n, $m*$m+$n*$n);
@@ -1148,7 +1148,7 @@ function rrand($min,$max,$p=0) {
 	if (func_num_args()!=3) { echo "Error: rrand expects 3 arguments"; return $min;}
 	if ($p<=0) {echo "Error with rrand: need to set positive step size"; return false;}
 	list($min,$max) = checkMinMax($min, $max, false, 'rrand');
-	
+
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 	$out = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
 	if ($rn==0) { $out = (int) $out;}
@@ -1172,7 +1172,7 @@ function rrands($min,$max,$p=0,$n=0) {
 	if (func_num_args()!=4) { echo "rrands expects 4 arguments"; return $min;}
 	if ($p<=0) {echo "Error with rrands: need to set positive step size"; return false;}
 	list($min,$max) = checkMinMax($min, $max, false, 'rrands');
-	
+
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	for ($i = 0; $i < $n; $i++) {
@@ -1246,7 +1246,7 @@ function nonzerorrand($min,$max,$p=0) {
 	if (floor(($max-$min)/$p)==0) {
 		return $min;
 	}
-	
+
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	do {
@@ -1261,7 +1261,7 @@ function nonzerorands($min,$max,$n=0) {
 	if (func_num_args()!=3) { echo "nonzerorands expects 3 arguments"; return $min;}
 	list($min,$max) = checkMinMax($min, $max, true, 'nonzerorands');
 	if ($min == 0 && $max == 0) { return 0; }
-	
+
 	for ($i = 0; $i < $n; $i++) {
 		do {
 			$r[$i] = $GLOBALS['RND']->rand($min,$max);
@@ -1275,12 +1275,12 @@ function nonzerorrands($min,$max,$p=0,$n=0) {
 	if (func_num_args()!=4) { echo "nonzerorrands expects 4 arguments"; return $min;}
 	$n = floor($n);
 	list($min,$max) = checkMinMax($min, $max, false, 'nonzerorrands');
-	
+
 	if ($p<=0) {echo "Error with nonzerorrands: need to set positive step size"; return array_fill(0,$n,$min);}
 	if (floor(($max-$min)/$p)==0) {
 		return array_fill(0, $n, $min);
 	}
-	
+
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	for ($i = 0; $i < $n; $i++) {
@@ -1302,7 +1302,7 @@ function diffrands($min,$max,$n=0) {
 			echo "diffrands: min-max not far enough for n requested";
 		}
 	}
-	
+
 	$n = floor($n);
 	if ($n<.1*($max-$min)) {
 		$out = array();
@@ -1328,7 +1328,7 @@ function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 	if (func_num_args()<4) { echo "diffrrands expects 4 arguments"; return $min;}
 	$n = floor($n);
 	list($min,$max) = checkMinMax($min, $max, false, 'diffrrands');
-	
+
 	if ($p<=0) {echo "Error with diffrrands: need to set positive step size"; return array_fill(0,$n,$min);}
 
 	if (floor(($max-$min)/$p)==0) {
@@ -1380,7 +1380,7 @@ function nonzerodiffrands($min,$max,$n=0) {
 			echo "nonzerodiffrands: min-max not far enough for n requested";
 		}
 	}
-	
+
 	if ($n<.1*($max-$min)) {
 		$out = array();
 		while (count($out)<$n) {
@@ -1797,7 +1797,7 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 		} else {
 			$sign = '';
 		}
-	
+
 		$v = floor(-log10($a)-1e-12);
 		if ($v+$sigfig <= 0) {
 			if ($v<-16 && $scinot=='') { //special handling of really huge numbers
@@ -2029,7 +2029,7 @@ function numtowords($num,$doth=false,$addcontractiontonum=false) {
 	}
 	$int = floor($num);
 	$dec = 	$num-$int;
-	
+
 	if ($int>0) {
 		$out .= convertTri($int,0,$doth);
 		if (abs($dec)>1e-9) {
@@ -2117,7 +2117,7 @@ function randname() {
 	return randnames(1,2);
 }
 function randnamewpronouns() {
-	$gender = $GLOBALS['RND']->rand(0,1);	
+	$gender = $GLOBALS['RND']->rand(0,1);
 	$name = randnames(1,$gender);
 	if ($gender==0) { //male
 		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'));
@@ -2452,12 +2452,12 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 	} else {
 		return $sign.$numerators[$i].'/'.$denominators[$i];
 	}
-}                                
+}
 
 function makenumberrequiretimes($arr) {
 	if (!is_array($arr)) {
 		$arr = listtoarray($arr);
-	} 
+	}
 	if (count($arr)==0) {
 		return "";
 	}
@@ -2475,7 +2475,7 @@ function makenumberrequiretimes($arr) {
 
 function evalbasic($str) {
 	global $myrights;
-	
+
 	$str = str_replace(',','',$str);
 	$str = str_replace('pi','3.141592653',$str);
 	$str = clean($str);
@@ -4060,7 +4060,7 @@ function checkMinMax($min, $max, $isint, $funcname) {
 		$max = floatval($max);
 	}
 	if ($max < $min) {
-		$err .= "Need min&lt;max. "; 
+		$err .= "Need min&lt;max. ";
 		$t = $max;
 		$max = $min;
 		$min = $t;
@@ -4074,7 +4074,7 @@ function checkMinMax($min, $max, $isint, $funcname) {
 	}
 	return array($min,$max);
 }
-	
-	
+
+
 
 ?>
