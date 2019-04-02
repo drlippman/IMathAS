@@ -5941,10 +5941,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$xintp = ($xint - $settings[0])*$pixelsperx + $imgborder;
 							$yint = $func($xint);
 							$yintp = $settings[7] - ($yint-$settings[2])*$pixelspery - $imgborder;
-							$secx = $xint + ($x4-$x0)/5*(($y1>$y0)?1:-1);  //over 1/5 of grid width
+							$flip = ($y1>$y0)?1:-1;
+							$secx = $xint + ($x4-$x0)/5*$flip;  //over 1/5 of grid width
 							$secy = $func($secx);
 							$secyp = $settings[7] - ($secy-$settings[2])*$pixelspery - $imgborder;
-							$anssqrts[$key] = array($xintp,$yintp,$secyp);
+							$anssqrts[$key] = array($xintp,$yintp,$secyp,$flip);
 						}
 					} else if (($p = strpos($function[0],'cos'))!==false || ($q = strpos($function[0],'sin'))!==false) { //is sin/cos
 						if ($p===false) { $p = $q;}
@@ -6150,7 +6151,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 						$secxp = $pts[1] + ($x4p-$x0p)/5*$flip;  //over 1/5 of grid width
 						$secyp = $stretch*sqrt($flip*($secxp - $pts[1]))+($pts[2]);
-						$sqrts[] = array($pts[1],$pts[2],$secyp);
+						$sqrts[] = array($pts[1],$pts[2],$secyp,$flip);
 					} else if ($pts[0]==6.3) {
 						//cubic
 						if ($pts[4]==$pts[2]) {
@@ -6569,6 +6570,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($anssqrts as $key=>$anssqrt) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($sqrts); $i++) {
+					if ($anssqrt[3] !== $sqrts[$i][3]) { //horiz flip doesn't match
+						continue;
+					}
 					if (abs($anssqrt[0]-$sqrts[$i][0])>$defpttol*$reltolerance) {
 						continue;
 					}
