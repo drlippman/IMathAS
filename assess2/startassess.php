@@ -150,8 +150,11 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
     // we need to create a whole new data
     $assess_record->buildAssessData(true);
   } else {
-    // if we can make a new one, do it
-    if ($assess_record->canMakeNewAttempt()) {
+    if ($assess_record->hasUnstartedAttempt()) {
+      // has an assessment attempt they haven't started yet
+      $assess_record->setStatus(true, true);
+    } else if ($assess_record->canMakeNewAttempt()) {
+      // if we can make a new one, do it
       $assess_record->buildNewAssessVersion(true);
     } else {
       // if we can't make one, report error

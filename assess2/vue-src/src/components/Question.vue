@@ -204,13 +204,14 @@ export default {
     },
     setInitValues() {
       var regex = new RegExp("^(qn|tc|qs)\\d");
+      var thisqn = this.qn;
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .each(function(index, el) {
           if (el.name.match(regex)) {
             if (el.type === 'radio' || el.type === 'checked') {
-              actions.setInitValue(this.qn, el.name, el.checked?1:0);
+              actions.setInitValue(thisqn, el.name, el.checked?1:0);
             } else {
-              actions.setInitValue(this.qn, el.name, $(el).val());
+              actions.setInitValue(thisqn, el.name, $(el).val());
             }
           }
         });

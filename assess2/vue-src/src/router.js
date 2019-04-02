@@ -136,7 +136,6 @@ router.beforeEach((to,from,next) => {
     store.APIbase = process.env.BASE_URL;
   }
   // if no assessinfo, or if cid/aid has changed, load data
-  console.log(window.location.search);
   let querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
   let queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
   if (store.assessInfo === null ||

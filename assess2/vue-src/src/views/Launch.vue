@@ -80,6 +80,7 @@ export default {
     SettingsList,
     PasswordEntry,
     GroupEntry,
+    SummaryGbScore,
     PreviousAttempts,
     Icons
   },

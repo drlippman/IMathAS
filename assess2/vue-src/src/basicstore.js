@@ -155,9 +155,10 @@ export const actions = {
     // figure out non-blank questions to submit
     let lastLoaded = [];
     let changedQuestions = this.getChangedQuestions(qns);
+
     let data = new FormData();
     for (let k=0; k<qns.length; k++) {
-      let qn = qns[k];
+      let qn = parseInt(qns[k]);
       var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
       window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
         if (el.name.match(regex)) {
@@ -394,6 +395,18 @@ export const actions = {
       store.initValues[qn] = {};
     }
     // only record initvalue if we don't already have one
+    let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
+    let pn = 0;
+    if (m[2]>1000) {
+      pn = pn = m[2]%1000;
+    }
+    if (store.assessInfo.questions[qn].hasOwnProperty('usedautosave') &&
+      store.assessInfo.questions[qn].usedautosave.indexOf(pn) !== -1
+    ) {
+      // was loaded from autosave, so don't record as init initValue
+      return;
+    }
+
     if (!store.initValues[qn].hasOwnProperty(fieldname)) {
       store.initValues[qn][fieldname] = val;
     }
@@ -421,7 +434,7 @@ export const actions = {
     let m;
     for (let k=0; k < qns.length; k++) {
       let qn = qns[k];
-      var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
+      var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn*1+1)+"\\d{3})");
       window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
         if (m = el.name.match(regex)) {
           let thisChanged = false;
@@ -439,8 +452,9 @@ export const actions = {
               changed[qn] = [];
             }
             let pn = 0;
-            if (m[2]>1000) {
-              pn = m[2]%1000;
+            let qidnum = parseInt(m[2]);
+            if (qidnum>1000) {
+              pn = qidnum%1000;
             }
             if (changed[qn].indexOf(pn) === -1) {
               changed[qn].push(pn);
@@ -519,11 +533,6 @@ export const actions = {
             .replace(/<img[^>]*redx.gif[^>]*>/g, svgx);
         }
         store.lastLoaded[i] = new Date();
-        if (data.questions[i].hasOwnProperty('usedautosave')) {
-          //TODO: add these question parts to the dirty tracker
-          // need to track dirty by-part for this to work
-          delete data.questions[i].usedautosave;
-        }
       }
     }
     if (data.hasOwnProperty('showscores')) {

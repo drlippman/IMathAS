@@ -64,8 +64,9 @@ class AssessRecord
    */
   public function setInPractice($is_practice) {
     if ($is_practice !== $this->is_practice) {
+      $tmp = $this->tmpdata;
       $this->tmpdata = $this->data;
-      $this->data = $this->tmpdata;
+      $this->data = $tmp;
     }
     $this->is_practice = $is_practice;
   }
@@ -173,7 +174,7 @@ class AssessRecord
     }
 
     //generate scored data
-    $this->buildAssessData($recordStart);
+    $this->buildAssessData($recordStart && !$waspractice);
     $scoredtosave = ($this->data !== null) ? gzencode(json_encode($this->data)) : '';
     $this->assessRecord['scoreddata'] = $scoredtosave;
 
@@ -236,12 +237,11 @@ class AssessRecord
   public function buildNewAssessVersion($recordStart = true) {
     $this->parseData();
     $attempt = count($this->data['assess_versions']);
-
     // build base framework
     $out = array(
       'starttime' => $recordStart ? $this->now : 0,
       'lastchange' => 0,
-      'status' => 0,
+      'status' => $recordStart ? 0 : -1,
       'score' => 0,
       'questions' => array()
     );
@@ -277,7 +277,7 @@ class AssessRecord
 
     $this->need_to_record = true;
 
-    $this->setStatus(true, false);
+    $this->setStatus($recordStart, false);
   }
 
   /**
@@ -432,6 +432,11 @@ class AssessRecord
         if ($submitby == 'by_assessment') {
           // only mark as submitted if by_assessment
           $this->data['assess_versions'][$lastver]['status'] = $active ? 0 : 1;
+        } else {
+          // if by_question and not started, mark started
+          if ($this->data['assess_versions'][$lastver]['status'] === -1 && $active) {
+            $this->data['assess_versions'][$lastver]['status'] = 0;
+          }
         }
         // record now as lastchange on attempt if no submissions have been made
         if ($this->data['assess_versions'][$lastver]['lastchange'] === 0) {
@@ -593,6 +598,29 @@ class AssessRecord
   }
 
   /**
+   * Determine if there is an unstarted assessment attempt
+   * Typically only happens if first opened in review mode then later
+   * in scored mode
+   * @return boolean true if there is an unstarted assessment attempt
+   */
+  public function hasUnstartedAttempt() {
+    if (empty($this->assessRecord)) {
+      //no assessment record at all
+      return false;
+    }
+    $this->parseData();
+
+    if ($this->data === null) {
+      return false;
+    }
+    if (count($this->data['assess_versions']) == 0) {
+      return false;
+    }
+    $last_attempt = $this->data['assess_versions'][count($this->data['assess_versions'])-1];
+    return ($last_attempt['status'] === -1);
+  }
+
+  /**
    * Determine if there is an unsubmitted assessment attempt
    * This includes not-yet-opened assessment attempts
    * @return boolean true if there is an unsubmitted assessment attempt
@@ -674,7 +702,8 @@ class AssessRecord
     $showscores = $this->assess_info->getSetting('showscores');
 
     foreach ($this->data['assess_versions'] as $k=>$ver) {
-      if ($ver['status'] == 1 || !$is_available) {  // if it's a submitted version
+      // if it's a submitted version or an active one no longer available
+      if ($ver['status'] === 1 || (!$is_available && $ver['status'] === 0)) {
         $out[$k] = array(
           'date' => $ver['lastchange'],
         );
@@ -682,7 +711,7 @@ class AssessRecord
         // if by_question and not available and showscores is allowed, or
         // if by_assessment and submitted and showscores is allowed
         if ($force_scores ||
-          (!$by_assessment && !$is_availble && $showscores === 'during') ||
+          (!$by_assessment && !$is_available && $showscores === 'during') ||
           ($by_assessment && $ver['status'] == 1 && $showscores !== 'none')
         ) {
           $out[$k]['score'] = $ver['score'];
@@ -1044,6 +1073,7 @@ class AssessRecord
     $is_singlescore = !empty($qver['singlescore']);
     // loop over each part
     for ($pn = 0; $pn < count($answeights); $pn++) {
+      $partpenalty = array();
       $max = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) - 1 : -1;
       if ($max == -1) {
         // no tries yet
@@ -1059,7 +1089,6 @@ class AssessRecord
       } else {
         $min = 0;
       }
-      $penaltyList = array();
       for ($pa = $min; $pa <= $max; $pa++) {
         $parttry = $qver['tries'][$pn][$pa];
         if ($parttry['raw'] > 0) {
@@ -1081,6 +1110,7 @@ class AssessRecord
           if ($scoreAfterPenalty > $partscores[$pn]) {
             $partscores[$pn] = $scoreAfterPenalty;
             $partrawscores[$pn] = $parttry['raw']*1;
+            $partpenalty = $penaltyList;
           }
         }
       }
@@ -1090,14 +1120,14 @@ class AssessRecord
           'rawscore' => $partrawscores[$pn]
         );
         if ($pn==0) {
-          $parts[$pn]['penalties'] = $penaltyList;
+          $parts[$pn]['penalties'] = $partpenalty;
         }
       } else {
         $parts[$pn] = array(
           'try' => count($qver['tries'][$pn]),
           'score' => $partscores[$pn],
           'rawscore' => $partrawscores[$pn],
-          'penalties' => $penaltyList,
+          'penalties' => $partpenalty,
           'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
         );
       }
