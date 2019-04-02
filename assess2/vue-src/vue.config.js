@@ -13,9 +13,11 @@ module.exports = {
   // delete HTML related webpack plugins
   filenameHashing: false,
   chainWebpack: config => {
-    config.plugins.delete('html')
-    config.plugins.delete('preload')
-    config.plugins.delete('prefetch')
-    config.plugins.delete('copy')
+    if (process.env.NODE_ENV === 'production') {
+      config.plugins.delete('html')
+      config.plugins.delete('preload')
+      config.plugins.delete('prefetch')
+      config.plugins.delete('copy')
+    }
   }
 };
