@@ -77,7 +77,7 @@ export default {
 <style>
 ul.vuetablist {
   border-bottom: 1px solid #ccc;
-  padding-left: 12px;
+  padding-left: 16px;
 }
 ul.vuetablist li {
   display: inline-block;
@@ -86,6 +86,7 @@ ul.vuetablist li {
   color: #666;
   padding: 4px 8px;
   border: 1px solid #ccc;
+  cursor: default;
 }
 ul.vuetablist li.active {
   border-bottom: 1px solid #fff;

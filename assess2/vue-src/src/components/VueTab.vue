@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="active"
+    v-show="active"
     tabindex="0"
     :id="id"
     :aria-labelledby="control"
