@@ -41,13 +41,14 @@
     </menu-button>
 
     <div>
-      <router-link
-        to="/print"
+      <a
+        :href="printLink"
         class = "noextlink"
         target = "_blank"
+        :aria-label = "$t('print.print_version')"
       >
         <icons name="print" size="medium"/>
-      </router-link>
+      </a>
     </div>
   </div>
 </template>
@@ -117,6 +118,9 @@ export default {
         return '';
         //return this.$t('header.done');
       }
+    },
+    printLink () {
+      return window.location.pathname + window.location.search + '#/print';
     }
   },
   methods: {

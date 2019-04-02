@@ -183,13 +183,12 @@ export default {
 }
 
 #skip-question-select #qprev, #skip-question-select #qnext {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
 }
 #qprev, #qnext {
   padding: 0px 8px;
 }
-#qprev {
+#qprev, #skip-question-select #qprev {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   margin-left: 8px;

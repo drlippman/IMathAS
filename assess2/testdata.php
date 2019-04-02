@@ -609,7 +609,30 @@ $assessGroups = [
           2=>['questionsetid' => 7]
         ],
         'itemorder' => [0,1,2]
-      ]
+      ],
+      [
+        'name' => 'Password',
+        'summary' => 'Password: abc',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'password' => 'abc',
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1],
+          2=>['questionsetid' => 0]
+        ],
+        'itemorder' => [0,1,2]
+      ],
     ]
   ],
   [
