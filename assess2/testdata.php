@@ -59,6 +59,13 @@ $questionSet = [
     'qtype' => 'file',
     'control' => '',
     'qtext' => '<p>Upload your work here</p>'
+  ],
+  8=>[
+    'uniqueid' => 1552587894535721,
+    'description' => 'Really long question',
+    'qtype' => 'number',
+    'control' => '$answer = rand(1,100)',
+    'qtext' => '<p>This is some text</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>Type $answer</p>'
   ]
 ];
 
@@ -112,8 +119,8 @@ $assessGroups = [
         'ver' => 2,
         'questions' => [
           0=>['questionsetid' => 0],
-          1=>['questionsetid' => 1],
-          2=>['questionsetid' => 0]
+          1=>['questionsetid' => 8],
+          2=>['questionsetid' => 1]
         ],
         'itemorder' => [0,1,2]
       ],

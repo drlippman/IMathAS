@@ -218,6 +218,9 @@ export const actions = {
         if (endattempt) {
           store.inProgress = false;
           Router.push('/summary');
+        } else if (qns.length === 1) {
+          // scroll to score result
+          document.getElementById("questionwrap" + qns[0]).parentNode.scrollIntoView();
         }
 
       })
