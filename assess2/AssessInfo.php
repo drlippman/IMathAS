@@ -808,6 +808,11 @@ class AssessInfo
       $settings['showans'] = 'after_lastattempt';
     }
 
+    // if LivePoll, force all stu same random seed
+    if ($settings['displaymethod'] === 'livepoll') {
+      $settings['shuffle'] = $settings['shuffle'] | 4;
+    }
+
     //unpack minscore
     if ($settings['minscore'] > 10000) {
       $settings['minscore'] = $settings['minscore'] - 10000;
