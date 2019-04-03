@@ -510,9 +510,9 @@ export const actions = {
             data.questions[i].tries_remaining_range = [trymin, trymax];
           }
         }
-        if (thisq.hasOwnProperty('regens_max') !== 'undefined' && thisq.regen < thisq.regens_max) {
+        if (thisq.hasOwnProperty('regens_max') !== 'undefined' && thisq.regen < thisq.regens_max - 1) {
           data.questions[i].canregen = true;
-          data.questions[i].regens_remaining = thisq.regens_max - thisq.regen;
+          data.questions[i].regens_remaining = thisq.regens_max - thisq.regen - 1; //-1 to adjust to current version
         } else {
           data.questions[i].canregen = false;
           data.questions[i].regens_remaining = 0;
@@ -542,7 +542,7 @@ export const actions = {
       data['show_scores_during'] = (data.showscores === 'during');
     }
     if (data.hasOwnProperty('regen')) {
-      data['regens_remaining'] = (data.regens_max - data.regen);
+      data['regens_remaining'] = (data.regens_max - data.regen - 1);
     }
     if (data.hasOwnProperty('timelimit_expires')) {
       clearTimeout(store.timelimit_timer);

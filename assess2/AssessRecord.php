@@ -776,8 +776,10 @@ class AssessRecord
    */
   public function getAttemptScore($ver = 'last') {
     $this->parseData();
-    $lastver = count($this->data['assess_versions']) - 1;
-    return $this->data['assess_versions'][$lastver]['score'];
+    if ($ver === 'last') {
+      $ver = count($this->data['assess_versions']) - 1;
+    }
+    return $this->data['assess_versions'][$ver]['score'];
   }
 
   /**
@@ -864,14 +866,14 @@ class AssessRecord
     // get regen number for by_question
     if ($by_question) {
       if (!is_numeric($ver)) {
-        $regen = count($aver['questions'][$qn]['question_versions']);
+        $regen = count($aver['questions'][$qn]['question_versions']) - 1;
       } else {
         $regen = $ver;
       }
       $out['regen'] = $regen;
     } else {
       if (!is_numeric($ver)) {
-        $regen = count($this->data['assess_versions']);
+        $regen = count($this->data['assess_versions']) - 1;
       } else {
         $regen = $ver;
       }
@@ -1036,7 +1038,7 @@ class AssessRecord
     } else if ($by_question || !is_numeric($ver)) {
       $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
       if (!$by_question) {
-        $regen = count($this->data['assess_versions']);
+        $regen = count($this->data['assess_versions']) - 1;
       }
     } else {
       $assessver = $this->data['assess_versions'][$ver];
@@ -1052,7 +1054,7 @@ class AssessRecord
     if (!$by_question || $ver === 'last') {
       $qver = $question_versions[count($question_versions) - 1];
       if ($by_question) {
-        $regen = count($question_versions);
+        $regen = count($question_versions) - 1;
       }
     } else if ($ver === 'scored') {
       // get scored version when by_question
@@ -1488,13 +1490,13 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') === 'by_question');
     if (!$by_question) {
       $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
-      $regen = count($this->data['assess_versions']) - 1;  //-1 to adjust for current version
+      $regen = count($this->data['assess_versions']) - 1;
     }
     foreach ($verification as $qn=>$qdata) {
       if ($by_question) {
         $qvers = $this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
         $tries = $qvers[count($qvers) - 1]['tries'];
-        $regen = count($qvers);
+        $regen = count($qvers) - 1;
       } else {
         $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
       }
@@ -1561,7 +1563,7 @@ class AssessRecord
    * @param  int $try        The try number (starts at 0)
    * @param  int $retry_penalty
    * @param  int $retry_penalty_after
-   * @param  int $regen      The regen number (starts at 1)
+   * @param  int $regen      The regen number (starts at 0)
    * @param  int $regen_penalty
    * @param  int $regen_penalty_after
    * @param  int $duedate    Original due date timestamp
@@ -1583,7 +1585,7 @@ class AssessRecord
       }
     }
     if ($regen_penalty > 0) {
-      $regensOver = $regen - $regen_penalty_after;
+      $regensOver = $regen + 1 - $regen_penalty_after;
       if ($regensOver > 1e-10) {
         $base *= (1 - $regensOver * $regen_penalty/100);
         $penalties[] = array('type'=>'regen', 'pct'=>$regensOver * $regen_penalty);
