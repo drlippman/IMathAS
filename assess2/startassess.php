@@ -165,6 +165,16 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
   }
 }
 
+// log access
+if ($isstudent) {
+  $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+  $query .= "(:userid, :courseid, :type, :typeid, :viewtime)";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid,
+    ':type'=>$in_practice?'assessreview':'assess',
+    ':typeid'=>$aid, ':viewtime'=>time()));
+}
+
 // update lti_sourcedid if needed
 if (isset($sessiondata['lti_lis_result_sourcedid'])) {
   $altltisourcedid = $sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
