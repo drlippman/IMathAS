@@ -2419,7 +2419,7 @@ These macros are for working with arrays:
 <li><strong>multicalconarray(calculation,varslist,var1array,var2array,etc.)</strong>  Returns an array, performing the given calculation on each set
     of elements from the given arrays.  Allows multivariable calculations.  Example:  $z= multicalconarray("x*y^2","x,y",$xs,$ys)</li>
 <li><strong>calconarrayif(array,calculation,ifcondition)</strong>:  Like calconarray, but allows you to specify a condition for each element for whether to
-    do the calculation.  Example:  $b = calconarray($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the
+    do the calculation.  Example:  $b = calconarrayif($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the
     other elements unchanged.</li>
 <li><strong>subarray(array,params)</strong>:  Creates a new array as a subset of the specified array.  The params can take several forms:
 	<ul>
