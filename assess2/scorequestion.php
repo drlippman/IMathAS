@@ -34,7 +34,7 @@ check_for_required('GET', array('aid', 'cid'));
 check_for_required('POST', array('toscoreqn', 'lastloaded'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-if ($isteacher && isset($_GET['uid'])) {
+if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = Sanitize::onlyInt($_GET['uid']);
 } else {
   $uid = $userid;

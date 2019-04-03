@@ -6,6 +6,11 @@
  * Some common processing useful at the start of scripts, after init.
  */
 
+// handle other instructor previewing course - treat like teacher
+if (isset($instrPreviewId)) {
+  $teacherid=$instrPreviewId;
+}
+
 $isteacher = isset($teacherid);
 $istutor = isset($tutorid);
 $isstudent = isset($studentid);
@@ -20,6 +25,7 @@ if (!$isstudent) {
 }
 
 $canViewAll = $isteacher || $istutor;
+$isActualTeacher = $isteacher && !isset($instrPreviewId);
 
 /**
  * Check if the required parameters are set
