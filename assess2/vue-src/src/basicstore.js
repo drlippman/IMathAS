@@ -32,7 +32,7 @@ export const actions = {
     })
       .done(response => {
         if (response.hasOwnProperty('error')) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
           return;
         }
         // reset store
@@ -70,7 +70,7 @@ export const actions = {
     })
       .done(response => {
         if (response.hasOwnProperty('error')) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
           return;
         }
       // overwrite properties with those from response
@@ -79,7 +79,7 @@ export const actions = {
 
         // route to correct display
         if (response.error) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
         } else if (store.assessInfo.has_active_attempt) {
           store.inProgress = true;
           if (typeof callback !== 'undefined') {
@@ -128,7 +128,7 @@ export const actions = {
     })
       .done(response => {
         if (response.hasOwnProperty('error')) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
           return;
         }
         response = this.processSettings(response);
@@ -198,7 +198,7 @@ export const actions = {
     })
       .done(response => {
         if (response.hasOwnProperty('error')) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
           if (response.error === 'already_submitted') {
             response = this.processSettings(response);
             this.copySettings(response);
@@ -302,7 +302,7 @@ export const actions = {
     })
       .done(response => {
         if (response.hasOwnProperty('error')) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
           if (response.error === 'already_submitted') {
             response = this.processSettings(response);
             this.copySettings(response);
@@ -340,7 +340,7 @@ export const actions = {
     })
       .done(response => {
         if (response.hasOwnProperty('error')) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
           return;
         }
         response = this.processSettings(response);
@@ -363,7 +363,7 @@ export const actions = {
     })
       .done(response => {
         if (response.hasOwnProperty('error')) {
-          store.errorMsg = response.error;
+          this.handleError(response.error);
           return;
         }
         response = this.processSettings(response);
@@ -464,6 +464,9 @@ export const actions = {
       });
     }
     return changed;
+  },
+  handleError (error) {
+    store.errorMsg = error;
   },
   copySettings(response) {
     // overwrite existing questions with new data

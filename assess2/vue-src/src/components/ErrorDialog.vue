@@ -39,6 +39,9 @@ export default {
   },
   methods: {
     clearError () {
+      if (store.errorMsg === 'no_session') {
+        window.location.reload();
+      }
       store.errorMsg = null;
     }
   }
