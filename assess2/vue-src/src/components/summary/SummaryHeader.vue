@@ -11,7 +11,7 @@
         {{ $t('launch.retake_assess') }}
       </button>
       <button
-        v-if="!ainfo.is_lti"
+        v-if="window.exiturl !== ''"
         @click = "exit"
       >
         {{ $t('closed.exit') }}
@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     exit () {
-
+      window.location = window.exiturl;
     },
     retake () {
       store.assessInfo = null;

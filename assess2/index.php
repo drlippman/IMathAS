@@ -5,14 +5,20 @@
 $lastupdate = '20190402';
 
 require('../init.php');
-
-$isdiag = isset($sessiondata['isdiag']);
-if ($isdiag) {
-  $diagid = $sessiondata['isdiag'];
-  $hideAllHeaderNav = true;
+if (empty($_GET['cid']) || empty($_GET['aid'])) {
+  echo 'Error - need to specify course ID and assessment ID in URL';
+  exit;
 }
+$cid = Sanitize::onlyInt($_GET['cid']);
+$aid = Sanitize::onlyInt($_GET['aid']);
+
 $isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
 $inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
+$isdiag = isset($sessiondata['isdiag']);
+if ($isdiag) {
+  $diagid = Sanitize::onlyInt($sessiondata['isdiag']);
+  $hideAllHeaderNav = true;
+}
 
 if ($isltilimited || $inTreeReader) {
   $flexwidth = true;
@@ -22,16 +28,25 @@ if ($isltilimited || $inTreeReader) {
 $placeinhead = '<script type="text/javascript">var APIbase = "'.$GLOBALS['basesiteurl'].'/assess2/";</script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/app.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+if ($isltilimited || $inTreeReader) {
+  $placeinhead .= '<script>var exiturl = "";</script>';
+} else if ($isdiag) {
+  $placeinhead .= '<script>var exiturl = "'.$GLOBALS['basesiteurl'].'/diag/index.php?id='.$diagid.'";</script>';
+} else {
+  $placeinhead .= '<script>var exiturl = "'.$GLOBALS['basesiteurl'].'/course/course.php?cid='.$cid.'";</script>';
+}
 $nologo = true;
 require('../header.php');
 
-echo "<div class=breadcrumb>";
-if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
-  echo "$breadcrumbbase ", _('Assessment'), "</div>";
-} else {
-  echo $breadcrumbbase . ' <a href="../course/course.php?cid='.$cid.'">';
-  echo Sanitize::encodeStringForDisplay($coursename);
-  echo '</a> &gt; ', _('Assessment'), '</div>';
+if (!$isltilimited && !$inTreeReader && !$isdiag) {
+  echo "<div class=breadcrumb>";
+  if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+    echo "$breadcrumbbase ", _('Assessment'), "</div>";
+  } else {
+    echo $breadcrumbbase . ' <a href="../course/course.php?cid='.$cid.'">';
+    echo Sanitize::encodeStringForDisplay($coursename);
+    echo '</a> &gt; ', _('Assessment'), '</div>';
+  }
 }
 ?>
 <noscript>

@@ -52,15 +52,17 @@ $include_from_assess_info = array(
   'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
-  'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore'
+  'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
+  'noprint'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
 // indicate if teacher user
 $assessInfoOut['can_view_all'] = $canViewAll;
 
-//set is_lti
+//set is_lti and is_diag
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']);
+$assessInfoOut['is_diag'] = isset($sessiondata['isdiag']);
 
 //set has password
 $assessInfoOut['has_password'] = $assess_info->hasPassword();

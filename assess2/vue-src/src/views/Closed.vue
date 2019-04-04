@@ -150,8 +150,10 @@ export default {
         return this.$t('closed.do_practice');
       } else if (this.canViewScored) {
         return this.$t('closed.view_scored');
-      } else {
+      } else if (window.exiturl !== '') {
         return this.$t('closed.exit');
+      } else {
+        return '';
       }
     },
     secondaryButton () {
@@ -183,6 +185,7 @@ export default {
 
       } else {
         // exit assessment
+        window.location = window.exiturl;
       }
     },
     handleSecondary () {
