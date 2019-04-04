@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Icons from '@/components/Icons.vue';
+import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'InterQuestionText',

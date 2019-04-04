@@ -55,8 +55,8 @@
 
 <script>
 import Timer from '@/components/Timer.vue';
-import MenuButton from '@/components/MenuButton.vue';
-import Icons from '@/components/Icons.vue';
+import MenuButton from '@/components/widgets/MenuButton.vue';
+import Icons from '@/components/widgets/Icons.vue';
 import { store, actions } from '../basicstore';
 
 export default {

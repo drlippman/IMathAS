@@ -44,8 +44,8 @@ import SummaryDiagInfo from '@/components/summary/SummaryDiagInfo.vue';
 import SummaryReshowQuestions from '@/components/summary/SummaryReshowQuestions.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import PreviousAttempts from '@/components/PreviousAttempts.vue';
-import VueTabs from '@/components/VueTabs.vue';
-import VueTab from '@/components/VueTab.vue';
+import VueTabs from '@/components/widgets/VueTabs.vue';
+import VueTab from '@/components/widgets/VueTab.vue';
 
 export default {
   name: 'Summary',

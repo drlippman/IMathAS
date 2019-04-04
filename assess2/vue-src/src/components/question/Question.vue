@@ -48,10 +48,10 @@
 </template>
 
 <script>
-import { store, actions } from '../basicstore';
-import ScoreResult from '@/components/ScoreResult.vue';
-import Icons from '@/components/Icons.vue';
-import QuestionHelps from '@/components/QuestionHelps.vue';
+import { store, actions } from '../../basicstore';
+import ScoreResult from '@/components/question/ScoreResult.vue';
+import Icons from '@/components/widgets/Icons.vue';
+import QuestionHelps from '@/components/question/QuestionHelps.vue';
 
 export default {
   name: 'Question',

@@ -9,7 +9,7 @@
           searchby = "dispqn"
         >
           <template v-slot="{ option }">
-            <question-list-item :option="option" />
+            <skip-question-list-item :option="option" />
           </template>
         </menu-button>
 
@@ -67,10 +67,10 @@
 
 <script>
 import QuestionDetailsPane from '@/components/QuestionDetailsPane.vue';
-import MenuButton from '@/components/MenuButton.vue';
-import Dropdown from '@/components/Dropdown.vue';
-import QuestionListItem from '@/components/QuestionListItem.vue';
-import Icons from '@/components/Icons.vue';
+import MenuButton from '@/components/widgets/MenuButton.vue';
+import Dropdown from '@/components/widgets/Dropdown.vue';
+import SkipQuestionListItem from '@/components/SkipQuestionListItem.vue';
+import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
 
 export default {
@@ -81,7 +81,7 @@ export default {
     Dropdown,
     Icons,
     MenuButton,
-    QuestionListItem
+    SkipQuestionListItem
   },
   data: function () {
     return {

@@ -84,7 +84,7 @@
 
 <script>
 
-import Icons from '@/components/Icons.vue';
+import Icons from '@/components/widgets/Icons.vue';
 import PreviousAttempts from '@/components/PreviousAttempts.vue';
 import SummaryGbScore from '@/components/summary/SummaryGbScore.vue';
 import { store, actions } from '../basicstore';

@@ -38,7 +38,7 @@
 import AssessHeader from '@/components/AssessHeader.vue';
 import SkipQuestionHeader from '@/components/SkipQuestionHeader.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
-import Question from '@/components/Question.vue';
+import Question from '@/components/question/Question.vue';
 import { store } from '../basicstore';
 
 export default {

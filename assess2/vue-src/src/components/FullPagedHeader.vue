@@ -6,7 +6,7 @@
       searchby = "title"
     >
       <template v-slot="{ option }">
-        <pages-list-item :option="option" />
+        <full-paged-list-item :option="option" />
       </template>
     </menu-button>
 
@@ -36,18 +36,18 @@
 </template>
 
 <script>
-import MenuButton from '@/components/MenuButton.vue';
-import PagesListItem from '@/components/PagesListItem.vue';
-import Icons from '@/components/Icons.vue';
+import MenuButton from '@/components/widgets/MenuButton.vue';
+import FullPagedListItem from '@/components/FullPagedListItem.vue';
+import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
 
 export default {
-  name: 'PagesHeader',
+  name: 'FullPagedHeader',
   props: ['page'],
   components: {
     Icons,
     MenuButton,
-    PagesListItem
+    FullPagedListItem
   },
   data: function () {
     return {

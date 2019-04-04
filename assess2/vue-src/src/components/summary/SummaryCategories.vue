@@ -20,7 +20,7 @@
 
 <script>
 import { store } from '../../basicstore';
-import Icons from '@/components/Icons.vue';
+import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'SummaryCategories',

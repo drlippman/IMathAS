@@ -60,7 +60,7 @@
 // This menu button follows the patterns recommended at
 // https://www.w3.org/TR/wai-aria-practices/examples/menu-button/menu-button-actions-active-descendant.html
 
-import Icons from '@/components/Icons.vue';
+import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'MenuButton',

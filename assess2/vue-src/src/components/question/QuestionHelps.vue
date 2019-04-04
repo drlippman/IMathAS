@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import Icons from '@/components/Icons.vue';
-import { store } from '../basicstore';
+import Icons from '@/components/widgets/Icons.vue';
+import { store } from '../../basicstore';
 
 export default {
   name: 'QuestionHelps',

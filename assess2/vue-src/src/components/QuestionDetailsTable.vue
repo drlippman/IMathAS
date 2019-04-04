@@ -32,7 +32,7 @@
 
 <script>
 import { store } from '../basicstore';
-import Icons from '@/components/Icons.vue';
+import Icons from '@/components/widgets/Icons.vue';
 import PenaltiesApplied from '@/components/PenaltiesApplied.vue';
 
 export default {

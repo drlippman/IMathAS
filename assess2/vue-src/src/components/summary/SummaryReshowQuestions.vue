@@ -16,7 +16,7 @@
 
 <script>
 import { store } from '../../basicstore';
-import Question from '@/components/Question.vue';
+import Question from '@/components/question/Question.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 
 export default {

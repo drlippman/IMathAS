@@ -35,7 +35,7 @@
 <script>
 import AssessHeader from '@/components/AssessHeader.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
-import Question from '@/components/Question.vue';
+import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
 import { store } from '../basicstore';
 
