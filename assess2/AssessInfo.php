@@ -918,5 +918,27 @@ class AssessInfo
     return $settings;
   }
 
+  /**
+   * Checks to see if the intro needs any processing and does it
+   * @return void
+   */
+  public function processIntro () {
+    if (!isset($this->assessData['intro'])) {
+      return false;
+    }
+    if (preg_match('/ImportFrom:\s*([a-zA-Z]+)(\d+)/',$this->assessData['intro'],$matches)==1) {
+      if (strtolower($matches[1])=='link') {
+        $stm = $this->DBH->prepare('SELECT text FROM imas_linkedtext WHERE id=:id');
+        $stm->execute(array(':id'=>$matches[2]));
+        $vals = $stm->fetch(PDO::FETCH_NUM);
+        $this->assessData['intro'] = str_replace($matches[0], $vals[0], $this->assessData['intro']);
+      } else if (strtolower($matches[1])=='assessment') {
+        $stm = $this->DBH->prepare('SELECT intro FROM imas_assessments WHERE id=:id');
+        $stm->execute(array(':id'=>$matches[2]));
+        $vals = $stm->fetch(PDO::FETCH_NUM);
+        $this->assessData['intro'] = str_replace($matches[0], $vals[0], $this->assessData['intro']);
+      }
+  	}
+  }
 
 }

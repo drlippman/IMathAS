@@ -192,6 +192,9 @@ if ($in_practice) {
   $assess_info->overridePracticeSettings();
 }
 
+// See if we need to do anything to the intro, since we're sending it
+$assess_info->processIntro();
+
 // grab any assessment info fields that may have updated:
 // has_active_attempt, timelimit_expires,
 // prev_attempts (if we just closed out a version?)

@@ -32,6 +32,8 @@ if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
+$inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
+
 //load settings without questions
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
@@ -61,6 +63,9 @@ $assessInfoOut['can_view_all'] = $canViewAll;
 
 //set is_lti
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']);
+
+//set in tree reader
+$assessInfoOut['in_tree_reader'] = $inTreeReader;
 
 //set has password
 $assessInfoOut['has_password'] = $assess_info->hasPassword();

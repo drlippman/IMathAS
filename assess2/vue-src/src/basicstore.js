@@ -215,6 +215,12 @@ export const actions = {
 
         response = this.processSettings(response);
         this.copySettings(response);
+
+        // update tree reader with score
+        if (store.assessInfo.in_tree_reader && !store.assessInfo.in_practice) {
+          this.updateTreeReader();
+        }
+
         if (endattempt) {
           store.inProgress = false;
           Router.push('/summary');
@@ -470,6 +476,23 @@ export const actions = {
   },
   handleError (error) {
     store.errorMsg = error;
+  },
+  updateTreeReader() {
+    let qAttempted = 0;
+    for (let i in store.assessInfo.questions) {
+      if (store.assessInfo.questions[i].try > 0) {
+        qAttempted++;
+      }
+    }
+    let status = 0;
+    if (qAttempted === store.assessInfo.questions.length) {
+      status = 2;
+    } else if (qAttempted > 0) {
+      status = 1;
+    }
+    try {
+      top.updateTRunans(store.curAid, status);
+    } catch (e) {}
   },
   copySettings(response) {
     // overwrite existing questions with new data
