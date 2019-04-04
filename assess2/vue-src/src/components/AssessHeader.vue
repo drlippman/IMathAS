@@ -40,7 +40,7 @@
       </template>
     </menu-button>
 
-    <div>
+    <div v-if = "showPrint">
       <a
         :href="printLink"
         class = "noextlink"
@@ -118,6 +118,9 @@ export default {
         return '';
         //return this.$t('header.done');
       }
+    },
+    showPrint () {
+      return (this.ainfo.noprint !== 1);
     },
     printLink () {
       return window.location.pathname + window.location.search + '#/print';

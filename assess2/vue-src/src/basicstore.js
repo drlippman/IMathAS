@@ -620,6 +620,14 @@ export const actions = {
         delete data.interquestion_pages;
       }
     }
+    if (data.hasOwnProperty('noprint') && data.noprint === 1) {
+      // want to block printing - inject print styles
+      let styleEl = document.createElement('style');
+      styleEl.type =  'text/css';
+      styleEl.media =  'print';
+      styleEl.innerText = 'body { display: none;}';
+      document.head.appendChild(styleEl);
+    }
     return data;
   }
 };
