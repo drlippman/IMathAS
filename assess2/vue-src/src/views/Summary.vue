@@ -3,6 +3,8 @@
     <summary-header class="headerpane" />
     <div class="flexpanes">
       <div style="flex-grow: 1">
+        <summary-diag-info />
+
         <summary-score-total />
 
         <div
@@ -38,6 +40,7 @@ import SummaryHeader from '@/components/summary/SummaryHeader.vue';
 import SummaryGbScore from '@/components/summary/SummaryGbScore.vue';
 import SummaryScoreTotal from '@/components/summary/SummaryScoreTotal.vue';
 import SummaryScoreList from '@/components/summary/SummaryScoreList.vue';
+import SummaryDiagInfo from '@/components/summary/SummaryDiagInfo.vue';
 import SummaryReshowQuestions from '@/components/summary/SummaryReshowQuestions.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import PreviousAttempts from '@/components/PreviousAttempts.vue';
@@ -53,6 +56,7 @@ export default {
     SummaryScoreList,
     SummaryCategories,
     SummaryReshowQuestions,
+    SummaryDiagInfo,
     PreviousAttempts,
     VueTabs,
     VueTab

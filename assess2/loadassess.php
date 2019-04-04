@@ -122,6 +122,9 @@ if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
 }
 
 $assessInfoOut['userfullname'] = $userfullname;
+if ($assessInfoOut['is_diag']) {
+  $assessInfoOut['diag_userid'] = substr($username,0,strpos($username,'~'));
+}
 
 //output JSON object
 echo json_encode($assessInfoOut);
