@@ -100,6 +100,17 @@ export default {
 </script>
 
 <style>
+table.qdetails {
+  border-collapse: collapse;
+  margin-top: 0.5em;
+  margin-bottom: 20px;
+}
+table.qdetails tr {
+  border-bottom: 1px solid #ccc;
+}
+table.qdetails td, table.qdetails th {
+  padding: 4px 8px;
+}
 .qdetails caption {
   text-align: left;
 }

@@ -103,14 +103,4 @@ export default {
 .pane-body {
   padding: 16px 20px;
 }
-table.qdetails {
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-table.qdetails tr {
-  border-bottom: 1px solid #ccc;
-}
-table.qdetails td, table.qdetails th {
-  padding: 4px 8px;
-}
 </style>
