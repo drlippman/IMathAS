@@ -89,7 +89,6 @@ export default {
   methods: {
     trySimilar () {
       actions.loadQuestion(this.qn, true);
-      this.expanded = false;
     }
   }
 };

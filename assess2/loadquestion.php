@@ -118,13 +118,37 @@ $assess_info->loadQuestionSettings(array($qid), true);
 
 // Try a Similar Question, if requested
 if ($doRegen) {
-    if ($assess_record->canRegenQuestion($qn, $qid)) {
-      $qid = $assess_record->buildNewQuestionVersion($qn, $qid);
-      $assess_info->loadQuestionSettings(array($qid), true);
-    } else {
-      echo '{"error": "out_of_regens"}';
+  if (!isset($sessiondata['regendelay'])) {
+    $sessiondata['regendelay'] = 2;
+  }
+  if (isset($sessiondata['lastregen'])) {
+    if ($now-$sessiondata['lastregen']<$sessiondata['regendelay']) {
+      $sessiondata['regendelay'] = 5;
+      if (!isset($sessiondata['regenwarnings'])) {
+        $sessiondata['regenwarnings'] = 1;
+      } else {
+        $sessiondata['regenwarnings']++;
+      }
+      if ($sessiondata['regenwarnings']>10) {
+        $stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
+        $stm->execute(array(':time'=>$now, ':log'=>"Over 10 regen warnings triggered by $userid"));
+      }
+      echo '{"error": "fast_regen"}';
       exit;
     }
+    if ($now - $sessiondata['lastregen'] > 20) {
+      $sessiondata['regendelay'] = 2;
+    }
+  }
+  $sessiondata['lastregen'] = $now;
+  writesessiondata();
+  if ($assess_record->canRegenQuestion($qn, $qid)) {
+    $qid = $assess_record->buildNewQuestionVersion($qn, $qid);
+    $assess_info->loadQuestionSettings(array($qid), true);
+  } else {
+    echo '{"error": "out_of_regens"}';
+    exit;
+  }
 }
 
 // jump to answer, if requested
