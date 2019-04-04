@@ -217,7 +217,7 @@ export const actions = {
         this.copySettings(response);
 
         // update tree reader with score
-        if (store.assessInfo.in_tree_reader && !store.assessInfo.in_practice) {
+        if (document.referrer.match(/treereader/) && !store.assessInfo.in_practice) {
           this.updateTreeReader();
         }
 

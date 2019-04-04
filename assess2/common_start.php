@@ -64,3 +64,10 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
   header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
   header("Access-Control-Allow-Headers: Origin");
 }
+
+$useeditor = 1;
+
+if (isset($CFG['GEN']['keeplastactionlog']) && isset($sessiondata['loginlog'.$testsettings['courseid']])) {
+  $stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
+  $stm->execute(array(':lastaction'=>time(), ':id'=>$_GET['cid']));
+}

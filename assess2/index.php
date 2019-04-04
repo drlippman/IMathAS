@@ -12,7 +12,12 @@ if ($isdiag) {
   $hideAllHeaderNav = true;
 }
 $isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
+$inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
 
+if ($isltilimited || $inTreeReader) {
+  $flexwidth = true;
+  $hideAllHeaderNav = true;
+}
 
 $placeinhead = '<script type="text/javascript">var APIbase = "'.$GLOBALS['basesiteurl'].'/assess2/";</script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/app.css?v='.$lastupdate.'" />';
