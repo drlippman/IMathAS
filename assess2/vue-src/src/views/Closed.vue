@@ -178,6 +178,7 @@ export default {
     handlePrimary () {
       if (this.settings.can_use_latepass > 0) {
         // redeem latepass
+        actions.redeemLatePass();
       } else if (this.settings.available === 'practice') {
         // start practice mode
         actions.startAssess(true, '', []);

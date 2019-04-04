@@ -382,6 +382,30 @@ export const actions = {
         store.inTransit = false;
       });
   },
+  redeemLatePass () {
+    store.inTransit = true;
+    window.$.ajax({
+      url: store.APIbase + 'uselatepass.php' + store.queryString,
+      type: 'POST',
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        response = this.processSettings(response);
+        this.copySettings(response);
+        Router.push('/');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
   getVerificationData(qns) {
     let out = {};
     let by_question = (store.assessInfo.submitby === 'by_question');

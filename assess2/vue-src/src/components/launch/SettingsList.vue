@@ -86,9 +86,9 @@ export default {
         var origduedate = this.$d(new Date(settings.original_enddate * 1000), 'long');
         dateobj.sub = this.$t('setlist.originally_due', { date: origduedate });
         if (settings.extended_with.type === 'latepass') {
-          dateobj.sub += this.$tc('setlist.latepass_used', settings.extended_with.n);
+          dateobj.sub += ' ' + this.$tc('setlist.latepass_used', settings.extended_with.n);
         } else {
-          dateobj.sub += this.$t('setlist.extension');
+          dateobj.sub += ' ' + this.$t('setlist.extension');
         }
         if (settings.exceptionpenalty > 0) {
           dateobj.alert = this.$t('setlist.penalty', { p: settings.exceptionpenalty });

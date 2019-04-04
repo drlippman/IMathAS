@@ -76,7 +76,9 @@ class AssessInfo
     $stm->execute(array($uid, $this->curAid));
     $this->exception = $stm->fetch(PDO::FETCH_NUM);
 
-    if ($this->exception !== null && $this->exception[4] !== null) {
+    $this->assessData['hasexception'] = ($this->exception !== false);
+
+    if ($this->exception !== false && $this->exception[4] !== null) {
       //override default exception penalty
       $this->assessData['exceptionpenalty'] = $this->exception[4];
     }
@@ -93,7 +95,7 @@ class AssessInfo
           $this->assessData['extended_with'] = array('type'=>'manual');
         } else {
           $this->assessData['extended_with'] = array(
-            'latepass' => 'manual',
+            'type' => 'latepass',
             'n' => $this->exception[2]
           );
         }
@@ -660,6 +662,48 @@ class AssessInfo
       $this->questionData[$i]['regen_penalty'] = 0;
       $this->questionData[$i]['showans'] = 'with_score';
     }
+  }
+
+  /**
+   * Redeem LatePass(es) to extend the assessment
+   * @param  int  $uid              User ID
+   * @param  integer $latepasshrs   Number of hours a latepass extends assessments
+   * @param  integer $courseenddate The course end date
+   * @return boolean  True if latepass successfully redeemed
+   */
+  public function redeemLatePass($uid, $latepasshrs=24, $courseenddate=2000000000) {
+    $now = time();
+    if ($this->assessData['can_use_latepass'] > 0) {
+      $LPneeded = $this->assessData['can_use_latepass'];
+      $stm = $this->DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
+      $stm->execute(array(
+        ':lps'=>$LPneeded,
+        ':lps2'=>$LPneeded,
+        ':userid'=>$uid,
+        ':courseid'=>$this->cid
+      ));
+      if ($stm->rowCount()>0) {
+        $enddate = min(
+          strtotime("+".($latepasshrs*$LPneeded)." hours", $this->assessData['enddate']),
+          $courseenddate
+        );
+        if ($LPcutoff>0) {
+          $enddate = min($enddate, $LPcutoff);
+        }
+        if ($this->assessData['hasexception']) { //already have exception
+          $stm = $this->DBH->prepare("UPDATE imas_exceptions SET enddate=:enddate,islatepass=islatepass+:lps WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+          $stm->execute(array(':lps'=>$LPneeded, ':userid'=>$uid,
+            ':assessmentid'=>$this->curAid, ':enddate'=>$enddate));
+        } else {
+          $stm = $this->DBH->prepare("INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES (:userid, :assessmentid, :startdate, :enddate, :islatepass, :itemtype)");
+          $stm->execute(array(':userid'=>$uid, ':assessmentid'=>$this->curAid,
+            ':startdate'=>$this->assessData['startdate'], ':enddate'=>$enddate,
+            ':islatepass'=>$LPneeded, ':itemtype'=>'A'));
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
  /**
