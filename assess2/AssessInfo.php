@@ -706,6 +706,46 @@ class AssessInfo
     return false;
   }
 
+  /**
+   * Parses and reformats viddata
+   * @return array JSON object with video id and cues
+   */
+  public function getVideoCues() {
+    if ($this->assessData['viddata'] === '') {
+      return array();
+    }
+    $viddata = json_decode($this->assessData['viddata'], true);
+    if ($viddata !== null) {
+      return $viddata;
+    }
+    $tmpdata = unserialize($this->assessData['viddata']);
+    $out = array();
+    $vidid = array_shift($tmpdata);
+    if (is_array($vidid)) {
+      $out['vidid'] = $vidid[0];
+      $out['vidar'] = $vidid[1];
+    } else {
+      $out['vidid'] = $vidid;
+      $out['vidar'] = "16:9";
+    }
+    $out['cues'] = array();
+    foreach ($tmpdata as $cue=>$data) {
+      $out['cues'][$cue] = array(
+        'title' => $data[0],
+        'time' => $data[1]
+      );
+      if (isset($data[2])) {
+        $out['cues'][$cue]['qn'] = $data[2];
+      }
+      if (isset($data[3])) {
+        $out['cues'][$cue]['followuptime'] = $data[3];
+        $out['cues'][$cue]['followuplink'] = $data[4];
+        $out['cues'][$cue]['followuptitle'] = $data[5];
+      }
+    }
+    return $out;
+  }
+
  /**
   * Normalizes question settings pulled from the database
   * and replaces them with defaults when appropriate.

@@ -42,7 +42,7 @@ import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
 
 export default {
-  name: 'FullPagedHeader',
+  name: 'FullPagedNav',
   props: ['page'],
   components: {
     Icons,

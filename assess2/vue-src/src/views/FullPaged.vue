@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <assess-header />
-    <full-paged-header :page="page" />
+    <full-paged-nav :page="page" />
     <div class="scrollpane">
       <div
         class = "questionpane"
@@ -69,7 +69,7 @@
 
 <script>
 import AssessHeader from '@/components/AssessHeader.vue';
-import FullPagedHeader from '@/components/FullPagedHeader.vue';
+import FullPagedNav from '@/components/FullPagedNav.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
@@ -80,7 +80,7 @@ export default {
   components: {
     Question,
     AssessHeader,
-    FullPagedHeader,
+    FullPagedNav,
     FullQuestionHeader,
     InterQuestionTextList
   },

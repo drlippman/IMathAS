@@ -2,11 +2,15 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Launch from './views/Launch.vue';
 import Closed from './views/Closed.vue';
+import Summary from './views/Summary.vue';
 import Skip from './views/Skip.vue';
 import Full from './views/Full.vue';
 import Print from './views/Print.vue';
 import FullPaged from './views/FullPaged.vue';
-import Summary from './views/Summary.vue';
+//const Skip = () => import(/* webpackChunkName: "skip" */ './views/Skip.vue');
+//const Full = () => import(/* webpackChunkName: "full" */ './views/Full.vue');
+//const Print = () => import(/* webpackChunkName: "print" */ './views/Print.vue');
+//const FullPaged = () => import(/* webpackChunkName: "fullpaged" */ './views/FullPaged.vue');
 import { store, actions } from './basicstore';
 
 Vue.use(Router);
@@ -77,6 +81,30 @@ const router = new Router({
       path: '/full/page/:page',
       name: 'fullpaged',
       component: FullPaged,
+      beforeEnter: (to, from, next) => {
+        // if no active attempt, route to launch
+        if (store.inProgress) {
+          next();
+        } else {
+          next({path: '/', replace: true});
+        }
+      }
+    },
+    {
+      path: '/videocued/:cue',
+      component: VideoCued,
+      beforeEnter: (to, from, next) => {
+        // if no active attempt, route to launch
+        if (store.inProgress) {
+          next();
+        } else {
+          next({path: '/', replace: true});
+        }
+      }
+    },
+    {
+      path: '/videocued/:cue/:toshow',
+      component: VideoCued,
       beforeEnter: (to, from, next) => {
         // if no active attempt, route to launch
         if (store.inProgress) {
