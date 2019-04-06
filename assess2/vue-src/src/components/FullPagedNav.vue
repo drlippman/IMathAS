@@ -69,6 +69,7 @@ export default {
       if (this.hasIntro) {
         out[0] = {
           internallink: '/full/page/0',
+          title: this.$t('intro'),
           disppage: 0
         };
       }

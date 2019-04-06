@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <assess-header></assess-header>
-    <videocued-header :cue="cue" :toshow="toshow" />
+    <videocued-nav :cue="cue" :toshow="toshow" />
     <div class="scrollpane">
       <div
         class = "questionpane"
@@ -10,7 +10,7 @@
         v-html = "intro"
         ref = "introtext"
       />
-      <div id = "playerwrapper">
+      <div id = "playerwrapper" v-show = "cue > -1 && qn === -1">
         <div id = "player">
         </div>
       </div>
@@ -84,6 +84,7 @@ foreach viddata
    show link with followuptitle, jumps to main segment end time
 */
 import AssessHeader from '@/components/AssessHeader.vue';
+import VideocuedNav from '@/components/VideocuedNav.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
 import Question from '@/components/question/Question.vue';
@@ -93,6 +94,7 @@ export default {
   name: 'videocued',
   components: {
     FullQuestionHeader,
+    VideocuedNav,
     Question,
     InterQuestionTextList,
     AssessHeader
@@ -110,7 +112,7 @@ export default {
     },
     qn () {
       if (this.toshow === 'q') {
-        return parseInt(store.assessInfo.videocues[cue].qn);
+        return parseInt(store.assessInfo.videocues[this.cue].qn);
       } else {
         return -1;
       }

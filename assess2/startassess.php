@@ -224,6 +224,14 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
 }
 
+// grab video cues if needed
+if ($assess_info->getSetting('displaymethod') === 'videocued') {
+  $viddata = $assess_info->getVideoCues();
+  $assessInfoOut['videoid'] = $viddata['vidid'];
+  $assessInfoOut['videoar'] = $viddata['vidar'];
+  $assessInfoOut['videocues'] = $viddata['cues'];
+}
+
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
 $generate_html = ($assess_info->getSetting('displaymethod') == 'full');

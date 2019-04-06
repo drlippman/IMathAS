@@ -201,7 +201,33 @@ $assessGroups = [
           2=>['questionsetid' => 0]
         ],
         'itemorder' => [0,1,2]
-      ]
+      ],
+      [
+        'name' => 'VideoCued 1',
+        'summary' => 'by-question, video cued, showscores during, showans after last try, no penalties<br>
+                      3 regens, 2 tries per, no penalties',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'videocued',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1],
+          2=>['questionsetid' => 0]
+        ],
+        'itemorder' => [0,1,2],
+        'viddata' => 'a:6:{i:0;a:2:{i:0;s:11:"p_di4Zn4wz4";i:1;s:4:"16:9";}i:1;a:6:{i:0;s:11:"First Q Seg";i:1;s:2:"23";i:2;s:1:"0";i:3;s:2:"33";i:4;b:1;i:5;s:16:"First Q Followup";}i:2;a:3:{i:0;s:12:"Second Q Seg";i:1;s:2:"45";i:2;s:1:"1";}i:3;a:2:{i:0;s:23:"Vid seg between 2 and 3";i:1;s:2:"51";}i:4;a:3:{i:0;s:11:"Third Q seg";i:1;s:2:"55";i:2;s:1:"2";}i:5;a:1:{i:0;s:10:"Conclusion";}}'
+      ],
     ]
   ],
   [

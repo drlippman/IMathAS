@@ -731,14 +731,16 @@ class AssessInfo
     $out['cues'] = array();
     foreach ($tmpdata as $cue=>$data) {
       $out['cues'][$cue] = array(
-        'title' => $data[0],
-        'time' => $data[1]
+        'title' => $data[0]
       );
+      if (isset($data[1])) {
+        $out['cues'][$cue]['time'] = intval($data[1]);
+      }
       if (isset($data[2])) {
-        $out['cues'][$cue]['qn'] = $data[2];
+        $out['cues'][$cue]['qn'] = intval($data[2]);
       }
       if (isset($data[3])) {
-        $out['cues'][$cue]['followuptime'] = $data[3];
+        $out['cues'][$cue]['followuptime'] = intval($data[3]);
         $out['cues'][$cue]['followuplink'] = $data[4];
         $out['cues'][$cue]['followuptitle'] = $data[5];
       }

@@ -102,6 +102,12 @@ export const actions = {
             } else {
               Router.push('/full');
             }
+          } else if (store.assessInfo.displaymethod === 'videocued') {
+            if (store.assessInfo.intro != '') {
+              Router.push('/videocued/0');
+            } else {
+              Router.push('/videocued/1/v');
+            }
           }
         }
       })
