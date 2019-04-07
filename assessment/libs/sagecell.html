@@ -1,7 +1,38 @@
 <html><body>
 <h1>Macro Library sagecell</h1>
-<p>Sagecell integration documentation, Version 1.0, Jan 2018</p>
+<p>Sagecell integration documentation, Version 2.0, Mar 2019</p>
+<ol>
+  <li><a href="#qc">Integration via Macros in Question Common Control</a></li>
+  <li><a href="#qt">Integration via JavaScript in Question Text</a></li>
+</ol>
+<h2 id="qc">Integration via Macros in Question Common Control</h2>
+<p>
+This library provides functions to create SageCells and transfer their output into answerboxes. To use the library in a question, make sure to call
+</p>
+<pre>loadlibrary("sagecell1");</pre>
+<p>
+before calling the functions.
+</p>
 
+<ul>
+<li><a href="#sagecell">sagecell</a></li>
+<li><a href="#sagecellTransfer">sagecellTransfer</a></li>
+</ul>
+<h3><a name="sagecell">sagecell</a></h3>
+<p>
+<i>sagecell(script)</i> generates a SageCell with content <i>script</i>.
+<p>
+Usage example: <i>$s=sagecell("1+1")</i>, place $s in question text
+</p>
+<h3><a name="sagecellTransfer">sagecellTransfer</a></h3>
+<p>
+<i>sagecellTransfer(script,questionNr,[label,partNr])</i> generates a SageCell with content <i>script</i> and a button with <i>label</i> (default: "Transfer"). Clicking the button transfers the content of the SageCell output into the answerbox. For multipart questions, <i>partNr</i> determines the index of the target answerbox.
+</p>
+<p>
+Usage example: <i>$s = sagecellTransfer("1+1",$thisq,"Use as Answer to Part 2",1)</i>, place $s in question text.
+</p>
+
+<h2 id="qt">Integration via HTML in Question Text</h2>
 <p>There is not need to actually load this macro library. This documentation
 describes how to set up your HTML to enable SageCell integration.</p>
 
