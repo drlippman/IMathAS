@@ -14,6 +14,7 @@
         v-for="curqn in questionArray"
         :key="curqn"
         :class="{inactive: curqn != qn, questionpane: true}"
+        :aria-hidden = "curqn != qn"
       >
         <inter-question-text-list
           pos = "before"

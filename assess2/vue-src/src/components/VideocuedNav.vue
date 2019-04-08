@@ -9,29 +9,6 @@
         <videocued-nav-list-item :option="option" />
       </template>
     </menu-button>
-
-    <router-link
-      :to="prevLink"
-      tag="button"
-      :disabled="curOption <= 0"
-      class="secondarybtn"
-      id="qprev"
-      :aria-label="$t('previous')"
-      v-if = "showNextPrev"
-    >
-      <icons name="left"/>
-    </router-link>
-    <router-link
-      :to="nextLink"
-      tag="button"
-      :disabled="curOption>=navOptions.length-1"
-      class="secondarybtn"
-      id="qnext"
-      :aria-label="$t('next')"
-      v-if = "showNextPrev"
-    >
-      <icons name="right" />
-    </router-link>
   </div>
 </template>
 
@@ -62,6 +39,14 @@ export default {
           type: ''
         });
       }
+      /*
+       foreach viddata
+       link using segment title, jumps to previous segment end time
+       if has a qn,
+        link to jump to question
+        if has followup with showlink==true
+         show link with followuptitle, jumps to main segment end time
+      */
       for (let i=0; i < store.assessInfo.videocues.length; i++) {
         let cuedata = store.assessInfo.videocues[i];
         let cuen = i+1;
@@ -122,6 +107,31 @@ export default {
     }
   }
 };
+/* Next/Prev buttons, removed since they don't make much sense in this view
+
+<router-link
+  :to="prevLink"
+  tag="button"
+  :disabled="curOption <= 0"
+  class="secondarybtn"
+  id="qprev"
+  :aria-label="$t('previous')"
+  v-if = "showNextPrev"
+>
+  <icons name="left"/>
+</router-link>
+<router-link
+  :to="nextLink"
+  tag="button"
+  :disabled="curOption>=navOptions.length-1"
+  class="secondarybtn"
+  id="qnext"
+  :aria-label="$t('next')"
+  v-if = "showNextPrev"
+>
+  <icons name="right" />
+</router-link>
+ */
 </script>
 
 <style>

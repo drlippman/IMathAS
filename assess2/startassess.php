@@ -204,7 +204,7 @@ $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
   'extended_with', 'timelimit', 'timelimit_type', 'allowed_attempts',
   'latepasses_avail', 'latepass_extendto', 'showscores', 'intro',
-  'interquestion_text', 'resources', 'video_id', 'category_urls', 'help_features',
+  'interquestion_text', 'resources', 'category_urls', 'help_features',
   'points_possible'
 );
 if ($in_practice) {

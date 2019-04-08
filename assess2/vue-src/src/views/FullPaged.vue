@@ -17,6 +17,7 @@
         v-for = "(pageData,pagenum) in allPages"
         :key = "pagenum"
         :class="{inactive: pagenum !== page, questionpane: true}"
+        :aria-hidden = "pagenum !== page"
       >
         <div v-if = "pageData[0].questions.length === 0">
           <inter-question-text-list
