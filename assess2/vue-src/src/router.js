@@ -92,19 +92,7 @@ const router = new Router({
       }
     },
     {
-      path: '/videocued/:cue',
-      component: Videocued,
-      beforeEnter: (to, from, next) => {
-        // if no active attempt, route to launch
-        if (store.inProgress) {
-          next();
-        } else {
-          next({path: '/', replace: true});
-        }
-      }
-    },
-    {
-      path: '/videocued/:cue/:toshow',
+      path: '/videocued',
       component: Videocued,
       beforeEnter: (to, from, next) => {
         // if no active attempt, route to launch

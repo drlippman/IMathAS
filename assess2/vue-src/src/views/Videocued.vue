@@ -1,7 +1,11 @@
 <template>
   <div class="home">
     <assess-header></assess-header>
-    <videocued-nav :cue="cue" :toshow="toshow" />
+    <videocued-nav
+      :cue="cue"
+      :toshow="toshow"
+      @jumpto="jumpTo"
+    />
     <div class="scrollpane">
       <div
         class = "questionpane"
@@ -27,6 +31,7 @@
         v-if = "qn != -1"
         :qn = "qn"
         :cue = "cue"
+        @jumpto="jumpTo"
       />
       <div
         v-for="curqn in questionArray"
@@ -98,23 +103,15 @@ export default {
       videoWidth: 600,
       aspectRatioPercent: 56.2,
       ytplayer: null,
-      timer: null
+      timer: null,
+      cue: 0,
+      toshow: 'v'
     }
   },
   computed: {
-    cue () {
-      return parseInt(this.$route.params.cue) - 1;
-    },
     curCue () {
       if (this.cue > -1) {
         return store.assessInfo.videocues[this.cue];
-      }
-    },
-    toshow () {
-      if (this.$route.params.hasOwnProperty('toshow')) {
-        return this.$route.params.toshow;
-      } else {
-        return '';
       }
     },
     qn () {
@@ -192,8 +189,7 @@ export default {
         !(this.toshow === 'f' && this.cue === this.timeCues[curTime]) &&
         this.ytplayer.getPlayerState() == window.YT.PlayerState.PLAYING
       ) {
-        let cuen = parseInt(this.timeCues[curTime]) + 1;
-        this.$router.replace('/videocued/' + cuen + '/q');
+        this.jumpTo(parseInt(this.timeCues[curTime]), 'q');
       } else {
         // wait again
         this.timer = window.setTimeout(()=>{this.checkTime();}, 200);
@@ -212,18 +208,15 @@ export default {
         // video ended - check to see if there's a question to show.
         if (this.toshow == 'v' && this.curCue.hasOwnProperty('qn')) {
           window.clearTimeout(this.timer);
-          this.$router.replace('/videocued/' + this.cue + '/q');
+          this.jumpTo(this.cue, 'q');
         }
       }
     },
     handlePlayerError(event) {
       store.errorMsg = event.data;
-    }
-  },
-  watch: {
-    '$route' (to, from) {
-      let newCueNum = parseInt(to.params.cue) - 1;
-      if (newCueNum == -1 || to.params.toshow == 'q') {
+    },
+    jumpTo(newCueNum, newToshow) {
+      if (newCueNum === -1 || newToshow === 'q') {
         // if showing a question, pause the video
         this.exitFullscreen();
         if (this.ytplayer) {
@@ -232,7 +225,7 @@ export default {
       } else {
         let newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
-        if (to.params.toshow == 'v') {
+        if (newToshow == 'v') {
           if (newCueNum > 0) {
             let prevCue = store.assessInfo.videocues[newCueNum-1];
             if (prevCue.hasOwnProperty('followuptime')) {
@@ -243,20 +236,24 @@ export default {
               seektime = prevCue.time;
             }
           }
-        } else if (to.params.toshow == 'f') {
+        } else if (newToshow == 'f') {
           // start of followup is end of video segment
           seektime = newCue.time;
         }
         // seek to right place in video
         this.ytplayer.seekTo(seektime, true);
-        // if coming from inside view, play video now
-        if (from.path.match(/videocued/)) {
-          this.ytplayer.playVideo();
-        }
+        this.ytplayer.playVideo();
       }
+      this.cue = newCueNum;
+      this.toshow = newToshow;
     }
   },
   created () {
+    // don't show intro if it's empty
+    if (store.assessInfo.intro !== '') {
+      this.cue = -1;
+      this.toshow = 'i';
+    }
     //async load YouTube API
     window.onYouTubePlayerAPIReady = () => {
       this.youtubeApiLoaded = true;

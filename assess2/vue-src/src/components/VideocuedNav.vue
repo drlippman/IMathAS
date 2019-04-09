@@ -34,9 +34,10 @@ export default {
       var out = [];
       if (this.hasIntro) {
         out.push({
-          internallink: '/videocued/0',
+          //internallink: '/videocued/0',
+          onclick: () => this.$emit('jumpto', -1, 'i'),
           title: this.$t('intro'),
-          type: ''
+          type: 'i'
         });
       }
       /*
@@ -49,16 +50,17 @@ export default {
       */
       for (let i=0; i < store.assessInfo.videocues.length; i++) {
         let cuedata = store.assessInfo.videocues[i];
-        let cuen = i+1;
         out.push({
-          internallink: '/videocued/' + cuen + '/v',
+          //internallink: '/videocued/' + cuen + '/v',
+          onclick: () => this.$emit('jumpto', i, 'v'),
           type: 'v',
           title: cuedata.title,
           cue: i
         });
         if (cuedata.hasOwnProperty('qn')) {
           out.push({
-            internallink: '/videocued/' + cuen + '/q',
+            //internallink: '/videocued/' + cuen + '/q',
+            onclick: () => this.$emit('jumpto', i, 'q'),
             type: 'q',
             title: this.$t('question_n', { n: parseInt(cuedata.qn) + 1 }),
             qn: parseInt(cuedata.qn),
@@ -67,7 +69,8 @@ export default {
         }
         if (cuedata.hasOwnProperty('followuptime')) {
           out.push({
-            internallink: '/videocued/' + cuen + '/f',
+            //internallink: '/videocued/' + cuen + '/f',
+            onclick: () => this.$emit('jumpto', i, 'f'),
             type: 'f',
             title: cuedata.followuptitle,
             cue: i

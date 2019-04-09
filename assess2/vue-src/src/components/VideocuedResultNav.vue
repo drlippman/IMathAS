@@ -3,23 +3,21 @@
     v-if = "showNav"
     class="video-result-nav"
   >
-    <router-link
+    <button
       v-if = "hasNextVid"
-      tag = "button"
-      :to = "nextVidLink"
+      @click = "nextVidLink"
       :class="{'primary': status !== 'correct' || !showSkip}"
     >
       {{ $t('videocued.continue', {'title': nextVidTitle}) }}
-    </router-link>
+    </button>
 
-    <router-link
+    <button
       v-if = "showSkip"
-      tag = "button"
-      :to = "skipLink"
+      @click = "skipLink"
       class="primary"
     >
       {{ $t('videocued.skipto', {'title': skipTitle}) }}
-    </router-link>
+    </button>
   </div>
 </template>
 
@@ -69,22 +67,12 @@ export default {
         store.assessInfo.videocues.hasOwnProperty(this.cue+1)
       );
     },
-    nextVidLink () {
-      if (this.nextVidType === 'followup') {
-        return '/videocued/' + (this.cue+1) + '/f';
-      } else {
-        return '/videocued/' + (this.cue+2) + '/v';
-      }
-    },
     nextVidTitle () {
       if (this.nextVidType === 'followup') {
         return store.assessInfo.videocues[this.cue].followuptitle;
       } else {
         return store.assessInfo.videocues[this.cue+1].title;
       }
-    },
-    skipLink () {
-      return '/videocued/' + (this.cue+2) + '/v';
     },
     showSkip () {
       return (this.status === 'correct' &&
@@ -96,6 +84,18 @@ export default {
       return store.assessInfo.videocues[this.cue+1].title;
     }
   },
+  methods: {
+    skipLink () {
+      this.$emit('jumpto', this.cue+1, 'v');
+    },
+    nextVidLink () {
+      if (this.nextVidType === 'followup') {
+        this.$emit('jumpto', this.cue, 'f');
+      } else {
+        this.$emit('jumpto', this.cue+1, 'v');
+      }
+    }
+  }
 }
 </script>
 

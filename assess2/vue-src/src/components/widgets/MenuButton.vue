@@ -34,7 +34,9 @@
       <li v-if="!!header" class="menubutton-header">
         {{ header }}
       </li>
-      <li v-for="(option,index) in options" :key="index">
+      <li v-for="(option,index) in options" :key="index"
+        @click = "handleClick(index)"
+      >
         <component
           v-bind = "getLinkProps(option,index)"
           @click = "toggleOpen"
@@ -95,12 +97,16 @@ export default {
           is: 'router-link',
           to: option.internallink
         };
-      } else {
+      } else if (option.link) {
         return {
           is: 'a',
           href: option.link,
           target: '_blank'
         };
+      } else {
+        return {
+          is: 'span'
+        }
       }
     },
     toggleOpen (val) {
@@ -137,6 +143,11 @@ export default {
       let wrapperHeight = wrapper.clientHeight;
       let offset = selectedPos - (wrapperHeight / 2 - selectedHeight / 2);
       wrapper.scrollTop = offset;
+    },
+    handleClick (index) {
+      if (this.options[index].onclick) {
+        this.options[index].onclick();
+      }
     },
     handleUpDown (val) {
       if (!this.open) {
@@ -182,7 +193,7 @@ export default {
       }
     },
     handleBlur () {
-      this.closetimer = setTimeout(() => { this.open = false; }, 50);
+      //this.closetimer = setTimeout(() => { this.open = false; }, 50);
     },
     handleFocus () {
       clearTimeout(this.closetimer);
@@ -229,10 +240,11 @@ export default {
   padding: 0;
   border-bottom: 1px solid #ddd;
 }
-.menubutton li a {
+.menubutton li a, .menubutton li > span {
   padding: 12px 20px;
   display: block;
   white-space: nowrap;
+  cursor: pointer;
 }
 li.menubutton-header {
   padding: 12px 20px;
