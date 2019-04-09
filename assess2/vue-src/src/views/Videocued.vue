@@ -21,7 +21,7 @@
         >
           <div
             class="fluid-width-video-wrapper"
-            :style = "{'padding-top': aspectRatioPercent + '%'}"
+            :style = "{'padding-bottom': aspectRatioPercent + '%'}"
           >
             <div id = "player"></div>
           </div>
@@ -130,6 +130,23 @@ export default {
       }
       return out;
     },
+    nextVidTimes () {
+      // we'll want to update the nav when a followup ends, or when a
+      // video segment with a question ends
+      let out = {};
+      for (let i=0; i<store.assessInfo.videocues.length; i++) {
+        if (store.assessInfo.videocues[i].hasOwnProperty('followuptime') &&
+          store.assessInfo.videocues.hasOwnProperty(i+1)
+        ) {
+          out[store.assessInfo.videocues[i].followuptime] = i;
+        } else if (!store.assessInfo.videocues[i].hasOwnProperty('qn') &&
+          store.assessInfo.videocues.hasOwnProperty(i+1)
+        ) {
+          out[store.assessInfo.videocues[i].time] = i;
+        }
+      }
+      return out;
+    },
     intro () {
       return store.assessInfo.intro;
     },
@@ -191,6 +208,12 @@ export default {
       ) {
         this.jumpTo(parseInt(this.timeCues[curTime]), 'q');
       } else {
+        if (this.nextVidTimes.hasOwnProperty(curTime) &&
+          this.cue == this.nextVidTimes[curTime]
+        ) {
+          this.cue = this.cue+1;
+          this.toshow = 'v';
+        }
         // wait again
         this.timer = window.setTimeout(()=>{this.checkTime();}, 200);
       }
