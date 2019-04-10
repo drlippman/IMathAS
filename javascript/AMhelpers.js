@@ -2227,6 +2227,17 @@ function initShowAnswer() {
 				.removeClass("hidden");
 		});
 	});
+	$("input.dsbtn + div.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
+	$("input.dsbtn").each(function() {
+		var idnext = $(this).siblings("div:first-of-type").attr("id");
+		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
+		  .off("click.sashow").on("click.sashow", function() {
+			$(this).attr("aria-expanded",true)
+		  	  .siblings("div:first-of-type")
+				.attr("aria-expanded",true).attr("aria-hidden",false)
+				.removeClass("hidden");
+		});
+	});
 }
 $(window).on("ImathasEmbedReload", initShowAnswer);
 initstack.push(initShowAnswer);

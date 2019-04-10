@@ -820,7 +820,7 @@ if ($stm->rowCount()==0) {
 
 					$query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
 					$query .= "AND imt.userid=:userid JOIN imas_assessments AS ia ON ic.id=ia.courseid ";
-					$query .= "WHERE ic.deleted=0 AND ic.ancestors REGEXP :cregex AND ia.ancestors REGEXP :aregex ORDER BY ic.name";
+					$query .= "WHERE ic.available<4 AND ic.ancestors REGEXP :cregex AND ia.ancestors REGEXP :aregex ORDER BY ic.name";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(
 						':userid'=>$userid, 

@@ -717,7 +717,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 
-			if (isset($search) && ($searchall==0 || $searchlikes!='')) {
+			if (isset($search) && ($searchall==0 || $searchlikes!='' || $searchmine==1)) {
 				$qarr = $searchlikevals;
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
@@ -745,6 +745,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
 					$query .= " LIMIT 300";
+					$offset = 0;
+					if (isset($_REQUEST['offset'])) {
+						$offset = Sanitize::onlyInt($_REQUEST['offset']);
+						if ($offset>0 && $offset < 1000000000) {
+							$query .= " OFFSET $offset";
+						}
+					}
 				}
 
 				if ($search=='recommend' && count($existingq)>0) {
@@ -1245,7 +1252,7 @@ if ($overwriteBody==1) {
 
 	</form>
 <?php
-			if ($searchall==1 && trim($search)=='') {
+			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
 				echo "Must provide a search term when searching all libraries";
 			} elseif (isset($search)) {
 				if ($noSearchResults) {
@@ -1336,8 +1343,18 @@ if ($overwriteBody==1) {
 <?php
 					}
 				}
-				if ($searchall==1 && $searchlimited) {
-					echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
+				if ($searchall==1 && ($searchlimited || $offset>0)) {
+					echo '<tr><td></td><td><i>'._('Search cut off at 300 results');
+					echo '<br>'._('Showing ').($offset+1).'-'.($offset + 300).'. ';
+					if ($offset>0) {
+						$prevoffset = max($offset-300, 0);
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$prevoffset\">"._('Previous').'</a> ';
+					}
+					if ($searchlimited) {
+						$nextoffset = $offset+300;
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$nextoffset\">"._('Next').'</a> ';
+					}
+					echo '</i></td></tr>';
 				}
 ?>
 			</tbody>

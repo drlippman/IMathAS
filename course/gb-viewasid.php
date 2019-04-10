@@ -669,6 +669,7 @@
 			'id'=>$line['assessmentid'], 
 			'allowlate'=>$line['allowlate'],
 			'enddate'=>$line['enddate'],
+			'startdate'=>$line['startdate'],
 			'LPcutoff'=>$line['LPcutoff']
 			);
 			

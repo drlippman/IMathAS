@@ -71,11 +71,20 @@ makeaccttable(headers, $rows, $anshead, $ansarray, start number, &$anstypes, &$a
 <BR>ansarray:  an array of column arrays.  These are the answers to the to-be-filled-in columns
 <BR>start number: starting value for multipart
 <BR><h3><a name="makeaccttable2">makeaccttable2</a></h3>
-makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize)
+makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize, [$opts, $questions])
 <BR>headers:  array(title, colspan, title, colspan,...) or array(title,title,title) or array of these for multiple headers
 <BR>coltypes: array(true if scores, false if fixed), one for each column
-<BR>fixedrows: array(title, colspan, title, colspan,...), ignores coltypes
-<BR>columsn: an array for each column of fixed values or answer values
+<BR>fixedrows: array of array(title, colspan, title, colspan,...), ignores coltypes
+<BR>cols: an array for each column of fixed values or answer values
+<br>sn: The starting part number for the table
+<br>anstypes, answer, showanswer, displayformat, answerformat, answerboxsize: pass these
+  variables directly to the function; it will extend them will values determined
+  by the other inputs.
+<br>opts: optionsal array of options:
+<br>&nbsp;&nbsp; $opts['totrow']: row to treat as totals row (decorates above and below with lines) - optional
+<br>&nbsp;&nbsp; $opts['class']: class to use for table
+<br>&nbsp;&nbsp; $opts['ops']: a list of typeahead options for string entries
+<br>$questions: you only need to pass this if you're using $opts['ops']
 <BR><h3><a name="makeTchartsfromjournal">makeTchartsfromjournal</a></h3>
 makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize)
 <BR><h3><a name="scoreTchartsfromjournal">scoreTchartsfromjournal</a></h3>

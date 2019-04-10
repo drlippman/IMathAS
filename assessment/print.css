@@ -15,7 +15,7 @@ input.text {
 p.tips {
 	display: none;
 }
-input.btn {
+input.btn, input.sabtn, input.dsbtn {
 	display: none;
 }
 #bannerimg {

@@ -671,6 +671,26 @@ require_once("includes/sanitize.php");
 				exit;
 			}
 		}
+		if (isset($_POST['dochgmfa'])) {
+			require('includes/GoogleAuthenticator.php');
+			$MFA = new GoogleAuthenticator();
+			$mfasecret = $_POST['mfasecret'];
+			
+			if ($MFA->verifyCode($mfasecret, $_POST['mfaverify'])) {
+				$mfadata = array('secret'=>$mfasecret, 'last'=>'', 'laston'=>0);
+				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
+				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
+			} else {
+				require("header.php");
+				echo $pagetopper;
+				echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+				require("footer.php");
+				exit;
+			}
+		} else if (isset($_POST['delmfa'])) {
+			$stm = $DBH->prepare("UPDATE imas_users SET mfa = '' WHERE id = :uid");
+			$stm->execute(array(':uid'=>$userid));
+		}
 
 		require("includes/userprefs.php");
 		storeUserPrefs();

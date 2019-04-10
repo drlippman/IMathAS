@@ -115,7 +115,8 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT * FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		echo '<script type="text/javascript">function togglechgpw(val) { if (val) {document.getElementById("pwinfo").style.display="";} else {document.getElementById("pwinfo").style.display="none";} } </script>';
+		echo '<script type="text/javascript">function togglechgpw(val) { document.getElementById("pwinfo").style.display=val?"":"none"; } ';
+		echo 'function togglechgmfa(val) { document.getElementById("mfainfo").style.display = val?"":"none";}</script>';
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
 		}
@@ -136,6 +137,29 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"pw1\">Enter new password:</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">Verify new password:</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
 		echo '</div>';
+		if ($myrights>40 || $myspecialrights>0) {
+			if ($line['mfa']=='') {
+				require('includes/GoogleAuthenticator.php');
+				$MFA = new GoogleAuthenticator();
+				$mfasecret = $MFA->createSecret();
+				$mfaurl = $MFA->getOtpauthUrl($installname.':'.$line['SID'], $mfasecret, $installname);
+				echo '<span class=form><label for="dochgmfa">2-factor Authentication</label></span>';
+				echo '<span class="formright"><input type="checkbox" name="dochgmfa" id="dochgmfa" onclick="togglechgmfa(this.checked)" /> '._('Enable 2-factor authentication for admin actions').'</span><br class="form" />';
+				echo '<div style="display:none" id="mfainfo">';
+				echo '<script type="text/javascript" src="javascript/jquery.qrcode.min.js"></script>';
+				echo '<script type="text/javascript">$(function(){$("#mfaqrcode").qrcode({width:128,height:128,text:"'.Sanitize::encodeStringForJavascript($mfaurl).'"})});</script>';
+				echo '<input type=hidden name=mfasecret value="'.Sanitize::encodeStringForDisplay($mfasecret).'" />';
+				echo '<span class=form>Instructions:</span><span class=formright>To enable 2-factor authentication, you will need an app compatible with Google Authenticator. <a href="https://authy.com/">Authy</a> is recommended.';
+				echo 'Using the app, scan the QR code below. Once it is set up, enter the code provided in the box.</span><BR class=form>';
+				echo '<span class=form>QR Code:</span><span class=formright><span id="mfaqrcode"></span> </span><br class=form>';
+				echo "<span class=form><label for=\"mfaverify\">Enter code from app:</label></span> <input class=form id=mfaverify name=mfaverify size=8> <br class=form>\n";
+				echo '</div>'; 
+			} else {
+				echo '<span class=form><label for="delmfa">2-factor Authentication</label></span>';
+				echo '<span class="formright">2-factor authentication is currently enabled.  <input type="checkbox" name="delmfa" id="delmfa" /> '._('Disable').'</span><br class="form" />';
+			}
+				
+		}
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"".Sanitize::emailAddress($line['email'])."\"><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}

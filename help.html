@@ -2219,7 +2219,8 @@ The following macros create graphs or tables:
 <li><strong>showarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers.  Alternatively you can call this function with arguments
     showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "r", or "l" to center, left-align, or right align data,
-	  or can be an array with $opts["align"] for alignment, and $opts["caption"] to add a caption to the table.</li>
+	  or can be an array with $opts["align"] for alignment, and $opts["caption"] to add a caption to the table.  To align each column differently, provide a 
+	  a string with a character for each column, like "rcc"</li>
 <li><strong>showdataarray(array,[columns])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
     in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
 <li><strong>horizshowarrays(string,array,[string,array]...)</strong>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
@@ -2418,7 +2419,7 @@ These macros are for working with arrays:
 <li><strong>multicalconarray(calculation,varslist,var1array,var2array,etc.)</strong>  Returns an array, performing the given calculation on each set
     of elements from the given arrays.  Allows multivariable calculations.  Example:  $z= multicalconarray("x*y^2","x,y",$xs,$ys)</li>
 <li><strong>calconarrayif(array,calculation,ifcondition)</strong>:  Like calconarray, but allows you to specify a condition for each element for whether to
-    do the calculation.  Example:  $b = calconarray($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the
+    do the calculation.  Example:  $b = calconarrayif($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the
     other elements unchanged.</li>
 <li><strong>subarray(array,params)</strong>:  Creates a new array as a subset of the specified array.  The params can take several forms:
 	<ul>

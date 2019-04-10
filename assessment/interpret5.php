@@ -4,7 +4,7 @@
 //(c) 2006 David Lippman
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
-//require_once("mathphp.php");
+
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights');
 
@@ -637,11 +637,11 @@ function tokenize($str,$anstype,$countcnt) {
 //handle braces and variable variables in strings and qtext
 function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 	global $disallowedvar;
-	
+
 	//remove any blatent disallowed var
-	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str); 
+	$str = preg_replace('/('.str_replace('$','\\$',implode('|',$disallowedvar)).')\b/',_('Invalid variable'),$str);
 	//$str = str_replace($disallowedvar,_('Invalid variable'),$str);
-	
+
 	$startmarker = 0; $lastend = 0;
 	$invarvar = false;
 	$inbraces = false;
@@ -660,8 +660,8 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 					}
 				}
 				if (!$invarvar) {
-					if ($c<strlen($str)-1 && $str{$c+1}!=='$') {	
-						continue; //skip {b and { $a since won't parse as brace 
+					if ($c<strlen($str)-1 && $str{$c+1}!=='$') {
+						continue; //skip {b and { $a since won't parse as brace
 					} else {
 						$inbraces = true;
 					}
@@ -673,7 +673,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 				} else {
 					$outstr .= substr($str,$lastend,$c-$lastend);
 				}
-			}		
+			}
 		} else if ($str{$c}=='}' && ($invarvar || $inbraces)) {
 			$depth--;
 			if ($depth==0) {
@@ -710,8 +710,8 @@ function checkvarvarisallowed($inside) {
 	}
 	echo _('Invalid variable: ').$inside;
 	return false;
-}		
-	
+}
+
 //loads a macro library
 function loadlibrary($str) {
 	$str = str_replace(array("/",".",'"'),"",$str);
