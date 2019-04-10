@@ -6,7 +6,10 @@
 
 require_once('./AssessUtils.php');
 require_once('../filter/filter.php');
-require_once('../assessment/displayq2.php');
+require_once('displayq3.php');
+//TODO: should be passed to displayq instead of using globals
+$useeqnhelper = 4;
+$showtips = 2;
 
 /**
  * Primary class for working with assessment records

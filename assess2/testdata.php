@@ -66,6 +66,27 @@ $questionSet = [
     'qtype' => 'number',
     'control' => '$answer = rand(1,100)',
     'qtext' => '<p>This is some text</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>And some more</p><p>Type $answer</p>'
+  ],
+  9=>[
+    'uniqueid' => 1552587894535722,
+    'description' => 'Simple calculated',
+    'qtype' => 'calculated',
+    'control' => '$a = rand(2,9)'."\n".'$answerformat="fraction"'."\n".'$answer="1/$a"',
+    'qtext' => '<p>Enter `1/$a`</p>'
+  ],
+  10=>[
+    'uniqueid' => 1552587894535723,
+    'description' => 'Simple numfunc',
+    'qtype' => 'numfunc',
+    'control' => '$a = rand(2,9)'."\n".'$variables="x,y"'."\n".'$answer="$a(x+y)"',
+    'qtext' => '<p>Factor `$a x + $a y`</p>'
+  ],
+  11=>[
+    'uniqueid' => 1552587894535724,
+    'description' => 'calc ntuple',
+    'qtype' => 'calcntuple',
+    'control' => '$displayformat="pointlist"'."\n".'$answer="(1/2,3),(4,9)"',
+    'qtext' => '<p>Enter (1/2,3),(4,9)</p>'
   ]
 ];
 
@@ -747,6 +768,35 @@ $assessGroups = [
           1=>['questionsetid' => 1]
         ],
         'itemorder' => [0,1]
+      ]
+    ]
+  ],
+  [
+    'name' => 'Question types',
+    'assessments' => [
+      [
+        'name' => 'Qtypes 1',
+        'summary' => 'number,calculated',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'noprint' => 1,
+        'displaymethod' => 'skip',
+        'ptsposs' => 10,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 100,
+        'defpoints' => 5,
+        'defattempts' => 100,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 9],
+          2=>['questionsetid' => 10],
+          3=>['questionsetid' => 11],
+        ],
+        'itemorder' => [0,1,2,3]
       ]
     ]
   ],
