@@ -65,7 +65,8 @@ export default {
             type: 'q',
             title: this.$t('question_n', { n: parseInt(cuedata.qn) + 1 }),
             qn: parseInt(cuedata.qn),
-            cue: i
+            cue: i,
+            subitem: true
           });
         }
         if (cuedata.hasOwnProperty('followuptime')) {
@@ -74,7 +75,8 @@ export default {
             onclick: () => this.$emit('jumpto', i, 'f'),
             type: 'f',
             title: cuedata.followuptitle,
-            cue: i
+            cue: i,
+            subitem: true
           });
         }
       }

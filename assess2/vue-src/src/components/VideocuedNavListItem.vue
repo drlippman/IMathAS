@@ -1,5 +1,5 @@
 <template>
-  <span :class="{'med-left': option.type === 'q' || option.type === 'f'}">
+  <span>
     <span class="qname-wrap">
       <icons :name="statusIcon" class="qstatusicon" />
       <span

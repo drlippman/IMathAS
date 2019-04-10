@@ -36,6 +36,7 @@
       </li>
       <li v-for="(option,index) in options" :key="index"
         @click = "handleClick(index)"
+        :class="{'listsubitem': option.subitem}"
       >
         <component
           v-bind = "getLinkProps(option,index)"
@@ -272,5 +273,11 @@ li.menubutton-header {
 .menubutton ul::-webkit-scrollbar-thumb {
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+/*.menubutton .listsubitem {
+  border-left: 8px solid #dfe3e8;
+}*/
+.menubutton .listsubitem > span > span{
+  margin-left: 16px;
 }
 </style>
