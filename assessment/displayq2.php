@@ -6,8 +6,8 @@
 $GLOBALS['noformatfeedback'] = true;
 $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
-//require_once("mathphp.php");
 require_once("mathphp2.php");
+require_once("mathparser.php");
 require("interpret5.php");
 require("macros.php");
 require_once(__DIR__ . "/../includes/sanitize.php");
@@ -3350,19 +3350,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						}
 						//add asymptotes for rational function graphs
 						if (strpos($function[0],'/x')!==false || preg_match('|/\([^\)]*x|', $function[0])) {
-							$func = makepretty($function[0]);
-							$func = mathphp($func,'x');
-							$func = str_replace("(x)",'($x)',$func);
-							$func = my_create_function('$x', 'return ('.$func.');');
+							$func = makeMathFunction(makepretty($function[0]), 'x');
 
 							$epsilon = ($settings[1]-$settings[0])/97;
 							$x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
 							$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
 							$x3 = 3/4*$settings[1] + 1/4*$settings[0] + $epsilon;
 
-							$y1 = $func($x1);
-							$y2 = $func($x2);
-							$y3 = $func($x3);
+							$y1 = $func(['x'=>$x1]);
+							$y2 = $func(['x'=>$x2]);
+							$y3 = $func(['x'=>$x3]);
 
 							$va = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
 							$ha = (($x1*$y1-$x2*$y2)-$va*($y1-$y2))/($x1-$x2);
@@ -3942,9 +3939,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 
-		//$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
-		//$answerlist = explode(",",preg_replace('/[^\d\.,\-]/','',$answer));
-
 		if ($givenans==='oo' || $givenans==='DNE') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if (isset($answersize)) {
@@ -3984,8 +3978,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 0;
 		}
 		foreach ($answerlist as $k=>$v) {
-			//$v = eval('return ('.mathphp($v,null).');');
-			$v = evalMathPHP($v,null);
+			$v = evalMathParser($v);
 			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
 		}
 
@@ -4075,12 +4068,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$answerlist = explode(',',$ansr);
 
 		foreach ($answerlist as $k=>$v) {
-			//$v = eval('return ('.mathphp($v,null).');');
-			$v = evalMathPHP($v,null);
+			$v = evalMathParser($v);
 			$answerlist[$k] = preg_replace('/[^\d\.,\-E]/','',$v);
 		}
-		//$answer = preg_replace_callback('/([^\[\(\)\]\,]+)/',"preg_mathphp_callback",$answer);
-		//$answerlist = explode(",",preg_replace('/[^\d\.,\-E]/','',$answer));
 		if (isset($answersize)) {
 			for ($i=0; $i<count($answerlist); $i++) {
 				if (!checkanswerformat($givenanslist[$i],$ansformats)) {
@@ -4246,7 +4236,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$ansparts = explode(',',$orv[2]);
 				foreach ($ansparts as $j=>$v) {
 					if (!is_numeric($v) && $v != 'oo' && $v != '-oo') {
-						$ansparts[$j] = evalMathPHP($v,null); //eval('return('.mathphp($v,null).');');
+						$ansparts[$j] = evalMathParser($v);
 					}
 				}
 				$listans[$ork][2] = $ansparts;
@@ -4489,8 +4479,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if ($cparts[1]!='' && $cparts[1][strlen($cparts[1])-1]=='*') {
 					$cparts[1] = substr($cparts[1],0,-1);
 				}
-				$ansparts[0] = evalMathPHP($cparts[0],null);//eval('return ('.mathphp($cparts[0],null).');');
-				$ansparts[1] = evalMathPHP($cparts[1],null);//eval('return ('.mathphp($cparts[1],null).');');
+				$ansparts[0] = evalMathParser($cparts[0]);
+				$ansparts[1] = evalMathParser($cparts[1]);
 			}
 			if (!in_array('exactlist',$ansformats)) {
 				foreach ($annumarr as $prevvals) {
@@ -4609,7 +4599,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
 							$aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
 						} else {
-							$aarr[$j] = evalMathPHP($anans,null);//eval('return('.mathphp($anans,null).');');
+							$aarr[$j] = evalMathParser($anans);
 						}
 					}
 				}
@@ -4628,17 +4618,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($matches[2]=='-oo') {$matches[2] = -1e99;}
 					if ($matches[3]=='oo') {$matches[3] = 1e99;}
 					if (!is_numeric($matches[2])) {
-						$matches[2] = evalMathPHP($matches[2],null);
+						$matches[2] = evalMathParser($matches[2]);
 					}
 					if (!is_numeric($matches[3])) {
-						$matches[3] = evalMathPHP($matches[3],null);
+						$matches[3] = evalMathParser($matches[3]);
 					}
 					$aarr[$j] = $matches;
 				} else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
 					if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
 						$aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
 					} else {
-						$aarr[$j] = evalMathPHP($anans,null);//eval('return('.mathphp($anans,null).');');
+						$aarr[$j] = evalMathParser($anans);
 					}
 				}
 			}
@@ -4727,14 +4717,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				foreach ($anss as $anans) {
 					if (!is_numeric($anans)) {
 						$givenans = trim($givenans);
-						/* moved to preprocessing
-						if (preg_match('/(\(|\[)([\d\.]+)\,([\d\.]+)(\)|\])/',$anans,$matches)) {
-							if (($matches[1]=="(" && $givenans>$matches[2]) || ($matches[1]=="[" && $givenans>=$matches[2])) {
-								if (($matches[4]==")" && $givenans<$matches[3]) || ($matches[4]=="]" && $givenans<=$matches[3])) {
-									$correct += 1; $foundloc = $j; break 2;
-								}
-							}
-						} */
 						if (is_array($anans)) {
 							if (($anans[1]=="(" && $givenans>$anans[2]) || ($anans[1]=="[" && $givenans>=$anans[2])) {
 								if (($anans[4]==")" && $givenans<$anans[3]) || ($anans[4]=="]" && $givenans<=$anans[3])) {
@@ -4747,16 +4729,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 						} else if ($anans=="-oo" && $givenans=="-oo") {
 							if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
-						}/* moved to preprocessing
-						else if (is_numeric($givenans)) {
-							//try evaling answer
-							$eanans = eval('return('.mathphp($anans,null).');');
-							if (isset($abstolerance)) {
-								if (abs($eanans-$givenans) < $abstolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;}
-							} else {
-								if (abs($eanans - $givenans)/(abs($eanans)+.0001) < $reltolerance+1E-12) {$correct += 1; $foundloc = $j; break 2;}
-							}
-						}*/
+						}
 					} else if (is_numeric($givenans)) {
 						if (isset($reqsigfigs)) {
 							$tocheck = preg_replace('/\s*(\*|x|X|×|✕)\s*10\s*\^/','E',$orarr[$j]);
@@ -4919,7 +4892,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$flist = implode("|",$ofunc);
 			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
 		}
-		$vlist = implode("|",$variables);
+		$vlist = implode(",",$variables);
 
 
 		for ($i = 0; $i < 20; $i++) {
@@ -4992,14 +4965,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				return 0;
 			}
 			$origanswer = $answer;
-			$answer = mathphppre($answer);
-			$answer = makepretty($answer);
-			$answer = mathphp($answer,$vlist);
-
-			for($i=0; $i < count($variables); $i++) {
-				$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
+			$answerfunc = makeMathFunction(makepretty($answer), $vlist);
+			if ($answerfunc === false) {  // parse error on $answer - can't do much
+				return 0;
 			}
-
 			$myans = explode(",",$_POST["qn$qn-vals"]);
 
 			$cntnan = 0;
@@ -5009,18 +4978,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ysqrtot = 0;
 			$reldifftot = 0;
 			for ($i = 0; $i < 20; $i++) {
+				$varvals = array();
 				for($j=0; $j < count($variables); $j++) {
-
-				//causing problems on multipart - breaking messed up rand order
-				/*	if (isset($fromto[2]) && $fromto[2]=="integers") {
-						$tp[$j] = rand($fromto[0],$fromto[1]);
-					} else {
-						$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,32000)/32000.0;
-					}
-				*/
-					$tp[$j] = $tps[$i][$j];
+					$varvals[$variables[$j]] = $tps[$i][$j];
 				}
-				$realans = evalReturnValue("return ($answer);", $origanswer, array('tp'=>$tp));  //eval("return ($answer);");
+				$realans = $answerfunc($varvals);
 
 				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
@@ -5397,10 +5359,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$ansint = substr($ansint,1,strlen($ansint)-2);
 				list($anssn,$ansen) = explode(',',$ansint);
 				if (!is_numeric($anssn) && strpos($anssn,'oo')===false) {
-					$anssn = evalMathPHP($anssn,null);//eval('return('.mathphp($anssn,null).');');
+					$anssn = evalMathParser($anssn);
 				}
 				if (!is_numeric($ansen) && strpos($ansen,'oo')===false) {
-					$ansen = evalMathPHP($ansen,null); //eval('return('.mathphp($ansen,null).');');
+					$ansen = evalMathParser($ansen);
 				}
 				$foundloc = -1;
 				foreach ($gaarr as $k=>$gansint) {
@@ -5733,12 +5695,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$y2p = $ytopix($y2);
 						$y3p = $ytopix($y3);
 						$func = makepretty(substr($function[0],2));
-						$func = mathphp($func,'y');
-						$func = str_replace("(y)",'($y)',$func);
-						$func = my_create_function('$y', 'return ('.$func.');');
-						$Lx1p = $xtopix(@$func($y1));
-						$Lx2p = $xtopix(@$func($y2));
-						$Lx3p = $xtopix(@$func($y3));
+						$func = makeMathFunction($func, 'y');
+						$Lx1p = $xtopix(@$func(['y'=>$y1]));
+						$Lx2p = $xtopix(@$func(['y'=>$y2]));
+						$Lx3p = $xtopix(@$func(['y'=>$y3]));
 						$denom = ($y1p - $y2p)*($y1p - $y3p)*($y2p - $y3p);
 						$A = ($y3p * ($Lx2p - $Lx1p) + $y2p * ($Lx1p - $Lx3p) + $y1p * ($Lx3p - $Lx2p)) / $denom;
 						$B = ($y3p*$y3p * ($Lx1p - $Lx2p) + $y2p*$y2p * ($Lx3p - $Lx1p) + $y1p*$y1p * ($Lx2p - $Lx3p)) / $denom;
@@ -5779,17 +5739,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					}
 				} else if (count($function)==3) { //line segment or ray
-					$func = makepretty($function[0]);
-					$func = mathphp($func,'x');
-					$func = str_replace("(x)",'($x)',$func);
-					$func = my_create_function('$x', 'return ('.$func.');');
+					$func = makeMathFunction(makepretty($function[0]), 'x');
 					if ($function[1]=='-oo') { //ray to left
-						$y1p = $ytopix($func(floatval($function[2])-1));
-						$y2p = $ytopix($func(floatval($function[2])));
+						$y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
+						$y2p = $ytopix($func(['x'=>floatval($function[2])]));
 						$ansvecs[$key] = array('r', $xtopix($function[2]), $y2p, $xtopix(floatval($function[2])-1), $y1p);
 					} else if ($function[2]=='oo') { //ray to right
-						$y1p = $ytopix($func(floatval($function[1])));
-						$y2p = $ytopix($func(floatval($function[1])+1));
+						$y1p = $ytopix($func(['x'=>floatval($function[1])]));
+						$y2p = $ytopix($func(['x'=>floatval($function[1])+1]));
 						$ansvecs[$key] = array('r', $xtopix($function[1]), $y1p, $xtopix(floatval($function[1])+1), $y2p);
 					} else { //line seg
 						if ($function[1]>$function[2]) {  //if xmin>xmax, swap
@@ -5797,19 +5754,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$function[2] = $function[1];
 							$function[1] = $tmp;
 						}
-						$y1p = $ytopix($func(floatval($function[1])));
-						$y2p = $ytopix($func(floatval($function[2])));
+						$y1p = $ytopix($func(['x'=>floatval($function[1])]));
+						$y2p = $ytopix($func(['x'=>floatval($function[2])]));
 						$ansvecs[$key] = array('ls', $xtopix($function[1]), $y1p, $xtopix($function[2]), $y2p);
 					}
 				} else {
-					$func = makepretty($function[0]);
-					$func = mathphp($func,'x');
-					$func = str_replace("(x)",'($x)',$func);
-					$func = my_create_function('$x', 'return ('.$func.');');
+					$func = makeMathFunction(makepretty($function[0]), 'x');
 
-					$y1 = @$func($x1);
-					$y2 = @$func($x2);
-					$y3 = @$func($x3);
+					$y1 = @$func(['x'=>$x1]);
+					$y2 = @$func(['x'=>$x2]);
+					$y3 = @$func(['x'=>$x3]);
+
 					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
 					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
 					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
@@ -5841,15 +5796,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 											continue;
 										}
 									}
-									$inlogfunc = mathphp(makepretty($loginside),'x');
-									$inlogfunc = str_replace("(x)",'($x)',$inlogfunc);
-									$inlogfunc = create_function('$x', 'return ('.$inlogfunc.');');
+									$inlogfunc = makeMathFunction(makepretty($loginside), 'x');
 									//We're going to assume inside is linear
 									//Calculate (0,y0), (1,y1).  m=(y1-y0), y=(y1-y0)x+y0
 									//solve for when this is =0
 									// x = -y0/(y1-y0)
-									$inlogy0 = $inlogfunc(0);
-									$inlogy1 = $inlogfunc(1);
+									$inlogy0 = $inlogfunc(['x'=>0]);
+									$inlogy1 = $inlogfunc(['x'=>1]);
 									$vertasy = -$inlogy0/($inlogy1 - $inlogy0);
 									break;
 								}
@@ -5875,8 +5828,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 						$xa = $vertasy + $asign*1;
 						$xb = $vertasy + $asign*2;
-						$ya = @$func($xa);
-						$yb = @$func($xb);
+						$ya = @$func(['x'=>$xa]);
+						$yb = @$func(['x'=>$xb]);
 						$xap = $xtopix($xa);
 						$xbp = $xtopix($xb);
 						$vertasyp = $xtopix($vertasy);
@@ -5908,8 +5861,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$anslogs[$key] = array($str, $base, $vertasyp);
 
 					} else if (strpos($function[0],'abs')!==false) { //is abs
-						$y0 = $func($x0);
-						$y4 = $func($x4);
+						$y0 = $func(['x'=>$x0]);
+						$y4 = $func(['x'=>$x4]);
 						$y0p = $settings[7] - ($y0-$settings[2])*$pixelspery - $imgborder;
 						$y4p = $settings[7] - ($y4-$settings[2])*$pixelspery - $imgborder;
 						if (abs(($y2-$y1)-($y1-$y0))<1e-9) { //if first 3 points are colinear
@@ -5932,18 +5885,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 						if ($nested==0) {
 							$infunc = makepretty(substr($function[0],$p+5,$i-$p-5));
-							$infunc = mathphp($infunc,'x');
-							$infunc = str_replace("(x)",'($x)',$infunc);
-							$infunc = my_create_function('$x', 'return ('.$infunc.');');
-							$y0 = $infunc(0);
-							$y1 = $infunc(1);
+							$infunc = makeMathFunction($infunc, 'x');
+							$y0 = $infunc(['x'=>0]);
+							$y1 = $infunc(['x'=>1]);
 							$xint = -$y0/($y1-$y0);
 							$xintp = ($xint - $settings[0])*$pixelsperx + $imgborder;
-							$yint = $func($xint);
+							$yint = $func(['x'=>$xint]);
 							$yintp = $settings[7] - ($yint-$settings[2])*$pixelspery - $imgborder;
 							$flip = ($y1>$y0)?1:-1;
 							$secx = $xint + ($x4-$x0)/5*$flip;  //over 1/5 of grid width
-							$secy = $func($secx);
+							$secy = $func(['x'=>$secx]);
 							$secyp = $settings[7] - ($secy-$settings[2])*$pixelspery - $imgborder;
 							$anssqrts[$key] = array($xintp,$yintp,$secyp,$flip);
 						}
@@ -5957,11 +5908,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 						if ($nested==0) {
 							$infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
-							$infunc = mathphp($infunc,'x');
-							$infunc = str_replace("(x)",'($x)',$infunc);
-							$infunc = my_create_function('$x', 'return ('.$infunc.');');
-							$y0 = $infunc(0);
-							$y1 = $infunc(1);
+							$infunc = makeMathFunction($infunc, 'x');
+							$y0 = $infunc(['x'=>0]);
+							$y1 = $infunc(['x'=>1]);
 							$period = 2*M_PI/($y1-$y0); //slope of inside function
 							$xint = -$y0/($y1-$y0);
 							if (strpos($function[0],'sin')!==false) {
@@ -5970,9 +5919,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$secx = $xint + $period/2;
 							$xintp = ($xint - $settings[0])*$pixelsperx + $imgborder;
 							$secxp = ($secx - $settings[0])*$pixelsperx + $imgborder;
-							$yint = $func($xint);
+							$yint = $func(['x'=>$xint]);
 							$yintp = $settings[7] - ($yint-$settings[2])*$pixelspery - $imgborder;
-							$secy = $func($secx);
+							$secy = $func(['x'=>$secx]);
 							$secyp = $settings[7] - ($secy-$settings[2])*$pixelspery - $imgborder;
 							if ($yintp>$secyp) {
 								$anscoss[$key] = array($xintp,$secxp,$yintp,$secyp);
@@ -5981,7 +5930,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							}
 						}
 					} else if (strpos($function[0],'^3')!==false) { //cubic
-						$y4p = $ytopix($func($x4));
+						$y4p = $ytopix($func(['x'=>$x4]));
 						$a1 = safepow($x3p,3)-2*safepow($x2p,3)+safepow($x1p,3);
 						$a2 = safepow($x4p,3)-2*safepow($x3p,3)+safepow($x2p,3);
 						$b1 = safepow($x3p,2)-2*safepow($x2p,2)+safepow($x1p,2);
@@ -5996,7 +5945,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$anscubics[$key] = array($h, $k, safepow($str,1/3));
 					} else if (strpos($function[0],'root(3)')!==false || strpos($function[0],'^(1/3)')!==false) { //cube root
 						//y=str*cuberoot(x-h)^3+k is equiv to x=(1/str^3)(y-k)^3+h
-						$y4p = $ytopix($func($x4));
+						$y4p = $ytopix($func(['x'=>$x4]));
 						$a1 = safepow($y3p,2)-safepow($y1p,2)+ $y3p*$y2p - $y1p*$y2p;
 						$a2 = safepow($y4p,2)-safepow($y2p,2)+ $y4p*$y3p - $y2p*$y3p;
 						$b1 = $y3p - $y1p;
@@ -6045,7 +5994,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$hp = ($h - $settings[0])*$pixelsperx + $imgborder;
 						$kp = $settings[7] - ($k-$settings[2])*$pixelspery - $imgborder;
 						//eval at point on graph closest to (h,k), at h+sqrt(c)
-						$np = $settings[7] - (@$func($h+sqrt(abs($c)))-$settings[2])*$pixelspery - $imgborder;
+						$np = $settings[7] - (@$func(['x'=>$h+sqrt(abs($c))])-$settings[2])*$pixelspery - $imgborder;
 						$ansrats[$key] = array($hp,$kp,$np);
 
 					} else if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
@@ -6738,12 +6687,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
 				} else {
 					$func = makepretty(substr($function[0],$c));
-					$func = mathphp($func,'x');
-					$func = str_replace("(x)",'($x)',$func);
-					$func = my_create_function('$x', 'return ('.$func.');');
-					$y1 = $func($x1);
-					$y2 = $func($x2);
-					$y3 = $func($x3);
+					$func = makeMathFunction($func, 'x');
+					$y1 = $func(['x'=>$x1]);
+					$y2 = $func(['x'=>$x2]);
+					$y3 = $func(['x'=>$x3]);
 					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
 					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
 					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
@@ -7031,10 +6978,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					continue;
 				}
 				$anslines[$key] = array();
-				$func = makepretty($function[0]);
-				$func = mathphp($func,'x');
-				$func = str_replace("(x)",'($x)',$func);
-				$func = my_create_function('$x', 'return ('.$func.');');
+				$func = makeMathFunction(makepretty($function[0]), 'x');
 
 				if (!isset($function[1])) {
 					$function[1] = $settings[0];
@@ -7053,7 +6997,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				for ($k=ceil($xminpix/$step); $k*$step <= $xmaxpix; $k++) {
 					$x = $k*$step;
 					$coordx = ($x - $imgborder)/$pixelsperx + $settings[0]+1E-10;
-					$coordy = $func($coordx);
+					$coordy = $func(['x'=>$coordx]);
 					if ($coordy>$settings[2] && $coordy<$settings[3]) {
 						$anslines[$key][$k] = $settings[7] - ($coordy-$settings[2])*$pixelspery - $imgborder;
 						if (!isset($anslineptcnt[$k])) {
@@ -7704,10 +7648,9 @@ function checkreqtimes($tocheck,$rtimes) {
 }
 
 function parsesloppycomplex($v) {
-	$v = mathphp($v,'i');
-	$v = str_replace('(i)','($i)',$v);
-	$a = evalReturnValue('$i=0;return ('.$v.');');
-	$apb = evalReturnValue('$i=1;return ('.$v.');');
+	$func = makeMathFunction($v, 'i');
+	$a = $func(['i'=>0]);
+	$apb = $func(['i'=>1]);
 	return array($a,$apb-$a);
 }
 

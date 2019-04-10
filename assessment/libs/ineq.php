@@ -9,9 +9,9 @@ array_push($allowedmacros,"ineqplot","ineqbetweenplot");
 //
 //funcstring format: (function and filltype are required) - one string or array
 //  function of x,filltype,fillcolor,linecolor,dash,strokewidth
-//  
+//
 //filltypes: above, below
-function ineqplot($funcs) { 
+function ineqplot($funcs) {
 	if (!is_array($funcs)) {
 		settype($funcs,"array");
 	}
@@ -52,7 +52,7 @@ function ineqplot($funcs) {
 //funcstring format: (function and filltype are required) - one string or array
 //  function of x,above or below,linecolor,dash,strokewidth,fillcolor
 //  or x=number,right or left,linecolor,dash,strokewidth,fillcolor
-function ineqbetweenplot($funcs) { 
+function ineqbetweenplot($funcs) {
 	if (!is_array($funcs)) {
 		settype($funcs,"array");
 	}
@@ -83,8 +83,8 @@ function ineqbetweenplot($funcs) {
 		if (isset($function[5])) {$fillcolor=$function[5];}
 		$newfuncstr[] = $function[0].','.$function[2].',,,,,'.$function[4].','.$function[3];
 		for ($i = 0; $i<$stopat;$i++) {
-			$mins[$i][$k]=$settings[2] - 5*($settings[3]-$settings[2])/$settings[7]; 
-			$maxs[$i][$k]=$settings[3] + 5*($settings[3]-$settings[2])/$settings[7]; 
+			$mins[$i][$k]=$settings[2] - 5*($settings[3]-$settings[2])/$settings[7];
+			$maxs[$i][$k]=$settings[3] + 5*($settings[3]-$settings[2])/$settings[7];
 		}
 		//correct for parametric
 		if (substr($function[0],0,2)=='x=') {
@@ -93,7 +93,7 @@ function ineqbetweenplot($funcs) {
 			if ($ix>0 && $ix<102) {
 				if ($filltype=='right') {
 					for ($i=0;$i<$ix;$i++) {
-						$skipi[$i] = true;	
+						$skipi[$i] = true;
 					}
 					$skipi[$i-1] = $ix;
 				} else {
@@ -104,13 +104,10 @@ function ineqbetweenplot($funcs) {
 				}
 			}
 		} else {
-			$func = makepretty($function[0]);
-			$func = mathphp($func,"x");
-			$func = str_replace("(x)",'($x)',$func);
-			$xfunc = my_create_function('$x','return ('.$func.');');
+			$xfunc = makeMathFunction(makepretty($function[0]), "x");
 			for ($i = 0; $i<$stopat;$i++) {
 				$x = $xmin + $dx*$i;
-				$y = $xfunc($x);
+				$y = $xfunc(["x"=>$x]);
 				if (is_nan($y)) {
 					if (!isset($skipi[$i])) {
 						$skipi[$i] = $i;
@@ -134,8 +131,8 @@ function ineqbetweenplot($funcs) {
 			$min = max($mins[$i]);
 			$max = min($maxs[$i]);
 		} else {
-			$min=$settings[2] - 5*($settings[3]-$settings[2])/$settings[7]; 
-			$max=$settings[3] + 5*($settings[3]-$settings[2])/$settings[7]; 
+			$min=$settings[2] - 5*($settings[3]-$settings[2])/$settings[7];
+			$max=$settings[3] + 5*($settings[3]-$settings[2])/$settings[7];
 		}
 		if ($min<$max && !isset($skipi[$i])) { //point is in shape
 			if ($inshape==false) {
@@ -148,7 +145,7 @@ function ineqbetweenplot($funcs) {
 						$shape[$shapecnt][] = array($ti,$min,$max);
 					}
 					//in shape from beginning
-					$shape[$shapecnt][] = array($i,$min,$max);	
+					$shape[$shapecnt][] = array($i,$min,$max);
 				} else {
 					//entering shape partway through
 					//interpolate entry point
@@ -194,8 +191,8 @@ function ineqbetweenplot($funcs) {
 		for ($j=0;$j<count($shape[$i]);$j++) {
 			if ($j>0) { $path .= ',';}
 			$x = round($xmin + $dx*$shape[$i][$j][0],3);
-			$y = $shape[$i][$j][1];			
-			$path .= "[$x,$y]";			
+			$y = $shape[$i][$j][1];
+			$path .= "[$x,$y]";
 		}
 		for ($j=count($shape[$i])-1;$j>=0;$j--) {
 			if (!isset($shape[$i][$j][2])) { continue;}
@@ -207,7 +204,7 @@ function ineqbetweenplot($funcs) {
 			$path .= ']);';
 		}
 	}
-	
+
 	$p = showplot($newfuncstr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		$parts = explode('<table', $p);
@@ -218,13 +215,13 @@ function ineqbetweenplot($funcs) {
 	} else {
 		$p = str_replace("' />","fill=\"trans$fillcolor\";strokewidth=0;$path;' />",$p);
 	}
-	return $p;		
+	return $p;
 }
 
 /*
 old code
 
-function ineqplot($funcs) { 
+function ineqplot($funcs) {
 	if (!is_array($funcs)) {
 		settype($funcs,"array");
 	}
@@ -246,11 +243,11 @@ function ineqplot($funcs) {
 	} else {
 		$commands .= 'axes(1,1,null';
 	}
-	
+
 	if (strpos($settings[5],':')) {
 		$grid = explode(':',$settings[5]);
 	}
-	if (is_numeric($settings[5]) && $settings[5]>0) { 
+	if (is_numeric($settings[5]) && $settings[5]>0) {
 		$commands .= ','.$settings[5].','.$settings[5].');';
 		$dgrid = $settings[5];
 	} else if (isset($grid[0]) && is_numeric($grid[0]) && $grid[0]>0 && $grid[1]>0) {
@@ -260,7 +257,7 @@ function ineqplot($funcs) {
 		$commands .= ');';
 		$dgrid = 1;
 	}
-		
+
 	foreach ($funcs as $k=>$function) {
 		$alt .= "Start Graph";
 		$function = explode(",",$function);
@@ -271,7 +268,7 @@ function ineqplot($funcs) {
 		$xfunc = my_create_function('$x','return ('.$func.');');
 		//even though ASCIIsvg has a plot function, we'll calculate it here to hide the function
 		//  function of x,filltype,fillcolor,linecolor,dash,strokewidth
-		
+
 		$path = '';
 		$shades = '';
 		$filltype = $function[1];
@@ -285,7 +282,7 @@ function ineqplot($funcs) {
 		} else {
 			$fillslope = false;
 		}
-		
+
 		if ($function[2]!='') {
 			$shades .= "stroke=\"{$function[2]}\";strokedasharray=\"none\";";
 			$alt .= "Shaded in {$function[2]} " . substr($filltype,0,5);
@@ -315,10 +312,10 @@ function ineqplot($funcs) {
 		} else {
 			$path .= "strokedasharray=\"none\";";
 		}
-		
+
 		$xmin = $settings[0];
 		$xmax = $settings[1];
-		
+
 		if ($GLOBALS['sessiondata']['graphdisp']==0) {
 			$dx = 1;
 			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
@@ -330,12 +327,12 @@ function ineqplot($funcs) {
 		$lasty = 0;
 		$lastl = 0;
 		for ($i = 0; $i<$stopat;$i++) {
-			
+
 			$x = $xmin + $dx*$i;
 			$y = round($xfunc($x),3);
-			
+
 			$alt .= "<tr><td>$x</td><td>$y</td></tr>";
-			
+
 			if (abs($y-$lasty) > ($ymax-$ymin)) {
 				if ($lastl > 1) { $path .= ']);'; $lastl = 0;}
 				$lasty = $y;
@@ -349,7 +346,7 @@ function ineqplot($funcs) {
 		if ($lastl > 0) {$path .= "]);";}
 		$alt .= "</tbody></table>\n";
 		$commands .= $path;
-		
+
 		//do shades
 		for ($x = $xmin+$dgrid/2*($k+1)/(count($funcs)+1); $x<$xmax; $x+=$dgrid/2) {
 			$y = round($xfunc($x),3);
@@ -379,7 +376,7 @@ function ineqplot($funcs) {
 }
 
 
-function ineqbetweenplot($funcs) { 
+function ineqbetweenplot($funcs) {
 	if (!is_array($funcs)) {
 		settype($funcs,"array");
 	}
@@ -401,11 +398,11 @@ function ineqbetweenplot($funcs) {
 	} else {
 		$commands .= 'axes(1,1,null';
 	}
-	
+
 	if (strpos($settings[5],':')) {
 		$grid = explode(':',$settings[5]);
 	}
-	if (is_numeric($settings[5]) && $settings[5]>0) { 
+	if (is_numeric($settings[5]) && $settings[5]>0) {
 		$commands .= ','.$settings[5].','.$settings[5].');';
 		$dgrid = $settings[5];
 	} else if (isset($grid[0]) && is_numeric($grid[0]) && $grid[0]>0 && $grid[1]>0) {
@@ -415,7 +412,7 @@ function ineqbetweenplot($funcs) {
 		$commands .= ');';
 		$dgrid = 1;
 	}
-		
+
 	foreach ($funcs as $k=>$function) {
 		$alt .= "Start Graph";
 		$function = explode(",",$function);
@@ -426,15 +423,15 @@ function ineqbetweenplot($funcs) {
 		$xfunc = my_create_function('$x','return ('.$func.');');
 		//even though ASCIIsvg has a plot function, we'll calculate it here to hide the function
 		//  function of x,filltype,fillcolor,linecolor,dash,strokewidth
-		
+
 		$path = '';
 		$shades = '';
 		$filltype = $function[1];
-		
-		
+
+
 		$shades .= "stroke=\"blue\";strokedasharray=\"none\";";
 		$alt .= "Shaded in blue " . substr($filltype,0,5);
-		
+
 		if ($function[2]!='') {
 			$path .= "stroke=\"{$function[2]}\";";
 			$alt .= ", Color {$function[2]}";
@@ -457,10 +454,10 @@ function ineqbetweenplot($funcs) {
 		} else {
 			$path .= "strokedasharray=\"none\";";
 		}
-		
+
 		$xmin = $settings[0];
 		$xmax = $settings[1];
-		
+
 		if ($GLOBALS['sessiondata']['graphdisp']==0) {
 			$dx = 1;
 			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
@@ -472,12 +469,12 @@ function ineqbetweenplot($funcs) {
 		$lasty = 0;
 		$lastl = 0;
 		for ($i = 0; $i<$stopat;$i++) {
-			
+
 			$x = $xmin + $dx*$i;
 			$y = round($xfunc($x),3);
-			
+
 			$alt .= "<tr><td>$x</td><td>$y</td></tr>";
-			
+
 			if (abs($y-$lasty) > ($ymax-$ymin)) {
 				if ($lastl > 1) { $path .= ']);'; $lastl = 0;}
 				$lasty = $y;
@@ -491,7 +488,7 @@ function ineqbetweenplot($funcs) {
 		if ($lastl > 0) {$path .= "]);";}
 		$alt .= "</tbody></table>\n";
 		$commands .= $path;
-		
+
 				//do shades
 		for ($i=0; $i<($xmax-$xmin)*4/$dgrid;$i++) {
 			$x = $xmin + $dgrid*(.125+.25*$i);
@@ -500,7 +497,7 @@ function ineqbetweenplot($funcs) {
 				$mins[$i][] = $y;
 			} else if ($filltype=="below") {
 				$maxs[$i][] = $y;
-			} 
+			}
 		}
 	}
 	for ($i=0; $i<($xmax-$xmin)*4/$dgrid;$i++) {

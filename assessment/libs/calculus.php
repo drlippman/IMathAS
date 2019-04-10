@@ -1,6 +1,6 @@
 <?php
 //A collection of numerical calculus routines.  These are intended to do
-//numerical calculations where they are specifically needed, not substitute 
+//numerical calculations where they are specifically needed, not substitute
 //for entering symbolic derivatives or integrals.
 //
 //Version 1.1 April 8, 2009
@@ -11,12 +11,10 @@ array_push($allowedmacros,"calculusdiffquotient","calculusnumint");
 //calculusdiffquotient(function,variable,a,h)
 //calculated the difference quotient (f(a+h)-f(a))/h
 function calculusdiffquotient($func,$var,$ainputval,$hval) {
-	$func = makepretty($func);
-	$func = mathphp($func,$var);
-	if ($func=='0;') { return 0;}
-	$func = str_replace("($var)","(\$$var)",$func);
-	$fah = eval("\$$var = $ainputval + ($hval); return($func);");
-	$fa = eval("\$$var = $ainputval; return($func);");
+	$func = makeMathFunction(makepretty($func), $var);
+	if ($func===false) { return 0;}
+	$fah = $func([$var => $ainputval + $hval]);
+	$fa = $func([$var => $ainputval]);
 	return (($fah - $fa)/$hval);
 }
 
@@ -32,12 +30,9 @@ function calculusnumint($func,$var,$a,$b,$n,$method) {
 	if ($method=='simpsons' && $n%2!=0) {
 		echo "simpsons requires even n";
 		return false;
-	}	
-	$func = makepretty($func);
-	$func = mathphp($func,$var);
-	if ($func=='0;') { return 0;}
-	$func = str_replace("($var)","(\$$var)",$func);
-	$evalfunc = my_create_function("\$$var",'return('.$func.');');
+	}
+	$func = makeMathFunction(makepretty($func), $var);
+	if ($func===false) { return 0;}
 	$dx = ($b-$a)/$n;
 	if ($method=='right') {
 		$x = $a+$dx;
@@ -51,7 +46,7 @@ function calculusnumint($func,$var,$a,$b,$n,$method) {
 	} else {
 		$ntodo = $n+1;
 	}
-	
+
 	$out = 0;
 	$mult = 1;
 	for ($i=0; $i<$ntodo; $i++) {
@@ -69,9 +64,9 @@ function calculusnumint($func,$var,$a,$b,$n,$method) {
 			} else {
 				$mult = 4;
 			}
-		} 
-		$out += $mult*$evalfunc($x);
-		$x += $dx;		
+		}
+		$out += $mult*$func([$var=>$x]);
+		$x += $dx;
 	}
 	if ($method=='trapezoidal') {
 		return ($out*$dx/2);

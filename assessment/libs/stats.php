@@ -282,7 +282,7 @@ function allquartile($a,$q) {
 			return ($a[floor($n/2)]);
 		}
 	}
-	
+
 	//%4==0, all same except Excel
 	//%4==1, q and Excel same, TI and Nplus1 same
 	//%4==2, q and TI same, Excel and Nplus1 diff
@@ -596,7 +596,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		return $alt;
 	}
 	$x++;
-	
+
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
 
@@ -667,7 +667,7 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 		$row .= '",' . floatval($pcts[$k]) . ']';
 		$rows[] = $row;
 	}
-	
+
 	$out .= 'function '.$uniqueid.'() {
 		var data = new google.visualization.DataTable();
 		data.addColumn("string", "Data");
@@ -676,7 +676,7 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 		var chart = new google.visualization.PieChart(document.getElementById("'.$uniqueid.'"));
 		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}});
 	}';
-	
+
 	//load it
 	$out .= 'if (typeof google == "undefined" || typeof google.charts == "undefined") {
 			window.chartqueue.push('.$uniqueid.');
@@ -835,7 +835,7 @@ function boxplot($arr,$label="",$options = array()) {
 	if ($dw>100) {$step = 20;} else if ($dw > 50) { $step = 10; } else if ($dw > 20) { $step = 5;} else {$step=1;}
 	$bigmin = floor($bigmin/$step)*$step;
 	$bigmax = ceil($bigmax/$step)*$step;
-	
+
 	$outst = "setBorder(15); initPicture($bigmin,$bigmax,-3,".($ycnt).");";
 	$outst .= "axes($step,100,1,null,null,1,'off');";
 	$outst .= "text([". ($bigmin+.5*$dw) . ",-3],\"$label\");";
@@ -878,7 +878,7 @@ function normalcdf($ztest,$dec=4) {
 		$b5 =  1.330274429;
 		$p  =  0.2316419;
 		$c  =  0.39894228;
-		
+
 		$x = $ztest;
 		if($x >= 0.0) {
 		     $t = 1.0 / ( 1.0 + $p * $x );
@@ -1213,19 +1213,20 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 	$m = ($n*$sxy - $sx*$sy)/($n*$sxx - $sx*$sx);
 	$b = ($sy - $sx*$m)/$n;
 
-	if ($line=='') {return array('',makepretty("`$m $var + $b`"));}
+	if ($line=='') {return array(false,makepretty("`$m $var + $b`"));}
 
 	foreach ($_POST as $k=>$v) { //try to catch junk answers
 		if ($v==$line) {
 			if (preg_match('/[^,\d\.\-]/',$_POST['qn'.substr($k,2).'-vals'])) {
-				return array('',makepretty("`$m $var + $b`"));
+				return array(false,makepretty("`$m $var + $b`"));
 			}
 		}
 	}
-	$linec = mathphp(makepretty($line),$var);
-	$linec = str_replace("($var)",'($t)',$linec);
-	$linefunc = my_create_function('$t','return('.$linec.');');
 
+  $linefunc = makeMathFunction(makepretty($line), $var);
+  if ($linefunc === false) {  //parse eror
+    return array(false,makepretty("`$m $var + $b`"));
+  }
 	$xmin = min($xarr);
 	$xmax = max($xarr);
 	$dx = ($xmax-$xmin)/5;
@@ -1244,7 +1245,7 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 	$xbar = $sx/$n;
 	for ($x = $xmin;$x<$xmax*1.02;$x+=$dx) {
 		$ypred = $m*$x+$b;
-		$yline = $linefunc($x);
+		$yline = $linefunc([$var=>$x]);
 		$yconf = $tcrit*$sqres*sqrt(1+1/$n+($x-$xbar)*($x-$xbar)/$sdiv);
 		if (abs($ypred-$yline)>$yconf) {
 			$isinbounds = false;
