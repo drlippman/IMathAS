@@ -1,7 +1,6 @@
 <template>
   <div
     v-if = "showNav"
-    class="video-result-nav"
   >
     <button
       v-if = "hasNextVid"
@@ -98,9 +97,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.video-result-nav {
-  margin: 8px 0;
-}
-</style>

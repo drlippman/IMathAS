@@ -5,7 +5,15 @@
       :cue="cue"
       :toshow="toshow"
       @jumpto="jumpTo"
-    />
+    >
+      <videocued-result-nav
+        class="med-left"
+        v-if = "qn != -1"
+        :qn = "qn"
+        :cue = "cue"
+        @jumpto="jumpTo"
+      />
+    </videocued-nav>
     <div class="scrollpane">
       <div
         class = "questionpane"
@@ -27,12 +35,6 @@
           </div>
         </div>
       </div>
-      <videocued-result-nav
-        v-if = "qn != -1"
-        :qn = "qn"
-        :cue = "cue"
-        @jumpto="jumpTo"
-      />
       <div
         v-for="curqn in questionArray"
         :key="curqn"

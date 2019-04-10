@@ -9,6 +9,7 @@
         <videocued-nav-list-item :option="option" />
       </template>
     </menu-button>
+    <slot></slot>
   </div>
 </template>
 
