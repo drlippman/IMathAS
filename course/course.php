@@ -166,7 +166,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		}
 		$nocoursenav = true;
 	}
-	
+
 	//get exceptions
 	$now = time();
 	$exceptions = array();
@@ -177,7 +177,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	if (count($exceptions)>0) {
 		upsendexceptions($items);
 	}
-	
+
 	if ($useleftnav && !isset($teacherid)) { //load quick block nav
 		$stuLeftNavBlocks = array();
 		buildBlockLeftNav($items, '0', $stuLeftNavBlocks);
@@ -591,7 +591,7 @@ if ($overwriteBody==1) {
 			}
 			echo '</p>';
 		}
-	
+
 		if (!isset($sessiondata['ltiitemtype'])) { //don't show in LTI embed
 	?>
 			<p>
@@ -621,7 +621,7 @@ if ($overwriteBody==1) {
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
 		   echo "</script>";
 		   echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
-		   echo "<script src=\"$imasroot/javascript/nested1.js?v=011917\"></script>";
+		   echo "<script src=\"$imasroot/javascript/nested1.js?v=041119\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
 
@@ -707,10 +707,10 @@ function makeTopMenu() {
 		echo '<span class="showinmobile"><b>'._('Quick Rearrange.'), "</b> <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>.</span> ";
 
 		if (isset($CFG['CPS']['miniicons'])) {
-			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
+			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
 
 		} else {
-			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
+			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges(\'json\')"/>';
 		}
 		 echo '<span id="submitnotice" class=noticetext></span>';
 		 echo '<div class="clear"></div>';
