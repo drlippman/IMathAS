@@ -225,7 +225,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$stm = $DBH->prepare("SELECT name,summary,intro,startdate,enddate,reviewdate,LPcutoff,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,posttoforum,ptsposs,extrefs FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT name,summary,intro,startdate,enddate,reviewdate,LPcutoff,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,posttoforum,ptsposs,extrefs,justintimeorder FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$typeid));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($row['ptsposs']==-1) {
@@ -311,6 +311,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$typeid));
 		$itemorder = $stm->fetchColumn(0);
+		$justintimeorder = $row['justintimeorder'];
 		if (trim($itemorder)!='') {
 			$flat = preg_replace('/\d+\|\d+~/','',$itemorder);
 			$flat = str_replace('~',',',$itemorder);
@@ -407,9 +408,25 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 						}
 					}
 				}
+				//print_r($aitems);
+				//print_r($newaitems);
+				//JIT addition for assignment copying (c) Ondrej Zjevik
+				// Update items ID for JIT display
+				//$justintimeorder = $row['justintimeorder'];
+				if($justintimeorder != ""){
+					for($i = 0; $i < count($aitems); $i++){
+						$id_old = $aitems[$i];
+						$id_new = $newaitems[$i];
+						$justintimeorder = str_replace('"id":'.$id_old.',"','"id":'.$id_new.',"',$justintimeorder);
+						$justintimeorder = str_replace(':'.$id_old.':',':'.$id_new.':',$justintimeorder);
+						$justintimeorder = str_replace('?id='.$id_old.'&','?id='.$id_new.'&',$justintimeorder);
+						$justintimeorder = str_replace(';qid='.$id_old.'&',';qid='.$id_new.'&',$justintimeorder);
+					}
+				}
+
 				$newitemorder = implode(',',$newaitems);
-				$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
-				$stm->execute(array(':itemorder'=>$newitemorder, ':id'=>$newtypeid));
+				$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,justintimeorder=:justintimeorder WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$newitemorder,':justintimeorder'=>$justintimeorder, ':id'=>$newtypeid));
 				//Temporary: force recalculation of points possible on copying, 
 				// to fix any lingering buggy ptsposs values
 				//if ($needToUpdatePtsPoss) {

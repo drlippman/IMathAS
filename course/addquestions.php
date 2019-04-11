@@ -2,6 +2,8 @@
 //IMathAS:  Add/modify blocks of items on course page
 //(c) 2006 David Lippman
 
+//Modified by Ondrej Zjevik 2018
+
 /*** master php includes *******/
 require("../init.php");
 include("../includes/htmlutil.php");
@@ -39,7 +41,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		echo "Invalid ID";
 		exit;
 	}
-	
+
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
 		$sessiondata['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
@@ -375,6 +377,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=030818\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jquery.nestable.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=010519\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -395,10 +398,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$beentaken = false;
 	}
-	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,intro FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,intro,justintimeorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef, $assessintro) = $stm->fetch(PDO::FETCH_NUM);
+	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef, $assessintro, $justintimeorder) = $stm->fetch(PDO::FETCH_NUM);
 	$ln = 1;
+
+	if($displaymethod == "JustInTime"){
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsortJIT.js?v=080618\"></script>";
+	} else{
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=080618\"></script>";
+	}
 
 	// Format of imas_assessments.intro is a JSON representation like
 	// [ "original (main) intro text",
@@ -492,7 +501,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$timeout = array(0);
 		}
 		if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-			$timeout[1] = round($avgtimepts[2]); //score 
+			$timeout[1] = round($avgtimepts[2]); //score
 			$timeout[2] = round($avgtimepts[1]/60,1); //time first try
 			$timeout[3] = Sanitize::onlyInt($avgtimepts[3]); //# of data
 		}
@@ -524,7 +533,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$jsarr[] = array("text", $text_seg['text'],
 					Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
 					Sanitize::onlyInt($text_seg['ispage']),
-					$text_seg['pagetitle'], 
+					$text_seg['pagetitle'],
 					isset($text_seg['forntype'])?$text_seg['forntype']:0);
 			}
 		}
@@ -569,6 +578,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$text_seg['pagetitle'], 1);
 		}
 	}
+
 
 	unset($questionjsarr);
 
@@ -740,7 +750,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?) ";
 						$qarr[] = $userid;
 					}
-					
+
 				}
 				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
@@ -1194,6 +1204,28 @@ if ($overwriteBody==1) {
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+		/*document.getElementById("curqtbl").innerHTML = generateTable();
+		initeditor("selector","div.textsegment",null,true ,editorSetup);
+		tinymce.init({
+			selector: "h4.textsegment",
+			inline: true,
+			menubar: false,
+			statusbar: false,
+			branding: false,
+			plugins: ["charmap"],
+			toolbar: "charmap saveclose",
+			setup: editorSetup
+		});
+		*/
+		<?php
+			if($displaymethod == "JustInTime"){
+				if($justintimeorder != ""){
+					echo "var justintimeorder = ".$justintimeorder.";";
+				} else{
+					echo "var justintimeorder = [];";
+				}
+			}
+		?>
 		//$(refreshTable);
 		refreshTable();
 	</script>

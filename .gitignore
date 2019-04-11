@@ -4,3 +4,10 @@
 /c3.php
 *.php~
 *.js~
+config.php
+header.php
+infoheader.php
+loginpage.php
+newinstructor.php
+.DS_Store
+._.DS_Store

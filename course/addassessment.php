@@ -2,6 +2,8 @@
 //IMathAS:  Add/modify blocks of items on course page
 //(c) 2006 David Lippman
 
+// Modified by Ondrej Zjevik 2018
+
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
@@ -1025,6 +1027,7 @@ if ($overwriteBody==1) {
 						writeHtmlSelected($line['displaymethod'],"LivePoll",0);
 						echo '>Live Poll (experimental)</option>';
 					}?>
+					<option value="JustInTime" <?php writeHtmlSelected($line['displaymethod'],"JustInTime",0) ?>>Just In time</option>
 				</select>
 			</span><BR class=form>
 

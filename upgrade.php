@@ -6,7 +6,7 @@ require('migrator.php');
 
 //don't use this anymore:  create files in the /migrations/ directory
 //old approach: change counter; increase by 1 each time a change is made
-$latest_oldstyle = 119;
+$latest_oldstyle = 120;
 
 ini_set("max_input_time", "6000");
 ini_set("max_execution_time", "6000");
@@ -1864,11 +1864,18 @@ span.instronly {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			 }
 		}
+		if ($last<120) {
+			$query = "ALTER TABLE  `imas_assessments` ADD `justintimeorder` MEDIUMTEXT NULL DEFAULT NULL;";
+			$res = $DBH->query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			 }
+		}
 	
 /***
   end older DB update stuff
 ***/
-	if ($last<119) { 
+	if ($last<120) { 
 		//if we just ran any of those changes, update DB, otherwise
 		//let Migrator handle updating the ver
 		$stm = $DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=1");
