@@ -75,6 +75,23 @@ Need to:
 	- auto-add aria-describedby?  and autocomplete=off
 	- remove livepreview condition from 'preview'; handle that separately in frontend
   - remove inline javascript from show answer buttons
+	- need to signal that a question should be submitted all-at-once, when
+	   scoremethod = singlescore or acct
+	- EEK: Need to be able to get numeric values for Conditional lastanswer
+	  and nosolninf answers
+		ALSO need them for populating showanswersval at start of scoreq
+		If we calculate them there, we should be able to pass that to the part scorer
+		for conditional and reuse them.
+		Also, reuse them inside the scorepart to be efficient
+
+RETHINK
+ - for all calc numeric types, have front-end send
+   qn$qn-val in the submission
+ - This should already be formatted in the $stuanswersval format
+ - Will get passed to scorepart function
+   x use the provided value if provided
+	 x keep local eval code so we can use to rescore if needed
+ - make sure front end is nosolninf aware
  */
 
 
@@ -2840,6 +2857,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		$params['calcformat'] = $answerformat;
 
+		$out .= '<input ' .
+						Sanitize::generateAttributeString($attributes) .
+						'class="'.implode(' ', $classes) .
+						'" />';
+
 		if (!isset($hidepreview)) {
 			$params['preview'] = 1;
 			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
@@ -3547,6 +3569,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	$defaultreltol = .0015;
+	//TODO: move this into the function call
+	$hasNumVal = !empty($_POST["qn$qn-val"]);
+	$givenansval = $hasNumVal ? $_POST["qn$qn-val"] : null;
 	global $RND,$mathfuncs;
 	if ($anstype == "number") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
@@ -4111,18 +4136,28 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if (isset($answersize)) {
 			$sizeparts = explode(',',$answersize);
 			$givenanslist = array();
-			$givenanslistvals = array();
+			if ($hasNumVal) {
+				$giveanslistvals = explode('|', $givenansval);
+			} else {
+				$givenanslistvals = array();
+			}
 			for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
 				$givenanslist[$i] = $_POST["qn$qn-$i"];
-				$givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
+				if (!$hasNumVal) {
+					$givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
+				}
 			}
 			$GLOBALS['partlastanswer'] = implode("|",$givenanslist);
 			$GLOBALS['partlastanswer'] .= '$#$'.implode('|', $givenanslistvals);
 		} else {
 			$givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
 			$givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
-			foreach ($givenanslist as $j=>$v) {
-				$givenanslistvals[$j] = evalMathParser($v);
+			if ($hasNumVal) {
+				$giveanslistvals = explode('|', $givenansval);
+			} else {
+				foreach ($givenanslist as $j=>$v) {
+					$givenanslistvals[$j] = evalMathParser($v);
+				}
 			}
 			//this may not be backwards compatible
 			$GLOBALS['partlastanswer'] = $givenans.'$#$'.implode('|', $givenanslistvals);
@@ -4233,11 +4268,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($anstype=='ntuple') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calcntuple') {
-			$givenans = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $givenans);
-			$givenans = normalizemathunicode($givenans);
 			// parse and evaluate
-			$gaarr = parseNtuple($givenans, false, true);
-			$GLOBALS['partlastanswer'] = $givenans.'$#$'.ntupleToString($gaarr);
+			if ($hasNumVal) {
+				$gaarr = parseNtuple($givenansval, false, true);
+				$GLOBALS['partlastanswer'] = $givenans.'$#$'.$givenansval;
+			} else {
+				$gaarr = parseNtuple($givenans, false, true);
+				$GLOBALS['partlastanswer'] = $givenans.'$#$'.ntupleToString($gaarr);
+			}
 			//test for correct format, if specified
 			if (checkreqtimes($givenans,$requiretimes)==0) {
 				return 0;
@@ -4424,49 +4462,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
 		}
 		$givenans = normalizemathunicode($givenans);
-		if ($anstype=='complex') {
-			$GLOBALS['partlastanswer'] = $givenans;
-		} else if ($anstype=='calccomplex') {
-			$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
-			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
-			//test for correct format, if specified
-			if (($answer!='DNE'&&$answer!='oo') && checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
-				return 0;
-			}
-			$tocheck = explode(',',$_POST["tc$qn"]);
-			foreach ($tocheck as $tchk) {
-				if (in_array('sloppycomplex',$ansformats)) {
-					$tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
-					if (substr_count($tchk,'i')>1) {
-						return 0;
-					}
-					$tchk = str_replace(array('s$n','p$'),array('sin','pi'),$tchk);
-				} else {
-					$cpts = parsecomplex($tchk);
-
-					if (!is_array($cpts)) {
-						return 0;
-					}
-					if ($cpts[1]{0}=='+') {
-						$cpts[1] = substr($cpts[1],1);
-					}
-					if ($cpts[1]!='' && $cpts[1][strlen($cpts[1])-1]=='*') {
-						$cpts[1] = substr($cpts[1],0,-1);
-					}
-					//echo $cpts[0].','.$cpts[1].'<br/>';
-					if ($answer!='DNE'&&$answer!='oo' && (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats))) {
-						return 0;
-					}
-					if ($answer!='DNE'&&$answer!='oo' && isset($requiretimeslistpart) && checkreqtimes($tchk,$requiretimeslistpart)==0) {
-						return 0;
-					}
-				}
-			}
+		$GLOBALS['partlastanswer'] = $givenans;
+		if ($anstype=='calccomplex' && $hasNumVal) {
+			$GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
 		}
-
 		if ($givenans == null) {return 0;}
 		$answer = str_replace(' ','',makepretty($answer));
-		$givenans = str_replace(' ','',$givenans);
+		$givenans = trim($givenans);
 
 		if ($answer=='DNE') {
 			if (strtoupper($givenans)=='DNE') {
@@ -4483,17 +4485,45 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		$gaarr = array_map('trim',explode(',',$givenans));
+
+		if ($anstype=='calccomplex') {
+			//test for correct format, if specified
+			if (($answer!='DNE'&&$answer!='oo') && checkreqtimes($givenans,$requiretimes)==0) {
+				return 0;
+			}
+			foreach ($gaarr as $tchk) {
+				if (in_array('sloppycomplex',$ansformats)) {
+					$tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
+					if (substr_count($tchk,'i')>1) {
+						return 0;
+					}
+					$tchk = str_replace(array('s$n','p$'),array('sin','pi'),$tchk);
+				} else {
+					// TODO: rewrite using mathparser
+					$cpts = parsecomplex($tchk);
+
+					if (!is_array($cpts)) {
+						return 0;
+					}
+					$cpts[1] = ltrim($cpts[1], '+');
+					$cpts[1] = rtrim($cpts[1], '*');
+
+					//echo $cpts[0].','.$cpts[1].'<br/>';
+					if ($answer!='DNE'&&$answer!='oo' && (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats))) {
+						return 0;
+					}
+					if ($answer!='DNE'&&$answer!='oo' && isset($requiretimeslistpart) && checkreqtimes($tchk,$requiretimeslistpart)==0) {
+						return 0;
+					}
+				}
+			}
+		}
+
 		$ganumarr = array();
 		foreach ($gaarr as $j=>$givenans) {
-			$cparts = parsecomplex($givenans);
-			$gaparts = array();
-			if (!is_array($cparts)) {
-				return 0;
-			} else {
-				$gaparts[0] = floatval($cparts[0]);
-				$gaparts[1] = floatval($cparts[1]);
-			}
+			$gaparts = parsesloppycomplex($givenans);
 			if (!in_array('exactlist',$ansformats)) {
+				// don't add if we already have it in the list
 				foreach ($ganumarr as $prevvals) {
 					if (abs($gaparts[0]-$prevvals[0])<1e-12 && abs($gaparts[1]-$prevvals[1])<1e-12) {
 						continue 2; //skip adding it to the list
@@ -4506,16 +4536,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$anarr = array_map('trim',explode(',',$answer));
 		$annumarr = array();
 		foreach ($anarr as $i=>$answer) {
-			$cparts = parsecomplex($answer);
-			if (!is_array($cparts)) {
-				$ansparts = parsesloppycomplex($answer);
-			} else {
-				if ($cparts[1]!='' && $cparts[1][strlen($cparts[1])-1]=='*') {
-					$cparts[1] = substr($cparts[1],0,-1);
-				}
-				$ansparts[0] = evalMathParser($cparts[0]);
-				$ansparts[1] = evalMathParser($cparts[1]);
-			}
+			$ansparts = parsesloppycomplex($answer);
 			if (!in_array('exactlist',$ansformats)) {
 				foreach ($annumarr as $prevvals) {
 					if (abs($ansparts[0]-$prevvals[0])<1e-12 && abs($ansparts[1]-$prevvals[1])<1e-12) {
@@ -4583,6 +4604,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		$GLOBALS['partlastanswer'] = $givenans;
+		if ($hasNumVal) {
+			$GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
+		}
 		if ($answer==='') {
 			if (trim($givenans)==='') { return 1;} else { return 0;}
 		}
@@ -4667,21 +4691,51 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = $aarr;
 		}
 
+		if (!$hasNumVal) {
+			if (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats)) {
+				$gaarr = array_map('trim',explode(',',$givenans));
+			} else {
+				$gaarr = array(trim(str_replace(',','', $givenans)));
+			}
+			$numvalarr = array();
+			foreach ($gaarr as $j=>$v) {
+				if ($v!='DNE' && $v!='oo' && $v!='+oo' && $v!='-oo') {
+					if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
+						$numvalarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
+					} else {
+						$numvalarr[$j] = evalMathParser($v);
+					}
+				} else {
+					$numvalarr[$j] = $v;
+				}
+			}
+			$givenansval = implode(',', $numvalarr);
+			$GLOBALS['partlastanswer'] .= '$#$'. $givenansval;
+		} {
+			$numvalarr = explode(',', $givenansval);
+		}
+
 		if (in_array('exactlist',$ansformats)) {
 			$gaarr = array_map('trim',explode(',',$givenans));
 		} else if (in_array('orderedlist',$ansformats)) {
 			$gamasterarr = array_map('trim',explode(',',$givenans));
 			$gaarr = $gamasterarr;
+			//$anarr = explode(',',$answer);
 		} else if (in_array('list',$ansformats)) {
 			$tmp = array_map('trim',explode(',',$givenans));
-			asort($tmp);
+			$tmpnumval = $numvalarr;
+			$numvalarr = [];
+			$gaarr = [];
+			asort($tmpnumval);
 			$lastval = null;
-			foreach ($tmp as $i=>$v) {
+			foreach ($tmpnumval as $i=>$v) {
 				if ($lastval===null || !is_numeric($lastval)) {
 					$gaarr[] = $tmp[$i];
+					$numvalarr[] = $tmpnumval[$i];
 				} else if (is_numeric($v)) {
 					if (abs($v-$lastval)>1E-12) {
 						$gaarr[] = $tmp[$i];
+						$numvalarr[] = $tmpnumval[$i];
 					}
 				}
 				$lastval = $v;
@@ -4710,21 +4764,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$gaarr = array(str_replace(',','',$givenans));
 			$anarr = array($answer);
 		}
+
 		$extrapennum = count($gaarr)+count($anarr);
 		$gaarrcnt = count($gaarr);
-
-		$numvalarr = array();
-		foreach ($gaarr as $j=>$v) {
-			if ($v!='DNE' && $v!='oo' && $v!='+oo' && $v!='-oo') {
-				if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
-					$numvalarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
-				} else {
-					$numvalarr[$j] = evalMathParser($v);
-				}
-			} else {
-				$numvalarr[$j] = $v;
-			}
-		}
 
 		if (in_array('orderedlist',$ansformats)) {
 			if (count($gamasterarr)!=count($anarr)) {
@@ -5145,12 +5187,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$givenans = normalizemathunicode($givenans);
-		$tostoreans = str_replace('~', '&tilde;', $givenans);
-		$tostoreans = preg_replace('/&(\w+;)/','%$1',$tostoreans);
-		$tostoreans = preg_replace('/&/','%amp;',$tostoreans);
-		$GLOBALS['partlastanswer'] = $tostoreans;
 
-		if (isset($scoremethod) && (($scoremethod=='takeanything'  && trim($givenans)!='') || $scoremethod=='takeanythingorblank')) {
+		$GLOBALS['partlastanswer'] = $givenans;
+
+		if (isset($scoremethod) &&
+			(($scoremethod=='takeanything' && trim($givenans)!='') ||
+				$scoremethod=='takeanythingorblank')
+		) {
 			return 1;
 		}
 
@@ -5302,11 +5345,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	} else if ($anstype == "essay") {
 		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
 		$givenans = myhtmLawed($givenans);
-		$givenans = str_replace('~', '&tilde;', $givenans);
-		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
-		if (isset($scoremethod) && (($scoremethod=='takeanything'  && trim($givenans)!='') || $scoremethod=='takeanythingorblank')) {
+		if (isset($scoremethod) &&
+			(($scoremethod=='takeanything'  && trim($givenans)!='') ||
+				$scoremethod=='takeanythingorblank')
+		) {
 			return 1;
 		} else if (trim($givenans)=='') {
 			return 0;
@@ -5327,52 +5371,66 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
 		$givenans = normalizemathunicode($givenans);
-		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
 
 		if (in_array('nosoln',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt, in_array('inequality',$ansformats)?'inequality':'interval');
 		}
 
-		if ($anstype == 'interval') {
-			$GLOBALS['partlastanswer'] = $givenans;
-			$givenans = str_replace('u', 'U', $givenans);
-		} else if ($anstype == 'calcinterval') {
-			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
+		$givenans = str_replace('u', 'U', $givenans);
+		$GLOBALS['partlastanswer'] = $givenans;
+		if ($hasNumVal) {
+			$GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
+		}
+		if ($anstype == 'calcinterval') {
 			//test for correct format, if specified
-			if (checkreqtimes($_POST["tc$qn"],$requiretimes)==0) {
+			if (checkreqtimes($givenans,$requiretimes)==0) {
 				return 0;
 			}
 			if (in_array('inequality',$ansformats)) {
-				$_POST["tc$qn"] = str_replace('or', ' or ', $_POST["tc$qn"]);
-				preg_match_all('/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/',$_POST["tc$qn"],$matches);
-				foreach ($matches[0] as $var) {
-					$var = str_replace(' ','',$var);
-					if (in_array($var,$mathfuncs)) { continue;}
-					if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' &&
-						strtolower($var) != strtolower($variables) && $_POST["qn$qn"]!="(-oo,oo)") {
-						return 0;
+				$givenans = str_replace('or', ' or ', $givenans);
+				if (preg_match('/all\s*real/i', $givenans)) {
+					$givenans = '(-oo,oo)';
+				} else if (preg_match('/empty\s*set/i', $givenans)) {
+					$givenans = 'DNE';
+				} else {
+					if ($variables != 'var') {
+						$givenans = str_replace('var','',$givenans);
 					}
-				}
-				$orarr = explode(' or ',$_POST["tc$qn"]);
-				foreach ($orarr as $opt) {
-					$opt = trim($opt);
-					if ($opt=='DNE' || $givenans=='(-oo,oo)') {continue;} //DNE or all real numbers
-					$opts = preg_split('/(<=?|>=?)/',$opt);
-					foreach ($opts as $optp) {
-						$optp = trim($optp);
-						if (strtolower($optp)==strtolower($variables) || $optp=='oo' || $optp=='-oo') {continue;}
-						if (!checkanswerformat($optp,$ansformats)) {
+					//for simplicity, we're going to replace correct $variables with var
+					$givenans = str_ireplace($variables, 'var', $givenans);
+
+					// now it'll be easier to see if there's something unintended
+					preg_match_all('/([a-zA-Z]+)/',$givenans,$matches);
+					foreach ($matches[0] as $var) {
+						if (in_array($var,$mathfuncs)) { continue;}
+						if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' &&
+							strtolower($var) != 'var') {
 							return 0;
 						}
 					}
+					$orarr = explode(' or ', $givenans);
+					foreach ($orarr as $opt) {
+						$opt = trim($opt);
+						if ($opt=='DNE' || $givenans=='(-oo,oo)') {continue;} //DNE or all real numbers
+						$opts = preg_split('/(<=?|>=?)/',$opt);
+						foreach ($opts as $optp) {
+							$optp = trim($optp);
+							if (strtolower($optp)=='var' || $optp=='oo' || $optp=='-oo') {continue;}
+							if (!checkanswerformat($optp,$ansformats)) {
+								return 0;
+							}
+						}
+					}
+					// convert it to an interval for scoring
+					if (!$hasNumVal) {
+						$givenans = ineqtointerval($givenans, 'var');
+					}
 				}
 			} else {
-				$givenans = str_replace('u', 'U', $givenans);
-				$_POST["tc$qn"] = str_replace('u', 'U', $_POST["tc$qn"]);
 				if (in_array('list',$ansformats)) {
-					$orarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$_POST["tc$qn"]);
+					$orarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/', $givenans);
 				} else {
-					$orarr = explode('U',$_POST["tc$qn"]);
+					$orarr = explode('U', $givenans);
 				}
 				foreach ($orarr as $opt) {
 					$opt = trim($opt);
@@ -5386,7 +5444,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			}
-
 		}
 
 		if ($givenans == null) {return 0;}
@@ -5394,6 +5451,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansar = explode(' or ',$answer);
 		$givenans = str_replace(' ','',$givenans);
 
+		if ($hasNumVal) {
+			$gaarr = parseInterval($givenansval, in_array('list',$ansformats));
+		} else {
+			$gaarr = parseInterval($givenans, in_array('list',$ansformats));
+		}
+
+		if ($anstype == 'calcinterval' && !$hasNumVal) {
+			$GLOBALS['partlastanswer'] .= '$#$' . parsedIntervalToSTring($gaarr);
+		}
+		if ($gaarr === false) {
+			return 0;
+		}
 		foreach($ansar as $anans) {
 			$answer = str_replace(' ','',$anans);
 
@@ -5403,65 +5472,41 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else {
 					continue;
 				}
+			} else if ($givenans==='DNE') {
+				continue;
 			}
-			if (in_array('list',$ansformats)) {
-				$aarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$anans);
-				$gaarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$givenans);
-			} else {
-				$aarr = explode('U',$anans);
-				$gaarr = explode('U',$givenans);
+
+			$aarr = parseInterval($anans, in_array('list',$ansformats));
+			if ($aarr === false) {
+				return 0; //uh oh
 			}
+
 			if (count($aarr)!=count($gaarr)) {
 				continue;
 			}
 
 			foreach ($aarr as $ansint) {
-				$ansint = trim($ansint);
-				$anssm = substr($ansint,0,1);
-				$ansem = substr($ansint,-1);
-				$ansint = substr($ansint,1,strlen($ansint)-2);
-				list($anssn,$ansen) = explode(',',$ansint);
-				if (!is_numeric($anssn) && strpos($anssn,'oo')===false) {
-					$anssn = evalMathParser($anssn);
-				}
-				if (!is_numeric($ansen) && strpos($ansen,'oo')===false) {
-					$ansen = evalMathParser($ansen);
-				}
 				$foundloc = -1;
 				foreach ($gaarr as $k=>$gansint) {
-					$gansint = trim($gansint);
-					$ganssm = substr($gansint,0,1);
-					$gansem = substr($gansint,-1);
-					$gansint = substr($gansint,1,strlen($gansint)-2);
-					list($ganssn,$gansen) = explode(',',$gansint);
-					if ($anssm!=$ganssm || $ansem!=$gansem) {
+					// check brackets
+					if ($ansint['lb']!=$gansint['lb'] || $ansint['rb']!=$gansint['rb']) {
 						continue;
 					}
-					if (strpos($anssn,'oo')!==false || !is_numeric($ganssn)) {
-						$anssn = trim($anssn);
-						if (($anssn=='oo' || $anssn=='+oo') && ($ganssn=='oo' || $ganssn=='+oo')) {
-
-						} else if ($anssn=='-oo' && $ganssn=='-oo') {
-
-						} else {
+					list($anssn, $ansen) = $ansint['vals'];
+					list($ganssn, $gansen) = $gansint['vals'];
+					if (!is_numeric($anssn) || !is_numeric($ganssn)) {
+						if ($anssn !== $ganssn) {
 							continue;
 						}
-						//if ($anssn===$ganssn) {} else {continue;}
 					} else if (isset($abstolerance)) {
 						if (abs($anssn-$ganssn) < $abstolerance + 1E-12) {} else {continue;}
 					} else {
 						if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
 					}
-					if (strpos($ansen,'oo')!==false || !is_numeric($gansen)) {
-						$ansen = trim($ansen);
-						if (($ansen=='oo' || $ansen=='+oo') && ($gansen=='oo' || $gansen=='+oo')) {
-
-						} else if ($ansen=='-oo' && $gansen=='-oo') {
-
-						} else {
+					if (!is_numeric($ansen) || !is_numeric($gansen)) {
+						if ($ansen !== $gansen) {
 							continue;
 						}
-						//if ($ansen===$gansen) {} else {continue;}
 					} else if (isset($abstolerance)) {
 						if (abs($ansen-$gansen) < $abstolerance + 1E-12) {} else {continue;}
 					} else {
@@ -7903,6 +7948,48 @@ function ntupleToString($ntuples) {
 		}
 	}
 	implode(',', $out);
+}
+
+function parseInterval($str, $islist = false) {
+	if ($islist) {
+		$ints = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$str);
+	} else {
+		$ints = explode('U',$str);
+	}
+	$out = array();
+	foreach ($ints as $int) {
+		$i = array();
+		$i['lb'] = $int[0];
+		$i['rb'] = $int[strlen($int)-1];
+		$i['vals'] = array_map('trim', explode(',', substr($int,1,-1)));
+		if (count($i['vals']) != 2) {
+			return false;
+		}
+		for ($j=0;$j<2;$j++) {
+			if ($i['vals'][$j] == '+oo') {
+				$i['vals'][$j] = 'oo';
+			}
+			if (!is_numeric($i['vals'][$j]) &&
+			 	$i['vals'][$j] != 'oo' && $i['vals'][$j] != '-oo'
+			) {
+				$i['vals'][$j] = evalMathParser($i['vals'][$j]);
+			}
+		}
+		$out[] = $i;
+	}
+	return $out;
+}
+
+function parsedIntervalToString($parsed, $islist) {
+	$out = [];
+	foreach ($parsed as $int) {
+		$out[] = $int['lb'] . $int['vals'][0] . ',' . $int['vals'][1] . $int['rb'];
+	}
+	if ($islist) {
+		return implode(',', $out);
+	} else {
+		return implode('U', $out);
+	}
 }
 
 //checks the format of a value

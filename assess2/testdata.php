@@ -87,6 +87,20 @@ $questionSet = [
     'qtype' => 'calcntuple',
     'control' => '$displayformat="pointlist"'."\n".'$answer="(1/2,3),(4,9)"',
     'qtext' => '<p>Enter (1/2,3),(4,9)</p>'
+  ],
+  12=>[
+    'uniqueid' => 1552587894535725,
+    'description' => 'calc complex',
+    'qtype' => 'calccomplex',
+    'control' => '$answerformat="list,fraction"'."\n".'$answer="1/2+3i,4-1/4i"',
+    'qtext' => '<p>Enter 1/2+3i,4-1/4i</p>'
+  ],
+  13=>[
+    'uniqueid' => 1552587894535726,
+    'description' => 'calc interval',
+    'qtype' => 'calcinterval',
+    'control' => '$answerformat="fraction"'."\n".'$answer="[1/2,oo)"',
+    'qtext' => '<p>Enter [1/2,oo)</p>'
   ]
 ];
 
@@ -795,8 +809,10 @@ $assessGroups = [
           1=>['questionsetid' => 9],
           2=>['questionsetid' => 10],
           3=>['questionsetid' => 11],
+          4=>['questionsetid' => 12],
+          5=>['questionsetid' => 13]
         ],
-        'itemorder' => [0,1,2,3]
+        'itemorder' => [0,1,2,3,4,5]
       ]
     ]
   ],
