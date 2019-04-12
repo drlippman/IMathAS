@@ -22,8 +22,8 @@ attributes:
  data-qtype	question type	for number, add oo/DNE helper
  data-helper  1   add oo/DNE helper or mathquill
  data-preview 1
- data-format	debit		onkeyup = editdebit(el)
- 		credit		onkeyup = editcredit(el)
+ data-format	x debit		onkeyup = editdebit(el)
+ 		x credit		onkeyup = editcredit(el)
  data-tip	the short tooltip
 		put long tooltip in "tips-$qn"
  aria-describedby	"tips-$qn"
@@ -54,7 +54,7 @@ Need to:
      initstack.push(function(){ autosugg'.$qn.' = new AutoSuggest(document.getElementById("qn'.$qn.'"),'.$asvar.');})
 		 params autosuggest, look for value
 		 look for element with autosuggestlist-(value) and use that (already array)
- - on data-format = normslider
+ x on data-format = normslider
  		 imathasDraw.addnormslider('.$qn.');
  - if class .a11ydrawadd, pull data-qn and add onclick:
  		imathasDraw.adda11ydraw('.$qn.')
@@ -1840,6 +1840,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						'autocomplete' => 'off'
 					];
 					$attributes['aria-describedby'] = "tips-$qn";
+					$params['matrixsize'] = $answersize;
 
 					$out .= '<input ' .
 									Sanitize::generateAttributeString($attributes) .
@@ -1945,6 +1946,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						'autocomplete' => 'off'
 					];
 					$attributes['aria-describedby'] = "tips-$qn";
+					$params['matrixsize'] = $answersize;
 
 					$out .= '<input ' .
 									Sanitize::generateAttributeString($attributes) .
@@ -1960,7 +1962,6 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= getcolormark($colorbox);
 			if (!isset($hidepreview)) {$preview .= "<input type=button id=\"pbtn$qn\" class=btn value=\"" . _('Preview') . "\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
-			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
 		} else {
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -2115,9 +2116,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$params['preview'] = 1;
 		}
 		$params['calcformat'] = Sanitize::encodeStringForDisplay($answerformat);
-		$params['vars'] = implode(',', $variables);
-		$params['fvars'] = implode(',', $ofunc);
-		$params['domain'] = implode(',', $newdomain);
+		$params['vars'] = $variables;
+		$params['fvars'] = $ofunc;
+		$params['domain'] = $newdomain;
 
 		$out .= '<input ' .
 						Sanitize::generateAttributeString($attributes) .
