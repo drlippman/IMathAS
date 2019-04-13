@@ -201,6 +201,7 @@ export default {
       this.setInitValues();
       this.addDirtyTrackers();
       this.initShowAnswer();
+      window.imathasAssess.init(this.questionData.jsparams);
     },
     setInitValues() {
       var regex = new RegExp("^(qn|tc|qs)\\d");

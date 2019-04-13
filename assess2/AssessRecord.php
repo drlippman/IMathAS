@@ -965,7 +965,8 @@ class AssessRecord
       $showans = $this->assess_info->getSetting('showans');
       $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt');
 
-      list($out['html'], $out['answeights'], $out['usedautosave']) = $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
+      list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
+        $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
       $this->setAnsweights($qn, $out['answeights'], $ver);
       $out['seed'] = $curq['seed'];
     } else {
@@ -1171,10 +1172,14 @@ class AssessRecord
     $trylimit = $qsettings['tries_max'];
     $usedAutosave = array();
 
+    list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
+
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
       $partattemptn[$pn] = count($qver['tries'][$pn]);
 
+      // TODO: Rework this to use stuanswers?  Or dont even need if we Rework
+      // displayq to use stuanswers
       if ($clearans) {
         $lastans[$pn] = '';
       } else if (isset($autosave['stuans'][$pn])) {
@@ -1213,27 +1218,28 @@ class AssessRecord
     // TODO:  pass as input
     $GLOBALS['lastanswers'] = array($qn => implode('&', $lastans));
     $GLOBALS['lastansweights'] = array(1);
-    ob_start();
-    //$qout = displayq(
-    displayq(
+
+    list($qout,$jsparams) = displayq(
         $qn,                            // question number
         $qsettings['questionsetid'],    // questionset ID
         $qver['seed'],                  // seed
         $showans,                       // whether to show answers
         $qsettings['showhints'],        // whether to show hints
         $attemptn,                      // the attempt number //TODO: make by-part
-        false, //using ob for now                           // return question text rather than echo
+        $partattemptn,                  // the attempt number by-part
+        true,                          // return question text rather than echo
         $clearans,                      // whether to clear last ans //TODO: move here
-        false,                          // seqinactive //TODO: deprecate
-        $qcolors                        // array of part scores for score marking
+        $qcolors,                        // array of part scores for score marking
+        $stuanswers,
+        $stuanswersval
     );
-    $qout = ob_get_clean();
+
     // need to extract answeights to provide to frontend
     $answeights = $GLOBALS['lastansweights'];
     if (empty($answeights)) {
       $answeights = array(1);
     }
-    return array($qout, $answeights, $usedAutosave);
+    return array($qout, $jsparams, $answeights, $usedAutosave);
   }
 
   /**
@@ -1319,6 +1325,7 @@ class AssessRecord
     $stuanswers = array();
     $stuanswerval = array();
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
+      $bcnt = 0;
       $question_versions = $assessver['questions'][$qn]['question_versions'];
       if (!$by_question || !is_numeric($ver)) {
         $curq = $question_versions[count($question_versions) - 1];
@@ -1327,7 +1334,7 @@ class AssessRecord
       }
       $stuansparts = array();
       $stuansvalparts = array();
-      for ($pn = 0; $pn < $curq['tries']; $pn++) {
+      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
         $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
         $stuansparts[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
         $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
@@ -1339,6 +1346,7 @@ class AssessRecord
         $stuanswers[$qn] = $stuansparts[0];
         $stuanswersval[$qn] = $stuansvalparts[0];
       }
+
     }
     return array($stuanswers, $stuanswerval);
   }

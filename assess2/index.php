@@ -28,6 +28,10 @@ if ($isltilimited || $inTreeReader) {
 $placeinhead = '<script type="text/javascript">var APIbase = "'.$GLOBALS['basesiteurl'].'/assess2/";</script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/app.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js" type="text/javascript"></script>';
+
 if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "";</script>';
 } else if ($isdiag) {
@@ -54,8 +58,15 @@ if (!$isltilimited && !$inTreeReader && !$isdiag) {
 </noscript>
 <div id="app"></div>
 
+<div id="ehdd" class="ehdd">
+  <span id="ehddtext"></span>
+  <span onclick="showeh(curehdd);" style="cursor:pointer;"><?php echo _('[more..]'); ?></span>
+</div>
+<div id="eh" class="eh"></div>
+
 <script type="text/javascript" src="<?php echo $imasroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/assess2/vue/js/app.js?v=<?php echo $lastupdate;?>"></script>
+
 <?php
 
 require('../footer.php');

@@ -174,6 +174,10 @@ export const actions = {
           }
         }
       });
+      let valstr = imathasAssess.preSubmit(qn);
+      if (valstr !== '') {
+        data.append('qn'+qn+'-val', valstr);
+      }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
     };
     data.append('toscoreqn', JSON.stringify(changedQuestions));

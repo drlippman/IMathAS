@@ -58,11 +58,15 @@ function init(paramarr) {
       //TODO
     }
     if (params.preview) { //setup preview TODO: check for userpref
+      document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(qn)});
       if (!params.qtype.match(/matrix/)) { //no live preview for matrix types
+        if (LivePreviews.hasOwnProperty(qn)) {
+          delete LivePreviews[qn]; // want to reinit
+        }
         setupLivePreview(qn);
         document.getElementById("qn"+qn).addEventListener('keyup', updateLivePreview);
+        //document.getElementById("pbtn"+qn).style.display = 'none';
       }
-      document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(qn)});
     }
     if (params.format === 'debit') {
       document.getElementById("qn"+qn).addEventListener('keyup', editdebit);
@@ -91,13 +95,13 @@ function init(paramarr) {
 // setup tip focus/blur handlers
 function setupTips(id, tip) {
   var el = document.getElementById(id);
-  var ref = el.getAttribute('aria-describedby');
+  var ref = el.getAttribute('aria-describedby').substr(4);
   el.addEventListener('focus', function() {
-    showehdd(qn, tip, ref);
+    showehdd(id, tip, ref);
   });
   el.addEventListener('blur', hideeh);
   el.addEventListener('click', function() {
-    reshrinkeh(qn);
+    reshrinkeh(id);
   });
 }
 
@@ -121,11 +125,12 @@ function setupLivePreview(qn) {
 			  //  Get the preview and buffer DIV's
 			  //
 			  Init: function() {
-				$("#p"+qn).css("positive","relative")
-					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;position:absolute;"></span>')
-					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');
-				this.preview = document.getElementById("lpbuf1"+qn);
-				this.buffer = document.getElementById("lpbuf2"+qn);
+  				$("#p"+qn).css("positive","relative")
+  					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;position:absolute;"></span>')
+  					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');
+  				this.preview = document.getElementById("lpbuf1"+qn);
+  				this.buffer = document.getElementById("lpbuf2"+qn);
+          showPreview(qn);  //TODO: review this
 			  },
 
 			  SwapBuffers: function () {
@@ -165,7 +170,7 @@ function setupLivePreview(qn) {
 			  },
 
 			  DoFinalPreview: function() {
-				$("#pbtn"+qn).trigger("click");
+          $("#pbtn"+qn).trigger("click");
 			  },
 
 			  preformat: function(text) {
@@ -177,11 +182,7 @@ function setupLivePreview(qn) {
 			  CreatePreview: function () {
 			    this.timeout = null;
 			    if (this.mjPending) return;
-			    if (document.getElementById("tc"+qn)==null) { //string preview
-			    	    var text = document.getElementById("qn"+qn).value;
-			    } else {
-			    	    var text = document.getElementById("tc"+qn).value;
-			    }
+			    var text = document.getElementById("qn"+qn).value;
 			    if (text === this.oldtext) return;
 			    if (this.mjRunning) {
 			      this.mjPending = true;
@@ -197,7 +198,7 @@ function setupLivePreview(qn) {
 			  PreviewDone: function () {
 			    this.mjRunning = this.mjPending = false;
 			    this.SwapBuffers();
-			    updateeeddpos();
+			    //updateeeddpos();  //TODO: re-enable later
 			    updateehpos();
 			  }
 
@@ -265,18 +266,18 @@ function showPreview(qn) {
   var params = allParams[qn];
   var outstr = '';
   var res = processByType(qn);
-  var outstr = '`' + var.str + '`';
+  var outstr = '`' + res.str + '`';
   if (res.dispvalstr != '' && params.calcformat.indexOf('showval')!=-1) {
     outstr += ' = ' + res.dispvalstr;
   }
-  if (res.err != '') {
-    outstr += '. ' + res.err;
+  if (res.err != '' && res.str != '') {
+    outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
   }
   if (LivePreviews.hasOwnProperty(qn)) {
     LivePreviews[qn].RenderNow(outstr);
   } else {
     var previewel = document.getElementById('p'+qn);
-    previewel.innerText = outstr;
+    previewel.innerHTML = outstr;
     rendermathnode(previewel);
   }
 }
@@ -288,7 +289,8 @@ function showPreview(qn) {
 function preSubmitForm(form) {
   for (var qn in allParams) {
     // reuse existing if there is one
-    if (var ex = document.getElementById('qn' + qn + '-val')) {
+    var ex;
+    if (ex = document.getElementById('qn' + qn + '-val')) {
       ex.value = preSubmit(qn);
     } else {
       var el = document.createElement('input');
@@ -315,7 +317,7 @@ function preSubmit(qn) {
  *   .dispvalstr: the evaluated string, formatted for display
  *   .submitstr: the evaluated answer, formatted for submission
  */
-functon processByType(qn) {
+function processByType(qn) {
   var params = allParams[qn];
   var res;
   if (params.hasOwnProperty('matrixsize')) {
@@ -629,10 +631,36 @@ function singlevaleval(evalstr, format) {
   }
 }
 
+function scopedeval(c) {
+	try {
+		return eval(c);
+	} catch(e) {
+		return "synerr";
+	}
+}
+
+function scopedmatheval(c) {
+	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
+		return '';
+	}
+	try {
+		return eval(prepWithMath(mathjs(c)));
+	} catch(e) {
+		return '';
+	}
+}
+
+function prepWithMath(str) {
+	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
+	str = str.replace(/\(E\)/g,'(Math.E)');
+	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
+	return str;
+}
+
 return {
   init: init,
   preSubmitForm: preSubmitForm,
   preSubmit: preSubmit
 };
 
-}}(jQuery));
+}(jQuery));

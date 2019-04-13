@@ -168,4 +168,24 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
   transform: translate(-2em, 0);
 }
 
+
+.ehdd {
+	position: absolute;
+	background: #669;
+	display:none;
+	color: #fff;
+	font-size: 75%;
+	padding: 0px 4px;
+	opacity: 0.9;
+}
+.eh {
+	position: absolute;
+	background: #669;
+	color: #fff;
+	display: none;
+	padding: 0px 4px;
+	font-size: 75%;
+	opacity: 0.9;
+}
+
 </style>

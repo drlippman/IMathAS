@@ -25,8 +25,8 @@ attributes:
  data-format	x debit		onkeyup = editdebit(el)
  		x credit		onkeyup = editcredit(el)
  data-tip	the short tooltip
-		put long tooltip in "tips-$qn"
- aria-describedby	"tips-$qn"
+		put long tooltip in "tips$qn"
+ aria-describedby	"tips$qn"
     may need to update the tips lookup to pull from right place
 
  data-calcformat	$answerformat	 calc field with preview to setup onkeyup
@@ -584,7 +584,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$partattemp
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& $showtips>0) {
 			$tipsdiv .= "<p class=\"tips\" ";
 			if ($showtips!=1) { $tipsdiv .= 'style="display:none;" ';}
-			$tipsdiv .= ">". _('Box'). " ".($iidx+1).": <span id=\"tips-$tipid\">".filter($entryTip)."</span></p>";
+			$tipsdiv .= ">". _('Box'). " ".($iidx+1).": <span id=\"tips$tipid\">".filter($entryTip)."</span></p>";
 		}
 	}
 
@@ -1206,7 +1206,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 
 		$params['tip'] = $shorttip;
-		$attributes['aria-describedby'] = "tips-$qn";
+		$attributes['aria-describedby'] = "tips$qn";
 		if ($useeqnhelper && $useeqnhelper>2 && !(isset($scoremethod) && $scoremethod=='acct') && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
 			$params['helper'] = 1;
 		}
@@ -1746,7 +1746,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		];
 
 		$params['tip'] = $shorttip;
-		$attributes['aria-describedby'] = "tips-$qn";
+		$attributes['aria-describedby'] = "tips$qn";
 		if ($useeqnhelper) {
 			$params['helper'] = 1;
 		}
@@ -1839,7 +1839,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						'value' => $las[$count],
 						'autocomplete' => 'off'
 					];
-					$attributes['aria-describedby'] = "tips-$qn";
+					$attributes['aria-describedby'] = "tips$qn";
 					$params['matrixsize'] = $answersize;
 
 					$out .= '<input ' .
@@ -1880,7 +1880,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				'autocomplete' => 'off'
 			];
 			$params['tip'] = $tip;
-			$attributes['aria-describedby'] = "tips-$qn";
+			$attributes['aria-describedby'] = "tips$qn";
 
 			$out .= '<input ' .
 							Sanitize::generateAttributeString($attributes) .
@@ -1945,7 +1945,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						'value' => $las[$count],
 						'autocomplete' => 'off'
 					];
-					$attributes['aria-describedby'] = "tips-$qn";
+					$attributes['aria-describedby'] = "tips$qn";
 					$params['matrixsize'] = $answersize;
 
 					$out .= '<input ' .
@@ -1984,7 +1984,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				'value' => $la,
 				'autocomplete' => 'off'
 			];
-			$attributes['aria-describedby'] = "tips-$qn";
+			$attributes['aria-describedby'] = "tips$qn";
 
 			$out .= '<input ' .
 							Sanitize::generateAttributeString($attributes) .
@@ -2108,7 +2108,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		];
 
 		$params['tip'] = Sanitize::encodeStringForDisplay($shorttip);
-		$attributes['aria-describedby'] = "tips-$qn";
+		$attributes['aria-describedby'] = "tips$qn";
 		if ($useeqnhelper) {
 			$params['helper'] = 1;
 		}
@@ -2232,7 +2232,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			'autocomplete' => 'off'
 		];
 		$params['tip'] = $shorttip;
-		$attributes['aria-describedby'] = "tips-$qn";
+		$attributes['aria-describedby'] = "tips$qn";
 
 		$out .= '<input ' .
 						Sanitize::generateAttributeString($attributes) .
@@ -2304,7 +2304,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			'autocomplete' => 'off'
 		];
 		$params['tip'] = $shorttip;
-		$attributes['aria-describedby'] = "tips-$qn";
+		$attributes['aria-describedby'] = "tips$qn";
 		$params['calcformat'] = $answerformat;
 		if ($useeqnhelper) {
 			$params['helper'] = 1;
@@ -2366,7 +2366,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			'id' => "qn$qn",
 			'value' => $la,
 			'autocomplete' => 'off',
-			'aria-describedby' => "tips-$qn"
+			'aria-describedby' => "tips$qn"
 		];
 		$params['tip'] = $shorttip;
 		if ($useeqnhelper) {
@@ -2425,7 +2425,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			'id' => "qn$qn",
 			'value' => $la,
 			'autocomplete' => 'off',
-			'aria-describedby' => "tips-$qn"
+			'aria-describedby' => "tips$qn"
 		];
 		$params['tip'] = $shorttip;
 		if ($useeqnhelper) {
@@ -2549,7 +2549,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 
 			$params['tip'] = $shorttip;
-			$attributes['aria-describedby'] = "tips-$qn";
+			$attributes['aria-describedby'] = "tips$qn";
 			if ($useeqnhelper && $displayformat == 'usepreview') {
 				$params['helper'] = 1;
 			}
@@ -2762,7 +2762,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			'id' => "qn$qn",
 			'value' => $la,
 			'autocomplete' => 'off',
-			'aria-describedby' => "tips-$qn"
+			'aria-describedby' => "tips$qn"
 		];
 		$params['tip'] = $shorttip;
 		if ($useeqnhelper) {
@@ -2849,7 +2849,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			'id' => "qn$qn",
 			'value' => $la,
 			'autocomplete' => 'off',
-			'aria-describedby' => "tips-$qn"
+			'aria-describedby' => "tips$qn"
 		];
 		$params['tip'] = $shorttip;
 		if ($useeqnhelper) {
