@@ -163,9 +163,8 @@ if (isset($_POST['order'])) {
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
-$placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; var j=jQuery.noConflict();</script>";
-$placeinhead .= "<script src=\"$imasroot/javascript/mootools.js\"></script>";
-$placeinhead .= "<script src=\"$imasroot/javascript/nested1.js?v=041119\"></script>";
+$placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?cid=$cid&save=save'; </script>";
+$placeinhead .= "<script src=\"$imasroot/javascript/nestedjq.js?v=041119\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var ocnt = 0;
@@ -181,8 +180,8 @@ $placeinhead .= '<script type="text/javascript">
 		var html = \'<li id="new\'+ocnt+\'"><span class=icon style="background-color:#0f0">O</span> \';
 		html += \'<input class="outcome" type="text" size="60" id="newo\'+ocnt+\'" onkeyup="txtchg()"> \';
 		html += \'<a href="#" onclick="removeoutcome(this);return false\">'._("Delete").'</a></li>\';
-		j("#qviewtree").append(html);
-		j("#new"+ocnt).focus();
+		$("#qviewtree").append(html);
+		$("#new"+ocnt).focus();
 		ocnt++;
 		if (!sortIt.haschanged) {
 			sortIt.haschanged = true;
@@ -194,8 +193,8 @@ $placeinhead .= '<script type="text/javascript">
 		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f">G</span> \';
 		html += \'<input class="outcome" type="text" size="60" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
 		html += \'<a href="#" onclick="removeoutcomegrp(this);return false\">'._("Delete").'</a></li>\';
-		j("#qviewtree").append(html);
-		j("#newgrp"+ocnt).focus();
+		$("#qviewtree").append(html);
+		$("#newgrp"+ocnt).focus();
 		ocnt++;
 		if (!sortIt.haschanged) {
 			sortIt.haschanged = true;
@@ -205,7 +204,7 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	function removeoutcome(el) {
 		if (confirm("'._("Are you sure you want to delete this outcome?").'")) {
-			j(el).parent().remove();
+			$(el).parent().remove();
 			if (!sortIt.haschanged) {
 				sortIt.haschanged = true;
 				sortIt.fireEvent(\'onFirstChange\', null);
@@ -215,9 +214,9 @@ $placeinhead .= '<script type="text/javascript">
 	}
 	function removeoutcomegrp(el) {
 		if (confirm("'._("Are you sure you want to delete this outcome group?  This will not delete the included outcomes.").'")) {
-			var curloc = j(el).parent();
+			var curloc = $(el).parent();
 			curloc.find("li").each(function() {
-				curloc.before(j(this));
+				curloc.before($(this));
 			});
 			curloc.remove();
 			if (!sortIt.haschanged) {

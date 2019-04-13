@@ -125,9 +125,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 }
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
-$placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/admin/modcourseorder.php?type=$type'; var j=jQuery.noConflict();</script>";
-$placeinhead .= "<script src=\"$imasroot/javascript/mootools.js\"></script>";
-$placeinhead .= "<script src=\"$imasroot/javascript/nested1.js?v=041119\"></script>";
+$placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/admin/modcourseorder.php?type=$type';</script>";
+$placeinhead .= "<script src=\"$imasroot/javascript/nestedjq.js?v=041119\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var ocnt = 0;
@@ -145,16 +144,16 @@ $placeinhead .= '<script type="text/javascript">
 		var html = \'<li class="blockli" id="newgrp\'+ocnt+\'"><span class=icon style="background-color:#66f">G</span> \';
 		html += \'<input class="outcome" type="text" size="40" id="newg\'+ocnt+\'" onkeyup="txtchg()"> \';
 		html += \'<a href="#" onclick="removecoursegrp(this);return false\">'._("Delete").'</a></li>\';
-		j("#maingrp > ul").prepend(html);
-		j("#newgrp"+ocnt).focus();
+		$("#maingrp > ul").prepend(html);
+		$("#newgrp"+ocnt).focus();
 		ocnt++;
 		txtchg();
 	}
 	function removecoursegrp(el) {
 		if (confirm("'._("Are you sure you want to delete this course group?  This will not delete the included courses.").'")) {
-			var curloc = j(el).parent();
+			var curloc = $(el).parent();
 			curloc.find("li").each(function() {
-				curloc.before(j(this));
+				curloc.before($(this));
 			});
 			curloc.remove();
 			txtchg();
