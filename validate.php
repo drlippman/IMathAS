@@ -264,7 +264,7 @@
 		 	 $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 		 	 $stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 		 }
-		 
+
 		 //call hook, if defined
 		 if (function_exists('onLogin')) {
 			onLogin();
@@ -284,14 +284,14 @@
 		 	 if (!checkFormatAgainstRegex($_POST['password'], $CFG['acct']['passwordFormat'])) {
 		 	 	 $needToForcePasswordReset = true;
 		 	 }
-		 } 
+		 }
 		 // checks if the array $querys is empty
 		 if (!empty($querys)){
 		     $rqp = "&r=" .Sanitize::randomQueryStringParam();
 		 } else {
 		     $rqp = "?r=" .Sanitize::randomQueryStringParam();
 		 }
-		 
+
 		 if ($needToForcePasswordReset) {
 		 	 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd&r='.Sanitize::randomQueryStringParam());
 		 } else {
@@ -362,7 +362,7 @@
 			$myrights = 40;
 			$myspecialrights = 0;
 		}
-	}	
+	}
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];
@@ -384,8 +384,8 @@
 	if (isset($sessiondata['userprefs']['usertheme']) && strcmp($sessiondata['userprefs']['usertheme'],'0')!=0) {
 		$coursetheme = $sessiondata['userprefs']['usertheme'];
 	}
-	
-	if (!empty($line['forcepwreset']) && (empty($_GET['action']) || $_GET['action']!='forcechgpwd') 
+
+	if (!empty($line['forcepwreset']) && (empty($_GET['action']) || $_GET['action']!='forcechgpwd')
 		&& (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltirole']!='learner')
 		&& !isset($sessiondata['emulateuseroriginaluser'])) {
 		 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd&r='.Sanitize::randomQueryStringParam());
@@ -449,7 +449,7 @@
 			exit;
 		}
 	}
-	
+
 	if (isset($sessiondata['ltiitemtype'])) {
 		$hideAllHeaderNav = true;
 		if ($sessiondata['ltiitemtype']==1) {
@@ -552,12 +552,12 @@
 					$tutorid = $line['id'];
 					$tutorsection = trim($line['section']);
 				} else if ($myrights==5 && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
-					//guest user not enrolled, but trying via guestaccess; enroll	
+					//guest user not enrolled, but trying via guestaccess; enroll
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES (?,?)");
 					$stm->execute(array($userid, $cid));
 					$studentid = $DBH->lastInsertId();
 					$studentinfo = array('latepasses'=>0, 'timelimitmult'=>1, 'section'=>null);
-				} 
+				}
 			}
 		}
 		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs,imas_courses.startdate,imas_courses.enddate ";
@@ -584,7 +584,7 @@
 			$coursetoolset = $crow['toolset'];
 			$coursedeftime = $crow['deftime']%10000;
 			if ($crow['deftime']>10000) {
-				$coursedefstime = floor($crow['deftime']/10000);
+				$coursedefstime = floor($crow['deftime']/10000)%10000;
 			} else {
 				$coursedefstime = $coursedeftime;
 			}
