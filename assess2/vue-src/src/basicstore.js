@@ -459,6 +459,9 @@ export const actions = {
       return store.initValues[qn][fieldname];
     }
   },
+  setRendered(qn) {
+    store.assessInfo.questions[qn].rendered = true;
+  },
   getChangedQuestions(qns) {
     if (typeof qns !== 'object') {
       if (!store.assessInfo.hasOwnProperty('questions')) {

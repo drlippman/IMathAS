@@ -101,6 +101,41 @@ $questionSet = [
     'qtype' => 'calcinterval',
     'control' => '$answerformat="fraction"'."\n".'$answer="[1/2,oo)"',
     'qtext' => '<p>Enter [1/2,oo)</p>'
+  ],
+  14=>[
+    'uniqueid' => 1552587894535727,
+    'description' => 'calc interval ineq',
+    'qtype' => 'calcinterval',
+    'control' => '$answerformat="inequality,fraction"'."\n".'$answer="[1/2,oo)"',
+    'qtext' => '<p>Enter `x>=1/2`</p>'
+  ],
+  15=>[
+    'uniqueid' => 1552587894535728,
+    'description' => 'matrix plain',
+    'qtype' => 'matrix',
+    'control' => '$answer="[(1,2),(3,4)]"',
+    'qtext' => '<p>Enter [(1,2),(3,4)]</p>'
+  ],
+  16=>[
+    'uniqueid' => 1552587894535729,
+    'description' => 'calcmatrix plain',
+    'qtype' => 'calcmatrix',
+    'control' => '$answerformat="fraction"'."\n".'$answer="[(1/2,2),(3,4)]"',
+    'qtext' => '<p>Enter [(1/2,2),(3,4)]</p>'
+  ],
+  17=>[
+    'uniqueid' => 1552587894535730,
+    'description' => 'matrix sized',
+    'qtype' => 'matrix',
+    'control' => '$answersize="2,3"'."\n".'$answer="[(1,2,3),(4,5,6)]"',
+    'qtext' => '<p>Enter `[(1,2),(3,4)]`</p>'
+  ],
+  18=>[
+    'uniqueid' => 1552587894535731,
+    'description' => 'calcmatrix sized',
+    'qtype' => 'calcmatrix',
+    'control' => '$answerformat="fraction"'."\n".'$answersize="2,3"'."\n".'$answer="[(1/2,2,3),(4,5,6)]"',
+    'qtext' => '<p>Enter `[(1/2,2,3),(4,5,6)]`</p>'
   ]
 ];
 
@@ -790,7 +825,7 @@ $assessGroups = [
     'assessments' => [
       [
         'name' => 'Qtypes 1',
-        'summary' => 'number,calculated',
+        'summary' => 'number,calculated,calcntuple,calccomplex,calcinterval',
         'startdate' =>  -2*24,
         'enddate' => 24*7,
         'reviewdate' => 2000000000,
@@ -807,12 +842,36 @@ $assessGroups = [
         'questions' => [
           0=>['questionsetid' => 0],
           1=>['questionsetid' => 9],
-          2=>['questionsetid' => 10],
-          3=>['questionsetid' => 11],
-          4=>['questionsetid' => 12],
-          5=>['questionsetid' => 13]
+          2=>['questionsetid' => 11],
+          3=>['questionsetid' => 12],
+          4=>['questionsetid' => 13],
+          5=>['questionsetid' => 14]
         ],
         'itemorder' => [0,1,2,3,4,5]
+      ],
+      [
+        'name' => 'Qtypes 2',
+        'summary' => 'matrix,calcmatrix',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'noprint' => 1,
+        'displaymethod' => 'skip',
+        'ptsposs' => 10,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 100,
+        'defpoints' => 5,
+        'defattempts' => 100,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 15],
+          1=>['questionsetid' => 16],
+          2=>['questionsetid' => 17],
+          3=>['questionsetid' => 18]
+        ],
+        'itemorder' => [0,1,2,3]
       ]
     ]
   ],

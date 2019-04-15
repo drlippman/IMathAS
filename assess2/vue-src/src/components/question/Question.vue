@@ -195,6 +195,10 @@ export default {
       }
     },
     renderAndTrack () {
+      if (this.questionData.rendered) {
+        return;
+      }
+      console.log("doing render and track for "+this.qn);
       setTimeout(window.drawPics, 100);
       window.rendermathnode(document.getElementById('questionwrap' + this.qn));
       this.updateTime(true);
@@ -202,6 +206,7 @@ export default {
       this.addDirtyTrackers();
       this.initShowAnswer();
       window.imathasAssess.init(this.questionData.jsparams);
+      actions.setRendered(this.qn);
     },
     setInitValues() {
       var regex = new RegExp("^(qn|tc|qs)\\d");

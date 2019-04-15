@@ -1887,8 +1887,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							'class="'.implode(' ', $classes) .
 							'" />';
 
-			$out .= "<input type=button class=btn value=\"" . _('Preview') . "\" /> &nbsp;\n";
-			$out .= "<span id=p$qn></span> ";
+			if (!isset($hidepreview)) {
+				$params['preview'] = 1;
+				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";
+			}
+			$preview .= "<span id=p$qn></span> ";
 		}
 
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
@@ -1960,8 +1963,6 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "</table>\n";
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			$out .= getcolormark($colorbox);
-			if (!isset($hidepreview)) {$preview .= "<input type=button id=\"pbtn$qn\" class=btn value=\"" . _('Preview') . "\" /> &nbsp;\n";}
-			$preview .= "<span id=p$qn></span>\n";
 		} else {
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1990,13 +1991,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							Sanitize::generateAttributeString($attributes) .
 							'class="'.implode(' ', $classes) .
 							'" />';
-
-			if (!isset($hidepreview)) {
-				$preview .= "<input type=button value=\"" . _('Preview') . "\" /> &nbsp;\n";
-				$preview .= "<span id=p$qn></span> \n";
-			}
 		}
+		if (!isset($hidepreview)) {
+			$params['preview'] = 1;
+			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";
+		}
+		$preview .= "<span id=p$qn></span> ";
 		$params['tip'] = $shorttip;
+		$params['calcformat'] = $answerformat;
 		if ($useeqnhelper) {
 			$params['helper'] = 1;
 		}
@@ -2398,12 +2400,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$qn];} else {$reqdecimals = $options['reqdecimals'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = array_map('trim',explode(',',$answerformat));
 
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
+
+		$la = explode('$#$',$la);
+		$la = $la[0];
 
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats)) {
 			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
@@ -4138,7 +4142,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$sizeparts = explode(',',$answersize);
 			$givenanslist = array();
 			if ($hasNumVal) {
-				$giveanslistvals = explode('|', $givenansval);
+				$givenanslistvals = explode('|', $givenansval);
 			} else {
 				$givenanslistvals = array();
 			}
@@ -4154,7 +4158,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
 			$givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
 			if ($hasNumVal) {
-				$giveanslistvals = explode('|', $givenansval);
+				$givenanslistvals = explode('|', $givenansval);
 			} else {
 				foreach ($givenanslist as $j=>$v) {
 					$givenanslistvals[$j] = evalMathParser($v);
@@ -4492,7 +4496,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (($answer!='DNE'&&$answer!='oo') && checkreqtimes($givenans,$requiretimes)==0) {
 				return 0;
 			}
-			foreach ($gaarr as $tchk) {
+			foreach ($gaarr as $i=>$tchk) {
 				if (in_array('sloppycomplex',$ansformats)) {
 					$tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
 					if (substr_count($tchk,'i')>1) {
@@ -4511,10 +4515,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 					//echo $cpts[0].','.$cpts[1].'<br/>';
 					if ($answer!='DNE'&&$answer!='oo' && (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats))) {
-						return 0;
+						//return 0;
+						unset($gaarr[$i]);
 					}
 					if ($answer!='DNE'&&$answer!='oo' && isset($requiretimeslistpart) && checkreqtimes($tchk,$requiretimeslistpart)==0) {
-						return 0;
+						//return 0;
+						unset($gaarr[$i]);
 					}
 				}
 			}

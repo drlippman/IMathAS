@@ -66,8 +66,8 @@ function init(paramarr) {
         setupLivePreview(qn);
         document.getElementById("qn"+qn).addEventListener('keyup', updateLivePreview);
         //document.getElementById("pbtn"+qn).style.display = 'none';
-      }
-    }
+      } //TODO: when matrix, clear preview on further input
+    } //TODO: for non-preview types, still check syntax
     if (params.format === 'debit') {
       document.getElementById("qn"+qn).addEventListener('keyup', editdebit);
     } else if (params.format === 'credit') {
@@ -76,7 +76,7 @@ function init(paramarr) {
       imathasDraw.addnormslider(qn);
     }
     if (params.tip) {
-      if (el = document.getElementById("qn"+qn+"-0") && el.type == 'text') {
+      if ((el = document.getElementById("qn"+qn+"-0")) && el.type == 'text') {
         // setup for matrix sub-parts
         i=0;
         while (document.getElementById("qn"+qn+"-"+i)) {
@@ -176,7 +176,7 @@ function setupLivePreview(qn) {
 			  preformat: function(text) {
           var qtype = allParams[qn].qtype;
           var calcformat = allParams[qn].calcformat;
-          return preformat(text, qtype, calcformat);
+          return preformat(qn, text, qtype, calcformat);
 			  },
 
 			  CreatePreview: function () {
@@ -216,9 +216,9 @@ function setupLivePreview(qn) {
 				finaltimeout: null,  // setTimeout id for clicking preview
 
 				Update: function (content) {
-				    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
-				    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
-				  },
+          if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
+				  this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
+        },
 
 				  RenderNow: function(text) {
 				      var outnode = document.getElementById("p"+qn);
@@ -227,7 +227,7 @@ function setupLivePreview(qn) {
 				  },
 
 				  DoFinalPreview: function() {
-					$("#pbtn"+qn).trigger("click");
+            $("#pbtn"+qn).trigger("click");
 				  }
 			}
 		}
@@ -266,11 +266,14 @@ function showPreview(qn) {
   var params = allParams[qn];
   var outstr = '';
   var res = processByType(qn);
-  var outstr = '`' + res.str + '`';
-  if (res.dispvalstr != '' && params.calcformat.indexOf('showval')!=-1) {
-    outstr += ' = ' + res.dispvalstr;
+  console.log(res);
+  if (res.str) {
+    outstr = '`' + res.str + '`';
   }
-  if (res.err != '' && res.str != '') {
+  if (res.dispvalstr && res.dispvalstr != '') {// && params.calcformat.indexOf('showval')!=-1) {
+    outstr += (outstr==''?'':' = ') + '`' + res.dispvalstr + '`';
+  }
+  if (res.err && res.err != '' && res.str != '') {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
   }
   if (LivePreviews.hasOwnProperty(qn)) {
@@ -319,18 +322,42 @@ function preSubmit(qn) {
  */
 function processByType(qn) {
   var params = allParams[qn];
-  var res;
+  var res = {};
   if (params.hasOwnProperty('matrixsize')) {
     res = processSizedMatrix(qn);
   } else {
     var str = document.getElementById('qn'+qn).value;
-    var res;
+    str = normalizemathunicode(str);
+    str = str.replace(/^\s+/,'').replace(/\s+$/,'');
+    if (str.match(/^\s*$/)) {
+      return ['','',''];
+    } else if (str.match(/^\s*DNE\s*$/i)) {
+      return ['DNE','','DNE'];
+    } else if (str.match(/^\s*oo\s*$/i)) {
+      return ['oo','','oo'];
+    }
     switch (params.qtype) {
       case 'calculated':
         res = processCalculated(str, params.calcformat);
         break;
+      case 'calcinterval':
+        res = processCalcInterval(str, params.calcformat);
+        break;
+      case 'calcntuple':
+        res = processCalcNtuple(str, params.calcformat);
+        break;
+      case 'calccomplex':
+        res = processCalcComplex(str, params.calcformat);
+        break;
+      case 'calcmatrix':
+        res = processCalcMatrix(str, params.calcformat);
+        break;
+      case 'matrix':
+        res = processCalcMatrix(str, '');
+        res.dispvalstr = ''; // don't need to show for standard matrix
+        break;
     }
-    res.str = preformat(str, params.qtype, params.calcformat);
+    res.str = preformat(qn, str, params.qtype, params.calcformat);
   }
   return res;
 }
@@ -340,7 +367,7 @@ function processByType(qn) {
 /**
  * Formats the string for rendering
  */
-function preformat(text, qtype, calcformat) {
+function preformat(qn, text, qtype, calcformat) {
   text = normalizemathunicode(text);
   if (qtype == 'calcinterval') {
     if (!calcformat.match(/inequality/)) {
@@ -366,6 +393,8 @@ function preformat(text, qtype, calcformat) {
   text = text.replace(/[^\u0000-\u007f]/g, '?');
   return text;
 }
+
+var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
 
 function AMnumfuncPrepVar(qn,str) {
   var vars = allParams[qn].vars;
@@ -506,12 +535,444 @@ function processCalculated(fullstr, format) {
   };
 }
 
+function processCalcInterval(fullstr, format) {
+  var origstr = fullstr;
+  if (format.indexOf('inequality')!=-1) {
+    fullstr = fullstr.replace(/or/g,' or ');
+    fullstr = ineqtointerval(fullstr);
+  }
+  var strarr = [], submitstrarr = []; dispstrarr = [];
+  //split into array of intervals
+  if (format.indexOf('list')!=-1) {
+    var lastpos = 0;
+    for (var pos = 1; pos<fullstr.length-1; pos++) {
+      if (fullstr.charAt(pos)==',') {
+        if ((fullstr.charAt(pos-1)==')' || fullstr.charAt(pos-1)==']')
+          && (fullstr.charAt(pos+1)=='(' || fullstr.charAt(pos+1)=='[')
+        ) {
+          strarr.push(fullstr.substring(lastpos,pos));
+          lastpos = pos+1;
+        }
+      }
+    }
+    strarr.push(fullstr.substring(lastpos));
+  } else {
+     strarr = fullstr.split(/\s*U\s*/i);
+  }
+  var err = ''; var str, vals, res, calcvals;
+  for (i=0; i<strarr.length; i++) {
+    str = strarr[i];
+    sm = str.charAt(0);
+    em = str.charAt(str.length-1);
+    vals = str.substring(1,str.length-1);
+    vals = vals.split(/,/);
+    // check right basic format
+    if (vals.length != 2 || ((sm != '(' && sm != '[') || (em != ')' && em != ']'))) {
+      if (format.indexOf('inequality')!=-1) {
+        err += _("invalid inequality notation") + '. ';
+      } else {
+        err += _("invalid interval notation") + '. ';
+      }
+      break;
+    }
+    for (j=0; j<2; j++) {
+      err += singlevalsyntaxcheck(vals[j], format);
+      err += syntaxcheckexpr(vals[j], format);
+      res = singlevaleval(str, format);
+      err += res[1];
+      calcvals[j] = res[0];
+    }
+    submitstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
+    if (format.indexOf('inequality')!=-1) {
+      // reformat as inequality
+      if (calcvals[0].match(/oo/)) {
+        if (calcvals[1].match(/oo/)) {
+          dispstrarr[i] = 'RR';
+        } else {
+          dispstrarr[i] = ineqvar + (em==']'?'le':'lt') + calcvals[1];
+        }
+      } else if (calcvals[1].match(/oo/)) {
+        dispstrarr[i] = ineqvar + (sm=='['?'ge':'gt') + calcvals[0];
+      } else {
+        dispstrarr[i] = calcvals[0] + (sm=='['?'le':'lt') + ineqvar + (em==']'?'le':'lt') + calcvals[1];
+      }
+    }
+  }
+  if (format.indexOf('inequality')!=-1) {
+    return {
+      err: err,
+      dispvalstr: dispstrarr.join(' "or" '),
+      submitstr:  submitstrarr.join('U')
+    };
+  } else {
+    return {
+      err: err,
+      dispvalstr: submitstrarr.join(' uu '),
+      submitstr: submitstrarr.join('U')
+    };
+  }
+}
+
+function processCalcNtuple(fullstr, format) {
+  var outcalced = '';
+  var NCdepth = 0;
+  var lastcut = 0;
+  var err = "";
+  var notationok = true;
+  var res = NaN;
+  var dec;
+  fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
+  if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
+    notationok=false;
+  }
+  for (var i=0; i<fullstr.length; i++) {
+    dec = false;
+    if (NCdepth==0) {
+      outcalced += fullstr.charAt(i);
+      lastcut = i+1;
+      if (fullstr.charAt(i)==',') {
+        if (!fullstr.charAt(i+1).match(/[\(\[\<\{]/) || !fullstr.charAt(i-1).match(/[\)\]\>\}]/)) {
+          notationok=false;
+        }
+      } else if (i>0 && fullstr.charAt(i-1)!=',') {
+        notationok=false;
+      }
+    }
+    if (fullstr.charAt(i).match(/[\(\[\<\{]/)) {
+      NCdepth++;
+    } else if (fullstr.charAt(i).match(/[\)\]\>\}]/)) {
+      NCdepth--;
+      dec = true;
+    }
+
+    if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
+      sub = fullstr.substring(lastcut,i).replace(/^\s+/,'').replace(/\s+$/,'');
+      if (sub=='oo' || sub=='-oo') {
+        outcalced += sub;
+      } else {
+        err += singlevalsyntaxcheck(sub, format);
+        err += syntaxcheckexpr(sub, format);
+        res = singlevaleval(sub, format);
+        err += res[1];
+        outcalced += res[0];
+      }
+      outcalced += fullstr.charAt(i);
+      lastcut = i+1;
+    }
+  }
+  if (NCdepth!=0) {
+    notationok = false;
+  }
+  if (notationok==false) {
+    err = _("Invalid notation")+". " + err;
+  }
+  return {
+    err: err,
+    dispvalstr: outcalced,
+    submitstr: outcalced
+  };
+}
+
+function processCalcComplex(fullstr, format) {
+  var err = '';
+  var arr = fullstr.split(',');
+  var str = '';
+  var outstr = '';
+  var outarr = [];
+  var real, imag, imag2, prep;
+  for (var cnt=0; cnt<arr.length; cnt++) {
+    str = arr[cnt].replace(/^\s+/,'').replace(/\s+$/,'');
+    if (format.indexOf("sloppycomplex")==-1) {
+      var cparts = parsecomplex(arr[cnt]);
+      if (typeof cparts == 'string') {
+        err += cparts;
+      } else {
+        err += singlevalsyntaxcheck(cparts[0], format);
+        err += singlevalsyntaxcheck(cparts[1], format);
+      }
+    }
+    err + syntaxcheckexpr(str, format);
+    prep = prepWithMath(mathjs(str));
+    real = scopedeval('var i=0;'+prep);
+    imag = scopedeval('var i=1;'+prep);
+    imag2 = scopedeval('var i=-1;'+prep);
+    if (real=="synerr" || imag=="synerr") {
+      err += _("syntax incomplete");
+      real = NaN;
+    }
+    if (!isNaN(real) && real!="Infinity" && !isNaN(imag) && !isNaN(imag2) && imag!="Infinity") {
+      imag -= real;
+      outstr = Math.abs(real)<1e-16?'':real;
+      outstr += Math.abs(imag)<1e-16?'':((imag>0&&outstr!=''?'+':'')+imag+'i');
+      outarr.push(outstr);
+    }
+  }
+  return {
+    err: err,
+    dispvalstr: outarr.join(', '),
+    submitstr: outarr.join(',')
+  };
+}
+
+function processSizedMatrix(qn) {
+  var params = allParams[qn];
+  var size = params.matrixsize;
+  var format = '';
+  if (params.calcformat) {
+    format = params.calcformat;
+  }
+  var out = [];
+  var outcalc = [];
+  var outsub = [];
+  var count = 0;
+  var str;
+  var err = '';
+  for (var row=0; row < size[0]; row++) {
+    out[row] = [];
+    outcalc[row] = [];
+    for (var col=0; col<size[1]; col++) {
+      str = document.getElementById('qn' + qn + '-' + count).value;
+      str = normalizemathunicode(str);
+      err += syntaxcheckexpr(str,format);
+      err += singlevalsyntaxcheck(str,format);
+      out[row][col] = str;
+      res = singlevaleval(str, format);
+      err += res[1];
+      outcalc[row][col] = res[0];
+      outsub.push(res[0]);
+      count++;
+    }
+    out[row] = '(' + out[row].join(',') + ')';
+    outcalc[row] = '(' + outcalc[row].join(',') + ')';
+  }
+  return {
+    err: err,
+    str: '[' + out.join(',') + ']',
+    dispvalstr: (params.qtype=='calcmatrix')?('[' + outcalc.join(',') + ']'):'',
+    submitstr: outsub.join('|')
+  };
+}
+
+function processCalcMatrix(fullstr, format) {
+  fullstr = fullstr.replace('[','(');
+  fullstr = fullstr.replace(']',')');
+  fullstr = fullstr.replace(/\s+/g,'');
+  fullstr = fullstr.substring(1,fullstr.length-1);
+  var err = '';
+  var rowlist = [];
+  var lastcut = 0;
+  var MCdepth = 0;
+  for (var i=0; i<fullstr.length; i++) {
+    if (fullstr.charAt(i)=='(') {
+      MCdepth++;
+    } else if (fullstr.charAt(i)==')') {
+      MCdepth--;
+    } else if (fullstr.charAt(i)==',' && MCdepth==0) {
+      rowlist.push(fullstr.substring(lastcut+1,i-1));
+      lastcut = i+1;
+    }
+  }
+  rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
+  var okformat = true;
+  var lastnumcols = -1;
+  if (MCdepth !== 0) {
+    okformat = false;
+  }
+  var collist, str;
+  var outcalc = [];
+  var outsub = [];
+  for (var i=0; i<rowlist.length; i++) {
+    outcalc[i] = [];
+    collist = rowlist[i].split(',');
+    if (lastnumcols > -1 && collist.length != lastnumcols) {
+      okformat = false;
+    }
+    lastnumcols = collist.length;
+    for (var j=0; j<collist.length; j++) {
+      str = collist[j].replace(/^\s+/,'').replace(/\s+$/,'');
+      err += syntaxcheckexpr(str,format);
+      err += singlevalsyntaxcheck(str,format);
+      res = singlevaleval(str, format);
+      err += res[1];
+      outcalc[i][j] = res[0];
+      outsub.push(res[0]);
+    }
+    outcalc[i] = '(' + outcalc[i].join(',') + ')';
+  }
+  if (!okformat) {
+    err += _('Invalid matrix format')+'. ';
+  }
+  return {
+    err: err,
+    dispvalstr: '[' + outcalc.join(',') + ']',
+    submitstr: outsub.join('|')
+  };
+}
+
+//Function to convert inequalities into interval notation
+//TODO: make the matching more robust, so anything can be used as the variable
+function ineqtointerval(strw) {
+	strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+	var strpts = strw.split(/or/);
+	for (i=0; i<strpts.length; i++) {
+		str = strpts[i];
+		var out = '';
+		if (pat = str.match(/^([^<]+)\s*(<=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(<=?)([^<]+)$/)) {
+			if (pat[2]=='<=') {out += '[';} else {out += '(';}
+			out += pat[1] + ',' + pat[5];
+			if (pat[4]=='<=') {out += ']';} else {out += ')';}
+		} else if (pat = str.match(/^([^>]+)\s*(>=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(>=?)([^>]+)$/)) {
+			if (pat[4]=='>=') {out += '[';} else {out += '(';}
+			out += pat[5] + ',' + pat[1];
+			if (pat[2]=='>=') {out += ']';} else {out += ')';}
+		} else if (pat = str.match(/^([^><]+)\s*([><]=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*$/)) {
+			if (pat[2]=='>') { out = '(-oo,'+pat[1]+')';} else
+			if (pat[2]=='>=') { out = '(-oo,'+pat[1]+']';} else
+			if (pat[2]=='<') { out = '('+pat[1]+',oo)';} else
+			if (pat[2]=='<=') { out = '['+pat[1]+',oo)';}
+		} else if (pat = str.match(/^\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*([><]=?)\s*([^><]+)$/)) {
+			if (pat[2]=='<') { out = '(-oo,'+pat[3]+')';} else
+			if (pat[2]=='<=') { out = '(-oo,'+pat[3]+']';} else
+			if (pat[2]=='>') { out = '('+pat[3]+',oo)';} else
+			if (pat[2]=='>=') { out = '['+pat[3]+',oo)';}
+		} else if (str.match(/all\s*real/i)) {
+			out = '(-oo,oo)';
+		} else {
+			out = '';
+		}
+		strpts[i] = out;
+	}
+	out =  strpts.join('U');
+	return out;
+}
+
+function parsecomplex(v) {
+	var real,imag,c,nd,p,R,L;
+	v = v.replace(/\s/,'');
+	v = v.replace(/\((\d+\*?i|i)\)\/(\d+)/g,'$1/$2');
+	v = v.replace(/sin/,'s$n');
+	v = v.replace(/pi/,'p$');
+	var len = v.length;
+	//preg_match_all('/(\bi|i\b)/',v,matches,PREG_OFFSET_CAPTURE);
+	//if (count(matches[0])>1) {
+	if (v.split("i").length>2) {
+		return _('error - more than 1 i in expression');
+	} else {
+		p = v.indexOf('i');
+		if (p==-1) {
+			real = v;
+			imag = "0";
+		} else {
+			//look left
+			nd = 0;
+			for (L=p-1;L>0;L--) {
+				c = v.charAt(L);
+				if (c==')') {
+					nd++;
+				} else if (c=='(') {
+					nd--;
+				} else if ((c=='+' || c=='-') && nd==0) {
+					break;
+				}
+			}
+			if (L<0) {L=0;}
+			if (nd != 0) {
+				return _('error - invalid form');
+			}
+			//look right
+			nd = 0;
+
+			for (R=p+1;R<len;R++) {
+				c = v.charAt(R);
+				if (c=='(') {
+					nd++;
+				} else if (c==')') {
+					nd--;
+				} else if ((c=='+' || c=='-') && nd==0) {
+					break;
+				}
+			}
+			if (nd != 0) {
+				return _('error - invalid form');
+			}
+			//which is bigger?
+			if (p-L>0 && R-p>0 && (R==len || L==0)) {
+				if (R==len) { //real + AiB
+					real = v.substr(0,L);
+					imag = v.substr(L,p-L);
+				} else if (L==0) {
+					real = v.substr(R);
+					imag = v.substr(0,p);
+				} else {
+					return _('error - invalid form');
+				}
+				imag += '*'+v.substr(p+1+(v.charAt(p+1)=='*'?1:0),R-p-1);
+				imag = imag.replace("-*","-1*").replace("+*","+1*");
+				imag = imag.replace(/(\+|-)1\*(.+)/g,'$1$2');
+			} else if (p-L>1) {
+				imag = v.substr(L,p-L);
+				real = v.substr(0,L) + v.substr(p+1);
+			} else if (R-p>1) {
+				if (p>0) {
+					if (v.charAt(p-1)!='+' && v.charAt(p-1)!='-') {
+						return _('error - invalid form');
+					}
+					imag = v.charAt(p-1)+ v.substr(p+1+(v.charAt(p+1)=='*'?1:0),R-p-1);
+					real = v.substr(0,p-1) + v.substr(R);
+				} else {
+					imag = v.substr(p+1,R-p-1);
+					real = v.substr(0,p) + v.substr(R);
+				}
+			} else { //i or +i or -i or 3i  (one digit)
+				if (v.charAt(L)=='+') {
+					imag = "1";
+				} else if (v.charAt(L)=='-') {
+					imag = "-1";
+				} else if (p==0) {
+					imag = "1";
+				} else {
+					imag = v.charAt(L);
+				}
+				real = (p>0?v.substr(0,L):'') + v.substr(p+1);
+			}
+			if (real=='') {
+				real = "0";
+			}
+			if (imag.charAt(0)=='/') {
+				imag = '1'+imag;
+			} else if ((imag.charAt(0)=='+' || imag.charAt(0)=='-') && imag.charAt(1)=='/') {
+				imag = imag.charAt(0)+'1'+imag.substr(1);
+			}
+			if (imag.charAt(imag.length-1)=='*') {
+				imag = imag.substr(0,imag.length-1);
+			}
+			if (imag.charAt(0)=="+") {
+				imag = imag.substr(1);
+			}
+			if (real.charAt(0)=="+") {
+				real = real.substr(1);
+			}
+		}
+		real = real.replace("s$n","sin");
+		real = real.replace("p$","pi");
+		imag = imag.replace("s$n","sin");
+		imag = imag.replace("p$","pi");
+		imag = imag.replace(/\*\//g,"/");
+		return [real,imag];
+	}
+}
+
+var onlyAscii = /^[\u0000-\u007f]*$/;
+
 function singlevalsyntaxcheck(str,format) {
+  str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	if (str.match(/DNE/i)) {
 		 return '';
 	} else if (str.match(/oo$/) || str.match(/oo\W/)) {
 		 return '';
-	} else if (format.indexOf('allowmixed')!=-1 &&
+	} else if (str.match(/,/)) {
+    return _("Invalid use of a comma.");
+  } else if (format.indexOf('allowmixed')!=-1 &&
 		str.match(/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))\s*$/)) {
 		//if allowmixed and it's mixed, stop checking
 		return '';
