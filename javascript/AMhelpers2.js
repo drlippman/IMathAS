@@ -170,11 +170,13 @@ function setupDraw(qn) {
       }
     });
   }
-  document.getElementById("qn"+qn).parentNode.querySelector(".a11ydrawadd")
-    .addEventListener('click', function() {
+  var a11ydrawbtn = document.getElementById("qn"+qn).parentNode.querySelector(".a11ydrawadd");
+  if (a11ydrawbtn) {
+    a11ydrawbtn.addEventListener('click', function() {
       var qn = event.target.getAttribute('data-qn');
       imathasDraw.adda11ydraw(qn);
     });
+  }
 }
 
 var LivePreviews = [];
