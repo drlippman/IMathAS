@@ -2,16 +2,16 @@
 
 What is needed:
 
-1) syntax check inputs
+1) x syntax check inputs
 2) x Do any pre-preview cleanup
-3) Get numeric values for preview (when showvals is set)
-4) Get numeric values for submission (different for inequality)
+3) x Get numeric values for preview (when showvals is set)
+4) x Get numeric values for submission (different for inequality)
 
 - Do input validation for numeric types
-- No livepreview for matrix/calcmatrix
+x No livepreview for matrix/calcmatrix
 
 On question load:
-  - call init(jsParamArr)
+  x call init(jsParamArr)
     x add LivePreviews
     x add click handler for preview buttons
     x sets up entry tips (via setupTips)
@@ -20,25 +20,48 @@ On livepreview preview:
   x use preformat function in LivePreviews code, based on qtype
 
 For final preview (w possible showvals and syntax checking)
-  - Called from button click or LivePreviews timeout
+  x Called from button click or LivePreviews timeout
   - May also want to add a more advanced onblur (w onfocus listener to cancel)
     for numeric types without a perview button, to provide syntax warnings.
-  - Calls showPreview with the qn
-    - Looks up params from allParams
-    - if matrix type with matrixsize, calls processSizedMatrix function
-    - otherwise, gets string from input
-    - based on qtype, calls the appropriate process___ function with string
-      - returns [err, numeric for preview, numeric for submission]
-    - forms preview string, displays it
+  x Calls showPreview with the qn
+    x Looks up params from allParams
+    x if matrix type with matrixsize, calls processSizedMatrix function
+    x otherwise, gets string from input
+    x based on qtype, calls the appropriate process___ function with string
+      x returns [err, numeric for preview, numeric for submission]
+    x forms preview string, displays it
 
 For onsubmit
-  - For use cases without ajax submission / frontend,
-    - Have a generic preSubmitForm function that would be called from form onsubmit
-    - that loops over allParams
-    - Gets the presubmit values and appends new hidden inputs to the form
-  - Have individual preSubmit function that takes qn as input
-    - calls processSizedMatrix or process____ functions
-    - returns the numeric string, to be included in FormData
+  x For use cases without ajax submission / frontend,
+    x Have a generic preSubmitForm function that would be called from form onsubmit
+    x that loops over allParams
+    x Gets the presubmit values and appends new hidden inputs to the form
+  x Have individual preSubmit function that takes qn as input
+    x calls processSizedMatrix or process____ functions
+    x returns the numeric string, to be included in FormData
+
+Previewers / processors:
+    Number:  "number"
+  x  Calculated: "calculated"
+    Multiple Choice: "choices"
+    Multiple Answer: "multans"
+    Matching: "matching"
+  x  Function/expression: "numfunc"
+  x  Drawing: "draw"
+    N-tuple: "ntuple"
+  x  Calculated N-tuple: "calcntuple"
+  ~  Matrix: "matrix"
+  x  Calculated Matrix: "calcmatrix"
+    Complex: "complex"
+  x  Calculated Complex: "calccomplex"
+    Interval: "interval"
+  x  Calculated Interval: "calcinterval"
+    Essay: "essay"
+    File Upload: "file"
+  x  String: "string"
+
+TODO: capture any errors echoed during question generation and append
+to question output or something.
 
  */
 
@@ -87,8 +110,9 @@ function init(paramarr) {
         setupTips("qn"+qn, params.tip);
       }
     }
-    // TODO: handle setting up the individual question types, particularly
-    // setting up the Preview button and the on
+    if (params.qtype === 'draw') {
+      setupDraw(qn);
+    }
   }
 }
 
@@ -103,6 +127,54 @@ function setupTips(id, tip) {
   el.addEventListener('click', function() {
     reshrinkeh(id);
   });
+}
+
+function setupDraw(qn) {
+  var la = document.getElementById("qn"+qn).value;
+  var laarr, i;
+  var laarr = la.split(';;');
+  var todraw = [];
+  for (i=0; i<laarr.length; i++) {
+    if (i==5) {
+      laarr[i] = '[' + laarr[i].replace(/&quot;/g,'"') + ']';
+    } else {
+      laarr[i] = '[' + laarr[i].replace(/\(/g,'[').replace(/\)/g,']') + ']';
+      if (i==0 && laarr[i].length > 2) {
+        laarr[i] = '[' + laarr[i].replace(/;/g, '],[') + ']';
+      }
+    }
+    if (laarr[i] === '') {
+      todraw[i] = [];
+    } else {
+      try {
+        todraw[i] = JSON.parse(laarr[i]);
+      } catch (e) {
+        todraw[i] = [];
+      }
+    }
+  }
+  window.drawla[qn] = todraw;
+  window.canvases[qn] = allParams[qn].canvas;
+  imathasDraw.initCanvases(qn);
+  var drawbtns = document.getElementById("qn"+qn).parentNode.querySelectorAll("[data-drawaction]");
+  for (i=0; i<drawbtns.length; i++) {
+    drawbtns[i].addEventListener('click', function() {
+      var target = event.target;
+      var action = target.getAttribute('data-drawaction');
+      var qn = target.getAttribute('data-qn');
+      if (action === 'clearcanvas') {
+        imathasDraw.clearcanvas(qn);
+      } else if (action === 'settool') {
+        var val = target.getAttribute('data-val');
+        imathasDraw.settool(target, qn, val);
+      }
+    });
+  }
+  document.getElementById("qn"+qn).parentNode.querySelector(".a11ydrawadd")
+    .addEventListener('click', function() {
+      var qn = event.target.getAttribute('data-qn');
+      imathasDraw.adda11ydraw(qn);
+    });
 }
 
 var LivePreviews = [];
@@ -266,7 +338,6 @@ function showPreview(qn) {
   var params = allParams[qn];
   var outstr = '';
   var res = processByType(qn);
-  console.log(res);
   if (res.str) {
     outstr = '`' + res.str + '`';
   }
@@ -290,16 +361,21 @@ function showPreview(qn) {
  * and adds the elements to the form.
  */
 function preSubmitForm(form) {
+  var presub;
   for (var qn in allParams) {
     // reuse existing if there is one
     var ex;
+    presub = preSubmit(qn);
+    if (presub === false) {
+      continue;
+    }
     if (ex = document.getElementById('qn' + qn + '-val')) {
-      ex.value = preSubmit(qn);
+      ex.value = presub;
     } else {
       var el = document.createElement('input');
       el.type = 'hidden';
       el.name = 'qn' + qn + '-val';
-      el.value = preSubmit(qn);
+      el.value = presub;
       form.appendChild(el);
     }
   }
@@ -311,7 +387,11 @@ function preSubmitForm(form) {
  */
 function preSubmit(qn) {
   var res = processByType(qn);
-  return res.submitstr;
+  if (res.submitstr) {
+    return res.submitstr;
+  } else {
+    return false;
+  }
 }
 
 /**
@@ -323,7 +403,10 @@ function preSubmit(qn) {
 function processByType(qn) {
   var params = allParams[qn];
   var res = {};
-  if (params.hasOwnProperty('matrixsize')) {
+  if (params.qtype == 'draw') {
+    imathasDraw.encodea11ydraw();
+    return {};
+  } else if (params.hasOwnProperty('matrixsize')) {
     res = processSizedMatrix(qn);
   } else {
     var str = document.getElementById('qn'+qn).value;
@@ -351,6 +434,9 @@ function processByType(qn) {
         break;
       case 'calcmatrix':
         res = processCalcMatrix(str, params.calcformat);
+        break;
+      case 'numfunc':
+        res = processNumfunc(qn, str, params.calcformat);
         break;
       case 'matrix':
         res = processCalcMatrix(str, '');
@@ -397,7 +483,7 @@ function preformat(qn, text, qtype, calcformat) {
 var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
 
 function AMnumfuncPrepVar(qn,str) {
-  var vars = allParams[qn].vars;
+  var vars = allParams[qn].vars.slice();
   var vl = vars.join('|');
   var fvarslist = allParams[qn].fvars.join('|');
   vars.push("DNE");
@@ -809,6 +895,63 @@ function processCalcMatrix(fullstr, format) {
   };
 }
 
+//vars and fvars are arrays; format is string
+function processNumfunc(qn, fullstr, format) {
+  var params = allParams[qn];
+  var vars = params.vars;
+  var fvars = params.fvars;
+  var domain = params.domain;
+  var iseqn = format.match(/equation/);
+  var err = '';
+
+  var strprocess = AMnumfuncPrepVar(qn, fullstr);
+
+  var totesteqn = strprocess[0];
+
+  if (fullstr.match(/=/)) {
+    if (!iseqn) {
+      err += _("syntax error: you gave an equation, not an expression");
+    } else if (fullstr.match(/=/g).length>1) {
+      err += _("syntax error: your equation should only contain one equal sign");
+    }
+    totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
+  } else if (iseqn) {
+    err += _("syntax error: this is not an equation");
+  }
+
+  if (fvars.length > 0) {
+	  reg = new RegExp("("+fvars.join('|')+")\\(","g");
+	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
+  }
+
+  totesteqn = prepWithMath(mathjs(totesteqn,vars.join('|')));
+  var i,j,totest,testval,res;
+  var successfulEvals = 0;
+  for (j=0; j < 20; j++) {
+    totest = 'var DNE=1;';
+    for (i=0; i < vars.length; i++) {
+      if (domain[i][2]) { //integers
+        testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+      } else { //any real between min and max
+        testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
+      }
+      totest += 'var ' + vars[i] + '=' + testval + ';';
+    }
+    res = scopedeval(totest + totesteqn);
+    if (res !== 'synerr') {
+      successfulEvals++;
+      break;
+    }
+  }
+  if (successfulEvals === 0) {
+    err += _("syntax error") + '. ';
+  }
+  err += syntaxcheckexpr(fullstr, '', vars.join('|'));
+  return {
+    err: err
+  };
+}
+
 //Function to convert inequalities into interval notation
 //TODO: make the matching more robust, so anything can be used as the variable
 function ineqtointerval(strw) {
@@ -1111,13 +1254,6 @@ function scopedmatheval(c) {
 	}
 }
 
-function prepWithMath(str) {
-	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
-	str = str.replace(/\(E\)/g,'(Math.E)');
-	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
-	return str;
-}
-
 return {
   init: init,
   preSubmitForm: preSubmitForm,
@@ -1125,3 +1261,11 @@ return {
 };
 
 }(jQuery));
+
+// need in global scope for drawing
+function prepWithMath(str) {
+	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
+	str = str.replace(/\(E\)/g,'(Math.E)');
+	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
+	return str;
+}

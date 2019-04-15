@@ -161,6 +161,13 @@ export const actions = {
     let data = new FormData();
     for (let k=0; k<qns.length; k++) {
       let qn = parseInt(qns[k]);
+      // run any pre-submit routines.  The question type wants to return a value,
+      // it will get returned here.
+      let valstr = imathasAssess.preSubmit(qn);
+      if (valstr !== false) {
+        data.append('qn'+qn+'-val', valstr);
+      }
+      // add in regular input fields.
       var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
       window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
         if (el.name.match(regex)) {
@@ -174,10 +181,6 @@ export const actions = {
           }
         }
       });
-      let valstr = imathasAssess.preSubmit(qn);
-      if (valstr !== '') {
-        data.append('qn'+qn+'-val', valstr);
-      }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
     };
     data.append('toscoreqn', JSON.stringify(changedQuestions));
@@ -190,6 +193,7 @@ export const actions = {
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
     }
+
     window.$.ajax({
       url: store.APIbase + 'scorequestion.php' + store.queryString,
       type: 'POST',

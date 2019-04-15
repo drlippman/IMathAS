@@ -58,10 +58,10 @@ Need to:
  		 imathasDraw.addnormslider('.$qn.');
  - if class .a11ydrawadd, pull data-qn and add onclick:
  		imathasDraw.adda11ydraw('.$qn.')
- - if attribute data-drawaction
+ x if attribute data-drawaction
      pull data-drawaction, data-qn, data-val and do
 		 imathasDraw.action(event element, qn, val)
- - in draw, build drawla[qn] from data-la by converting:
+ x in draw, build drawla[qn] from data-la by converting:
 		 $la = str_replace(array('(',')'),array('[',']'),$la);
 		 $la = explode(';;',$la);
 		 if ($la[0]!='') {
@@ -2045,22 +2045,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		if (!isset($variables)) { $variables = "x";}
 		$variables = array_map('trim',explode(",",$variables));
-		$ovar = array();
 		$ofunc = array();
 		for ($i = 0; $i < count($variables); $i++) {
 			$variables[$i] = trim($variables[$i]);
-			if (strpos($variables[$i],'(')===false) {
-				$ovar[] = $variables[$i];
-			} else {
+			if (strpos($variables[$i],'(')!==false) {
 				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
 				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
 			}
 		}
 		if (($v = array_search('E', $variables))!==false) {
 			$variables[$v] = 'varE';
-		}
-		if (count($ovar)==0) {
-			$ovar[] = "x";
 		}
 
 		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
@@ -2088,9 +2082,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$touse = 0;
 			}
-			$newdomain[] = $domaingroups[$touse][0];
-			$newdomain[] = $domaingroups[$touse][1];
-			$newdomain[] = $domaingroups[$touse][2];
+			$newdomain[] = $domaingroups[$touse];
 		}
 
 		$variables = array_values($variables);
@@ -3110,7 +3102,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 
 				$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
-				$out .= "<span data-drawaction=\"clearcanvas\" data-qn=\"$qn\"" . _('Clear All') . "</span> ";
+				$out .= "<span data-drawaction=\"clearcanvas\" data-qn=\"$qn\">" . _('Clear All') . "</span> ";
 				//if ($answerformat[0]=='freehand' && count($answerformat)==1) {
 				//	$out .= "<span onclick=\"imathasDraw.clearlastline($qn)\">" . _('Clear Last') . "</span> ";
 				//}
@@ -4936,12 +4928,19 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
 			}
 		}
+
 		if (($v = array_search('E', $variables))!==false) {
 			$variables[$v] = 'varE';
 			$answer = str_replace('E','varE',$answer);
 		}
-		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
-		if (count($fromto)==1) {$fromto[0]=-10; $fromto[1]=10;}
+		if (isset($domain)) {
+			$fromto = array_map('trim',explode(",",$domain));
+		} else {
+			$fromto = array(-10, 10);
+		}
+		if (count($fromto)==1) {
+			$fromto = array(-10, 10);
+		}
 		$domaingroups = array();
 		$i=0;
 		while ($i<count($fromto)) {
@@ -4976,6 +4975,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			usort($ofunc,'lensort');
 			$flist = implode("|",$ofunc);
 			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
+			$givenans = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$givenans);
 		}
 		$vlist = implode(",",$variables);
 
@@ -5014,6 +5014,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else {
 			$toevalGivenans = $givenans;
 		}
+
 		$givenansfunc = parseMathQuiet($toevalGivenans, $vlist);
 		if ($givenansfunc === false) { //parse error
 			return 0;

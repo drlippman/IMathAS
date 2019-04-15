@@ -19,5 +19,9 @@ module.exports = {
       config.plugins.delete('prefetch')
       config.plugins.delete('copy')
     }
+  },
+  // in dev server mode, proxy all requests to localhost
+  devServer: {
+    proxy: 'http://localhost'
   }
 };

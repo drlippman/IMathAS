@@ -136,6 +136,27 @@ $questionSet = [
     'qtype' => 'calcmatrix',
     'control' => '$answerformat="fraction"'."\n".'$answersize="2,3"'."\n".'$answer="[(1/2,2,3),(4,5,6)]"',
     'qtext' => '<p>Enter `[(1/2,2,3),(4,5,6)]`</p>'
+  ],
+  19=>[
+    'uniqueid' => 1552587894535732,
+    'description' => 'twopoint draw',
+    'qtype' => 'draw',
+    'control' => '$answerformat="twopoint"'."\n".'$snaptogrid=1'."\n".'$answers="x-1"',
+    'qtext' => '<p>Graph `y=x-1`</p>'
+  ],
+  20=>[
+    'uniqueid' => 1552587894535733,
+    'description' => 'string w preview',
+    'qtype' => 'string',
+    'control' => '$displayformat="usepreview"'."\n".'$answer="x^2"',
+    'qtext' => '<p>Enter `x^2`</p>'
+  ],
+  21=>[
+    'uniqueid' => 1552587894535734,
+    'description' => 'Simple numfunc equation',
+    'qtype' => 'numfunc',
+    'control' => '$answerformat = "equation"'."\n".'$a=rand(1,20)'."\n".'$variables="x,y"'."\n".'$answer="y=x-$a"',
+    'qtext' => '<p>Enter `y=x-$a`</p>'
   ]
 ];
 
@@ -870,6 +891,30 @@ $assessGroups = [
           1=>['questionsetid' => 16],
           2=>['questionsetid' => 17],
           3=>['questionsetid' => 18]
+        ],
+        'itemorder' => [0,1,2,3]
+      ],
+      [
+        'name' => 'Qtypes 3',
+        'summary' => 'numfunc,draw,string w preview',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'noprint' => 1,
+        'displaymethod' => 'skip',
+        'ptsposs' => 10,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 100,
+        'defpoints' => 5,
+        'defattempts' => 100,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 10],
+          1=>['questionsetid' => 19],
+          2=>['questionsetid' => 20],
+          3=>['questionsetid' => 21]
         ],
         'itemorder' => [0,1,2,3]
       ]

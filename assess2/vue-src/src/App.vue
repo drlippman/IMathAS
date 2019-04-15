@@ -188,4 +188,25 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
 	opacity: 0.9;
 }
 
+.drawtools {
+  margin-left: 8px;
+}
+.drawtools img {
+  vertical-align: middle;
+}
+.drawtools [data-drawaction] {
+  border: 1px solid #ccc;
+  padding: 2px;
+  cursor: pointer;
+}
+.drawtools span[data-drawaction] {
+  padding: 2px 8px;
+}
+.drawtools [data-drawaction]:hover {
+  background-color: #EDF4FC;
+}
+.drawtools [data-drawaction].sel {
+  background-color: #E6F0F9;
+}
+
 </style>

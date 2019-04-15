@@ -198,7 +198,6 @@ export default {
       if (this.questionData.rendered) {
         return;
       }
-      console.log("doing render and track for "+this.qn);
       setTimeout(window.drawPics, 100);
       window.rendermathnode(document.getElementById('questionwrap' + this.qn));
       this.updateTime(true);
