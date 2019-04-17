@@ -33,6 +33,9 @@ function parseMath($str, $vars = '', $allowedfuncs = array()) {
  * @return function
  */
 function makeMathFunction($str, $vars = '', $allowedfuncs = array()) {
+  if (trim($str)=='') {
+    return false;
+  }
   try {
     $parser = new MathParser($vars, $allowedfuncs);
     $parser->parse($str);
