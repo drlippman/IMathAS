@@ -72,10 +72,10 @@ var allParams = {};
 
 function init(paramarr) {
   var qn, params, i, el;
-  //save the params to the master record
-  allParams = Object.assign(allParams, paramarr);
 
   for (qn in paramarr) {
+    //save the params to the master record
+    allParams[qn] = paramarr[qn];
     params = paramarr[qn];
     if (params.helper) { //want mathquill
       //TODO
