@@ -343,7 +343,7 @@ function showPreview(qn) {
   if (res.str) {
     outstr = '`' + res.str + '`';
   }
-  if (res.dispvalstr && res.dispvalstr != '') {// && params.calcformat.indexOf('showval')!=-1) {
+  if (res.dispvalstr && res.dispvalstr != '' && params.calcformat.indexOf('showval')!=-1) {
     outstr += (outstr==''?'':' = ') + '`' + res.dispvalstr + '`';
   }
   if (res.err && res.err != '' && res.str != '') {

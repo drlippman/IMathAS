@@ -113,6 +113,9 @@ export const actions = {
   },
   loadQuestion (qn, regen, jumptoans) {
     store.inTransit = true;
+    if (regen) {
+      this.clearInitValue(qn);
+    }
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
       type: 'POST',
@@ -462,6 +465,9 @@ export const actions = {
     } else {
       return store.initValues[qn][fieldname];
     }
+  },
+  clearInitValue(qn) {
+    store.initValues[qn] = {};
   },
   setRendered(qn) {
     store.assessInfo.questions[qn].rendered = true;

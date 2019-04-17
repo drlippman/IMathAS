@@ -512,7 +512,7 @@ class AssessRecord
     $data = &$this->data['autosaves'];
     if ($pn === -1) {
       unset($data[$qn]);
-    } else {
+    } else if (isset(($data[$qn]['stuans']))) {
       if (count($data[$qn]['stuans']) === 1) {
         unset($data[$qn]);
       } else {
@@ -1176,7 +1176,7 @@ class AssessRecord
 
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
-      $partattemptn[$pn] = count($qver['tries'][$pn]);
+      $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
 
       // TODO: Rework this to use stuanswers?  Or dont even need if we Rework
       // displayq to use stuanswers
@@ -1516,7 +1516,7 @@ class AssessRecord
         return false;
       }
       for ($i = 0; $i < count($qdata['tries']); $i++) {
-        if ($qdata['tries'][$i] !== count($tries[$i])) {
+        if (isset($tries[$i]) && $qdata['tries'][$i] !== count($tries[$i])) {
           //echo "tries failed $i: ".$qdata['tries'][$i]." vs ".count($tries[$i]).". ";
           return false;
         }
