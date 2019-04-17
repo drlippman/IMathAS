@@ -403,6 +403,9 @@ function preSubmit(qn) {
  *   .submitstr: the evaluated answer, formatted for submission
  */
 function processByType(qn) {
+  if (!allParams.hasOwnProperty(qn)) {
+    return false;
+  }
   var params = allParams[qn];
   var res = {};
   if (params.qtype == 'draw') {
@@ -426,7 +429,7 @@ function processByType(qn) {
         res = processCalculated(str, params.calcformat);
         break;
       case 'calcinterval':
-        res = processCalcInterval(str, params.calcformat);
+        res = processCalcInterval(str, params.calcformat, params.vars);
         break;
       case 'calcntuple':
         res = processCalcNtuple(str, params.calcformat);
@@ -623,11 +626,13 @@ function processCalculated(fullstr, format) {
   };
 }
 
-function processCalcInterval(fullstr, format) {
+function processCalcInterval(fullstr, format, vars) {
   var origstr = fullstr;
   if (format.indexOf('inequality')!=-1) {
     fullstr = fullstr.replace(/or/g,' or ');
     fullstr = ineqtointerval(fullstr);
+    //TODO: look for student var and make sure it's correct
+    ineqvar = vars;
   }
   var strarr = [], submitstrarr = []; dispstrarr = [];
   //split into array of intervals
@@ -647,7 +652,8 @@ function processCalcInterval(fullstr, format) {
   } else {
      strarr = fullstr.split(/\s*U\s*/i);
   }
-  var err = ''; var str, vals, res, calcvals;
+
+  var err = ''; var str, vals, res, calcvals = [];
   for (i=0; i<strarr.length; i++) {
     str = strarr[i];
     sm = str.charAt(0);
@@ -666,20 +672,24 @@ function processCalcInterval(fullstr, format) {
     for (j=0; j<2; j++) {
       err += singlevalsyntaxcheck(vals[j], format);
       err += syntaxcheckexpr(vals[j], format);
-      res = singlevaleval(str, format);
-      err += res[1];
-      calcvals[j] = res[0];
+      if (vals[j].match(/^\s*\-?oo\s*$/)) {
+        calcvals[j] = vals[j];
+      } else {
+        res = singlevaleval(vals[j], format);
+        err += res[1];
+        calcvals[j] = res[0];
+      }
     }
     submitstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
     if (format.indexOf('inequality')!=-1) {
       // reformat as inequality
-      if (calcvals[0].match(/oo/)) {
-        if (calcvals[1].match(/oo/)) {
+      if (calcvals[0].toString().match(/oo/)) {
+        if (calcvals[1].toString().match(/oo/)) {
           dispstrarr[i] = 'RR';
         } else {
           dispstrarr[i] = ineqvar + (em==']'?'le':'lt') + calcvals[1];
         }
-      } else if (calcvals[1].match(/oo/)) {
+      } else if (calcvals[1].toString().match(/oo/)) {
         dispstrarr[i] = ineqvar + (sm=='['?'ge':'gt') + calcvals[0];
       } else {
         dispstrarr[i] = calcvals[0] + (sm=='['?'le':'lt') + ineqvar + (em==']'?'le':'lt') + calcvals[1];

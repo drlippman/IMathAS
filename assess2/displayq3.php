@@ -2814,6 +2814,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
+		$la = explode('$#$',$la);
+		$la = $la[0];
+
 		if (in_array('inequality',$ansformats)) {
 			$tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 &lt;= %s &lt; 4'), $variables) . " <br/>";
 			$tip .= sprintf(_('Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3'), $variables, $variables) . "<br/>";
@@ -2850,6 +2853,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$params['tip'] = $shorttip;
 		if ($useeqnhelper) {
 			$params['helper'] = 1;
+		}
+		if (in_array('inequality',$ansformats)) {
+			$params['vars'] = $variables;
 		}
 
 		$params['calcformat'] = $answerformat;

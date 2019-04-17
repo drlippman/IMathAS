@@ -214,6 +214,8 @@ if ($in_practice) {
 }
 $assessInfoOut = array_merge($assessInfoOut, $assess_info->extractSettings($include_from_assess_info));
 
+$assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
+
 // indicate if teacher user
 $assessInfoOut['can_view_all'] = $canViewAll;
 

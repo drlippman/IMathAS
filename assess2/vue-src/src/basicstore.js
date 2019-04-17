@@ -166,14 +166,31 @@ export const actions = {
     }
 
     let data = new FormData();
+
+    // run any pre-submit routines.  The question type wants to return a value,
+    // it will get returned here.
+    let valstr;
+    for (let qn in changedQuestions) {
+      if (changedQuestions[qn].length == 1 && changedQuestions[qn][0] == 0) {
+        //one part, might be single part
+        valstr = imathasAssess.preSubmit(qn);
+        if (valstr !== false) {
+          data.append('qn'+qn+'-val', valstr);
+        }
+      }
+      //get presubmit for multipart parts
+      let subqn;
+      for (let k=0; k<changedQuestions[qn].length; k++) {
+        subqn = (parseInt(qn)+1)*1000 + changedQuestions[qn][k];
+        valstr = imathasAssess.preSubmit(subqn);
+        if (valstr !== false) {
+          data.append('qn'+subqn+'-val', valstr);
+        }
+      }
+    }
     for (let k=0; k<qns.length; k++) {
       let qn = parseInt(qns[k]);
-      // run any pre-submit routines.  The question type wants to return a value,
-      // it will get returned here.
-      let valstr = imathasAssess.preSubmit(qn);
-      if (valstr !== false) {
-        data.append('qn'+qn+'-val', valstr);
-      }
+      
       // add in regular input fields.
       var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
       window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
