@@ -626,13 +626,19 @@ function processCalculated(fullstr, format) {
   };
 }
 
-function processCalcInterval(fullstr, format, vars) {
+function processCalcInterval(fullstr, format, ineqvar) {
   var origstr = fullstr;
   if (format.indexOf('inequality')!=-1) {
     fullstr = fullstr.replace(/or/g,' or ');
-    fullstr = ineqtointerval(fullstr);
-    //TODO: look for student var and make sure it's correct
-    ineqvar = vars;
+    var conv = ineqtointerval(fullstr, ineqvar);
+    if (conv.length>1) { // has error
+      return {
+        err: (conv[1]=='wrongvar')?
+          _('you may have used the wrong variable'):
+          _('invalid inequality notation')
+      }
+    }
+    fullstr = conv[0];
   }
   var strarr = [], submitstrarr = []; dispstrarr = [];
   //split into array of intervals
@@ -964,41 +970,54 @@ function processNumfunc(qn, fullstr, format) {
   };
 }
 
+function simplifyVariable(str) {
+  //get rid of anything that's no alphanumeric, underscore, power, or +/-
+  return str.replace(/[^\w_\^\-+]/g,'');
+}
+
 //Function to convert inequalities into interval notation
-//TODO: make the matching more robust, so anything can be used as the variable
-function ineqtointerval(strw) {
-	strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
-	var strpts = strw.split(/or/);
-	for (i=0; i<strpts.length; i++) {
-		str = strpts[i];
-		var out = '';
-		if (pat = str.match(/^([^<]+)\s*(<=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(<=?)([^<]+)$/)) {
-			if (pat[2]=='<=') {out += '[';} else {out += '(';}
-			out += pat[1] + ',' + pat[5];
-			if (pat[4]=='<=') {out += ']';} else {out += ')';}
-		} else if (pat = str.match(/^([^>]+)\s*(>=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*(>=?)([^>]+)$/)) {
-			if (pat[4]=='>=') {out += '[';} else {out += '(';}
-			out += pat[5] + ',' + pat[1];
-			if (pat[2]=='>=') {out += ']';} else {out += ')';}
-		} else if (pat = str.match(/^([^><]+)\s*([><]=?)\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*$/)) {
-			if (pat[2]=='>') { out = '(-oo,'+pat[1]+')';} else
-			if (pat[2]=='>=') { out = '(-oo,'+pat[1]+']';} else
-			if (pat[2]=='<') { out = '('+pat[1]+',oo)';} else
-			if (pat[2]=='<=') { out = '['+pat[1]+',oo)';}
-		} else if (pat = str.match(/^\s*([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)\s*([><]=?)\s*([^><]+)$/)) {
-			if (pat[2]=='<') { out = '(-oo,'+pat[3]+')';} else
-			if (pat[2]=='<=') { out = '(-oo,'+pat[3]+']';} else
-			if (pat[2]=='>') { out = '('+pat[3]+',oo)';} else
-			if (pat[2]=='>=') { out = '['+pat[3]+',oo)';}
-		} else if (str.match(/all\s*real/i)) {
-			out = '(-oo,oo)';
-		} else {
-			out = '';
-		}
-		strpts[i] = out;
-	}
-	out =  strpts.join('U');
-	return out;
+function ineqtointerval(strw, intendedvar) {
+  var simpvar = simplifyVariable(intendedvar);
+  strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+	if (strw.match(/all\s*real/i)) {
+    return ['(-oo,oo)'];
+  } else if (strw.match(/DNE/)) {
+    return ['DNE'];
+  }
+  var pat, interval;
+  if (pat = strw.match(/^(.*?)(<=?|>=?)(.*?)(<=?|>=?)(.*?)$/)) {
+    if (simplifyVariable(pat[3]) != simpvar) { // wrong var
+      return ['', 'wrongvar'];
+    } else if (pat[2].charAt(0) != pat[4].charAt(0)) { // mixes > and <
+      return ['', 'invalid'];
+    }
+    if (pat[2].charAt(0)=='<') {
+      interval = (pat[2]=='<'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='<'?')':']');
+    } else {
+      interval = (pat[2]=='<'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='<'?')':']');
+    }
+    return [interval];
+  } else if (pat = strw.match(/^(.*?)(<=?|>=?)(.*?)$/)) {
+    if (simplifyVariable(pat[1])== simpvar) { // x> or x<
+      if (pat[2].charAt(0)=='<') { // x<
+        interval = '(-oo,' + pat[3] + (pat[2]=='<'?')':']');
+      } else { // x>
+        interval = (pat[2]=='<'?'(':'[') + pat[3] + ',oo)';
+      }
+      return [interval];
+    } else if (simplifyVariable(pat[3])== simpvar) { // 3<x or 3>x
+      if (pat[2].charAt(0)=='<') { // 3<x
+        interval = (pat[2]=='<'?'(':'[') + pat[1] + ',oo)';
+      } else { // x>
+        interval = '(-oo,' + pat[1] + (pat[2]=='<'?')':']');
+      }
+      return [interval];
+    } else {
+      return ['', 'wrongvar'];
+    }
+  } else {
+    return ['', 'invalid'];
+  }
 }
 
 function parsecomplex(v) {
