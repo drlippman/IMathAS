@@ -40,6 +40,7 @@ if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "'.$GLOBALS['basesiteurl'].'/course/course.php?cid='.$cid.'";</script>';
 }
 $nologo = true;
+$useeditor = 1;
 require('../header.php');
 
 if (!$isltilimited && !$inTreeReader && !$isdiag) {

@@ -1095,6 +1095,7 @@ class AssessRecord
       } else {
         $min = 0;
       }
+      $partReqManual = false;
       for ($pa = $min; $pa <= $max; $pa++) {
         $parttry = $qver['tries'][$pn][$pa];
         if ($parttry['raw'] > 0) {
@@ -1118,6 +1119,9 @@ class AssessRecord
             $partrawscores[$pn] = $parttry['raw']*1;
             $partpenalty = $penaltyList;
           }
+        } else if ($partscores[$pn]==0 && $parttry['raw']==-2) {
+          // -2 indicates the item is a manual grade item
+          $partReqManual = true;
         }
       }
       if ($is_singlescore) {
@@ -1134,6 +1138,7 @@ class AssessRecord
           'score' => $partscores[$pn],
           'rawscore' => $partrawscores[$pn],
           'penalties' => $partpenalty,
+          'req_manual' => $partReqManual,
           'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
         );
       }

@@ -113,6 +113,9 @@ function init(paramarr) {
     if (params.qtype === 'draw') {
       setupDraw(qn);
     }
+    if (window.usingTinymceEditor) {
+      initeditor("textareas","mceEditor");
+    }
   }
 }
 

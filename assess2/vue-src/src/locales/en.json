@@ -134,7 +134,8 @@
     "scorepts": "{pts} of {poss} pts | {pts} of {poss} pts",
     "scorelast": "Score on last try:",
     "submitted": "Question submitted.",
-    "see_details": "See Details for more."
+    "see_details": "See Details for more.",
+    "manual_grade": "This question contains parts that must be graded by your instructor. They will show a score of 0 until they are graded."
   },
   "summary": {
     "no_total": "Your assessment has been submitted.",

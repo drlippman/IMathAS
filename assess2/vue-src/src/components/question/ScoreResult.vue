@@ -15,6 +15,10 @@
       <p v-else>
         {{ $t('scoreresult.submitted') }}
       </p>
+      <p v-if="hasManualScore">
+        <icons name="info"/>
+        {{ $t('scoreresult.manual_grade') }}
+      </p>
       <p>
         <button
           v-if = "qdata.canretry"
@@ -84,6 +88,19 @@ export default {
       } else {
         return 'partial';
       }
+    },
+    hasManualScore () {
+      if (!this.showScores || !this.qdata.hasOwnProperty('parts')) {
+        return false;
+      }
+      for (let i=0; i < this.qdata.parts.length; i++) {
+        if (this.qdata.parts[i].hasOwnProperty('req_manual') &&
+          this.qdata.parts[i].req_manual
+        ) {
+          return true;
+        }
+      }
+      return false;
     }
   },
   methods: {
