@@ -57,6 +57,11 @@ $include_from_assess_info = array(
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
+// livepoll server location, if needed
+if ($assessInfoOut['displaymethod'] === 'livepoll') {
+  $assessInfoOut['livepoll_server'] = $CFG['GEN']['livepollserver'];
+}
+
 // indicate if teacher user
 $assessInfoOut['can_view_all'] = $canViewAll;
 

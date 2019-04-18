@@ -15,7 +15,8 @@ export const store = Vue.observable({
   autosaveTimer: null,
   timelimit_timer: null,
   timelimit_expired: false,
-  inPrintView: false
+  inPrintView: false,
+  livepollServer: ''
 });
 
 export const actions = {
@@ -190,7 +191,7 @@ export const actions = {
     }
     for (let k=0; k<qns.length; k++) {
       let qn = parseInt(qns[k]);
-      
+
       // add in regular input fields.
       var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
       window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
@@ -691,6 +692,14 @@ export const actions = {
       styleEl.media =  'print';
       styleEl.innerText = 'body { display: none;}';
       document.head.appendChild(styleEl);
+    }
+    if (data.hasOwnProperty('livepoll_server') && store.livepollServer === '') {
+      // inject socket script.
+      let scriptEl = document.createElement('script');
+      scriptEl.src = 'https://' + data.livepoll_server + ':3000/socket.io/socket.io.js';
+      document.head.appendChild(scriptEl);
+      // save for later
+      store.livepollServer = data.livepoll_server;
     }
     return data;
   }
