@@ -2273,11 +2273,23 @@ function evalfunc($farr) {
 	$toparen = implode('|',$vars);
 
 	if ($isnum) {
-		$func = makeMathFunction($func, implode(',', $vars));
-		foreach ($vars as $i=>$var) {
-			$varvals[$var] = $args[$i];
+		if (strpos($func, '||') !== false || strpos($func, '&&') !== false) {
+			// Temporary fix for cases where the func includes PHP || or &&
+			$func = mathphp($func,$toparen);
+			if ($func=='0;') { return 0;}
+			$varvals = array();
+			foreach ($vars as $i=>$var) {
+				$func = str_replace("($var)","(\$$var)",$func);
+				$varvals[$var] = $args[$i];
+			}
+			return evalReturnValue('return('.$func.');', $func, $varvals);
+		} else {
+			$func = makeMathFunction($func, implode(',', $vars));
+			foreach ($vars as $i=>$var) {
+				$varvals[$var] = $args[$i];
+			}
+			return $func($varvals);
 		}
-		return $func($varvals);
 	} else { //just replacing
 		if ($toparen != '') { // && !$skipextracleanup) {
 			  $reg = "/(" . $toparen . ")(" . $toparen . ')$/';
