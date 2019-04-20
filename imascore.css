@@ -40,7 +40,7 @@ h4 {
 h5,h6 {
 	font-size: 1em;
 }
-	
+
 div.pagetitle h2, div.pagetitle h1 {
 	margin: 10px 0px 20px 0px;
 }
@@ -138,12 +138,12 @@ div.blockitems, div.blockitems div.blockitems div.blockitems {
 	margin-top: -10px;
 	margin-bottom: 10px;
 }
-div.block.grouptoggle { 
-	margin-bottom: 0px; 
-	margin-top: 10px 
-} 
-div.block.grouptoggle + div.blockitems { 
-	margin-top: 0px 
+div.block.grouptoggle {
+	margin-bottom: 0px;
+	margin-top: 10px
+}
+div.block.grouptoggle + div.blockitems {
+	margin-top: 0px
 }
 div.hidden {
 	display:none;
@@ -194,7 +194,7 @@ ul.nomark li {
 	margin-left: 0px;
 	padding-left: 0px;
 }
-	
+
 ul.qview {
 	list-style-type: none;
 	margin-left: 12px;
@@ -245,7 +245,7 @@ td.c, input.c {
 td.r {
 	text-align: right;
 }
-span.form {
+span.form, label.form {
 	display: block;
 	width: 200px;
 	float: left;
@@ -292,7 +292,7 @@ span#leftcontenttoggle.leftcontentactive {
 }
 
 @media only screen and (max-width: 760px) {
-	span.form {
+	span.form, label.form {
 		width: auto;
 		float: none;
 		text-align: left;
@@ -461,7 +461,7 @@ img.faded {
 	color: #999;
 }
 .itemgrey {
-	opacity: .5;	
+	opacity: .5;
 }
 div.ddmenu {
 	position: absolute;
@@ -553,7 +553,7 @@ div.tips:after {
 	border-color: rgba(204, 255, 255, 0);
 	border-top-color: #cff;
 	border-width: 6px;
-	margin-left: -6px;        
+	margin-left: -6px;
 }
 div.tips:before {
 	border-color: rgba(145, 213, 213, 0);
@@ -898,7 +898,7 @@ a[target=_blank]::after {
 .mce-content-body a[target=_blank]:after {
 	display: none;
 }
-.mce-content-body span.AMedit {border: 1px solid #ff0000;} 
+.mce-content-body span.AMedit {border: 1px solid #ff0000;}
 div.forumgrp img {
 	max-width: 90%;
 	height: auto;
@@ -1177,9 +1177,9 @@ a.dropdown-toggle.arrow-down:hover {
 }
 
 .arrow-down::after {
-	content: "\25bc"; 
-	padding-left: 0.2em; 
-	font-size:70%; 
+	content: "\25bc";
+	padding-left: 0.2em;
+	font-size:70%;
 	position:relative;
 	top:-.2em;
 	text-decoration: none;
