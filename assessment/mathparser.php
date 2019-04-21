@@ -153,17 +153,17 @@ class MathParser
           return $a / $b;
         }],
       '^' => [
-        'precedence'=>4,
+        'precedence'=>8,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return safepow($a,$b);}],
       '!' => [
-        'precedence'=>5,
+        'precedence'=>10,
         'assoc'=>'right'],
       '~' => [
-        'precedence'=>20,
+        'precedence'=>6,
         'assoc'=>'left'],
       'not' => [
-        'precedence'=>20,
+        'precedence'=>6,
         'assoc'=>'right'],
       '&&' => [
         'precedence'=>15,
@@ -473,12 +473,6 @@ class MathParser
           } else if ($token['symbol'] == '-') {
             // unary minus; change to ~ to distinguish it.
             $token['symbol'] = '~';
-            //if unary negative and next is number, just negate it to
-            //save a little tree complexity
-            if ($this->tokens[$tokenindex+1]['type'] == 'number') {
-              $this->tokens[$tokenindex+1]['symbol'] *= -1;
-              continue;
-            }
           }
         } else {
           //grab info on current operator
