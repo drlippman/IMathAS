@@ -132,19 +132,19 @@ class MathParser
     //define operators
     $this->operators = [
       '+' => [
-        'precedence'=>1,
+        'precedence'=>11,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a + $b;}],
       '-' => [
-        'precedence'=>1,
+        'precedence'=>11,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a - $b;}],
       '*' => [
-        'precedence'=>2,
+        'precedence'=>12,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a * $b;}],
       '/' => [
-        'precedence'=>2,
+        'precedence'=>12,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {
           if (abs($b) < 1e-50) {
@@ -153,24 +153,24 @@ class MathParser
           return $a / $b;
         }],
       '^' => [
-        'precedence'=>8,
+        'precedence'=>18,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return safepow($a,$b);}],
       '!' => [
-        'precedence'=>10,
+        'precedence'=>20,
         'assoc'=>'right'],
       '~' => [
-        'precedence'=>6,
+        'precedence'=>16,
         'assoc'=>'left'],
       'not' => [
-        'precedence'=>6,
+        'precedence'=>16,
         'assoc'=>'right'],
       '&&' => [
-        'precedence'=>15,
+        'precedence'=>8,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a && $b;}],
       '||' => [
-        'precedence'=>16,
+        'precedence'=>7,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a || $b;}],
       '(' => true,
