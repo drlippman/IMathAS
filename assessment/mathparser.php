@@ -33,6 +33,9 @@ function parseMath($str, $vars = '', $allowedfuncs = array()) {
  * @return function
  */
 function makeMathFunction($str, $vars = '', $allowedfuncs = array()) {
+  if (trim($str)=='') {
+    return false;
+  }
   try {
     $parser = new MathParser($vars, $allowedfuncs);
     $parser->parse($str);
@@ -129,19 +132,19 @@ class MathParser
     //define operators
     $this->operators = [
       '+' => [
-        'precedence'=>1,
+        'precedence'=>11,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a + $b;}],
       '-' => [
-        'precedence'=>1,
+        'precedence'=>11,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a - $b;}],
       '*' => [
-        'precedence'=>2,
+        'precedence'=>12,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {return $a * $b;}],
       '/' => [
-        'precedence'=>2,
+        'precedence'=>12,
         'assoc'=>'left',
         'evalfunc'=>function($a,$b) {
           if (abs($b) < 1e-50) {
@@ -150,15 +153,26 @@ class MathParser
           return $a / $b;
         }],
       '^' => [
-        'precedence'=>4,
+        'precedence'=>18,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return safepow($a,$b);}],
       '!' => [
-        'precedence'=>5,
+        'precedence'=>20,
         'assoc'=>'right'],
       '~' => [
-        'precedence'=>10,
+        'precedence'=>16,
         'assoc'=>'left'],
+      'not' => [
+        'precedence'=>16,
+        'assoc'=>'right'],
+      '&&' => [
+        'precedence'=>8,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return $a && $b;}],
+      '||' => [
+        'precedence'=>7,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return $a || $b;}],
       '(' => true,
       ')' => true
     ];
@@ -266,6 +280,16 @@ class MathParser
           'type'=>'operator',
           'symbol'=>$c
         ];
+        $lastTokenType = 'operator';
+        continue;
+      } else if (($c=='|' || $c=='&') &&
+        isset($this->operators[substr($str,$n,2)])
+      ) {
+        $tokens[] = [
+          'type'=>'operator',
+          'symbol'=>substr($str,$n,2)
+        ];
+        $n++;
         $lastTokenType = 'operator';
         continue;
       } else {
@@ -419,17 +443,27 @@ class MathParser
       } else if ($token['symbol'] == '(') {
         $this->operatorStack[] = $token;
       } else if ($token['symbol'] == '!') {
-        // check to make sure there's something to take factorial of
-        if (count($this->operandStack) == 0) {
-          throw new MathParserException("Syntax error: ! without something to apply it to");
+        $unary = $this->isUnary($token, $lastNode);
+        if ($unary) { //treat as logical not
+          $token['symbol'] = 'not';
+          $this->operatorStack[] = $token;
+          if ($this->tokens[$tokenindex+1]['symbol']=='*') {
+            //remove implicit multiplication
+            unset($this->tokens[$tokenindex+1]);
+          }
+        } else { // treat as factorial
+          // check to make sure there's something to take factorial of
+          if (count($this->operandStack) == 0) {
+            throw new MathParserException("Syntax error: ! without something to apply it to");
+          }
+          $op = array_pop($this->operandStack);
+          // rewrite it as a function node
+          $this->operandStack[] = [
+            'type' => 'function',
+            'symbol' => 'factorial',
+            'input' => $op
+          ];
         }
-        $op = array_pop($this->operandStack);
-        // rewrite it as a function node
-        $this->operandStack[] = [
-          'type' => 'function',
-          'symbol' => 'factorial',
-          'input' => $op
-        ];
       } else if ($token['type'] == 'operator') {
         $unary = $this->isUnary($token, $lastNode);
         if ($unary) {
@@ -439,12 +473,6 @@ class MathParser
           } else if ($token['symbol'] == '-') {
             // unary minus; change to ~ to distinguish it.
             $token['symbol'] = '~';
-            //if unary negative and next is number, just negate it to
-            //save a little tree complexity
-            if ($this->tokens[$tokenindex+1]['type'] == 'number') {
-              $this->tokens[$tokenindex+1]['symbol'] *= -1;
-              continue;
-            }
           }
         } else {
           //grab info on current operator
@@ -499,7 +527,7 @@ class MathParser
    */
   private function isUnary($token, $lastNode) {
     // only possible unary symbols are + and -
-    if ($token['symbol'] != '-' && $token['symbol'] != '+') {
+    if ($token['symbol'] != '-' && $token['symbol'] != '+' && $token['symbol'] != '!') {
       return false;
     }
     // if at very start, or last node was starting paren or unary minus or div
@@ -522,7 +550,7 @@ class MathParser
       throw new MathParserException("Syntax error - parentheses mismatch");
     }
 
-    if ($node['symbol'] == '~') { //unary negation
+    if ($node['symbol'] == '~' || $node['symbol'] == 'not') { //unary negation or not
       $left = array_pop($this->operandStack);
       if ($left === null) {
         throw new MathParserException("Syntax error - unary negative with nothing following");
@@ -669,8 +697,11 @@ class MathParser
       }
       return call_user_func($funcname, $insideval);
     } else if ($node['symbol'] === '~') {
-      // unary
+      // unary negation
       return -1*$this->evalNode($node['left']);
+    } else if ($node['symbol'] === 'not') {
+      // unary not
+      return !$this->evalNode($node['left']);
     } else if (isset($this->operators[$node['symbol']])) {
       // operator.  We'll use the evalfunc defined for the operator
       $opfunc = $this->operators[$node['symbol']]['evalfunc'];

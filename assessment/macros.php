@@ -3332,7 +3332,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 		$variables = listtoarray($vars);
 		$vlist = implode(",",$variables);
 		$origstu = $stu;
-		$stufunc = makeMathFunction(mathpretty($stu), $vlist);
+		$stufunc = makeMathFunction(makepretty($stu), $vlist);
 		if ($stufunc===false) {
 			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
@@ -3376,7 +3376,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
 			}
 			$origb = $b;
-			$bfunc = makeMathFunction(mathpretty($b), $vlist);
+			$bfunc = makeMathFunction(makepretty($b), $vlist);
 			if ($bfunc === false) {
 				//parse error - skip it
 				continue;
