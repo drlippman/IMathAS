@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.10, Nov 17, 2017
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -700,7 +700,7 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
 function normrand($mu,$sig,$n,$rnd=null) {
-	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $sig < 0) {
+	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
 	}
@@ -726,6 +726,20 @@ function normrand($mu,$sig,$n,$rnd=null) {
 	} else {
 		return (array_slice($z,0,count($z)-1));
 	}
+}
+
+function expdistrand($mu=1, $n=1, $rnd=3) {
+	if (!is_finite($mu) || !is_finite($n) || $n < 0 || $n > 5000) {
+		echo 'invalid inputs to expdistrand';
+		return array();
+	}
+	global $RND;
+	
+	$out = array();
+	for ($i=0; $i<$n; $i++) {
+		$out[] = -$mu*log($RND->rand(1,32768)/32768);
+	}
+	return $out;
 }
 
 //boxplot(array,axislabel,[options])

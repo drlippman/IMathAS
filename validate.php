@@ -362,7 +362,7 @@
 			$myrights = 40;
 			$myspecialrights = 0;
 		}
-	}	
+	}
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];
@@ -584,7 +584,7 @@
 			$coursetoolset = $crow['toolset'];
 			$coursedeftime = $crow['deftime']%10000;
 			if ($crow['deftime']>10000) {
-				$coursedefstime = floor($crow['deftime']/10000);
+				$coursedefstime = floor($crow['deftime']/10000)%10000;
 			} else {
 				$coursedefstime = $coursedeftime;
 			}

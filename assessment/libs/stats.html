@@ -24,6 +24,7 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#fdbargraph">fdbargraph</a></li>
 <li><a href="#piechart">piechart</a></li>
 <li><a href="#normrand">normrand</a></li>
+<li><a href="#expdistrand">expdistrand</a></li>
 <li><a href="#boxplot">boxplot</a></li>
 <li><a href="#normalcdf">normalcdf</a></li>
 <li><a href="#tcdf">tcdf</a></li>
@@ -156,6 +157,11 @@ normrand(mu,sigma,n, [rnd])
 <BR>returns an array of n random numbers that are normally distributed with given
 <BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 <BR>specify rnd to round to that many digits
+<BR><h3><a name="expdistrand">expdistrand</a></h3>
+normrand(mu, n, [rnd])
+<BR>returns an array of n random numbers that are exponentially distributed 
+<BR>with given mean mu. 
+<BR>specify rnd to round to that many digits (default 3)
 <BR><h3><a name="boxplot">boxplot</a></h3>
 boxplot(array,axislabel,[options])
 <BR>draws a boxplot based on the data in array, with given axislabel
