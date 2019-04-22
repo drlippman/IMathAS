@@ -1291,6 +1291,7 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	foreach ($gridi as $i=>$v) {
 		$grid[$i] = $v;
 	}
+
 	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
 		return false;
@@ -1304,7 +1305,7 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	$showanswer = null;
 	list($r,$m,$b) = linreg($xarr,$yarr);
 	if ($line!='') {
-		$lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3]);
+		$lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3],$grid[6],$grid[7]);
 		if ($lines[0][0]==$lines[0][2]) {
 			$stum = 100000;
 		} else {
