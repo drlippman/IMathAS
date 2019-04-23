@@ -3,6 +3,11 @@
 // (c) 2007 David Lippman
 require_once ('../includes/loaditemshowdata.php');
 require_once ("../includes/exceptionfuncs.php");
+if ($courseUIver>1) {
+	$addassess = 'addassessment2.php';
+} else {
+	$addassess = 'addassessment.php';
+}
 
 if (isset ( $studentid ) && ! isset ( $sessiondata ['stuview'] )) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, true, $studentinfo ['latepasses'], $latepasshrs );
@@ -118,14 +123,14 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	return $out;
 }
 function getAssessDD($i, $typeid, $parent, $itemid) {
-	global $cid;
+	global $cid, $addassess;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
-	$out .= " <li><a href=\"addassessment.php?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
+	$out .= " <li><a href=\"$addassess?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" .  _('Move') .  '</a></li>';
 	$out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" .  _('Delete') .  "</a></li>";
 	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" .  _('Copy') .  "</a></li>";
@@ -1754,7 +1759,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
    }
 
    function generateadditem($blk,$tb) {
-   	global $cid, $CFG,$imasroot;
+   	global $cid, $CFG,$imasroot,$addassess;
 
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
@@ -1769,7 +1774,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
    		$blkUrlParam = Sanitize::encodeUrlParam($blk);
    		$tbUrlParam = Sanitize::encodeUrlParam($tb);
 
-		$html .= "<a href=\"addassessment.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
+		$html .= "<a href=\"$addassess?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
 			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
 		}
@@ -1923,7 +1928,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
 	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$hideicons,$exceptions,$latepasses,$CFG;
-	   global $itemtypes, $iteminfo;
+	   global $itemtypes, $iteminfo, $addassess;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {
 		   $itemtypes = array();  $iteminfo = array();
@@ -2103,7 +2108,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
+				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | <a href=\"$addassess?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
 				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=" . Sanitize::onlyInt($typeid) . "\">", _('Grades'), "</a>";

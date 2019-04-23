@@ -39,7 +39,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		echo "Invalid ID";
 		exit;
 	}
-	
+
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
 		$sessiondata['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
@@ -286,7 +286,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
-			
+
 			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
 				//update points possible
 				require_once("../includes/updateptsposs.php");
@@ -329,7 +329,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores WHERE id=:id");
 				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row['id']));
-				
+
 				if (strlen($row['lti_sourcedid'])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
@@ -492,7 +492,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$timeout = array(0);
 		}
 		if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-			$timeout[1] = round($avgtimepts[2]); //score 
+			$timeout[1] = round($avgtimepts[2]); //score
 			$timeout[2] = round($avgtimepts[1]/60,1); //time first try
 			$timeout[3] = Sanitize::onlyInt($avgtimepts[3]); //# of data
 		}
@@ -524,7 +524,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$jsarr[] = array("text", $text_seg['text'],
 					Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
 					Sanitize::onlyInt($text_seg['ispage']),
-					$text_seg['pagetitle'], 
+					$text_seg['pagetitle'],
 					isset($text_seg['forntype'])?$text_seg['forntype']:0);
 			}
 		}
@@ -740,7 +740,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?) ";
 						$qarr[] = $userid;
 					}
-					
+
 				}
 				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
@@ -1095,6 +1095,11 @@ $sessiondata['useed'] = 1;
 if ($overwriteBody==1) {
 	echo $body;
 } else {
+	if ($courseUIver>1) {
+		$addassess = 'addassessment2.php';
+	} else {
+		$addassess = 'addassessment.php';
+	}
 
 //var_dump($jsarr);
 ?>
@@ -1113,7 +1118,7 @@ if ($overwriteBody==1) {
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h1></div>
 <?php
-	echo '<div class="cp"><a href="addassessment.php?id='.Sanitize::onlyInt($_GET['aid']).'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';
+	echo '<div class="cp"><a href="'.$addassess.'?id='.Sanitize::onlyInt($_GET['aid']).'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';
 	if ($beentaken) {
 ?>
 	<h2>Warning</h2>
@@ -1205,7 +1210,7 @@ if ($overwriteBody==1) {
 ?>
 	<p>
 		<input type=button value="Done" title="Exit back to course page" onClick="window.location='course.php?cid=<?php echo $cid ?>'">
-		<input type=button value="Assessment Settings" title="Modify assessment settings" onClick="window.location='addassessment.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'">
+		<input type=button value="Assessment Settings" title="Modify assessment settings" onClick="window.location='<?php echo $address;?>?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'">
 		<input type=button value="Categorize Questions" title="Categorize questions by outcome or other groupings" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
 		<input type=button value="Create Print Version" onClick="window.location='<?php
 		if (isset($CFG['GEN']['pandocserver'])) {

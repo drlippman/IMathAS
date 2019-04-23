@@ -61,6 +61,11 @@ if ($isteacher || $istutor) {
 	echo "Go away";
 	exit;
 }
+if ($courseUIver>1) {
+	$addassess = 'addassessment2.php';
+} else {
+	$addassess = 'addassessment.php';
+}
 
 
 //DISPLAY
@@ -165,7 +170,7 @@ require("../footer.php");
 
 
 function gbinstrdisp() {
-	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection,$includeendmsg;
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection,$includeendmsg,$addassess;
 	$hidenc = 1;
 	$includeendmsg = true;
 	$hasendmsg = false;
@@ -232,7 +237,7 @@ function gbinstrdisp() {
 		//links
 		if ($isteacher) {
 			if ($gbt[0][1][$i][6]==0) { //online
-				echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
+				echo "<br/><a class=small href=\"$addassess?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 				echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
 			} else if ($gbt[0][1][$i][6]==1) { //offline
 				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";

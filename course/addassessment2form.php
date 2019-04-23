@@ -9,7 +9,7 @@ $vueData = array(
 	'startdate' => $startdate,
 	'sdate' => $sdate,
 	'stime' => $stime,
-	'edatetype' => ($enddate==0?'0':'edate'),
+	'edatetype' => ($enddate==2000000000?'2000000000':'edate'),
 	'enddate' => $enddate,
 	'edate' => $edate,
 	'etime' => $etime,
@@ -20,6 +20,7 @@ $vueData = array(
 	'defregens' => ($line['defregens']>1 ? $line['defregens'] : 2),
 	'defregenpenalty' => $defregenpenalty,
 	'defregenpenaltyaftern' => $defregenpenalty_aftern,
+	'keepscore' => $line['keepscore'],
 	'defattempts' => $line['defattempts'],
 	'defattemptpenalty' => $defattemptpenalty,
 	'defattemptpenaltyaftern' => $defattemptpenalty_aftern,
@@ -125,7 +126,7 @@ $vueData = array(
 		<span class=form>Available Until:</span>
 		<span class=formright>
 			<label>
-				<input type=radio name="edatetype" value="0" v-model="edatetype" />
+				<input type=radio name="edatetype" value="2000000000" v-model="edatetype" />
 				Available always after start date
 			</label><br/>
 			<label>
@@ -188,7 +189,7 @@ $vueData = array(
 				</select>
 			</span><br class=form />
 
-			<label class=form for="subtype">Submission type</label>
+			<label class=form for="subtype">Submission type:</label>
 			<span class=formright>
 				<select name="subtype" id="subtype" v-model="subtype">
 					<option value="onever">One version</option>
@@ -198,7 +199,7 @@ $vueData = array(
 			</span><br class=form />
 
 			<div v-if="subtype != 'onever'">
-				<span class=form>Versions</span>
+				<span class=form>Versions:</span>
 				<span class=formright>
 					<label for="defregens" v-if="subtype == 'by_question'">
 						Number of versions for each question:
@@ -215,14 +216,25 @@ $vueData = array(
 					per version
 					<span v-show="defregenpenalty>0">
 						after
-						<input type=number min=1 :max="defregens" size=3 id="defregenpenaltyaftern"
+						<input type=number min=1 :max="Math.min(defregens,9)" size=3 id="defregenpenaltyaftern"
 							name="defregenpenaltyaftern" v-model.number="defregenpenaltyaftern" />
 						full-credit versions
 					</span>
-				</span>
+					<br/>
+					<span v-show="subtype == 'by_assessment'">
+						<label for="keepscore">
+							Score to keep:
+						<label>
+						<select id="keepscore" name="keepscore" v-model="keepscore">
+							<option value="best">Best</option>
+							<option value="last">Last</option>
+							<option value="average">Average</option>
+						</select>
+					</span>
+				</span><br class=form />
 			</div>
 
-			<span class=form>Tries</span>
+			<span class=form>Tries:</span>
 			<span class=formright>
 				<label for="defattempts">
 					Number of tries on each version of a question:
@@ -237,7 +249,7 @@ $vueData = array(
 					per try
 					<span v-show="defattemptpenalty>0">
 						after
-						<input type=number min=1 :max="defattempts" size=3 id="defattemptpenaltyaftern"
+						<input type=number min=1 :max="Math.min(defattempts,9)" size=3 id="defattemptpenaltyaftern"
 							name="defattemptpenaltyaftern" v-model.number="defattemptpenaltyaftern" />
 						full-credit tries
 					</span>
@@ -249,7 +261,7 @@ $vueData = array(
 			</label>
 			<span class="formright">
 				<select name="showscores" id="showscores" v-model="showscores">
-					<option v-for="option in showscoresOptions" :value="option.value">
+					<option v-for="option in showscoresOptions" :value="option.value" :key="option.value">
 						{{ option.text }}
 					</option>
 				</select>
@@ -273,7 +285,7 @@ $vueData = array(
 			</label>
 			<span class="formright">
 				<select name="viewingb" id="viewingb" v-model="viewingb">
-					<option v-for="option in viewInGbOptions" :value="option.value">
+					<option v-for="option in viewInGbOptions" :value="option.value" :key="option.value">
 						{{ option.text }}
 					</option>
 				</select>
@@ -285,7 +297,7 @@ $vueData = array(
 				</label>
 				<span class="formright">
 					<select name="scoresingb" id="scoresingb" v-model="scoresingb">
-						<option v-for="option in scoresInGbOptions" :value="option.value">
+						<option v-for="option in scoresInGbOptions" :value="option.value" :key="option.value">
 							{{ option.text }}
 						</option>
 					</select>
@@ -298,7 +310,7 @@ $vueData = array(
 				</label>
 				<span class="formright">
 					<select name="ansingb" id="ansingb" v-model="ansingb">
-						<option v-for="option in ansInGbOptions" :value="option.value">
+						<option v-for="option in ansInGbOptions" :value="option.value" :key="option.value">
 							{{ option.text }}
 						</option>
 					</select>
@@ -310,7 +322,7 @@ $vueData = array(
 			</label>
 			<span class="formright">
 				<select name="gbcategory" id="gbcategory" v-model="gbcategory">
-					<option v-for="option in gbcatOptions" :value="option.value">
+					<option v-for="option in gbcatOptions" :value="option.value" :key="option.value">
 						{{ option.text }}
 					</option>
 				</select>
@@ -428,9 +440,13 @@ $vueData = array(
 				<span v-show="reqscoreshowtype > -1">
 					a score of
 	 				<input type=text size=4 name=reqscore v-model="reqscore" />
+					<select name="reqscorecalctype" v-model="reqscorecalctype">
+						<option value="0">points</option>
+						<option value="1">percent</option>
+					</select>
 					is obtained on
 					<select name="reqscoreaid" v-model="reqscoreaid">
-						<option v-for="option in reqscoreOptions" :value="option.value">
+						<option v-for="option in reqscoreOptions" :value="option.value" :key="option.value">
 							{{ option.text }}
 						</option>
 					</select>
@@ -446,12 +462,12 @@ $vueData = array(
 			<span class=form>Hints and Videos</span>
 			<span class=formright>
 				<label>
-					<input type="checkbox" name="showhints" v=model="showhints" />
+					<input type="checkbox" name="showhints" value="1" v=model="showhints" />
 					Show hints when available?
 				</label>
 				<br/>
 				<label>
-					<input type="checkbox" name="showextrefs" v=model="showextrefs" />
+					<input type="checkbox" name="showextrefs" value="2" v=model="showextrefs" />
 					Show video/text buttons when available?
 				</label>
 			</span><br class=form />
@@ -470,7 +486,7 @@ $vueData = array(
 			 	<span v-show="doposttoforum">
 					to forum
 					<select name="posttoforum" id="posttoforum" v-model="posttoforum">
-						<option v-for="option in forumOptions" :value="option.value">
+						<option v-for="option in forumOptions" :value="option.value" :key="option.value">
 							{{ option.text }}
 						</option>
 					</select>
@@ -479,7 +495,7 @@ $vueData = array(
 
 			<span class=form>Assessment resource links</span>
 			<span class=formright>
-				<span v-for="(extref,index) in extrefs">
+				<span v-for="(extref,index) in extrefs" :key="extref.label">
 					<label>
 						Label:
 						<input name="extreflabels[]" v-model="extref.label" size="10" />
@@ -568,7 +584,8 @@ $vueData = array(
 			<span class="formright">
 				<select name="defoutcome" id="defoutcome" v-model="defoutcome">
 					<option value="0">No default outcome selected</option>
-					<option v-for="option in optiongrp"
+					<option v-for="option in outcomeOptions"
+						:key="option.value"
 						:value="option.value"
 						:disabled="option.isgroup"
 					>
@@ -609,7 +626,10 @@ $vueData = array(
 					<select id="groupsetid" name="groupsetid" v-model="groupsetid"
 						:disabled="!canchangegroup"
 					>
-						<option v-for="option in groupOptions" :value="option.value">
+						<option v-for="option in groupOptions"
+						:value="option.value"
+						:key="option.value"
+						>
 							{{ option.text }}
 						</option>
 					</select>
@@ -643,20 +663,24 @@ var app = new Vue({
 				'text': _('No scores at all')
 			};
 
+			let out = [];
 			if (this.defattempts == 1 && this.subtype != 'by_question') {
 				// if we only have 1 try, and not HW mode, show all options
-				return [during, at_end, total, none];
+				out = [during, at_end, total, none];
 			} else if (this.subtype == 'by_question' && this.defregens>1) {
 				// if we're in HW mode, and allowing multiple versions, must show score immediately
-				return [during];
+				out = [during];
 			} else {
 				// otherwise, give option of immediately (typical) or no scores shown
-				return [during, none];
+				out = [during, none];
 			}
-			return [];
+			if (!this.valueInOptions(out, this.showscores)) {
+				this.showscores = out[0].value;
+			}
+			return out;
 		},
 		showansOptions() {
-			//TODO: revisit after_attempt vs with_score
+			//TODO: revisit after_take vs with_score
 
 			let never = {
 				'value': 'never',
@@ -667,12 +691,13 @@ var app = new Vue({
 				'text': _('Show with the score')
 			};
 
+			let out = [];
 			if (this.showscores == 'during' && this.defattempts == 1) {
 				// when showing scores immediately and 1 try
-				return [with_score, never];
+				out = [with_score, never];
 			} else if (this.showscores == 'during' && this.defattempts > 1) {
 				// when showing scores immediately and n tries
-				let out = [
+				out = [
 					{
 						'value': 'after_lastattempt',
 						'text': _('After the last try on a question')
@@ -686,18 +711,20 @@ var app = new Vue({
 													_('After 1 try')
 					});
 				}
-				return out;
 			} else if (this.showscores == 'at_end') {
 				// for showing scores at end: after_attempt or never
-				return [
+				out = [
 					{
-						'value': 'after_attempt',
+						'value': 'after_take',
 						'text': _('After the assessment version is submitted')
 					},
 					never
 				];
 			}
-			return [];
+			if (!this.valueInOptions(out, this.showans)) {
+				this.showans = out[0].value;
+			}
+			return out;
 		},
 		viewInGbOptions() {
 			/*
@@ -706,7 +733,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			var out = [
+			let out = [
 				{
 					'value': 'after_due',
 					'text': _('After the due date')
@@ -716,15 +743,19 @@ var app = new Vue({
 					'text': _('Immediately - they can always view it')
 				},
 				{
-					'never': 'never',
+					'value': 'never',
 					'text': _('Never')
 				}
 			];
 			if (this.subtype == 'by_assessment') {
 				out.unshift({
-					'value': 'after_attempt',
-					'text': _('After an assessment attempt is done')
+					'value': 'after_take',
+					'text': _('After the assessment version is submitted')
 				})
+			}
+			if (!this.valueInOptions(out, this.viewingb)) {
+				console.log("here");
+				this.viewingb = out[0].value;
 			}
 			return out;
 		},
@@ -734,6 +765,7 @@ var app = new Vue({
 			‘after_due’: After the due date
 			‘never’: Never
 			 */
+			console.log(this.viewingb);
 			if (this.viewingb == 'never') {
 				return [];
 			} else {
@@ -752,6 +784,9 @@ var app = new Vue({
 						'value': 'in_gb',
 						'text': _('When then can view their work')
 					});
+				}
+				if (!this.valueInOptions(out, this.scoresingb)) {
+					this.scoresingb = out[0].value;
 				}
 				return out;
 			}
@@ -777,14 +812,27 @@ var app = new Vue({
  				];
  				if (this.scoresingb === 'in_gb' && this.subtype == 'by_assessment') {
  					out.unshift({
- 						'value': 'after_attempt',
- 						'text': _('After an assessment attempt is done')
+ 						'value': 'after_take',
+ 						'text': _('After the assessment version is submitted')
  					});
  				}
+				if (!this.valueInOptions(out, this.ansingb)) {
+					this.ansingb = out[0].value;
+				}
 				return out;
  			}
 		}
 
+	},
+	methods: {
+		valueInOptions(optArr, value) {
+			for (let i in optArr) {
+				if (optArr[i].value == value) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 });
 </script>
