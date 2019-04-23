@@ -78,14 +78,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       	$DBH->beginTransaction();
           require_once('../includes/filehandler.php');
           deleteallaidfiles($assessmentId);
-          $stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+          $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
           $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
           $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
           $DBH->commit();
-          header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
+          header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
                   $cid, $assessmentId));
           exit;
       } else {
@@ -95,23 +95,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $assessmentname = $stm->fetchColumn(0);
           $body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
               $cid, Sanitize::encodeStringForDisplay($coursename));
-          $body .= sprintf("&gt; <a href=\"addassessment.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
+          $body .= sprintf("&gt; <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
               $cid, $assessmentId);
 					$body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
           $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-          $body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, $assessmentId).'">';
+          $body .= '<form method="POST" action="'.sprintf('addassessment2.php?cid=%s&id=%d',$cid, $assessmentId).'">';
           $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
-          $body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=%s&id=%d'\"></p>\n",
+          $body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment2.php?cid=%s&id=%d'\"></p>\n",
               $cid, $assessmentId);
           $body .= '</form>';
       }
   } elseif (!empty($_POST['name'])) { //if the form has been submitted
+
 		$DBH->beginTransaction();
 		$toset = array();
 		// Name and dates
-		$toset['assessName'] = Sanitize::stripHtmlTags($_POST['name']);
-    if ($toset['assessName'] == '') {
-    	$toset['assessName'] = _('Unnamed Assessment');
+		$toset['name'] = Sanitize::stripHtmlTags($_POST['name']);
+    if ($toset['name'] == '') {
+    	$toset['name'] = _('Unnamed Assessment');
     }
 		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
 			$toset['summary'] = '';
@@ -150,19 +151,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		// Core options
 		$toset['displaymethod'] = Sanitize::stripHtmlTags($_POST['displaymethod']);
 
-		if ($_POST['subtype'] == 'onever') {
-			$toset['submitby'] = 'by_question';
-			$toset['defregens'] = 1;
+		$toset['submitby'] = Sanitize::stripHtmlTags($_POST['subtype']);
+		$toset['defregens'] = Sanitize::onlyInt($_POST['defregens']);
+		$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern']);
+		if ($defregenpenalty_aftern > 1 && $_POST['defregens'] > 1) {
+			$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . Sanitize::onlyInt($_POST['defregenpenalty']);
 		} else {
-			$toset['submitby'] = Sanitize::stripHtmlTags($_POST['subtype']);
-			$toset['defregens'] = Sanitize::onlyInt($_POST['defregens']);
-			$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern']);
-			if ($defregenpenalty_aftern > 1 && $_POST['defregens'] > 1) {
-				$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . Sanitize::onlyInt($_POST['defregenpenalty']);
-			} else {
-				$toset['defregenpenalty'] = Sanitize::onlyInt($_POST['defregenpenalty']);
-			}
+			$toset['defregenpenalty'] = Sanitize::onlyInt($_POST['defregenpenalty']);
 		}
+		$toset['keepscore'] = Sanitize::simpleString($_POST['keepscore']);
+
 
 		$toset['defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
 		$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern']);
@@ -240,15 +238,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$extrefs = array();
-		foreach ($_POST['extreflabels'] as $k=>$label) {
-			$label = trim(Sanitize::stripHtmlTags($label));
-    	$link = trim(Sanitize::url($_POST['extreflinks'][$k]));
-    	if ($label != '' && $link != '') {
-    		$extrefs[] = array(
-    			'label' => $label,
-    			'link' => $link
-    		);
-    	}
+			if (isset($_POST['extreflabels'])) {
+			foreach ($_POST['extreflabels'] as $k=>$label) {
+				$label = trim(Sanitize::stripHtmlTags($label));
+	    	$link = trim(Sanitize::url($_POST['extreflinks'][$k]));
+	    	if ($label != '' && $link != '') {
+	    		$extrefs[] = array(
+	    			'label' => $label,
+	    			'link' => $link
+	    		);
+	    	}
+			}
 		}
 		$toset['extrefs'] = json_encode($extrefs);
 
@@ -263,9 +263,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
 		if (isset($_POST['usedeffb'])) {
-      $toset['deffb'] = Sanitize::incomingHtml($_POST['deffb']);
+      $toset['deffeedbacktext'] = Sanitize::incomingHtml($_POST['deffb']);
     } else {
-      $toset['deffb'] = '';
+      $toset['deffeedbacktext'] = '';
     }
 
 		$toset['tutoredit'] = Sanitize::onlyInt($_POST['tutoredit']);
@@ -307,7 +307,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     if ($toset['isgroup']>0 && isset($_POST['groupsetid']) && $toset['groupsetid']==0) {
         //create new groupset
         $stm = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
-        $stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$assessName));
+        $stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$toset['name']));
       	$toset['groupsetid'] = $DBH->lastInsertId();
         $updategroupset = $toset['groupsetid'];
     }
@@ -341,7 +341,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$qarr = array();
 			$setstr = array();
 			foreach ($toset as $k=>$v) {
-				$setstr[] = ':'.$k.'='.$k;
+				$setstr[] = $k . '=:' . $k;
 				$qarr[':'.$k] = $v;
 			}
 			$query = 'UPDATE imas_assessments SET ' . implode(',', $setstr);
@@ -619,7 +619,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       if ($taken) {
           $page_isTakenMsg = "<p>This assessment has already been taken.  Modifying some settings will mess up those assessment attempts, and those inputs ";
           $page_isTakenMsg .=  "have been disabled.  If you want to change these settings, you should clear all existing assessment attempts</p>\n";
-          $page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment.php?cid=$cid&id=".Sanitize::onlyInt($_GET['id'])."&clearattempts=ask'\"></p>\n";
+          $page_isTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addassessment2.php?cid=$cid&id=".Sanitize::onlyInt($_GET['id'])."&clearattempts=ask'\"></p>\n";
       } else {
           $page_isTakenMsg = "<p>&nbsp;</p>";
       }
@@ -630,7 +630,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$pageh1 = _('Add Assessment');
 			}
 
-      $page_formActionTag = sprintf("addassessment.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);
+      $page_formActionTag = sprintf("addassessment2.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);
       if (isset($_GET['id'])) {
           $page_formActionTag .= "&id=" . Sanitize::onlyInt($_GET['id']);
       }
@@ -640,8 +640,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
       $stm->execute(array(':courseid'=>$cid));
       $otherAssessments = array();
-      $i=0;
-      if ($stm->rowCount()>0) {
+      while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$otherAssessments[] = array(
 					'value' => $row[0],
 					'text' => $row[1]
@@ -654,24 +653,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				'value' => 0,
 				'text' => _('Default')
 			));
-      $i=0;
-      if ($stm->rowCount()>0) {
-          while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$gbcats[] = array(
-							'value' => $row[0],
-							'text' => $row[1]
-						);
-          }
+      while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$gbcats[] = array(
+					'value' => $row[0],
+					'text' => $row[1]
+				);
       }
+
       $stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
       $stm->execute(array(':courseid'=>$cid));
       $page_outcomes = array();
-      $i=0;
-      if ($stm->rowCount()>0) {
-          while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-              $page_outcomes[$row[0]] = $row[1];
-              $i++;
-          }
+      while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+          $page_outcomes[$row[0]] = $row[1];
       }
 
 			$outcomeOptions = array();
@@ -744,9 +737,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
+//$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>';
+$placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
 
  require("../header.php");
 
@@ -778,6 +771,7 @@ if ($overwriteBody==1) {
 
 	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
+	<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 <?php
 }
 	require("../footer.php");

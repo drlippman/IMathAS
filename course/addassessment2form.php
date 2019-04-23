@@ -14,10 +14,10 @@ $vueData = array(
 	'edate' => $edate,
 	'etime' => $etime,
 	'datesbylti' => intval($dates_by_lti),
-	'allowpractice' => $line['reviewdate']>0 ,
+	'allowpractice' => $line['reviewdate']>0,
 	'displaymethod' => $line['displaymethod'],
-	'subtype' => (($line['defregens'] == 1) ? 'onever' : $line['submitby']),
-	'defregens' => ($line['defregens']>1 ? $line['defregens'] : 2),
+	'subtype' => $line['submitby'],
+	'defregens' => $line['defregens'],
 	'defregenpenalty' => $defregenpenalty,
 	'defregenpenaltyaftern' => $defregenpenalty_aftern,
 	'keepscore' => $line['keepscore'],
@@ -33,10 +33,10 @@ $vueData = array(
 	'gbcatOptions' => $gbcats,
 	'caltag' => $line['caltag'],
 	'shuffle' => $line['shuffle']&(1+16),
-	'noprint' => $line['noprint'],
-	'sameseed' => $line['shuffle']&2,
-	'samever' => $line['shuffle']&4,
-	'istutorial' => $line['istutorial'],
+	'noprint' => $line['noprint'] > 0,
+	'sameseed' => $line['shuffle']&2 > 0,
+	'samever' => $line['shuffle']&4 > 0,
+	'istutorial' => $line['istutorial'] > 0,
 	'allowlate' => $line['allowlate']%10,
 	'latepassafterdue' => $line['allowlate']>10,
 	'dolpcutoff' => $line['LPcutoff']>0,
@@ -46,10 +46,10 @@ $vueData = array(
 	'allowovertime' => $line['timelimit']>0,
 	'assmpassword' => $line['password'],
 	'revealpw' => false,
-	'showhints' => $line['showhints']&1,
-	'showextrefs' => $line['showhints']&2,
-	'msgtoinstr' => $line['msgtoinstr'],
-	'doposttoforum' => $line['posttoforum']>0,
+	'showhints' => $line['showhints']&1 > 0,
+	'showextrefs' => $line['showhints']&2 > 0,
+	'msgtoinstr' => $line['msgtoinstr'] > 0,
+	'doposttoforum' => $line['posttoforum'] > 0,
 	'posttoforum' => $line['posttoforum']>0 ? $line['posttoforum'] :
 				((count($forums)>0) ? $forums[0]['value'] : 0),
 	'forumOptions' => $forums,
@@ -76,8 +76,11 @@ $vueData = array(
 	'reqscoreaid' => $line['reqscoreaid'],
 	'reqscoreOptions' => $otherAssessments
 );
+
+// skipmathrender class is needed to prevent katex parser from mangling
+// Vue template
 ?>
-<div id="app" v-cloak>
+<div id="app" class="skipmathrender" v-cloak>
 	<span class=form>Assessment Name:</span>
 	<span class=formright>
 		<input type=text size=30 name=name v-model="name" required>
@@ -119,7 +122,7 @@ $vueData = array(
 			</label>
 			<input type=text size=10 name="sdate" v-model="sdate">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=8 name=stime v-model="stime">
 		</span><br class="form"/>
 
@@ -135,7 +138,7 @@ $vueData = array(
 			</label>
 			<input type=text size=10 name="edate" v-model="edate">
 			<a href="#" onClick="displayDatePicker('edate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=8 name=etime v-model="etime">
 		</span><br class="form"/>
 	</div>
@@ -168,6 +171,7 @@ $vueData = array(
 
 	<fieldset>
 		<legend>Assessment Options</legend>
+
 		<div>
 			<a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 	 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a>
@@ -189,26 +193,27 @@ $vueData = array(
 				</select>
 			</span><br class=form />
 
-			<label class=form for="subtype">Submission type:</label>
-			<span class=formright>
+			<label class="form" for="subtype">Submission type:</label>
+			<span class="formright">
 				<select name="subtype" id="subtype" v-model="subtype">
-					<option value="onever">One version</option>
 					<option value="by_question">Homework-style: new versions of individual questions</option>
 					<option value="by_assessment">Quiz-style: retake whole assessment with new versions</option>
 				</select>
 			</span><br class=form />
 
-			<div v-if="subtype != 'onever'">
-				<span class=form>Versions:</span>
-				<span class=formright>
-					<label for="defregens" v-if="subtype == 'by_question'">
-						Number of versions for each question:
-					</label>
-					<label for="defregens" v-else-if="subtype == 'by_assessment'">
-						Number of times assessment can be taken:
-					</label>
-					<input type=number min=2 max=100 size=3 id="defregens"
-						name="defregens" v-model.number="defregens" />
+
+			<span class=form>Versions:</span>
+			<span class=formright>
+
+				<label for="defregens" v-show="subtype == 'by_question'">
+					Number of versions for each question:
+				</label>
+				<label for="defregens" v-show="subtype == 'by_assessment'">
+					Number of times assessment can be taken:
+				</label>
+				<input type=number min=1 max=100 size=3 id="defregens"
+					name="defregens" v-model.number="defregens" />
+				<span v-show="defregens > 1">
 					<br/>
 					With a penalty of
 					<input type=number min=0 max=100 size=3 id="defregenpenalty"
@@ -229,10 +234,11 @@ $vueData = array(
 							<option value="best">Best</option>
 							<option value="last">Last</option>
 							<option value="average">Average</option>
-						</select>
+						</select> {{ keepscore }}
 					</span>
-				</span><br class=form />
-			</div>
+				</span>
+			</span><br class=form />
+
 
 			<span class=form>Tries:</span>
 			<span class=formright>
@@ -355,7 +361,7 @@ $vueData = array(
 					<input type="checkbox" value="1" name="noprint" v-model="noprint" />
 					Make hard to print
 				</label>
-				<label v-show="subtype != 'by_question'">
+				<label v-show="subtype != 'by_question' || defregens==1">
 					<br/>
 					<input type="checkbox" value="2" name="sameseed" v-model="sameseed" />
 					All items same random seed
@@ -392,21 +398,23 @@ $vueData = array(
 					<option value="8">Up to 7</option>
 					<option value="9">Up to 8</option>
 				</select>
-				<label>
-					<input type="checkbox" name="latepassafterdue" v-model="latepassafterdue">
-					Allow LatePasses after due date
-				</label>
-				<br/>
-				<label>
-					<input type="checkbox" name="dolpcutoff" value="1" v-model="dolpcutoff" />
-					Restrict by date.
-				</label>
-				<span v-show="dolpcutoff">
-					No extensions past
-					<input type=text size=10 name="lpdate" v-model="lpdate">
-					<a href="#" onClick="displayDatePicker('lpdate', this); return false">
-					<img src="../img/cal.gif" alt="Calendar"/></A>
-					at <input type=text size=8 name=lptime v-model="lptime">
+				<span v-show="allowlate > 0">
+					<label>
+						<input type="checkbox" name="latepassafterdue" v-model="latepassafterdue">
+						Allow LatePasses after due date
+					</label>
+					<br/>
+					<label>
+						<input type="checkbox" name="dolpcutoff" value="1" v-model="dolpcutoff" />
+						Restrict by date.
+					</label>
+					<span v-show="dolpcutoff">
+						No extensions past
+						<input type=text size=10 name="lpdate" v-model="lpdate">
+						<a href="#" onClick="displayDatePicker('lpdate', this); return false">
+						<img src="../img/cal.gif" alt="Calendar"/></A>
+						at <input type=text size=8 name=lptime v-model="lptime">
+					</span>
 				</span>
 			</span><br class=form />
 
@@ -414,18 +422,20 @@ $vueData = array(
 			<span class=formright>
 				<input type=text size=4 name=timelimit id=timelimit v-model="timelimit">
 				minutes (blank or 0 for none)
-				<br/>
-				<label>
-					<input type="checkbox" name="allowovertime" v-model="allowovertime" />
-					Allow student to work past time limit
-				</label>
+				<span v-if="timelimit !== '' && timelimit > 0">
+					<br/>
+					<label>
+						<input type="checkbox" name="allowovertime" v-model="allowovertime" />
+						Allow student to work past time limit
+					</label>
+				</span>
 			</span><br class=form />
 
 			<label class=form>Require Password (blank for none):</label>
 			<span class=formright>
 				<input :type="revealpw?'text':'password'" name="assmpassword"
 					id="assmpassword" v-model="assmpassword" autocomplete="new-password">
-				<a href="#" @click.prevent="revealpw = !revealpw">
+				<a v-if="assmpassword != ''" href="#" @click.prevent="revealpw = !revealpw">
 					{{ revealpw ? _('Hide') : _('Show') }}
 				</a>
 			</span><br class=form />
@@ -495,21 +505,21 @@ $vueData = array(
 
 			<span class=form>Assessment resource links</span>
 			<span class=formright>
-				<span v-for="(extref,index) in extrefs" :key="extref.label">
+				<span v-for="(extref,index) in extrefs" :key="index">
 					<label>
 						Label:
 						<input name="extreflabels[]" v-model="extref.label" size="10" />
 					</label>
 					<label>
 						Link:
-						<input type="url" name="extreflinks[]" v-model="extref.link" size="30" />
+						<input type="url" name="extreflinks[]" v-model="extref.link" size="28" />
 					</label>
 					<button type="button" @click="extrefs.splice(index,1)">
 						Remove
 					</button>
 					<br/>
 				</span>
-				<button type="button" @click="extrefs.push({'label':'', 'link':''})">
+				<button type="button" @click="addExtref">
 					Add Resource
 				</button>
 			</span><br class=form>
@@ -532,10 +542,10 @@ $vueData = array(
 			<label for="cntingb" class=form>Count:</label>
 			<span class=formright>
 				<select name="cntingb" id="cntingb">
-					<option value="1"> Count in Gradebook</option>
-					<option value="0"> Don't count in grade total and hide from students</option>
-					<option value="3"> Don't count in grade total</option>
-					<option value="2"> Count as Extra Credit</option>
+					<option value="1">Count in Gradebook</option>
+					<option value="0">Don't count in grade total and hide from students</option>
+					<option value="3">Don't count in grade total</option>
+					<option value="2">Count as Extra Credit</option>
 				</select>
 			</span><br class=form />
 
@@ -639,7 +649,6 @@ $vueData = array(
 
 	</fieldset>
 </div>
-
 <script type="text/javascript">
 var app = new Vue({
 	el: '#app',
@@ -754,7 +763,6 @@ var app = new Vue({
 				})
 			}
 			if (!this.valueInOptions(out, this.viewingb)) {
-				console.log("here");
 				this.viewingb = out[0].value;
 			}
 			return out;
@@ -765,31 +773,28 @@ var app = new Vue({
 			‘after_due’: After the due date
 			‘never’: Never
 			 */
-			console.log(this.viewingb);
-			if (this.viewingb == 'never') {
-				return [];
-			} else {
-				let out = [
-					{
-						'value': 'after_due',
-						'text': _('After the due date')
-					},
-					{
-						'value': 'never',
-						'text': _('Never')
-					}
-				];
-				if (this.viewingb !== 'after_due') {
-					out.unshift({
-						'value': 'in_gb',
-						'text': _('When then can view their work')
-					});
+
+			let out = [
+				{
+					'value': 'after_due',
+					'text': _('After the due date')
+				},
+				{
+					'value': 'never',
+					'text': _('Never')
 				}
-				if (!this.valueInOptions(out, this.scoresingb)) {
-					this.scoresingb = out[0].value;
-				}
-				return out;
+			];
+			if (this.viewingb !== 'after_due' && this.viewingb !== 'never') {
+				out.unshift({
+					'value': 'in_gb',
+					'text': _('When then can view their work')
+				});
 			}
+			if (!this.valueInOptions(out, this.scoresingb)) {
+				this.scoresingb = out[0].value;
+			}
+			return out;
+
 		},
 		ansInGbOptions() {
 			/*
@@ -822,7 +827,6 @@ var app = new Vue({
 				return out;
  			}
 		}
-
 	},
 	methods: {
 		valueInOptions(optArr, value) {
@@ -832,6 +836,10 @@ var app = new Vue({
 				}
 			}
 			return false;
+		},
+		addExtref() {
+			this.extrefs.push({'label':'', 'link':''});
+			this.extrefs = this.extrefs.slice();
 		}
 	}
 });
