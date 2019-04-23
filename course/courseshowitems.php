@@ -1840,7 +1840,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		}
 		$html .= ">\n";
 		$html .= "<option value=\"\">" . _('Add An Item...') . "</option>\n";
-		$html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
+		if ($addassess=='addassessment2.php') {
+			$html .= "<option value=\"assessment2\">" . _('Add Assessment') . "</option>\n";
+		} else {
+			$html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
+		}
 		//$html .= "<option value=\"drillassess\">Add Drill</option>\n";
 		$html .= "<option value=\"inlinetext\">" . _('Add Inline Text') . "</option>\n";
 		$html .= "<option value=\"linkedtext\">" . _('Add Link') . "</option>\n";
