@@ -7,7 +7,7 @@ function hidecorrect() {
 		butn.html(_("Hide Questions with Perfect Scores"));
 		butn.removeClass("hchidden");
 	}
-	$(".iscorrect").toggleClass("pseudohidden");
+	$(".iscorrect").toggle();
 }
 function hidenonzero() {
 	var butn = $("#nztoggle");
@@ -20,7 +20,7 @@ function hidenonzero() {
 		butn.html(_("Hide Nonzero Score Questions"));
 		butn.removeClass("nzhidden");
 	}
-	$(".isnonzero").toggleClass("pseudohidden");
+	$(".isnonzero").toggle();
 }
 function hideperfect() {
 	var butn = $("#hptoggle");
@@ -43,7 +43,7 @@ function hideNA() {
 		butn.html(_("Hide Unanswered Questions"));
 		butn.removeClass("hnahidden");
 	}
-	$(".notanswered").toggleClass("pseudohidden");
+	$(".notanswered").toggle();
 }
 function showallans() {
 	$("span[id^='ans']").removeClass("hidden");
