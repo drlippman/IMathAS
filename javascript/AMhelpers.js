@@ -89,7 +89,7 @@ function setupLivePreview(qn) {
 			  		text = AMnumfuncPrepVar(qn, text)[1];
 
 			  	} else if (ntupletoproc.hasOwnProperty(qn)) {
-			  		text = text.replace(/</g, '(:').replace(/>/g, ':)');	
+			  		text = text.replace(/</g, '(:').replace(/>/g, ':)');
 			  	} else if (calcformat.hasOwnProperty(qn)) {
 			  		var format = calcformat[qn];
 			  		if (format.indexOf('list')==-1 && format.indexOf('set')==-1) {
@@ -98,7 +98,7 @@ function setupLivePreview(qn) {
 			  		if (format.indexOf('scinot')!=-1) {
 			  			text = text.replace(/(x|X|\u00D7)/,"xx");
 			  		}
-			  	} 
+			  	}
 			  	text = text.replace(/[^\u0000-\u007f]/g, '?');
 			  	return text;
 			  },
@@ -816,7 +816,7 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 				str += val;
 				//calcstr += calced(val);
 				calcout = calced(val);
-				
+
 				calcout[1] += syntaxcheckexpr(val,format);
 				if (calcout[1] == '') {
 					calcout[1] += singlevalsyntaxcheck(val,format);
@@ -824,7 +824,7 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 				if (err=='') {
 					err = calcout[1];
 				}
-				
+
 				calcstr += calcout[0];
 				count++;
 			}
@@ -863,10 +863,10 @@ function matrixcalc(inputId,outputId,rows,cols,format) {
 				if (calcout[1] == '') {
 					calcout[1] += singlevalsyntaxcheck(calclist2[j],format);
 				}
-				if (err=='') { 
+				if (err=='') {
 					err = calcout[1];
 				}
-				
+
 				calclist2[j] = calcout[0];
 			}
 			calclist[i] = calclist2.join(',');
@@ -922,7 +922,7 @@ function AMnumfuncPrepVar(qn,str) {
   var fl = flist[qn];
   var vars = vl.split("|");
   vars.push("DNE");
-  
+
   if (vl.match(/lambda/)) {
   	  str = str.replace(/lamda/, 'lambda');
   }
@@ -949,7 +949,7 @@ function AMnumfuncPrepVar(qn,str) {
   //sequentially escape variables from longest to shortest, then unescape
   str = str.replace(new RegExp("("+vl+")","gi"), function(match,p1) {
 	 for (var i=0; i<vars.length;i++) {
-		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) { 
+		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
 	 }});
@@ -958,7 +958,7 @@ function AMnumfuncPrepVar(qn,str) {
        });
   dispstr = dispstr.replace(new RegExp("("+vl+")","gi"), function(match,p1) {
 	 for (var i=0; i<vars.length;i++) {
-		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {  
+		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
 	 }});
@@ -1025,7 +1025,7 @@ function AMnumfuncPrepVar(qn,str) {
   }
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
-  
+
   //Correct rendering when f or g is a variable not a function
   if (vl.match(/\bf\b/) && !fl.match(/\bf\b/)) {
   	  dispstr = dispstr.replace(/([^a-zA-Z])f\^([\d\.]+)([^\d\.])/g, "$1f^$2{::}$3");
@@ -1099,7 +1099,7 @@ function AMpreview(inputId,outputId) {
   	  	  err += ". "+formaterr;
   	  }
   }
-  
+
   if (!onlyAscii.test(str)) {
   	  err += ". "+_("Your answer contains an unrecognized symbol");
   	  dispstr = dispstr.replace(/[^\u0000-\u007f]/g, '?');
@@ -1282,7 +1282,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				return false;
 			}
 		}
-		
+
 	}
 	imathasDraw.encodea11ydraw();
 
@@ -1549,10 +1549,10 @@ function assessbackgsave() {
 		tosubFormData.append("disptime", document.getElementById("disptime").value);
 		tosubFormData.append("isreview", document.getElementById("isreview").value);
 		$.ajax({
-			type:"POST", 
-			url: window.location.origin+window.location.pathname, 
-			data: tosubFormData, 
-			contentType: false, 
+			type:"POST",
+			url: window.location.origin+window.location.pathname,
+			data: tosubFormData,
+			contentType: false,
 			processData: false,
 			qn: qn
 		}).done(function(msg){
@@ -1567,7 +1567,7 @@ function assessbackgsave() {
 function assessbackgsubmit(qn,noticetgt) {
 	qn = parseInt(qn);
 	if (!confirmSubmit($("#embedqwrapper"+qn)[0])) {
-		return false;	
+		return false;
 	}
 	if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
 	doonsubmit();
@@ -1684,7 +1684,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		    if (usingTinymceEditor) {
 			    initeditor("textareas","mceEditor");
 		    }
-		   
+
 		    // Loop through every script collected and eval it
 		    initstack.length = 0;
 		    for(var i=0; i<scripts.length; i++) {
@@ -1721,7 +1721,7 @@ function assessbackgsubmit(qn,noticetgt) {
 		    	    assessFormIsDirty.splice(assessFormIsDirty.indexOf(qn*1),1);
 		    }
 		    $("#embedqwrapper"+qn).find("input,textarea").on("change", trackDirty);
-		    
+
 		    var pagescroll = 0;
 		    if(typeof window.pageYOffset!= 'undefined'){
 			//most browsers
@@ -1758,7 +1758,7 @@ function embedEnterHandler(el) {
 	});
 }
 $(window).on("ImathasEmbedReload", function(e, qn) {
-	embedEnterHandler("embedqwrapper"+qn);	
+	embedEnterHandler("embedqwrapper"+qn);
 });
 
 /*******************************************************
@@ -2221,10 +2221,17 @@ function initShowAnswer() {
 		var idnext = $(this).siblings("span:first-of-type").attr("id");
 		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
 		  .off("click.sashow").on("click.sashow", function() {
-			$(this).attr("aria-expanded",true)
-		  	  .siblings("span:first-of-type")
-				.attr("aria-expanded",true).attr("aria-hidden",false)
-				.removeClass("hidden");
+				if ($(this).attr("aria-expanded") == 'true') {
+					$(this).attr("aria-expanded",false)
+				  	.siblings("span:first-of-type")
+						.attr("aria-hidden",true)
+						.addClass("hidden");
+				} else {
+					$(this).attr("aria-expanded",true)
+				  	.siblings("span:first-of-type")
+						.attr("aria-hidden",false)
+						.removeClass("hidden");
+				}
 		});
 	});
 	$("input.dsbtn + div.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
@@ -2232,10 +2239,17 @@ function initShowAnswer() {
 		var idnext = $(this).siblings("div:first-of-type").attr("id");
 		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
 		  .off("click.sashow").on("click.sashow", function() {
-			$(this).attr("aria-expanded",true)
-		  	  .siblings("div:first-of-type")
-				.attr("aria-expanded",true).attr("aria-hidden",false)
-				.removeClass("hidden");
+				if ($(this).attr("aria-expanded") == 'true') {
+					$(this).attr("aria-expanded",false)
+				  	.siblings("div:first-of-type")
+						.attr("aria-hidden",true)
+						.addClass("hidden");
+				} else {
+					$(this).attr("aria-expanded",true)
+				  	.siblings("div:first-of-type")
+						.attr("aria-hidden",false)
+						.removeClass("hidden");
+				}
 		});
 	});
 }
@@ -2355,4 +2369,3 @@ $(function() {
 		}
 	});
 });
-
