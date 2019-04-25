@@ -58,6 +58,9 @@ while ($line = $stm->fetch(PDO::FETCH_NUM)) {
 $stm = $DBH->prepare("DELETE FROM imas_assessments WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 
+$stm = $DBH->prepare("DELETE FROM imas_forums WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+
 $stm = $DBH->prepare("DELETE FROM imas_items WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 
@@ -212,7 +215,7 @@ foreach ($assessGroups as $gn=>$agroup) {
         $udata['status'],
         gzencode($udata['scoreddata'])
       ));
-    } 
+    }
   }
 }
 
