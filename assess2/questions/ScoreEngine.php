@@ -10,6 +10,7 @@ use PDO;
 use RuntimeException;
 
 use Rand;
+use Sanitize;
 
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
@@ -23,6 +24,34 @@ use IMathAS\assess2\questions\models\ScoreQuestionParams;
  */
 class ScoreEngine
 {
+    const VARS_FOR_SCOREPART = array(
+        'abstolerance',
+        'ansprompt',
+        'anstypes',
+        'answeights',
+        'answer',
+        'answers',
+        'answersize',
+        'answerformat',
+        'domain',
+        'grid',
+        'matchlist',
+        'noshuffle',
+        'partialcredit',
+        'partweights',
+        'reltolerance',
+        'reqdecimals',
+        'reqsigfigs',
+        'requiretimes',
+        'requiretimeslistpart',
+        'scoremethod',
+        'snaptogrid',
+        'strflags',
+        'qnpointval',
+        'questions',
+        'variables',
+    );
+
     private $dbh;
     private $randWrapper;
 
@@ -36,24 +65,28 @@ class ScoreEngine
      * Score a question. This method wraps another method around error handlers.
      *
      * @param ScoreQuestionParams $scoreQuestionParams Params for scoring this question.
+     * @return array
      */
-    public function scoreQuestion(ScoreQuestionParams $scoreQuestionParams)
+    public function scoreQuestion(ScoreQuestionParams $scoreQuestionParams): array
     {
         set_error_handler('ErrorHandler::evalErrorHandler');
         set_exception_handler('ErrorHandler::evalExceptionHandler');
 
-        $this->scoreQuestionCatchErrors($scoreQuestionParams);
+        $results = $this->scoreQuestionCatchErrors($scoreQuestionParams);
 
         restore_error_handler();
         restore_exception_handler();
+
+        return $results;
     }
 
     /**
      * Score a question.
      *
      * @param ScoreQuestionParams $scoreQuestionParams Params for scoring this question.
+     * @return array
      */
-    private function scoreQuestionCatchErrors(ScoreQuestionParams $scoreQuestionParams)
+    private function scoreQuestionCatchErrors(ScoreQuestionParams $scoreQuestionParams): array
     {
         // This lets various parts of IMathAS know that question HTML is
         // NOT being generated for display.
@@ -64,6 +97,8 @@ class ScoreEngine
         }
 
         // FIXME: Where is this used? Do we need this in scope?
+        //        Appears to be used only during exception handling, which
+        //        will be replaced. Confirm with dlippman.
         $myrights = $scoreQuestionParams->getUserRights();
 
         $qdata = $this->loadQuestionData($scoreQuestionParams);
@@ -83,6 +118,13 @@ class ScoreEngine
         /*
          * Evals
          */
+
+        // These may be needed in evals.
+        // TODO: Confirm with dlippman.
+        // Note: If these lines are removed, update the scoring section below,
+        //       after packaging local variables.
+        $qnidx = $scoreQuestionParams->getQuestionNumber();
+        $attemptn = $scoreQuestionParams->getAttemptNumber();
 
         // TODO: Refactor error handling to use custom error handlers.
         // TODO: Also need to add student messages in custom error handlers.
@@ -172,6 +214,50 @@ class ScoreEngine
                 }
             }
         }
+
+        /*
+	     * Package local variables for scorepart().
+	     */
+
+        // These may have been defined by the question writer.
+        $varsForScorepart = array();
+        foreach (self::VARS_FOR_SCOREPART as $optionKey) {
+            if (!isset(${$optionKey})) {
+                continue;
+            }
+
+            if ('answerformat' == $optionKey) {
+                $answerformat = str_replace(' ', '', $answerformat);
+            }
+
+            $varsForScorepart[$optionKey] = ${$optionKey};
+        }
+
+        /*
+         * Look to see if we should splice off some autosaved answers.
+         */
+
+        if ($GLOBALS['lastanswers'][$qnidx] != '') {
+            $templastans = explode('##', $GLOBALS['lastanswers'][$qnidx]);
+            $countregens = count(array_keys($templastans, 'ReGen', true));
+            $tosplice = ($countregens + $attemptn) - count($templastans);
+            if ($tosplice < 0) {
+                array_splice($templastans, $tosplice);
+                $GLOBALS['lastanswers'][$qnidx] = implode('##', $templastans);
+            }
+        }
+
+        /*
+         * Score the student's answers.
+         */
+
+        if ($qdata['qtype'] == "multipart") {
+            $score = $this->scorePartMultiPart($scoreQuestionParams, $varsForScorepart);
+        } else {
+            $score = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata, $varsForScorepart);
+        }
+
+        return $score;
     }
 
     /**
@@ -442,12 +528,137 @@ class ScoreEngine
     }
 
     /**
+     * Score a non-multipart question's answers.
+     *
+     * @param ScoreQuestionParams $scoreQuestionParams
+     * @param array $optionsPack Packaged vars used by scorepart().
+     * @return array An array of scores.
+     */
+    private function scorePartMultiPart(ScoreQuestionParams $scoreQuestionParams,
+                                        array $optionsPack): array
+    {
+        $qnidx = $scoreQuestionParams->getQuestionNumber();
+
+        // We need to "unpack" this into locally scoped variables.
+        foreach ($optionsPack as $k => $v) {
+            ${$k} = $v;
+        }
+
+        $partla = array();
+        if (isset($answeights)) {
+            if (!is_array($answeights)) {
+                $answeights = explode(",", $answeights);
+            }
+
+            $answeights = array_map('trim', $answeights);
+            $localsum = array_sum($answeights);
+            if ($localsum == 0) {
+                $localsum = 1;
+            }
+            foreach ($answeights as $kidx => $vval) {
+                $answeights[$kidx] = $vval / $localsum;
+            }
+        } else {
+            if (count($anstypes) > 1) {
+                if ($qnpointval == 0) {
+                    $qnpointval = 1;
+                }
+                $answeights = array_fill(0, count($anstypes) - 1, round($qnpointval / count($anstypes), 2));
+                $answeights[] = $qnpointval - array_sum($answeights);
+                foreach ($answeights as $kidx => $vval) {
+                    $answeights[$kidx] = $vval / $qnpointval;
+                }
+            } else {
+                $answeights = array(1);
+            }
+        }
+        $scores = array();
+        $raw = array();
+        $accpts = 0;
+        foreach ($anstypes as $kidx => $anstype) {
+            $partnum = ($qnidx + 1) * 1000 + $kidx;
+            $raw[$kidx] = scorepart($anstype, $kidx, $_POST["qn" . Sanitize::onlyInt($partnum)], $optionsPack, $qnidx + 1);
+            if (isset($scoremethod) && $scoremethod == 'acct') {
+                if (($anstype == 'string' || $anstype == 'number') && $answer[$kidx] === '') {
+                    $scores[$kidx] = $raw[$kidx] - 1;  //0 if correct, -1 if wrong
+                } else {
+                    $scores[$kidx] = $raw[$kidx];
+                    $accpts++;
+                }
+            } else {
+                $scores[$kidx] = ($raw[$kidx] < 0) ? 0 : round($raw[$kidx] * $answeights[$kidx], 4);
+            }
+            $raw[$kidx] = round($raw[$kidx], 2);
+            $partla[$kidx] = $GLOBALS['partlastanswer'];
+        }
+
+        $partla = str_replace('&', '', $partla);
+        $partla = preg_replace('/#+/', '#', $partla);
+
+        if ($GLOBALS['lastanswers'][$qnidx] == '') {
+            $GLOBALS['lastanswers'][$qnidx] = implode("&", $partla);
+        } else {
+            $GLOBALS['lastanswers'][$qnidx] .= '##' . implode("&", $partla);
+        }
+        if (isset($scoremethod) && $scoremethod == "singlescore") {
+            return array(round(array_sum($scores), 3), implode('~', $raw));
+        } else if (isset($scoremethod) && $scoremethod == "allornothing") {
+            if (array_sum($scores) < .98) {
+                return array(0, implode('~', $raw));
+            } else {
+                return array(1, implode('~', $raw));
+            }
+        } else if (isset($scoremethod) && $scoremethod == "acct") {
+            $sc = round(array_sum($scores) / $accpts, 3);
+            return (array($sc, implode('~', $raw)));
+        } else {
+            return array(implode('~', $scores), implode('~', $raw));
+        }
+    }
+
+    /**
+     * Score a non-multipart question's answers.
+     *
+     * @param ScoreQuestionParams $scoreQuestionParams
+     * @param array $qdata The question's data as provided by loadQuestionData().
+     *                     Used to determine if a question is conditional.
+     * @param array $optionsPack Packaged vars used by scorepart().
+     * @return array An array of scores.
+     */
+    private function scorePartNonMultiPart(ScoreQuestionParams $scoreQuestionParams,
+                                           array $qdata,
+                                           array $optionsPack): array
+    {
+        $qnidx = $scoreQuestionParams->getQuestionNumber();
+        $givenans = $scoreQuestionParams->getGivenAnswer();
+
+        $score = scorepart($qdata['qtype'], $qnidx, $givenans, $optionsPack, 0);
+        if (isset($scoremethod) && $scoremethod == "allornothing") {
+            if ($score < .98) {
+                $score = 0;
+            }
+        }
+        if ($qdata['qtype'] != 'conditional') {
+            $GLOBALS['partlastanswer'] = str_replace('&', '', $GLOBALS['partlastanswer']);
+            $GLOBALS['partlastanswer'] = preg_replace('/#+/', '#', $GLOBALS['partlastanswer']);
+        }
+        if ($GLOBALS['lastanswers'][$qnidx] == '') {
+            $GLOBALS['lastanswers'][$qnidx] = $GLOBALS['partlastanswer'];
+        } else {
+            $GLOBALS['lastanswers'][$qnidx] .= '##' . $GLOBALS['partlastanswer'];
+        }
+
+        return array(round($score, 3), round($score, 2));
+    }
+
+    /**
      * Determine if a question is a multi-part question or not.
      *
      * @param array $questionData
      * @return bool True = Question is multi-part. False = It's not.
      */
-    private function isMultipartQuestion(array $questionData)
+    private
+    function isMultipartQuestion(array $questionData)
     {
         return ($questionData['qtype'] == "multipart"
             || $questionData['qtype'] == 'conditional');
