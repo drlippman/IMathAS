@@ -80,8 +80,12 @@
 		echo "<html><body>No item specified.</body></html>\n";
 		exit;
 	}
-	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id");
-	$stm->execute(array(':id'=>intval($_GET['id'])));
+	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>intval($_GET['id'], ':cid'=>$cid)));
+	if ($stm->rowCount()==0) {
+		echo "Invalid ID";
+		exit;
+	}
 	list($text,$title) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 
