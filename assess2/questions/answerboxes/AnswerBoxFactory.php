@@ -21,6 +21,8 @@ require_once(__DIR__ . '/NTupleAnswerBox.php');
 require_once(__DIR__ . '/NumberAnswerBox.php');
 require_once(__DIR__ . '/StringAnswerBox.php');
 
+use OutOfBoundsException;
+
 use Sanitize;
 
 /**

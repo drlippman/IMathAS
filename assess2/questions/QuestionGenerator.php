@@ -7,12 +7,15 @@ require_once(__DIR__ . "/../../assessment/interpret5.php");
 require_once(__DIR__ . "/../../assessment/macros.php");
 require_once(__DIR__ . "/../../includes/sanitize.php");
 
+require_once(__DIR__ . "/ErrorHandler.php");
 require_once(__DIR__ . "/QuestionHtmlGenerator.php");
 
 use PDO;
+use RuntimeException;
+use Throwable;
+
 use Rand;
 use Sanitize;
-use Throwable;
 
 use IMathAS\assess2\questions\models\Question;
 use IMathAS\assess2\questions\models\QuestionParams;
@@ -26,8 +29,6 @@ use IMathAS\assess2\questions\models\QuestionParams;
  *   - This is a refactor of displayq2.php.
  *   - Most code in here is being extracted as-is from displayq2.php,
  *     unless refactoring is simple or is necessary for OO-ness.
- *   - All code related to generating HTML may eventually be extracted to
- *     a separate class. I'm not sure yet. (class HtmlQuestion?)
  */
 class QuestionGenerator
 {
@@ -176,18 +177,11 @@ class QuestionGenerator
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
                                      int $errline, array $errcontext): bool
     {
-        error_log(sprintf('Caught error by QuestionGenerator in %s:%s -- %s',
-            $errfile, $errline, $errstr));
+        ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
-        if (extension_loaded('newrelic')) {
-            newrelic_notice_error($errno, $errstr, $errfile, $errline, $errcontext);
-        }
-
-        if ($GLOBALS['myrights'] > 10) {
-            $this->addError(sprintf(
-                _('<p>Caught warning in the question code: %s on line %d</p>'),
-                $errstr, $errline));
-        }
+        $this->addError(sprintf(
+            _('<p>Caught warning in the question code: %s on line %d</p>'),
+            $errstr, $errline));
 
         // True = Don't execute the PHP internal error handler.
         // False = Populate $php_errormsg.
@@ -202,19 +196,12 @@ class QuestionGenerator
      */
     public function evalExceptionHandler(Throwable $t): void
     {
-        error_log(sprintf('Caught exception by QuestionGenerator from %s:%d -- %s',
-            $t->getFile(), $t->getLine(), $t->getMessage()));
+        ErrorHandler::evalExceptionHandler($t);
 
-        if (extension_loaded('newrelic')) {
-            newrelic_notice_error($t);
-        }
-
-        if ($GLOBALS['myrights'] > 10) {
-            $this->addError(
-                _('<p>Caught error while evaluating the code in this question: ')
-                . Sanitize::encodeStringForDisplay($t->getMessage())
-                . '</p>');
-        }
+        $this->addError(
+            _('<p>Caught error while evaluating the code in this question: ')
+            . Sanitize::encodeStringForDisplay($t->getMessage())
+            . '</p>');
     }
 }
 
