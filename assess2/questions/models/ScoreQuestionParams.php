@@ -14,6 +14,7 @@ class ScoreQuestionParams
 
     /**
      * The user's rights. (from imas_users table, "rights" column)
+     *
      * While this is not related directly to the question, this value is
      * used during question scoring somewhere. FIXME: Note where it's used?
      *
@@ -26,6 +27,7 @@ class ScoreQuestionParams
 
     /**
      * The user's rights. (from imas_users table, "rights" column)
+     *
      * While this is not related directly to the question, this value is
      * used during question scoring somewhere. FIXME: Note where it's used?
      *
