@@ -6,38 +6,6 @@
 
 
 /*
-Ponderings for rewrite.  Want to move any inline script into attributes, and
-inline style into classes
-
-Want to be able to init without needing script tags
-	everything except autosuggest at least seems to not need an explicit init
-
-classes:
- textright	text-align: right
- pseudohidden	position: absolute; visibility: hidden; left: -5000px
- $colorbox
- creditbox	already defined (in mathtest - need to pull out)
-
-attributes:
- data-qtype	question type	for number, add oo/DNE helper
- data-helper  1   add oo/DNE helper or mathquill
- data-preview 1
- data-format	x debit		onkeyup = editdebit(el)
- 		x credit		onkeyup = editcredit(el)
- data-tip	the short tooltip
-		put long tooltip in "tips$qn"
- aria-describedby	"tips$qn"
-    may need to update the tips lookup to pull from right place
-
- data-calcformat	$answerformat	 calc field with preview to setup onkeyup
- data-mqtype		frac, basic, full	MathQuill type
- data-matrixsize	3,2			For calcmatrix preview
-   *** WHERE to put this??? //TODO
- data-draw		current canvasas[qn] stuff. Will have to convert types
- data-drawla		The last answer
-
-for number with hidden type, script defines imasprevans["qn-partnum"] with $la. What for?
- doesn't seem to be used in any of our code, but maybe in virtual manipulatives?
 
 MQexperimental??
 Autosuggests?
@@ -1208,7 +1176,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$params['tip'] = $shorttip;
 		$attributes['aria-describedby'] = "tips$qn";
 		if ($useeqnhelper && $useeqnhelper>2 && !(isset($scoremethod) && $scoremethod=='acct') && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
-			$params['helper'] = 1;
+			//$params['helper'] = 1;
 		}
 
 		$out .= $leftb .
@@ -2300,6 +2268,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$params['tip'] = $shorttip;
 		$attributes['aria-describedby'] = "tips$qn";
 		$params['calcformat'] = $answerformat;
+		$params['displayformat'] = $displayformat;
 		if ($useeqnhelper) {
 			$params['helper'] = 1;
 		}
