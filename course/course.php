@@ -620,7 +620,7 @@ if ($overwriteBody==1) {
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
 		   echo "</script>";
-		   echo "<script src=\"$imasroot/javascript/nestedjq.js?v=041119\"></script>";
+		   echo "<script src=\"$imasroot/javascript/nestedjq.js?v=042719\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
 

@@ -193,7 +193,7 @@ var Nested = function(listid, newoptions) {
 			if (dir == 'up') {
 				move = 'before'; dest = $(over);
 			} else {
-				sub = $(over).find(options.childTag);
+				sub = $(over).find(options.childTag).first();
 				if (sub && sub.height() > 0) {
 					move = 'before'; dest = sub;
 				} else {
@@ -251,6 +251,7 @@ var Nested = function(listid, newoptions) {
 				} else if (move == 'before') {
 					$(el).insertBefore(dest);
 				}
+
 				el.moved = true;
 				if (prevParent.children().length==0) prevParent.remove();
 				if (!haschanged) {
