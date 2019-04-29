@@ -2,6 +2,8 @@
 
 namespace IMathAS\assess2\questions\models;
 
+use Rand;
+
 class ScoreQuestionParams
 {
     private $userRights;        // Orig: $GLOBALS['myrights']
@@ -11,6 +13,13 @@ class ScoreQuestionParams
     private $givenAnswer;       // Orig: $givenans
     private $attemptNumber;     // Orig: $attemptn
     private $qnpointval;        // Orig: $qnpointval
+
+    // Used by ScorePart instances
+    private $randWrapper;           // Orig: $GLOBALS['RND']
+    private $answerType;            // Orig: $anstype
+    private $isMultiPartQuestion;   // Orig: $multi
+    private $questionPartNumber;    // Orig: $partnum
+    private $varsForScorePart;      // Orig: $options
 
     /**
      * The user's rights. (from imas_users table, "rights" column)
@@ -169,6 +178,116 @@ class ScoreQuestionParams
     public function setQnpointval($qnpointval): ScoreQuestionParams
     {
         $this->qnpointval = $qnpointval;
+        return $this;
+    }
+
+    /*
+     * The following are used by ScorePart instances.
+     */
+
+    /**
+     * @return Rand
+     */
+    public function getRandWrapper(): Rand
+    {
+        return $this->randWrapper;
+    }
+
+    /**
+     * @param Rand $randWrapper
+     * @return ScoreQuestionParams
+     */
+    public function setRandWrapper(Rand $randWrapper): ScoreQuestionParams
+    {
+        $this->randWrapper = $randWrapper;
+        return $this;
+    }
+
+    /**
+     * Get the question answer type. (set by ScoreEngine)
+     *
+     * @return string
+     */
+    public function getAnswerType(): string
+    {
+        return $this->answerType;
+    }
+
+    /**
+     * Set the question answer type. (set by ScoreEngine)
+     *
+     * @param string $answerType
+     * @return ScoreQuestionParams
+     */
+    public function setAnswerType(string $answerType): ScoreQuestionParams
+    {
+        $this->answerType = $answerType;
+        return $this;
+    }
+
+    /**
+     * Get question multi-part status. (set by ScoreEngine)
+     *
+     * @return bool
+     */
+    public function getIsMultiPartQuestion(): bool
+    {
+        return $this->isMultiPartQuestion;
+    }
+
+    /**
+     * Set question multi-part status. (set by ScoreEngine)
+     *
+     * @param bool $isMultiPartQuestion
+     * @return ScoreQuestionParams
+     */
+    public function setIsMultiPartQuestion(bool $isMultiPartQuestion): ScoreQuestionParams
+    {
+        $this->isMultiPartQuestion = $isMultiPartQuestion;
+        return $this;
+    }
+
+    /**
+     * Get the question part number, if applicable. (set by ScoreEngine)
+     *
+     * @return int
+     */
+    public function getQuestionPartNumber(): ?int
+    {
+        return $this->questionPartNumber;
+    }
+
+    /**
+     * Set the question part number, if applicable. (set by ScoreEngine)
+     *
+     * @param int $questionPartNumber
+     * @return ScoreQuestionParams
+     */
+    public function setQuestionPartNumber(?int $questionPartNumber): ScoreQuestionParams
+    {
+        $this->questionPartNumber = $questionPartNumber;
+        return $this;
+    }
+
+    /**
+     * Get variables packaged for ScorePart instances. (set by ScoreEngine)
+     *
+     * @return array
+     */
+    public function getVarsForScorePart(): array
+    {
+        return $this->varsForScorePart;
+    }
+
+    /**
+     * Set variables packaged for ScorePart instances. (set by ScoreEngine)
+     *
+     * @param array $varsForScorePart
+     * @return ScoreQuestionParams
+     */
+    public function setVarsForScorePart($varsForScorePart): ScoreQuestionParams
+    {
+        $this->varsForScorePart = $varsForScorePart;
         return $this;
     }
 }

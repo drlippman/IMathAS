@@ -7,14 +7,16 @@ require_once(__DIR__ . '/QuestionHtmlGenerator.php');
 require_once(__DIR__ . '/models/ScoreQuestionParams.php');
 require_once(__DIR__ . '/scorepart/ScorePartFactory.php');
 
-use IMathAS\assess2\questions\scorepart\ScorePartFactory;
 use PDO;
 use RuntimeException;
+use Throwable;
 
 use Rand;
 use Sanitize;
 
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
+use IMathAS\assess2\questions\scorepart\ScorePart;
+use IMathAS\assess2\questions\scorepart\ScorePartFactory;
 
 /**
  * Class ScoreEngine Scores answers to questions.
@@ -273,12 +275,13 @@ class ScoreEngine
          * Score the student's answers.
          */
 
+        $scoreQuestionParams->setVarsForScorePart($varsForScorepart);
+
         if ($qdata['qtype'] == "multipart") {
             $score = $this->scorePartMultiPart($scoreQuestionParams,
-                $varsForScorepart, $additionalVarsForScoring);
+                $additionalVarsForScoring);
         } else {
-            $score = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata,
-                $varsForScorepart);
+            $score = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata);
         }
 
         return $score;
@@ -554,19 +557,18 @@ class ScoreEngine
     }
 
     /**
-     * Score a non-multipart question's answers.
+     * Score a multipart question's answers.
      *
      * @param ScoreQuestionParams $scoreQuestionParams
-     * @param array $optionsPack Packaged vars used by scorepart().
      * @param array $additionalPackagedVars Additional packaged vars needed but
      *                                      not used by scorepart().
      * @return array An array of scores.
      */
     private function scorePartMultiPart(ScoreQuestionParams $scoreQuestionParams,
-                                        array $optionsPack,
                                         array $additionalPackagedVars): array
     {
         $qnidx = $scoreQuestionParams->getQuestionNumber();
+        $optionsPack = $scoreQuestionParams->getVarsForScorePart();
 
         // We need to "unpack" these into locally scoped variables.
         foreach ($optionsPack as $k => $v) {
@@ -614,10 +616,13 @@ class ScoreEngine
         foreach ($anstypes as $kidx => $anstype) {
             $partnum = ($qnidx + 1) * 1000 + $kidx;
 
-            // TODO: This will become a proper factory Soon™.
-            $scorePart = new ScorePartFactory();
-            $raw[$kidx] = $scorePart->scorePart($anstype, $kidx,
-                $_POST["qn" . Sanitize::onlyInt($partnum)], $optionsPack, $qnidx + 1);
+            $scoreQuestionParams
+                ->setAnswerType($anstype)
+                ->setIsMultiPartQuestion(true)
+                ->setQuestionPartNumber($partnum);
+
+            $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+            $raw[$kidx] = $scorePart->getScore();
 
             if (isset($scoremethod) && $scoremethod == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$kidx] === '') {
@@ -663,19 +668,19 @@ class ScoreEngine
      * @param ScoreQuestionParams $scoreQuestionParams
      * @param array $qdata The question's data as provided by loadQuestionData().
      *                     Used to determine if a question is conditional.
-     * @param array $optionsPack Packaged vars used by scorepart().
      * @return array An array of scores.
      */
     private function scorePartNonMultiPart(ScoreQuestionParams $scoreQuestionParams,
-                                           array $qdata,
-                                           array $optionsPack): array
+                                           array $qdata): array
     {
         $qnidx = $scoreQuestionParams->getQuestionNumber();
-        $givenans = $scoreQuestionParams->getGivenAnswer();
 
-        // TODO: This will become a proper factory Soon™.
-        $scorePart = new ScorePartFactory();
-        $score = $scorePart->scorePart($qdata['qtype'], $qnidx, $givenans, $optionsPack, 0);
+        $scoreQuestionParams
+            ->setAnswerType($qdata['qtype'])
+            ->setIsMultiPartQuestion(false);
+
+        $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+        $score = $scorePart->getScore();
 
         if (isset($scoremethod) && $scoremethod == "allornothing") {
             if ($score < .98) {
@@ -701,8 +706,7 @@ class ScoreEngine
      * @param array $questionData
      * @return bool True = Question is multi-part. False = It's not.
      */
-    private
-    function isMultipartQuestion(array $questionData)
+    private function isMultipartQuestion(array $questionData)
     {
         return ($questionData['qtype'] == "multipart"
             || $questionData['qtype'] == 'conditional');
