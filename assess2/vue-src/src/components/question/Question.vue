@@ -205,7 +205,7 @@ export default {
       this.setInitValues();
       this.addDirtyTrackers();
       this.initShowAnswer();
-      window.imathasAssess.init(this.questionData.jsparams);
+      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
       actions.setRendered(this.qn);
     },
     setInitValues() {

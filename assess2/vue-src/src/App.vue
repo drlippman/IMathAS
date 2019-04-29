@@ -87,7 +87,7 @@ button.plain {
   border: 0;
   background-color: #fff;
 }
-button.plain:hover, button.plain:active {
+button.plain:hover, button.plain:active, button.plain.active {
   background-color: #EDF4FC;
 }
 input[type=submit].primary,input[type=button].primary, button.primary, a.abutton.primary {

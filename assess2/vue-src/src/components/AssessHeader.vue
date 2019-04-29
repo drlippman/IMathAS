@@ -50,6 +50,13 @@
         <icons name="print" size="medium"/>
       </a>
     </div>
+    <button
+      @click="toggleMQuse"
+      :class="{plain:true, active:MQenabled}"
+      :title="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+    >
+      <icons name="eqned" size="medium"/>
+    </button>
   </div>
 </template>
 
@@ -124,6 +131,9 @@ export default {
     },
     printLink () {
       return window.location.pathname + window.location.search + '#/print';
+    },
+    MQenabled () {
+      return store.enableMQ;
     }
   },
   methods: {
@@ -158,6 +168,13 @@ export default {
       } else {
         // don't want to submit if by_question
         //actions.submitQuestion(-1, true);
+      }
+    },
+    toggleMQuse() {
+      if (store.enableMQ) {
+        actions.disableMQ();
+      } else {
+        actions.enableMQ();
       }
     }
   }

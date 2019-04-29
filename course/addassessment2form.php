@@ -54,7 +54,7 @@ $vueData = array(
 				((count($forums)>0) ? $forums[0]['value'] : 0),
 	'forumOptions' => $forums,
 	'extrefs' => $extrefs,
-	'showtips' => $line['showtips'],
+	'showtips' => ($line['showtips']==0 || $line['showtips']==2) ? $line['showtips'] : 2,
 	'cntingb' => $line['cntingb'],
 	'minscore' => $line['minscore'],
 	'minscoretype' => $minscoretype,
@@ -472,12 +472,12 @@ $vueData = array(
 			<span class=form>Hints and Videos</span>
 			<span class=formright>
 				<label>
-					<input type="checkbox" name="showhints" value="1" v=model="showhints" />
+					<input type="checkbox" name="showhints" value="1" v-model="showhints" />
 					Show hints when available?
 				</label>
 				<br/>
 				<label>
-					<input type="checkbox" name="showextrefs" value="2" v=model="showextrefs" />
+					<input type="checkbox" name="showextrefs" value="2" v-model="showextrefs" />
 					Show video/text buttons when available?
 				</label>
 			</span><br class=form />

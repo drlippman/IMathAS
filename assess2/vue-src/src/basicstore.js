@@ -16,6 +16,7 @@ export const store = Vue.observable({
   timelimit_timer: null,
   timelimit_expired: false,
   inPrintView: false,
+  enableMQ: true,
   livepollServer: ''
 });
 
@@ -559,6 +560,17 @@ export const actions = {
       top.updateTRunans(store.curAid, status);
     } catch (e) {}
   },
+  enableMQ() {
+    store.enableMQ = true;
+    $("input[type=button][id^=pbtn],button[id^=pbtn]").hide();
+    $("span[id^=p] span[id^=lpbuf]").empty();
+    MQeditor.toggleMQAll("input[data-mq]", true);
+  },
+  disableMQ() {
+    store.enableMQ = false;
+    $("input[type=button][id^=pbtn],button[id^=pbtn]").show().trigger("click");
+    MQeditor.toggleMQAll("input[data-mq]", false);
+  },
   copySettings(response) {
     // overwrite existing questions with new data
     if (response.hasOwnProperty('questions')) {
@@ -634,6 +646,9 @@ export const actions = {
     }
     if (data.hasOwnProperty('regen')) {
       data['regens_remaining'] = (data.regens_max - data.regen - 1);
+    }
+    if (data.hasOwnProperty('enableMQ')) {
+      store.enableMQ = data.enableMQ;
     }
     if (data.hasOwnProperty('timelimit_expires')) {
       clearTimeout(store.timelimit_timer);

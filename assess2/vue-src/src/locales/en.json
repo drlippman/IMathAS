@@ -102,7 +102,9 @@
     "pts": "1 pt | {n} pts",
     "details": "Details",
     "warn_unattempted": "There appears to be unattempted questions. Are you sure you want to submit now?",
-    "withdrawn": "Question withdrawn"
+    "withdrawn": "Question withdrawn",
+    "enable_mq": "Enable equation editor",
+    "disable_mq": "Disable equation editor"
   },
   "text": {
     "hide": "Hide text",
