@@ -2,10 +2,12 @@
 
 namespace IMathAS\assess2\questions;
 
-require_once(__DIR__ . 'ErrorHandler.php');
+require_once(__DIR__ . '/ErrorHandler.php');
 require_once(__DIR__ . '/QuestionHtmlGenerator.php');
 require_once(__DIR__ . '/models/ScoreQuestionParams.php');
+require_once(__DIR__ . '/scorepart/ScorePartFactory.php');
 
+use IMathAS\assess2\questions\scorepart\ScorePartFactory;
 use PDO;
 use RuntimeException;
 
@@ -24,7 +26,7 @@ use IMathAS\assess2\questions\models\ScoreQuestionParams;
  */
 class ScoreEngine
 {
-    const VARS_FOR_SCOREPART = array(
+    const VARS_FOR_SCOREPART_EVALS = array(
         'abstolerance',
         'ansprompt',
         'anstypes',
@@ -47,9 +49,12 @@ class ScoreEngine
         'scoremethod',
         'snaptogrid',
         'strflags',
-        'qnpointval',
         'questions',
         'variables',
+    );
+
+    const ADDITIONAL_VARS_FOR_SCORING = array(
+        'qnpointval',
     );
 
     private $dbh;
@@ -69,8 +74,9 @@ class ScoreEngine
      */
     public function scoreQuestion(ScoreQuestionParams $scoreQuestionParams): array
     {
-        set_error_handler('ErrorHandler::evalErrorHandler');
-        set_exception_handler('ErrorHandler::evalExceptionHandler');
+        $errorHandler = new ErrorHandler();
+        set_error_handler(array($errorHandler, 'evalErrorHandler'));
+        set_exception_handler(array($errorHandler, 'evalExceptionHandler'));
 
         $results = $this->scoreQuestionCatchErrors($scoreQuestionParams);
 
@@ -98,11 +104,12 @@ class ScoreEngine
 
         // FIXME: Where is this used? Do we need this in scope?
         //        Appears to be used only during exception handling, which
-        //        will be replaced. Confirm with dlippman.
+        //        will be replaced. Confirm with dlippman. -- Confirmed!
         $myrights = $scoreQuestionParams->getUserRights();
 
         $qdata = $this->loadQuestionData($scoreQuestionParams);
 
+        // FIXME: Found while answering a question in UI: $stuanswers is null??
         list($stuanswers, $stuanswersval) = $this->generateStudentAnswers($scoreQuestionParams);
 
         if ($this->isMultipartQuestion($qdata)) {
@@ -120,9 +127,6 @@ class ScoreEngine
          */
 
         // These may be needed in evals.
-        // TODO: Confirm with dlippman.
-        // Note: If these lines are removed, update the scoring section below,
-        //       after packaging local variables.
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $attemptn = $scoreQuestionParams->getAttemptNumber();
 
@@ -216,12 +220,18 @@ class ScoreEngine
         }
 
         /*
+         * Set RNG to a known state.
+         */
+
+        $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 2);
+
+        /*
 	     * Package local variables for scorepart().
 	     */
 
         // These may have been defined by the question writer.
         $varsForScorepart = array();
-        foreach (self::VARS_FOR_SCOREPART as $optionKey) {
+        foreach (self::VARS_FOR_SCOREPART_EVALS as $optionKey) {
             if (!isset(${$optionKey})) {
                 continue;
             }
@@ -248,13 +258,27 @@ class ScoreEngine
         }
 
         /*
+         * Package additional variables for scoring, not used by scorepart().
+         */
+        $additionalVarsForScoring = array();
+        foreach (self::ADDITIONAL_VARS_FOR_SCORING as $optionKey) {
+            if (!isset(${$optionKey})) {
+                continue;
+            }
+
+            $additionalVarsForScoring[$optionKey] = ${$optionKey};
+        }
+
+        /*
          * Score the student's answers.
          */
 
         if ($qdata['qtype'] == "multipart") {
-            $score = $this->scorePartMultiPart($scoreQuestionParams, $varsForScorepart);
+            $score = $this->scorePartMultiPart($scoreQuestionParams,
+                $varsForScorepart, $additionalVarsForScoring);
         } else {
-            $score = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata, $varsForScorepart);
+            $score = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata,
+                $varsForScorepart);
         }
 
         return $score;
@@ -301,7 +325,9 @@ class ScoreEngine
      */
     private function generateStudentAnswers(ScoreQuestionParams $scoreQuestionParams): array
     {
-        // FIXME: Does this need to be in $GLOBALS?
+        $stuanswers = array();
+        $stuanswersval = array();
+
         if (isset($GLOBALS['lastanswers'])) {
             foreach ($GLOBALS['lastanswers'] as $iidx => $ar) {
                 $arv = explode('##', $ar);
@@ -532,17 +558,27 @@ class ScoreEngine
      *
      * @param ScoreQuestionParams $scoreQuestionParams
      * @param array $optionsPack Packaged vars used by scorepart().
+     * @param array $additionalPackagedVars Additional packaged vars needed but
+     *                                      not used by scorepart().
      * @return array An array of scores.
      */
     private function scorePartMultiPart(ScoreQuestionParams $scoreQuestionParams,
-                                        array $optionsPack): array
+                                        array $optionsPack,
+                                        array $additionalPackagedVars): array
     {
         $qnidx = $scoreQuestionParams->getQuestionNumber();
 
-        // We need to "unpack" this into locally scoped variables.
+        // We need to "unpack" these into locally scoped variables.
         foreach ($optionsPack as $k => $v) {
             ${$k} = $v;
         }
+        foreach ($additionalPackagedVars as $k => $v) {
+            ${$k} = $v;
+        }
+
+        /*
+         * Begin scoring.
+         */
 
         $partla = array();
         if (isset($answeights)) {
@@ -577,7 +613,12 @@ class ScoreEngine
         $accpts = 0;
         foreach ($anstypes as $kidx => $anstype) {
             $partnum = ($qnidx + 1) * 1000 + $kidx;
-            $raw[$kidx] = scorepart($anstype, $kidx, $_POST["qn" . Sanitize::onlyInt($partnum)], $optionsPack, $qnidx + 1);
+
+            // TODO: This will become a proper factory Soon™.
+            $scorePart = new ScorePartFactory();
+            $raw[$kidx] = $scorePart->scorePart($anstype, $kidx,
+                $_POST["qn" . Sanitize::onlyInt($partnum)], $optionsPack, $qnidx + 1);
+
             if (isset($scoremethod) && $scoremethod == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$kidx] === '') {
                     $scores[$kidx] = $raw[$kidx] - 1;  //0 if correct, -1 if wrong
@@ -632,7 +673,10 @@ class ScoreEngine
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $givenans = $scoreQuestionParams->getGivenAnswer();
 
-        $score = scorepart($qdata['qtype'], $qnidx, $givenans, $optionsPack, 0);
+        // TODO: This will become a proper factory Soon™.
+        $scorePart = new ScorePartFactory();
+        $score = $scorePart->scorePart($qdata['qtype'], $qnidx, $givenans, $optionsPack, 0);
+
         if (isset($scoremethod) && $scoremethod == "allornothing") {
             if ($score < .98) {
                 $score = 0;
