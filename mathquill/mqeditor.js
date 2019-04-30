@@ -108,7 +108,10 @@ var MQeditor = (function($) {
         mqfield.focus();
       }
     } else { // disable MQ
-      $(el).attr("type","text").focus();
+      $(el).attr("type","text");
+      if (nofocus !== true) {
+        $(el).focus();
+      }
       $("#mqinput-"+textId).hide();
     }
 

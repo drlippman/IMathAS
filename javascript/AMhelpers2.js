@@ -123,7 +123,6 @@ function init(paramarr, enableMQ) {
     } else if (params.format === 'normslider') {
       imathasDraw.addnormslider(qn);
     }
-    console.log(params);
     if (params.tip) {
       if (el = document.getElementById("qn"+qn+"-0")) {
         // setup for matrix sub-parts
@@ -147,8 +146,8 @@ function init(paramarr, enableMQ) {
 
 // setup tip focus/blur handlers
 function setupTips(id, tip) {
-  console.log(id);
   var el = document.getElementById(id);
+  el.setAttribute('data-tip', tip);
   var ref = el.getAttribute('aria-describedby').substr(4);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);

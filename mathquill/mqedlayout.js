@@ -560,13 +560,27 @@ var myMQeditor = (function($) {
         var tabpanel = $("#mqeditor .mqed-tabpanel").first();
         var lastdiv = tabpanel.children("div").last();
         var tipwidth = lastdiv.position().left - 12;
-        var div = document.createElement("div");
+        var tiptext = textel.attr("data-tip");
+        var tipdiv = document.createElement("div");
+        $(tipdiv).html(tiptext);
+        if (textel[0].hasAttribute("aria-describedby")) {
+          var fulltipRef = textel[0].getAttribute("aria-describedby")+" ";
+          if (document.getElementById(fulltipRef).textContent != tiptext) {
+            var morelink = $("<a>", {
+              href: "#",
+              text: _("[more..]"),
+            }).on('click', function(e) {
+              e.preventDefault();
+              $(e.target).parent().html($("#"+fulltipRef).html());
+              return false;
+            });
+            $(tipdiv).append(morelink);
+          }
+        }
         tabpanel.parent().css("height", "auto").append($("<div>", {
           width: tipwidth,
           class: "mqed-tipholder"
-        }).append($("<div>", {
-          html: textel.attr("data-tip")
-        })));
+        }).append(tipdiv));
       }
     }
   }
