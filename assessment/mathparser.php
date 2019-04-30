@@ -120,7 +120,7 @@ class MathParser
     if (count($allowedfuncs) > 0) {
       $this->functions = $allowedfuncs;
     } else {
-      $this->functions = explode(',', 'arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
+      $this->functions = explode(',', 'arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
     }
 
     //build regex's for matching symbols
