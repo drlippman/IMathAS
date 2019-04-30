@@ -1154,7 +1154,7 @@
 
 		if (($isteacher || $istutor) && $asid!="new") {
 			echo '<div class="cpmid">';
-			echo '<a href="gb-viewasid.php?stu=$stu&asid='.$asid.'&from='.$from.'&cid='.$cid.'&uid='.$get_uid.'&links=0">';
+			echo '<a href="gb-viewasid.php?stu='.$stu.'&asid='.$asid.'&from='.$from.'&cid='.$cid.'&uid='.$get_uid.'&links=0">';
 			echo _('Show Score Details');
 			echo '</a>';
 			echo '</div>';
