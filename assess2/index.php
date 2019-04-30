@@ -68,7 +68,7 @@ if (!$isltilimited && !$inTreeReader && !$isdiag) {
 <script type="text/javascript" src="<?php echo $imasroot;?>/assess2/vue/js/app.js?v=<?php echo $lastupdate;?>"></script>
 
 <?php
-$placeinfooter = '<div id="ehdd" class="ehdd">
+$placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span id="ehddtext"></span>
   <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
 </div>
