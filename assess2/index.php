@@ -31,7 +31,12 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js" type="text/javascript"></script>';
-
+$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mqeditor.js" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mqedlayout.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
+  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "";</script>';
 } else if ($isdiag) {

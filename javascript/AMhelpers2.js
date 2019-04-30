@@ -86,13 +86,22 @@ function init(paramarr, enableMQ) {
       if (params.displayformat) {
         str += ','+params.displayformat;
       }
-      el.setAttribute("data-mq", str);
+      if (params.matrixsize) {
+        str += ',matrixsized';
+        $("input[id^=qn"+qn+"-]").attr("data-mq", str);
+      } else {
+        el.setAttribute("data-mq", str);
+      }
       if (params.vars) {
         el.setAttribute("data-mq-vars", params.vars);
       }
       //TODO: Need to adjust behavior for calcmatrix with answersize
       if (enableMQ) {
-        MQeditor.toggleMQ(el, true, true);
+        if (params.matrixsize) {
+          MQeditor.toggleMQAll("input[id^=qn"+qn+"-]", true, true);
+        } else {
+          MQeditor.toggleMQ(el, true, true);
+        }
         $("#pbtn"+qn).hide();
       }
     }
@@ -114,8 +123,9 @@ function init(paramarr, enableMQ) {
     } else if (params.format === 'normslider') {
       imathasDraw.addnormslider(qn);
     }
+    console.log(params);
     if (params.tip) {
-      if ((el = document.getElementById("qn"+qn+"-0")) && el.type == 'text') {
+      if (el = document.getElementById("qn"+qn+"-0")) {
         // setup for matrix sub-parts
         i=0;
         while (document.getElementById("qn"+qn+"-"+i)) {
@@ -137,6 +147,7 @@ function init(paramarr, enableMQ) {
 
 // setup tip focus/blur handlers
 function setupTips(id, tip) {
+  console.log(id);
   var el = document.getElementById(id);
   var ref = el.getAttribute('aria-describedby').substr(4);
   el.addEventListener('focus', function() {

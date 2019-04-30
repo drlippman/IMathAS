@@ -1,6 +1,6 @@
 .mqeditor {
   position: absolute;
-  font-size: 18px;
+  /*font-size: 18px;*/
   width: 400px;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.4);
   background-color: #fafafa;
@@ -46,6 +46,7 @@
   height: 38.5px;
 }
 .mqed-btn {
+  font-size: 16px;
   display: flex;
   flex-flow: row;
   align-items: center;
@@ -62,6 +63,9 @@
   border-radius: 4px;
   cursor: pointer;
   /*font-family: KaTeX_Main, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;*/
+}
+.mqed-btn.mq-math-mode {
+  font-size: 18px;
 }
 .mqed-btn:hover {
   background-color: #f2f2ff !important;
@@ -108,9 +112,6 @@
 
 .mqed-btn .mq-root-block {
   padding: 0;
-}
-.mqed-btn.mq-math-mode {
-  font-size: 100%;
 }
 
 /* Get the empty boxes to look decent */

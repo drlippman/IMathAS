@@ -270,13 +270,14 @@ var MQeditor = (function($) {
     var tabdiv = document.createElement("div");
     tabdiv.className = "mqed-row mqed-tabrow";
     var panelcont = document.createElement("div");
-    var btncont, btn, paneldiv;
+    var btncont, btn, paneldiv, tabcnt = 0;
     baseel.appendChild(tabdiv);
     baseel.appendChild(panelcont);
     for (var i=0; i<layoutarr.tabs.length; i++) {
       if (layoutarr.tabs[i].enabled !== true) {
         continue;
       }
+      tabcnt++;
       buildButton(tabdiv, layoutarr.tabs[i], baseid+'-'+i);
       paneldiv = document.createElement("div");
       paneldiv.className = "mqed-row mqed-tabpanel";
@@ -294,7 +295,11 @@ var MQeditor = (function($) {
         }
       }
     }
-    $(baseel).find(".mqed-tab").first().addClass("mqed-activetab");
+    if (tabcnt > 1) {
+      $(baseel).find(".mqed-tab").first().addClass("mqed-activetab");
+    } else {
+      $(tabdiv).hide();
+    }
   }
 
   /*
