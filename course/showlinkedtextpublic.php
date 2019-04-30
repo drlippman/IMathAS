@@ -81,7 +81,7 @@
 		exit;
 	}
 	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
-	$stm->execute(array(':id'=>intval($_GET['id'], ':cid'=>$cid)));
+	$stm->execute(array(':id'=>intval($_GET['id']), ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
@@ -91,9 +91,9 @@
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
-	
+
 	echo '<div id="headershowlinkedtext" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($titlesimp).'</h1></div>';
-	
+
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo Sanitize::outgoingHtml(filter($text));
 	echo '</div>';
