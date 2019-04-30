@@ -25,7 +25,7 @@ class ScoreQuestionParams
      * The user's rights. (from imas_users table, "rights" column)
      *
      * While this is not related directly to the question, this value is
-     * used during question scoring somewhere. FIXME: Note where it's used?
+     * used when displaying error messages encountered during scoring.
      *
      * @return int The user's rights.
      */
@@ -38,7 +38,7 @@ class ScoreQuestionParams
      * The user's rights. (from imas_users table, "rights" column)
      *
      * While this is not related directly to the question, this value is
-     * used during question scoring somewhere. FIXME: Note where it's used?
+     * used when displaying error messages encountered during scoring.
      *
      * @param int $userRights The user's rights.
      * @return ScoreQuestionParams
@@ -116,7 +116,8 @@ class ScoreQuestionParams
     }
 
     /**
-     * FIXME: Need a description.
+     * Get the answer as provided by the student.
+     *
      * FIXME: Need a variable type. In testing, this has been a string|array.
      *
      * @return mixed
@@ -127,7 +128,9 @@ class ScoreQuestionParams
     }
 
     /**
-     * FIXME: Need a description.
+     * Set the answer as provided by the student.
+     *
+     * FIXME: Need a variable type. In testing, this has been a string|array.
      *
      * @param mixed $givenAnswer
      * @return ScoreQuestionParams

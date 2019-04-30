@@ -6,6 +6,12 @@ use Throwable;
 
 class ErrorHandler
 {
+    const ERROR_CODES = array(
+        E_ERROR => 'error',
+        E_WARNING => 'warning',
+        E_NOTICE => 'notice',
+    );
+
     /**
      * Warning handler for question evals and scoring.
      *

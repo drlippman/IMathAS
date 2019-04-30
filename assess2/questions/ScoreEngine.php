@@ -15,7 +15,6 @@ use Rand;
 use Sanitize;
 
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
-use IMathAS\assess2\questions\scorepart\ScorePart;
 use IMathAS\assess2\questions\scorepart\ScorePartFactory;
 
 /**
@@ -61,6 +60,7 @@ class ScoreEngine
 
     private $dbh;
     private $randWrapper;
+    private $userRights;
 
     public function __construct(PDO $dbh, Rand $randWrapper)
     {
@@ -76,11 +76,13 @@ class ScoreEngine
      */
     public function scoreQuestion(ScoreQuestionParams $scoreQuestionParams): array
     {
-        $errorHandler = new ErrorHandler();
-        set_error_handler(array($errorHandler, 'evalErrorHandler'));
-        set_exception_handler(array($errorHandler, 'evalExceptionHandler'));
+        set_error_handler(array($this, 'evalErrorHandler'));
+        set_exception_handler(array($this, 'evalExceptionHandler'));
 
-        $results = $this->scoreQuestionCatchErrors($scoreQuestionParams);
+        // User's rights are used during exception handling.
+        $this->userRights = $scoreQuestionParams->getUserRights();
+
+        $results = $this->scoreQuestionAllParts($scoreQuestionParams);
 
         restore_error_handler();
         restore_exception_handler();
@@ -94,7 +96,7 @@ class ScoreEngine
      * @param ScoreQuestionParams $scoreQuestionParams Params for scoring this question.
      * @return array
      */
-    private function scoreQuestionCatchErrors(ScoreQuestionParams $scoreQuestionParams): array
+    public function scoreQuestionAllParts(ScoreQuestionParams $scoreQuestionParams): array
     {
         // This lets various parts of IMathAS know that question HTML is
         // NOT being generated for display.
@@ -103,11 +105,6 @@ class ScoreEngine
         if (!isset($_SESSION['choicemap'])) {
             $_SESSION['choicemap'] = array();
         }
-
-        // FIXME: Where is this used? Do we need this in scope?
-        //        Appears to be used only during exception handling, which
-        //        will be replaced. Confirm with dlippman. -- Confirmed!
-        $myrights = $scoreQuestionParams->getUserRights();
 
         $qdata = $this->loadQuestionData($scoreQuestionParams);
 
@@ -128,46 +125,22 @@ class ScoreEngine
          * Evals
          */
 
+        set_error_handler(array($this, 'evalErrorHandler'));
+        set_exception_handler(array($this, 'evalExceptionHandler'));
+
+        // User's rights are used during exception handling.
+        $this->userRights = $scoreQuestionParams->getUserRights();
+
         // These may be needed in evals.
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $attemptn = $scoreQuestionParams->getAttemptNumber();
 
-        // TODO: Refactor error handling to use custom error handlers.
-        // TODO: Also need to add student messages in custom error handlers.
-        $preevalerror = error_get_last();
-        try {
-            $res1 = eval(interpret('control', $qdata['qtype'], $qdata['control']));
-            $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
-            $res2 = eval(interpret('answer', $qdata['qtype'], $qdata['answer']));
-        } catch (Throwable $t) {
-            $res1 = 'caught';
-            $res2 = 'caught';
-            if ($myrights > 10) {
-                echo '<p>Caught error in evaluating the code in this question: ';
-                echo Sanitize::encodeStringForDisplay($t->getMessage());
-                echo '</p>';
-            }
-        } catch (Exception $e) {
-            $res1 = false;
-            $res2 = false;
-        }
-        if ($res1 === false || $res2 === false) {
-            if ($myrights > 10) {
-                $error = error_get_last();
-                echo '<p>Caught error in the question code: ', $error['message'], ' on line ', $error['line'], '</p>';
-            } else {
-                echo '<p>Something went wrong with this question.  Tell your teacher.</p>';
-            }
-        } else {
-            $error = error_get_last();
-            if ($error && $error != $preevalerror && $myrights > 10) {
-                if ($error['type'] == $_ERROR) {
-                    echo '<p>Caught error in the question code: ', $error['message'], ' on line ', $error['line'], '</p>';
-                } else if ($error['type'] == E_WARNING) {
-                    echo '<p>Caught warning in the question code: ', $error['message'], ' on line ', $error['line'], '</p>';
-                }
-            }
-        }
+        eval(interpret('control', $qdata['qtype'], $qdata['control']));
+        $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
+        eval(interpret('answer', $qdata['qtype'], $qdata['answer']));
+
+        restore_error_handler();
+        restore_exception_handler();
 
         /*
 		 * Correct mistakes made by question writers.
@@ -710,5 +683,50 @@ class ScoreEngine
     {
         return ($questionData['qtype'] == "multipart"
             || $questionData['qtype'] == 'conditional');
+    }
+
+    /**
+     * Warning handler for evals.
+     *
+     * @param int $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param int $errline
+     * @param array $errcontext
+     * @return bool
+     */
+    public function evalErrorHandler(int $errno, string $errstr, string $errfile,
+                                     int $errline, array $errcontext): bool
+    {
+        ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
+
+        if (E_WARNING == $errno || E_ERROR == $errno) {
+            printf('<p>Caught %s in the question code: %s on line %s</p>',
+                ErrorHandler::ERROR_CODES[$errno],
+                Sanitize::encodeStringForDisplay($errstr), $errline);
+        }
+
+        // True = Don't execute the PHP internal error handler.
+        // False = Populate $php_errormsg.
+        // Reference: https://secure.php.net/manual/en/function.set-error-handler.php
+        return true;
+    }
+
+    /**
+     * Exception handler for evals.
+     *
+     * @param Throwable $t
+     */
+    public function evalExceptionHandler(Throwable $t): void
+    {
+        ErrorHandler::evalExceptionHandler($t);
+
+        if ($this->userRights > 10) {
+            echo '<p>Caught error in evaluating the code in this question: ';
+            echo Sanitize::encodeStringForDisplay($t->getMessage());
+            echo '</p>';
+        } else {
+            echo '<p>Something went wrong with this question.  Tell your teacher.</p>';
+        }
     }
 }
