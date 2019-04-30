@@ -117,10 +117,11 @@ class ScoreQuestionParams
 
     /**
      * FIXME: Need a description.
+     * FIXME: Need a variable type. In testing, this has been a string|array.
      *
-     * @return string
+     * @return mixed
      */
-    public function getGivenAnswer(): ?string
+    public function getGivenAnswer()
     {
         return $this->givenAnswer;
     }
@@ -128,7 +129,7 @@ class ScoreQuestionParams
     /**
      * FIXME: Need a description.
      *
-     * @param string $givenAnswer
+     * @param mixed $givenAnswer
      * @return ScoreQuestionParams
      */
     public function setGivenAnswer($givenAnswer): ScoreQuestionParams
