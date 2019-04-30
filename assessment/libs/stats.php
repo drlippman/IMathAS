@@ -451,7 +451,8 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+
+	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,20,15);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
@@ -462,11 +463,12 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$startlabel = $start;
 	} //else {
-		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+    $maxx = 2*max($a);
+		$outst .= "axes($maxx,$step,1,null,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
-		while ($x <= $a[count($a)-1]+1) {
+		while ($x <= $a[count($a)-1]+$cw) {
 			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
 			$x+= $cw;
 		}
@@ -734,7 +736,7 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 		return array();
 	}
 	global $RND;
-	
+
 	$out = array();
 	for ($i=0; $i<$n; $i++) {
 		$out[] = -$mu*log($RND->rand(1,32768)/32768);
