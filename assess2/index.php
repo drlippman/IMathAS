@@ -64,15 +64,13 @@ if (!$isltilimited && !$inTreeReader && !$isdiag) {
 </noscript>
 <div id="app"></div>
 
-<div id="ehdd" class="ehdd">
-  <span id="ehddtext"></span>
-  <span onclick="showeh(curehdd);" style="cursor:pointer;"><?php echo _('[more..]'); ?></span>
-</div>
-<div id="eh" class="eh"></div>
-
 <script type="text/javascript" src="<?php echo $imasroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/assess2/vue/js/app.js?v=<?php echo $lastupdate;?>"></script>
 
 <?php
-
+$placeinfooter = '<div id="ehdd" class="ehdd">
+  <span id="ehddtext"></span>
+  <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
+</div>
+<div id="eh" class="eh"></div>';
 require('../footer.php');
