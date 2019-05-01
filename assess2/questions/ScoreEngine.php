@@ -102,6 +102,8 @@ class ScoreEngine
         // NOT being generated for display.
         $GLOBALS['inquestiondisplay'] = false;
 
+        $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed());
+
         if (!isset($_SESSION['choicemap'])) {
             $_SESSION['choicemap'] = array();
         }
