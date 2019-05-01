@@ -42,6 +42,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE id=:id LIMIT 1");
 		$stm->execute(array(':id'=>$sessiondata['sessiontestid']));
 	}
+	//TODO-assessver: figure out how to delete instructor attempts for new version
 
 	if (isset($teacherid) && isset($_GET['from']) && isset($_GET['to'])) {
 		$from = $_GET['from'];

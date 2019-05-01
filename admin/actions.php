@@ -1153,6 +1153,8 @@ switch($_POST['action']) {
 				$uid = $row[0];
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid");
 				$stm->execute(array(':userid'=>$uid));
+				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=:userid");
+				$stm->execute(array(':userid'=>$uid));
 				$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:userid");
 				$stm->execute(array(':userid'=>$uid));
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE userid=:userid");

@@ -94,7 +94,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	if (isset($typelookups['Assessment']) && !$ispublic) {
 		$placeholders = Sanitize::generateQueryPlaceholders($typelookups['Assessment']);
 		if ($limited) {
-			$tosel = 'id,name,summary';
+			$tosel = 'id,name,summary,ver';
 		} else {
 			$tosel = 'id,name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,ptsposs,date_by_lti,ver';
 		}
@@ -111,14 +111,25 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 			}
 		}
 		if (!$limited && !$viewall) {
-			$stm = $DBH->prepare("SELECT assessmentid,bestscores FROM imas_assessment_sessions WHERE assessmentid IN ($placeholders) AND userid=?");
+			$aver = $line['ver'];
+			if ($aver>1) {
+				$stm = $DBH->prepare("SELECT assessmentid,bestscores FROM imas_assessment_sessions WHERE assessmentid IN ($placeholders) AND userid=?");
+			} else {
+				$stm = $DBH->prepare("SELECT assessmentid,score,status FROM imas_assessment_records WHERE assessmentid IN ($placeholders) AND userid=?");
+			}
 			$stm->execute(array_merge(array_keys($typelookups['Assessment']), array($userid)));
 			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-				$scores = explode(';', $line['bestscores']);
-				if (preg_match('/(^|,|~)\.?\d/', $scores[0])) {
-					//ptsstatus: 1: some questions unattempted, 2: all questions attempted
-					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (strpos($scores[0],"-1")===false)?2:1;
-					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = getpts($scores[0]);
+				if ($aver > 1) {
+					//TODO-assessver: fix status lookup
+					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = $line['status']&3>0?2:1;
+					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = $line['score'];
+				} else {
+					$scores = explode(';', $line['bestscores']);
+					if (preg_match('/(^|,|~)\.?\d/', $scores[0])) {
+						//ptsstatus: 1: some questions unattempted, 2: all questions attempted
+						$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (strpos($scores[0],"-1")===false)?2:1;
+						$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = getpts($scores[0]);
+					}
 				}
 			}
 		}

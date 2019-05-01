@@ -742,27 +742,35 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   if (isset($line['reqscoreptsearned'])) {
 			   	   	   $ptsearned = $line['reqscoreptsearned'];
 			   	   } else {
-					   $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
-					   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
-					   if ($stm->rowCount()==0) {
-						   $nothidden = false;
-					   } else {
-						   $scores = explode(';',$stm->fetchColumn(0));
-						   $ptsearned = getpts($scores[0]);
-					   }
-				   }
-				   if ($nothidden) {
-					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if ($line['reqscoreptsposs']>0 &&
-					   	   	   round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+							 if ($line['ver']>1) {
+								 $stm = $DBH->prepare("SELECT score FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
+							 } else {
+						   	 $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
+							 }
+						   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
+						   if ($stm->rowCount()==0) {
 							   $nothidden = false;
-						   }
-					   } else { //points based
-						   if (round($ptsearned,1)+.02<abs($line['reqscore'])) {
-							   $nothidden = false;
+						   } else {
+								 if ($line['ver']>1) {
+									 $ptsearned = $stm->fetchColumn(0);
+								 } else {
+								   $scores = explode(';',$stm->fetchColumn(0));
+								   $ptsearned = getpts($scores[0]);
+								 }
 						   }
 					   }
-				   }
+					   if ($nothidden) {
+						   if ($line['reqscoretype']&2) { //using percent-based
+						   	   if ($line['reqscoreptsposs']>0 &&
+						   	   	   round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+								   $nothidden = false;
+							   }
+						   } else { //points based
+							   if (round($ptsearned,1)+.02<abs($line['reqscore'])) {
+								   $nothidden = false;
+							   }
+						   }
+					   }
 			   }
 			   $preReqNote = '';
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0) {

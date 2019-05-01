@@ -44,6 +44,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$addassess = 'addassessment.php';
 	}
+	$aver = $row['ver'];
 
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
@@ -132,7 +133,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
-			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+			if ($aver > 1) {
+				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+			} else {
+				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+			}
 			$stm->execute(array(':assessmentid'=>$aid));
 			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
@@ -299,49 +304,53 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 
 			//update assessment sessions
-			$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
-			$stm->execute(array(':assessmentid'=>$aid));
-			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				if (strpos($row['questions'],';')===false) {
-					$qarr = explode(",",$row['questions']);
-				} else {
-					list($questions,$bestquestions) = explode(";",$row['questions']);
-					$qarr = explode(",",$bestquestions);
-				}
-				if (strpos($row['bestscores'],';')===false) {
-					$bestscores = explode(',',$row['bestscores']);
-					$doraw = false;
-				} else {
-					list($bestscorelist,$bestrawscorelist,$firstscorelist) = explode(';',$row['bestscores']);
-					$bestscores = explode(',', $bestscorelist);
-					$bestrawscores = explode(',', $bestrawscorelist);
-					$firstscores = explode(',', $firstscorelist);
-					$doraw = true;
-				}
-				for ($i=0; $i<count($qarr); $i++) {
-					if (in_array($qarr[$i],$qids)) {
-						if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
-							$bestscores[$i] = 0;
-						} else if ($_POST['withdrawtype']=='full' || $_POST['withdrawtype']=='groupfull') {
-							$bestscores[$i] = $poss[$qarr[$i]];
+			if ($aver > 1) {
+				//TODO-assessver
+				//need to re-score assessment attempts based on withdrawal
+			} else {
+				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+				$stm->execute(array(':assessmentid'=>$aid));
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+					if (strpos($row['questions'],';')===false) {
+						$qarr = explode(",",$row['questions']);
+					} else {
+						list($questions,$bestquestions) = explode(";",$row['questions']);
+						$qarr = explode(",",$bestquestions);
+					}
+					if (strpos($row['bestscores'],';')===false) {
+						$bestscores = explode(',',$row['bestscores']);
+						$doraw = false;
+					} else {
+						list($bestscorelist,$bestrawscorelist,$firstscorelist) = explode(';',$row['bestscores']);
+						$bestscores = explode(',', $bestscorelist);
+						$bestrawscores = explode(',', $bestrawscorelist);
+						$firstscores = explode(',', $firstscorelist);
+						$doraw = true;
+					}
+					for ($i=0; $i<count($qarr); $i++) {
+						if (in_array($qarr[$i],$qids)) {
+							if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
+								$bestscores[$i] = 0;
+							} else if ($_POST['withdrawtype']=='full' || $_POST['withdrawtype']=='groupfull') {
+								$bestscores[$i] = $poss[$qarr[$i]];
+							}
 						}
 					}
-				}
-				if ($doraw) {
-					$slist = implode(',',$bestscores).';'.implode(',',$bestrawscores).';'.implode(',',$firstscores);
-				} else {
-					$slist = implode(',',$bestscores );
-				}
-				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores WHERE id=:id");
-				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row['id']));
+					if ($doraw) {
+						$slist = implode(',',$bestscores).';'.implode(',',$bestrawscores).';'.implode(',',$firstscores);
+					} else {
+						$slist = implode(',',$bestscores );
+					}
+					$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores WHERE id=:id");
+					$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row['id']));
 
-				if (strlen($row['lti_sourcedid'])>1) {
-					//update LTI score
-					require_once("../includes/ltioutcomes.php");
-					calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $bestscores, true);
+					if (strlen($row['lti_sourcedid'])>1) {
+						//update LTI score
+						require_once("../includes/ltioutcomes.php");
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $bestscores, true);
+					}
 				}
 			}
-
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 
@@ -391,8 +400,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//load filter.  Need earlier than usual header.php load
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/../filter/filter.php");
-	$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-	$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	if ($aver > 1) {
+		$query = "SELECT ias.id FROM imas_assessment_records AS iar,imas_students WHERE ";
+		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	} else {
+		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	}
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 	if ($stm->rowCount() > 0) {
