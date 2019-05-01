@@ -424,7 +424,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo "<p><a href=\"course/course.php?cid=" . Sanitize::courseId($cid) . "\">Enter course</a></p>";
 	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 } else if ($placementtype=='assess') {
-	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti,ver FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	echo "<h2>LTI Placement of " . Sanitize::encodeStringForDisplay($line['name']) . "</h2>";
@@ -461,7 +461,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	}
 	echo '</p>';
 	if ($role == 'teacher') {
-		if ($courseUIver>1) {
+		if ($line['ver']>1) {
 			$addassess = 'addassessment2.php';
 		} else {
 			$addassess = 'addassessment.php';

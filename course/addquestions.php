@@ -33,11 +33,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+	$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 	$stm->execute(array($aid));
-	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $cid) {
+	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($row === null || $row['courseid'] != $cid) {
 		echo "Invalid ID";
 		exit;
+	} else if ($row['ver']>1) {
+		$addassess = 'addassessment2.php';
+	} else {
+		$addassess = 'addassessment.php';
 	}
 
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
@@ -1095,11 +1100,6 @@ $sessiondata['useed'] = 1;
 if ($overwriteBody==1) {
 	echo $body;
 } else {
-	if ($courseUIver>1) {
-		$addassess = 'addassessment2.php';
-	} else {
-		$addassess = 'addassessment.php';
-	}
 
 //var_dump($jsarr);
 ?>

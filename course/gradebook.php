@@ -135,11 +135,6 @@ if ($canviewall && !empty($_GET['stu'])) {
 } else {
 	$stu = 0;
 }
-if ($courseUIver>1) {
-	$addassess = 'addassessment2.php';
-} else {
-	$addassess = 'addassessment.php';
-}
 
 //HANDLE ANY POSTS
 if ($isteacher) {
@@ -1429,7 +1424,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
-	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents,$addassess;
+	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
@@ -1545,6 +1540,11 @@ function gbinstrdisp() {
 			//links
 			if ($gbt[0][1][$i][6]==0 ) { //online
 				if ($isteacher) {
+					if (!empty($gbt[0][1][$i][15]) && $gbt[0][1][$i][15]>1) {
+						$addassess = 'addassessment2.php';
+					} else {
+						$addassess = 'addassessment.php';
+					}
 					echo "<br/><a class=small href=\"$addassess?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
 					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">", _('[Isolate]'), "</a>";
 					if ($gbt[0][1][$i][10]==true) {
