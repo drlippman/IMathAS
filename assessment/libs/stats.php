@@ -1293,6 +1293,12 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	foreach ($gridi as $i=>$v) {
 		$grid[$i] = $v;
 	}
+  if (strpos($grid[0],'0:')!==false) {
+		$grid[0] = substr($grid[0],2);
+	}
+  if (strpos($grid[2],'0:')!==false) {
+		$grid[2] = substr($grid[2],2);
+	}
 
 	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
