@@ -37,7 +37,7 @@ export default {
           continue;
         }
         let found = false;
-        for (let k=0; k < cats.length; k++) {
+        for (let k = 0; k < cats.length; k++) {
           if (cats[k].name == questions[i].category) {
             cats[k].tot += questions[i].score;
             cats[k].poss += questions[i].points_possible;
@@ -53,14 +53,14 @@ export default {
           });
         }
       }
-      for (let k=0; k < cats.length; k++) {
-        cats[k].pct = Math.round(1000*cats[k].tot/cats[k].poss)/10;
+      for (let k = 0; k < cats.length; k++) {
+        cats[k].pct = Math.round(1000 * cats[k].tot / cats[k].poss) / 10;
       }
-      cats.sort(function(a,b) {return a.name < b.name;});
+      cats.sort(function (a, b) { return a.name < b.name; });
       return cats;
     }
   }
-}
+};
 </script>
 
 <style>

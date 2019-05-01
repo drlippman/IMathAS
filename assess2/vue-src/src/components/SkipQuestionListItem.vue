@@ -41,9 +41,9 @@ export default {
       }
     },
     nameHover () {
-        if (this.option.withdrawn !== 0) {
-          return this.$t('header.withdrawn');
-        }
+      if (this.option.withdrawn !== 0) {
+        return this.$t('header.withdrawn');
+      }
     },
     scoreDisplay () {
       if (this.option.dispqn === 0) {

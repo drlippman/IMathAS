@@ -31,8 +31,8 @@ export default {
   },
   data: function () {
     return {
-      now: new Date
-    }
+      now: new Date()
+    };
   },
   computed: {
     settingRows () {
@@ -151,7 +151,7 @@ export default {
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
           let expires = new Date(settings.timelimit_expires * 1000);
-          timeobj.alert = this.$t('setlist.time_expires', {date: this.$d(expires, 'long')});
+          timeobj.alert = this.$t('setlist.time_expires', { date: this.$d(expires, 'long') });
         }
       }
       return timeobj;

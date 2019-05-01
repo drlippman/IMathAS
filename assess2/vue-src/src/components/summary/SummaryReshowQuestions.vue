@@ -30,5 +30,5 @@ export default {
       return store.assessInfo.questions;
     }
   }
-}
+};
 </script>

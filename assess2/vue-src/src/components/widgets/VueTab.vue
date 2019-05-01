@@ -18,10 +18,10 @@ export default {
       active: false,
       id: '',
       control: ''
-    }
+    };
   },
   props: ['name']
-}
+};
 </script>
 
 <style>

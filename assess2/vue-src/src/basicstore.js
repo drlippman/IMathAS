@@ -75,7 +75,7 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
-      // overwrite properties with those from response
+        // overwrite properties with those from response
         response = this.processSettings(response);
         store.assessInfo = Object.assign({}, store.assessInfo, response);
 
@@ -125,8 +125,8 @@ export const actions = {
       data: {
         qn: qn,
         practice: store.assessInfo.in_practice,
-        regen: regen?1:0,
-        jumptoans: jumptoans?1:0
+        regen: regen ? 1 : 0,
+        jumptoans: jumptoans ? 1 : 0
       },
       xhrFields: {
         withCredentials: true
@@ -156,7 +156,7 @@ export const actions = {
     } else if (typeof timeactive !== 'object') {
       timeactive = [timeactive];
     }
-    if (typeof window.tinyMCE != "undefined") {window.tinyMCE.triggerSave();}
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     store.inTransit = true;
 
     // figure out non-blank questions to submit
@@ -174,32 +174,32 @@ export const actions = {
     let valstr;
     for (let qn in changedQuestions) {
       if (changedQuestions[qn].length == 1 && changedQuestions[qn][0] == 0) {
-        //one part, might be single part
+        // one part, might be single part
         valstr = imathasAssess.preSubmit(qn);
         if (valstr !== false) {
-          data.append('qn'+qn+'-val', valstr);
+          data.append('qn' + qn + '-val', valstr);
         }
       }
-      //get presubmit for multipart parts
+      // get presubmit for multipart parts
       let subqn;
-      for (let k=0; k<changedQuestions[qn].length; k++) {
-        subqn = (parseInt(qn)+1)*1000 + changedQuestions[qn][k];
+      for (let k = 0; k < changedQuestions[qn].length; k++) {
+        subqn = (parseInt(qn) + 1) * 1000 + changedQuestions[qn][k];
         valstr = imathasAssess.preSubmit(subqn);
         if (valstr !== false) {
-          data.append('qn'+subqn+'-val', valstr);
+          data.append('qn' + subqn + '-val', valstr);
         }
       }
     }
-    for (let k=0; k<qns.length; k++) {
+    for (let k = 0; k < qns.length; k++) {
       let qn = parseInt(qns[k]);
 
       // add in regular input fields.
-      var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
-      window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
+      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn + 1) + '\\d{3})');
+      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if (el.name.match(regex)) {
           let fieldBlank = true;
-          if ((el.type!=='radio' && el.type!=='checkbox') || el.checked) {
-            if (el.type==='file') {
+          if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
+            if (el.type === 'file') {
               data.append(el.name, el.files[0]);
             } else {
               data.append(el.name, el.value);
@@ -242,7 +242,7 @@ export const actions = {
           return;
         }
         // clear out initValues for this question so they get re-set
-        for (let k=0; k<qns.length; k++) {
+        for (let k = 0; k < qns.length; k++) {
           let qn = qns[k];
           if (store.initValues.hasOwnProperty(qn)) {
             delete store.initValues[qn];
@@ -262,9 +262,8 @@ export const actions = {
           Router.push('/summary');
         } else if (qns.length === 1) {
           // scroll to score result
-          document.getElementById("questionwrap" + qns[0]).parentNode.scrollIntoView();
+          document.getElementById('questionwrap' + qns[0]).parentNode.scrollIntoView();
         }
-
       })
       .always(response => {
         store.inTransit = false;
@@ -278,9 +277,9 @@ export const actions = {
     if (store.autosaveQueue[qn].indexOf(partnum) === -1) {
       store.autosaveQueue[qn].push(partnum);
     }
-    store.autosaveTimer = window.setTimeout(() => {this.submitAutosave(true);}, 2000)
+    store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
   },
-  clearAutosave(qns) {
+  clearAutosave (qns) {
     for (let i in qns) {
       if (store.autosaveQueue.hasOwnProperty(qns[i])) {
         delete store.autosaveQueue[qns[i]];
@@ -290,7 +289,7 @@ export const actions = {
       window.clearTimeout(store.autosaveTimer);
     }
   },
-  clearAutosaveTimer() {
+  clearAutosaveTimer () {
     window.clearTimeout(store.autosaveTimer);
   },
   submitAutosave (async) {
@@ -300,7 +299,7 @@ export const actions = {
     }
     store.inTransit = true;
     let lastLoaded = {};
-    if (typeof window.tinyMCE != "undefined") {window.tinyMCE.triggerSave();}
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     let data = new FormData();
     for (let qn in store.autosaveQueue) {
       // build up regex to match the inputs for all the parts we want to save
@@ -310,13 +309,13 @@ export const actions = {
         if (pn === 0) {
           regexpts.push(qn);
         }
-        regexpts.push((qn*1+1)*1000 + pn*1);
+        regexpts.push((qn * 1 + 1) * 1000 + pn * 1);
       }
       var regex = new RegExp('^(qn|tc|qs)(' + regexpts.join('\\b|') + '\\b)');
-      window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
+      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if (el.name.match(regex)) {
-          if ((el.type!=='radio' && el.type!=='checkbox') || el.checked) {
-            if (el.type==='file') {
+          if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
+            if (el.type === 'file') {
               // don't autosave files
             } else {
               data.append(el.name, el.value);
@@ -370,7 +369,7 @@ export const actions = {
       }
       this.submitQuestion(tosub, true);
     }
-    //store.timelimit_expired = true;
+    // store.timelimit_expired = true;
   },
   endAssess () {
     store.inTransit = true;
@@ -442,14 +441,14 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  getVerificationData(qns) {
+  getVerificationData (qns) {
     let out = {};
     let by_question = (store.assessInfo.submitby === 'by_question');
     let assessRegen = store.assessInfo.prev_attempts.length;
     for (let qn in qns) {
       let parttries = [];
       let qdata = store.assessInfo.questions[qn];
-      for (let pn=0; pn < qdata.parts.length; pn++) {
+      for (let pn = 0; pn < qdata.parts.length; pn++) {
         parttries[pn] = qdata.parts[pn].try;
       }
       out[qn] = {
@@ -459,15 +458,15 @@ export const actions = {
     }
     return out;
   },
-  setInitValue(qn, fieldname, val) {
+  setInitValue (qn, fieldname, val) {
     if (!store.initValues.hasOwnProperty(qn)) {
       store.initValues[qn] = {};
     }
     // only record initvalue if we don't already have one
     let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
     let pn = 0;
-    if (m[2]>1000) {
-      pn = pn = m[2]%1000;
+    if (m[2] > 1000) {
+      pn = pn = m[2] % 1000;
     }
     if (store.assessInfo.questions[qn].hasOwnProperty('usedautosave') &&
       store.assessInfo.questions[qn].usedautosave.indexOf(pn) !== -1
@@ -480,7 +479,7 @@ export const actions = {
       store.initValues[qn][fieldname] = val;
     }
   },
-  getInitValue(qn, fieldname) {
+  getInitValue (qn, fieldname) {
     if (!store.initValues.hasOwnProperty(qn)) {
       return '';
     } else if (!store.initValues[qn].hasOwnProperty(fieldname)) {
@@ -489,28 +488,28 @@ export const actions = {
       return store.initValues[qn][fieldname];
     }
   },
-  clearInitValue(qn) {
+  clearInitValue (qn) {
     store.initValues[qn] = {};
   },
-  setRendered(qn) {
+  setRendered (qn) {
     store.assessInfo.questions[qn].rendered = true;
   },
-  getChangedQuestions(qns) {
+  getChangedQuestions (qns) {
     if (typeof qns !== 'object') {
       if (!store.assessInfo.hasOwnProperty('questions')) {
         return {};
       }
       qns = [];
-      for (let qn=0; qn<store.assessInfo.questions.length; qn++) {
+      for (let qn = 0; qn < store.assessInfo.questions.length; qn++) {
         qns.push(qn);
       }
     }
     let changed = {};
     let m;
-    for (let k=0; k < qns.length; k++) {
+    for (let k = 0; k < qns.length; k++) {
       let qn = qns[k];
-      var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn*1+1)+"\\d{3})");
-      window.$("#questionwrap" + qn).find("input,select,textarea").each(function(i,el) {
+      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn * 1 + 1) + '\\d{3})');
+      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if (m = el.name.match(regex)) {
           let thisChanged = false;
           if (el.type === 'radio' || el.type === 'checkbox') {
@@ -528,8 +527,8 @@ export const actions = {
             }
             let pn = 0;
             let qidnum = parseInt(m[2]);
-            if (qidnum>1000) {
-              pn = qidnum%1000;
+            if (qidnum > 1000) {
+              pn = qidnum % 1000;
             }
             if (changed[qn].indexOf(pn) === -1) {
               changed[qn].push(pn);
@@ -543,7 +542,7 @@ export const actions = {
   handleError (error) {
     store.errorMsg = error;
   },
-  updateTreeReader() {
+  updateTreeReader () {
     let qAttempted = 0;
     for (let i in store.assessInfo.questions) {
       if (store.assessInfo.questions[i].try > 0) {
@@ -560,18 +559,18 @@ export const actions = {
       top.updateTRunans(store.curAid, status);
     } catch (e) {}
   },
-  enableMQ() {
+  enableMQ () {
     store.enableMQ = true;
-    $("input[type=button][id^=pbtn],button[id^=pbtn]").hide();
-    $("span[id^=p] span[id^=lpbuf]").empty();
-    MQeditor.toggleMQAll("input[data-mq]", true);
+    $('input[type=button][id^=pbtn],button[id^=pbtn]').hide();
+    $('span[id^=p] span[id^=lpbuf]').empty();
+    MQeditor.toggleMQAll('input[data-mq]', true);
   },
-  disableMQ() {
+  disableMQ () {
     store.enableMQ = false;
-    $("input[type=button][id^=pbtn],button[id^=pbtn]").show().trigger("click");
-    MQeditor.toggleMQAll("input[data-mq]", false);
+    $('input[type=button][id^=pbtn],button[id^=pbtn]').show().trigger('click');
+    MQeditor.toggleMQAll('input[data-mq]', false);
   },
-  copySettings(response) {
+  copySettings (response) {
     // overwrite existing questions with new data
     if (response.hasOwnProperty('questions')) {
       if (!store.assessInfo.hasOwnProperty('questions')) {
@@ -615,7 +614,7 @@ export const actions = {
         }
         if (thisq.hasOwnProperty('regens_max') !== 'undefined' && thisq.regen < thisq.regens_max - 1) {
           data.questions[i].canregen = true;
-          data.questions[i].regens_remaining = thisq.regens_max - thisq.regen - 1; //-1 to adjust to current version
+          data.questions[i].regens_remaining = thisq.regens_max - thisq.regen - 1; // -1 to adjust to current version
         } else {
           data.questions[i].canregen = false;
           data.questions[i].regens_remaining = 0;
@@ -655,7 +654,7 @@ export const actions = {
       let now = new Date();
       let expires = new Date(data.timelimit_expires * 1000);
       if (expires > now) {
-        store.timelimit_timer = setTimeout(()=>{this.handleTimelimitUp();}, expires - now);
+        store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires - now);
         store.timelimit_expired = false;
       } else {
         store.timelimit_expired = true;
@@ -675,7 +674,7 @@ export const actions = {
           // first, add a question list to the previous page
           if (data.interquestion_pages.length > 0) {
             let qs = [];
-            for (let j=lastDisplayBefore; j<data.interquestion_text[i].displayBefore; j++) {
+            for (let j = lastDisplayBefore; j < data.interquestion_text[i].displayBefore; j++) {
               qs.push(j);
             }
             lastDisplayBefore = data.interquestion_text[i].displayBefore;
@@ -691,7 +690,7 @@ export const actions = {
       // if we have pages, add a question list to the last page
       if (data.interquestion_pages.length > 0) {
         let qs = [];
-        for (let j=lastDisplayBefore; j<data.interquestion_text[data.interquestion_text.length - 1].displayBefore; j++) {
+        for (let j = lastDisplayBefore; j < data.interquestion_text[data.interquestion_text.length - 1].displayBefore; j++) {
           qs.push(j);
         }
         data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
@@ -703,8 +702,8 @@ export const actions = {
     if (data.hasOwnProperty('noprint') && data.noprint === 1) {
       // want to block printing - inject print styles
       let styleEl = document.createElement('style');
-      styleEl.type =  'text/css';
-      styleEl.media =  'print';
+      styleEl.type = 'text/css';
+      styleEl.media = 'print';
       styleEl.innerText = 'body { display: none;}';
       document.head.appendChild(styleEl);
     }

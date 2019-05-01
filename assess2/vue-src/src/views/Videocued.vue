@@ -108,7 +108,7 @@ export default {
       timer: null,
       cue: 0,
       toshow: 'v'
-    }
+    };
   },
   computed: {
     curCue () {
@@ -136,13 +136,13 @@ export default {
       // we'll want to update the nav when a followup ends, or when a
       // video segment with a question ends
       let out = {};
-      for (let i=0; i<store.assessInfo.videocues.length; i++) {
+      for (let i = 0; i < store.assessInfo.videocues.length; i++) {
         if (store.assessInfo.videocues[i].hasOwnProperty('followuptime') &&
-          store.assessInfo.videocues.hasOwnProperty(i+1)
+          store.assessInfo.videocues.hasOwnProperty(i + 1)
         ) {
           out[store.assessInfo.videocues[i].followuptime] = i;
         } else if (!store.assessInfo.videocues[i].hasOwnProperty('qn') &&
-          store.assessInfo.videocues.hasOwnProperty(i+1)
+          store.assessInfo.videocues.hasOwnProperty(i + 1)
         ) {
           out[store.assessInfo.videocues[i].time] = i;
         }
@@ -161,13 +161,13 @@ export default {
     }
   },
   methods: {
-    createPlayer() {
+    createPlayer () {
       let supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
-      let pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen?1:0, 'controls':2, 'rel':0, 'modestbranding':1, 'showinfo':0};
-      let ar = store.assessInfo.videoar.split(":");
+      let pVarsInternal = { 'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen ? 1 : 0, 'controls': 2, 'rel': 0, 'modestbranding': 1, 'showinfo': 0 };
+      let ar = store.assessInfo.videoar.split(':');
       let videoHeight = window.innerHeight - 50;
-      this.videoWidth = ar[0]/ar[1] * videoHeight;
-      this.aspectRatioPercent = Math.round(1000*videoHeight/this.videoWidth)/10;
+      this.videoWidth = ar[0] / ar[1] * videoHeight;
+      this.aspectRatioPercent = Math.round(1000 * videoHeight / this.videoWidth) / 10;
       this.ytplayer = new window.YT.Player('player', {
         height: videoHeight,
         width: this.videoWidth,
@@ -176,16 +176,16 @@ export default {
         events: {
           'onReady': () => this.handlePlayerReady(),
           'onStateChange': (event) => this.handlePlayerStateChange(event),
-          'onError': (event) => this.handlePlayerError(event),
+          'onError': (event) => this.handlePlayerError(event)
         }
       });
     },
-    exitFullscreen() {
+    exitFullscreen () {
       let isInFullScreen = (
-        document.fullscreenElement  ||
-        document.webkitFullscreenElement  ||
-        document.mozFullScreenElement  ||
-        document.msFullscreenElement );
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement);
       if (isInFullScreen) {
         if (document.exitFullscreen) {
           document.exitFullscreen();
@@ -198,13 +198,13 @@ export default {
         }
       }
     },
-    checkTime() {
+    checkTime () {
       let curTime = Math.floor(this.ytplayer.getCurrentTime());
-      //If there's a queue for this time,
-      //But not if we jumped to a video and the queue is for the previous
-      //or if we jump to followup
+      // If there's a queue for this time,
+      // But not if we jumped to a video and the queue is for the previous
+      // or if we jump to followup
       if (this.timeCues.hasOwnProperty(curTime) &&
-        !(this.toshow === 'v' && this.cue === this.timeCues[curTime]+1) &&
+        !(this.toshow === 'v' && this.cue === this.timeCues[curTime] + 1) &&
         !(this.toshow === 'f' && this.cue === this.timeCues[curTime]) &&
         this.ytplayer.getPlayerState() == window.YT.PlayerState.PLAYING
       ) {
@@ -213,22 +213,22 @@ export default {
         if (this.nextVidTimes.hasOwnProperty(curTime) &&
           this.cue == this.nextVidTimes[curTime]
         ) {
-          this.cue = this.cue+1;
+          this.cue = this.cue + 1;
           this.toshow = 'v';
         }
         // wait again
-        this.timer = window.setTimeout(()=>{this.checkTime();}, 200);
+        this.timer = window.setTimeout(() => { this.checkTime(); }, 200);
       }
     },
-    handlePlayerReady() {
+    handlePlayerReady () {
       // remove cruft to allow autofit to work
-      window.$("iframe#player").removeAttr('height').removeAttr('width')
-        .css('height','').css('width','');
+      window.$('iframe#player').removeAttr('height').removeAttr('width')
+        .css('height', '').css('width', '');
     },
-    handlePlayerStateChange(event) {
+    handlePlayerStateChange (event) {
       if (event.data == window.YT.PlayerState.PLAYING) {
         // started playing video.  Start listing for the times
-        this.timer = window.setTimeout(()=>{this.checkTime();}, 200);
+        this.timer = window.setTimeout(() => { this.checkTime(); }, 200);
       } else if (event.data == window.YT.PlayerState.ENDED) {
         // video ended - check to see if there's a question to show.
         if (this.toshow == 'v' && this.curCue.hasOwnProperty('qn')) {
@@ -237,10 +237,10 @@ export default {
         }
       }
     },
-    handlePlayerError(event) {
+    handlePlayerError (event) {
       store.errorMsg = event.data;
     },
-    jumpTo(newCueNum, newToshow) {
+    jumpTo (newCueNum, newToshow) {
       if (newCueNum === -1 || newToshow === 'q') {
         // if showing a question, pause the video
         this.exitFullscreen();
@@ -252,7 +252,7 @@ export default {
         let seektime = 0;
         if (newToshow == 'v') {
           if (newCueNum > 0) {
-            let prevCue = store.assessInfo.videocues[newCueNum-1];
+            let prevCue = store.assessInfo.videocues[newCueNum - 1];
             if (prevCue.hasOwnProperty('followuptime')) {
               // if previous cue had followup, skip to end of that
               seektime = prevCue.followuptime;
@@ -279,13 +279,13 @@ export default {
       this.cue = -1;
       this.toshow = 'i';
     }
-    //async load YouTube API
+    // async load YouTube API
     window.onYouTubePlayerAPIReady = () => {
       this.youtubeApiLoaded = true;
       this.createPlayer();
-    }
+    };
     let tag = document.createElement('script');
-    tag.src = "//www.youtube.com/player_api";
+    tag.src = '//www.youtube.com/player_api';
     document.head.appendChild(tag);
   },
   mounted () {

@@ -89,7 +89,7 @@ export default {
     return {
       showTexts: true,
       showQs: true
-    }
+    };
   },
   computed: {
     ainfo () {
@@ -106,7 +106,7 @@ export default {
       return qnArray;
     },
     lastQ () {
-      return store.assessInfo.questions.length-1;
+      return store.assessInfo.questions.length - 1;
     },
     textToggleLabel () {
       return this.showTexts ? this.$t('print.hide_text') : this.$t('print.show_text');

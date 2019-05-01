@@ -42,7 +42,7 @@ export default {
       return store.assessInfo;
     }
   }
-}
+};
 </script>
 
 <style>

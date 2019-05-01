@@ -150,7 +150,7 @@ export default {
       return {
         msg: trymsg,
         cnt: trycnt
-      }
+      };
     }
   },
   methods: {

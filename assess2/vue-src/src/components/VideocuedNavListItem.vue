@@ -28,7 +28,7 @@ export default {
   },
   computed: {
     statusIcon () {
-      if (this.option.type === 'v' || this.option.type === 'f' ) {
+      if (this.option.type === 'v' || this.option.type === 'f') {
         return 'video';
       } else if (this.option.type === 'q') {
         return store.assessInfo.questions[this.option.qn].status;
@@ -37,12 +37,12 @@ export default {
       }
     },
     nameHover () {
-        if (this.option.type === 'q' &&
+      if (this.option.type === 'q' &&
           store.assessInfo.questions[this.option.qn].withdrawn !== 0
-        ) {
-          return this.$t('header.withdrawn');
-        }
-        return '';
+      ) {
+        return this.$t('header.withdrawn');
+      }
+      return '';
     },
     scoreDisplay () {
       if (this.option.type !== 'q') {

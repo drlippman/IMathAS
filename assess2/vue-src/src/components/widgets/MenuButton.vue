@@ -107,7 +107,7 @@ export default {
       } else {
         return {
           is: 'span'
-        }
+        };
       }
     },
     toggleOpen (val) {

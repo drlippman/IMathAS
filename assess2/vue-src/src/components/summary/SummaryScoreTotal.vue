@@ -26,7 +26,6 @@
 <script>
 import { store } from '../../basicstore';
 
-
 export default {
   name: 'SummaryScoreTotal',
   components: {
@@ -54,9 +53,9 @@ export default {
       if (this.ainfo.submitby === 'by_question') {
         return 0;
       }
-      let curAttempt = this.ainfo.prev_attempts.length+1;
+      let curAttempt = this.ainfo.prev_attempts.length + 1;
       if (curAttempt > this.ainfo.retake_penalty.n) {
-        return this.ainfo.retake_penalty.penalty*(curAttempt - this.ainfo.retake_penalty.n);
+        return this.ainfo.retake_penalty.penalty * (curAttempt - this.ainfo.retake_penalty.n);
       }
       return 0;
     },
@@ -67,11 +66,11 @@ export default {
       let hasLate = 0;
       for (let i in this.ainfo.questions) {
         let parts = this.ainfo.questions[i].parts;
-        for (let pn=0; pn < parts.length; pn++) {
+        for (let pn = 0; pn < parts.length; pn++) {
           if (parts[pn].hasOwnProperty('penalties') && parts[pn].penalties.hasOwnProperty('late')) {
             hasLate == parts[pn].penalties.late;
           } else if (hasLate > 0) {
-            //if one is not late, we won't report late here
+            // if one is not late, we won't report late here
             return 0;
           }
         }
@@ -79,10 +78,10 @@ export default {
       return hasLate;
     },
     scoreTotalPercent () {
-      return Math.round(1000*this.scoreTotal / this.ainfo.points_possible)/10;
+      return Math.round(1000 * this.scoreTotal / this.ainfo.points_possible) / 10;
     }
   }
-}
+};
 </script>
 
 <style>

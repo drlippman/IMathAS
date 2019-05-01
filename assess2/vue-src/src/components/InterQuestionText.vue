@@ -30,7 +30,7 @@ export default {
     };
   },
   methods: {
-    renderMath() {
+    renderMath () {
       setTimeout(window.drawPics, 100);
       window.rendermathnode(this.$refs.main);
       this.rendered = true;
@@ -54,5 +54,5 @@ export default {
       }
     }
   }
-}
+};
 </script>

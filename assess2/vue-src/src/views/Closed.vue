@@ -73,7 +73,6 @@
         </p>
       </div>
 
-
     </div>
     <div v-if="settings.hasOwnProperty('prev_attempts') && settings.prev_attempts.length > 0" >
       <summary-gb-score />

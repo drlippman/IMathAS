@@ -123,7 +123,7 @@ export default {
       } else {
         // don't have
         return '';
-        //return this.$t('header.done');
+        // return this.$t('header.done');
       }
     },
     showPrint () {
@@ -159,7 +159,7 @@ export default {
           } else {
             // submit them all
             var qns = [];
-            for (let k=0; k < this.ainfo.questions.length; k++) {
+            for (let k = 0; k < this.ainfo.questions.length; k++) {
               qns.push(k);
             }
             actions.submitQuestion(qns, true);
@@ -167,10 +167,10 @@ export default {
         }
       } else {
         // don't want to submit if by_question
-        //actions.submitQuestion(-1, true);
+        // actions.submitQuestion(-1, true);
       }
     },
-    toggleMQuse() {
+    toggleMQuse () {
       if (store.enableMQ) {
         actions.disableMQ();
       } else {

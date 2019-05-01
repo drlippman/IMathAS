@@ -44,5 +44,5 @@ export default {
       return Math.round(1000 * this.ainfo.scored_attempt.score / this.ainfo.points_possible) / 10;
     }
   }
-}
+};
 </script>

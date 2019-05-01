@@ -71,7 +71,7 @@ export default {
       return out;
     }
   }
-}
+};
 </script>
 
 <style>

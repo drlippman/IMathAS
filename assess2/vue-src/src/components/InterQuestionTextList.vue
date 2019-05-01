@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     textList () {
-      if (typeof this.page == 'undefined' || this.page < 0) {
+      if (typeof this.page === 'undefined' || this.page < 0) {
         if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
           return [];
         } else {
@@ -38,7 +38,7 @@ export default {
       }
     },
     lastQuestion () {
-      if (typeof this.page == 'undefined' || this.page < 0) {
+      if (typeof this.page === 'undefined' || this.page < 0) {
         return store.assessInfo.questions.length - 1;
       } else {
         let qlist = store.assessInfo.interquestion_pages[this.page][0].questions;
@@ -56,7 +56,7 @@ export default {
     },
     allText () {
       let out = [];
-      for (let  i in this.textList) {
+      for (let i in this.textList) {
         let textObj = this.textList[i];
         out.push({
           html: textObj.text,
@@ -67,7 +67,7 @@ export default {
     },
     preText () {
       let out = [];
-      for (let  i in this.textList) {
+      for (let i in this.textList) {
         let textObj = this.textList[i];
         if ((this.pos === 'beforeexact' && this.qn === textObj.displayBefore) ||
           (this.pos !== 'beforeexact' && this.qn >= textObj.displayBefore && this.qn <= textObj.displayUntil)
@@ -97,5 +97,5 @@ export default {
       return out;
     }
   }
-}
+};
 </script>

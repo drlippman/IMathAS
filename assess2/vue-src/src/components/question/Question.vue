@@ -63,9 +63,9 @@ export default {
   },
   data: function () {
     return {
-        timeActivated: null,
-        timeActive: 0
-    }
+      timeActivated: null,
+      timeActive: 0
+    };
   },
   computed: {
     questionData () {
@@ -88,7 +88,7 @@ export default {
         this.questionData.canretry && (
         store.assessInfo.submitby === 'by_question' ||
           this.questionData.tries_max > 1
-        )
+      )
       );
     },
     showScore () {
@@ -115,7 +115,7 @@ export default {
   },
   methods: {
     loadQuestionIfNeeded () {
-      if (!this.questionContentLoaded && this.active && store.errorMsg===null) {
+      if (!this.questionContentLoaded && this.active && store.errorMsg === null) {
         actions.loadQuestion(this.qn, false, false);
       }
     },
@@ -138,43 +138,43 @@ export default {
     },
     addDirtyTrackers () {
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
-      .off('focus.dirtytrack').off('change.dirtytrack')
-      .on('focus.dirtytrack', function() {
+        .off('focus.dirtytrack').off('change.dirtytrack')
+        .on('focus.dirtytrack', function () {
         // TODO: Does this work for checkboxes/radios?
-        if (this.type === 'radio' || this.type === 'checkbox') {
-          window.$(this).attr('data-lastval', this.checked?1:0);
-        } else {
-          window.$(this).attr('data-lastval', window.$(this).val());
-        }
+          if (this.type === 'radio' || this.type === 'checkbox') {
+            window.$(this).attr('data-lastval', this.checked ? 1 : 0);
+          } else {
+            window.$(this).attr('data-lastval', window.$(this).val());
+          }
 
-        actions.clearAutosaveTimer();
-      })
-      .on('change.dirtytrack', function() {
-        let val = window.$(this).val();
-        let changed = false;
-        if (this.type === 'radio' || this.type === 'checkbox') {
-          if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
+          actions.clearAutosaveTimer();
+        })
+        .on('change.dirtytrack', function () {
+          let val = window.$(this).val();
+          let changed = false;
+          if (this.type === 'radio' || this.type === 'checkbox') {
+            if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
+              changed = true;
+            }
+          } else if (this.type !== 'file' && val != window.$(this).attr('data-lastval')) {
             changed = true;
           }
-        } else if (this.type !== 'file' && val != window.$(this).attr('data-lastval')) {
-          changed = true;
-        }
-        if (changed) {
-          let name = window.$(this).attr("name");
-          let m = name.match(/^(qs|qn|tc)(\d+)/);
-          if (m !== null) {
-            var qn = m[2]*1;
-            var pn = 0;
-            if (qn>1000) {
-              pn = qn%1000;
-              qn = Math.floor(qn/1000 + .001)-1;
-            }
+          if (changed) {
+            let name = window.$(this).attr('name');
+            let m = name.match(/^(qs|qn|tc)(\d+)/);
+            if (m !== null) {
+              var qn = m[2] * 1;
+              var pn = 0;
+              if (qn > 1000) {
+                pn = qn % 1000;
+                qn = Math.floor(qn / 1000 + 0.001) - 1;
+              }
 
-            // autosave value
-            actions.doAutosave(qn, pn);
+              // autosave value
+              actions.doAutosave(qn, pn);
+            }
           }
-        }
-      });
+        });
     },
     disableOutOfTries () {
       let trymax = this.questionData.tries_max;
@@ -183,11 +183,11 @@ export default {
         if (this.questionData.parts[pn].try >= trymax) {
           // out of tries - disable inputs
           if (pn === 0) {
-            regex = new RegExp("^(qn|tc|qs)("+(this.qn)+"\\b|"+((this.qn+1)*1000 + pn*1)+"\\b)");
+            regex = new RegExp('^(qn|tc|qs)(' + (this.qn) + '\\b|' + ((this.qn + 1) * 1000 + pn * 1) + '\\b)');
           } else {
-            regex = new RegExp("^(qn|tc|qs)"+((this.qn+1)*1000 + pn*1)+"\\b");
+            regex = new RegExp('^(qn|tc|qs)' + ((this.qn + 1) * 1000 + pn * 1) + '\\b');
           }
-          window.$("#questionwrap" + this.qn).find("input,select,textarea").each(function(i,el) {
+          window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
             if (el.name.match(regex)) {
               el.disabled = true;
             }
@@ -208,31 +208,31 @@ export default {
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
       actions.setRendered(this.qn);
     },
-    setInitValues() {
-      var regex = new RegExp("^(qn|tc|qs)\\d");
+    setInitValues () {
+      var regex = new RegExp('^(qn|tc|qs)\\d');
       var thisqn = this.qn;
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
-        .each(function(index, el) {
+        .each(function (index, el) {
           if (el.name.match(regex)) {
             if (el.type === 'radio' || el.type === 'checked') {
-              actions.setInitValue(thisqn, el.name, el.checked?1:0);
+              actions.setInitValue(thisqn, el.name, el.checked ? 1 : 0);
             } else {
               actions.setInitValue(thisqn, el.name, $(el).val());
             }
           }
         });
     },
-    initShowAnswer() {
+    initShowAnswer () {
       let $ = window.$;
-    	$("input.sabtn + span.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
-    	$("input.sabtn").each(function() {
-    		var idnext = $(this).siblings("span:first-of-type").attr("id");
-    		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
-    		  .off("click.sashow").on("click.sashow", function() {
-    			$(this).attr("aria-expanded",true)
-    		  	  .siblings("span:first-of-type")
-    				.attr("aria-expanded",true).attr("aria-hidden",false)
-    				.removeClass("hidden");
+    	$('input.sabtn + span.hidden').attr('aria-hidden', true).attr('aria-expanded', false);
+    	$('input.sabtn').each(function () {
+    		var idnext = $(this).siblings('span:first-of-type').attr('id');
+    		$(this).attr('aria-expanded', false).attr('aria-controls', idnext)
+    		  .off('click.sashow').on('click.sashow', function () {
+    			$(this).attr('aria-expanded', true)
+    		  	  .siblings('span:first-of-type')
+    				.attr('aria-expanded', true).attr('aria-hidden', false)
+    				.removeClass('hidden');
     		});
     	});
     }

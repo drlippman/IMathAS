@@ -16,7 +16,7 @@ export default {
   data: function () {
     return {
       expanded: false
-    }
+    };
   },
   components: {
     Icons
@@ -33,7 +33,7 @@ export default {
       return penalties;
     }
   }
-}
+};
 </script>
 
 <style>
