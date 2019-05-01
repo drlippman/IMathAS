@@ -100,7 +100,7 @@ var Nested = function(listid, newoptions) {
 			var sub = el.find(options.parentTag);
 			if (sub) {
 				if (noblockcookie) {
-					if (sub.css('display') == 'none') {
+					if (sub.length == 0 || sub.css('display') == 'none') {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
 					} else {
@@ -111,7 +111,7 @@ var Nested = function(listid, newoptions) {
 					oblist = oblist.split(',');
 					var obn = el.attr("obn");
 					var loc = arraysearch(obn,oblist);
-					if (sub.css('display') == 'none') {
+					if (sub.length == 0 || sub.css('display') == 'none') {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
 						if (loc==-1) {oblist.push(obn);}
