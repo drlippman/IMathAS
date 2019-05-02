@@ -473,16 +473,23 @@ class AssessRecord
    * @param array $pn           The part number to save
    * @return void
    */
-  public  function setAutoSave($time, $qn, $pn) {
+  public  function setAutoSave($time, $timeactive, $qn, $pn) {
     $this->parseData();
     $data = &$this->data['autosaves'];
     $seconds = $time - $this->assessRecord['starttime'];
     if (!isset($data[$qn])) {
+      // if no autosave record, start one
       $data[$qn] = array(
         'time' => $seconds,
+        'timeactive' => $timeactive,
         'post' => array(),
         'stuans' => array()
       );
+    } else {
+      // otherwise update time info.  Don't want to overwrite completely as we
+      // may be adding additional part post/stuans data
+      $data[$qn]['time'] = $seconds;
+      $data[$qn]['timeactive'] = $timeactive;
     }
     $tosave = array();
     foreach ($_POST as $key=>$val) {
@@ -967,6 +974,10 @@ class AssessRecord
 
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
         $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
+      if ($out['usedautosave']) {
+        $autosave = $this->getAutoSaves($qn);
+        $out['autosave_timeactive'] = $autosave['timeactive'];
+      }
       $this->setAnsweights($qn, $out['answeights'], $ver);
       $out['seed'] = $curq['seed'];
     } else {

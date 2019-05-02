@@ -43,8 +43,13 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 $qns = json_decode($_POST['tosaveqn'], true);
 $lastloaded = json_decode($_POST['lastloaded'], true);
 $verification = json_decode($_POST['verification'], true);
+if ($_POST['timeactive'] == '') {
+  $timeactive = [];
+} else {
+  $timeactive = json_decode($_POST['timeactive'], true);
+}
 
-if ($qns === null || $lastloaded === null) {
+if ($qns === null || $lastloaded === null || $timeactive === null) {
   echo '{"error": "invalid_params"}';
   exit;
 }
@@ -121,12 +126,16 @@ if (!$assess_record->checkVerification($verification)) {
 
 // autosave the requested parts
 foreach ($qns as $qn=>$parts) {
+  if (!isset($timeactive[$qn])) {
+    $timeactive[$qn] = 0;
+  }
   $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn]);
   foreach ($parts as $part) {
     if ($ok_to_save === true || $ok_to_save[$part]) {
-      $assess_record->setAutoSave($now, $qn, $part);
+      $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
     }
   }
+  $k++;
 }
 
 // save record if needed

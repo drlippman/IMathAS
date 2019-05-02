@@ -169,22 +169,22 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
 }
 
 .ehdd {
-	position: absolute;
-	background: #669;
-	display:none;
-	color: #fff;
-	font-size: 75%;
-	padding: 0px 4px;
-	opacity: 0.9;
+  position: absolute;
+  background: #669;
+  display:none;
+  color: #fff;
+  font-size: 75%;
+  padding: 0px 4px;
+  opacity: 0.9;
 }
 .eh {
-	position: absolute;
-	background: #669;
-	color: #fff;
-	display: none;
-	padding: 0px 4px;
-	font-size: 75%;
-	opacity: 0.9;
+  position: absolute;
+  background: #669;
+  color: #fff;
+  display: none;
+  padding: 0px 4px;
+  font-size: 75%;
+  opacity: 0.9;
 }
 
 .drawtools {
@@ -211,74 +211,74 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
 /* TODO separate out */
 
 table.p3longdiv {
-	border-spacing: 0px;
-	border-collapse: collapse;
+  border-spacing: 0px;
+  border-collapse: collapse;
 }
 table.p3longdiv td.right {
-	text-align: right;
-	padding: 0px;
+  text-align: right;
+  padding: 0px;
 }
 table.p3longdiv td.bottomborder {
-	border-bottom:1px solid black;
-	text-align: right;
-	padding: 0px;
+  border-bottom:1px solid black;
+  text-align: right;
+  padding: 0px;
 }
 table.p3longdiv td.topborder {
-	border-top:1px solid black;
-	text-align: right;
-	padding: 0px;
+  border-top:1px solid black;
+  text-align: right;
+  padding: 0px;
 }
 table.p3longdiv td.topleftborder {
-	border-left: 1px solid black;
-	border-top: 1px solid black;
-	text-align: right;
-	padding: 0px;
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  text-align: right;
+  padding: 0px;
 }
 table.stats {
-	margin-left: 20px;
-	border-collapse: collapse;
-	background: #eef;
+  margin-left: 20px;
+  border-collapse: collapse;
+  background: #eef;
 }
 table.stats tbody tr td {
-	border: 1px solid #000;
-	padding: 1px 10px;
+  border: 1px solid #000;
+  padding: 1px 10px;
 }
 table.stats tbody tr td {
-	text-align: right;
+  text-align: right;
 }
 table td.left {
-	text-align: left;
+  text-align: left;
 }
 table.stats thead tr th {
-	border: 1px solid #000;
-	padding: 1px 10px;
-	text-align: center;
-	background: #eff;
-	border-bottom: 3px solid #000;
+  border: 1px solid #000;
+  padding: 1px 10px;
+  text-align: center;
+  background: #eff;
+  border-bottom: 3px solid #000;
 }
 table.stats tbody tr th {
-	border: 1px solid #000;
-	padding: 1px 10px;
-	text-align: center;
-	background: #eff;
-	border-right: 3px solid #000;
+  border: 1px solid #000;
+  padding: 1px 10px;
+  text-align: center;
+  background: #eff;
+  border-right: 3px solid #000;
 }
 table.scores td {
-	padding-right: 20px;
+  padding-right: 20px;
 }
 span.spanbutton {
-	padding: 1px 3px;
-	border: 2px outset #f9f;
-	background: #f9f;
-	cursor: default;
+  padding: 1px 3px;
+  border: 2px outset #f9f;
+  background: #f9f;
+  cursor: default;
 }
 span.spanbutton:active {
-	border: 2px inset #f9f;
-	background: #fcf;
-	cursor: default;
+  border: 2px inset #f9f;
+  background: #fcf;
+  cursor: default;
 }
 span.spanbutton:hover {
-	background: #fcf;
+  background: #fcf;
 }
 table.longdiv {
   border-collapse: collapse;
@@ -292,16 +292,16 @@ td.barslefttop {
   border-top: 1px solid #000;
 }
 td.matrixleft {
-	border: 1px solid #000;
-	border-width: 1px 0px 1px 1px;
-	margin: 0px;
-	padding: 0px;
+  border: 1px solid #000;
+  border-width: 1px 0px 1px 1px;
+  margin: 0px;
+  padding: 0px;
 }
 td.matrixright {
-	border: 1px solid #000;
-	border-width: 1px 1px 1px 0px;
-	margin: 0px;
-	padding: 0px;
+  border: 1px solid #000;
+  border-width: 1px 1px 1px 0px;
+  margin: 0px;
+  padding: 0px;
 }
 table.paddedtable tr.onepixel { line-height: 1px;}
 table.paddedtable td.matrixtopborder {border-top:1px solid black;padding:0;}
@@ -311,19 +311,19 @@ table.paddedtable td.matrixleftborder { border-left:1px solid black;padding:0;wi
 table.paddedtable td.matrixrightborder { border-right:1px solid black;padding:0;width:5px; }
 table.paddedtable td.matrixbottomleftborder { border-left:1px solid black;border-bottom:1px solid black;padding:0;width:5px; }
 table.paddedtable td.matrixbottomrightborder { border-right:1px solid black;border-bottom:1px solid black;padding:0;width:5px; }
-table.paddedtable td.nopad { padding:0;	width: 5px;}
+table.paddedtable td.nopad { padding:0;  width: 5px;}
 
 table.paddedtable td, table.paddedtable th {
-	padding: 2px 5px;
+  padding: 2px 5px;
 }
 td.c, table.stats tbody td.c {
-	text-align: center;
+  text-align: center;
 }
 td.r, table.stats tbody td.r {
-	text-align: right;
+  text-align: right;
 }
 td.l, table.stats tbody td.l {
-	text-align: left;
+  text-align: left;
 }
 
 </style>

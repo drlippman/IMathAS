@@ -11,7 +11,9 @@ export const store = Vue.observable({
   lastLoaded: [],
   inProgress: false,
   autosaveQueue: {},
+  autosaveTimeactive: {},
   initValues: {},
+  initTimes: {},
   autosaveTimer: null,
   timelimit_timer: null,
   timelimit_expired: false,
@@ -269,7 +271,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  doAutosave (qn, partnum) {
+  doAutosave (qn, partnum, timeactive) {
     window.clearTimeout(store.autosaveTimer);
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
       store.autosaveQueue[qn] = [];
@@ -277,6 +279,8 @@ export const actions = {
     if (store.autosaveQueue[qn].indexOf(partnum) === -1) {
       store.autosaveQueue[qn].push(partnum);
     }
+    store.autosaveTimeactive[qn] = timeactive;
+    console.log(timeactive);
     store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
   },
   clearAutosave (qns) {
@@ -328,6 +332,11 @@ export const actions = {
     data.append('tosaveqn', JSON.stringify(store.autosaveQueue));
     data.append('lastloaded', JSON.stringify(lastLoaded));
     data.append('verification', JSON.stringify(this.getVerificationData(store.autosaveQueue)));
+    if (store.assessInfo.displaymethod === 'full') {
+      data.append('timeactive', '');
+    } else {
+      data.append('timeactive', JSON.stringify(store.autosaveTimeactive));
+    }
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
     }
@@ -490,6 +499,15 @@ export const actions = {
   },
   clearInitValue (qn) {
     store.initValues[qn] = {};
+  },
+  getInitTimeactive (qn) {
+    if (store.assessInfo.questions[qn].hasOwnProperty('autosave_timeactive')) {
+      var timeactive = store.assessInfo.questions[qn].autosave_timeactive;
+      // set to 0 to indicate it's used
+      store.assessInfo.questions[qn].autosave_timeactive = 0;
+      return timeactive;
+    }
+    return 0;
   },
   setRendered (qn) {
     store.assessInfo.questions[qn].rendered = true;

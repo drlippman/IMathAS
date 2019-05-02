@@ -137,6 +137,7 @@ export default {
       }
     },
     addDirtyTrackers () {
+      var self = this;
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .off('focus.dirtytrack').off('change.dirtytrack')
         .on('focus.dirtytrack', function () {
@@ -171,7 +172,9 @@ export default {
               }
 
               // autosave value
-              actions.doAutosave(qn, pn);
+              let now = new Date();
+              let timeactive = self.timeActive + (now - self.timeActivated);
+              actions.doAutosave(qn, pn, timeactive);
             }
           }
         });
@@ -203,6 +206,8 @@ export default {
       window.rendermathnode(document.getElementById('questionwrap' + this.qn));
       this.updateTime(true);
       this.setInitValues();
+      // add in timeactive from autosave, if exists
+      this.timeActive += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
       this.initShowAnswer();
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
