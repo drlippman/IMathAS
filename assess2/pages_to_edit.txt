@@ -1,0 +1,50 @@
+X Edit /actions.php
+X Edit /admin/actions.php
+Delay /admin/federationpull.php
+Ignore /calcqtimes.php
+X Edit /course/addgrades.php
+Edit /course/addquestions.php
+Edit /course/course.php
+X Edit /course/coursemap.php
+X Edit /course/courseshowitems.php
+X Edit /course/deleteassessment.php
+X Edit /course/delitembyid.php
+/course/exception.php
+Newver /course/gb-aidexport.php
+Newver /course/gb-itemanalysis.php
+Newver /course/gb-itemanalysisdetail.php
+Newver /course/gb-itemresults.php
+Newver /course/gb-rescoreq.php
+Newver /course/gb-viewasid.php
+/course/gbtable2.php
+Newver /course/gradeallq.php
+Ignore /course/improveoerassess.php
+Edit /course/isolateassessbygroup.php
+Edit /course/isolatessessgrade.php
+/course/managestugrps.php
+/course/massexception.php
+/course/masssend.php
+/course/moddataset.php
+/course/modquestion.php
+/course/outcometable.php
+/course/report-weeklylab.php
+/course/showfeedback.php
+/course/treereader.php
+/diag/index.php
+/forms/posthandler.php
+/forums/posts.php
+/includes/calendardata.php
+/includes/calendardisp.php
+/includes/delcourse.php
+/includes/exceptionfuncs.php
+/includes/filehandler.php
+/includes/loaditemshowdata.php
+/includes/stugroups.php
+/includes/unenrollphp
+/msgs/viewmsg.php
+/util/copystudata.php
+/util/crosscoursedata.php
+/util/crosscoursedatadetail.php
+Delay /util/mergescores.php
+Delay /util/mergestus.php
+/util/rescoreassess.php

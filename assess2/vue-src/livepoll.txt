@@ -1,0 +1,39 @@
+LivePoll approach:
+
+For Teachers:
+startassess returns livepoll status
+  ? Also returns existing results data, in case of a page reset or something
+Top nav is question selection, with "settings" in place of "Intro"
+In top nav is "start" and "stop" controls
+If status is 'not started'
+  Show question for teacher if 'show on this computer before started' is selected
+When 'start' is clicked
+  update imas_livepoll_status
+  Send msg to livepoll server
+  Start timer
+  If 'show results live' is enabled
+    Show results as they come in
+When 'stop' is clicked
+  update imas_livepoll_status
+  Send msg to livepoll server
+  if 'show results' is enabled
+    show results
+
+For Students:
+startassess returns livepoll status.
+If status is 'not started',
+  then show a 'Waiting for teacher to start a question' notice
+If status is 'active question'
+  then run loadquestion to show the question
+  On submission,
+    Give acknowledgement of submission
+    Reshow question to allow resubmitting
+If status is 'stopped'
+  reshow question w answer, disabled
+If status is 'show scored'
+  reshow question, scored
+
+
+API endpoint for livepoll
+  Handles all the startq / stopq / etc messaging
+Existing scorequestion can handle scoring - add code for sending result socket msg
