@@ -1327,6 +1327,8 @@ class AssessRecord
     }
     $singlescore = (count($rawparts) > 1 && count($scores) == 1);
     $this->recordTry($qn, $data, $singlescore);
+
+    //TODO: record to firstscores if appropriate
   }
 
   /**
@@ -1629,6 +1631,32 @@ class AssessRecord
     }
   }
 
+  /**
+   * Finds the time active in the question, given question version datas
+   * @param  object $qdata   question version object
+   * @return array  assoc array with 'total' and 'pertry' times active 
+   *  Note that "pertry" is a rough average for the time per full-question try
+   */
+  private function calcTimeActive($qdata) {
+    $trycnt = 0;
+    $timetot = 0;
+    $subsUsed = array();
+    $partsCnt = count($qdata['tries']);
+    foreach ($qdata['tries'] as $pn=>$part) {
+      foreach ($part as $tn=>$try) {
+        $trycnt++;
+        // only count the time once for each submission, no matter how many parts
+        if (!isset($subsUsed[$try['sub']])) {
+          $timetot += $try['time'];
+          $subsUsed[$try['sub']] = 1;
+        }
+      }
+    }
+    return array(
+      'total' => $timetot,
+      'pertry' => min($timetot, $timetot*$partsCnt/$trycnt)
+    )
+  }
 
   /**
    * Get the specified version of assessment data
