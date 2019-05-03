@@ -74,7 +74,7 @@ class ScoreEngine
      * @param ScoreQuestionParams $scoreQuestionParams Params for scoring this question.
      * @return array
      */
-    public function scoreQuestion(ScoreQuestionParams $scoreQuestionParams): array
+    public function scoreQuestionWrapper(ScoreQuestionParams $scoreQuestionParams): array
     {
         set_error_handler(array($this, 'evalErrorHandler'));
         set_exception_handler(array($this, 'evalExceptionHandler'));
@@ -96,7 +96,7 @@ class ScoreEngine
      * @param ScoreQuestionParams $scoreQuestionParams Params for scoring this question.
      * @return array
      */
-    public function scoreQuestionAllParts(ScoreQuestionParams $scoreQuestionParams): array
+    public function scoreQuestion(ScoreQuestionParams $scoreQuestionParams): array
     {
         // This lets various parts of IMathAS know that question HTML is
         // NOT being generated for display.
@@ -595,6 +595,9 @@ class ScoreEngine
                 ->setAnswerType($anstype)
                 ->setIsMultiPartQuestion(true)
                 ->setQuestionPartNumber($partnum);
+
+			// TODO: Do this a different/better way. (not accessing _POST)
+			$scoreQuestionParams->setGivenAnswer($_POST["qn$partnum"]);
 
             $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
             $raw[$kidx] = $scorePart->getScore();
