@@ -1,50 +1,56 @@
-X Edit /actions.php
-X Edit /admin/actions.php
-Delay /admin/federationpull.php
-Ignore /calcqtimes.php
-X Edit /course/addgrades.php
-Edit /course/addquestions.php
-Edit /course/course.php
-X Edit /course/coursemap.php
-X Edit /course/courseshowitems.php
-X Edit /course/deleteassessment.php
-X Edit /course/delitembyid.php
-/course/exception.php
 Newver /course/gb-aidexport.php
 Newver /course/gb-itemanalysis.php
 Newver /course/gb-itemanalysisdetail.php
 Newver /course/gb-itemresults.php
 Newver /course/gb-rescoreq.php
 Newver /course/gb-viewasid.php
-/course/gbtable2.php
 Newver /course/gradeallq.php
-Ignore /course/improveoerassess.php
+Newver /course/modquestion.php  (need to update query to look for i_q w no i_a_s or i_a_r)
+Newver /course/modquestiongrid.php
+
+Edit/Rewrite /util/crosscoursedata.php
+Edit/Rewrite /util/crosscoursedatadetail.php
+
+Edit /course/addquestions.php  (need to rewrite withdraw handling, line 308)
+Edit /course/course.php  (need to decide how to delete teacher tries)
+Edit /course/exception.php  (need to handle or rewrite "force regen" option)
+Edit /course/gbtable2.php
 Edit /course/isolateassessbygroup.php
-Edit /course/isolatessessgrade.php
-/course/managestugrps.php
-/course/massexception.php
-/course/masssend.php
-/course/moddataset.php
-/course/modquestion.php
-/course/outcometable.php
-/course/report-weeklylab.php
-/course/showfeedback.php
-/course/treereader.php
-/diag/index.php
-/forms/posthandler.php
-/forums/posts.php
-/includes/calendardata.php
-/includes/calendardisp.php
-/includes/delcourse.php
-/includes/exceptionfuncs.php
-/includes/filehandler.php
-/includes/loaditemshowdata.php
-/includes/stugroups.php
-/includes/unenrollphp
-/msgs/viewmsg.php
-/util/copystudata.php
-/util/crosscoursedata.php
-/util/crosscoursedatadetail.php
+Edit /course/isolatessessgrade.php  (need easy way to pull time on task)
+Edit /course/managestugrps.php
+Edit /course/massexception.php
+Edit /course/masssend.php  (how to determine not complete (status&3>0?))
+Edit /course/moddataset.php  (need to do replaceby)
+Edit /course/outcometable.php
+Edit /course/report-weeklylab.php
+Edit /course/showfeedback.php
+Edit /course/treereader.php  (need to read status)
+Edit /diag/index.php
+Edit /forms/posthandler.php (need to look up q, seed, and attempt)
+Edit /forums/posts.php (need link to gb-viewasid)
+Edit /includes/calendardata.php (look up prereq scores)
+Edit /includes/calendardisp.php (look up prereq scores)
+Edit /includes/exceptionfuncs.php  (see if latepass pointless due to timelimit)
+Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
+Edit /includes/stugroups.php  (update i_a_r agroupid; make sure nothing fancier needs to happen)
+Edit /msgs/viewmsg.php  (need link to gb-viewasid)
+
+X? Edit /includes/loaditemshowdata.php (check status)
+
+X Edit /includes/delcourse.php
+X Edit /actions.php
+X Edit /admin/actions.php
+X Edit /course/addgrades.php
+X Edit /course/coursemap.php
+X Edit /course/courseshowitems.php
+X Edit /course/deleteassessment.php
+X Edit /course/delitembyid.php
+X Edit /includes/unenrollphp (totally done when filehandler is updated)
+
+Delay /admin/federationpull.php
 Delay /util/mergescores.php
 Delay /util/mergestus.php
-/util/rescoreassess.php
+Delay /util/copystudata.php
+Ignore/Rewrite /util/rescoreassess.php
+Ignore /course/improveoerassess.php
+Ignore /calcqtimes.php
