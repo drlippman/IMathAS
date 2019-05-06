@@ -568,8 +568,8 @@ class ScoreEngine
             if ($localsum == 0) {
                 $localsum = 1;
             }
-            foreach ($answeights as $kidx => $vval) {
-                $answeights[$kidx] = $vval / $localsum;
+            foreach ($answeights as $partnum => $vval) {
+                $answeights[$partnum] = $vval / $localsum;
             }
         } else {
             if (count($anstypes) > 1) {
@@ -578,8 +578,8 @@ class ScoreEngine
                 }
                 $answeights = array_fill(0, count($anstypes) - 1, round($qnpointval / count($anstypes), 2));
                 $answeights[] = $qnpointval - array_sum($answeights);
-                foreach ($answeights as $kidx => $vval) {
-                    $answeights[$kidx] = $vval / $qnpointval;
+                foreach ($answeights as $partnum => $vval) {
+                    $answeights[$partnum] = $vval / $qnpointval;
                 }
             } else {
                 $answeights = array(1);
@@ -588,8 +588,8 @@ class ScoreEngine
         $scores = array();
         $raw = array();
         $accpts = 0;
-        foreach ($anstypes as $kidx => $anstype) {
-            $partnum = ($qnidx + 1) * 1000 + $kidx;
+        foreach ($anstypes as $partnum => $anstype) {
+            $inputReferenceNumber = ($qnidx + 1) * 1000 + $partnum;
 
             $scoreQuestionParams
                 ->setAnswerType($anstype)
@@ -597,23 +597,23 @@ class ScoreEngine
                 ->setQuestionPartNumber($partnum);
 
 			// TODO: Do this a different/better way. (not accessing _POST)
-			$scoreQuestionParams->setGivenAnswer($_POST["qn$partnum"]);
+			$scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
 
             $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
-            $raw[$kidx] = $scorePart->getScore();
+            $raw[$partnum] = $scorePart->getScore();
 
             if (isset($scoremethod) && $scoremethod == 'acct') {
-                if (($anstype == 'string' || $anstype == 'number') && $answer[$kidx] === '') {
-                    $scores[$kidx] = $raw[$kidx] - 1;  //0 if correct, -1 if wrong
+                if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
+                    $scores[$partnum] = $raw[$partnum] - 1;  //0 if correct, -1 if wrong
                 } else {
-                    $scores[$kidx] = $raw[$kidx];
+                    $scores[$partnum] = $raw[$partnum];
                     $accpts++;
                 }
             } else {
-                $scores[$kidx] = ($raw[$kidx] < 0) ? 0 : round($raw[$kidx] * $answeights[$kidx], 4);
+                $scores[$partnum] = ($raw[$partnum] < 0) ? 0 : round($raw[$partnum] * $answeights[$partnum], 4);
             }
-            $raw[$kidx] = round($raw[$kidx], 2);
-            $partla[$kidx] = $GLOBALS['partlastanswer'];
+            $raw[$partnum] = round($raw[$partnum], 2);
+            $partla[$partnum] = $GLOBALS['partlastanswer'];
         }
 
         $partla = str_replace('&', '', $partla);
