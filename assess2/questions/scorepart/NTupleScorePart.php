@@ -25,6 +25,7 @@ class NTupleScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $anstype = $this->scoreQuestionParams->getAnswerType();
 
         $defaultreltol = .0015;
 
@@ -52,13 +53,14 @@ class NTupleScorePart implements ScorePart
 
         if ($anstype=='ntuple') {
             $GLOBALS['partlastanswer'] = $givenans;
+            $gaarr = $this->parseNtuple($givenans, false, true);
         } else if ($anstype=='calcntuple') {
             // parse and evaluate
             if ($hasNumVal) {
-                $gaarr = parseNtuple($givenansval, false, true);
+                $gaarr = $this->parseNtuple($givenansval, false, true);
                 $GLOBALS['partlastanswer'] = $givenans.'$#$'.$givenansval;
             } else {
-                $gaarr = parseNtuple($givenans, false, true);
+                $gaarr = $this->parseNtuple($givenans, false, true);
                 $GLOBALS['partlastanswer'] = $givenans.'$#$'.ntupleToString($gaarr);
             }
             //test for correct format, if specified
@@ -67,7 +69,7 @@ class NTupleScorePart implements ScorePart
             }
 
             //parse the ntuple without evaluating
-            $tocheck = parseNtuple($givenans, false, false);
+            $tocheck = $this->parseNtuple($givenans, false, false);
 
             if ($answer != 'DNE' && $answer != 'oo') {
                 foreach($tocheck as $chkme) {
@@ -105,7 +107,7 @@ class NTupleScorePart implements ScorePart
 
         $answer = makepretty($answer);
         // parse and evaluate the answer, capturing "or"s
-        $anarr = parseNtuple($answer, true, true);
+        $anarr = $this->parseNtuple($answer, true, true);
 
 
         if (in_array('scalarmult',$ansformats)) {
@@ -228,5 +230,82 @@ class NTupleScorePart implements ScorePart
         //$score = $correct/count($anarr) - count($gaarr)/$extrapennum;
         if ($score<0) { $score = 0; }
         return ($score);
+    }
+
+    /**
+	 * Parses a list of string ntuples
+	 * do_or: for each element in list, create an array of "or" alternatives
+	 * eval: true to eval non-numeric values
+	 */
+    private function parseNtuple($str, $do_or = false, $do_eval = true) {
+        if ($str == 'DNE' || $str == 'oo' || $str == '-oo') {
+            return $str;
+        }
+        $ntuples = [];
+        $NCdepth = 0;
+        $lastcut = 0;
+        $inor = false;
+        $str = makepretty($str);
+        $matchbracket = array(
+            '(' => ')',
+            '[' => ']',
+            '<' => '>',
+            '{' => '}'
+        );
+        $closebracket = '';
+        for ($i=0; $i<strlen($str); $i++) {
+            $dec = false;
+            if ($str[$i]=='(' || $str[$i]=='[' || $str[$i]=='<' || $str[$i]=='{') {
+                if ($NCdepth==0) {
+                    $lastcut = $i;
+                    $closebracket = $matchbracket[$str[$i]];
+                }
+                $NCdepth++;
+            } else if ($str[$i]==$closebracket) {
+                $NCdepth--;
+                if ($NCdepth==0) {
+                    $thisTuple = array(
+                        'lb' => $str[$lastcut],
+                        'rb' => $str[$i],
+                        'vals' => explode(',', substr($str,$lastcut+1,$i-$lastcut-1))
+                    );
+                    if ($do_eval) {
+                        for ($j=0; $j < count($thisTuple['vals']); $j++) {
+                            if ($thisTuple['vals'][$j] != 'oo' && $thisTuple['vals'][$j] != '-oo') {
+                                $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
+                            }
+                        }
+                    }
+                    if ($do_or && $inor) {
+                        $ntuples[count($ntuples)-1][] = $thisTuple;
+                    } else if ($do_or) {
+                        $ntuples[] = array($thisTuple);
+                    } else {
+                        $ntuples[] = $thisTuple;
+                    }
+                    $inor = ($do_or && substr($str, $i+1, 2)==='or');
+                }
+            }
+        }
+        return $ntuples;
+    }
+
+    private function ntupleToString($ntuples) {
+        if (!is_array($ntuples)) {
+            return $ntuples;
+        }
+        $out = array();
+        foreach ($ntuples as $ntuple) {
+            if (isset($ntuple['lb'])) {
+                $out[] = $ntuple['lb'] . implode(',', $ntuple['vals']) . $ntuple['rb'];
+            } else if (is_array($ntuple[0])) {
+                $sub = array();
+                foreach ($ntuple as $subtuple) {
+                    $sub[] = $subtuple['lb'] . implode(',', $subtuple['vals']) . $subtuple['rb'];
+                }
+                $out[] = implode(' or ', $sub);
+            }
+        }
+        implode(',', $out);
     }
 }
