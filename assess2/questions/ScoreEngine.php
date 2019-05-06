@@ -248,6 +248,8 @@ class ScoreEngine
 
         /*
          * Score the student's answers.
+         *
+         * FIXME: Need to handle conditional questions.
          */
 
         $scoreQuestionParams->setVarsForScorePart($varsForScorepart);

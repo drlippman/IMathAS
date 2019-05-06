@@ -116,9 +116,7 @@ class ScoreQuestionParams
     }
 
     /**
-     * Get the answer as provided by the student.
-     *
-     * FIXME: Need a variable type. In testing, this has been a string|array.
+     * Get the answer as provided by the student. (string or array)
      *
      * @return mixed
      */
@@ -128,9 +126,7 @@ class ScoreQuestionParams
     }
 
     /**
-     * Set the answer as provided by the student.
-     *
-     * FIXME: Need a variable type. In testing, this has been a string|array.
+     * Set the answer as provided by the student. (string or array)
      *
      * @param mixed $givenAnswer
      * @return ScoreQuestionParams
@@ -164,7 +160,8 @@ class ScoreQuestionParams
     }
 
     /**
-     * FIXME: Need a description.
+     * Get how many points a question is worth in the assessment.
+     * Used to assist with rounding issues.
      *
      * @return int
      */
@@ -174,7 +171,8 @@ class ScoreQuestionParams
     }
 
     /**
-     * FIXME: Need a description.
+     * Get how many points a question is worth in the assessment.
+     * Used to assist with rounding issues.
      *
      * @param int $qnpointval
      * @return ScoreQuestionParams
