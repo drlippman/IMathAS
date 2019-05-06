@@ -1,3 +1,5 @@
+Make sure rescoreassess method also updates iar.timeontask
+
 Newver /course/gb-aidexport.php
 Newver /course/gb-itemanalysis.php
 Newver /course/gb-itemanalysisdetail.php
@@ -10,30 +12,24 @@ Newver /course/modquestiongrid.php
 
 Edit/Rewrite /util/crosscoursedata.php
 Edit/Rewrite /util/crosscoursedatadetail.php
+Edit/Rewerite /course/showfeedback.php
 
 Edit /course/addquestions.php  (need to rewrite withdraw handling, line 308)
 Edit /course/course.php  (need to decide how to delete teacher tries)
 Edit /course/exception.php  (need to handle or rewrite "force regen" option)
+Edit /course/massexception.php (need to handle or rewrite "force regen")
 Edit /course/gbtable2.php
 Edit /course/isolateassessbygroup.php
 Edit /course/isolatessessgrade.php  (need easy way to pull time on task)
 Edit /course/managestugrps.php
-Edit /course/massexception.php
-Edit /course/masssend.php  (how to determine not complete (status&3>0?))
-Edit /course/moddataset.php  (need to do replaceby)
 Edit /course/outcometable.php
 Edit /course/report-weeklylab.php
-Edit /course/showfeedback.php
-Edit /course/treereader.php  (need to read status)
 Edit /diag/index.php
 Edit /forms/posthandler.php (need to look up q, seed, and attempt)
-Edit /forums/posts.php (need link to gb-viewasid)
-Edit /includes/calendardata.php (look up prereq scores)
-Edit /includes/calendardisp.php (look up prereq scores)
 Edit /includes/exceptionfuncs.php  (see if latepass pointless due to timelimit)
 Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
-Edit /includes/stugroups.php  (update i_a_r agroupid; make sure nothing fancier needs to happen)
 Edit /msgs/viewmsg.php  (need link to gb-viewasid)
+Edit /forums/posts.php (need link to gb-viewasid)
 
 X? Edit /includes/loaditemshowdata.php (check status)
 
@@ -46,6 +42,12 @@ X Edit /course/courseshowitems.php
 X Edit /course/deleteassessment.php
 X Edit /course/delitembyid.php
 X Edit /includes/unenrollphp (totally done when filehandler is updated)
+X Edit /course/masssend.php  (how to determine not complete (status&3>0?))
+X Edit /course/treereader.php  (need to read status)
+X Edit /includes/calendardata.php (look up prereq scores)
+X Edit /includes/calendardisp.php (look up prereq scores)
+X Edit /includes/stugroups.php  (update i_a_r agroupid; make sure nothing fancier needs to happen)
+X Edit /course/moddataset.php  (need to do replaceby)
 
 Delay /admin/federationpull.php
 Delay /util/mergescores.php

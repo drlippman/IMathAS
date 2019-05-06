@@ -106,12 +106,18 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 			$showgrayedout = false;
 			if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0)) {
 				if ($bestscores_stm===null) { //only prepare once
-					$query = "SELECT ias.bestscores,ia.ptsposs FROM imas_assessment_sessions AS ias ";
+					$query = "SELECT ias.bestscores,ia.ptsposs,ia.ver FROM imas_assessment_sessions AS ias ";
 					$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
-					$query .= "WHERE assessmentid=:assessmentid AND userid=:userid";
+					$query .= "WHERE assessmentid=:assessmentid AND userid=:userid ";
+					$query .= "UNION ";
+					$query = "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
+					$query .= "JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ";
+					$query .= "WHERE assessmentid=:assessmentid2 AND userid=:userid2 ";
+
 					$bestscores_stm = $DBH->prepare($query);
 				}
-				$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
+				$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid,
+					':assessmentid2'=>$row['reqscoreaid'], ':userid2'=>$userid));
 				if ($bestscores_stm->rowCount()==0) {
 					if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 						$showgrayedout = true;
@@ -119,14 +125,19 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 						continue;
 					}
 				} else {
-					list($scores,$reqscoreptsposs) = $bestscores_stm->fetch(PDO::FETCH_NUM);
-					$scores = explode(';', $scores);
+					list($scores,$reqscoreptsposs,$reqaver) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+					if ($reqaver > 1) {
+						$reqascore = $scores;
+					} else {
+						$scores = explode(';', $scores);
+						$reqascore = getpts($scores[0]);
+					}
 					if ($row['reqscoretype']&2) { //using percent-based
 						if ($reqscoreptsposs==-1) {
 							require("../includes/updateptsposs.php");
 							$reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
 						}
-						if (round(100*getpts($scores[0])/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
+						if (round(100*$reqascore/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
 							if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 								$showgrayedout = true;
 							} else {
@@ -134,7 +145,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 							}
 						}
 					} else { //points based
-						if (round(getpts($scores[0]),1)+.02<abs($row['reqscore'])) {
+						if (round($reqascore,1)+.02<abs($row['reqscore'])) {
 							if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 								$showgrayedout = true;
 							} else {

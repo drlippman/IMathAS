@@ -233,8 +233,9 @@ $foundopenitem = '';
 
 $astatus = array();
 if (!$viewall) {
-	$query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
-	$query .= "WHERE ia.courseid=:courseid AND ias.userid=:userid";
+	$query = "SELECT ia.id,ia.ver,ias.bestscores FROM imas_assessments AS ia ";
+	$query .= "JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
+	$query .= "WHERE ia.courseid=:courseid AND ias.userid=:userid AND ia.ver=1";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -248,6 +249,20 @@ if (!$viewall) {
 					continue 2;
 				}
 			}
+			$astatus[$row[0]] = 0; //unstarted
+		}
+	}
+	$query = "SELECT ia.id,ia.ver,iar.status,iar.lastchange FROM imas_assessments AS ia ";
+	$query .= "JOIN imas_assessment_records AS iar ON ia.id=iar.assessmentid ";
+	$query .= "WHERE ia.courseid=:courseid AND iar.userid=:userid AND ia.ver>1";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if (($row['status']&3)==0) {
+			$astatus[$row[0]] = 2; //completed
+		} else if ($row['lastchange']>0) {
+			$astatus[$row[0]] = 1; //something done
+		} else {
 			$astatus[$row[0]] = 0; //unstarted
 		}
 	}
