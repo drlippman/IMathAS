@@ -83,7 +83,7 @@ class ComplexScorePart implements ScorePart
                     $tchk = str_replace(array('s$n','p$'),array('sin','pi'),$tchk);
                 } else {
                     // TODO: rewrite using mathparser
-                    $cpts = parsecomplex($tchk);
+                    $cpts = $this->parsecomplex($tchk);
 
                     if (!is_array($cpts)) {
                         return 0;
@@ -106,7 +106,7 @@ class ComplexScorePart implements ScorePart
 
         $ganumarr = array();
         foreach ($gaarr as $j=>$givenans) {
-            $gaparts = parsesloppycomplex($givenans);
+            $gaparts = $this->parsesloppycomplex($givenans);
             if (!in_array('exactlist',$ansformats)) {
                 // don't add if we already have it in the list
                 foreach ($ganumarr as $prevvals) {
@@ -121,7 +121,7 @@ class ComplexScorePart implements ScorePart
         $anarr = array_map('trim',explode(',',$answer));
         $annumarr = array();
         foreach ($anarr as $i=>$answer) {
-            $ansparts = parsesloppycomplex($answer);
+            $ansparts = $this->parsesloppycomplex($answer);
             if (!in_array('exactlist',$ansformats)) {
                 foreach ($annumarr as $prevvals) {
                     if (abs($ansparts[0]-$prevvals[0])<1e-12 && abs($ansparts[1]-$prevvals[1])<1e-12) {
@@ -168,4 +168,125 @@ class ComplexScorePart implements ScorePart
         if ($score<0) { $score = 0; }
         return ($score);
     }
+
+    private function parsesloppycomplex($v) {
+        $func = makeMathFunction($v, 'i');
+        $a = $func(['i'=>0]);
+        $apb = $func(['i'=>1]);
+        return array($a,$apb-$a);
+    }
+
+    /**
+	  * parses complex numbers.  Can handle anything, but only with
+      * one i in it.
+      */
+    private function parsecomplex($v) {
+        $v = str_replace(' ','',$v);
+        $v = str_replace(array('sin','pi'),array('s$n','p$'),$v);
+        $v = preg_replace('/\((\d+\*?i|i)\)\/(\d+)/','$1/$2',$v);
+        $len = strlen($v);
+        //preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
+        //if (count($matches[0])>1) {
+        if (substr_count($v,'i')>1) {
+            return _('error - more than 1 i in expression');
+        } else {
+            //$p = $matches[0][0][1];
+            $p = strpos($v,'i');
+            if ($p===false) {
+                $real = $v;
+                $imag = 0;
+            } else {
+                //look left
+                $nd = 0;
+                for ($L=$p-1;$L>0;$L--) {
+                    $c = $v{$L};
+                    if ($c==')') {
+                        $nd++;
+                    } else if ($c=='(') {
+                        $nd--;
+                    } else if (($c=='+' || $c=='-') && $nd==0) {
+                        break;
+                    }
+                }
+                if ($L<0) {$L=0;}
+                if ($nd != 0) {
+                    return _('error - invalid form');
+                }
+                //look right
+                $nd = 0;
+
+                for ($R=$p+1;$R<$len;$R++) {
+                    $c = $v{$R};
+                    if ($c=='(') {
+                        $nd++;
+                    } else if ($c==')') {
+                        $nd--;
+                    } else if (($c=='+' || $c=='-') && $nd==0) {
+                        break;
+                    }
+                }
+                if ($nd != 0) {
+                    return _('error - invalid form');
+                }
+                //which is bigger?
+                if ($p-$L>0 && $R-$p>0 && ($R==$len || $L==0)) {
+                    //return _('error - invalid form');
+                    if ($R==$len) {// real + AiB
+                        $real = substr($v,0,$L);
+                        $imag = substr($v,$L,$p-$L);
+                        $imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+                    } else if ($L==0) { //AiB + real
+                        $real = substr($v,$R);
+                        $imag = substr($v,0,$p);
+                        $imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+                    } else {
+                        return _('error - invalid form');
+                    }
+                    $imag = str_replace('-*','-1*',$imag);
+                    $imag = str_replace('+*','+1*',$imag);
+                } else if ($p-$L>1) {
+                    $imag = substr($v,$L,$p-$L);
+                    $real = substr($v,0,$L) . substr($v,$p+1);
+                } else if ($R-$p>1) {
+                    if ($p>0) {
+                        if ($v{$p-1}!='+' && $v{$p-1}!='-') {
+                            return _('error - invalid form');
+                        }
+                        $imag = $v{$p-1}.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+                        $real = substr($v,0,$p-1) . substr($v,$R);
+                    } else {
+                        $imag = substr($v,$p+1,$R-$p-1);
+                        $real = substr($v,0,$p) . substr($v,$R);
+                    }
+                } else { //i or +i or -i or 3i  (one digit)
+                    if ($v{$L}=='+') {
+                        $imag = 1;
+                    } else if ($v{$L}=='-') {
+                        $imag = -1;
+                    } else if ($p==0) {
+                        $imag = 1;
+                    } else {
+                        $imag = $v{$L};
+                    }
+                    $real = ($p>0?substr($v,0,$L):'') . substr($v,$p+1);
+                }
+                if ($real=='') {
+                    $real = 0;
+                }
+                if ($imag{0}=='/') {
+                    $imag = '1'.$imag;
+                } else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
+                    $imag = $imag{0}.'1'.substr($imag,1);
+                }
+                $imag = str_replace('*/','/',$imag);
+                if (substr($imag,-1)=='*') {
+                    $imag = substr($imag,0,-1);
+                }
+            }
+            $real = str_replace(array('s$n','p$'),array('sin','pi'),$real);
+            $imag = str_replace(array('s$n','p$'),array('sin','pi'),$imag);
+            return array($real,$imag);
+        }
+    }
+
 }
