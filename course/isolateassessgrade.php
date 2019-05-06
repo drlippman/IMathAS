@@ -15,7 +15,7 @@
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	
+
 	if ($isteacher) {
 		if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
 			$calledfrom='isolateassess';
@@ -40,7 +40,7 @@
 	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$includeduedate = (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
-	
+
 	if (isset($tutorsection) && $tutorsection!='') {
 		$secfilter = $tutorsection;
 	} else {
@@ -54,16 +54,16 @@
 			$secfilter = -1;
 		}
 	}
-	
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id AND courseid=:cid");
+
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-	
-	
+	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver) = $stm->fetch(PDO::FETCH_NUM);
+
+
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
@@ -102,7 +102,7 @@
 	} else {
 		$sortorder = "name";
 	}
-	
+
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
@@ -163,10 +163,15 @@
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$excused[$row[0]] = 1;
 	}
-
-	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
-	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
-	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
+	if ($aver>1) {
+		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
+		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
+		$query .= "LEFT JOIN imas_assessment_records AS iar ON iu.id=iar.userid AND iar.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
+	} else {
+		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
+		$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
+		$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
+	}
 	if ($secfilter != -1) {
 		$query .= " AND istu.section=:section ";
 	}
@@ -212,6 +217,9 @@
 	$tottime = 0;
 	$tottimeontask = 0;
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($aver==1) {
+			$line['lastchange'] = $line['endtime'];
+		}
 		if ($lc%2!=0) {
 			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">";
 		} else {
@@ -235,15 +243,21 @@
 			if ($line['code']==null) {$line['code']='';}
 			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['code']));
 		}
-		$total = 0;
-		$sp = explode(';',$line['bestscores']);
-		$scores = explode(",",$sp[0]);
-		if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
-		for ($i=0;$i<count($scores);$i++) {
-			$total += getpts($scores[$i]);
+		if ($aver>1) {
+			$total = $line['score'];
+			$timeused = $line['lastchange'] - $line['starttime'];
+			$timeontask = $line['timeontask'];
+		} else {
+			$total = 0;
+			$sp = explode(';',$line['bestscores']);
+			$scores = explode(",",$sp[0]);
+			if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
+			for ($i=0;$i<count($scores);$i++) {
+				$total += getpts($scores[$i]);
+			}
+			$timeused = $line['endtime']-$line['starttime'];
+			$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 		}
-		$timeused = $line['endtime']-$line['starttime'];
-		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
@@ -254,16 +268,28 @@
 			$thisenddate = $enddate;
 		}
 		if ($line['id']==null) {
-			$querymap = array(
-				'gbmode' => $gbmode,
-				'cid' => $cid,
-				'asid' => 'new',
-				'uid' => $line['userid'],
-				'from' => 'isolate',
-				'aid' => $aid
-			);
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
 
-			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+				echo '<td><a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+			} else {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'asid' => 'new',
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+			}
 			if ($useexception) {
 				if ($exceptions[$line['userid']][2]>0) {
 					echo '<sup>LP</sup>';
@@ -280,16 +306,28 @@
 			}
 			echo "<td></td><td></td>";
 		} else {
-			$querymap = array(
-				'gbmode' => $gbmode,
-				'cid' => $cid,
-				'asid' => $line['id'],
-				'uid' => $line['userid'],
-				'from' => 'isolate',
-				'aid' => $aid
-			);
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
 
-			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+				echo '<td><a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			} else {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'asid' => $line['id'],
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			}
 			if ($thisenddate>$now) {
 				echo '<i>'.Sanitize::onlyFloat($total);
 			} else {
@@ -328,19 +366,19 @@
 			} else {
 				echo '<td>&nbsp;</td>';
 			}
-			if ($line['endtime']==0) {
+			if ($line['lastchange']==0) {
 				if ($line['starttime']==0) {
 					echo '<td>Never started</td>';
 				} else {
 					echo '<td>Never submitted</td>';
 				}
 			} else {
-				echo '<td>'.tzdate("n/j/y g:ia",$line['endtime']).'</td>';
+				echo '<td>'.tzdate("n/j/y g:ia",$line['lastchange']).'</td>';
 			}
 			if ($includeduedate) {
 				echo '<td>'.tzdate("n/j/y g:ia",$thisenddate).'</td>';
 			}
-			if ($line['endtime']==0 || $line['starttime']==0) {
+			if ($line['lastchange']==0 || $line['starttime']==0) {
 				echo '<td>&nbsp;</td>';
 			} else {
 				echo '<td>'.round($timeused/60).' min';
@@ -352,19 +390,23 @@
 				$tottime += $timeused;
 				$ntime++;
 			}
-
-			$feedback = json_decode($line['feedback']);
-			if ($feedback===null) {
-				$hasfeedback = ($line['feedback'] != '');
+			if ($aver > 1 ) {
+				$hasfeedback = ($line['status']&8) == 8;
 			} else {
-				$hasfeedback = false;
-				foreach ($feedback as $k=>$v) {
-					if ($v != '' && $v != '<p></p>') {
-						$hasfeedback = true;
-						break;
+				$feedback = json_decode($line['feedback']);
+				if ($feedback===null) {
+					$hasfeedback = ($line['feedback'] != '');
+				} else {
+					$hasfeedback = false;
+					foreach ($feedback as $k=>$v) {
+						if ($v != '' && $v != '<p></p>') {
+							$hasfeedback = true;
+							break;
+						}
 					}
 				}
 			}
+			//TODO: FINISH CHANGES
 			if ($hasfeedback) {
 				echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">', _('[Show Feedback]'), '</a></td>';
 			} else {

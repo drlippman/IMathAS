@@ -26,7 +26,7 @@ if (!empty($_GET['embed'])) {
 	$nologo = true;
 }
 $now = time();
-	
+
 //special "page"s
 //-1 new posts from forum page
 //-2 tagged posts from forum page
@@ -298,7 +298,7 @@ if ($oktoshow) {
 	if (count($files)>0) {
 		require_once('../includes/filehandler.php');
 	}
-	
+
 	//get next/prev before marked as read
 	$prevth = '';
 	$nextth = '';
@@ -346,7 +346,7 @@ if ($oktoshow) {
 				$nextthforum = $row['id'];
 				break;
 			}
-			if ($row['id']==$forumid && $row['threadid']==$threadid) { //found current 
+			if ($row['id']==$forumid && $row['threadid']==$threadid) { //found current
 				if (count($lastrow)>1) {
 					$prevth = $lastrow['threadid'];
 					$prevthforum = $lastrow['id'];
@@ -375,11 +375,11 @@ if ($oktoshow) {
 		$stm = $DBH->prepare($query);
 		$stm->execute($array);
 		// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
+
 		if ($stm->rowCount()>0) {
 			$prevth = $stm->fetchColumn(0);
 			$prevthforum = $forumid;
-		} 
+		}
 		$query ="SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid AND lastposttime<:now ";
 		$array = array(':forumid'=>$forumid, ':threadid'=>$threadid, ':now'=>$now);
 		if ($groupset>0 && $groupid!=-1) {
@@ -391,13 +391,13 @@ if ($oktoshow) {
 		$stm->execute($array);
 		//$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND threadid>'$threadid' AND parent=0 ORDER BY threadid LIMIT 1";
 		// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
+
 		if ($stm->rowCount()>0) {
 			$nextth = $stm->fetchColumn(0);
 			$nextthforum = $forumid;
 		}
 	}
-	
+
 	//update view count
 	$stm = $DBH->prepare("UPDATE imas_forum_posts SET views=:views WHERE id=:id");
 	$stm->execute(array(':views'=>$newviews, ':id'=>$threadid));
@@ -407,7 +407,7 @@ if ($oktoshow) {
 	//mark as read
 	$stm = $DBH->prepare("SELECT lastview,tagged FROM imas_forum_views WHERE userid=:userid AND threadid=:threadid");
 	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid));
-	
+
 	if ($stm->rowCount()>0) {
 		list($lastview, $tagged) = $stm->fetch(PDO::FETCH_NUM);
 		$stm = $DBH->prepare("UPDATE imas_forum_views SET lastview=:lastview WHERE userid=:userid AND threadid=:threadid");
@@ -438,20 +438,20 @@ if (!$oktoshow) {
 } else {
 	echo '<div id="headerposts" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 	echo "<b style=\"font-size: 120%\">"._('Post').': '. $re[$threadid] . Sanitize::encodeStringForDisplay($subject[$threadid]) . "</b><br/>\n";
-	
+
 	echo '<div class="fixedonscroll">';
 	if ($prevth != '') {
 		echo "<a href=\"posts.php?cid=$cid&forum=$prevthforum&thread=".Sanitize::onlyInt($prevth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Prev</a> ";
 	} else {
 		echo "Prev ";
 	}
-	
+
 	if ($nextth != '') {
 		echo "<a href=\"posts.php?cid=$cid&forum=$nextthforum&thread=".Sanitize::onlyInt($nextth)."&page=$page&grp=".Sanitize::onlyInt($groupid)."\">Next</a>";
 	} else {
 		echo "Next";
 	}
-	
+
 	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a> ";
 	if ($tagged) {
 		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
@@ -565,14 +565,18 @@ function printchildren($base,$restricttoowner=false) {
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
 			echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
 			if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
-				$query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
+				$query = "SELECT ia.ver,ia.id,ias.id AS asid FROM imas_assessments AS ia LEFT JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 				$query .= "WHERE ia.courseid=:courseid AND (ia.name=:name OR ia.name=:name2) AND ias.userid=:ownerid";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':courseid'=>$cid, ':name'=>$matches[2], ':name2'=>htmlentities($matches[2]), ':ownerid'=>intval($ownerid[$child])));
 				if ($stm->rowCount()>0) {
 					$qn = $matches[1];
-					$r = $stm->fetch(PDO::FETCH_NUM);
-					echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r[0]}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
+					$r = $stm->fetch(PDO::FETCH_ASSOC);
+					if ($r['ver'] > 1) {
+						echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid2.php?cid=$cid&uid={$ownerid[$child]}&aid={$r['id']}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
+					} else if ($r['id'] !== null) {
+						echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r['asid']}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
+					}
 				}
 			}
 		}

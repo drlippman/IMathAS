@@ -20,16 +20,14 @@ Edit /course/exception.php  (need to handle or rewrite "force regen" option)
 Edit /course/massexception.php (need to handle or rewrite "force regen")
 Edit /course/gbtable2.php
 Edit /course/isolateassessbygroup.php
-Edit /course/isolatessessgrade.php  (need easy way to pull time on task)
-Edit /course/managestugrps.php
+Edit /course/isolatessessgrade.php  ( ** started, not done)
+Edit /course/managestugrps.php  (** mostly done - need to fix file stuff)
 Edit /course/outcometable.php
 Edit /course/report-weeklylab.php
 Edit /diag/index.php
 Edit /forms/posthandler.php (need to look up q, seed, and attempt)
 Edit /includes/exceptionfuncs.php  (see if latepass pointless due to timelimit)
 Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
-Edit /msgs/viewmsg.php  (need link to gb-viewasid)
-Edit /forums/posts.php (need link to gb-viewasid)
 
 X? Edit /includes/loaditemshowdata.php (check status)
 
@@ -48,6 +46,8 @@ X Edit /includes/calendardata.php (look up prereq scores)
 X Edit /includes/calendardisp.php (look up prereq scores)
 X Edit /includes/stugroups.php  (update i_a_r agroupid; make sure nothing fancier needs to happen)
 X Edit /course/moddataset.php  (need to do replaceby)
+X Edit /msgs/viewmsg.php  (need link to gb-viewasid)
+X Edit /forums/posts.php (need link to gb-viewasid)
 
 Delay /admin/federationpull.php
 Delay /util/mergescores.php
