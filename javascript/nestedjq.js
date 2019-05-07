@@ -29,8 +29,10 @@ var Nested = function(listid, newoptions) {
 	};
 
 	function initialize(listid, newoptions) {
-
-		options = Object.assign(getOptions(), newoptions);
+		options = getOptions();
+		for (var i in newoptions) {
+			options[i] = newoptions[i];
+		}
 		if (!options.expandKey.match(/^(control|shift)$/)) {
 			options.expandKey = 'shift';
 		}
