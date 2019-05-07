@@ -4,6 +4,8 @@
  * (c) 2019 David Lippman
  */
 
+// TODO: calc and record assessment-level timeontask
+
 require_once('./AssessUtils.php');
 require_once('../filter/filter.php');
 require_once('displayq3.php');
@@ -1634,7 +1636,7 @@ class AssessRecord
   /**
    * Finds the time active in the question, given question version datas
    * @param  object $qdata   question version object
-   * @return array  assoc array with 'total' and 'pertry' times active 
+   * @return array  assoc array with 'total' and 'pertry' times active
    *  Note that "pertry" is a rough average for the time per full-question try
    */
   private function calcTimeActive($qdata) {

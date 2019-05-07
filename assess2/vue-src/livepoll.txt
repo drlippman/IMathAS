@@ -1,7 +1,60 @@
 LivePoll approach:
 
+states:
+0 - nothing displayed
+1 - question loaded on instructor side
+2 - question open for students
+3 - closed and reshow q without score
+4 - closed and reshow q with score
+
+In loadsettings, override some settings for livepoll:
+ - always do by_question
+ - always do "all students same seed"  |4
+
+In startassess
+  - Return livepoll status (create if needed)
+
+In front-end
+  - Top nav is question selection, with "settings" in place of "Intro"
+  - Start and Stop controls
+
+On teacher question selection
+  - call loadquestion (show or hide based on "Show question" setting)
+
+On teacher "Open Student Input"
+  - call livepoll endpoint
+  - endpoint updates livepoll status
+  - endpoint calls livepoll server with status update
+  - livepoll emits message to students to start input
+
+Student: on status update to start input
+  - Call loadquestion
+  - Loadquestion verifies status
+  - Loadquestion verifies seed, and creates a new question version if needed
+  - loadquestion returns actual question for input
+
+Student: on submission
+  - Calls scorequestion
+  - Scorequestion just returns acknowledgement of receipt; show recorded note
+    and allow resubmission
+
+On teacher "Close Student Input"
+  - call livepoll endpoint
+  - endpoint updates livepoll status
+  - endpoint calls livepoll server with status update
+  - livepoll emits message to students to start input
+
+Student: on status update to end input
+  - call loadquestion again to view scored version
+  - if "show answers" is set (curstate=4) then show answers w question
+
+If instructor changes the "show answers" option
+  - calls livepoll endpoint, does status update, etc.
+  - Student side calls loadquestion again to get new HTML w/wo answers
+
+
 For Teachers:
-startassess returns livepoll status
+x startassess returns livepoll status
   ? Also returns existing results data, in case of a page reset or something
 Top nav is question selection, with "settings" in place of "Intro"
 In top nav is "start" and "stop" controls
@@ -20,11 +73,14 @@ When 'stop' is clicked
     show results
 
 For Students:
-startassess returns livepoll status.
+x startassess returns livepoll status.
+for all stu same ver
 If status is 'not started',
   then show a 'Waiting for teacher to start a question' notice
 If status is 'active question'
   then run loadquestion to show the question
+    Need loadquestion to check livepoll status to verify
+    If instructor has regen'd, then need to create a new question version w that seed
   On submission,
     Give acknowledgement of submission
     Reshow question to allow resubmitting

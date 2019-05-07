@@ -234,6 +234,19 @@ if ($assess_info->getSetting('displaymethod') === 'videocued') {
   $assessInfoOut['videocues'] = $viddata['cues'];
 }
 
+// grab livepoll status if needed.  If doesn't exist, create record
+if ($assess_info->getSetting('displaymethod') === 'livepoll') {
+  $stm = $DBH->prepare("SELECT curquestion,curstate,seed,startt FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+  $stm->execute(array(':assessmentid'=>$aid));
+  if ($stm->rowCount()==0) {
+    $assessInfoOut['livepoll_status'] = array("curquestion"=>0, "curstate"=>0, "seed"=>0, "startt"=>0);
+    $stm = $DBH->prepare("INSERT INTO imas_livepoll_status (assessmentid,curquestion,curstate) VALUES (:assessmentid, :curquestion, :curstate) ON DUPLICATE KEY UPDATE curquestion=curquestion");
+    $stm->execute(array(':assessmentid'=>$aid, ':curquestion'=>0, ':curstate'=>0));
+  } else {
+    $assessInfoOut['livepoll_status'] = $stm->fetch(PDO::FETCH_ASSOC);
+  }
+}
+
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
 $generate_html = ($assess_info->getSetting('displaymethod') == 'full');

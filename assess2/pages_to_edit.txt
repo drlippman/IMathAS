@@ -14,7 +14,7 @@ Edit/Rewrite /util/crosscoursedata.php
 Edit/Rewrite /util/crosscoursedatadetail.php
 Edit/Rewerite /course/showfeedback.php
 
-Edit /course/addquestions.php  (need to rewrite withdraw handling, line 308)
+Edit /course/addquestions.php  (need to rewrite withdraw handling, line 308 - need to add func to AssessRecord)
 Edit /course/course.php  (need to decide how to delete teacher tries)
 Edit /course/exception.php  (need to handle or rewrite "force regen" option)
 Edit /course/massexception.php (need to handle or rewrite "force regen")
@@ -25,8 +25,8 @@ Edit /course/managestugrps.php  (** mostly done - need to fix file stuff)
 Edit /course/outcometable.php
 Edit /course/report-weeklylab.php
 Edit /diag/index.php
-Edit /forms/posthandler.php (need to look up q, seed, and attempt)
-Edit /includes/exceptionfuncs.php  (see if latepass pointless due to timelimit)
+Edit /forums/posthandler.php (need to look up q, seed, and attempt and call displayq)
+Edit /includes/exceptionfuncs.php (see if latepass pointless due to timelimit - need to consider retakes now)
 Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
 
 X? Edit /includes/loaditemshowdata.php (check status)
