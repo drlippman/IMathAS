@@ -151,6 +151,14 @@ export default {
     updateNewGroup (newMembers) {
       this.newGroupMembers = newMembers;
     }
+  },
+  mounted () {
+    if (this.aInfo.displaymethod === 'livepoll') {
+      // inject socket javascript
+      var script = document.createElement('script');
+      script.src = 'https://' + this.aInfo.livepoll_server + ':3000/socket.io/socket.io.js';
+      document.getElementsByTagName('head')[0].appendChild(script);
+    }
   }
 };
 </script>

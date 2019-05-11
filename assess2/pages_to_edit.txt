@@ -1,14 +1,45 @@
-Make sure rescoreassess method also updates iar.timeontask
+Make sure rescoreassess method also updates iar.timeontask total
 
-Newver /course/gb-aidexport.php
 Newver /course/gb-itemanalysis.php
+  - For by-assessment, should we could all attempts? or just scored?
+  - For by-question, should we just count scored version for timespent, or all versions?
+  - Do we estimate per-try times, or just leave them out?
 Newver /course/gb-itemanalysisdetail.php
 Newver /course/gb-itemresults.php
+  - Might be a little easier now, if we're storing unrand selection
+  - Probably can't do this one until displayq refactor is integrated
+Newver /course/gb-aidexport.php
+  - Ditto on above
 Newver /course/gb-rescoreq.php
+  - Should be simpler, since we have stored stuans for most question types and
+    can replicate clientside eval
 Newver /course/gb-viewasid.php
+  - Might be some summary components we could reuse, maybe some widgets
+  - Not essential to use Vue, but would be nice for walking through previous tries/versions
+    - When walking through retakes, would want all the summary info to update too
 Newver /course/gradeallq.php
+  - Should this only show scored version?
 Newver /course/modquestion.php  (need to update query to look for i_q w no i_a_s or i_a_r)
+  - Tries allowed for this problem
+  - Penalty: __% after ___ full-credit tries
+  - When by-question:
+    - Versions allowed
+    - Penalties for new versions
+  - Show answers
+  - show hints
+  - show video/text help buttons
+  - Rubric
+  - Fixed seeds
 Newver /course/modquestiongrid.php
+  - Already added:
+    - Tries allowed
+    - Show hints / help
+    - Copies to add
+  - Initial add
+    - Points
+    - Stuff above
+    - Add as group
+    - Set points = number of parts
 
 Edit/Rewrite /util/crosscoursedata.php
 Edit/Rewrite /util/crosscoursedatadetail.php
@@ -17,6 +48,10 @@ Edit/Rewerite /course/showfeedback.php
 Edit /course/addquestions.php  (need to rewrite withdraw handling, line 308 - need to add func to AssessRecord)
 Edit /course/course.php  (need to decide how to delete teacher tries)
 Edit /course/exception.php  (need to handle or rewrite "force regen" option)
+  - What if they're out of regens?
+  - For by-assessment, do we force new take?
+    - If so, how do we communicate that, especially in massexception where diff
+      assessments might have diff types
 Edit /course/massexception.php (need to handle or rewrite "force regen")
 Edit /course/gbtable2.php
 Edit /course/isolateassessbygroup.php

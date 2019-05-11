@@ -875,6 +875,13 @@ class AssessInfo
       $settings['defregenpenalty_after'] = 1;
     }
 
+    // if LivePoll, force all stu same random seed
+    // force by-question submission
+    if ($settings['displaymethod'] === 'livepoll') {
+      $settings['shuffle'] = $settings['shuffle'] | 4;
+      $settings['submitby'] = 'by_question';
+    }
+
     //if by-assessment, define attempt values
     if ($settings['submitby'] == 'by_assessment') {
       $settings['allowed_attempts'] = $settings['defregens'];
@@ -894,10 +901,7 @@ class AssessInfo
       $settings['showans'] = 'after_lastattempt';
     }
 
-    // if LivePoll, force all stu same random seed
-    if ($settings['displaymethod'] === 'livepoll') {
-      $settings['shuffle'] = $settings['shuffle'] | 4;
-    }
+
 
     //unpack minscore
     if ($settings['minscore'] > 10000) {

@@ -62,8 +62,9 @@ if ($assessInfoOut['displaymethod'] === 'livepoll') {
   $assessInfoOut['livepoll_server'] = $CFG['GEN']['livepollserver'];
 }
 
-// indicate if teacher user
+// indicate if teacher or tutor user
 $assessInfoOut['can_view_all'] = $canViewAll;
+$assessInfoOut['is_teacher'] = $isteacher;
 
 //set is_lti and is_diag
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']);

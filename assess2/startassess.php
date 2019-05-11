@@ -216,8 +216,6 @@ $assessInfoOut = array_merge($assessInfoOut, $assess_info->extractSettings($incl
 
 $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
-// indicate if teacher user
-$assessInfoOut['can_view_all'] = $canViewAll;
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
@@ -244,6 +242,15 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
     $stm->execute(array(':assessmentid'=>$aid, ':curquestion'=>0, ':curstate'=>0));
   } else {
     $assessInfoOut['livepoll_status'] = $stm->fetch(PDO::FETCH_ASSOC);
+  }
+  $livepollroom = $aid.'-'.($isteacher ? 'teachers':'students');
+  $assessInfoOut['livepoll_data'] = array(
+    'room' => $livepollroom,
+    'now' => $now
+  );
+  if (isset($CFG['GEN']['livepollpassword'])) {
+    $livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
+    $assessInfoOut['livepoll_data']['sig'] = $livepollsig;
   }
 }
 

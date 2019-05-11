@@ -7,19 +7,42 @@ states:
 3 - closed and reshow q without score
 4 - closed and reshow q with score
 
+In Launch view
+  - x Inject socket javascript if livepoll type
+
 In loadsettings, override some settings for livepoll:
- - always do by_question
- - always do "all students same seed"  |4
+ - x always do by_question
+ - x always do "all students same seed"  |4
+ - disable question shuffle if enabled
+ - Need to make sure teacher also gets same seed as students
 
 In startassess
-  - Return livepoll status (create if needed)
+  - x Return livepoll status (create if needed)
+
+x Move livepoll settings into a component
+  - x Use getters/setters to store the default settings into main store
 
 In front-end
-  - Top nav is question selection, with "settings" in place of "Intro"
-  - Start and Stop controls
+  - x On mount, connect to socket server
+  - Teachers:
+    - x Top nav is question selection, with "settings" in place of "Intro"
+    - x Start and Stop controls
+    - x Number of students connected
+    - x Results display below question
+  - Students:
+    - x Only display is question.
+    - When question
 
 On teacher question selection
-  - call loadquestion (show or hide based on "Show question" setting)
+  - x replace current settings w defaults
+  - x call setLivepollStatus to call server
+    - x endpoint updates livepolll status
+    - ???
+      - endpoint calls livepoll server with status update
+      - livepoll emits message to change state
+      - on reply, set curquestion so question updates
+    - get HTML with state update
+      - Or, call loadquestion (show or hide based on "Show question" setting)
 
 On teacher "Open Student Input"
   - call livepoll endpoint

@@ -19,7 +19,17 @@ export const store = Vue.observable({
   timelimit_expired: false,
   inPrintView: false,
   enableMQ: true,
-  livepollServer: ''
+  livepollServer: '',
+  livepollSettings: {
+    showQuestionDefault: true,
+    showResultsLiveDefault: false,
+    showResultsAfter: true,
+    showAnswersAfter: true,
+    useTimer: false,
+    questionTimelimit: 60
+  },
+  livepollStuCnt: 0,
+  livepollResults: {}
 });
 
 export const actions = {
@@ -445,6 +455,30 @@ export const actions = {
         response = this.processSettings(response);
         this.copySettings(response);
         Router.push('/');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
+  setLivepollStatus (data) {
+    store.inTransit = true;
+    store.errorMsg = null;
+    window.$.ajax({
+      url: store.APIbase + 'livepollstatus.php' + store.queryString,
+      dataType: 'json',
+      data: data,
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        response = this.processSettings(response);
+        this.copySettings(response);
       })
       .always(response => {
         store.inTransit = false;

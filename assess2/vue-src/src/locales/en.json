@@ -115,6 +115,7 @@
     "invalid_password": "The password you entered was invalid",
     "invalid_aid": "Invalid assessment ID",
     "no_access": "You must be a student, teacher, or tutor to access this assessment",
+    "teacher_only": "You must be a teacher to access this feature",
     "missing_param": "Missing required parameter on API call",
     "not_avail": "The assessment is not currently available",
     "not_ready": "The assessment is not ready for this action",
