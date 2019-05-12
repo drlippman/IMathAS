@@ -630,16 +630,16 @@ class MathParser
     if ($node['type'] === 'number') {
       return $node['symbol'];
     } else if ($node['type'] === 'variable') {
-      if ($node['symbol'] === 'pi') {
+      if (isset($this->variableValues[$node['symbol']])) {
+        return $this->variableValues[$node['symbol']];
+      } else if ($node['symbol'] === 'pi') {
         return M_PI;
       } else if ($node['symbol'] === 'e') {
         return M_E;
-      }
-      if (!isset($this->variableValues[$node['symbol']])) {
+      } else {
         throw new MathParserException("Variable found without a provided value");
         return;
       }
-      return $this->variableValues[$node['symbol']];
     } else if ($node['type'] === 'function') {
       // find the value of the input to the function
       $insideval = $this->evalNode($node['input']);
