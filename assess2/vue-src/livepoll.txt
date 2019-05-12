@@ -37,7 +37,7 @@ On teacher question selection
   - x replace current settings w defaults
   - x call setLivepollStatus to call server
     - x endpoint updates livepolll status
-    - ???
+    - ??? do we want to do this? Or wait until Q is opened
       - endpoint calls livepoll server with status update
       - livepoll emits message to change state
       - on reply, set curquestion so question updates
@@ -45,10 +45,10 @@ On teacher question selection
       - Or, call loadquestion (show or hide based on "Show question" setting)
 
 On teacher "Open Student Input"
-  - call livepoll endpoint
-  - endpoint updates livepoll status
-  - endpoint calls livepoll server with status update
-  - livepoll emits message to students to start input
+  - x call livepoll endpoint
+  - x endpoint updates livepoll status
+  - x endpoint calls livepoll server with status update
+  - x livepoll emits message to students to start input
 
 Student: on status update to start input
   - Call loadquestion

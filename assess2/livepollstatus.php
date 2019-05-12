@@ -70,14 +70,9 @@ $stm = $DBH->prepare("SELECT curquestion,curstate,seed,startt FROM imas_livepoll
 $stm->execute(array(':assessmentid'=>$aid));
 $livepollStatus = $stm->fetch(PDO::FETCH_ASSOC);
 
-$query = "UPDATE imas_livepoll_status SET ";
-$query .= "curquestion=?,curstate=?,seed=?,startt=? ";
-$query .= "WHERE assessmentid=?";
-$livepollUpdate = $DBH->prepare($query);
-
 // If new question, or if previous state was 0, then we're
 // preloading a new question
-// We'll set the state and load the question HTML
+// Set the state and load the question HTML
 // No need to send anything out to livepoll server for this
 if ($newQuestion !== $livepollStatus['curquestion'] ||
   $livepollStatus['curstate'] === 0
@@ -102,11 +97,21 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     $qn => $assess_record->getQuestionObject($qn, false, true, true)
   );
 
+  //TODO: ^^ gets the html, but we also need to get all the other stuff
+  // needed by livepoll for handling of student results
+  // drawinit, choices, etc. showtest 2500
+
+  //TODO: ? pull any existing results (in case we refreshed)
+
   // extract seed
   $seed = $assessInfoOut['questions'][$qn]['seed'];
 
   //set status
-  $livepollUpdate->execute(array($newQuestion, $newState, $seed, 0, $aid));
+  $query = "UPDATE imas_livepoll_status SET ";
+  $query .= "curquestion=?,curstate=?,seed=?,startt=? ";
+  $query .= "WHERE assessmentid=?";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array($newQuestion, $newState, $seed, 0, $aid));
 
   //output
   $assessInfoOut['livepoll_status'] = array(
@@ -115,6 +120,47 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     'seed' => $seed,
     'startt' => 0
   );
+} else if ($newState === 2) {
+  // Opening the question for student input
+  $query = "UPDATE imas_livepoll_status SET ";
+  $query .= "curquestion=?,curstate=?,startt=? ";
+  $query .= "WHERE assessmentid=?";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array($newQuestion, $newState, $now, $aid));
+
+  // load question settings
+  $assess_info->loadQuestionSettings(array($qid), false);
+  $seed = $assessInfoOut['questions'][$qn]['seed'];
+
+  //output
+  $assessInfoOut['livepoll_status'] = array(
+    'curquestion' => $newQuestion,
+    'curstate' => $newState,
+    'seed' => $seed,
+    'startt' => $now
+  );
+
+  // call the livepoll server
+  if (isset($CFG['GEN']['livepollpassword'])) {
+    $livepollsig = base64_encode(sha1($aid . $qn . $seed. $CFG['GEN']['livepollpassword'] . $now, true));
+  } else {
+    $livepollsig = '';
+  }
+  $qs = Sanitize::generateQueryStringFromMap(array(
+    'aid' => $aid,
+    'qn' => $qn,
+    'seed' => $seed,
+    'startt' => $now,
+    'now' => $now,
+    'sig' => $livepollsig
+  ));
+  $result = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/startq?' . $qs);
+
+  if ($rresult !== 'success') {
+    echo '{"error": "'.Sanitize::encodeStringForDisplay($r).'"}';
+    exit;
+  }
+
 }
 
 // save record if needed

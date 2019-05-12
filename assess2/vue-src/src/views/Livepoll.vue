@@ -149,8 +149,28 @@ export default {
         });
       }
     },
+    openInput() {
+      actions.setLivepollStatus({
+        newquestion: qn,
+        newstate: 2
+      });
+    },
+    closeInput() {
+      let nextState = this.showAnswers ? 4 : 3;
+      actions.setLivepollStatus({
+        newquestion: qn,
+        newstate: nextState;
+      });
+    },
     updateShowAnswers () {
-      // Need to call livepoll server so student's view updates too
+      // if already showing results, need to call the server with new state
+      if (this.curstate > 2) {
+        let nextState = this.showAnswers ? 4 : 3;
+        actions.setLivepollStatus({
+          newquestion: qn,
+          newstate: nextState;
+        });
+      }
     }
   },
   mounted () {
