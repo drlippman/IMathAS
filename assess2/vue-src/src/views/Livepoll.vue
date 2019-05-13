@@ -63,6 +63,7 @@
 
       <livepoll-results
         v-if = "isTeacher && showResults && curstate > 2"
+        :qn = "curqn"
       />
 
     </div>
@@ -73,6 +74,7 @@
 import AssessHeader from '@/components/AssessHeader.vue';
 import LivepollNav from '@/components/LivepollNav.vue';
 import LivepollSettings from '@/components/LivepollSettings.vue';
+import LivepollResults from '@/components/LivepollResults.vue';
 import Question from '@/components/question/Question.vue';
 import { store } from '../basicstore';
 
@@ -82,6 +84,7 @@ export default {
     LivepollNav,
     Question,
     LivepollSettings,
+    LivepollResults,
     AssessHeader
   },
   data: function () {
@@ -125,7 +128,7 @@ export default {
     addResult(data) {
       //add question result data
   		if (!store.livepollResults.hasOwnProperty(this.curqn)) {
-  			this.$set(store.livepollResults, this.curqn, []);
+  			this.$set(store.livepollResults, this.curqn, {});
   		}
       this.$set(store.livepollResults[this.curqn], data.user, data);
       //TODO: update results. Hopefully will happen automatically
