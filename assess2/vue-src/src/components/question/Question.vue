@@ -55,7 +55,7 @@ import QuestionHelps from '@/components/question/QuestionHelps.vue';
 
 export default {
   name: 'Question',
-  props: ['qn', 'active'],
+  props: ['qn', 'active', 'state'],
   components: {
     ScoreResult,
     QuestionHelps,
@@ -86,9 +86,13 @@ export default {
         !store.inPrintView &&
         this.questionData.withdrawn === 0 &&
         this.questionData.canretry && (
-        store.assessInfo.submitby === 'by_question' ||
+          store.assessInfo.submitby === 'by_question' ||
           this.questionData.tries_max > 1
-      )
+        ) && (
+          // if livepoll, only show if state is 2
+          store.assessInfo.displaymethod !== 'livepoll' ||
+          this.state === 2
+        )
       );
     },
     showScore () {
@@ -263,6 +267,15 @@ export default {
     active: function (newVal, oldVal) {
       this.loadQuestionIfNeeded();
       this.updateTime(newVal);
+    }
+    state: function (newVal, oldVal) {
+      if ((newVal > 1 && oldVal <= 1) ||
+          (newVal === 4 && oldVal < 4) ||
+          (newVal === 3 && oldVal === 4)
+      ) {
+        // force reload
+        actions.loadQuestion(this.qn, false, false);
+      }
     }
   }
 };

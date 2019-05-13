@@ -156,11 +156,49 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   ));
   $result = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/startq?' . $qs);
 
-  if ($rresult !== 'success') {
+  if ($result !== 'success') {
     echo '{"error": "'.Sanitize::encodeStringForDisplay($r).'"}';
     exit;
   }
+} else if ($newState === 3 || $newState === 4) {
+  // Closing the question for student input
+  $query = "UPDATE imas_livepoll_status SET ";
+  $query .= "curquestion=?,curstate=? ";
+  $query .= "WHERE assessmentid=?";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array($newQuestion, $newState, $aid));
 
+  // load question settings
+  $assess_info->loadQuestionSettings(array($qid), false);
+  $seed = $assessInfoOut['questions'][$qn]['seed'];
+
+  //output
+  $assessInfoOut['livepoll_status'] = array(
+    'curquestion' => $newQuestion,
+    'curstate' => $newState,
+    'seed' => $seed,
+    'startt' => $now
+  );
+
+  // call the livepoll server
+  if (isset($CFG['GEN']['livepollpassword'])) {
+    $livepollsig = base64_encode(sha1($aid . $qn . $newState. $CFG['GEN']['livepollpassword'] . $now, true));
+  } else {
+    $livepollsig = '';
+  }
+  $qs = Sanitize::generateQueryStringFromMap(array(
+    'aid' => $aid,
+    'qn' => $qn,
+    'newstate' => $newState,
+    'now' => $now,
+    'sig' => $livepollsig
+  ));
+  $result = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/stopq?' . $qs);
+
+  if ($result !== 'success') {
+    echo '{"error": "'.Sanitize::encodeStringForDisplay($r).'"}';
+    exit;
+  }
 }
 
 // save record if needed

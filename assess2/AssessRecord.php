@@ -289,15 +289,16 @@ class AssessRecord
    * Build a new question version.  Used in by-question submission to regen
    * @param  int     $qn          Question #
    * @param  int     $qid         Current Question ID
+   * @param  int     $forceseed   (optional) Force a particular seed (-1 to not force)
    * @return int   New question ID
    */
-  public function buildNewQuestionVersion($qn, $qid) {
+  public function buildNewQuestionVersion($qn, $qid, $forceseed = -1) {
     list($oldquestions, $oldseeds) = $this->getOldQuestions();
     list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds);
     // build question data
     $newver = array(
       'qid' => $question,
-      'seed' => $seed,
+      'seed' => $forceseed > -1 ? $forceseed : $seed,
       'tries' => array()
     );
 
@@ -987,6 +988,42 @@ class AssessRecord
     }
 
     return $out;
+  }
+
+  /**
+   * Get the rawscores and last student answers for the latest version and try
+   * @param  int  $qn
+   * @return array with keys 'raw' and 'stuans', each an array of scores and
+   *                student answers for each part. 
+   */
+  public function getLastRawResult($qn) {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $aver = $this->getAssessVer($ver);
+    $question_versions = $aver['questions'][$qn]['question_versions'];
+    $curq = $question_versions[count($question_versions) - 1];
+    $rawscores = array();
+    $lastans = array();
+    if (count($curq['tries']) == 0) {
+      $rawscores[0] = 0;
+      $lastans[0] = '';
+    } else {
+      $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
+      for ($pn = 0; $pn < count($answeights); $pn++) {
+        // get part details
+        if (isset($curq['tries'][$pn])) {
+          $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
+          $rawscores[$pn] = $lasttry['rawscore'];
+          $lastans[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
+        } else {
+          $rawscores[$pn] = 0;
+          $lastans[$pn] = '';
+        }
+      }
+    }
+    return array(
+      'raw' => $rawscores,
+      'stuans' => $lastans
+    );
   }
 
   /**

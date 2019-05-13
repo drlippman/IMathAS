@@ -118,9 +118,8 @@ export default {
       // update store.livepollStuCnt
       //receive usercount data
       store.livepollStuCnt = data.cnt;
-  		if (data.teachcnt==0) {
-        //TODO : update if needed
-  			showHandler({action: 0, qn: -1});
+  		if (data.teachcnt === 0) {
+        store.assessInfo.livepoll_status.curstate = 0;
   		}
     },
     addResult(data) {
@@ -132,7 +131,24 @@ export default {
       //TODO: update results. Hopefully will happen automatically
     },
     showHandler(data) {
-
+      if (data.action === 'showq') {
+        // On question show, server sends as data:
+        //  action: "showq", qn: qn, seed: seed, startt:startt
+        this.$set(store.assessInfo, 'livepoll_status', {
+          curstate: 2,
+          curquestion: data.qn,
+          seed: data.seed,
+          startt: data.startt
+        });
+      } else {
+        // On question stop, server sends as data:
+        //  action: newstate, qn: qn
+        this.$set(store.assessInfo, 'livepoll_status',
+          Object.assign(store.assessInfo.livepoll_status, {
+            curquestion: data.qn,
+            curstate: data.action
+          }));
+      }
     },
     selectQuestion(dispqn) {
       // called by teacher when they select a question
