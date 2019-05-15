@@ -21,7 +21,7 @@
     </button>
     <button
       @click="$emit('selectq', dispqn+1)"
-      :disabled="curOption>=navOptions.length-1"
+      :disabled="dispqn >= navOptions.length-1"
       class="secondarybtn"
       id="qnext"
       :aria-label="$t('next')"

@@ -91,6 +91,7 @@ export default {
       showQuestion: true,
       showResults: true,
       showAnswers: true,
+      onSettings: false,
       socket: null
     };
   },
@@ -100,7 +101,11 @@ export default {
     },
     curqn () {
       // In liveoll, .curquestion is display qn; 0 is settings
-      return parseInt(store.assessInfo.livepoll_status.curquestion) - 1;
+      if (this.onSettings) {
+        return -1;
+      } else {
+        return parseInt(store.assessInfo.livepoll_status.curquestion) - 1;
+      }
     },
     curstate () {
       return store.assessInfo.livepoll_status.curstate;
@@ -157,6 +162,12 @@ export default {
       // called by teacher when they select a question
       // If 0, show the settings
       let qn = parseInt(dispqn) - 1;
+      if (qn === -1) {
+        this.onSettings = true;
+        return;
+      } else {
+        this.onSettings = false;
+      }
       if (qn !== this.curqn) {
         // replace settings with defaults
         this.showQuestion = store.livepollSettings.showQuestionDefault;
@@ -166,12 +177,6 @@ export default {
           actions.setLivepollStatus({
             newquestion: dispqn,
             newstate: 1
-          });
-        } else {
-          //show settings
-          actions.setLivepollStatus({
-            newquestion: 0,
-            newstate: 0
           });
         }
       }
@@ -215,6 +220,11 @@ export default {
       this.socket.on('livepoll qans', (data) => this.addResult(data));
     } else {
       this.socket.on('livepoll show', (data) => this.showHandler(data));
+    }
+  },
+  created () {
+    if (store.assessInfo.livepoll_status.curquestion === 0) {
+      this.onSettings = true;
     }
   }
 };

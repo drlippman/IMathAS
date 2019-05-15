@@ -241,7 +241,8 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
     $stm = $DBH->prepare("INSERT INTO imas_livepoll_status (assessmentid,curquestion,curstate) VALUES (:assessmentid, :curquestion, :curstate) ON DUPLICATE KEY UPDATE curquestion=curquestion");
     $stm->execute(array(':assessmentid'=>$aid, ':curquestion'=>0, ':curstate'=>0));
   } else {
-    $assessInfoOut['livepoll_status'] = $stm->fetch(PDO::FETCH_ASSOC);
+    $assessInfoOut['livepoll_status'] = array_map('intval', $stm->fetch(PDO::FETCH_ASSOC));
+
   }
   $livepollroom = $aid.'-'.($isteacher ? 'teachers':'students');
   $assessInfoOut['livepoll_data'] = array(
