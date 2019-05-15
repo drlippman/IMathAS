@@ -86,13 +86,13 @@ export default {
         !store.inPrintView &&
         this.questionData.withdrawn === 0 &&
         this.questionData.canretry && (
-          store.assessInfo.submitby === 'by_question' ||
+        store.assessInfo.submitby === 'by_question' ||
           this.questionData.tries_max > 1
-        ) && (
-          // if livepoll, only show if state is 2
-          store.assessInfo.displaymethod !== 'livepoll' ||
+      ) && (
+      // if livepoll, only show if state is 2
+        store.assessInfo.displaymethod !== 'livepoll' ||
           this.state === 2
-        )
+      )
       );
     },
     showScore () {
@@ -161,7 +161,7 @@ export default {
             if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
               changed = true;
             }
-          } else if (this.type !== 'file' && val != window.$(this).attr('data-lastval')) {
+          } else if (this.type !== 'file' && val !== window.$(this).attr('data-lastval')) {
             changed = true;
           }
           if (changed) {
@@ -226,24 +226,24 @@ export default {
             if (el.type === 'radio' || el.type === 'checked') {
               actions.setInitValue(thisqn, el.name, el.checked ? 1 : 0);
             } else {
-              actions.setInitValue(thisqn, el.name, $(el).val());
+              actions.setInitValue(thisqn, el.name, window.$(el).val());
             }
           }
         });
     },
     initShowAnswer () {
       let $ = window.$;
-    	$('input.sabtn + span.hidden').attr('aria-hidden', true).attr('aria-expanded', false);
-    	$('input.sabtn').each(function () {
-    		var idnext = $(this).siblings('span:first-of-type').attr('id');
-    		$(this).attr('aria-expanded', false).attr('aria-controls', idnext)
-    		  .off('click.sashow').on('click.sashow', function () {
-    			$(this).attr('aria-expanded', true)
-    		  	  .siblings('span:first-of-type')
-    				.attr('aria-expanded', true).attr('aria-hidden', false)
-    				.removeClass('hidden');
-    		});
-    	});
+      $('input.sabtn + span.hidden').attr('aria-hidden', true).attr('aria-expanded', false);
+      $('input.sabtn').each(function () {
+        var idnext = $(this).siblings('span:first-of-type').attr('id');
+        $(this).attr('aria-expanded', false).attr('aria-controls', idnext)
+          .off('click.sashow').on('click.sashow', function () {
+            $(this).attr('aria-expanded', true)
+              .siblings('span:first-of-type')
+              .attr('aria-expanded', true).attr('aria-hidden', false)
+              .removeClass('hidden');
+          });
+      });
     }
   },
   updated () {
@@ -267,7 +267,7 @@ export default {
     active: function (newVal, oldVal) {
       this.loadQuestionIfNeeded();
       this.updateTime(newVal);
-    }
+    },
     state: function (newVal, oldVal) {
       if ((newVal > 1 && oldVal <= 1) ||
           (newVal === 4 && oldVal < 4) ||

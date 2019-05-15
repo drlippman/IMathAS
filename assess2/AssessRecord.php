@@ -994,7 +994,7 @@ class AssessRecord
    * Get the rawscores and last student answers for the latest version and try
    * @param  int  $qn
    * @return array with keys 'raw' and 'stuans', each an array of scores and
-   *                student answers for each part. 
+   *                student answers for each part.
    */
   public function getLastRawResult($qn) {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
@@ -1694,7 +1694,7 @@ class AssessRecord
     return array(
       'total' => $timetot,
       'pertry' => min($timetot, $timetot*$partsCnt/$trycnt)
-    )
+    );
   }
 
   /**

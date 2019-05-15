@@ -44,7 +44,7 @@ export default {
       set (val) {
         this.$set(store.livepollSettings, 'showQuestionDefault', val);
       },
-      get() {
+      get () {
         return store.livepollSettings.showQuestionDefault;
       }
     },
@@ -52,7 +52,7 @@ export default {
       set (val) {
         this.$set(store.livepollSettings, 'showResultsLiveDefault', val);
       },
-      get() {
+      get () {
         return store.livepollSettings.showResultsLiveDefault;
       }
     },
@@ -60,7 +60,7 @@ export default {
       set (val) {
         this.$set(store.livepollSettings, 'showResultsAfter', val);
       },
-      get() {
+      get () {
         return store.livepollSettings.showResultsAfter;
       }
     },
@@ -68,7 +68,7 @@ export default {
       set (val) {
         this.$set(store.livepollSettings, 'showAnswersAfter', val);
       },
-      get() {
+      get () {
         return store.livepollSettings.showAnswersAfter;
       }
     },
@@ -76,7 +76,7 @@ export default {
       set (val) {
         this.$set(store.livepollSettings, 'useTimer', val);
       },
-      get() {
+      get () {
         return store.livepollSettings.useTimer;
       }
     },
@@ -84,7 +84,7 @@ export default {
       set (val) {
         this.$set(store.livepollSettings, 'questionTimelimit', val);
       },
-      get() {
+      get () {
         return store.livepollSettings.questionTimelimit;
       }
     }

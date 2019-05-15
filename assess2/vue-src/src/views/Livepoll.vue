@@ -52,9 +52,8 @@
       >
         {{ $t('livepoll.waiting') }}
       </div>
-
       <question
-        v-if = "(isTeacher && curstate>0) || (!isTeacher && curstate>1)"
+        v-if = "curqn >= 0 && ((isTeacher && curstate>0) || (!isTeacher && curstate>1))"
         v-show = "showQuestion"
         :qn = "curqn"
         :active = "true"
@@ -76,7 +75,7 @@ import LivepollNav from '@/components/LivepollNav.vue';
 import LivepollSettings from '@/components/LivepollSettings.vue';
 import LivepollResults from '@/components/LivepollResults.vue';
 import Question from '@/components/question/Question.vue';
-import { store } from '../basicstore';
+import { store, actions } from '../basicstore';
 
 export default {
   name: 'livepoll',
@@ -93,14 +92,15 @@ export default {
       showResults: true,
       showAnswers: true,
       socket: null
-    }
+    };
   },
   computed: {
     isTeacher () {
       return store.assessInfo.is_teacher;
     },
     curqn () {
-      return store.assessInfo.livepoll_status.curquestion;
+      // In liveoll, .curquestion is display qn; 0 is settings 
+      return parseInt(store.assessInfo.livepoll_status.curquestion) - 1;
     },
     curstate () {
       return store.assessInfo.livepoll_status.curstate;
@@ -117,23 +117,23 @@ export default {
     }
   },
   methods: {
-    updateUsercount(data) {
+    updateUsercount (data) {
       // update store.livepollStuCnt
-      //receive usercount data
+      // receive usercount data
       store.livepollStuCnt = data.cnt;
-  		if (data.teachcnt === 0) {
+      if (data.teachcnt === 0) {
         store.assessInfo.livepoll_status.curstate = 0;
-  		}
+      }
     },
-    addResult(data) {
-      //add question result data
-  		if (!store.livepollResults.hasOwnProperty(this.curqn)) {
-  			this.$set(store.livepollResults, this.curqn, {});
-  		}
+    addResult (data) {
+      // add question result data
+      if (!store.livepollResults.hasOwnProperty(this.curqn)) {
+        this.$set(store.livepollResults, this.curqn, {});
+      }
       this.$set(store.livepollResults[this.curqn], data.user, data);
-      //TODO: update results. Hopefully will happen automatically
+      // TODO: update results. Hopefully will happen automatically
     },
-    showHandler(data) {
+    showHandler (data) {
       if (data.action === 'showq') {
         // On question show, server sends as data:
         //  action: "showq", qn: qn, seed: seed, startt:startt
@@ -153,32 +153,32 @@ export default {
           }));
       }
     },
-    selectQuestion(dispqn) {
+    selectQuestion (dispqn) {
       // called by teacher when they select a question
       // If 0, show the settings
-      let qn = parseInt(dispqn)-1;
-      if (qn !== this.qn) {
+      let qn = parseInt(dispqn) - 1;
+      if (qn !== this.curqn) {
         // replace settings with defaults
         this.showQuestion = store.livepollSettings.showQuestionDefault;
         this.showResults = store.livepollSettings.showResultsLiveDefault;
         this.showAnswers = store.livepollSettings.showAnswersAfter;
         actions.setLivepollStatus({
-          newquestion: qn,
+          newquestion: dispqn,
           newstate: 1
         });
       }
     },
-    openInput() {
+    openInput () {
       actions.setLivepollStatus({
-        newquestion: qn,
+        newquestion: this.curqn,
         newstate: 2
       });
     },
-    closeInput() {
+    closeInput () {
       let nextState = this.showAnswers ? 4 : 3;
       actions.setLivepollStatus({
-        newquestion: qn,
-        newstate: nextState;
+        newquestion: this.curqn,
+        newstate: nextState
       });
     },
     updateShowAnswers () {
@@ -186,8 +186,8 @@ export default {
       if (this.curstate > 2) {
         let nextState = this.showAnswers ? 4 : 3;
         actions.setLivepollStatus({
-          newquestion: qn,
-          newstate: nextState;
+          newquestion: this.curqn,
+          newstate: nextState
         });
       }
     }
@@ -197,18 +197,17 @@ export default {
     let server = store.assessInfo.livepoll_server;
     let LPdata = store.assessInfo.livepoll_data;
 
-    let querystr = 'room='+LPdata.room+'&now='+LPdata.now;
+    let querystr = 'room=' + LPdata.room + '&now=' + LPdata.now;
     if (LPdata.sig) {
-      querystr += '&sig='+encodeURIComponent(LPdata.sig);
+      querystr += '&sig=' + encodeURIComponent(LPdata.sig);
     }
-		this.socket = io('https://'+server+':3000', {query: querystr});
-		this.socket.on('livepoll usercount', (data) => this.updateUsercount(data));
-
-		if (store.assessInfo.is_teacher) {
-			this.socket.on('livepoll qans', (data) => this.addResult(data));
-		} else {
-			this.socket.on('livepoll show', (data) => this.showHandler(data));
-		}
+    this.socket = window.io('https://' + server + ':3000', { query: querystr });
+    this.socket.on('livepoll usercount', (data) => this.updateUsercount(data));
+    if (store.assessInfo.is_teacher) {
+      this.socket.on('livepoll qans', (data) => this.addResult(data));
+    } else {
+      this.socket.on('livepoll show', (data) => this.showHandler(data));
+    }
   }
 };
 </script>

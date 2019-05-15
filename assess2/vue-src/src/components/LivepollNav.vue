@@ -52,14 +52,14 @@ export default {
       var out = [];
       out.push({
         onclick: () => this.$emit('selectq', 0),
-        title: this.$t("livepoll.settings"),
+        title: this.$t('livepoll.settings'),
         dispqn: 0
       });
       for (let qn in store.assessInfo.questions) {
-        let dispqn = parseInt(this.qn) + 1;
+        let dispqn = parseInt(qn) + 1;
         out.push({
           onclick: () => this.$emit('selectq', dispqn),
-          title: $t('question_n', { n: dispqn }),
+          title: this.$t('question_n', { n: dispqn }),
           dispqn: dispqn
         });
       }
@@ -72,7 +72,7 @@ export default {
       return parseInt(this.qn) + 1;
     },
     studentCount () {
-      return this.$tc('livepoll.stucnt', store.livepollStuCnt;
+      return this.$tc('livepoll.stucnt', store.livepollStuCnt);
     }
   }
 };

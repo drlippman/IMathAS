@@ -79,6 +79,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 ) {
   // force the newstate to be 1; don't want to skip any steps
   $newState = 1;
+  $qn = $newQuestion - 1;
 
   // look up question HTML. Also grab seed
   // get current question version
@@ -128,6 +129,8 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   $stm = $DBH->prepare($query);
   $stm->execute(array($newQuestion, $newState, $now, $aid));
 
+  $qn = $newQuestion - 1;
+  
   // load question settings
   $assess_info->loadQuestionSettings(array($qid), false);
   $seed = $assessInfoOut['questions'][$qn]['seed'];

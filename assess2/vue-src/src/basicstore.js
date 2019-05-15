@@ -118,6 +118,8 @@ export const actions = {
             }
           } else if (store.assessInfo.displaymethod === 'videocued') {
             Router.push('/videocued');
+          } else if (store.assessInfo.displaymethod === 'livepoll') {
+            Router.push('/livepoll');
           }
         }
       })
@@ -465,6 +467,7 @@ export const actions = {
     store.errorMsg = null;
     window.$.ajax({
       url: store.APIbase + 'livepollstatus.php' + store.queryString,
+      type: 'POST',
       dataType: 'json',
       data: data,
       xhrFields: {

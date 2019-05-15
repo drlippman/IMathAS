@@ -8,6 +8,7 @@ import Full from './views/Full.vue';
 import Print from './views/Print.vue';
 import FullPaged from './views/FullPaged.vue';
 import Videocued from './views/Videocued.vue';
+import Livepoll from './views/Livepoll.vue';
 // const Skip = () => import(/* webpackChunkName: "skip" */ './views/Skip.vue');
 // const Full = () => import(/* webpackChunkName: "full" */ './views/Full.vue');
 // const Print = () => import(/* webpackChunkName: "print" */ './views/Print.vue');
@@ -94,6 +95,18 @@ const router = new Router({
     {
       path: '/videocued',
       component: Videocued,
+      beforeEnter: (to, from, next) => {
+        // if no active attempt, route to launch
+        if (store.inProgress) {
+          next();
+        } else {
+          next({ path: '/', replace: true });
+        }
+      }
+    },
+    {
+      path: '/livepoll',
+      component: Livepoll,
       beforeEnter: (to, from, next) => {
         // if no active attempt, route to launch
         if (store.inProgress) {

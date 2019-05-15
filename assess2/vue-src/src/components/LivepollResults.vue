@@ -11,11 +11,11 @@ export default {
   name: 'LivepollResults',
   props: ['qn'],
   computed: {
-    numResults: {
-      if (!store.livepollResults.hasOwnProperty(this.qn)) {
-        return 0;
-      } else {
+    numResults () {
+      if (store.livepollResults.hasOwnProperty(this.qn)) {
         return Object.keys(store.livepollResults[this.qn]).length;
+      } else {
+        return 0;
       }
     }
   }
