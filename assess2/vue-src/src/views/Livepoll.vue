@@ -61,7 +61,7 @@
       />
 
       <livepoll-results
-        v-if = "isTeacher && showResults && curstate > 2"
+        v-if = "isTeacher && showResults && curstate > 1"
         :qn = "curqn"
       />
 
@@ -188,7 +188,11 @@ export default {
       });
     },
     closeInput () {
+      //TODO: how do we use the global show answers setting?
       let nextState = this.showAnswers ? 4 : 3;
+      if (store.livepollSettings.showResultsAfter) {
+        this.showResults = true;
+      }
       actions.setLivepollStatus({
         newquestion: this.curqn+1,
         newstate: nextState
