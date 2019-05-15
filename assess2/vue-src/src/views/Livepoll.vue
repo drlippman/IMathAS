@@ -99,7 +99,7 @@ export default {
       return store.assessInfo.is_teacher;
     },
     curqn () {
-      // In liveoll, .curquestion is display qn; 0 is settings 
+      // In liveoll, .curquestion is display qn; 0 is settings
       return parseInt(store.assessInfo.livepoll_status.curquestion) - 1;
     },
     curstate () {
@@ -162,22 +162,30 @@ export default {
         this.showQuestion = store.livepollSettings.showQuestionDefault;
         this.showResults = store.livepollSettings.showResultsLiveDefault;
         this.showAnswers = store.livepollSettings.showAnswersAfter;
-        actions.setLivepollStatus({
-          newquestion: dispqn,
-          newstate: 1
-        });
+        if (qn >= 0) {
+          actions.setLivepollStatus({
+            newquestion: dispqn,
+            newstate: 1
+          });
+        } else {
+          //show settings
+          actions.setLivepollStatus({
+            newquestion: 0,
+            newstate: 0
+          });
+        }
       }
     },
     openInput () {
       actions.setLivepollStatus({
-        newquestion: this.curqn,
+        newquestion: this.curqn+1,
         newstate: 2
       });
     },
     closeInput () {
       let nextState = this.showAnswers ? 4 : 3;
       actions.setLivepollStatus({
-        newquestion: this.curqn,
+        newquestion: this.curqn+1,
         newstate: nextState
       });
     },
@@ -186,7 +194,7 @@ export default {
       if (this.curstate > 2) {
         let nextState = this.showAnswers ? 4 : 3;
         actions.setLivepollStatus({
-          newquestion: this.curqn,
+          newquestion: this.curqn+1,
           newstate: nextState
         });
       }

@@ -33,7 +33,8 @@ check_for_required('POST', array('newquestion', 'newstate'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $uid = $userid;
-$newQuestion = Sanitize::onlyInt($_POST['newquestion']);
+$newQuestion = (int) Sanitize::onlyInt($_POST['newquestion']);
+$qn = $newQuestion - 1;
 $newState = Sanitize::onlyInt($_POST['newstate']);
 
 // this page is only for teachers
@@ -79,7 +80,6 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 ) {
   // force the newstate to be 1; don't want to skip any steps
   $newState = 1;
-  $qn = $newQuestion - 1;
 
   // look up question HTML. Also grab seed
   // get current question version
@@ -129,8 +129,6 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   $stm = $DBH->prepare($query);
   $stm->execute(array($newQuestion, $newState, $now, $aid));
 
-  $qn = $newQuestion - 1;
-  
   // load question settings
   $assess_info->loadQuestionSettings(array($qid), false);
   $seed = $assessInfoOut['questions'][$qn]['seed'];
