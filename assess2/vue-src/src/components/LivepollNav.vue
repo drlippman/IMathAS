@@ -47,7 +47,7 @@
         {{ $t('livepoll.open_input') }}
       </button>
       <button
-        class = "med-left secondary"
+        class = "secondary"
         v-if = "curstate > 2 && dispqn > 0"
         @click = "newVersion"
       >
