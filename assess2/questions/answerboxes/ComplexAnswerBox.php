@@ -11,6 +11,7 @@ class ComplexAnswerBox implements AnswerBox
     private $answerBoxParams;
 
     private $answerBox;
+    private $jsParams;
     private $entryTip;
     private $correctAnswerForPart;
     private $previewLocation;
@@ -32,15 +33,11 @@ class ComplexAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
 
-        // FIXME: The following code needs to be updated
-        //        - $qn is always the question number (never $qn+1)
-        //        - $multi is now a boolean
-        //        - $partnum is now available
-
         $out = '';
         $tip = '';
         $sa = '';
         $preview = '';
+        $params = [];
 
         if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$partnum];} else {$sz = $options['answerboxsize'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
@@ -52,40 +49,54 @@ class ComplexAnswerBox implements AnswerBox
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-
         if (in_array('list',$ansformats)) {
-            $tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5172i,-3-4i') . "<br/>";
-            $shorttip = _('Enter a list of complex numbers');
-        } else {
-            $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i') . "<br/>";
-            $shorttip = _('Enter a complex number');
-        }
-        if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-            $tip .= _('Enter DNE for Does Not Exist');
-        }
+    			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5172i,-3-4i') . "<br/>";
+    			$shorttip = _('Enter a list of complex numbers');
+    		} else {
+    			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i') . "<br/>";
+    			$shorttip = _('Enter a complex number');
+    		}
+    		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+    			$tip .= _('Enter DNE for Does Not Exist');
+    		}
 
-        $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\"  ";
-        if ($showtips==2) { //eqntips: work in progress
-            if ($multi==0) {
-                $qnref = "$qn-0";
-            } else {
-                $qnref = ($multi-1).'-'.($qn%1000);
-            }
-            $out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
-            $out .= 'aria-describedby="tips'.$qnref.'" ';
-        }
-        $out .= '/>';
-        $out .= getcolormark($colorbox);
-        if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
-            $answer = str_replace('"','',$answer);
-        }
-        if (isset($answer)) {
-            $sa = makepretty($answer);
-        }
+    		$classes = ['text'];
+    		if ($colorbox != '') {
+    			$classes[] = $colorbox;
+    		}
+    		$attributes = [
+    			'type' => 'text',
+    			'size' => $sz,
+    			'name' => "qn$qn",
+    			'id' => "qn$qn",
+    			'value' => $la,
+    			'autocomplete' => 'off',
+    			'aria-describedby' => "tips$qn"
+    		];
+    		$params['tip'] = $shorttip;
+    		if ($useeqnhelper) {
+    			$params['helper'] = 1;
+    		}
+    		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
+    			$params['preview'] = 1;
+    		}
+
+    		$out .= '<input ' .
+    						Sanitize::generateAttributeString($attributes) .
+    						'class="'.implode(' ', $classes) .
+    						'" />';
+
+    		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+    			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+    			$answer = str_replace('"','',$answer);
+    		}
+    		if (isset($answer)) {
+    			$sa = makepretty($answer);
+    		}
 
         // Done!
         $this->answerBox = $out;
+        $this->jsParams = $params;
         $this->entryTip = $tip;
         $this->correctAnswerForPart = $sa;
         $this->previewLocation = $preview;
@@ -94,6 +105,11 @@ class ComplexAnswerBox implements AnswerBox
     public function getAnswerBox(): string
     {
         return $this->answerBox;
+    }
+
+    public function getJsParams(): string
+    {
+        return $this->jsParams;
     }
 
     public function getEntryTip(): string

@@ -11,6 +11,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
     private $answerBoxParams;
 
     private $answerBox;
+    private $jsParams;
     private $entryTip;
     private $correctAnswerForPart;
     private $previewLocation;
@@ -32,15 +33,11 @@ class CalculatedComplexAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
 
-        // FIXME: The following code needs to be updated
-        //        - $qn is always the question number (never $qn+1)
-        //        - $multi is now a boolean
-        //        - $partnum is now available
-
         $out = '';
         $tip = '';
         $sa = '';
         $preview = '';
+        $params = [];
 
         if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$partnum];} else {$sz = $options['answerboxsize'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
@@ -55,57 +52,65 @@ class CalculatedComplexAnswerBox implements AnswerBox
 
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+
         if (!isset($answerformat)) { $answerformat = '';}
-        $ansformats = array_map('trim',explode(',',$answerformat));
+    		$ansformats = array_map('trim',explode(',',$answerformat));
 
-        if (in_array('list',$ansformats) || in_array('exactlist',$ansformats)) {
-            $tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
-            $shorttip = _('Enter a list of complex numbers');
-        } else {
-            $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5i') . "<br/>";
-            $shorttip = _('Enter a complex number');
-        }
-        $tip .= formathint('each value',$ansformats,isset($reqdecimals)?$reqdecimals:null,'calccomplex');
+    		$la = explode('$#$',$la);
+    		$la = $la[0];
 
-        $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\"  ";
-        if ($showtips==2) { //eqntips: work in progress
-            if ($multi==0) {
-                $qnref = "$qn-0";
-            } else {
-                $qnref = ($multi-1).'-'.($qn%1000);
-            }
-            if ($useeqnhelper) {
-                $out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper);showehdd('tc$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('tc$qn')\" ";
-            } else {
-                $out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
-            }
-            $out .= 'aria-describedby="tips'.$qnref.'" ';
-        } else if ($useeqnhelper) {
-            $out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
-        }
-        if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
-            $out .= 'onKeyUp="updateLivePreview(this)" ';
-        }
-        $out .= "/>";
-        $out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
-        $out .= getcolormark($colorbox);
-        if (!isset($hidepreview)) {
-            $preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" onclick=\"complexcalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
-        }
-        $preview .= "<span id=p$qn></span> ";
-        $out .= "<script type=\"text/javascript\">complextoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
+    		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats)) {
+    			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
+    			$shorttip = _('Enter a list of complex numbers');
+    		} else {
+    			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5i') . "<br/>";
+    			$shorttip = _('Enter a complex number');
+    		}
+    		$tip .= formathint('each value',$ansformats,isset($reqdecimals)?$reqdecimals:null,'calccomplex');
 
-        if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
-        }
+    		$classes = ['text'];
+    		if ($colorbox != '') {
+    			$classes[] = $colorbox;
+    		}
+    		$attributes = [
+    			'type' => 'text',
+    			'size' => $sz,
+    			'name' => "qn$qn",
+    			'id' => "qn$qn",
+    			'value' => $la,
+    			'autocomplete' => 'off',
+    			'aria-describedby' => "tips$qn"
+    		];
+    		$params['tip'] = $shorttip;
+    		if ($useeqnhelper) {
+    			$params['helper'] = 1;
+    		}
+    		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
+    			$params['preview'] = 1;
+    		}
+    		$params['calcformat'] = $answerformat;
 
-        //$tip .= "Enter DNE for Does Not Exist";
-        if (isset($answer)) {
-            $sa = makeprettydisp( $answer);
-        }
+    		$out .= '<input ' .
+    						Sanitize::generateAttributeString($attributes) .
+    						'class="'.implode(' ', $classes) .
+    						'" />';
+
+    		if (!isset($hidepreview)) {
+    			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
+    		}
+    		$preview .= "<span id=p$qn></span> ";
+
+    		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+    			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+    		}
+
+    		if (isset($answer)) {
+    			$sa = makeprettydisp( $answer);
+    		}
 
         // Done!
         $this->answerBox = $out;
+        $this->jsParams = $params;
         $this->entryTip = $tip;
         $this->correctAnswerForPart = $sa;
         $this->previewLocation = $preview;
@@ -114,6 +119,11 @@ class CalculatedComplexAnswerBox implements AnswerBox
     public function getAnswerBox(): string
     {
         return $this->answerBox;
+    }
+
+    public function getJsParams(): string
+    {
+        return $this->jsParams;
     }
 
     public function getEntryTip(): string

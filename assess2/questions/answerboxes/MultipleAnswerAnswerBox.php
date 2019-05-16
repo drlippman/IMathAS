@@ -9,6 +9,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
     private $answerBoxParams;
 
     private $answerBox;
+    private $jsParams = [];
     private $entryTip;
     private $correctAnswerForPart;
     private $previewLocation;
@@ -51,13 +52,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
 			return;
 		}
 
-        if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+    if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-		//trim out unshuffled showans
-		$la = explode('$!$',$la);
-		$la = $la[0];
 
-		if ($noshuffle == "last") {
+    if ($noshuffle == "last") {
 			$randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
 			$RND->shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
@@ -165,6 +163,11 @@ class MultipleAnswerAnswerBox implements AnswerBox
 	{
 		return $this->answerBox;
 	}
+
+  public function getJsParams(): string
+  {
+      return $this->jsParams;
+  }
 
 	public function getEntryTip(): string
 	{

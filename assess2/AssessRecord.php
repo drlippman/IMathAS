@@ -6,7 +6,14 @@
 
 require_once('./AssessUtils.php');
 require_once('../filter/filter.php');
-require_once('displayq3.php');
+require_once(__DIR__ . '/questions/QuestionGenerator.php');
+require_once(__DIR__ . '/questions/models/QuestionParams.php');
+require_once(__DIR__ . '/questions/models/ShowAnswer.php');
+
+use IMathAS\assess2\questions\QuestionGenerator;
+use IMathAS\assess2\questions\models\QuestionParams;
+use IMathAS\assess2\questions\models\ShowAnswer;
+
 //TODO: should be passed to displayq instead of using globals
 $useeqnhelper = 4;
 $showtips = 2;
@@ -1178,7 +1185,8 @@ class AssessRecord
     $usedAutosave = array();
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
-
+    $isCorrect = $showscores; // default to false if not showing scores
+    $isNonzero = false;
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
       $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
@@ -1213,9 +1221,18 @@ class AssessRecord
       }
       if ($showscores && $partattemptn[$pn] > 0) {
         $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
+        if ($qcolors[$pn] > 0) {
+          $isNonzero = true;
+        }
+        if ($qcolors[$pn] < .99) {
+          $isCorrect = false;
+        }
+      } else if ($partattemptn[$pn] == 0) {
+        $isCorrect = false;
       }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : min($partattemptn);
+
 
     // TODO: move this to displayq input
     // TODO: pass stuanswers, stuanswersval
@@ -1223,7 +1240,7 @@ class AssessRecord
     // TODO:  pass as input
     $GLOBALS['lastanswers'] = array($qn => implode('&', $lastans));
     $GLOBALS['lastansweights'] = array(1);
-
+    /*
     list($qout,$jsparams) = displayq(
         $qn,                            // question number
         $qsettings['questionsetid'],    // questionset ID
@@ -1238,6 +1255,28 @@ class AssessRecord
         $stuanswers,
         $stuanswersval
     );
+    */
+    //TODO!!
+
+    $questionParams = new QuestionParams();
+    $questionParams
+        ->setDbQuestionSetId($qsettings['questionsetid'])
+        ->setQuestionNumber($qn)
+        ->setQuestionSeed($qver['seed'])
+        ->setShowHints($qsettings['showhints'])
+        ->setShowAnswer($showans)
+        ->setShowAnswerButton(true)
+        ->setStudentAttemptNumber($attemptn)
+        ->setStudentPartAttemptCount($partattemptn)
+        ->setAllQuestionAnswers($stuanswers)
+        ->setAllQuestionAnswersAsNum($stuanswersval)
+        ->setScoreNonZero($isNonzero)
+        ->setScoreIsCorrect($isCorrect);
+    $questionGenerator = new QuestionGenerator($this->DBH,
+        $GLOBALS['RND'], $questionParams);
+    $question = $questionGenerator->getQuestion();
+
+    $qout = $question->getQuestionContent();
 
     // need to extract answeights to provide to frontend
     $answeights = $GLOBALS['lastansweights'];

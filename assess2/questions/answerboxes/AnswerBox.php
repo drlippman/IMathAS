@@ -34,6 +34,13 @@ interface AnswerBox
     public function getAnswerBox(): string;
 
     /**
+     * Get javascript parameters for a question.
+     *
+     * @return string
+     */
+    public function getJsParams(): string;
+
+    /**
      * Get all answer box entry tips for a question.
      *
      * @return string

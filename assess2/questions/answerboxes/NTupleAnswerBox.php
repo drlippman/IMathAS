@@ -11,6 +11,7 @@ class NTupleAnswerBox implements AnswerBox
     private $answerBoxParams;
 
     private $answerBox;
+    private $jsParams;
     private $entryTip;
     private $correctAnswerForPart;
     private $previewLocation;
@@ -32,15 +33,11 @@ class NTupleAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
 
-        // FIXME: The following code needs to be updated
-        //        - $qn is always the question number (never $qn+1)
-        //        - $multi is now a boolean
-        //        - $partnum is now available
-
         $out = '';
         $tip = '';
         $sa = '';
         $preview = '';
+        $params = [];
 
         if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$partnum];} else {$sz = $options['answerboxsize'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
@@ -56,61 +53,69 @@ class NTupleAnswerBox implements AnswerBox
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if ($displayformat == 'point') {
-            $tip = _('Enter your answer as a point.  Example: (2,5.5172)') . "<br/>";
-            $shorttip = _('Enter a point');
-        } else if ($displayformat == 'pointlist') {
-            $tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5172,5)') . "<br/>";
-            $shorttip = _('Enter a list of points');
-        } else if ($displayformat == 'vector') {
-            $tip = _('Enter your answer as a vector.  Example: <2,5.5>') . "<br/>";
-            $shorttip = _('Enter a vector');
-        } else if ($displayformat == 'vectorlist') {
-            $tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5172,5>') . "<br/>";
-            $shorttip = _('Enter a list of vectors');
-        } else if ($displayformat == 'set') {
-            $tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
-            $shorttip = _('Enter a set');
-        } else if ($displayformat == 'list') {
-            $tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5172,4)') . "<br/>";
-            $shorttip = _('Enter a list of n-tuples');
-        } else {
-            $tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
-            $shorttip = _('Enter an n-tuple');
-        }
-        if (isset($reqdecimals)) {
-            $tip .= sprintf(_('Each value should be accurate to %d decimal places.'), $reqdecimals).'<br/>';
-            $shorttip .= sprintf(_(", each value accurate to %d decimal places"), $reqdecimals);
-        }
-        if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-            $tip .= _('Enter DNE for Does Not Exist');
-        }
+    			$tip = _('Enter your answer as a point.  Example: (2,5.5172)') . "<br/>";
+    			$shorttip = _('Enter a point');
+    		} else if ($displayformat == 'pointlist') {
+    			$tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5172,5)') . "<br/>";
+    			$shorttip = _('Enter a list of points');
+    		} else if ($displayformat == 'vector') {
+    			$tip = _('Enter your answer as a vector.  Example: <2,5.5>') . "<br/>";
+    			$shorttip = _('Enter a vector');
+    		} else if ($displayformat == 'vectorlist') {
+    			$tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5172,5>') . "<br/>";
+    			$shorttip = _('Enter a list of vectors');
+    		} else if ($displayformat == 'set') {
+    			$tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
+    			$shorttip = _('Enter a set');
+    		} else if ($displayformat == 'list') {
+    			$tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5172,4)') . "<br/>";
+    			$shorttip = _('Enter a list of n-tuples');
+    		} else {
+    			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
+    			$shorttip = _('Enter an n-tuple');
+    		}
+    		if (isset($reqdecimals)) {
+    			$tip .= sprintf(_('Each value should be accurate to %d decimal places.'), $reqdecimals).'<br/>';
+    			$shorttip .= sprintf(_(", each value accurate to %d decimal places"), $reqdecimals);
+    		}
+    		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+    			$tip .= _('Enter DNE for Does Not Exist');
+    		}
 
-        $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\" ";
-        if ($showtips==2) { //eqntips: work in progress
-            if ($multi==0) {
-                $qnref = "$qn-0";
-            } else {
-                $qnref = ($multi-1).'-'.($qn%1000);
-            }
-            $out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
-            $out .= 'aria-describedby="tips'.$qnref.'" ';
-        }
-        $out .= '/>';
-        $out .= getcolormark($colorbox);
+    		$classes = ['text'];
+    		if ($colorbox != '') {
+    			$classes[] = $colorbox;
+    		}
+    		$attributes = [
+    			'type' => 'text',
+    			'size' => $sz,
+    			'name' => "qn$qn",
+    			'id' => "qn$qn",
+    			'value' => $la,
+    			'autocomplete' => 'off'
+    		];
+    		$params['tip'] = $shorttip;
+    		$attributes['aria-describedby'] = "tips$qn";
 
-        if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
-        }
-        if (isset($answer)) {
-            $sa = $answer;
-            if ($displayformat == 'vectorlist' || $displayformat == 'vector') {
-                $sa = str_replace(array('<','>'),array('(:',':)'),$sa);
-            }
-            $sa = '`'.$sa.'`';
-        }
+    		$out .= '<input ' .
+    						Sanitize::generateAttributeString($attributes) .
+    						'class="'.implode(' ', $classes) .
+    						'" />';
+
+    		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+    			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+    		}
+    		if (isset($answer)) {
+    			$sa = $answer;
+    			if ($displayformat == 'vectorlist' || $displayformat == 'vector') {
+    				$sa = str_replace(array('<','>'),array('(:',':)'),$sa);
+    			}
+    			$sa = '`'.$sa.'`';
+    		}
 
         // Done!
         $this->answerBox = $out;
+        $this->jsParams = $params;
         $this->entryTip = $tip;
         $this->correctAnswerForPart = $sa;
         $this->previewLocation = $preview;
@@ -119,6 +124,11 @@ class NTupleAnswerBox implements AnswerBox
     public function getAnswerBox(): string
     {
         return $this->answerBox;
+    }
+
+    public function getJsParams(): string
+    {
+        return $this->jsParams;
     }
 
     public function getEntryTip(): string

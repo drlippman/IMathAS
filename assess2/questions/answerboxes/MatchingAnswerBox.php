@@ -9,6 +9,7 @@ class MatchingAnswerBox implements AnswerBox
     private $answerBoxParams;
 
     private $answerBox;
+    private $jsParams = [];
     private $entryTip;
     private $correctAnswerForPart;
     private $previewLocation;
@@ -51,128 +52,124 @@ class MatchingAnswerBox implements AnswerBox
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        //trim out unshuffled showans
-        $la = explode('$!$',$la);
-        $la = $la[0];
-
         if (!is_array($questions) || !is_array($answers)) {
             throw new RuntimeException(_('Eeek!  $questions or $answers is not defined or needs to be an array'));
             return;
         }
         if (isset($matchlist)) { $matchlist = array_map('trim',explode(',',$matchlist));}
-        if ($noshuffle=="questions" || $noshuffle=='all') {
-            $randqkeys = array_keys($questions);
-        } else {
-            $randqkeys = $RND->array_rand($questions,count($questions));
-            $RND->shuffle($randqkeys);
-        }
-        if ($noshuffle=="answers" || $noshuffle=='all') {
-            $randakeys = array_keys($answers);
-        } else {
-            $randakeys = $RND->array_rand($answers,count($answers));
-            $RND->shuffle($randakeys);
-        }
+    		if ($noshuffle=="questions" || $noshuffle=='all') {
+    			$randqkeys = array_keys($questions);
+    		} else {
+    			$randqkeys = $RND->array_rand($questions,count($questions));
+    			$RND->shuffle($randqkeys);
+    		}
+    		if ($noshuffle=="answers" || $noshuffle=='all') {
+    			$randakeys = array_keys($answers);
+    		} else {
+    			$randakeys = $RND->array_rand($answers,count($answers));
+    			$RND->shuffle($randakeys);
+    		}
 
-        if (isset($GLOBALS['capturechoices'])) {
-            if (!isset($GLOBALS['choicesdata'])) {
-                $GLOBALS['choicesdata'] = array();
-            }
-            $GLOBALS['choicesdata'][$qn] = array($anstype, $randakeys);
-        }
+    		if (isset($GLOBALS['capturechoices'])) {
+    			if (!isset($GLOBALS['choicesdata'])) {
+    				$GLOBALS['choicesdata'] = array();
+    			}
+    			$GLOBALS['choicesdata'][$qn] = array($anstype, $randakeys);
+    		}
 
-        $ncol = 1;
-        if (substr($displayformat,1)=='columnselect') {
-            $ncol = $displayformat{0};
-            $itempercol = ceil(count($randqkeys)/$ncol);
-            $displayformat = 'select';
-        }
-        if (substr($displayformat,0,8)=="limwidth") {
-            $divstyle = 'style="max-width:'.substr($displayformat,8).'px;"';
-        } else {
-            $divstyle = '';
-        }
-        if ($colorbox != '') {$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'" style="display:block">';}
-        $out .= "<div class=\"match\" $divstyle>\n";
-        $out .= "<p class=\"centered\">$questiontitle</p>\n";
-        $out .= "<ul class=\"nomark\">\n";
-        $las = explode("|",$la);
-        $letters = array_slice(explode(',','a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az'),0,count($answers));
+    		$ncol = 1;
+    		if (substr($displayformat,1)=='columnselect') {
+    			$ncol = $displayformat{0};
+    			$itempercol = ceil(count($randqkeys)/$ncol);
+    			$displayformat = 'select';
+    		}
+    		if (substr($displayformat,0,8)=="limwidth") {
+    			$divstyle = 'style="max-width:'.substr($displayformat,8).'px;"';
+    		} else {
+    			$divstyle = '';
+    		}
+    		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'" style="display:block">';}
+    		$out .= "<div class=\"match\" $divstyle>\n";
+    		$out .= "<p class=\"centered\">$questiontitle</p>\n";
+    		$out .= "<ul class=\"nomark\">\n";
+    		$las = explode("|",$la);
+    		$letters = array_slice(explode(',','a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az'),0,count($answers));
 
-        for ($i=0;$i<count($randqkeys);$i++) {
-            //$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\" /> {$questions[$randqkeys[$i]]}</li>\n";
-            if ($ncol>1) {
-                if ($i>0 && $i%$itempercol==0) {
-                    $out .= '</ul></div><div class="match"><ul class=nomark>';
-                }
-            }
-            if (strpos($questions[$randqkeys[$i]],' ')===false || strlen($questions[$randqkeys[$i]])<12) {
-                $out .= '<li class="nowrap">';
-            } else {
-                $out .= '<li>';
-            }
-            $out .= "<select name=\"qn$qn-$i\">";
-            $out .= '<option value="-" ';
-            if ($las[$i]=='-' || strcmp($las[$i],'')==0) {
-                $out .= 'selected="1"';
-            }
-            $out .= '>-</option>';
-            if ($displayformat=="select") {
-                for ($j=0;$j<count($randakeys);$j++) {
-                    //$out .= "<option value=\"".$letters[$j]."\" ";
-                    $out .= "<option value=\"".$j."\" ";
-                    if (strcmp($las[$i],$j)==0 || $las[$i]==$letters[$j]) { //second is legacy
-                        $out .= 'selected="1"';
-                    }
-                    $out .= ">".str_replace('`','',$answers[$randakeys[$j]])."</option>\n";
-                }
-            } else {
-                foreach ($letters as $j=>$v) {
-                    //$out .= "<option value=\"$v\" ";
-                    $out .= "<option value=\"$j\" ";
-                    if (strcmp($las[$i],$j)==0 || $las[$i]==$v) {
-                        $out .= 'selected="1"';
-                    }
-                    $out .= ">$v</option>";
-                }
-            }
-            $out .= "</select>&nbsp;{$questions[$randqkeys[$i]]}</li>\n";
-        }
-        $out .= "</ul>\n";
-        $out .= "</div>";
+    		for ($i=0;$i<count($randqkeys);$i++) {
+    			//$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\" /> {$questions[$randqkeys[$i]]}</li>\n";
+    			if ($ncol>1) {
+    				if ($i>0 && $i%$itempercol==0) {
+    					$out .= '</ul></div><div class="match"><ul class=nomark>';
+    				}
+    			}
+    			if (strpos($questions[$randqkeys[$i]],' ')===false || strlen($questions[$randqkeys[$i]])<12) {
+    				$out .= '<li class="nowrap">';
+    			} else {
+    				$out .= '<li>';
+    			}
+    			$out .= "<select name=\"qn$qn-$i\">";
+    			$out .= '<option value="-" ';
+    			if ($las[$i]=='-' || strcmp($las[$i],'')==0) {
+    				$out .= 'selected="1"';
+    			}
+    			$out .= '>-</option>';
+    			if ($displayformat=="select") {
+    				for ($j=0;$j<count($randakeys);$j++) {
+    					//$out .= "<option value=\"".$letters[$j]."\" ";
+    					$out .= "<option value=\"".$j."\" ";
+    					if (strcmp($las[$i],$j)==0 || $las[$i]==$letters[$j]) { //second is legacy
+    						$out .= 'selected="1"';
+    					}
+    					$out .= ">".str_replace('`','',$answers[$randakeys[$j]])."</option>\n";
+    				}
+    			} else {
+    				foreach ($letters as $j=>$v) {
+    					//$out .= "<option value=\"$v\" ";
+    					$out .= "<option value=\"$j\" ";
+    					if (strcmp($las[$i],$j)==0 || $las[$i]==$v) {
+    						$out .= 'selected="1"';
+    					}
+    					$out .= ">$v</option>";
+    				}
+    			}
+    			$out .= "</select>&nbsp;{$questions[$randqkeys[$i]]}</li>\n";
+    		}
+    		$out .= "</ul>\n";
+    		$out .= "</div>";
 
-        if (!isset($displayformat) || $displayformat!="select") {
-            $out .= "<div class=\"match\" $divstyle>\n";
-            $out .= "<p class=centered>$answertitle</p>\n";
+    		if (!isset($displayformat) || $displayformat!="select") {
+    			$out .= "<div class=\"match\" $divstyle>\n";
+    			$out .= "<p class=centered>$answertitle</p>\n";
 
-            $out .= "<ol class=lalpha>\n";
-            for ($i=0;$i<count($randakeys);$i++) {
-                $out .= "<li>{$answers[$randakeys[$i]]}</li>\n";
-            }
-            $out .= "</ol>";
-            $out .= "</div>";
-        }
-        $out .= "<input type=hidden name=\"qn$qn\" value=\"done\" /><div class=spacer>&nbsp;</div>";
-        $out .= getcolormark($colorbox);
-        if ($colorbox != '') {$out .= '</div>';}
-        //$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
-        if ($displayformat=="select") {
-            $tip = _('In each pull-down, select the item that matches with the displayed item');
-        } else {
-            $tip = _('In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column');
-        }
-        for ($i=0; $i<count($randqkeys);$i++) {
-            if (isset($matchlist)) {
-                $akey = array_search($matchlist[$randqkeys[$i]],$randakeys);
-            } else {
-                $akey = array_search($randqkeys[$i],$randakeys);
-            }
-            if ($displayformat == "select") {
-                $sa .= '<br/>'.$answers[$randakeys[$akey]];
-            } else {
-                $sa .= chr($akey+97)." ";
-            }
+    			$out .= "<ol class=lalpha>\n";
+    			for ($i=0;$i<count($randakeys);$i++) {
+    				$out .= "<li>{$answers[$randakeys[$i]]}</li>\n";
+    			}
+    			$out .= "</ol>";
+    			$out .= "</div>";
+    		}
+    		$out .= "<input type=hidden name=\"qn$qn\" value=\"done\" /><div class=spacer>&nbsp;</div>";
+    		$out .= getcolormark($colorbox);
+    		if ($colorbox != '') {$out .= '</div>';}
+    		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
+    		if ($displayformat=="select") {
+    			$tip = _('In each pull-down, select the item that matches with the displayed item');
+    		} else {
+    			$tip = _('In each pull-down on the left, select the letter (a, b, c, etc.) of the matching answer in the right-hand column');
+    		}
+    		for ($i=0; $i<count($randqkeys);$i++) {
+    			if (isset($matchlist)) {
+    				$akey = array_search($matchlist[$randqkeys[$i]],$randakeys);
+    			} else {
+    				$akey = array_search($randqkeys[$i],$randakeys);
+    			}
+    			if ($displayformat == "select") {
+    				$sa .= '<br/>'.$answers[$randakeys[$akey]];
+    			} else {
+    				$sa .= chr($akey+97)." ";
+    			}
 
-        }
+    		}
 
         // Done!
         $this->answerBox = $out;
@@ -184,6 +181,11 @@ class MatchingAnswerBox implements AnswerBox
     public function getAnswerBox(): string
     {
         return $this->answerBox;
+    }
+
+    public function getJsParams(): string
+    {
+        return $this->jsParams;
     }
 
     public function getEntryTip(): string

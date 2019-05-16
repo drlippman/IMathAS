@@ -11,6 +11,7 @@ class StringAnswerBox implements AnswerBox
     private $answerBoxParams;
 
     private $answerBox;
+    private $jsParams;
     private $entryTip;
     private $correctAnswerForPart;
     private $previewLocation;
@@ -32,15 +33,12 @@ class StringAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
 
-        // FIXME: The following code needs to be updated
-        //        - $qn is always the question number (never $qn+1)
-        //        - $multi is now a boolean
-        //        - $partnum is now available
 
         $out = '';
         $tip = '';
         $sa = '';
         $preview = '';
+        $params = [];
 
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$partnum];} else {$sz = $options['answerboxsize'];}}
@@ -52,128 +50,145 @@ class StringAnswerBox implements AnswerBox
         if (!isset($answerformat)) { $answerformat = '';}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+
         if (!isset($sz)) { $sz = 20;}
-        if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+    		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 
-        $la = preg_replace('/%(\w+;)/',"&$1",$la);
-        $la = str_replace('&tilde;', '~', $la);
+    		$la = preg_replace('/%(\w+;)/',"&$1",$la);
+    		$la = str_replace('&tilde;', '~', $la);
 
-        if ($answerformat=='list') {
-            $tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
-            $shorttip = _('Enter a list of text');
-        } else {
-            $tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
-            $shorttip = _('Enter text');
-        }
-        if ($displayformat=='select') {
-            $out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\"><option value=\"\"> </option>";
-            foreach ($questions as $i=>$v) {
-                $out .= '<option value="'.htmlentities($v).'"';
-                //This is a hack.  Need to figure a better way to deal with & in answers
-                if (str_replace('&','',$v)==$la) {
-                    $out .= ' selected="selected"';
-                }
-                $out .= '>'.htmlentities($v).'</option>';
-            }
-            $out .= '</select>';
-            $out .= getcolormark($colorbox);
-        } else if ($answerformat=='MQexperimental') {
-            $out .= "<input type=\"text\" style=\"position:absolute;visibility:hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
-            $out .= "<span class=\"$colorbox mathquill-embedded-latex MQE$qn\">";
-            if ($displayformat != '') {
-                $laprts = explode(';',$la);
-                $laptcnt = 0;
-                while (($p=strpos($displayformat, '[AB]'))!==false) {
-                    if (isset($laprts[$laptcnt])) {
-                        $lav = $laprts[$laptcnt];
-                        $laptcnt++;
-                    } else {
-                        $lav = '';
-                    }
-                    $displayformat = substr($displayformat,0,$p).'\editable{'.$lav.'}'.substr($displayformat,$p+4);
-                    //$out .= str_replace('[AB]', '\editable{'.$lav.'}', $displayformat, 1);
-                }
-                $out .= $displayformat;
-            } else {
-                $out .= '\editable{'.$la.'}';
-            }
-            $out .= "</span>";
-            $out .= getcolormark($colorbox);
-            $out .= '<script type="text/javascript">$(function() {
-				 $(".MQE'.$qn.'").on("keypress keyup", function() {
-				     var latexvals = [];
-				     var latex = $(".MQE'.$qn.'").find(".mathquill-editable").each(function(i,el) {
-				            latexvals.push($(el).mathquill("latex"));
-				         });
-				     $("#qn'.$qn.'").val(MQtoAM(latexvals.join(";")));
-				   });
-				   setTimeout(function(){$(".MQE'.$qn.'").find("textarea").blur();}, 25);
-				});</script>';
-        } else {
-            $out .= "<input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\"  ";
+    		if ($answerformat=='list') {
+    			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
+    			$shorttip = _('Enter a list of text');
+    		} else {
+    			$tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
+    			$shorttip = _('Enter text');
+    		}
+    		if ($displayformat=='select') {
+    			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\"><option value=\"\"> </option>";
+    			foreach ($questions as $i=>$v) {
+    				$out .= '<option value="'.htmlentities($v).'"';
+    				//This is a hack.  Need to figure a better way to deal with & in answers
+    				if (str_replace('&','',$v)==$la) {
+    					$out .= ' selected="selected"';
+    				}
+    				$out .= '>'.htmlentities($v).'</option>';
+    			}
+    			$out .= '</select>';
+    			$out .= getcolormark($colorbox);
+    		} else if ($answerformat=='MQexperimental') {
+    			$out .= "<input type=\"text\" style=\"position:absolute;visibility:hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
+    			$out .= "<span class=\"$colorbox mathquill-embedded-latex MQE$qn\">";
+    			if ($displayformat != '') {
+    				$laprts = explode(';',$la);
+    				$laptcnt = 0;
+    				while (($p=strpos($displayformat, '[AB]'))!==false) {
+    					if (isset($laprts[$laptcnt])) {
+    						$lav = $laprts[$laptcnt];
+    						$laptcnt++;
+    					} else {
+    						$lav = '';
+    					}
+    					$displayformat = substr($displayformat,0,$p).'\editable{'.$lav.'}'.substr($displayformat,$p+4);
+    					//$out .= str_replace('[AB]', '\editable{'.$lav.'}', $displayformat, 1);
+    				}
+    				$out .= $displayformat;
+    			} else {
+    				$out .= '\editable{'.$la.'}';
+    			}
+    			$out .= "</span>";
+    			$out .= getcolormark($colorbox);
+    			$out .= '<script type="text/javascript">$(function() {
+    				 $(".MQE'.$qn.'").on("keypress keyup", function() {
+    				     var latexvals = [];
+    				     var latex = $(".MQE'.$qn.'").find(".mathquill-editable").each(function(i,el) {
+    				            latexvals.push($(el).mathquill("latex"));
+    				         });
+    				     $("#qn'.$qn.'").val(MQtoAM(latexvals.join(";")));
+    				   });
+    				   setTimeout(function(){$(".MQE'.$qn.'").find("textarea").blur();}, 25);
+    				});</script>';
+    		} else {
+    			$classes = ['text'];
+    			if ($colorbox != '') {
+    				$classes[] = $colorbox;
+    			}
+    			$attributes = [
+    				'type' => 'text',
+    				'size' => $sz,
+    				'name' => "qn$qn",
+    				'id' => "qn$qn",
+    				'value' => $la,
+    				'autocomplete' => 'off'
+    			];
 
-            if ($showtips==2) { //eqntips: work in progress
-                if ($multi==0) {
-                    $qnref = "$qn-0";
-                } else {
-                    $qnref = ($multi-1).'-'.($qn%1000);
-                }
-                if ($useeqnhelper && $displayformat == 'usepreview') {
-                    $out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper);showehdd('qn$qn','$shorttip','$qnref');\" onblur=\"hideee();hideeedd();hideeh();\" onclick=\"reshrinkeh('qn$qn')\" ";
-                } else {
-                    $out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
-                }
-                $out .= 'aria-describedby="tips'.$qnref.'" ';
-            } else if ($useeqnhelper && $displayformat == 'usepreview') {
-                $out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
-            }
-            if ($displayformat == 'usepreview' && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
-                $out .= 'onKeyUp="updateLivePreview(this)" ';
-            }
-            $addlclass = '';
-            if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
-            else if ($displayformat=='credit') { $out .= 'onkeyup="editcredit(this)" style="text-align: right;" '; $addlclass=' creditbox';}
-            else if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
-            $out .= "class=\"text $colorbox$addlclass\"";
-            $out .= '/>';
-            $out .= getcolormark($colorbox);
+    			if ($displayformat=='alignright') {
+    				$classes[] = 'textright';
+    			}	else if ($displayformat=='hidden') {
+    				$classes[] = 'pseudohidden';
+    			}	else if ($displayformat=='debit') {
+    				$params['format'] = 'debit';
+    				$classes[] = 'textright';
+    			} else if ($displayformat=='credit') {
+    				$params['format'] = 'credit';
+    				$classes[] = 'textright';
+    				$classes[] = 'creditbox';
+    			}
 
-            if ($displayformat == 'usepreview') {
-                $preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
-                $preview .= "<span id=p$qn></span> ";
-            } else if ($displayformat == 'typeahead') {
-                if (!is_array($questions)) {
-                    echo _('Eeek!  $questions is not defined or needs to be an array');
-                } else {
-                    foreach ($questions as $i=>$v) {
-                        $questions[$i] = htmlentities(trim($v));
-                    }
+    			$params['tip'] = $shorttip;
+    			$attributes['aria-describedby'] = "tips$qn";
+    			if ($useeqnhelper && $displayformat == 'usepreview') {
+    				$params['helper'] = 1;
+    			}
+    			if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
+    				$params['preview'] = 1;
+    			}
+    			$params['calcformat'] = $answerformat;
 
-                    $out .= '<script type="text/javascript">';
-                    $autosugglist = '["'.implode('","',$questions).'"]';
-                    if (!isset($GLOBALS['autosuggestlists'])) {
-                        $GLOBALS['autosuggestlists'] = array();
-                    }
-                    if (($k = array_search($autosugglist, $GLOBALS['autosuggestlists']))!==false) {
-                        $asvar = 'autosuggestlist'.$k;
-                    } else {
-                        $GLOBALS['autosuggestlists'][] = $autosugglist;
-                        $ascnt = count($GLOBALS['autosuggestlists'])-1;
-                        $out .= 'var autosuggestlist'.$ascnt.' = '.$autosugglist.';';
-                        $asvar = 'autosuggestlist'.$ascnt;
-                    }
-                    $out .= 'initstack.push(function(){ autosugg'.$qn.' = new AutoSuggest(document.getElementById("qn'.$qn.'"),'.$asvar.');});</script>';
-                }
-            }
-        }
-        if (strpos($strflags,'regex')!==false) {
-            $sa .= _('The answer must match a specified pattern');
-        } else {
-            $sa .= $answer;
-        }
+    			if ($displayformat == 'typeahead') {
+    				if (!is_array($questions)) {
+    					echo _('Eeek!  $questions is not defined or needs to be an array');
+    				} else {
+    					foreach ($questions as $i=>$v) {
+    						$questions[$i] = htmlentities(trim($v));
+    					}
+
+    					$autosugglist = '["'.implode('","',$questions).'"]';
+    					if (!isset($GLOBALS['autosuggestlists'])) {
+    						$GLOBALS['autosuggestlists'] = array();
+    					}
+    					if (($k = array_search($autosugglist, $GLOBALS['autosuggestlists']))!==false) {
+    						$asvar = 'autosuggestlist'.$k;
+    					} else {
+    						$GLOBALS['autosuggestlists'][] = $autosugglist;
+    						$ascnt = count($GLOBALS['autosuggestlists'])-1;
+    						$asvar = 'autosuggestlist'.$ascnt;
+
+    						$params[$asvar] = $questions;
+    					}
+    					$params['autosuggest'] = $asvar;
+    				}
+    			}
+
+    			$out .= '<input ' .
+    							Sanitize::generateAttributeString($attributes) .
+    							'class="'.implode(' ', $classes) .
+    							'" />';
+
+    			if ($displayformat == 'usepreview') {
+    				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
+    				$preview .= "<span id=p$qn></span> ";
+    			}
+    		}
+    		if (strpos($strflags,'regex')!==false) {
+    			$sa .= _('The answer must match a specified pattern');
+    		} else {
+    			$sa .= $answer;
+    		}
 
         // Done!
         $this->answerBox = $out;
+        $this->jsParams = $params;
         $this->entryTip = $tip;
         $this->correctAnswerForPart = $sa;
         $this->previewLocation = $preview;
@@ -182,6 +197,11 @@ class StringAnswerBox implements AnswerBox
     public function getAnswerBox(): string
     {
         return $this->answerBox;
+    }
+
+    public function getJsParams(): string
+    {
+        return $this->jsParams;
     }
 
     public function getEntryTip(): string
