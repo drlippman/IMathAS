@@ -307,6 +307,7 @@ class AssessRecord
 
     // note that record needs to be saved
     $this->need_to_record = true;
+    return $question;
   }
 
   /**
@@ -969,6 +970,8 @@ class AssessRecord
       $out['did_jump_to_ans'] = true;
     }
 
+    $out['seed'] = $curq['seed'];
+
     if ($generate_html) {
       $showscores = $this->assess_info->getSetting('showscores');
       $force_scores = ($aver['status'] === 1 && $showscores === 'at_end');
@@ -982,7 +985,6 @@ class AssessRecord
         $out['autosave_timeactive'] = $autosave['timeactive'];
       }
       $this->setAnsweights($qn, $out['answeights'], $ver);
-      $out['seed'] = $curq['seed'];
     } else {
       $out['html'] = null;
     }
@@ -1012,7 +1014,7 @@ class AssessRecord
         // get part details
         if (isset($curq['tries'][$pn])) {
           $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
-          $rawscores[$pn] = $lasttry['rawscore'];
+          $rawscores[$pn] = $lasttry['raw'];
           $lastans[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
         } else {
           $rawscores[$pn] = 0;

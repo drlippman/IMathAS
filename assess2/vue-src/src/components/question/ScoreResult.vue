@@ -19,7 +19,7 @@
         <icons name="info"/>
         {{ $t('scoreresult.manual_grade') }}
       </p>
-      <p>
+      <p v-if="showRetryButtons">
         <button
           v-if = "qdata.canretry"
           type = "button"
@@ -101,6 +101,9 @@ export default {
         }
       }
       return false;
+    },
+    showRetryButtons () {
+      return (store.assessInfo.displaymethod !== 'livepoll');
     }
   },
   methods: {
@@ -127,5 +130,9 @@ export default {
 .scoreresult.partial {
   background-color: #fff9dd;
   border-top: 2px solid #fa3;
+}
+.scoreresult.neutral {
+  background-color: #f3f3f3;
+  border-top: 2px solid #ddd;
 }
 </style>

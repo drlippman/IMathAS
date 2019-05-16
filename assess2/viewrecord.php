@@ -5,7 +5,12 @@ if ($myrights < 100) {
   exit;
 }
 
-$stm = $DBH->query("SELECT scoreddata,practicedata FROM imas_assessment_records ORDER BY lastchange DESC LIMIT 1");
+if (isset($_GET['uid'])) {
+  $stm = $DBH->prepare("SELECT scoreddata,practicedata FROM imas_assessment_records WHERE userid=? ORDER BY lastchange DESC LIMIT 1");
+  $stm->execute(array($_GET['uid']));
+} else {
+  $stm = $DBH->query("SELECT scoreddata,practicedata FROM imas_assessment_records ORDER BY lastchange DESC LIMIT 1");
+}
 echo '<pre>';
 $row = $stm->fetch(PDO::FETCH_ASSOC);
 print_r(gzdecode($row['scoreddata']));

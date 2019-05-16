@@ -92,7 +92,7 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $stm = $DBH->prepare("SELECT * FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
   $stm->execute(array(':assessmentid'=>$aid));
   $livepollStatus = $stm->fetch(PDO::FETCH_ASSOC);
-  if ($livepollStatus['curquestion'] !== $qn) {
+  if ($livepollStatus['curquestion']-1 != $qn) {
     echo '{"error": "livepoll_wrongquestion"}';
     exit;
   }
@@ -110,7 +110,8 @@ if ($in_practice) {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto'
+  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
+  'showscores'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
@@ -129,7 +130,7 @@ $assess_info->loadQuestionSettings(array($qid), true);
 // For livepoll, verify seed and generate new question version if needed
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $curQuestionObject = $assess_record->getQuestionObject($qn, false, false, false);
-  if ($curQuestionObject['seed'] !== $livepollStatus['seed']) {
+  if ($curQuestionObject['seed'] != $livepollStatus['seed']) {
     // teacher has changed seed. Need to generate a new question version.
     $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $livepollStatus['seed']);
   }
@@ -177,7 +178,11 @@ if ($jumpToAnswer) {
 
 // grab question settings data with HTML
 if ($assess_info->getSetting('displaymethod') === 'livepoll') {
-  $showscores = ($livepollStatus === 4);
+  $showscores = ($livepollStatus['curstate'] == 4);
+  // override showscores value to prevent score marks
+  if (!$showscores) {
+    $assessInfoOut['showscores'] = 'at_end';
+  }
 } else {
   $showscores = $assess_info->showScoresDuring();
 }

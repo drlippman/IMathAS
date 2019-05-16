@@ -109,7 +109,7 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   if ($livepollStatus['curquestion'] - 1 !== $qns[0]) {
     echo '{"error": "livepoll_wrongquestion"}'; //TODO: translate this
     exit;
-  } else if ($livepollStatus['curstate'] !== 2) {
+  } else if ($livepollStatus['curstate'] != 2) {
     echo '{"error": "livepoll_notopen"}';  //TODO: translate this
     exit;
   }
@@ -231,6 +231,8 @@ if ($end_attempt) {
   if ($assess_info->getSetting('displaymethod') === 'livepoll') {
     // don't show scores until question is closed for livepoll
     $showscores = false;
+    $assess_info->overrideSetting('showscores', 'at_end');
+    $assessInfoOut['showscores'] = 'at_end';
 
     if (!$isteacher) {
       // call the livepoll server with the result
@@ -244,21 +246,23 @@ if ($end_attempt) {
       $rawscores = implode('~', $lastResults['raw']);
       $lastAnswer = implode('~', $lastResults['stuans']);
 
-      $toSign = $aid.$qn.$uid.$rawscore.$lastAnswer;
+      $toSign = $aid.$qn.$uid.$rawscores.$lastAnswer;
       $now = time();
       if (isset($CFG['GEN']['livepollpassword'])) {
-        $livepollsig = Sanitize::encodeUrlParam(base64_encode(sha1($toSign . $CFG['GEN']['livepollpassword'] . $now,true)));
+        $livepollsig = base64_encode(sha1($toSign . $CFG['GEN']['livepollpassword'] . $now, true));
       }
       $qs = Sanitize::generateQueryStringFromMap(array(
         'aid' => $aid,
         'qn' => $qn,
         'user' => $uid,
-        'score' => $rawscore,
+        'score' => $rawscores,
         'la' => $lastAnswer,
         'now' => $now,
         'sig' => $livepollsig
       ));
       $r = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/qscored?'.$qs);
+      $assessInfoOut['lpres'] = $r;
+      $assessInfoOut['lpq'] = 'https://'.$CFG['GEN']['livepollserver'].':3000/qscored?'.$qs;
     }
   } else {
     // grab question settings data with HTML

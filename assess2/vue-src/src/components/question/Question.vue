@@ -55,7 +55,7 @@ import QuestionHelps from '@/components/question/QuestionHelps.vue';
 
 export default {
   name: 'Question',
-  props: ['qn', 'active', 'state'],
+  props: ['qn', 'active', 'state', 'seed'],
   components: {
     ScoreResult,
     QuestionHelps,
@@ -97,7 +97,9 @@ export default {
     },
     showScore () {
       return (store.inProgress &&
-        this.questionData.hasOwnProperty('score') &&
+        (this.questionData.hasOwnProperty('score') ||
+         this.questionData.status === 'attempted'
+        ) &&
         store.assessInfo.show_results &&
         (this.questionData.try > 0 ||
           this.questionData.hasOwnProperty('tries_remaining_range')) &&
@@ -276,6 +278,9 @@ export default {
         // force reload
         actions.loadQuestion(this.qn, false, false);
       }
+    },
+    seed: function(newVal, oldVal) {
+      actions.loadQuestion(this.qn, false, false);
     }
   }
 };

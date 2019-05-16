@@ -1,34 +1,60 @@
 <template>
   <div class="subheader">
-    <menu-button id="qnav"
-      :options = "navOptions"
-      :selected = "dispqn"
-      searchby = "dispqn"
-    >
-      <template v-slot="{ option }">
-        {{ option.title }}
-      </template>
-    </menu-button>
-    <button
-      @click="$emit('selectq', dispqn-1)"
-      :disabled="dispqn <= 0"
-      class="secondarybtn"
-      id="qprev"
-      :aria-label="$t('previous')"
-      v-if = "showNextPrev"
-    >
-      <icons name="left"/>
-    </button>
-    <button
-      @click="$emit('selectq', dispqn+1)"
-      :disabled="dispqn >= navOptions.length-1"
-      class="secondarybtn"
-      id="qnext"
-      :aria-label="$t('next')"
-      v-if = "showNextPrev"
-    >
-      <icons name="right" />
-    </button>
+    <div class="flexrow" style="flex-grow:1">
+      <menu-button id="qnav"
+        :options = "navOptions"
+        :selected = "dispqn"
+        searchby = "dispqn"
+      >
+        <template v-slot="{ option }">
+          {{ option.title }}
+        </template>
+      </menu-button>
+      <button
+        @click="selectQuestion(dispqn-1)"
+        :disabled="dispqn <= 0"
+        class="secondarybtn"
+        id="qprev"
+        :aria-label="$t('previous')"
+        v-if = "showNextPrev"
+      >
+        <icons name="left"/>
+      </button>
+      <button
+        @click="selectQuestion(dispqn+1)"
+        :disabled="dispqn >= navOptions.length-1"
+        class="secondarybtn"
+        id="qnext"
+        :aria-label="$t('next')"
+        v-if = "showNextPrev"
+      >
+        <icons name="right" />
+      </button>
+    </div>
+    <div style="flex-grow:1">
+      <button
+        class = "primary"
+        v-if = "curstate === 2 && dispqn > 0"
+        @click = "closeQuestion"
+      >
+        {{ $t('livepoll.close_input') }}
+      </button>
+      <button
+        class = "primary"
+        v-else-if = "curstate > 0 && dispqn > 0"
+        @click = "openQuestion"
+      >
+        {{ $t('livepoll.open_input') }}
+      </button>
+      <button
+        class = "med-left secondary"
+        v-if = "curstate > 2 && dispqn > 0"
+        @click = "newVersion"
+      >
+        <icons name="retake" />
+        {{ $t('livepoll.new_version') }}
+      </button>
+    </div>
     <div>
       {{ studentCount }}
     </div>
@@ -71,8 +97,25 @@ export default {
     dispqn () {
       return parseInt(this.qn) + 1;
     },
+    curstate () {
+      return store.assessInfo.livepoll_status.curstate;
+    },
     studentCount () {
       return this.$tc('livepoll.stucnt', store.livepollStuCnt);
+    }
+  },
+  methods: {
+    selectQuestion(n) {
+      this.$emit('selectq', n);
+    },
+    openQuestion() {
+      this.$emit('openq');
+    },
+    closeQuestion() {
+      this.$emit('closeq');
+    },
+    newVersion() {
+      this.$emit('newversion');
     }
   }
 };
@@ -84,8 +127,9 @@ export default {
   display: flex;
   flex-flow: row wrap;
   border-bottom: 1px solid #ccc;
+  align-items: center;
 }
-.subheader > * {
+.subheader > *, .subheader > .flexrow > * {
   margin: 4px 0;
 }
 </style>

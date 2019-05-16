@@ -218,5 +218,22 @@
   "videocued": {
     "continue": "Continue video to {title}",
     "skipto": "Jump video to {title}"
+  },
+  "livepoll": {
+    "settings": "LivePoll Settings",
+    "show_question_default": "Show question on this screen when first selected",
+    "show_results_live_default": "Show results as they come in on this screen",
+    "show_results_after": "Show results on this screen after question is closed",
+    "show_answers_after": "Show correct answers automatically after question is closed",
+    "use_timer": "Use question timer",
+    "seconds": "seconds",
+    "show_question": "Show question on this screen",
+    "show_results": "Show results",
+    "show_answers": "Show correct answers",
+    "stucnt": "No students | 1 student | {n} students",
+    "open_input": "Open student input",
+    "close_input": "Close student input",
+    "new_version": "Generate a similar question",
+    "waiting": "Waiting for the instructor to start a question"
   }
 }

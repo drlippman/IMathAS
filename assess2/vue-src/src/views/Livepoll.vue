@@ -5,41 +5,40 @@
       v-if = "isTeacher"
       :qn="curqn"
       @selectq="selectQuestion"
+      @openq="openInput"
+      @closeq="closeInput"
+      @newversion="newVersion"
     />
     <div
+      class = "subheader"
       v-if = "isTeacher && curstate > 0 && curqn > -1"
     >
-      <button
-        v-if = "curstate === 2"
-        @click = "closeInput"
-      >
-        {{ $t('livepoll.close_input') }}
-      </button>
-      <button
-        v-else
-        @click = "openInput"
-      >
-        {{ $t('livepoll.open_input') }}
-      </button>
-      <label>
-        <input type="checkbox" v-model="showQuestion" />
-        {{ $t('livepoll.show_question') }}
-      </label>
-      <label>
-        <input type="checkbox" v-model="showResults" />
-        {{ $t('livepoll.show_results') }}
-      </label>
-      <label>
-        <input type="checkbox" v-model="showAnswers" @change="updateShowAnswers"/>
-        {{ showAnswersLabel }}
-      </label>
+      <div id="livepoll_qsettings" style="flex-grow:1">
+        <label>
+          <input type="checkbox" v-model="showQuestion" />
+          {{ $t('livepoll.show_question') }}
+        </label>
+        <label>
+          <input type="checkbox" v-model="showResults" />
+          {{ $t('livepoll.show_results') }}
+        </label>
+        <label>
+          <input type="checkbox" v-model="showAnswers" @change="updateShowAnswers"/>
+          {{ showAnswersLabel }}
+        </label>
+      </div>
+      <timer
+        v-if = "timelimit > 0 && starttime > 0"
+        :end = "starttime + timelimit"
+        :total = "timelimit"
+      />
     </div>
     <div
       v-if = "!isTeacher && curstate>0"
     >
-      <strong>
-        {{ $t('question_n', { n: qn+1 }) }}
-      </strong>
+      <h2>
+        {{ $t('question_n', { n: curqn+1 }) }}
+      </h2>
     </div>
     <div class="scrollpane">
       <livepoll-settings
@@ -58,6 +57,7 @@
         :qn = "curqn"
         :active = "true"
         :state = "curstate"
+        :seed="curseed"
       />
 
       <livepoll-results
@@ -75,6 +75,7 @@ import LivepollNav from '@/components/LivepollNav.vue';
 import LivepollSettings from '@/components/LivepollSettings.vue';
 import LivepollResults from '@/components/LivepollResults.vue';
 import Question from '@/components/question/Question.vue';
+import Timer from '@/components/Timer.vue';
 import { store, actions } from '../basicstore';
 
 export default {
@@ -84,7 +85,8 @@ export default {
     Question,
     LivepollSettings,
     LivepollResults,
-    AssessHeader
+    AssessHeader,
+    Timer
   },
   data: function () {
     return {
@@ -92,6 +94,7 @@ export default {
       showResults: true,
       showAnswers: true,
       onSettings: false,
+      livepollTimer: null,
       socket: null
     };
   },
@@ -107,15 +110,25 @@ export default {
         return parseInt(store.assessInfo.livepoll_status.curquestion) - 1;
       }
     },
+    curseed () {
+      return store.assessInfo.livepoll_status.seed;
+    },
     curstate () {
       return store.assessInfo.livepoll_status.curstate;
     },
     starttime () {
       return store.assessInfo.livepoll_status.startt;
     },
+    timelimit () {
+      if (store.livepollSettings.useTimer) {
+        return parseInt(store.livepollSettings.questionTimelimit);
+      } else {
+        return 0;
+      }
+    },
     showAnswersLabel () {
       if (this.curstate < 3) {
-        return this.$t('livepoll.show_answers_on_close');
+        return this.$t('livepoll.show_answers_after');
       } else {
         return this.$t('livepoll.show_answers');
       }
@@ -131,6 +144,7 @@ export default {
       }
     },
     addResult (data) {
+      console.log(data);
       // add question result data
       if (!store.livepollResults.hasOwnProperty(this.curqn)) {
         this.$set(store.livepollResults, this.curqn, {});
@@ -139,28 +153,30 @@ export default {
       // TODO: update results. Hopefully will happen automatically
     },
     showHandler (data) {
+      console.log(data);
       if (data.action === 'showq') {
         // On question show, server sends as data:
         //  action: "showq", qn: qn, seed: seed, startt:startt
         this.$set(store.assessInfo, 'livepoll_status', {
           curstate: 2,
-          curquestion: data.qn,
-          seed: data.seed,
-          startt: data.startt
+          curquestion: parseInt(data.qn)+1,
+          seed: parseInt(data.seed),
+          startt: parseInt(data.startt)
         });
       } else {
         // On question stop, server sends as data:
         //  action: newstate, qn: qn
         this.$set(store.assessInfo, 'livepoll_status',
           Object.assign(store.assessInfo.livepoll_status, {
-            curquestion: data.qn,
-            curstate: data.action
+            curquestion: parseInt(data.qn)+1,
+            curstate: parseInt(data.action)
           }));
       }
     },
     selectQuestion (dispqn) {
       // called by teacher when they select a question
       // If 0, show the settings
+      clearTimeout(this.livepollTimer);
       let qn = parseInt(dispqn) - 1;
       if (qn === -1) {
         this.onSettings = true;
@@ -186,9 +202,15 @@ export default {
         newquestion: this.curqn+1,
         newstate: 2
       });
+      if (this.timelimit > 0) {
+        this.livepollTimer = window.setTimeout(
+          () => this.closeInput(),
+          1000*this.timelimit);
+      }
     },
     closeInput () {
       //TODO: how do we use the global show answers setting?
+      clearTimeout(this.livepollTimer);
       let nextState = this.showAnswers ? 4 : 3;
       if (store.livepollSettings.showResultsAfter) {
         this.showResults = true;
@@ -196,6 +218,13 @@ export default {
       actions.setLivepollStatus({
         newquestion: this.curqn+1,
         newstate: nextState
+      });
+    },
+    newVersion() {
+      actions.setLivepollStatus({
+        newquestion: this.curqn+1,
+        newstate: 1,
+        forceregen: 1
       });
     },
     updateShowAnswers () {
@@ -219,6 +248,7 @@ export default {
       querystr += '&sig=' + encodeURIComponent(LPdata.sig);
     }
     this.socket = window.io('https://' + server + ':3000', { query: querystr });
+    this.socket.off();
     this.socket.on('livepoll usercount', (data) => this.updateUsercount(data));
     if (store.assessInfo.is_teacher) {
       this.socket.on('livepoll qans', (data) => this.addResult(data));
@@ -227,7 +257,7 @@ export default {
     }
   },
   created () {
-    if (store.assessInfo.livepoll_status.curquestion === 0) {
+    if (store.assessInfo.livepoll_status.curquestion === 0 && this.isTeacher) {
       this.onSettings = true;
     }
   }
@@ -247,5 +277,8 @@ export default {
 .scrollpane {
   width: 100%;
   overflow-x: auto;
+}
+#livepoll_qsettings > label {
+  margin-right: 8px;
 }
 </style>

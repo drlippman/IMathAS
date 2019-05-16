@@ -8,16 +8,16 @@ states:
 4 - closed and reshow q with score
 
 In Launch view
-  - x Inject socket javascript if livepoll type
+  - xx Inject socket javascript if livepoll type
 
 In loadsettings, override some settings for livepoll:
- - x always do by_question
- - x always do "all students same seed"  |4
+ - xx always do by_question
+ - xx always do "all students same seed"  |4
  - disable question shuffle if enabled
  - Need to make sure teacher also gets same seed as students
 
 In startassess
-  - x Return livepoll status (create if needed)
+  - xx Return livepoll status (create if needed)
 
 x Move livepoll settings into a component
   - x Use getters/setters to store the default settings into main store
@@ -80,6 +80,13 @@ Student: on status update to end input
 If instructor changes the "show answers" option
   - x calls livepoll endpoint, does status update, etc.
   - x Student side calls loadquestion again to get new HTML w/wo answers
+
+If instructor clicks a "generate new version" button
+  - x calls livepoll endpoint
+  - x generates new version
+  - x on open, new seed triggers student's to create new question version
+
+Timer
 
 
 For Teachers:

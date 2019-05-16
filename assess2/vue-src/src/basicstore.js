@@ -292,7 +292,6 @@ export const actions = {
       store.autosaveQueue[qn].push(partnum);
     }
     store.autosaveTimeactive[qn] = timeactive;
-    console.log(timeactive);
     store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
   },
   clearAutosave (qns) {

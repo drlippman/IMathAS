@@ -33,7 +33,7 @@ check_for_required('POST', array('newquestion', 'newstate'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $uid = $userid;
-$newQuestion = (int) Sanitize::onlyInt($_POST['newquestion']);
+$newQuestion = Sanitize::onlyInt($_POST['newquestion']);
 $qn = $newQuestion - 1;
 $newState = Sanitize::onlyInt($_POST['newstate']);
 
@@ -69,14 +69,19 @@ $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 // get current livepoll status
 $stm = $DBH->prepare("SELECT curquestion,curstate,seed,startt FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 $stm->execute(array(':assessmentid'=>$aid));
-$livepollStatus = $stm->fetch(PDO::FETCH_ASSOC);
+$livepollStatus = array_map('intval', $stm->fetch(PDO::FETCH_ASSOC));
+
+if ($newState > 0) {
+
+}
 
 // If new question, or if previous state was 0, then we're
 // preloading a new question
 // Set the state and load the question HTML
 // No need to send anything out to livepoll server for this
 if ($newQuestion !== $livepollStatus['curquestion'] ||
-  $livepollStatus['curstate'] === 0
+  $livepollStatus['curstate'] === 0 ||
+  !empty($_POST['forceregen'])
 ) {
   // force the newstate to be 1; don't want to skip any steps
   $newState = 1;
@@ -84,9 +89,11 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   // look up question HTML. Also grab seed
   // get current question version
   $qid = $assess_record->getQuestionId($qn);
-
   // do regen if requested
   if (!empty($_POST['forceregen'])) {
+    // need to temporarily override shuffle setting to bypass the
+    // "all students same seed" setting
+    $assess_info->overrideSetting('shuffle', 0);
     $qid = $assess_record->buildNewQuestionVersion($qn, $qid);
   }
 
@@ -122,6 +129,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     'startt' => 0
   );
 } else if ($newState === 2) {
+
   // Opening the question for student input
   $query = "UPDATE imas_livepoll_status SET ";
   $query .= "curquestion=?,curstate=?,startt=? ";
@@ -129,9 +137,11 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   $stm = $DBH->prepare($query);
   $stm->execute(array($newQuestion, $newState, $now, $aid));
 
-  // load question settings
+  // load question seed
+  $qid = $assess_record->getQuestionId($qn);
   $assess_info->loadQuestionSettings(array($qid), false);
-  $seed = $assessInfoOut['questions'][$qn]['seed'];
+  $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
+  $seed = $question_obj['seed'];
 
   //output
   $assessInfoOut['livepoll_status'] = array(
@@ -155,6 +165,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     'now' => $now,
     'sig' => $livepollsig
   ));
+
   $result = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/startq?' . $qs);
 
   if ($result !== 'success') {
@@ -164,21 +175,23 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 } else if ($newState === 3 || $newState === 4) {
   // Closing the question for student input
   $query = "UPDATE imas_livepoll_status SET ";
-  $query .= "curquestion=?,curstate=? ";
+  $query .= "curquestion=?,curstate=?,startt=0 ";
   $query .= "WHERE assessmentid=?";
   $stm = $DBH->prepare($query);
   $stm->execute(array($newQuestion, $newState, $aid));
 
-  // load question settings
+  // lookup question seed
+  $qid = $assess_record->getQuestionId($qn);
   $assess_info->loadQuestionSettings(array($qid), false);
-  $seed = $assessInfoOut['questions'][$qn]['seed'];
+  $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
+  $seed = $question_obj['seed'];
 
   //output
   $assessInfoOut['livepoll_status'] = array(
     'curquestion' => $newQuestion,
     'curstate' => $newState,
     'seed' => $seed,
-    'startt' => $now
+    'startt' => 0
   );
 
   // call the livepoll server
@@ -200,6 +213,9 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     echo '{"error": "'.Sanitize::encodeStringForDisplay($r).'"}';
     exit;
   }
+} else {
+  echo '{"error": "livepoll_unknown"}';
+  exit;
 }
 
 // save record if needed

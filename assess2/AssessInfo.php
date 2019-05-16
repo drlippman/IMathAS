@@ -282,6 +282,16 @@ class AssessInfo
   }
 
   /**
+   * Override an assessment setting value
+   * @param  string $key   the setting name
+   * @param  string $value the value to override with
+   * @return void
+   */
+  public function overrideSetting($key, $value) {
+    $this->assessData[$key] = $value;
+  }
+
+  /**
    * Get a setting value from the question Data
    * @param  int $id    The question ID
    * @param  string $field  The setting field to grab
