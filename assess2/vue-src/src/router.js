@@ -8,17 +8,18 @@ import Full from './views/Full.vue';
 import Print from './views/Print.vue';
 import FullPaged from './views/FullPaged.vue';
 import Videocued from './views/Videocued.vue';
-//const Skip = () => import(/* webpackChunkName: "skip" */ './views/Skip.vue');
-//const Full = () => import(/* webpackChunkName: "full" */ './views/Full.vue');
-//const Print = () => import(/* webpackChunkName: "print" */ './views/Print.vue');
-//const FullPaged = () => import(/* webpackChunkName: "fullpaged" */ './views/FullPaged.vue');
+import Livepoll from './views/Livepoll.vue';
+// const Skip = () => import(/* webpackChunkName: "skip" */ './views/Skip.vue');
+// const Full = () => import(/* webpackChunkName: "full" */ './views/Full.vue');
+// const Print = () => import(/* webpackChunkName: "print" */ './views/Print.vue');
+// const FullPaged = () => import(/* webpackChunkName: "fullpaged" */ './views/FullPaged.vue');
 import { store, actions } from './basicstore';
 
 Vue.use(Router);
 
 const router = new Router({
   base: process.env.NODE_ENV === 'production' ? window.imasroot + '/assess2/' : '/',
-  //mode: 'history',
+  // mode: 'history',
   routes: [
     {
       path: '/',
@@ -27,13 +28,13 @@ const router = new Router({
       beforeEnter: (to, from, next) => {
         // if not open, route to closed
         if ((store.assessInfo.available === 'yes' ||
-          (store.assessInfo.available === 'practice' && store.assessInfo.in_practice))
-            && (store.assessInfo.has_active_attempt || store.assessInfo.can_retake)
-         ) {
-           next();
-         } else {
-           next({path: '/closed', replace: true});
-         }
+          (store.assessInfo.available === 'practice' && store.assessInfo.in_practice)) &&
+            (store.assessInfo.has_active_attempt || store.assessInfo.can_retake)
+        ) {
+          next();
+        } else {
+          next({ path: '/closed', replace: true });
+        }
       }
     },
     {
@@ -43,13 +44,13 @@ const router = new Router({
       beforeEnter: (to, from, next) => {
         // if open, route to launch instead
         if ((store.assessInfo.available === 'yes' ||
-          (store.assessInfo.available === 'practice' && store.assessInfo.in_practice))
-            && (store.assessInfo.has_active_attempt || store.assessInfo.can_retake)
-         ) {
-           next({path: '/', replace: true});
-         } else {
-           next();
-         }
+          (store.assessInfo.available === 'practice' && store.assessInfo.in_practice)) &&
+            (store.assessInfo.has_active_attempt || store.assessInfo.can_retake)
+        ) {
+          next({ path: '/', replace: true });
+        } else {
+          next();
+        }
       }
     },
     {
@@ -61,7 +62,7 @@ const router = new Router({
         if (store.inProgress) {
           next();
         } else {
-          next({path: '/', replace: true});
+          next({ path: '/', replace: true });
         }
       }
     },
@@ -74,7 +75,7 @@ const router = new Router({
         if (store.inProgress) {
           next();
         } else {
-          next({path: '/', replace: true});
+          next({ path: '/', replace: true });
         }
       }
     },
@@ -87,7 +88,7 @@ const router = new Router({
         if (store.inProgress) {
           next();
         } else {
-          next({path: '/', replace: true});
+          next({ path: '/', replace: true });
         }
       }
     },
@@ -99,7 +100,19 @@ const router = new Router({
         if (store.inProgress) {
           next();
         } else {
-          next({path: '/', replace: true});
+          next({ path: '/', replace: true });
+        }
+      }
+    },
+    {
+      path: '/livepoll',
+      component: Livepoll,
+      beforeEnter: (to, from, next) => {
+        // if no active attempt, route to launch
+        if (store.inProgress) {
+          next();
+        } else {
+          next({ path: '/', replace: true });
         }
       }
     },
@@ -110,13 +123,13 @@ const router = new Router({
       beforeEnter: (to, from, next) => {
         // if active attempt or not avail, route to Launch
         if ((store.assessInfo.available === 'yes' ||
-          (store.assessInfo.available === 'practice' && store.assessInfo.in_practice))
-          && (!store.assessInfo.has_active_attempt)
-         ) {
-           next();
-         } else {
-           next({path: '/', replace: true});
-         }
+          (store.assessInfo.available === 'practice' && store.assessInfo.in_practice)) &&
+          (!store.assessInfo.has_active_attempt)
+        ) {
+          next();
+        } else {
+          next({ path: '/', replace: true });
+        }
       }
     },
     {
@@ -126,8 +139,8 @@ const router = new Router({
       beforeEnter: (to, from, next) => {
         // if no active attempt, route to launch
         if ((store.assessInfo.available === 'yes' ||
-          (store.assessInfo.available === 'practice'))
-          && (store.assessInfo.has_active_attempt)
+          (store.assessInfo.available === 'practice')) &&
+          (store.assessInfo.has_active_attempt)
         ) {
           store.inPrintView = true;
           if (store.assessInfo.hasOwnProperty('questions')) {
@@ -137,16 +150,16 @@ const router = new Router({
             actions.startAssess(dopractice, '', [], () => next());
           }
         } else {
-          next({path: '/', replace: true});
+          next({ path: '/', replace: true });
         }
       }
-    },
+    }
   ]
 });
 
 // This checks before every route to make sure the
 // base assessInfo is loaded, and updates query string
-router.beforeEach((to,from,next) => {
+router.beforeEach((to, from, next) => {
   if (typeof window.APIbase !== 'undefined') {
     store.APIbase = window.APIbase;
   } else {

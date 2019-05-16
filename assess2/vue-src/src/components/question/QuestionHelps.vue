@@ -46,9 +46,9 @@ export default {
       let href = window.imasroot + '/msgs/msglist.php?';
       href += window.$.param({
         cid: store.cid,
-        add: "new",
+        add: 'new',
         quoteq: this.quoteQ,
-        to: "instr"
+        to: 'instr'
       });
       return href;
     },
@@ -57,13 +57,13 @@ export default {
       href += window.$.param({
         cid: store.cid,
         forum: store.assessInfo.help_features.forum,
-        modify: "new",
+        modify: 'new',
         quoteq: this.quoteQ
       });
       return href;
     }
   }
-}
+};
 </script>
 
 <style>

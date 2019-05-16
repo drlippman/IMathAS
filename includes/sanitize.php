@@ -350,7 +350,7 @@ class Sanitize
 	 */
 	public static function onlyInt($data)
 	{
-		return filter_var($data, FILTER_SANITIZE_NUMBER_INT);
+		return (int) filter_var($data, FILTER_SANITIZE_NUMBER_INT);
 	}
 
 	/**
@@ -361,7 +361,7 @@ class Sanitize
 	 */
 	public static function onlyFloat($data)
 	{
-		return filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+		return (float) filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 	}
 
 	/**

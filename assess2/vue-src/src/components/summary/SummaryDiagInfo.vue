@@ -22,5 +22,5 @@ export default {
       return store.assessInfo.userfullname + ': ' + store.assessInfo.diag_userid;
     }
   }
-}
+};
 </script>

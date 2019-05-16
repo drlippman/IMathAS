@@ -7,10 +7,7 @@ require("../init.php");
 require("../includes/htmlutil.php");
 
 if ($courseUIver > 1) {
-	if (isset($_GET['id'])) {
-		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
-			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
-	} else {
+	if (!isset($_GET['id'])) {
 		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid));
 	}
@@ -50,11 +47,19 @@ if (isset($_GET['id'])) {
 }
 
 if (isset($_GET['id'])) {
-	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+	$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 	$stm->execute(array(intval($_GET['id'])));
-	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $_GET['cid']) {
+	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($row === null || $row['courseid'] != $_GET['cid']) {
 		echo "Invalid ID";
 		exit;
+	} else if ($row['ver']>1) {
+		if ($courseUIver==1) {
+			echo "Uh oh - new version assessment in an old version course";
+			exit;
+		}
+		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
+			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
 	}
 }
 

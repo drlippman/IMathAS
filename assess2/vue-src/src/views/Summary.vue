@@ -64,7 +64,7 @@ export default {
   data: function () {
     return {
       activeTab: 0
-    }
+    };
   },
   computed: {
     ainfo () {
@@ -103,13 +103,13 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.loadScoresIfNeeded();
   },
-  updated() {
+  updated () {
     this.loadScoresIfNeeded();
   }
-}
+};
 </script>
 
 <style>

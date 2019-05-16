@@ -10,11 +10,7 @@ if (!isset($teacherid)) {
 	echo "You are not authorized for this action";
 	exit;
 }
-if ($courseUIver>1) {
-	$addassess = 'addassessment2.php';
-} else {
-	$addassess = 'addassessment.php';
-}
+
 
 function convertintro($current_intro) {
 	if (($intro=json_decode($current_intro,true))!==null) { //is json intro
@@ -134,10 +130,15 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 	require("../footer.php");
 	exit;
 } else {
-	$stm = $DBH->prepare("SELECT intro,itemorder FROM imas_assessments WHERE id=:id AND courseid=:courseid");
+	$stm = $DBH->prepare("SELECT intro,itemorder,ver FROM imas_assessments WHERE id=:id AND courseid=:courseid");
 	$stm->execute(array(':id'=>$aid, ':courseid'=>$cid));
 	if ($stm->rowCount()==0) {echo "Invalid id"; exit;}
-	list($current_intro_json,$qitemorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($current_intro_json,$qitemorder,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	if ($aver>1) {
+		$addassess = 'addassessment2.php';
+	} else {
+		$addassess = 'addassessment.php';
+	}
 
 	list($introjson,$isembed) = convertintro($current_intro_json);
 	if ($introjson===false) {

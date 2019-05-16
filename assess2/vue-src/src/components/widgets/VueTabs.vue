@@ -31,47 +31,47 @@ export default {
     return {
       activeTab: 0,
       tabs: []
-    }
+    };
   },
   methods: {
-    setActive(index) {
+    setActive (index) {
       for (let i in this.tabs) {
-        this.tabs[i].active = (i*1 === index*1);
+        this.tabs[i].active = (i * 1 === index * 1);
       }
       this.activeTab = index;
       this.$nextTick(() => {
         document.getElementById(this.tabs[index].id).focus();
       });
     },
-    setFocus(index) {
+    setFocus (index) {
       this.$refs.tab[index].focus();
     },
-    handleKey(event, index) {
+    handleKey (event, index) {
       let cnt = this.tabs.length;
       let key = event.key.toLowerCase();
       if (key === 'enter' || key === ' ') {
         this.setActive(index);
       } else if (key === 'arrowleft') {
-        this.setFocus((index-1+cnt)%cnt);
+        this.setFocus((index - 1 + cnt) % cnt);
       } else if (key === 'arrowright') {
-        this.setFocus((index+1)%cnt);
+        this.setFocus((index + 1) % cnt);
       } else if (key === 'home') {
         this.setFocus(0);
       } else if (key === 'end') {
-        this.setFocus(cnt-1);
+        this.setFocus(cnt - 1);
       }
     }
   },
-  mounted() {
+  mounted () {
     this.tabs = this.$children;
     for (let i in this.tabs) {
-      this.tabs[i].control = this.id + "_" + i;
-      this.tabs[i].id = this.id + "_" + i + "_pane";
+      this.tabs[i].control = this.id + '_' + i;
+      this.tabs[i].id = this.id + '_' + i + '_pane';
     }
     this.tabs[0].active = true;
   }
 
-}
+};
 </script>
 
 <style>

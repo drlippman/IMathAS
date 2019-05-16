@@ -58,6 +58,9 @@ while ($line = $stm->fetch(PDO::FETCH_NUM)) {
 $stm = $DBH->prepare("DELETE FROM imas_assessments WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 
+$stm = $DBH->prepare("DELETE FROM imas_forums WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+
 $stm = $DBH->prepare("DELETE FROM imas_items WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 
@@ -153,6 +156,12 @@ foreach ($assessGroups as $gn=>$agroup) {
     if (isset($data['defoutcome'])) {
       $data['defoutcome'] = $outcomes[$data['defoutcome']];
     }
+    if (!isset($data['showtips'])) {
+      $data['showtips'] = 2;
+    }
+    if (!isset($data['eqnhelper'])) {
+      $data['eqnhelper'] = 2;
+    }
     $data['startdate'] = $now + $data['startdate']*60*60;
     $data['enddate'] = $now + $data['enddate']*60*60;
     $keys = implode(',', array_keys($data));
@@ -212,7 +221,7 @@ foreach ($assessGroups as $gn=>$agroup) {
         $udata['status'],
         gzencode($udata['scoreddata'])
       ));
-    } 
+    }
   }
 }
 
@@ -239,7 +248,7 @@ foreach ($assessGroups as $gn=>$agroup) {
 }
 
 // add to course
-$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=? WHERE id=?");
+$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=?,UIver=2 WHERE id=?");
 $stm->execute(array(serialize($courseitemorder), $cid));
 
 // TODO: Add exceptions, student attempt data, views, etc.

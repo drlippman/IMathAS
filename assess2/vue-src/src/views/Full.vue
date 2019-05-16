@@ -59,7 +59,7 @@ export default {
       return qnArray;
     },
     lastQ () {
-      return store.assessInfo.questions.length-1;
+      return store.assessInfo.questions.length - 1;
     }
   }
 };

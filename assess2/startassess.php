@@ -216,8 +216,6 @@ $assessInfoOut = array_merge($assessInfoOut, $assess_info->extractSettings($incl
 
 $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
-// indicate if teacher user
-$assessInfoOut['can_view_all'] = $canViewAll;
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
@@ -232,6 +230,29 @@ if ($assess_info->getSetting('displaymethod') === 'videocued') {
   $assessInfoOut['videoid'] = $viddata['vidid'];
   $assessInfoOut['videoar'] = $viddata['vidar'];
   $assessInfoOut['videocues'] = $viddata['cues'];
+}
+
+// grab livepoll status if needed.  If doesn't exist, create record
+if ($assess_info->getSetting('displaymethod') === 'livepoll') {
+  $stm = $DBH->prepare("SELECT curquestion,curstate,seed,startt FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+  $stm->execute(array(':assessmentid'=>$aid));
+  if ($stm->rowCount()==0) {
+    $assessInfoOut['livepoll_status'] = array("curquestion"=>0, "curstate"=>0, "seed"=>0, "startt"=>0);
+    $stm = $DBH->prepare("INSERT INTO imas_livepoll_status (assessmentid,curquestion,curstate) VALUES (:assessmentid, :curquestion, :curstate) ON DUPLICATE KEY UPDATE curquestion=curquestion");
+    $stm->execute(array(':assessmentid'=>$aid, ':curquestion'=>0, ':curstate'=>0));
+  } else {
+    $assessInfoOut['livepoll_status'] = array_map('intval', $stm->fetch(PDO::FETCH_ASSOC));
+
+  }
+  $livepollroom = $aid.'-'.($isteacher ? 'teachers':'students');
+  $assessInfoOut['livepoll_data'] = array(
+    'room' => $livepollroom,
+    'now' => $now
+  );
+  if (isset($CFG['GEN']['livepollpassword'])) {
+    $livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
+    $assessInfoOut['livepoll_data']['sig'] = $livepollsig;
+  }
 }
 
 // grab question settings data

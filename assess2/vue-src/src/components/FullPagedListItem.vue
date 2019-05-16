@@ -41,8 +41,8 @@ export default {
         return '';
       } else {
         return this.$t('header.answered', {
-          n:this.option.numattempted,
-          tot:this.option.numquestions
+          n: this.option.numattempted,
+          tot: this.option.numquestions
         });
       }
     }

@@ -87,6 +87,17 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
   exit;
 }
 
+// if livepoll, look up status and verify
+if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
+  $stm = $DBH->prepare("SELECT * FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+  $stm->execute(array(':assessmentid'=>$aid));
+  $livepollStatus = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($livepollStatus['curquestion']-1 != $qn) {
+    echo '{"error": "livepoll_wrongquestion"}';
+    exit;
+  }
+}
+
 // If in practice, now we overwrite settings
 if ($in_practice) {
   $assess_info->overridePracticeSettings();
@@ -99,7 +110,8 @@ if ($in_practice) {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto'
+  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
+  'showscores'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
@@ -115,6 +127,14 @@ $qid = $assess_record->getQuestionId($qn);
 // load question settings and code
 $assess_info->loadQuestionSettings(array($qid), true);
 
+// For livepoll, verify seed and generate new question version if needed
+if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
+  $curQuestionObject = $assess_record->getQuestionObject($qn, false, false, false);
+  if ($curQuestionObject['seed'] != $livepollStatus['seed']) {
+    // teacher has changed seed. Need to generate a new question version.
+    $qid = $assess_record->buildNewQuestionVersion($qn, $qid, $livepollStatus['seed']);
+  }
+}
 
 // Try a Similar Question, if requested
 if ($doRegen) {
@@ -157,7 +177,15 @@ if ($jumpToAnswer) {
 }
 
 // grab question settings data with HTML
-$showscores = $assess_info->showScoresDuring();
+if ($assess_info->getSetting('displaymethod') === 'livepoll') {
+  $showscores = ($livepollStatus['curstate'] == 4);
+  // override showscores value to prevent score marks
+  if (!$showscores) {
+    $assessInfoOut['showscores'] = 'at_end';
+  }
+} else {
+  $showscores = $assess_info->showScoresDuring();
+}
 $assessInfoOut['questions'] = array(
   $qn => $assess_record->getQuestionObject($qn, $showscores, true, true)
 );

@@ -282,6 +282,16 @@ class AssessInfo
   }
 
   /**
+   * Override an assessment setting value
+   * @param  string $key   the setting name
+   * @param  string $value the value to override with
+   * @return void
+   */
+  public function overrideSetting($key, $value) {
+    $this->assessData[$key] = $value;
+  }
+
+  /**
    * Get a setting value from the question Data
    * @param  int $id    The question ID
    * @param  string $field  The setting field to grab
@@ -875,6 +885,13 @@ class AssessInfo
       $settings['defregenpenalty_after'] = 1;
     }
 
+    // if LivePoll, force all stu same random seed
+    // force by-question submission
+    if ($settings['displaymethod'] === 'livepoll') {
+      $settings['shuffle'] = $settings['shuffle'] | 4;
+      $settings['submitby'] = 'by_question';
+    }
+
     //if by-assessment, define attempt values
     if ($settings['submitby'] == 'by_assessment') {
       $settings['allowed_attempts'] = $settings['defregens'];
@@ -894,10 +911,7 @@ class AssessInfo
       $settings['showans'] = 'after_lastattempt';
     }
 
-    // if LivePoll, force all stu same random seed
-    if ($settings['displaymethod'] === 'livepoll') {
-      $settings['shuffle'] = $settings['shuffle'] | 4;
-    }
+
 
     //unpack minscore
     if ($settings['minscore'] > 10000) {

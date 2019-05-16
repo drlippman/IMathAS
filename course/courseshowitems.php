@@ -122,15 +122,15 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	$out .= '</div>';
 	return $out;
 }
-function getAssessDD($i, $typeid, $parent, $itemid) {
-	global $cid, $addassess;
+function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess) {
+	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
-	$out .= " <li><a href=\"$addassess?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
+	$out .= " <li><a href=\"$thisaddassess?id=$typeid&block=$parent&cid=$cid\">" .  _('Settings') .  "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" .  _('Move') .  '</a></li>';
 	$out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" .  _('Delete') .  "</a></li>";
 	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" .  _('Copy') .  "</a></li>";
@@ -742,27 +742,35 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   if (isset($line['reqscoreptsearned'])) {
 			   	   	   $ptsearned = $line['reqscoreptsearned'];
 			   	   } else {
-					   $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
-					   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
-					   if ($stm->rowCount()==0) {
-						   $nothidden = false;
-					   } else {
-						   $scores = explode(';',$stm->fetchColumn(0));
-						   $ptsearned = getpts($scores[0]);
-					   }
-				   }
-				   if ($nothidden) {
-					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if ($line['reqscoreptsposs']>0 &&
-					   	   	   round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+							 if ($line['ver']>1) {
+								 $stm = $DBH->prepare("SELECT score FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
+							 } else {
+						   	 $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
+							 }
+						   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
+						   if ($stm->rowCount()==0) {
 							   $nothidden = false;
-						   }
-					   } else { //points based
-						   if (round($ptsearned,1)+.02<abs($line['reqscore'])) {
-							   $nothidden = false;
+						   } else {
+								 if ($line['ver']>1) {
+									 $ptsearned = $stm->fetchColumn(0);
+								 } else {
+								   $scores = explode(';',$stm->fetchColumn(0));
+								   $ptsearned = getpts($scores[0]);
+								 }
 						   }
 					   }
-				   }
+					   if ($nothidden) {
+						   if ($line['reqscoretype']&2) { //using percent-based
+						   	   if ($line['reqscoreptsposs']>0 &&
+						   	   	   round(100*$ptsearned/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+								   $nothidden = false;
+							   }
+						   } else { //points based
+							   if (round($ptsearned,1)+.02<abs($line['reqscore'])) {
+								   $nothidden = false;
+							   }
+						   }
+					   }
 			   }
 			   $preReqNote = '';
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0) {
@@ -771,12 +779,14 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 
 				 if ($line['ver'] > 1) {
+					 $thisaddassess = "addassessment2.php";
 					 	if ($assessUseVueDev) {
 					 		$assessUrl = "http://localhost:8080/?cid=$cid&aid=$typeid";
 						} else {
 							$assessUrl = "../assess2/?cid=$cid&aid=$typeid";
 						}
 				 } else {
+					 $thisaddassess = "addassessment.php";
 					 $assessUrl = "../assessment/showtest.php?id=$typeid&cid=$cid";
 				 }
 			   //calc status icon
@@ -882,7 +892,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</div>'; //title
 
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
 				   }
 				   echo '</div>'; //itemhdr
 
@@ -917,7 +927,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i>");
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -935,7 +945,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				}
 				echo '</div>'; //title
 				if ($canedit) {
-					echo getAssessDD($i, $typeid, $parent, $items[$i]);
+					echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
 				}
 
 				echo '</div>'; //itemhdr
@@ -963,7 +973,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -986,7 +996,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i]);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -1025,7 +1035,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i]);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1941,7 +1951,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $itemtypes[$row[0]] = array($row[1],$row[2]);
 		   }
-		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid=:courseid");
+		   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,avail,ver FROM imas_assessments WHERE courseid=:courseid");
 		   $stm->execute(array(':courseid'=>$cid));
 		   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   $id = array_shift($row);
@@ -2062,7 +2072,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 	   	   } else if ($itemtypes[$items[$i]][0] == 'Assessment') {
 			   $typeid = Sanitize::onlyInt($itemtypes[$items[$i]][1]);
-			   list($line['name'],$line['startdate'],$line['enddate'],$line['reviewdate'],$line['avail']) = $iteminfo['Assessment'][$typeid];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['reviewdate'],$line['avail'],$line['ver']) = $iteminfo['Assessment'][$typeid];
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
 			   } else {
@@ -2112,7 +2122,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | <a href=\"$addassess?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
+				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | ";
+					 if ($line['ver']>1) {
+						 echo "<a href=\"addassessment2.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
+					 } else {
+						 echo "<a href=\"addassessment.php?id=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Settings'), "</a> | \n";
+					 }
 				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=" . Sanitize::onlyInt($typeid) . "\">", _('Grades'), "</a>";

@@ -45,7 +45,7 @@ export default {
       store.errorMsg = null;
     }
   }
-}
+};
 </script>
 
 <style>

@@ -31,7 +31,12 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js" type="text/javascript"></script>';
-
+$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mqeditor.js" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mqedlayout.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
+  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "";</script>';
 } else if ($isdiag) {
@@ -59,15 +64,13 @@ if (!$isltilimited && !$inTreeReader && !$isdiag) {
 </noscript>
 <div id="app"></div>
 
-<div id="ehdd" class="ehdd">
-  <span id="ehddtext"></span>
-  <span onclick="showeh(curehdd);" style="cursor:pointer;"><?php echo _('[more..]'); ?></span>
-</div>
-<div id="eh" class="eh"></div>
-
 <script type="text/javascript" src="<?php echo $imasroot;?>/assess2/vue/js/chunk-vendors.js?v=<?php echo $lastupdate;?>"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/assess2/vue/js/app.js?v=<?php echo $lastupdate;?>"></script>
 
 <?php
-
+$placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
+  <span id="ehddtext"></span>
+  <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
+</div>
+<div id="eh" class="eh"></div>';
 require('../footer.php');

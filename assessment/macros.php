@@ -3657,6 +3657,9 @@ function getscorenonzero() {
 function getiscorrect() {
 	global $rawscores;
 	$out = array();
+	if (!is_array($rawscores)) {
+		return $out;
+	}
 	foreach ($rawscores as $i=>$v) {
 		if (strpos($v,'~')===false) {
 			$out[$i+1] = ($v<0)?-1:(($v==1)?1:0);

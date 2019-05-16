@@ -69,7 +69,6 @@ import GroupEntry from '@/components/launch/GroupEntry.vue';
 import PreviousAttempts from '@/components/PreviousAttempts.vue';
 import SummaryGbScore from '@/components/summary/SummaryGbScore.vue';
 
-
 import Icons from '@/components/widgets/Icons.vue';
 
 import { store, actions } from '../basicstore';
@@ -114,7 +113,7 @@ export default {
     timeLimitExpired () {
       if (store.timelimit_expired && this.aInfo.has_active_attempt) {
         let expires = new Date(this.aInfo.timelimit_expires * 1000);
-        return this.$t('setlist.time_expired', {date: this.$d(expires, 'long')});
+        return this.$t('setlist.time_expired', { date: this.$d(expires, 'long') });
       } else {
         return '';
       }
@@ -151,6 +150,14 @@ export default {
     },
     updateNewGroup (newMembers) {
       this.newGroupMembers = newMembers;
+    }
+  },
+  mounted () {
+    if (this.aInfo.displaymethod === 'livepoll') {
+      // inject socket javascript
+      var script = document.createElement('script');
+      script.src = 'https://' + this.aInfo.livepoll_server + ':3000/socket.io/socket.io.js';
+      document.getElementsByTagName('head')[0].appendChild(script);
     }
   }
 };

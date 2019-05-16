@@ -4,6 +4,8 @@
  * (c) 2019 David Lippman
  */
 
+// TODO: calc and record assessment-level timeontask
+
 require_once('./AssessUtils.php');
 require_once('../filter/filter.php');
 require_once(__DIR__ . '/questions/QuestionGenerator.php');
@@ -294,15 +296,16 @@ class AssessRecord
    * Build a new question version.  Used in by-question submission to regen
    * @param  int     $qn          Question #
    * @param  int     $qid         Current Question ID
+   * @param  int     $forceseed   (optional) Force a particular seed (-1 to not force)
    * @return int   New question ID
    */
-  public function buildNewQuestionVersion($qn, $qid) {
+  public function buildNewQuestionVersion($qn, $qid, $forceseed = -1) {
     list($oldquestions, $oldseeds) = $this->getOldQuestions();
     list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds);
     // build question data
     $newver = array(
       'qid' => $question,
-      'seed' => $seed,
+      'seed' => $forceseed > -1 ? $forceseed : $seed,
       'tries' => array()
     );
 
@@ -311,6 +314,7 @@ class AssessRecord
 
     // note that record needs to be saved
     $this->need_to_record = true;
+    return $question;
   }
 
   /**
@@ -480,16 +484,23 @@ class AssessRecord
    * @param array $pn           The part number to save
    * @return void
    */
-  public  function setAutoSave($time, $qn, $pn) {
+  public  function setAutoSave($time, $timeactive, $qn, $pn) {
     $this->parseData();
     $data = &$this->data['autosaves'];
     $seconds = $time - $this->assessRecord['starttime'];
     if (!isset($data[$qn])) {
+      // if no autosave record, start one
       $data[$qn] = array(
         'time' => $seconds,
+        'timeactive' => $timeactive,
         'post' => array(),
         'stuans' => array()
       );
+    } else {
+      // otherwise update time info.  Don't want to overwrite completely as we
+      // may be adding additional part post/stuans data
+      $data[$qn]['time'] = $seconds;
+      $data[$qn]['timeactive'] = $timeactive;
     }
     $tosave = array();
     foreach ($_POST as $key=>$val) {
@@ -966,6 +977,8 @@ class AssessRecord
       $out['did_jump_to_ans'] = true;
     }
 
+    $out['seed'] = $curq['seed'];
+
     if ($generate_html) {
       $showscores = $this->assess_info->getSetting('showscores');
       $force_scores = ($aver['status'] === 1 && $showscores === 'at_end');
@@ -974,13 +987,52 @@ class AssessRecord
 
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
         $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
+      if ($out['usedautosave']) {
+        $autosave = $this->getAutoSaves($qn);
+        $out['autosave_timeactive'] = $autosave['timeactive'];
+      }
       $this->setAnsweights($qn, $out['answeights'], $ver);
-      $out['seed'] = $curq['seed'];
     } else {
       $out['html'] = null;
     }
 
     return $out;
+  }
+
+  /**
+   * Get the rawscores and last student answers for the latest version and try
+   * @param  int  $qn
+   * @return array with keys 'raw' and 'stuans', each an array of scores and
+   *                student answers for each part.
+   */
+  public function getLastRawResult($qn) {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $aver = $this->getAssessVer($ver);
+    $question_versions = $aver['questions'][$qn]['question_versions'];
+    $curq = $question_versions[count($question_versions) - 1];
+    $rawscores = array();
+    $lastans = array();
+    if (count($curq['tries']) == 0) {
+      $rawscores[0] = 0;
+      $lastans[0] = '';
+    } else {
+      $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
+      for ($pn = 0; $pn < count($answeights); $pn++) {
+        // get part details
+        if (isset($curq['tries'][$pn])) {
+          $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
+          $rawscores[$pn] = $lasttry['raw'];
+          $lastans[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
+        } else {
+          $rawscores[$pn] = 0;
+          $lastans[$pn] = '';
+        }
+      }
+    }
+    return array(
+      'raw' => $rawscores,
+      'stuans' => $lastans
+    );
   }
 
   /**
@@ -1355,6 +1407,8 @@ class AssessRecord
     }
     $singlescore = (count($rawparts) > 1 && count($scores) == 1);
     $this->recordTry($qn, $data, $singlescore);
+
+    //TODO: record to firstscores if appropriate
   }
 
   /**
@@ -1657,6 +1711,32 @@ class AssessRecord
     }
   }
 
+  /**
+   * Finds the time active in the question, given question version datas
+   * @param  object $qdata   question version object
+   * @return array  assoc array with 'total' and 'pertry' times active
+   *  Note that "pertry" is a rough average for the time per full-question try
+   */
+  private function calcTimeActive($qdata) {
+    $trycnt = 0;
+    $timetot = 0;
+    $subsUsed = array();
+    $partsCnt = count($qdata['tries']);
+    foreach ($qdata['tries'] as $pn=>$part) {
+      foreach ($part as $tn=>$try) {
+        $trycnt++;
+        // only count the time once for each submission, no matter how many parts
+        if (!isset($subsUsed[$try['sub']])) {
+          $timetot += $try['time'];
+          $subsUsed[$try['sub']] = 1;
+        }
+      }
+    }
+    return array(
+      'total' => $timetot,
+      'pertry' => min($timetot, $timetot*$partsCnt/$trycnt)
+    );
+  }
 
   /**
    * Get the specified version of assessment data

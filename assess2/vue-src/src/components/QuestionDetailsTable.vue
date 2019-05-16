@@ -37,7 +37,7 @@ import PenaltiesApplied from '@/components/PenaltiesApplied.vue';
 
 export default {
   name: 'QuestionDetailsTable',
-  props: ['qinfo','caption','showtries'],
+  props: ['qinfo', 'caption', 'showtries'],
   components: {
     Icons,
     PenaltiesApplied
@@ -51,7 +51,7 @@ export default {
     },
     partHasPenalties () {
       let out = [];
-      for (let pn=0; pn<this.parts.length; pn++) {
+      for (let pn = 0; pn < this.parts.length; pn++) {
         if (this.parts[pn].hasOwnProperty('penalties') &&
           this.parts[pn].penalties.length > 0
         ) {
@@ -62,7 +62,7 @@ export default {
     },
     triesRemaining () {
       let out = [];
-      for (let pn=0; pn<this.parts.length; pn++) {
+      for (let pn = 0; pn < this.parts.length; pn++) {
         if (this.qinfo.hasOwnProperty('did_jump_to_ans')) {
           out[pn] = 0;
         } else {
@@ -80,14 +80,14 @@ export default {
     partIcons () {
       let out = [];
 
-      for (let i=0; i < this.parts.length; i++) {
+      for (let i = 0; i < this.parts.length; i++) {
         if (this.parts[i].try == 0) {
           out[i] = 'unattempted';
         } else if (!this.parts[i].hasOwnProperty('rawscore')) {
           out[i] = 'attempted';
-        } else if (this.parts[i].rawscore > .99) {
+        } else if (this.parts[i].rawscore > 0.99) {
           out[i] = 'correct';
-        } else if (this.parts[i].rawscore < .01) {
+        } else if (this.parts[i].rawscore < 0.01) {
           out[i] = 'incorrect';
         } else {
           out[i] = 'partial';
@@ -96,7 +96,7 @@ export default {
       return out;
     }
   }
-}
+};
 </script>
 
 <style>

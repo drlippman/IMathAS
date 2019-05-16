@@ -82,6 +82,8 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			//deleteasidfilesbyquery(array('assessmentid'=>$assesses, 'userid'=>$tounenroll));
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
+			$query = "DELETE FROM imas_assessment_records WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
+			$DBH->query($query); //values already sanitized
 			$query = "DELETE FROM imas_exceptions WHERE itemtype='A' AND assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
 		}
@@ -175,7 +177,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		$query = "DELETE FROM imas_content_track WHERE userid IN ($stulist) AND courseid=$cid";
 		$DBH->query($query); //values already sanitized
 	}
-	
+
 	$lognote = "Unenroll in $cid run by $userid via script ".basename($_SERVER['PHP_SELF']);
 	$lognote .= ". Unenrolled: $stulist";
 	$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");

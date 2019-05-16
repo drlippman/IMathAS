@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
   outputDir: path.resolve(__dirname, '../vue'),
@@ -14,10 +14,10 @@ module.exports = {
   filenameHashing: false,
   chainWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
-      config.plugins.delete('html')
-      config.plugins.delete('preload')
-      config.plugins.delete('prefetch')
-      config.plugins.delete('copy')
+      config.plugins.delete('html');
+      config.plugins.delete('preload');
+      config.plugins.delete('prefetch');
+      config.plugins.delete('copy');
     }
   },
   // in dev server mode, proxy all requests to localhost

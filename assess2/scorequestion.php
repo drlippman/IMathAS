@@ -101,6 +101,20 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
   exit;
 }
 
+// if livepoll, look up status and verify
+if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
+  $stm = $DBH->prepare("SELECT * FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+  $stm->execute(array(':assessmentid'=>$aid));
+  $livepollStatus = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($livepollStatus['curquestion'] - 1 !== $qns[0]) {
+    echo '{"error": "livepoll_wrongquestion"}'; //TODO: translate this
+    exit;
+  } else if ($livepollStatus['curstate'] != 2) {
+    echo '{"error": "livepoll_notopen"}';  //TODO: translate this
+    exit;
+  }
+}
+
 // If in practice, now we overwrite settings
 if ($in_practice) {
   $assess_info->overridePracticeSettings();
@@ -214,8 +228,46 @@ if ($end_attempt) {
   }
 
 } else {
-  // grab question settings data with HTML
-  $showscores = $assess_info->showScoresDuring();
+  if ($assess_info->getSetting('displaymethod') === 'livepoll') {
+    // don't show scores until question is closed for livepoll
+    $showscores = false;
+    $assess_info->overrideSetting('showscores', 'at_end');
+    $assessInfoOut['showscores'] = 'at_end';
+
+    if (!$isteacher) {
+      // call the livepoll server with the result
+      // always only one question
+      $qn = $qns[0];
+
+      // Get last raw scores and stuans to send to livepoll server
+      $lastResults = $assess_record->getLastRawResult($qn);
+      //TODO: Need to figure out the format they should be in (for multipart)
+      //TODO: Or, just don't support multipart
+      $rawscores = implode('~', $lastResults['raw']);
+      $lastAnswer = implode('~', $lastResults['stuans']);
+
+      $toSign = $aid.$qn.$uid.$rawscores.$lastAnswer;
+      $now = time();
+      if (isset($CFG['GEN']['livepollpassword'])) {
+        $livepollsig = base64_encode(sha1($toSign . $CFG['GEN']['livepollpassword'] . $now, true));
+      }
+      $qs = Sanitize::generateQueryStringFromMap(array(
+        'aid' => $aid,
+        'qn' => $qn,
+        'user' => $uid,
+        'score' => $rawscores,
+        'la' => $lastAnswer,
+        'now' => $now,
+        'sig' => $livepollsig
+      ));
+      $r = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/qscored?'.$qs);
+      $assessInfoOut['lpres'] = $r;
+      $assessInfoOut['lpq'] = 'https://'.$CFG['GEN']['livepollserver'].':3000/qscored?'.$qs;
+    }
+  } else {
+    // grab question settings data with HTML
+    $showscores = $assess_info->showScoresDuring();
+  }
   $assessInfoOut['questions'] = array();
   foreach ($qns as $qn) {
     $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);

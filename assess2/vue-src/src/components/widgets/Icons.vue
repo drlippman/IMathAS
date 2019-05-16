@@ -108,6 +108,11 @@
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
         <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
       </template>
+      <template v-else-if="name=='eqned'">
+        <polyline points="1 10 4 10 7 22 10 2 22 2" />
+        <rect x="14" y="7" width="6" height="12" rx="2" ry="2" />
+      </template>
+
     </svg>
     <span class="sronly" v-if="alttext.length > 0">
       {{ alttext }}
@@ -128,7 +133,7 @@ export default {
       wrong: '#900',
       correct: '#090',
       partial: '#fb0',
-      warn: "#900"
+      warn: '#900'
     };
   },
   props: ['name', 'size', 'color'],

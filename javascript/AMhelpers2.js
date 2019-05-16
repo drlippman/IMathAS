@@ -70,15 +70,40 @@ var imathasAssess = (function($) {
 
 var allParams = {};
 
-function init(paramarr) {
-  var qn, params, i, el;
+function init(paramarr, enableMQ) {
+  var qn, params, i, el, str;
 
   for (qn in paramarr) {
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
-    if (params.helper) { //want mathquill
-      //TODO
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string)/)) { //want mathquill
+      el = document.getElementById("qn"+qn);
+      str = params.qtype;
+      if (params.calcformat) {
+        str += ','+params.calcformat;
+      }
+      if (params.displayformat) {
+        str += ','+params.displayformat;
+      }
+      if (params.matrixsize) {
+        str += ',matrixsized';
+        $("input[id^=qn"+qn+"-]").attr("data-mq", str);
+      } else {
+        el.setAttribute("data-mq", str);
+      }
+      if (params.vars) {
+        el.setAttribute("data-mq-vars", params.vars);
+      }
+      //TODO: Need to adjust behavior for calcmatrix with answersize
+      if (enableMQ) {
+        if (params.matrixsize) {
+          MQeditor.toggleMQAll("input[id^=qn"+qn+"-]", true, true);
+        } else {
+          MQeditor.toggleMQ(el, true, true);
+        }
+        $("#pbtn"+qn).hide();
+      }
     }
     if (params.preview) { //setup preview TODO: check for userpref
       document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(qn)});
@@ -86,7 +111,7 @@ function init(paramarr) {
         if (LivePreviews.hasOwnProperty(qn)) {
           delete LivePreviews[qn]; // want to reinit
         }
-        setupLivePreview(qn);
+        setupLivePreview(qn, enableMQ);
         document.getElementById("qn"+qn).addEventListener('keyup', updateLivePreview);
         //document.getElementById("pbtn"+qn).style.display = 'none';
       } //TODO: when matrix, clear preview on further input
@@ -99,7 +124,7 @@ function init(paramarr) {
       imathasDraw.addnormslider(qn);
     }
     if (params.tip) {
-      if ((el = document.getElementById("qn"+qn+"-0")) && el.type == 'text') {
+      if (el = document.getElementById("qn"+qn+"-0")) {
         // setup for matrix sub-parts
         i=0;
         while (document.getElementById("qn"+qn+"-"+i)) {
@@ -122,6 +147,7 @@ function init(paramarr) {
 // setup tip focus/blur handlers
 function setupTips(id, tip) {
   var el = document.getElementById(id);
+  el.setAttribute('data-tip', tip);
   var ref = el.getAttribute('aria-describedby').substr(4);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
@@ -183,7 +209,7 @@ function setupDraw(qn) {
 }
 
 var LivePreviews = [];
-function setupLivePreview(qn) {
+function setupLivePreview(qn, skipinitial) {
 	if (!LivePreviews.hasOwnProperty(qn)) {
 		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
 			LivePreviews[qn] = {
@@ -201,13 +227,15 @@ function setupLivePreview(qn) {
 			  //
 			  //  Get the preview and buffer DIV's
 			  //
-			  Init: function() {
+			  Init: function(skipinitial) {
   				$("#p"+qn).css("positive","relative")
   					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;position:absolute;"></span>')
   					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');
   				this.preview = document.getElementById("lpbuf1"+qn);
   				this.buffer = document.getElementById("lpbuf2"+qn);
-          showPreview(qn);  //TODO: review this
+          if (!skipinitial) {
+            showPreview(qn);  //TODO: review this
+          }
 			  },
 
 			  SwapBuffers: function () {
@@ -286,7 +314,7 @@ function setupLivePreview(qn) {
 			} else {
 				LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
 			}
-			LivePreviews[qn].Init();
+			LivePreviews[qn].Init(skipinitial);
 		} else {
 			LivePreviews[qn] = {
 				finaldelay: 1000,

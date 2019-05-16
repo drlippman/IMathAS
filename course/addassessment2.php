@@ -231,6 +231,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$toset['msgtoinstr'] = empty($_POST['msgtoinstr']) ? 0 : 1;
 
+		$toset['eqnhelper'] = 2;
+
 		if (!isset($_POST['doposttoforum'])) {
       $toset['posttoforum'] = 0;
     } else {

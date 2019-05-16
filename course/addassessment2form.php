@@ -54,7 +54,7 @@ $vueData = array(
 				((count($forums)>0) ? $forums[0]['value'] : 0),
 	'forumOptions' => $forums,
 	'extrefs' => $extrefs,
-	'showtips' => $line['showtips'],
+	'showtips' => ($line['showtips']==0 || $line['showtips']==2) ? $line['showtips'] : 2,
 	'cntingb' => $line['cntingb'],
 	'minscore' => $line['minscore'],
 	'minscoretype' => $minscoretype,
@@ -472,12 +472,12 @@ $vueData = array(
 			<span class=form>Hints and Videos</span>
 			<span class=formright>
 				<label>
-					<input type="checkbox" name="showhints" value="1" v=model="showhints" />
+					<input type="checkbox" name="showhints" value="1" v-model="showhints" />
 					Show hints when available?
 				</label>
 				<br/>
 				<label>
-					<input type="checkbox" name="showextrefs" value="2" v=model="showextrefs" />
+					<input type="checkbox" name="showextrefs" value="2" v-model="showextrefs" />
 					Show video/text buttons when available?
 				</label>
 			</span><br class=form />
@@ -655,15 +655,15 @@ var app = new Vue({
   data: <?php echo json_encode($vueData); ?>,
 	computed: {
 		showscoresOptions() {
-			let during = {
+			var during = {
 				'value': 'during',
 				'text': _('On each question immediately')
 			};
-			let at_end = {
+			var at_end = {
 				'value': 'at_end',
 				'text': _('At the end of the assessment')
 			};
-			let total = {
+			var total = {
 				'value': 'total',
 				'text': _('Total score only at the end')
 			};
@@ -672,7 +672,7 @@ var app = new Vue({
 				'text': _('No scores at all')
 			};
 
-			let out = [];
+			var out = [];
 			if (this.defattempts == 1 && this.subtype != 'by_question') {
 				// if we only have 1 try, and not HW mode, show all options
 				out = [during, at_end, total, none];
@@ -691,16 +691,16 @@ var app = new Vue({
 		showansOptions() {
 			//TODO: revisit after_take vs with_score
 
-			let never = {
+			var never = {
 				'value': 'never',
 				'text': _('Never')
 			};
-			let with_score = {
+			var with_score = {
 				'value': 'with_score',
 				'text': _('Show with the score')
 			};
 
-			let out = [];
+			var out = [];
 			if (this.showscores == 'during' && this.defattempts == 1) {
 				// when showing scores immediately and 1 try
 				out = [with_score, never];
@@ -713,7 +713,7 @@ var app = new Vue({
 					},
 					never
 				];
-				for (let i=1; i<Math.min(9,this.defattempts);i++) {
+				for (var i=1; i<Math.min(9,this.defattempts);i++) {
 					out.push({
 						'value': 'after_'+i,
 						'text': i>1 ? _('After %d tries').replace(/%d/, i) :
@@ -742,7 +742,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			let out = [
+			var out = [
 				{
 					'value': 'after_due',
 					'text': _('After the due date')
@@ -774,7 +774,7 @@ var app = new Vue({
 			‘never’: Never
 			 */
 
-			let out = [
+			var out = [
 				{
 					'value': 'after_due',
 					'text': _('After the due date')
@@ -805,7 +805,7 @@ var app = new Vue({
 			 if (this.viewingb == 'never' || this.scoresingb == 'never') {
  				return [];
  			} else {
- 				let out = [
+ 				var out = [
  					{
  						'value': 'after_due',
  						'text': _('After the due date')
@@ -830,7 +830,8 @@ var app = new Vue({
 	},
 	methods: {
 		valueInOptions(optArr, value) {
-			for (let i in optArr) {
+			var i;
+			for (i in optArr) {
 				if (optArr[i].value == value) {
 					return true;
 				}

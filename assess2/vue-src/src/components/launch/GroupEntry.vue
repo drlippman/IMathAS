@@ -119,7 +119,7 @@ export default {
       if (this.isPresetGroups) {
         return this.$t('group.teacher_preset');
       } else {
-        return this.$t('group.teacher_auto', {n: store.assessInfo.groupmax});
+        return this.$t('group.teacher_auto', { n: store.assessInfo.groupmax });
       }
     }
   },

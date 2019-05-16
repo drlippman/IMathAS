@@ -47,53 +47,53 @@ export default {
       if (!this.showScores || !this.qdata.hasOwnProperty('parts')) {
         return 'neutral';
       }
-      for (let i=0; i < this.qdata.parts.length; i++) {
-          if (this.qdata.parts[i].try === 0 ||
-            this.qdata.parts[i].rawscore < .98
-          ) {
-            return 'neutral';
-          }
+      for (let i = 0; i < this.qdata.parts.length; i++) {
+        if (this.qdata.parts[i].try === 0 ||
+            this.qdata.parts[i].rawscore < 0.98
+        ) {
+          return 'neutral';
+        }
       }
       return 'correct';
     },
     nextVidType () {
-      return store.assessInfo.videocues[this.cue].hasOwnProperty('followuptitle') ?
-        'followup' :
-        'nextseg';
+      return store.assessInfo.videocues[this.cue].hasOwnProperty('followuptitle')
+        ? 'followup'
+        : 'nextseg';
     },
     hasNextVid () {
       return (this.nextVidType === 'followup' ||
-        store.assessInfo.videocues.hasOwnProperty(this.cue+1)
+        store.assessInfo.videocues.hasOwnProperty(this.cue + 1)
       );
     },
     nextVidTitle () {
       if (this.nextVidType === 'followup') {
         return store.assessInfo.videocues[this.cue].followuptitle;
       } else {
-        return store.assessInfo.videocues[this.cue+1].title;
+        return store.assessInfo.videocues[this.cue + 1].title;
       }
     },
     showSkip () {
       return (this.status === 'correct' &&
         this.nextVidType === 'followup' &&
-        store.assessInfo.videocues.hasOwnProperty(this.cue+1)
+        store.assessInfo.videocues.hasOwnProperty(this.cue + 1)
       );
     },
     skipTitle () {
-      return store.assessInfo.videocues[this.cue+1].title;
+      return store.assessInfo.videocues[this.cue + 1].title;
     }
   },
   methods: {
     skipLink () {
-      this.$emit('jumpto', this.cue+1, 'v');
+      this.$emit('jumpto', this.cue + 1, 'v');
     },
     nextVidLink () {
       if (this.nextVidType === 'followup') {
         this.$emit('jumpto', this.cue, 'f');
       } else {
-        this.$emit('jumpto', this.cue+1, 'v');
+        this.$emit('jumpto', this.cue + 1, 'v');
       }
     }
   }
-}
+};
 </script>

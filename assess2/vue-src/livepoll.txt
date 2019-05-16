@@ -1,0 +1,131 @@
+LivePoll approach:
+
+states:
+0 - nothing displayed
+1 - question loaded on instructor side
+2 - question open for students
+3 - closed and reshow q without score
+4 - closed and reshow q with score
+
+In Launch view
+  - xx Inject socket javascript if livepoll type
+
+In loadsettings, override some settings for livepoll:
+ - xx always do by_question
+ - xx always do "all students same seed"  |4
+ - disable question shuffle if enabled
+ - Need to make sure teacher also gets same seed as students
+
+In startassess
+  - xx Return livepoll status (create if needed)
+
+x Move livepoll settings into a component
+  - x Use getters/setters to store the default settings into main store
+
+In front-end
+  - x On mount, connect to socket server
+  - Teachers:
+    - x Top nav is question selection, with "settings" in place of "Intro"
+    - x Start and Stop controls
+    - x Number of students connected
+    - x Results display below question
+  - Students:
+    - x Only display is question.
+    - When question
+
+On teacher question selection
+  - x replace current settings w defaults
+  - x call setLivepollStatus to call server
+    - x endpoint updates livepolll status
+    - ??? do we want to do this? Or wait until Q is opened
+      - endpoint calls livepoll server with status update
+      - livepoll emits message to change state
+      - on reply, set curquestion so question updates
+    - get HTML with state update
+      - Or, call loadquestion (show or hide based on "Show question" setting)
+
+On teacher "Open Student Input"
+  - x call livepoll endpoint
+  - x endpoint updates livepoll status
+  - x endpoint calls livepoll server with status update
+  - x livepoll emits message to students to start input
+
+Student: on status update to start input
+  - x On server messgage, update livepoll_status
+    - x Triggers call to loadquestion
+  - x Loadquestion verifies qn
+  - x Loadquestion verifies seed, and creates a new question version if needed
+  - x loadquestion returns actual question for input
+
+Student: on submission
+  - x Calls scorequestion
+  - x Verify right question && right state(that it's still the current livepoll question)
+  - x Calls livepoll server with result
+    - x Need to get score and answer
+  - x Scorequestion returns usual output (no scores forced)
+    - Should display acknowledgement of submission
+    - and do resubmission if allowed
+
+On teacher "Close Student Input"
+  - x call livepoll endpoint
+  - x endpoint updates livepoll status
+  - x endpoint calls livepoll server with status update
+  - x livepoll emits message to students to stop input
+
+Student: on status update to end input
+  - x Update livepoll_status
+    - x call loadquestion again to view scored version
+    - x if "show answers" is set (curstate=4) then show answers w question
+
+If instructor changes the "show answers" option
+  - x calls livepoll endpoint, does status update, etc.
+  - x Student side calls loadquestion again to get new HTML w/wo answers
+
+If instructor clicks a "generate new version" button
+  - x calls livepoll endpoint
+  - x generates new version
+  - x on open, new seed triggers student's to create new question version
+
+Timer
+
+
+For Teachers:
+x startassess returns livepoll status
+  ? Also returns existing results data, in case of a page reset or something
+Top nav is question selection, with "settings" in place of "Intro"
+In top nav is "start" and "stop" controls
+If status is 'not started'
+  Show question for teacher if 'show on this computer before started' is selected
+When 'start' is clicked
+  update imas_livepoll_status
+  Send msg to livepoll server
+  Start timer
+  If 'show results live' is enabled
+    Show results as they come in
+When 'stop' is clicked
+  update imas_livepoll_status
+  Send msg to livepoll server
+  if 'show results' is enabled
+    show results
+
+For Students:
+x startassess returns livepoll status.
+for all stu same ver
+If status is 'not started',
+  then show a 'Waiting for teacher to start a question' notice
+If status is 'active question'
+  then run loadquestion to show the question
+    Need loadquestion to check livepoll status to verify
+    If instructor has regen'd, then need to create a new question version w that seed
+  On submission,
+    Give acknowledgement of submission
+    Reshow question to allow resubmitting
+If status is 'stopped'
+  reshow question w answer, disabled
+If status is 'show scored'
+  reshow question, scored
+
+
+API endpoint for livepoll
+  Handles all the startq / stopq / etc messaging
+Existing scorequestion can handle scoring - add code for sending result socket msg

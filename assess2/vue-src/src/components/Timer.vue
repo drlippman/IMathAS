@@ -32,14 +32,14 @@ export default {
   },
   computed: {
     warningTime () {
-      return Math.max(60, Math.min(.05*this.total, 300));
+      return Math.max(60, Math.min(0.05 * this.total, 300));
     }
   },
   methods: {
     updateTimer: function () {
       let now = new Date().getTime();
-      let remaining = Math.max(0, this.end*1000 - now);
-      if (!this.gaveWarning && remaining < this.warningTime*1000) {
+      let remaining = Math.max(0, this.end * 1000 - now);
+      if (!this.gaveWarning && remaining < this.warningTime * 1000) {
         this.open = true;
         this.gaveWarning = true;
       }

@@ -19,7 +19,7 @@
         <icons name="info"/>
         {{ $t('scoreresult.manual_grade') }}
       </p>
-      <p>
+      <p v-if="showRetryButtons">
         <button
           v-if = "qdata.canretry"
           type = "button"
@@ -72,14 +72,14 @@ export default {
       let correct = 0;
       let incorrect = 0;
       let partial = 0;
-      for (let i=0; i < this.qdata.parts.length; i++) {
-          if (this.qdata.parts[i].rawscore > .99) {
-            correct++;
-          } else if (this.qdata.parts[i].rawscore < .01) {
-            incorrect++;
-          } else {
-            partial++;
-          }
+      for (let i = 0; i < this.qdata.parts.length; i++) {
+        if (this.qdata.parts[i].rawscore > 0.99) {
+          correct++;
+        } else if (this.qdata.parts[i].rawscore < 0.01) {
+          incorrect++;
+        } else {
+          partial++;
+        }
       }
       if (correct === this.qdata.parts.length) {
         return 'correct';
@@ -93,7 +93,7 @@ export default {
       if (!this.showScores || !this.qdata.hasOwnProperty('parts')) {
         return false;
       }
-      for (let i=0; i < this.qdata.parts.length; i++) {
+      for (let i = 0; i < this.qdata.parts.length; i++) {
         if (this.qdata.parts[i].hasOwnProperty('req_manual') &&
           this.qdata.parts[i].req_manual
         ) {
@@ -101,6 +101,9 @@ export default {
         }
       }
       return false;
+    },
+    showRetryButtons () {
+      return (store.assessInfo.displaymethod !== 'livepoll');
     }
   },
   methods: {
@@ -127,5 +130,9 @@ export default {
 .scoreresult.partial {
   background-color: #fff9dd;
   border-top: 2px solid #fa3;
+}
+.scoreresult.neutral {
+  background-color: #f3f3f3;
+  border-top: 2px solid #ddd;
 }
 </style>
