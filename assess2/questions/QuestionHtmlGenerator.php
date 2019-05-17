@@ -491,9 +491,9 @@ class QuestionHtmlGenerator
         $question = new Question(
             $evaledqtext,
             $jsParams,
+            isset($answeights) ? $answeights : array(1),
             $evaledsoln,
             $detailedSolutionContent,
-            $entryTips,
             $displayedAnswersForParts,
             $externalReferences
         );

@@ -1323,14 +1323,9 @@ class AssessRecord
     $question = $questionGenerator->getQuestion();
 
     $qout = $question->getQuestionContent();
-
     $jsparams = $question->getJsParams();
+    $answeights = $question->getAnswerPartWeights();
 
-    // need to extract answeights to provide to frontend
-    $answeights = $GLOBALS['lastansweights'];
-    if (empty($answeights)) {
-      $answeights = array(1);
-    }
     return array($qout, $jsparams, $answeights, $usedAutosave);
   }
 

@@ -16,6 +16,7 @@ class Question
 {
     private $questionContent;
     private $jsParams;
+    private $answerPartWeights;
     private $solutionContent;
     private $solutionContentDetailed;
     private $answerEntryTips;
@@ -29,27 +30,27 @@ class Question
      *
      * @param string $questionContent The generated question text.
      * @param array $jsParams  The generated question javascript params.
+     * @param array $answerPartWeights  The answer weights per part
      * @param string $solutionContent The question's solution.
      * @param string $solutionContentDetailed The solution text displayed in popups.
-     * @param array $answerEntryTips Answer box (input fields) entry tips.
      * @param array $correctAnswersForParts (for formative quizzes only)
      * @param string $externalReferences Video links.
      */
     public function __construct(
         string $questionContent,
         array $jsParams,
+        array $answerPartWeights,
         string $solutionContent,
         string $solutionContentDetailed,
-        array $answerEntryTips,
         array $correctAnswersForParts,
         string $externalReferences
     )
     {
         $this->questionContent = $questionContent;
         $this->jsParams = $jsParams;
+        $this->answerPartWeights = $answerPartWeights;
         $this->solutionContent = $solutionContent;
         $this->solutionContentDetailed = $solutionContentDetailed;
-        $this->answerEntryTips = $answerEntryTips;
         $this->correctAnswersForParts = $correctAnswersForParts;
         $this->externalReferences = $externalReferences;
     }
@@ -105,6 +106,16 @@ class Question
     }
 
     /**
+     * Get array of answer part weights.
+     *
+     * @return array
+     */
+    public function getAnswerPartWeights(): array
+    {
+        return $this->answerPartWeights;
+    }
+
+    /**
      * Get the question's solution content.
      *
      * @return string
@@ -122,16 +133,6 @@ class Question
     public function getSolutionContentDetailed(): string
     {
         return $this->solutionContentDetailed;
-    }
-
-    /**
-     * Get all entry tips for answer boxes.
-     *
-     * @return array
-     */
-    public function getAnswerEntryTips(): array
-    {
-        return $this->answerEntryTips;
     }
 
     /**
