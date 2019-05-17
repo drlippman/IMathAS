@@ -125,7 +125,7 @@ class MatrixAnswerBox implements AnswerBox
     				'autocomplete' => 'off'
     			];
     			$params['tip'] = $tip;
-          $params['longtip'] = '';
+          $params['longtip'] = $tip;
 
     			$out .= '<input ' .
     							Sanitize::generateAttributeString($attributes) .

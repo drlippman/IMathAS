@@ -151,8 +151,8 @@ function setupTips(id, tip, longtip) {
   var ref = id.substr(2).split(/-/)[0];
   if (!document.getElementById("tips"+ref)) {
     $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
-    el.setAttribute('aria-describedby', 'tips'+ref);
   }
+  el.setAttribute('aria-describedby', 'tips'+ref);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
   });

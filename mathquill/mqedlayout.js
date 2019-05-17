@@ -564,7 +564,7 @@ var myMQeditor = (function($) {
         var tipdiv = document.createElement("div");
         $(tipdiv).html(tiptext);
         if (textel[0].hasAttribute("aria-describedby")) {
-          var fulltipRef = textel[0].getAttribute("aria-describedby")+" ";
+          var fulltipRef = textel[0].getAttribute("aria-describedby");
           if (document.getElementById(fulltipRef).textContent != tiptext) {
             var morelink = $("<a>", {
               href: "#",
@@ -574,7 +574,7 @@ var myMQeditor = (function($) {
               $(e.target).parent().html($("#"+fulltipRef).html());
               return false;
             });
-            $(tipdiv).append(morelink);
+            $(tipdiv).append(" ").append(morelink);
           }
         }
         tabpanel.parent().css("height", "auto").append($("<div>", {
