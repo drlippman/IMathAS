@@ -71,7 +71,7 @@ input[type=submit],input[type=button], button, a.abutton {
 input[type=submit]:disabled,input[type=button]:disabled, button:disabled {
   opacity: .5;
 }
-input {
+input, .mq-editable-field {
   border: 1px solid #999;
   padding: 4px 6px;
   border-radius: 4px;
