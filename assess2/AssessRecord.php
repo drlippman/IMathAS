@@ -11,10 +11,14 @@ require_once('../filter/filter.php');
 require_once(__DIR__ . '/questions/QuestionGenerator.php');
 require_once(__DIR__ . '/questions/models/QuestionParams.php');
 require_once(__DIR__ . '/questions/models/ShowAnswer.php');
+require_once(__DIR__ . '/questions/ScoreEngine.php');
+require_once(__DIR__ . '/questions/models/ScoreQuestionParams.php');
 
 use IMathAS\assess2\questions\QuestionGenerator;
 use IMathAS\assess2\questions\models\QuestionParams;
 use IMathAS\assess2\questions\models\ShowAnswer;
+use IMathAS\assess2\questions\ScoreEngine;
+use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 //TODO: should be passed to displayq instead of using globals
 $useeqnhelper = 4;
@@ -1365,7 +1369,7 @@ class AssessRecord
     $attemptn = (count($partattemptn) == 0) ? 0 : min($partattemptn);
 
     $data = array();
-
+    /*
     // TODO: move this to displayq input
     // TODO: pass stuanswers, stuanswersval
 
@@ -1381,6 +1385,26 @@ class AssessRecord
 
     // TODO need better way to get student's answer and unrand and such
     // TODO: rework this to handle singlescore questions
+    $rawparts = explode('~', $rawscores);
+    $scores = explode('~', $scores);
+    $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
+    */
+
+    $scoreEngine = new ScoreEngine($this->DBH, $GLOBALS['RND']);
+
+    $scoreQuestionParams = new ScoreQuestionParams();
+    $scoreQuestionParams
+        ->setUserRights($GLOBALS['myrights'])
+        ->setRandWrapper($GLOBALS['RND'])
+        ->setQuestionNumber($qn)
+        ->setDbQuestionSetId($qsettings['questionsetid'])
+        ->setQuestionSeed($qver['seed'])
+        ->setGivenAnswer($_POST['qn'.$qn])
+        ->setAttemptNumber($attemptn)
+        ->setQnpointval($qsettings['points_possible']);
+
+    list($scores, $rawscores) = $scoreEngine->scoreQuestion($scoreQuestionParams);
+    // TODO need better way to get student's answer and unrand and such
     $rawparts = explode('~', $rawscores);
     $scores = explode('~', $scores);
     $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
