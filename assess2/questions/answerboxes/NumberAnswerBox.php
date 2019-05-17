@@ -165,7 +165,7 @@ class NumberAnswerBox implements AnswerBox
     		}
 
     		$params['tip'] = $shorttip;
-    		$attributes['aria-describedby'] = "tips$qn";
+    		$params['longtip'] = $tip;
     		if ($useeqnhelper && $useeqnhelper>2 && !(isset($scoremethod) && $scoremethod=='acct') &&
           !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)
         ) {

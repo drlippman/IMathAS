@@ -71,9 +71,9 @@ class ComplexAnswerBox implements AnswerBox
     			'id' => "qn$qn",
     			'value' => $la,
     			'autocomplete' => 'off',
-    			'aria-describedby' => "tips$qn"
     		];
     		$params['tip'] = $shorttip;
+        $params['longtip'] = $tip;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}

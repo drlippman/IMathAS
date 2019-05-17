@@ -129,8 +129,8 @@ class FunctionExpressionAnswerBox implements AnswerBox
     			'autocomplete' => 'off'
     		];
 
-    		$params['tip'] = Sanitize::encodeStringForDisplay($shorttip);
-    		$attributes['aria-describedby'] = "tips$qn";
+    		$params['tip'] = $shorttip;
+    		$params['longtip'] = $tip;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}

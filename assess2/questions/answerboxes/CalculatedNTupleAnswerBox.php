@@ -91,7 +91,7 @@ class CalculatedNTupleAnswerBox implements AnswerBox
     			'autocomplete' => 'off'
     		];
     		$params['tip'] = $shorttip;
-    		$attributes['aria-describedby'] = "tips$qn";
+        $params['longtip'] = $tip;
     		$params['calcformat'] = $answerformat;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;

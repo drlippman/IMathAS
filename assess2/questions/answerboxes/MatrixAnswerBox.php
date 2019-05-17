@@ -84,8 +84,6 @@ class MatrixAnswerBox implements AnswerBox
     						'value' => $las[$count],
     						'autocomplete' => 'off'
     					];
-    					$attributes['aria-describedby'] = "tips$qn";
-    					$params['matrixsize'] = $answersize;
 
     					$out .= '<input ' .
     									Sanitize::generateAttributeString($attributes) .
@@ -99,7 +97,9 @@ class MatrixAnswerBox implements AnswerBox
     			$out .= "</table>\n";
     			$out .= getcolormark($colorbox);
     			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
-
+          $params['matrixsize'] = $answersize;
+          $params['tip'] = $shorttip;
+          $params['longtip'] = $tip;
     		} else {
     			if ($multi==0) {
     				$qnref = "$qn-0";
@@ -125,7 +125,7 @@ class MatrixAnswerBox implements AnswerBox
     				'autocomplete' => 'off'
     			];
     			$params['tip'] = $tip;
-    			$attributes['aria-describedby'] = "tips$qn";
+          $params['longtip'] = '';
 
     			$out .= '<input ' .
     							Sanitize::generateAttributeString($attributes) .

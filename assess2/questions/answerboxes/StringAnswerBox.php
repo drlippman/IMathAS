@@ -136,7 +136,7 @@ class StringAnswerBox implements AnswerBox
     			}
 
     			$params['tip'] = $shorttip;
-    			$attributes['aria-describedby'] = "tips$qn";
+    			$params['longtip'] = $tip;
     			if ($useeqnhelper && $displayformat == 'usepreview') {
     				$params['helper'] = 1;
     			}

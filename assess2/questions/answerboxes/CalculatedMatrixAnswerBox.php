@@ -83,7 +83,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     						'value' => $las[$count],
     						'autocomplete' => 'off'
     					];
-    					$attributes['aria-describedby'] = "tips$qn";
+
     					$params['matrixsize'] = $answersize;
 
     					$out .= '<input ' .
@@ -120,7 +120,6 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     				'value' => $la,
     				'autocomplete' => 'off'
     			];
-    			$attributes['aria-describedby'] = "tips$qn";
 
     			$out .= '<input ' .
     							Sanitize::generateAttributeString($attributes) .
@@ -133,6 +132,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     		}
     		$preview .= "<span id=p$qn></span> ";
     		$params['tip'] = $shorttip;
+        $params['longtip'] = $tip;
     		$params['calcformat'] = $answerformat;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;

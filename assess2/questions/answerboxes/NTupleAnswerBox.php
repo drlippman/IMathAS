@@ -95,7 +95,7 @@ class NTupleAnswerBox implements AnswerBox
     			'autocomplete' => 'off'
     		];
     		$params['tip'] = $shorttip;
-    		$attributes['aria-describedby'] = "tips$qn";
+        $params['longtip'] = $tip;
 
     		$out .= '<input ' .
     						Sanitize::generateAttributeString($attributes) .

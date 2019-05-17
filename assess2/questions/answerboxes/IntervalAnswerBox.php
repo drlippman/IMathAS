@@ -104,10 +104,10 @@ class IntervalAnswerBox implements AnswerBox
     			'name' => "qn$qn",
     			'id' => "qn$qn",
     			'value' => $la,
-    			'autocomplete' => 'off',
-    			'aria-describedby' => "tips$qn"
+    			'autocomplete' => 'off'
     		];
     		$params['tip'] = $shorttip;
+        $params['longtip'] = $tip;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}

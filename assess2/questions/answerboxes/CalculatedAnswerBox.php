@@ -137,7 +137,7 @@ class CalculatedAnswerBox implements AnswerBox
     		];
 
     		$params['tip'] = $shorttip;
-    		$attributes['aria-describedby'] = "tips$qn";
+        $params['longtip'] = $tip;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}

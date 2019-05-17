@@ -128,11 +128,11 @@ function init(paramarr, enableMQ) {
         // setup for matrix sub-parts
         i=0;
         while (document.getElementById("qn"+qn+"-"+i)) {
-          setupTips("qn"+qn+"-"+i, params.tip);
+          setupTips("qn"+qn+"-"+i, params.tip, params.longtip);
           i++;
         }
       } else {
-        setupTips("qn"+qn, params.tip);
+        setupTips("qn"+qn, params.tip, params.longtip);
       }
     }
     if (params.qtype === 'draw') {
@@ -145,10 +145,14 @@ function init(paramarr, enableMQ) {
 }
 
 // setup tip focus/blur handlers
-function setupTips(id, tip) {
+function setupTips(id, tip, longtip) {
   var el = document.getElementById(id);
   el.setAttribute('data-tip', tip);
-  var ref = el.getAttribute('aria-describedby').substr(4);
+  var ref = id.substr(2).split(/-/)[0];
+  if (!document.getElementById("tips"+ref)) {
+    $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
+    el.setAttribute('aria-describedby', 'tips'+ref);
+  }
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
   });

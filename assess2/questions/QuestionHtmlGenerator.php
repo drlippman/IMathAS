@@ -298,6 +298,7 @@ class QuestionHtmlGenerator
                 $entryTips[$atIdx] = $answerBoxGenerator->getEntryTip();
                 $qnRef = ($this->questionParams->getQuestionNumber()+1)*1000 + $atIdx;
                 $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
+                $jsParams[$qnRef]['qtype'] = $anstype;
                 $displayedAnswersForParts[$atIdx] = $answerBoxGenerator->getCorrectAnswerForPart();
                 $previewLocations[$atIdx] = $answerBoxGenerator->getPreviewLocation();
             }
@@ -325,6 +326,7 @@ class QuestionHtmlGenerator
             $entryTips[0] = $answerBoxGenerator->getEntryTip();
             $qnRef = $this->questionParams->getQuestionNumber();
             $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
+            $jsParams[$qnRef]['qtype'] = $qdata['qtype'];
             $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
             $previewLocations = $answerBoxGenerator->getPreviewLocation();
         }
@@ -443,7 +445,7 @@ class QuestionHtmlGenerator
             }
         }
 
-        $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('QuestionGenerator') . "\">\n"
+        $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . "\">\n"
             . filter($evaledqtext);
 
         /*
