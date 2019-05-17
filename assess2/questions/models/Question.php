@@ -15,6 +15,7 @@ namespace IMathAS\assess2\questions\models;
 class Question
 {
     private $questionContent;
+    private $jsParams;
     private $solutionContent;
     private $solutionContentDetailed;
     private $answerEntryTips;
@@ -27,6 +28,7 @@ class Question
      * Question constructor.
      *
      * @param string $questionContent The generated question text.
+     * @param array $jsParams  The generated question javascript params.
      * @param string $solutionContent The question's solution.
      * @param string $solutionContentDetailed The solution text displayed in popups.
      * @param array $answerEntryTips Answer box (input fields) entry tips.
@@ -35,6 +37,7 @@ class Question
      */
     public function __construct(
         string $questionContent,
+        array $jsParams,
         string $solutionContent,
         string $solutionContentDetailed,
         array $answerEntryTips,
@@ -43,6 +46,7 @@ class Question
     )
     {
         $this->questionContent = $questionContent;
+        $this->jsParams = $jsParams;
         $this->solutionContent = $solutionContent;
         $this->solutionContentDetailed = $solutionContentDetailed;
         $this->answerEntryTips = $answerEntryTips;
@@ -88,6 +92,16 @@ class Question
     public function getQuestionContent(): string
     {
         return $this->questionContent;
+    }
+
+    /**
+     * Get (only) the jsParams.
+     *
+     * @return string
+     */
+    public function getJsParams(): array
+    {
+        return $this->jsParams;
     }
 
     /**

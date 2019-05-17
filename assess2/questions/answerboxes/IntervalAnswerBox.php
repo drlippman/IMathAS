@@ -159,7 +159,7 @@ class IntervalAnswerBox implements AnswerBox
         return $this->answerBox;
     }
 
-    public function getJsParams(): string
+    public function getJsParams(): array
     {
         return $this->jsParams;
     }

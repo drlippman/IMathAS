@@ -1237,8 +1237,8 @@ class AssessRecord
     $usedAutosave = array();
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
-    $isCorrect = $showscores; // default to false if not showing scores
-    $isNonzero = false;
+    list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
+
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
       $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
@@ -1273,26 +1273,18 @@ class AssessRecord
       }
       if ($showscores && $partattemptn[$pn] > 0) {
         $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
-        if ($qcolors[$pn] > 0) {
-          $isNonzero = true;
-        }
-        if ($qcolors[$pn] < .99) {
-          $isCorrect = false;
-        }
-      } else if ($partattemptn[$pn] == 0) {
-        $isCorrect = false;
       }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : min($partattemptn);
 
-
+    /*
     // TODO: move this to displayq input
     // TODO: pass stuanswers, stuanswersval
     $GLOBALS['qdatafordisplayq'] = $this->assess_info->getQuestionSetData($qsettings['questionsetid']);
     // TODO:  pass as input
     $GLOBALS['lastanswers'] = array($qn => implode('&', $lastans));
     $GLOBALS['lastansweights'] = array(1);
-    /*
+
     list($qout,$jsparams) = displayq(
         $qn,                            // question number
         $qsettings['questionsetid'],    // questionset ID
@@ -1310,9 +1302,11 @@ class AssessRecord
     */
     //TODO!!
 
+
     $questionParams = new QuestionParams();
     $questionParams
         ->setDbQuestionSetId($qsettings['questionsetid'])
+        ->setQuestionData($this->assess_info->getQuestionSetData($qsettings['questionsetid']))
         ->setQuestionNumber($qn)
         ->setQuestionSeed($qver['seed'])
         ->setShowHints($qsettings['showhints'])
@@ -1322,14 +1316,15 @@ class AssessRecord
         ->setStudentPartAttemptCount($partattemptn)
         ->setAllQuestionAnswers($stuanswers)
         ->setAllQuestionAnswersAsNum($stuanswersval)
-        ->setScoreNonZero($isNonzero)
-        ->setScoreIsCorrect($isCorrect);
+        ->setScoreNonZero($scorenonzero)
+        ->setScoreIsCorrect($scoreiscorrect);
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
 
     $qout = $question->getQuestionContent();
-
+    $jsparams = $question->getJsParams();
+    
     // need to extract answeights to provide to frontend
     $answeights = $GLOBALS['lastansweights'];
     if (empty($answeights)) {
@@ -1448,6 +1443,50 @@ class AssessRecord
     }
     return array($stuanswers, $stuanswerval);
   }
+
+  /**
+   * Generate $scoreiscorrect and $scorenonzero for the last tries
+   * @param  string  $ver         Version to grab from, or 'last' for latest
+   * @return array  ($scorenonzero, $scoreiscorrect)
+   */
+  public function getScoreIsCorrect($ver = 'last') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    // get data structure for this question
+    $assessver = $this->getAssessVer($ver);
+    $scorenonzero = array();
+    $scoreiscorrect = array();
+    for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
+      $bcnt = 0;
+      $question_versions = $assessver['questions'][$qn]['question_versions'];
+      if (!$by_question || !is_numeric($ver)) {
+        $curq = $question_versions[count($question_versions) - 1];
+      } else {
+        $curq = $question_versions[$ver];
+      }
+      if (count($curq['tries']) == 0) {
+        $scorenonzero[$qn] = 0;
+        $scoreiscorrect[$qn] = 0;
+        continue;
+      }
+      $scorenonzeroparts = array();
+      $scoreiscorrectparts = array();
+      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
+        $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
+        $scorenonzeroparts[$pn] = $lasttry['raw'] > 0;
+        $scoreiscorrectparts[$pn] = $lasttry['raw'] > .99;
+      }
+      if (count($stuansparts) > 1) {
+        $scorenonzero[$qn] = $scorenonzeroparts;
+        $scoreiscorrect[$qn] = $scoreiscorrectparts;
+      } else {
+        $scorenonzero[$qn] = $scorenonzeroparts[0];
+        $scoreiscorrect[$qn] = $scoreiscorrectparts[0];
+      }
+
+    }
+    return array($scorenonzero, $scoreiscorrect);
+  }
+
 
   /**
    * Gets the question ID for the given question number

@@ -204,7 +204,7 @@ class QuestionHtmlGenerator
          */
 
         // $answerbox must not be renamed, it is expected in eval'd code.
-        $answerbox = $entryTips = $displayedAnswersForParts = $previewLocations = null;
+        $answerbox = $jsParams = $entryTips = $displayedAnswersForParts = $previewLocations = null;
 
         if ($qdata['qtype'] == "multipart" || $qdata['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
@@ -296,6 +296,8 @@ class QuestionHtmlGenerator
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();
                 $entryTips[$atIdx] = $answerBoxGenerator->getEntryTip();
+                $qnRef = ($this->questionParams->getQuestionNumber()+1)*1000 + $atIdx;
+                $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
                 $displayedAnswersForParts[$atIdx] = $answerBoxGenerator->getCorrectAnswerForPart();
                 $previewLocations[$atIdx] = $answerBoxGenerator->getPreviewLocation();
             }
@@ -304,6 +306,8 @@ class QuestionHtmlGenerator
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
 
+            $lastAnswer = $stuanswers[$this->questionParams->getQuestionNumber()];
+
             $answerBoxParams = new AnswerBoxParams();
             $answerBoxParams
                 ->setQuestionWriterVars($questionWriterVars)
@@ -311,7 +315,7 @@ class QuestionHtmlGenerator
                 ->setAnswerType($qdata['qtype'])
                 ->setQuestionNumber($this->questionParams->getQuestionNumber())
                 ->setIsMultiPartQuestion(false)
-                ->setStudentLastAnswers($stuanswers)
+                ->setStudentLastAnswers($lastAnswer)
                 ->setColorboxKeyword($questionColor);
 
             $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
@@ -319,6 +323,8 @@ class QuestionHtmlGenerator
 
             $answerbox = $answerBoxGenerator->getAnswerBox();
             $entryTips[0] = $answerBoxGenerator->getEntryTip();
+            $qnRef = $this->questionParams->getQuestionNumber();
+            $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
             $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
             $previewLocations = $answerBoxGenerator->getPreviewLocation();
         }
@@ -482,6 +488,7 @@ class QuestionHtmlGenerator
 
         $question = new Question(
             $evaledqtext,
+            $jsParams,
             $evaledsoln,
             $detailedSolutionContent,
             $entryTips,

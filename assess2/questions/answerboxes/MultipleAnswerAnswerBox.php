@@ -4,6 +4,8 @@ namespace IMathAS\assess2\questions\answerboxes;
 
 require_once(__DIR__ . '/AnswerBox.php');
 
+use Sanitize;
+
 class MultipleAnswerAnswerBox implements AnswerBox
 {
     private $answerBoxParams;
@@ -164,7 +166,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		return $this->answerBox;
 	}
 
-  public function getJsParams(): string
+  public function getJsParams(): array
   {
       return $this->jsParams;
   }

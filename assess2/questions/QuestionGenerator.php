@@ -3,8 +3,10 @@
 namespace IMathAS\assess2\questions;
 
 require_once(__DIR__ . "/../../assessment/mathphp2.php");
+require_once(__DIR__ . "/../../assessment/mathparser.php");
 require_once(__DIR__ . "/../../assessment/interpret5.php");
 require_once(__DIR__ . "/../../assessment/macros.php");
+require_once(__DIR__ . "/answerboxhelpers.php");
 require_once(__DIR__ . "/../../includes/sanitize.php");
 
 require_once(__DIR__ . "/ErrorHandler.php");
@@ -204,4 +206,3 @@ class QuestionGenerator
             . '</p>');
     }
 }
-

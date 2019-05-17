@@ -40,6 +40,7 @@ Newver /course/modquestiongrid.php
     - Stuff above
     - Add as group
     - Set points = number of parts
+Newver /course/chgassessments.php
 
 Edit/Rewrite /util/crosscoursedata.php
 Edit/Rewrite /util/crosscoursedatadetail.php

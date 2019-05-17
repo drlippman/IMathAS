@@ -38,7 +38,7 @@ interface AnswerBox
      *
      * @return string
      */
-    public function getJsParams(): string;
+    public function getJsParams(): array;
 
     /**
      * Get all answer box entry tips for a question.
