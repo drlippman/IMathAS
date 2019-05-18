@@ -74,7 +74,7 @@ class FunctionExpressionScorePart implements ScorePart
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
             if ($variables[$i]=='lambda') { //correct lamda/lambda
-                $_POST["tc$qn"] = str_replace('lamda', 'lambda', $_POST["tc$qn"]);
+                $givenans = str_replace('lamda', 'lambda', $givenans);
             }
             //find f() function variables
             if (strpos($variables[$i],'(')!==false) {

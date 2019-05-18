@@ -38,53 +38,6 @@ class ConditionalScorePart implements ScorePart
         if (!is_array($anstypes)) {
             $anstypes = array_map('trim',explode(',',$anstypes));
         }
-        $la = array();
-        foreach ($anstypes as $i=>$anst) {
-//            $qn = ($qn+1)*1000+$partnum;
-            // FIXME: Does the following line ($qnt) need to be changed?
-            $qnt = 1000*($qn+1)+$i;
-            if (isset($_POST["tc$qnt"])) {
-                if ($anst=='calculated' || $anst=='calcmatrix') {
-                    $la[$i] = $_POST["tc$qnt"].'$#$'.$_POST["qn$qnt"];
-                } else {
-                    $la[$i] = $_POST["tc$qnt"];
-                }
-            } else if (isset($_SESSION['choicemap'][$qnt])) {
-                if (is_array($_POST["qn$qnt"])) { //multans
-                    $origmala = array();
-                    $mappedpost = array();
-                    foreach ($_SESSION['choicemap'][$qnt] as $k=>$v) {
-                        if (isset($_POST["qn$qnt"][$k])) {
-                            $origmala[$k] = $_POST["qn$qnt"][$k];
-                            $mappedpost[$k] = $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"][$k]];
-                        } else {
-                            $origmala[$k] = "";
-                        }
-                    }
-                    $la[$i] = implode('|',$origmala) . '$!$' . implode('|', $mappedpost);
-                } else if (isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
-                    $la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
-                }
-            } else if (isset($_POST["qn$qnt-0"])) {
-                $tmp = array();
-                $spc = 0;
-                while (isset($_POST["qn$qnt-$spc"])) {
-                    $tmp[] = $_POST["qn$qnt-$spc"];
-                    $spc++;
-                }
-                $la[$i] = implode('|', $tmp);
-                if (isset($_POST["qn$qnt"]) && $_POST["qn$qnt"] !== 'done') {
-                    $stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$qnt"]);
-                    $la[$i] .= '$#$'.str_replace(',','|',$stuav);
-                }
-            } else {
-                $la[$i] = $_POST["qn$qnt"];
-            }
-            $la[$i] = str_replace('&','',$la[$i]);
-            $la[$i] = preg_replace('/#+/','#',$la[$i]);
-        }
-
-        $GLOBALS['partlastanswer'] = implode('&',$la);
 
         if (isset($abstolerance)) {
             $tol = '|'.$abstolerance;

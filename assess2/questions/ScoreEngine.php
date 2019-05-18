@@ -247,6 +247,11 @@ class ScoreEngine
                 $additionalVarsForScoring);
         } else {
             $score = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata);
+            if ($qdata['qtype'] == "conditional") {
+              // Store just-build $stuanswers as lastanswer for conditional
+              $GLOBALS['lastanswers'][$qnidx] = implode('&', $stuanswers[$thisq]);
+              //TODO: store $stuanswersval
+            }
         }
 
         return $score;
