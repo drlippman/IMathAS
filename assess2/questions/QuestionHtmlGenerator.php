@@ -302,6 +302,12 @@ class QuestionHtmlGenerator
                 $jsParams[$qnRef]['qtype'] = $anstype;
                 $displayedAnswersForParts[$atIdx] = $answerBoxGenerator->getCorrectAnswerForPart();
                 $previewLocations[$atIdx] = $answerBoxGenerator->getPreviewLocation();
+
+                // enact hidetips if set
+                if (!empty($hidetips) && (!is_array($hidetips) || !empty($hidetips[$atIdx]))) {
+                  unset($jsParams[$qnRef]['tip']);
+                  unset($jsParams[$qnRef]['longtip']);
+                }
             }
         } else {
             // Generate answer boxes. (non-multipart question)
@@ -330,6 +336,12 @@ class QuestionHtmlGenerator
             $jsParams[$qnRef]['qtype'] = $qdata['qtype'];
             $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
             $previewLocations = $answerBoxGenerator->getPreviewLocation();
+
+            // enact hidetips if set
+            if (!empty($hidetips)) {
+              unset($jsParams[$qnRef]['tip']);
+              unset($jsParams[$qnRef]['longtip']);
+            }
         }
 
         /*
