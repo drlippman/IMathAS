@@ -73,10 +73,11 @@ class MatchingAnswerBox implements AnswerBox
     		}
         $_SESSION['choicemap'][$qn] = array($randqkeys, $randakeys);
     		if (isset($GLOBALS['capturechoices'])) {
-    			if (!isset($GLOBALS['choicesdata'])) {
-    				$GLOBALS['choicesdata'] = array();
-    			}
-    			$GLOBALS['choicesdata'][$qn] = array($anstype, $randakeys);
+          /* TODO
+          $params['livepoll_choices'] = $questions;
+          $params['livepoll_ans'] = $answer;
+          $params['livepoll_randkeys'] = $randakeys;
+          */
     		}
 
     		$ncol = 1;

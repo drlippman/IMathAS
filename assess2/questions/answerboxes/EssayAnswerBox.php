@@ -58,9 +58,7 @@ class EssayAnswerBox implements AnswerBox
     		}
     		if ($GLOBALS['useeditor']=='review' || ($GLOBALS['useeditor']=='reviewifneeded' && trim($la)=='')) {
     			$la = str_replace('&quot;','"',$la);
-    			$la = preg_replace('/%(\w+;)/','&$1',$la);
-    			$la = str_replace('&tilde;', '~', $la);
-    			//$la = str_replace('nbsp;','&nbsp;',$la);
+
     			if ($displayformat!='editor') {
     				$la = preg_replace('/\n/','<br/>',$la);
     			}
@@ -114,8 +112,7 @@ class EssayAnswerBox implements AnswerBox
     			$out .= getcolormark($colorbox);
     			$out .= "</div>";
     		} else {
-    			$la = preg_replace('/%(\w+;)/','&$1',$la);
-    			$la = str_replace('&tilde;', '~', $la);
+
     			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
     				$la = str_replace('&quot;','"',$la);
     			}
@@ -135,8 +132,8 @@ class EssayAnswerBox implements AnswerBox
     				if ($colorbox!='') { $out .= '</div>';}
     			}
     			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
-    				//$out .= "<script type=\"text/javascript\">editornames[editornames.length] = \"qn$qn\";</script>";
-    			}
+            $params['usetinymce'] = 1;
+          }
     		}
     		$tip .= _('Enter your answer as text.  This question is not automatically graded.');
     		$sa .= $answer;

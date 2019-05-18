@@ -183,6 +183,11 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
   if (!$showscores) {
     $assessInfoOut['showscores'] = 'at_end';
   }
+  if ($isteacher) {
+    // trigger additional jsParams for livepoll results display
+    $GLOBALS['capturedrawinit'] = true;
+    $GLOBALS['capturechoices'] = true;
+  }
 } else {
   $showscores = $assess_info->showScoresDuring();
 }

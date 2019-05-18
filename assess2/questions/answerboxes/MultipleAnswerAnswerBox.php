@@ -33,15 +33,11 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
 
-        // FIXME: The following code needs to be updated
-        //        - $qn is always the question number (never $qn+1)
-        //        - $multi is now a boolean
-        //        - $partnum is now available
-
 		$out = '';
 		$tip = '';
 		$sa = '';
 		$preview = '';
+    $params = [];
 
 		if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
 		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
@@ -69,14 +65,9 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		}
 		$_SESSION['choicemap'][$qn] = $randkeys;
 		if (isset($GLOBALS['capturechoices'])) {
-			if (!isset($GLOBALS['choicesdata'])) {
-				$GLOBALS['choicesdata'] = array();
-			}
-			if ($GLOBALS['capturechoices']=='shuffled') {
-				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answers, $randkeys);
-			} else {
-				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
-			}
+      $params['livepoll_choices'] = $questions;
+      $params['livepoll_ans'] = $answer;
+      $params['livepoll_randkeys'] = $randkeys;
 		}
 
     if ($la=='') {
@@ -160,6 +151,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
 
 		// Done!
 		$this->answerBox = $out;
+    $this->jsParams = $params;
 		$this->entryTip = $tip;
 		$this->correctAnswerForPart = $sa;
 		$this->previewLocation = $preview;

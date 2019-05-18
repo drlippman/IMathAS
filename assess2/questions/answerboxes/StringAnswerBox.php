@@ -54,9 +54,6 @@ class StringAnswerBox implements AnswerBox
         if (!isset($sz)) { $sz = 20;}
     		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 
-    		$la = preg_replace('/%(\w+;)/',"&$1",$la);
-    		$la = str_replace('&tilde;', '~', $la);
-
     		if ($answerformat=='list') {
     			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
     			$shorttip = _('Enter a list of text');

@@ -486,10 +486,7 @@ class DrawingAnswerBox implements AnswerBox
     							'" />';
 
     			if (isset($GLOBALS['capturedrawinit'])) {
-    				if (!isset($GLOBALS['drawinitdata'])) {
-    					$GLOBALS['drawinitdata'] = array();
-    				}
-    				$GLOBALS['drawinitdata'][$qn] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
+    				$params['livepoll_drawinit'] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
     			}
     		}
     		if ($revertgraphdisp) {

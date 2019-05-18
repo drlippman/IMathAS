@@ -37,6 +37,7 @@ class ChoicesAnswerBox implements AnswerBox
         $tip = '';
         $sa = '';
         $preview = '';
+        $params = [];
 
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat="vert";}
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
@@ -71,14 +72,9 @@ class ChoicesAnswerBox implements AnswerBox
     		}
     		$_SESSION['choicemap'][$qn] = $randkeys;
     		if (isset($GLOBALS['capturechoices'])) {
-    			if (!isset($GLOBALS['choicesdata'])) {
-    				$GLOBALS['choicesdata'] = array();
-    			}
-    			if ($GLOBALS['capturechoices']=='shuffled') {
-    				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answer, $randkeys);
-    			} else {
-    				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
-    			}
+          $params['livepoll_choices'] = $questions;
+          $params['livepoll_ans'] = $answer;
+          $params['livepoll_randkeys'] = $randkeys;
     		}
 
     		if ($displayformat == 'column') { $displayformat = '2column';}
@@ -177,6 +173,7 @@ class ChoicesAnswerBox implements AnswerBox
 
         // Done!
         $this->answerBox = $out;
+        $this->jsParams = $params;
         $this->entryTip = $tip;
         $this->correctAnswerForPart = $sa;
         $this->previewLocation = $preview;

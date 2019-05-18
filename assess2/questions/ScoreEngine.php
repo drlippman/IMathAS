@@ -221,19 +221,6 @@ class ScoreEngine
             $varsForScorepart[$optionKey] = ${$optionKey};
         }
 
-        /*
-         * Look to see if we should splice off some autosaved answers.
-         */
-
-        if ($GLOBALS['lastanswers'][$qnidx] != '') {
-            $templastans = explode('##', $GLOBALS['lastanswers'][$qnidx]);
-            $countregens = count(array_keys($templastans, 'ReGen', true));
-            $tosplice = ($countregens + $attemptn) - count($templastans);
-            if ($tosplice < 0) {
-                array_splice($templastans, $tosplice);
-                $GLOBALS['lastanswers'][$qnidx] = implode('##', $templastans);
-            }
-        }
 
         /*
          * Package additional variables for scoring, not used by scorepart().
@@ -531,9 +518,6 @@ class ScoreEngine
             $raw[$partnum] = round($raw[$partnum], 2);
             $partla[$partnum] = $GLOBALS['partlastanswer'];
         }
-
-        $partla = str_replace('&', '', $partla);
-        $partla = preg_replace('/#+/', '#', $partla);
 
         if ($GLOBALS['lastanswers'][$qnidx] == '') {
             $GLOBALS['lastanswers'][$qnidx] = implode("&", $partla);
