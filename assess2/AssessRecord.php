@@ -1207,7 +1207,10 @@ class AssessRecord
       }
     }
     $qScore = array_sum($partscores);
-    $qRawscore = array_sum($partrawscores);
+    $qRawscore = 0;
+    for ($pn = 0; $pn < count($answeights); $pn++) {
+      $qRawscore += $partrawscores[$pn]*$answeights[$pn];
+    }
     return array($qScore, $qRawscore, $parts);
   }
 

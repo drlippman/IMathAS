@@ -615,6 +615,7 @@ export const actions = {
   },
   enableMQ () {
     store.enableMQ = true;
+    imathasAssess.clearLivePreviewTimeouts();
     $('input[type=button][id^=pbtn],button[id^=pbtn]').hide();
     $('span[id^=p] span[id^=lpbuf]').empty();
     MQeditor.toggleMQAll('input[data-mq]', true);
