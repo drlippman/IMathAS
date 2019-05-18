@@ -62,7 +62,7 @@ class FunctionExpressionScorePart implements ScorePart
         $givenans = normalizemathunicode(trim($givenans));
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($givenans, $junk, $answer) = scorenosolninf($qn, '', $answer, $ansprompt);
+            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
         }
 
         $GLOBALS['partlastanswer'] = $givenans;

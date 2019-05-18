@@ -349,4 +349,26 @@ td.l, table.stats tbody td.l {
   text-align: left;
 }
 
+ul.nomark {
+	padding-left: 40px;
+}
+div.toppad {
+	padding-top: 5px;
+}
+ul.likelines {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+ul.likelines li {
+	margin-bottom: .4em;
+}
+
+ul.nomark {list-style-type: none;}
+ul.nomark li { margin-top: .7em;}
+ol.lalpha {list-style-type: lower-alpha;}
+ol.lalpha li { margin-top: .7em;}
+
+.spaced li { margin-bottom: .3em;}
+
 </style>

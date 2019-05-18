@@ -38,13 +38,19 @@ class IntervalScorePart implements ScorePart
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $hasNumVal = !empty($_POST["qn$qn-val"]);
+        if ($hasNumVal) {
+          $givenansval = $_POST["qn$qn-val"];
+        }
         
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         $givenans = normalizemathunicode($givenans);
 
         if (in_array('nosoln',$ansformats)) {
-            list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt, in_array('inequality',$ansformats)?'inequality':'interval');
+            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt, in_array('inequality',$ansformats)?'inequality':'interval');
+            if ($givenans === 'DNE' || $givenans === 'oo') {
+              $_POST["qn$qn-val"] = $givenans;
+            }
         }
 
         $givenans = str_replace('u', 'U', $givenans);

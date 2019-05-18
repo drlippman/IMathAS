@@ -41,6 +41,9 @@ class NTupleScorePart implements ScorePart
         if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $hasNumVal = !empty($_POST["qn$qn-val"]);
+        if ($hasNumVal) {
+          $givenansval = $_POST["qn$qn-val"];
+        }
         
         if (!isset($answerformat)) { $answerformat = '';}
         $givenans = normalizemathunicode($givenans);
@@ -50,7 +53,10 @@ class NTupleScorePart implements ScorePart
         $answer = str_replace(' ','',$answer);
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            if ($givenans === 'DNE' || $givenans === 'oo') {
+              $_POST["qn$qn-val"] = $givenans;
+            }
         }
 
         if ($anstype=='ntuple') {

@@ -37,12 +37,18 @@ class CalculatedMatrixScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $hasNumVal = !empty($_POST["qn$qn-val"]);
-        
+        if ($hasNumVal) {
+          $givenansval = $_POST["qn$qn-val"];
+        }
+
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            if ($givenans === 'DNE' || $givenans === 'oo') {
+              $_POST["qn$qn-val"] = $givenans;
+            }
         }
         //store answers
         if ($givenans==='oo' || $givenans==='DNE') {

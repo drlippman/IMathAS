@@ -276,7 +276,7 @@ class QuestionHtmlGenerator
 
             // Generate answer boxes. (multipart question)
             foreach ($anstypes as $atIdx => $anstype) {
-                $questionColor = $this->isMultipart()
+                $questionColor = ($qdata['qtype'] == "multipart")
                     ? $this->getAnswerColorFromRawScore(
                         $this->questionParams->getLastRawScores(), $atIdx, $answeights[$atIdx])
                     : '';

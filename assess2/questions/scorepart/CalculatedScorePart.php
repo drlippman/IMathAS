@@ -46,12 +46,17 @@ class CalculatedScorePart implements ScorePart
 
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($givenans, $_POST["qn$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            if ($givenans === 'DNE' || $givenans === 'oo') {
+              $_POST["qn$qn-val"] = $givenans;
+            }
         }
 
         $GLOBALS['partlastanswer'] = $givenans;
         if ($hasNumVal) {
-            $GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
+          $givenansval = $_POST["qn$qn-val"];
+          //TODO: return this as the numeric part last answer
+          //  $GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
         }
         if ($answer==='') {
             if (trim($givenans)==='') { return 1;} else { return 0;}
@@ -156,7 +161,8 @@ class CalculatedScorePart implements ScorePart
                 }
             }
             $givenansval = implode(',', $numvalarr);
-            $GLOBALS['partlastanswer'] .= '$#$'. $givenansval;
+            //TODO: return this as the numeric part last answer
+            //$GLOBALS['partlastanswer'] .= '$#$'. $givenansval;
         } {
         $numvalarr = explode(',', $givenansval);
     }

@@ -1413,18 +1413,27 @@ class AssessRecord
     $scores = explode('~', $scores);
     $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
 
-    foreach ($rawparts as $k=>$v) {
+    if (count($rawparts)===1 && count($partla) > 1) {
+      // force recording of all parts for conditional
+      $parts_to_score = true;
+    }
+
+    //foreach ($rawparts as $k=>$v) {
+    foreach ($partla as $k=>$v) {
       if ($parts_to_score === true || !empty($parts_to_score[$k])) {
         $data[$k] = array(
           'sub' => $submission,
-          'raw' => $v,
           'time' => round($timeactive/1000),
-          'stuans' => $partla[$k]   // TODO: this is wrong for most types
+          'stuans' => $v   // TODO: this is wrong for most types
         );
+        if (isset($rawparts[$k])) {
+          $data[$k]['raw'] = $rawparts[$k];
+        }
         $this->clearAutoSave($qn, $k);
       }
     }
-    $singlescore = (count($rawparts) > 1 && count($scores) == 1);
+
+    $singlescore = (count($partla) > 1 && count($scores) == 1);
     $this->recordTry($qn, $data, $singlescore);
 
     //TODO: record to firstscores if appropriate

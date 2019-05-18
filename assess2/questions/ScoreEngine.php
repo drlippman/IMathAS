@@ -314,7 +314,13 @@ class ScoreEngine
         }
 
         foreach ($postpartstoprocess as $partnum => $kidx) {
-            if (isset($_POST["qn$partnum-0"])) {
+            if (isset($_POST["qs$partnum"]) && (
+              $_POST["qs$partnum"] === 'DNE' || $_POST["qs$partnum"] === 'inf')
+            ) {
+              // nosolninf solution
+              $stuanswers[$thisq][$kidx] = $_POST["qs$partnum"];
+              $stuanswersval[$thisq][$kidx] = $_POST["qs$partnum"];
+            } else if (isset($_POST["qn$partnum-0"])) {
               // either matrix or calcmatrix with answersize, or matching
                 $tmp = array();
                 $spc = 0;
@@ -384,7 +390,13 @@ class ScoreEngine
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
 
-        if (isset($_POST["qn$qnidx-0"])) {
+        if (isset($_POST["qs$qnidx"]) && (
+          $_POST["qs$qnidx"] === 'DNE' || $_POST["qs$qnidx"] === 'inf')
+        ) {
+          // nosolninf solution
+          $stuanswers[$thisq] = $_POST["qs$qnidx"];
+          $stuanswersval[$thisq] = $_POST["qs$qnidx"];
+        } else if (isset($_POST["qn$qnidx-0"])) {
           // either matrix or calcmatrix with answersize, or matching
             $tmp = array();
             $spc = 0;

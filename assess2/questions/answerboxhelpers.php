@@ -655,15 +655,11 @@ function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {
 	$qs = $_POST["qs$qn"];
 	if ($qs=='DNE') {
 		$givenans = "DNE";
-		$newpost = "DNE";
 	} else if ($qs=='inf') {
 		$givenans = "oo";
-		$newpost = "oo";
-	} else {
-		$newpost = $_POST["tc$qn"];
 	}
 
-	return array($givenans, $newpost, $answer);
+	return array($givenans, $answer);
 }
 
 function rawscoretocolor($sc,$aw) {
