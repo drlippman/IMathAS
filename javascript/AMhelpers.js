@@ -512,7 +512,9 @@ function ntuplecalc(inputId,outputId,format) {
 				outcalced += fullstr.charAt(i);
 				lastcut = i+1;
 				if (fullstr.charAt(i)==',') {
-					if (!fullstr.charAt(i+1).match(/[\(\[\<\{]/) || !fullstr.charAt(i-1).match(/[\)\]\>\}]/)) {
+					if (!fullstr.substring(i+1).match(/^\s*[\(\[\<\{]/) ||
+						!fullstr.substring(0,i).match(/[\)\]\>\}]\s*$/)
+					) {
 						notationok=false;
 					}
 				}
