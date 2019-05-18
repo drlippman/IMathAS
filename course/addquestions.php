@@ -401,7 +401,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/../filter/filter.php");
 	if ($aver > 1) {
-		$query = "SELECT ias.id FROM imas_assessment_records AS iar,imas_students WHERE ";
+		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
 		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
 	} else {
 		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";

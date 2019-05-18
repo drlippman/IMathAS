@@ -64,7 +64,6 @@ class MultipleAnswerScorePart implements ScorePart
         $origla = array();
         for ($i=0;$i<count($questions);$i++) {
             if ($i>0) {$GLOBALS['partlastanswer'] .= "|"; } else {$GLOBALS['partlastanswer']='';}
-            $GLOBALS['partlastanswer'] .= $_POST["qn$qn"][$i];
             if (isset($_POST["qn$qn"][$i])) {
                 $origla[] = $randqkeys[$i];
             }
@@ -73,7 +72,8 @@ class MultipleAnswerScorePart implements ScorePart
                 $score -= $deduct;
             }
         }
-        $GLOBALS['partlastanswer'] .= '$!$'.implode('|',$origla);
+        // just store unrandomized last answers
+        $GLOBALS['partlastanswer'] = implode('|',$origla);
         if (isset($scoremethod)) {
             if ($scoremethod=='allornothing' && $score<1) {
                 $score = 0;

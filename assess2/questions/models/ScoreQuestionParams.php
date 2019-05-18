@@ -13,6 +13,8 @@ class ScoreQuestionParams
     private $givenAnswer;       // Orig: $givenans
     private $attemptNumber;     // Orig: $attemptn
     private $qnpointval;        // Orig: $qnpointval
+    private $allQuestionAnswers;        // Orig: $GLOBALS['stuanswers']
+    private $allQuestionAnswersAsNum;   // Orig: $GLOBALS['stuanswersval']
 
     // Used by ScorePart instances
     private $randWrapper;           // Orig: $GLOBALS['RND']
@@ -290,6 +292,50 @@ class ScoreQuestionParams
     public function setVarsForScorePart($varsForScorePart): ScoreQuestionParams
     {
         $this->varsForScorePart = $varsForScorePart;
+        return $this;
+    }
+
+    /**
+     * Get all of the student's answers to ALL questions. (as entered)
+     *
+     * @return array
+     */
+    public function getAllQuestionAnswers(): ?array
+    {
+        return $this->allQuestionAnswers;
+    }
+
+    /**
+     * Set all of the student's answers to ALL questions. (as entered)
+     *
+     * @param array $allQuestionAnswers
+     * @return QuestionParams
+     */
+    public function setAllQuestionAnswers(?array $allQuestionAnswers): ScoreQuestionParams
+    {
+        $this->allQuestionAnswers = $allQuestionAnswers;
+        return $this;
+    }
+
+    /**
+     * Get all of the student's answers to ALL questions. (as floats)
+     *
+     * @return array
+     */
+    public function getAllQuestionAnswersAsNum(): ?array
+    {
+        return $this->allQuestionAnswersAsNum;
+    }
+
+    /**
+     * Set all of the student's answers to ALL questions. (as floats)
+     *
+     * @param array $allQuestionAnswersAsNum
+     * @return QuestionParams
+     */
+    public function setAllQuestionAnswersAsNum(?array $allQuestionAnswersAsNum): ScoreQuestionParams
+    {
+        $this->allQuestionAnswersAsNum = $allQuestionAnswersAsNum;
         return $this;
     }
 }

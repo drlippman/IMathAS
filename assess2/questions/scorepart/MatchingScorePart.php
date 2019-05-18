@@ -4,6 +4,8 @@ namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
 
+use Sanitize;
+
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class MatchingScorePart implements ScorePart
@@ -57,19 +59,8 @@ class MatchingScorePart implements ScorePart
 
         $origla = array();
         for ($i=0;$i<count($questions);$i++) {
-            if ($i>0) {$GLOBALS['partlastanswer'] .= "|";} else {$GLOBALS['partlastanswer']='';}
-            $GLOBALS['partlastanswer'] .= $_POST["qn$qn-$i"];
             if ($_POST["qn$qn-$i"]!="" && $_POST["qn$qn-$i"]!="-") {
-                if (!is_numeric($_POST["qn$qn-$i"])) { //legacy
-                    $qa = ord($_POST["qn$qn-$i"]);
-                    if ($qa<97) { //if uppercase answer
-                        $qa -= 65;  //shift A to 0
-                    } else { //if lower case
-                        $qa -= 97;  //shift a to 0
-                    }
-                } else {
-                    $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
-                }
+                $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
                 if (isset($matchlist)) {
                     if ($matchlist[$randqkeys[$i]]!=$randakeys[$qa]) {
@@ -83,7 +74,8 @@ class MatchingScorePart implements ScorePart
             } else {$origla[$randqkeys[$i]] = '';$score -= $deduct;}
         }
         ksort($origla);
-        $GLOBALS['partlastanswer'] .= '$!$'.implode('|',$origla);
+        // only store unrandomized
+        $GLOBALS['partlastanswer'] = implode('|',$origla);
         return $score;
     }
 }

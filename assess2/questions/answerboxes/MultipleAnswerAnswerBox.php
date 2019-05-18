@@ -79,7 +79,11 @@ class MultipleAnswerAnswerBox implements AnswerBox
 			}
 		}
 
-		$labits = explode('|',$la);
+    if ($la=='') {
+      $labits = array();
+    } else {
+		  $labits = explode('|',$la);
+    }
 		if ($displayformat == 'column') { $displayformat = '2column';}
 
 		if (substr($displayformat,1)=='column') {
@@ -109,11 +113,11 @@ class MultipleAnswerAnswerBox implements AnswerBox
 			if ($displayformat == "horiz") {
 				$out .= "<div class=choice><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/>";
 				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
-				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+        if (in_array($randkeys[$i], $labits)) { $out .= 'checked';}
 				$out .= " /></div> \n";
 			} else if ($displayformat == "inline") {
 				$out .= "<input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
-				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				if (in_array($randkeys[$i], $labits)) { $out .= 'checked';}
 				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label> ";
 			} else if ($displayformat == 'column') {
 				if ($i%$itempercol==0) {
@@ -123,11 +127,11 @@ class MultipleAnswerAnswerBox implements AnswerBox
 					$out .= '<div class="match"><ul class=nomark>';
 				}
 				$out .= "<li><input type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
-				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				if (in_array($randkeys[$i], $labits)) { $out .= 'checked';}
 				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			} else {
 				$out .= "<li><input class=\"unind\" type=checkbox name=\"qn$qn"."[$i]\" value=$i id=\"qn$qn-$i\" ";
-				if (isset($labits[$i]) && ($labits[$i]!='') && ($labits[$i] == $i)) { $out .= "CHECKED";}
+				if (in_array($randkeys[$i], $labits)) { $out .= 'checked';}
 				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			}
 		}

@@ -446,6 +446,8 @@ function processByType(qn) {
   if (params.qtype == 'draw') {
     imathasDraw.encodea11ydraw();
     return {};
+  } else if (params.qtype == 'choices' || params.qtype == 'multans' || params.qtype == 'matching') {
+    return {};
   } else if (params.hasOwnProperty('matrixsize')) {
     res = processSizedMatrix(qn);
   } else {
@@ -453,11 +455,11 @@ function processByType(qn) {
     str = normalizemathunicode(str);
     str = str.replace(/^\s+/,'').replace(/\s+$/,'');
     if (str.match(/^\s*$/)) {
-      return ['','',''];
+      return {str: '', displvalstr: '', submitstr: ''};
     } else if (str.match(/^\s*DNE\s*$/i)) {
-      return ['DNE','','DNE'];
+      return {str: 'DNE', displvalstr: '', submitstr: 'DNE'};
     } else if (str.match(/^\s*oo\s*$/i)) {
-      return ['oo','','oo'];
+      return {str: 'oo', displvalstr: '', submitstr: 'oo'};
     }
     switch (params.qtype) {
       case 'calculated':

@@ -118,6 +118,7 @@ class QuestionHtmlGenerator
         $partattemptn = $this->questionParams->getStudentPartAttemptCount();
         $qdata = $this->questionParams->getQuestionData();
         $showHints = $this->questionParams->getShowHints();
+        $thisq = $this->questionParams->getQuestionNumber() + 1;
 
         if ($qdata['hasimg'] > 0) {
             // We need to "unpack" this into locally scoped variables.
@@ -249,7 +250,7 @@ class QuestionHtmlGenerator
             }
 
             // Get the answers to all parts of this question.
-            $lastAnswersAllParts = $stuanswers[$this->questionParams->getQuestionNumber()];
+            $lastAnswersAllParts = $stuanswers[$thisq];
 
             /*
 			 * Original displayq2.php notes:
@@ -307,7 +308,7 @@ class QuestionHtmlGenerator
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
 
-            $lastAnswer = $stuanswers[$this->questionParams->getQuestionNumber()];
+            $lastAnswer = $stuanswers[$thisq];
 
             $answerBoxParams = new AnswerBoxParams();
             $answerBoxParams

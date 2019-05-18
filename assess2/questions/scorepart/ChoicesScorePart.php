@@ -72,7 +72,8 @@ class ChoicesScorePart implements ScorePart
         if ($givenans==='NA' || $givenans === null) {
             $GLOBALS['partlastanswer'] = $givenans;
         } else {
-            $GLOBALS['partlastanswer'] = $givenans.'$!$'.$randkeys[$givenans];
+          // only store the unrandomized value
+            $GLOBALS['partlastanswer'] = $randkeys[$givenans];//$givenans.'$!$'.$randkeys[$givenans];
         }
         if ($givenans == null) {return 0;}
 

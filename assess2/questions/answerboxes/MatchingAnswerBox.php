@@ -71,7 +71,7 @@ class MatchingAnswerBox implements AnswerBox
     			$randakeys = $RND->array_rand($answers,count($answers));
     			$RND->shuffle($randakeys);
     		}
-
+        $_SESSION['choicemap'][$qn] = array($randqkeys, $randakeys);
     		if (isset($GLOBALS['capturechoices'])) {
     			if (!isset($GLOBALS['choicesdata'])) {
     				$GLOBALS['choicesdata'] = array();
@@ -94,11 +94,20 @@ class MatchingAnswerBox implements AnswerBox
     		$out .= "<div class=\"match\" $divstyle>\n";
     		$out .= "<p class=\"centered\">$questiontitle</p>\n";
     		$out .= "<ul class=\"nomark\">\n";
-    		$las = explode("|",$la);
+        if ($la=='') {
+          $las = array();
+        } else {
+    		  $las = explode("|",$la);
+        }
+
     		$letters = array_slice(explode(',','a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az'),0,count($answers));
 
     		for ($i=0;$i<count($randqkeys);$i++) {
-    			//$out .= "<li><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$i\" value=\"{$las[$i]}\" /> {$questions[$randqkeys[$i]]}</li>\n";
+          if (isset($las[$randqkeys[$i]])) {
+            $laval = $las[$randqkeys[$i]];
+          } else {
+            $laval = '-';
+          }
     			if ($ncol>1) {
     				if ($i>0 && $i%$itempercol==0) {
     					$out .= '</ul></div><div class="match"><ul class=nomark>';
@@ -111,15 +120,14 @@ class MatchingAnswerBox implements AnswerBox
     			}
     			$out .= "<select name=\"qn$qn-$i\">";
     			$out .= '<option value="-" ';
-    			if ($las[$i]=='-' || strcmp($las[$i],'')==0) {
+    			if ($laval=='-' || strcmp($laval,'')==0) {
     				$out .= 'selected="1"';
     			}
     			$out .= '>-</option>';
     			if ($displayformat=="select") {
     				for ($j=0;$j<count($randakeys);$j++) {
-    					//$out .= "<option value=\"".$letters[$j]."\" ";
     					$out .= "<option value=\"".$j."\" ";
-    					if (strcmp($las[$i],$j)==0 || $las[$i]==$letters[$j]) { //second is legacy
+    					if (strcmp($laval, $randakeys[$j])==0) {
     						$out .= 'selected="1"';
     					}
     					$out .= ">".str_replace('`','',$answers[$randakeys[$j]])."</option>\n";
@@ -128,7 +136,7 @@ class MatchingAnswerBox implements AnswerBox
     				foreach ($letters as $j=>$v) {
     					//$out .= "<option value=\"$v\" ";
     					$out .= "<option value=\"$j\" ";
-    					if (strcmp($las[$i],$j)==0 || $las[$i]==$v) {
+    					if (strcmp($laval,$randakeys[$j])==0) {
     						$out .= 'selected="1"';
     					}
     					$out .= ">$v</option>";

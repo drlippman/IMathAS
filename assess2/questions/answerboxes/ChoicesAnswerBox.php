@@ -120,15 +120,15 @@ class ChoicesAnswerBox implements AnswerBox
     		for ($i=0; $i < count($randkeys); $i++) {
     			if ($displayformat == "horiz") {
     				$out .= "<div class=choice><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label><br/><input type=radio id=\"qn$qn-$i\" name=qn$qn value=$i ";
-    				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
+    				if (($la!='') && ($la == $randkeys[$i])) { $out .= "CHECKED";}
     				$out .= " /></div>\n";
     			} else if ($displayformat == "select") {
     				$out .= "<option value=$i ";
-    				if (($la!='') && ($la!='NA') && ($la == $i)) { $out .= "selected=1";}
+    				if (($la!='') && ($la!='NA') && ($la == $randkeys[$i])) { $out .= "selected=1";}
     				$out .= ">".str_replace('`','',$questions[$randkeys[$i]])."</option>\n";
     			} else if ($displayformat == "inline") {
     				$out .= "<input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
-    				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
+    				if (($la!='') && ($la == $randkeys[$i])) { $out .= "CHECKED";}
     				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label>";
     			} else if ($displayformat == 'column') {
     				if ($i%$itempercol==0) {
@@ -138,11 +138,11 @@ class ChoicesAnswerBox implements AnswerBox
     					$out .= '<div class="match"><ul class=nomark>';
     				}
     				$out .= "<li><input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
-    				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
+    				if (($la!='') && ($la == $randkeys[$i])) { $out .= "CHECKED";}
     				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
     			} else {
     				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
-    				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
+    				if (($la!='') && ($la == $randkeys[$i])) { $out .= "CHECKED";}
     				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
     			}
     		}

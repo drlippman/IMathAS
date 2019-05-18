@@ -210,6 +210,29 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
 
 /* TODO separate out */
 
+div.choice {
+	padding: 5px;
+	float: left;
+	text-align: center;
+}
+div.float {
+	float:left;
+}
+
+div.match {
+	float:left;
+	padding: 5px;
+	padding-right: 30px;
+}
+div.spacer {
+	clear: both;
+	height: 1px;
+	padding: 0px;
+}
+p.centered {
+	text-align: center;
+}
+
 table.p3longdiv {
   border-spacing: 0px;
   border-collapse: collapse;

@@ -1390,6 +1390,8 @@ class AssessRecord
     $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
     */
 
+    list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
+
     $scoreEngine = new ScoreEngine($this->DBH, $GLOBALS['RND']);
 
     $scoreQuestionParams = new ScoreQuestionParams();
@@ -1401,6 +1403,8 @@ class AssessRecord
         ->setQuestionSeed($qver['seed'])
         ->setGivenAnswer($_POST['qn'.$qn])
         ->setAttemptNumber($attemptn)
+        ->setAllQuestionAnswers($stuanswers)
+        ->setAllQuestionAnswersAsNum($stuanswersval)
         ->setQnpointval($qsettings['points_possible']);
 
     list($scores, $rawscores) = $scoreEngine->scoreQuestion($scoreQuestionParams);
@@ -1452,12 +1456,13 @@ class AssessRecord
         $stuansparts[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
         $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
       }
+      // stuanswers array is 1-indexed
       if (count($stuansparts) > 1) {
-        $stuanswers[$qn] = $stuansparts;
-        $stuanswersval[$qn] = $stuansvalparts;
+        $stuanswers[$qn+1] = $stuansparts;
+        $stuanswersval[$qn+1] = $stuansvalparts;
       } else {
-        $stuanswers[$qn] = $stuansparts[0];
-        $stuanswersval[$qn] = $stuansvalparts[0];
+        $stuanswers[$qn+1] = $stuansparts[0];
+        $stuanswersval[$qn+1] = $stuansvalparts[0];
       }
 
     }
