@@ -32,7 +32,7 @@ class FileUploadAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
-
+        $assessmentId = $this->answerBoxParams->getAssessmentId();
 
         $out = '';
         $tip = '';
@@ -52,10 +52,8 @@ class FileUploadAnswerBox implements AnswerBox
     		$out .= getcolormark($colorbox);
     		if ($colorbox!='') { $out .= '</span>';}
     		if ($la!='') {
-    			if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
-    				$s3asid = 'grp'.$GLOBALS['sessiondata']['groupid'].'/'.$GLOBALS['testsettings']['id'];
-    			} else if (isset($GLOBALS['asid'])) {
-    				$s3asid = $GLOBALS['asid'];
+    			if (!empty($assessmentId)) {
+    				$s3asid = $assessmentId;
     			}
     			if (isset($GLOBALS['questionscoreref'])) {
     				if ($multi==0) {
@@ -74,7 +72,7 @@ class FileUploadAnswerBox implements AnswerBox
     				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
     			}
     			if (!empty($s3asid)) {
-    				require_once(dirname(__FILE__)."/../includes/filehandler.php");
+    				require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
 
     				if (substr($la,0,5)=="Error") {
     					$out .= "<br/>$la";

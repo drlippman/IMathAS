@@ -289,6 +289,7 @@ class QuestionHtmlGenerator
                     ->setQuestionNumber($this->questionParams->getQuestionNumber())
                     ->setIsMultiPartQuestion($this->isMultipart())
                     ->setQuestionPartNumber($atIdx)
+                    ->setAssessmentId($this->questionParams->getAssessmentId())
                     ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
                     ->setColorboxKeyword($questionColor);
 
@@ -322,6 +323,7 @@ class QuestionHtmlGenerator
                 ->setVarsForAnswerBoxGenerator($varsForAnswerBoxGenerator)
                 ->setAnswerType($qdata['qtype'])
                 ->setQuestionNumber($this->questionParams->getQuestionNumber())
+                ->setAssessmentId($this->questionParams->getAssessmentId())
                 ->setIsMultiPartQuestion(false)
                 ->setStudentLastAnswers($lastAnswer)
                 ->setColorboxKeyword($questionColor);

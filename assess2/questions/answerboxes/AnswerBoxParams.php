@@ -16,7 +16,7 @@ class AnswerBoxParams
     private $questionNumber;
     private $isMultiPartQuestion;
     private $questionPartNumber;
-
+    private $assessmentId = 0;
     private $studentLastAnswers;
     private $colorboxKeyword;
 
@@ -113,6 +113,28 @@ class AnswerBoxParams
     public function setQuestionNumber(?int $questionNumber): AnswerBoxParams
     {
         $this->questionNumber = $questionNumber;
+        return $this;
+    }
+
+    /**
+     * Get the assessment ID
+     *
+     * @return int The assessment ID.
+     */
+    public function getAssessmentId(): ?int
+    {
+        return $this->assessmentId;
+    }
+
+    /**
+     * Set the assessment ID.
+     *
+     * @param int $assessmentId The assessment ID.
+     * @return AnswerBoxParams
+     */
+    public function setAssessmentId(?int $assessmentId): AnswerBoxParams
+    {
+        $this->assessmentId = $assessmentId;
         return $this;
     }
 

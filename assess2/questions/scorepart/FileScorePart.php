@@ -28,6 +28,7 @@ class FileScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $assessmentId = $this->scoreQuestionParams->getAssessmentId();
 
         $defaultreltol = .0015;
 
@@ -39,7 +40,7 @@ class FileScorePart implements ScorePart
         $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
         $filename = preg_replace('/[^\w\.]/','',$filename);
         $hasfile = false;
-        require_once(dirname(__FILE__)."/../includes/filehandler.php");
+        require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
         if (trim($filename)=='') {
             $found = false;
             if ($_POST["lf$qn"]!='') {
@@ -88,16 +89,9 @@ class FileScorePart implements ScorePart
                 $GLOBALS['scoremessages'] .= _('Error - Invalid file type');
                 return 0;
             }
-            //if($GLOBALS['isreview']) {echo 'TRUE';}
-            if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
+            if (!empty($assessmentId)) { //going to use assessmentid/random
                 $randstr = '';
-                /*using rand was messing up the disp/score regen sequence of multipart
-				for ($i=0; $i<6; $i++) {
-					$n = $RND->rand(0,61);
-					if ($n<10) { $randstr .= chr(48+$n);}
-					else if ($n<36) { $randstr .= chr(65 + $n-10);}
-					else { $randstr .= chr(97 + $n-36);}
-				}*/
+
                 $chars = 'abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789';
                 $m = microtime(true);
                 $res = '';
@@ -113,18 +107,9 @@ class FileScorePart implements ScorePart
                     $in = floor($in/62);
                     $randstr .= $chars[$i];
                 }
-                //in case "same random seed" is selected, students can overwrite their own
-                //files. Avoid this.
-                if (($GLOBALS['testsettings']['shuffle']&4)==4 || ($GLOBALS['testsettings']['shuffle']&2)==2) {
-                    //if same random seed is set, need to check for duplicates
-                    $n = 0;
-                    do {
-                        $n++;
-                        $s3asid = $GLOBALS['testsettings']['id']."/$n";
-                    } while (doesfileexist('assess',"adata/$s3asid/$filename"));
-                } else {
-                    $s3asid = $GLOBALS['testsettings']['id']."/$randstr";
-                }
+
+                $s3asid = $assessmentId."/$randstr";
+
             } else {
                 $GLOBALS['partlastanswer'] = _('Error - no asid');
                 $GLOBALS['scoremessages'] .= _('Error - no asid');

@@ -8,6 +8,7 @@ class ScoreQuestionParams
 {
     private $userRights;        // Orig: $GLOBALS['myrights']
     private $questionNumber;    // Orig: $qnidx
+    private $assessmentId = 0;  
     private $dbQuestionSetId;   // Orig: $qidx
     private $questionSeed;      // Orig: $seed
     private $givenAnswer;       // Orig: $givenans
@@ -70,6 +71,28 @@ class ScoreQuestionParams
     public function setQuestionNumber(?int $questionNumber): ScoreQuestionParams
     {
         $this->questionNumber = $questionNumber;
+        return $this;
+    }
+
+    /**
+     * Get the assessment ID
+     *
+     * @return int The assessment ID.
+     */
+    public function getAssessmentId(): ?int
+    {
+        return $this->assessmentId;
+    }
+
+    /**
+     * Set the assessment ID.
+     *
+     * @param int $assessmentId The assessment ID.
+     * @return ScoreQuestionParams
+     */
+    public function setAssessmentId(?int $assessmentId): ScoreQuestionParams
+    {
+        $this->assessmentId = $assessmentId;
         return $this;
     }
 

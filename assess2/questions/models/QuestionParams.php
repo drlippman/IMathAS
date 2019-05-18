@@ -10,6 +10,7 @@ class QuestionParams
 {
     private $dbQuestionSetId;   // Orig: $qidx
     private $questionNumber;    // Orig: $qnidx
+    private $assessmentId = 0;
     private $questionSeed;      // Orig: $seed
     private $questionData;      // Obtained from imas_questionset; optional
 
@@ -80,6 +81,28 @@ class QuestionParams
     public function setQuestionNumber(?int $questionNumber): QuestionParams
     {
         $this->questionNumber = $questionNumber;
+        return $this;
+    }
+
+    /**
+     * Get the assessment ID
+     *
+     * @return int The assessment ID.
+     */
+    public function getAssessmentId(): ?int
+    {
+        return $this->assessmentId;
+    }
+
+    /**
+     * Set the assessment ID.
+     *
+     * @param int $assessmentId The assessment ID.
+     * @return QuestionParams
+     */
+    public function setAssessmentId(?int $assessmentId): QuestionParams
+    {
+        $this->assessmentId = $assessmentId;
         return $this;
     }
 

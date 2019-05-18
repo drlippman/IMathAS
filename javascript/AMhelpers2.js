@@ -1337,3 +1337,19 @@ function prepWithMath(str) {
 	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
 	return str;
 }
+
+function toggleinlinebtn(n,p){ //n: target, p: click el
+	var btn = document.getElementById(p);
+	var el=document.getElementById(n);
+	if (el.style.display=="none") {
+		el.style.display="";
+		el.setAttribute("aria-hidden",false);
+		btn.setAttribute("aria-expanded",true);
+	} else {
+		el.style.display="none";
+		el.setAttribute("aria-hidden",true);
+		btn.setAttribute("aria-expanded",false);
+	}
+	var k=btn.innerHTML;
+	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
+}
