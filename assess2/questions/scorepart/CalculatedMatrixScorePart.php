@@ -36,6 +36,8 @@ class CalculatedMatrixScorePart implements ScorePart
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+        $hasNumVal = !empty($_POST["qn$qn-val"]);
+        
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 

@@ -39,6 +39,8 @@ class CalculatedScorePart implements ScorePart
 
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+        $hasNumVal = !empty($_POST["qn$qn-val"]);
+
         $givenans = normalizemathunicode($givenans);
         $ansformats = array_map('trim',explode(',',$answerformat));
 

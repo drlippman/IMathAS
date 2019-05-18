@@ -40,6 +40,8 @@ class NTupleScorePart implements ScorePart
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+        $hasNumVal = !empty($_POST["qn$qn-val"]);
+        
         if (!isset($answerformat)) { $answerformat = '';}
         $givenans = normalizemathunicode($givenans);
         $givenans = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $givenans);
