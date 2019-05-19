@@ -144,7 +144,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
-
+	// removed MathJax fallback since Katex covers pretty much everything now, and MathJax load was slowing display.
 	/*echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}, skipStartupTypeset: true});
 		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/javascript/mathjax";
@@ -167,6 +167,10 @@ if (!isset($sessiondata['mathdisp'])) {
 	}
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=120118"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
+	// re-route MathJax render requests to katex. Allows jsxgraph to work.
+	echo '<script type="text/javascript">
+	  var MathJax = {Hub: {Queue: function(arr) { rendermathnode(arr[2]);}}};
+		</script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2) {
