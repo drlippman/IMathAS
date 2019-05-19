@@ -1441,7 +1441,6 @@ class AssessRecord
     $singlescore = (count($partla) > 1 && count($scores) == 1);
     $this->recordTry($qn, $data, $singlescore);
 
-    //TODO: record to firstscores if appropriate
   }
 
   /**
@@ -1573,6 +1572,7 @@ class AssessRecord
 
     $maxAscore = 0;
     $aScoredVer = 0;
+    $totalTime = 0;
     // loop through all the assessment versions
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
       $curAver = &$this->data['assess_versions'][$av];
@@ -1585,12 +1585,14 @@ class AssessRecord
             !empty($curAver['questions'][$qn]['withdrawn'])
         ) {
           $aVerScore += $curAver['questions'][$qn]['score'];
+          $totalTime += $curAver['questions'][$qn]['time'];
           continue;
         }
         // loop through the question versions
         $maxQscore = 0;
         $maxQrawscore = 0;
         $qScoredVer = 0;
+        $totalQtime = 0;
         for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
           $curQver = &$curAver['questions'][$qn]['question_versions'][$qv];
           if (isset($curQver['scoreoverride'])) {
@@ -1598,6 +1600,7 @@ class AssessRecord
           } else {
             list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, max($av,$qv), 'all');
           }
+          $totalQtime += $this->calcTimeActive($curQver)['total'];
           if ($qScore >= $maxQscore) {
             $maxQscore = $qScore;
             $maxQrawscore = $qRawscore;
@@ -1610,7 +1613,9 @@ class AssessRecord
         }
         $curAver['questions'][$qn]['score'] = $maxQscore;
         $curAver['questions'][$qn]['rawscore'] = $maxQrawscore;
+        $curAver['questions'][$qn]['time'] = $totalQtime;
         $aVerScore += $maxQscore;
+        $totalTime += $totalQtime;
       } // end loop over questions
       $curAver['score'] = $aVerScore;
       if ($aVerScore >= $maxAscore) {
@@ -1623,6 +1628,7 @@ class AssessRecord
     }
     if (!$this->is_practice) {
       $this->assessRecord['score'] = $maxAscore;
+      $this->assessRecord['timeontask'] = $totalTime;
     }
     return $maxAscore;
   }
@@ -1883,16 +1889,19 @@ class AssessRecord
   private function recordTry($qn, $data, $singlescore = false, $ver='last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $this->parseData();
+    $isFirstVer = false;
     if ($this->is_practice) {
       $assessver = &$this->data['assess_versions'][0];
     } else if ($by_question || !is_numeric($ver)) {
       $assessver = &$this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+      $isFirstVer = (!$by_question && count($this->data['assess_versions']) === 1);
     } else {
       $assessver = &$this->data['assess_versions'][$ver];
     }
     $question_versions = &$assessver['questions'][$qn]['question_versions'];
     if (!$by_question || !is_numeric($ver)) {
       $curq = &$question_versions[count($question_versions) - 1];
+      $isFirstVer = ($by_question && count($question_versions) === 1);
     } else {
       $curq = &$question_versions[$ver];
     }
@@ -1901,9 +1910,75 @@ class AssessRecord
     } else if (isset($curq['singlescore'])) {
       unset($curq['singlescore']);
     }
+    if ($isFirstVer) {
+      $hadUnattempted = $this->hasUnattemptedParts($curq);
+    }
     foreach ($data as $pn=>$partdata) {
       $curq['tries'][$pn][] = $partdata;
     }
+    // if it's the first version, and before this we didn't have all parts
+    // attempted, but now we do, then we'll record this to firstscores
+    if ($isFirstVer && $hadUnattempted && !$this->hasUnattemptedParts($curq)) {
+      // record to firstscores
+      $this->recordFirstScores($curq);
+    }
+  }
+
+  /**
+   * Determines if there are any unattempted parts
+   * @param  array  $qdata  Array of question info from question_version
+   * @return boolean   true if any unattempted parts
+   */
+  private function hasUnattemptedParts($qdata) {
+    if (count($qdata['tries']) === 0 ||
+      count($qdata['tries']) < count($qdata['answeights'])
+    ) {
+      return true;
+    }
+    foreach ($qdata['tries'] as $pn=>$partdata) {
+      if (count($partdata) === 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Record first try info to imas_firstscores table
+   * @param  array  $qdata question version data array
+   * @return void
+   */
+  private function recordFirstScores($qdata) {
+    // only record for students
+    // TODO: better way to determine isstudent
+    if (!$GLOBALS['isstudent']) {
+      return;
+    }
+    $timeonfirst = 0;
+    $scoredet = array();
+    $scoreonfirst = 0;
+    $subsUsed = array();
+
+    for ($pn = 0; $pn < count($qdata['tries']); $pn++) {
+      $firstTry = $qdata['tries'][$pn][0];
+      $scoreonfirst += $firstTry['raw'] * $qdata['answeights'][$pn];
+      $scoredet[$pn] = $firstTry['raw'];
+      if (!isset($subsUsed[$firstTry['sub']])) {
+        $timeonfirst += $firstTry['time'];
+        $subsUsed[$firstTry['sub']] = 1;
+      }
+    }
+
+    $query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
+		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
+		$stm = $this->DBH->prepare($query);
+    $stm->execute(array(
+      ':courseid'=> $this->assess_info->getCourseId(),
+      ':qsetid'=> $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid'),
+			':score'=> round(100*$scoreonfirst),
+      ':scoredet'=> implode('~', $scoredet),
+      ':timespent'=> $timeonfirst
+    ));
   }
 
   /**

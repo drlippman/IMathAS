@@ -42,6 +42,22 @@ class AssessInfo
   }
 
   /**
+   * Return the current course ID
+   * @return int Course ID
+   */
+  public function getCourseId() {
+    return $this->cid;
+  }
+
+  /**
+   * Return the current assessment ID
+   * @return int  Assessment ID
+   */
+  public function getAssessmentId() {
+    return $this->curAid;
+  }
+
+  /**
    * Load and normalize assessment settings.  Typically called internally.
    * @return void
    */
