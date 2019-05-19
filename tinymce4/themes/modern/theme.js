@@ -4855,13 +4855,14 @@ var modern = (function (domGlobals) {
         self.on('click mousedown', function (e) {
           e.preventDefault();
         });
-        /*
+        
         self.on('touchstart', function (e) {
-        		console.log("here");
-          self.fire('click', e);
-          e.preventDefault();
+          if (e.control === self) {
+            self.fire('click', e);
+            e.preventDefault();
+          }
         });
-        */
+        
         if (settings.subtype) {
           self.classes.add(settings.subtype);
         }
@@ -4996,6 +4997,9 @@ var modern = (function (domGlobals) {
         });
         global$9(self.getEl('button')).on('click touchstart', function (e) {
           e.stopPropagation();
+          if (e.type=='touchstart') {
+            e.preventDefault();
+          }
           input.click();
         });
         self.getEl().appendChild(input);
@@ -8928,8 +8932,13 @@ var modern = (function (domGlobals) {
             self._textStyle = textStyle;
           }
         }
-        self.on('mouseenter click', function (e) {
+        self.on('mouseenter click touchstart', function (e) {		
           if (e.control === self) {
+            if (e.type === 'touchstart') {
+              e.preventDefault();
+              self.fire('click', e);
+              return;
+            }
             if (!settings.menu && e.type === 'click') {
               self.fire('select');
               global$7.requestAnimationFrame(function () {
