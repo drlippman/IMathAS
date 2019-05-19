@@ -4855,10 +4855,13 @@ var modern = (function (domGlobals) {
         self.on('click mousedown', function (e) {
           e.preventDefault();
         });
+        /*
         self.on('touchstart', function (e) {
+        		console.log("here");
           self.fire('click', e);
           e.preventDefault();
         });
+        */
         if (settings.subtype) {
           self.classes.add(settings.subtype);
         }
