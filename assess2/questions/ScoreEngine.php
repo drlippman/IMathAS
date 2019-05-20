@@ -250,15 +250,9 @@ class ScoreEngine
         $dbQuestionId = $scoreQuestionParams->getDbQuestionSetId();
         $questionNumber = $scoreQuestionParams->getQuestionNumber();
 
-        if (isset($GLOBALS['qdatafordisplayq'])) {
-            $questionData = $GLOBALS['qdatafordisplayq'];
-        } else if (isset($GLOBALS['qi']) && isset($GLOBALS['qi'][$GLOBALS['questions'][$questionNumber]]['qtext'])) {
-            $questionData = $GLOBALS['qi'][$GLOBALS['questions'][$questionNumber]];
-        } else {
-            $stm = $this->dbh->prepare("SELECT qtype,control,answer FROM imas_questionset WHERE id=:id");
-            $stm->execute(array(':id' => $dbQuestionId));
-            $questionData = $stm->fetch(PDO::FETCH_ASSOC);
-        }
+        $stm = $this->dbh->prepare("SELECT qtype,control,answer FROM imas_questionset WHERE id=:id");
+        $stm->execute(array(':id' => $dbQuestionId));
+        $questionData = $stm->fetch(PDO::FETCH_ASSOC);
 
         if (!$questionData) {
             throw new RuntimeException(
