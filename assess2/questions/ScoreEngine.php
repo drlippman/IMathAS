@@ -86,7 +86,11 @@ class ScoreEngine
             $_SESSION['choicemap'] = array();
         }
 
-        $qdata = $this->loadQuestionData($scoreQuestionParams);
+        // If question data was not provided, load it from the database.
+        $qdata = $scoreQuestionParams->getQuestionData();
+        if (is_null($qdata)) {
+            $qdata = $this->loadQuestionData($scoreQuestionParams);
+        }
 
         $stuanswers = $scoreQuestionParams->getAllQuestionAnswers();
         $stuanswersval = $scoreQuestionParams->getAllQuestionAnswersAsNum();

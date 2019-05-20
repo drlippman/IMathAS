@@ -10,6 +10,7 @@ class ScoreQuestionParams
     private $questionNumber;    // Orig: $qnidx
     private $assessmentId = 0;  
     private $dbQuestionSetId;   // Orig: $qidx
+    private $questionData;      // Obtained from imas_questionset; optional
     private $questionSeed;      // Orig: $seed
     private $givenAnswer;       // Orig: $givenans
     private $attemptNumber;     // Orig: $attemptn
@@ -115,6 +116,34 @@ class ScoreQuestionParams
     public function setDbQuestionSetId(?int $dbQuestionSetId): ScoreQuestionParams
     {
         $this->dbQuestionSetId = $dbQuestionSetId;
+        return $this;
+    }
+
+    /**
+     * Get the question's data.
+     *
+     * This is an array of columns from imas_questionset for this question.
+     *
+     * @return array
+     */
+    public function getQuestionData(): ?array
+    {
+        return $this->questionData;
+    }
+
+    /**
+     * Set the question's data.
+     *
+     * This is an array of columns from imas_questionset for this question.
+     *
+     * If left null, question data will be loaded from imas_questionset.
+     *
+     * @param array $questionData
+     * @return ScoreQuestionParams
+     */
+    public function setQuestionData(array $questionData): ScoreQuestionParams
+    {
+        $this->questionData = $questionData;
         return $this;
     }
 
