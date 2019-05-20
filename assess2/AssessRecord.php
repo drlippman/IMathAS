@@ -903,7 +903,11 @@ class AssessRecord
     // get regen number for by_question
     if ($by_question) {
       if (!is_numeric($ver)) {
-        $regen = count($aver['questions'][$qn]['question_versions']) - 1;
+        if ($ver === 'scored') {
+          $regen = $aver['questions'][$qn]['scored_version'];
+        } else {
+          $regen = count($aver['questions'][$qn]['question_versions']) - 1;
+        }
       } else {
         $regen = $ver;
       }
