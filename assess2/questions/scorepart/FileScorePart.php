@@ -3,10 +3,12 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
 use DOMDocument;
 use ZipArchive;
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class FileScorePart implements ScorePart
@@ -18,9 +20,11 @@ class FileScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -55,7 +59,7 @@ class FileScorePart implements ScorePart
                 }
             }
             if ($found) {
-                $GLOBALS['partlastanswer'] = '@FILE:'.$_POST["lf$qn"].'@';
+                $scorePartResult->setLastAnswerAsGiven('@FILE:'.$_POST["lf$qn"].'@');
                 if ($answerformat=='excel') {
                     $zip = new ZipArchive;
                     if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
@@ -63,31 +67,32 @@ class FileScorePart implements ScorePart
                         $doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'));
                         $zip->close();
                     } else {
-                        $GLOBALS['scoremessages'] .= _(' Unable to open Excel file');
-                        return 0;
+                        $scorePartResult->addScoreMessage(_(' Unable to open Excel file'));
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
                     }
                 }
                 $hasfile = true;
             } else {
-                $GLOBALS['partlastanswer'] = '';
+                $scorePartResult->setLastAnswerAsGiven('');
                 if (isset($scoremethod) && $scoremethod=='takeanythingorblank') {
-                    return 1;
+                    $scorePartResult->setRawScore(1);
+                    return $scorePartResult;
                 } else {
-                    return 0;
+                    $scorePartResult->setRawScore(0);
+                    return $scorePartResult;
                 }
             }
         }
         if (!$hasfile) {
             $extension = strtolower(strrchr($filename,"."));
             $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
-            if ($GLOBALS['scoremessages'] != '') {
-                $GLOBALS['scoremessages'] .= '<br/>';
-            }
-            $GLOBALS['scoremessages'] .= sprintf(_('Upload of %s: '), $filename);
+            $scorePartResult->addScoreMessage(sprintf(_('Upload of %s: '), $filename));
             if (in_array($extension,$badextensions)) {
-                $GLOBALS['partlastanswer'] = _('Error - Invalid file type');
-                $GLOBALS['scoremessages'] .= _('Error - Invalid file type');
-                return 0;
+                $scorePartResult->setLastAnswerAsGiven(_('Error - Invalid file type'));
+                $scorePartResult->addScoreMessage(_('Error - Invalid file type'));
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
             if (!empty($assessmentId)) { //going to use assessmentid/random
                 $randstr = '';
@@ -111,14 +116,16 @@ class FileScorePart implements ScorePart
                 $s3asid = $assessmentId."/$randstr";
 
             } else {
-                $GLOBALS['partlastanswer'] = _('Error - no asid');
-                $GLOBALS['scoremessages'] .= _('Error - no asid');
-                return 0;
+                $scorePartResult->setLastAnswerAsGiven(_('Error - no asid'));
+                $scorePartResult->addScoreMessage(_('Error - no asid'));
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
             if (is_numeric($s3asid) && $s3asid==0) {  //set in testquestion for preview
-                $GLOBALS['partlastanswer'] = _('Error - File not uploaded in preview');
-                $GLOBALS['scoremessages'] .= _('Error - File not uploaded in preview');
-                return 0;
+                $scorePartResult->setLastAnswerAsGiven(_('Error - File not uploaded in preview'));
+                $scorePartResult->addScoreMessage(_('Error - File not uploaded in preview'));
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
 
             if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
@@ -133,37 +140,41 @@ class FileScorePart implements ScorePart
 
                         $zip->close();
                     } else {
-                        $GLOBALS['scoremessages'] .= _(' Unable to open Excel file');
-                        return 0;
+                        $scorePartResult->addScoreMessage(_(' Unable to open Excel file'));
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
                     }
                 }
 
                 $s3object = "adata/$s3asid/$filename";
                 if (storeuploadedfile("qn$qn",$s3object)) {
-                    $GLOBALS['partlastanswer'] = "@FILE:$s3asid/$filename@";
-                    $GLOBALS['scoremessages'] .= _("Successful");
+                    $scorePartResult->setLastAnswerAsGiven("@FILE:$s3asid/$filename@");
+                    $scorePartResult->addScoreMessage(_("Successful"));
                     $hasfile = true;
                 } else {
                     //echo "Error storing file";
-                    $GLOBALS['partlastanswer'] = _('Error storing file');
-                    $GLOBALS['scoremessages'] .= _('Error storing file');
-                    return 0;
+                    $scorePartResult->setLastAnswerAsGiven(_('Error storing file'));
+                    $scorePartResult->addScoreMessage(_('Error storing file'));
+                    $scorePartResult->setRawScore(0);
+                    return $scorePartResult;
                 }
 
             } else {
                 //echo "Error uploading file";
                 if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
-                    $GLOBALS['partlastanswer'] = _('Error uploading file - file too big');
-                    $GLOBALS['scoremessages'] .= _('Error uploading file - file too big');
+                    $scorePartResult->setLastAnswerAsGiven(_('Error uploading file - file too big'));
+                    $scorePartResult->addScoreMessage(_('Error uploading file - file too big'));
                 } else {
-                    $GLOBALS['partlastanswer'] = _('Error uploading file');
-                    $GLOBALS['scoremessages'] .= _('Error uploading file');
+                    $scorePartResult->setLastAnswerAsGiven(_('Error uploading file'));
+                    $scorePartResult->addScoreMessage(_('Error uploading file'));
                 }
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         }
         if (isset($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
-            return 1;
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
         } else {
             if ($answerformat=='excel') {
                 $doccells = array();
@@ -179,8 +190,7 @@ class FileScorePart implements ScorePart
                         if (abs($val-$doccells[$cell])<.01) {
                             $pts++;
                         } else {
-                            $GLOBALS['scoremessages'] .= "<br/>Cell $cell incorrect";
-                            echo "<br/>Cell $cell incorrect";
+                            $scorePartResult->addScoreMessage("Cell $cell incorrect");
                         }
                     } else {
                         if (trim($val)==trim($doccells[$cell])) {
@@ -188,10 +198,12 @@ class FileScorePart implements ScorePart
                         }
                     }
                 }
-                return $pts/count($answer);
+                $scorePartResult->setRawScore($pts/count($answer));
+                return $scorePartResult;
             } else {
-                $GLOBALS['questionmanualgrade'] = true;
-                return -2;
+                $scorePartResult->setRequiresManualGrading(true);
+                $scorePartResult->setRawScore(-2);
+                return $scorePartResult;
             }
         }
     }

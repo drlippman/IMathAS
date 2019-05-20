@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class NTupleScorePart implements ScorePart
@@ -15,9 +17,11 @@ class NTupleScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -60,20 +64,21 @@ class NTupleScorePart implements ScorePart
         }
 
         if ($anstype=='ntuple') {
-            $GLOBALS['partlastanswer'] = $givenans;
+            $scorePartResult->setLastAnswerAsGiven($givenans);
             $gaarr = $this->parseNtuple($givenans, false, true);
         } else if ($anstype=='calcntuple') {
             // parse and evaluate
             if ($hasNumVal) {
                 $gaarr = $this->parseNtuple($givenansval, false, true);
-                $GLOBALS['partlastanswer'] = $givenans.'$#$'.$givenansval;
+                $scorePartResult->setLastAnswerAsNumber($givenansval);
             } else {
                 $gaarr = $this->parseNtuple($givenans, false, true);
-                $GLOBALS['partlastanswer'] = $givenans.'$#$'.ntupleToString($gaarr);
+                $scorePartResult->setLastAnswerAsNumber($this->ntupleToString($gaarr));
             }
             //test for correct format, if specified
             if (checkreqtimes($givenans,$requiretimes)==0) {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
 
             //parse the ntuple without evaluating
@@ -84,33 +89,43 @@ class NTupleScorePart implements ScorePart
                     foreach ($chkme['vals'] as $chkval) {
                         if ($chkval != 'oo' && $chkval != '-oo') {
                             if (!checkanswerformat($chkval,$ansformats)) {
-                                return 0; //perhaps should just elim bad answer rather than all?
+                                //perhaps should just elim bad answer rather than all?
+                                $scorePartResult->setRawScore(0);
+                                return $scorePartResult;
                             }
                         }
                     }
                 }
             }
         }
-        if ($givenans == null) {return 0;}
+        if ($givenans == null) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
 
         $givenans = str_replace(' ','',$givenans);
 
         if ($answer=='DNE') {
             if (strtoupper($givenans)=='DNE') {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         } else if ($answer=='oo') {
             if ($givenans=='oo') {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         }
 
         if (count($gaarr)==0) {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
 
         $answer = makepretty($answer);
@@ -237,7 +252,8 @@ class NTupleScorePart implements ScorePart
         }
         //$score = $correct/count($anarr) - count($gaarr)/$extrapennum;
         if ($score<0) { $score = 0; }
-        return ($score);
+        $scorePartResult->setRawScore($score);
+        return $scorePartResult;
     }
 
     /**

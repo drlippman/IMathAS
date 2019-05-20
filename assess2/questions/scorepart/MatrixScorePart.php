@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class MatrixScorePart implements ScorePart
@@ -15,9 +17,11 @@ class MatrixScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -35,6 +39,7 @@ class MatrixScorePart implements ScorePart
         if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$partnum];} else {$answersize = $options['answersize'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (!isset($answerformat)) { $answerformat = '';}
+        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -46,16 +51,16 @@ class MatrixScorePart implements ScorePart
 
 
         if ($givenans==='oo' || $givenans==='DNE') {
-            $GLOBALS['partlastanswer'] = $givenans;
+            $scorePartResult->setLastAnswerAsGiven($givenans);
         } else if (isset($answersize)) {
             $sizeparts = explode(',',$answersize);
             for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
                 $givenanslist[$i] = $_POST["qn$qn-$i"];
             }
-            $GLOBALS['partlastanswer'] = implode("|",$givenanslist);
+            $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
             $givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
-            $GLOBALS['partlastanswer'] = $givenans;
+            $scorePartResult->setLastAnswerAsGiven($givenans);
             $givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
             if (substr_count($answer,'),(')!=substr_count($_POST["qn$qn"],'),(')) {$correct = false;}
         }
@@ -63,16 +68,20 @@ class MatrixScorePart implements ScorePart
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
             if ($answer==$givenans) {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         } else if ($answer==='DNE' || $answer==='oo') {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         foreach ($givenanslist as $j=>$v) {
             if (!is_numeric($v)) {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         }
 
@@ -81,7 +90,8 @@ class MatrixScorePart implements ScorePart
         $answerlist = explode(',',$ansr);
 
         if (count($answerlist) != count($givenanslist)) {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         foreach ($answerlist as $k=>$v) {
             $v = evalMathParser($v);
@@ -125,6 +135,12 @@ class MatrixScorePart implements ScorePart
             }
         }
 
-        if ($correct) {return 1;} else {return 0;}
+        if ($correct) {
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
+        } else {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
     }
 }

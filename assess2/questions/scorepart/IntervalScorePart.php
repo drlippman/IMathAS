@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class IntervalScorePart implements ScorePart
@@ -15,9 +17,11 @@ class IntervalScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -25,6 +29,7 @@ class IntervalScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $anstype = $this->scoreQuestionParams->getAnswerType();
 
         $defaultreltol = .0015;
 
@@ -34,6 +39,7 @@ class IntervalScorePart implements ScorePart
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
         if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}}
+        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         if (!isset($variables)) { $variables = 'x';}
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -53,15 +59,17 @@ class IntervalScorePart implements ScorePart
             }
         }
 
+        $ansformatsHasList = in_array('list',$ansformats);
         $givenans = str_replace('u', 'U', $givenans);
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenansval);
         if ($hasNumVal) {
-            $GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
+            $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($anstype == 'calcinterval') {
             //test for correct format, if specified
             if (checkreqtimes($givenans,$requiretimes)==0) {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
             if (in_array('inequality',$ansformats)) {
                 $givenans = str_replace('or', ' or ', $givenans);
@@ -82,7 +90,8 @@ class IntervalScorePart implements ScorePart
                         if (in_array($var,$mathfuncs)) { continue;}
                         if ($var!= 'or' && $var!='and' && $var!='DNE' && $var!='oo' &&
                             strtolower($var) != 'var') {
-                            return 0;
+                            $scorePartResult->setRawScore(0);
+                            return $scorePartResult;
                         }
                     }
                     $orarr = explode(' or ', $givenans);
@@ -94,7 +103,8 @@ class IntervalScorePart implements ScorePart
                             $optp = trim($optp);
                             if (strtolower($optp)=='var' || $optp=='oo' || $optp=='-oo') {continue;}
                             if (!checkanswerformat($optp,$ansformats)) {
-                                return 0;
+                                $scorePartResult->setRawScore(0);
+                                return $scorePartResult;
                             }
                         }
                     }
@@ -104,7 +114,7 @@ class IntervalScorePart implements ScorePart
                     }
                 }
             } else {
-                if (in_array('list',$ansformats)) {
+                if ($ansformatsHasList) {
                     $orarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/', $givenans);
                 } else {
                     $orarr = explode('U', $givenans);
@@ -114,31 +124,38 @@ class IntervalScorePart implements ScorePart
                     if ($opt=='DNE') {continue;}
                     $opts = explode(',',substr($opt,1,strlen($opt)-2));
                     if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
-                        return 0;
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
                     }
                     if (strpos($opts[1],'oo')===false &&  !checkanswerformat($opts[1],$ansformats)) {
-                        return 0;
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
                     }
                 }
             }
         }
 
-        if ($givenans == null) {return 0;}
+        if ($givenans == null) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
         $correct = 0;
         $ansar = explode(' or ',$answer);
         $givenans = str_replace(' ','',$givenans);
 
         if ($hasNumVal) {
-            $gaarr = parseInterval($givenansval, in_array('list',$ansformats));
+            $gaarr = parseInterval($givenansval, $ansformatsHasList);
         } else {
-            $gaarr = parseInterval($givenans, in_array('list',$ansformats));
+            $gaarr = parseInterval($givenans, $ansformatsHasList);
         }
 
         if ($anstype == 'calcinterval' && !$hasNumVal) {
-            $GLOBALS['partlastanswer'] .= '$#$' . parsedIntervalToSTring($gaarr);
+            $scorePartResult->setLastAnswerAsNumber(
+                parsedIntervalToString($gaarr, $ansformatsHasList));
         }
         if ($gaarr === false) {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         foreach($ansar as $anans) {
             $answer = str_replace(' ','',$anans);
@@ -155,7 +172,9 @@ class IntervalScorePart implements ScorePart
 
             $aarr = parseInterval($anans, in_array('list',$ansformats));
             if ($aarr === false) {
-                return 0; //uh oh
+                // uh oh
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
 
             if (count($aarr)!=count($gaarr)) {

@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class ChoicesScorePart implements ScorePart
@@ -15,9 +17,11 @@ class ChoicesScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -70,25 +74,29 @@ class ChoicesScorePart implements ScorePart
             $RND->shuffle($randkeys);
         }
         if ($givenans==='NA' || $givenans === null) {
-            $GLOBALS['partlastanswer'] = $givenans;
+            $scorePartResult->setLastAnswerAsGiven($givenans);
         } else {
-          // only store the unrandomized value
-            $GLOBALS['partlastanswer'] = $randkeys[$givenans];//$givenans.'$!$'.$randkeys[$givenans];
+            $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
         }
-        if ($givenans == null) {return 0;}
 
-        if ($givenans=='NA') { return 0; }
+        if ($givenans=='NA') {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
         $anss = explode(' or ',$answer);
         foreach ($anss as $k=>$v) {
             $anss[$k] = intval($v);
         }
         //if ($randkeys[$givenans] == $answer) {return 1;} else { return 0;}
         if (in_array($randkeys[$givenans],$anss)) {
-            return 1;
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
         } else if (isset($partialcredit) && isset($creditweight[$randkeys[$givenans]])) {
-            return $creditweight[$randkeys[$givenans]];
+            $scorePartResult->setRawScore($creditweight[$randkeys[$givenans]]);
+            return $scorePartResult;
         } else {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
     }
 }

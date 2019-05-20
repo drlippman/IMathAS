@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class MultipleAnswerScorePart implements ScorePart
@@ -15,9 +17,11 @@ class MultipleAnswerScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -36,8 +40,9 @@ class MultipleAnswerScorePart implements ScorePart
         if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
 
         if (!is_array($questions)) {
-            echo _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
-            return false;
+            $scorePartResult->addScoreMessage(_('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.'));
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $score = 1.0;
@@ -63,7 +68,6 @@ class MultipleAnswerScorePart implements ScorePart
         }
         $origla = array();
         for ($i=0;$i<count($questions);$i++) {
-            if ($i>0) {$GLOBALS['partlastanswer'] .= "|"; } else {$GLOBALS['partlastanswer']='';}
             if (isset($_POST["qn$qn"][$i])) {
                 $origla[] = $randqkeys[$i];
             }
@@ -73,7 +77,7 @@ class MultipleAnswerScorePart implements ScorePart
             }
         }
         // just store unrandomized last answers
-        $GLOBALS['partlastanswer'] = implode('|',$origla);
+        $scorePartResult->setLastAnswerAsGiven(implode('|',$origla));
         if (isset($scoremethod)) {
             if ($scoremethod=='allornothing' && $score<1) {
                 $score = 0;
@@ -84,6 +88,6 @@ class MultipleAnswerScorePart implements ScorePart
         if ($score < 0) {
             $score = 0;
         }
-        return $score;
+        $scorePartResult->setRawScore($score);
     }
 }

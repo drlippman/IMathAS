@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class ComplexScorePart implements ScorePart
@@ -15,9 +17,11 @@ class ComplexScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -25,6 +29,7 @@ class ComplexScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $anstype = $this->scoreQuestionParams->getAnswerType();
 
         $defaultreltol = .0015;
 
@@ -53,25 +58,32 @@ class ComplexScorePart implements ScorePart
             }
         }
         $givenans = normalizemathunicode($givenans);
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($anstype=='calccomplex' && $hasNumVal) {
-            $GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
+            $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
-        if ($givenans == null) {return 0;}
+        if ($givenans == null) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
         $answer = str_replace(' ','',makepretty($answer));
         $givenans = trim($givenans);
 
         if ($answer=='DNE') {
             if (strtoupper($givenans)=='DNE') {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         } else if ($answer=='oo') {
             if ($givenans=='oo') {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         }
 
@@ -80,13 +92,15 @@ class ComplexScorePart implements ScorePart
         if ($anstype=='calccomplex') {
             //test for correct format, if specified
             if (($answer!='DNE'&&$answer!='oo') && checkreqtimes($givenans,$requiretimes)==0) {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
             foreach ($gaarr as $i=>$tchk) {
                 if (in_array('sloppycomplex',$ansformats)) {
                     $tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
                     if (substr_count($tchk,'i')>1) {
-                        return 0;
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
                     }
                     $tchk = str_replace(array('s$n','p$'),array('sin','pi'),$tchk);
                 } else {
@@ -94,7 +108,8 @@ class ComplexScorePart implements ScorePart
                     $cpts = $this->parsecomplex($tchk);
 
                     if (!is_array($cpts)) {
-                        return 0;
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
                     }
                     $cpts[1] = ltrim($cpts[1], '+');
                     $cpts[1] = rtrim($cpts[1], '*');
@@ -141,7 +156,8 @@ class ComplexScorePart implements ScorePart
         }
 
         if (count($ganumarr)==0) {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         $extrapennum = count($ganumarr)+count($annumarr);
         $correct = 0;
@@ -173,8 +189,12 @@ class ComplexScorePart implements ScorePart
             }
         }
         $score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
-        if ($score<0) { $score = 0; }
-        return ($score);
+        if ($score<0) {
+            $scorePartResult->setRawScore(0);
+        } else {
+            $scorePartResult->setRawScore($score);
+        }
+        return $scorePartResult;
     }
 
     private function parsesloppycomplex($v) {

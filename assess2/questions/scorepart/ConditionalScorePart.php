@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class ConditionalScorePart implements ScorePart
@@ -15,9 +17,11 @@ class ConditionalScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -47,9 +51,11 @@ class ConditionalScorePart implements ScorePart
         $correct = true;
         if (!is_array($answer)) { //single boolean
             if ($answer===true) {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else if ($answer===false) {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             } else {
                 return $answer;
             }
@@ -77,10 +83,11 @@ class ConditionalScorePart implements ScorePart
                 $pt = $ans;
             }
             if ($pt==false) {
-                return 0;
-                break;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         }
-        return 1;
+        $scorePartResult->setRawScore(1);
+        return $scorePartResult;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 /**
@@ -13,5 +14,5 @@ interface ScorePart
 {
     public function __construct(ScoreQuestionParams $scoreQuestionParams);
 
-    public function getScore(): int;
+    public function getScore(): ScorePartResult;
 }

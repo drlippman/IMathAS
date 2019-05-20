@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class DrawingScorePart implements ScorePart
@@ -15,9 +17,11 @@ class DrawingScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getScore(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -66,7 +70,7 @@ class DrawingScorePart implements ScorePart
         }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenans);
 
         $imgborder = 5; $step = 5;
         if (!isset($answerformat)) {
@@ -133,9 +137,11 @@ class DrawingScorePart implements ScorePart
         $linepts = 0;
         if ((is_array($answers) && count($answers)==0) || (!is_array($answers) && $answers=='')) {
             if ($givenans==';;;;;;;;') {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         }
         if (!is_array($answers)) {
@@ -224,12 +230,15 @@ class DrawingScorePart implements ScorePart
 
             if (isset($abstolerance)) {
                 if ($totscore<$abstolerance) {
-                    return 0;
+                    $scorePartResult->setRawScore(0);
+                    return $scorePartResult;
                 } else {
-                    return 1;
+                    $scorePartResult->setRawScore(1);
+                    return $scorePartResult;
                 }
             } else {
-                return $totscore;
+                $scorePartResult->setRawScore($totscore);
+                return $scorePartResult;
             }
 
         } else if ($answerformat[0]=="twopoint") {
@@ -381,7 +390,6 @@ class DrawingScorePart implements ScorePart
                     } else {
                         $xop = $x2p;
                     }
-                    $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
                     if (($logloc = strpos($function[0],'log'))!==false ||
                         ($lnloc = strpos($function[0],'ln'))!==false) { //is log
 
@@ -1800,12 +1808,15 @@ class DrawingScorePart implements ScorePart
         }
         if (isset($abstolerance)) {
             if ($totscore<$abstolerance) {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             } else {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             }
         } else {
-            return $totscore;
+            $scorePartResult->setRawScore($totscore);
+            return $scorePartResult;
         }
     }
 }
