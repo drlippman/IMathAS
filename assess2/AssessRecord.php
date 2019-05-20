@@ -6,8 +6,8 @@
 
 // TODO: calc and record assessment-level timeontask
 
-require_once('./AssessUtils.php');
-require_once('../filter/filter.php');
+require_once(__DIR__ . '/AssessUtils.php');
+require_once(__DIR__ . '/../filter/filter.php');
 require_once(__DIR__ . '/questions/QuestionGenerator.php');
 require_once(__DIR__ . '/questions/models/QuestionParams.php');
 require_once(__DIR__ . '/questions/models/ShowAnswer.php');
@@ -72,6 +72,18 @@ class AssessRecord
     } else {
       $this->hasRecord = true;
     }
+    $this->tmpdata = null;
+  }
+
+  /**
+   * Set the assessment record using pre-loaded data.
+   * @param array $recordData  assoc array of imas_assessment_records.*
+   */
+  public function setRecord($recordData) {
+    $this->curUid = $recordData['userid'];
+    $this->assessRecord = $recordData;
+    $this->hasRecord = true;
+    $this->tmpdata = null;
   }
 
   /**
@@ -1091,10 +1103,11 @@ class AssessRecord
    * @param  int  $qn             The question number
    * @param  string  $ver         The attempt to use, or 'last' for most recent
    * @param  string  $try         'last' for last try, or 'all' to pick best try per-part
+   * @param  array   $overrides   By-part score overrides
    * @return array (question Score, question Rawscore, parts details)
    *    Where part details is array by part, with (try, score, rawscore, penalties, points_possible)
    */
-  public function getQuestionPartScores ($qn, $ver = 'last', $try = 'last') {
+  public function getQuestionPartScores ($qn, $ver = 'last', $try = 'last', $overrides = array()) {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $due_date = $this->assess_info->getSetting('original_enddate');
     $starttime = $this->assessRecord['starttime'];
@@ -1186,6 +1199,11 @@ class AssessRecord
           // -2 indicates the item is a manual grade item
           $partReqManual = true;
         }
+      }
+      // apply by-part overrides, if set
+      if (isset($overrides[$pn])) {
+        $partrawscores[$pn] = $overrides[$pn];
+        $partscores[$pn] = $overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot;
       }
       if ($is_singlescore) {
         $parts[$pn] = array(
@@ -1595,11 +1613,17 @@ class AssessRecord
         $totalQtime = 0;
         for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
           $curQver = &$curAver['questions'][$qn]['question_versions'][$qv];
-          if (isset($curQver['scoreoverride'])) {
-            $qScore = $curQver['scoreoverride'];
+          // scoreoverride can be a single value override, or array per-part
+          // should be RAW (0-1) override.
+          if (isset($curQver['scoreoverride']) && !is_array($curQver['scoreoverride'])) {
+            $qScore = $curQver['scoreoverride'] * $points[$curQver['qid']];
+            $qRawscore = $curQver['scoreoverride'];
+          } else if (isset($curQver['scoreoverride']) && is_array($curQver['scoreoverride'])) {
+            list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, max($av,$qv), 'all', $curQver['scoreoverride']);
           } else {
             list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, max($av,$qv), 'all');
           }
+
           $totalQtime += $this->calcTimeActive($curQver)['total'];
           if ($qScore >= $maxQscore) {
             $maxQscore = $qScore;
@@ -1750,6 +1774,37 @@ class AssessRecord
   }
 
   /**
+   * Withdraw questions, by setting score override to the specified values
+   * @param  array $qpts  Assoc array of imas_questions.id => points to assign
+   * @return float  Updated assessment final score
+   */
+  public function withdrawQuestions($qpts) {
+    $this->parseData();
+    $madeChanges = false;
+    $avers = &$this->data['assess_versions'];
+    for ($av = 0; $av < count($avers); $av++) {
+      for ($q = 0; $q < count($avers[$av]['questions']); $q++) {
+        $qdata = &$avers[$av]['questions'][$q];
+        for ($qv = 0; $qv < count($qdata['question_versions']); $qv++) {
+          if (isset($qpts[$qdata['question_versions'][$qv]['qid']])) {
+            $qdata['withdrawn'] = 1;
+            $madeChanges = true;
+            // expects raw override, so set to 0 or 1.
+            $pts = $qpts[$qdata['question_versions'][$qv]['qid']];
+            $qdata['question_versions'][$qv]['scoreoverride'] = ($pts>0)?1:0;
+            $qdata['rawscore'] = ($pts>0)?1:0;
+            $qdata['score'] = $pts;
+          }
+        }
+      }
+    }
+    if ($madeChanges) {
+      $this->need_to_record = true;
+    }
+    return $this->reTotalAssess();
+  }
+
+  /**
    * Calculate the score on a question after applying penalties
    * @param  float $score    Raw score, 0-1
    * @param  float $points   Points possible
@@ -1818,7 +1873,7 @@ class AssessRecord
     }
     return array(
       'total' => $timetot,
-      'pertry' => min($timetot, $timetot*$partsCnt/$trycnt)
+      'pertry' => ($trycnt>0) ? min($timetot, $timetot*$partsCnt/$trycnt) : 0
     );
   }
 

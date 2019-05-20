@@ -4,7 +4,7 @@
  * (c) 2019 David Lippman
  */
 
-require_once('../includes/exceptionfuncs.php');
+require_once(__DIR__ . '/../includes/exceptionfuncs.php');
 
 /**
  * Primary class for working with assessment settings

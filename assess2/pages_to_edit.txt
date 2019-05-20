@@ -48,7 +48,9 @@ Edit/Rewrite testquestion.php
 Edit/Rewrite embedq.php
 Edit/Rewrite multiembedq.php
 
-Edit /course/addquestions.php  (need to rewrite withdraw handling, line 308 - need to add func to AssessRecord)
+// LOOK for pages calling calcandupdateLTIgrade
+// If we're going to introduce a JSON itemorder format, need to modify everything that touches itemorder too (!)
+
 Edit /course/course.php  (need to decide how to delete teacher tries)
 Edit /course/exception.php  (need to handle or rewrite "force regen" option)
   - What if they're out of regens?
@@ -86,6 +88,7 @@ X Edit /msgs/viewmsg.php  (need link to gb-viewasid)
 X Edit /forums/posts.php (need link to gb-viewasid)
 X Edit /course/isolateassessbygroup.php
 X Edit /course/isolatessessgrade.php
+X Edit /course/addquestions.php  (test withdraw handling)
 
 Delay /admin/federationpull.php
 Delay /util/mergescores.php
