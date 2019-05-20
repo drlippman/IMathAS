@@ -61,6 +61,14 @@ export default {
 </script>
 
 <style>
+.scrollpane {
+  background-image: linear-gradient(to right, white, white), linear-gradient(to right, white, white), linear-gradient(to right, rgba(0,0,0,.25), rgba(255,255,255,0)), linear-gradient(to left, rgba(0,0,0,.25), rgba(255,255,255,0));
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: inherit;
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
 a[target=_blank].noextlink::after {
   display: none;
 }
@@ -210,6 +218,29 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
 
 /* TODO separate out */
 
+div.choice {
+	padding: 5px;
+	float: left;
+	text-align: center;
+}
+div.float {
+	float:left;
+}
+
+div.match {
+	float:left;
+	padding: 5px;
+	padding-right: 30px;
+}
+div.spacer {
+	clear: both;
+	height: 1px;
+	padding: 0px;
+}
+p.centered {
+	text-align: center;
+}
+
 table.p3longdiv {
   border-spacing: 0px;
   border-collapse: collapse;
@@ -325,5 +356,27 @@ td.r, table.stats tbody td.r {
 td.l, table.stats tbody td.l {
   text-align: left;
 }
+
+ul.nomark {
+	padding-left: 40px;
+}
+div.toppad {
+	padding-top: 5px;
+}
+ul.likelines {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+ul.likelines li {
+	margin-bottom: .4em;
+}
+
+ul.nomark {list-style-type: none;}
+ul.nomark li { margin-top: .7em;}
+ol.lalpha {list-style-type: lower-alpha;}
+ol.lalpha li { margin-top: .7em;}
+
+.spaced li { margin-bottom: .3em;}
 
 </style>

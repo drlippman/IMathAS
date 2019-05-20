@@ -183,7 +183,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						//use asid from first student assessment
 						$grpasidexists = false;
 						if ($aver > 1) {
-							$query = "SELECT id,$fieldstocopy ";
+							$query = "SELECT userid,$fieldstocopy ";
 							$query .= "FROM imas_assessment_records WHERE userid IN ($stulist) AND assessmentid=:assessmentid";
 						} else {
 							$query = "SELECT id,$fieldstocopy ";
@@ -192,16 +192,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$stm2 = $DBH->prepare($query);
 						$stm2->execute(array(':assessmentid'=>$aid));
 						if ($stm2->rowCount()>0) {
+							// first student - grab their data to copy to others
 							$rowgrptest = $stm2->fetch(PDO::FETCH_ASSOC);
-							unset($rowgrptest['id']);
-							$rowgrptest['agroupid'] = $grpid;
-							while ($row = $stm2->fetch(PDO::FETCH_ASSOC)) {
-								if ($aver > 1 ) {
-									//TODO: figure out how to handle this
-								} else {
+
+							// remaining students: delete any files in their existing records
+							// since we'll be overwriting them
+							if ($aver > 1) {
+								$otherstus = array_diff($stustoadd, array($rowgrptest['userid']));
+								deleteAssess2FilesOnUnenroll($otherstus, array($aid), array($aid));
+							} else {
+								while ($row = $stm2->fetch(PDO::FETCH_ASSOC)) {
 									deleteasidfilesfromstring2($row['lastanswers'].$row['bestlastanswers'],'id',$row['id'],$row['assessmentid']);
 								}
 							}
+							unset($rowgrptest['id']);
+							unset($rowgrptest['userid']);
+							$rowgrptest['agroupid'] = $grpid;
 						}
 					}
 					if ($rowgrptest != '') {  //if an assessment session already exists

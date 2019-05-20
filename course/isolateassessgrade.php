@@ -69,6 +69,10 @@
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
 			return false;
 		}
+		function showfb2(aid,uid,type) {
+			GB_show(_("Feedback"), "showfeedback2.php?cid="+cid+"&type="+type+"&aid="+aid+"&uid="+uid, 500, 500);
+			return false;
+		}
 		</script>';
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -247,6 +251,7 @@
 			$total = $line['score'];
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$timeontask = $line['timeontask'];
+			$isOvertime = ($line['status']&4) == 4;
 		} else {
 			$total = 0;
 			$sp = explode(';',$line['bestscores']);
@@ -257,6 +262,7 @@
 			}
 			$timeused = $line['endtime']-$line['starttime'];
 			$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
+			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 		}
 		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
@@ -338,7 +344,7 @@
 				echo "&nbsp;(NC)";
 			} else 	if ($IP==1 && $thisenddate>$now) {
 				echo "&nbsp;(IP)";
-			} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
+			} else	if ($isOvertime) {
 				echo "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
 				echo "&nbsp;(PT)";
@@ -408,7 +414,15 @@
 			}
 			//TODO: FINISH CHANGES
 			if ($hasfeedback) {
-				echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">', _('[Show Feedback]'), '</a></td>';
+				if ($aver > 1 ) {
+					echo '<td><a href="#" class="small feedbacksh pointer" ';
+					echo 'onclick="return showfb2('.$aid.','.Sanitize::onlyInt($line['userid']).',\'A\')">';
+					echo _('[Show Feedback]'), '</a></td>';
+				} else {
+					echo '<td><a href="#" class="small feedbacksh pointer" ';
+					echo 'onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">';
+					echo _('[Show Feedback]'), '</a></td>';
+				}
 			} else {
 				echo '<td></td>';
 			}

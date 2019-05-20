@@ -13,7 +13,6 @@
 //mathphp does not use disallowedvar, so be check for those in implementations
 //if changing from letter vars to php $vars to be evaled
 
-
 function mathphppre($st) {
   if (strpos($st,"^-1") || strpos($st,"^(-1)")) {
 		$st = str_replace(array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)"),array("arcsin","arccos","arctan","arcsin","arccos","arctan"),$st);

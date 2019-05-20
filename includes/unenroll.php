@@ -27,9 +27,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	$forumlist = implode(',',$forums);
 
 	$assesses = array();
-	$stm = $DBH->query("SELECT id FROM imas_assessments WHERE courseid=$cid");
+	$groupassess = array();
+	$stm = $DBH->query("SELECT id,isgroup FROM imas_assessments WHERE courseid=$cid");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$assesses[] = $row[0];
+		if ($row[1]>0) {
+			$groupassess[] = $row[0];
+		}
 	}
 	$aidlist =  implode(',',$assesses);
 
@@ -79,6 +83,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		//new
 		if (count($assesses)>0) {
 			deleteasidfilesbyquery2('userid',$tounenroll,$assesses);
+			deleteAssess2FilesOnUnenroll($tounenroll, $assesses, $groupassess);
 			//deleteasidfilesbyquery(array('assessmentid'=>$assesses, 'userid'=>$tounenroll));
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized

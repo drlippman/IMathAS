@@ -128,27 +128,31 @@ function init(paramarr, enableMQ) {
         // setup for matrix sub-parts
         i=0;
         while (document.getElementById("qn"+qn+"-"+i)) {
-          setupTips("qn"+qn+"-"+i, params.tip);
+          setupTips("qn"+qn+"-"+i, params.tip, params.longtip);
           i++;
         }
       } else {
-        setupTips("qn"+qn, params.tip);
+        setupTips("qn"+qn, params.tip, params.longtip);
       }
     }
     if (params.qtype === 'draw') {
       setupDraw(qn);
     }
-    if (window.usingTinymceEditor) {
+    if (params.usetinymce) {
       initeditor("textareas","mceEditor");
     }
   }
 }
 
 // setup tip focus/blur handlers
-function setupTips(id, tip) {
+function setupTips(id, tip, longtip) {
   var el = document.getElementById(id);
   el.setAttribute('data-tip', tip);
-  var ref = el.getAttribute('aria-describedby').substr(4);
+  var ref = id.substr(2).split(/-/)[0];
+  if (!document.getElementById("tips"+ref)) {
+    $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
+  }
+  el.setAttribute('aria-describedby', 'tips'+ref);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
   });
@@ -345,6 +349,12 @@ function updateLivePreview(event) {
 	LivePreviews[qn].Update();
 }
 
+function clearLivePreviewTimeouts() {
+  for (var i in LivePreviews) {
+    clearTimeout(LivePreviews[i].finaltimeout);
+  }
+}
+
 function normalizemathunicode(str) {
 	str = str.replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, "");
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
@@ -442,6 +452,8 @@ function processByType(qn) {
   if (params.qtype == 'draw') {
     imathasDraw.encodea11ydraw();
     return {};
+  } else if (params.qtype == 'choices' || params.qtype == 'multans' || params.qtype == 'matching') {
+    return {};
   } else if (params.hasOwnProperty('matrixsize')) {
     res = processSizedMatrix(qn);
   } else {
@@ -449,11 +461,11 @@ function processByType(qn) {
     str = normalizemathunicode(str);
     str = str.replace(/^\s+/,'').replace(/\s+$/,'');
     if (str.match(/^\s*$/)) {
-      return ['','',''];
+      return {str: '', displvalstr: '', submitstr: ''};
     } else if (str.match(/^\s*DNE\s*$/i)) {
-      return ['DNE','','DNE'];
+      return {str: 'DNE', displvalstr: '', submitstr: 'DNE'};
     } else if (str.match(/^\s*oo\s*$/i)) {
-      return ['oo','','oo'];
+      return {str: 'oo', displvalstr: '', submitstr: 'oo'};
     }
     switch (params.qtype) {
       case 'calculated':
@@ -1319,7 +1331,8 @@ function scopedmatheval(c) {
 return {
   init: init,
   preSubmitForm: preSubmitForm,
-  preSubmit: preSubmit
+  preSubmit: preSubmit,
+  clearLivePreviewTimeouts: clearLivePreviewTimeouts
 };
 
 }(jQuery));
@@ -1330,4 +1343,20 @@ function prepWithMath(str) {
 	str = str.replace(/\(E\)/g,'(Math.E)');
 	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
 	return str;
+}
+
+function toggleinlinebtn(n,p){ //n: target, p: click el
+	var btn = document.getElementById(p);
+	var el=document.getElementById(n);
+	if (el.style.display=="none") {
+		el.style.display="";
+		el.setAttribute("aria-hidden",false);
+		btn.setAttribute("aria-expanded",true);
+	} else {
+		el.style.display="none";
+		el.setAttribute("aria-hidden",true);
+		btn.setAttribute("aria-expanded",false);
+	}
+	var k=btn.innerHTML;
+	btn.innerHTML = k.match(/\[\+\]/)?k.replace(/\[\+\]/,'[-]'):k.replace(/\[\-\]/,'[+]');
 }

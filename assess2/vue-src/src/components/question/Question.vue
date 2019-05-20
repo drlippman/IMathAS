@@ -191,7 +191,11 @@ export default {
         var regex;
         if (this.questionData.parts[pn].try >= trymax) {
           // out of tries - disable inputs
-          if (pn === 0) {
+          if (Object.keys(this.questionData.parts).length === 1 && Object.keys(this.questionData.jsparams).length > 1) {
+            // Only one "part" listed, but multiple input boxes.
+            // Probably conditional. Disable all boxes
+            regex = new RegExp('^(qn|tc|qs)(' + (this.qn) + '\\b|' + (this.qn + 1) + '\\d{3}\\b)');
+          } else if (pn === 0) {
             regex = new RegExp('^(qn|tc|qs)(' + (this.qn) + '\\b|' + ((this.qn + 1) * 1000 + pn * 1) + '\\b)');
           } else {
             regex = new RegExp('^(qn|tc|qs)' + ((this.qn + 1) * 1000 + pn * 1) + '\\b');

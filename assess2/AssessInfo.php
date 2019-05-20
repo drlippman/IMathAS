@@ -4,7 +4,7 @@
  * (c) 2019 David Lippman
  */
 
-require_once('../includes/exceptionfuncs.php');
+require_once(__DIR__ . '/../includes/exceptionfuncs.php');
 
 /**
  * Primary class for working with assessment settings
@@ -39,6 +39,22 @@ class AssessInfo
       $get_code = ($this->assessData['displaymethod'] === 'full');
       $this->loadQuestionSettings($questions, $get_code);
     }
+  }
+
+  /**
+   * Return the current course ID
+   * @return int Course ID
+   */
+  public function getCourseId() {
+    return $this->cid;
+  }
+
+  /**
+   * Return the current assessment ID
+   * @return int  Assessment ID
+   */
+  public function getAssessmentId() {
+    return $this->curAid;
   }
 
   /**

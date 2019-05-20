@@ -2,6 +2,14 @@
 //IMathAS:  Test display utility functions
 //(c) 2007 David Lippman
 
+require_once(__DIR__ . '/../assess2/questions/QuestionGenerator.php');
+require_once(__DIR__ . '/../assess2/questions/models/QuestionParams.php');
+require_once(__DIR__ . '/../assess2/questions/models/ShowAnswer.php');
+
+use IMathAS\assess2\questions\QuestionGenerator;
+use IMathAS\assess2\questions\models\QuestionParams;
+use IMathAS\assess2\questions\models\ShowAnswer;
+
 //Returns Question settings for a single or set of questions
 //qns:  array of or single question ids
 //testsettings: assoc array of assessment settings
@@ -790,8 +798,27 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 		}
 	}
 	if (!$seqinactive) {
-		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
-	} else {
+//        displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,
+//            $thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
+        $questionParams = new QuestionParams();
+        $questionParams
+            ->setDbQuestionSetId($qi[$questions[$qn]]['questionsetid'])
+            ->setQuestionNumber($qn)
+            ->setQuestionSeed($seeds[$qn])
+            ->setShowHints($thisshowhints)
+            ->setShowAnswer(ShowAnswer::ALWAYS)
+            ->setShowAnswerButton(true)
+            ->setStudentAttemptNumber($attempts[$qn])
+            ->setAllQuestionAnswers($GLOBALS['stuanswers'])
+            ->setAllQuestionAnswersAsNum($GLOBALS['stuanswersval'])
+            ->setScoreNonZero(getscorenonzero())
+            ->setScoreIsCorrect(getiscorrect());
+        $questionGenerator = new QuestionGenerator($GLOBALS['DBH'],
+            $GLOBALS['RND'], $questionParams);
+        $question = $questionGenerator->getQuestion();
+
+        echo $question->getQuestionContent();
+    } else {
 		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,false,$attempts[$qn],false,$regen,$seqinactive,$colors);
 	}
 }

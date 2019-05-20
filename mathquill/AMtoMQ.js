@@ -407,6 +407,12 @@ function AMQTparseSexpr(str) { //parses str and returns [node,tailstr]
 
     result = AMQTparseExpr(str,true);
     AMQnestingDepth--;
+    if (result[0].match(/bmatrix/)) {
+      // special case for bmatrix to avoid double brackets
+      node = result[0].substring(0,result[0].length-7);
+      return [node, result[1]];
+    }
+
     var leftchop = 0;
     if (result[0].substr(0,6)=="\\right") {
     	    st = result[0].charAt(6);
@@ -611,7 +617,7 @@ function AMQTparseExpr(str,rightbracket) {
 		if (right==')' || right==']') {
 			var left = newFrag.charAt(6);
 			if ((left=='(' && right==')' && symbol.output != '}') || (left=='[' && right==']')) {
-				var mxout = '\\matrix{';
+				var mxout = '\\begin{bmatrix}';
 				var pos = new Array(); //position of commas
 				pos.push(0);
 				var matrix = true;
@@ -672,13 +678,14 @@ function AMQTparseExpr(str,rightbracket) {
 						mxout += subarr.join('&');
 					}
 				}
-				mxout += '}';
+				mxout += '\\end{bmatrix}';
 				if (matrix) { newFrag = mxout;}
 			}
 		}
 	}
 
     str = AMQremoveCharsAndBlanks(str,symbol.input.length);
+
     if (typeof symbol.invisible != "boolean" || !symbol.invisible) {
       node = '\\right'+AMQTgetTeXbracket(symbol); //AMQcreateMmlNode("mo",document.createTextNode(symbol.output));
       newFrag += node;
@@ -693,7 +700,6 @@ function AMQTparseExpr(str,rightbracket) {
 	  newFrag += '\\right.'; //adjust for non-matching left brackets
 	  //todo: adjust for non-matching right brackets
   }
-
   return [newFrag,str];
 }
 
@@ -702,7 +708,7 @@ AMQinitSymbols();
 return function(str) {
  AMQnestingDepth = 0;
   str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
-  str = str.replace(/^\s*<(.*?)>\s*$/,"<<$1>>");
+  str = str.replace(/^\s*<([^<].*?[^>])>\s*$/,"<<$1>>");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
@@ -757,7 +763,9 @@ function MQtoAM(tex,display) {
 	} else {
 		tex = tex.replace(/\\Re/g,'RR');
 	}
-
+  tex = tex.replace(/\\begin{.?matrix}(.*?)\\end{.?matrix}/g, function(m, p) {
+    return '[(' + p.replace(/\\\\/g,'),(').replace(/&/g,',') + ')]';
+  });
 	tex = tex.replace(/\\le(?!f)/g,'<=');
 	tex = tex.replace(/\\ge/g,'>=');
 	tex = tex.replace(/\\approx/g,'~~');

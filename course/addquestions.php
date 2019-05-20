@@ -305,8 +305,37 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			//update assessment sessions
 			if ($aver > 1) {
-				//TODO-assessver
+				//If settings scores to zero, need to define $poss array
+				if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
+					$poss = array();
+					foreach ($qids as $qid) {
+						$poss[$qid] = 0;
+					}
+				}
 				//need to re-score assessment attempts based on withdrawal
+				require_once('../assess2/AssessInfo.php');
+				require_once('../assess2/AssessRecord.php');
+				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
+				$assess_info->loadQuestionSettings();
+				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+		    $stm->execute(array($aid));
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+					$assess_record = new AssessRecord($DBH, $assess_info, false);
+					$assess_record->setRecord($row);
+					$updatedScore = $assess_record->withdrawQuestions($poss);
+					$assess_record->saveRecordIfNeeded();
+					// also want to adjust practice attempts
+					// this is sloppy, but not used often, so oh well
+					$assess_record->setInPractice(true);
+					$assess_record->withdrawQuestions($poss);
+					$assess_record->saveRecordIfNeeded();
+
+					if (strlen($row['lti_sourcedid'])>1) {
+						//update LTI score
+						require_once("../includes/ltioutcomes.php");
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $updatedScore, true);
+					}
+				}
 			} else {
 				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));

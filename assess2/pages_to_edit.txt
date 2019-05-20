@@ -1,5 +1,3 @@
-Make sure rescoreassess method also updates iar.timeontask total
-
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
   - For by-question, should we just count scored version for timespent, or all versions?
@@ -40,12 +38,19 @@ Newver /course/modquestiongrid.php
     - Stuff above
     - Add as group
     - Set points = number of parts
+Newver /course/chgassessments.php
 
 Edit/Rewrite /util/crosscoursedata.php
 Edit/Rewrite /util/crosscoursedatadetail.php
-Edit/Rewerite /course/showfeedback.php
+Edit/Rewrite /course/showfeedback.php  (showfeedback2, with aid=, uid=)
 
-Edit /course/addquestions.php  (need to rewrite withdraw handling, line 308 - need to add func to AssessRecord)
+Edit/Rewrite testquestion.php
+Edit/Rewrite embedq.php
+Edit/Rewrite multiembedq.php
+
+// LOOK for pages calling calcandupdateLTIgrade
+// If we're going to introduce a JSON itemorder format, need to modify everything that touches itemorder too (!)
+
 Edit /course/course.php  (need to decide how to delete teacher tries)
 Edit /course/exception.php  (need to handle or rewrite "force regen" option)
   - What if they're out of regens?
@@ -54,9 +59,6 @@ Edit /course/exception.php  (need to handle or rewrite "force regen" option)
       assessments might have diff types
 Edit /course/massexception.php (need to handle or rewrite "force regen")
 Edit /course/gbtable2.php
-Edit /course/isolateassessbygroup.php
-Edit /course/isolatessessgrade.php  ( ** started, not done)
-Edit /course/managestugrps.php  (** mostly done - need to fix file stuff)
 Edit /course/outcometable.php
 Edit /course/report-weeklylab.php
 Edit /diag/index.php
@@ -65,6 +67,7 @@ Edit /includes/exceptionfuncs.php (see if latepass pointless due to timelimit - 
 Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
 
 X? Edit /includes/loaditemshowdata.php (check status)
+X Edit /includes/unenrollphp
 
 X Edit /includes/delcourse.php
 X Edit /actions.php
@@ -74,15 +77,18 @@ X Edit /course/coursemap.php
 X Edit /course/courseshowitems.php
 X Edit /course/deleteassessment.php
 X Edit /course/delitembyid.php
-X Edit /includes/unenrollphp (totally done when filehandler is updated)
 X Edit /course/masssend.php  (how to determine not complete (status&3>0?))
 X Edit /course/treereader.php  (need to read status)
 X Edit /includes/calendardata.php (look up prereq scores)
 X Edit /includes/calendardisp.php (look up prereq scores)
 X Edit /includes/stugroups.php  (update i_a_r agroupid; make sure nothing fancier needs to happen)
+X Edit /course/managestugrps.php
 X Edit /course/moddataset.php  (need to do replaceby)
 X Edit /msgs/viewmsg.php  (need link to gb-viewasid)
 X Edit /forums/posts.php (need link to gb-viewasid)
+X Edit /course/isolateassessbygroup.php
+X Edit /course/isolatessessgrade.php
+X Edit /course/addquestions.php  (test withdraw handling)
 
 Delay /admin/federationpull.php
 Delay /util/mergescores.php
