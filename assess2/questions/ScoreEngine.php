@@ -69,28 +69,6 @@ class ScoreEngine
     }
 
     /**
-     * Score a question. This method wraps another method around error handlers.
-     *
-     * @param ScoreQuestionParams $scoreQuestionParams Params for scoring this question.
-     * @return array
-     */
-    public function scoreQuestionWrapper(ScoreQuestionParams $scoreQuestionParams): array
-    {
-        set_error_handler(array($this, 'evalErrorHandler'));
-        set_exception_handler(array($this, 'evalExceptionHandler'));
-
-        // User's rights are used during exception handling.
-        $this->userRights = $scoreQuestionParams->getUserRights();
-
-        $results = $this->scoreQuestionAllParts($scoreQuestionParams);
-
-        restore_error_handler();
-        restore_exception_handler();
-
-        return $results;
-    }
-
-    /**
      * Score a question.
      *
      * @param ScoreQuestionParams $scoreQuestionParams Params for scoring this question.
