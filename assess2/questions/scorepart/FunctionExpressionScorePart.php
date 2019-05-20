@@ -255,7 +255,6 @@ class FunctionExpressionScorePart implements ScorePart
                     $varvals[$variables[$j]] = $tps[$i][$j];
                 }
                 $realans = $answerfunc->evaluateQuiet($varvals);
-
                 //echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
                 if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
                 if (in_array('equation',$ansformats)) {  //if equation, store ratios
@@ -344,6 +343,7 @@ class FunctionExpressionScorePart implements ScorePart
                     }
                 }
                 $scorePartResult->setRawScore($partialpts[$ansidx]);
+                return $scorePartResult;
             }
         }
         if ($rightanswrongformat!=-1) {

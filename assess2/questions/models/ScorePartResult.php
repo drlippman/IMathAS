@@ -74,7 +74,7 @@ class ScorePartResult
      * @param string|array $lastAnswerAsGiven
      * @return ScorePartResult
      */
-    public function setLastAnswerAsGiven(array $lastAnswerAsGiven): ScorePartResult
+    public function setLastAnswerAsGiven($lastAnswerAsGiven): ScorePartResult
     {
         $this->lastAnswerAsGiven = $lastAnswerAsGiven;
         return $this;
@@ -96,7 +96,7 @@ class ScorePartResult
      * @param string|array $lastAnswerAsNumber
      * @return ScorePartResult
      */
-    public function setLastAnswerAsNumber(array $lastAnswerAsNumber): ScorePartResult
+    public function setLastAnswerAsNumber($lastAnswerAsNumber): ScorePartResult
     {
         $this->lastAnswerAsNumber = $lastAnswerAsNumber;
         return $this;
@@ -179,5 +179,6 @@ class ScorePartResult
     {
         $this->scoreMessages .=
             empty($this->scoreMessage) ? $scoreMessage : '<br/>' . $scoreMessage;
+        return $this;
     }
 }

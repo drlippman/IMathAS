@@ -89,5 +89,6 @@ class MultipleAnswerScorePart implements ScorePart
             $score = 0;
         }
         $scorePartResult->setRawScore($score);
+        return $scorePartResult;
     }
 }

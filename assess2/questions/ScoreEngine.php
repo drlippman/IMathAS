@@ -517,7 +517,7 @@ class ScoreEngine
 
         if (isset($scoremethod) && $scoremethod == "singlescore") {
             return array(
-                'scores' => round(array_sum($scores), 3),
+                'scores' => array(round(array_sum($scores), 3)),
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
@@ -525,14 +525,14 @@ class ScoreEngine
         } else if (isset($scoremethod) && $scoremethod == "allornothing") {
             if (array_sum($scores) < .98) {
                 return array(
-                    'scores' => 0,
+                    'scores' => array(0),
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
                 );
             } else {
                 return array(
-                    'scores' => 1,
+                    'scores' => array(1),
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
@@ -541,7 +541,7 @@ class ScoreEngine
         } else if (isset($scoremethod) && $scoremethod == "acct") {
             $sc = round(array_sum($scores) / $accpts, 3);
             return (array(
-                'scores' => $sc,
+                'scores' => array($sc),
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
@@ -584,10 +584,10 @@ class ScoreEngine
         }
 
         return array(
-            'scores' => round($score, 3),
-            'rawScores' => round($score, 2),
-            'lastAnswerAsGiven' => $scorePartResult->getLastAnswerAsGiven(),
-            'lastAnswerAsNumber' => $scorePartResult->getLastAnswerAsNumber(),
+            'scores' => array(round($score, 3)),
+            'rawScores' => array(round($score, 2)),
+            'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
+            'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber()),
         );
     }
 
