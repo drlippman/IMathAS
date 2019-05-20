@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class FunctionExpressionScorePart implements ScorePart
@@ -15,9 +17,11 @@ class FunctionExpressionScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -65,7 +69,7 @@ class FunctionExpressionScorePart implements ScorePart
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
         }
 
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenans);
 
         $correct = true;
 
@@ -149,12 +153,15 @@ class FunctionExpressionScorePart implements ScorePart
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
             if ($answer==$givenans) {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         } else if ($answer==='DNE' || $answer==='oo') {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
 
         if (!in_array('equation',$ansformats) && strpos($answer,'=')!==false) {
@@ -171,7 +178,8 @@ class FunctionExpressionScorePart implements ScorePart
 
         $givenansfunc = parseMathQuiet($toevalGivenans, $vlist);
         if ($givenansfunc === false) { //parse error
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         for ($i = 0; $i < 20; $i++) {
             $varvals = array();
@@ -213,7 +221,8 @@ class FunctionExpressionScorePart implements ScorePart
 
             if (in_array('equation',$ansformats)) {
                 if (substr_count($givenans, '=')!=1) {
-                    return 0;
+                    $scorePartResult->setRawScore(0);
+                    return $scorePartResult;
                 }
                 $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
                 unset($ratios);
@@ -224,12 +233,14 @@ class FunctionExpressionScorePart implements ScorePart
 
 
             if ($answer == '') {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
             $origanswer = $answer;
             $answerfunc = parseMathQuiet(makepretty($answer), $vlist);
             if ($answerfunc === false) {  // parse error on $answer - can't do much
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
 
             $cntnan = 0;
@@ -332,13 +343,14 @@ class FunctionExpressionScorePart implements ScorePart
                         continue;
                     }
                 }
-                return $partialpts[$ansidx];
+                $scorePartResult->setRawScore($partialpts[$ansidx]);
             }
         }
         if ($rightanswrongformat!=-1) {
-            $GLOBALS['partlastanswer'] .= '$f$1';
+            $scorePartResult->setCorrectAnswerWrongFormat(true);
         }
 
-        return 0;
+        $scorePartResult->setRawScore(0);
+        return $scorePartResult;
     }
 }

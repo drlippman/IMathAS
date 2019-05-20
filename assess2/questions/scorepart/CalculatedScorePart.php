@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class CalculatedScorePart implements ScorePart
@@ -15,9 +17,11 @@ class CalculatedScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -52,17 +56,25 @@ class CalculatedScorePart implements ScorePart
             }
         }
 
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
-          //TODO: return this as the numeric part last answer
-          //  $GLOBALS['partlastanswer'] .= '$#$' . $givenansval;
+          $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($answer==='') {
-            if (trim($givenans)==='') { return 1;} else { return 0;}
+            if (trim($givenans)==='') {
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
+            } else {
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
         }
 
-        if ($givenans == null) {return 0;}
+        if ($givenans == null) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
 
         $formatok = "all";
         if (checkreqtimes($givenans, $requiretimes)==0) {
@@ -100,7 +112,8 @@ class CalculatedScorePart implements ScorePart
                         if (isset($GLOBALS['teacherid'])) {
                             echo '<p>', _('Debug info: empty, missing or invalid $answer'), ' </p>';
                         }
-                        return 0;
+                        $scorePartResult->setRawScore(0);
+                        return $scorePartResult;
                     }
                     if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
                         if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
@@ -119,7 +132,8 @@ class CalculatedScorePart implements ScorePart
                     if (isset($GLOBALS['teacherid'])) {
                         echo '<p>', _('Debug info: empty, missing, or invalid $answer'), ' </p>';
                     }
-                    return 0;
+                    $scorePartResult->setRawScore(0);
+                    return $scorePartResult;
                 }
                 if (preg_match('/(\(|\[)(.+?)\,(.+?)(\)|\])/',$anans,$matches)) {
                     if ($matches[2]=='-oo') {$matches[2] = -1e99;}
@@ -161,8 +175,7 @@ class CalculatedScorePart implements ScorePart
                 }
             }
             $givenansval = implode(',', $numvalarr);
-            //TODO: return this as the numeric part last answer
-            //$GLOBALS['partlastanswer'] .= '$#$'. $givenansval;
+            $scorePartResult->setLastAnswerAsNumber($numvalarr);
         } {
         $numvalarr = explode(',', $givenansval);
     }
@@ -222,7 +235,8 @@ class CalculatedScorePart implements ScorePart
 
         if (in_array('orderedlist',$ansformats)) {
             if (count($gamasterarr)!=count($anarr)) {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         }
 
@@ -310,21 +324,24 @@ class CalculatedScorePart implements ScorePart
         }
         if (in_array('orderedlist',$ansformats)) {
             $score = $correct/count($anarr);
+            $scorePartResult->setRawScore($score);
         } else {
             //$score = $correct/count($anarr) - count($gaarr)/$extrapennum;  //take off points for extranous stu answers
             if ($gaarrcnt<=count($anarr)) {
                 $score = $correct/count($anarr);
+                $scorePartResult->setRawScore($score);
             } else {
                 $score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/$extrapennum;  //take off points for extranous stu answers
+                $scorePartResult->setRawScore($score);
             }
         }
-        if ($score<0) { $score = 0; }
+        if ($score<0) { $scorePartResult->setRawScore(0); }
         if ($formatok != "all" && $correctanyformat>0) {
-            $GLOBALS['partlastanswer'] .= '$f$1';
+            $scorePartResult->setCorrectAnswerWrongFormat(true);
             if ($formatok == 'nowhole') {
-                $score = 0;
+                $scorePartResult->setRawScore(0);
             }
         }
-        return ($score);
+        return $scorePartResult;
     }
 }

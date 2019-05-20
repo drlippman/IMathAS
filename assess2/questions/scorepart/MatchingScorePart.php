@@ -3,9 +3,11 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
 use Sanitize;
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class MatchingScorePart implements ScorePart
@@ -17,9 +19,11 @@ class MatchingScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -37,8 +41,9 @@ class MatchingScorePart implements ScorePart
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
 
         if (!is_array($questions) || !is_array($answers)) {
-            echo _('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.');
-            return 0;
+            $scorePartResult->addScoreMessage(_('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.'));
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $score = 1.0;
@@ -75,7 +80,8 @@ class MatchingScorePart implements ScorePart
         }
         ksort($origla);
         // only store unrandomized
-        $GLOBALS['partlastanswer'] = implode('|',$origla);
-        return $score;
+        $scorePartResult->setLastAnswerAsGiven(implode('|', $origla));
+        $scorePartResult->setRawScore($score);
+        return $scorePartResult;
     }
 }

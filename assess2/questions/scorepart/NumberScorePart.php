@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class NumberScorePart implements ScorePart
@@ -15,9 +17,11 @@ class NumberScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -49,18 +53,21 @@ class NumberScorePart implements ScorePart
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
         }
 
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenans);
 
         if ($answer==='' && $givenans==='') {
-            return 1;
+            $scorePartResult->setScoreMessages(1);
+            return $scorePartResult;
         }
 
 
         if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
-            return 0;
+            $scorePartResult->setScoreMessages(0);
+            return $scorePartResult;
         }
         if (in_array('integer',$ansformats) && preg_match('/\..*[1-9]/',$givenans)) {
-            return 0;
+            $scorePartResult->setScoreMessages(0);
+            return $scorePartResult;
         }
 
         if (isset($partialcredit)) {
@@ -94,15 +101,33 @@ class NumberScorePart implements ScorePart
         }
 
         if ($answer==='') {
-            if (trim($givenans)==='') { return 1;} else { return 0;}
+            if (trim($givenans)==='') {
+                $scorePartResult->setScoreMessages(1);
+                return $scorePartResult;
+            } else {
+                $scorePartResult->setScoreMessages(0);
+                return $scorePartResult;
+            }
         }
         if ($answer==='0 or ') {
-            if (trim($givenans)==='' || trim($givenans)==='0') { return 1;} else { return 0;}
+            if (trim($givenans)==='' || trim($givenans)==='0') {
+                $scorePartResult->setScoreMessages(1);
+                return $scorePartResult;
+            } else {
+                $scorePartResult->setScoreMessages(0);
+                return $scorePartResult;
+            }
         }
-        if ($givenans == null) {return 0;}
+        if ($givenans == null) {
+            $scorePartResult->setScoreMessages(0);
+            return $scorePartResult;
+        }
         if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
             $givenans = trim($givenans);
-            if ($givenans{0}!='{' || substr($givenans,-1)!='}') { return 0; }
+            if ($givenans{0}!='{' || substr($givenans,-1)!='}') {
+                $scorePartResult->setScoreMessages(0);
+                return $scorePartResult;
+            }
             $answer = str_replace(array('{','}'),'', $answer);
             $givenans = str_replace(array('{','}'),'', $givenans);
             $answerformat = str_replace('set','list',$answerformat);
@@ -149,8 +174,8 @@ class NumberScorePart implements ScorePart
             }
             $islist = true;
         } else {
-            $givenan = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenan);
-            $givenan = str_replace(',','99999999',$givenan); //force wrong ans on lingering commas
+            $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
+            $givenans = str_replace(',','99999999',$givenans); //force wrong ans on lingering commas
             $gaarr = array($givenans);
 
             if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
@@ -163,7 +188,8 @@ class NumberScorePart implements ScorePart
 
         if (in_array('orderedlist',$ansformats)) {
             if (count($gamasterarr)!=count($anarr)) {
-                return 0;
+                $scorePartResult->setScoreMessages(0);
+                return $scorePartResult;
             }
         }
         if (in_array('parenneg',$ansformats)) {
@@ -290,6 +316,7 @@ class NumberScorePart implements ScorePart
                 }
             }
         }
-        return ($score);
+        $scorePartResult->setRawScore($score);
+        return $scorePartResult;
     }
 }

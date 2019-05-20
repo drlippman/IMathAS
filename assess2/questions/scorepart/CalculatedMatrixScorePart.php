@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class CalculatedMatrixScorePart implements ScorePart
@@ -15,9 +17,11 @@ class CalculatedMatrixScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -52,7 +56,7 @@ class CalculatedMatrixScorePart implements ScorePart
         }
         //store answers
         if ($givenans==='oo' || $givenans==='DNE') {
-            $GLOBALS['partlastanswer'] = $givenans;
+            $scorePartResult->setLastAnswerAsGiven($givenans);
         } else if (isset($answersize)) {
             $sizeparts = explode(',',$answersize);
             $givenanslist = array();
@@ -67,8 +71,8 @@ class CalculatedMatrixScorePart implements ScorePart
                     $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
                 }
             }
-            $GLOBALS['partlastanswer'] = implode("|",$givenanslist);
-            $GLOBALS['partlastanswer'] .= '$#$'.implode('|', $givenanslistvals);
+            $scorePartResult->setLastAnswerAsGiven($givenanslist);
+            $scorePartResult->setLastAnswerAsNumber($givenanslistvals);
         } else {
             $givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
             $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
@@ -80,18 +84,22 @@ class CalculatedMatrixScorePart implements ScorePart
                 }
             }
             //this may not be backwards compatible
-            $GLOBALS['partlastanswer'] = $givenans.'$#$'.implode('|', $givenanslistvals);
+            $scorePartResult->setLastAnswerAsGiven($givenans);
+            $scorePartResult->setLastAnswerAsNumber($givenanslistvals);
         }
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
             if ($answer==$givenans) {
-                return 1;
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
             } else {
-                return 0;
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
             }
         } else if ($answer==='DNE' || $answer==='oo') {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
 
         $correct = true;
@@ -106,7 +114,9 @@ class CalculatedMatrixScorePart implements ScorePart
         if (isset($answersize)) {
             for ($i=0; $i<count($answerlist); $i++) {
                 if (!checkanswerformat($givenanslist[$i],$ansformats)) {
-                    return 0; //perhaps should just elim bad answer rather than all?
+                    //perhaps should just elim bad answer rather than all?
+                    $scorePartResult->setRawScore(0);
+                    return $scorePartResult;
                 }
             }
 
@@ -120,13 +130,16 @@ class CalculatedMatrixScorePart implements ScorePart
             $tocheck = explode(',',$tocheck);
             foreach($tocheck as $chkme) {
                 if (!checkanswerformat($chkme,$ansformats)) {
-                    return 0; //perhaps should just elim bad answer rather than all?
+                    //perhaps should just elim bad answer rather than all?
+                    $scorePartResult->setRawScore(0);
+                    return $scorePartResult;
                 }
             }
         }
 
         if (count($answerlist) != count($givenanslist)) {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
 
         if (in_array('scalarmult',$ansformats)) {
@@ -161,6 +174,12 @@ class CalculatedMatrixScorePart implements ScorePart
                 }
             }
         }
-        if ($correct) {return 1;} else {return 0;}
+        if ($correct) {
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
+        } else {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
     }
 }

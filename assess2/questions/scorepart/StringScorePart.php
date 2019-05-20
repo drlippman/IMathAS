@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class StringScorePart implements ScorePart
@@ -15,9 +17,11 @@ class StringScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -36,13 +40,14 @@ class StringScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $givenans = normalizemathunicode($givenans);
 
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenans);
 
         if (isset($scoremethod) &&
             (($scoremethod=='takeanything' && trim($givenans)!='') ||
                 $scoremethod=='takeanythingorblank')
         ) {
-            return 1;
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
         }
 
         if (!isset($answerformat)) { $answerformat = "normal";}
@@ -188,7 +193,8 @@ class StringScorePart implements ScorePart
             $score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/($gaarrcnt+count($anarr));
         }
         if ($score<0) { $score = 0; }
-        return ($score);
+        $scorePartResult->setRawScore($score);
+        return $scorePartResult;
         //return $correct;
     }
 }

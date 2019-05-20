@@ -3,7 +3,9 @@
 namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
+require_once(__DIR__ . '/../models/ScorePartResult.php');
 
+use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
 class EssayScorePart implements ScorePart
@@ -15,9 +17,11 @@ class EssayScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): int
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
+
+        $scorePartResult = new ScorePartResult();
 
         $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
@@ -37,12 +41,15 @@ class EssayScorePart implements ScorePart
             (($scoremethod=='takeanything'  && trim($givenans)!='') ||
                 $scoremethod=='takeanythingorblank')
         ) {
-            return 1;
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
         } else if (trim($givenans)=='') {
-            return 0;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         } else {
             $GLOBALS['questionmanualgrade'] = true;
-            return -2;
+            $scorePartResult->setRawScore(-2);
+            return $scorePartResult;
         }
     }
 }
