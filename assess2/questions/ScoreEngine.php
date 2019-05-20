@@ -243,18 +243,18 @@ class ScoreEngine
         $scoreQuestionParams->setVarsForScorePart($varsForScorepart);
 
         if ($qdata['qtype'] == "multipart") {
-            $score = $this->scorePartMultiPart($scoreQuestionParams,
+            $scoreResult = $this->scorePartMultiPart($scoreQuestionParams,
                 $additionalVarsForScoring);
         } else {
-            $score = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata);
+            $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata);
             if ($qdata['qtype'] == "conditional") {
               // Store just-build $stuanswers as lastanswer for conditional
-              $GLOBALS['lastanswers'][$qnidx] = implode('&', $stuanswers[$thisq]);
-              //TODO: store $stuanswersval
+              $scoreResult['lastAnswerAsGiven'] = $stuanswers[$thisq];
+              $scoreResult['lastAnswerAsNumber'] = $stuanswersval[$thisq];
             }
         }
 
-        return $score;
+        return $scoreResult;
     }
 
     /**
@@ -477,7 +477,8 @@ class ScoreEngine
          * Begin scoring.
          */
 
-        $partla = array();
+        $partLastAnswerAsGiven = array();
+        $partLastAnswerAsNumber = array();
         if (isset($answeights)) {
             if (!is_array($answeights)) {
                 $answeights = explode(",", $answeights);
@@ -534,27 +535,48 @@ class ScoreEngine
                 $scores[$partnum] = ($raw[$partnum] < 0) ? 0 : round($raw[$partnum] * $answeights[$partnum], 4);
             }
             $raw[$partnum] = round($raw[$partnum], 2);
-            $partla[$partnum] = $GLOBALS['partlastanswer'];
+            $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
+            $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
         }
 
-        if ($GLOBALS['lastanswers'][$qnidx] == '') {
-            $GLOBALS['lastanswers'][$qnidx] = implode("&", $partla);
-        } else {
-            $GLOBALS['lastanswers'][$qnidx] .= '##' . implode("&", $partla);
-        }
         if (isset($scoremethod) && $scoremethod == "singlescore") {
-            return array(round(array_sum($scores), 3), implode('~', $raw));
+            return array(
+                'scores' => round(array_sum($scores), 3),
+                'rawScores' => $raw,
+                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
+                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+            );
         } else if (isset($scoremethod) && $scoremethod == "allornothing") {
             if (array_sum($scores) < .98) {
-                return array(0, implode('~', $raw));
+                return array(
+                    'scores' => 0,
+                    'rawScores' => $raw,
+                    'lastAnswerAsGiven' => $partLastAnswerAsGiven,
+                    'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                );
             } else {
-                return array(1, implode('~', $raw));
+                return array(
+                    'scores' => 1,
+                    'rawScores' => $raw,
+                    'lastAnswerAsGiven' => $partLastAnswerAsGiven,
+                    'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                );
             }
         } else if (isset($scoremethod) && $scoremethod == "acct") {
             $sc = round(array_sum($scores) / $accpts, 3);
-            return (array($sc, implode('~', $raw)));
+            return (array(
+                'scores' => $sc,
+                'rawScores' => $raw,
+                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
+                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+            ));
         } else {
-            return array(implode('~', $scores), implode('~', $raw));
+            return array(
+                'scores' => $scores,
+                'rawScores' => $raw,
+                'lastAnswerAsGiven' => $partLastAnswerAsGiven,
+                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+            );
         }
     }
 
@@ -584,17 +606,13 @@ class ScoreEngine
                 $score = 0;
             }
         }
-        if ($qdata['qtype'] != 'conditional') {
-            $GLOBALS['partlastanswer'] = str_replace('&', '', $GLOBALS['partlastanswer']);
-            $GLOBALS['partlastanswer'] = preg_replace('/#+/', '#', $GLOBALS['partlastanswer']);
-        }
-        if ($GLOBALS['lastanswers'][$qnidx] == '') {
-            $GLOBALS['lastanswers'][$qnidx] = $GLOBALS['partlastanswer'];
-        } else {
-            $GLOBALS['lastanswers'][$qnidx] .= '##' . $GLOBALS['partlastanswer'];
-        }
 
-        return array(round($score, 3), round($score, 2));
+        return array(
+            'scores' => round($score, 3),
+            'rawScores' => round($score, 2),
+            'lastAnswerAsGiven' => $scorePartResult->getLastAnswerAsGiven(),
+            'lastAnswerAsNumber' => $scorePartResult->getLastAnswerAsNumber(),
+        );
     }
 
     /**

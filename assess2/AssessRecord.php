@@ -1412,11 +1412,11 @@ class AssessRecord
         ->setAllQuestionAnswersAsNum($stuanswersval)
         ->setQnpointval($qsettings['points_possible']);
 
-    list($scores, $rawscores) = $scoreEngine->scoreQuestion($scoreQuestionParams);
-    // TODO need better way to get student's answer and unrand and such
-    $rawparts = explode('~', $rawscores);
-    $scores = explode('~', $scores);
-    $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
+    $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
+    $scores = $scoreResult['scores'];
+    $rawparts = $scoreResult['rawScores'];
+    $partla = $scoreResult['lastAnswerAsGiven'];
+    $partlaNum = $scoreResult['lastAnswerAsNumber'];
 
     if (count($rawparts)===1 && count($partla) > 1) {
       // force recording of all parts for conditional
@@ -1431,6 +1431,9 @@ class AssessRecord
           'time' => round($timeactive/1000),
           'stuans' => $v   // TODO: this is wrong for most types
         );
+        if (isset($partlaNum[$k])) {
+          $data[$k]['stuansval'] = $partlaNum[$k];
+        }
         if (isset($rawparts[$k])) {
           $data[$k]['raw'] = $rawparts[$k];
         }
