@@ -1425,6 +1425,7 @@ class AssessRecord
         ->setUserRights($GLOBALS['myrights'])
         ->setRandWrapper($GLOBALS['RND'])
         ->setQuestionNumber($qn)
+        ->setQuestionData($this->assess_info->getQuestionSetData($qsettings['questionsetid']))
         ->setAssessmentId($this->assess_info->getSetting('id'))
         ->setDbQuestionSetId($qsettings['questionsetid'])
         ->setQuestionSeed($qver['seed'])
