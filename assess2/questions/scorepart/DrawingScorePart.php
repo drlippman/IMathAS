@@ -17,7 +17,7 @@ class DrawingScorePart implements ScorePart
         $this->scoreQuestionParams = $scoreQuestionParams;
     }
 
-    public function getScore(): ScorePartResult
+    public function getResult(): ScorePartResult
     {
         global $mathfuncs;
 

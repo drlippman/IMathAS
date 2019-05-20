@@ -14,5 +14,5 @@ interface ScorePart
 {
     public function __construct(ScoreQuestionParams $scoreQuestionParams);
 
-    public function getScore(): ScorePartResult;
+    public function getResult(): ScorePartResult;
 }

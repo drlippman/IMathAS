@@ -520,7 +520,8 @@ class ScoreEngine
 			$scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
 
             $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
-            $raw[$partnum] = $scorePart->getScore();
+            $scorePartResult = $scorePart->getResult();
+            $raw[$partnum] = $scorePartResult->getRawScore();
 
             if (isset($scoremethod) && $scoremethod == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
@@ -575,7 +576,8 @@ class ScoreEngine
             ->setIsMultiPartQuestion(false);
 
         $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
-        $score = $scorePart->getScore();
+        $scorePartResult = $scorePart->getResult();
+        $score = $scorePartResult->getRawScore();
 
         if (isset($scoremethod) && $scoremethod == "allornothing") {
             if ($score < .98) {
