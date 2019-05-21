@@ -730,7 +730,9 @@ var app = new Vue({
 					never
 				];
 			}
-			if (!this.valueInOptions(out, this.showans)) {
+			if (out.length === 0) {
+				this.showans = 'never';
+			} else if (!this.valueInOptions(out, this.showans)) {
 				this.showans = out[0].value;
 			}
 			return out;
@@ -802,7 +804,8 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			 if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+				this.ansingb = 'never';
  				return [];
  			} else {
  				var out = [

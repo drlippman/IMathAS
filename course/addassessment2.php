@@ -171,10 +171,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);
-		$toset['showans'] = Sanitize::simpleString($_POST['showans']);
+		if ($toset['showscores'] == 'none') {
+			$toset['showans'] = 'never';
+		} else {
+			$toset['showans'] = Sanitize::simpleString($_POST['showans']);
+		}
 		$toset['viewingb'] = Sanitize::simpleString($_POST['viewingb']);
 		$toset['scoresingb'] = Sanitize::simpleString($_POST['scoresingb']);
-		$toset['ansingb'] = Sanitize::simpleString($_POST['ansingb']);
+		if ($toset['viewingb'] == 'never' || $toset['scoresingb'] == 'never') {
+			$toset['ansingb'] = 'never';
+		} else {
+			$toset['ansingb'] = Sanitize::simpleString($_POST['ansingb']);
+		}
 		$toset['gbcategory'] = Sanitize::onlyInt($_POST['gbcategory']);
 
 		// additional display options
