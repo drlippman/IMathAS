@@ -13,7 +13,7 @@ To discuss:
     Nice for "ability to review work", but what will it look like? (can use N/A like NoScores does now)
   For skip-around by-assessment, should 'score' only reflect submitted assessment takes?
     Or should it depend on showscores setting?
-
+  Gradeallq: only show questions from scored take / scored version?
 
 Test accounting
 
@@ -36,6 +36,7 @@ Newver /course/gb-viewasid.php
     - When walking through retakes, would want all the summary info to update too
 Newver /course/gradeallq.php
   - Should this only show scored version?
+  - This one probably not in Vue (no need)
 ~ Newver /course/modquestion.php  (need to update query to look for i_q w no i_a_s or i_a_r)
   - Tries allowed for this problem
   - Penalty: __% after ___ full-credit tries

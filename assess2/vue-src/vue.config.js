@@ -23,5 +23,9 @@ module.exports = {
   // in dev server mode, proxy all requests to localhost
   devServer: {
     proxy: 'http://localhost'
+  },
+  pages: {
+    index: 'src/main.js',
+    gbviewassess: 'src/gbviewassess/main.js'
   }
 };
