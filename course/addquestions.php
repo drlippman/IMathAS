@@ -45,6 +45,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$addassess = 'addassessment.php';
 	}
 	$aver = $row['ver'];
+	$modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
 
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
@@ -62,7 +63,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$body = "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
 		} else if (isset($_POST['add'])) {
-			include("modquestiongrid.php");
+			if ($aver > 1) {
+				include("modquestiongrid2.php");
+			} else {
+				include("modquestiongrid.php");
+			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
@@ -122,7 +127,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$body = "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
 		} else {
-			include("modquestiongrid.php");
+			if ($aver > 1) {
+				include("modquestiongrid2.php");
+			} else {
+				include("modquestiongrid.php");
+			}
 			if (isset($_GET['process'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
@@ -416,6 +425,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
 		var addqaddr = '$address';
+		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=030818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=010519\"></script>";
@@ -952,7 +962,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 
 
-						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">Add</a>";
+						$page_questionTable[$i]['add'] = "<a href=\"$modquestion.php?qsetid=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid\">Add</a>";
 
 						if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
 							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id=".Sanitize::onlyInt($line['id'])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
@@ -1062,7 +1072,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
 					$page_assessmentQuestions[$x]['times'][$y] = $qsetusecnts[$qsetid[$qid]];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;
-					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">Add</a>";
+					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"$modquestion.php?qsetid=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">Add</a>";
 					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid\">View Code</a>" ;
 					$page_assessmentQuestions[$x]['templ'][$y] = "<a href=\"moddataset.php?id=".Sanitize::onlyFloat($qsetid[$qid])."&aid=$aid&cid=$cid&template=true\">Template</a>";
 					$page_assessmentQuestions[$x]['extref'][$y] = '';

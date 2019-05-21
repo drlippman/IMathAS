@@ -717,7 +717,7 @@ function groupSelected() {
 		}
 	}
 	for (i=0; i<itemarray[to][2].length; i++) {
-		itemarray[to][2][i][4] = grppoints;	
+		itemarray[to][2][i][4] = grppoints;
 	}
 	submitChanges();
 }
@@ -725,7 +725,7 @@ function groupSelected() {
 function updatePts() {
 	if (!confirm_textseg_dirty()) {
 		$("[id^=pts-],[id^=grppts],#defpts").each(function() {
-			$(this).val($(this).attr("data-lastval"));	
+			$(this).val($(this).attr("data-lastval"));
 		});
 	} else {
 		var newdefpts = Math.round($("#defpts").val());
@@ -795,7 +795,7 @@ function updateGrpT(num,old_type) {
 function confirmclearattempts() {
 	return confirm(_("Are you sure you want to clear all attempts on this question?"));
 }
-	
+
 
 function edittextseg(i) {
 	tinyMCE.get("textseg"+i).setContent(itemarray[i][1]);
@@ -956,7 +956,7 @@ function generateTable() {
 	html += "</th>";
 	html += "<th>Actions</th>";
 	html += "</thead><tbody>";
-	var text_segment_count = 0; var curqnum = 0; var curqitemloc = 0;  
+	var text_segment_count = 0; var curqnum = 0; var curqitemloc = 0;
 	var badgrppoints = false; var badthisgrppoints = false; var grppoints = -1;
 	for (var i=0; i<itemcount; i++) {
 		curistext = 0;
@@ -1184,7 +1184,7 @@ function generateTable() {
 
 				html += '<td class=c><div class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 				html += 'Action</a><ul role="menu" class="dropdown-menu dropdown-menu-right">';
-				html += " <li><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change Settings</a></li>";
+				html += " <li><a href=\"modquestion"+(assessver>1?'2':'')+".php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change Settings</a></li>";
 				if (curitems[j][5]==1) {
 					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit Code</a></li>"; //edit
 				} else {
@@ -1317,7 +1317,7 @@ function submitChanges() {
 	document.getElementById(target).innerHTML = _(' Saving Changes... ');
 	data=generateOutput();
 	var outdata = {
-			order: data[0], 
+			order: data[0],
 			text_order: JSON.stringify(data[1])
 	};
 	if (!beentaken) {

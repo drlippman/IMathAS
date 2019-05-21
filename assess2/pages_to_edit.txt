@@ -1,3 +1,16 @@
+To discuss:
+  What options do we want to allow overrides for at the per-question level?
+    How will we enforce the values are reasonable if assess settings change?
+    Could limit showans options to:
+      Use default
+      Never during
+      after last attempt / after take (depending on showscores setting)
+    Then auto-remap after_lastattempt <-> after_take if showscores is changed later
+    OR, just limit to use default / Never.
+  How will "force regens" work on exceptions page?
+
+Test accounting
+
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
   - For by-question, should we just count scored version for timespent, or all versions?
@@ -65,6 +78,9 @@ Edit /diag/index.php
 Edit /forums/posthandler.php (need to look up q, seed, and attempt and call displayq)
 Edit /includes/exceptionfuncs.php (see if latepass pointless due to timelimit - need to consider retakes now)
 Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
+
+Future TODO: migrate itemorder to JSON format
+
 
 X? Edit /includes/loaditemshowdata.php (check status)
 X Edit /includes/unenrollphp
