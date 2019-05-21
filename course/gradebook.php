@@ -893,30 +893,51 @@ function gbstudisp($stu) {
 						}
 					} else {
 						if (isset($gbt[1][1][$i][0])) { //has score
-							$querymap = array(
-                                'stu' => $stu,
-                                'cid' => $cid,
-                                'asid' => $gbt[1][1][$i][4],
-                                'uid' => $gbt[1][4][0]
-                            );
+							if ($gbt[0][1][$i][15] > 1) { // assess2
+								$querymap = array(
+	                                'stu' => $stu,
+	                                'cid' => $cid,
+	                                'aid' => $gbt[0][1][$i][7],
+	                                'uid' => $gbt[1][4][0]
+	                            );
 
-							echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+								echo '<a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+							} else {
+								$querymap = array(
+	                                'stu' => $stu,
+	                                'cid' => $cid,
+	                                'asid' => $gbt[1][1][$i][4],
+	                                'uid' => $gbt[1][4][0]
+	                            );
 
+								echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+							}
 							if ($afterduelatepass) {
 								echo ' onclick="return confirm(\''._('If you view this assignment, you will not be able to use a LatePass on it').'\');"';
 							}
 							echo ">";
 							$haslink = true;
 						} else if ($isteacher) {
-                            $querymap = array(
-                                'stu' => $stu,
-                                'cid' => $cid,
-                                'aid' => $gbt[0][1][$i][7],
-                                'uid' => $gbt[1][4][0],
-                                'asid' => 'new'
-                            );
+							if ($gbt[0][1][$i][15] > 1) { // assess2
+								$querymap = array(
+                    'stu' => $stu,
+                    'cid' => $cid,
+                    'aid' => $gbt[0][1][$i][7],
+                    'uid' => $gbt[1][4][0]
+                );
 
-                            echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
+								echo '<a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+							} else {
+                $querymap = array(
+                    'stu' => $stu,
+                    'cid' => $cid,
+                    'aid' => $gbt[0][1][$i][7],
+                    'uid' => $gbt[1][4][0],
+                    'asid' => 'new'
+                );
+
+                echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
+							}
 							$haslink = true;
 						}
 					}
@@ -1659,7 +1680,11 @@ function gbinstrdisp() {
 							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
+							if ($gbt[0][1][$j][15] > 1) { // assess2
+								echo "<a href=\"gb-viewasid2.php?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">";
+							} else {
+								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
+							}
 						}
 
 						echo $gbt[$i][1][$j][0];
@@ -1687,7 +1712,11 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
 						} else if ($isteacher) {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
+							if ($gbt[0][1][$j][15] > 1) { // assess2
+								echo "<a href=\"gb-viewasid2.php?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
+							} else {
+								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
+							}
 						} else {
 							echo '-';
 						}

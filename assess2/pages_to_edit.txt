@@ -8,6 +8,12 @@ To discuss:
     Then auto-remap after_lastattempt <-> after_take if showscores is changed later
     OR, just limit to use default / Never.
   How will "force regens" work on exceptions page?
+  Exception: timelimit check (latepass isn't useful)
+  Do we really want the ability to view in GB without seeing scores in GB?
+    Nice for "ability to review work", but what will it look like? (can use N/A like NoScores does now)
+  For skip-around by-assessment, should 'score' only reflect submitted assessment takes?
+    Or should it depend on showscores setting?
+
 
 Test accounting
 
@@ -30,7 +36,7 @@ Newver /course/gb-viewasid.php
     - When walking through retakes, would want all the summary info to update too
 Newver /course/gradeallq.php
   - Should this only show scored version?
-Newver /course/modquestion.php  (need to update query to look for i_q w no i_a_s or i_a_r)
+~ Newver /course/modquestion.php  (need to update query to look for i_q w no i_a_s or i_a_r)
   - Tries allowed for this problem
   - Penalty: __% after ___ full-credit tries
   - When by-question:
@@ -41,7 +47,7 @@ Newver /course/modquestion.php  (need to update query to look for i_q w no i_a_s
   - show video/text help buttons
   - Rubric
   - Fixed seeds
-Newver /course/modquestiongrid.php
+~ Newver /course/modquestiongrid.php
   - Already added:
     - Tries allowed
     - Show hints / help
@@ -71,7 +77,6 @@ Edit /course/exception.php  (need to handle or rewrite "force regen" option)
     - If so, how do we communicate that, especially in massexception where diff
       assessments might have diff types
 Edit /course/massexception.php (need to handle or rewrite "force regen")
-Edit /course/gbtable2.php
 Edit /course/outcometable.php
 Edit /course/report-weeklylab.php
 Edit /diag/index.php
@@ -85,6 +90,8 @@ Future TODO: migrate itemorder to JSON format
 X? Edit /includes/loaditemshowdata.php (check status)
 X Edit /includes/unenrollphp
 
+X Edit /course/gbtable2.php
+X Edit /course/gradebook.php
 X Edit /includes/delcourse.php
 X Edit /actions.php
 X Edit /admin/actions.php
