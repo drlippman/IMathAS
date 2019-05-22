@@ -162,6 +162,9 @@ foreach ($assessGroups as $gn=>$agroup) {
     if (!isset($data['eqnhelper'])) {
       $data['eqnhelper'] = 2;
     }
+    if (!isset($data['showhints'])) {
+      $data['showhints'] = 3;
+    }
     $data['startdate'] = $now + $data['startdate']*60*60;
     $data['enddate'] = $now + $data['enddate']*60*60;
     $keys = implode(',', array_keys($data));
