@@ -968,7 +968,7 @@ class AssessInfo
     // handle help features
     $settings['help_features'] = array(
       'message' => ($settings['msgtoinstr'] == 1),
-      'forum' => $settings['posttoforum']
+      'forum' => intval($settings['posttoforum'])
     );
     unset($settings['msgtoinstr']);
     unset($settings['posttoforum']);

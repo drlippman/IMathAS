@@ -119,7 +119,9 @@ export default {
       }
     },
     showHelps () {
-      return (store.assessInfo.hasOwnProperty('help_features') ||
+      return ((store.assessInfo.hasOwnProperty('help_features') && (
+        store.assessInfo.help_features.message == true ||
+        store.assessInfo.help_features.forum > 0)) ||
         (this.questionData.jsparams && this.questionData.jsparams.helps.length > 0));
     }
   },

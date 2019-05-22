@@ -184,6 +184,9 @@ foreach ($assessGroups as $gn=>$agroup) {
       } else if (substr($qdata['category'],0,3)==='AID') {
         $qdata['category'] = 'AID-'.$addedIds[$n + substr($qdata['category'],3)];
       }
+      if (!isset($qdata['showhints'])) {
+        $qdata['showhints'] = -1;
+      }
       $keys = implode(',', array_keys($qdata));
       $ph = Sanitize::generateQueryPlaceholders($qdata);
       $stm = $DBH->prepare("INSERT INTO imas_questions ($keys) VALUES ($ph)");
