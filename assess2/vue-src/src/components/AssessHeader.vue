@@ -52,10 +52,18 @@
     </div>
     <button
       @click="toggleMQuse"
-      :class="{plain:true, active:MQenabled}"
+      :class="{plain:true, 'switch-toggle':true}"
       :title="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+      :aria-label="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+      :aria-pressed="MQenabled"
     >
-      <icons name="eqned" size="medium"/>
+      <icons
+        :name="MQenabled ? 'eqned' : 'eqnedoff'"
+        :color="MQenabled ? '#060' : '#600'"
+        size="medium"
+      />
+      <span class="switch-toggle__ui"></span>
+      </span>
     </button>
   </div>
 </template>
@@ -208,5 +216,76 @@ export default {
 .practicenotice {
   color: #C00;
   font-style: italic;
+}
+
+/* FROM  https://scottaohara.github.io/a11y_styled_form_controls/src/toggle-button-switch/*/
+.switch-toggle {
+	display: inline-block;
+	position: relative;
+  padding-right: 0px;
+  padding-left: 4px;
+}
+
+.switch-toggle:focus {
+	outline: none;
+}
+
+/* negate 'flash' of text color when pressing a button in some browsers */
+.switch-toggle:active {
+	color: inherit;
+}
+
+.switch-toggle__ui {
+  position: relative;
+  display: inline-block;
+  width: 2em;
+  height: 1em;
+}
+/* using the before/after pseudo elements of the span to create the "switch" */
+.switch-toggle__ui:before,
+.switch-toggle__ui:after {
+	border: 1px solid #565656;
+	content: "";
+	position: absolute;
+  top: 0;
+}
+
+/* styling specific to the knob of the switch */
+.switch-toggle__ui:after {
+	background: #fff;
+	border-radius: 100%;
+	height: 1em;
+	right: .75em;
+	transition: right .1825s ease-in-out;
+	width: 1em;
+}
+
+/* styling specific to the knob "container" */
+.switch-toggle__ui:before {
+	background: #caa;
+	border-radius: 1em;
+	height: 1em;
+	right: 0em;
+	transition: background .2s ease-in-out;
+	width: 1.75em;
+}
+
+.switch-toggle span {
+	pointer-events: none;
+}
+
+.switch-toggle:focus .switch-toggle__ui:before {
+	outline: 2px solid #2196f3;
+	outline-offset: 2px;
+}
+
+/* change the position of the knob to indicate it has been checked*/
+.switch-toggle[aria-pressed="true"] .switch-toggle__ui:after {
+	right: 0em;
+}
+
+/* update the color of the "container" to further visually indicate state */
+.switch-toggle[aria-pressed="true"] .switch-toggle__ui:before {
+	background: #090;
 }
 </style>

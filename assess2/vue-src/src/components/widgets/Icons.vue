@@ -112,6 +112,11 @@
         <polyline points="1 10 4 10 7 22 10 2 22 2" />
         <rect x="14" y="7" width="6" height="12" rx="2" ry="2" />
       </template>
+      <template v-else-if="name=='eqnedoff'">
+        <polyline points="1 10 4 10 7 22 10 2 22 2" />
+        <rect x="14" y="7" width="6" height="12" rx="2" ry="2" />
+        <polyline points="0 2 24 22"></polyline>
+      </template>
 
     </svg>
     <span class="sronly" v-if="alttext.length > 0">
