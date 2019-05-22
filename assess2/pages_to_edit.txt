@@ -48,27 +48,6 @@ Newver /course/gb-viewasid.php
 Newver /course/gradeallq.php
   - Should this only show scored version?
   - This one probably not in Vue (no need)
-~ Newver /course/modquestion.php  (need to update query to look for i_q w no i_a_s or i_a_r)
-  - Tries allowed for this problem
-  - Penalty: __% after ___ full-credit tries
-  - When by-question:
-    - Versions allowed
-    - Penalties for new versions
-  - Show answers
-  - show hints
-  - show video/text help buttons
-  - Rubric
-  - Fixed seeds
-~ Newver /course/modquestiongrid.php
-  - Already added:
-    - Tries allowed
-    - Show hints / help
-    - Copies to add
-  - Initial add
-    - Points
-    - Stuff above
-    - Add as group
-    - Set points = number of parts
 Newver /course/chgassessments.php
 
 Edit/Rewrite /util/crosscoursedata.php
@@ -102,6 +81,8 @@ Future TODO: migrate itemorder to JSON format
 X? Edit /includes/loaditemshowdata.php (check status)
 X Edit /includes/unenrollphp
 
+X Newver /course/modquestion.php
+X Newver /course/modquestiongrid.php
 X Edit /course/gbtable2.php
 X Edit /course/gradebook.php
 X Edit /includes/delcourse.php

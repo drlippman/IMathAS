@@ -219,15 +219,46 @@ export default {
 }
 
 /* FROM  https://scottaohara.github.io/a11y_styled_form_controls/src/toggle-button-switch/*/
+
+.switch-toggle2__ui {
+  margin-left: 2px;
+  display: inline-block;
+  position: relative;
+  width: 27px;
+  height: 16px;
+  border: 1px solid #444;
+  background-color: #f99;
+  border-radius: 4px;
+}
+.switch-toggle[aria-pressed="true"] .switch-toggle2__ui {
+  background-color: #9f9
+}
+.switch-toggle2__ui:after {
+  border-radius: 4px;
+  height: 12px;
+  font-size: 10px;
+  border: 1px solid #444;
+  position: absolute;
+  content: "Off";
+  color: #600;
+  left: 0;
+  background-color: #fff;
+  vertical-align: -50%;
+  line-height: 10px;
+  padding: 1px 2px;
+}
+.switch-toggle[aria-pressed="true"] .switch-toggle2__ui:after {
+  content: "On";
+  color: #040;
+  right: 0;
+  left: auto;
+}
+
 .switch-toggle {
 	display: inline-block;
 	position: relative;
   padding-right: 0px;
   padding-left: 4px;
-}
-
-.switch-toggle:focus {
-	outline: none;
 }
 
 /* negate 'flash' of text color when pressing a button in some browsers */
@@ -258,13 +289,15 @@ export default {
 	right: .75em;
 	transition: right .1825s ease-in-out;
 	width: 1em;
+  box-shadow: 1px 2px 2px 0px rgba(0,0,0,0.25);
 }
 
 /* styling specific to the knob "container" */
 .switch-toggle__ui:before {
-	background: #caa;
+	background: #baa;
 	border-radius: 1em;
-	height: 1em;
+	height: .5em;
+  top: .25em;
 	right: 0em;
 	transition: background .2s ease-in-out;
 	width: 1.75em;
@@ -274,11 +307,6 @@ export default {
 	pointer-events: none;
 }
 
-.switch-toggle:focus .switch-toggle__ui:before {
-	outline: 2px solid #2196f3;
-	outline-offset: 2px;
-}
-
 /* change the position of the knob to indicate it has been checked*/
 .switch-toggle[aria-pressed="true"] .switch-toggle__ui:after {
 	right: 0em;
@@ -286,6 +314,9 @@ export default {
 
 /* update the color of the "container" to further visually indicate state */
 .switch-toggle[aria-pressed="true"] .switch-toggle__ui:before {
+	background: #0c0;
+}
+.switch-toggle[aria-pressed="true"] .switch-toggle__ui:after {
 	background: #090;
 }
 </style>
