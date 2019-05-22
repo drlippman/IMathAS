@@ -3,7 +3,7 @@
     <span class="qname-wrap">
       <icons :name="statusIcon" class="qstatusicon" />
       <span
-        :class="{greystrike: option.withdrawn !==0}"
+        :class="{greystrike: option.withdrawn > 0}"
         :title = "nameHover"
       >
         {{ nameDisp }}

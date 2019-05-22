@@ -106,7 +106,8 @@ export default {
       if (this.hasIntro) {
         out[0] = {
           internallink: '/skip/0',
-          dispqn: 0
+          dispqn: 0,
+          withdrawn: 0
         };
       }
       for (let qn in store.assessInfo.questions) {
