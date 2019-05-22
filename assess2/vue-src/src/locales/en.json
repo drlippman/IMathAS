@@ -197,8 +197,11 @@
     "min": "min | mins"
   },
   "helps": {
-    "message_instructor": "Message instructor about this question",
-    "post_to_forum": "Post this question to forum"
+    "message_instructor": "Message instructor",
+    "post_to_forum": "Post to forum",
+    "video": "Video",
+    "read": "Read",
+    "written_example": "Written Example"
   },
   "unload": {
     "unsubmitted_questions": "You have entered answered that have not yet been submitted. Are you sure you want to leave?",

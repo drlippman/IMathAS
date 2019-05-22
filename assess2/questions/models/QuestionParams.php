@@ -11,6 +11,7 @@ class QuestionParams
     private $dbQuestionSetId;   // Orig: $qidx
     private $questionNumber;    // Orig: $qnidx
     private $assessmentId = 0;
+    private $questionId = 0; // imas_questions.id
     private $questionSeed;      // Orig: $seed
     private $questionData;      // Obtained from imas_questionset; optional
 
@@ -103,6 +104,28 @@ class QuestionParams
     public function setAssessmentId(?int $assessmentId): QuestionParams
     {
         $this->assessmentId = $assessmentId;
+        return $this;
+    }
+
+    /**
+     * Get the imas_questions.id ID
+     *
+     * @return int The question ID.
+     */
+    public function getQuestionId(): ?int
+    {
+        return $this->assessmentId;
+    }
+
+    /**
+     * Set the question ID.
+     *
+     * @param int $questionId The question ID.
+     * @return QuestionParams
+     */
+    public function setQuestionId(?int $assessmentId): QuestionParams
+    {
+        $this->questionId = $questionId;
         return $this;
     }
 
@@ -323,22 +346,22 @@ class QuestionParams
     }
 
     /**
-     * Show question hints? (true=yes)
+     * Show question hints? Bitwise: 1 hints, 2 help buttons
      *
-     * @return bool
+     * @return int
      */
-    public function getShowHints(): ?bool
+    public function getShowHints(): ?int
     {
         return $this->showHints;
     }
 
     /**
-     * Show question hints? (true=yes)
+     * Show question hints?  Bitwise: 1 hints, 2 help buttons
      *
-     * @param bool $showHints
+     * @param int $showHints
      * @return QuestionParams
      */
-    public function setShowHints(?bool $showHints): QuestionParams
+    public function setShowHints(?int $showHints): QuestionParams
     {
         $this->showHints = $showHints;
         return $this;

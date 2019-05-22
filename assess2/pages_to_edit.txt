@@ -6,14 +6,24 @@ To discuss:
       Never during
       after last attempt / after take (depending on showscores setting)
     Then auto-remap after_lastattempt <-> after_take if showscores is changed later
-    OR, just limit to use default / Never.
+    ** OR, just limit to use default / Never.
   How will "force regens" work on exceptions page?
   Exception: timelimit check (latepass isn't useful)
   Do we really want the ability to view in GB without seeing scores in GB?
     Nice for "ability to review work", but what will it look like? (can use N/A like NoScores does now)
   For skip-around by-assessment, should 'score' only reflect submitted assessment takes?
     Or should it depend on showscores setting?
-  Gradeallq: only show questions from scored take / scored version?
+  Gradeallq: only show questions from scored take / scored version
+
+
+TODOs:
+  X GET novideo icon displaying right in addquestions
+  Figure out extref display on questions
+    Need to revisit showhints throughout display code
+  X Print Version: Remove blue box, make Print version primary
+    X Disable input boxes if possible
+    Fix styling (no curved borders)
+    Make sure MQ is disabled too, or just turn off on Print page
 
 Test accounting
 

@@ -9,6 +9,7 @@ require_once(__DIR__ . '/models/Question.php');
 use PDO;
 
 use Rand;
+use Sanitize;
 
 use IMathAS\assess2\questions\answerboxes\AnswerBoxFactory;
 use IMathAS\assess2\questions\answerboxes\AnswerBoxParams;
@@ -768,19 +769,19 @@ class QuestionHtmlGenerator
     /**
      * Get external references for this question.
      *
-     * @return string External references as raw HTML.
+     * @return array External references as raw HTML.
      */
-    private function getExternalReferences(): string
+    private function getExternalReferences(): array
     {
         $showhints = $this->questionParams->getShowHints();
         $qdata = $this->questionParams->getQuestionData();
         $qnidx = $this->questionParams->getQuestionNumber();
         $qidx = $this->questionParams->getDbQuestionSetId();
+        $qid = $this->questionParams->getQuestionId();
 
-        $externalReferences = '';
+        $externalReferences = [];
 
-        if ($showhints && ($qdata['extref'] != '' || (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != ''))) {
-            $externalReferences .= '<div><p class="tips">' . _('Get help: ');
+        if (($showhints&2)==2 && ($qdata['extref'] != '' || (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != ''))) {
             $extrefwidth = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][0] : 700;
             $extrefheight = isset($GLOBALS['CFG']['GEN']['extrefsize']) ? $GLOBALS['CFG']['GEN']['extrefsize'][1] : 500;
             $vidextrefwidth = isset($GLOBALS['CFG']['GEN']['vidextrefsize']) ? $GLOBALS['CFG']['GEN']['vidextrefsize'][0] : 873;
@@ -788,9 +789,9 @@ class QuestionHtmlGenerator
             if ($qdata['extref'] != '') {
                 $extref = explode('~~', $qdata['extref']);
 
-                if (isset($GLOBALS['questions']) && (!isset($GLOBALS['sessiondata']['isteacher'])
+                if ($qid > 0 && (!isset($GLOBALS['sessiondata']['isteacher'])
                         || $GLOBALS['sessiondata']['isteacher'] == false) && !isset($GLOBALS['sessiondata']['stuview'])) {
-                    $qref = $GLOBALS['questions'][$qnidx] . '-' . ($qnidx + 1);
+                    $qref = $qid . '-' . ($qnidx + 1);
                 } else {
                     $qref = '';
                 }
@@ -798,14 +799,23 @@ class QuestionHtmlGenerator
                     $extrefpt = explode('!!', $extref[$i]);
                     if ($extrefpt[0] == 'video' || strpos($extrefpt[1], 'youtube.com/watch') !== false) {
                         $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
-                        if ($extrefpt[0] == 'video') {
-                            $extrefpt[0] = 'Video';
-                        }
-                        $externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
-                    } else if ($extrefpt[0] == 'read') {
-                        $externalReferences .= formpopup("Read", $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
+                        $externalReferences[] = [
+                          'label' => $extrefpt[0],
+                          'url' => $extrefpt[1],
+                          'w' => $vidextrefwidth,
+                          'h' => $vidextrefheight,
+                          'ref' => $qref
+                        ];
+                        //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
                     } else {
-                        $externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
+                        //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
+                        $externalReferences[] = [
+                          'label' => $extrefpt[0],
+                          'url' => $extrefpt[1],
+                          'w' => $extrefwidth,
+                          'h' => $extrefheight,
+                          'ref' => $qref
+                        ];
                     }
                 }
             }
@@ -815,9 +825,15 @@ class QuestionHtmlGenerator
                 if ($GLOBALS['cid'] == 'embedq' && isset($GLOBALS['theme'])) {
                     $addr .= '&theme=' . Sanitize::encodeUrlParam($GLOBALS['theme']);
                 }
-                $externalReferences .= formpopup(_("Written Example"), $addr, $extrefwidth, $extrefheight, "button", true, "soln", $qref);
+                //$externalReferences .= formpopup(_("Written Example"), $addr, $extrefwidth, $extrefheight, "button", true, "soln", $qref);
+                $externalReferences[] = [
+                  'label' => 'ex',
+                  'url' => $addr,
+                  'w' => $extrefwidth,
+                  'h' => $extrefheight,
+                  'ref' => $qref
+                ];
             }
-            $externalReferences .= '</p></div>';
         }
 
         return $externalReferences;

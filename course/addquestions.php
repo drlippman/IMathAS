@@ -511,8 +511,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$canedit = 0;
 		}
 		$extrefval = 0;
-		if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
-			$extrefval += 1;
+		if ($aver > 1) {
+			if (($line['showhints']==-1 && ($showhintsdef&2)==2) || ($line['showhints']&2)==2) {
+				$extrefval += 1;
+			}
+		} else {
+			if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
+				$extrefval += 1;
+			}
 		}
 		if ($line['extref']!='') {
 			$extref = explode('~~',$line['extref']);

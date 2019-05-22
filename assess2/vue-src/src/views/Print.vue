@@ -8,16 +8,17 @@
         {{ ainfo.userfullname }}
       </div>
     </div>
-    <p class="loudnotice hideonprint">
-      {{ $t('print.print_version') }}
+    <p class="hideonprint headerpane">
+      <strong>
+        {{ $t('print.print_version') }}
+      </strong>
       <button
         type = "button"
+        class = "primary"
         @click = "doPrint"
       >
         {{ $t('print.print') }}
       </button>
-    </p>
-    <p class="hideonprint">
       <button
         type = "button"
         @click = "showTexts = !showTexts"
@@ -57,6 +58,7 @@
             :qn="curqn"
             :active = "showQs"
             :key="'q'+curqn"
+            :disabled = "true"
           />
         </div>
 
@@ -141,10 +143,5 @@ export default {
 .scrollpane {
   width: 100%;
   overflow-x: auto;
-}
-.loudnotice {
-  background-color: #369;
-  color: #fff;
-  padding: 4px 8px;
 }
 </style>

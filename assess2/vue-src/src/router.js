@@ -173,6 +173,7 @@ router.beforeEach((to, from, next) => {
     store.aid !== queryaid
   ) {
     store.cid = querycid;
+    window.cid = querycid;  // some other functions need this in global scope
     store.aid = queryaid;
     store.queryString = '?cid=' + store.cid + '&aid=' + store.aid;
     actions.loadAssessData(() => next());

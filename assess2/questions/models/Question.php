@@ -34,7 +34,7 @@ class Question
      * @param string $solutionContent The question's solution.
      * @param string $solutionContentDetailed The solution text displayed in popups.
      * @param array $correctAnswersForParts (for formative quizzes only)
-     * @param string $externalReferences Video links.
+     * @param array $externalReferences Video links.
      */
     public function __construct(
         string $questionContent,
@@ -43,7 +43,7 @@ class Question
         string $solutionContent,
         string $solutionContentDetailed,
         array $correctAnswersForParts,
-        string $externalReferences
+        array $externalReferences
     )
     {
         $this->questionContent = $questionContent;
@@ -150,11 +150,29 @@ class Question
 
     /**
      * Get all external references.
-     *
-     * @return string
+     * @param string $format   'list' (def) for array, 'html' for html of buttons
+     * @return string|array
      */
-    public function getExternalReferences(): string
+    public function getExternalReferences($format = 'list')
     {
-        return $this->externalReferences;
+        if ($format === 'list') {
+          return $this->externalReferences;
+        } else if ($format === 'html') {
+          $out = '<div><p class="tips">' . _('Get help: ');
+          foreach ($this->externalReferences as $extref) {
+            if ($extref['label'] == 'video') {
+              $label = _('Video');
+            } else if ($extref['label'] == 'read') {
+              $label = _('Read');
+            } else if ($extref['label'] == 'ex') {
+              $label = _('Written Example');
+            } else {
+              $label = $extref['label'];
+            }
+            $out .= formpopup($label, $extref['url'], $extref['w'], $extref['h'], "button", true, "help", $extref['ref']);
+          }
+          $out .= '</p></div>';
+          return $out;
+        }
     }
 }

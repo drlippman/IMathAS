@@ -22,7 +22,7 @@
       :id="'questionwrap' + qn"
     />
     <question-helps
-      v-if = "questionData.hasOwnProperty('help_features')"
+      v-if = "showHelps"
       :qn = "qn"
     />
     <div v-if="showSubmit" class="submitbtnwrap">
@@ -55,7 +55,7 @@ import QuestionHelps from '@/components/question/QuestionHelps.vue';
 
 export default {
   name: 'Question',
-  props: ['qn', 'active', 'state', 'seed'],
+  props: ['qn', 'active', 'state', 'seed', 'disabled'],
   components: {
     ScoreResult,
     QuestionHelps,
@@ -117,6 +117,10 @@ export default {
         // by assessment, can retry
         return this.$t('question.checkans');
       }
+    },
+    showHelps () {
+      return (store.assessInfo.hasOwnProperty('help_features') ||
+        (this.questionData.jsparams && this.questionData.jsparams.helps.length > 0));
     }
   },
   methods: {
@@ -222,6 +226,13 @@ export default {
       this.initShowAnswer();
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
       actions.setRendered(this.qn);
+      if (this.disabled) {
+        window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
+          if (el.name.match(/^(qn|tc|qs)\d/)) {
+            el.disabled = true;
+          }
+        });
+      }
     },
     setInitValues () {
       var regex = new RegExp('^(qn|tc|qs)\\d');

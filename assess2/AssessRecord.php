@@ -1331,15 +1331,15 @@ class AssessRecord
     */
     //TODO!!
 
-
     $questionParams = new QuestionParams();
     $questionParams
         ->setDbQuestionSetId($qsettings['questionsetid'])
         ->setQuestionData($this->assess_info->getQuestionSetData($qsettings['questionsetid']))
         ->setQuestionNumber($qn)
+        ->setQuestionId($qver['qid'])
         ->setAssessmentId($this->assess_info->getSetting('id'))
         ->setQuestionSeed($qver['seed'])
-        ->setShowHints($qsettings['showhints'])
+        ->setShowHints($this->assess_info->getQuestionSetting($qver['qid'], 'showhints'))
         ->setShowAnswer($showans)
         ->setShowAnswerButton(true)
         ->setStudentAttemptNumber($attemptn)
@@ -1354,6 +1354,7 @@ class AssessRecord
 
     $qout = $question->getQuestionContent();
     $jsparams = $question->getJsParams();
+    $jsparams['helps'] = $question->getExternalReferences();
     $answeights = $question->getAnswerPartWeights();
 
     return array($qout, $jsparams, $answeights, $usedAutosave);

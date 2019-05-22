@@ -1,5 +1,14 @@
 <template>
   <ul class="helplist">
+    <li>
+      Question Help:
+    </li>
+    <li v-for="qHelp in qHelps">
+      <a href="#" @click.prevent="loadHelp(qHelp)">
+        <icons :name="qHelp.icon" />
+        {{ qHelp.title }}
+      </a>
+    </li>
     <li v-if="showMessage">
       <a :href="messageHref" target="help">
         <icons name="message" />
@@ -36,6 +45,29 @@ export default {
         store.assessInfo.help_features.forum
       );
     },
+    qHelps () {
+      if (store.assessInfo.questions[this.qn].jsparams) {
+        let helps = store.assessInfo.questions[this.qn].jsparams.helps;
+        for (let i in helps) {
+          if (helps[i].label == 'video') {
+            helps[i].icon = 'video';
+            helps[i].title = this.$t('helps.video');
+          } else if (helps[i].label == 'read') {
+            helps[i].icon = 'file';
+            helps[i].title = this.$t('helps.read');
+          } else if (helps[i].label == 'ex') {
+            helps[i].icon = 'file';
+            helps[i].title = this.$t('helps.written_Example');
+          } else {
+            helps[i].icon = 'file';
+            helps[i].title = helps[i].label;
+          }
+        }
+        return helps;
+      } else {
+        return [];
+      }
+    },
     quoteQ () {
       let qsid = store.assessInfo.questions[this.qn].questionsetid;
       let seed = store.assessInfo.questions[this.qn].seed;
@@ -62,6 +94,22 @@ export default {
       });
       return href;
     }
+  },
+  methods: {
+    loadHelp(help) {
+      // record click if ref is provided
+      if (help.ref) {
+        let refpts = help.ref.split(/-/);
+        let prefix = 'Q' + refpts[1] + ': ';
+        if (help.url.match(/watchvid\.php/)) {
+          let cp = help.url.split(/url=/);
+          recclick('extref', help.ref, prefix + decodeURIComponent(cp[1]));
+        } else {
+          recclick('extref', help.ref, prefix + help.url);
+        }
+      }
+      popupwindow('help', help.url, help.w, help.h, true);
+    }
   }
 };
 </script>
@@ -72,7 +120,11 @@ ul.helplist {
   padding-left: 0;
 }
 ul.helplist li {
+  opacity: .8;
   list-style-type: none;
   margin-left: 0;
+  display: inline;
+  margin-right: 12px;
 }
+
 </style>
