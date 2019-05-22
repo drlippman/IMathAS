@@ -45,13 +45,22 @@
         </button>
       </p>
 
-      <p v-if="okToLaunch">
+      <p>
         <button
+          v-if="okToLaunch"
           type="button"
           class="primary"
           @click="startAssess"
         >
           {{ startLabel }}
+        </button>
+        <button
+          v-if="hasExit"
+          type="button"
+          class="secondary"
+          @click="exitAssess"
+        >
+          {{ $t('closed.exit') }}
         </button>
       </p>
     </div>
@@ -134,6 +143,9 @@ export default {
         return false;
       }
       return true;
+    },
+    hasExit () {
+      return (window.exiturl && window.exiturl !== '');
     }
   },
   methods: {
@@ -150,6 +162,9 @@ export default {
     },
     updateNewGroup (newMembers) {
       this.newGroupMembers = newMembers;
+    },
+    exitAssess () {
+      window.location = window.exiturl;
     }
   },
   mounted () {

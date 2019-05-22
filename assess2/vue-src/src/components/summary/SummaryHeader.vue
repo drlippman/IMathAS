@@ -11,7 +11,7 @@
         {{ $t('launch.retake_assess') }}
       </button>
       <button
-        v-if="window.exiturl !== ''"
+        v-if="hasExit"
         @click = "exit"
       >
         {{ $t('closed.exit') }}
@@ -32,6 +32,9 @@ export default {
     canRetake () {
       return (this.ainfo.submitby === 'by_assessment' &&
         this.ainfo.prev_attempts.length < this.ainfo.allowed_attempts);
+    },
+    hasExit () {
+      return (window.exiturl && window.exiturl !== '');
     }
   },
   methods: {
