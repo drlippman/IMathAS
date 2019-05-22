@@ -8,7 +8,7 @@
         {{ $t('question_n', { n: dispqn }) }}
       </strong>
     </div>
-    <div>
+    <div class="headericons">
       <span>
         <icons name="square-check" />
         {{ scoreDisplay }}
@@ -123,5 +123,7 @@ export default {
 .bigicon {
   font-size: 130%;
 }
-
+.headericons > * {
+  margin-left: 8px;
+}
 </style>
