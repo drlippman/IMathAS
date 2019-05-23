@@ -946,7 +946,7 @@ class AssessRecord
       $status = 'attempted';
       if ($include_scores) {
         // get scores. Get last try unless doing 'scored'
-        list($score, $raw, $parts) = $this->getQuestionPartScores($qn, $ver, $tryToGet);
+        list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet);
       }
       $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
 
@@ -1156,6 +1156,7 @@ class AssessRecord
     $partscores = array_fill(0, count($answeights), 0);
     $partrawscores = array_fill(0, count($answeights), 0);
     $parts = array();
+    $scoredTry = array_fill(0, count($answeights), -1);
     $is_singlescore = !empty($qver['singlescore']);
     // loop over each part
     for ($pn = 0; $pn < count($answeights); $pn++) {
@@ -1198,6 +1199,7 @@ class AssessRecord
             $partscores[$pn] = $scoreAfterPenalty;
             $partrawscores[$pn] = $parttry['raw']*1;
             $partpenalty = $penaltyList;
+            $scoredTry[$pn] = $pa;
           }
         } else if ($partscores[$pn]==0 && $parttry['raw']==-2) {
           // -2 indicates the item is a manual grade item
@@ -1233,7 +1235,7 @@ class AssessRecord
     for ($pn = 0; $pn < count($answeights); $pn++) {
       $qRawscore += $partrawscores[$pn]*$answeights[$pn];
     }
-    return array($qScore, $qRawscore, $parts);
+    return array($qScore, $qRawscore, $parts, $scoredTry);
   }
 
   /**
@@ -1630,9 +1632,11 @@ class AssessRecord
             $qScore = $curQver['scoreoverride'] * $points[$curQver['qid']];
             $qRawscore = $curQver['scoreoverride'];
           } else if (isset($curQver['scoreoverride']) && is_array($curQver['scoreoverride'])) {
-            list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, max($av,$qv), 'all', $curQver['scoreoverride']);
+            list($qScore, $qRawscore, $parts, $scoredTry) =
+              $this->getQuestionPartScores($qn, max($av,$qv), 'all', $curQver['scoreoverride']);
           } else {
-            list($qScore, $qRawscore, $parts) = $this->getQuestionPartScores($qn, max($av,$qv), 'all');
+            list($qScore, $qRawscore, $parts, $scoredTry) =
+              $this->getQuestionPartScores($qn, max($av,$qv), 'all');
           }
 
           $totalQtime += $this->calcTimeActive($curQver)['total'];
@@ -1640,6 +1644,7 @@ class AssessRecord
             $maxQscore = $qScore;
             $maxQrawscore = $qRawscore;
             $qScoredVer = $qv;
+            $curQver['scored_try'] = $scoredTry;
           }
 
         } // end loop over question versions
