@@ -22,11 +22,13 @@ TODOs:
   ! Need to revisit showhints throughout display code
   X Print Version: Remove blue box, make Print version primary
     X Disable input boxes if possible
-    Fix styling (no curved borders)
+    X Fix styling (no curved borders)
     Make sure MQ is disabled too, or just turn off on Print page
   Look into recclick tracking for question helps and assessment visits
   Test accounting Qs
   Takeanythingorblank??
+    pass jsparam to front end.  Include in submission anything on first try
+    with "submitblank" param set.
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?

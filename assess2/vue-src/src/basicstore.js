@@ -7,6 +7,7 @@ export const store = Vue.observable({
   aid: null,
   cid: null,
   queryString: '',
+  inTransit: false,
   errorMsg: null,
   lastLoaded: [],
   inProgress: false,

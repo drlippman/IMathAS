@@ -1814,6 +1814,137 @@ class AssessRecord
   }
 
   /**
+   * Get assessment metadata for gradebook view
+   * @return array
+   */
+  public function getGbAssessMeta() {
+    $this->parseData();
+    // Will also want to add in student's name
+    // TODO: get latepass status
+
+    $out['starttime'] = $this->assessRecord['starttime'];
+    $out['lastchange'] = $this->assessRecord['lastchange'];
+    $out['timeontask'] = $this->assessRecord['timeontask'];
+    $out['scored_version'] = $this->data['scored_version'];
+    return $out;
+  }
+
+  /**
+   * Get array of scores and and question details for all scored questions
+   * @return array
+   */
+  public function getGbAssessData() {
+    $this->parseData();
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $out = array();
+    $scored_aver = $by_question ? 0 : $this->data['scored_version'];
+    for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
+      $aver = $this->data['assess_versions'][$av];
+      $out[$av] = array(
+        'score' => $aver['score'],
+        'lastchange' => $aver['lastchange'],
+        'status' => $aver['status'],
+        'scored_version' => $scored_aver
+      );
+      if ($av == $scored_aver) {
+        $out[$av]['status'] = 2;
+        $out[$av]['feedback'] = $aver['feedback'];
+        $out[$av]['starttime'] = $aver['starttime'];
+        $out[$av]['questions'] = $this->getGbQuestionsData($by_question ? 'scored' : $av);
+      }
+    }
+    return $out;
+  }
+
+  /**
+   * Get the questions data for a particular assessment or question version
+   * @param  string $ver   assessment or question version, or 'scored'
+   * @return array
+   */
+  public function getGbQuestionsData($ver = 'scored') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    if ($by_question) {
+      $aver = 0;
+    } else if ($aver === 'scored') {
+      $aver = $this->data['scored_version'];
+    } else {
+      $aver = $ver;
+    }
+    $qdata = $this->data['assess_versions'][$aver]['questions'];
+    $out = array();
+    for ($qn = 0; $qn < count($qdata); $qn++) {
+      $out[$qn] = array();
+      $qvers = $qdata[$qn]['question_versions'];
+      if (!$by_question) {
+        $qver = 0;
+      } else if ($ver === 'scored') {
+        $qver = $qdata[$qn]['scored_version'];
+      } else {
+        $qver = $ver;
+      }
+      for ($qv = 0; $qv < count($qvers); $qv++) {
+        $out[$qn][$qv] = $this->getGbQuestionVersionData($qn, $qv==$qver, $by_question ? $qv : $aver);
+        if ($qv == $qver) {
+          $out[$qn][$qv]['scored'] = true;
+        }
+      }
+    }
+    return $out;
+  }
+
+  /**
+   * Get the specific details on a question version
+   * @param  int  $qn                Question number
+   * @param  boolean $generate_html Whether to return HTML of question
+   * @param  string  $ver           'scored' or particular assess/question version
+   * @return array
+   */
+  public function getGbQuestionVersionData($qn, $generate_html = false, $ver = 'scored') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    if ($by_question) {
+      $aver = 0;
+    } else if ($aver === 'scored') {
+      $aver = $this->data['scored_version'];
+    } else {
+      $aver = $ver;
+    }
+    if (!$by_question) {
+      $qver = 0;
+    } else if ($ver === 'scored') {
+      $qver = $this->data['assess_versions'][$aver]['questions'][$qn]['scored_version'];
+    } else {
+      $qver = $ver;
+    }
+    $qdata = $this->data['assess_versions'][$aver]['questions'][$qn]['question_versions'][$qver];
+    $out = $this->getQuestionObject($qn, true, false, $generate_html, $by_question ? $qver : $aver);
+    if ($generate_html) { // only include this if we're displaying the question
+      $out['qid'] = $qdata['qid'];
+      $out['qsetid'] = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');
+      $out['seed'] = $qdata['seed'];
+      $out['feedback'] = $qdata['feedback'];
+      $out['other_tries'] = $this->getPreviousTries($qdata['tries']);
+    }
+    return $out;
+  }
+
+  /**
+   * Collect the previous tries, organized by part number
+   * TODO: eliminate the displayed/current try
+   * @param  array $trydata  Data from a question version 'tries' array
+   * @return array
+   */
+  private function getPreviousTries($trydata) {
+    $out = array();
+    for ($pn = 0; $pn < count($trydata); $pn++) {
+      $out[$pn] = array();
+      for ($tn = 0; $tn < count($trydata[$pn]); $tn++) {
+        $out[$pn][] = $trydata[$pn][$tn]['stuans'];
+      }
+    }
+    return $out;
+  }
+
+  /**
    * Calculate the score on a question after applying penalties
    * @param  float $score    Raw score, 0-1
    * @param  float $points   Points possible
