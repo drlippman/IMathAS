@@ -62,6 +62,10 @@ $assess_info->applyTimelimitMultiplier($studata['timelimitmult']);
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
+if (!$assess_record->hasRecord()) {
+  echo '{"error": "invalid_record"}';
+  exit;
+}
 
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(

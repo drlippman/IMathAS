@@ -36,9 +36,15 @@
         Clear all attempts | View as student | Print version
       </p>
 
-      <p>
-        Version selector here
-      </p>
+      <div>
+        {{ scoreCalc }}
+        <gb-assess-select
+          :versions = "aData.assess_versions"
+          :submitby = "aData.submitby"
+          :selected = "curAver"
+          @setversion = "changeAssessVersion"
+        />
+      </div>
 
       <p>
         Show/Hide controls
@@ -48,18 +54,22 @@
         <div
           v-for = "(qdata,qn) in curQuestions"
           :key = "qn"
-          class = "questionpane"
+          class = "med-pad-below"
         >
           <div>
-            {{ $tc('question_n', qn+1) }}.  Version selector here
+            <strong>
+              {{ $tc('question_n', qn+1) }}.
+            </strong>
+            Version selector here
           </div>
-          <div
-            v-html="qdata[curQver[qn]].html"
-            class = "question"
-            :id="'questionwrap' + qn"
-          />
-          <div>
-            Scoreboxes will go here
+          <div class = "questionpane">
+            <gb-question
+              :qdata = "qdata[curQver[qn]]"
+              :qn = "qn"
+            />
+            <div>
+              Scoreboxes will go here
+            </div>
           </div>
         </div>
       </div>
@@ -69,9 +79,15 @@
 
 <script>
 import { store, actions } from './gbstore';
+import GbQuestion from '@/gbviewassess/GbQuestion.vue';
+import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
 //import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
+  components: {
+    GbQuestion,
+    GbAssessSelect
+  },
   computed: {
     assessInfoLoaded () {
       return (store.assessInfo !== null);
@@ -94,7 +110,7 @@ export default {
       }
     },
     totalTimeOnTask () {
-      return this.$tc('gradebook.minutes', Math.round(this.aData.timeontask/60));
+      return this.$tc('minutes', Math.round(this.aData.timeontask/60));
     },
     extensionString () {
       if (this.aData.extended_with.type === 'latepass') {
@@ -111,6 +127,23 @@ export default {
     },
     curQver () {
       return store.curQver;
+    },
+    scoreCalc() {
+      if (this.aData.submitby === 'by_question') {
+        return this.$t('gradebook.best_on_question');
+      } else if (this.aData.keepscore === 'best') {
+        return this.$t('gradebook.keep_best') +
+          ' (' + this.$tc('gradebook.attempt_n', this.aData.scored_version + 1) + ')';
+      } else if (this.aData.keepscore === 'average') {
+        return this.$t('gradebook.keep_avg');
+      } else if (this.aData.keepscore === 'last') {
+        return this.$t('gradebook.keep_last');
+      }
+    }
+  },
+  methods: {
+    changeAssessVersion(val) {
+      // TODO
     }
   },
   created () {
@@ -140,4 +173,7 @@ export default {
 </script>
 
 <style>
+.med-pad-below {
+  padding-bottom: 16px;
+}
 </style>

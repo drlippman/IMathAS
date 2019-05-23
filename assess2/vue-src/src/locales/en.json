@@ -238,5 +238,24 @@
     "close_input": "Close student input",
     "new_version": "Generate a similar question",
     "waiting": "Waiting for the instructor to start a question"
+  },
+  "gradebook": {
+    "detail_title": "Review Assessment Attempts",
+    "started": "Started",
+    "lastchange": "Last Changed",
+    "time_onscreen": "Total time questions were on-screen",
+    "due": "Due Date",
+    "originally_due": "Originally Due",
+    "make_exception": "Make Exception",
+    "attempt_n": "Attempt {n}",
+    "submitted": "Submitted",
+    "scored": "scored",
+    "score": "Score",
+    "not_started": "Not started",
+    "not_submitted": "Not submitted",
+    "best_on_question": "Grade is calculated on the best version of each question",
+    "keep_best": "Grade is calculated on the best assessment attempt",
+    "keep_avg": "Grade is calculated on the average of all assessment attempts",
+    "keep_last": "Grade is calculated on the last assessment attempt"
   }
 }

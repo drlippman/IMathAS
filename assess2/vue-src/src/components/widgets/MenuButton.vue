@@ -217,6 +217,7 @@ export default {
   background-color: #fff;
   color: #000;
   text-align: left;
+  height: auto;
 }
 .menubutton button.nobutton {
   border: 0;
