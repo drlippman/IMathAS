@@ -875,10 +875,11 @@ class AssessRecord
    * @param  boolean $include_scores Whether to include scores (def: false)
    * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
    * @param  boolean $generate_html Whether to generate question HTML (def: false)
-   * @param int  $ver               Which version to grab data for, or 'last' for most recent
+   * @param int|string  $ver               Which version to grab data for, or 'last' for most recent
+   * @param string   $try       Which try to show: 'last' (def) or 'scored'
    * @return array  The question object
    */
-  public function getQuestionObject($qn, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
+  public function getQuestionObject($qn, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last', $tryToShow = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $due_date = $this->assess_info->getSetting('original_enddate');
 
@@ -1006,7 +1007,7 @@ class AssessRecord
       $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt');
 
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
-        $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers);
+        $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow);
       if ($out['usedautosave']) {
         $autosave = $this->getAutoSaves($qn);
         $out['autosave_timeactive'] = $autosave['timeactive'];
@@ -1245,9 +1246,10 @@ class AssessRecord
    * @param  boolean $clearans      true to clear answer (def: false)
    * @param  boolean $force_scores  force display of scores (def: false)
    * @param  boolean $force_answers force display of answers (def: false)
+   * @param  string  $tryToShow     Try to show answers for: 'last' (def) or 'scored'
    * @return array (questionhtml, answeights)
    */
-  public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false) {
+  public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false, $tryToShow = 'last') {
     // get assessment attempt data for given version
     $qver = $this->getQuestionVer($qn, $ver);
 
@@ -1278,6 +1280,8 @@ class AssessRecord
       // displayq to use stuanswers
       if ($clearans) {
         $lastans[$pn] = '';
+      } else if ($tryToShow === 'scored' && $qver['scored_try'][$pn] > -1) {
+        $lastans[$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['stuans'];
       } else if (isset($autosave['stuans'][$pn])) {
         $lastans[$pn] = $autosave['stuans'][$pn];
         $usedAutosave[] = $pn;
