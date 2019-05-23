@@ -469,7 +469,6 @@ class DrawingAnswerBox implements AnswerBox
     			$la = str_replace(';,' , ';' , $la);
 
     			if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
-    			$out .= getcolormark($colorbox);
     			if ($colorbox!='') { $out .= '</div>';}
 
     			$attributes = [

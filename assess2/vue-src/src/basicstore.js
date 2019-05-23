@@ -641,11 +641,7 @@ export const actions = {
     store.assessInfo = Object.assign({}, store.assessInfo, response);
   },
   processSettings (data) {
-    // hack job temporary fix until we can do something better
-    let svgchk = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none"><title>correct</title>';
-    svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
-    let svgx = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="red" stroke-width="3" fill="none"><title>correct</title>';
-    svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+    
     if (data.hasOwnProperty('questions')) {
       for (let i in data.questions) {
         let thisq = data.questions[i];
@@ -687,12 +683,7 @@ export const actions = {
           data.questions[i].canregen = false;
           data.questions[i].regens_remaining = 0;
         }
-        // TODO: remove this hack
-        if (data.questions[i].html !== null) {
-          data.questions[i].html = data.questions[i].html
-            .replace(/<img[^>]*gchk.gif[^>]*>/g, svgchk)
-            .replace(/<img[^>]*redx.gif[^>]*>/g, svgx);
-        }
+
         store.lastLoaded[i] = new Date();
       }
     }

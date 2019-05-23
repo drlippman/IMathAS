@@ -7,12 +7,12 @@ namespace IMathAS\assess2\questions\models;
  */
 class ScorePartResult
 {
-    private $rawScore;
+    private $rawScore = 0;
     private $requiresManualGrading = false;
-    private $lastAnswerAsGiven;        // Orig: $givenans
-    private $lastAnswerAsNumber;       // Orig: $givenansval
-    private $correctAnswerWrongFormat; // Orig: $GLOBALS['partlastanswer'] .= '$f$1'
-    private $scoreMessages;            // Orig:
+    private $lastAnswerAsGiven = '';        // Orig: $givenans
+    private $lastAnswerAsNumber = '';       // Orig: $givenansval
+    private $correctAnswerWrongFormat = false; // Orig: $GLOBALS['partlastanswer'] .= '$f$1'
+    private $scoreMessages = '';            // Orig:
 
     /**
      * The student's raw score.

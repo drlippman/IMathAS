@@ -153,7 +153,6 @@ class ChoicesAnswerBox implements AnswerBox
     		} else {
     			$out .= "</ul>\n";
     		}
-    		$out .= getcolormark($colorbox);
     		if ($displayformat == 'inline') {
     			$out .= "</span>";
     		} else if ($displayformat != 'select') {

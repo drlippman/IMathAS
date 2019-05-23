@@ -160,7 +160,6 @@ class MatchingAnswerBox implements AnswerBox
     			$out .= "</div>";
     		}
     		$out .= "<input type=hidden name=\"qn$qn\" value=\"done\" /><div class=spacer>&nbsp;</div>";
-    		$out .= getcolormark($colorbox);
     		if ($colorbox != '') {$out .= '</div>';}
     		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
     		if ($displayformat=="select") {

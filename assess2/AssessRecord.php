@@ -1332,6 +1332,7 @@ class AssessRecord
     //TODO!!
 
     $questionParams = new QuestionParams();
+
     $questionParams
         ->setDbQuestionSetId($qsettings['questionsetid'])
         ->setQuestionData($this->assess_info->getQuestionSetData($qsettings['questionsetid']))
@@ -1347,7 +1348,8 @@ class AssessRecord
         ->setAllQuestionAnswers($stuanswers)
         ->setAllQuestionAnswersAsNum($stuanswersval)
         ->setScoreNonZero($scorenonzero)
-        ->setScoreIsCorrect($scoreiscorrect);
+        ->setScoreIsCorrect($scoreiscorrect)
+        ->setLastRawScores($qcolors);
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
@@ -1497,7 +1499,7 @@ class AssessRecord
         $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
       }
       // stuanswers array is 1-indexed
-      if (count($stuansparts) > 1) {
+      if (isset($curq['answeights']) && count($curq['answeights']) > 1) {
         $stuanswers[$qn+1] = $stuansparts;
         $stuanswersval[$qn+1] = $stuansvalparts;
       } else {

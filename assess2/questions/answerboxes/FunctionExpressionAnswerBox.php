@@ -147,8 +147,6 @@ class FunctionExpressionAnswerBox implements AnswerBox
     						'class="'.implode(' ', $classes) .
     						'" />';
 
-    		$out .= getcolormark($colorbox);
-
     		if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
     			$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
     		}

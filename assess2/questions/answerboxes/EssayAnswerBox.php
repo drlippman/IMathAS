@@ -109,7 +109,6 @@ class EssayAnswerBox implements AnswerBox
     			}
 
     			$out .= filter($la);
-    			$out .= getcolormark($colorbox);
     			$out .= "</div>";
     		} else {
 
@@ -118,7 +117,6 @@ class EssayAnswerBox implements AnswerBox
     			}
     			if ($rows<2) {
     				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" /> ";
-    				$out .= getcolormark($colorbox);
     			} else {
     				if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
     				$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
@@ -128,7 +126,6 @@ class EssayAnswerBox implements AnswerBox
     					$out .= "cols=\"$cols\" ";
     				}
     				$out .= sprintf(">%s</textarea>\n", Sanitize::encodeStringForDisplay($la, true));
-    				$out .= getcolormark($colorbox);
     				if ($colorbox!='') { $out .= '</div>';}
     			}
     			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {

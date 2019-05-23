@@ -95,7 +95,6 @@ class MatrixAnswerBox implements AnswerBox
     				$out .= "</tr>";
     			}
     			$out .= "</table>\n";
-    			$out .= getcolormark($colorbox);
     			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
           $params['matrixsize'] = $answersize;
           $params['tip'] = $shorttip;

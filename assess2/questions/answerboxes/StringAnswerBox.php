@@ -72,7 +72,6 @@ class StringAnswerBox implements AnswerBox
     				$out .= '>'.htmlentities($v).'</option>';
     			}
     			$out .= '</select>';
-    			$out .= getcolormark($colorbox);
     		} else if ($answerformat=='MQexperimental') {
     			$out .= "<input type=\"text\" style=\"position:absolute;visibility:hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
     			$out .= "<span class=\"$colorbox mathquill-embedded-latex MQE$qn\">";
@@ -94,7 +93,6 @@ class StringAnswerBox implements AnswerBox
     				$out .= '\editable{'.$la.'}';
     			}
     			$out .= "</span>";
-    			$out .= getcolormark($colorbox);
     			$out .= '<script type="text/javascript">$(function() {
     				 $(".MQE'.$qn.'").on("keypress keyup", function() {
     				     var latexvals = [];

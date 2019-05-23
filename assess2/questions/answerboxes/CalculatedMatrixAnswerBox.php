@@ -97,7 +97,6 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     			}
     			$out .= "</table>\n";
     			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
-    			$out .= getcolormark($colorbox);
     		} else {
     			if ($multi==0) {
     				$qnref = "$qn-0";

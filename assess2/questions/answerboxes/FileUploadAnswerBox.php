@@ -49,7 +49,6 @@ class FileUploadAnswerBox implements AnswerBox
 
         if ($colorbox!='') { $out .= '<span class="'.$colorbox.'">';}
     		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
-    		$out .= getcolormark($colorbox);
     		if ($colorbox!='') { $out .= '</span>';}
     		if ($la!='') {
     			if (!empty($assessmentId)) {

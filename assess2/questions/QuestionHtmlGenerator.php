@@ -252,6 +252,11 @@ class QuestionHtmlGenerator
 
             // Get the answers to all parts of this question.
             $lastAnswersAllParts = $stuanswers[$thisq];
+            if (!is_array($lastAnswersAllParts)) {
+              // multipart questions with one part get stored as single value;
+              // turn back into an array
+              $lastAnswersAllParts = array($lastAnswersAllParts);
+            }
 
             /*
 			 * Original displayq2.php notes:
@@ -359,8 +364,6 @@ class QuestionHtmlGenerator
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
             if ($questionColor != '') {
-                $evalQuestionText = $toevalqtxt . str_replace('"', '\\"',
-                        $this->getColoredMark($questionColor));
 
                 if (strpos($toevalqtxt, '<div') !== false || strpos($toevalqtxt, '<table') !== false) {
                     $toevalqtxt = sprintf(
