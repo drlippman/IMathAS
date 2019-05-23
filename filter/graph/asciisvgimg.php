@@ -1047,11 +1047,11 @@ function ASslopefield($arg) {
 	*/
 	$efunc = makeMathFunction($func, "x,y");
 	$dz = sqrt($dx*$dx + $dy*$dy)/6;
-	$x_min = ceil($this->xmin/$dx);
-	$y_min = ceil($this->ymin/$dy);
+	$x_min = $dx*ceil($this->xmin/$dx);
+	$y_min = $dy*ceil($this->ymin/$dy);
 	for ($x = $x_min; $x<= $this->xmax; $x+= $dx) {
 		for ($y = $y_min; $y<= $this->ymax; $y+= $dy) {
-			$gxy = @$efunc($x,$y);
+			$gxy = @$efunc(['x'=>$x, 'y'=>$y]);
 			if ($gxy!=null && !is_infinite($gxy) && !is_nan($gxy)) {
 				if ($gxy===false) {
 					$u = 0; $v = $dz;
@@ -1121,13 +1121,13 @@ function ASplot($function) {
 		if ($isparametric) {
 			$t = $xmin + $dx*$i;
 			if (in_array($t,$avoid)) { continue;}
-			$x = $exfunc($t);
-			$y = $eyfunc($t);
+			$x = $exfunc(['t'=>$t]);
+			$y = $eyfunc(['t'=>$t]);
 			if (is_infinite($x) || is_infinite($y) || is_nan($x) || is_nan($y)) { continue; }
 		} else {
 			$x = $xmin + $dx*$i;
 			if (in_array($x,$avoid)) { continue;}
-			$y = $efunc($x);
+			$y = $efunc(['x'=>$x]);
 			if (is_infinite($y) || is_nan($y)) { continue;}
 		}
 		if ($i<2 || $i==$stopat-2) {
