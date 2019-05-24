@@ -101,5 +101,7 @@ $assessInfoOut['userfullname'] = $studata['LastName'].', '.$studata['FirstName']
 
 // get records of all previous attempts, as well as HTML for the scored versions
 $assessInfoOut['assess_versions'] = $assess_record->getGbAssessData();
+$assessInfoOut['has_practice'] = ($assess_record->getStatus()&16)>0;
+
 //output JSON object
 echo json_encode($assessInfoOut);

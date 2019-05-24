@@ -41,6 +41,7 @@
         <gb-assess-select
           :versions = "aData.assess_versions"
           :submitby = "aData.submitby"
+          :haspractice = "aData.has_practice"
           :selected = "curAver"
           @setversion = "changeAssessVersion"
         />
@@ -60,7 +61,13 @@
             <strong>
               {{ $tc('question_n', qn+1) }}.
             </strong>
-            Version selector here
+            <gb-question-select
+              v-if = "aData.submitby === 'by_question'"
+              :versions="qdata"
+              :selected="curQver[qn]"
+              :qn="qn"
+              @setversion = "changeQuestionVersion"
+            />
           </div>
           <div class = "questionpane">
             <gb-question
@@ -81,12 +88,14 @@
 import { store, actions } from './gbstore';
 import GbQuestion from '@/gbviewassess/GbQuestion.vue';
 import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
+import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 //import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
   components: {
     GbQuestion,
-    GbAssessSelect
+    GbAssessSelect,
+    GbQuestionSelect
   },
   computed: {
     assessInfoLoaded () {
@@ -143,7 +152,19 @@ export default {
   },
   methods: {
     changeAssessVersion(val) {
-      // TODO
+      if (val !== store.curAver) {
+        if (val === this.aData.assess_versions.length) {
+          // requesting the practice version
+          actions.loadGbAssessVersion(0, true);
+        } else {
+          actions.loadGbAssessVersion(val, false);
+        }
+      }
+    },
+    changeQuestionVersion(qn,val) {
+      if (val !== store.curQver[qn]) {
+        actions.loadGbQuestionVersion(qn, val);
+      }
     }
   },
   created () {

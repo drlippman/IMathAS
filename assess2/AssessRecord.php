@@ -367,6 +367,14 @@ class AssessRecord
   }
 
   /**
+   * Gets the assessment status
+   * @return [type] [description]
+   */
+  public function getStatus() {
+    return $this->assessRecord['status'];
+  }
+
+  /**
    * Determine if there is an active assessment attempt
    * @return boolean true if there is an active assessment attempt
    */
@@ -1850,19 +1858,31 @@ class AssessRecord
     $out = array();
     $scored_aver = $by_question ? 0 : $this->data['scored_version'];
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
-      $aver = $this->data['assess_versions'][$av];
-      $out[$av] = array(
-        'score' => $aver['score'],
-        'lastchange' => $aver['lastchange'],
-        'status' => $aver['status'],
-        'scored_version' => $scored_aver
-      );
-      if ($av == $scored_aver) {
-        $out[$av]['status'] = 2;
-        $out[$av]['feedback'] = $aver['feedback'];
-        $out[$av]['starttime'] = $aver['starttime'];
-        $out[$av]['questions'] = $this->getGbQuestionsData($by_question ? 'scored' : $av);
-      }
+      $out[$av] = $this->getGbAssessVerData($av, $av == $scored_aver);
+    }
+    return $out;
+  }
+
+  /**
+   * Get an assessment version data
+   * @param  int $av         The assessment version
+   * @param  boolean $getdetails Whether to return questions and other details
+   * @return array
+   */
+  public function getGbAssessVerData($av, $getdetails) {
+    $aver = $this->data['assess_versions'][$av];
+    $out = array(
+      'score' => $aver['score'],
+      'lastchange' => $aver['lastchange'],
+      'status' => $aver['status'],
+      'scored_version' => $scored_aver
+    );
+    if ($getdetails) {
+      $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+      $out['status'] = 2;
+      $out['feedback'] = $aver['feedback'];
+      $out['starttime'] = $aver['starttime'];
+      $out['questions'] = $this->getGbQuestionsData($by_question ? 'scored' : $av);
     }
     return $out;
   }
@@ -2191,7 +2211,7 @@ class AssessRecord
    * uncompress and decode attempt data
    * @return void
    */
-  private function parseData () {
+  public function parseData () {
     if ($this->data === null) {
       if ($this->is_practice) {
         if ($this->assessRecord['practicedata'] != '') {

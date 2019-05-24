@@ -40,7 +40,7 @@ export default {
   watch: {
     qdata: function (newVal, oldVal) {
       this.rendered = false;
-      this.renderMath();
+      this.$nextTick(this.renderMath);
     }
   }
 }

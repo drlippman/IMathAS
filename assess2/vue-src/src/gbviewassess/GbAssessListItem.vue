@@ -1,8 +1,12 @@
 <template>
   <span>
     <strong>{{ attemptNum }}.</strong>
-    {{ score }}.
-    {{ verStatus }}
+    <span v-if="option.score">
+      {{ score }}.
+    </span>
+    <span v-if="option.status">
+      {{ verStatus }}
+    </span>
   </span>
 </template>
 
@@ -15,7 +19,9 @@ export default {
   computed: {
     attemptNum() {
       if (this.option.status === 3) {
-        return $t('gradebook.practice_version');
+        return this.$t('gradebook.practice_attempt');
+      } else if (this.submitby === 'by_question') {
+        return this.$t('gradebook.scored_attempt');
       } else {
         return this.$tc('gradebook.attempt_n', this.option.ver + 1);
       }

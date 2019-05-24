@@ -1,6 +1,6 @@
 <template>
   <div>
-    <menu-button id="qnav"
+    <menu-button id="assess_select"
       :options = "navOptions"
       :selected = "selected"
       searchby = "ver"
@@ -17,7 +17,7 @@ import MenuButton from '@/components/widgets/MenuButton.vue';
 import GbAssessListItem from '@/gbviewassess/GbAssessListItem.vue';
 export default {
   name: 'GbAssessSelect',
-  props: ['versions', 'selected', 'submitby'],
+  props: ['versions', 'selected', 'submitby', 'haspractice'],
   components: {
     MenuButton,
     GbAssessListItem
@@ -32,6 +32,13 @@ export default {
           status: this.versions[i].status,
           lastchange: this.versions[i].lastchange,
           onclick: () => this.$emit("setversion", i)
+        });
+      }
+      if (this.haspractice) {
+        out.push({
+          ver: this.versions.length,
+          status: 3,
+          onclick: () => this.$emit("setversion", this.versions.length)
         });
       }
       return out;
