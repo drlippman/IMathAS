@@ -1947,11 +1947,15 @@ class AssessRecord
       $qver = $ver;
     }
     $qdata = $this->data['assess_versions'][$aver]['questions'][$qn]['question_versions'][$qver];
-    $out = $this->getQuestionObject($qn, true, false, $generate_html, $by_question ? $qver : $aver);
+    $out = $this->getQuestionObject($qn, true, true, $generate_html, $by_question ? $qver : $aver);
     if ($generate_html) { // only include this if we're displaying the question
       $out['qid'] = $qdata['qid'];
       $out['qsetid'] = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');
       $out['seed'] = $qdata['seed'];
+      if (isset($qdata['scoreoverride'])) {
+        $out['scoreoverride'] = floatval($qdata['scoreoverride']);
+      }
+      $out['timeactive'] = $this->calcTimeActive($qdata);
       $out['feedback'] = $qdata['feedback'];
       $out['other_tries'] = $this->getPreviousTries($qdata['tries']);
     }

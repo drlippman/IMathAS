@@ -259,6 +259,11 @@
     "best_on_question": "Grade is calculated on the best version of each question",
     "keep_best": "Grade is calculated on the best assessment attempt",
     "keep_avg": "Grade is calculated on the average of all assessment attempts",
-    "keep_last": "Grade is calculated on the last assessment attempt"
+    "keep_last": "Grade is calculated on the last assessment attempt",
+    "full_credit_parts": "Full credit all parts",
+    "full_credit": "Full credit",
+    "add_feedback": "Add feedback",
+    "feedback": "Feedback"
+
   }
 }

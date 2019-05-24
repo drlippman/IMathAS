@@ -57,7 +57,7 @@
           :key = "qn"
           class = "med-pad-below"
         >
-          <div>
+          <div class="headerpane">
             <strong>
               {{ $tc('question_n', qn+1) }}.
             </strong>
@@ -74,10 +74,13 @@
               :qdata = "qdata[curQver[qn]]"
               :qn = "qn"
             />
-            <div>
-              Scoreboxes will go here
-            </div>
           </div>
+          <gb-score-details
+            :qdata = "qdata[curQver[qn]]"
+            :qn = "qn"
+            @updatescore = "updateScore"
+            @updatefeedback = "updateFeedback"
+          />
         </div>
       </div>
     </div>
@@ -89,13 +92,15 @@ import { store, actions } from './gbstore';
 import GbQuestion from '@/gbviewassess/GbQuestion.vue';
 import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
 import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
+import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 //import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
   components: {
     GbQuestion,
     GbAssessSelect,
-    GbQuestionSelect
+    GbQuestionSelect,
+    GbScoreDetails
   },
   computed: {
     assessInfoLoaded () {
@@ -165,6 +170,12 @@ export default {
       if (val !== store.curQver[qn]) {
         actions.loadGbQuestionVersion(qn, val);
       }
+    },
+    updateScore(qn, pn, score) {
+      //console.log("update for "+qn+" part "+pn+": "+score);
+    },
+    updateFeedback(qn, feedback) {
+      
     }
   },
   created () {
