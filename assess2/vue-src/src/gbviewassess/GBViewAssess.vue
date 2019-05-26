@@ -3,18 +3,18 @@
     <div v-if="!assessInfoLoaded">
       {{ $t('loading') }}
     </div>
-    <div v-else>
+    <div v-else class="gbmainview">
       <h1>{{ $t('gradebook.detail_title')}}</h1>
       <h2>{{ aData.userfullname }}</h2>
       <h3>{{ aData.name }}</h3>
 
-      <p>
+      <div>
         {{ $t('gradebook.started') }}: {{ startedString }}<br/>
         {{ $t('gradebook.lastchange') }}: {{ lastchangeString }}<br/>
         {{ $t('gradebook.time_onscreen') }}: {{ totalTimeOnTask }}
-      </p>
+      </div>
 
-      <p>
+      <div>
         {{ $t('gradebook.due')}}:
           {{ $d(new Date(aData.enddate * 1000), 'long') }}
           <button>
@@ -26,7 +26,7 @@
             {{ $d(new Date(aData.original_enddate * 1000), 'long') }}.
           {{ extensionString }}
         </span>
-      </p>
+      </div>
 
       <div>
         <strong>
@@ -49,9 +49,15 @@
         </span>
       </div>
 
-      <p v-if="canEdit">
-        Clear all attempts | View as student | Print version
-      </p>
+      <div v-if="canEdit">
+        Clear all attempts |
+        <a :href="viewAsStuUrl" target="_blank">
+          {{ $t('gradebook.view_as_stu') }}
+        </a> |
+        <a :href="viewAsStuUrl + '#/print'" target="_blank">
+          {{ $t('gradebook.print') }}
+        </a>
+      </div>
 
       <div>
         {{ scoreCalc }}
@@ -64,9 +70,27 @@
         />
       </div>
 
-      <p v-if="canEdit">
-        Show/Hide controls
-      </p>
+      <div v-if="canEdit">
+        <button
+          type="button"
+          @click = "hidePerfect = !hidePerfect"
+        >
+          {{ hidePerfectLabel }}
+        </button>
+        <button
+          type="button"
+          @click = "hideCorrect = !hideCorrect"
+        >
+          {{ hideCorrectLabel }}
+        </button>
+        <button
+          type="button"
+          @click = "hideUnanswered = !hideUnanswered"
+        >
+          {{ hideUnansweredLabel }}
+        </button>
+
+      </div>
 
       <div class="scrollpane">
         <div
@@ -88,11 +112,13 @@
           </div>
           <div class = "questionpane">
             <gb-question
+              v-show = "showQuestion[qn]"
               :qdata = "qdata[curQver[qn]]"
               :qn = "qn"
             />
           </div>
           <gb-score-details
+            :showfull = "showQuestion[qn]"
             :canedit = "canEdit"
             :qdata = "qdata[curQver[qn]]"
             :qn = "qn"
@@ -162,7 +188,10 @@ export default {
   data: function () {
     return {
       showOverride: false,
-      assessOverride: ''
+      assessOverride: '',
+      hidePerfect: false,
+      hideCorrect: false,
+      hideUnanswered: false,
     }
   },
   computed: {
@@ -222,6 +251,41 @@ export default {
       } else if (this.aData.keepscore === 'last') {
         return this.$t('gradebook.keep_last');
       }
+    },
+    viewAsStuUrl() {
+      return 'index.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
+    },
+    showQuestion() {
+      //1 to hide perfect, 2 correct, 4 unanswered
+      let out = {};
+      for (let i=0; i < this.curQuestions.length; i++) {
+        let qdata = this.curQuestions[i][this.curQver[i]];
+        let showit = true;
+        if (this.hidePerfect && Math.abs(qdata.score - qdata.points_possible) < .002) {
+          showit = false;
+        } else if (this.hideCorrect && Math.abs(qdata.rawscore - 1) < .002) {
+          showit = false;
+        } else if (this.hideUnanswered && qdata.try === 0) {
+          showit = false;
+        }
+        out[i] = showit;
+      }
+      return out;
+    },
+    hidePerfectLabel() {
+      return this.hidePerfect ?
+        this.$t('gradebook.show_perfect') :
+        this.$t('gradebook.hide_perfect');
+    },
+    hideCorrectLabel() {
+      return this.hideCorrect ?
+        this.$t('gradebook.show_correct') :
+        this.$t('gradebook.hide_correct');
+    },
+    hideUnansweredLabel() {
+      return this.hideUnanswered ?
+        this.$t('gradebook.show_unans') :
+        this.$t('gradebook.hide_unans');
     }
   },
   methods: {
@@ -283,5 +347,8 @@ export default {
 <style>
 .med-pad-below {
   padding-bottom: 16px;
+}
+.gbmainview > div {
+  margin-bottom: 16px;
 }
 </style>

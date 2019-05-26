@@ -46,7 +46,7 @@
         v-html="qdata.feedback"
       />
     </div>
-    <div v-if="canedit">
+    <div v-if="canedit && showfull">
       <button
         type="button"
         @click="allFull"
@@ -55,11 +55,11 @@
         {{ fullCreditLabel }}
       </button>
     </div>
-    <div v-if="qdata.timeactive.total > 0">
+    <div v-if="qdata.timeactive.total > 0 && showfull">
       {{ $t('gradebook.time_on_version') }}:
       {{ timeSpent }}
     </div>
-    <div v-if="canedit">
+    <div v-if="canedit && showfull">
       <button
         type="button"
         class="slim"
@@ -75,7 +75,7 @@
         {{ $t('gradebook.clear_qwork') }}
       </button>
     </div>
-    <div v-if="canedit">
+    <div v-if="canedit && showfull">
       {{ $t('gradebook.question_id') }}:
         <a
           target="_blank"
@@ -104,7 +104,7 @@ import { store, actions } from './gbstore';
 
 export default {
   name: 'GbScoreDetails',
-  props: ['qdata', 'qn', 'canedit'],
+  props: ['qdata', 'qn', 'canedit', 'showfull'],
   data: function() {
     return {
       curScores: false,

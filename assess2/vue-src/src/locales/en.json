@@ -274,6 +274,14 @@
     "save": "Save Changes",
     "return": "Return to Gradebook",
     "gb_score": "Score in Gradebook",
-    "override": "Override score"
+    "override": "Override score",
+    "view_as_stu": "View as student",
+    "print": "Print version",
+    "hide_perfect": "Hide full-credit questions",
+    "hide_correct": "Hide correct questions",
+    "hide_unans": "Hide unanswered questions",
+    "show_perfect": "Show full-credit questions",
+    "show_correct": "Show correct questions",
+    "show_unans": "Show unanswered questions"
   }
 }

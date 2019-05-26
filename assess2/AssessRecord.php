@@ -997,7 +997,7 @@ class AssessRecord
     }
     if ($include_scores) {
       $out['score'] = ($score != -1) ? $score : 0;
-      // TODO:  Do we want to return score saved in gb too?
+      $out['rawscore'] = ($raw != -1) ? $raw : 0;
     }
     // if jumped to answer, burn tries
     if (!empty($curq['jumptoans'])) {
@@ -1838,9 +1838,7 @@ class AssessRecord
    */
   public function getGbAssessMeta() {
     $this->parseData();
-    // Will also want to add in student's name
     // TODO: get latepass status
-
     $out['starttime'] = intval($this->assessRecord['starttime']);
     $out['lastchange'] = intval($this->assessRecord['lastchange']);
     $out['timeontask'] = intval($this->assessRecord['timeontask']);
