@@ -215,7 +215,9 @@ var livepoll = new function() {
 		var drawinitstack = [];
 		//group and total results
 		for (i in results[curquestion]) {
-			ischoices = (qdata[curquestion].anstypes=="choices" || qdata[curquestion].anstypes=="multans");
+			ischoices = (qdata[curquestion].anstypes=="choices"
+				|| qdata[curquestion].anstypes=="multans"
+				|| qdata[curquestion].anstypes=="matching");
 			if (ischoices) {
 				pts = results[curquestion][i].ans.split("$!$");
 				subpts = pts[1].split("|");
@@ -261,7 +263,9 @@ var livepoll = new function() {
 		for (i in datatots) {
 			if (datatots[i]>maxfreq) {maxfreq = datatots[i];}
 		}
-		if (qdata[curquestion].choices.length>0) {
+		if (qdata[curquestion].anstypes=="matching") {
+			// not implemented
+		} else if (qdata[curquestion].choices.length>0) {
 			if (qdata[curquestion].initrdisp) {
 				for (i=0;i<qdata[curquestion].randkeys.length;i++) {
 					partn = qdata[curquestion].randkeys[i];

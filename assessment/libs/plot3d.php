@@ -12,7 +12,7 @@ array_push($allowedmacros,"plot3d","spacecurve","replace3dalttext","CalcPlot3Dem
 //axes defaults to 1 (on), set to 0 for off
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
 //alttext: text for non-visual users. Can also be added later using replace3dalttext
-function plot3d($func,$umin,$umax,$vmin,$vmax,$disc=20,$width=300,$height=300,$axes=1) {
+function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$height=300,$axes=1) {
 	global $imasroot;
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 
@@ -20,10 +20,10 @@ function plot3d($func,$umin,$umax,$vmin,$vmax,$disc=20,$width=300,$height=300,$a
 	if (func_num_args()>14) {
 		$bounds = array_slice(func_get_args(),9,6);
 		if (func_num_args()>15) {
-			$alt = func_get_arg(15);	
+			$alt = func_get_arg(15);
 		}
 	} else if (func_num_args()>9) {
-		$alt = func_get_arg(9);	
+		$alt = func_get_arg(9);
 	}
 
 	if (strpos($func,',')!==FALSE) {
@@ -32,18 +32,12 @@ function plot3d($func,$umin,$umax,$vmin,$vmax,$disc=20,$width=300,$height=300,$a
 		$func = str_replace(']','',$func);
 		$func = explode(',',$func);
 		foreach ($func as $k=>$v) {
-			$func[$k] = mathphp($v,'u|v');;
-			$func[$k] = str_replace('(u)','($u)',$func[$k]);
-			$func[$k] = str_replace('(v)','($v)',$func[$k]);
-			$usefunc[$k] = my_create_function('$u,$v','return('.$func[$k].');');
+			$usefunc[$k] = makeMathFunction($v, "u,v");
 		}
 
 	} else {
 		$isparam = false;
-		$func = mathphp($func,'x|y');
-		$func = str_replace('(x)','($u)',$func);
-		$func = str_replace('(y)','($v)',$func);
-		$zfunc = my_create_function('$u,$v','return('.$func.');');
+		$zfunc = makeMathFunction($func, "x,y");
 	}
 	$count = 0;
 	$du = ($umax-$umin)/($disc-1);
@@ -57,12 +51,12 @@ function plot3d($func,$umin,$umax,$vmin,$vmax,$disc=20,$width=300,$height=300,$a
 			  $u = $umin+$du*$i;
 			  $v = $vmin+$dv*$j;
 			  if ($isparam) {
-				  $x = round($usefunc[0]($u,$v),$urnd);
-				  $y = round($usefunc[1]($u,$v),$vrnd);
-				  $z = round($usefunc[2]($u,$v),$zrnd);
+				  $x = round($usefunc[0](['u'=>$u,'v'=>$v]),$urnd);
+				  $y = round($usefunc[1](['u'=>$u,'v'=>$v]),$vrnd);
+				  $z = round($usefunc[2](['u'=>$u,'v'=>$v]),$zrnd);
 				  $verts .= "$x,$y,$z";
 			  } else {
-				  $z = round($zfunc($u,$v),$zrnd);
+				  $z = round($zfunc(['x'=>$u,'y'=>$v]),$zrnd);
 				  $u = round($u,$urnd);
 				  $v = round($v,$vrnd);
 				  $verts .= "$u,$v,$z";
@@ -192,10 +186,7 @@ function spacecurve($func,$tmin,$tmax) {
 		$func[1] = "(1+.01*cos(u))*({$func[1]})";
 		$func[2] = "(1+.01*sin(u))*({$func[2]})";
 		foreach ($func as $k=>$v) {
-			$func[$k] = mathphp($v,'u|t');
-			$func[$k] = str_replace('(u)','($u)',$func[$k]);
-			$func[$k] = str_replace('(t)','($t)',$func[$k]);
-			$usefunc[$k] = my_create_function('$u,$t','return('.$func[$k].');');
+			$usefunc[$k] = makeMathFunction($func[$k], "u,v");
 		}
 
 		$count = 0;
@@ -206,9 +197,9 @@ function spacecurve($func,$tmin,$tmax) {
 				  $u = 1.571*$i;
 				  $t = $vmin+$dt*$j;
 
-				  $x = $usefunc[0]($u,$t);
-				  $y = $usefunc[1]($u,$t);
-				  $z = $usefunc[2]($u,$t);
+				  $x = $usefunc[0](['u'=>$u, 't'=>$t]);
+				  $y = $usefunc[1](['u'=>$u, 't'=>$t]);
+				  $z = $usefunc[2](['u'=>$u, 't'=>$t]);
 				  $verts .= "$x,$y,$z";
 
 				  $count++;
@@ -248,9 +239,7 @@ function spacecurve($func,$tmin,$tmax) {
 		$func = str_replace(']','',$func);
 		$func = explode(',',$func);
 		foreach ($func as $k=>$v) {
-			$func[$k] = mathphp($v,'t');
-			$func[$k] = str_replace('(t)','($t)',$func[$k]);
-			$usefunc[$k] = my_create_function('$t','return('.$func[$k].');');
+			$usefunc[$k] = makeMathFunction($func[$k], "t");
 		}
 
 		$count = 0;
@@ -259,9 +248,9 @@ function spacecurve($func,$tmin,$tmax) {
 			  if ($count > 0) { $verts .= '~';}
 			  $t = $vmin+$dt*$j;
 
-			  $x = $usefunc[0]($t);
-			  $y = $usefunc[1]($t);
-			  $z = $usefunc[2]($t);
+			  $x = $usefunc[0](['t'=>$t]);
+			  $y = $usefunc[1](['t'=>$t]);
+			  $z = $usefunc[2](['t'=>$t]);
 			  $verts .= "$x,$y,$z";
 
 			  $count++;
@@ -277,9 +266,9 @@ function spacecurve($func,$tmin,$tmax) {
 	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
 	  	 $html .= 'role="img" tabindex="0" aria-label="'.Sanitize::encodeStringForDisplay($alt).'" ';
 	  	 $html .= ">";
-	  	 
+
 	  	 $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
-		  
+
 		 $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></span>";
 	  	 $html .= "</canvas>";
 	  	 $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');});</script>";
@@ -289,7 +278,7 @@ function spacecurve($func,$tmin,$tmax) {
 }
 
 function replace3dalttext($plot, $alttext) {
-	return preg_replace('/aria-label="[^"]*"/', 'aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"', $plot);	
+	return preg_replace('/aria-label="[^"]*"/', 'aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"', $plot);
 }
 
 //CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])
@@ -429,7 +418,7 @@ function CalcPlot3DprepFunc($str,$gxmin=-2,$gxmax=2,$gymin=-2,$gymax=2,$gzmin=-2
 		$out[] = 'vector=<'.$bits[1].','.$bits[2].','.$bits[3].'>';
 		if (count($bits)>8) {
 			$bits[6] = '('.$bits[6].','.$bits[7].','.$bits[8].')';
-			array_splice($bits, 7, 2);	
+			array_splice($bits, 7, 2);
 		}
 		$def = array(array('color','size','initialpt'), array('000000', 2, '(0,0,0)'));
 		$start = 4;

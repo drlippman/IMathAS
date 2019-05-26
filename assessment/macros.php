@@ -235,14 +235,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else if ($function[0]{0}=='[') { //strpos($function[0],"[")===0) {
 			$isparametric = true;
 			$xfunc = makepretty(str_replace("[","",$function[0]));
-			$xfunc = mathphp($xfunc,"t");
-			$xfunc = str_replace("(t)",'($t)',$xfunc);
+			$evalxfunc = makeMathFunction($xfunc, "t");
 			$yfunc = makepretty(str_replace("]","",$function[1]));
-			$yfunc = mathphp($yfunc,"t");
-			$yfunc = str_replace("(t)",'($t)',$yfunc);
+			$evalyfunc = makeMathFunction($yfunc, "t");
 			array_shift($function);
-			$evalxfunc = my_create_function('$t','return('.$xfunc.');');
-			$evalyfunc = my_create_function('$t','return('.$yfunc.');');
 			if ($evalxfunc===false || $evalyfunc===false) {continue;}
 		} else if ($function[0]{0}=='<' || $function[0]{0}=='>') {
 			$isineq = true;
@@ -253,9 +249,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$ineqtype = $function[0]{0};
 				$func = makepretty(substr($function[0],1));
 			}
-			$func = mathphp($func,"x");
-			$func = str_replace("(x)",'($x)',$func);
-			$evalfunc = my_create_function('$x','return('.$func.');');
+			$evalfunc = makeMathFunction($func, "x");
 			if ($evalfunc===false) {continue;}
 		} else if (strlen($function[0])>1 && $function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>' || $function[0]{1}=='=')) {
 			$isxequals = true;
@@ -273,9 +267,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			}
 		} else {
 			$func = makepretty($function[0]);
-			$func = mathphp($func,"x");
-			$func = str_replace("(x)",'($x)',$func);
-			$evalfunc = my_create_function('$x','return('.$func.');');
+			$evalfunc = makeMathFunction($func, "x");
 			if ($evalfunc===false) {continue;}
 		}
 
@@ -398,8 +390,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			if ($isparametric) {
 				$t = $xmin + $dx*$i + 1E-10;
 				if (in_array($t,$avoid)) { continue;}
-				$x = $evalxfunc($t);
-				$y = $evalyfunc($t);
+				$x = $evalxfunc(['t'=>$t]);
+				$y = $evalyfunc(['t'=>$t]);
 				if (!is_numeric($x) || !is_numeric($y)) {
 					continue;
 				}
@@ -412,7 +404,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-				$y = $evalfunc($x);
+				$y = $evalfunc(['x'=>$x]);
 				if (!is_numeric($y)) {
 					continue;
 				}
@@ -456,11 +448,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					//need to determine which direction.  Let's calculate an extra value
 					//and need un-rounded y-value for comparison
 					if ($isparametric) {
-						$y = $evalyfunc($t);
-						$tempy = $evalyfunc($t-$dx/10);
+						$y = $evalyfunc(['t'=>$t]);
+						$tempy = $evalyfunc(['t'=>$t-$dx/10]);
 					} else {
-						$y = $evalfunc($x);
-						$tempy = $evalfunc($x-$dx/10);
+						$y = $evalfunc(['x'=>$x]);
+						$tempy = $evalfunc(['x'=>$x-$dx/10]);
 					}
 					if ($tempy>$y) { //seems to be coming down
 						$iy = $yymax;
@@ -1479,11 +1471,10 @@ function joinarray($a,$s=',') {
 	return (implode($s,$a));
 }
 
-
 function calclisttoarray($l) {
 	$l = listtoarray($l);
 	foreach ($l as $k=>$tocalc) {
-		$l[$k] = evalMathPHP($tocalc,null);
+		$l[$k] = evalMathParser($tocalc,null);
 	}
 	return $l;
 }
@@ -1954,7 +1945,7 @@ $tensth = array("",""," twentieth", " thirtieth", " fortieth", " fiftieth", " si
 $triplets = array( "", " thousand", " million", " billion", " trillion", " quadrillion", " quintillion", " sextillion", " septillion", " octillion", " nonillion");
 $placevals = array( "", "tenth", "hundredth", "thousandth", "ten-thousandth", "hundred-thousandth", "millionth", "ten-millionth", "hundred-millionth", "billionth");
  // recursive fn, converts three digits per pass
-function convertTri($num, $tri, $doth=false) {
+function convertTri($num, $tri, $doth=false, $addcommas=false) {
   global $ones, $onesth, $tens, $tensth, $triplets;
 
   // chunk the number, ...rxyy
@@ -1991,15 +1982,14 @@ function convertTri($num, $tri, $doth=false) {
   // is some output to be modified...
   if ($str != "")
    $str .= $triplets[$tri];
-
   // continue recursing?
   if ($r > 0)
-   return convertTri($r, $tri+1).$str;
+   return convertTri($r, $tri+1, false, $addcommas).($addcommas?',':'').$str;
   else
    return $str;
  }
 
-function numtowords($num,$doth=false,$addcontractiontonum=false) {
+function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false) {
 	global $placevals;
 
 	if ($addcontractiontonum) {
@@ -2031,7 +2021,7 @@ function numtowords($num,$doth=false,$addcontractiontonum=false) {
 	$dec = 	$num-$int;
 
 	if ($int>0) {
-		$out .= convertTri($int,0,$doth);
+		$out .= convertTri($int,0,$doth,$addcommas);
 		if (abs($dec)>1e-9) {
 			$out .= " and ";
 		}
@@ -2282,14 +2272,11 @@ function evalfunc($farr) {
 	$toparen = implode('|',$vars);
 
 	if ($isnum) {
-		$func = mathphp($func,$toparen);
-		if ($func=='0;') { return 0;}
-		$varvals = array();
+		$func = makeMathFunction($func, implode(',', $vars));
 		foreach ($vars as $i=>$var) {
-			$func = str_replace("($var)","(\$$var)",$func);
 			$varvals[$var] = $args[$i];
 		}
-		return evalReturnValue('return('.$func.');', $func, $varvals);
+		return $func($varvals);
 	} else { //just replacing
 		if ($toparen != '') { // && !$skipextracleanup) {
 			  $reg = "/(" . $toparen . ")(" . $toparen . ')$/';
@@ -2965,10 +2952,10 @@ function comparenumbers($a,$b,$tol='.001') {
 		$abstolerance = floatval(substr($tol,1));
 	}
 	if (!is_numeric($a)) {
-		$a = evalMathPHP($a,null);
+		$a = evalMathParser($a);
 	}
 	if (!is_numeric($b)) {
-		$b = evalMathPHP($b,null);
+		$b = evalMathParser($b);
 	}
 	//echo "comparing $a and $b ";
 	if (isset($abstolerance)) {
@@ -2991,7 +2978,7 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	}
 	$fromto = listtoarray($domain);
 	$variables = listtoarray($vars);
-	$vlist = implode("|",$variables);
+	$vlist = implode(",",$variables);
 	for ($i = 0; $i < 20; $i++) {
 		for($j=0; $j < count($variables); $j++) {
 			if (isset($fromto[2]) && $fromto[2]=="integers") {
@@ -3010,18 +2997,13 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
 	}
 
-	$a = mathphp(makepretty(mathphppre($a)), $vlist);
-	$b = mathphp(makepretty(mathphppre($b)), $vlist);
-	if ($a=='' || $b=='') {
+	$afunc = makeMathFunction($a, $vlist);
+	$bfunc= makeMathFunction($b, $vlist);
+	if ($afunc === false || $bfunc === false) {
 		if (isset($GLOBALS['teacherid'])) {
 			echo "<p>Debug info: one function failed to compile.</p>";
 		}
 		return false;
-	}
-	//echo "pretty: $a, $b";
-	for($i=0; $i < count($variables); $i++) {
-		$a = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$a);
-		$b = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$b);
 	}
 
 	$cntnana = 0;
@@ -3030,11 +3012,12 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	$ratios = array();
 	$evalerr = false;
 	for ($i = 0; $i < 20; $i++) {
+		$varvals = array();
 		for($j=0; $j < count($variables); $j++) {
-			$tp[$j] = $tps[$i][$j];
+			$varvals[$variables[$j]] = $tps[$i][$j];
 		}
-		$ansa = evalReturnValue('return('.$a.');','',array('tp'=>$tp));
-		$ansb = evalReturnValue('return('.$b.');','',array('tp'=>$tp));
+		$ansa = $afunc($varvals);
+		$ansb = $bfunc($varvals);
 
 		if ($ansa===false || $ansb===false) {
 			$evalerr = true;
@@ -3113,7 +3096,7 @@ function getnumbervalue($a) {
 	if (is_numeric($a)) {
 		return $a*1;
 	} else {
-		$a = evalMathPHP($a,null);
+		$a = evalMathParser($a);
 		return $a;
 	}
 }
@@ -3234,7 +3217,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		if (!is_array($partial)) { $partial = listtoarray($partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
 			if (!is_numeric($partial[$i])) {
-				$partial[$i] = evalMathPHP($partial[$i],null);
+				$partial[$i] = evalMathParser($partial[$i]);
 			}
 			if ($abstol) {
 				if (abs($stu-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
@@ -3299,7 +3282,7 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 				}
 			}
 			if (!is_numeric($partial[$i])) {
-				$partial[$i] = evalMathPHP($partial[$i],null);
+				$partial[$i] = evalMathParser($partial[$i]);
 			}
 			if ($abstol) {
 				if (abs($stunum-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
@@ -3346,10 +3329,10 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 
 		$fromto = listtoarray($domain);
 		$variables = listtoarray($vars);
-		$vlist = implode("|",$variables);
+		$vlist = implode(",",$variables);
 		$origstu = $stu;
-		$stu = mathphp(makepretty(mathphppre($stu)), $vlist);
-		if ($stu=='') {
+		$stufunc = makeMathFunction(makepretty($stu), $vlist);
+		if ($stufunc===false) {
 			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
 
@@ -3366,17 +3349,15 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			}
 		}
 
-		for($i=0; $i < count($variables); $i++) {
-			$stu = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$stu);
-		}
 		$stupts = array();
 		$cntnana = 0;
 		$correct = true;
 		for ($i = 0; $i < $numpts; $i++) {
+			$varvals = array();
 			for($j=0; $j < count($variables); $j++) {
-				$tp[$j] = $tps[$i][$j];
+				$varvals[$variables[$j]] = $tps[$i][$j];
 			}
-			$stupts[$i] = evalReturnValue("return ($stu);", $origstu, array('tp'=>$tp));
+			$stupts[$i] = $stufunc($varvals);
 			if (isNaN($stupts[$i])) {$cntnana++;}
 			if ($stupts[$i]===false) {$correct = false; break;}
 		}
@@ -3394,24 +3375,23 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 				$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
 			}
 			$origb = $b;
-			$b = mathphp(makepretty(mathphppre($b)), $vlist);
-			for($j=0; $j < count($variables); $j++) {
-				$b = str_replace("(".$variables[$j].")",'($tp['.$j.'])',$b);
+			$bfunc = makeMathFunction(makepretty($b), $vlist);
+			if ($bfunc === false) {
+				//parse error - skip it
+				continue;
 			}
-
 			$cntnanb = 0;
 			$ratios = array();
 			for ($i = 0; $i < $numpts; $i++) {
+				$varvals = array();
 				for($j=0; $j < count($variables); $j++) {
-					$tp[$j] = $tps[$i][$j];
+					$varvals[$variables[$j]] = $tps[$i][$j];
 				}
-				$ansb = evalReturnValue("return ($b);", $origb, array('tp'=>$tp));//@eval("return ($b);");
-				if ($ansb===false) { //invalid option - skip it
-					continue 2;
-				}
+				$ansb = $bfunc($varvals);
+
 				//echo "real: $ansa, my: $ansb <br/>";
-				if (isNaN($stupts[$i])) {if (isNaN($ansb)) {$cntnanb++;}; continue;} //avoid NaN problems
 				if (isNaN($ansb)) {$cntnanb++; continue;}
+				if (isNaN($stupts[$i])) {continue;} //avoid NaN problems
 
 				if ($type=='equation') {
 					if (abs($stupts[$i])>.000001 && is_numeric($ansb)) {

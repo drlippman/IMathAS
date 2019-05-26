@@ -189,7 +189,7 @@
 //HTML formatted, for Excel import?
 function gbInstrCatHdrs(&$gbt, &$pointsrow) {
 	global $catfilter, $availshow, $totonleft, $cid, $pointsln;
-	
+
 	$n = 0;
 	$tots = '';
 	$pointstots = '';
@@ -250,7 +250,7 @@ function gbInstrCatHdrs(&$gbt, &$pointsrow) {
 					}
 				}
 			}
-			
+
 			echo '</span></div></th>';
 			$n++;
 		}
@@ -263,7 +263,7 @@ function gbInstrCatHdrs(&$gbt, &$pointsrow) {
 }
 function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
 	global $catfilter, $availshow, $totonleft, $cid;
-	
+
 	//total totals
 	$tot = '';
 	if ($catfilter<0) {
@@ -324,9 +324,9 @@ function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
 			echo '<td class="c">'.$insdiv;
 			if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
 				echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
-			} 
+			}
 			if ($catfilter!=-1) { //single category view
-			
+
 				if ($gbt[$i][0][0]=='Averages') {
 					if ($gbt[$i][2][$j][4+$availshow] == 0) {
 						echo $gbt[$i][2][$j][$availshow].'%';
@@ -364,7 +364,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
 	}
 	if (!$totonleft) {
 		echo $tot;
-	}	
+	}
 }
 function gbinstrdisp() {
 	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
@@ -380,18 +380,19 @@ function gbinstrdisp() {
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		//if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
-		$pointsrow .= '<th>';
 		if ($gbt[0][0][$i]=='Name') {
 			echo '&nbsp;<span class="small">N='.(count($gbt)-2).'</span>';
 		}
 		echo '</th>';
-		$pointsrow .= '</th>';
+		if ($i>0) {
+			$pointsrow .= '<th></th>';
+		}
 		$n++;
 	}
 	if ($totonleft && !$hidepast) {
 		$n += gbInstrCatHdrs($gbt, $pointsrow);
 	}
-	
+
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
 			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden
@@ -410,7 +411,7 @@ function gbinstrdisp() {
 			}
 			//name and points
 			echo '<th class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0];
-			
+
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
 				$v = $gbt[0][1][$i][2].' (Not Counted)';
 			} else {
@@ -505,7 +506,7 @@ function gbinstrdisp() {
 		}
 		if ($totonleft && !$hidepast) {
 			gbInstrCatCols($gbt, $i);
-		} 
+		}
 		//assessment values
 		if ($catfilter>-2) {
 			for ($j=0;$j<count($gbt[0][1]);$j++) {

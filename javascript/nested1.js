@@ -9,7 +9,7 @@ var Nested = new Class({
 			childTag: 'LI',
 			ghost: false,
 			childStep: 20, // attempts to become a child if the mouse is moved this number of pixels right
-			handleClass: 'icon', 
+			handleClass: 'icon',
 			onStart: Class.empty,
 			onComplete: Class.empty,
 			onFirstChange: Class.empty,
@@ -22,7 +22,7 @@ var Nested = new Class({
 	},
 
 	initialize: function(list, options) {
-		
+
 		this.setOptions(this.getOptions(), options);
 		if (!this.options.expandKey.match(/^(control|shift)$/)) {
 			this.options.expandKey = 'shift';
@@ -47,7 +47,7 @@ var Nested = new Class({
 				el = el.getParent();
 			}
 			if (!el.hasClass(this.options.handleClass)) return true;
-		} 
+		}
 		while (el.nodeName != this.options.childTag && el != this.list) {
 			el = el.parentNode;
 		}
@@ -87,7 +87,7 @@ var Nested = new Class({
 				el = el.getParent();
 			}
 			if (!el.hasClass(this.options.handleClass)) return true;
-		} 
+		}
 		while (el.nodeName != this.options.childTag && el != this.list) {
 			el = el.parentNode;
 		}
@@ -124,12 +124,12 @@ var Nested = new Class({
 		}
 		event.stop();
 	},
-	
+
 	stop: function(event) {
 		event.stop();
 		return false;
 	},
-	
+
 	getDepth: function(el, add) {
 		var counter = (add) ? 1 : 0;
 		while (el != this.list) {
@@ -138,7 +138,7 @@ var Nested = new Class({
 		}
 		return counter;
 	},
-	
+
 	movement: function(event, el) {
 		var dir, over, check, items;
 		var dest, move, prev, prevParent;
@@ -171,7 +171,7 @@ var Nested = new Class({
 		}
 		// Make sure we end up with a childTag element
 		if (over.nodeName != this.options.childTag) return;
-			
+
 		// store the previous parent 'ol' to remove it if a move makes it empty
 		prevParent = el.getParent();
 		dir = (event.page.y < el.getTop()) ? 'up' : 'down';
@@ -210,7 +210,7 @@ var Nested = new Class({
 				//document.getElementById("submitnotice").innerHTML = dest.parentNode.tagName + ',' + dest.parentNode.parentNode.tagName;
 				move = 'inside';
 			}
-			
+
 		}
 
 		last = dest.getParent().getLast();
@@ -219,7 +219,7 @@ var Nested = new Class({
 			dest = $(dest.parentNode.parentNode);
 			last = dest.getParent().getLast();
 		}
-		
+
 		abort = false;
 		if (move != '') {
 			abort += (dest == el);
@@ -316,17 +316,33 @@ function toSimpleJSON(a) {
 	return out;
 }
 
-function submitChanges() { 
-  var params = 'checkhash='+itemorderhash+'&order='+toSimpleJSON(sortIt.serialize());
-  var url = AHAHsaveurl;
-  var els = document.getElementsByTagName("input");
-  for (var i=0; i<els.length; i++) {
-	  if (els[i].type=="hidden" && els[i].value!="") {
-	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
-	  } else if (els[i].type=="text" && els[i].className=="outcome") {
-		  params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
+function submitChanges(format) {
+	if (format === 'json') {
+		var params = {
+			checkhash: itemorderhash,
+			order: JSON.stringify(sortIt.serialize())
+		};
+		var url = AHAHsaveurl;
+		var els = document.getElementsByTagName("input");
+	  for (var i=0; i<els.length; i++) {
+		  if (els[i].type=="hidden" && els[i].value!="") {
+		  	 params[els[i].id.substring(5)] = els[i].value;
+		  } else if (els[i].type=="text" && els[i].className=="outcome") {
+				params[els[i].id] = els[i].value;
+		  }
 	  }
-  }
+	} else {
+	  var params = 'checkhash='+itemorderhash+'&order='+toSimpleJSON(sortIt.serialize());
+	  var url = AHAHsaveurl;
+	  var els = document.getElementsByTagName("input");
+	  for (var i=0; i<els.length; i++) {
+		  if (els[i].type=="hidden" && els[i].value!="") {
+		  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
+		  } else if (els[i].type=="text" && els[i].className=="outcome") {
+			  params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
+		  }
+	  }
+	}
 
   var target = "submitnotice";
   //document.getElementById(target).innerHTML = url;
@@ -362,7 +378,7 @@ function submitChanges() {
 			status + "\n" +req.statusText+
 			"\nError: "+errorThrown
 	});
-}  
+}
 
 function quickviewexpandAll() {
 	jQuery("#qviewtree li.blockli.nCollapse").removeClass("nCollapse").children("ul").show();
@@ -386,13 +402,13 @@ function editinplace(el) {
 		var inputh = document.createElement("input");
 		inputh.id = 'input'+el.id;
 		inputh.type = "hidden";
-		el.parentNode.insertBefore(inputh,el);	
+		el.parentNode.insertBefore(inputh,el);
 		var inputt  = document.createElement("input");
 		inputt.id = 'inputt'+el.id;
 		inputt.type = "text";
 		inputt.size = 60;
 		inputt.onblur = editinplaceun;
-		el.parentNode.insertBefore(inputt,el);	
+		el.parentNode.insertBefore(inputt,el);
 	} else {
 		inputt = document.getElementById('inputt'+el.id);
 		inputt.style.display = "inline";

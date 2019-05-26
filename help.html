@@ -2349,8 +2349,12 @@ The following macros help with formatting values for display:
    will often cause weird things to happen, so test well</li>
 <li><strong>makexxpretty and makexxprettydisp</strong>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, x^1, x^0, etc.  Can occasionally cause strange output, so
    be sure to test.  Handles things better than the older makexpretty, but does not always produce 100% identical output.</li>
-<li><strong>numtowords(number,[addth])</strong>:  Creates a string containing number written out in words.  Add true as second parameter
-    to change five to fifth.</li>
+<li><strong>numtowords(number,[addth, numwithTh, addcommas)</strong>:  Creates a string containing number written out in words.<br/>
+   numtowords(1203) returns "one thousand two hundred three"<br/>
+   numtowords(1203,true) returns "one thousand two hundred third"<br/>
+   numtowords(1203,false,true) returns "1023rd"<br/>
+   numtowords(1203,false,false,true) returns "one thousand, two hundred three"
+  </li>
 <li><strong>numtoroman(number,[uppercase])</strong>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
     produce lowercase</li>
 <li><strong>prettyint(number)</strong>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which

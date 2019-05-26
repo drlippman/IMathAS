@@ -93,14 +93,14 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=030219" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=051719" type="text/javascript"></script>';
 
 //assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 /*
 
 echo '<script src="' . $imasroot . '/javascript/general.js?v=112918" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=021919" type="text/javascript"></script>';
-echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=030219" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=051719" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/drawing.js?v=021419" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/eqntips.js?v=082616" type="text/javascript"></script>';
@@ -144,7 +144,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
-
+	// removed MathJax fallback since Katex covers pretty much everything now, and MathJax load was slowing display.
 	/*echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}, skipStartupTypeset: true});
 		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/javascript/mathjax";
@@ -167,6 +167,10 @@ if (!isset($sessiondata['mathdisp'])) {
 	}
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=120118"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
+	// re-route MathJax render requests to katex. Allows jsxgraph to work.
+	echo '<script type="text/javascript">
+	  var MathJax = {Hub: {Queue: function(arr) { rendermathnode(arr[2]);}}};
+		</script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2) {
@@ -177,7 +181,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
 }
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=101018\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=052319\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
@@ -206,7 +210,7 @@ div { zoom: 1; }
 
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
-	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.js?v=013118"></script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.min.js?v=051919"></script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';

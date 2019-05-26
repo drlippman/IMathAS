@@ -49,7 +49,7 @@
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
-	
+
 	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit) = $stm->fetch(PDO::FETCH_NUM);
@@ -252,10 +252,8 @@
 			if ($row[5]=='essay' || $row[5]=='file') {
 				$needmanualgrade[$row[1]] = true;
 			} else if ($row[5]=='multipart') {
-				if (preg_match('/anstypes.*?(".*?"|array\(.*?\))/',$row[6],$matches)) {
-					if (strpos($matches[1],'essay')!==false || strpos($matches[1],'file')!==false) {
-						$needmanualgrade[$row[1]] = true;
-					}
+				if (preg_match('/anstypes.*?(essay|file)/', $row[6])) {
+					$needmanualgrade[$row[1]] = true;
 				}
 			}
 			if ($row[8]!='' && ($row[7]==2 || ($row[7]==0 && $showhints==1))) {
@@ -390,7 +388,7 @@
 	if ($isteacher) {
 		echo '<div class="cpmid">Experimental:<br/>';
 		echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
-	
+
 		echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
 	}
 	require("../footer.php");

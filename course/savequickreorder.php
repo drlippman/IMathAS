@@ -12,42 +12,48 @@
 	 exit;
  }
  $cid = Sanitize::courseId($_GET['cid']);
- $order = $_POST['order'];
- $DBH->beginTransaction();
+
+
  $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
  $stm->execute(array(':id'=>$cid));
  $itemorder = $stm->fetchColumn(0);
  $items = unserialize($itemorder);
+
+ $order = json_decode($_POST['order'], true);
+ $newitems = additems2($order);
+
  if (md5($itemorder)!=$_POST['checkhash']) {
  	 echo '0:'._('Error: Items have changed in the course, perhaps in another window, since this page was loaded. Refresh the page to load changes and try again.');
  	 exit;
- } else if (countitems($items) != countitems(additems($order))) {
+ } else if (countitems($items) != countitems($newitems)) {
  	 echo '0:'._('Error: Some item data was not sent correctly. Please try again.');
  	 exit;
  }
+
+ $DBH->beginTransaction();
 
   foreach ($_POST as $id=>$val) {
 	 if ($id=="order" || trim($val)=='') { continue;}
 	 $type = $id{0};
 	 $typeid = substr($id,1);
 	 if ($type=="I") {
-		 $stm = $DBH->prepare("UPDATE imas_inlinetext SET title=:title WHERE id=:id");
-		 $stm->execute(array(':title'=>$val, ':id'=>$typeid));
+		 $stm = $DBH->prepare("UPDATE imas_inlinetext SET title=:title WHERE id=:id AND courseid=:cid");
+		 $stm->execute(array(':title'=>$val, ':id'=>$typeid, ':cid'=>$cid));
 	 } else if ($type=="L") {
-		 $stm = $DBH->prepare("UPDATE imas_linkedtext SET title=:title WHERE id=:id");
-		 $stm->execute(array(':title'=>$val, ':id'=>$typeid));
+		 $stm = $DBH->prepare("UPDATE imas_linkedtext SET title=:title WHERE id=:id AND courseid=:cid");
+		 $stm->execute(array(':title'=>$val, ':id'=>$typeid, ':cid'=>$cid));
 	 } else if ($type=="A") {
-		 $stm = $DBH->prepare("UPDATE imas_assessments SET name=:name WHERE id=:id");
-		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
+		 $stm = $DBH->prepare("UPDATE imas_assessments SET name=:name WHERE id=:id AND courseid=:cid");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid, ':cid'=>$cid));
 	 } else if ($type=="F") {
-		 $stm = $DBH->prepare("UPDATE imas_forums SET name=:name WHERE id=:id");
-		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
+		 $stm = $DBH->prepare("UPDATE imas_forums SET name=:name WHERE id=:id AND courseid=:cid");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid, ':cid'=>$cid));
 	 } else if ($type=="W") {
-		 $stm = $DBH->prepare("UPDATE imas_wikis SET name=:name WHERE id=:id");
-		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
+		 $stm = $DBH->prepare("UPDATE imas_wikis SET name=:name WHERE id=:id AND courseid=:cid");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid, ':cid'=>$cid));
 	 } else if ($type=="D") {
-		 $stm = $DBH->prepare("UPDATE imas_drillassess SET name=:name WHERE id=:id");
-		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
+		 $stm = $DBH->prepare("UPDATE imas_drillassess SET name=:name WHERE id=:id AND courseid=:cid");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid, ':cid'=>$cid));
 	 } else if ($type=="B") {
 		$blocktree = explode('-',$typeid);
 		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
@@ -60,10 +66,8 @@
 		$sub[$existingid]['name'] = $val;
 	 }
  }
-
- $newitems = array();
-
- $newitems = additems($order);
+ // do it again to capture block name changes
+ $newitems = additems2($order);
  $itemlist = serialize($newitems);
  $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
  $stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
@@ -81,6 +85,31 @@
  	}
  	return $n;
  }
+
+function additems2($arr) {
+  global $items;
+  $outitems = array();
+  foreach ($arr as $id=>$item) {
+    if (strpos($item['id'],'-')!==false) { //is block
+      $blocktree = explode('-',$item['id']);
+      $sub = $items;
+      for ($i=1;$i<count($blocktree)-1;$i++) {
+        $sub = $sub[$blocktree[$i]-1]['items'];
+      }
+      $block = $sub[$blocktree[count($blocktree)-1]-1];
+      if (!empty($item['children'])) {
+        $block['items'] = additems2($item['children']);
+      } else {
+        $block['items'] = array();
+      }
+      $outitems[] = $block;
+    } else {
+      $outitems[] = $item['id'];
+    }
+  }
+  return $outitems;
+}
+
  function additems($list) {
 	 global $items;
 	 $outarr = array();

@@ -1,6 +1,6 @@
 <?php
 $graphfilterdir = rtrim(dirname(__FILE__), '/\\');
-require_once("$graphfilterdir/../../assessment/mathphp2.php");
+require_once("$graphfilterdir/../../assessment/mathparser.php");
 // ASCIIsvgIMG.php
 // (c) 2006-2009 David Lippman   http://www.pierce.ctc.edu/dlippman
 // Generates an image based on an ASCIIsvg script
@@ -492,7 +492,7 @@ function ASinitPicture($arg=array()) {
 	}
 	if (!is_array($this->border)) {
 		$this->border = array($this->border,$this->border,$this->border,$this->border);
-	} else if (count($this->border<4)) {
+	} else if (count($this->border)<4) {
 		for ($i=count($this->border);$i<5;$i++) {
 			if ($i==1) {
 				$this->border[$i] = $this->border[0];
@@ -1045,15 +1045,13 @@ function ASslopefield($arg) {
 		if (!in_array($m,$okfunc)) { echo "$m"; return;}
 	}
 	*/
-	$func = mathphp($func,"x|y");
-	$func = str_replace(array('(x)','(y)'),array('($x)','($y)'),$func);
-	$efunc = my_create_function('$x,$y','return ('.$func.');');
+	$efunc = makeMathFunction($func, "x,y");
 	$dz = sqrt($dx*$dx + $dy*$dy)/6;
-	$x_min = ceil($this->xmin/$dx);
-	$y_min = ceil($this->ymin/$dy);
+	$x_min = $dx*ceil($this->xmin/$dx);
+	$y_min = $dy*ceil($this->ymin/$dy);
 	for ($x = $x_min; $x<= $this->xmax; $x+= $dx) {
 		for ($y = $y_min; $y<= $this->ymax; $y+= $dy) {
-			$gxy = @$efunc($x,$y);
+			$gxy = @$efunc(['x'=>$x, 'y'=>$y]);
 			if ($gxy!=null && !is_infinite($gxy) && !is_nan($gxy)) {
 				if ($gxy===false) {
 					$u = 0; $v = $dz;
@@ -1083,18 +1081,12 @@ function ASplot($function) {
 		$funcp = explode(',',$function[0]);
 		$isparametric = true;
 		$xfunc = str_replace("[","",$funcp[0]);
-		$xfunc = mathphp($xfunc,"t");
-		$xfunc = str_replace("(t)",'($t)',$xfunc);
-		$exfunc = my_create_function('$t','return ('.$xfunc.');');
+		$exfunc = makeMathFunction($xfunc, "t");
 		$yfunc = str_replace("]","",$funcp[1]);
-		$yfunc = mathphp($yfunc,"t");
-		$yfunc = str_replace("(t)",'($t)',$yfunc);
-		$eyfunc = my_create_function('$t','return ('.$yfunc.');');
+		$eyfunc = makeMathFunction($yfunc, "t");
 	} else {
 		$isparametric = false;
-		$func = mathphp($function[0],"x");
-		$func = str_replace("(x)",'($x)',$func);
-		$efunc = my_create_function('$x','return ('.$func.');');
+		$efunc = makeMathFunction($function[0], "x");
 	}
 	$avoid = array();
 	if (isset($function[1]) && $function[1]!='' && $function[1]!='null') {
@@ -1129,13 +1121,13 @@ function ASplot($function) {
 		if ($isparametric) {
 			$t = $xmin + $dx*$i;
 			if (in_array($t,$avoid)) { continue;}
-			$x = $exfunc($t);
-			$y = $eyfunc($t);
+			$x = $exfunc(['t'=>$t]);
+			$y = $eyfunc(['t'=>$t]);
 			if (is_infinite($x) || is_infinite($y) || is_nan($x) || is_nan($y)) { continue; }
 		} else {
 			$x = $xmin + $dx*$i;
 			if (in_array($x,$avoid)) { continue;}
-			$y = $efunc($x);
+			$y = $efunc(['x'=>$x]);
 			if (is_infinite($y) || is_nan($y)) { continue;}
 		}
 		if ($i<2 || $i==$stopat-2) {

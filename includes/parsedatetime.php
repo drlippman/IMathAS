@@ -29,4 +29,21 @@ function parsedatetime($date,$time, $failureDefault=0) {
 	}
 	return $t;
 }
+
+function parsetime($time, $failureDefault=0) {
+	preg_match('/(\d+)\s*:(\d+)\s*(\w*)/', $time, $tmatches);
+	if (count($tmatches)==0) {
+		preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);
+		if (count($tmatches)==0) {
+			return $failureDefault;
+		}
+		$tmatches[3] = $tmatches[2];
+		$tmatches[2] = 0;
+	}
+	if ($tmatches[3] != '') {
+		$tmatches[1] = $tmatches[1]%12;
+		if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+	}
+	return $tmatches[1]*60 + $tmatches[2];
+}
 ?>

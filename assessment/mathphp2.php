@@ -511,6 +511,8 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 	return $syms;
 }
 
+/* Now in mathparser.php
+
 function safepow($base,$power) {
 	if ($base==0) {if($power==0) {return sqrt(-1);} else {return 0;}}
 	if ($base<0 && floor($power)!=$power) {
@@ -534,16 +536,6 @@ function safepow($base,$power) {
 		$result = -($result);
 	}
 	return $result;
-}
-
-function root($n,$x) {
-	if ($n%2==0 && $x<0) { //if even root and negative base
-		return sqrt(-1);
-	} else if ($x<0) { //odd root of negative base - negative result
-		return -1*exp(1/$n*log(abs($x)));
-	} else { //root of positive base
-		return exp(1/$n*log(abs($x)));
-	}
 }
 
 function factorial($x) {
@@ -571,6 +563,17 @@ function csch($x) {
 function coth($x) {
 	return (1/tanh($x));
 }
+*/
+function root($n,$x) {
+	if ($n%2==0 && $x<0) { //if even root and negative base
+		return sqrt(-1);
+	} else if ($x<0) { //odd root of negative base - negative result
+		return -1*exp(1/$n*log(abs($x)));
+	} else { //root of positive base
+		return exp(1/$n*log(abs($x)));
+	}
+}
+
 function nthlog($n,$x) {
 	return (log($x)/log($n));
 }
@@ -584,7 +587,7 @@ function cotn($n,$x) { return 1/safepow(tan($x), $n);}
 function my_create_function($args, $code) {
 	global $myrights;
 	$preevalerror = error_get_last();
-	try {  
+	try {
 		$res = eval('return function('.$args.'){'.$code.'};');
 	} catch (Throwable $t) {
 		if ($myrights>10) {
@@ -594,7 +597,7 @@ function my_create_function($args, $code) {
 			return function(){};
 		}
 	}
-	
+
 	if ($res===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -610,6 +613,6 @@ function my_create_function($args, $code) {
 			return function(){};
 		}
 	}
-	return $res;	
+	return $res;
 }
 ?>

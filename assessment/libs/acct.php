@@ -660,22 +660,33 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 	return $out;
 }
 
-//makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize, $opts)
+//makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize, [$opts, $questions])
 //headers:  array(title, colspan, title, colspan,...) or array(title,title,title) or array of these for multiple headers
 //coltypes: array(true if scores, false if fixed), one for each column  (use 2 to add dollar signs when not already in column values)
-//fixedrows: array(title, colspan, title, colspan,...), ignores coltypes
+//fixedrows: array of array(title, colspan, title, colspan,...), ignores coltypes
 //columsn: an array for each column of fixed values or answer values
 //opts: optionsal array of options:
 //   $opts['totrow']: row to treat as totals row (decorates above and below with lines) - optional
 //   $opts['class']: class to use for table
-function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $opts=array()) {
+//   $opts['ops']: a list of typeahead options for string entries
+//$questions: you only need to pass this if you're using $opts['ops']
+function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $opts=array(), &$questions=null) {
 	if ($anstypes === null) { $anstypes = array();}
 	if ($answer === null) { $answer = array();}
 	if ($showanswer === null) { $showanswer = '';}
 	if ($displayformat === null) { $displayformat = array();}
 	if (isset($opts['totrow'])) { $totrow = $opts['totrow'];} else {$totrow = -1;}
 	if (isset($opts['class'])) { $tblclass = $opts['class'];} else {$tblclass = 'gridded';}
-
+	if (isset($opts['ops'])) {
+		if ($opts['ops'][0] == 'pulldowns') {
+			array_shift($opts['ops']);
+			$strdisptype = 'select';
+		} else {
+			$strdisptype = 'typeahead';
+		}
+	} else {
+		$strdisptype = '';
+	}
 	$maxsize = array();  $hasdecimals = false;
 	for ($j=0;$j<count($coltypes);$j++) {
 		if ($coltypes[$j]==false) {continue;} //fixed column
@@ -750,25 +761,29 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 				$out .= '<td'.$dec.' class="r">'.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']</td>';
 				$sa .= '<td'.$dec.' class="r">'.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'');
 
+				$cols[$j][$i] = str_replace('$','',$cols[$j][$i]);
 				$answer[$sn] = $cols[$j][$i];
 
-				if ($cols[$j][$i]!=='') {
+				if (is_numeric($cols[$j][$i])) {
 					$cols[$j][$i] = str_replace(array('$',','),'',$cols[$j][$i]) * 1;
 					if ($hasdecimals) {
 						$sa .= number_format($cols[$j][$i],2,'.',',');
 					} else {
 						$sa .= number_format($cols[$j][$i]);
 					}
-				}
-				$sa .= '</td>';
-				$answerboxsize[$sn] = $maxsize[$j];
-				$displayformat[$sn] = 'alignright';
-				$answerformat[$sn] = 'parenneg';
-				if ($cols[$j][$i]!='') {
+					$displayformat[$sn] = 'alignright';
+					$answerformat[$sn] = 'parenneg';
 					$anstypes[$sn] = 'number';
 				} else {
+					$sa .= $cols[$j][$i];
 					$anstypes[$sn] = 'string';
+					if ($strdisptype != '') {
+						$displayformat[$sn] = $strdisptype;
+						$questions[$sn] = $opts['ops'];
+					}
 				}
+				$answerboxsize[$sn] = $maxsize[$j];
+				$sa .= '</td>';
 				$sn++;
 			}
 		}
