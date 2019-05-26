@@ -1841,9 +1841,13 @@ class AssessRecord
     // Will also want to add in student's name
     // TODO: get latepass status
 
-    $out['starttime'] = $this->assessRecord['starttime'];
-    $out['lastchange'] = $this->assessRecord['lastchange'];
-    $out['timeontask'] = $this->assessRecord['timeontask'];
+    $out['starttime'] = intval($this->assessRecord['starttime']);
+    $out['lastchange'] = intval($this->assessRecord['lastchange']);
+    $out['timeontask'] = intval($this->assessRecord['timeontask']);
+    $out['gbscore'] = floatval($this->assessRecord['score']);
+    if (isset($this->data['scoreoverride'])) {
+      $out['scoreoverride'] = $this->data['scoreoverride'];
+    }
     $out['scored_version'] = $this->data['scored_version'];
     return $out;
   }
@@ -1951,6 +1955,7 @@ class AssessRecord
     if ($generate_html) { // only include this if we're displaying the question
       $out['qid'] = $qdata['qid'];
       $out['qsetid'] = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');
+      $out['qowner'] = $this->assess_info->getQuestionSetData($out['qsetid'])['ownerid'];
       $out['seed'] = $qdata['seed'];
       if (isset($qdata['scoreoverride'])) {
         $out['scoreoverride'] = floatval($qdata['scoreoverride']);

@@ -70,8 +70,8 @@ if (!$assess_record->hasRecord()) {
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(
   'name', 'submitby', 'enddate', 'can_use_latepass',
-  'original_enddate', 'extended_with', 'latepasses_avail',
-  'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit'
+  'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
+  'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -80,6 +80,10 @@ if ($istutor && $tutoredit == 0) {
   $assessInfoOut['can_edit_scores'] = false;
 } else {
   $assessInfoOut['can_edit_scores'] = true;
+}
+
+if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+  $assessInfoOut['qerror_cid'] = $CFG['GEN']['sendquestionproblemsthroughcourse'];
 }
 
 // get student's assessment attempt metadata

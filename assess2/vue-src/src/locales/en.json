@@ -263,7 +263,17 @@
     "full_credit_parts": "Full credit all parts",
     "full_credit": "Full credit",
     "add_feedback": "Add feedback",
-    "feedback": "Feedback"
-
+    "feedback": "Feedback",
+    "general_feedback": "General feedback",
+    "use_in_msg": "Use in Message",
+    "clear_qwork": "Clear work on question",
+    "question_id": "Question ID",
+    "seed": "Seed",
+    "msg_owner": "Message owner to report problems",
+    "had_help": "Had help available",
+    "save": "Save Changes",
+    "return": "Return to Gradebook",
+    "gb_score": "Score in Gradebook",
+    "override": "Override score"
   }
 }

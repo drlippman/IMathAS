@@ -28,11 +28,28 @@
         </span>
       </p>
 
-      <p>
-        Override score on assessment
-      </p>
+      <div>
+        <strong>
+          {{ $t('gradebook.gb_score') }}:
+          {{ aData.gbscore }}/{{ aData.points_possible }}
+        </strong>
+        <span v-if="aData.scoreoverride">
+          {{ $t('gradebook.overridden') }}
+        </span>
+        <button v-if="canEdit"
+          class = "slim"
+          type="button"
+          @click="showOverride = !showOverride"
+        >
+          {{ $t('gradebook.override') }}
+        </button>
+        <span v-if="showOverride">
+          <label for="assessoverride">{{ $t('gradebook.override') }}</label>:
+          <input id="assessoverride" size=4 v-model="assessOverride" />
+        </span>
+      </div>
 
-      <p>
+      <p v-if="canEdit">
         Clear all attempts | View as student | Print version
       </p>
 
@@ -47,7 +64,7 @@
         />
       </div>
 
-      <p>
+      <p v-if="canEdit">
         Show/Hide controls
       </p>
 
@@ -76,6 +93,7 @@
             />
           </div>
           <gb-score-details
+            :canedit = "canEdit"
             :qdata = "qdata[curQver[qn]]"
             :qn = "qn"
             @updatescore = "updateScore"
@@ -83,6 +101,45 @@
           />
         </div>
       </div>
+      <div>
+        {{ $t('gradebook.general_feedback') }}:
+        <textarea
+          v-if="canEdit && !useEditor"
+          class="fbbox"
+          rows="2"
+          cols="60"
+          ref="genfb"
+        >{{  }}</textarea>
+        <div
+          v-else-if="canEdit"
+          rows="2"
+          class="fbbox"
+          ref="genfb"
+          v-html=""
+        />
+        <div
+          v-else
+          v-html="qdata-feedback"
+        />
+      </div>
+      <div>
+        <button
+          v-if = "canEdit"
+          type = "button"
+          class = "primary"
+          @click = "submitChanges"
+        >
+          {{ $t('gradebook.save') }}
+        </button>
+        <button
+          type = "button"
+          class = "secondary"
+          @click = "exit"
+        >
+          {{ $t('gradebook.return') }}
+        </button>
+      </div>
+      <div style="margin-bottom:100px"></div>
     </div>
   </div>
 </template>
@@ -102,12 +159,24 @@ export default {
     GbQuestionSelect,
     GbScoreDetails
   },
+  data: function () {
+    return {
+      showOverride: false,
+      assessOverride: ''
+    }
+  },
   computed: {
     assessInfoLoaded () {
       return (store.assessInfo !== null);
     },
     aData () {
       return store.assessInfo;
+    },
+    canEdit() {
+      return store.assessInfo['can_edit_scores'];
+    },
+    useEditor() {
+      return (typeof window.tinyMCE !== 'undefined');
     },
     startedString() {
       if (this.aData.starttime === 0) {
@@ -175,10 +244,17 @@ export default {
       //console.log("update for "+qn+" part "+pn+": "+score);
     },
     updateFeedback(qn, feedback) {
-      
+
+    },
+    submitChanges() {
+
+    },
+    exit() {
+
     }
   },
   created () {
+    // TODO: Also need to run this on updated?
     if (typeof window.APIbase !== 'undefined') {
       store.APIbase = window.APIbase;
     } else {

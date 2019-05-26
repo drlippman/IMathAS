@@ -7,14 +7,15 @@
         :key="i"
       >
         <input
+          v-if="canedit"
           type="text"
           size="4"
           v-model="curScores[i]"
           @input="updateScore(i, $event)"
-        />/{{ poss }}
+        /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
       </span>
       <button
-        v-if="showfeedback === false"
+        v-if="canedit && showfeedback === false"
         type="button"
         class="slim"
         @click="showfeedback = true"
@@ -27,21 +28,25 @@
     >
       {{ $t('gradebook.feedback') }}:<br/>
       <textarea
-        v-if="!useEditor"
+        v-if="canedit && !useEditor"
         class="fbbox"
         rows="2"
         cols="60"
         @input="updateFeedback"
       >{{ qdata.feedback }}</textarea>
       <div
-        v-else
+        v-else-if="canedit"
         rows="2"
         class="fbbox"
         v-html="qdata.feedback"
         @input="updateFeedback"
       />
+      <div
+        v-else
+        v-html="qdata.feedback"
+      />
     </div>
-    <div>
+    <div v-if="canedit">
       <button
         type="button"
         @click="allFull"
@@ -54,15 +59,52 @@
       {{ $t('gradebook.time_on_version') }}:
       {{ timeSpent }}
     </div>
-
-
+    <div v-if="canedit">
+      <button
+        type="button"
+        class="slim"
+        @click="useInMsg"
+      >
+        {{ $t('gradebook.use_in_msg') }}
+      </button>
+      <button
+        type="button"
+        class="slim"
+        @click="clearWork"
+      >
+        {{ $t('gradebook.clear_qwork') }}
+      </button>
+    </div>
+    <div v-if="canedit">
+      {{ $t('gradebook.question_id') }}:
+        <a
+          target="_blank"
+          :href="questionEditUrl"
+        >{{ qdata.qsetid }}</a>.
+      {{ $t('gradebook.seed') }}:
+        {{ qdata.seed }}.
+      <a
+        v-if="questionErrorUrl != ''"
+        target="_blank"
+        :href="questionErrorUrl"
+      >{{ $t('gradebook.msg_owner') }}.</a>
+      <span v-if="qHelps.length > 0">
+        {{ $t('gradebook.had_help') }}:
+        <a v-for="help in qHelps"
+          :href="help.url"
+          target="_blank"
+        >{{ help.title }}</a>
+      </span>
+    </div>
   </div>
 </template>
 
 <script>
+import { store, actions } from './gbstore';
+
 export default {
   name: 'GbScoreDetails',
-  props: ['qdata', 'qn'],
+  props: ['qdata', 'qn', 'canedit'],
   data: function() {
     return {
       curScores: false,
@@ -115,6 +157,24 @@ export default {
     },
     useEditor() {
       return (typeof window.tinyMCE !== 'undefined');
+    },
+    questionEditUrl() {
+      let qs = 'id=' + this.qdata.qsetid + '&cid=' + store.cid;
+      qs += '&aid=' + store.aid + '&qid=' + this.qdata.qid;
+      console.log(store.APIbase);
+      return store.APIbase + '../course/moddataset.php?' + qs;
+    },
+    questionErrorUrl() {
+      if (store.assessInfo.qerror_cid) {
+        let quoteq = '0-' + this.qdata.qsetid + '-' + this.qdata.seed +
+          '-reperr-' + store.assessInfo.ver;
+        let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
+          '&to=' + this.qdata.qowner + '&title=Problem%20with%20question%20id%20'
+          + this.qdata.qsetid;
+        return store.APIbase + '../msgs/msglist.php?' + qs;
+      } else {
+        return '';
+      }
     }
   },
   methods: {
@@ -136,11 +196,40 @@ export default {
         this.$emit('updatescore', this.qn, i, this.curScores[i]);
       }
     },
+    useInMsg() {
+      // TODO
+    },
+    clearWork() {
+      // TODO
+    },
     initCurScores () {
       this.$set(this, 'curScores', this.initScores);
       this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
       if (this.useEditor) {
         window.initeditor("divs","fbbox",null,true);
+      }
+    },
+    qHelps () {
+      if (this.qdata.jsparams) {
+        let helps = this.qdata.jsparams.helps;
+        for (let i in helps) {
+          if (helps[i].label == 'video') {
+            helps[i].icon = 'video';
+            helps[i].title = this.$t('helps.video');
+          } else if (helps[i].label == 'read') {
+            helps[i].icon = 'file';
+            helps[i].title = this.$t('helps.read');
+          } else if (helps[i].label == 'ex') {
+            helps[i].icon = 'file';
+            helps[i].title = this.$t('helps.written_Example');
+          } else {
+            helps[i].icon = 'file';
+            helps[i].title = helps[i].label;
+          }
+        }
+        return helps;
+      } else {
+        return [];
       }
     }
   },

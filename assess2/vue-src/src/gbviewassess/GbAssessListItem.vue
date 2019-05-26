@@ -2,7 +2,8 @@
   <span>
     <strong>{{ attemptNum }}.</strong>
     <span v-if="option.score">
-      {{ score }}.
+      {{ $t('gradebook.score') }}:
+      <strong>{{ score }}</strong>.
     </span>
     <span v-if="option.status">
       {{ verStatus }}
@@ -11,7 +12,7 @@
 </template>
 
 <script>
-
+import { store, actions } from './gbstore';
 
 export default {
   name: 'GbAssessListItem',
@@ -46,7 +47,7 @@ export default {
       }
     },
     score() {
-      return this.$t('gradebook.score')+": "+this.option.score;
+      return this.option.score + '/' + store.assessInfo['points_possible'];
     }
   }
 };
