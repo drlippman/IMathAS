@@ -8,7 +8,12 @@ To discuss:
     Then auto-remap after_lastattempt <-> after_take if showscores is changed later
     ** OR, just limit to use default / Never.
   How will "force regens" work on exceptions page?
+    Shorten language to "Force student to work on new versions?" w explaination
+    Remove the "clear student's atempts" option at massexception level
   Exception: timelimit check (latepass isn't useful)
+    need to check if retakes remain & if not, whether latest attempt timelimit is expired
+    Maybe store latepass_useless time (def 2000000000) at i_a_r level?
+    Won't auto-update if assess setting is changed.
   Do we really want the ability to view in GB without seeing scores in GB?
     Nice for "ability to review work", but what will it look like? (can use N/A like NoScores does now)
   For skip-around by-assessment, should 'score' only reflect submitted assessment takes?

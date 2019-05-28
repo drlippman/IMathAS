@@ -277,6 +277,7 @@ export const actions = {
           Router.push('/summary');
         } else if (qns.length === 1) {
           // scroll to score result
+          // TODO: check if element is already in view; don't do this if it is
           document.getElementById('questionwrap' + qns[0]).parentNode.scrollIntoView();
         }
       })
@@ -641,7 +642,7 @@ export const actions = {
     store.assessInfo = Object.assign({}, store.assessInfo, response);
   },
   processSettings (data) {
-    
+
     if (data.hasOwnProperty('questions')) {
       for (let i in data.questions) {
         let thisq = data.questions[i];

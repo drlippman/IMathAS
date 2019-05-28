@@ -1,6 +1,6 @@
 <?php
 /*
- * IMathAS: Gradebook - save score overrides from gbviewassess
+ * IMathAS: Gradebook - clear attempt from scored record
  * (c) 2019 David Lippman
  *
  * Method: POST
@@ -10,8 +10,11 @@
  *  uid   Student's User ID
  *
  * POST variables:
- *  scores    JSON string with keys of form av-qn-qv-pn, or gen
- *  feedback  JSON string with keys of the form av-g, or av-qn-qv
+ *  type:   'all', 'attempt', or 'qver'
+ *  keepver: true to keep ques/seed, false to remove completely
+ *  aver:  assessment version (for 'attempt' or 'qver')
+ *  qn:    question number (for 'qver')
+ *  qver:  question version (for 'qver')
  *
  * Returns: success or error message
  */
@@ -32,12 +35,19 @@ if (!$isActualTeacher && !$istutor) {
 }
 //validate inputs
 check_for_required('GET', array('aid', 'cid', 'uid'));
-check_for_required('POST', array('scores', 'feedback'));
+check_for_required('POST', array('type', 'keepver'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $uid = Sanitize::onlyInt($_GET['uid']);
-$scores = json_decode($_POST['scores'], true);
-$feedbacks = json_decode($_POST['feedback'], true);
+$type = Sanitize::simpleString($_POST['type']);
+$keepver = Sanitize::onlyInt($_POST['keepver']);
+if ($type == 'attempt' || $type == 'qver') {
+  $aver = Sanitize::onlyInt($_POST['aver']);
+}
+if ($type == 'qver') {
+  $qn = Sanitize::onlyInt($_POST['qn']);
+  $qver = Sanitize::onlyInt($_POST['qver']);
+}
 
 //load settings without questions
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
@@ -57,8 +67,22 @@ if (!$assess_record->hasRecord()) {
   exit;
 }
 
-$assess_record->setGbScoreOverrides($scores);
-$assess_record->setGbFeedbacks($feedbacks);
+if ($type == 'all' && $keepver == 0) {
+  $stm = $DBH->prepare('DELETE FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
+  $stm->execute(array($aid, $uid));
+  echo '{"success": "saved"}';
+  exit;
+} else if ($type == 'all' && $keepver == 1) {
+  $assess_record->gbClearAttempts($type, $keepver);
+} else if ($type == 'attempt') {
+  $assess_record->gbClearAttempts($type, $keepver, $aver);
+} else if ($type == 'qver') {
+  $assess_record->gbClearAttempts($type, $keepver, $aver, $qn, $qver);
+}
+// recalculated totals based on removed attempts
+$assess_record->reTotalAssess();
 $assess_record->saveRecord();
 
+// TODO: return updated data
 echo '{"success": "saved"}';
+exit;

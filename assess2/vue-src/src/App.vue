@@ -69,6 +69,9 @@ export default {
   background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
   background-attachment: local, local, scroll, scroll;
 }
+input + svg {
+  vertical-align: middle;
+}
 a[target=_blank].noextlink::after {
   display: none;
 }

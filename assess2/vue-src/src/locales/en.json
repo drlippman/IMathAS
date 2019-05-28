@@ -247,6 +247,7 @@
     "due": "Due Date",
     "originally_due": "Originally Due",
     "make_exception": "Make Exception",
+    "edit_exception": "Edit Exception",
     "attempt_n": "Attempt {n}",
     "version_n": "Version {n}",
     "scored_attempt": "Scored attempt",
@@ -283,6 +284,16 @@
     "show_perfect": "Show full-credit questions",
     "show_correct": "Show correct questions",
     "show_unans": "Show unanswered questions",
-    "quick_grade": "Quick grade"
+    "quick_grade": "Quick grade",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "save_fail": "Error saving",
+    "clear_completely_msg": "Clear all student attempts, as if the student never started the assessment. If the student takes the assessment, they will get new versions of all questions.",
+    "clear_all_work_msg": "Clear all student work, but retain the most recent question versions.",
+    "clear_attempt_regen_msg": "Clear this assessment attempt completely. If the student takes the assessment, they will get new versions of all questions.",
+    "clear_attempt_msg": "Clear work on this attempt. Student will be able to redo this attempt with the same question versions.",
+    "clear_qver_regen_msg": "Clear this question version entirely.",
+    "clear_qver_msg": "Clear student work on this question version, but keep the version.",
+    "clear_warning": "WARNING: This action will delete student data and CAN NOT be undone."
   }
 }

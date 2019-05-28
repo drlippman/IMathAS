@@ -10,16 +10,19 @@
 
       <div>
         {{ $t('gradebook.started') }}: {{ startedString }}<br/>
-        {{ $t('gradebook.lastchange') }}: {{ lastchangeString }}<br/>
-        {{ $t('gradebook.time_onscreen') }}: {{ totalTimeOnTask }}
+        {{ $t('gradebook.lastchange') }}: {{ lastchangeString }}
+        <span v-if="aData.timeontask > 0">
+          <br/>
+          {{ $t('gradebook.time_onscreen') }}: {{ totalTimeOnTask }}
+        </span>
       </div>
 
       <div>
         {{ $t('gradebook.due')}}:
           {{ $d(new Date(aData.enddate * 1000), 'long') }}
-          <button>
-            {{ $t('gradebook.make_exception') }}
-          </button>
+          <a :href="exceptionUrl">
+            {{ exceptionActionLabel }}
+          </a>
         <span v-if="aData.hasOwnProperty('original_enddate')">
           <br/>
           {{ $t('gradebook.originally_due') }}:
@@ -50,11 +53,17 @@
       </div>
 
       <div v-if="canEdit">
-        Clear all attempts |
-        <a :href="viewAsStuUrl" target="_blank">
+        <button
+          type="button"
+          @click="clearAttempts('all')"
+        >
+          {{ $t('gradebook.clear_all') }}
+        </button>
+        |
+        <a :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
         </a> |
-        <a :href="viewAsStuUrl + '#/print'" target="_blank">
+        <a :href="viewAsStuUrl + '#/print'">
           {{ $t('gradebook.print') }}
         </a>
       </div>
@@ -89,7 +98,12 @@
         >
           {{ hideUnansweredLabel }}
         </button>
-
+        <button
+          type="button"
+          @click="clearAttempts('attempt')"
+        >
+          {{ $t('gradebook.clear_attempt') }}
+        </button>
       </div>
 
       <div class="scrollpane">
@@ -163,6 +177,20 @@
           {{ $t('gradebook.return') }}
         </button>
       </div>
+      <div class="floatrightbutton">
+        <div v-if="savedMsg !== ''" class="noticetext">
+          {{ savedMsg }}
+        </div>
+        <button
+          v-if = "canEdit"
+          type = "button"
+          class = "primary"
+          @click = "submitChanges"
+        >
+          {{ $t('gradebook.save') }}
+        </button>
+      </div>
+      <gb-clear-attempts />
       <div style="margin-bottom:100px"></div>
     </div>
   </div>
@@ -174,6 +202,7 @@ import GbQuestion from '@/gbviewassess/GbQuestion.vue';
 import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
 import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
+import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 //import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
@@ -181,7 +210,8 @@ export default {
     GbQuestion,
     GbAssessSelect,
     GbQuestionSelect,
-    GbScoreDetails
+    GbScoreDetails,
+    GbClearAttempts
   },
   data: function () {
     return {
@@ -285,8 +315,28 @@ export default {
         this.$t('gradebook.show_unans') :
         this.$t('gradebook.hide_unans');
     },
+    exceptionActionLabel() {
+      if (this.aData.hasexception) {
+        return this.$t('gradebook.edit_exception');
+      } else {
+        return this.$t('gradebook.make_exception')
+      }
+    },
+    exceptionUrl() {
+      let url = store.APIbase + '../course/exception.php';
+      url += '?cid=' + store.cid + '&aid=' + store.aid + '&uid' + store.uid;
+      url += '&from=gb';
+      return url;
+    },
     assessFeedback() {
       return this.aData.assess_versions[store.curAver].feedback || '';
+    },
+    savedMsg() {
+      if (store.saving === '') {
+        return '';
+      } else {
+        return this.$t('gradebook.' + store.saving);
+      }
     }
   },
   methods: {
@@ -323,7 +373,27 @@ export default {
       actions.saveChanges();
     },
     exit() {
-
+      window.location = store.exitUrl;
+    },
+    setExitUrl(from) {
+      let page = '';
+      if (from === 'isolate') {
+        page = 'isolateassessgrade.php';
+      } else if (from === 'gisolate') {
+        page = 'isolateassessbygroup.php';
+      } else if (from === 'stugrp') {
+        page = 'managestugrps.php';
+      } else if (from === 'gisolate') {
+        page = 'gb-testing.php';
+      } else if (from === 'gisolate') {
+        page = 'gradebook.php';
+      }
+      let qs = '?cid=' + store.cid + '&aid=' + store.aid + '&stu=' + store.stu;
+      store.exitUrl = store.APIbase + '../course/' + page + qs;
+    },
+    clearAttempts(type) {
+      store.clearAttempts.type = type;
+      store.clearAttempts.show = true;
     }
   },
   created () {
@@ -337,6 +407,8 @@ export default {
     let querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
     let queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
     let queryuid = window.location.search.replace(/^.*uid=(\d+).*$/, '$1');
+    let queryfrom = window.location.search.replace(/^.*from=(\w+).*$/, '$1');
+    let querystu = window.location.search.replace(/^.*stu=(\d+).*$/, '$1');
     if (store.assessInfo === null ||
       store.cid !== querycid ||
       store.aid !== queryaid ||
@@ -346,7 +418,9 @@ export default {
       window.cid = querycid;  // some other functions need this in global scope
       store.aid = queryaid;
       store.uid = queryuid;
+      store.stu = querystu;
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
+      this.setExitUrl(queryfrom);
       actions.loadGbAssessData();
     }
   }
@@ -359,5 +433,11 @@ export default {
 }
 .gbmainview > div {
   margin-bottom: 16px;
+}
+.floatrightbutton {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  text-align: center;
 }
 </style>

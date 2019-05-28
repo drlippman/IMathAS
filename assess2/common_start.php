@@ -44,13 +44,6 @@ function check_for_required($method, $required) {
   }
 }
 
-// called if there is no imathas session, rather
-// than redirecting to loginpage
-function onNoSession () {
-  header('Content-Type: application/json; charset=utf-8');
-  echo '{"error": "no_session"}';
-  exit;
-}
 
 // normalize $_POST['practice'] to boolean
 if (!empty($_POST['practice']) && $_POST['practice'] === 'false') {

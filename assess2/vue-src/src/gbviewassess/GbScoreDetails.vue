@@ -61,13 +61,9 @@
       {{ timeSpent }}
     </div>
     <div v-if="canedit && showfull">
-      <button
-        type="button"
-        class="slim"
-        @click="useInMsg"
-      >
+      <a :href="useInMsg" target="_blank">
         {{ $t('gradebook.use_in_msg') }}
-      </button>
+      </a>
       <button
         type="button"
         class="slim"
@@ -170,13 +166,25 @@ export default {
         let quoteq = '0-' + this.qdata.qsetid + '-' + this.qdata.seed +
           '-reperr-' + store.assessInfo.ver;
         let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
+          '&quoteq=' + quoteq
           '&to=' + this.qdata.qowner + '&title=Problem%20with%20question%20id%20'
           + this.qdata.qsetid;
         return store.APIbase + '../msgs/msglist.php?' + qs;
       } else {
         return '';
       }
-    }
+    },
+    useInMsg() {
+      // TODO
+      let quoteq = this.qn + '-' + this.qdata.qsetid + '-' + this.qdata.seed +
+        '-' + store.aid + '-' + store.assessInfo.ver;
+      let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
+        '&quoteq=' + quoteq + '&to=' + store.uid;
+      return store.APIbase + '../msgs/msglist.php?'+qs;
+      //TODO: get GB to work for this.
+      //window.GB_show(this.$t('gradebook.send_msg'),
+      //  store.APIbase + '../msgs/msglist.php?'+qs, 800, 'auto');
+    },
   },
   methods: {
     updateScore(pn, evt) {
@@ -197,11 +205,10 @@ export default {
         actions.setScoreOverride(this.qn, i, this.curScores[i]);
       }
     },
-    useInMsg() {
-      // TODO
-    },
     clearWork() {
-      // TODO
+      store.clearAttempts.type = 'qver';
+      store.clearAttempts.qn = this.qn;
+      store.clearAttempts.show = true;
     },
     initCurScores () {
       this.$set(this, 'curScores', this.initScores);

@@ -6,16 +6,23 @@ export const store = Vue.observable({
   aid: null,
   cid: null,
   uid: null,
+  stu: 0,
   queryString: '',
+  exitUrl: '',
   inTransit: false,
-  saving: false,
+  saving: '',
   errorMsg: null,
   curAver: 0,
   ispractice: false,
   curQver: [],
   orig_submitby: null,
   scoreOverrides: {},
-  feedbacks: {}
+  feedbacks: {},
+  clearAttempts: {
+    show: false,
+    type: '',
+    qn: 0
+  }
 });
 
 export const actions = {
@@ -166,6 +173,62 @@ export const actions = {
       })
       .always(response => {
         store.inTransit = false;
+      });
+  },
+  clearAttempt(keepver) {
+    let data = {
+      type: store.clearAttempts.type,
+      keepver: keepver
+    };
+    if (store.clearAttempts.type === 'attempt' ||
+        store.clearAttempts.type === 'qver'
+    ) {
+      data.aver = store.curAver;
+    }
+    if (store.clearAttempts.type === 'qver') {
+      data.qn = store.clearAttempts.qn;
+      data.qver = store.curQver[data.qn];
+    }
+    window.$.ajax({
+      url: store.APIbase + 'gbclearattempt.php' + store.queryString,
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        // TODO: update displayed data rather than just exiting
+        if (store.clearAttempts.type === 'all') {
+          // cleared all - exit
+          window.location = store.exitUrl;
+        } else {
+          // TODO: be more surgical.  For now, we'll just reload everything
+          store.assessInfo = null;
+          actions.loadGbAssessData();
+          /*
+            If we can return the new version:
+
+          store.assessInfo = response;
+          // set current versions to scored versions
+          store.curAver = response.scored_version;
+          this.setQverAsScored(response.scored_version);
+
+           */
+        }
+      })
+      .fail(response => {
+        this.handleError('send_fail');
+      })
+      .always(response => {
+        store.inTransit = false;
+        store.clearAttempts.show = false;
       });
   },
   setQverAsScored(aver) {

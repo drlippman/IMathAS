@@ -632,7 +632,12 @@
  if (!$verified) {
 	if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
     if (isset($no_session_handler)) {
-      call_user_func($no_session_handler);
+      if (!$no_session_handler === 'json_error') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo '{"error": "no_session"}';
+      } else {
+        call_user_func($no_session_handler);
+      }
       exit;
     }
     if (!isset($loginpage)) {
