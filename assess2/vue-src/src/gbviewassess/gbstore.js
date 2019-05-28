@@ -8,11 +8,14 @@ export const store = Vue.observable({
   uid: null,
   queryString: '',
   inTransit: false,
+  saving: false,
   errorMsg: null,
   curAver: 0,
   ispractice: false,
   curQver: [],
-  orig_submitby: null
+  orig_submitby: null,
+  scoreOverrides: {},
+  feedbacks: {}
 });
 
 export const actions = {
@@ -69,6 +72,7 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
+
         // set into store
         store.assessInfo.assess_versions[ver] = response;
         // set current versions to scored versions
@@ -120,6 +124,50 @@ export const actions = {
         store.inTransit = false;
       });
   },
+  saveChanges () {
+    let qs = store.queryString;
+    store.inTransit = true;
+    store.saving = 'saving';
+    store.errorMsg = null;
+    let data = new FormData();
+    data.append('scores', JSON.stringify(store.scoreOverrides));
+    data.append('feedback', JSON.stringify(store.feedbacks));
+    data.append('practice', store.ispractice?1:0);
+    window.$.ajax({
+      url: store.APIbase + 'gbsave.php' + qs,
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      processData: false,
+      contentType: false,
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        store.saving = 'saved';
+        // update store.assessInfo with the new scores so it
+        // can tell if we change anything
+        for (let key in store.scoreOverrides) {
+          let pts = key.split(/-/);
+          let qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
+          qdata.parts[pts[3]].score = Math.round(1000*store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible)/1000;
+        }
+        store.scoreOverrides = {};
+        store.feedbacks = {};
+      })
+      .fail(response => {
+        store.saving = 'save_fail';
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
   setQverAsScored(aver) {
     let qdata = store.assessInfo.assess_versions[aver].questions;
     let qv;
@@ -131,6 +179,37 @@ export const actions = {
         }
       }
     }
+  },
+  setScoreOverride(qn, pn, score) {
+    // get current assess and question versions
+    let av = store.curAver;
+    let qv = store.curQver[qn];
+
+    // compare new score against existing value
+    let qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
+    let key = av + '-' + qn + '-' + qv + '-' + pn;
+    if (score === '' || Math.abs(score - qdata.parts[pn].score)<.001) {
+      // same as existing - don't submit as an override
+      delete store.scoreOverrides[key];
+    } else {
+      // different score - submit as override. Save raw score (0-1)?.
+      store.scoreOverrides[key] = Math.round(10000*score/qdata.parts[pn].points_possible)/10000;
+    }
+    store.saving = '';
+  },
+  setFeedback(qn, feedback) {
+    // get current assess and question versions
+    let av = store.curAver;
+    let key = av;
+    if (qn === null) {
+      // assessment-level feedback
+      key += '-g';
+    } else {
+      let qv = store.curQver[qn];
+      key += '-' + qn + '-' + qv;
+    }
+    store.feedbacks[key] = feedback;
+    store.saving = '';
   },
   handleError (error) {
     store.errorMsg = error;

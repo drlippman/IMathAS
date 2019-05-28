@@ -97,6 +97,7 @@ export default {
     },
     showScore () {
       return (store.inProgress &&
+        !store.inPrintView &&
         (this.questionData.hasOwnProperty('score') ||
          this.questionData.status === 'attempted'
         ) &&

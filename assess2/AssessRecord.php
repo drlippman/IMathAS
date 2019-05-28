@@ -1956,13 +1956,58 @@ class AssessRecord
       $out['qowner'] = $this->assess_info->getQuestionSetData($out['qsetid'])['ownerid'];
       $out['seed'] = $qdata['seed'];
       if (isset($qdata['scoreoverride'])) {
-        $out['scoreoverride'] = floatval($qdata['scoreoverride']);
+        $out['scoreoverride'] = $qdata['scoreoverride'];
       }
       $out['timeactive'] = $this->calcTimeActive($qdata);
       $out['feedback'] = $qdata['feedback'];
       $out['other_tries'] = $this->getPreviousTries($qdata['tries']);
     }
     return $out;
+  }
+
+  /**
+   * Save score overrides
+   * @param array $scores array with keys av-qn-qv-pn, or gen
+   */
+  public function setGbScoreOverrides($scores) {
+    $this->parseData();
+    if (isset($scores['gen'])) { // general score override
+      $this->data['scoreoverride'] = floatval($scores['gen']);
+      unset($scores['gen']);
+    } else {
+      // TODO: Do we want to do this?
+      //unset($this->data['scoreoverride']);
+    }
+    foreach ($scores as $key=>$score) {
+      list($av,$qn,$qv,$pn) = array_map('intval', explode('-', $key));
+      $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
+      if (!isset($qdata['scoreoverride'])) {
+        $qdata['scoreoverride'] = array();
+      }
+      // TODO: how do we handle overrides for unattempted questions?
+      $qdata['scoreoverride'][$pn] = floatval($score);
+    }
+  }
+
+  /**
+   * Save feedbacks
+   * @param array $feedback keys av-g or av-qn-qv
+   */
+  public function setGbFeedbacks($feedback) {
+    $this->parseData();
+    foreach ($feedback as $key=>$fb) {
+      $pts = explode('-', $key);
+      if ($pts[1] == 'g') {
+        // assessment-level feedback
+        $av = intval($pts[0]);
+        $this->data['assess_versions'][$av]['feedback'] = Sanitize::incomingHtml($fb);
+      } else {
+        // question-level feedback
+        list($av,$qn,$qv) = array_map('intval', $pts);
+        $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
+        $qdata['feedback'] = Sanitize::incomingHtml($fb);
+      }
+    }
   }
 
   /**

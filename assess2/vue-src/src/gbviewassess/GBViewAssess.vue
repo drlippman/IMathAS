@@ -122,8 +122,6 @@
             :canedit = "canEdit"
             :qdata = "qdata[curQver[qn]]"
             :qn = "qn"
-            @updatescore = "updateScore"
-            @updatefeedback = "updateFeedback"
           />
         </div>
       </div>
@@ -134,18 +132,18 @@
           class="fbbox"
           rows="2"
           cols="60"
-          ref="genfb"
-        >{{  }}</textarea>
+          @input="updateFeedback"
+        >{{ assessFeedback }}</textarea>
         <div
           v-else-if="canEdit"
           rows="2"
           class="fbbox"
-          ref="genfb"
-          v-html=""
+          v-html="assessFeedback"
+          @input="updateFeedback"
         />
         <div
           v-else
-          v-html="qdata-feedback"
+          v-html="assessFeedback"
         />
       </div>
       <div>
@@ -286,6 +284,9 @@ export default {
       return this.hideUnanswered ?
         this.$t('gradebook.show_unans') :
         this.$t('gradebook.hide_unans');
+    },
+    assessFeedback() {
+      return this.aData.assess_versions[store.curAver].feedback || '';
     }
   },
   methods: {
@@ -304,14 +305,22 @@ export default {
         actions.loadGbQuestionVersion(qn, val);
       }
     },
-    updateScore(qn, pn, score) {
-      //console.log("update for "+qn+" part "+pn+": "+score);
-    },
-    updateFeedback(qn, feedback) {
-
+    updateFeedback(evt) {
+      let content;
+      if (this.useEditor) {
+        content = window.tinymce.activeEditor.getContent();
+      } else {
+        content = evt.target.value;
+      }
+      actions.setFeedback(null, content);
     },
     submitChanges() {
-
+      if (this.showOverride && this.assessOverride !== '') {
+        store.scoreOverrides['gen'] = this.assessOverride;
+      } else {
+        delete store.scoreOverrides['gen'];
+      }
+      actions.saveChanges();
     },
     exit() {
 

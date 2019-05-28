@@ -282,6 +282,7 @@
     "hide_unans": "Hide unanswered questions",
     "show_perfect": "Show full-credit questions",
     "show_correct": "Show correct questions",
-    "show_unans": "Show unanswered questions"
+    "show_unans": "Show unanswered questions",
+    "quick_grade": "Quick grade"
   }
 }

@@ -47,6 +47,7 @@
       />
     </div>
     <div v-if="canedit && showfull">
+      {{ $t('gradebook.quick_grade') }}:
       <button
         type="button"
         @click="allFull"
@@ -132,11 +133,11 @@ export default {
       for (let i=0; i<this.answeights.length; i++) {
         // handle the case of a single override
         if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
-          let partscore = this.qdata.scoreoverride * this.answeights[i]/qdata.points_possible;
+          let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
           partscore = Math.round(1000*partscore)/1000;
           out.push(partscore);
         } else if (this.qdata.scoreoverride) {
-          out.push(this.qdata.scoreoverride[i]);
+          out.push(this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible);
         } else {
           out.push(this.qdata.parts[i].score);
         }
@@ -179,7 +180,7 @@ export default {
   },
   methods: {
     updateScore(pn, evt) {
-      this.$emit('updatescore', this.qn, pn, this.curScores[pn]);
+      actions.setScoreOverride(this.qn, pn, this.curScores[pn]);
     },
     updateFeedback(evt) {
       let content;
@@ -188,12 +189,12 @@ export default {
       } else {
         content = evt.target.value;
       }
-      this.$emit('updatefeedback', this.qn, content);
+      actions.setFeedback(this.qn, content);
     },
     allFull() {
       for (let i=0; i<this.answeights.length; i++) {
         this.$set(this.curScores, i, this.partPoss[i]);
-        this.$emit('updatescore', this.qn, i, this.curScores[i]);
+        actions.setScoreOverride(this.qn, i, this.curScores[i]);
       }
     },
     useInMsg() {
