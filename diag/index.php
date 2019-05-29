@@ -13,9 +13,9 @@
 	$sessionid = session_id();
 
 	function decodeSelector($sel) {
-		return str_replace(array('@c@','@s@','@t@'), array(',',';','~'), $sel);	
+		return str_replace(array('@c@','@s@','@t@'), array(',',';','~'), $sel);
 	}
-	
+
 	if (!isset($_GET['id'])) {
 		//echo "<html><body><h1>Diagnostics</h1><ul>";
 		$nologo = true;
@@ -55,7 +55,7 @@
 	}
 	$sel1 = array_map('decodeSelector', explode(',',$line['sel1list']));
 	$entryformat = $line['entryformat'];
-	
+
 	if ($line['sel1name'][0]=='!') {
 		$line['sel1name'] = substr($line['sel1name'], 1);
 	} else {
@@ -221,22 +221,36 @@ if (isset($_POST['SID'])) {
 	}
 	$cnt = 0;
 	$now = time();
+
+	$aids = explode(',',$line['aidlist']);
+	$paid = $aids[$_POST['course']];
+	$stm2 = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=:assessmentid");
+	$stm2->execute(array(':assessmentid'=>$paid));
+	$aVer = $stm2->fetchColumn(0);
+
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 	$stm->execute(array(':SID'=>$diagSID));
 	if ($stm->rowCount()>0) {
 		$userid = $stm->fetchColumn(0);
 		$allowreentry = ($line['public']&4);
 		if (!in_array(strtolower($_POST['passwd']),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
-			$aids = explode(',',$line['aidlist']);
-			$paid = $aids[$_POST['course']];
+			$d = null;
 			$stm2 = $DBH->prepare("SELECT id,starttime FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 			$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
 			if ($stm2->rowCount()>0) {
+				$d = $stm2->fetch(PDO::FETCH_NUM);
+			} else {
+				$stm2 = $DBH->prepare("SELECT id,starttime FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid");
+				$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
+				if ($stm2->rowCount()>0) {
+					$d = $stm2->fetch(PDO::FETCH_NUM);
+				}
+			}
+			if ($d !== null) {
 				if (!$allowreentry) {
 					echo _("You've already taken this diagnostic."), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Back'), "</a>\n";
 					exit;
 				} else {
-					$d = $stm2->fetch(PDO::FETCH_NUM);
 					$now = time();
 					if ($now - $d[1] > 60*$line['reentrytime']) {
 						echo _('Your window to complete this diagnostic has expired.'), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Back'), "</a>\n";
@@ -261,17 +275,24 @@ if (isset($_POST['SID'])) {
 			}
 			$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
 			$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessiondata'=>$enc));
-			$aids = explode(',',$line['aidlist']);
-			$paid = $aids[$_POST['course']];
+
 			if ((intval($line['forceregen']) & (1<<intval($_POST['course'])))>0) {
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
+				$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
+				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid LIMIT 1");
 				$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
 			}
 			$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 			$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
+			if ($aVer > 1) {
+				header(sprintf('Location: %s/assess2/index.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'],
+			        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
+			} else {
+
 		    header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
                 Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
+			}
 			exit;
 
 		//} else {
@@ -309,9 +330,13 @@ if (isset($_POST['SID'])) {
 	$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessiondata'=>$enc));
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
-
-	header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
-        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
+	if ($aVer > 1) {
+		header(sprintf('Location: %s/assess2/index.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'],
+	        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
+	} else {
+		header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
+	        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
+	}
 	exit;
 }
 
@@ -392,7 +417,7 @@ for ($i=0;$i<count($sel1);$i++) {
 			echo '<select name=timelimitmult><option value="1">'._('Standard').'</option><option value="1.5">'._('1.5x standard').'</option>';
 			echo '<option value="2">'._('2x standard').'</option></select><BR class=form>';
 		}
-		
+
 	}
 ?>
 <input type="hidden" id="tzoffset" name="tzoffset" value="">
