@@ -67,9 +67,11 @@
 			foreach($addexcarr as $aid) {
 				if (isset($_POST['forceregen'])) {
 					//this is not group-safe
-					$stm = $DBH->prepare("SELECT shuffle FROM imas_assessments WHERE id=:id");
+					$stm = $DBH->prepare("SELECT shuffle,ver FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$aid));
-					$shuffle = $stm->fetchColumn(0);
+					list($shuffle,$aVer) = $stm->fetch(PDO::FETCH_NUM);
+					// for now, skip this for new assessment versions
+					if ($aVer > 1) { continue; }
 					$allqsameseed = (($shuffle&2)==2);
 					$stm = $DBH->prepare("SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
@@ -298,9 +300,9 @@
 					echo ' <i>('._('LatePass').')</i>';
 				} else if ($row['is_lti']>0) {
 					echo ' <i>('._('Set by LTI').')</i>';
-				} 
+				}
 				echo "</li>";
-				
+
 			}
 			echo "</ul></li>";
 		} else {
@@ -345,7 +347,7 @@
 					$notesarr[$row['eid']] .= ' ('._('LatePass').')';
 				} else if ($row['is_lti']>0) {
 					$notesarr[$row['eid']] .= ' ('._('Set by LTI').')';
-				} 
+				}
 
 			}
 			natsort($assessarr);
@@ -404,7 +406,7 @@
 	} else {
 		$fclass = '';
 	}
-	
+
 	//echo "<h3>Make New Exception</h3>";
 	echo '<h2>'._("Make New Exception").'</h2>';
 	if ($isDateByLTI) {
@@ -416,15 +418,16 @@
 	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
 	echo '<p class="list"><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
 	echo '<p>For assessments:</p>';
-	echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
+	echo '<p class="list"><input type="checkbox" name="forceregen"/> <sup>*</sup> Force student to work on new versions of all questions?  Students ';
 	echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
-	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
+	echo '<p class="list"><input type="checkbox" name="forceclear"/> <sup>*</sup> Clear student\'s attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
 	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
 	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
+	echo '<p class="small"><sup>*</sup> Note: These two options only work on older-format assessments for now</p>';
 	echo '</fieldset>';
 
-	
+
 	if (count($assessarr)>0) {
 		echo '<fieldset'.$fclass.'><legend>'._("New Assessment Exception").'</legend>';
 

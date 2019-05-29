@@ -158,7 +158,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$uid));
 		$stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
-		$stm = $DBH->prepare("SELECT startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT startdate,enddate,date_by_lti,ver FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['aid'])));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$sdate = tzdate("m/d/Y",$row[0]);
@@ -166,6 +166,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stime = tzdate("g:i a",$row[0]);
 		$etime = tzdate("g:i a",$row[1]);
 		$isDateByLTI = ($row[2]>0);
+		$aVer = $row[3];
 
 		//check if exception already exists
 		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
@@ -254,9 +255,15 @@ if ($overwriteBody==1) {
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime ?>">
 		</span><BR class=form>
+<?php
+if ($aVer == 1) { // only allow this option for old assess UI for now. TODO
+?>
 		<span class="form"><input type="checkbox" name="forceregen"/></span>
 		<span class="formright">Force student to work on new versions of all questions?  Students
 		   will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</span><br class="form"/>
+<?php
+}
+?>
 		<span class="form"><input type="checkbox" name="eatlatepass"/></span>
 		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).
 		   Student currently has <?php echo Sanitize::onlyInt($latepasses);?> latepasses.</span><br class="form"/>
