@@ -13,7 +13,9 @@
     "continue_assess": "Continue Assessment",
     "retake_assess": "Retake Assessment",
     "start_assess": "Start Assessment",
-    "timewarning": "This assessment has a time limit. Once you start the assessment, the timer will not pause for any reason.  Are you sure you are ready to start?"
+    "timewarning": "This assessment has a time limit. Once you start the assessment, the timer will not pause for any reason.  Are you sure you are ready to start?",
+    "resetmsg": "Teachers: you can reset your attempts on this assessment if desired.",
+    "doreset": "Reset Assessment"
   },
   "closed": {
     "hidden": "This assessment is not currently available.",

@@ -34,11 +34,15 @@ export const store = Vue.observable({
 });
 
 export const actions = {
-  loadAssessData (callback) {
+  loadAssessData (callback, doreset) {
+    let qs = store.queryString;
+    if (doreset === true) {
+      qs += '&reset=1';
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
-      url: store.APIbase + 'loadassess.php' + store.queryString,
+      url: store.APIbase + 'loadassess.php' + qs,
       dataType: 'json',
       xhrFields: {
         withCredentials: true

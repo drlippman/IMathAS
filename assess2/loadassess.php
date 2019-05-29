@@ -32,6 +32,12 @@ if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
+// option to reset assessment entirely
+if ($isActualTeacher && $uid == $userid && isset($_GET['reset'])) {
+  $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=? AND assessmentid=?");
+  $stm->execute(array($uid, $aid));
+}
+
 //load settings without questions
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
@@ -40,7 +46,9 @@ if ($isstudent) {
 }
 
 //check to see if prereq has been met
-$assess_info->checkPrereq($uid);
+if ($isstudent) {
+  $assess_info->checkPrereq($uid);
+}
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);

@@ -45,6 +45,16 @@
         </button>
       </p>
 
+      <p v-if="showReset">
+        {{ $t('launch.resetmsg') }}
+        <br/>
+        <button
+          type="button"
+          class="secondary"
+          @click="doReset"
+        >
+          {{ $t('launch.doreset') }}
+        </button>
       <p>
         <button
           v-if="okToLaunch"
@@ -144,6 +154,11 @@ export default {
       }
       return true;
     },
+    showReset () {
+        return this.aInfo.is_teacher && (
+          this.aInfo.has_active_attempt || this.aInfo.prev_attempts.length > 0
+        );
+    },
     hasExit () {
       return (window.exiturl && window.exiturl !== '');
     }
@@ -159,6 +174,9 @@ export default {
     },
     endAssess () {
       actions.endAssess();
+    },
+    doReset () {
+      actions.loadAssessData(null, true);
     },
     updateNewGroup (newMembers) {
       this.newGroupMembers = newMembers;
