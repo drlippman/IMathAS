@@ -36,6 +36,9 @@ TODOs:
   Takeanythingorblank??
     pass jsparam to front end.  Include in submission anything on first try
     with "submitblank" param set.
+  Prop types
+  tinymce drag handle showing when question is not active
+  store timeontask for whole assessment attempt when in full-test-view
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -59,22 +62,14 @@ Newver /course/gradeallq.php
   - This one probably not in Vue (no need)
 Newver /course/chgassessments.php
 
-Edit/Rewrite /util/crosscoursedata.php
-Edit/Rewrite /util/crosscoursedatadetail.php
 Edit/Rewrite /course/showfeedback.php  (showfeedback2, with aid=, uid=)
-
-Edit/Rewrite testquestion.php
-Edit/Rewrite embedq.php
-Edit/Rewrite multiembedq.php
 
 // LOOK for pages calling calcandupdateLTIgrade
 // If we're going to introduce a JSON itemorder format, need to modify everything that touches itemorder too (!)
 
-Edit /course/course.php  (need to decide how to delete teacher tries)
 Edit /course/outcometable.php
 Edit /course/report-weeklylab.php
 Edit /diag/index.php
-Edit /forums/posthandler.php (need to look up q, seed, and attempt and call displayq)
 Edit /includes/exceptionfuncs.php (see if latepass pointless due to timelimit - need to consider retakes now)
 Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
 
@@ -87,10 +82,21 @@ Future TODO: migrate itemorder to JSON format
       assessments might have diff types
 ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
   Punt on these by just disabling the regen option for now.
+~ Edit /forums/posthandler.php
+  Punt by continuing to use displayq2 for now
+
+Delay for later (since they work with displayq2 for now):
+  Edit/Rewrite testquestion.php
+  Edit/Rewrite embedq.php
+  Edit/Rewrite multiembedq.php
+Delay for later:
+  Edit/Rewrite /util/crosscoursedata.php
+  Edit/Rewrite /util/crosscoursedatadetail.php
 
 X? Edit /includes/loaditemshowdata.php (check status)
 X Edit /includes/unenrollphp
 
+X Edit /course/course.php  (need to decide how to delete teacher tries)
 X Newver /course/modquestion.php
 X Newver /course/modquestiongrid.php
 X Edit /course/gbtable2.php

@@ -125,9 +125,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$userid, ':refid'=>$threadid, ':score'=>$autoscore[0]));
-					} 
+					}
 				}
-			} 
+			}
 			$_GET['modify'] = $threadid;
 			$files = array();
 		} else if ($_GET['modify']=="reply") { //new reply post
@@ -256,7 +256,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		if ($sendemail) {
 			require_once("../includes/email.php");
-				
+
 			$query = "SELECT iu.email FROM imas_users AS iu,imas_forum_subscriptions AS ifs WHERE ";
 			$query .= "iu.id=ifs.userid AND ifs.forumid=:forumid AND iu.id<>:userid";
 			$stm = $DBH->prepare($query);
@@ -272,7 +272,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$row[0] = trim($row[0]);
 				if ($row[0]!='' && $row[0]!='none@none.com') {
-					send_email($row[0], $sendfrom, _('New forum post notification'), $message, array(), array(), 1); 
+					send_email($row[0], $sendfrom, _('New forum post notification'), $message, array(), array(), 1);
 				}
 			}
 		}
@@ -354,7 +354,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo '<div id="headerposthandler" class="pagetitle"><h1>Modify Post</h1></div>';
 		} else {
 			if ($_GET['modify']=='reply') {
-				
+
 					//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 				$query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
 				$query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id=:id";
@@ -393,6 +393,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$showa = false;
 					$parts = explode('-',$_GET['quoteq']);
 					$GLOBALS['assessver'] = $parts[4];
+					/* This doesn't seem to be used anywhere...
 					if (count($parts)==6) {
 						//wants to show ans
 						$stm = $DBH->prepare("SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
@@ -425,6 +426,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						}
 
 					}
+					*/
 					$message = displayq($parts[0],$parts[1],$parts[2],$showa,false,0,true);
 					$message = printfilter(forcefiltergraph($message));
 					if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
@@ -583,7 +585,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if ($line['posttype']==3) { echo "checked=1 ";}
 				echo "> <label for=type3>Displayed at top and students can only see their own replies</label>\n";
 				echo "</span><br class=form>";
-				
+
 				echo "<span class=form id=allowreplieslabel>Allow replies: </span><span class=formright role=radiogroup aria-labelledby=allowreplieslabel>\n";
 				echo "<input type=radio name=replyby id=replyby0 value=\"null\" ";
 				if ($line['replyby']==null) { echo "checked=1 ";}
@@ -602,7 +604,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
 				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=replybytime value=\"".Sanitize::encodeStringForDisplay($replybytime)."\" aria-label=\"reply by time\"></span><br class=\"form\" />";
-				
+
 				$thread_lastposttime = 0;
 
 				if ($_GET['modify']!='new' && $line['parent']==0) {
