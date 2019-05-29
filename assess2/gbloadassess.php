@@ -76,10 +76,11 @@ $include_from_assess_info = array(
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
 // indicate whether teacher/tutor can edit scores or not
-if ($istutor && $tutoredit == 0) {
-  $assessInfoOut['can_edit_scores'] = false;
-} else {
+if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
+  $assess_record->setTeacherInGb(true);
+} else {
+  $assessInfoOut['can_edit_scores'] = false;
 }
 
 if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {

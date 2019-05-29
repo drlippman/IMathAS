@@ -295,13 +295,10 @@ class Sanitize
 	public static function generateAttributeString($args) {
 		$out = '';
 		foreach ($args as $k=>$v) {
-			if ($out !== '') {
-				$out .= ' ';
-			}
 			$out .= preg_replace('/[^\w\-_]/','', $k) .
 							'="' .
 							htmlspecialchars($v, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), false) .
-							'"';
+							'" ';
 		}
 		return $out;
 	}

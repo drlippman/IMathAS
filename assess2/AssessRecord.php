@@ -39,6 +39,7 @@ class AssessRecord
   private $tmpdata = null;
   private $is_practice = false;
   private $status = 'no_record';
+  private $teacherInGb = false;
   private $now = 0;
   private $need_to_record = false;
   private $penalties = array();
@@ -97,6 +98,14 @@ class AssessRecord
       $this->data = $tmp;
     }
     $this->is_practice = $is_practice;
+  }
+
+  /**
+   * Set if teacher in GB, for scores/answers
+   * @param bool $val true if teacher/tutor
+   */
+  public function setTeacherInGb($val) {
+    $this->teacherInGb = $val;
   }
 
   /**
@@ -1010,11 +1019,12 @@ class AssessRecord
 
     if ($generate_html) {
       $showscores = $this->assess_info->getSetting('showscores');
-      $force_scores = ($aver['status'] === 1 && $showscores === 'at_end');
-      $showans = $this->assess_info->getSetting('showans');
-      //TODO: should be grabbing from question settings
-      $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt');
-
+      $force_scores = ($aver['status'] === 1 && $showscores === 'at_end') ||
+        $this->teacherInGb;
+      $showans = $this->assess_info->getQuestionSetting($curq['qid'], 'showans');
+      $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt') ||
+        $this->teacherInGb;
+      $out['info'] = $force_answers;
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
         $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow);
       if ($out['usedautosave']) {
@@ -1951,6 +1961,8 @@ class AssessRecord
       $qver = $ver;
     }
     $qdata = $this->data['assess_versions'][$aver]['questions'][$qn]['question_versions'][$qver];
+    // TODO: look up showscores (second param)
+
     $out = $this->getQuestionObject($qn, true, true, $generate_html, $by_question ? $qver : $aver);
     if ($generate_html) { // only include this if we're displaying the question
       $out['qid'] = $qdata['qid'];
