@@ -277,8 +277,13 @@ export const actions = {
           Router.push('/summary');
         } else if (qns.length === 1) {
           // scroll to score result
-          // TODO: check if element is already in view; don't do this if it is
-          document.getElementById('questionwrap' + qns[0]).parentNode.scrollIntoView();
+          Vue.nextTick(() => {
+            var el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
+            var bounding = el.getBoundingClientRect();
+            if (bounding.top < 0 || bounding.bottom > document.documentElement.clientHeight) {
+              el.scrollIntoView();
+            }
+          });
         }
       })
       .always(response => {
