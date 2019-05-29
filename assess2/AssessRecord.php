@@ -1012,6 +1012,7 @@ class AssessRecord
       $showscores = $this->assess_info->getSetting('showscores');
       $force_scores = ($aver['status'] === 1 && $showscores === 'at_end');
       $showans = $this->assess_info->getSetting('showans');
+      //TODO: should be grabbing from question settings
       $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt');
 
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
@@ -1974,6 +1975,7 @@ class AssessRecord
     $this->parseData();
     if (isset($scores['gen'])) { // general score override
       $this->data['scoreoverride'] = floatval($scores['gen']);
+      $this->assessRecord['score'] = floatval($scores['gen']);
       unset($scores['gen']);
     } else {
       // TODO: Do we want to do this?
@@ -2011,7 +2013,7 @@ class AssessRecord
     }
   }
 
-  
+
   public function gbClearAttempts($type, $keepver, $av=0, $qn=0, $qv=0) {
     $this->parseData();
     if ($type == 'all' && $keepver == 1) {

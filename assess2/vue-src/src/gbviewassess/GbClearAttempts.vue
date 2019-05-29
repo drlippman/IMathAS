@@ -12,7 +12,7 @@
             {{ $t('gradebook.clear_completely_msg') }}
           </label>
         </p>
-        <p>
+        <p v-if="isByQuestion">
           <label>
             <input type="radio" value="1" v-model="type">
             {{ $t('gradebook.clear_all_work_msg') }}
@@ -26,7 +26,7 @@
             {{ $t('gradebook.clear_attempt_regen_msg') }}
           </label>
         </p>
-        <p>
+        <p v-if="isLastAttempt">
           <label>
             <input type="radio" value="1" v-model="type">
             {{ $t('gradebook.clear_attempt_msg') }}
@@ -34,10 +34,16 @@
         </p>
       </div>
       <div v-else-if="showType === 'qver'">
-        <p>
+        <p v-if="isByQuestion">
           <label>
             <input type="radio" value="0" v-model="type">
             {{ $t('gradebook.clear_qver_regen_msg') }}
+          </label>
+        </p>
+        <p v-else>
+          <label>
+            <input type="radio" value="0" v-model="type">
+            {{ $t('gradebook.clear_qver_regen_msg2') }}
           </label>
         </p>
         <p>
@@ -81,8 +87,17 @@ export default {
     },
     showType() {
       return store.clearAttempts.type;
+    },
+    isByQuestion() {
+      return (store.assessInfo.submitby === 'by_question');
+    },
+    isLastAttempt() {
+      let avercnt = store.assessInfo.assess_versions.length;
+      if (store.assessInfo.has_practice) {
+        avercnt--;
+      }
+      return (store.curAver === avercnt);
     }
-
   },
   methods: {
     close() {

@@ -34,13 +34,6 @@ export default {
           onclick: () => this.$emit("setversion", i)
         });
       }
-      if (this.haspractice) {
-        out.push({
-          ver: this.versions.length,
-          status: 3,
-          onclick: () => this.$emit("setversion", this.versions.length)
-        });
-      }
       return out;
     }
   },

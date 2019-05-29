@@ -7,7 +7,7 @@
         :key="i"
       >
         <input
-          v-if="canedit"
+          v-if="canedit && !isPractice"
           type="text"
           size="4"
           v-model="curScores[i]"
@@ -15,7 +15,7 @@
         /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
       </span>
       <button
-        v-if="canedit && showfeedback === false"
+        v-if="canedit && !isPractice && showfeedback === false"
         type="button"
         class="slim"
         @click="showfeedback = true"
@@ -154,6 +154,9 @@ export default {
     },
     useEditor() {
       return (typeof window.tinyMCE !== 'undefined');
+    },
+    isPractice() {
+      return store.ispractice;
     },
     questionEditUrl() {
       let qs = 'id=' + this.qdata.qsetid + '&cid=' + store.cid;

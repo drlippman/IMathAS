@@ -8,6 +8,7 @@
  *  aid   Assessment ID
  *  cid   Course ID
  *  uid   Student's User ID
+ *  aver  The assessment version
  *  qn    The question number
  *  ver   The version # to get
  *  practice  true if the version is a practice version

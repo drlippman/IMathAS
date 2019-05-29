@@ -101,7 +101,7 @@ export const actions = {
   },
   loadGbQuestionVersion (qn, ver) {
     let qs = store.queryString + '&ver=' + ver + '&qn=' + qn;
-    qs += '&aver=' + store.curAver + '&practice=' + (store.ispractice?1:0);
+    qs += '&practice=' + (store.ispractice?1:0);
     if (store.assessInfo.assess_versions[store.curAver].questions[qn][ver].html !== null) {
       // already have html loaded - just switch displayed version
       Vue.set(store.curQver, qn, ver);
@@ -161,6 +161,11 @@ export const actions = {
         // update store.assessInfo with the new scores so it
         // can tell if we change anything
         for (let key in store.scoreOverrides) {
+          if (key === 'gen') {
+            store.assessInfo.score = store.scoreOverrides[key];
+            store.assessInfo.scoreoverride = store.scoreOverrides[key];
+            continue;
+          }
           let pts = key.split(/-/);
           let qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
           qdata.parts[pts[3]].score = Math.round(1000*store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible)/1000;
@@ -229,6 +234,30 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
         store.clearAttempts.show = false;
+      });
+  },
+  endAssess () {
+    store.inTransit = true;
+    store.errorMsg = null;
+    window.$.ajax({
+      url: store.APIbase + 'endassess.php' + store.queryString,
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        // TODO: be more surgical.  For now, we'll just reload everything
+        store.assessInfo = null;
+        actions.loadGbAssessData();
+      })
+      .always(response => {
+        store.inTransit = false;
       });
   },
   setQverAsScored(aver) {

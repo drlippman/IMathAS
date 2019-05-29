@@ -34,21 +34,31 @@
       <div>
         <strong>
           {{ $t('gradebook.gb_score') }}:
-          {{ aData.gbscore }}/{{ aData.points_possible }}
+          <span v-if="aData.scoreoverride && canEdit">
+            <input id="assessoverride" size=4
+              :value = "aData.scoreoverride"
+              @input = "setScoreOverride"
+            />
+          </span>
+          <span v-else>
+            {{ aData.gbscore }}
+          </span>/{{ aData.points_possible }}
         </strong>
         <span v-if="aData.scoreoverride">
-          {{ $t('gradebook.overridden') }}
+          ({{ $t('gradebook.overridden') }})
         </span>
-        <button v-if="canEdit"
-          class = "slim"
-          type="button"
-          @click="showOverride = !showOverride"
-        >
-          {{ $t('gradebook.override') }}
-        </button>
-        <span v-if="showOverride">
-          <label for="assessoverride">{{ $t('gradebook.override') }}</label>:
-          <input id="assessoverride" size=4 v-model="assessOverride" />
+        <span v-else-if="canEdit">
+          <button
+            class = "slim"
+            type="button"
+            @click="showOverride = !showOverride"
+          >
+            {{ $t('gradebook.override') }}
+          </button>
+          <span v-if="showOverride">
+            <label for="assessoverride">{{ $t('gradebook.override') }}</label>:
+            <input id="assessoverride" size=4 v-model="assessOverride" />
+          </span>
         </span>
       </div>
 
@@ -77,6 +87,15 @@
           :selected = "curAver"
           @setversion = "changeAssessVersion"
         />
+        <div v-if="isUnsubmitted">
+          {{ $t('gradebook.unsubmitted') }}.
+          <button
+            type="button"
+            @click="submitVersion"
+          >
+            {{ $t('closed.submit_now') }}
+          </button>
+        </div>
       </div>
 
       <div v-if="canEdit">
@@ -99,6 +118,7 @@
           {{ hideUnansweredLabel }}
         </button>
         <button
+          v-if = "!isByQuestion"
           type="button"
           @click="clearAttempts('attempt')"
         >
@@ -235,6 +255,9 @@ export default {
     useEditor() {
       return (typeof window.tinyMCE !== 'undefined');
     },
+    isByQuestion() {
+      return (this.aData.submitby === 'by_question');
+    },
     startedString() {
       if (this.aData.starttime === 0) {
         return this.$t('gradebook.not_started');
@@ -337,10 +360,21 @@ export default {
       } else {
         return this.$t('gradebook.' + store.saving);
       }
+    },
+    isUnsubmitted() {
+      return (this.aData.submitby === 'by_assessent' &&
+        this.aData.assess_versions[store.curAver].status === 0);
     }
   },
   methods: {
     changeAssessVersion(val) {
+      if (Object.keys(store.scoreOverrides).length > 0 ||
+        Object.keys(store.feedbacks).length > 0
+      ) {
+        if (!confirm(this.$t('gradebook.unsaved_warn'))) {
+          return;
+        }
+      }
       if (val !== store.curAver) {
         if (val === this.aData.assess_versions.length) {
           // requesting the practice version
@@ -351,6 +385,22 @@ export default {
       }
     },
     changeQuestionVersion(qn,val) {
+      let hasUnsaved = false;
+      let av = store.curAver;
+      let regex = new RegExp('^'+store.curAver+'-'+qn+'-');
+      for (let k in store.scoreOverrides) {
+        if (regex.test(k)) {
+          hasUnsaved = true;
+        }
+      }
+      for (let k in store.feedbacks) {
+        if (regex.test(k)) {
+          hasUnsaved = true;
+        }
+      }
+      if (hasUnsaved && !confirm(this.$t('gradebook.unsaved_warn'))) {
+        return;
+      }
       if (val !== store.curQver[qn]) {
         actions.loadGbQuestionVersion(qn, val);
       }
@@ -364,8 +414,14 @@ export default {
       }
       actions.setFeedback(null, content);
     },
+    setScoreOverride(evt) {
+      this.assessOverride = evt.target.value;
+      store.saving = '';
+    },
     submitChanges() {
       if (this.showOverride && this.assessOverride !== '') {
+        store.scoreOverrides['gen'] = this.assessOverride;
+      } else if (this.aData.scoreoverride && this.assessOverride != this.aData.scoreoverride) {
         store.scoreOverrides['gen'] = this.assessOverride;
       } else {
         delete store.scoreOverrides['gen'];

@@ -47,6 +47,7 @@ if ($istutor) {
 }
 if ($practicever) {
   $assess_info->overridePracticeSettings();
+  $ver = 0;
 }
 // load question settings and code
 $assess_info->loadQuestionSettings('all', true);

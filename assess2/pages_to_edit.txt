@@ -31,6 +31,8 @@ TODOs:
     Make sure MQ is disabled too, or just turn off on Print page
   Look into recclick tracking for question helps and assessment visits
   Test accounting Qs
+  Implement keepscore options: best, last, average
+  Make sure assess scoreoverride is considered in reTotalAssess
   Takeanythingorblank??
     pass jsparam to front end.  Include in submission anything on first try
     with "submitblank" param set.
