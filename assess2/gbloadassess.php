@@ -32,6 +32,8 @@ $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $uid = Sanitize::onlyInt($_GET['uid']);
 
+$now = time();
+
 //load settings without questions
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 if ($istutor) {
@@ -40,6 +42,11 @@ if ($istutor) {
     echo '{"error": "no_access"}';
     exit;
   }
+}
+$viewInGb = $assess_info->getSetting('viewingb');
+if ($isstudent && $viewInGb == 'never') {
+  echo '{"error": "no_access"}';
+  exit;
 }
 // load question settings and code
 $assess_info->loadQuestionSettings('all', true);
@@ -74,6 +81,11 @@ $include_from_assess_info = array(
   'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
+
+if ($isstudent && $viewInGb == 'after_due' && $now < $assessInfoOut['enddate']) {
+  echo '{"error": "no_access"}';
+  exit;
+}
 
 // indicate whether teacher/tutor can edit scores or not
 if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
