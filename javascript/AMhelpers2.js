@@ -141,6 +141,7 @@ function init(paramarr, enableMQ) {
     if (params.usetinymce) {
       initeditor("textareas","mceEditor");
     }
+    initShowAnswer();
   }
 }
 
@@ -160,6 +161,31 @@ function setupTips(id, tip, longtip) {
   el.addEventListener('click', function() {
     reshrinkeh(id);
   });
+}
+
+function initShowAnswer() {
+	$("input.sabtn + span.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
+	$("input.sabtn").each(function() {
+		var idnext = $(this).siblings("span:first-of-type").attr("id");
+		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
+		  .off("click.sashow").on("click.sashow", function() {
+			$(this).attr("aria-expanded",true)
+		  	  .siblings("span:first-of-type")
+				.attr("aria-expanded",true).attr("aria-hidden",false)
+				.removeClass("hidden");
+		});
+	});
+	$("input.dsbtn + div.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
+	$("input.dsbtn").each(function() {
+		var idnext = $(this).siblings("div:first-of-type").attr("id");
+		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
+		  .off("click.sashow").on("click.sashow", function() {
+			$(this).attr("aria-expanded",true)
+		  	  .siblings("div:first-of-type")
+				.attr("aria-expanded",true).attr("aria-hidden",false)
+				.removeClass("hidden");
+		});
+	});
 }
 
 function setupDraw(qn) {

@@ -226,7 +226,6 @@ export default {
       // add in timeactive from autosave, if exists
       this.timeActive += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
-      this.initShowAnswer();
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
       actions.setRendered(this.qn);
       if (this.disabled) {
@@ -263,20 +262,6 @@ export default {
             }
           }
         });
-    },
-    initShowAnswer () {
-      let $ = window.$;
-      $('input.sabtn + span.hidden').attr('aria-hidden', true).attr('aria-expanded', false);
-      $('input.sabtn').each(function () {
-        var idnext = $(this).siblings('span:first-of-type').attr('id');
-        $(this).attr('aria-expanded', false).attr('aria-controls', idnext)
-          .off('click.sashow').on('click.sashow', function () {
-            $(this).attr('aria-expanded', true)
-              .siblings('span:first-of-type')
-              .attr('aria-expanded', true).attr('aria-hidden', false)
-              .removeClass('hidden');
-          });
-      });
     }
   },
   updated () {

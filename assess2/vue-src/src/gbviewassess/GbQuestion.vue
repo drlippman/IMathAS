@@ -16,12 +16,13 @@ export default {
     }
   },
   methods: {
-    renderMath () {
+    renderInit () {
       if (this.rendered) {
         return;
       }
       setTimeout(window.drawPics, 100);
       window.rendermathnode(document.getElementById('questionwrap' + this.qn));
+      window.imathasAssess.init(this.qdata.jsparams, true);
       //TODO: improve this, and add yellow check
       let svgchk = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none"><title>correct</title>';
       svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
@@ -39,7 +40,7 @@ export default {
     }
   },
   mounted () {
-    this.renderMath();
+    this.renderInit();
   },
   watch: {
     qdata: function (newVal, oldVal) {

@@ -109,6 +109,11 @@ class QuestionHtmlGenerator
     public function getQuestion(): Question
     {
         $showAnswer = $this->questionParams->getShowAnswer();
+        if (ShowAnswer::ALWAYS == $showAnswer) {
+            $nosabutton = true;
+        } else {
+            $nosabutton = false;
+        }
 
         // The following variables are expected by the question writer's code in interpret().
         $stuanswers = $this->questionParams->getAllQuestionAnswers();  // Contains ALL question answers.
@@ -118,7 +123,7 @@ class QuestionHtmlGenerator
         $attemptn = $this->questionParams->getStudentAttemptNumber();
         $partattemptn = $this->questionParams->getStudentPartAttemptCount();
         $qdata = $this->questionParams->getQuestionData();
-        $showHints = $this->questionParams->getShowHints();
+        $showHints = ($this->questionParams->getShowHints()&1)==1;
         $thisq = $this->questionParams->getQuestionNumber() + 1;
 
         if ($qdata['hasimg'] > 0) {
@@ -206,7 +211,7 @@ class QuestionHtmlGenerator
          */
 
         // $answerbox must not be renamed, it is expected in eval'd code.
-        $answerbox = $jsParams = $entryTips = $displayedAnswersForParts = $previewLocations = null;
+        $answerbox = $jsParams = $entryTips = $displayedAnswersForParts = $previewloc = null;
 
         if ($qdata['qtype'] == "multipart" || $qdata['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
@@ -273,7 +278,7 @@ class QuestionHtmlGenerator
              *                  // Orig: $shanspt in displayq2.php
              *                     "show answer part"; the displayed answer for
              *                     each question part (not the scored answer)
-			 * $previewLocations[]
+			 * $previewloc[]
              *                  // Orig: $previewloc in displayq2.php
              *                     Sets if the preview is displayed after the
 			 *                     question (default) or in a location defined
@@ -308,7 +313,7 @@ class QuestionHtmlGenerator
                 $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
                 $jsParams[$qnRef]['qtype'] = $anstype;
                 $displayedAnswersForParts[$atIdx] = $answerBoxGenerator->getCorrectAnswerForPart();
-                $previewLocations[$atIdx] = $answerBoxGenerator->getPreviewLocation();
+                $previewloc[$atIdx] = $answerBoxGenerator->getPreviewLocation();
 
                 // enact hidetips if set
                 if (!empty($hidetips) && (!is_array($hidetips) || !empty($hidetips[$atIdx]))) {
@@ -343,7 +348,7 @@ class QuestionHtmlGenerator
             $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
             $jsParams[$qnRef]['qtype'] = $qdata['qtype'];
             $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
-            $previewLocations = $answerBoxGenerator->getPreviewLocation();
+            $previewloc = $answerBoxGenerator->getPreviewLocation();
 
             // enact hidetips if set
             if (!empty($hidetips)) {
@@ -396,7 +401,7 @@ class QuestionHtmlGenerator
          * location for it, this moves it there.
          */
 
-        $answerbox = $this->adjustPreviewLocation($answerbox, $toevalqtxt, $previewLocations);
+        $answerbox = $this->adjustPreviewLocation($answerbox, $toevalqtxt, $previewloc);
 
         /*
          * Get the "Show Answer" button location.
@@ -485,10 +490,37 @@ class QuestionHtmlGenerator
         }
 
         /*
+         * For now, tack on the Show Answer buttons to the question code.
+         * Later, we may handle these separately on the front-end
+         */
+
+        if ($showAnswer) {
+          $sadiv = '<div>';
+          if (!is_array($showanswerloc) && strpos($toevalqtxt,'$showanswerloc')===false) {
+            $sadiv .= '<div>'.$showanswerloc.'</div>';
+          } else if (is_array($showanswerloc)) {
+            foreach ($showanswerloc as $iidx => $saloc) {
+              $sadiv .= '<div>'.$saloc.'</div>';
+            }
+          }
+          // display detailed solution, if allowed and set
+          if (($qdata['solutionopts']&4)==4 && $qdata['solution'] != '') {
+            if ($nosabutton) {
+              $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
+            } else {
+              $sadiv .= "<div><input class=\"dsbtn\" type=button value=\""._('Show Detailed Solution')."\" />";
+              $sadiv .= filter(" <div class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
+            }
+          }
+          $sadiv .= '<div>';
+          $evaledqtext .= $sadiv;
+        }
+
+        /*
          * Add help text / hints.
          */
 
-        if (isset($helptext) && $this->questionParams->getShowHints()) {
+        if (isset($helptext) && $showHints) {
             // This was previously an echo statement.
             $evaledqtext .= '<div><p class="tips">' . filter($helptext) . '</p></div>';
         }
@@ -706,6 +738,7 @@ class QuestionHtmlGenerator
             $doshowans = true;
             $nosabutton = true;
         } else {
+            $doshowans = ($showAnswer > 0);
             $nosabutton = false;
         }
 
