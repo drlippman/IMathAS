@@ -52,6 +52,15 @@ if ($isstudent && $viewInGb == 'never') {
   echo '{"error": "no_access"}';
   exit;
 }
+
+// log gradebook view
+if ($isstudent) {
+  $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+  $query .= "(:userid, :courseid, 'gbviewassess', :typeid, :viewtime)";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':typeid'=>$aid, ':viewtime'=>$now));
+}
+
 // load question settings and code
 $assess_info->loadQuestionSettings('all', true);
 

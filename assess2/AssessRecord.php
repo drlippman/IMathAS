@@ -1039,7 +1039,15 @@ class AssessRecord
       $force_scores = ($aver['status'] === 1 && $showscores === 'at_end') ||
         $this->teacherInGb;
       $showans = $this->assess_info->getQuestionSetting($curq['qid'], 'showans');
-      $force_answers = ($aver['status'] === 1 && $showans === 'after_attempt') ||
+      $ansInGb = $this->assess_info->getSetting('ansingb');
+
+      $force_answers = ($aver['status'] === 1 && (
+          $showans === 'after_attempt' || $ansInGb === 'after_take')
+        ) ||
+        ($ansInGb == 'after_due'
+          && time() > $this->assess_info->getSetting('enddate')
+          && !$this->assess_info->getSetting('can_use_latepass')
+        ) ||
         $this->teacherInGb;
       $out['info'] = $force_answers;
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
@@ -1899,7 +1907,12 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $out = array();
     $scored_aver = $by_question ? 0 : $this->data['scored_version'];
+    $viewInGb = $this->assess_info->getSetting('viewingb');
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
+      if ($viewInGb == 'after_take' && $this->data['assess_versions'][$av]['status'] != 1) {
+        // not yet submitted, so don't include
+        continue;
+      }
       $out[$av] = $this->getGbAssessVerData($av, $av == $scored_aver);
     }
     return $out;

@@ -25,6 +25,10 @@ To discuss:
     link to be able to bring up specific aver...
   ACK: need to rethink gradebook blocking latepass use, and differentiate b/t
     views of submitted attempts and viewing active/unsubmitted attempt.
+  Idea: If showans is enabled, and the assessment attempt is not submitted,
+    and the student can use a latepass, then
+      show it without the answers initially, but show the "Submit now" button and only show answers then.
+      and link to redeem latepass.
 
 TODOs:
   X GET novideo icon displaying right in addquestions
@@ -46,6 +50,7 @@ TODOs:
   store timeontask for whole assessment attempt when in full-test-view
   Get overtime handled
   Add an "out of retakes" status 32 to use in warning LP won't help
+  LOOK for pages calling calcandupdateLTIgrade
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -69,8 +74,6 @@ Newver /course/gradeallq.php
   - This one probably not in Vue (no need)
 Newver /course/chgassessments.php
 
-// LOOK for pages calling calcandupdateLTIgrade
-// If we're going to introduce a JSON itemorder format, need to modify everything that touches itemorder too (!)
 
 ~ Newver /course/modquestion.php
 ~ Newver /course/modquestiongrid.php

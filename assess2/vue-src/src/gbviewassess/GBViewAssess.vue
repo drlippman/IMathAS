@@ -95,6 +95,13 @@
           >
             {{ $t('closed.submit_now') }}
           </button>
+          <button
+            v-if="!canEdit && aData.can_use_latepass"
+            type = "button"
+            @click = "redeemLatePass"
+          >
+            {{ $t('lti.use_latepass') }}
+          </button>
         </div>
       </div>
 
@@ -295,8 +302,11 @@ export default {
       if (this.aData.submitby === 'by_question') {
         return this.$t('gradebook.best_on_question');
       } else if (this.aData.keepscore === 'best') {
-        return this.$t('gradebook.keep_best') +
-          ' (' + this.$tc('gradebook.attempt_n', this.aData.scored_version + 1) + ')';
+        let out = this.$t('gradebook.keep_best');
+        if (this.aData.gbscore.match(/\d/)) {
+          out += ' (' + this.$tc('gradebook.attempt_n', this.aData.scored_version + 1) + ')';
+        }
+        return out;
       } else if (this.aData.keepscore === 'average') {
         return this.$t('gradebook.keep_avg');
       } else if (this.aData.keepscore === 'last') {
@@ -450,6 +460,9 @@ export default {
     clearAttempts(type) {
       store.clearAttempts.type = type;
       store.clearAttempts.show = true;
+    },
+    redeemLatePass () {
+      window.location = this.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid;
     }
   },
   created () {
