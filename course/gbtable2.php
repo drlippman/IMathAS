@@ -1179,21 +1179,25 @@ function gbtable() {
 			}
 		}
 		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
-			$fbarr = json_decode($l['feedback'], true);
-			if ($fbarr === null) {
-				$gb[$row][1][$col][1] = $l['feedback']; //the feedback
+			if ($gb[0][1][$col][15] > 1) {//assess2
+				// TODO
 			} else {
-				$fbtxt = '';
-				foreach ($fbarr as $k=>$v) {
-					if ($v=='') {continue;}
-					if ($k=='Z') {
-						$fbtxt .= 'Overall feedback: '.$v.'<br>';
-					} else {
-						$q = substr($k,1);
-						$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'<br>';
+				$fbarr = json_decode($l['feedback'], true);
+				if ($fbarr === null) {
+					$gb[$row][1][$col][1] = $l['feedback']; //the feedback
+				} else {
+					$fbtxt = '';
+					foreach ($fbarr as $k=>$v) {
+						if ($v=='') {continue;}
+						if ($k=='Z') {
+							$fbtxt .= 'Overall feedback: '.$v.'<br>';
+						} else {
+							$q = substr($k,1);
+							$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'<br>';
+						}
 					}
+					$gb[$row][1][$col][1] = $fbtxt;
 				}
-				$gb[$row][1][$col][1] = $fbtxt;
 			}
 		} else if ($l['feedback']!='') {
 			$gb[$row][1][$col][1] = 1; //has comment

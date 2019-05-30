@@ -2002,6 +2002,9 @@ class AssessRecord
       // TODO: how do we handle overrides for unattempted questions?
       $qdata['scoreoverride'][$pn] = floatval($score);
     }
+    if (!empty($scores)) {
+      $this->reTotalAssess();
+    }
   }
 
   /**
@@ -2022,6 +2025,9 @@ class AssessRecord
         $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
         $qdata['feedback'] = Sanitize::incomingHtml($fb);
       }
+    }
+    if (!empty($feedback)) {
+      $this->assessRecord['status'] |= 8; // indicate we have feedback
     }
   }
 

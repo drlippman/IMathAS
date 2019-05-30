@@ -160,7 +160,7 @@ function outcometable() {
 		$startdate[$kcnt] = $line['startdate'];
 		$allowlate[$kcnt] = $line['allowlate'];
 		$LPcutoff[$kcnt] = $line['LPcutoff'];
-		
+
 		$timelimits[$kcnt] = $line['timelimit'];
 
 		$assessments[$kcnt] = $line['id'];
@@ -617,6 +617,136 @@ function outcometable() {
 		} else if ($assessmenttype[$i]=="Practice") {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][2] = 4;  //practice test
+		} else { //regular score available to students
+			$gb[$row][1][$col][0] = $pts; //the score
+			$gb[$row][1][$col][2] = 0;  //no other info
+			$countthisone =true;
+		}
+		if ($now < $thised) { //still active
+			$gb[$row][1][$col][2] += 10;
+		}
+		if ($countthisone) {
+			foreach ($pts as $oc=>$pv) {
+				if ($cntingb[$i] == 1) {
+					if ($gb[0][1][$col][2]<1) { //past
+						$cattotpast[$row][$category[$i]][$oc][$col] = $pv;
+						$catposspast[$row][$category[$i]][$oc][$col] = $ptsposs[$oc];
+					}
+					if ($gb[0][1][$col][2]<2) { //past or cur
+						$cattotcur[$row][$category[$i]][$oc][$col] = $pv;
+						$catposscur[$row][$category[$i]][$oc][$col] = $ptsposs[$oc];
+					}
+
+				} else if ($cntingb[$i] == 2) {
+					if ($gb[0][1][$col][2]<1) { //past
+						$cattotpastec[$row][$category[$i]][$oc][$col] = $pv;
+					}
+					if ($gb[0][1][$col][2]<2) { //past or cur
+						$cattotcurec[$row][$category[$i]][$oc][$col] = $pv;
+					}
+				}
+			}
+		}
+	}
+
+	//Get assessment2 scores
+	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.userid,iar.scoreddata FROM imas_assessment_records AS iar ";
+	$query .= "JOIN imas_assessments AS ia ON ia.id=iar.assessmentid WHERE ia.courseid=:courseid ";
+	if ($limuser>0) {
+		$query .= " AND iar.userid=:userid ";
+	}
+	$stm2 = $DBH->prepare($query);
+	if ($limuser>0) {
+		$stm2->execute(array(':courseid'=>$cid, ':userid'=>$limuser));
+	} else {
+		$stm2->execute(array(':courseid'=>$cid));
+	}
+	while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
+		if (!isset($assessidx[$l['assessmentid']]) || !isset($sturow[$l['userid']]) || !isset($assesscol[$l['assessmentid']])) {
+			continue;
+		}
+		$i = $assessidx[$l['assessmentid']];
+		$row = $sturow[$l['userid']];
+		$col = $assesscol[$l['assessmentid']];
+
+		$gb[$row][1][$col][3] = $l['userid'];; //in place of assessment session id
+
+		$scoreddata = json_decode(gzdecode($l['scoreddata']), true);
+		$assessver = $scoreddata['assess_versions'][$scoreddata['scored_version']];
+		$pts = array();
+		foreach ($assessver['questions'] as $qn => $qdata) {
+			$qver = $qdata['question_versions'][$qdata['scored_version']];
+			$qid = $qver['qid'];
+			if (!isset($qoutcome[$qid])) { continue; } //no outcome set - skip it
+			if (!isset($pts[$qoutcome[$qid]])) {
+				$pts[$qoutcome[$qid]] = 0;
+			}
+			$pts[$qoutcome[$qid]] += $qdata['score'];
+			if (!isset($ptsposs[$qoutcome[$qid]])) {
+				$ptsposs[$qoutcome[$qid]] = 0;
+			}
+			$ptsposs[$qoutcome[$qid]] += $qposs[$qid];
+		}
+
+		$useexception = false;
+		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
+			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'LPcutoff'=>$LPcutoff[$i]), true);
+		}
+
+		if ($useexception) {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
+				//if exception set for earlier, and NoScores is set, use later date to hide score until later
+				$thised = $enddate[$i];
+			} else {
+				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
+				if ($limuser>0) {  //change $avail past/cur/future
+					if ($now<$thised && $now>$exceptions[$l['assessmentid']][$l['userid']][0]) { //inside exception window
+						$gb[0][1][$col][2] = 1;
+					} else if ($now>$thised) { //past exception due date
+						$gb[0][1][$col][2] = 0;
+					} else {
+						$gb[0][1][$col][2] = 2;
+					}
+				}
+			}
+			$inexception = true;
+		} else {
+			$thised = $enddate[$i];
+			$inexception = false;
+		}
+
+		if (($l['status']&3)>0 && $thised>$now) {
+			$IP=1;
+		} else {
+			$IP=0;
+		}
+
+		$countthisone = false;
+		$gb[$row][1][$col][1] = $ptsposs;
+
+		//TODO: This is wrong
+		if (($sa[$i]=="never" && !$canviewall) ||
+		 	($sa[$i]=='after_due' && $now<$thised) ||
+			($sa[$i]=='in_gb' && $gb[$row][1][$col][2] == 0)
+		) {
+			$gb[$row][1][$col][0] = 'N/A'; //score is not available
+			$gb[$row][1][$col][2] = 0;  //no other info
+		} else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
+		//else if ($pts<$minscores[$i]) {
+			if ($canviewall) {
+				$gb[$row][1][$col][0] = $pts; //the score
+				$gb[$row][1][$col][2] = 1;  //no credit
+			} else {
+				$gb[$row][1][$col][0] = 'NC'; //score is No credit
+				$gb[$row][1][$col][2] = 1;  //no credit
+			}
+		} else if ($IP==1) {
+			$gb[$row][1][$col][0] = $pts; //the score
+			$gb[$row][1][$col][2] = 2;  //in progress
+			$countthisone =true;
+		} else if (($l['status']&4)>0) {
+			$gb[$row][1][$col][0] = $pts; //the score
+			$gb[$row][1][$col][2] = 3;  //over time
 		} else { //regular score available to students
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][2] = 0;  //no other info

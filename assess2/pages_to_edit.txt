@@ -62,13 +62,11 @@ Newver /course/gradeallq.php
   - This one probably not in Vue (no need)
 Newver /course/chgassessments.php
 
-Edit/Rewrite /course/showfeedback.php  (showfeedback2, with aid=, uid=)
-
 // LOOK for pages calling calcandupdateLTIgrade
 // If we're going to introduce a JSON itemorder format, need to modify everything that touches itemorder too (!)
 
-Edit /course/outcometable.php
-Edit /course/report-weeklylab.php
+~ Edit /course/outcometable.php (need to fix viewingb/scoresingb handling)
+~ Edit /course/gbtable2.php (need to fix viewingb/scoresingb handling, get includecomments working)
 Edit /includes/exceptionfuncs.php (see if latepass pointless due to timelimit - need to consider retakes now)
 Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
 
@@ -95,11 +93,12 @@ Delay for later:
 X? Edit /includes/loaditemshowdata.php (check status)
 X Edit /includes/unenrollphp
 
+X Edit/Rewrite /course/showfeedback.php  (showfeedback2, with aid=, uid=)
+X Edit /course/report-weeklylab.php
 X Edit /diag/index.php
 X Edit /course/course.php  (need to decide how to delete teacher tries)
 X Newver /course/modquestion.php
 X Newver /course/modquestiongrid.php
-X Edit /course/gbtable2.php
 X Edit /course/gradebook.php
 X Edit /includes/delcourse.php
 X Edit /actions.php

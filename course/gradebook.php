@@ -291,6 +291,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 				GB_show(_("Feedback"), "showfeedbackall.php?cid="+cid+"&stu="+id, 600, 600);
 			} else if (type=="F") {
 				GB_show(_("Feedback"), "viewforumgrade.php?embed=true&cid="+cid+"&uid="+uid+"&fid="+id, 600, 600);
+			} else if (type=="A2") {
+				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id+"&uid="+uid, 600, 600);
 			} else {
 				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 600, 600);
 			}
@@ -767,8 +769,10 @@ function gbstudisp($stu) {
 			$sarr .= ",'D'";
 		}
 		//echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
-		echo '<th>', _('Feedback'), '<br/>';
-		echo '<a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($stu).',\'all\')">', _('View All'), '</a>';
+		echo '<th>', _('Feedback');
+		// Disable for now, since we can't do this for assess2 right now
+		//echo '<br/>';
+		//echo '<a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($stu).',\'all\')">', _('View All'), '</a>';
 		echo '</th>';
 		$sarr .= ",'N'";
 	}
@@ -1075,7 +1079,11 @@ function gbstudisp($stu) {
 				if ($gbt[1][1][$i][1]==0) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
-					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][4]).',\'A\')">', _('View Feedback'), '</a></td>';
+					if ($gbt[0][1][$i][15]>1) { //assess2
+						echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[0][1][$i][7]).',\'A2\','.Sanitize::onlyInt($gbt[1][4][0]).')">', _('View Feedback'), '</a></td>';
+					} else {
+						echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][4]).',\'A\')">', _('View Feedback'), '</a></td>';
+					}
 				} else if ($gbt[0][1][$i][6]==1) { //offline
 					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][2]).',\'O\')">', _('View Feedback'), '</a></td>';
 				} else if ($gbt[0][1][$i][6]==3) { //exttool
