@@ -78,147 +78,152 @@
         </a>
       </div>
 
-      <div>
-        {{ scoreCalc }}
-        <gb-assess-select
-          :versions = "aData.assess_versions"
-          :submitby = "aData.submitby"
-          :haspractice = "aData.has_practice"
-          :selected = "curAver"
-          @setversion = "changeAssessVersion"
-        />
-        <div v-if="isUnsubmitted">
-          {{ $t('gradebook.unsubmitted') }}.
+      <div v-if="aData.assess_versions.length == 0">
+        {{ $t('gradebook.no_versions') }}
+      </div>
+      <div v-else>
+        <div>
+          {{ scoreCalc }}
+          <gb-assess-select
+            :versions = "aData.assess_versions"
+            :submitby = "aData.submitby"
+            :haspractice = "aData.has_practice"
+            :selected = "curAver"
+            @setversion = "changeAssessVersion"
+          />
+          <div v-if="isUnsubmitted">
+            {{ $t('gradebook.unsubmitted') }}.
+            <button
+              type="button"
+              @click="submitVersion"
+            >
+              {{ $t('closed.submit_now') }}
+            </button>
+            <button
+              v-if="!canEdit && aData.can_use_latepass"
+              type = "button"
+              @click = "redeemLatePass"
+            >
+              {{ $t('lti.use_latepass') }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="canEdit">
           <button
             type="button"
-            @click="submitVersion"
+            @click = "hidePerfect = !hidePerfect"
           >
-            {{ $t('closed.submit_now') }}
+            {{ hidePerfectLabel }}
           </button>
           <button
-            v-if="!canEdit && aData.can_use_latepass"
-            type = "button"
-            @click = "redeemLatePass"
+            type="button"
+            @click = "hideCorrect = !hideCorrect"
           >
-            {{ $t('lti.use_latepass') }}
+            {{ hideCorrectLabel }}
+          </button>
+          <button
+            type="button"
+            @click = "hideUnanswered = !hideUnanswered"
+          >
+            {{ hideUnansweredLabel }}
+          </button>
+          <button
+            v-if = "!isByQuestion"
+            type="button"
+            @click="clearAttempts('attempt')"
+          >
+            {{ $t('gradebook.clear_attempt') }}
           </button>
         </div>
-      </div>
 
-      <div v-if="canEdit">
-        <button
-          type="button"
-          @click = "hidePerfect = !hidePerfect"
-        >
-          {{ hidePerfectLabel }}
-        </button>
-        <button
-          type="button"
-          @click = "hideCorrect = !hideCorrect"
-        >
-          {{ hideCorrectLabel }}
-        </button>
-        <button
-          type="button"
-          @click = "hideUnanswered = !hideUnanswered"
-        >
-          {{ hideUnansweredLabel }}
-        </button>
-        <button
-          v-if = "!isByQuestion"
-          type="button"
-          @click="clearAttempts('attempt')"
-        >
-          {{ $t('gradebook.clear_attempt') }}
-        </button>
-      </div>
-
-      <div class="scrollpane">
-        <div
-          v-for = "(qdata,qn) in curQuestions"
-          :key = "qn"
-          class = "med-pad-below"
-        >
-          <div class="headerpane">
-            <strong>
-              {{ $tc('question_n', qn+1) }}.
-            </strong>
-            <gb-question-select
-              v-if = "aData.submitby === 'by_question'"
-              :versions="qdata"
-              :selected="curQver[qn]"
-              :qn="qn"
-              @setversion = "changeQuestionVersion"
-            />
-          </div>
-          <div class = "questionpane">
-            <gb-question
-              v-show = "showQuestion[qn]"
+        <div class="scrollpane">
+          <div
+            v-for = "(qdata,qn) in curQuestions"
+            :key = "qn"
+            class = "med-pad-below"
+          >
+            <div class="headerpane">
+              <strong>
+                {{ $tc('question_n', qn+1) }}.
+              </strong>
+              <gb-question-select
+                v-if = "aData.submitby === 'by_question'"
+                :versions="qdata"
+                :selected="curQver[qn]"
+                :qn="qn"
+                @setversion = "changeQuestionVersion"
+              />
+            </div>
+            <div class = "questionpane">
+              <gb-question
+                v-show = "showQuestion[qn]"
+                :qdata = "qdata[curQver[qn]]"
+                :qn = "qn"
+              />
+            </div>
+            <gb-score-details
+              :showfull = "showQuestion[qn]"
+              :canedit = "canEdit"
               :qdata = "qdata[curQver[qn]]"
               :qn = "qn"
             />
           </div>
-          <gb-score-details
-            :showfull = "showQuestion[qn]"
-            :canedit = "canEdit"
-            :qdata = "qdata[curQver[qn]]"
-            :qn = "qn"
+        </div>
+        <div>
+          {{ $t('gradebook.general_feedback') }}:
+          <textarea
+            v-if="canEdit && !useEditor"
+            class="fbbox"
+            rows="2"
+            cols="60"
+            @input="updateFeedback"
+          >{{ assessFeedback }}</textarea>
+          <div
+            v-else-if="canEdit"
+            rows="2"
+            class="fbbox"
+            v-html="assessFeedback"
+            @input="updateFeedback"
+          />
+          <div
+            v-else
+            v-html="assessFeedback"
           />
         </div>
-      </div>
-      <div>
-        {{ $t('gradebook.general_feedback') }}:
-        <textarea
-          v-if="canEdit && !useEditor"
-          class="fbbox"
-          rows="2"
-          cols="60"
-          @input="updateFeedback"
-        >{{ assessFeedback }}</textarea>
-        <div
-          v-else-if="canEdit"
-          rows="2"
-          class="fbbox"
-          v-html="assessFeedback"
-          @input="updateFeedback"
-        />
-        <div
-          v-else
-          v-html="assessFeedback"
-        />
-      </div>
-      <div>
-        <button
-          v-if = "canEdit"
-          type = "button"
-          class = "primary"
-          @click = "submitChanges"
-        >
-          {{ $t('gradebook.save') }}
-        </button>
-        <button
-          type = "button"
-          class = "secondary"
-          @click = "exit"
-        >
-          {{ $t('gradebook.return') }}
-        </button>
-      </div>
-      <div class="floatrightbutton">
-        <div v-if="savedMsg !== ''" class="noticetext">
-          {{ savedMsg }}
+        <div>
+          <button
+            v-if = "canEdit"
+            type = "button"
+            class = "primary"
+            @click = "submitChanges"
+          >
+            {{ $t('gradebook.save') }}
+          </button>
+          <button
+            type = "button"
+            class = "secondary"
+            @click = "exit"
+          >
+            {{ $t('gradebook.return') }}
+          </button>
         </div>
-        <button
-          v-if = "canEdit"
-          type = "button"
-          class = "primary"
-          @click = "submitChanges"
-        >
-          {{ $t('gradebook.save') }}
-        </button>
+        <div class="floatrightbutton">
+          <div v-if="savedMsg !== ''" class="noticetext">
+            {{ savedMsg }}
+          </div>
+          <button
+            v-if = "canEdit"
+            type = "button"
+            class = "primary"
+            @click = "submitChanges"
+          >
+            {{ $t('gradebook.save') }}
+          </button>
+        </div>
+        <gb-clear-attempts />
+        <div style="margin-bottom:100px"></div>
       </div>
-      <gb-clear-attempts />
-      <div style="margin-bottom:100px"></div>
     </div>
   </div>
 </template>

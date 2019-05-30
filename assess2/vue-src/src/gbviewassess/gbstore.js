@@ -168,7 +168,9 @@ export const actions = {
           }
           let pts = key.split(/-/);
           let qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
-          qdata.parts[pts[3]].score = Math.round(1000*store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible)/1000;
+          if (qdata.parts[pts[3]]) {
+            qdata.parts[pts[3]].score = Math.round(1000*store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible)/1000;
+          }
         }
         store.scoreOverrides = {};
         store.feedbacks = {};
@@ -280,12 +282,12 @@ export const actions = {
     // compare new score against existing value
     let qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
     let key = av + '-' + qn + '-' + qv + '-' + pn;
-    if (score === '' || Math.abs(score - qdata.parts[pn].score)<.001) {
+    if (qdata.parts[pn] && (score === '' || Math.abs(score - qdata.parts[pn].score)<.001)) {
       // same as existing - don't submit as an override
       delete store.scoreOverrides[key];
     } else {
       // different score - submit as override. Save raw score (0-1)?.
-      store.scoreOverrides[key] = Math.round(10000*score/qdata.parts[pn].points_possible)/10000;
+      store.scoreOverrides[key] = Math.round(10000*score)/10000;
     }
     store.saving = '';
   },

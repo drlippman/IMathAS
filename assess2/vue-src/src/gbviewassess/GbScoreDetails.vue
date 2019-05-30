@@ -127,13 +127,19 @@ export default {
       var out = [];
       let partscore;
       for (let i=0; i<this.answeights.length; i++) {
-        // handle the case of a single override
         if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
+          // handle the case of a single override
           let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
           partscore = Math.round(1000*partscore)/1000;
           out.push(partscore);
         } else if (this.qdata.scoreoverride) {
-          out.push(this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible);
+          if (this.qdata.parts[i] && this.qdata.parts[i].points_possible) {
+            out.push(this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible);
+          } else {
+            out.push(Math.round(1000*this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible)/1000);
+          }
+        } else if (this.qdata.try === 0) { // not attempted
+          out.push('N/A');
         } else {
           out.push(this.qdata.parts[i].score);
         }
@@ -191,7 +197,7 @@ export default {
   },
   methods: {
     updateScore(pn, evt) {
-      actions.setScoreOverride(this.qn, pn, this.curScores[pn]);
+      actions.setScoreOverride(this.qn, pn, this.curScores[pn]/this.partPoss[pn]);
     },
     updateFeedback(evt) {
       let content;
@@ -205,7 +211,7 @@ export default {
     allFull() {
       for (let i=0; i<this.answeights.length; i++) {
         this.$set(this.curScores, i, this.partPoss[i]);
-        actions.setScoreOverride(this.qn, i, this.curScores[i]);
+        actions.setScoreOverride(this.qn, i, this.curScores[i]/this.partPoss[i]);
       }
     },
     clearWork() {

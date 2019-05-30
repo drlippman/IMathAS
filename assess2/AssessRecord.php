@@ -1909,7 +1909,9 @@ class AssessRecord
     $scored_aver = $by_question ? 0 : $this->data['scored_version'];
     $viewInGb = $this->assess_info->getSetting('viewingb');
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
-      if ($viewInGb == 'after_take' && $this->data['assess_versions'][$av]['status'] != 1) {
+      if ($viewInGb == 'after_take' && $this->data['assess_versions'][$av]['status'] != 1 &&
+        !$this->teacherInGb
+      ) {
         // not yet submitted, so don't include
         continue;
       }
