@@ -262,7 +262,7 @@ if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
     // get msg count
     $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
 		$stm->execute(array(':msgto'=>$uid, ':courseid'=>$cid));
-		$assessInfoOut['lti_msgcnt'] = $stm->fetchColumn(0);
+		$assessInfoOut['lti_msgcnt'] = intval($stm->fetchColumn(0));
   }
 }
 

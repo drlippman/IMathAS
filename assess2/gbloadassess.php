@@ -82,7 +82,8 @@ if (!$assess_record->hasRecord()) {
 $include_from_assess_info = array(
   'name', 'submitby', 'enddate', 'can_use_latepass', 'hasexception',
   'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
-  'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver'
+  'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
+  'scoresingb', 'viewingb'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 

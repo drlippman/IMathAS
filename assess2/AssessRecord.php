@@ -1867,15 +1867,26 @@ class AssessRecord
    */
   public function getGbAssessMeta() {
     $this->parseData();
+    $scoresInGb = $this->assess_info->getSetting('scoresingb');
     // TODO: get latepass status
     $out['starttime'] = intval($this->assessRecord['starttime']);
     $out['lastchange'] = intval($this->assessRecord['lastchange']);
     $out['timeontask'] = intval($this->assessRecord['timeontask']);
-    $out['gbscore'] = floatval($this->assessRecord['score']);
-    if (isset($this->data['scoreoverride'])) {
-      $out['scoreoverride'] = $this->data['scoreoverride'];
+
+    if (!$this->teacherInGb && (
+      $scoresInGb == 'never' ||
+      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')))
+    ) {
+      // don't show overall score
+      $out['gbscore'] = "N/A";
+      $out['scored_version'] = 0;
+    } else {
+      $out['scored_version'] = $this->data['scored_version'];
+      $out['gbscore'] = floatval($this->assessRecord['score']);
+      if (isset($this->data['scoreoverride'])) {
+        $out['scoreoverride'] = $this->data['scoreoverride'];
+      }
     }
-    $out['scored_version'] = $this->data['scored_version'];
     return $out;
   }
 
@@ -1902,18 +1913,29 @@ class AssessRecord
    */
   public function getGbAssessVerData($av, $getdetails) {
     $aver = $this->data['assess_versions'][$av];
+    $scoresInGb = $this->assess_info->getSetting('scoresingb');
     $out = array(
-      'score' => $aver['score'],
+      'score' => "N/A",  //default
       'lastchange' => $aver['lastchange'],
-      'status' => $aver['status'],
-      'scored_version' => $scored_aver
+      'status' => $aver['status']
     );
+    $qVerToGet = $by_question ? 'scored' : $av;
+    if ($this->teacherInGb ||
+      $scoresInGb == 'immediately' ||
+      ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
+      ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'))
+    ) {
+      $out['score'] = $aver['score'];
+      if ($by_question) {
+        $qVerToGet = 'last';
+      }
+    }
     if ($getdetails) {
       $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
       $out['status'] = 2;
       $out['feedback'] = $aver['feedback'];
       $out['starttime'] = $aver['starttime'];
-      $out['questions'] = $this->getGbQuestionsData($by_question ? 'scored' : $av);
+      $out['questions'] = $this->getGbQuestionsData($qVerToGet);
     }
     return $out;
   }
@@ -1927,11 +1949,12 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if ($by_question) {
       $aver = 0;
-    } else if ($aver === 'scored') {
+    } else if ($ver === 'scored') {
       $aver = $this->data['scored_version'];
     } else {
       $aver = $ver;
     }
+
     $qdata = $this->data['assess_versions'][$aver]['questions'];
     $out = array();
     for ($qn = 0; $qn < count($qdata); $qn++) {
@@ -1941,12 +1964,14 @@ class AssessRecord
         $qver = 0;
       } else if ($ver === 'scored') {
         $qver = $qdata[$qn]['scored_version'];
+      } else if ($ver === 'last') {
+        $qver = count($qvers) - 1;
       } else {
         $qver = $ver;
       }
       for ($qv = 0; $qv < count($qvers); $qv++) {
         $out[$qn][$qv] = $this->getGbQuestionVersionData($qn, $qv==$qver, $by_question ? $qv : $aver);
-        if ($qv == $qver) {
+        if ($qv == $qver && $ver !== 'last') {
           $out[$qn][$qv]['scored'] = true;
         }
       }
@@ -1965,7 +1990,7 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if ($by_question) {
       $aver = 0;
-    } else if ($aver === 'scored') {
+    } else if ($ver === 'scored') {
       $aver = $this->data['scored_version'];
     } else {
       $aver = $ver;
@@ -1978,9 +2003,19 @@ class AssessRecord
       $qver = $ver;
     }
     $qdata = $this->data['assess_versions'][$aver]['questions'][$qn]['question_versions'][$qver];
-    // TODO: look up showscores (second param)
 
-    $out = $this->getQuestionObject($qn, true, true, $generate_html, $by_question ? $qver : $aver);
+    $scoresInGb = $this->assess_info->getSetting('scoresingb');
+    if ($this->teacherInGb ||
+      $scoresInGb == 'immediately' ||
+      ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
+      ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'))
+    ) {
+      $showScores = true;
+    } else {
+      $showScores = false;
+    }
+
+    $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver);
     if ($generate_html) { // only include this if we're displaying the question
       $out['qid'] = $qdata['qid'];
       $out['qsetid'] = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');

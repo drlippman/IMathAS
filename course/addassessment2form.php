@@ -740,7 +740,7 @@ var app = new Vue({
 		viewInGbOptions() {
 			/*
 			‘immediately’: Immediately - can always view it
-			‘after_attempt’: After an assessment version is done
+			‘after_take’: After an assessment version is done
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
@@ -771,9 +771,19 @@ var app = new Vue({
 		},
 		scoresInGbOptions() {
 			/*
-			‘in_gb’: Whenever they can view in gb
+			‘immediately’: Immediately - can always view it
+			‘after_take’: After an assessment version is done
 			‘after_due’: After the due date
 			‘never’: Never
+			 */
+
+			/*
+			If showscores = 'during', then scores should show in GB immediately
+			If showscores = 'at_end', then scores should show in GB after_take
+			If showscores = 'total', then select 'after_take', 'after_due', or 'never' (?)
+				What if we want to only allow viewing total, and NEVER see score details?
+				Then GB would need to look at showscores as well as scoresingb
+			If showscores = 'never', then select 'after_take', 'after_due', or 'never'
 			 */
 
 			var out = [
@@ -786,11 +796,25 @@ var app = new Vue({
 					'text': _('Never')
 				}
 			];
-			if (this.viewingb !== 'after_due' && this.viewingb !== 'never') {
+			if (this.showscores !== 'during' && this.showscores !== 'at_end' &&
+					this.subtype == 'by_assessment'
+			) {
 				out.unshift({
-					'value': 'in_gb',
-					'text': _('When then can view their work')
+					'value': 'after_take',
+					'text': _('After the assessment version is submitted')
 				});
+			}
+
+			if (this.showscores == 'during') {
+				out = [{
+					'value': 'immediately',
+					'text': _('Immediately')
+				}];
+			} else if (this.showscores == 'at_end') {
+				out = [{
+					'value': 'after_take',
+					'text': _('After the assessment version is submitted')
+				}];
 			}
 			if (!this.valueInOptions(out, this.scoresingb)) {
 				this.scoresingb = out[0].value;
@@ -818,7 +842,9 @@ var app = new Vue({
  						'text': _('Never')
  					}
  				];
- 				if (this.scoresingb === 'in_gb' && this.subtype == 'by_assessment') {
+ 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
+				 	&& this.subtype == 'by_assessment'
+				) {
  					out.unshift({
  						'value': 'after_take',
  						'text': _('After the assessment version is submitted')

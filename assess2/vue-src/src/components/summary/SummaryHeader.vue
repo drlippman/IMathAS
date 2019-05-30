@@ -34,7 +34,7 @@ export default {
         this.ainfo.prev_attempts.length < this.ainfo.allowed_attempts);
     },
     hasExit () {
-      return (window.exiturl && window.exiturl !== '');
+      return (window.exiturl && window.exiturl !== '' && !this.ainfo.is_lti);
     }
   },
   methods: {

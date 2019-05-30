@@ -86,11 +86,16 @@ class AssessInfo
    * @return void
    */
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
-    $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
-    $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
-    $stm = $this->DBH->prepare($query);
-    $stm->execute(array($uid, $this->curAid));
-    $this->exception = $stm->fetch(PDO::FETCH_NUM);
+    if (!$isstu && isset($_SESSION['lti_duedate'])) {
+      // fake exception for teachers from LTI
+      $this->exception = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+    } else {
+      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
+      $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
+      $stm = $this->DBH->prepare($query);
+      $stm->execute(array($uid, $this->curAid));
+      $this->exception = $stm->fetch(PDO::FETCH_NUM);
+    }
 
     $this->assessData['hasexception'] = ($this->exception !== false);
 

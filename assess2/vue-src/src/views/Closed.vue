@@ -198,7 +198,12 @@ export default {
         // start practice mode
         actions.startAssess(true, '', []);
       } else if (this.primaryAction === 'view_scored') {
-        // TODO
+        // view scored assess
+        if (this.settings.can_use_latepass === 0 ||
+          window.confirm(this.$t('closed.confirm'))
+        ) {
+          window.location = store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid;
+        }
       } else if (this.primaryAction === 'exit') {
         // exit assessment
         window.location = window.exiturl;

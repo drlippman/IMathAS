@@ -1,7 +1,15 @@
 <template>
-  <div>
-    <icons name="more" size="medium" />
-  </div>
+  <menu-button
+    :options = "LtiOptions"
+    position = "right"
+    nobutton = "true"
+    noarrow = "true"
+    searchby = "label"
+  >
+    <template v-slot:button>
+      <icons name="more" size="medium"/>
+    </template>
+  </menu-button>
 </template>
 
 <script>
@@ -31,7 +39,7 @@ export default {
     Icons
   },
   computed: {
-    options () {
+    LtiOptions () {
       let out = [];
       out.push({
         label: this.$t('lti.userprefs'),
@@ -45,7 +53,7 @@ export default {
       });
       if (store.assessInfo['lti_showmsg']) {
         out.push({
-          label: this.$tc('lti.msgs', store.assessInfo['lti_msgcng']),
+          label: this.$tc('lti.msgs', store.assessInfo['lti_msgcnt']),
           link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid
         });
       }
@@ -64,6 +72,7 @@ export default {
           link: store.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid
         });
       }
+      return out;
     }
   }
 }
