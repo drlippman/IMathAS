@@ -1,0 +1,70 @@
+<template>
+  <div>
+    <icons name="more" size="medium" />
+  </div>
+</template>
+
+<script>
+import Icons from '@/components/widgets/Icons.vue';
+import MenuButton from '@/components/widgets/MenuButton.vue';
+import { store } from '../basicstore';
+
+/*
+ Dropdown menu for LTI users
+ Needs to show:
+  x Link to set userprefs
+    GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto')
+    Need to figure a better way to enact changes
+  x Link to messages, when settings allow
+    x Need to generate 'lti_showmsg' in loadassess
+      $coursemsgset < 4 && msgtoinstr enabled
+    x Need to genereate 'lti_msgcnt' in loadassess, maybe on load/score question too?
+  Link to view scored when in review mode
+    When in practice and ['prev_attempts'].length > 0
+  Link to redeem latepass
+    ref ainfo['can_use_latepass']
+ */
+export default {
+  name: 'LtiMenu',
+  components: {
+    MenuButton,
+    Icons
+  },
+  computed: {
+    options () {
+      let out = [];
+      out.push({
+        label: this.$t('lti.userprefs'),
+        onclick: () => {
+          GB_show(
+            this.$t('lti.userprefs'),
+            store.APIbase + '../admin/ltiuserprefs.php?cid=' + store.cid + '&greybox=true',
+            800, 'auto'
+          );
+        }
+      });
+      if (store.assessInfo['lti_showmsg']) {
+        out.push({
+          label: this.$tc('lti.msgs', store.assessInfo['lti_msgcng']),
+          link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid
+        });
+      }
+      // view scored assessment link
+      if (store.assessInfo.in_practice &&
+          store.assessInfo['prev_attempts'].length > 0
+      ) {
+        out.push({
+          label: this.$t('closed.view_scored'),
+          link: store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid
+        });
+      }
+      if (store.assessInfo['can_use_latepass']) {
+        out.push({
+          label: this.$t('lti.use_latepass'),
+          link: store.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid
+        });
+      }
+    }
+  }
+}
+</script>

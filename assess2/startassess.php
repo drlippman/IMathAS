@@ -255,6 +255,17 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
   }
 }
 
+// get settings for LTI if needed
+if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+  if ($coursemsgset < 4 && $assessInfoOut['help_features']['message']==true) {
+    $assessInfoOut['lti_showmsg'] = 1;
+    // get msg count
+    $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
+		$stm->execute(array(':msgto'=>$uid, ':courseid'=>$cid));
+		$assessInfoOut['lti_msgcnt'] = $stm->fetchColumn(0);
+  }
+}
+
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
 $generate_html = ($assess_info->getSetting('displaymethod') == 'full');

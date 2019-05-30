@@ -27,10 +27,14 @@ if (!$isActualTeacher && !$istutor) {
   exit;
 }
 //validate inputs
-check_for_required('GET', array('aid', 'cid', 'uid'));
+check_for_required('GET', array('aid', 'cid'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-$uid = Sanitize::onlyInt($_GET['uid']);
+if ($isstudent) {
+  $uid = $userid;
+} else {
+  $uid = Sanitize::onlyInt($_GET['uid']);
+}
 
 $now = time();
 

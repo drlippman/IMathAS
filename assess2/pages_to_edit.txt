@@ -20,6 +20,11 @@ To discuss:
     Or should it depend on showscores setting?
   Gradeallq: only show questions from scored take / scored version
   Test: Multipart questions with one part
+  Based on viewingb setting, make previous attempts list on launch/closed have links
+    with confirm warnings that it will block latepass use. But then would need
+    link to be able to bring up specific aver... 
+  ACK: need to rethink gradebook blocking latepass use, and differentiate b/t
+    views of submitted attempts and viewing active/unsubmitted attempt.
 
 TODOs:
   X GET novideo icon displaying right in addquestions
@@ -39,6 +44,9 @@ TODOs:
   Prop types
   tinymce drag handle showing when question is not active
   store timeontask for whole assessment attempt when in full-test-view
+  Get overtime handled
+  Add an "out of retakes" status 32 to use in warning LP won't help
+  Future TODO: migrate itemorder to JSON format
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -67,11 +75,7 @@ Newver /course/chgassessments.php
 
 ~ Edit /course/outcometable.php (need to fix viewingb/scoresingb handling)
 ~ Edit /course/gbtable2.php (need to fix viewingb/scoresingb handling, get includecomments working)
-Edit /includes/exceptionfuncs.php (see if latepass pointless due to timelimit - need to consider retakes now)
-Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
-
-Future TODO: migrate itemorder to JSON format
-
+~ Edit /includes/exceptionfuncs.php (Need to figure a way to determine if out of retakes)
 ~ Edit /course/exception.php  (need to handle or rewrite "force regen" option)
   - What if they're out of regens?
   - For by-assessment, do we force new take?
@@ -92,7 +96,7 @@ Delay for later:
 
 X? Edit /includes/loaditemshowdata.php (check status)
 X Edit /includes/unenrollphp
-
+X Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
 X Edit/Rewrite /course/showfeedback.php  (showfeedback2, with aid=, uid=)
 X Edit /course/report-weeklylab.php
 X Edit /diag/index.php

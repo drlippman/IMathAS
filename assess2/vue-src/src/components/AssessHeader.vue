@@ -65,6 +65,7 @@
       <span class="switch-toggle__ui"></span>
       </span>
     </button>
+    <lti-menu v-if="ainfo.is_lti" />
   </div>
 </template>
 
@@ -72,6 +73,8 @@
 import Timer from '@/components/Timer.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import Icons from '@/components/widgets/Icons.vue';
+import LtiMenu from '@/components/LtiMenu.vue';
+
 import { store, actions } from '../basicstore';
 
 export default {
@@ -79,7 +82,8 @@ export default {
   components: {
     Timer,
     MenuButton,
-    Icons
+    Icons,
+    LtiMenu
   },
   data: function () {
     return {
@@ -202,6 +206,9 @@ export default {
 }
 .assess-header > * {
   margin-right: 10px;
+}
+.assess-header > *:last-child {
+  margin-right: 0;
 }
 .assess-header h1 {
   margin: .4em 0 .2em;

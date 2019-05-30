@@ -34,6 +34,8 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 
 // option to reset assessment entirely
 if ($isActualTeacher && $uid == $userid && isset($_GET['reset'])) {
+  require_once(__DIR__ . '/../includes/filehandler.php');
+  deleteAssess2FilesOnUnenroll(array($uid), array($aid), array());
   $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=? AND assessmentid=?");
   $stm->execute(array($uid, $aid));
 }
@@ -75,7 +77,7 @@ $assessInfoOut['can_view_all'] = $canViewAll;
 $assessInfoOut['is_teacher'] = $isteacher;
 
 //set is_lti and is_diag
-$assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']);
+$assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0;
 $assessInfoOut['is_diag'] = isset($sessiondata['isdiag']);
 
 //set has password

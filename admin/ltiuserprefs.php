@@ -17,7 +17,7 @@ require('../header.php');
 
 if (isset($_POST['mathdisp'])) {
 	storeUserPrefs();
-	echo '<p>'._('Preferences saved. Your new preferences will go into effect when you visit a new page or load the current page.').'</p>';
+	echo '<p>'._('Preferences saved. Your new preferences will go into effect when you visit a new page or reload the current page.').'</p>';
 	if ($greybox) {
 		echo '<input type="button" onclick="parent.GB_hide()" value="'._('Done').'" />';
 	}

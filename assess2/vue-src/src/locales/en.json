@@ -241,6 +241,11 @@
     "new_version": "Generate a similar question",
     "waiting": "Waiting for the instructor to start a question"
   },
+  "lti": {
+    "userprefs": "User Preferences",
+    "msgs": "Messages | Messages (1 new) | Messages ({n} new)",
+    "use_latepass": "Redeem LatePass"
+  },
   "gradebook": {
     "detail_title": "Review Assessment Attempts",
     "started": "Started",

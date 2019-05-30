@@ -117,6 +117,11 @@
         <rect x="14" y="7" width="6" height="12" rx="2" ry="2" />
         <polyline points="0 2 24 22"></polyline>
       </template>
+      <template v-else-if="name=='more'">
+        <circle :fill="stroke" cx="12" cy="12" r="1" />
+        <circle :fill="stroke" cx="12" cy="4" r="1" />
+        <circle :fill="stroke" cx="12" cy="20" r="1" />
+      </template>
 
     </svg>
     <span class="sronly" v-if="alttext.length > 0">

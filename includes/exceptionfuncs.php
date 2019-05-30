@@ -32,7 +32,7 @@ class ExceptionFuncs {
 		}
 		$this->latepasshrs = $lph;
 	}
-	
+
 	public function calcLPneeded($end) {
 		$now = time();
 		$latepassesNeededToExtend = ceil(($now - $end)/($this->latepasshrs*3600) - .0001);
@@ -40,7 +40,7 @@ class ExceptionFuncs {
 		if ($now < strtotime("+".($this->latepasshrs*($latepassesNeededToExtend-1))." hours", $end)) { //are OK with one less
 			$latepassesNeededToExtend--;
 		} else if ($now < strtotime("+".($this->latepasshrs*$latepassesNeededToExtend)." hours", $end)) { //calculated # works
-			
+
 		} else { //really need 1 more
 			$latepassesNeededToExtend++;
 		}
@@ -83,24 +83,44 @@ class ExceptionFuncs {
 
 	//determine time limit status of an assessment:
 	// returns: noissue, started, expired
-	public function getTimelimitStatus($aid) {
+	public function getTimelimitStatus($aid, $ver) {
 		global $DBH;
-		$query = 'SELECT ias.starttime,ia.timelimit FROM imas_assessment_sessions AS ias ';
-		$query .= 'JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ';
-		$query .= 'WHERE ias.userid=? AND ia.id=?';
-		$stm = $DBH->prepare($query);
-		$stm->execute(array($this->uid, $aid));
-		$now = time();
-		if ($stm->rowCount()==0) {
-			return 'noissue';
-		} else {
-			$row = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($row['timelimit']==0) {
+		if ($ver > 1) {
+			$query = 'SELECT iar.timelimitexp,iar.status,ia.timelimit FROM imas_assessment_records AS iar ';
+			$query .= 'JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ';
+			$query .= 'WHERE iar.userid=? AND ia.id=?';
+			$stm = $DBH->prepare($query);
+			$stm->execute(array($this->uid, $aid));
+			if ($stm->rowCount()==0) {
 				return 'noissue';
-			} else if ($now - $row['starttime'] > abs($row['timelimit'])) {
-				return 'expired';
 			} else {
-				return 'started';
+				$row = $stm->fetch(PDO::FETCH_ASSOC);
+				if ($row['timelimit']==0 || ($row['status']&3)==0) {
+					return 'noissue';
+				} else if ($row['timelimitexp'] > 0 && $now > $row['timelimitexp']) {
+					return 'expired';
+				} else {
+					return 'started';
+				}
+			}
+		} else {
+			$query = 'SELECT ias.starttime,ia.timelimit FROM imas_assessment_sessions AS ias ';
+			$query .= 'JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ';
+			$query .= 'WHERE ias.userid=? AND ia.id=?';
+			$stm = $DBH->prepare($query);
+			$stm->execute(array($this->uid, $aid));
+			$now = time();
+			if ($stm->rowCount()==0) {
+				return 'noissue';
+			} else {
+				$row = $stm->fetch(PDO::FETCH_ASSOC);
+				if ($row['timelimit']==0) {
+					return 'noissue';
+				} else if ($now - $row['starttime'] > abs($row['timelimit'])) {
+					return 'expired';
+				} else {
+					return 'started';
+				}
 			}
 		}
 	}
@@ -120,7 +140,7 @@ class ExceptionFuncs {
 		$useexception = ($exception!==null && $exception!==false); //use by default
 		if ($exception!==null && $exception!==false && !empty($exception[3])) {
 			//is LTI-set - use the exception
-			
+
 		} else if ($exception!==null && $exception[2]>0 && ($adata['enddate']>$exception[1] || $exception[1]>$this->courseenddate)) {
 			//if latepass and assessment enddate is later than exception enddate, skip exception
 			//or, if latepass and exception would put it past the course end date, skip exception
@@ -166,7 +186,7 @@ class ExceptionFuncs {
 		}
 
 	}
-	
+
 	//get if latepass could be used if viewedassess was cleared
 	// latepasscnt is number of latepasses already used
 	public function getLatePassBlockedByView($adata, $latepasscnt = 0) {
@@ -231,7 +251,7 @@ class ExceptionFuncs {
 		//replaced ($now - $adata['enddate']) < $this->latepasshrs*3600
 		// $now < $adata['enddate'] + $this->latepasshrs*3600
 		// $now < strtotime("+".$this->latepasshrs." hours", $adata['enddate'])
-		
+
 		if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && !in_array($adata['id'],$this->viewedassess) && $this->latepasses>0 && $this->isstu) {
 			if ($now>$adata['enddate'] && $adata['allowlate']>10 && $now < strtotime("+".$this->latepasshrs." hours", $adata['enddate']) && $adata['enddate'] < $this->courseenddate) {
 				$canuselatepass = true;
@@ -303,7 +323,7 @@ class ExceptionFuncs {
 		   	   $latepassesAllowed =  $line['allowlate']%10 - 1;
 		   }
 		   $allowlateon = floor($line['allowlate']/10)%10;  //0: both, 2: posts only, 3: replies only
-		   
+
 		   if ($allowlateon != 3  && $line['postby']<2000000000) { //it allows post LPs
 		   	if ($now < $line['postby'] && $latepassesAllowed > $latepasscntP) { //before due date and use is allowed
 		   		$canuselatepassP = true;
@@ -321,7 +341,7 @@ class ExceptionFuncs {
 		   		$latepassesNeededToExtend = $this->calcLPneeded($line['replyby']);
 				if ($latepassesAllowed >= $latepasscntR + $latepassesNeededToExtend && $latepassesNeededToExtend<=$this->latepasses) {
 					$canuselatepassR = true;
-				}	
+				}
 		   	}
 		   }
 		   /*

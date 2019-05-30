@@ -286,6 +286,9 @@ class AssessRecord
     if ($recordStart && $this->assess_info->getSetting('timelimit') > 0) {
       //recording start and has time limit, so record end time
       $out['timelimit_end'] = $this->now + $this->assess_info->getAdjustedTimelimit();
+      if (!$this->canMakeNewAttempt()) {
+        $this->assessRecord['timelimitexp'] = $out['timelimit_end'];
+      }
     }
 
     // generate the questions and seeds
@@ -472,6 +475,9 @@ class AssessRecord
         } else if ($submitby == 'by_question') {
           $this->assessRecord['status'] |= 2;
         }
+        if ($this->assessRecord['starttime'] == 0) {
+          $this->assessRecord['starttime'] = time();
+        }
       }
       if ($setattempt) {
         $this->parseData();
@@ -485,12 +491,23 @@ class AssessRecord
             $this->data['assess_versions'][$lastver]['status'] = 0;
           }
         }
-        // record now as lastchange on attempt if no submissions have been made
-        if ($this->data['assess_versions'][$lastver]['lastchange'] === 0) {
-          $this->data['assess_versions'][$lastver]['lastchange'] = time();
+        if ($active && $this->data['assess_versions'][$lastver]['starttime'] === 0) {
+          $this->data['assess_versions'][$lastver]['starttime'] = $this->now;
         }
-        if ($this->data['lastchange'] === 0) {
-          $this->data['lastchange'] = time();
+        // record now as lastchange on attempt if no submissions have been made
+        if (!$active && $this->data['assess_versions'][$lastver]['lastchange'] === 0) {
+          $this->data['assess_versions'][$lastver]['lastchange'] = $this->now;
+        }
+        if (!$active && $this->data['lastchange'] === 0) {
+          $this->data['lastchange'] = $this->now;
+        }
+        // if there's a time limit, set the time limit
+        if ($active && $this->assess_info->getSetting('timelimit') > 0) {
+          $this->data['assess_versions'][$lastver]['timelimit_end'] =
+            $this->now + $this->assess_info->getAdjustedTimelimit();
+          if (!$this->canMakeNewAttempt()) {
+            $this->assessRecord['timelimitexp'] = $out['timelimit_end'];
+          }
         }
       }
     }
