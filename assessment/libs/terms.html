@@ -53,7 +53,7 @@
     </p>
     <h3 id="isInstanceOf">isInstanceOf</h3>
     <p>
-      <code>isInstanceOf(termString,templateString [,variableString,sloppyString])</code> tests whether the term in <code>termString</code> is an instance of one of the terms in <code>templateString</code>. <code>templateString</code> is a '|'-separated list of terms. The parameter <code>variableString</code> must be a ,-separated list of all variables occuring in <code>termString</code> or <code>templateString</code>. <code>variableString</code> defaults to "x". <code>sloppyString</code> is a list of + and * defaulting to <code>'+'</code>. If + resp. * is in this list, <code>t1-t2</code> resp. <code>t1/t2</code> may be handled as <code>t1+(-t2)</code> resp. <code>t1*(1/t2)</code> if this allows additional
+      <code>isInstanceOf(termString,templateString [,variableString,sloppyString])</code> tests whether the term in <code>termString</code> is an instance of one of the terms in <code>templateString</code>. <code>templateString</code> is a '|'-separated list of terms. The parameter <code>variableString</code> must be a ,-separated list of all variables occuring in <code>termString</code> or <code>templateString</code>. <code>variableString</code> defaults to "x,y,z". <code>sloppyString</code> is a list of + and * defaulting to <code>'+'</code>. If + resp. * is in this list, <code>t1-t2</code> resp. <code>t1/t2</code> may be handled as <code>t1+(-t2)</code> resp. <code>t1*(1/t2)</code> if this allows additional
       matches.
     </p>
     <p><code>isInstanceOf</code> returns the result of the match and, in case of success, the matching template and the matching instantiation of the template variables.</p>

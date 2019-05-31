@@ -7,6 +7,7 @@ class Term {
     //parent::__construct($vars);
     $parser = new MathParser($vars);
     $this->term = $parser->parse($string);
+    $this->parser = $parser;
   }
 
   public function getTerm() {
@@ -385,7 +386,7 @@ function getPolynomialDegree($termString,$vars='x',$pvar='x') {
  *  if 'result' is true, 'instantiation' => array containing variable => string with instance of variable
  *  if 'result' is true, 'template' => first template which matched successfully
  */
-function isInstanceOf($termString,$templateString,$vars='x',$sloppy='+') {
+function isInstanceOf($termString,$templateString,$vars='x,y,z',$sloppy='+') {
   $term = new Term($termString,$vars);
   $templates=explode('|',$templateString);
   foreach ($templates as $template) {
