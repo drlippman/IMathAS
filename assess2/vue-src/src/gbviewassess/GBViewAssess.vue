@@ -308,7 +308,7 @@ export default {
         return this.$t('gradebook.best_on_question');
       } else if (this.aData.keepscore === 'best') {
         let out = this.$t('gradebook.keep_best');
-        if (this.aData.gbscore.match(/\d/)) {
+        if (typeof this.aData.gbscore === 'number') {
           out += ' (' + this.$tc('gradebook.attempt_n', this.aData.scored_version + 1) + ')';
         }
         return out;

@@ -10,9 +10,17 @@
           v-if="canedit && !isPractice"
           type="text"
           size="4"
+          :id="'sc'+qn+'-'+i"
           v-model="curScores[i]"
           @input="updateScore(i, $event)"
         /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
+        <button
+          v-if="canedit && !isPractice && qdata.rubric > 0"
+          class="plain nopad"
+          @click="showRubric(i)"
+        >
+          <icons name="clipboard" size="small" />
+        </button>
       </span>
       <button
         v-if="canedit && !isPractice && showfeedback === false"
@@ -22,6 +30,14 @@
       >
         {{ $t('gradebook.add_feedback') }}
       </button>
+      <button
+        v-if="qdata.try > 1"
+        type="button"
+        class="slim"
+        @click="showAllTries = !showAllTries"
+      >
+        {{ $t('gradebook.show_tries') }}
+      </button>
     </div>
     <div
       v-show="showfeedback"
@@ -30,6 +46,7 @@
       <textarea
         v-if="canedit && !useEditor"
         class="fbbox"
+        :name="'fb'+qn"
         rows="2"
         cols="60"
         @input="updateFeedback"
@@ -37,6 +54,7 @@
       <div
         v-else-if="canedit"
         rows="2"
+        :id="'fb'+qn"
         class="fbbox"
         v-html="qdata.feedback"
         @input="updateFeedback"
@@ -46,7 +64,11 @@
         v-html="qdata.feedback"
       />
     </div>
-    <div v-if="canedit && showfull">
+    <gb-all-tries
+      v-if="showAllTries"
+      :tries="qdata.other_tries"
+    />
+    <div v-if="canedit && showfull" class="med-below">
       {{ $t('gradebook.quick_grade') }}:
       <button
         type="button"
@@ -98,14 +120,21 @@
 
 <script>
 import { store, actions } from './gbstore';
+import GbAllTries from '@/gbviewassess/GbAllTries';
+import Icons from '@/components/widgets/Icons';
 
 export default {
   name: 'GbScoreDetails',
   props: ['qdata', 'qn', 'canedit', 'showfull'],
+  components: {
+    GbAllTries,
+    Icons
+  },
   data: function() {
     return {
       curScores: false,
-      showfeedback: false
+      showfeedback: false,
+      showAllTries: false
     }
   },
   computed: {
@@ -248,6 +277,20 @@ export default {
       } else {
         return [];
       }
+    },
+    showRubric(pn) {
+      if (!window.imasrubrics) {
+        window.imasrubrics = store.assessInfo['rubrics'];
+      }
+      this.showfeedback = true;
+      imasrubric_show(
+        this.qdata.rubric,
+        this.qdata.points_possible,
+        'sc'+this.qn+'-'+pn,
+        'fb'+this.qn,
+        this.qn,
+        600
+      );
     }
   },
   mounted () {

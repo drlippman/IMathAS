@@ -934,6 +934,9 @@ class AssessRecord
 
     // get basic settings
     $out = $this->assess_info->getQuestionSettings($curq['qid']);
+    if ($this->teacherInGb) {
+      $out['rubric'] = $this->assess_info->getQuestionSetting($curq['qid'], 'rubric');
+    }
 
     // get regen number for by_question
     if ($by_question) {

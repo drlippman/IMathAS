@@ -145,8 +145,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 		feedback += '#'+qn+': ';
 	}
 	if (window.tinymce) {
-		tinymce.triggerSave();
-		var pastfb = $("input[name="+feedbackid+"]").val();
+		var pastfb = tinymce.get(feedbackid).getContent();
 	} else {
 		var pastfb = $("textarea[name="+feedbackid+"]").val();
 	}

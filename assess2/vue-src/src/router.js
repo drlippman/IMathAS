@@ -138,9 +138,10 @@ const router = new Router({
       component: Print,
       beforeEnter: (to, from, next) => {
         // if no active attempt, route to launch
-        if ((store.assessInfo.available === 'yes' ||
+        if (((store.assessInfo.available === 'yes' ||
           (store.assessInfo.available === 'practice')) &&
-          (store.assessInfo.has_active_attempt)
+          (store.assessInfo.has_active_attempt)) ||
+          store.assessInfo.can_view_all 
         ) {
           store.inPrintView = true;
           if (store.assessInfo.hasOwnProperty('questions')) {

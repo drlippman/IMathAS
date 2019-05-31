@@ -307,6 +307,10 @@
     "clear_qver_msg": "Delete student work on this question version, but keep the version.",
     "clear_warning": "WARNING: This action will delete student data and CAN NOT be undone.",
     "unsaved_warn": "Warning: You have unsaved score or feedback changes. If you change versions now, your changes will be discarded.",
-    "unsubmitted": "This assessment attempt has not been submitted for grading."
+    "unsubmitted": "This assessment attempt has not been submitted for grading.",
+    "show_tries": "Show all tries",
+    "all_tries": "All Tries",
+    "part_n": "Part {n}",
+    "try_n": "Try {n}"
   }
 }

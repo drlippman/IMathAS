@@ -105,6 +105,18 @@ if ($isstudent && $viewInGb == 'after_due' && $now < $assessInfoOut['enddate']) 
 if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
   $assess_record->setTeacherInGb(true);
+  // get rubrics
+  $assessInfoOut['rubrics'] = array();
+  $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN
+	 (SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid=:assessmentid AND rubric>0)";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':assessmentid'=>$aid));
+  while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    $assessInfoOut['rubrics'][$row['id']] = array(
+      'type' => $row['rubrictype'],
+      'data' => unserialize($row['rubric'])
+    );
+  }
 } else {
   $assessInfoOut['can_edit_scores'] = false;
 }
