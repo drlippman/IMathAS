@@ -313,6 +313,7 @@
     "all_tries": "All Tries",
     "part_n": "Part {n}",
     "try_n": "Try {n}",
-    "view_edit": "View/Edit Question"
+    "view_edit": "View/Edit Question",
+    "show_all_ans": "Show All Answers"
   }
 }

@@ -20,9 +20,13 @@
       <div>
         {{ $t('gradebook.due')}}:
           {{ $d(new Date(aData.enddate * 1000), 'long') }}
-          <a :href="exceptionUrl">
+          <button
+            type="button"
+            class="slim"
+            @click = "makeException"
+          >
             {{ exceptionActionLabel }}
-          </a>
+          </button>
         <span v-if="aData.hasOwnProperty('original_enddate')">
           <br/>
           {{ $t('gradebook.originally_due') }}:
@@ -60,16 +64,16 @@
             <input id="assessoverride" size=4 v-model="assessOverride" />
           </span>
         </span>
-      </div>
-
-      <div v-if="canEdit">
         <button
+          v-if="canEdit"
           type="button"
           @click="clearAttempts('all')"
         >
           {{ $t('gradebook.clear_all') }}
         </button>
-        |
+      </div>
+
+      <div v-if="canEdit">
         <a :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
         </a> |
@@ -81,7 +85,7 @@
       <div v-if="aData.assess_versions.length == 0">
         {{ $t('gradebook.no_versions') }}
       </div>
-      <div v-else>
+      <div v-else class="gbmainview">
         <div>
           {{ scoreCalc }}
           <gb-assess-select
@@ -129,6 +133,12 @@
             {{ hideUnansweredLabel }}
           </button>
           <button
+            type="button"
+            @click = "showAllAns"
+          >
+            {{ $t('gradebook.show_all_ans') }}
+          </button>
+          <button
             v-if = "!isByQuestion"
             type="button"
             @click="clearAttempts('attempt')"
@@ -137,26 +147,30 @@
           </button>
         </div>
 
-        <div class="scrollpane">
+        <div>
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
-            class = "med-pad-below"
+            class = "bigquestionwrap"
           >
             <div class="headerpane">
               <strong>
                 {{ $tc('question_n', qn+1) }}.
               </strong>
+
               <gb-question-select
                 v-if = "aData.submitby === 'by_question'"
                 :versions="qdata"
                 :selected="curQver[qn]"
                 :qn="qn"
                 @setversion = "changeQuestionVersion"
+                class = "med-left"
               />
+
             </div>
-            <div class = "questionpane">
+            <div class="scrollpane">
               <gb-question
+                class = "questionpane"
                 v-show = "showQuestion[qn]"
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
@@ -360,12 +374,6 @@ export default {
         return this.$t('gradebook.make_exception')
       }
     },
-    exceptionUrl() {
-      let url = store.APIbase + '../course/exception.php';
-      url += '?cid=' + store.cid + '&aid=' + store.aid + '&uid' + store.uid;
-      url += '&from=gb';
-      return url;
-    },
     assessFeedback() {
       return this.aData.assess_versions[store.curAver].feedback || '';
     },
@@ -468,6 +476,16 @@ export default {
     },
     redeemLatePass () {
       window.location = this.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid;
+    },
+    makeException() {
+      let url = store.APIbase + '../course/exception.php';
+      url += '?cid=' + store.cid + '&aid=' + store.aid + '&uid' + store.uid;
+      url += '&from=gb';
+      window.location = url;
+    },
+    showAllAns() {
+      window.$("span[id^='ans']").removeClass("hidden");
+      window.$(".sabtn").replaceWith("<span>Answer: </span>")
     }
   },
   created () {
@@ -513,5 +531,14 @@ export default {
   right: 10px;
   bottom: 10px;
   text-align: center;
+}
+.bigquestionwrap {
+  border: 1px solid #ccc;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+.bigquestionwrap .headerpane {
+  padding: 8px;
+  background-color: #eee;
 }
 </style>

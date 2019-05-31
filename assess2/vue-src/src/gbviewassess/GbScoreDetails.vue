@@ -48,14 +48,6 @@
       >
         {{ $t('gradebook.add_feedback') }}
       </button>
-      <button
-        v-if="qdata.try > 1"
-        type="button"
-        class="slim"
-        @click="showAllTries = !showAllTries"
-      >
-        {{ $t('gradebook.show_tries') }}
-      </button>
     </div>
     <div
       v-show="showfeedback"
@@ -83,51 +75,37 @@
       />
     </div>
 
-    <div v-if="qdata.timeactive.total > 0 && showfull">
-      {{ $t('gradebook.time_on_version') }}:
-      {{ timeSpent }}
-    </div>
-    <div class="hidden">
-    <div v-if="canedit && showfull">
-      <a :href="useInMsg" target="_blank">
-        {{ $t('gradebook.use_in_msg') }}
-      </a>
+    <div v-if="showfull">
+      <span v-if="qdata.timeactive.total > 0">
+        {{ $t('gradebook.time_on_version') }}:
+        {{ timeSpent }}
+      </span>
       <button
+        v-if="maxTry > 1"
         type="button"
         class="slim"
-        @click="clearWork"
+        @click="showAllTries = !showAllTries"
       >
-        {{ $t('gradebook.clear_qwork') }}
+        {{ $t('gradebook.show_tries') }}
       </button>
     </div>
-    <div v-if="canedit && showfull">
-      {{ $t('gradebook.question_id') }}:
-        <a
-          target="_blank"
-          :href="questionEditUrl"
-        >{{ qdata.qsetid }}</a>.
-      {{ $t('gradebook.seed') }}:
-        {{ qdata.seed }}.
-      <a
-        v-if="questionErrorUrl != ''"
+    <gb-all-tries
+      v-if="showAllTries"
+      :tries="qdata.other_tries"
+    />
+    <div v-if="canedit && showfull && qHelps.length > 0">
+      {{ $t('gradebook.had_help') }}:
+      <a v-for="help in qHelps"
+        :href="help.url"
         target="_blank"
-        :href="questionErrorUrl"
-      >{{ $t('gradebook.msg_owner') }}.</a>
-      <span v-if="qHelps.length > 0">
-        {{ $t('gradebook.had_help') }}:
-        <a v-for="help in qHelps"
-          :href="help.url"
-          target="_blank"
-        >{{ help.title }}</a>
-      </span>
+      >{{ help.title }}</a>
     </div>
-  </div>
   </div>
 </template>
 
 <script>
 import { store, actions } from './gbstore';
-//import GbAllTries from '@/gbviewassess/GbAllTries';
+import GbAllTries from '@/gbviewassess/GbAllTries';
 import Icons from '@/components/widgets/Icons';
 import MenuButton from '@/components/widgets/MenuButton';
 
@@ -135,6 +113,7 @@ export default {
   name: 'GbScoreDetails',
   props: ['qdata', 'qn', 'canedit', 'showfull'],
   components: {
+    GbAllTries,
     MenuButton,
     Icons
   },
@@ -175,7 +154,7 @@ export default {
           } else {
             out.push(Math.round(1000*this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible)/1000);
           }
-        } else if (this.qdata.try === 0) { // not attempted
+        } else if (this.maxTry === 0) { // not attempted
           out.push('N/A');
         } else {
           out.push(this.qdata.parts[i].score);
@@ -200,6 +179,17 @@ export default {
     },
     isPractice() {
       return store.ispractice;
+    },
+    maxTry() {
+      let maxtry = 0;
+      for (let i=0; i<this.qdata.parts.length; i++) {
+        if (this.qdata.parts[i] && this.qdata.parts[i].try) {
+          if (this.qdata.parts[i].try > maxtry) {
+            maxtry = this.qdata.parts[i].try;
+          }
+        }
+      }
+      return maxtry;
     },
     questionEditUrl() {
       let qs = 'id=' + this.qdata.qsetid + '&cid=' + store.cid;
@@ -238,16 +228,16 @@ export default {
           link: this.useInMsg
         },
         {
-          label: this.$t('gradebook.clear_qwork'),
-          onclick: () => this.clearWork()
-        },
-        {
           label: this.$t('gradebook.view_edit') + ' ID '+this.qdata.qsetid + ' Seed ' + this.qdata.seed,
           link: this.questionEditUrl
         },
         {
           label: this.$t('gradebook.msg_owner'),
           link: this.questionErrorUrl
+        },
+        {
+          label: this.$t('gradebook.clear_qwork'),
+          onclick: () => this.clearWork()
         }
       ];
     }
@@ -334,8 +324,7 @@ export default {
 
 <style>
 .scoredetails {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom:16px;
+  border-top: 1px solid #ccc;
+  padding: 8px;
 }
 </style>
