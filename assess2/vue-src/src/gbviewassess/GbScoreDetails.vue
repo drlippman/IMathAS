@@ -1,5 +1,16 @@
 <template>
   <div class="scoredetails">
+    <menu-button
+      class = "floatright"
+      :options = "moreOptions"
+      position = "right"
+      nobutton = "true"
+      noarrow = "true"
+    >
+      <template v-slot:button>
+        <icons name="more" size="medium"/>
+      </template>
+    </menu-button>
     <div>
       {{ $t('gradebook.score') }}:
       <span
@@ -22,6 +33,13 @@
           <icons name="clipboard" size="small" />
         </button>
       </span>
+      <button
+        type="button"
+        @click="allFull"
+        class="slim"
+      >
+        {{ fullCreditLabel }}
+      </button>
       <button
         v-if="canedit && !isPractice && showfeedback === false"
         type="button"
@@ -64,24 +82,12 @@
         v-html="qdata.feedback"
       />
     </div>
-    <gb-all-tries
-      v-if="showAllTries"
-      :tries="qdata.other_tries"
-    />
-    <div v-if="canedit && showfull" class="med-below">
-      {{ $t('gradebook.quick_grade') }}:
-      <button
-        type="button"
-        @click="allFull"
-        class="slim"
-      >
-        {{ fullCreditLabel }}
-      </button>
-    </div>
+
     <div v-if="qdata.timeactive.total > 0 && showfull">
       {{ $t('gradebook.time_on_version') }}:
       {{ timeSpent }}
     </div>
+    <div class="hidden">
     <div v-if="canedit && showfull">
       <a :href="useInMsg" target="_blank">
         {{ $t('gradebook.use_in_msg') }}
@@ -116,18 +122,20 @@
       </span>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
 import { store, actions } from './gbstore';
-import GbAllTries from '@/gbviewassess/GbAllTries';
+//import GbAllTries from '@/gbviewassess/GbAllTries';
 import Icons from '@/components/widgets/Icons';
+import MenuButton from '@/components/widgets/MenuButton';
 
 export default {
   name: 'GbScoreDetails',
   props: ['qdata', 'qn', 'canedit', 'showfull'],
   components: {
-    GbAllTries,
+    MenuButton,
     Icons
   },
   data: function() {
@@ -223,6 +231,26 @@ export default {
       //window.GB_show(this.$t('gradebook.send_msg'),
       //  store.APIbase + '../msgs/msglist.php?'+qs, 800, 'auto');
     },
+    moreOptions () {
+      return [
+        {
+          label: this.$t('gradebook.use_in_msg'),
+          link: this.useInMsg
+        },
+        {
+          label: this.$t('gradebook.clear_qwork'),
+          onclick: () => this.clearWork()
+        },
+        {
+          label: this.$t('gradebook.view_edit') + ' ID '+this.qdata.qsetid + ' Seed ' + this.qdata.seed,
+          link: this.questionEditUrl
+        },
+        {
+          label: this.$t('gradebook.msg_owner'),
+          link: this.questionErrorUrl
+        }
+      ];
+    }
   },
   methods: {
     updateScore(pn, evt) {

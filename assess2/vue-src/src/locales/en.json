@@ -251,6 +251,7 @@
     "started": "Started",
     "lastchange": "Last Changed",
     "time_onscreen": "Total time questions were on-screen",
+    "time_on_version": "Time spent on this version",
     "due": "Due Date",
     "originally_due": "Originally Due",
     "make_exception": "Make Exception",
@@ -311,6 +312,7 @@
     "show_tries": "Show all tries",
     "all_tries": "All Tries",
     "part_n": "Part {n}",
-    "try_n": "Try {n}"
+    "try_n": "Try {n}",
+    "view_edit": "View/Edit Question"
   }
 }

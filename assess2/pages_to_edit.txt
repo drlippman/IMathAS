@@ -73,6 +73,15 @@ Newver /course/gradeallq.php
   - Should this only show scored version?
   - This one probably not in Vue (no need)
 Newver /course/chgassessments.php
+  Separate General Options from Assessment Options
+  Have No change option in dropdowns, switch radio/checks to dropdowns.
+    So "change" box isn't required
+  Have core options set so if one is changed, a notice is displayed that all
+    need to be changed (mark option with *)
+  In "Copy options" page, when selected, show a link to review the settings in a new window
+  Maybe add tabs: one for assessments and one for settings
+  Maybe have block groups collapseable?
+  Icons on assessments in selector?
 
 
 ~ Newver /course/modquestion.php
