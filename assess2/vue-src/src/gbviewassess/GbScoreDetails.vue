@@ -30,7 +30,7 @@
           class="plain nopad"
           @click="showRubric(i)"
         >
-          <icons name="clipboard" size="small" />
+          <icons name="clipboard" alt="icons.rubric" size="small" />
         </button>
       </span>
       <button

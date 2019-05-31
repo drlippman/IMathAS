@@ -19,7 +19,7 @@
         <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
         <polyline points="7 23 3 19 7 15"></polyline>
         <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-        </template>
+      </template>
       <template v-else-if="name=='calendar'">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -150,17 +150,18 @@ export default {
       warn: '#900'
     };
   },
-  props: ['name', 'size', 'color'],
+  props: ['name', 'size', 'color', 'alt'],
   computed: {
     alttext () {
-      switch (this.name) {
-        case 'circle-filled': return 'Attempted';
-        case 'circle-open': return 'Unattempted';
-        case 'circle-half': return 'Partially attempted';
-        case 'circle-x': return 'Incorrect';
-        case 'circle-check': return 'Correct';
+      if (this.alt) {
+        if (this.alt === '') {
+          return '';
+        } else {
+          return this.$t(this.alt);
+        }
+      } else {
+        return this.$t('icons.'+this.name);
       }
-      return '';
     },
     stroke () {
       if (this.color) {
