@@ -1950,7 +1950,7 @@ class AssessRecord
     }
     if ($getdetails) {
       $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-      $out['status'] = 2;
+      $out['status'] = $this->is_practice ? 3 : 2;
       $out['feedback'] = $aver['feedback'];
       $out['starttime'] = $aver['starttime'];
       $out['questions'] = $this->getGbQuestionsData($qVerToGet);

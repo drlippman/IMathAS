@@ -80,6 +80,10 @@ export const actions = {
           return;
         }
 
+        if (practice) {
+          // practice gets scored as last ver 
+          ver = store.assessInfo.assess_versions.length - 1;
+        }
         // set into store
         store.assessInfo.assess_versions[ver] = response;
         // set current versions to scored versions

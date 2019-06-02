@@ -1,6 +1,6 @@
 <template>
   <span>
-    {{ attemptNum }}<span v-if="option.scored">*</span>.
+    {{ attemptNum }}.
     <span v-if="option.score">
       {{ score }}
     </span>
@@ -12,10 +12,11 @@
 
 export default {
   name: 'GbQuestionListItem',
-  props: ['option'],
+  props: ['option', 'total'],
   computed: {
     attemptNum() {
-      return this.$tc('gradebook.version_n', this.option.ver + 1);
+      return this.$tc('gradebook.version_n', this.option.ver + 1) +
+        (this.option.scored?'*':'') + '/' + this.total;
     },
     score() {
       return this.$t('gradebook.score')+": "+this.option.score;

@@ -34,6 +34,7 @@
         </button>
       </span>
       <button
+        v-if="canedit && !isPractice"
         type="button"
         @click="allFull"
         class="slim"
@@ -222,7 +223,7 @@ export default {
       //  store.APIbase + '../msgs/msglist.php?'+qs, 800, 'auto');
     },
     moreOptions () {
-      return [
+      let out = [
         {
           label: this.$t('gradebook.use_in_msg'),
           link: this.useInMsg
@@ -234,12 +235,15 @@ export default {
         {
           label: this.$t('gradebook.msg_owner'),
           link: this.questionErrorUrl
-        },
-        {
-          label: this.$t('gradebook.clear_qwork'),
-          onclick: () => this.clearWork()
         }
       ];
+      if (!this.isPractice) {
+        out.push({
+          label: this.$t('gradebook.clear_qwork'),
+          onclick: () => this.clearWork()
+        });
+      }
+      return out;
     }
   },
   methods: {

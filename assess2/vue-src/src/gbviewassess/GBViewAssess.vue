@@ -399,7 +399,7 @@ export default {
         }
       }
       if (val !== store.curAver) {
-        if (val === this.aData.assess_versions.length) {
+        if (this.aData.assess_versions[val].status === 3) {
           // requesting the practice version
           actions.loadGbAssessVersion(0, true);
         } else {

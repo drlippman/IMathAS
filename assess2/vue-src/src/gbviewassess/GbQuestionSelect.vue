@@ -6,7 +6,7 @@
       searchby = "ver"
     >
       <template v-slot="{ option }">
-        <gb-question-list-item :option="option"/>
+        <gb-question-list-item :option="option" :total="navOptions.length"/>
       </template>
     </menu-button>
   </div>
