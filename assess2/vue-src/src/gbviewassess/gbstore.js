@@ -287,9 +287,7 @@ export const actions = {
     for (let i=0; i < qdata.length; i++) {
       for (qv=0; qv < qdata[i].length; qv++) {
         if (qdata[i][qv].hasOwnProperty('scored')) {
-          console.log("setting q " + i + " ver" + qv);
           Vue.set(store.curQver, i, qv);
-          //store.curQver[i] = qv;
         }
       }
     }
