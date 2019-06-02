@@ -30,7 +30,7 @@ export default {
     }
   },
   methods: {
-    beforeUnload () {
+    beforeUnload (evt) {
       if (store.autosaveQueue.length > 0) {
         actions.submitAutosave(false);
       }
@@ -48,8 +48,10 @@ export default {
         }
       }
       if (Object.keys(actions.getChangedQuestions()).length > 0) {
+        evt.preventDefault();
         return this.$t('unload.unsubmitted_questions');
       } else if (store.assessInfo.submitby === 'by_assessment' && !unanswered) {
+        evt.preventDefault();
         return this.$t('unload.unsubmitted_assessment');
       }
     }

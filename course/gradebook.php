@@ -136,6 +136,12 @@ if ($canviewall && !empty($_GET['stu'])) {
 	$stu = 0;
 }
 
+if (!empty($CFG['assess2-use-vue-dev'])) {
+	$assessGbUrl = "http://localhost:8080/gbviewassess.html";
+} else {
+	$assessGbUrl = "../assess2/gbviewassess.php";
+}
+
 //HANDLE ANY POSTS
 if ($isteacher) {
 	if (isset($_GET['togglenewflag'])) {
@@ -905,7 +911,7 @@ function gbstudisp($stu) {
 	                                'uid' => $gbt[1][4][0]
 	                            );
 
-								echo '<a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+								echo '<a href="'.$assessGbUrl.'?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
 							} else {
 								$querymap = array(
 	                                'stu' => $stu,
@@ -930,7 +936,7 @@ function gbstudisp($stu) {
                     'uid' => $gbt[1][4][0]
                 );
 
-								echo '<a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+								echo '<a href="'.$assessGbUrl.'?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
 							} else {
                 $querymap = array(
                     'stu' => $stu,
@@ -1689,7 +1695,7 @@ function gbinstrdisp() {
 							echo ">";
 						} else {
 							if ($gbt[0][1][$j][15] > 1) { // assess2
-								echo "<a href=\"gb-viewasid2.php?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">";
+								echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">";
 							} else {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
 							}
@@ -1721,7 +1727,7 @@ function gbinstrdisp() {
 							echo '-';
 						} else if ($isteacher) {
 							if ($gbt[0][1][$j][15] > 1) { // assess2
-								echo "<a href=\"gb-viewasid2.php?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
+								echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							} else {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							}

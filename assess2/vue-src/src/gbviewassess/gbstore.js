@@ -81,7 +81,7 @@ export const actions = {
         }
 
         if (practice) {
-          // practice gets scored as last ver 
+          // practice gets scored as last ver
           ver = store.assessInfo.assess_versions.length - 1;
         }
         // set into store
@@ -286,7 +286,7 @@ export const actions = {
     // compare new score against existing value
     let qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
     let key = av + '-' + qn + '-' + qv + '-' + pn;
-    if (qdata.parts[pn] && (score === '' || Math.abs(score - qdata.parts[pn].score)<.001)) {
+    if (qdata.parts[pn] && (score === '' || Math.abs(score - qdata.parts[pn].rawscore)<.001)) {
       // same as existing - don't submit as an override
       delete store.scoreOverrides[key];
     } else {
@@ -299,14 +299,25 @@ export const actions = {
     // get current assess and question versions
     let av = store.curAver;
     let key = av;
+    let isNew = true;
     if (qn === null) {
       // assessment-level feedback
       key += '-g';
+      if (feedback === store.assessInfo.assess_versions[store.curAver].feedback) {
+        isNew = false;
+      }
     } else {
       let qv = store.curQver[qn];
       key += '-' + qn + '-' + qv;
+      if (feedback === store.assessInfo.assess_versions[store.curAver].questions[qn][qv].feedback) {
+        isNew = false;
+      }
     }
-    store.feedbacks[key] = feedback;
+    if (isNew) {
+      store.feedbacks[key] = feedback;
+    } else {
+      delete store.feedbacks[key];
+    }
     store.saving = '';
   },
   handleError (error) {

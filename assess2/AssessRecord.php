@@ -1648,6 +1648,7 @@ class AssessRecord
    */
   public function reTotalAssess($rescoreQs = 'all') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $keepscore = $this->assess_info->getSetting('keepscore');
 
     $points = $this->assess_info->getAllQuestionPoints();
     $this->parseData();
@@ -1660,6 +1661,7 @@ class AssessRecord
       $curAver = &$this->data['assess_versions'][$av];
 
       // loop through the question numbers
+      $allAssessVerScores = array();
       $aVerScore = 0;
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
         // if not rescoring this question, or if withdrawn, use existing score
@@ -1713,16 +1715,50 @@ class AssessRecord
         $maxAscore = $aVerScore;
         $aScoredVer = $av;
       }
+      $allAssessVerScores[$av] = $aVerScore;
     } // end loop over assessment versions
     if (!$by_question) {
-      // TODO: implement "keepscore"
-      $this->data['scored_version'] = $aScoredVer;
+      if ($keepscore === 'best') {
+        $this->data['scored_version'] = $aScoredVer;
+      } else { // last or average, show last version as scored version
+        $this->data['scored_version'] = count($this->data['assess_versions']) - 1;
+      }
+    } else { // by_question has only one version
+      $this->data['scored_version'] = 0;
     }
     if (!$this->is_practice) {
-      $this->assessRecord['score'] = $maxAscore;
+      if ($keepscore === 'average') {
+        $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),2);
+      } else { // best, last, or by_question
+        $this->assessRecord['score'] = $allAssessVerScores[$this->data['scored_version']];
+      }
       $this->assessRecord['timeontask'] = $totalTime;
     }
     return $maxAscore;
+  }
+
+  /**
+   * Convert data from by_assessment to by_question or vice versa
+   * @param  string $newFormat The new submitby: 'by_question' or 'by_assessment'
+   * @return void
+   */
+  public function convertSubmitBy($newFormat) {
+    $this->parseData();
+    if ($newFormat == 'by_question') {
+      // keep latest assessment version
+      $cntVer = count($this->data['assess_versions']);
+      $latestAver = $this->data['assess_versions'][$cntVer-1];
+      $this->data['assess_versions'] = array($latestAver);
+      $this->data['scored_version'] = 0;
+    } else if ($newFormat == 'by_assessment') {
+      // keep latest question version
+      $questions = &$this->data['assess_versions'][0]['questions'];
+      for ($qn=0; $qn < count($questions); $qn++) {
+        $qvers = $questions[$qn]['question_versions'];
+        $questions[$qn]['question_versions'] = array($qvers[count($qvers)-1]);
+        $questions[$qn]['scored_version'] = 0;
+      }
+    }
   }
 
   /**

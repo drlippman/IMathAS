@@ -74,7 +74,8 @@ $vueData = array(
 	'reqscore' => abs($line['reqscore']),
 	'reqscorecalctype' => ($line['reqscoretype']&2) > 0,
 	'reqscoreaid' => $line['reqscoreaid'],
-	'reqscoreOptions' => $otherAssessments
+	'reqscoreOptions' => $otherAssessments,
+	'taken' => $taken
 );
 
 // skipmathrender class is needed to prevent katex parser from mangling
@@ -199,6 +200,11 @@ $vueData = array(
 					<option value="by_question">Homework-style: new versions of individual questions</option>
 					<option value="by_assessment">Quiz-style: retake whole assessment with new versions</option>
 				</select>
+				<span v-if="taken" class="noticetext">
+					<br/>
+					Warning: Changing this after students have started will require converting
+					their data, and lead to loss of data on earlier attempts.
+				</span>
 			</span><br class=form />
 
 
@@ -234,7 +240,7 @@ $vueData = array(
 							<option value="best">Best</option>
 							<option value="last">Last</option>
 							<option value="average">Average</option>
-						</select> {{ keepscore }}
+						</select>
 					</span>
 				</span>
 			</span><br class=form />

@@ -396,7 +396,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			*/
-			// Delete any teacher or tutor attempts on this assessment 
+			// Delete any teacher or tutor attempts on this assessment
 			$query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
 				imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
 				WHERE iar.assessmentid=?';
@@ -407,6 +407,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				WHERE iar.assessmentid=?';
 			$stm = $DBH->prepare($query);
 			$stm->execute(array($cid, $assessmentId));
+
+			// Re-total any student attempts on this assessment
+			//need to re-score assessment attempts based on withdrawal
+			require_once('../assess2/AssessInfo.php');
+			require_once('../assess2/AssessRecord.php');
+			$assess_info = new AssessInfo($DBH, $assessmentId, $cid, false);
+			$assess_info->loadQuestionSettings();
+			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+			$stm->execute(array($assessmentId));
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$assess_record = new AssessRecord($DBH, $assess_info, false);
+				$assess_record->setRecord($row);
+				if ($toset['submitby']!=$curassess['submitby']) {
+					// convert data format
+					$assess_record->convertSubmitBy($toset['submitby']);
+				}
+				$assess_record->reTotalAssess();
+				// TODO: adjust deffb
+				// if ($toset['deffb']!=$curassess['deffeedbacktext']) {
+				$assess_record->saveRecord();
+			}
 
 			$DBH->commit();
 			$rqp = Sanitize::randomQueryStringParam();

@@ -486,9 +486,19 @@ export default {
     showAllAns() {
       window.$("span[id^='ans']").removeClass("hidden");
       window.$(".sabtn").replaceWith("<span>Answer: </span>")
+    },
+    beforeUnload (evt) {
+      if (Object.keys(store.scoreOverrides).length > 0 ||
+        Object.keys(store.feedbacks).length > 0
+      ) {
+        evt.preventDefault();
+        evt.returnValue = "You have unsaved changes";
+        return "You have unsaved changes";
+      }
     }
   },
   created () {
+    window.$(window).on('beforeunload', this.beforeUnload);
     // TODO: Also need to run this on updated?
     if (typeof window.APIbase !== 'undefined') {
       store.APIbase = window.APIbase;
