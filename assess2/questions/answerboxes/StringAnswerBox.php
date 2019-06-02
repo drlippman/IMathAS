@@ -46,6 +46,7 @@ class StringAnswerBox implements AnswerBox
         if (isset($options['strflags'])) {if (is_array($options['strflags'])) {$strflags = $options['strflags'][$partnum];} else {$strflags = $options['strflags'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
         if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
         if (!isset($answerformat)) { $answerformat = '';}
 
@@ -180,6 +181,10 @@ class StringAnswerBox implements AnswerBox
     		} else {
     			$sa .= $answer;
     		}
+
+        if ($scoremethod == 'takeanythingorblank') {
+          $params['submitblank'] = 1;
+        }
 
         // Done!
         $this->answerBox = $out;

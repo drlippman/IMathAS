@@ -42,6 +42,7 @@ class FileUploadAnswerBox implements AnswerBox
 
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         if (isset($ansprompt)) {
           $out .= "<label for=\"qn$qn\">$ansprompt</label>";
@@ -97,6 +98,10 @@ class FileUploadAnswerBox implements AnswerBox
     		}
     		$tip .= _('Select a file to upload');
     		$sa .= $answer;
+
+        if ($scoremethod == 'takeanythingorblank') {
+          $params['submitblank'] = 1;
+        }
 
         // Done!
         $this->answerBox = $out;

@@ -176,14 +176,20 @@ if (count($qns) > 0) {
     $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score);
   }
 
+  // If it's full test, we'll score time at the assessment attempt level
+  if ($assess_info->getSetting('displaymethod') === 'full') {
+    $minloaded = min($lastloaded);
+    if ($minloaded > 0) {
+      $assess_record->addTotalAttemptTime($now - $minloaded);
+    }
+  }
+
   // Update lastchange
   $assess_record->setLastChange($now);
-  // update status if all questions answered
-  // TODO
 
   // Recalculate scores
   $assess_record->reTotalAssess($qns);
-  // TODO: if by-question and all questions attempted, update status
+  
 } else {
   $assess_info->loadQuestionSettings('all', false);
 }

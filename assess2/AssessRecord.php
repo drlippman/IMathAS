@@ -387,6 +387,18 @@ class AssessRecord
   }
 
   /**
+   * Get final score and assessment scored_version
+   * @return array with 'score' and 'scored_version'
+   */
+  public function getGbScore() {
+    $this->parseData();
+    return array(
+      'gbscore' => $this->assessRecord['score'],
+      'scored_version' => $this->data['scored_version']
+    );
+  }
+
+  /**
    * Determine if there is an active assessment attempt
    * @return boolean true if there is an active assessment attempt
    */
@@ -644,6 +656,20 @@ class AssessRecord
     $this->reTotalAssess($qns);
 
     $this->need_to_record = true;
+  }
+
+  /**
+   * Add timeontask at the assessment level for full-test display
+   * @param int $time timeontask for the assessment version
+   */
+  public function addTotalAttemptTime($time) {
+    $this->parseData();
+    $ver = count($this->data['assess_versions']) - 1;
+    if (!isset($this->data['assess_versions'][$ver]['time'])) {
+      $this->data['assess_versions'][$ver]['time'] = $time;
+    } else {
+      $this->data['assess_versions'][$ver]['time'] += $time;
+    }
   }
 
   /**
@@ -1655,13 +1681,14 @@ class AssessRecord
 
     $maxAscore = 0;
     $aScoredVer = 0;
+    $allAssessVerScores = array();
     $totalTime = 0;
+
     // loop through all the assessment versions
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
       $curAver = &$this->data['assess_versions'][$av];
-
+      $verTime = 0;
       // loop through the question numbers
-      $allAssessVerScores = array();
       $aVerScore = 0;
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
         // if not rescoring this question, or if withdrawn, use existing score
@@ -1669,7 +1696,7 @@ class AssessRecord
             !empty($curAver['questions'][$qn]['withdrawn'])
         ) {
           $aVerScore += $curAver['questions'][$qn]['score'];
-          $totalTime += $curAver['questions'][$qn]['time'];
+          $verTime += $curAver['questions'][$qn]['time'];
           continue;
         }
         // loop through the question versions
@@ -1679,6 +1706,7 @@ class AssessRecord
         $totalQtime = 0;
         for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
           $curQver = &$curAver['questions'][$qn]['question_versions'][$qv];
+
           // scoreoverride can be a single value override, or array per-part
           // should be RAW (0-1) override.
           if (isset($curQver['scoreoverride']) && !is_array($curQver['scoreoverride'])) {
@@ -1708,17 +1736,22 @@ class AssessRecord
         $curAver['questions'][$qn]['rawscore'] = $maxQrawscore;
         $curAver['questions'][$qn]['time'] = $totalQtime;
         $aVerScore += $maxQscore;
-        $totalTime += $totalQtime;
+        $verTime += $totalQtime;
       } // end loop over questions
       $curAver['score'] = $aVerScore;
       if ($aVerScore >= $maxAscore) {
         $maxAscore = $aVerScore;
         $aScoredVer = $av;
       }
+      if (isset($curAver['time']) && $verTime == 0) { // full-test assess-level time
+        $totalTime += $curAver['time'];
+      } else { // indiv question times
+        $totalTime += $verTime;
+      }
       $allAssessVerScores[$av] = $aVerScore;
     } // end loop over assessment versions
     if (!$by_question) {
-      if ($keepscore === 'best') {
+      if ($keepscore == 'best') {
         $this->data['scored_version'] = $aScoredVer;
       } else { // last or average, show last version as scored version
         $this->data['scored_version'] = count($this->data['assess_versions']) - 1;
@@ -1727,13 +1760,17 @@ class AssessRecord
       $this->data['scored_version'] = 0;
     }
     if (!$this->is_practice) {
-      if ($keepscore === 'average') {
+      if (isset($this->data['scoreoverride'])) {
+        $this->assessRecord['score'] = $this->data['scoreoverride'];
+      } else if ($keepscore === 'average') {
         $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),2);
       } else { // best, last, or by_question
         $this->assessRecord['score'] = $allAssessVerScores[$this->data['scored_version']];
       }
       $this->assessRecord['timeontask'] = $totalTime;
     }
+    // update out of attempts, if needed
+    $this->updateStatus();
     return $maxAscore;
   }
 
@@ -1967,6 +2004,7 @@ class AssessRecord
    */
   public function getGbAssessVerData($av, $getdetails) {
     $aver = $this->data['assess_versions'][$av];
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $scoresInGb = $this->assess_info->getSetting('scoresingb');
     $out = array(
       'score' => "N/A",  //default
@@ -1974,12 +2012,14 @@ class AssessRecord
       'status' => $aver['status']
     );
     $qVerToGet = $by_question ? 'scored' : $av;
+
     if ($this->teacherInGb ||
       $scoresInGb == 'immediately' ||
       ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'))
     ) {
       $out['score'] = $aver['score'];
+    } else {
       if ($by_question) {
         $qVerToGet = 'last';
       }
@@ -2201,6 +2241,51 @@ class AssessRecord
         'seed' => $qver['seed'],
         'tries' => array()
       );
+    }
+    $this->updateStatus();
+  }
+
+  /**
+   * Update by-question "has unsubmitted attempts" and
+   * by-assessment "out of retakes" markers in assess record 'status'
+   * @return void
+   */
+  private function updateStatus() {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $outOfAttempts = false;
+    if ($by_question) {
+      // check if there are unattempted questions
+      $allQattempted = true;
+      $curAver = $this->data['assess_versions'][0];
+      for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
+        for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
+          $curQver = $curAver['questions'][$qn]['question_versions'][$qv];
+          // check if question is unattempted; may way to use scored_try instead?
+          if (count($curQver['tries']) == 0) {
+            $allQattempted = false;
+            break 2;
+          }
+        }
+      }
+      if ($allQattempted) {
+        $this->assessRecord['status'] & ~2;
+      } else {
+        $this->assessRecord['status'] |= 2;
+      }
+    } else {
+      $maxVersions = $this->assess_info->getSetting('allowed_attempts');
+      $lastAver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+      // if used all attempts AND latest version is submitted
+      if (count($this->data['assess_versions']) >= $maxVersions &&
+        $lastAver['status'] == 1
+      ) {
+        $outOfAttempts = true;
+      }
+    }
+    if ($outOfAttempts) {
+      $this->assessRecord['status'] |= 32;
+    } else {
+      $this->assessRecord['status'] = $this->assessRecord['status'] & ~32;
     }
   }
 

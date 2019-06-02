@@ -53,9 +53,13 @@ export const actions = {
           // set current versions to scored versions
           store.curAver = response.scored_version;
           this.setQverAsScored(response.scored_version);
+
           if (typeof callback !== 'undefined') {
             callback();
           }
+        })
+        .fail((xhr,textStatus, errorThrown) => {
+          this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
         })
         .always(response => {
           store.inTransit = false;
@@ -99,6 +103,9 @@ export const actions = {
           store.assessInfo.submitby = store.orig_submitby;
         }
       })
+      .fail((xhr,textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      })
       .always(response => {
         store.inTransit = false;
       });
@@ -130,6 +137,9 @@ export const actions = {
           Object.assign(store.assessInfo.assess_versions[store.curAver].questions[qn][ver], response);
         // set current versions to scored versions
         Vue.set(store.curQver, qn, ver);
+      })
+      .fail((xhr,textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -166,7 +176,7 @@ export const actions = {
         // can tell if we change anything
         for (let key in store.scoreOverrides) {
           if (key === 'gen') {
-            store.assessInfo.score = store.scoreOverrides[key];
+            store.assessInfo.gbscore = store.scoreOverrides[key];
             store.assessInfo.scoreoverride = store.scoreOverrides[key];
             continue;
           }
@@ -176,6 +186,8 @@ export const actions = {
             qdata.parts[pts[3]].score = Math.round(1000*store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible)/1000;
           }
         }
+        store.assessInfo.gbscore = response.gbscore;
+        store.assessInfo.scored_version = response.scored_version;
         store.scoreOverrides = {};
         store.feedbacks = {};
       })
@@ -262,6 +274,9 @@ export const actions = {
         store.assessInfo = null;
         actions.loadGbAssessData();
       })
+      .fail((xhr,textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      })
       .always(response => {
         store.inTransit = false;
       });
@@ -272,6 +287,7 @@ export const actions = {
     for (let i=0; i < qdata.length; i++) {
       for (qv=0; qv < qdata[i].length; qv++) {
         if (qdata[i][qv].hasOwnProperty('scored')) {
+          console.log("setting q " + i + " ver" + qv);
           Vue.set(store.curQver, i, qv);
           //store.curQver[i] = qv;
         }

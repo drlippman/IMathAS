@@ -64,4 +64,6 @@ $assess_record->setGbScoreOverrides($scores);
 $assess_record->setGbFeedbacks($feedbacks);
 $assess_record->saveRecord();
 
-echo '{"success": "saved"}';
+$out = $assess_record->getGbScore();
+
+echo json_encode($out);

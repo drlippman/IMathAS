@@ -16,16 +16,17 @@ $istutor = isset($tutorid);
 $isstudent = isset($studentid);
 
 if (!$isteacher && !$istutor && !$isstudent) {
-  echo '{error: "no_access"}';
+  echo '{"error": "no_access"}';
   exit;
-}
-
-if (!$isstudent) {
-  $studentinfo = array('latepasses' => 0, 'timelimitmult' => 1);
 }
 
 $canViewAll = $isteacher || $istutor;
 $isActualTeacher = $isteacher && !isset($instrPreviewId);
+$isRealStudent = (isset($studentid) && !isset($sessiondata['stuview']));
+
+if (!$isRealStudent) {
+  $studentinfo = array('latepasses' => 0, 'timelimitmult' => 1);
+}
 
 /**
  * Check if the required parameters are set
@@ -38,7 +39,7 @@ function check_for_required($method, $required) {
     if (($method == 'POST' && !isset($_POST[$r])) ||
       ($method == 'GET' && !isset($_GET[$r]))
     ) {
-      echo '{error: "missing_param", "error_details": "Missing parameter '.sanitize::encodeStringForJavascript($r).'"}';
+      echo '{"error": "missing_param", "error_details": "Missing parameter '.sanitize::encodeStringForJavascript($r).'"}';
       exit;
     }
   }

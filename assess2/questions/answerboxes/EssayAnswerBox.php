@@ -41,6 +41,7 @@ class EssayAnswerBox implements AnswerBox
 
         if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$partnum];} else {$sz = $options['answerboxsize'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
@@ -134,6 +135,10 @@ class EssayAnswerBox implements AnswerBox
     		}
     		$tip .= _('Enter your answer as text.  This question is not automatically graded.');
     		$sa .= $answer;
+
+        if ($scoremethod == 'takeanythingorblank') {
+          $params['submitblank'] = 1;
+        }
 
         // Done!
         $this->answerBox = $out;

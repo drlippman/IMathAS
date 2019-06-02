@@ -598,6 +598,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 function gbstudisp($stu) {
 	global $DBH,$CFG,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	global $includeduedate, $includelastchange,$latepasshrs,$latepasses,$hidelocked,$exceptionfuncs;
+	global $assessGbUrl;
+	
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -1460,6 +1462,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
 	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents;
+	global $assessGbUrl;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {

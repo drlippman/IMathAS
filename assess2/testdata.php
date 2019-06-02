@@ -173,7 +173,7 @@ $assessGroups = [
         'enddate' => 24*7,
         'reviewdate' => 2000000000,
         'displaymethod' => 'skip',
-        'ptsposs' => 15,
+        'ptsposs' => 20,
         'submitby' => 'by_question',
         'showscores' => 'during',
         'showans' => 'after_lastattempt',
@@ -186,9 +186,15 @@ $assessGroups = [
         'questions' => [
           0=>['questionsetid' => 0],
           1=>['questionsetid' => 1],
-          2=>['questionsetid' => 0]
+          2=>['questionsetid' => 0],
+          3=>['questionsetid' => 1],
         ],
-        'itemorder' => [0,1,2]
+        'itemorder' => [0,1,2,3],
+        'studata' => [
+          'source' => 'hw1',
+          'starttime' => -4*24,
+          'lastchange' => -3*24
+        ]
       ],
       [
         'name' => 'HW 2',
@@ -237,9 +243,15 @@ $assessGroups = [
         'questions' => [
           0=>['questionsetid' => 0],
           1=>['questionsetid' => 1],
-          2=>['questionsetid' => 0]
+          2=>['questionsetid' => 0],
+          3=>['questionsetid' => 1],
         ],
-        'itemorder' => [0,1,2]
+        'itemorder' => [0,1,2,3],
+        'studata' => [
+          'source' => 'q1',
+          'starttime' => -4*24,
+          'lastchange' => -1*24
+        ]
       ],
       [
         'name' => 'Quiz 2',
@@ -1035,5 +1047,17 @@ $studatarec = array(
     'scoreddata' => '{"submissions":[4,12,15,74,81],"autosaves":[],"scored_version":1,"assess_versions":[{"starttime":1553631054,"lastchange":1553631069,"status":1,"score":9.499,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"8037429","seed":629,"tries":[[{"sub":0,"raw":"1","time":0,"stuans":"77"}]],"answeights":[1]}]},{"score":4.499,"rawscore":3,"scored_version":0,"question_versions":[{"qid":"8037430","seed":5417,"tries":[[{"sub":1,"raw":"1","time":0,"stuans":"39"},{"sub":2,"raw":"1","time":0,"stuans":"39"}],[{"sub":1,"raw":"1","time":0,"stuans":"87"},{"sub":2,"raw":"1","time":0,"stuans":"87"}],[{"sub":1,"raw":"0","time":0,"stuans":"3"},{"sub":2,"raw":"1","time":0,"stuans":"46"}]],"answeights":[0.333,0.333,0.334]}]}]},{"starttime":1553631124,"lastchange":1553631135,"status":1,"score":10,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"8037429","seed":4826,"tries":[[{"sub":3,"raw":"1","time":0,"stuans":"28"}]],"answeights":[1]}]},{"score":5,"rawscore":3,"scored_version":0,"question_versions":[{"qid":"8037430","seed":6369,"tries":[[{"sub":4,"raw":"1","time":0,"stuans":"68"}],[{"sub":4,"raw":"1","time":0,"stuans":"29"}],[{"sub":4,"raw":"1","time":0,"stuans":"97"}]],"answeights":[0.333,0.333,0.334]}]}]}]}',
     'score' => 10,
     'status' => 0
+  ),
+  'hw1' => array(
+    'scoreddata' => '{"submissions":[7,9,13,22,25,35,59,63,68,71],"autosaves":[],"scored_version":0,"assess_versions":[{"starttime":1559452483,"lastchange":1559452554,"status":0,"score":18.33,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q0!","seed":5896,"tries":[[{"sub":0,"time":6,"stuans":"14","stuansval":"","raw":0},{"sub":1,"time":8,"stuans":"12","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[1]},{"qid":"!Q0!","seed":3399,"tries":[],"answeights":[1]}],"time":14},{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q1!","seed":5564,"tries":[[{"sub":2,"time":3,"stuans":"39","stuansval":"","raw":1}],[{"sub":3,"time":12,"stuans":"71","stuansval":"","raw":0},{"sub":4,"time":15,"stuans":"73","stuansval":"","raw":1}],[{"sub":3,"time":12,"stuans":"25","stuansval":"","raw":1}]],"answeights":[0.333,0.333,0.33399999999999996],"scored_try":[0,1,0]}],"time":30},{"score":5,"rawscore":1,"scored_version":1,"question_versions":[{"qid":"!Q2!","seed":3029,"tries":[[{"sub":6,"time":10,"stuans":"15","stuansval":"","raw":0},{"sub":7,"time":14,"stuans":"17","stuansval":"","raw":0}]],"answeights":[1],"scored_try":[-1]},{"qid":"!Q2!","seed":8420,"tries":[[{"sub":8,"time":18,"stuans":"74","stuansval":"","raw":0},{"sub":9,"time":21,"stuans":"94","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[1]}],"time":63},{"score":3.33,"rawscore":0.666,"scored_version":0,"question_versions":[{"qid":"!Q3!","seed":6771,"tries":[[{"sub":5,"time":5,"stuans":"60","stuansval":"","raw":1}],[{"sub":5,"time":5,"stuans":"63","stuansval":"","raw":1}]],"answeights":[0.333,0.333,0.33399999999999996],"scored_try":[0,0,-1]}],"time":5}]}]}',
+    'score' => 18.33,
+    'status' => 0,
+    'timeontask' => 112
+  ),
+  'q1' => array(
+    'scoreddata' => '{"submissions":[4,8,13,17,23,78,94,103,113],"autosaves":[],"scored_version":0,"assess_versions":[{"starttime":1559452898,"lastchange":1559452976,"status":1,"score":11.665,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q0!","seed":4790,"tries":[[{"sub":0,"time":3,"stuans":"34","stuansval":"","raw":0},{"sub":1,"time":7,"stuans":"70","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[1]}],"time":10},{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q1!","seed":9151,"tries":[[{"sub":2,"time":4,"stuans":"39","stuansval":"","raw":1}],[{"sub":2,"time":4,"stuans":"23","stuansval":"","raw":1}],[{"sub":2,"time":4,"stuans":"77","stuansval":"","raw":1}]],"answeights":[0.333,0.333,0.33399999999999996],"scored_try":[0,0,0]}],"time":4},{"score":0,"rawscore":0,"scored_version":0,"question_versions":[{"qid":"!Q2!","seed":9656,"tries":[[{"sub":3,"time":2,"stuans":"32","stuansval":"","raw":0},{"sub":4,"time":8,"stuans":"44","stuansval":"","raw":0}]],"answeights":[1],"scored_try":[-1]}],"time":10},{"score":1.665,"rawscore":0.333,"scored_version":0,"question_versions":[{"qid":"!Q3!","seed":9723,"tries":[[{"sub":5,"time":0,"stuans":"91","stuansval":"","raw":1}]],"answeights":[0.333,0.333,0.33399999999999996],"scored_try":[0,-1,-1]}],"time":0}]},{"starttime":1559452986,"lastchange":1559453001,"status":1,"score":5,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q0!","seed":968,"tries":[[{"sub":6,"time":6,"stuans":"8","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[0]}],"time":6},{"score":0,"rawscore":0,"scored_version":0,"question_versions":[{"qid":"!Q1!","seed":9343,"tries":[[{"sub":7,"time":0,"stuans":"34","stuansval":"","raw":0}],[{"sub":7,"time":0,"stuans":"15","stuansval":"","raw":0}],[{"sub":7,"time":0,"stuans":"","stuansval":"","raw":0}]],"answeights":[0.333,0.333,0.33399999999999996],"scored_try":[-1,-1,-1]}],"time":0},{"score":0,"rawscore":0,"scored_version":0,"question_versions":[{"qid":"!Q2!","seed":2931,"tries":[],"answeights":[1]}]},{"score":0,"rawscore":0,"scored_version":0,"question_versions":[{"qid":"!Q3!","seed":5575,"tries":[],"answeights":[0.333,0.333,0.33399999999999996]}]}]},{"starttime":1559453007,"lastchange":1559453011,"status":0,"score":5,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q0!","seed":3561,"tries":[[{"sub":8,"time":4,"stuans":"51","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[0]}],"time":4},{"score":0,"rawscore":0,"scored_version":0,"question_versions":[{"qid":"!Q1!","seed":3984,"tries":[]}]},{"score":0,"rawscore":0,"scored_version":0,"question_versions":[{"qid":"!Q2!","seed":7589,"tries":[]}]},{"score":0,"rawscore":0,"scored_version":0,"question_versions":[{"qid":"!Q3!","seed":7654,"tries":[]}]}]}]}',
+    'score' => 11.67,
+    'status' => 1,
+    'timeontask' => 34
   )
 );

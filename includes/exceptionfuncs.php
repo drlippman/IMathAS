@@ -95,7 +95,9 @@ class ExceptionFuncs {
 				return 'noissue';
 			} else {
 				$row = $stm->fetch(PDO::FETCH_ASSOC);
-				if ($row['timelimit']==0 || ($row['status']&3)==0) {
+				if (($row['status']&32)==32) {
+					return 'outofattempts';
+				} else if ($row['timelimit']==0 || ($row['status']&3)==0) {
 					return 'noissue';
 				} else if ($row['timelimitexp'] > 0 && $now > $row['timelimitexp']) {
 					return 'expired';

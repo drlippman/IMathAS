@@ -166,7 +166,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
 }
 
 // log access
-if ($isstudent) {
+if ($isRealStudent) {
   $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
   $query .= "(:userid, :courseid, :type, :typeid, :viewtime)";
   $stm = $DBH->prepare($query);

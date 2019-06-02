@@ -67,7 +67,7 @@ class AssessInfo
       $assessData = $stm->fetch(PDO::FETCH_ASSOC);
 
       if ($assessData === false) {
-        echo '{error: "invalid_aid"}';
+        echo '{"error": "invalid_aid"}';
         exit;
       }
 

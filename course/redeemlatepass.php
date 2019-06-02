@@ -253,6 +253,8 @@
 				echo '<p class="noticetext">'._('Reminder: You have already started this assessment, and it has a time limit.  Using a LatePass does <b>not</b> extend or pause the time limit, only the due date.').'</p>';
 			} else if ($timelimitstatus=='expired') {
 				echo '<p class="noticetext">'._('Your time limit has expired on this assessment.  Using a LatePass does <b>not</b> extend the time limit, so there is no reason to use a LatePass.').'</p>';
+			} else if ($timelimitstatus=='outofattempts') {
+				echo '<p class="noticetext">'._('You have used all your attempts on this question.  Using a LatePass does <b>not</b> add another attempt, so there is no reason to use a LatePass.').'</p>';
 			}
 			echo '<p><input type="hidden" name="confirm" value="true" />';
 			echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($from).'" />';

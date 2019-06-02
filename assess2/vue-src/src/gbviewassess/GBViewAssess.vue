@@ -474,6 +474,9 @@ export default {
       store.clearAttempts.type = type;
       store.clearAttempts.show = true;
     },
+    submitVersion () {
+      actions.endAssess();
+    },
     redeemLatePass () {
       window.location = this.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid;
     },

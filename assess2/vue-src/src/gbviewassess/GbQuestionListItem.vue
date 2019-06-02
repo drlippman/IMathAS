@@ -1,7 +1,7 @@
 <template>
   <span>
     {{ attemptNum }}.
-    <span v-if="option.score">
+    <span v-if="option.hasOwnProperty('score')">
       {{ score }}
     </span>
   </span>
