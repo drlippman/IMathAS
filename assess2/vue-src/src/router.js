@@ -13,6 +13,7 @@ import Livepoll from './views/Livepoll.vue';
 // const Full = () => import(/* webpackChunkName: "full" */ './views/Full.vue');
 // const Print = () => import(/* webpackChunkName: "print" */ './views/Print.vue');
 // const FullPaged = () => import(/* webpackChunkName: "fullpaged" */ './views/FullPaged.vue');
+//const Livepoll = () => import(/* webpackChunkName: "livepoll" */ './views/Livepoll.vue');
 import { store, actions } from './basicstore';
 
 Vue.use(Router);
@@ -141,7 +142,7 @@ const router = new Router({
         if (((store.assessInfo.available === 'yes' ||
           (store.assessInfo.available === 'practice')) &&
           (store.assessInfo.has_active_attempt)) ||
-          store.assessInfo.can_view_all 
+          store.assessInfo.can_view_all
         ) {
           store.inPrintView = true;
           if (store.assessInfo.hasOwnProperty('questions')) {
