@@ -144,7 +144,6 @@ export default {
       }
     },
     addResult (data) {
-      console.log(data);
       // add question result data
       if (!store.livepollResults.hasOwnProperty(this.curqn)) {
         this.$set(store.livepollResults, this.curqn, {});
@@ -153,7 +152,6 @@ export default {
       // TODO: update results. Hopefully will happen automatically
     },
     showHandler (data) {
-      console.log(data);
       if (data.action === 'showq') {
         // On question show, server sends as data:
         //  action: "showq", qn: qn, seed: seed, startt:startt

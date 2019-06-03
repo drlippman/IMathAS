@@ -20,13 +20,9 @@
 
 <script>
 import { store } from '../../basicstore';
-import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'SummaryCategories',
-  components: {
-    Icons
-  },
   computed: {
     catScores () {
       let questions = store.assessInfo.questions;
@@ -38,7 +34,7 @@ export default {
         }
         let found = false;
         for (let k = 0; k < cats.length; k++) {
-          if (cats[k].name == questions[i].category) {
+          if (cats[k].name === questions[i].category) {
             cats[k].tot += questions[i].score;
             cats[k].poss += questions[i].points_possible;
             found = true;

@@ -32,6 +32,8 @@ export default {
         return this.$t('setlist.keep_highest');
       } else if (this.ainfo.keepscore === 'last') {
         return this.$t('setlist.keep_last');
+      } else {
+        return '';
       }
     },
     showGBScore () {

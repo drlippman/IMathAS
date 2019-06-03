@@ -9,6 +9,7 @@ TODOs:
   FIX: don't give "answers haven't changed" warning on assessment submit
   Make sure course page indicators are working
   Teacher view-as-student working
+  Category summary in GB view
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?

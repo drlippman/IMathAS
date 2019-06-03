@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { store, actions } from './gbstore';
+import { store } from './gbstore';
 
 export default {
   name: 'GbAssessListItem',
@@ -28,11 +28,11 @@ export default {
       }
     },
     verStatus () {
-      if (this.option.status == -1) {
+      if (this.option.status === -1) {
         return this.$t('gradebook.not_started');
-      } else if (this.option.status == 0) {
-        return $t('gradebook.not_submitted');
-      } else if (this.option.status == 1 || this.option.status == 2) {
+      } else if (this.option.status === 0) {
+        return this.$t('gradebook.not_submitted');
+      } else if (this.option.status === 1 || this.option.status === 2) {
         let out = '';
         if (this.submitby === 'by_question') {
           out += this.$t('gradebook.lastchange');

@@ -67,7 +67,7 @@ export default {
     },
     hasOnePartPenalties () {
       return (this.qinfo.hasOwnProperty('parts') &&
-        this.qinfo.parts.length == 1 &&
+        this.qinfo.parts.length === 1 &&
         this.qinfo.parts[0].hasOwnProperty('penalties') &&
         this.qinfo.parts[0].penalties.length > 0
       );

@@ -3,6 +3,7 @@
     <ul class="vuetablist" :id="id">
       <li
         v-for="(tab,index) in tabs"
+        :key = "index"
         :class = "{active: index === activeTab}"
         :aria-selected = "index === activeTab"
         ref = "tab"

@@ -63,7 +63,6 @@
         size="medium"
       />
       <span class="switch-toggle__ui"></span>
-      </span>
     </button>
     <lti-menu v-if="ainfo.is_lti" />
   </div>
@@ -262,15 +261,15 @@ export default {
 }
 
 .switch-toggle {
-	display: inline-block;
-	position: relative;
+  display: inline-block;
+  position: relative;
   padding-right: 0px;
   padding-left: 4px;
 }
 
 /* negate 'flash' of text color when pressing a button in some browsers */
 .switch-toggle:active {
-	color: inherit;
+  color: inherit;
 }
 
 .switch-toggle__ui {
@@ -282,48 +281,48 @@ export default {
 /* using the before/after pseudo elements of the span to create the "switch" */
 .switch-toggle__ui:before,
 .switch-toggle__ui:after {
-	border: 1px solid #565656;
-	content: "";
-	position: absolute;
+  border: 1px solid #565656;
+  content: "";
+  position: absolute;
   top: 0;
 }
 
 /* styling specific to the knob of the switch */
 .switch-toggle__ui:after {
-	background: #fff;
-	border-radius: 100%;
-	height: 1em;
-	right: .75em;
-	transition: right .1825s ease-in-out;
-	width: 1em;
+  background: #fff;
+  border-radius: 100%;
+  height: 1em;
+  right: .75em;
+  transition: right .1825s ease-in-out;
+  width: 1em;
   box-shadow: 1px 2px 2px 0px rgba(0,0,0,0.25);
 }
 
 /* styling specific to the knob "container" */
 .switch-toggle__ui:before {
-	background: #baa;
-	border-radius: 1em;
-	height: .5em;
+  background: #baa;
+  border-radius: 1em;
+  height: .5em;
   top: .25em;
-	right: 0em;
-	transition: background .2s ease-in-out;
-	width: 1.75em;
+  right: 0em;
+  transition: background .2s ease-in-out;
+  width: 1.75em;
 }
 
 .switch-toggle span {
-	pointer-events: none;
+  pointer-events: none;
 }
 
 /* change the position of the knob to indicate it has been checked*/
 .switch-toggle[aria-pressed="true"] .switch-toggle__ui:after {
-	right: 0em;
+  right: 0em;
 }
 
 /* update the color of the "container" to further visually indicate state */
 .switch-toggle[aria-pressed="true"] .switch-toggle__ui:before {
-	background: #0c0;
+  background: #0c0;
 }
 .switch-toggle[aria-pressed="true"] .switch-toggle__ui:after {
-	background: #090;
+  background: #090;
 }
 </style>

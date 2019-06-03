@@ -21,8 +21,7 @@
 </template>
 
 <script>
-import { store, actions } from '../basicstore';
-import Icons from '@/components/widgets/Icons.vue';
+import { store } from '../basicstore';
 
 export default {
   name: 'VideocuedResultNav',

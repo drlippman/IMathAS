@@ -114,6 +114,8 @@ export default {
     curCue () {
       if (this.cue > -1) {
         return store.assessInfo.videocues[this.cue];
+      } else {
+        return {};
       }
     },
     qn () {
@@ -206,12 +208,12 @@ export default {
       if (this.timeCues.hasOwnProperty(curTime) &&
         !(this.toshow === 'v' && this.cue === this.timeCues[curTime] + 1) &&
         !(this.toshow === 'f' && this.cue === this.timeCues[curTime]) &&
-        this.ytplayer.getPlayerState() == window.YT.PlayerState.PLAYING
+        this.ytplayer.getPlayerState() === window.YT.PlayerState.PLAYING
       ) {
         this.jumpTo(parseInt(this.timeCues[curTime]), 'q');
       } else {
         if (this.nextVidTimes.hasOwnProperty(curTime) &&
-          this.cue == this.nextVidTimes[curTime]
+          this.cue === this.nextVidTimes[curTime]
         ) {
           this.cue = this.cue + 1;
           this.toshow = 'v';
@@ -226,12 +228,12 @@ export default {
         .css('height', '').css('width', '');
     },
     handlePlayerStateChange (event) {
-      if (event.data == window.YT.PlayerState.PLAYING) {
+      if (event.data === window.YT.PlayerState.PLAYING) {
         // started playing video.  Start listing for the times
         this.timer = window.setTimeout(() => { this.checkTime(); }, 200);
-      } else if (event.data == window.YT.PlayerState.ENDED) {
+      } else if (event.data === window.YT.PlayerState.ENDED) {
         // video ended - check to see if there's a question to show.
-        if (this.toshow == 'v' && this.curCue.hasOwnProperty('qn')) {
+        if (this.toshow === 'v' && this.curCue.hasOwnProperty('qn')) {
           window.clearTimeout(this.timer);
           this.jumpTo(this.cue, 'q');
         }
@@ -250,7 +252,7 @@ export default {
       } else {
         let newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
-        if (newToshow == 'v') {
+        if (newToshow === 'v') {
           if (newCueNum > 0) {
             let prevCue = store.assessInfo.videocues[newCueNum - 1];
             if (prevCue.hasOwnProperty('followuptime')) {
@@ -261,7 +263,7 @@ export default {
               seektime = prevCue.time;
             }
           }
-        } else if (newToshow == 'f') {
+        } else if (newToshow === 'f') {
           // start of followup is end of video segment
           seektime = newCue.time;
         }

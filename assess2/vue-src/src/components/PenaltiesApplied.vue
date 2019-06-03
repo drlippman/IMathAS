@@ -8,7 +8,6 @@
 
 <script>
 import { store } from '../basicstore';
-import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'PreviousAttempts',
@@ -18,15 +17,12 @@ export default {
       expanded: false
     };
   },
-  components: {
-    Icons
-  },
   computed: {
     penalties () {
-      let by_questions = (store.assessInfo.submitby === 'by_question');
+      let byQuestion = (store.assessInfo.submitby === 'by_question');
       let penalties = this.part.penalties;
       for (let i in penalties) {
-        if (penalties[i].type === 'regen' && by_questions) {
+        if (penalties[i].type === 'regen' && byQuestion) {
           penalties[i].type = 'trysimilar';
         }
       }

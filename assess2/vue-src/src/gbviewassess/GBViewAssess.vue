@@ -192,8 +192,9 @@
             class="fbbox"
             rows="2"
             cols="60"
+            :value = "assessFeedback"
             @input="updateFeedback"
-          >{{ assessFeedback }}</textarea>
+          ></textarea>
           <div
             v-else-if="canEdit"
             rows="2"
@@ -331,6 +332,8 @@ export default {
         return this.$t('gradebook.keep_avg');
       } else if (this.aData.keepscore === 'last') {
         return this.$t('gradebook.keep_last');
+      } else {
+        return '';
       }
     },
     viewAsStuUrl () {
@@ -410,7 +413,6 @@ export default {
     },
     changeQuestionVersion (qn, val) {
       let hasUnsaved = false;
-      let av = store.curAver;
       let regex = new RegExp('^' + store.curAver + '-' + qn + '-');
       for (let k in store.scoreOverrides) {
         if (regex.test(k)) {
@@ -445,7 +447,7 @@ export default {
     submitChanges () {
       if (this.showOverride && this.assessOverride !== '') {
         store.scoreOverrides['gen'] = this.assessOverride;
-      } else if (this.aData.scoreoverride && this.assessOverride != this.aData.scoreoverride) {
+      } else if (this.aData.scoreoverride && this.assessOverride !== this.aData.scoreoverride) {
         store.scoreOverrides['gen'] = this.assessOverride;
       } else {
         delete store.scoreOverrides['gen'];

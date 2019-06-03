@@ -61,8 +61,9 @@
         :name="'fb'+qn"
         rows="2"
         cols="60"
+        :value = "qdata.feedback"
         @input="updateFeedback"
-      >{{ qdata.feedback }}</textarea>
+      ></textarea>
       <div
         v-else-if="canedit"
         rows="2"
@@ -97,7 +98,8 @@
     />
     <div v-if="canedit && showfull && qHelps.length > 0">
       {{ $t('gradebook.had_help') }}:
-      <a v-for="help in qHelps"
+      <a v-for="(help,idx) in qHelps"
+        :key="idx"
         :href="help.url"
         target="_blank"
       >{{ help.title }}</a>
@@ -143,7 +145,6 @@ export default {
     },
     initScores () {
       var out = [];
-      let partscore;
       for (let i = 0; i < this.answeights.length; i++) {
         if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
           // handle the case of a single override
@@ -196,7 +197,6 @@ export default {
     questionEditUrl () {
       let qs = 'id=' + this.qdata.qsetid + '&cid=' + store.cid;
       qs += '&aid=' + store.aid + '&qid=' + this.qdata.qid;
-      console.log(store.APIbase);
       return store.APIbase + '../course/moddataset.php?' + qs;
     },
     questionErrorUrl () {
@@ -204,8 +204,8 @@ export default {
         let quoteq = '0-' + this.qdata.qsetid + '-' + this.qdata.seed +
           '-reperr-' + store.assessInfo.ver;
         let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
-          '&quoteq=' + quoteq;
-        '&to=' + this.qdata.qowner + '&title=Problem%20with%20question%20id%20' +
+          '&quoteq=' + quoteq + '&to=' + this.qdata.qowner +
+          '&title=Problem%20with%20question%20id%20' +
           this.qdata.qsetid;
         return store.APIbase + '../msgs/msglist.php?' + qs;
       } else {
@@ -282,13 +282,13 @@ export default {
       if (this.qdata.jsparams) {
         let helps = this.qdata.jsparams.helps;
         for (let i in helps) {
-          if (helps[i].label == 'video') {
+          if (helps[i].label === 'video') {
             helps[i].icon = 'video';
             helps[i].title = this.$t('helps.video');
-          } else if (helps[i].label == 'read') {
+          } else if (helps[i].label === 'read') {
             helps[i].icon = 'file';
             helps[i].title = this.$t('helps.read');
-          } else if (helps[i].label == 'ex') {
+          } else if (helps[i].label === 'ex') {
             helps[i].icon = 'file';
             helps[i].title = this.$t('helps.written_Example');
           } else {
@@ -306,7 +306,7 @@ export default {
         window.imasrubrics = store.assessInfo['rubrics'];
       }
       this.showfeedback = true;
-      imasrubric_show(
+      window.imasrubric_show(
         this.qdata.rubric,
         this.qdata.points_possible,
         'sc' + this.qn + '-' + pn,

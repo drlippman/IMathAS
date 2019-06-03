@@ -3,7 +3,7 @@
     <li>
       Question Help:
     </li>
-    <li v-for="qHelp in qHelps">
+    <li v-for="(qHelp,idx) in qHelps" :key="idx">
       <a href="#" @click.prevent="loadHelp(qHelp)">
         <icons :name="qHelp.icon" />
         {{ qHelp.title }}
@@ -49,13 +49,13 @@ export default {
       if (store.assessInfo.questions[this.qn].jsparams) {
         let helps = store.assessInfo.questions[this.qn].jsparams.helps;
         for (let i in helps) {
-          if (helps[i].label == 'video') {
+          if (helps[i].label === 'video') {
             helps[i].icon = 'video';
             helps[i].title = this.$t('helps.video');
-          } else if (helps[i].label == 'read') {
+          } else if (helps[i].label === 'read') {
             helps[i].icon = 'file';
             helps[i].title = this.$t('helps.read');
-          } else if (helps[i].label == 'ex') {
+          } else if (helps[i].label === 'ex') {
             helps[i].icon = 'file';
             helps[i].title = this.$t('helps.written_Example');
           } else {
@@ -103,12 +103,12 @@ export default {
         let prefix = 'Q' + refpts[1] + ': ';
         if (help.url.match(/watchvid\.php/)) {
           let cp = help.url.split(/url=/);
-          recclick('extref', help.ref, prefix + decodeURIComponent(cp[1]));
+          window.recclick('extref', help.ref, prefix + decodeURIComponent(cp[1]));
         } else {
-          recclick('extref', help.ref, prefix + help.url);
+          window.recclick('extref', help.ref, prefix + help.url);
         }
       }
-      popupwindow('help', help.url, help.w, help.h, true);
+      window.popupwindow('help', help.url, help.w, help.h, true);
     }
   }
 };

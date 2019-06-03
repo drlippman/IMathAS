@@ -43,6 +43,8 @@ export default {
     nameHover () {
       if (this.option.withdrawn !== 0) {
         return this.$t('header.withdrawn');
+      } else {
+        return '';
       }
     },
     scoreDisplay () {

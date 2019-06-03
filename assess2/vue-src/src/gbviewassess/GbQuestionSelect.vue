@@ -30,7 +30,7 @@ export default {
         out.push({
           ver: i,
           score: this.versions[i].score,
-          scored: i == this.selected,
+          scored: i === this.selected,
           onclick: () => this.$emit('setversion', this.qn, i)
         });
       }

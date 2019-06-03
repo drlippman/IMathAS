@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
 import Icons from '@/components/widgets/Icons.vue';
 import PenaltiesApplied from '@/components/PenaltiesApplied.vue';
 
@@ -81,7 +80,7 @@ export default {
       let out = [];
 
       for (let i = 0; i < this.parts.length; i++) {
-        if (this.parts[i].try == 0) {
+        if (this.parts[i].try === 0) {
           out[i] = 'unattempted';
         } else if (!this.parts[i].hasOwnProperty('rawscore')) {
           out[i] = 'attempted';

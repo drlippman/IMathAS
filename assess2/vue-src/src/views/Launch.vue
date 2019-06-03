@@ -147,7 +147,7 @@ export default {
       }
       if (this.aInfo.timelimit > 0 &&
         store.timelimit_expired &&
-        this.aInfo.timelimit_type == 'kick_out' &&
+        this.aInfo.timelimit_type === 'kick_out' &&
         this.aInfo.has_active_attempt
       ) {
         return false;

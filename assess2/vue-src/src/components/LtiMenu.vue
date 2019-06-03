@@ -44,7 +44,7 @@ export default {
       out.push({
         label: this.$t('lti.userprefs'),
         onclick: () => {
-          GB_show(
+          window.GB_show(
             this.$t('lti.userprefs'),
             store.APIbase + '../admin/ltiuserprefs.php?cid=' + store.cid + '&greybox=true',
             800, 'auto'

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(question,curqn) in questions">
+    <div v-for="(question,curqn) in questions" :key="curqn">
       <full-question-header
         :qn = "curqn"
         :showretry="false"

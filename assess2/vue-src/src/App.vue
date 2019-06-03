@@ -224,26 +224,26 @@ input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, but
 /* TODO separate out */
 
 div.choice {
-	padding: 5px;
-	float: left;
-	text-align: center;
+  padding: 5px;
+  float: left;
+  text-align: center;
 }
 div.float {
-	float:left;
+  float:left;
 }
 
 div.match {
-	float:left;
-	padding: 5px;
-	padding-right: 30px;
+  float:left;
+  padding: 5px;
+  padding-right: 30px;
 }
 div.spacer {
-	clear: both;
-	height: 1px;
-	padding: 0px;
+  clear: both;
+  height: 1px;
+  padding: 0px;
 }
 p.centered {
-	text-align: center;
+  text-align: center;
 }
 
 table.p3longdiv {
@@ -363,18 +363,18 @@ td.l, table.stats tbody td.l {
 }
 
 ul.nomark {
-	padding-left: 40px;
+  padding-left: 40px;
 }
 div.toppad {
-	padding-top: 5px;
+  padding-top: 5px;
 }
 ul.likelines {
-	padding: 0;
-	margin: 0;
-	list-style-type: none;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
 }
 ul.likelines li {
-	margin-bottom: .4em;
+  margin-bottom: .4em;
 }
 
 ul.nomark {list-style-type: none;}

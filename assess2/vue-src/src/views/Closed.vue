@@ -95,12 +95,6 @@ export default {
     PreviousAttempts,
     SummaryGbScore
   },
-  data: function () {
-    return {
-      primaryAction: '',
-      secondaryAction: ''
-    };
-  },
   computed: {
     settings () {
       return store.assessInfo;
@@ -137,6 +131,8 @@ export default {
         let now = new Date();
         if (expires < now) {
           return this.$t('closed.unsubmitted_overtime');
+        } else {
+          return this.$t('closed.unsubmitted_pastdue');
         }
       } else {
         return this.$t('closed.unsubmitted_pastdue');
@@ -150,32 +146,47 @@ export default {
     },
     primaryButton () {
       if (this.settings.can_use_latepass > 0) {
-        this.primaryAction = 'latepass';
         return this.$tc('closed.use_latepass', this.settings.can_use_latepass);
       } else if (this.settings.available === 'practice') {
-        this.primaryAction = 'practice';
         return this.$t('closed.do_practice');
       } else if (this.canViewScored) {
-        this.primaryAction = 'view_scored';
         return this.$t('closed.view_scored');
       } else if (window.exiturl && window.exiturl !== '') {
-        this.primaryAction = 'exit';
         return this.$t('closed.exit');
       } else {
-        this.primaryAction = '';
+        return '';
+      }
+    },
+    primaryAction () {
+      if (this.settings.can_use_latepass > 0) {
+        return 'latepass';
+      } else if (this.settings.available === 'practice') {
+        return 'practice';
+      } else if (this.canViewScored) {
+        return 'view_scored';
+      } else if (window.exiturl && window.exiturl !== '') {
+        return 'exit';
+      } else {
         return '';
       }
     },
     secondaryButton () {
       // Practice is secondary if we can use latepass
       if (this.settings.can_use_latepass > 0 && this.settings.available === 'practice') {
-        this.secondaryAction = 'practice';
         return this.$t('closed.do_practice');
       } else if (window.exiturl && window.exiturl !== '') {
-        this.secondaryAction = 'exit';
         return this.$t('closed.exit');
       } else {
-        this.secondaryAction = '';
+        return '';
+      }
+    },
+    secondaryAction () {
+      // Practice is secondary if we can use latepass
+      if (this.settings.can_use_latepass > 0 && this.settings.available === 'practice') {
+        return 'practice';
+      } else if (window.exiturl && window.exiturl !== '') {
+        return 'exit';
+      } else {
         return '';
       }
     },

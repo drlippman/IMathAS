@@ -16,14 +16,12 @@
 <script>
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import VideocuedNavListItem from '@/components/VideocuedNavListItem.vue';
-import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
 
 export default {
   name: 'VideocuedNav',
   props: ['cue', 'toshow'],
   components: {
-    Icons,
     MenuButton,
     VideocuedNavListItem
   },
@@ -84,7 +82,7 @@ export default {
     },
     curOption () {
       let curCue = parseInt(this.cue);
-      if (curCue == -1 && this.hasIntro) {
+      if (curCue === -1 && this.hasIntro) {
         return 0;
       }
       for (let i = this.hasIntro ? 1 : 0; i < this.navOptions.length; i++) {

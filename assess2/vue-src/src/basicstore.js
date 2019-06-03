@@ -109,14 +109,14 @@ export const actions = {
             return;
           }
           if (store.assessInfo.displaymethod === 'skip') {
-            if (store.assessInfo.intro != '') {
+            if (store.assessInfo.intro !== '') {
               Router.push('/skip/0');
             } else {
               Router.push('/skip/1');
             }
           } else if (store.assessInfo.displaymethod === 'full') {
             if (store.assessInfo.hasOwnProperty('interquestion_pages')) {
-              if (store.assessInfo.intro != '') {
+              if (store.assessInfo.intro !== '') {
                 Router.push('/full/page/0');
               } else {
                 Router.push('/full/page/1');
@@ -201,9 +201,9 @@ export const actions = {
     // it will get returned here.
     let valstr;
     for (let qn in changedQuestions) {
-      if (changedQuestions[qn].length == 1 && changedQuestions[qn][0] == 0) {
+      if (changedQuestions[qn].length === 1 && changedQuestions[qn][0] === 0) {
         // one part, might be single part
-        valstr = imathasAssess.preSubmit(qn);
+        valstr = window.imathasAssess.preSubmit(qn);
         if (valstr !== false) {
           data.append('qn' + qn + '-val', valstr);
         }
@@ -212,7 +212,7 @@ export const actions = {
       let subqn;
       for (let k = 0; k < changedQuestions[qn].length; k++) {
         subqn = (parseInt(qn) + 1) * 1000 + changedQuestions[qn][k];
-        valstr = imathasAssess.preSubmit(subqn);
+        valstr = window.imathasAssess.preSubmit(subqn);
         if (valstr !== false) {
           data.append('qn' + subqn + '-val', valstr);
         }
@@ -225,7 +225,6 @@ export const actions = {
       var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn + 1) + '\\d{3})');
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if (el.name.match(regex)) {
-          let fieldBlank = true;
           if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
             if (el.type === 'file') {
               data.append(el.name, el.files[0]);
@@ -526,7 +525,7 @@ export const actions = {
   },
   getVerificationData (qns) {
     let out = {};
-    let by_question = (store.assessInfo.submitby === 'by_question');
+    let byQuestion = (store.assessInfo.submitby === 'by_question');
     let assessRegen = store.assessInfo.prev_attempts.length;
     for (let qn in qns) {
       let parttries = [];
@@ -536,7 +535,7 @@ export const actions = {
       }
       out[qn] = {
         tries: parttries,
-        regen: by_question ? qdata.regen : assessRegen
+        regen: byQuestion ? qdata.regen : assessRegen
       };
     }
     return out;
@@ -602,7 +601,7 @@ export const actions = {
       let qn = qns[k];
       var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn * 1 + 1) + '\\d{3})');
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
-        if (m = el.name.match(regex)) {
+        if ((m = el.name.match(regex)) !== null) {
           let thisChanged = false;
           if (el.type === 'radio' || el.type === 'checkbox') {
             if ((el.checked === true) !== (actions.getInitValue(qn, el.name) === '1')) {
@@ -666,15 +665,15 @@ export const actions = {
   },
   enableMQ () {
     store.enableMQ = true;
-    imathasAssess.clearLivePreviewTimeouts();
-    $('input[type=button][id^=pbtn],button[id^=pbtn]').hide();
-    $('span[id^=p] span[id^=lpbuf]').empty();
-    MQeditor.toggleMQAll('input[data-mq]', true);
+    window.imathasAssess.clearLivePreviewTimeouts();
+    window.$('input[type=button][id^=pbtn],button[id^=pbtn]').hide();
+    window.$('span[id^=p] span[id^=lpbuf]').empty();
+    window.MQeditor.toggleMQAll('input[data-mq]', true);
   },
   disableMQ () {
     store.enableMQ = false;
-    $('input[type=button][id^=pbtn],button[id^=pbtn]').show().trigger('click');
-    MQeditor.toggleMQAll('input[data-mq]', false);
+    window.$('input[type=button][id^=pbtn],button[id^=pbtn]').show().trigger('click');
+    window.MQeditor.toggleMQAll('input[data-mq]', false);
   },
   copySettings (response) {
     // overwrite existing questions with new data

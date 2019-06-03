@@ -46,7 +46,7 @@ export default {
       this.hours = Math.floor(remaining / (1000 * 60 * 60));
       this.minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
       this.seconds = Math.floor((remaining % (1000 * 60)) / (1000));
-      if (this.hours == 0 && this.minutes < 5) {
+      if (this.hours === 0 && this.minutes < 5) {
         this.timeString = this.hours > 0 ? this.hours + ':' : '';
         this.timeString += (this.minutes < 10 ? '0' : '') + this.minutes + ':';
         this.timeString += (this.seconds < 10 ? '0' : '') + this.seconds;

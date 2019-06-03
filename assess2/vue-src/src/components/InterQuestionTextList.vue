@@ -89,7 +89,7 @@ export default {
           if (this.qn < textObj.displayBefore) {
             out.push({
               html: textObj.text,
-              expanded: (textObj.forntype == 1 || this.qn == textObj.displayBefore)
+              expanded: (textObj.forntype === 1 || this.qn === textObj.displayBefore)
             });
           }
         }
