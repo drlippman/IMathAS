@@ -792,7 +792,20 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   //calc status icon
 
 			   if (!$canedit) {
-				   $deffb = explode('-', $line['deffeedback']);
+					 $showScoreInIcon = true;
+					 if ($line['ver']>1) {
+						 if (($line['scoresingb'] == 'after_due' && $now < $line['enddate']) ||
+						 			$line['scoresingb'] == 'never'
+							) {
+								$showScoreInIcon = false;
+							}
+					 } else {
+						 $deffb = explode('-', $line['deffeedback']);
+						 if ($deffb[0]=='NoScores' || $deffb[0]=='EndScore' || $deffb[0]=='EachAtEnd') {
+							 $showScoreInIcon = false;
+						 }
+					 }
+
 				   if (isset($line['ptsearned'])) {
 				   	   if ($line['ptsstatus']==1) {
 				   	   	   $iconstatus = 1;
@@ -801,9 +814,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   	   $iconstatus = 2;
 				   	   	   $scoremsg = _('All questions attempted');
 				   	   }
-					   if ($deffb[0]=='NoScores' || $deffb[0]=='EndScore' || $deffb[0]=='EachAtEnd') {
-						   //don't show score
-					   } else if ($line['ptsposs']>0) {
+					   if ($showScoreInIcon && $line['ptsposs']>0) {
 						   $scoremsg .= '. '._('Score: ').round(100*$line['ptsearned']/$line['ptsposs'],1).'%';
 					   }
 				   } else {

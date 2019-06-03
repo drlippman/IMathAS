@@ -3,6 +3,7 @@
     <menu-button :id="'qselect' + qn"
       :options = "navOptions"
       :selected = "selected"
+      :noarrow = "navOptions.length == 1"
       searchby = "ver"
     >
       <template v-slot="{ option }">

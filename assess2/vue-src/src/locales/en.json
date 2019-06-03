@@ -346,6 +346,8 @@
     "part_n": "Part {n}",
     "try_n": "Try {n}",
     "view_edit": "View/Edit Question",
-    "show_all_ans": "Show All Answers"
+    "show_all_ans": "Show All Answers",
+    "no_versions": "No assessment attempts available to view yet",
+    "minutes": "minutes"
   }
 }

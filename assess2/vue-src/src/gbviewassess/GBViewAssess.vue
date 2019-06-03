@@ -21,6 +21,7 @@
         {{ $t('gradebook.due')}}:
           {{ $d(new Date(aData.enddate * 1000), 'long') }}
           <button
+            v-if = "canEdit"
             type="button"
             class="slim"
             @click = "makeException"
@@ -299,7 +300,7 @@ export default {
       }
     },
     totalTimeOnTask () {
-      return this.$tc('minutes', Math.round(this.aData.timeontask/60));
+      return Math.round(10*this.aData.timeontask/60)/10 + ' ' + this.$t('gradebook.minutes');
     },
     extensionString () {
       if (this.aData.extended_with.type === 'latepass') {

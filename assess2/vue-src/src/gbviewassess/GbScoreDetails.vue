@@ -1,6 +1,7 @@
 <template>
   <div class="scoredetails">
     <menu-button
+      v-if="canedit"
       class = "floatright"
       :options = "moreOptions"
       position = "right"
@@ -171,7 +172,7 @@ export default {
       }
     },
     timeSpent() {
-      let out = this.$tc('minutes', Math.round(10*this.qdata.timeactive.total/60)/10);
+      let out = Math.round(10*this.qdata.timeactive.total/60)/10 + ' ' + this.$t('gradebook.minutes');
       // TODO: Add per-try average?
       return out;
     },

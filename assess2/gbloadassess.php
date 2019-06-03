@@ -22,15 +22,11 @@ require_once('./AssessUtils.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (!$isActualTeacher && !$istutor) {
-  echo '{"error": "no_access"}';
-  exit;
-}
 //validate inputs
 check_for_required('GET', array('aid', 'cid'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-if ($isstudent) {
+if ($isRealStudent) {
   $uid = $userid;
 } else {
   $uid = Sanitize::onlyInt($_GET['uid']);
