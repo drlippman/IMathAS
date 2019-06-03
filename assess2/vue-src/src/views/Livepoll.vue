@@ -159,7 +159,7 @@ export default {
         //  action: "showq", qn: qn, seed: seed, startt:startt
         this.$set(store.assessInfo, 'livepoll_status', {
           curstate: 2,
-          curquestion: parseInt(data.qn)+1,
+          curquestion: parseInt(data.qn) + 1,
           seed: parseInt(data.seed),
           startt: parseInt(data.startt)
         });
@@ -168,7 +168,7 @@ export default {
         //  action: newstate, qn: qn
         this.$set(store.assessInfo, 'livepoll_status',
           Object.assign(store.assessInfo.livepoll_status, {
-            curquestion: parseInt(data.qn)+1,
+            curquestion: parseInt(data.qn) + 1,
             curstate: parseInt(data.action)
           }));
       }
@@ -199,30 +199,30 @@ export default {
     },
     openInput () {
       actions.setLivepollStatus({
-        newquestion: this.curqn+1,
+        newquestion: this.curqn + 1,
         newstate: 2
       });
       if (this.timelimit > 0) {
         this.livepollTimer = window.setTimeout(
           () => this.closeInput(),
-          1000*this.timelimit);
+          1000 * this.timelimit);
       }
     },
     closeInput () {
-      //TODO: how do we use the global show answers setting?
+      // TODO: how do we use the global show answers setting?
       clearTimeout(this.livepollTimer);
       let nextState = this.showAnswers ? 4 : 3;
       if (store.livepollSettings.showResultsAfter) {
         this.showResults = true;
       }
       actions.setLivepollStatus({
-        newquestion: this.curqn+1,
+        newquestion: this.curqn + 1,
         newstate: nextState
       });
     },
-    newVersion() {
+    newVersion () {
       actions.setLivepollStatus({
-        newquestion: this.curqn+1,
+        newquestion: this.curqn + 1,
         newstate: 1,
         forceregen: 1
       });
@@ -232,7 +232,7 @@ export default {
       if (this.curstate > 2) {
         let nextState = this.showAnswers ? 4 : 3;
         actions.setLivepollStatus({
-          newquestion: this.curqn+1,
+          newquestion: this.curqn + 1,
           newstate: nextState
         });
       }

@@ -160,7 +160,7 @@ export default {
           return this.$t(this.alt);
         }
       } else {
-        return this.$t('icons.'+this.name);
+        return this.$t('icons.' + this.name);
       }
     },
     stroke () {

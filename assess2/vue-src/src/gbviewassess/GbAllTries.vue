@@ -22,5 +22,5 @@ import { store, actions } from './gbstore';
 export default {
   name: 'GbAllTries',
   props: ['tries']
-}
+};
 </script>

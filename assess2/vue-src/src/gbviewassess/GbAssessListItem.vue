@@ -18,7 +18,7 @@ export default {
   name: 'GbAssessListItem',
   props: ['option', 'submitby'],
   computed: {
-    attemptNum() {
+    attemptNum () {
       if (this.option.status === 3) {
         return this.$t('gradebook.practice_attempt');
       } else if (this.submitby === 'by_question') {
@@ -46,7 +46,7 @@ export default {
         return '';
       }
     },
-    score() {
+    score () {
       return this.option.score + '/' + store.assessInfo['points_possible'];
     }
   }

@@ -32,7 +32,7 @@ export default {
           score: this.versions[i].score,
           status: this.versions[i].status,
           lastchange: this.versions[i].lastchange,
-          onclick: () => this.$emit("setversion", i)
+          onclick: () => this.$emit('setversion', i)
         });
       }
       return out;
@@ -41,5 +41,5 @@ export default {
   methods: {
 
   }
-}
+};
 </script>

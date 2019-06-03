@@ -31,11 +31,11 @@ export default {
           ver: i,
           score: this.versions[i].score,
           scored: i == this.selected,
-          onclick: () => this.$emit("setversion", this.qn, i)
+          onclick: () => this.$emit('setversion', this.qn, i)
         });
       }
       return out;
     }
   }
-}
+};
 </script>

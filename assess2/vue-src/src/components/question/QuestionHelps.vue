@@ -96,7 +96,7 @@ export default {
     }
   },
   methods: {
-    loadHelp(help) {
+    loadHelp (help) {
       // record click if ref is provided
       if (help.ref) {
         let refpts = help.ref.split(/-/);

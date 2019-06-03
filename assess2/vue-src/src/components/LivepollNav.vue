@@ -105,16 +105,16 @@ export default {
     }
   },
   methods: {
-    selectQuestion(n) {
+    selectQuestion (n) {
       this.$emit('selectq', n);
     },
-    openQuestion() {
+    openQuestion () {
       this.$emit('openq');
     },
-    closeQuestion() {
+    closeQuestion () {
       this.$emit('closeq');
     },
-    newVersion() {
+    newVersion () {
       this.$emit('newversion');
     }
   }

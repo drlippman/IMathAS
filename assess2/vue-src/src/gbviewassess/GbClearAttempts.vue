@@ -75,23 +75,23 @@ import { store, actions } from './gbstore';
 // TODO: Need to set focus in modal on opening
 
 export default {
-  name: "GbClearAttempts",
-  data: function() {
+  name: 'GbClearAttempts',
+  data: function () {
     return {
       type: 0
-    }
+    };
   },
   computed: {
-    showModal() {
+    showModal () {
       return store.clearAttempts.show;
     },
-    showType() {
+    showType () {
       return store.clearAttempts.type;
     },
-    isByQuestion() {
+    isByQuestion () {
       return (store.assessInfo.submitby === 'by_question');
     },
-    isLastAttempt() {
+    isLastAttempt () {
       let avercnt = store.assessInfo.assess_versions.length;
       if (store.assessInfo.has_practice) {
         avercnt--;
@@ -100,19 +100,19 @@ export default {
     }
   },
   methods: {
-    close() {
+    close () {
       store.clearAttempts.show = false;
     },
-    doAction() {
+    doAction () {
       actions.clearAttempt(this.type);
     }
   },
-  updated() {
+  updated () {
     if (store.clearAttempts.show) {
       window.$('.modal').find('input').focus();
     }
   }
-}
+};
 </script>
 
 <style>

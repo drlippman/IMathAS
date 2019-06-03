@@ -9,17 +9,16 @@
 
 <script>
 
-
 export default {
   name: 'GbQuestionListItem',
   props: ['option', 'total'],
   computed: {
-    attemptNum() {
+    attemptNum () {
       return this.$tc('gradebook.version_n', this.option.ver + 1) +
-        (this.option.scored?'*':'') + '/' + this.total;
+        (this.option.scored ? '*' : '') + '/' + this.total;
     },
-    score() {
-      return this.$t('gradebook.score')+": "+this.option.score;
+    score () {
+      return this.$t('gradebook.score') + ': ' + this.option.score;
     }
   }
 };

@@ -250,7 +250,7 @@ import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
 import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
-//import ErrorDialog from '@/components/ErrorDialog.vue';
+// import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
   components: {
@@ -266,8 +266,8 @@ export default {
       assessOverride: '',
       hidePerfect: false,
       hideCorrect: false,
-      hideUnanswered: false,
-    }
+      hideUnanswered: false
+    };
   },
   computed: {
     assessInfoLoaded () {
@@ -276,23 +276,23 @@ export default {
     aData () {
       return store.assessInfo;
     },
-    canEdit() {
+    canEdit () {
       return store.assessInfo['can_edit_scores'];
     },
-    useEditor() {
+    useEditor () {
       return (typeof window.tinyMCE !== 'undefined');
     },
-    isByQuestion() {
+    isByQuestion () {
       return (this.aData.submitby === 'by_question');
     },
-    startedString() {
+    startedString () {
       if (this.aData.starttime === 0) {
         return this.$t('gradebook.not_started');
       } else {
         return this.$d(new Date(this.aData.starttime * 1000), 'long');
       }
     },
-    lastchangeString() {
+    lastchangeString () {
       if (this.aData.lastchange === 0) {
         return this.$t('gradebook.not_submitted');
       } else {
@@ -300,7 +300,7 @@ export default {
       }
     },
     totalTimeOnTask () {
-      return Math.round(10*this.aData.timeontask/60)/10 + ' ' + this.$t('gradebook.minutes');
+      return Math.round(10 * this.aData.timeontask / 60) / 10 + ' ' + this.$t('gradebook.minutes');
     },
     extensionString () {
       if (this.aData.extended_with.type === 'latepass') {
@@ -318,7 +318,7 @@ export default {
     curQver () {
       return store.curQver;
     },
-    scoreCalc() {
+    scoreCalc () {
       if (this.aData.submitby === 'by_question') {
         return this.$t('gradebook.best_on_question');
       } else if (this.aData.keepscore === 'best') {
@@ -333,18 +333,18 @@ export default {
         return this.$t('gradebook.keep_last');
       }
     },
-    viewAsStuUrl() {
+    viewAsStuUrl () {
       return 'index.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
     },
-    showQuestion() {
-      //1 to hide perfect, 2 correct, 4 unanswered
+    showQuestion () {
+      // 1 to hide perfect, 2 correct, 4 unanswered
       let out = {};
-      for (let i=0; i < this.curQuestions.length; i++) {
+      for (let i = 0; i < this.curQuestions.length; i++) {
         let qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
-        if (this.hidePerfect && Math.abs(qdata.score - qdata.points_possible) < .002) {
+        if (this.hidePerfect && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
           showit = false;
-        } else if (this.hideCorrect && Math.abs(qdata.rawscore - 1) < .002) {
+        } else if (this.hideCorrect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;
         } else if (this.hideUnanswered && qdata.try === 0) {
           showit = false;
@@ -353,45 +353,45 @@ export default {
       }
       return out;
     },
-    hidePerfectLabel() {
-      return this.hidePerfect ?
-        this.$t('gradebook.show_perfect') :
-        this.$t('gradebook.hide_perfect');
+    hidePerfectLabel () {
+      return this.hidePerfect
+        ? this.$t('gradebook.show_perfect')
+        : this.$t('gradebook.hide_perfect');
     },
-    hideCorrectLabel() {
-      return this.hideCorrect ?
-        this.$t('gradebook.show_correct') :
-        this.$t('gradebook.hide_correct');
+    hideCorrectLabel () {
+      return this.hideCorrect
+        ? this.$t('gradebook.show_correct')
+        : this.$t('gradebook.hide_correct');
     },
-    hideUnansweredLabel() {
-      return this.hideUnanswered ?
-        this.$t('gradebook.show_unans') :
-        this.$t('gradebook.hide_unans');
+    hideUnansweredLabel () {
+      return this.hideUnanswered
+        ? this.$t('gradebook.show_unans')
+        : this.$t('gradebook.hide_unans');
     },
-    exceptionActionLabel() {
+    exceptionActionLabel () {
       if (this.aData.hasexception) {
         return this.$t('gradebook.edit_exception');
       } else {
-        return this.$t('gradebook.make_exception')
+        return this.$t('gradebook.make_exception');
       }
     },
-    assessFeedback() {
+    assessFeedback () {
       return this.aData.assess_versions[store.curAver].feedback || '';
     },
-    savedMsg() {
+    savedMsg () {
       if (store.saving === '') {
         return '';
       } else {
         return this.$t('gradebook.' + store.saving);
       }
     },
-    isUnsubmitted() {
+    isUnsubmitted () {
       return (this.aData.submitby === 'by_assessent' &&
         this.aData.assess_versions[store.curAver].status === 0);
     }
   },
   methods: {
-    changeAssessVersion(val) {
+    changeAssessVersion (val) {
       if (Object.keys(store.scoreOverrides).length > 0 ||
         Object.keys(store.feedbacks).length > 0
       ) {
@@ -408,10 +408,10 @@ export default {
         }
       }
     },
-    changeQuestionVersion(qn,val) {
+    changeQuestionVersion (qn, val) {
       let hasUnsaved = false;
       let av = store.curAver;
-      let regex = new RegExp('^'+store.curAver+'-'+qn+'-');
+      let regex = new RegExp('^' + store.curAver + '-' + qn + '-');
       for (let k in store.scoreOverrides) {
         if (regex.test(k)) {
           hasUnsaved = true;
@@ -429,7 +429,7 @@ export default {
         actions.loadGbQuestionVersion(qn, val);
       }
     },
-    updateFeedback(evt) {
+    updateFeedback (evt) {
       let content;
       if (this.useEditor) {
         content = window.tinymce.activeEditor.getContent();
@@ -438,11 +438,11 @@ export default {
       }
       actions.setFeedback(null, content);
     },
-    setScoreOverride(evt) {
+    setScoreOverride (evt) {
       this.assessOverride = evt.target.value;
       store.saving = '';
     },
-    submitChanges() {
+    submitChanges () {
       if (this.showOverride && this.assessOverride !== '') {
         store.scoreOverrides['gen'] = this.assessOverride;
       } else if (this.aData.scoreoverride && this.assessOverride != this.aData.scoreoverride) {
@@ -452,10 +452,10 @@ export default {
       }
       actions.saveChanges();
     },
-    exit() {
+    exit () {
       window.location = store.exitUrl;
     },
-    setExitUrl(from) {
+    setExitUrl (from) {
       let page = '';
       if (from === 'isolate') {
         page = 'isolateassessgrade.php';
@@ -471,7 +471,7 @@ export default {
       let qs = '?cid=' + store.cid + '&aid=' + store.aid + '&stu=' + store.stu;
       store.exitUrl = store.APIbase + '../course/' + page + qs;
     },
-    clearAttempts(type) {
+    clearAttempts (type) {
       store.clearAttempts.type = type;
       store.clearAttempts.show = true;
     },
@@ -481,23 +481,23 @@ export default {
     redeemLatePass () {
       window.location = this.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid;
     },
-    makeException() {
+    makeException () {
       let url = store.APIbase + '../course/exception.php';
       url += '?cid=' + store.cid + '&aid=' + store.aid + '&uid' + store.uid;
       url += '&from=gb';
       window.location = url;
     },
-    showAllAns() {
-      window.$("span[id^='ans']").removeClass("hidden");
-      window.$(".sabtn").replaceWith("<span>Answer: </span>")
+    showAllAns () {
+      window.$("span[id^='ans']").removeClass('hidden');
+      window.$('.sabtn').replaceWith('<span>Answer: </span>');
     },
     beforeUnload (evt) {
       if (Object.keys(store.scoreOverrides).length > 0 ||
         Object.keys(store.feedbacks).length > 0
       ) {
         evt.preventDefault();
-        evt.returnValue = "You have unsaved changes";
-        return "You have unsaved changes";
+        evt.returnValue = 'You have unsaved changes';
+        return 'You have unsaved changes';
       }
     }
   },
@@ -521,7 +521,7 @@ export default {
       store.uid !== queryuid
     ) {
       store.cid = querycid;
-      window.cid = querycid;  // some other functions need this in global scope
+      window.cid = querycid; // some other functions need this in global scope
       store.aid = queryaid;
       store.uid = queryuid;
       store.stu = querystu;

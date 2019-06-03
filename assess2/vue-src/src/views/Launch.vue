@@ -155,9 +155,9 @@ export default {
       return true;
     },
     showReset () {
-        return this.aInfo.is_teacher && (
-          this.aInfo.has_active_attempt || this.aInfo.prev_attempts.length > 0
-        );
+      return this.aInfo.is_teacher && (
+        this.aInfo.has_active_attempt || this.aInfo.prev_attempts.length > 0
+      );
     },
     hasExit () {
       return (window.exiturl && window.exiturl !== '');

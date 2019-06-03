@@ -216,7 +216,7 @@ export default {
       ) {
         // start practice mode
         actions.startAssess(true, '', []);
-        //TODO: test this
+        // TODO: test this
       } else if (this.secondaryAction === 'exit') {
         // exit assessment
         window.location = window.exiturl;

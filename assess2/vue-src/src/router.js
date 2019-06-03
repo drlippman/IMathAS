@@ -13,7 +13,7 @@ import Livepoll from './views/Livepoll.vue';
 // const Full = () => import(/* webpackChunkName: "full" */ './views/Full.vue');
 // const Print = () => import(/* webpackChunkName: "print" */ './views/Print.vue');
 // const FullPaged = () => import(/* webpackChunkName: "fullpaged" */ './views/FullPaged.vue');
-//const Livepoll = () => import(/* webpackChunkName: "livepoll" */ './views/Livepoll.vue');
+// const Livepoll = () => import(/* webpackChunkName: "livepoll" */ './views/Livepoll.vue');
 import { store, actions } from './basicstore';
 
 Vue.use(Router);
@@ -175,7 +175,7 @@ router.beforeEach((to, from, next) => {
     store.aid !== queryaid
   ) {
     store.cid = querycid;
-    window.cid = querycid;  // some other functions need this in global scope
+    window.cid = querycid; // some other functions need this in global scope
     store.aid = queryaid;
     store.queryString = '?cid=' + store.cid + '&aid=' + store.aid;
     actions.loadAssessData(() => next());

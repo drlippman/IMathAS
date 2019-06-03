@@ -58,8 +58,8 @@ export const actions = {
             callback();
           }
         })
-        .fail((xhr,textStatus, errorThrown) => {
-          this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+        .fail((xhr, textStatus, errorThrown) => {
+          this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
         })
         .always(response => {
           store.inTransit = false;
@@ -67,7 +67,7 @@ export const actions = {
     }
   },
   loadGbAssessVersion (ver, practice) {
-    let qs = store.queryString + '&ver=' + ver + '&practice=' + (practice?1:0);
+    let qs = store.queryString + '&ver=' + ver + '&practice=' + (practice ? 1 : 0);
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -103,8 +103,8 @@ export const actions = {
           store.assessInfo.submitby = store.orig_submitby;
         }
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -112,11 +112,11 @@ export const actions = {
   },
   loadGbQuestionVersion (qn, ver) {
     let qs = store.queryString + '&ver=' + ver + '&qn=' + qn;
-    qs += '&practice=' + (store.ispractice?1:0);
+    qs += '&practice=' + (store.ispractice ? 1 : 0);
     if (store.assessInfo.assess_versions[store.curAver].questions[qn][ver].html !== null) {
       // already have html loaded - just switch displayed version
       Vue.set(store.curQver, qn, ver);
-      return
+      return;
     }
     store.inTransit = true;
     store.errorMsg = null;
@@ -138,8 +138,8 @@ export const actions = {
         // set current versions to scored versions
         Vue.set(store.curQver, qn, ver);
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -153,7 +153,7 @@ export const actions = {
     let data = new FormData();
     data.append('scores', JSON.stringify(store.scoreOverrides));
     data.append('feedback', JSON.stringify(store.feedbacks));
-    data.append('practice', store.ispractice?1:0);
+    data.append('practice', store.ispractice ? 1 : 0);
     window.$.ajax({
       url: store.APIbase + 'gbsave.php' + qs,
       type: 'POST',
@@ -183,7 +183,7 @@ export const actions = {
           let pts = key.split(/-/);
           let qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
           if (qdata.parts[pts[3]]) {
-            qdata.parts[pts[3]].score = Math.round(1000*store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible)/1000;
+            qdata.parts[pts[3]].score = Math.round(1000 * store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible) / 1000;
           }
         }
         store.assessInfo.gbscore = response.gbscore;
@@ -198,7 +198,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  clearAttempt(keepver) {
+  clearAttempt (keepver) {
     let data = {
       type: store.clearAttempts.type,
       keepver: keepver
@@ -274,25 +274,25 @@ export const actions = {
         store.assessInfo = null;
         actions.loadGbAssessData();
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
       });
   },
-  setQverAsScored(aver) {
+  setQverAsScored (aver) {
     let qdata = store.assessInfo.assess_versions[aver].questions;
     let qv;
-    for (let i=0; i < qdata.length; i++) {
-      for (qv=0; qv < qdata[i].length; qv++) {
+    for (let i = 0; i < qdata.length; i++) {
+      for (qv = 0; qv < qdata[i].length; qv++) {
         if (qdata[i][qv].hasOwnProperty('scored')) {
           Vue.set(store.curQver, i, qv);
         }
       }
     }
   },
-  setScoreOverride(qn, pn, score) {
+  setScoreOverride (qn, pn, score) {
     // get current assess and question versions
     let av = store.curAver;
     let qv = store.curQver[qn];
@@ -300,16 +300,16 @@ export const actions = {
     // compare new score against existing value
     let qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
     let key = av + '-' + qn + '-' + qv + '-' + pn;
-    if (qdata.parts[pn] && (score === '' || Math.abs(score - qdata.parts[pn].rawscore)<.001)) {
+    if (qdata.parts[pn] && (score === '' || Math.abs(score - qdata.parts[pn].rawscore) < 0.001)) {
       // same as existing - don't submit as an override
       delete store.scoreOverrides[key];
     } else {
       // different score - submit as override. Save raw score (0-1)?.
-      store.scoreOverrides[key] = Math.round(10000*score)/10000;
+      store.scoreOverrides[key] = Math.round(10000 * score) / 10000;
     }
     store.saving = '';
   },
-  setFeedback(qn, feedback) {
+  setFeedback (qn, feedback) {
     // get current assess and question versions
     let av = store.curAver;
     let key = av;
@@ -336,5 +336,5 @@ export const actions = {
   },
   handleError (error) {
     store.errorMsg = error;
-  },
+  }
 };

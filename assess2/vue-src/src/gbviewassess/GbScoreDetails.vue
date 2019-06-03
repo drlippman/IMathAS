@@ -119,42 +119,42 @@ export default {
     MenuButton,
     Icons
   },
-  data: function() {
+  data: function () {
     return {
       curScores: false,
       showfeedback: false,
       showAllTries: false
-    }
+    };
   },
   computed: {
-    answeights() {
+    answeights () {
       if (!this.qdata.answeights) { // if answeights not generated yet
         return [1];
       } else {
         return this.qdata.answeights;
       }
     },
-    partPoss() {
+    partPoss () {
       var out = [];
-      for (let i=0; i<this.answeights.length; i++) {
-        out[i] = Math.round(1000*this.qdata.points_possible*this.answeights[i])/1000;
+      for (let i = 0; i < this.answeights.length; i++) {
+        out[i] = Math.round(1000 * this.qdata.points_possible * this.answeights[i]) / 1000;
       }
       return out;
     },
-    initScores() {
+    initScores () {
       var out = [];
       let partscore;
-      for (let i=0; i<this.answeights.length; i++) {
+      for (let i = 0; i < this.answeights.length; i++) {
         if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
           // handle the case of a single override
           let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
-          partscore = Math.round(1000*partscore)/1000;
+          partscore = Math.round(1000 * partscore) / 1000;
           out.push(partscore);
         } else if (this.qdata.scoreoverride) {
           if (this.qdata.parts[i] && this.qdata.parts[i].points_possible) {
             out.push(this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible);
           } else {
-            out.push(Math.round(1000*this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible)/1000);
+            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible) / 1000);
           }
         } else if (this.maxTry === 0) { // not attempted
           out.push('N/A');
@@ -164,27 +164,27 @@ export default {
       }
       return out;
     },
-    fullCreditLabel() {
+    fullCreditLabel () {
       if (this.answeights.length > 1) {
         return this.$t('gradebook.full_credit_parts');
       } else {
         return this.$t('gradebook.full_credit');
       }
     },
-    timeSpent() {
-      let out = Math.round(10*this.qdata.timeactive.total/60)/10 + ' ' + this.$t('gradebook.minutes');
+    timeSpent () {
+      let out = Math.round(10 * this.qdata.timeactive.total / 60) / 10 + ' ' + this.$t('gradebook.minutes');
       // TODO: Add per-try average?
       return out;
     },
-    useEditor() {
+    useEditor () {
       return (typeof window.tinyMCE !== 'undefined');
     },
-    isPractice() {
+    isPractice () {
       return store.ispractice;
     },
-    maxTry() {
+    maxTry () {
       let maxtry = 0;
-      for (let i=0; i<this.qdata.parts.length; i++) {
+      for (let i = 0; i < this.qdata.parts.length; i++) {
         if (this.qdata.parts[i] && this.qdata.parts[i].try) {
           if (this.qdata.parts[i].try > maxtry) {
             maxtry = this.qdata.parts[i].try;
@@ -193,34 +193,34 @@ export default {
       }
       return maxtry;
     },
-    questionEditUrl() {
+    questionEditUrl () {
       let qs = 'id=' + this.qdata.qsetid + '&cid=' + store.cid;
       qs += '&aid=' + store.aid + '&qid=' + this.qdata.qid;
       console.log(store.APIbase);
       return store.APIbase + '../course/moddataset.php?' + qs;
     },
-    questionErrorUrl() {
+    questionErrorUrl () {
       if (store.assessInfo.qerror_cid) {
         let quoteq = '0-' + this.qdata.qsetid + '-' + this.qdata.seed +
           '-reperr-' + store.assessInfo.ver;
         let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
-          '&quoteq=' + quoteq
-          '&to=' + this.qdata.qowner + '&title=Problem%20with%20question%20id%20'
-          + this.qdata.qsetid;
+          '&quoteq=' + quoteq;
+        '&to=' + this.qdata.qowner + '&title=Problem%20with%20question%20id%20' +
+          this.qdata.qsetid;
         return store.APIbase + '../msgs/msglist.php?' + qs;
       } else {
         return '';
       }
     },
-    useInMsg() {
+    useInMsg () {
       // TODO
       let quoteq = this.qn + '-' + this.qdata.qsetid + '-' + this.qdata.seed +
         '-' + store.aid + '-' + store.assessInfo.ver;
       let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
         '&quoteq=' + quoteq + '&to=' + store.uid;
-      return store.APIbase + '../msgs/msglist.php?'+qs;
-      //TODO: get GB to work for this.
-      //window.GB_show(this.$t('gradebook.send_msg'),
+      return store.APIbase + '../msgs/msglist.php?' + qs;
+      // TODO: get GB to work for this.
+      // window.GB_show(this.$t('gradebook.send_msg'),
       //  store.APIbase + '../msgs/msglist.php?'+qs, 800, 'auto');
     },
     moreOptions () {
@@ -230,7 +230,7 @@ export default {
           link: this.useInMsg
         },
         {
-          label: this.$t('gradebook.view_edit') + ' ID '+this.qdata.qsetid + ' Seed ' + this.qdata.seed,
+          label: this.$t('gradebook.view_edit') + ' ID ' + this.qdata.qsetid + ' Seed ' + this.qdata.seed,
           link: this.questionEditUrl
         },
         {
@@ -248,10 +248,10 @@ export default {
     }
   },
   methods: {
-    updateScore(pn, evt) {
-      actions.setScoreOverride(this.qn, pn, this.curScores[pn]/this.partPoss[pn]);
+    updateScore (pn, evt) {
+      actions.setScoreOverride(this.qn, pn, this.curScores[pn] / this.partPoss[pn]);
     },
-    updateFeedback(evt) {
+    updateFeedback (evt) {
       let content;
       if (this.useEditor) {
         content = window.tinymce.activeEditor.getContent();
@@ -260,13 +260,13 @@ export default {
       }
       actions.setFeedback(this.qn, content);
     },
-    allFull() {
-      for (let i=0; i<this.answeights.length; i++) {
+    allFull () {
+      for (let i = 0; i < this.answeights.length; i++) {
         this.$set(this.curScores, i, this.partPoss[i]);
-        actions.setScoreOverride(this.qn, i, this.curScores[i]/this.partPoss[i]);
+        actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
       }
     },
-    clearWork() {
+    clearWork () {
       store.clearAttempts.type = 'qver';
       store.clearAttempts.qn = this.qn;
       store.clearAttempts.show = true;
@@ -275,7 +275,7 @@ export default {
       this.$set(this, 'curScores', this.initScores);
       this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
       if (this.useEditor) {
-        window.initeditor("divs","fbbox",null,true);
+        window.initeditor('divs', 'fbbox', null, true);
       }
     },
     qHelps () {
@@ -301,7 +301,7 @@ export default {
         return [];
       }
     },
-    showRubric(pn) {
+    showRubric (pn) {
       if (!window.imasrubrics) {
         window.imasrubrics = store.assessInfo['rubrics'];
       }
@@ -309,8 +309,8 @@ export default {
       imasrubric_show(
         this.qdata.rubric,
         this.qdata.points_possible,
-        'sc'+this.qn+'-'+pn,
-        'fb'+this.qn,
+        'sc' + this.qn + '-' + pn,
+        'fb' + this.qn,
         this.qn,
         600
       );
@@ -324,7 +324,7 @@ export default {
       this.initCurScores();
     }
   }
-}
+};
 </script>
 
 <style>

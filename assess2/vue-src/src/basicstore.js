@@ -65,8 +65,8 @@ export const actions = {
           callback();
         }
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -131,8 +131,8 @@ export const actions = {
           }
         }
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -166,8 +166,8 @@ export const actions = {
         response = this.processSettings(response);
         this.copySettings(response);
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -299,8 +299,8 @@ export const actions = {
           });
         }
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -399,8 +399,8 @@ export const actions = {
         // clear autosave queue
         store.autosaveQueue = {};
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -436,8 +436,8 @@ export const actions = {
         response = this.processSettings(response);
         this.copySettings(response);
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -462,8 +462,8 @@ export const actions = {
         response = this.processSettings(response);
         this.copySettings(response);
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -489,8 +489,8 @@ export const actions = {
         this.copySettings(response);
         Router.push('/');
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -517,8 +517,8 @@ export const actions = {
         response = this.processSettings(response);
         this.copySettings(response);
       })
-      .fail((xhr,textStatus, errorThrown) => {
-        this.handleError(textStatus === 'parsererror' ? 'parseerror': 'noserver');
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
       })
       .always(response => {
         store.inTransit = false;
@@ -691,7 +691,6 @@ export const actions = {
     store.assessInfo = Object.assign({}, store.assessInfo, response);
   },
   processSettings (data) {
-
     if (data.hasOwnProperty('questions')) {
       for (let i in data.questions) {
         let thisq = data.questions[i];
