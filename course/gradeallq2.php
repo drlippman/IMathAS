@@ -80,7 +80,7 @@
 
 	// Load new assess info class
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings(array($qid));
+	$assess_info->loadQuestionSettings('all');
 	$ptsposs = $assess_info->getQuestionSetting($qid, 'points_possible');
 
 	if (isset($_GET['update']) && $canedit) {

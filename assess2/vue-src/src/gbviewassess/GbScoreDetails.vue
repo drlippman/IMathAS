@@ -151,9 +151,9 @@ export default {
           let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
           partscore = Math.round(1000 * partscore) / 1000;
           out.push(partscore);
-        } else if (this.qdata.scoreoverride) {
+        } else if (this.qdata.scoreoverride && this.qdata.scoreoverride.hasOwnProperty(i)) {
           if (this.qdata.parts[i] && this.qdata.parts[i].points_possible) {
-            out.push(this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible);
+            out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.qdata.parts[i].points_possible) / 1000);
           } else {
             out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible) / 1000);
           }

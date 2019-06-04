@@ -1711,7 +1711,6 @@ class AssessRecord
         $totalQtime = 0;
         for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
           $curQver = &$curAver['questions'][$qn]['question_versions'][$qv];
-
           // scoreoverride can be a single value override, or array per-part
           // should be RAW (0-1) override.
           if (isset($curQver['scoreoverride']) && !is_array($curQver['scoreoverride'])) {
@@ -1743,7 +1742,7 @@ class AssessRecord
         $aVerScore += $maxQscore;
         $verTime += $totalQtime;
       } // end loop over questions
-      $curAver['score'] = $aVerScore;
+      $curAver['score'] = round($aVerScore, 2);
       if ($aVerScore >= $maxAscore && ($by_question || $curAver['status'] == 1)) {
         $maxAscore = $aVerScore;
         $aScoredVer = $av;
@@ -1773,7 +1772,7 @@ class AssessRecord
       } else if ($keepscore === 'average') {
         $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),2);
       } else { // best, last, or by_question
-        $this->assessRecord['score'] = $allAssessVerScores[$this->data['scored_version']];
+        $this->assessRecord['score'] = round($allAssessVerScores[$this->data['scored_version']], 2);
       }
       $this->assessRecord['timeontask'] = $totalTime;
     }
