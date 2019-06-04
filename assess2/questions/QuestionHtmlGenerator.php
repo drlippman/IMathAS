@@ -512,7 +512,7 @@ class QuestionHtmlGenerator
               $sadiv .= filter(" <div class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
             }
           }
-          $sadiv .= '<div>';
+          $sadiv .= '</div>';
           $evaledqtext .= $sadiv;
         }
 

@@ -1283,7 +1283,7 @@ class AssessRecord
       // apply by-part overrides, if set
       if (isset($overrides[$pn])) {
         $partrawscores[$pn] = $overrides[$pn];
-        $partscores[$pn] = $overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot;
+        $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
       }
       if ($is_singlescore) {
         $parts[$pn] = array(
@@ -1655,10 +1655,15 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $assessver = $this->getAssessVer($ver);
     $out = array();
+    if ($qns === 'all') {
+      $qns = range(0, count($assessver['questions']) - 1);
+    }
     foreach ($qns as $qn) {
       $question_versions = $assessver['questions'][$qn]['question_versions'];
-      if (!$by_question || !is_numeric($ver)) {
+      if (!$by_question || $ver === 'last') {
         $curq = $question_versions[count($question_versions) - 1];
+      } else if ($ver === 'scored') {
+        $curq = $question_versions[$assessver['questions'][$qn]['scored_version']];
       } else {
         $curq = $question_versions[$ver];
       }
@@ -2126,11 +2131,70 @@ class AssessRecord
   }
 
   /**
+   * Converts score overrides for the scored version with keys in the form
+   * qn-pn into an array that can be fed into setGbScoreOverrides.
+   * @param  array $scores  with keys in the form qn-pn
+   * @return array         scores in the form av-qn-qv-pn
+   */
+  public function convertGbScoreOverrides($scores, $qptsposs = -1) {
+    $this->parseData();
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $out = array();
+    foreach ($scores as $key=>$score) {
+      list($qn,$pn) = array_map('intval', explode('-', $key));
+      if ($by_question) {
+        $av = 0;
+        $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+      } else {
+        $av = $this->data['scored_version'];
+        $qv = 0;
+      }
+      $qdata = $this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
+      if ($qptsposs > -1) {
+        $ptsposs = $qptsposs;
+      } else {
+        $ptsposs = $assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
+      }
+      $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]), 5);
+      $out[$av.'-'.$qn.'-'.$qv.'-'.$pn] = $adjscore;
+    }
+    return $out;
+  }
+
+  /**
+   * Check feedbacks to see if they've changed.  Converts from qn keys
+   * to av-qn-qv expected by setGbFeedbacks
+   * @param  [type] $feedbacks [description]
+   * @return [type]            [description]
+   */
+  public function convertGbFeedbacks($feedbacks) {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $this->parseData();
+    $out = array();
+    foreach ($feedbacks as $qn=>$fb) {
+      if ($by_question) {
+        $av = 0;
+        $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+      } else {
+        $av = $this->data['scored_version'];
+        $qv = 0;
+      }
+      $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
+      if ($fb != $qdata['feedback']) {
+        $out[$av.'-'.$qn.'-'.$qv] = $fb;
+      }
+    }
+    return $out;
+  }
+
+  /**
    * Save score overrides
-   * @param array $scores array with keys av-qn-qv-pn, or gen
+   * @param array $scores array with keys av-qn-qv-pn, or gen, or scored-qn-pn
    */
   public function setGbScoreOverrides($scores) {
     $this->parseData();
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+
     if (isset($scores['gen'])) { // general score override
       $this->data['scoreoverride'] = floatval($scores['gen']);
       $this->assessRecord['score'] = floatval($scores['gen']);
@@ -2140,7 +2204,20 @@ class AssessRecord
       //unset($this->data['scoreoverride']);
     }
     foreach ($scores as $key=>$score) {
-      list($av,$qn,$qv,$pn) = array_map('intval', explode('-', $key));
+      $keyparts = explode('-', $key);
+      if ($keyparts[0] === 'scored') {
+        $qn = intval($keyparts[1]);
+        $pn = intval($keyparts[2]);
+        if ($by_question) {
+          $av = 0;
+          $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+        } else {
+          $av = $this->data['scored_version'];
+          $qv = 0;
+        }
+      } else {
+        list($av,$qn,$qv,$pn) = array_map('intval', $keyparts);
+      }
       $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
       if (!isset($qdata['scoreoverride'])) {
         $qdata['scoreoverride'] = array();
@@ -2155,16 +2232,29 @@ class AssessRecord
 
   /**
    * Save feedbacks
-   * @param array $feedback keys av-g or av-qn-qv
+   * @param array $feedback keys av-g or av-qn-qv, or 'scored-qn'
    */
   public function setGbFeedbacks($feedback) {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+
     $this->parseData();
     foreach ($feedback as $key=>$fb) {
       $pts = explode('-', $key);
-      if ($pts[1] == 'g') {
+      if ($pts[1] === 'g') {
         // assessment-level feedback
         $av = intval($pts[0]);
         $this->data['assess_versions'][$av]['feedback'] = Sanitize::incomingHtml($fb);
+      } else if ($pts[0] === 'scored') {
+        $qn = intval($pts[1]);
+        if ($by_question) {
+          $av = 0;
+          $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+        } else {
+          $av = $this->data['scored_version'];
+          $qv = 0;
+        }
+        $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
+        $qdata['feedback'] = Sanitize::incomingHtml($fb);
       } else {
         // question-level feedback
         list($av,$qn,$qv) = array_map('intval', $pts);
@@ -2381,7 +2471,7 @@ class AssessRecord
 
   /**
    * Get the specified version of assessment data
-   * @param  string  $ver         The assessment attempt to grab, or 'last'
+   * @param  string  $ver         The assessment attempt to grab, or 'last' or 'scored'
    * @return object  assessment data for that take
    */
   private function getAssessVer($ver = 'last') {
@@ -2389,8 +2479,10 @@ class AssessRecord
     $this->parseData();
     if ($this->is_practice) {
       $assessver = $this->data['assess_versions'][0];
-    } else if ($by_question || !is_numeric($ver)) {
+    } else if ($by_question || $ver === 'last') {
       $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+    } else if ($ver === 'scored') {
+      $assessver = $this->data['assess_versions'][$this->data['scored_version']];
     } else {
       $assessver = $this->data['assess_versions'][$ver];
     }

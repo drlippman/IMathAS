@@ -66,4 +66,11 @@ $assess_record->saveRecord();
 
 $out = $assess_record->getGbScore();
 
+// update LTI grade
+$lti_sourcedid = $assess_info->getSetting('lti_sourcedid');
+if (strlen($lti_sourcedid) > 1) {
+  require_once("../includes/ltioutcomes.php");
+  calcandupdateLTIgrade($lti_sourcedid,$aid,$out['gbscore'],true);
+}
+
 echo json_encode($out);

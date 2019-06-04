@@ -47,7 +47,7 @@
 	} else {
 		$secfilter = -1;
 	}
-	
+
 	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
@@ -242,7 +242,7 @@
 		}
 
 	}
-	
+
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
 	$sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
@@ -444,13 +444,13 @@
 			}
 			echo "<div ";
 			if (getpts($scores[$loc])==$points) {
-				echo 'class="iscorrect"';
+				echo 'class="iscorrect bigquestionwrap"';
 			} else if (getpts($scores[$loc])>0) {
-				echo 'class="isnonzero"';
+				echo 'class="isnonzero bigquestionwrap"';
 			} else if ($scores[$loc]==-1) {
-				echo 'class="notanswered"';
+				echo 'class="notanswered bigquestionwrap"';
 			} else {
-				echo 'class="iswrong"';
+				echo 'class="iswrong bigquestionwrap"';
 			}
 			echo '>';
 
@@ -463,9 +463,9 @@
 				}
 				echo '</select></p>';
 			}
-			
+
 			echo "<p class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></p>';
-			    
+
 			if (!$groupdup) {
 				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
@@ -550,7 +550,7 @@
 						if ($j>0) { echo ', ';}
 						echo Sanitize::encodeStringForDisplay($prts[$j]);
 					}
-					
+
 				}
 
 			}
@@ -753,7 +753,7 @@ function sandboxgetweights($code,$seed) {
 		}
 	}
 	if (!isset($answeights)) {
-		if (!isset($anstypes)) { 
+		if (!isset($anstypes)) {
 			//this shouldn't happen unless the code crashed
 			return array(1);
 		}

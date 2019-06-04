@@ -7,9 +7,8 @@ TODOs:
   Add "latepass won't help you" warning on Closed page
   ! Need to revisit showhints throughout display code
   FIX: don't give "answers haven't changed" warning on assessment submit
-  Make sure course page indicators are working
   Teacher view-as-student working
-  Category summary in GB view
+  Category summary in GBviewassess
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -24,10 +23,6 @@ Newver /course/gb-aidexport.php
 Newver /course/gb-rescoreq.php
   - Should be simpler, since we have stored stuans for most question types and
     can replicate clientside eval
-Newver /course/gb-viewasid.php
-  - Might be some summary components we could reuse, maybe some widgets
-  - Not essential to use Vue, but would be nice for walking through previous tries/versions
-    - When walking through retakes, would want all the summary info to update too
 Newver /course/gradeallq.php
   - Should this only show scored version?
   - This one probably not in Vue (no need)
@@ -40,9 +35,11 @@ Newver /course/chgassessments.php
   In "Copy options" page, when selected, show a link to review the settings in a new window
   Maybe add tabs: one for assessments and one for settings
   Maybe have block groups collapseable?
-  Icons on assessments in selector?
+  Icons on assessments in selection list?
 
 
+~ Newver /course/gb-viewasid.php
+    Need to add category summary
 ~ Newver /course/modquestion.php
 ~ Newver /course/modquestiongrid.php
     Need to adjust options on these
@@ -57,8 +54,7 @@ Newver /course/chgassessments.php
       assessments might have diff types
 ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
   Punt on these by just disabling the regen option for now.
-~ Edit /forums/posthandler.php
-  Punt by continuing to use displayq2 for now
+
 
 Future Todos:
   Build modal for redeeming latepasses for LTI users.
@@ -67,6 +63,7 @@ Future Todos:
 
 Delay for later (since they work with displayq2 for now):
   Edit/Rewrite testquestion.php
+  Edit /forums/posthandler.php
   Edit/Rewrite embedq.php
   Edit/Rewrite multiembedq.php
 Delay for later:
