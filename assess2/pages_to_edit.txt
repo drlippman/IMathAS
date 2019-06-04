@@ -9,6 +9,14 @@ TODOs:
   FIX: don't give "answers haven't changed" warning on assessment submit
   Teacher view-as-student working
   Category summary in GBviewassess
+  Pre-generate dates in backend as strings:
+    enddate (need to have a way to tell if <2000000000)
+    original_enddate
+    timelimit_expires
+    Previous attempts date
+    gb assessver lastchange (need way tell if 0)
+    latepass_extendto
+
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -23,9 +31,6 @@ Newver /course/gb-aidexport.php
 Newver /course/gb-rescoreq.php
   - Should be simpler, since we have stored stuans for most question types and
     can replicate clientside eval
-Newver /course/gradeallq.php
-  - Should this only show scored version?
-  - This one probably not in Vue (no need)
 Newver /course/chgassessments.php
   Separate General Options from Assessment Options
   Have No change option in dropdowns, switch radio/checks to dropdowns.
@@ -70,6 +75,8 @@ Delay for later:
   Edit/Rewrite /util/crosscoursedata.php
   Edit/Rewrite /util/crosscoursedatadetail.php
 
+X Newver /course/gradeallq.php
+    - Only scored version implemented
 X? Edit /includes/loaditemshowdata.php (check status)
 X Edit /includes/unenrollphp
 X Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
