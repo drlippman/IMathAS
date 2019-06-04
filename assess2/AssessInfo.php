@@ -847,7 +847,10 @@ class AssessInfo
     }
     if ($settings['showans'] == 'N') {
       $settings['showans'] = 'never';
-    } else if ($settings['showans'] == 'L') {
+    }
+    /* question showans limited to never / default
+  
+    else if ($settings['showans'] == 'L') {
       $settings['showans'] = 'after_lastattempt';
     } else if ($settings['showans'] == 'J') {
       $settings['showans'] = 'after_lastattempt';
@@ -857,6 +860,7 @@ class AssessInfo
     } else if ($settings['showans'] == 'W') {
       $settings['showans'] = 'with_score';
     }
+    */
 
     if ($settings['showhints'] == -1) {
       $settings['showhints'] = $defaults['showhints'];

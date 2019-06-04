@@ -28,9 +28,11 @@ Newver /course/gb-itemresults.php
   - Probably can't do this one until displayq refactor is integrated
 Newver /course/gb-aidexport.php
   - Ditto on above
+  
 Newver /course/gb-rescoreq.php
   - Should be simpler, since we have stored stuans for most question types and
     can replicate clientside eval
+
 Newver /course/chgassessments.php
   Separate General Options from Assessment Options
   Have No change option in dropdowns, switch radio/checks to dropdowns.
@@ -45,10 +47,6 @@ Newver /course/chgassessments.php
 
 ~ Newver /course/gb-viewasid.php
     Need to add category summary
-~ Newver /course/modquestion.php
-~ Newver /course/modquestiongrid.php
-    Need to adjust options on these
-    Limit showans to use default / Never.
 ~ Edit /course/outcometable.php (need to fix viewingb/scoresingb handling)
 ~ Edit /course/gbtable2.php (need to fix viewingb/scoresingb handling, get includecomments working)
 ~ Edit /includes/exceptionfuncs.php (Need to figure a way to determine if out of retakes)
@@ -75,6 +73,8 @@ Delay for later:
   Edit/Rewrite /util/crosscoursedata.php
   Edit/Rewrite /util/crosscoursedatadetail.php
 
+X Newver /course/modquestion.php
+X Newver /course/modquestiongrid.php
 X Newver /course/gradeallq.php
     - Only scored version implemented
 X? Edit /includes/loaditemshowdata.php (check status)

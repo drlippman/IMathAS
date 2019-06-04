@@ -30,7 +30,6 @@ if (!(isset($teacherid))) {
 			$points = 9999;
 			$attempts=9999;
 			$penalty=9999;
-      $regenpenalty=9999;
 			$regen = 0;
 			$showans = 0;
 			$rubric = 0;
@@ -41,7 +40,6 @@ if (!(isset($teacherid))) {
 			if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
 			if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
 			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
-      if (trim($_POST['regenpenalty'])=="") {$regenpenalty=9999;} else {$regenpenalty = intval($_POST['regenpenalty']);}
 			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
 			if ($penalty!=9999) {
         $penalty_aftern = Sanitize::onlyInt($_POST['penaltyaftern']);
@@ -49,12 +47,7 @@ if (!(isset($teacherid))) {
           $penalty = 'S' . $penalty_aftern . $penalty;
         }
 			}
-      if ($regenpenalty!=9999) {
-        $regenpenalty_aftern = Sanitize::onlyInt($_POST['regenpenaltyaftern']);
-				if ($regenpenalty_aftern > 1) {
-          $regenpenalty = 'S' . $regenpenalty_aftern . $regenpenalty;
-        }
-			}
+
 			$regen = $_POST['allowregen'];
 			$showans = $_POST['showans'];
 			$rubric = intval($_POST['rubric']);
@@ -132,7 +125,7 @@ if (!(isset($teacherid))) {
 	} else { //DEFAULT DATA MANIPULATION
 
 		if (isset($_GET['id'])) {
-			$stm = $DBH->prepare("SELECT points,attempts,penalty,regenpenalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
+			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($line['penalty']{0}==='S') {
@@ -141,17 +134,10 @@ if (!(isset($teacherid))) {
 			} else {
 				$penalty_aftern = 1;
 			}
-      if ($line['regenpenalty']{0}==='S') {
-				$regenpenalty_aftern = $line['regenpenalty']{1};
-				$line['regenpenalty'] = substr($line['regenpenalty'],2);
-			} else {
-				$regenpenalty_aftern = 1;
-			}
 
 			if ($line['points']==9999) {$line['points']='';}
 			if ($line['attempts']==9999) {$line['attempts']='';}
 			if ($line['penalty']==9999) {$line['penalty']=''; }
-      if ($line['regenpenalty']==9999) {$line['regenpenalty']=''; }
 			if ($line['fixedseeds']===null) {$line['fixedseeds'] = '';}
 			$qsetid = $line['questionsetid'];
 		} else {
@@ -159,14 +145,12 @@ if (!(isset($teacherid))) {
 			$line['points']="";
 			$line['attempts']="";
 			$line['penalty']="";
-      $line['regenpenalty']="";
 			$line['fixedseeds'] = '';
 		  $penalty_aftern = 1;
-      $regenpenalty_aftern = 1;
 			$line['regen']=0;
 			$line['showans']='0';
 			$line['rubric']=0;
-			$line['showhints']=0;
+			$line['showhints']=-1;
 			$qsetid = $_GET['qsetid'];
 		}
 
@@ -200,7 +184,7 @@ if (!(isset($teacherid))) {
 		}
 
 		//get defaults
-		$query = "SELECT defpoints,defattempts,defpenalty,defregenpenalty,defregens,";
+		$query = "SELECT defpoints,defattempts,defpenalty,defregens,";
     $query .= "showans,submitby,showhints,shuffle FROM imas_assessments ";
 		$query .= "WHERE id=:id";
 		$stm = $DBH->prepare($query);
@@ -213,13 +197,6 @@ if (!(isset($teacherid))) {
 		} else {
 			$defaults['penalty'] = $defaults['defpenalty'] . '%';
 		}
-    if ($defaults['defregenpenalty']{0}==='S') {
-			$defaults['regenpenalty'] = sprintf(_('%d%% after %d full-credit versions'),
-        substr($defaults['defregenpenalty'],2), $defaults['defregenpenalty']{1});
-		} else {
-			$defaults['regenpenalty'] = $defaults['defregenpenalty'] . '%';
-		}
-
 
 		if ($defaults['showans']=='after_lastattempt') {
 			$defaults['showans'] = _('After last attempt on a version');
@@ -309,19 +286,10 @@ if ($defaults['submitby'] == 'by_question' && $defaults['defregens'] > 1) {
 <?php
 }
 ?>
-<span class=form>Show Answers</span><span class=formright>
+<span class=form>Show Answers during Assessment</span><span class=formright>
     <select name="showans">
      <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>>Use Default</option>
      <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>>Never during assessment</option>
-     <option value="F" <?php if ($line['showans']=='F') { echo 'selected="1"';}?>>After last attempt on a version</option>
-     <option value="1" <?php if ($line['showans']=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
-     <option value="2" <?php if ($line['showans']=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
-     <option value="3" <?php if ($line['showans']=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
-     <option value="4" <?php if ($line['showans']=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
-     <option value="5" <?php if ($line['showans']=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
-     <option value="6" <?php if ($line['showans']=="6") {echo "SELECTED";} ?>>After 6 attempts</option>
-     <option value="7" <?php if ($line['showans']=="7") {echo "SELECTED";} ?>>After 7 attempts</option>
-
     </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['showans']);?></i></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>
