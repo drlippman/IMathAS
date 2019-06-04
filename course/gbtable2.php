@@ -1207,7 +1207,11 @@ function gbtable() {
 	}
 
 	//Get assessment2 scores,
-	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.userid FROM imas_assessment_records AS iar ";
+	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.userid";
+	if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
+		$query .= ',iar.scoreddata';
+	}
+	$query .= " FROM imas_assessment_records AS iar ";
 	$query .= "JOIN imas_assessments AS ia ON ia.id=iar.assessmentid WHERE ia.courseid=:courseid ";
 	if ($limuser>0) {
 		$query .= " AND iar.userid=:userid ";
@@ -1290,10 +1294,12 @@ function gbtable() {
 			$IP=0;
 		}
 
+		$hasSubmittedTake = ($l['status']&64)>0;
+
 		if ($canviewall ||
 			$assessmenttype[$i] == 'immediately' || //viewingb
-			($assessmenttype[$i] == 'after_take' && $pts > 0) ||
-			($assessmenttype[$i] != 'never' && $now>$thised)
+			($assessmenttype[$i] == 'after_take' && $hasSubmittedTake) ||
+			($assessmenttype[$i] == 'after_due' && $now > $thised)
 		) {
 			$gb[$row][1][$col][2] = 1; //show link
 		} else {
@@ -1302,10 +1308,11 @@ function gbtable() {
 
 		$countthisone = false;
 
-		if (($sa[$i]=="never" && !$canviewall) ||
-		 	($sa[$i]=='after_due' && $now<$thised) ||
-			($sa[$i]=='in_gb' && $gb[$row][1][$col][2] == 0)
-		) {
+		if (!$canviewall && (
+			($sa[$i]=="never") ||
+		 	($sa[$i]=='after_due' && $now < $thised) ||
+			($sa[$i]=='after_take' && !$hasSubmittedTake)
+		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][3] = 0;  //no other info
 		} else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
@@ -1389,8 +1396,7 @@ function gbtable() {
 		}
 
 		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
-			// TODO - build feedback from scoredata
-			$gb[$row][1][$col][1] = $fbtxt;
+			$gb[$row][1][$col][1] = buildFeedback2($l['scoreddata']);
 		} else if (($l['status']&8)>0) {
 			$gb[$row][1][$col][1] = 1; //has comment
 		} else {
@@ -2325,5 +2331,44 @@ function gbpercentile($a,$p) {
 	} else {
 		return ($a[ceil($l)-1]);
 	}
+}
+
+function buildFeedback2($scoreddata) {
+	$scoreddata = json_decode(gzdecode($scoreddata), true);
+	$out = '';
+
+	foreach ($scoreddata['assess_versions'] as $av => $aver) {
+		$fbdisp = '';
+		foreach ($aver['questions'] as $qn => $qdata) {
+			$qfb = '';
+			foreach ($qdata['question_versions'] as $qv => $qver) {
+				if (!empty($qver['feedback'])) {
+					if (count($qdata['question_versions'])>1) {
+						$qfb .= '<p>'.sprintf(_('Feedback on Version %d:'), $qv+1).'</p>';
+					}
+					$qfb .= '<div class="fbbox">'.Sanitize::outgoingHtml($qver['feedback']).'</div>';
+				}
+			}
+			if ($qfb != '') {
+				$fbdisp .= '<p>'.sprintf(_('Feedback on Question %d:'), Sanitize::onlyInt($qn+1)).'</p>';
+				$fbdisp .= $qfb;
+			}
+		}
+		if (!empty($aver['feedback'])) {
+			if (count($scoreddata['assess_versions'])>1) {
+				$fbdisp .= '<p>'._('Overall feedback on this attempt:').'</p>';
+			} else {
+				$fbdisp .= '<p>'._('Overall feedback:').'</p>';
+			}
+			$fbdisp .= '<div class="fbbox">'.Sanitize::outgoingHtml($aver['feedback']).'</div>';
+		}
+		if ($fbdisp != '') {
+			if (count($scoreddata['assess_versions'])>1) {
+				$out .= '<p><b>'.sprintf(_('Feedback on attempt %d'), Sanitize::onlyInt($av)+1).'</b></p>';
+			}
+			$out .= $fbdisp;
+		}
+	}
+	return $out;
 }
 ?>

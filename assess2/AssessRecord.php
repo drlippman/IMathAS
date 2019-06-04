@@ -1744,7 +1744,7 @@ class AssessRecord
         $verTime += $totalQtime;
       } // end loop over questions
       $curAver['score'] = $aVerScore;
-      if ($aVerScore >= $maxAscore) {
+      if ($aVerScore >= $maxAscore && ($by_question || $curAver['status'] == 1)) {
         $maxAscore = $aVerScore;
         $aScoredVer = $av;
       }
@@ -1753,7 +1753,10 @@ class AssessRecord
       } else { // indiv question times
         $totalTime += $verTime;
       }
-      $allAssessVerScores[$av] = $aVerScore;
+      // only consider for final score if by_question or submitted
+      if ($by_question || $curAver['status'] == 1) {
+        $allAssessVerScores[$av] = $aVerScore;
+      }
     } // end loop over assessment versions
     if (!$by_question) {
       if ($keepscore == 'best') {
@@ -2358,7 +2361,7 @@ class AssessRecord
         }
       }
       if ($allQattempted) {
-        $this->assessRecord['status'] & ~2;
+        $this->assessRecord['status'] = $this->assessRecord['status'] & ~2;
       } else {
         $this->assessRecord['status'] |= 2;
       }
@@ -2370,6 +2373,17 @@ class AssessRecord
         $lastAver['status'] == 1
       ) {
         $outOfAttempts = true;
+      }
+      $hasSubmitted = false;
+      for ($av=0; $av < count($this->data['assess_versions']); $av++) {
+        if ($this->data['assess_versions'][$av]['status'] == 1) {
+          $hasSubmitted = true;
+        }
+      }
+      if ($hasSubmitted) {
+        $this->assessRecord['status'] |= 64;
+      } else {
+        $this->assessRecord['status'] = $this->assessRecord['status'] & ~64;
       }
     }
     if ($outOfAttempts) {

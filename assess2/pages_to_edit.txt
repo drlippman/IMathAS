@@ -28,7 +28,7 @@ Newver /course/gb-itemresults.php
   - Probably can't do this one until displayq refactor is integrated
 Newver /course/gb-aidexport.php
   - Ditto on above
-  
+
 Newver /course/gb-rescoreq.php
   - Should be simpler, since we have stored stuans for most question types and
     can replicate clientside eval
@@ -47,16 +47,6 @@ Newver /course/chgassessments.php
 
 ~ Newver /course/gb-viewasid.php
     Need to add category summary
-~ Edit /course/outcometable.php (need to fix viewingb/scoresingb handling)
-~ Edit /course/gbtable2.php (need to fix viewingb/scoresingb handling, get includecomments working)
-~ Edit /includes/exceptionfuncs.php (Need to figure a way to determine if out of retakes)
-~ Edit /course/exception.php  (need to handle or rewrite "force regen" option)
-  - What if they're out of regens?
-  - For by-assessment, do we force new take?
-    - If so, how do we communicate that, especially in massexception where diff
-      assessments might have diff types
-~ Edit /course/massexception.php (need to handle or rewrite "force regen")
-  Punt on these by just disabling the regen option for now.
 
 
 Future Todos:
@@ -72,7 +62,19 @@ Delay for later (since they work with displayq2 for now):
 Delay for later:
   Edit/Rewrite /util/crosscoursedata.php
   Edit/Rewrite /util/crosscoursedatadetail.php
+  ~ Edit /course/exception.php  (need to handle or rewrite "force regen" option)
+    - What if they're out of regens?
+    - For by-assessment, do we force new take?
+      - If so, how do we communicate that, especially in massexception where diff
+        assessments might have diff types
+  ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
+    Punt on these by just disabling the regen option for now.
 
+x Make sure assess_record.score only updates in by_assess mode on submission
+X Better way to tell if there is a submitted take (status |= 64)
+X Edit /course/gbtable2.php
+X Edit /includes/exceptionfuncs.php
+X Edit /course/outcometable.php
 X Newver /course/modquestion.php
 X Newver /course/modquestiongrid.php
 X Newver /course/gradeallq.php

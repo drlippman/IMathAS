@@ -110,7 +110,7 @@ function outcometable() {
 	}
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome,allowlate FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome,allowlate,viewingb,scoresingb,ver FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
 	$query .= "AND cntingb>0 AND cntingb<3 ";
 	$qarr = array(':courseid'=>$cid);
 	if ($istutor) {
@@ -143,6 +143,8 @@ function outcometable() {
 	$qposs = array();
 	$qoutcome = array();
 	$itemoutcome = array();
+	$assessmenttype = array();
+	$sa = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (substr($line['deffeedback'],0,8)=='Practice') { continue;}
 		if ($line['avail']==2) {
@@ -169,6 +171,18 @@ function outcometable() {
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb']; //1: count, 2: extra credit
 		$assessoutcomes[$kcnt] = array();
+
+		if ($line['ver'] > 1) {
+			// For assess2,
+			// $assessmenttype = viewingb setting
+			// $sa = scoresingb setting
+			$assessmenttype[$kcnt] = $line['viewingb'];
+			$sa[$kcnt] = $line['scoresingb'];
+		} else {
+			$deffeedback = explode('-',$line['deffeedback']);
+			$assessmenttype[$kcnt] = $deffeedback[0];
+			$sa[$kcnt] = $deffeedback[1];
+		}
 
 		$aitems = explode(',',$line['itemorder']);
 		foreach ($aitems as $k=>$v) {
@@ -694,7 +708,7 @@ function outcometable() {
 		}
 
 		if ($useexception) {
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $sa[$i]=="never") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
@@ -724,11 +738,13 @@ function outcometable() {
 		$countthisone = false;
 		$gb[$row][1][$col][1] = $ptsposs;
 
-		//TODO: This is wrong
-		if (($sa[$i]=="never" && !$canviewall) ||
-		 	($sa[$i]=='after_due' && $now<$thised) ||
-			($sa[$i]=='in_gb' && $gb[$row][1][$col][2] == 0)
-		) {
+		$hasSubmittedTake = ($l['status']&64)>0;
+
+		if (!$canviewall && (
+			($sa[$i]=="never") ||
+		 	($sa[$i]=='after_due' && $now < $thised) ||
+			($sa[$i]=='after_take' && !$hasSubmittedTake)
+		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][2] = 0;  //no other info
 		} else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
