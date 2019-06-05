@@ -1147,13 +1147,12 @@ jQuery(function() {
 });
 
 function setActiveTab(el) {
-	var tabid = el.id;
 	jQuery(el).closest(".tabwrap").find("li.active").removeClass("active");
 	jQuery(el).closest(".tablist").find("a[role=tab]").attr("aria-selected",false);
 	jQuery(el).attr("aria-selected",true);
 	jQuery(el).parent().addClass("active");
 	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);
-	var tabpanelid = tabid.replace(/tab/,"tabpanel");
+	var tabpanelid = el.getAttribute('aria-controls');
 	jQuery(el).closest(".tabwrap").find("#"+tabpanelid).show().attr("aria-hidden",false);
 }
 

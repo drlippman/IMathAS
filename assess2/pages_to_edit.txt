@@ -9,6 +9,16 @@ TODOs:
   FIX: don't give "answers haven't changed" warning on assessment submit
   Teacher view-as-student working
   Category summary in GBviewassess
+  Default feedback text (maybe only tack on at point of viewing?)
+  Rounding:
+    Final rounding in GB (1 decimal place)
+    Individual question scores:
+      Current: 1 decimal place
+    Part scores:
+      Current: 2 decimal places
+    Answeights:
+      Current: 3 decimal places
+      maybe look at storing [1,1,1] instead of [.333,.333,.337]
   Pre-generate dates in backend as strings:
     enddate (need to have a way to tell if <2000000000)
     original_enddate
@@ -32,17 +42,6 @@ Newver /course/gb-aidexport.php
 Newver /course/gb-rescoreq.php
   - Should be simpler, since we have stored stuans for most question types and
     can replicate clientside eval
-
-Newver /course/chgassessments.php
-  Separate General Options from Assessment Options
-  Have No change option in dropdowns, switch radio/checks to dropdowns.
-    So "change" box isn't required
-  Have core options set so if one is changed, a notice is displayed that all
-    need to be changed (mark option with *)
-  In "Copy options" page, when selected, show a link to review the settings in a new window
-  Maybe add tabs: one for assessments and one for settings
-  Maybe have block groups collapseable?
-  Icons on assessments in selection list?
 
 
 ~ Newver /course/gb-viewasid.php
@@ -70,6 +69,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Newver /course/chgassessments.php
 x Make sure assess_record.score only updates in by_assess mode on submission
 X Better way to tell if there is a submitted take (status |= 64)
 X Edit /course/gbtable2.php

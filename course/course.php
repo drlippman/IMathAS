@@ -531,7 +531,13 @@ if ($overwriteBody==1) {
 		</p>
 
 		<p><b><?php echo _('Mass Change'); ?></b><br/>
-			<a href="chgassessments.php?cid=<?php echo $cid ?>"><?php echo _('Assessments'); ?></a><br/>
+			<?php
+			if ($courseUIver>1) {
+				echo '<a href="chgassessments2.php?cid='.$cid.'">'. _('Assessments') .'</a><br/>';
+			} else {
+				echo '<a href="chgassessments.php?cid='.$cid.'">'. _('Assessments') .'</a><br/>';
+			}
+			?>
 			<a href="chgforums.php?cid=<?php echo $cid ?>"><?php echo _('Forums'); ?></a><br/>
 			<a href="chgblocks.php?cid=<?php echo $cid ?>"><?php echo _('Blocks'); ?></a><br/>
 			<a href="masschgdates.php?cid=<?php echo $cid ?>"><?php echo _('Dates'); ?></a><br/>
