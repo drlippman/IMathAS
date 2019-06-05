@@ -1282,16 +1282,21 @@ class AssessRecord
             $exceptionPenalty,
             true
           );
-          if ($scoreAfterPenalty > $partscores[$pn]) {
+          if ($scoreAfterPenalty >= $partscores[$pn]) {
             $partscores[$pn] = $scoreAfterPenalty;
             $partrawscores[$pn] = $parttry['raw']*1;
             $partpenalty = $penaltyList;
             $scoredTry[$pn] = $pa;
           }
-        } else if ($partscores[$pn]==0 && $parttry['raw']==-2) {
-          // -2 indicates the item is a manual grade item
-          $partReqManual = true;
+        } else if ($partscores[$pn]==0) {
+          // if the best score so far is 0, mark this as scored try
+          $scoredTry[$pn] = $pa;
+          if ($parttry['raw']==-2) {
+            // -2 indicates the item is a manual grade item
+            $partReqManual = true;
+          }
         }
+
       }
       // apply by-part overrides, if set
       if (isset($overrides[$pn])) {
@@ -2462,6 +2467,7 @@ class AssessRecord
       $base *= (1 - $exceptionpenalty / 100);
       $penalties[] = array('type'=>'late', 'pct'=>$exceptionpenalty);
     }
+    $base = round($base, 5); // cut off weird computer arithmetic issues
     if ($returnPenalties) {
       return array($base, $penalties);
     } else {
