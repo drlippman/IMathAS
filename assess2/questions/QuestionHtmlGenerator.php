@@ -224,35 +224,20 @@ class QuestionHtmlGenerator
             if ($qdata['qtype'] == "multipart") {
                 // $answeights - question writer defined
                 if (isset($answeights)) {
-                    if (!is_array($answeights)) {
-                        $answeights = explode(",", $answeights);
-                    }
-                    $answeights = array_map('trim', $answeights);
-                    $localsum = array_sum($answeights);
-                    if ($localsum == 0) {
-                        $localsum = 1;
-                    }
-                    foreach ($answeights as $atIdx => $vval) {
-                        $answeights[$atIdx] = $vval / $localsum;
-                    }
-                } else {
-                    if (count($anstypes) > 1) {
-                        if ($qnpointval == 0) {
-                            $qnpointval = 1;
-                        }
-                        $answeights = array_fill(
-                            0,
-                            count($anstypes) - 1,
-                            round($qnpointval / count($anstypes), 3)
-                        );
-                        $answeights[] = $qnpointval - array_sum($answeights);
-                        foreach ($answeights as $atIdx => $vval) {
-                            $answeights[$atIdx] = $vval / $qnpointval;
-                        }
-                    } else {
-                        $answeights = array(1);
-                    }
-                }
+          				if (!is_array($answeights)) {
+          					$answeights = explode(",",$answeights);
+          				}
+          				$answeights = array_map('trim', $answeights);
+          				if (count($answeights) != count($anstypes)) {
+          					$answeights = array_fill(0, count($anstypes), 1);
+          				}
+          			} else {
+          				if (count($anstypes)>1) {
+          					$answeights = array_fill(0, count($anstypes), 1);
+          				} else {
+          					$answeights = array(1);
+          				}
+          			}
             }
 
             // Get the answers to all parts of this question.

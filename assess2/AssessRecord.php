@@ -1051,8 +1051,8 @@ class AssessRecord
       $out['status'] = 'attempted';
     }
     if ($include_scores) {
-      $out['score'] = ($score != -1) ? $score : 0;
-      $out['rawscore'] = ($raw != -1) ? $raw : 0;
+      $out['score'] = ($score != -1) ? round($score,2) : 0;
+      $out['rawscore'] = ($raw != -1) ? round($raw,4) : 0;
     }
     // if jumped to answer, burn tries
     if (!empty($curq['jumptoans'])) {
@@ -1288,7 +1288,7 @@ class AssessRecord
       if ($is_singlescore) {
         $parts[$pn] = array(
           'try' => count($qver['tries'][$pn]),
-          'rawscore' => $partrawscores[$pn]
+          'rawscore' => round($partrawscores[$pn],4)
         );
         if ($pn==0) {
           $parts[$pn]['penalties'] = $partpenalty;
@@ -1296,18 +1296,18 @@ class AssessRecord
       } else {
         $parts[$pn] = array(
           'try' => count($qver['tries'][$pn]),
-          'score' => $partscores[$pn],
-          'rawscore' => $partrawscores[$pn],
+          'score' => round($partscores[$pn],3),
+          'rawscore' => round($partrawscores[$pn],4),
           'penalties' => $partpenalty,
           'req_manual' => $partReqManual,
-          'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
+          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
         );
       }
     }
     $qScore = array_sum($partscores);
     $qRawscore = 0;
     for ($pn = 0; $pn < count($answeights); $pn++) {
-      $qRawscore += $partrawscores[$pn]*$answeights[$pn];
+      $qRawscore += $partrawscores[$pn]*$answeights[$pn]/$answeightTot;
     }
     return array($qScore, $qRawscore, $parts, $scoredTry);
   }
@@ -1736,13 +1736,13 @@ class AssessRecord
         if ($by_question) {
           $curAver['questions'][$qn]['scored_version'] = $qScoredVer;
         }
-        $curAver['questions'][$qn]['score'] = $maxQscore;
-        $curAver['questions'][$qn]['rawscore'] = $maxQrawscore;
+        $curAver['questions'][$qn]['score'] = round($maxQscore,2);
+        $curAver['questions'][$qn]['rawscore'] = round($maxQrawscore,4);
         $curAver['questions'][$qn]['time'] = $totalQtime;
         $aVerScore += $maxQscore;
         $verTime += $totalQtime;
       } // end loop over questions
-      $curAver['score'] = round($aVerScore, 2);
+      $curAver['score'] = round($aVerScore, 1);
       if ($aVerScore >= $maxAscore && ($by_question || $curAver['status'] == 1)) {
         $maxAscore = $aVerScore;
         $aScoredVer = $av;
@@ -1770,9 +1770,9 @@ class AssessRecord
       if (isset($this->data['scoreoverride'])) {
         $this->assessRecord['score'] = $this->data['scoreoverride'];
       } else if ($keepscore === 'average') {
-        $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),2);
+        $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),1);
       } else { // best, last, or by_question
-        $this->assessRecord['score'] = round($allAssessVerScores[$this->data['scored_version']], 2);
+        $this->assessRecord['score'] = round($allAssessVerScores[$this->data['scored_version']], 1);
       }
       $this->assessRecord['timeontask'] = $totalTime;
     }
@@ -2157,7 +2157,8 @@ class AssessRecord
       } else {
         $ptsposs = $assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
       }
-      $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]), 5);
+      $answeightTot = array_sum($qdata['answeights']);
+      $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
       $out[$av.'-'.$qn.'-'.$qv.'-'.$pn] = $adjscore;
     }
     return $out;
@@ -2620,10 +2621,11 @@ class AssessRecord
     $scoredet = array();
     $scoreonfirst = 0;
     $subsUsed = array();
+    $answeightTot = array_sum($qdata['answeights']);
 
     for ($pn = 0; $pn < count($qdata['tries']); $pn++) {
       $firstTry = $qdata['tries'][$pn][0];
-      $scoreonfirst += $firstTry['raw'] * $qdata['answeights'][$pn];
+      $scoreonfirst += $firstTry['raw'] * $qdata['answeights'][$pn]/$answeightTot;
       $scoredet[$pn] = $firstTry['raw'];
       if (!isset($subsUsed[$firstTry['sub']])) {
         $timeonfirst += $firstTry['time'];

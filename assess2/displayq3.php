@@ -274,19 +274,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$partattemp
 					$answeights = explode(",",$answeights);
 				}
 				$answeights = array_map('trim', $answeights);
-				$localsum = array_sum($answeights);
-				if ($localsum==0) {$localsum = 1;}
-				foreach ($answeights as $kidx=>$vval) {
-					$answeights[$kidx] = $vval/$localsum;
+				if (count($answeights) != count($anstypes)) {
+					$answeights = array_fill(0, 1, count($anstypes));
 				}
 			} else {
 				if (count($anstypes)>1) {
-					if ($qnpointval==0) {$qnpointval=1;}
-					$answeights = array_fill(0,count($anstypes)-1,round($qnpointval/count($anstypes),3));
-					$answeights[] = $qnpointval-array_sum($answeights);
-					foreach ($answeights as $kidx=>$vval) {
-						$answeights[$kidx] = $vval/$qnpointval;
-					}
+					$answeights = array_fill(0, 1, count($anstypes));
 				} else {
 					$answeights = array(1);
 				}

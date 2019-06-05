@@ -456,35 +456,24 @@ class ScoreEngine
         $partLastAnswerAsGiven = array();
         $partLastAnswerAsNumber = array();
         if (isset($answeights)) {
-            if (!is_array($answeights)) {
-                $answeights = explode(",", $answeights);
-            }
-
-            $answeights = array_map('trim', $answeights);
-            $localsum = array_sum($answeights);
-            if ($localsum == 0) {
-                $localsum = 1;
-            }
-            foreach ($answeights as $partnum => $vval) {
-                $answeights[$partnum] = $vval / $localsum;
-            }
-        } else {
-            if (count($anstypes) > 1) {
-                if ($qnpointval == 0) {
-                    $qnpointval = 1;
-                }
-                $answeights = array_fill(0, count($anstypes) - 1, round($qnpointval / count($anstypes), 2));
-                $answeights[] = $qnpointval - array_sum($answeights);
-                foreach ($answeights as $partnum => $vval) {
-                    $answeights[$partnum] = $vval / $qnpointval;
-                }
-            } else {
-                $answeights = array(1);
-            }
-        }
+  				if (!is_array($answeights)) {
+  					$answeights = explode(",",$answeights);
+  				}
+  				$answeights = array_map('trim', $answeights);
+  				if (count($answeights) != count($anstypes)) {
+  					$answeights = array_fill(0, count($anstypes), 1);
+  				}
+  			} else {
+  				if (count($anstypes)>1) {
+  					$answeights = array_fill(0, count($anstypes), 1);
+  				} else {
+  					$answeights = array(1);
+  				}
+  			}
         $scores = array();
         $raw = array();
         $accpts = 0;
+        $answeightTot = array_sum($answeights);
         foreach ($anstypes as $partnum => $anstype) {
             $inputReferenceNumber = ($qnidx + 1) * 1000 + $partnum;
 
@@ -493,8 +482,8 @@ class ScoreEngine
                 ->setIsMultiPartQuestion(true)
                 ->setQuestionPartNumber($partnum);
 
-			// TODO: Do this a different/better way. (not accessing _POST)
-			$scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
+            // TODO: Do this a different/better way. (not accessing _POST)
+			      $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
 
             $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
             $scorePartResult = $scorePart->getResult();
@@ -508,7 +497,7 @@ class ScoreEngine
                     $accpts++;
                 }
             } else {
-                $scores[$partnum] = ($raw[$partnum] < 0) ? 0 : round($raw[$partnum] * $answeights[$partnum], 4);
+                $scores[$partnum] = ($raw[$partnum] < 0) ? 0 : round($raw[$partnum] * $answeights[$partnum]/$answeightTot, 4);
             }
             $raw[$partnum] = round($raw[$partnum], 2);
             $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
