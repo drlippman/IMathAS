@@ -30,6 +30,7 @@ export default {
         out.push({
           ver: i,
           score: this.versions[i].score,
+          ptsposs: this.versions[i].points_possible,
           scored: i === this.selected,
           onclick: () => this.$emit('setversion', this.qn, i)
         });

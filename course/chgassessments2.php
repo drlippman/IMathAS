@@ -398,7 +398,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['removeperq'])) {
 			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0,showhints=-1,fixedseeds=NULL WHERE assessmentid IN ($checkedlist)");
 		}
-		if (isset($_POST['docopyopt']) || isset($_POST['chgdefpoints']) || isset($_POST['removeperq'])) {
+		if (isset($_POST['docopyopt']) || $_POST['defpoints'] !== '' || isset($_POST['removeperq'])) {
 			//update points possible
 			require_once("../includes/updateptsposs.php");
 			foreach ($checked as $aid) {
@@ -407,7 +407,7 @@ if (!(isset($teacherid))) {
 			// re-total existing assessment attempts to adjust scores
 			require("../assess2/AssessInfo.php");
 			require("../assess2/AssessRecord.php");
-			$stm->$DBH->query("SELECT * FROM imas_assessment_records WHERE assessmentid IN ($checkedlist) ORDER BY assessmentid");
+			$stm = $DBH->query("SELECT * FROM imas_assessment_records WHERE assessmentid IN ($checkedlist) ORDER BY assessmentid");
 			$lastAid = 0;
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['assessmentid'] != $lastAid) {

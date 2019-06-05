@@ -47,7 +47,7 @@
           </span>
           <span v-else>
             {{ aData.gbscore }}
-          </span>/{{ aData.points_possible }}
+          </span> / {{ aData.points_possible }}
         </strong>
         <span v-if="aData.scoreoverride">
           ({{ $t('gradebook.overridden') }})
@@ -167,6 +167,12 @@
                 @setversion = "changeQuestionVersion"
                 class = "med-left"
               />
+              <span v-else>
+                {{ $t('gradebook.score') }}:
+                <strong>
+                  {{ qdata[curQver[qn]].score }}/{{ qdata[curQver[qn]].points_possible }}
+                </strong>
+              </span>
 
             </div>
             <div class="scrollpane">

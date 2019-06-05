@@ -2,7 +2,7 @@
   <span>
     {{ attemptNum }}.
     <span v-if="option.hasOwnProperty('score')">
-      {{ score }}
+      {{$t('gradebook.score')}}: <strong>{{ score }}</strong>
     </span>
   </span>
 </template>
@@ -18,7 +18,7 @@ export default {
         (this.option.scored ? '*' : '') + '/' + this.total;
     },
     score () {
-      return this.$t('gradebook.score') + ': ' + this.option.score;
+      return this.option.score + '/' + this.option.ptsposs;
     }
   }
 };
