@@ -1,7 +1,7 @@
 <template>
   <div v-if="qinfo.answeights">
     <p>{{ $tc('livepoll.numresults', numResults) }}</p>
-    <div v-if="showresults">
+    <div v-show="showresults">
       <div v-for="(resdata,pn) in results" :key="pn" class="med-below">
         <livepoll-results-choices
           v-if="resdata.hasOwnProperty('choices')"
