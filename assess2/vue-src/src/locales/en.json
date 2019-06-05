@@ -241,7 +241,10 @@
     "open_input": "Open student input",
     "close_input": "Close student input",
     "new_version": "Generate a similar question",
-    "waiting": "Waiting for the instructor to start a question"
+    "waiting": "Waiting for the instructor to start a question",
+    "numresults": "1 result received | {n} results received",
+    "answer": "Answer",
+    "frequency": "Frequency"
   },
   "lti": {
     "userprefs": "User Preferences",

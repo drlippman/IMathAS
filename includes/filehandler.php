@@ -441,14 +441,14 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 	// file uploads in them
 	$aidlist = implode(',', array_map('intval', $aids));
 	$userlist = implode(',', array_map('intval', $tounenroll));
-	$query = "SELECT assessmentid,scoredata,practicedata FROM imas_assessment_records ";
+	$query = "SELECT assessmentid,scoreddata,practicedata FROM imas_assessment_records ";
 	$query .= "WHERE assessmentid IN ($aidlist) AND userid IN ($userlist)";
 	$stm = $DBH->query($query);
 	$todel = [];
 	$tomaybedel = [];
 	$tolookupaid = [];
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$scoredata = gzdecode($row['scoredata']);
+		$scoredata = gzdecode($row['scoreddata']);
 		$practicedata = gzdecode($row['practicedata']);
 		preg_match_all('/@FILE:(.+?)@/', $scoredata.$practicedata, $matches);
 		foreach ($matches[1] as $file) {

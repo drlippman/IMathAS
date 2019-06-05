@@ -61,7 +61,9 @@
       />
 
       <livepoll-results
-        v-if = "isTeacher && showResults && curstate > 1"
+        v-if = "isTeacher"
+        :showresults = "showResults && curstate > 1"
+        :showans = "curstate === 4"
         :qn = "curqn"
       />
 
@@ -148,6 +150,8 @@ export default {
       if (!store.livepollResults.hasOwnProperty(this.curqn)) {
         this.$set(store.livepollResults, this.curqn, {});
       }
+      data.score = JSON.parse(data.score);
+      data.ans = JSON.parse(data.ans);
       this.$set(store.livepollResults[this.curqn], data.user, data);
       // TODO: update results. Hopefully will happen automatically
     },
@@ -224,6 +228,7 @@ export default {
         newstate: 1,
         forceregen: 1
       });
+      this.$set(store.livepollResults, this.curqn, {});
     },
     updateShowAnswers () {
       // if already showing results, need to call the server with new state

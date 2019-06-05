@@ -433,7 +433,7 @@ class DrawingAnswerBox implements AnswerBox
     						} else if ($answerformat[$i]=='freehand') {
     							$out .= "data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"0.7\">" . _('Freehand Draw') . "</span>";
     							if ($answerformat[0]=='freehand' && count($answerformat)==1) {
-    								$out .= "<span onclick=\"imathasDraw.settool(this,$qn,-1)\">" . _('Eraser') . "</span>";
+    								$out .= "<span data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"-1\">" . _('Eraser') . "</span>";
     							}
     						} else if ($answerformat[$i]=='dot') {
     							$out .= "data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"1\">" . _('Dot') . "</span>";

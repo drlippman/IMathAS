@@ -133,8 +133,8 @@ export default {
       if (!this.qdata.answeights) { // if answeights not generated yet
         return [1];
       } else {
-        let answeightTot = this.qdata.answeights.reduce((a,c) => a+c);
-        return this.qdata.answeights.map(x => x/answeightTot);
+        let answeightTot = this.qdata.answeights.reduce((a, c) => a + c);
+        return this.qdata.answeights.map(x => x / answeightTot);
       }
     },
     partPoss () {

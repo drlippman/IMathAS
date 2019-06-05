@@ -4,6 +4,8 @@ TODOs:
   Prop types
   ? tinymce drag handle showing when question is not active
   Get overtime handled
+    overtime penalty?  Still mark as overtime, but count in grade
+    Make sure questions submitted after time limit are marked in gbviewassess
   Add "latepass won't help you" warning on Closed page
   ! Need to revisit showhints throughout display code
   FIX: don't give "answers haven't changed" warning on assessment submit
@@ -18,7 +20,7 @@ TODOs:
       Current: 2 decimal places
     Answeights:
       Current: 3 decimal places
-      maybe look at storing [1,1,1] instead of [.333,.333,.337]
+      maybe look at storing [1,1,1] instead of [.333,.333,.334]
   Pre-generate dates in backend as strings:
     enddate (need to have a way to tell if <2000000000)
     original_enddate

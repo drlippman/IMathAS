@@ -189,7 +189,7 @@ if (count($qns) > 0) {
 
   // Recalculate scores
   $assess_record->reTotalAssess($qns);
-  
+
 } else {
   $assess_info->loadQuestionSettings('all', false);
 }
@@ -249,8 +249,8 @@ if ($end_attempt) {
       $lastResults = $assess_record->getLastRawResult($qn);
       //TODO: Need to figure out the format they should be in (for multipart)
       //TODO: Or, just don't support multipart
-      $rawscores = implode('~', $lastResults['raw']);
-      $lastAnswer = implode('~', $lastResults['stuans']);
+      $rawscores = json_encode($lastResults['raw']);
+      $lastAnswer = json_encode($lastResults['stuans']);
 
       $toSign = $aid.$qn.$uid.$rawscores.$lastAnswer;
       $now = time();
