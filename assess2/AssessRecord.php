@@ -1010,7 +1010,15 @@ class AssessRecord
       $status = 'attempted';
       if ($include_scores) {
         // get scores. Get last try unless doing 'scored'
-        list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet);
+        if (isset($curq['scoreoverride']) && is_array($curq['scoreoverride'])) {
+          list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet, $curq['scoreoverride']);
+        } else {
+          list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet);
+        }
+        if (isset($curq['scoreoverride']) && !is_array($curq['scoreoverride'])) {
+          $score = $curq['scoreoverride'] * $out['points_possible'];
+          $raw = $curq['scoreoverride'];
+        }
       }
       $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
 
@@ -1241,8 +1249,13 @@ class AssessRecord
         $parts[$pn] = array(
           'try' => 0,
           'score' => 0,
-          'points_possible' => $qsettings['points_possible'] * $answeights[$pn]/$answeightTot
+          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
         );
+        // apply by-part overrides, if set
+        if (isset($overrides[$pn])) {
+          $partrawscores[$pn] = $overrides[$pn];
+          $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
+        }
         continue;
       }
       if ($try === 'last') {
