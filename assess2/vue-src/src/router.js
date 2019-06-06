@@ -7,13 +7,14 @@ import Skip from './views/Skip.vue';
 import Full from './views/Full.vue';
 import Print from './views/Print.vue';
 import FullPaged from './views/FullPaged.vue';
-import Videocued from './views/Videocued.vue';
-import Livepoll from './views/Livepoll.vue';
+//import Videocued from './views/Videocued.vue';
+//import Livepoll from './views/Livepoll.vue';
 // const Skip = () => import(/* webpackChunkName: "skip" */ './views/Skip.vue');
 // const Full = () => import(/* webpackChunkName: "full" */ './views/Full.vue');
 // const Print = () => import(/* webpackChunkName: "print" */ './views/Print.vue');
 // const FullPaged = () => import(/* webpackChunkName: "fullpaged" */ './views/FullPaged.vue');
-// const Livepoll = () => import(/* webpackChunkName: "livepoll" */ './views/Livepoll.vue');
+const Videocued = () => import(/* webpackChunkName: "special" */ './views/Videocued.vue');
+const Livepoll = () => import(/* webpackChunkName: "special" */ './views/Livepoll.vue');
 import { store, actions } from './basicstore';
 
 Vue.use(Router);

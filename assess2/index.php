@@ -29,6 +29,7 @@ $placeinhead = '<script type="text/javascript">var APIbase = "'.$GLOBALS['basesi
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js" type="text/javascript"></script>';
