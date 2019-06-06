@@ -802,7 +802,7 @@ class AssessRecord
       // if it's a submitted version or an active one no longer available
       if ($ver['status'] === 1 || (!$is_available && $ver['status'] === 0)) {
         $out[$k] = array(
-          'date' => $ver['lastchange'],
+          'date' => tzdate("n/j/y, g:i a", $ver['lastchange'])
         );
         // show score if forced, or
         // if by_question and not available and showscores is allowed, or
@@ -1979,7 +1979,9 @@ class AssessRecord
     $scoresInGb = $this->assess_info->getSetting('scoresingb');
     // TODO: get latepass status
     $out['starttime'] = intval($this->assessRecord['starttime']);
+    $out['starttime_disp'] = tzdate("n/j/y, g:i a", intval($this->assessRecord['starttime']));
     $out['lastchange'] = intval($this->assessRecord['lastchange']);
+    $out['lastchange_disp'] = tzdate("n/j/y, g:i a", intval($this->assessRecord['lastchange']));
     $out['timeontask'] = intval($this->assessRecord['timeontask']);
 
     if (!$this->teacherInGb && (
@@ -2034,6 +2036,7 @@ class AssessRecord
     $out = array(
       'score' => "N/A",  //default
       'lastchange' => $aver['lastchange'],
+      'lastchange_disp' => tzdate("n/j/y, g:i a", $aver['lastchange']),
       'status' => $aver['status']
     );
     $qVerToGet = $by_question ? 'scored' : $av;

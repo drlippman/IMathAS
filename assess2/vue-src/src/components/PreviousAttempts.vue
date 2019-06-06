@@ -15,7 +15,7 @@
         :key = "index"
       >
         <td>
-          {{ $d(new Date(prev.date * 1000), 'long')}}
+          {{ prev.date_disp}}
         </td>
         <td v-if="prev.hasOwnProperty('score')" class="med-left">
           {{ Math.round(1000*prev.score/totPoss)/ 10 }}%

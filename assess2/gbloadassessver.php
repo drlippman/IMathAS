@@ -71,5 +71,8 @@ $assess_record->parseData();
 // get requested assessment version
 $assessInfoOut = $assess_record->getGbAssessVerData($ver, true);
 
+//prep date display
+prepDateDisp($assessInfoOut);
+
 //output JSON object
 echo json_encode($assessInfoOut);

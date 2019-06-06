@@ -283,5 +283,8 @@ if ($end_attempt) {
 // save record if needed
 $assess_record->saveRecordIfNeeded();
 
+//prep date display
+prepDateDisp($assessInfoOut);
+
 //output JSON object
 echo json_encode($assessInfoOut);

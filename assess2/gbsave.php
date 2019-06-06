@@ -73,4 +73,7 @@ if (strlen($lti_sourcedid) > 1) {
   calcandupdateLTIgrade($lti_sourcedid,$aid,$out['gbscore'],true);
 }
 
+//prep date display
+prepDateDisp($assessInfoOut);
+
 echo json_encode($out);

@@ -104,5 +104,8 @@ if ($assessInfoOut['showscores'] != 'none') {
   );
 }
 
+//prep date display 
+prepDateDisp($assessInfoOut);
+
 //output JSON object
 echo json_encode($assessInfoOut);

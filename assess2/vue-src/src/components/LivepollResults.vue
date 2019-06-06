@@ -131,7 +131,7 @@ export default {
         if (parttype === 'draw') {
           let initpts = this.params[pn].livepoll_drawinit;
           initpts = initpts.replace(/"|'/g, '').split(',');
-          for (let i=1; i < initpts.length; i++) {
+          for (let i = 1; i < initpts.length; i++) {
             initpts[i] = Number(initpts[i]);
           }
           out[pn].initpts = initpts;

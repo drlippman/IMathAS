@@ -61,5 +61,8 @@ $include_from_assess_info = array(
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
+//prep date display
+prepDateDisp($assessInfoOut);
+
 //output JSON object
 echo json_encode($assessInfoOut);

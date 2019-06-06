@@ -147,5 +147,8 @@ if ($assessInfoOut['has_practice']) {
   );
 }
 
+//prep date display
+prepDateDisp($assessInfoOut);
+
 //output JSON object
 echo json_encode($assessInfoOut);

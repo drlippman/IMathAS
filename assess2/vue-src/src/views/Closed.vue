@@ -106,12 +106,12 @@ export default {
       } else if (this.settings.available === 'notyet') {
         // not yet available
         return this.$t('closed.notyet', {
-          sd: this.$d(new Date(this.settings.startdate * 1000), 'long'),
-          ed: this.$d(new Date(this.settings.enddate * 1000), 'long')
+          sd: this.settings.startdate_disp,
+          ed: this.settings.enddate_disp
         });
       } else if (this.settings.available === 'practice' || this.settings.available === 'pastdue') {
         // past due
-        return this.$t('closed.pastdue', { ed: this.$d(new Date(this.settings.enddate * 1000), 'long') });
+        return this.$t('closed.pastdue', { ed: this.settings.enddate_disp });
       } else if (this.settings.available === 'needprereq') {
         return this.$t('closed.needprereq');
       } else if (this.settings.has_active_attempt === false && this.settings.can_retake === false) {
@@ -141,7 +141,7 @@ export default {
     latepassExtendMsg () {
       return this.$tc('closed.latepass_needed', this.settings.can_use_latepass, {
         n: this.settings.can_use_latepass,
-        date: this.$d(new Date(this.settings.latepass_extendto * 1000), 'long')
+        date: this.settings.latepass_extendto_disp
       });
     },
     primaryButton () {

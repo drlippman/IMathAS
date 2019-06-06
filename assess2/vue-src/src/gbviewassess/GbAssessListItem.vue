@@ -39,8 +39,7 @@ export default {
         } else {
           out += this.$t('gradebook.submitted');
         }
-        out += ' ' +
-          this.$d(new Date(this.option.lastchange * 1000), 'long');
+        out += ' ' + this.option.lastchange_disp;
         return out;
       } else {
         return '';

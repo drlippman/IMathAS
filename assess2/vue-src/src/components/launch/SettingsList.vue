@@ -77,13 +77,13 @@ export default {
     },
     getDateObj () {
       var settings = store.assessInfo;
-      var duedate = this.$d(new Date(settings.enddate * 1000), 'long');
+      var duedate = settings.enddate_disp;
       var dateobj = {
         icon: 'calendar',
         str: this.$t('setlist.due_at', { date: duedate })
       };
       if (settings.hasOwnProperty('original_enddate')) {
-        var origduedate = this.$d(new Date(settings.original_enddate * 1000), 'long');
+        var origduedate = settings.original_enddate_disp;
         dateobj.sub = this.$t('setlist.originally_due', { date: origduedate });
         if (settings.extended_with.type === 'latepass') {
           dateobj.sub += ' ' + this.$tc('setlist.latepass_used', settings.extended_with.n);
@@ -150,8 +150,8 @@ export default {
       }
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
-          let expires = new Date(settings.timelimit_expires * 1000);
-          timeobj.alert = this.$t('setlist.time_expires', { date: this.$d(expires, 'long') });
+          let expires = settings.timelimit_expires_disp;
+          timeobj.alert = this.$t('setlist.time_expires', { date: expires });
         }
       }
       return timeobj;

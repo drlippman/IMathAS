@@ -18,8 +18,7 @@
       </div>
 
       <div>
-        {{ $t('gradebook.due')}}:
-          {{ $d(new Date(aData.enddate * 1000), 'long') }}
+        {{ $t('gradebook.due')}}: {{ aData.enddate_disp }}
           <button
             v-if = "canEdit"
             type="button"
@@ -31,7 +30,7 @@
         <span v-if="aData.hasOwnProperty('original_enddate')">
           <br/>
           {{ $t('gradebook.originally_due') }}:
-            {{ $d(new Date(aData.original_enddate * 1000), 'long') }}.
+            {{ aData.original_enddate_disp }}.
           {{ extensionString }}
         </span>
       </div>
@@ -296,14 +295,14 @@ export default {
       if (this.aData.starttime === 0) {
         return this.$t('gradebook.not_started');
       } else {
-        return this.$d(new Date(this.aData.starttime * 1000), 'long');
+        return this.aData.starttime_disp;
       }
     },
     lastchangeString () {
       if (this.aData.lastchange === 0) {
         return this.$t('gradebook.not_submitted');
       } else {
-        return this.$d(new Date(this.aData.lastchange * 1000), 'long');
+        return this.aData.lastchange_disp;
       }
     },
     totalTimeOnTask () {

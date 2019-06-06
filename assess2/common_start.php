@@ -45,6 +45,15 @@ function check_for_required($method, $required) {
   }
 }
 
+function prepDateDisp(&$out) {
+  $tochg = ['starddate', 'enddate', 'original_enddate', 'timelimit_expires', 'latepass_extendto'];
+  foreach ($tochg as $key) {
+    if (isset($out[$key])) {
+      $out[$key . '_disp'] = tzdate("D n/j/y, g:i a", $out[$key]);
+    }
+  }
+}
+
 
 // normalize $_POST['practice'] to boolean
 if (!empty($_POST['practice']) && $_POST['practice'] === 'false') {

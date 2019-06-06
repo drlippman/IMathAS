@@ -282,5 +282,8 @@ $assess_record->saveRecordIfNeeded();
 $sessiondata['assess2-'.$aid] = $in_practice;
 writesessiondata();
 
+//prep date display
+prepDateDisp($assessInfoOut);
+
 //output JSON object
 echo json_encode($assessInfoOut);

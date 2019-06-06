@@ -142,5 +142,8 @@ if ($assessInfoOut['is_diag']) {
   $assessInfoOut['diag_userid'] = substr($username,0,strpos($username,'~'));
 }
 
+//prep date display
+prepDateDisp($assessInfoOut);
+
 //output JSON object
 echo json_encode($assessInfoOut);
