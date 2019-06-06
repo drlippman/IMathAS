@@ -934,7 +934,7 @@ class AssessRecord
    * @param  int  $qn            Question number (0 indexed)
    * @param  boolean $include_scores Whether to include scores (def: false)
    * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
-   * @param  boolean $generate_html Whether to generate question HTML (def: false)
+   * @param  boolean|int $generate_html Whether to generate question HTML (def: false) 2 to also grab correct ans
    * @param int|string  $ver               Which version to grab data for, or 'last' for most recent
    * @param string   $try       Which try to show: 'last' (def) or 'scored'
    * @return array  The question object
@@ -1088,7 +1088,7 @@ class AssessRecord
         $this->teacherInGb;
       $out['info'] = $force_answers;
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
-        $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow);
+        $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow, $generate_html == 2);
       if ($out['usedautosave']) {
         $autosave = $this->getAutoSaves($qn);
         $out['autosave_timeactive'] = $autosave['timeactive'];
@@ -1170,8 +1170,8 @@ class AssessRecord
    * Generate the question API object for all questions
    * @param  boolean $include_scores Whether to include scores (def: false)
    * @param  boolean $include_parts  True to include part scores and details, false for just total score (def false)
-   * @param  boolean $generate_html Whether to generate question HTML (def: false)
-   * @param int  $ver               Which version to grab data for, or 'last' for most recent
+   * @param  boolean|int $generate_html Whether to generate question HTML (def: false)  2 to grab correct ans
+   * @param int  $ver               Which version to grab data for, or 'last' for most recent, or 'scored'
    * @return array  The question object
    */
   public function getAllQuestionObjects($include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last') {
@@ -1338,9 +1338,10 @@ class AssessRecord
    * @param  boolean $force_scores  force display of scores (def: false)
    * @param  boolean $force_answers force display of answers (def: false)
    * @param  string  $tryToShow     Try to show answers for: 'last' (def) or 'scored'
+   * @param  boolean $includeCorrect  True to include 'ans' array in jsparams (def false)
    * @return array (questionhtml, answeights)
    */
-  public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false, $tryToShow = 'last') {
+  public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false, $tryToShow = 'last', $includeCorrect = false) {
     // get assessment attempt data for given version
     $qver = $this->getQuestionVer($qn, $ver);
 
@@ -1429,7 +1430,6 @@ class AssessRecord
     //TODO!!
 
     $questionParams = new QuestionParams();
-
     $questionParams
         ->setDbQuestionSetId($qsettings['questionsetid'])
         ->setQuestionData($this->assess_info->getQuestionSetData($qsettings['questionsetid']))
@@ -1455,6 +1455,10 @@ class AssessRecord
     $jsparams = $question->getJsParams();
     $jsparams['helps'] = $question->getExternalReferences();
     $answeights = $question->getAnswerPartWeights();
+    if ($includeCorrect) {
+      $jsparams['ans'] = $question->getCorrectAnswersForParts();
+      $jsparams['stuans'] = $stuanswers[$qn+1];
+    }
 
     return array($qout, $jsparams, $answeights, $usedAutosave);
   }
@@ -1583,8 +1587,10 @@ class AssessRecord
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
       $bcnt = 0;
       $question_versions = $assessver['questions'][$qn]['question_versions'];
-      if (!$by_question || !is_numeric($ver)) {
+      if (!$by_question || $ver === 'last') {
         $curq = $question_versions[count($question_versions) - 1];
+      } else if ($ver === 'scored') {
+        $curq = $question_versions[$assessver['questions'][$qn]['scored_version']];
       } else {
         $curq = $question_versions[$ver];
       }

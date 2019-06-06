@@ -849,7 +849,7 @@ class AssessInfo
       $settings['showans'] = 'never';
     }
     /* question showans limited to never / default
-  
+
     else if ($settings['showans'] == 'L') {
       $settings['showans'] = 'after_lastattempt';
     } else if ($settings['showans'] == 'J') {
@@ -889,6 +889,9 @@ class AssessInfo
   * @return array             Normalized $settings.
   */
   static function normalizeSettings($settings) {
+    // set global assessver
+    $GLOBALS['assessver'] = $settings['ver'];
+
     // adjust for language change
     $settings['deftries'] = $settings['defattempts'];
 
