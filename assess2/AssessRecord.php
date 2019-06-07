@@ -1371,17 +1371,24 @@ class AssessRecord
       // TODO: Rework this to use stuanswers?  Or dont even need if we Rework
       // displayq to use stuanswers
       if ($clearans) {
-        $lastans[$pn] = '';
-      } else if ($tryToShow === 'scored' && $qver['scored_try'][$pn] > -1) {
-        $lastans[$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['stuans'];
+        $stuanswers[$qn+1][$pn] = '';
+        $stuanswersval[$qn+1][$pn] = '';
       } else if (isset($autosave['stuans'][$pn])) {
-        $lastans[$pn] = $autosave['stuans'][$pn];
+        $stuanswers[$qn+1][$pn] = $autosave['stuans'][$pn];
         $usedAutosave[] = $pn;
+      }
+      /* These cases should already be handled in $stuanswers grab
+      else if ($tryToShow === 'scored' && $qver['scored_try'][$pn] > -1) {
+        $stuanswers[$qn+1][$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['stuans'];
+        if (isset($qver['tries'][$pn][$qver['scored_try'][$pn]]['stuansval'])) {
+          $stuanswersval[$qn+1][$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['stuansval'];
+        }
       } else if ($partattemptn[$pn] > 0) {
         $lastans[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['stuans'];
       } else {
         $lastans[$pn] = '';
       }
+      */
 
       // figure out if we should show answers
       if ($force_answers) {

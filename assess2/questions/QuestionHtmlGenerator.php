@@ -312,6 +312,9 @@ class QuestionHtmlGenerator
                 $this->questionParams->getLastRawScores(), 0, 1);
 
             $lastAnswer = $stuanswers[$thisq];
+            if (is_array($lastAnswer)) { // happens with autosaves 
+              $lastAnswer = $lastAnswer[0];
+            }
 
             $answerBoxParams = new AnswerBoxParams();
             $answerBoxParams

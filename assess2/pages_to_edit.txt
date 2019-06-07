@@ -14,9 +14,7 @@ TODOs:
   Default feedback text (maybe only tack on at point of viewing?)
   Some display of when tries were submitted, maybe in previous tries display?
   Take eqnhelper/showtips out of global in AssessRecord
-  Use $clearans in getQuestionHtml, refactor $lastans in that function.
-    See if autosaves are being used - might need to rework $lastans stuff to
-    overwrite $stuanswers.
+  Test $showans in getQuestionHtml, see if we want to use $showansparts
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -59,6 +57,9 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Use $clearans in getQuestionHtml, refactor $lastans in that function.
+    See if autosaves are being used - might need to rework $lastans stuff to
+    overwrite $stuanswers.
 X Pre-generate dates in backend as strings:
     enddate (need to have a way to tell if <2000000000)
     original_enddate
