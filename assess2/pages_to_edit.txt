@@ -1,20 +1,25 @@
 TODOs:
-  Make sure MQ is disabled on Print page, or just turn off
-  Test accounting Qs
-  Prop types
-  ? tinymce drag handle showing when question is not active
   Get overtime handled
     overtime penalty?  Still mark as overtime, but count in grade
     Make sure questions submitted after time limit are marked in gbviewassess
-  Add "latepass won't help you" warning on Closed page
+    Some display of when tries were submitted, maybe in previous tries display?
   ! Need to revisit showhints throughout display code
-  FIX: don't give "answers haven't changed" warning on assessment submit
   Teacher view-as-student working
   Category summary in GBviewassess
-  Default feedback text (maybe only tack on at point of viewing?)
-  Some display of when tries were submitted, maybe in previous tries display?
-  Take eqnhelper/showtips out of global in AssessRecord
-  Test $showans in getQuestionHtml, see if we want to use $showansparts
+  Test accounting Qs
+  Jump to answer??
+
+Separate:
+  Collate CSS
+  Add a11y landmarks / skip navigation
+  Build migration function
+
+Minor TODOs:
+  Add "latepass won't help you" warning on Closed page
+  Prop types
+  Make sure MQ is disabled on Print page, or just turn off
+  tinymce drag handle showing when question is not active (doesn't honor visibility: hidden on parent)
+
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -57,6 +62,10 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Default feedback text (only tack on at point of viewing)
+X Dynamically set eqnhelper/showtips in AssessInfo
+X Get "no submission" warning to not block
+X Don't give "answers haven't changed" warning on assessment submit
 X Use $clearans in getQuestionHtml, refactor $lastans in that function.
     See if autosaves are being used - might need to rework $lastans stuff to
     overwrite $stuanswers.

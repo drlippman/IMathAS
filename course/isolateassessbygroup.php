@@ -23,13 +23,13 @@
 		$gbmode = $stm->fetchColumn(0);
 	}
 
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
@@ -205,7 +205,7 @@
 				echo '<td></td>';
 			}
 			if ($aver > 1 ) {
-				$hasfeedback = ($line['status']&8) == 8;
+				$hasfeedback = (($line['status']&8) == 8 || $deffeedbacktext !== '');
 			} else {
 				$feedback = json_decode($line['feedback']);
 				if ($feedback===null) {

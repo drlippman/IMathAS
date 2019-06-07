@@ -177,6 +177,16 @@ export const actions = {
     if (typeof qns !== 'object') {
       qns = [qns];
     }
+    // figure out non-blank questions to submit
+    let lastLoaded = [];
+    let changedQuestions = this.getChangedQuestions(qns);
+    if (Object.keys(changedQuestions).length === 0 && !endattempt) {
+      store.errorMsg = 'nochange';
+      return;
+    }
+
+    store.inTransit = true;
+
     this.clearAutosave(qns);
     // don't store time active when full-test
     if (store.assessInfo.displaymethod === 'full') {
@@ -185,15 +195,6 @@ export const actions = {
       timeactive = [timeactive];
     }
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
-    store.inTransit = true;
-
-    // figure out non-blank questions to submit
-    let lastLoaded = [];
-    let changedQuestions = this.getChangedQuestions(qns);
-    if (Object.keys(changedQuestions).length === 0) {
-      store.errorMsg = 'nochange';
-      return;
-    }
 
     let data = new FormData();
 

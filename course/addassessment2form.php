@@ -717,6 +717,10 @@ var app = new Vue({
 						'value': 'after_lastattempt',
 						'text': _('After the last try on a question')
 					},
+					{
+						'value': 'jump_to_answer',
+						'text': _('After the last try or Jump to Answer button')
+					},
 					never
 				];
 				for (var i=1; i<Math.min(9,this.defattempts);i++) {

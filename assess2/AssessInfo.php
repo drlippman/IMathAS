@@ -891,6 +891,8 @@ class AssessInfo
   static function normalizeSettings($settings) {
     // set global assessver
     $GLOBALS['assessver'] = $settings['ver'];
+    $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);
+    $GLOBALS['showtips'] = $settings['showtips'];
 
     // adjust for language change
     $settings['deftries'] = $settings['defattempts'];

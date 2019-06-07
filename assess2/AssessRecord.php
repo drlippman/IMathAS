@@ -20,10 +20,6 @@ use IMathAS\assess2\questions\models\ShowAnswer;
 use IMathAS\assess2\questions\ScoreEngine;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
 
-//TODO: should be passed to displayq instead of using globals
-$useeqnhelper = 4;
-$showtips = 2;
-
 /**
  * Primary class for working with assessment records
  */
@@ -1086,9 +1082,9 @@ class AssessRecord
           && !$this->assess_info->getSetting('can_use_latepass')
         ) ||
         $this->teacherInGb;
-      $out['info'] = $force_answers;
+      $out['info'] = $generate_html;
       list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
-        $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow, $generate_html == 2);
+        $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow, $generate_html === 2);
       if ($out['usedautosave']) {
         $autosave = $this->getAutoSaves($qn);
         $out['autosave_timeactive'] = $autosave['timeactive'];
@@ -2069,6 +2065,9 @@ class AssessRecord
       $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
       $out['status'] = $this->is_practice ? 3 : 2;
       $out['feedback'] = $aver['feedback'];
+      if ($out['feedback'] == '') {
+        $out['feedback'] = $this->assess_info->getSetting('deffeedbacktext');
+      }
       $out['starttime'] = $aver['starttime'];
       $out['questions'] = $this->getGbQuestionsData($qVerToGet);
     }

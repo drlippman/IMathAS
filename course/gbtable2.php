@@ -279,7 +279,7 @@ function gbtable() {
 
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti,ver,viewingb,scoresingb";
+	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate,date_by_lti,ver,viewingb,scoresingb,deffeedbacktext";
 	if ($limuser>0) {
 		$query .= ',reqscoreaid,reqscore,reqscoretype';
 	}
@@ -333,6 +333,7 @@ function gbtable() {
 	$endmsgs = array();
 	$reqscores = array();
 	$uiver = array();
+	$defFb = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($courseitemsassoc['Assessment'.$line['id']])) {
 			continue; //assess is in hidden block - skip it
@@ -383,6 +384,8 @@ function gbtable() {
 		if ($limuser>0) {
 			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']), 'calctype'=>($line['reqscoretype']&2));
 		}
+		$defFb[$kcnt] = $line['deffeedbacktext'];
+
 		$k = 0;
 
 		if ($line['ptsposs']==-1) {
@@ -1397,7 +1400,10 @@ function gbtable() {
 
 		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 			$gb[$row][1][$col][1] = buildFeedback2($l['scoreddata']);
-		} else if (($l['status']&8)>0) {
+			if ($gb[$row][1][$col][1] == '') {
+				$gb[$row][1][$col][1] = $defFb[$i];
+			}
+		} else if (($l['status']&8)>0 || $defFb[$i] !== '') {
 			$gb[$row][1][$col][1] = 1; //has comment
 		} else {
 			$gb[$row][1][$col][1] = 0; //no comment

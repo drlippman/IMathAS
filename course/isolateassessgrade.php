@@ -55,13 +55,13 @@
 		}
 	}
 
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
 
 
 	$placeinhead .= '<script type="text/javascript">
@@ -397,7 +397,7 @@
 				$ntime++;
 			}
 			if ($aver > 1 ) {
-				$hasfeedback = ($line['status']&8) == 8;
+				$hasfeedback = (($line['status']&8) == 8 || $deffeedbacktext !== '');
 			} else {
 				$feedback = json_decode($line['feedback']);
 				if ($feedback===null) {

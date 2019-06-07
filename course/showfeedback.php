@@ -54,18 +54,18 @@ if ($type=='A') {
 	if (isset($studentid)) {
 		$uid = $userid;
 	}
-	$query = "SELECT ia.name,ia.submitby,iar.scoreddata FROM imas_assessment_records AS iar ";
+	$query = "SELECT ia.name,ia.submitby,ia.deffeedbacktext,iar.scoreddata FROM imas_assessment_records AS iar ";
 	$query .= "JOIN imas_assessments AS ia ON ia.id=iar.assessmentid ";
 	$query .= "WHERE iar.assessmentid=? AND iar.userid=? AND ia.courseid=? ";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($id, $uid, $cid));
 
-	list($aname, $submitby, $scoreddata) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname, $submitby, $deffb, $scoreddata) = $stm->fetch(PDO::FETCH_NUM);
 	$scoreddata = json_decode(gzdecode($scoreddata), true);
 	$by_question = ($submitby == 'by_question');
 
 	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
-
+	$hasFb = false;
 	foreach ($scoreddata['assess_versions'] as $av => $aver) {
 		$fbdisp = '';
 		foreach ($aver['questions'] as $qn => $qdata) {
@@ -95,8 +95,12 @@ if ($type=='A') {
 			if (!$by_question) {
 				echo '<h2>'.sprintf(_('Feedback on attempt %d'), Sanitize::onlyInt($av)+1).'</h2>';
 			}
+			$hasFb = true;
 			echo $fbdisp;
 		}
+	}
+	if (!$hasFb && $deffb !== '') {
+		echo '<p>'.Sanitize::encodeStringForDisplay($deffb).'</p>';
 	}
 } else if ($type=='O' || $type=='E') {
 	if ($type=='O') {
