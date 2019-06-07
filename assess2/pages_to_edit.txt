@@ -13,7 +13,10 @@ TODOs:
   Category summary in GBviewassess
   Default feedback text (maybe only tack on at point of viewing?)
   Some display of when tries were submitted, maybe in previous tries display?
-  take eqnhelper/showtips out of global in AssessRecord
+  Take eqnhelper/showtips out of global in AssessRecord
+  Use $clearans in getQuestionHtml, refactor $lastans in that function.
+    See if autosaves are being used - might need to rework $lastans stuff to
+    overwrite $stuanswers.
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?

@@ -1575,7 +1575,7 @@ class AssessRecord
 
   /**
    * Generate $stuanswers and $stuanswersval for the last tries
-   * @param  string  $ver         Version to grab from, or 'last' for latest
+   * @param  string  $ver         Version to grab from, or 'last' for latest, or 'scored'
    * @return array  ($stuanswers, $stuanswersval)
    */
   public function getStuanswers($ver = 'last') {

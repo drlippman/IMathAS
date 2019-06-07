@@ -141,14 +141,20 @@ if (isset($_POST['options'])) {
 				// Get question objects.  This returns a lot more than we need.
 				// The 2 for generate_html tells it to tack on the 'ans' and 'stuans'
 				// to jsparams.
-				$question_objects = $assess_record->getAllQuestionObjects(true, true, 2, 'scored');
+				$question_objects = $assess_record->getAllQuestionObjects(true, true, $dobca ? 2 : false, 'scored');
 				$questionIds = $assess_record->getQuestionIds(range(0,count($question_objects)-1), 'scored');
-
+				if (!$dobca && $doba) {
+					list($stuanswers, $stuanswersval) = $assess_record->getStuanswers('scored');
+				}
         for ($qn = 0; $qn < count($question_objects); $qn++) {
 						$question_object = $question_objects[$qn];
 
-						$correctAns = $question_object['jsparams']['ans'];
-						$stuAns = $question_object['jsparams']['stuans'];
+						if ($dobca) {
+							$correctAns = $question_object['jsparams']['ans'];
+							$stuAns = $question_object['jsparams']['stuans'];
+						} else if ($doba) {
+							$stuAns = $stuanswers[$qn+1];
+						}
 
             $qscore = array();
             $qatt = array();
