@@ -7,7 +7,7 @@ TODOs:
   Teacher view-as-student working
   Category summary in GBviewassess
   Test accounting Qs
-  Jump to answer??
+  Click on '-' in GB to create new record for student (?)
 
 Separate:
   Collate CSS

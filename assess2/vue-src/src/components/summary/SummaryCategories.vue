@@ -23,9 +23,10 @@ import { store } from '../../basicstore';
 
 export default {
   name: 'SummaryCategories',
+  props: ['data'],
   computed: {
     catScores () {
-      let questions = store.assessInfo.questions;
+      let questions = this.data;
       let cats = [];
       for (let i in questions) {
         if (!questions[i].hasOwnProperty('category') || questions[i].category === '') {

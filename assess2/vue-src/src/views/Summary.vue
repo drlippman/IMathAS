@@ -17,7 +17,10 @@
             <vue-tab :name="$t('summary.scorelist')">
               <summary-score-list />
               <p>&nbsp;</p>
-              <summary-categories v-if="hasCategories" />
+              <summary-categories
+                v-if="hasCategories" 
+                :data = "ainfo.questions"
+              />
             </vue-tab>
             <vue-tab :name="$t('summary.reshowquestions')">
               <summary-reshow-questions />

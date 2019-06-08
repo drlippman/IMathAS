@@ -242,6 +242,10 @@
             {{ $t('gradebook.save') }}
           </button>
         </div>
+        <summary-categories
+          v-if = "showCategories"
+          :data = "curQuestionVers"
+        />
         <gb-clear-attempts />
         <div style="margin-bottom:100px"></div>
       </div>
@@ -256,6 +260,8 @@ import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
 import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
+import SummaryCategories from '@/components/summary/SummaryCategories.vue';
+
 // import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
@@ -264,7 +270,8 @@ export default {
     GbAssessSelect,
     GbQuestionSelect,
     GbScoreDetails,
-    GbClearAttempts
+    GbClearAttempts,
+    SummaryCategories
   },
   data: function () {
     return {
@@ -323,6 +330,28 @@ export default {
     },
     curQver () {
       return store.curQver;
+    },
+    curQuestionVers () {
+      let out = [];
+      for (let qn = 0; qn < this.curQuestions.length; qn++) {
+        out[qn] = this.curQuestions[qn][this.curQver[qn]];
+      }
+      return out;
+    },
+    showCategories () {
+      let hascat = false;
+      for (let i in this.curQuestionVers) {
+        if (this.curQuestionVers[i].hasOwnProperty('category') &&
+          this.curQuestionVers[i].category !== '' &&
+          this.curQuestionVers[i].category !== null
+        ) {
+          hascat = true;
+          break;
+        }
+      }
+      let hasScores = this.curQuestionVers[0].hasOwnProperty('score') &&
+        !isNaN(Number(this.curQuestionVers[0].score));
+      return hascat && hasScores;
     },
     scoreCalc () {
       if (this.aData.submitby === 'by_question') {
