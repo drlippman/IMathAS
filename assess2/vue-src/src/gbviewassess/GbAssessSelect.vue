@@ -31,7 +31,7 @@ export default {
           ver: i,
           score: this.versions[i].score,
           status: this.versions[i].status,
-          lastchange: this.versions[i].lastchange,
+          lastchange_disp: this.versions[i].lastchange_disp,
           onclick: () => this.$emit('setversion', i)
         });
       }

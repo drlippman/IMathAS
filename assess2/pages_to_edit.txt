@@ -3,9 +3,9 @@ TODOs:
     overtime penalty?  Still mark as overtime, but count in grade
     Make sure questions submitted after time limit are marked in gbviewassess
     Some display of when tries were submitted, maybe in previous tries display?
+  Some display of penalties in Gradebook view; maybe can reuse PenaltiesApplied
   ! Need to revisit showhints throughout display code
   Teacher view-as-student working
-  Category summary in GBviewassess
   Test accounting Qs
   Click on '-' in GB to create new record for student (?)
 
@@ -62,6 +62,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Category summary in GBviewassess
 X Default feedback text (only tack on at point of viewing)
 X Dynamically set eqnhelper/showtips in AssessInfo
 X Get "no submission" warning to not block
