@@ -1599,10 +1599,21 @@ class AssessRecord
       }
       $stuansparts = array();
       $stuansvalparts = array();
-      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
-        $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
-        $stuansparts[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
-        $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
+      if (!isset($curq['answeights'])) {
+        // question hasn't been displayed yet
+        $stuanswers[$qn+1] = null;
+        $stuanswersval[$qn+1] = null;
+        continue;
+      }
+      for ($pn = 0; $pn < count($curq['answeights']); $pn++) {
+        if (!isset($curq['tries'][$pn])) {
+          $stuansparts[$pn] = null;
+          $stuansvalparts[$pn] = null;
+        } else {
+          $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
+          $stuansparts[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
+          $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
+        }
       }
       // stuanswers array is 1-indexed
       if (isset($curq['answeights']) && count($curq['answeights']) > 1) {
