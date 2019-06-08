@@ -11,6 +11,7 @@
       {{ scoreDisplay }}
     </span>
     <span class="redoicon">
+      <icons name="retake" v-if="option.regens_remaining" />
       <icons name="retry" v-if="option.canretry" />
     </span>
   </span>
@@ -93,5 +94,9 @@ export default {
   display: inline-block;
   width: 40px;
   text-align: right;
+  white-space: nowrap;
+}
+.redoicon > * {
+  margin-left: 8px;
 }
 </style>

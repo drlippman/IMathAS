@@ -37,18 +37,20 @@
         </router-link>
     </div>
     <div class="headericons">
-      <span
+      <tooltip-span
         v-if="qn >= 0 && curQData.canretry"
-        :title="retryInfo.msg">
+        :tip="retryInfo.msg"
+      >
         <icons name="retry"/>
         {{ retryInfo.cnt }}
-      </span>
-      <span
+      </tooltip-span>
+      <tooltip-span
         v-if="qn >= 0 && curQData.canregen"
-        :title="$tc('qinfo.regens_remaining', curQData.regens_remaining)">
+        :tip="$tc('qinfo.regens_remaining', curQData.regens_remaining)"
+      >
         <icons name="retake"/>
         {{ curQData.regens_remaining }}
-      </span>
+      </tooltip-span>
       <dropdown
         :id="'qd-dd-'+qn"
         class="question-details"
@@ -69,6 +71,7 @@
 import QuestionDetailsPane from '@/components/QuestionDetailsPane.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import Dropdown from '@/components/widgets/Dropdown.vue';
+import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 import SkipQuestionListItem from '@/components/SkipQuestionListItem.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
@@ -81,6 +84,7 @@ export default {
     Dropdown,
     Icons,
     MenuButton,
+    TooltipSpan,
     SkipQuestionListItem
   },
   data: function () {
