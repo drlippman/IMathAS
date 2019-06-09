@@ -347,6 +347,14 @@ class AssessInfo
     return $this->assessData['timelimit_multiplier'] * $this->assessData['timelimit'];
   }
 
+  /**
+   * Returns time limit grace adjusted with time limit multiplier
+   * @return [type] [description]
+   */
+  public function getAdjustedTimelimitGrace() {
+    return $this->assessData['timelimit_multiplier'] * $this->assessData['overtime_grace'];
+  }
+
  /**
   * Gets a flattened array of all question IDs for the assessment.
   * @return array Array of all question IDs in assessment.
@@ -952,9 +960,10 @@ class AssessInfo
     }
 
     //unpack timelimit
-    if ($settings['timelimit'] < 0) {
+    if ($settings['timelimit'] < 0 || $settings['overtime_grace'] == 0) {
       $settings['timelimit'] = abs($settings['timelimit']);
       $settings['timelimit_type'] = 'kick_out';
+      $settings['overtime_grace'] = 0;
     } else {
       $settings['timelimit_type'] = 'allow_overtime';
     }

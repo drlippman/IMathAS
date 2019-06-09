@@ -823,6 +823,60 @@ $assessGroups = [
           2=>['questionsetid' => 0]
         ],
         'itemorder' => [0,1,2]
+      ],
+      [
+        'name' => 'Timed 3',
+        'summary' => 'by-question, skip, timelimit of 20s w 30s grace',
+        'timelimit' => 20,
+        'overtime_grace' => 30,
+        'overtime_penalty' => 20,
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1],
+          2=>['questionsetid' => 0]
+        ],
+        'itemorder' => [0,1,2]
+      ],
+      [
+        'name' => 'Timed 4',
+        'summary' => 'by-assess, skip, 20 retakes, timelimit of 20s w 30s grace',
+        'timelimit' => 20,
+        'overtime_grace' => 30,
+        'overtime_penalty' => 20,
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 15,
+        'submitby' => 'by_assessment',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 20,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 0],
+          1=>['questionsetid' => 1],
+          2=>['questionsetid' => 0]
+        ],
+        'itemorder' => [0,1,2]
       ]
     ]
   ],

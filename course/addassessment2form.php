@@ -42,8 +42,10 @@ $vueData = array(
 	'dolpcutoff' => $line['LPcutoff']>0,
 	'lpdate' => $lpdate,
 	'lptime' => $lptime,
-	'timelimit' => abs($line['timelimit'])>0 ? abs($line['timelimit']) : '',
-	'allowovertime' => $line['timelimit']>0,
+	'timelimit' => abs($line['timelimit'])>0 ? $timelimit : '',
+	'allowovertime' => $line['overtime_grace'] > 0,
+	'overtimegrace' => $line['overtime_grace'] > 0 ? round($line['overtime_grace']/60,3) : 5 ,
+	'overtimepenalty' => $line['overtime_penalty'],
 	'assmpassword' => $line['password'],
 	'revealpw' => false,
 	'showhints' => ($line['showhints']&1) > 0,
@@ -432,8 +434,14 @@ $vueData = array(
 					<br/>
 					<label>
 						<input type="checkbox" name="allowovertime" v-model="allowovertime" />
-						Allow student to work past time limit
+						Allow student to work past time limit.
 					</label>
+					<span v-if="allowovertime">
+						Grace period of
+						<input type="text" size="3" name="overtimegrace" v-model="overtimegrace" />
+						minutes with a penalty of
+						<input type="text" size="2" name="overtimepenalty" v-model="overtimepenalty" />%
+					</span>
 				</span>
 			</span><br class=form />
 

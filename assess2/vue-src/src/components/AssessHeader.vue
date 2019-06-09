@@ -14,7 +14,8 @@
 
     <timer v-if="ainfo.timelimit > 0"
       :total="ainfo.timelimit"
-      :end="ainfo.timelimit_expires">
+      :end="ainfo.timelimit_expires"
+      :grace="ainfo.timelimit_grace">
     </timer>
 
     <button

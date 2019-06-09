@@ -18,6 +18,7 @@ export const store = Vue.observable({
   autosaveTimer: null,
   timelimit_timer: null,
   timelimit_expired: false,
+  timelimit_grace_expired: false,
   inPrintView: false,
   enableMQ: true,
   livepollServer: '',
@@ -61,8 +62,11 @@ export const actions = {
         // parse response
         response = this.processSettings(response);
         store.assessInfo = response;
-        if (typeof callback !== 'undefined') {
+        if (typeof callback !== 'undefined' && callback !== null) {
           callback();
+        }
+        if (doreset === true) {
+          Router.push('/');
         }
       })
       .fail((xhr, textStatus, errorThrown) => {
@@ -407,12 +411,10 @@ export const actions = {
       });
   },
   handleTimelimitUp () {
+    console.log("time limit up");
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
       let tosub = Object.keys(this.getChangedQuestions());
-      if (tosub.length === 0) {
-        tosub = -1;
-      }
       this.submitQuestion(tosub, true);
     }
     // store.timelimit_expired = true;
@@ -629,15 +631,18 @@ export const actions = {
         }
       });
       // look to see if any have submitblank set
-      let curqparams = store.assessInfo.questions[qn].jsparams;
-      for (let qref in curqparams) {
-        if (curqparams[qref].hasOwnProperty('submitblank')) {
-          let pn = 0;
-          if (qref > 1000) {
-            pn = qref % 1000;
-          }
-          if (changed[qn].indexOf(pn) === -1) {
-            changed[qn].push(pn);
+      console.log("checking "+qn);
+      if (store.assessInfo.questions[qn].hasOwnProperty('jsparams')) {
+        let curqparams = store.assessInfo.questions[qn].jsparams;
+        for (let qref in curqparams) {
+          if (curqparams[qref].hasOwnProperty('submitblank')) {
+            let pn = 0;
+            if (qref > 1000) {
+              pn = qref % 1000;
+            }
+            if (changed[qn].indexOf(pn) === -1) {
+              changed[qn].push(pn);
+            }
           }
         }
       }
@@ -750,10 +755,24 @@ export const actions = {
       let now = new Date();
       let expires = new Date(data.timelimit_expires * 1000);
       if (expires > now) {
-        store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires - now);
+        if (data.timelimit_grace > 0) {
+          let grace = new Date(data.timelimit_grace * 1000);
+          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace - now);
+        } else {
+          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires - now);
+        }
         store.timelimit_expired = false;
+        store.timelimit_grace_expired = false;
       } else {
         store.timelimit_expired = true;
+        store.timelimit_grace_expired = true;
+        if (data.timelimit_grace > 0) {
+          let grace = new Date(data.timelimit_grace * 1000);
+          if (grace > now) {
+            store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace - now);
+            store.timelimit_grace_expired = false;
+          }
+        }
       }
     }
     if (data.hasOwnProperty('interquestion_text')) {

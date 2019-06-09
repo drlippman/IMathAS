@@ -214,11 +214,18 @@ if (!(isset($teacherid))) {
 			}
 
 			if ($_POST['timelimit'] !== '') {
-				$timelimit = -1*Sanitize::onlyInt($_POST['timelimit'])*60;
-				if (isset($_POST['allowovertime'])) {
-					$timelimit = -1*$timelimit;
-				}
+				$sets[] = "overtimegrace=:overtimegrace";
 				$sets[] = "timelimit=:timelimit";
+				$sets[] = "overtimepenalty=:overtimepenalty";
+				$timelimit = -1*round(Sanitize::onlyFloat($_POST['timelimit'])*60);
+				if (isset($_POST['allowovertime']) && $_POST['overtimegrace'] > 0) {
+					$timelimit = -1*$timelimit;
+					$qarr[':overtimegrace'] = round(Sanitize::onlyFloat($_POST['overtimegrace'])*60);
+					$qarr[':overtimepenalty'] = Sanitize::onlyInt($_POST['overtimepenalty']);
+				} else {
+					$qarr[':overtimegrace'] = 0;
+					$qarr[':overtimepenalty'] = 0;
+				}
 				$qarr[':timelimit'] = $timelimit;
 			}
 

@@ -3,6 +3,9 @@ TODOs:
     overtime penalty?  Still mark as overtime, but count in grade
     Make sure questions submitted after time limit are marked in gbviewassess
     Some display of when tries were submitted, maybe in previous tries display?
+    normalize to overtime_grace and overtime_penalty
+  What to do with HW-style after time limit runs out?
+
   Some display of penalties in Gradebook view; maybe can reuse PenaltiesApplied
     Perhaps detail display that shows part, date submitted (scored), and penalties applied
     Will need to add submission date to parts output object

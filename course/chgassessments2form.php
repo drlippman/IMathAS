@@ -39,6 +39,9 @@ $vueData = array(
 	'noprint' => 'DNC',
 	'allowlate' => 'DNC',
 	'timelimit' => '',
+	'allowovertime' => false,
+	'overtimegrace' => 5,
+	'overtimepenalty' => 0,
 	'dochgpassword' => false,
 	'assmpassword' => '',
 	'reqscoretype' => 'DNC',
@@ -448,9 +451,15 @@ $vueData = array(
 					<span v-if="timelimit !== '' && timelimit > 0">
 						<br/>
 						<label>
-							<input type="checkbox" name="allowovertime" />
+							<input type="checkbox" name="allowovertime" v-model="allowovertime" />
 							Allow student to work past time limit
 						</label>
+						<span v-if="allowovertime">
+							Grace period of
+							<input type="text" size="3" name="overtimegrace" v-model="overtimegrace" />
+							minutes with a penalty of
+							<input type="text" size="2" name="overtimepenalty" v-model="overtimepenalty" />%
+						</span>
 					</span>
 				</span><br class=form />
 			</div>

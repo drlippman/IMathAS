@@ -449,7 +449,7 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 	$tolookupaid = [];
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$scoredata = gzdecode($row['scoreddata']);
-		$practicedata = gzdecode($row['practicedata']);
+		$practicedata = $row['practicedata']==''?'':gzdecode($row['practicedata']);
 		preg_match_all('/@FILE:(.+?)@/', $scoredata.$practicedata, $matches);
 		foreach ($matches[1] as $file) {
 			// if it's a group asssess, we'll look to see if anyone else is using

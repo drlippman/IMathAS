@@ -210,9 +210,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     	$toset['LPcutoff'] = 0;
     }
 
-		$toset['timelimit'] = -1*Sanitize::onlyInt($_POST['timelimit'])*60;
-    if (isset($_POST['allowovertime'])) {
-        $toset['timelimit'] = -1*$timelimit;
+		$toset['timelimit'] = -1*round(Sanitize::onlyFloat($_POST['timelimit'])*60);
+		$toset['overtime_grace'] = 0;
+		$toset['overtime_penalty'] = 0;
+    if (isset($_POST['allowovertime']) && $_POST['overtimegrace'] > 0) {
+        $toset['timelimit'] = -1*$toset['timelimit'];
+				$toset['overtime_grace'] = round(Sanitize::onlyFloat($_POST['overtimegrace'])*60);
+				$toset['overtime_penalty'] = Sanitize::onlyInt($_POST['overtimepenalty']);
     }
 
 		$toset['password'] = trim(Sanitize::stripHtmlTags($_POST['assmpassword']));
@@ -503,7 +507,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $line = $stm->fetch(PDO::FETCH_ASSOC);
           $startdate = $line['startdate'];
           $enddate = $line['enddate'];
-          $timelimit = $line['timelimit']/60;
+          $timelimit = round(abs($line['timelimit'])/60, 3);
           if ($line['isgroup']==0) {
               $line['groupsetid']=0;
           }
@@ -552,6 +556,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']:11;
           $line['LPcutoff'] = 0;
           $timelimit = 0;
+					$line['overtime_grace'] = 0;
+					$line['overtime_penalty'] = 0;
           $line['password'] = '';
 					$line['showhints']=isset($CFG['AMS2']['showhints'])?$CFG['AMS2']['showhints']:3;
 					$line['msgtoinstr'] = isset($CFG['AMS']['msgtoinstr'])?$CFG['AMS']['msgtoinstr']:0;

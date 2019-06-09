@@ -58,8 +58,11 @@
     "keep_last": "Last attempt recorded as grade.",
     "retake_penalty": "A penalty of {p}% will be applied on the next retake.",
     "time_expires": "Your current assessment time limit expires at {date}.",
+    "time_expires_wgrace": "Your current assessment time limit expires at {date}, and the grace period ends {grace}.",
     "time_expired": "Your current assessment time limit expired at {date}.",
+    "time_grace_expires": "Your current assessment time limit expired at {date}. The grace period ends {grace}.",
     "timelimit": "Time limit: {time}.",
+    "timelimit_wgrace": "Time limit: {time}, with a grace period of {grace} subject to a {penalty}% penalty.",
     "timelimit_extend": "Extended from the original {time}."
   },
   "group": {
@@ -182,7 +185,8 @@
     "retry": "Retry penalty",
     "regen": "Assessment retake penalty",
     "trysimilar": "Try Similar Question penalty",
-    "late": "Late work penalty"
+    "late": "Late work penalty",
+    "overtime": "Overtime penalty"
   },
   "qdetails": {
     "question_details": "Question Details",
@@ -198,7 +202,8 @@
   },
   "timer": {
     "hrs": "hr | hrs",
-    "min": "min | mins"
+    "min": "min | mins",
+    "overtime": "Overtime"
   },
   "helps": {
     "message_instructor": "Message instructor",

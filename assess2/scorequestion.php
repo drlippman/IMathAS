@@ -88,12 +88,15 @@ if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
 if (!$in_practice &&
   $assess_record->hasActiveAttempt() &&
   $assess_info->getSetting('timelimit') > 0 &&
-  $assess_info->getSetting('timelimit_type') == 'kick_out' &&
-  $now > $assess_record->getTimeLimitExpires() + 5  // TODO: adjust
+  (($assess_info->getSetting('timelimit_type') == 'kick_out' &&
+    $now > $assess_record->getTimeLimitExpires() + 5) || // TODO: adjust
+    ($assess_info->getSetting('timelimit_type') == 'allow_overtime' &&
+    $now > $assess_record->getTimeLimitGrace() + 5))
 ) {
   echo '{"error": "timelimit_expired"}';
   exit;
 }
+
 
 // if there's no active assessment attempt, exit
 if (!$assess_record->hasUnsubmittedAttempt()) {
@@ -136,6 +139,7 @@ $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
+  $assessInfoOut['timelimit_grace'] = $assess_record->getTimeLimitGrace();
 }
 
 if (count($qns) > 0) {

@@ -63,7 +63,7 @@ $include_from_assess_info = array(
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
-  'noprint'
+  'noprint', 'overtime_penalty', 'overtime_grace'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -88,6 +88,7 @@ $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
+  $assessInfoOut['timelimit_grace'] = $assess_record->getTimeLimitGrace();
 }
 
 // if not available, see if there is an unsubmitted scored attempt
@@ -104,6 +105,18 @@ if (!$assessInfoOut['has_active_attempt']) {
     $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) == 0);
   } else {
     $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) < $assessInfoOut['allowed_attempts']);
+  }
+}
+
+// adjust output if time limit is expired in by_question mode
+if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
+  $assessInfoOut['submitby'] == 'by_question' &&
+  time() > $assessInfoOut['timelimit_grace']
+) {
+  $assessInfoOut['has_active_attempt'] = false;
+  $assessInfoOut['can_retake'] = false;
+  if ($canViewAll) {
+    $assessInfoOut['show_reset'] = true;
   }
 }
 

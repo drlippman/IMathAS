@@ -59,7 +59,18 @@
         </button>
       </p>
 
-      <div v-if = "canViewAll">
+      <div v-if = "canViewAll && showReset">
+        {{ $t('launch.resetmsg') }}
+        <br/>
+        <button
+          type="button"
+          class="primary"
+          @click="doReset"
+        >
+          {{ $t('launch.doreset') }}
+        </button>
+      </div>
+      <div v-else-if = "canViewAll">
         <p>
         {{ $t('closed.teacher_preview') }}
         </p>
@@ -198,6 +209,9 @@ export default {
     },
     canViewAll () {
       return store.assessInfo.can_view_all;
+    },
+    showReset () {
+      return store.assessInfo.hasOwnProperty('show_reset');
     }
   },
   methods: {
@@ -235,6 +249,9 @@ export default {
     },
     teacherPreview () {
       actions.startAssess(false, '', []);
+    },
+    doReset () {
+      actions.loadAssessData(null, true);
     },
     endAssess () {
       actions.endAssess();

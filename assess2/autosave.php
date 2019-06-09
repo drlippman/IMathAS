@@ -88,8 +88,10 @@ if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
 if (!$in_practice &&
   $assess_record->hasActiveAttempt() &&
   $assess_info->getSetting('timelimit') > 0 &&
-  $assess_info->getSetting('timelimit_type') == 'kick_out' &&
-  $now > $assess_record->getTimeLimitExpires() + 5  // TODO: adjust
+  (($assess_info->getSetting('timelimit_type') == 'kick_out' &&
+    $now > $assess_record->getTimeLimitExpires() + 5) || // TODO: adjust
+    ($assess_info->getSetting('timelimit_type') == 'allow_overtime' &&
+    $now > $assess_record->getTimeLimitGrace() + 5))
 ) {
   echo '{"error": "timelimit_expired"}';
   exit;

@@ -14,7 +14,7 @@
 <script>
 export default {
   name: 'Timer',
-  props: ['end', 'total'],
+  props: ['end', 'total', 'grace'],
   data: function () {
     return {
       hours: 0,
@@ -30,6 +30,9 @@ export default {
     this.updateTimer();
     this.interval = setInterval(this.updateTimer, 1000);
   },
+  beforeDestroy () {
+    clearInterval(this.interval);
+  },
   computed: {
     warningTime () {
       return Math.max(60, Math.min(0.05 * this.total, 300));
@@ -38,7 +41,12 @@ export default {
   methods: {
     updateTimer: function () {
       let now = new Date().getTime();
+      this.timeString = '';
       let remaining = Math.max(0, this.end * 1000 - now);
+      if (remaining == 0 && this.grace > 0) {
+        remaining = Math.max(0, this.grace * 1000 - now);
+        this.timeString += this.$t('timer.overtime') + ' ';
+      }
       if (!this.gaveWarning && remaining < this.warningTime * 1000) {
         this.open = true;
         this.gaveWarning = true;
@@ -47,7 +55,7 @@ export default {
       this.minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
       this.seconds = Math.floor((remaining % (1000 * 60)) / (1000));
       if (this.hours === 0 && this.minutes < 5) {
-        this.timeString = this.hours > 0 ? this.hours + ':' : '';
+        this.timeString += this.hours > 0 ? this.hours + ':' : '';
         this.timeString += (this.minutes < 10 ? '0' : '') + this.minutes + ':';
         this.timeString += (this.seconds < 10 ? '0' : '') + this.seconds;
       } else {

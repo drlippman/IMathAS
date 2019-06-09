@@ -130,7 +130,9 @@ export default {
       }
     },
     timeLimitExpired () {
-      if (store.timelimit_expired && this.aInfo.has_active_attempt) {
+      if (store.timelimit_expired && store.timelimit_grace_expired &&
+          this.aInfo.has_active_attempt
+      ) {
         let expires = this.aInfo.timelimit_expires_disp;
         return this.$t('setlist.time_expired', { date: expires });
       } else {
@@ -146,9 +148,11 @@ export default {
         return false;
       }
       if (this.aInfo.timelimit > 0 &&
-        store.timelimit_expired &&
-        this.aInfo.timelimit_type === 'kick_out' &&
-        this.aInfo.has_active_attempt
+        this.aInfo.has_active_attempt &&
+        ((store.timelimit_expired &&
+        this.aInfo.timelimit_type === 'kick_out') ||
+        (store.timelimit_grace_expired &&
+        this.aInfo.timelimit_type === 'allow_overtime'))
       ) {
         return false;
       }

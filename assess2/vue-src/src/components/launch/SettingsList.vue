@@ -144,14 +144,37 @@ export default {
         icon: 'timer'
       };
       var mytime = settings.timelimit * settings.timelimit_multiplier;
-      timeobj.str = this.$t('setlist.timelimit', { time: this.formatTimeLimit(mytime) });
+      if (settings.overtime_grace > 0) {
+        timeobj.str = this.$t('setlist.timelimit_wgrace', {
+          time: this.formatTimeLimit(mytime),
+          grace: this.formatTimeLimit(settings.overtime_grace * settings.timelimit_multiplier),
+          penalty: settings.overtime_penalty
+        });
+      } else {
+        timeobj.str = this.$t('setlist.timelimit', { time: this.formatTimeLimit(mytime) });
+      }
       if (settings.timelimit_multiplier > 1) {
-        timeobj.sub = this.$t('setlist.timelimit_extend', { time: this.formatTimeLimit(settings.timelimit) });
+        timeobj.sub = this.$t('setlist.timelimit_extend', {
+          time: this.formatTimeLimit(settings.timelimit)
+        });
       }
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
           let expires = settings.timelimit_expires_disp;
-          timeobj.alert = this.$t('setlist.time_expires', { date: expires });
+          if (settings.overtime_grace > 0) {
+            timeobj.alert = this.$t('setlist.time_expires_wgrace', {
+              date: expires,
+              grace: settings.timelimit_grace_disp
+            });
+          } else {
+            timeobj.alert = this.$t('setlist.time_expires', { date: expires });
+          }
+        } else if (!store.timelimit_grace_expired) {
+
+          timeobj.alert = this.$t('setlist.time_grace_expires', {
+            date: settings.timelimit_expires_disp,
+            grace: settings.timelimit_grace_disp
+          });
         }
       }
       return timeobj;

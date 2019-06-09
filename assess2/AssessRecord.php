@@ -283,7 +283,8 @@ class AssessRecord
       //recording start and has time limit, so record end time
       $out['timelimit_end'] = $this->now + $this->assess_info->getAdjustedTimelimit();
       if (!$this->canMakeNewAttempt()) {
-        $this->assessRecord['timelimitexp'] = $out['timelimit_end'];
+        // set time after which latepass is useless
+        $this->assessRecord['timelimitexp'] = $out['timelimit_end'] + $this->assess_info->getAdjustedTimelimitGrace();
       }
     }
 
@@ -924,6 +925,22 @@ class AssessRecord
     return $returnVal;
   }
 
+  /**
+   * The the expiration time for time limit grace period.
+   * @return int  timestamp, or 0 if no grace
+   */
+  public function getTimeLimitGrace() {
+    $exp = $this->getTimeLimitExpires();
+    if ($exp === false) {
+      return false;
+    }
+    if ($this->assess_info->getSetting('timelimit_type') == 'allow_overtime') {
+      return $exp + $this->assess_info->getAdjustedTimelimitGrace();
+    } else {
+      return 0;
+    }
+  }
+
 
   /**
    * Generate the question API object
@@ -1228,6 +1245,7 @@ class AssessRecord
 
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
     $exceptionPenalty = $this->assess_info->getSetting('exceptionpenalty');
+    $overtimePenalty = $this->assess_info->getSetting('overtime_penalty');
 
     $answeights = isset($qver['answeights']) ? $qver['answeights'] : array(1);
     $answeightTot = array_sum($answeights);
@@ -1276,6 +1294,8 @@ class AssessRecord
             $due_date,           // the due date
             $starttime + $submissions[$parttry['sub']], // submission time
             $exceptionPenalty,
+            isset($assessver['timelimit_end']) ? $assessver['timelimit_end'] : 0,
+            $overtimePenalty,
             true
           );
           if ($scoreAfterPenalty >= $partscores[$pn]) {
@@ -2466,13 +2486,15 @@ class AssessRecord
    * @param  int $regen_penalty_after
    * @param  int $duedate    Original due date timestamp
    * @param  int $exceptionpenalty
+   * @param  int $timelimitEnd
+   * @param  int $overtimePenalty
    * @param  int $subtime    Timestamp question was submitted
    *
    * @param boolean $returnPenalties  Set true to return array of penalties applied (def: false)
    * @return float  score after penalties if $returnPenalties = false
    *         array(score, array of penalties) if $returnPenalties = true
    */
-  private function scoreAfterPenalty($score, $points, $try, $retry_penalty, $retry_penalty_after, $regen, $regen_penalty, $regen_penalty_after, $duedate, $subtime, $exceptionpenalty, $returnPenalties = false) {
+  private function scoreAfterPenalty($score, $points, $try, $retry_penalty, $retry_penalty_after, $regen, $regen_penalty, $regen_penalty_after, $duedate, $subtime, $exceptionpenalty, $timelimitEnd, $overtimePenalty, $returnPenalties = false) {
     $base = $score * $points;
     $penalties = array();
     if ($retry_penalty > 0) {
@@ -2492,6 +2514,10 @@ class AssessRecord
     if ($exceptionpenalty > 0 && $subtime > $duedate) {
       $base *= (1 - $exceptionpenalty / 100);
       $penalties[] = array('type'=>'late', 'pct'=>$exceptionpenalty);
+    }
+    if ($timelimitEnd > 0 && $overtimePenalty > 0 && $subtime > $timelimitEnd+5) {
+      $base *= (1 - $overtimePenalty / 100);
+      $penalties[] = array('type'=>'overtime', 'pct'=>$overtimePenalty);
     }
     $base = round($base, 5); // cut off weird computer arithmetic issues
     if ($returnPenalties) {
