@@ -4,7 +4,9 @@ TODOs:
     Make sure questions submitted after time limit are marked in gbviewassess
     Some display of when tries were submitted, maybe in previous tries display?
   Some display of penalties in Gradebook view; maybe can reuse PenaltiesApplied
-  ! Need to revisit showhints throughout display code
+    Perhaps detail display that shows part, date submitted (scored), and penalties applied
+    Will need to add submission date to parts output object
+  Need to revisit showhints throughout display code
   Teacher view-as-student working
   Test accounting Qs
   Click on '-' in GB to create new record for student (?)
