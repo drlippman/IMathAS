@@ -22,6 +22,7 @@
         <td v-if="hasPenalty">
           <penalties-applied
             :part="part"
+            :submitby="submitby"
             v-if="partHasPenalties.indexOf(index) != -1"
           />
         </td>
@@ -36,7 +37,7 @@ import PenaltiesApplied from '@/components/PenaltiesApplied.vue';
 
 export default {
   name: 'QuestionDetailsTable',
-  props: ['qinfo', 'caption', 'showtries'],
+  props: ['qinfo', 'caption', 'showtries', 'submitby'],
   components: {
     Icons,
     PenaltiesApplied

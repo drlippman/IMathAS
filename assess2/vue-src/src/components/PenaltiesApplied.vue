@@ -7,11 +7,10 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
 
 export default {
   name: 'PreviousAttempts',
-  props: ['part'],
+  props: ['part', 'submitby'],
   data: function () {
     return {
       expanded: false
@@ -19,7 +18,7 @@ export default {
   },
   computed: {
     penalties () {
-      let byQuestion = (store.assessInfo.submitby === 'by_question');
+      let byQuestion = (this.submitby === 'by_question');
       let penalties = this.part.penalties;
       for (let i in penalties) {
         if (penalties[i].type === 'regen' && byQuestion) {

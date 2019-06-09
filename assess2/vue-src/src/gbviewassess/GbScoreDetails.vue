@@ -91,10 +91,23 @@
       >
         {{ $t('gradebook.show_tries') }}
       </button>
+      <button
+        v-if="hasPenalties"
+        type="button"
+        class="slim"
+        @click="showPenalties = !showPenalties"
+      >
+        {{ $t('gradebook.show_penalties') }}
+      </button>
     </div>
     <gb-all-tries
       v-if="showAllTries"
       :tries="qdata.other_tries"
+    />
+    <gb-penalties
+      v-if="showPenalties"
+      :parts="qdata.parts"
+      :submitby="submitby"
     />
     <div v-if="canedit && showfull && qHelps.length > 0">
       {{ $t('gradebook.had_help') }}:
@@ -110,6 +123,7 @@
 <script>
 import { store, actions } from './gbstore';
 import GbAllTries from '@/gbviewassess/GbAllTries';
+import GbPenalties from '@/gbviewassess/GbPenalties';
 import Icons from '@/components/widgets/Icons';
 import MenuButton from '@/components/widgets/MenuButton';
 
@@ -118,6 +132,7 @@ export default {
   props: ['qdata', 'qn', 'canedit', 'showfull'],
   components: {
     GbAllTries,
+    GbPenalties,
     MenuButton,
     Icons
   },
@@ -125,7 +140,8 @@ export default {
     return {
       curScores: false,
       showfeedback: false,
-      showAllTries: false
+      showAllTries: false,
+      showPenalties: false
     };
   },
   computed: {
@@ -246,6 +262,20 @@ export default {
         });
       }
       return out;
+    },
+    hasPenalties () {
+      for (let pn = 0; pn < this.qdata.parts.length; pn++) {
+        if (this.qdata.parts[pn].hasOwnProperty('penalties') &&
+          this.qdata.parts[pn].penalties.length > 0
+        ) {
+          return true;
+        }
+      }
+      return false;
+    },
+    submitby () {
+      console.log(store.assessInfo.submitby);
+      return store.assessInfo.submitby;
     }
   },
   methods: {

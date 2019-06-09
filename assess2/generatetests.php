@@ -228,7 +228,7 @@ foreach ($assessGroups as $gn=>$agroup) {
         $now + $studata['lastchange']*60*60,
         $udata['score'],
         $udata['status'],
-        $udata['timeontask'],
+        isset($udata['timeontask']) ? $udata['timeontask'] : 0,
         gzencode($udata['scoreddata']),
         $studata['source']=='hw1' ? gzencode($udata['scoreddata']) : ''
       ));

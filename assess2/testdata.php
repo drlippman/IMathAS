@@ -548,7 +548,12 @@ $assessGroups = [
           1=>['questionsetid' => 1, 'category' => 'Cat 1'],
           2=>['questionsetid' => 0, 'category' => 'Cat 2']
         ],
-        'itemorder' => [0,1,2]
+        'itemorder' => [0,1,2],
+        'studata' => [
+          'source' => 'p1',
+          'starttime' => -4*24,
+          'lastchange' => -3*24
+        ]
       ],
       [
         'name' => 'Penalties 2',
@@ -1113,5 +1118,11 @@ $studatarec = array(
     'score' => 11.70,
     'status' => 65,
     'timeontask' => 50
+  ),
+  'p1' => array(
+    'scoreddata' => '{"submissions":[3,7,22,32,39,41,44],"autosaves":[],"scored_version":0,"assess_versions":[{"starttime":1560055857,"lastchange":1560055901,"status":0,"score":12.5,"questions":[{"score":4.5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q0!","seed":7075,"tries":[[{"sub":0,"time":4,"stuans":"26","stuansval":"","raw":0},{"sub":1,"time":7,"stuans":"30","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[1]}],"time":11},{"score":4,"rawscore":1,"scored_version":1,"question_versions":[{"qid":"!Q1!","seed":9329,"tries":[[{"sub":2,"time":12,"stuans":"42","stuansval":"","raw":0}],[{"sub":2,"time":12,"stuans":"15","stuansval":"","raw":1}],[{"sub":2,"time":12,"stuans":"87","stuansval":"","raw":1}]],"answeights":[1,1,1],"scored_try":[0,0,0]},{"qid":"!Q1!","seed":3755,"tries":[[{"sub":3,"time":18,"stuans":"58","stuansval":"","raw":1}],[{"sub":3,"time":18,"stuans":"8","stuansval":"","raw":1}],[{"sub":3,"time":18,"stuans":"34","stuansval":"","raw":1}]],"answeights":[1,1,1],"scored_try":[0,0,0]}],"time":30},{"score":4,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q2!","seed":6600,"tries":[[{"sub":4,"time":5,"stuans":"33","stuansval":"","raw":0},{"sub":5,"time":7,"stuans":"22","stuansval":"","raw":0},{"sub":6,"time":9,"stuans":"57","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[2]}],"time":21}]}]}',
+    'score' => 12.50,
+    'status' => 0,
+    'timeontask' => 62
   )
 );

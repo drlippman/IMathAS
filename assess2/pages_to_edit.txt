@@ -4,8 +4,7 @@ TODOs:
     Make sure questions submitted after time limit are marked in gbviewassess
     Some display of when tries were submitted, maybe in previous tries display?
     normalize to overtime_grace and overtime_penalty
-  Some display of penalties in Gradebook view; maybe can reuse PenaltiesApplied
-    Perhaps detail display that shows part, date submitted (scored), and penalties applied
+  Perhaps GB detail display that shows part, date submitted (scored), and penalties applied
     Will need to add submission date to parts output object
   Need to revisit showhints throughout display code
   Teacher view-as-student working
@@ -65,6 +64,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Some display of penalties in Gradebook view;
 X Category summary in GBviewassess
 X Default feedback text (only tack on at point of viewing)
 X Dynamically set eqnhelper/showtips in AssessInfo

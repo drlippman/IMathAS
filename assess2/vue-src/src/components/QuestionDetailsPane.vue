@@ -24,6 +24,7 @@
         v-if="hasParts"
         :caption = "$t('qdetails.lasttry')"
         :qinfo="qinfo"
+        :submitby="submitby"
       />
 
       <div v-if = "hasOnePartPenalties">
@@ -31,6 +32,7 @@
         <penalties-applied
           class = "med-left"
           :part="qinfo.parts[0]"
+          :submitby="submitby"
         />
       </div>
 
@@ -90,6 +92,9 @@ export default {
         this.qinfo.category !== '' &&
         this.qinfo.category !== null
       );
+    },
+    submitby () {
+      return store.assessInfo.submitby;
     }
   }
 };
