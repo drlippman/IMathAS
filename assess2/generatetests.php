@@ -214,8 +214,8 @@ foreach ($assessGroups as $gn=>$agroup) {
 
     if (is_array($studata)) {
       // record student data for this assessment
-      $query = "INSERT INTO imas_assessment_records (assessmentid, userid, starttime, lastchange, score, status, scoreddata, practicedata)";
-      $query .= "VALUES (?,?,?,?,?,?,?,?)";
+      $query = "INSERT INTO imas_assessment_records (assessmentid, userid, starttime, lastchange, score, status, timeontask, scoreddata, practicedata)";
+      $query .= "VALUES (?,?,?,?,?,?,?,?,?)";
       $stm = $DBH->prepare($query);
       $udata = $studatarec[$studata['source']];
       foreach ($qmap as $qn=>$qid) {
@@ -228,6 +228,7 @@ foreach ($assessGroups as $gn=>$agroup) {
         $now + $studata['lastchange']*60*60,
         $udata['score'],
         $udata['status'],
+        $udata['timeontask'],
         gzencode($udata['scoreddata']),
         $studata['source']=='hw1' ? gzencode($udata['scoreddata']) : ''
       ));

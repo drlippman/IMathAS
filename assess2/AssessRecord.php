@@ -2077,7 +2077,7 @@ class AssessRecord
       'score' => "N/A",  //default
       'lastchange' => $aver['lastchange'],
       'lastchange_disp' => tzdate("n/j/y, g:i a", $aver['lastchange']),
-      'status' => $aver['status']
+      'status' => $this->is_practice ? 3 : $aver['status']
     );
     $qVerToGet = $by_question ? 'scored' : $av;
 
@@ -2094,7 +2094,6 @@ class AssessRecord
     }
     if ($getdetails) {
       $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-      $out['status'] = $this->is_practice ? 3 : 2;
       $out['feedback'] = $aver['feedback'];
       if ($out['feedback'] == '') {
         $out['feedback'] = $this->assess_info->getSetting('deffeedbacktext');

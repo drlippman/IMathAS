@@ -423,7 +423,7 @@ export default {
       }
     },
     isUnsubmitted () {
-      return (this.aData.submitby === 'by_assessent' &&
+      return (this.aData.submitby === 'by_assessment' &&
         this.aData.assess_versions[store.curAver].status === 0);
     }
   },

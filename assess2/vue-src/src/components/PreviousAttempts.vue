@@ -15,7 +15,7 @@
         :key = "index"
       >
         <td>
-          {{ prev.date_disp}}
+          {{ prev.date }}
         </td>
         <td v-if="prev.hasOwnProperty('score')" class="med-left">
           {{ Math.round(1000*prev.score/totPoss)/ 10 }}%

@@ -5,7 +5,7 @@
       {{ $t('gradebook.score') }}:
       <strong>{{ score }}</strong>.
     </span>
-    <span v-if="option.status">
+    <span v-if="option.hasOwnProperty('status')">
       {{ verStatus }}
     </span>
   </span>
