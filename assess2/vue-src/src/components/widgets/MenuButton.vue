@@ -235,7 +235,8 @@ export default {
   padding: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  box-shadow: 0 2px 32px 0 rgba(145, 158, 171, 0.3), 0 1px 3px 0 rgba(63, 63, 68, 0.15), 0 0 0 1px rgba(63, 63, 68, 0.05);
+  border: 1px solid #ccc;
+  box-shadow: 1px 3px 8px 0 rgba(0,0,0,0.25);
 }
 .menubutton li {
   margin: 0;

@@ -84,7 +84,8 @@ export default {
 }
 .dropdown-pane {
   position: absolute;
-  box-shadow: 0 2px 16px 0 rgba(33, 43, 54, 0.2), 0 0 0 1px rgba(6, 44, 82, 0.1);
+  box-shadow: 1px 3px 8px 0 rgba(0,0,0,0.25);
+  border: 1px solid #ccc;
   background-color: #fff;
   padding: 0;
   margin: 0;
