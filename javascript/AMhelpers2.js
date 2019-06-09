@@ -72,9 +72,8 @@ var allParams = {};
 
 function init(paramarr, enableMQ) {
   var qn, params, i, el, str;
-
   for (qn in paramarr) {
-    if (!isNaN(parseInt(qn))) { continue; }
+    if (isNaN(parseInt(qn))) { continue; }
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];

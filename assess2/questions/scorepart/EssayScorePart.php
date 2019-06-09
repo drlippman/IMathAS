@@ -35,7 +35,8 @@ class EssayScorePart implements ScorePart
         require_once(dirname(__FILE__)."/../../../includes/htmLawed.php");
 
         $givenans = myhtmLawed($givenans);
-        $GLOBALS['partlastanswer'] = $givenans;
+        $scorePartResult->setLastAnswerAsGiven($givenans);
+        
         if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
         if (isset($scoremethod) &&
             (($scoremethod=='takeanything'  && trim($givenans)!='') ||

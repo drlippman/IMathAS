@@ -51,6 +51,7 @@ class FileUploadAnswerBox implements AnswerBox
         if ($colorbox!='') { $out .= '<span class="'.$colorbox.'">';}
     		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
     		if ($colorbox!='') { $out .= '</span>';}
+        $hasPrevSubmittedFile = false;
     		if ($la!='') {
     			if (!empty($assessmentId)) {
     				$s3asid = $assessmentId;
@@ -90,7 +91,7 @@ class FileUploadAnswerBox implements AnswerBox
     						$out .= " <span aria-expanded=\"false\" aria-controls=\"fileprev$qn\" class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
     						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".rawurlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
     					}
-
+              $hasPrevSubmittedFile = true;
     				}
     			} else {
     				$out .= "<br/>$la";
@@ -99,7 +100,7 @@ class FileUploadAnswerBox implements AnswerBox
     		$tip .= _('Select a file to upload');
     		$sa .= $answer;
 
-        if ($scoremethod == 'takeanythingorblank') {
+        if ($scoremethod == 'takeanythingorblank' && !$hasPrevSubmittedFile) {
           $params['submitblank'] = 1;
         }
 

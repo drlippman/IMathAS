@@ -181,6 +181,9 @@ export const actions = {
     if (typeof qns !== 'object') {
       qns = [qns];
     }
+
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    
     // figure out non-blank questions to submit
     let lastLoaded = [];
     let changedQuestions = this.getChangedQuestions(qns);
@@ -198,7 +201,6 @@ export const actions = {
     } else if (typeof timeactive !== 'object') {
       timeactive = [timeactive];
     }
-    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
 
     let data = new FormData();
 
@@ -631,7 +633,6 @@ export const actions = {
         }
       });
       // look to see if any have submitblank set
-      console.log("checking "+qn);
       if (store.assessInfo.questions[qn].hasOwnProperty('jsparams')) {
         let curqparams = store.assessInfo.questions[qn].jsparams;
         for (let qref in curqparams) {
@@ -639,6 +640,9 @@ export const actions = {
             let pn = 0;
             if (qref > 1000) {
               pn = qref % 1000;
+            }
+            if (!changed.hasOwnProperty(qn)) {
+              changed[qn] = [];
             }
             if (changed[qn].indexOf(pn) === -1) {
               changed[qn].push(pn);

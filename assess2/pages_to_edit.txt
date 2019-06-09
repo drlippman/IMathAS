@@ -1,26 +1,34 @@
 TODOs:
-  Get overtime handled
+  ~ Get overtime handled
     overtime penalty?  Still mark as overtime, but count in grade
     Make sure questions submitted after time limit are marked in gbviewassess
     Some display of when tries were submitted, maybe in previous tries display?
     normalize to overtime_grace and overtime_penalty
-  Perhaps GB detail display that shows part, date submitted (scored), and penalties applied
+  ~ Perhaps GB detail display that shows part, date submitted (scored), and penalties applied
     Will need to add submission date to parts output object
   Need to revisit showhints throughout display code
   Teacher view-as-student working
   Test accounting Qs
   Click on '-' in GB to create new record for student (?)
+  Syntax error warnings in MQ mode
 
+To discuss:
+  Syntax error warnings: error icon w hoverover vs displaying error
+  
 Separate:
   Collate CSS
   Add a11y landmarks / skip navigation
   Build migration function
+  Bundle support JS/css on build
+  Improve build documentation
+  Update disallowed variables list
 
 Minor TODOs:
   Add "latepass won't help you" warning on Closed page
   Prop types
   Make sure MQ is disabled on Print page, or just turn off
   tinymce drag handle showing when question is not active (doesn't honor visibility: hidden on parent)
+  Handle "right answer wrong format"
 
 
 Newver /course/gb-itemanalysis.php
@@ -38,9 +46,6 @@ Newver /course/gb-rescoreq.php
   - Should be simpler, since we have stored stuans for most question types and
     can replicate clientside eval
 
-
-~ Newver /course/gb-viewasid.php
-    Need to add category summary
 
 
 Future Todos:
@@ -64,6 +69,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Newver /course/gb-viewasid.php
 X Some display of penalties in Gradebook view;
 X Category summary in GBviewassess
 X Default feedback text (only tack on at point of viewing)

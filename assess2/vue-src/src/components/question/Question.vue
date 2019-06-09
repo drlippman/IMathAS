@@ -235,13 +235,13 @@ export default {
           }
         });
       };
-      // TODO: improve this, and add yellow check
-      let svgchk = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
+      let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
       svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
-      let svgychk = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.partial') + '">';
+      let svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.partial') + '">';
       svgchk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
-      let svgx = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
+      let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
       svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+      window.$('#questionwrap' + this.qn).find('.scoremarker').remove();
       window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
       window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
       window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
