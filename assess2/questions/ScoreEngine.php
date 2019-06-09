@@ -87,15 +87,15 @@ class ScoreEngine
         }
 
         // If question data was not provided, load it from the database.
-        $qdata = $scoreQuestionParams->getQuestionData();
-        if (is_null($qdata)) {
-            $qdata = $this->loadQuestionData($scoreQuestionParams);
+        $quesData = $scoreQuestionParams->getQuestionData();
+        if (is_null($quesData)) {
+            $quesData = $this->loadQuestionData($scoreQuestionParams);
         }
 
         $stuanswers = $scoreQuestionParams->getAllQuestionAnswers();
         $stuanswersval = $scoreQuestionParams->getAllQuestionAnswersAsNum();
 
-        if ($this->isMultipartQuestion($qdata)) {
+        if ($this->isMultipartQuestion($quesData)) {
             list($stuanswers, $stuanswersval) =
                 $this->processStudentAnswersMultipart($scoreQuestionParams,
                     $stuanswers, $stuanswersval);
@@ -120,9 +120,9 @@ class ScoreEngine
         $attemptn = $scoreQuestionParams->getAttemptNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
 
-        eval(interpret('control', $qdata['qtype'], $qdata['control']));
+        eval(interpret('control', $quesData['qtype'], $quesData['control']));
         $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
-        eval(interpret('answer', $qdata['qtype'], $qdata['answer']));
+        eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
 
         restore_error_handler();
         restore_exception_handler();
@@ -224,12 +224,12 @@ class ScoreEngine
 
         $scoreQuestionParams->setVarsForScorePart($varsForScorepart);
 
-        if ($qdata['qtype'] == "multipart") {
+        if ($quesData['qtype'] == "multipart") {
             $scoreResult = $this->scorePartMultiPart($scoreQuestionParams,
                 $additionalVarsForScoring);
         } else {
-            $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $qdata);
-            if ($qdata['qtype'] == "conditional") {
+            $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $quesData);
+            if ($quesData['qtype'] == "conditional") {
               // Store just-build $stuanswers as lastanswer for conditional
               $scoreResult['lastAnswerAsGiven'] = $stuanswers[$thisq];
               $scoreResult['lastAnswerAsNumber'] = $stuanswersval[$thisq];

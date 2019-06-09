@@ -108,8 +108,8 @@ class QuestionHtmlGenerator
      */
     public function getQuestion(): Question
     {
-        $showAnswer = $this->questionParams->getShowAnswer();
-        if (ShowAnswer::ALWAYS == $showAnswer) {
+        $doShowAnswer = $this->questionParams->getShowAnswer();
+        if (ShowAnswer::ALWAYS == $doShowAnswer) {
             $nosabutton = true;
         } else {
             $nosabutton = false;
@@ -122,11 +122,11 @@ class QuestionHtmlGenerator
         $scoreiscorrect = $this->questionParams->getScoreIsCorrect();
         $attemptn = $this->questionParams->getStudentAttemptNumber();
         $partattemptn = $this->questionParams->getStudentPartAttemptCount();
-        $qdata = $this->questionParams->getQuestionData();
+        $quesData = $this->questionParams->getQuestionData();
         $showHints = ($this->questionParams->getShowHints()&1)==1;
         $thisq = $this->questionParams->getQuestionNumber() + 1;
 
-        if ($qdata['hasimg'] > 0) {
+        if ($quesData['hasimg'] > 0) {
             // We need to "unpack" this into locally scoped variables.
             foreach ($this->getImagesAsHtml() as $k => $v) {
                 ${$k} = $v;
@@ -139,16 +139,16 @@ class QuestionHtmlGenerator
         // Eval the question writer's question code.
         // In older questions, code is broken up into three parts.
         // In "modern" questions, the last two parts are empty.
-        eval(interpret('control', $qdata['qtype'], $qdata['control']));
-        eval(interpret('qcontrol', $qdata['qtype'], $qdata['qcontrol']));
-        eval(interpret('answer', $qdata['qtype'], $qdata['answer']));
+        eval(interpret('control', $quesData['qtype'], $quesData['control']));
+        eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol']));
+        eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
 
-        $toevalqtxt = interpret('qtext', $qdata['qtype'], $qdata['qtext']);
+        $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
         $toevalqtxt = str_replace('\\', '\\\\', $toevalqtxt);
         $toevalqtxt = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalqtxt);
 
-        $toevalsoln = interpret('qtext', $qdata['qtype'], $qdata['solution']);
+        $toevalsoln = interpret('qtext', $quesData['qtype'], $quesData['solution']);
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalsoln);
@@ -213,7 +213,7 @@ class QuestionHtmlGenerator
         // $answerbox must not be renamed, it is expected in eval'd code.
         $answerbox = $jsParams = $entryTips = $displayedAnswersForParts = $previewloc = null;
 
-        if ($qdata['qtype'] == "multipart" || $qdata['qtype'] == 'conditional') {
+        if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
             if (!isset($anstypes) && $GLOBALS['myrights'] > 10) {
                 $this->addError('Error in question: missing $anstypes for multipart or conditional question');
@@ -221,7 +221,7 @@ class QuestionHtmlGenerator
             }
 
             // Calculate answer weights.
-            if ($qdata['qtype'] == "multipart") {
+            if ($quesData['qtype'] == "multipart") {
                 // $answeights - question writer defined
                 if (isset($answeights)) {
           				if (!is_array($answeights)) {
@@ -272,7 +272,7 @@ class QuestionHtmlGenerator
 
             // Generate answer boxes. (multipart question)
             foreach ($anstypes as $atIdx => $anstype) {
-                $questionColor = ($qdata['qtype'] == "multipart")
+                $questionColor = ($quesData['qtype'] == "multipart")
                     ? $this->getAnswerColorFromRawScore(
                         $this->questionParams->getLastRawScores(), $atIdx, $answeights[$atIdx])
                     : '';
@@ -312,7 +312,7 @@ class QuestionHtmlGenerator
                 $this->questionParams->getLastRawScores(), 0, 1);
 
             $lastAnswer = $stuanswers[$thisq];
-            if (is_array($lastAnswer)) { // happens with autosaves 
+            if (is_array($lastAnswer)) { // happens with autosaves
               $lastAnswer = $lastAnswer[0];
             }
 
@@ -320,7 +320,7 @@ class QuestionHtmlGenerator
             $answerBoxParams
                 ->setQuestionWriterVars($questionWriterVars)
                 ->setVarsForAnswerBoxGenerator($varsForAnswerBoxGenerator)
-                ->setAnswerType($qdata['qtype'])
+                ->setAnswerType($quesData['qtype'])
                 ->setQuestionNumber($this->questionParams->getQuestionNumber())
                 ->setAssessmentId($this->questionParams->getAssessmentId())
                 ->setIsMultiPartQuestion(false)
@@ -334,7 +334,7 @@ class QuestionHtmlGenerator
             $entryTips[0] = $answerBoxGenerator->getEntryTip();
             $qnRef = $this->questionParams->getQuestionNumber();
             $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
-            $jsParams[$qnRef]['qtype'] = $qdata['qtype'];
+            $jsParams[$qnRef]['qtype'] = $quesData['qtype'];
             $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
             $previewloc = $answerBoxGenerator->getPreviewLocation();
 
@@ -353,7 +353,7 @@ class QuestionHtmlGenerator
          * the color of those answer boxes. We do this instead.
          */
 
-        if ($qdata['qtype'] == 'conditional') {
+        if ($quesData['qtype'] == 'conditional') {
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
             if ($questionColor != '') {
@@ -397,7 +397,7 @@ class QuestionHtmlGenerator
 
         // This variable must be named $showanswerloc, as it may be used by
         // the question writer.
-        $showanswerloc = $this->getShowAnswerLocation($showAnswer, $answerbox,
+        $showanswerloc = $this->getShowAnswerLocation($doShowAnswer, $answerbox,
             $entryTips, $displayedAnswersForParts, $questionWriterVars);
 
         /*
@@ -482,7 +482,7 @@ class QuestionHtmlGenerator
          * Later, we may handle these separately on the front-end
          */
 
-        if ($showAnswer) {
+        if ($doShowAnswer) {
           $sadiv = '<div>';
           if (!is_array($showanswerloc) && strpos($toevalqtxt,'$showanswerloc')===false) {
             $sadiv .= '<div>'.$showanswerloc.'</div>';
@@ -492,7 +492,7 @@ class QuestionHtmlGenerator
             }
           }
           // display detailed solution, if allowed and set
-          if (($qdata['solutionopts']&4)==4 && $qdata['solution'] != '') {
+          if (($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
             if ($nosabutton) {
               $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
             } else {
@@ -705,14 +705,14 @@ class QuestionHtmlGenerator
     /**
      * Get the "Show Answer" button location.
      *
-     * @param int $showAnswer @see ShowAnswer
+     * @param int $doShowAnswer @see ShowAnswer
      * @param string|array $answerBoxes String for single answer box, array for multiple.
      * @param array $entryTips Tooltips displayed for answer boxes.
      * @param array $displayedAnswersForParts
      * @param array $questionWriterVars
      * @return array|string
      */
-    private function getShowAnswerLocation(int $showAnswer,
+    private function getShowAnswerLocation(int $doShowAnswer,
                                            $answerBoxes,
                                            array $entryTips,
                                            array $displayedAnswersForParts,
@@ -722,11 +722,11 @@ class QuestionHtmlGenerator
         $qnidx = $this->questionParams->getQuestionNumber();
         $shanspt = $displayedAnswersForParts;
 
-        if (ShowAnswer::ALWAYS == $showAnswer) {
+        if (ShowAnswer::ALWAYS == $doShowAnswer) {
             $doshowans = true;
             $nosabutton = true;
         } else {
-            $doshowans = ($showAnswer > 0);
+            $doshowans = ($doShowAnswer > 0);
             $nosabutton = false;
         }
 

@@ -14,14 +14,14 @@ TODOs:
 
 To discuss:
   Syntax error warnings: error icon w hoverover vs displaying error
-  
+
 Separate:
   Collate CSS
   Add a11y landmarks / skip navigation
   Build migration function
   Bundle support JS/css on build
   Improve build documentation
-  Update disallowed variables list
+
 
 Minor TODOs:
   Add "latepass won't help you" warning on Closed page
@@ -69,6 +69,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Update disallowed variables list
 X Newver /course/gb-viewasid.php
 X Some display of penalties in Gradebook view;
 X Category summary in GBviewassess
