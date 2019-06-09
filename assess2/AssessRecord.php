@@ -132,11 +132,21 @@ class AssessRecord
     }
     if (!$this->is_practice && $this->data !== null) {
       $fields[] = 'scoreddata';
-      $qarr[':scoreddata'] = gzencode(json_encode($this->data));
+      $encoded = json_encode($this->data);
+      if ($encoded === false) {
+        echo '{"error": "encoding_error"}';
+        exit;
+      }
+      $qarr[':scoreddata'] = gzencode($encoded);
     }
     if ($this->is_practice && $this->data !== null) {
       $fields[] = 'practicedata';
-      $qarr[':practicedata'] = gzencode(json_encode($this->data));
+      $encoded = json_encode($this->data);
+      if ($encoded === false) {
+        echo '{"error": "encoding_error"}';
+        exit;
+      }
+      $qarr[':practicedata'] = gzencode($encoded);
     }
 
     if ($this->hasRecord) {

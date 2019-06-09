@@ -106,13 +106,17 @@ function init(paramarr, enableMQ) {
       }
     }
     if (params.preview) { //setup preview TODO: check for userpref
-      document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(qn)});
+      var thisqn = qn;
+      document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(thisqn)});
       if (!params.qtype.match(/matrix/)) { //no live preview for matrix types
         if (LivePreviews.hasOwnProperty(qn)) {
           delete LivePreviews[qn]; // want to reinit
         }
         setupLivePreview(qn, enableMQ);
         document.getElementById("qn"+qn).addEventListener('keyup', updateLivePreview);
+        if (enableMQ) {
+          showSyntaxCheckMQ(qn);
+        }
         //document.getElementById("pbtn"+qn).style.display = 'none';
       } //TODO: when matrix, clear preview on further input
     } //TODO: for non-preview types, still check syntax
@@ -416,12 +420,42 @@ function showPreview(qn) {
   if (res.err && res.err != '' && res.str != '') {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
   }
+
   if (LivePreviews.hasOwnProperty(qn)) {
     LivePreviews[qn].RenderNow(outstr);
   } else {
     var previewel = document.getElementById('p'+qn);
     previewel.innerHTML = outstr;
     rendermathnode(previewel);
+  }
+}
+
+var MQsyntaxtimer = null;
+/**
+ * Called on MathQuill edit
+ * @param   id  mathquill element id, mqinput-qn#
+ * @param   str the asciimath string entered
+ */
+function syntaxCheckMQ(id, str) {
+  clearTimeout(MQsyntaxtimer);
+  var qn = parseInt(id.replace(/\D/g,''));
+  MQsyntaxtimer = setTimeout(function() { showSyntaxCheckMQ(qn);}, 1000);
+}
+
+function showSyntaxCheckMQ(qn) {
+  var res = processByType(qn);
+  var outstr = '';
+  if (res.err && res.err != '' && res.str != '') {
+    outstr += '<span class=noticetext>' + res.err + '</span>';
+  }
+  if (LivePreviews.hasOwnProperty(qn)) {
+    var previewel = document.getElementById('p'+qn).firstChild;
+    previewel.innerHTML = outstr;
+    previewel.style.visibility = '';
+    previewel.style.position = '';
+  } else {
+    var previewel = document.getElementById('p'+qn);
+    previewel.innerHTML = outstr;
   }
 }
 
@@ -1358,7 +1392,8 @@ return {
   init: init,
   preSubmitForm: preSubmitForm,
   preSubmit: preSubmit,
-  clearLivePreviewTimeouts: clearLivePreviewTimeouts
+  clearLivePreviewTimeouts: clearLivePreviewTimeouts,
+  syntaxCheckMQ: syntaxCheckMQ
 };
 
 }(jQuery));

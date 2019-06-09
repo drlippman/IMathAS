@@ -205,7 +205,7 @@ var MQeditor = (function($) {
     // now show and position the editor
     if (config.curlayoutstyle === 'OSK') {
       $("#mqeditor").slideDown(50, function () {
-        var mqedheight = $("#mqeditor").height() + 5; 
+        var mqedheight = $("#mqeditor").height() + 5;
         var mqedDistBottom = $(window).height() - (mqel.offset().top + mqel.outerHeight() - $(window).scrollTop());
         if (mqedDistBottom < mqedheight) {
           $(window).scrollTop($(window).scrollTop() + (mqedheight - mqedDistBottom));
@@ -263,6 +263,9 @@ var MQeditor = (function($) {
         latex = config.fromMQ(latex);
       }
   		document.getElementById(el.id.substring(8)).value = latex;
+      if (config.hasOwnProperty('onEdit')) {
+        config.onEdit(el.id, latex);
+      }
   	}
   }
 

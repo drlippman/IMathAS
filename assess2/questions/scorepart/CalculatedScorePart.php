@@ -169,13 +169,16 @@ class CalculatedScorePart implements ScorePart
                         $numvalarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                     } else {
                         $numvalarr[$j] = evalMathParser($v);
+                        if (!is_finite($numvalarr[$j])) {
+                          $numvalarr[$j] = '';
+                        }
                     }
                 } else {
                     $numvalarr[$j] = $v;
                 }
             }
             $givenansval = implode(',', $numvalarr);
-            $scorePartResult->setLastAnswerAsNumber($numvalarr);
+            $scorePartResult->setLastAnswerAsNumber($givenansval);
         } {
         $numvalarr = explode(',', $givenansval);
     }
