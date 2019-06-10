@@ -22,6 +22,7 @@
     "hidden": "This assessment is not currently available.",
     "notyet": "This assessment is not yet available.  It will be available {sd} until {ed}.",
     "pastdue": "This assessment was due {ed}.",
+    "pasttime": "The timelimit has expired on this assessment.",
     "needprereq": "You have not yet met the prerequisite requirements to work on this assessment.",
     "no_attempts": "You have used all your attempts at this assessment.",
     "latepassn": "You have one LatePass available. | You have {n} LatePass available.",

@@ -839,7 +839,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					   $endname = $duedatewords;
 				   }
 				   $line['timelimit'] = abs($line['timelimit']);
-				   if ($line['timelimit']>0) {
+				   if ($line['timelimit']>0 && $line['ver']==1) {
 					   if ($line['timelimit']>3600) {
 						$tlhrs = floor($line['timelimit']/3600);
 						$tlrem = $line['timelimit'] % 3600;

@@ -144,7 +144,7 @@ function showcalcontents(el) {
 function hidevisualcal() {
 	showcalcontents(1);
 	jQuery("table.cal").toggle();
-}                                                                         
+}
 
 function showcalcontentsid(elid) {
 	var html = '';
@@ -163,7 +163,11 @@ function showcalcontentsid(elid) {
 			} else if (caleventsarr[elid].data[i].type=='AE') {
 				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null && !caleventsarr[elid].data[i].hasOwnProperty('inactive')) {
-					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
+          if (caleventsarr[elid].data[i].ver > 1) {
+            html += '<a href="../assess2/?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'"';
+          } else {
+					  html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
+          }
 					if (caleventsarr[elid].data[i].timelimit!=null) {
 						html += 'onclick="return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
 						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
@@ -183,24 +187,37 @@ function showcalcontentsid(elid) {
 					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
 				}
 				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
-					html += ' <a href="addquestions.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
-					html += ' <a href="gb-itemanalysis.php?asid=average&cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
+          if (caleventsarr[elid].data[i].ver > 1) {
+            html += ' <a href="addassessment2.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
+            html += ' <a href="addquestions.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
+            html += ' <a href="gb-itemanalysis2.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
+          } else {
+  					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
+  					html += ' <a href="addquestions.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
+  					html += ' <a href="gb-itemanalysis.php?asid=average&cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
+          }
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='AR') {
 				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) {
-					//html += '<a onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';
-					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+          if (caleventsarr[elid].data[i].ver > 1) {
+            html += '<a href="../assess2/?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'"';
+          } else {
+            html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+          }
 					html += caleventsarr[elid].data[i].name + '</a>';
 				} else {
 					html += caleventsarr[elid].data[i].name;
 				}
 				html += ' Review until '+caleventsarr[elid].data[i].time;
 				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
-					html += ' <a href="isolateassessgrade.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
+          if (caleventsarr[elid].data[i].ver > 1) {
+            html += ' <a href="addassessment2.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
+          } else {
+  					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
+          }
+          html += ' <a href="isolateassessgrade.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type.charAt(0)=='I') {

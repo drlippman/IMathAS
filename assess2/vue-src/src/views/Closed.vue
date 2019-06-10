@@ -125,6 +125,8 @@ export default {
         return this.$t('closed.pastdue', { ed: this.settings.enddate_disp });
       } else if (this.settings.available === 'needprereq') {
         return this.$t('closed.needprereq');
+      } else if (this.settings.available === 'pasttime') {
+        return this.$t('closed.pasttime');
       } else if (this.settings.has_active_attempt === false && this.settings.can_retake === false) {
         return this.$t('closed.no_attempts');
       }

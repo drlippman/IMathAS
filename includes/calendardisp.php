@@ -126,7 +126,7 @@ if (!isset($teacherid)) {
 $byid = array();
 $k = 0;
 $bestscores_stm = null;
-$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
+$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag,ver FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
@@ -230,7 +230,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"time"=>$time,
 			"tag"=>$tag,
 			"color"=> $colors,
-			"name"=> $row['name']
+			"name"=> $row['name'],
+			'ver'=> $row['ver']
 		);
 		if ($now<$row['reviewdate'] || isset($teacherid)) {
 			$json['id'] = $row['id'];
@@ -279,7 +280,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"color"=> $colors,
 			"allowlate"=>$lp,
 			"undolate"=>$ulp,
-			"name"=> $row['name']
+			"name"=> $row['name'],
+			'ver'=> $row['ver']
 		);
 		if ($now<$row['enddate'] || $row['reviewdate']>$now || isset($teacherid) || $lp==1) {
 			$json['id'] = $row['id'];
@@ -287,7 +289,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ((($now>$row['enddate'] && $now>$row['reviewdate']) || $showgrayedout) && !isset($teacherid)) {
 			$json['inactive']=true;
 		}
-		if ($row['timelimit']!=0) {
+		if ($row['timelimit']!=0 && $row['ver']==1) {
 			$json['timelimit']=true;
 		}
 		if (isset($teacherid)) {
@@ -300,7 +302,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"type"=>"AS",
 			"typeref"=>$row['id'],
 			"tag"=>$tag,
-			"name"=> $row['name']
+			"name"=> $row['name'],
+			'ver'=> $row['ver']
 		);
 		$byid['AS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']) ,$tag,'',$json,$row['name'],$status);
 	}
