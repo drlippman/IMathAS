@@ -827,6 +827,9 @@ function gbtable() {
 			if (isset($LPcutoff[$k])) {
 				$gb[0][1][$pos][14] = $LPcutoff[$k];
 			}
+			if (isset($uiver[$k])) {
+				$gb[0][1][$pos][15] = $uiver[$k];
+			}
 			$pos++;
 		}
 	}
@@ -1182,25 +1185,21 @@ function gbtable() {
 			}
 		}
 		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
-			if ($gb[0][1][$col][15] > 1) {//assess2
-				// TODO
+			$fbarr = json_decode($l['feedback'], true);
+			if ($fbarr === null) {
+				$gb[$row][1][$col][1] = $l['feedback']; //the feedback
 			} else {
-				$fbarr = json_decode($l['feedback'], true);
-				if ($fbarr === null) {
-					$gb[$row][1][$col][1] = $l['feedback']; //the feedback
-				} else {
-					$fbtxt = '';
-					foreach ($fbarr as $k=>$v) {
-						if ($v=='') {continue;}
-						if ($k=='Z') {
-							$fbtxt .= 'Overall feedback: '.$v.'<br>';
-						} else {
-							$q = substr($k,1);
-							$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'<br>';
-						}
+				$fbtxt = '';
+				foreach ($fbarr as $k=>$v) {
+					if ($v=='') {continue;}
+					if ($k=='Z') {
+						$fbtxt .= 'Overall feedback: '.$v.'<br>';
+					} else {
+						$q = substr($k,1);
+						$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'<br>';
 					}
-					$gb[$row][1][$col][1] = $fbtxt;
 				}
+				$gb[$row][1][$col][1] = $fbtxt;
 			}
 		} else if ($l['feedback']!='') {
 			$gb[$row][1][$col][1] = 1; //has comment
